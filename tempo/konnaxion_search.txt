@@ -1,0 +1,14 @@
+Directory: C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\apps.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\consumers.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\models.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\signals.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\tests.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\urls.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\views.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_search\__init__.py
+Directory: api
+    api\serializers.py
+    api\viewsets.py
+Directory: templates
+    templates\home.html

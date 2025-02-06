@@ -1,0 +1,14 @@
+Directory: C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\apps.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\consumers.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\models.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\signals.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\tests.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\urls.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\views.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_notifications\__init__.py
+Directory: api
+    api\serializers.py
+    api\viewsets.py
+Directory: templates
+    templates\home.html

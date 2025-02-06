@@ -1,0 +1,15 @@
+Directory: C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\apps.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\consumers.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\models.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\signals.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\tests.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\urls.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\views.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\kreative_core\__init__.py
+Directory: api
+    api\serializers.py
+    api\viewsets.py
+Directory: templates
+    templates\home.html
+    templates\artwork_gallery.html

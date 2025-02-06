@@ -1,0 +1,14 @@
+Directory: C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\apps.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\consumers.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\models.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\signals.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\tests.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\urls.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\views.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnected_learning\__init__.py
+Directory: api
+    api\serializers.py
+    api\viewsets.py
+Directory: templates
+    templates\home.html

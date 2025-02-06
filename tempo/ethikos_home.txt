@@ -1,0 +1,15 @@
+Directory: C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\apps.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\consumers.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\models.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\signals.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\tests.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\urls.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\views.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\ethikos_home\__init__.py
+Directory: api
+    api\serializers.py
+    api\viewsets.py
+Directory: templates
+Directory: templates\konnaxion_core
+    templates\konnaxion_core\home.html

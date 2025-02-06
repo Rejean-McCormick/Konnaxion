@@ -1,0 +1,14 @@
+Directory: C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\apps.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\consumers.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\models.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\signals.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\tests.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\urls.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\views.py
+    C:\MonCode\KonnaxionV2\konnaxion\konnaxion_project\konnaxion_messaging\__init__.py
+Directory: api
+    api\serializers.py
+    api\viewsets.py
+Directory: templates
+    templates\home.html
