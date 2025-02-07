@@ -27,8 +27,9 @@ if __name__ == "__main__":
     # This allows easy placement of apps within the interior
     # konnaxion_project directory.
     current_path = Path(__file__).parent.resolve()
-    sys.path.append(str(current_path / "konnaxion"))  
-    sys.path.append(str(current_path / "konnaxion" / "konnaxion_project")) 
+    sys.path.append(str(current_path))
+    #sys.path.append(str(current_path / "konnaxion"))  
+    #sys.path.append(str(current_path / "konnaxion" / "konnaxion_project")) 
 
 
     execute_from_command_line(sys.argv)
