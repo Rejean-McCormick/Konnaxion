@@ -1,0 +1,134 @@
+##############################################################################
+#  0.  GLOBAL – OS, éditeurs, logs
+##############################################################################
+# Windows & macOS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Éditeurs
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Logs & rapports
+*.log
+logs/
+*.tmp
+*.swp
+*.bak
+*.orig
+coverage/
+htmlcov/
+.cache/
+
+##############################################################################
+#  1.  PYTHON / DJANGO
+##############################################################################
+# Environnements virtuels
+venv/
+.venv/
+env/
+ENV/
+
+# Compilés Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+
+# Outils de test / typage
+.pytest_cache/
+.mypy_cache/
+.tox/
+.dmypy.json
+.pyre/
+
+# Secrets
+*.env
+.env
+.env.*
+.envs/          # dossiers créés par cookiecutter-django
+!.env.example   # conserver le template si vous en avez un
+
+# Base de données locale
+*.sqlite3
+*.db
+
+##############################################################################
+#  2.  COOKIECUTTER-DJANGO (konnaxion)
+##############################################################################
+# Builds statiques collectés
+staticfiles/
+media/
+
+# Artefacts Sphinx docs
+docs/_build/
+
+# Docker
+**/local_postgres_data/
+**/local_postgres_data_backups/
+**/local_pgdata/
+**/local_pgadmin/
+
+##############################################################################
+#  3.  CELERY & FLOWER
+##############################################################################
+celerybeat-schedule
+celerybeat.pid
+flower.pid
+
+##############################################################################
+#  4.  NODE / NEXT.JS (next-enterprise)
+##############################################################################
+# Dépendances
+next-enterprise/node_modules/
+.next/
+.pnpm-store/
+npm-debug.log*
+pnpm-debug.log*
+
+# Build / caches
+.next/
+.out/
+dist/
+coverage/
+playwright-report/
+playwright/.cache/
+
+# Storybook
+.storybook-static/
+
+##############################################################################
+#  5.  TYPESCRIPT & FRONT TOOLING
+##############################################################################
+*.tsbuildinfo
+.eslintcache
+.prettiercache
+
+##############################################################################
+#  6.  CONTAINERS & CI
+##############################################################################
+# Docker
+**/.docker/
+.dockerignore
+docker-compose.override.yml
+
+# Traefik / Nginx certs (générées)
+compose/**/traefik/acme.json
+compose/**/nginx/certs/
+
+# GitHub Actions runners
+.github/workflows/*.log
+
+##############################################################################
+#  7.  EXCEPTIONS (on **ne** veut **pas** ignorer !)
+##############################################################################
+!konnaxion/**/migrations/
+!konnaxion/requirements/
+!konnaxion/config/
+!next-enterprise/package.json
+!next-enterprise/tsconfig.json
+!*.md
