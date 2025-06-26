@@ -86,8 +86,12 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "konnaxion.users",
-    # Your stuff: custom apps go here
+    "konnaxion.users",                    
+    "konnaxion.kollective_intelligence",  
+    "konnaxion.ethikos",                  
+    "konnaxion.keenkonnect",              
+    "konnaxion.konnected",               
+    "konnaxion.kreative",                 
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -350,3 +354,4 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+ACCOUNT_EMAIL_REQUIRED     = True

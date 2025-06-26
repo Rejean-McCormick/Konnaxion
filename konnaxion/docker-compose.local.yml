@@ -70,9 +70,13 @@ services:
     command: /start-celerybeat
 
   flower:
-    <<: *django
+    <<: *django          # héritage commun
     image: konnaxion_local_flower
     container_name: konnaxion_local_flower
     ports:
-      - '5555:5555'
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_FLOWER_USER=admin        # choisissez des valeurs
+      - CELERY_FLOWER_PASSWORD=admin123 # plus sûres en prod
     command: /start-flower

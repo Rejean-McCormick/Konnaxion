@@ -1,0 +1,1370 @@
+C:\MonCode\KonnaxionV14\next-enterprise\env.mjs
+C:\MonCode\KonnaxionV14\next-enterprise\eslint.config.mjs
+C:\MonCode\KonnaxionV14\next-enterprise\instrumentation.ts
+C:\MonCode\KonnaxionV14\next-enterprise\jest.config.js
+C:\MonCode\KonnaxionV14\next-enterprise\jest.setup.js
+C:\MonCode\KonnaxionV14\next-enterprise\lp-items.tsx
+C:\MonCode\KonnaxionV14\next-enterprise\next-env.d.ts
+C:\MonCode\KonnaxionV14\next-enterprise\next.config.ts
+C:\MonCode\KonnaxionV14\next-enterprise\package.json
+C:\MonCode\KonnaxionV14\next-enterprise\playwright.config.ts
+C:\MonCode\KonnaxionV14\next-enterprise\postcss.config.js
+C:\MonCode\KonnaxionV14\next-enterprise\prettier.config.js
+C:\MonCode\KonnaxionV14\next-enterprise\renovate.json
+C:\MonCode\KonnaxionV14\next-enterprise\report-bundle-size.js
+C:\MonCode\KonnaxionV14\next-enterprise\reset.d.ts
+C:\MonCode\KonnaxionV14\next-enterprise\tsconfig.json
+C:\MonCode\KonnaxionV14\next-enterprise\.storybook\main.ts
+C:\MonCode\KonnaxionV14\next-enterprise\.storybook\preview.ts
+C:\MonCode\KonnaxionV14\next-enterprise\app\layout.tsx
+C:\MonCode\KonnaxionV14\next-enterprise\app\page.tsx
+C:\MonCode\KonnaxionV14\next-enterprise\app\api\health\route.ts
+C:\MonCode\KonnaxionV14\next-enterprise\components\Button\Button.stories.tsx
+C:\MonCode\KonnaxionV14\next-enterprise\components\Button\Button.tsx
+C:\MonCode\KonnaxionV14\next-enterprise\components\Tooltip\Tooltip.tsx
+C:\MonCode\KonnaxionV14\next-enterprise\styles\tailwind.css
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\env.mjs ====
+import { createEnv } from "@t3-oss/env-nextjs"
+import { z } from "zod"
+
+export const env = createEnv({
+  server: {
+    ANALYZE: z
+      .enum(["true", "false"])
+      .optional()
+      .transform((value) => value === "true"),
+  },
+  client: {},
+  runtimeEnv: {
+    ANALYZE: process.env.ANALYZE,
+  },
+})
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\eslint.config.mjs ====
+import * as fs from "fs"
+
+// https://github.com/francoismassart/eslint-plugin-tailwindcss/pull/381
+// import eslintPluginTailwindcss from "eslint-plugin-tailwindcss"
+import eslintPluginImport from "eslint-plugin-import"
+import eslintPluginNext from "@next/eslint-plugin-next"
+import eslintPluginStorybook from "eslint-plugin-storybook"
+import typescriptEslint from "typescript-eslint"
+
+const eslintIgnore = [
+  ".git/",
+  ".next/",
+  "node_modules/",
+  "dist/",
+  "build/",
+  "coverage/",
+  "*.min.js",
+  "*.config.js",
+  "*.d.ts",
+]
+
+const config = typescriptEslint.config(
+  {
+    ignores: eslintIgnore,
+  },
+  ...eslintPluginStorybook.configs["flat/recommended"],
+  //  https://github.com/francoismassart/eslint-plugin-tailwindcss/pull/381
+  // ...eslintPluginTailwindcss.configs["flat/recommended"],
+  typescriptEslint.configs.recommended,
+  eslintPluginImport.flatConfigs.recommended,
+  {
+    plugins: {
+      "@next/next": eslintPluginNext,
+    },
+    rules: {
+      ...eslintPluginNext.configs.recommended.rules,
+      ...eslintPluginNext.configs["core-web-vitals"].rules,
+    },
+  },
+  {
+    settings: {
+      tailwindcss: {
+        callees: ["classnames", "clsx", "ctl", "cn", "cva"],
+      },
+
+      "import/resolver": {
+        typescript: true,
+        node: true,
+      },
+    },
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
+      "sort-imports": [
+        "error",
+        {
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+        },
+      ],
+      "import/order": [
+        "warn",
+        {
+          groups: ["external", "builtin", "internal", "sibling", "parent", "index"],
+          pathGroups: [
+            ...getDirectoriesToSort().map((singleDir) => ({
+              pattern: `${singleDir}/**`,
+              group: "internal",
+            })),
+            {
+              pattern: "env",
+              group: "internal",
+            },
+            {
+              pattern: "theme",
+              group: "internal",
+            },
+            {
+              pattern: "public/**",
+              group: "internal",
+              position: "after",
+            },
+          ],
+          pathGroupsExcludedImportTypes: ["internal"],
+          alphabetize: {
+            order: "asc",
+            caseInsensitive: true,
+          },
+        },
+      ],
+    },
+  }
+)
+
+function getDirectoriesToSort() {
+  const ignoredSortingDirectories = [".git", ".next", ".vscode", "node_modules"]
+  return fs
+    .readdirSync(process.cwd())
+    .filter((file) => fs.statSync(process.cwd() + "/" + file).isDirectory())
+    .filter((f) => !ignoredSortingDirectories.includes(f))
+}
+
+export default config
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\instrumentation.ts ====
+import { registerOTel } from "@vercel/otel"
+
+export function register() {
+  registerOTel("next-app")
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\jest.config.js ====
+const nextJest = require("next/jest")
+
+const createJestConfig = nextJest({
+  dir: "./",
+})
+
+const customJestConfig = {
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.js"],
+  testEnvironment: "jest-environment-jsdom",
+  modulePathIgnorePatterns: ["<rootDir>/dist/"],
+  testPathIgnorePatterns: ["<rootDir>/e2e"],
+}
+
+module.exports = createJestConfig(customJestConfig)
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\jest.setup.js ====
+// Learn more: https://github.com/testing-library/jest-dom
+import "@testing-library/jest-dom"
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\lp-items.tsx ====
+export const LP_GRID_ITEMS = [
+  {
+    title: "Next.js",
+    description: "Fast by default, with config optimized for performance.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 18v-5.25m0 0a6.01 6.01 0 001.5-.189m-1.5.189a6.01 6.01 0 01-1.5-.189m3.75 7.478a12.06 12.06 0 01-4.5 0m3.75 2.383a14.406 14.406 0 01-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 10-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Tailwind CSS",
+    description: "A utility-first CSS framework for rapid UI development.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m16.5 0H21m-1.5 0H12m-8.457 3.077l1.41-.513m14.095-5.13l1.41-.513M5.106 17.785l1.15-.964m11.49-9.642l1.149-.964M7.501 19.795l.75-1.3m7.5-12.99l.75-1.3m-6.063 16.658l.26-1.477m2.605-14.772l.26-1.477m0 17.726l-.26-1.477M10.698 4.614l-.26-1.477M16.5 19.794l-.75-1.299M7.5 4.205L12 12m6.894 5.785l-1.149-.964M6.256 7.178l-1.15-.964m15.352 8.864l-1.41-.513M4.954 9.435l-1.41-.514M12.002 12l-3.75 6.495"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "ESlint & Prettier",
+    description: "For clean, consistent, and error-free code.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+      </svg>
+    ),
+  },
+  {
+    title: "Extremely strict TypeScript",
+    description: "With `ts-reset` library for ultimate type safety.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Bundle analyzer plugin",
+    description: "Keep an eye on your bundle size.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Jest & React Testing Library",
+    description: "For rock-solid unit and integration tests.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23-.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Playwright",
+    description: "Write end-to-end tests like a pro.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3.75 3v11.25A2.25 2.25 0 006 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0118 16.5h-2.25m-7.5 0h7.5m-7.5 0l-1 3m8.5-3l1 3m0 0l.5 1.5m-.5-1.5h-9.5m0 0l-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Storybook",
+    description: "Create, test, and showcase your components.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Smoke Testing & Acceptance Tests",
+    description: "For confidence in your deployments.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M11.35 3.836c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m8.9-4.414c.376.023.75.05 1.124.08 1.131.094 1.976 1.057 1.976 2.192V16.5A2.25 2.25 0 0118 18.75h-2.25m-7.5-10.5H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V18.75m-7.5-10.5h6.375c.621 0 1.125.504 1.125 1.125v9.375m-8.25-3l1.5 1.5 3-3.75"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Conventional commits git hook",
+    description: "Keep your commit history neat and tidy.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M6.75 7.5l3 2.25-3 2.25m4.5 0h3m-9 8.25h13.5A2.25 2.25 0 0021 18V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v12a2.25 2.25 0 002.25 2.25z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Observability",
+    description: "Open Telemetry integration for seamless monitoring.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+        />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+  },
+  {
+    title: "Absolute imports",
+    description: "No more spaghetti imports.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Health checks",
+    description: "Kubernetes-compatible for robust deployments.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Radix UI",
+    description: "Headless UI components for endless customization.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M14.25 6.087c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.036-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959v0a.64.64 0 01-.657.643 48.39 48.39 0 01-4.163-.3c.186 1.613.293 3.25.315 4.907a.656.656 0 01-.658.663v0c-.355 0-.676-.186-.959-.401a1.647 1.647 0 00-1.003-.349c-1.036 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401v0c.31 0 .555.26.532.57a48.039 48.039 0 01-.642 5.056c1.518.19 3.058.309 4.616.354a.64.64 0 00.657-.643v0c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.035 1.008-1.875 2.25-1.875 1.243 0 2.25.84 2.25 1.875 0 .369-.128.713-.349 1.003-.215.283-.4.604-.4.959v0c0 .333.277.599.61.58a48.1 48.1 0 005.427-.63 48.05 48.05 0 00.582-4.717.532.532 0 00-.533-.57v0c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.035 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.37 0 .713.128 1.003.349.283.215.604.401.96.401v0a.656.656 0 00.658-.663 48.422 48.422 0 00-.37-5.36c-1.886.342-3.81.574-5.766.689a.578.578 0 01-.61-.58v0z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "CVA",
+    description: "Create a consistent, reusable, and atomic design system.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M21 7.5l-2.25-1.313M21 7.5v2.25m0-2.25l-2.25 1.313M3 7.5l2.25-1.313M3 7.5l2.25 1.313M3 7.5v2.25m9 3l2.25-1.313M12 12.75l-2.25-1.313M12 12.75V15m0 6.75l2.25-1.313M12 21.75V19.5m0 2.25l-2.25-1.313m0-16.875L12 2.25l2.25 1.313M21 14.25v2.25l-2.25 1.313m-13.5 0L3 16.5v-2.25"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Renovate BOT",
+    description: "Auto-updating dependencies, so you can focus on coding.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Patch-package",
+    description: "Fix external dependencies without losing your mind.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Components coupling & cohesion graph",
+    description: "A tool for managing component relationships.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+      </svg>
+    ),
+  },
+  {
+    title: "GitHub Actions",
+    description: "Pre-configured actions for smooth workflows, including Bundle Size and performance stats.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Automated ChatGPT Code Reviews",
+    description: "Stay on the cutting edge with AI-powered code reviews!",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M2.25 12.76c0 1.6 1.123 2.994 2.707 3.227 1.068.157 2.148.279 3.238.364.466.037.893.281 1.153.671L12 21l2.652-3.978c.26-.39.687-.634 1.153-.67 1.09-.086 2.17-.208 3.238-.365 1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z"
+        />
+      </svg>
+    ),
+  },
+  {
+    title: "Semantic Release",
+    description: "For automatic changelog generation.",
+    icon: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        strokeWidth={1.5}
+        stroke="currentColor"
+        className="h-6 w-6"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M15 11.25l-3-3m0 0l-3 3m3-3v7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
+    ),
+  },
+]
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\next-env.d.ts ====
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\next.config.ts ====
+import withBundleAnalyzer from "@next/bundle-analyzer"
+import { type NextConfig } from "next"
+
+import { env } from "./env.mjs"
+
+const config: NextConfig = {
+  reactStrictMode: true,
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
+  rewrites: async () => [
+    { source: "/healthz", destination: "/api/health" },
+    { source: "/api/healthz", destination: "/api/health" },
+    { source: "/health", destination: "/api/health" },
+    { source: "/ping", destination: "/api/health" },
+  ],
+}
+
+export default env.ANALYZE ? withBundleAnalyzer({ enabled: env.ANALYZE })(config) : config
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\package.json ====
+{
+  "name": "next-enterprise",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env FORCE_COLOR=1 next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "prettier": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",
+    "prettier:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
+    "analyze": "cross-env ANALYZE=true pnpm run build",
+    "storybook": "cross-env FORCE_COLOR=1 storybook dev -p 6006",
+    "test-storybook": "cross-env FORCE_COLOR=1 test-storybook",
+    "build-storybook": "cross-env FORCE_COLOR=1 storybook build",
+    "test": "cross-env FORCE_COLOR=1 jest --passWithNoTests",
+    "e2e:headless": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "postinstall": "npx patch-package -y",
+    "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg"
+  },
+  "dependencies": {
+    "@next/bundle-analyzer": "^15.3.1",
+    "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-checkbox": "^1.3.1",
+    "@radix-ui/react-dialog": "^1.1.13",
+    "@radix-ui/react-dropdown-menu": "^2.1.14",
+    "@radix-ui/react-form": "^0.0.3",
+    "@radix-ui/react-label": "^2.1.6",
+    "@radix-ui/react-popover": "^1.1.13",
+    "@radix-ui/react-radio-group": "^1.3.6",
+    "@radix-ui/react-scroll-area": "^1.2.8",
+    "@radix-ui/react-select": "2.0.0",
+    "@radix-ui/react-slider": "^1.3.4",
+    "@radix-ui/react-switch": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.11",
+    "@radix-ui/react-toggle-group": "^1.1.9",
+    "@radix-ui/react-tooltip": "^1.2.6",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "12.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.3.5",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^13.0.0",
+    "@t3-oss/env-nextjs": "^0.10.1",
+    "@vercel/otel": "^1.12.0",
+    "class-variance-authority": "^0.7.0",
+    "lodash": "^4.17.21",
+    "next": "15.3.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/plugin-syntax-flow": "^7.27.1",
+    "@babel/plugin-transform-optional-chaining": "^7.27.1",
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@eslint/eslintrc": "^3.3.1",
+    "@jest/globals": "^29.7.0",
+    "@next/eslint-plugin-next": "15.1.6",
+    "@opentelemetry/api": "1.7.0",
+    "@opentelemetry/resources": "1.18.1",
+    "@opentelemetry/sdk-node": "0.45.1",
+    "@opentelemetry/sdk-trace-node": "1.18.1",
+    "@opentelemetry/semantic-conventions": "1.18.1",
+    "@playwright/test": "^1.52.0",
+    "@storybook/addon-controls": "^8.6.12",
+    "@storybook/addon-essentials": "^8.6.12",
+    "@storybook/addon-interactions": "^8.6.12",
+    "@storybook/addon-links": "^8.6.12",
+    "@storybook/blocks": "^8.6.12",
+    "@storybook/nextjs": "^8.6.12",
+    "@storybook/react": "^8.6.12",
+    "@storybook/test": "^8.6.12",
+    "@storybook/test-runner": "^0.21.3",
+    "@tailwindcss/postcss": "^4.1.5",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^14.3.1",
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@types/jest": "^29.5.10",
+    "@types/node": "^20.17.43",
+    "@types/react": "^19.1.3",
+    "@types/react-dom": "^19.1.3",
+    "@typescript-eslint/eslint-plugin": "8.21.0",
+    "all-contributors-cli": "^6.26.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.26.0",
+    "eslint-config-next": "15.1.6",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-storybook": "^0.11.6",
+    "eslint-plugin-tailwindcss": "^3.18.0",
+    "fetch-mock": "^9.11.0",
+    "gzip-size": "6.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "mkdirp": "^3.0.1",
+    "patch-package": "^8.0.0",
+    "postcss": "^8.5.3",
+    "postcss-import": "^16.1.0",
+    "postinstall-postinstall": "^2.1.0",
+    "prettier": "3.0.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "semantic-release": "^22.0.12",
+    "storybook": "^8.6.12",
+    "tailwindcss": "^4.1.5",
+    "ts-jest": "^29.3.2",
+    "tsc": "^2.0.4",
+    "typed-query-selector": "^2.12.0",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.0",
+    "webpack": "5.89.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@9.1.0"
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\playwright.config.ts ====
+import { defineConfig, devices } from "@playwright/test"
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// require('dotenv').config();
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+export default defineConfig({
+  testDir: "./e2e",
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: "html",
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    baseURL: "http://127.0.0.1:3000",
+
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: "on-first-retry",
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+    },
+
+    /* Test against mobile viewports. */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
+
+    /* Test against branded browsers. */
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ..devices['Desktop Chrome'], channel: 'chrome' },
+    // },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  webServer: {
+    command: "pnpm dev",
+    url: "http://127.0.0.1:3000",
+    reuseExistingServer: !process.env.CI,
+  },
+})
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\postcss.config.js ====
+module.exports = {
+  plugins: {
+    "postcss-import": {},
+    "@tailwindcss/postcss": {},
+  },
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\prettier.config.js ====
+module.exports = {
+  plugins: ["prettier-plugin-tailwindcss"],
+  trailingComma: "es5",
+  tabWidth: 2,
+  printWidth: 120,
+  semi: false,
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\renovate.json ====
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "enabled": false,
+      "matchPackagePatterns": ["*"]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "osvVulnerabilityAlerts": true
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\report-bundle-size.js ====
+#!/usr/bin/env node
+/* eslint-disable no-console */
+/**
+ * Copyright (c) HashiCorp, Inc.
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+// edited to work with the appdir by @raphaelbadia
+
+const gzSize = require("gzip-size")
+const mkdirp = require("mkdirp")
+const fs = require("fs")
+const path = require("path")
+
+// Pull options from `package.json`
+const options = getOptions()
+const BUILD_OUTPUT_DIRECTORY = getBuildOutputDirectory(options)
+
+// first we check to make sure that the build output directory exists
+const nextMetaRoot = path.join(process.cwd(), BUILD_OUTPUT_DIRECTORY)
+try {
+  fs.accessSync(nextMetaRoot, fs.constants.R_OK)
+} catch (err) {
+  console.error(
+    `No build output found at "${nextMetaRoot}" - you may not have your working directory set correctly, or not have run "next build".`
+  )
+  process.exit(1)
+}
+
+// if so, we can import the build manifest
+const buildMeta = require(path.join(nextMetaRoot, "build-manifest.json"))
+const appDirMeta = require(path.join(nextMetaRoot, "app-build-manifest.json"))
+
+// this memory cache ensures we dont read any script file more than once
+// bundles are often shared between pages
+const memoryCache = {}
+
+// since _app is the template that all other pages are rendered into,
+// every page must load its scripts. we'll measure its size here
+const globalBundle = buildMeta.pages["/_app"]
+const globalBundleSizes = getScriptSizes(globalBundle)
+
+// next, we calculate the size of each page's scripts, after
+// subtracting out the global scripts
+const allPageSizes = Object.values(buildMeta.pages).reduce((acc, scriptPaths, i) => {
+  const pagePath = Object.keys(buildMeta.pages)[i]
+  const scriptSizes = getScriptSizes(scriptPaths.filter((scriptPath) => !globalBundle.includes(scriptPath)))
+
+  acc[pagePath] = scriptSizes
+
+  return acc
+}, {})
+
+const globalAppDirBundle = buildMeta.rootMainFiles
+const globalAppDirBundleSizes = getScriptSizes(globalAppDirBundle)
+
+const allAppDirSizes = Object.values(appDirMeta.pages).reduce((acc, scriptPaths, i) => {
+  const pagePath = Object.keys(appDirMeta.pages)[i]
+  const scriptSizes = getScriptSizes(scriptPaths.filter((scriptPath) => !globalAppDirBundle.includes(scriptPath)))
+  acc[pagePath] = scriptSizes
+
+  return acc
+}, {})
+
+// format and write the output
+const rawData = JSON.stringify({
+  ...allAppDirSizes,
+  __global: globalAppDirBundleSizes,
+})
+
+// log ouputs to the gh actions panel
+console.log(rawData)
+
+mkdirp.sync(path.join(nextMetaRoot, "analyze/"))
+fs.writeFileSync(path.join(nextMetaRoot, "analyze/__bundle_analysis.json"), rawData)
+
+// --------------
+// Util Functions
+// --------------
+
+// given an array of scripts, return the total of their combined file sizes
+function getScriptSizes(scriptPaths) {
+  const res = scriptPaths.reduce(
+    (acc, scriptPath) => {
+      const [rawSize, gzipSize] = getScriptSize(scriptPath)
+      acc.raw += rawSize
+      acc.gzip += gzipSize
+
+      return acc
+    },
+    { raw: 0, gzip: 0 }
+  )
+
+  return res
+}
+
+// given an individual path to a script, return its file size
+function getScriptSize(scriptPath) {
+  const encoding = "utf8"
+  const p = path.join(nextMetaRoot, scriptPath)
+
+  let rawSize, gzipSize
+  if (Object.keys(memoryCache).includes(p)) {
+    rawSize = memoryCache[p][0]
+    gzipSize = memoryCache[p][1]
+  } else {
+    const textContent = fs.readFileSync(p, encoding)
+    rawSize = Buffer.byteLength(textContent, encoding)
+    gzipSize = gzSize.sync(textContent)
+    memoryCache[p] = [rawSize, gzipSize]
+  }
+
+  return [rawSize, gzipSize]
+}
+
+/**
+ * Reads options from `package.json`
+ */
+function getOptions(pathPrefix = process.cwd()) {
+  const pkg = require(path.join(pathPrefix, "package.json"))
+
+  return { ...pkg.nextBundleAnalysis, name: pkg.name }
+}
+
+/**
+ * Gets the output build directory, defaults to `.next`
+ *
+ * @param {object} options the options parsed from package.json.nextBundleAnalysis using `getOptions`
+ * @returns {string}
+ */
+function getBuildOutputDirectory(options) {
+  return options.buildOutputDirectory || ".next"
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\reset.d.ts ====
+import "@total-typescript/ts-reset"
+import "typed-query-selector/strict"
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\tsconfig.json ====
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Next.js",
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "baseUrl": ".",
+    "types": ["node", "jest", "@testing-library/jest-dom"],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.mjs", "jest.config.js", ".next/types/**/*.ts", "eslint.config.mjs"],
+  "exclude": ["node_modules"]
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\.storybook\main.ts ====
+import type { StorybookConfig } from "@storybook/nextjs"
+const config: StorybookConfig = {
+  stories: ["../components/**/*.stories.mdx", "../components/**/*.stories.@(js|jsx|ts|tsx)"],
+  addons: ["@storybook/addon-links", "@storybook/addon-essentials", "@storybook/addon-interactions"],
+  framework: {
+    name: "@storybook/nextjs",
+    options: {},
+  },
+  docs: {
+    autodocs: "tag",
+  },
+  typescript: {
+    check: false,
+    checkOptions: {},
+    reactDocgen: false,
+    reactDocgenTypescriptOptions: {
+      shouldExtractLiteralValuesFromEnum: true,
+      propFilter: (prop) => (prop.parent ? !/node_modules/.test(prop.parent.fileName) : true),
+    },
+  },
+}
+export default config
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\.storybook\preview.ts ====
+import type { Preview } from "@storybook/react"
+
+import "../styles/tailwind.css"
+
+const preview: Preview = {
+  parameters: {
+    actions: { argTypesRegex: "^on[A-Z].*" },
+    controls: {
+      matchers: {
+        color: /(background|color)$/i,
+        date: /Date$/,
+      },
+    },
+  },
+}
+
+export default preview
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\app\layout.tsx ====
+import "styles/tailwind.css"
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  )
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\app\page.tsx ====
+import { Metadata } from "next"
+import { Button } from "components/Button/Button"
+
+import { LP_GRID_ITEMS } from "lp-items"
+
+export const metadata: Metadata = {
+  title: "Next.js Enterprise Boilerplate",
+  twitter: {
+    card: "summary_large_image",
+  },
+  openGraph: {
+    url: "https://next-enterprise.vercel.app/",
+    images: [
+      {
+        width: 1200,
+        height: 630,
+        url: "https://raw.githubusercontent.com/Blazity/next-enterprise/main/.github/assets/project-logo.png",
+      },
+    ],
+  },
+}
+
+export default function Web() {
+  return (
+    <>
+      <section className="bg-white dark:bg-gray-900">
+        <div className="mx-auto grid max-w-(--breakpoint-xl) px-4 py-8 text-center lg:py-16">
+          <div className="mx-auto place-self-center">
+            <h1 className="mb-4 max-w-2xl text-4xl leading-none font-extrabold tracking-tight md:text-5xl xl:text-6xl dark:text-white">
+              Next.js Enterprise Boilerplate
+            </h1>
+            <p className="mb-6 max-w-2xl font-light text-gray-500 md:text-lg lg:mb-8 lg:text-xl dark:text-gray-400">
+              Jumpstart your enterprise project with our feature-packed, high-performance Next.js boilerplate!
+              Experience rapid UI development, AI-powered code reviews, and an extensive suite of tools for a smooth and
+              enjoyable development process.
+            </p>
+            <Button href="https://github.com/Blazity/next-enterprise" className="mr-3">
+              Get started
+            </Button>
+            <Button
+              href="https://vercel.com/new/git/external?repository-url=https://github.com/Blazity/next-enterprise"
+              intent="secondary"
+            >
+              Deploy Now
+            </Button>
+          </div>
+        </div>
+      </section>
+      <section className="bg-white dark:bg-gray-900">
+        <div className="mx-auto max-w-(--breakpoint-xl) px-4 py-8 sm:py-16 lg:px-6">
+          <div className="justify-center space-y-8 md:grid md:grid-cols-2 md:gap-12 md:space-y-0 lg:grid-cols-3">
+            {LP_GRID_ITEMS.map((singleItem) => (
+              <div key={singleItem.title} className="flex flex-col items-center justify-center text-center">
+                <div className="bg-primary-100 dark:bg-primary-900 mb-4 flex size-10 items-center justify-center rounded-full p-1.5 text-blue-700 lg:size-12">
+                  {singleItem.icon}
+                </div>
+                <h3 className="mb-2 text-xl font-bold dark:text-white">{singleItem.title}</h3>
+                <p className="text-gray-500 dark:text-gray-400">{singleItem.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\app\api\health\route.ts ====
+export async function GET() {
+  return Response.json({ status: "ok" })
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\components\Button\Button.stories.tsx ====
+import type { Meta, StoryObj } from "@storybook/react"
+import { Button } from "./Button"
+
+const meta: Meta<typeof Button> = {
+  title: "Button",
+  component: Button,
+  args: {
+    intent: "primary",
+    underline: false,
+    children: "Button",
+    size: "lg",
+  },
+  argTypes: {
+    intent: {
+      options: ["primary", "secondary"],
+      control: { type: "select" },
+    },
+    size: {
+      options: ["sm", "lg"],
+      control: { type: "select" },
+    },
+  },
+}
+
+type Story = StoryObj<typeof Button>
+
+export const Default: Story = {
+  render: (args) => <Button {...args} />,
+}
+
+export default meta
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\components\Button\Button.tsx ====
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { twMerge } from "tailwind-merge"
+
+const button = cva(
+  [
+    "justify-center",
+    "inline-flex",
+    "items-center",
+    "rounded-xl",
+    "text-center",
+    "border",
+    "border-blue-400",
+    "transition-colors",
+    "delay-50",
+  ],
+  {
+    variants: {
+      intent: {
+        primary: ["bg-blue-400", "text-white", "hover:enabled:bg-blue-700"],
+        secondary: ["bg-transparent", "text-blue-400", "hover:enabled:bg-blue-400", "hover:enabled:text-white"],
+      },
+      size: {
+        sm: ["min-w-20", "h-full", "min-h-10", "text-sm", "py-1.5", "px-4"],
+        lg: ["min-w-32", "h-full", "min-h-12", "text-lg", "py-2.5", "px-6"],
+      },
+      underline: { true: ["underline"], false: [] },
+    },
+    defaultVariants: {
+      intent: "primary",
+      size: "lg",
+    },
+  }
+)
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLAnchorElement>, VariantProps<typeof button> {
+  underline?: boolean
+  href: string
+}
+
+export function Button({ className, intent, size, underline, ...props }: ButtonProps) {
+  return (
+    <a className={twMerge(button({ intent, size, className, underline }))} {...props}>
+      {props.children}
+    </a>
+  )
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\components\Tooltip\Tooltip.tsx ====
+"use client"
+
+import * as RadixTooltip from "@radix-ui/react-tooltip"
+import { cva, type VariantProps } from "class-variance-authority"
+import React from "react"
+import { twMerge } from "tailwind-merge"
+
+const tooltipContent = cva([], {
+  variants: {
+    intent: {
+      primary: ["rounded-md", "bg-zinc-700", "font-sans", "text-white"],
+    },
+    size: {
+      md: ["px-4", "py-2.5", "text-xs"],
+    },
+  },
+  defaultVariants: {
+    intent: "primary",
+    size: "md",
+  },
+})
+
+const tooltipArrow = cva([], {
+  variants: {
+    intent: {
+      primary: ["fill-zinc-700"],
+    },
+    size: {
+      md: ["w-4", "h-2"],
+    },
+  },
+  defaultVariants: {
+    intent: "primary",
+    size: "md",
+  },
+})
+
+export interface TooltipProps extends VariantProps<typeof tooltipContent>, RadixTooltip.TooltipProps {
+  explainer: React.ReactElement | string
+  children: React.ReactElement
+  className?: string
+  withArrow?: boolean
+  side?: "top" | "right" | "bottom" | "left"
+}
+
+export function Tooltip({
+  children,
+  explainer,
+  open,
+  defaultOpen,
+  onOpenChange,
+  intent,
+  size,
+  side = "top",
+  className,
+  withArrow,
+}: TooltipProps) {
+  return (
+    <RadixTooltip.Provider>
+      <RadixTooltip.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} delayDuration={200}>
+        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          <RadixTooltip.Content
+            side={side}
+            sideOffset={5}
+            className={twMerge(tooltipContent({ intent, size, className }))}
+          >
+            {explainer}
+            {withArrow ? <RadixTooltip.Arrow className={twMerge(tooltipArrow({ intent, size, className }))} /> : null}
+          </RadixTooltip.Content>
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
+  )
+}
+
+
+# ==== C:\MonCode\KonnaxionV14\next-enterprise\styles\tailwind.css ====
+@import 'tailwindcss';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+
