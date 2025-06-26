@@ -1,11 +1,11 @@
-import * as fs from "fs"
+import * as fs from "fs";
 
 // https://github.com/francoismassart/eslint-plugin-tailwindcss/pull/381
-// import eslintPluginTailwindcss from "eslint-plugin-tailwindcss"
-import eslintPluginImport from "eslint-plugin-import"
-import eslintPluginNext from "@next/eslint-plugin-next"
-import eslintPluginStorybook from "eslint-plugin-storybook"
-import typescriptEslint from "typescript-eslint"
+// import eslintPluginTailwindcss from "eslint-plugin-tailwindcss";
+import eslintPluginImport from "eslint-plugin-import";
+import eslintPluginNext from "@next/eslint-plugin-next";
+import eslintPluginStorybook from "eslint-plugin-storybook";
+import typescriptEslint from "typescript-eslint";
 
 const eslintIgnore = [
   ".git/",
@@ -17,14 +17,13 @@ const eslintIgnore = [
   "*.min.js",
   "*.config.js",
   "*.d.ts",
-]
+];
 
 const config = typescriptEslint.config(
   {
     ignores: eslintIgnore,
   },
   ...eslintPluginStorybook.configs["flat/recommended"],
-  //  https://github.com/francoismassart/eslint-plugin-tailwindcss/pull/381
   // ...eslintPluginTailwindcss.configs["flat/recommended"],
   typescriptEslint.configs.recommended,
   eslintPluginImport.flatConfigs.recommended,
@@ -38,16 +37,18 @@ const config = typescriptEslint.config(
     },
   },
   {
+    /* ---------------- updated settings ---------------- */
     settings: {
       tailwindcss: {
         callees: ["classnames", "clsx", "ctl", "cn", "cva"],
       },
-
       "import/resolver": {
-        typescript: true,
+        typescript: { project: "./tsconfig.json" }, // 👈 added project path
         node: true,
       },
     },
+    /* -------------------------------------------------- */
+
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "warn",
@@ -72,37 +73,24 @@ const config = typescriptEslint.config(
               pattern: `${singleDir}/**`,
               group: "internal",
             })),
-            {
-              pattern: "env",
-              group: "internal",
-            },
-            {
-              pattern: "theme",
-              group: "internal",
-            },
-            {
-              pattern: "public/**",
-              group: "internal",
-              position: "after",
-            },
+            { pattern: "env", group: "internal" },
+            { pattern: "theme", group: "internal" },
+            { pattern: "public/**", group: "internal", position: "after" },
           ],
           pathGroupsExcludedImportTypes: ["internal"],
-          alphabetize: {
-            order: "asc",
-            caseInsensitive: true,
-          },
+          alphabetize: { order: "asc", caseInsensitive: true },
         },
       ],
     },
   }
-)
+);
 
 function getDirectoriesToSort() {
-  const ignoredSortingDirectories = [".git", ".next", ".vscode", "node_modules"]
+  const ignored = [".git", ".next", ".vscode", "node_modules"];
   return fs
     .readdirSync(process.cwd())
     .filter((file) => fs.statSync(process.cwd() + "/" + file).isDirectory())
-    .filter((f) => !ignoredSortingDirectories.includes(f))
+    .filter((f) => !ignored.includes(f));
 }
 
-export default config
+export default config;
