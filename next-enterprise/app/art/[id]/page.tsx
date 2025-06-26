@@ -1,9 +1,2 @@
-﻿import MainLayout from '@/shared/layout/MainLayout';
-
-export default function Page() {
-  return (
-    <MainLayout>
-      <p className='text-gray-500'>Placeholder for /art/[id]</p>
-    </MainLayout>
-  );
-}
+﻿import { ArtworkSheet } from "@/kreative/pages";
+export default ArtworkSheet;

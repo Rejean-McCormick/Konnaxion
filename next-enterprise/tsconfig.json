@@ -18,12 +18,25 @@
     "jsx": "preserve",
     "incremental": true,
 
-    /* ---- added lines ---- */
+    /* ---- path aliases ---- */
     "baseUrl": ".",
     "paths": {
-      "@/shared/*": ["shared/*"]
+      "@/*": ["*"],
+      "@/shared/*": ["shared/*"],
+      "@/modules/*": ["modules/*"],
+      "@/insights/*": ["modules/insights/*"],
+      "@/konsensus/*": ["modules/konsensus/*"],
+      "@/ekoh/*": ["modules/ekoh/*"],
+      "@/ethikos/*": ["modules/ethikos/*"],
+      "@/konsultations/*": ["modules/konsultations/*"],
+      "@/keenkonnect/*": ["modules/keenkonnect/*"],
+      "@/konnected/*": ["modules/konnected/*"],
+      "@/kreative/*": ["modules/kreative/*"],
+      "@/kontact/*": ["modules/kontact/*"],
+      "@/global/*": ["modules/global/*"],
+      "@/admin/*": ["modules/admin/*"]
     },
-    /* --------------------- */
+    /* ---------------------- */
 
     "types": ["node", "jest", "@testing-library/jest-dom"],
     "plugins": [

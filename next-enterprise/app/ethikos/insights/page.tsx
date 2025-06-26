@@ -1,9 +1,2 @@
-import MainLayout from "@/shared/layout/MainLayout";
-
-export default function Page() {
-  return (
-    <MainLayout>
-      <div className="text-gray-400">??  ethikos/insights  (coming soon)</div>
-    </MainLayout>
-  );
-}
+﻿import { EthikosInsightsDashboard } from "@/ethikos/pages";
+export default EthikosInsightsDashboard;

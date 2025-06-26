@@ -1,7 +1,6 @@
 import * as fs from "fs";
 
-// https://github.com/francoismassart/eslint-plugin-tailwindcss/pull/381
-// import eslintPluginTailwindcss from "eslint-plugin-tailwindcss";
+// import eslintPluginTailwindcss from "eslint-plugin-tailwindcss";  // optional
 import eslintPluginImport from "eslint-plugin-import";
 import eslintPluginNext from "@next/eslint-plugin-next";
 import eslintPluginStorybook from "eslint-plugin-storybook";
@@ -20,13 +19,19 @@ const eslintIgnore = [
 ];
 
 const config = typescriptEslint.config(
-  {
-    ignores: eslintIgnore,
-  },
+  // ➊ baseline
+  { ignores: eslintIgnore },
+
+  // ➋ add Storybook rules
   ...eslintPluginStorybook.configs["flat/recommended"],
-  // ...eslintPluginTailwindcss.configs["flat/recommended"],
+
+  // ➌ base TS rules
   typescriptEslint.configs.recommended,
+
+  // ➍ import-plugin recommended
   eslintPluginImport.flatConfigs.recommended,
+
+  // ➎ Next.js plugin
   {
     plugins: {
       "@next/next": eslintPluginNext,
@@ -36,41 +41,45 @@ const config = typescriptEslint.config(
       ...eslintPluginNext.configs["core-web-vitals"].rules,
     },
   },
+
+  // ➏ **our project-specific settings & rules**
   {
-    /* ---------------- updated settings ---------------- */
     settings: {
       tailwindcss: {
         callees: ["classnames", "clsx", "ctl", "cn", "cva"],
       },
       "import/resolver": {
-        typescript: { project: "./tsconfig.json" }, // 👈 added project path
-        node: true,
+        /* ---- make eslint-plugin-import understand TS aliases ---- */
+        typescript: {
+          project: ["./tsconfig.json"], // array form is preferred
+          alwaysTryTypes: true,
+        },
+        /* --------------------------------------------------------- */
+        node: {
+          moduleDirectory: ["node_modules", "./"],
+        },
       },
     },
-    /* -------------------------------------------------- */
 
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "warn",
-        {
-          argsIgnorePattern: "^_",
-          varsIgnorePattern: "^_",
-        },
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
       ],
+
       "sort-imports": [
         "error",
-        {
-          ignoreCase: true,
-          ignoreDeclarationSort: true,
-        },
+        { ignoreCase: true, ignoreDeclarationSort: true },
       ],
+
+      /* group & alphabetise imports; include @/modules alias */
       "import/order": [
         "warn",
         {
           groups: ["external", "builtin", "internal", "sibling", "parent", "index"],
           pathGroups: [
-            ...getDirectoriesToSort().map((singleDir) => ({
-              pattern: `${singleDir}/**`,
+            ...getDirectoriesToSort().map((d) => ({
+              pattern: `${d}/**`,
               group: "internal",
             })),
             { pattern: "env", group: "internal" },
@@ -82,14 +91,15 @@ const config = typescriptEslint.config(
         },
       ],
     },
-  }
+  },
 );
 
+/* -------- helper ------------------------------------------------ */
 function getDirectoriesToSort() {
   const ignored = [".git", ".next", ".vscode", "node_modules"];
   return fs
     .readdirSync(process.cwd())
-    .filter((file) => fs.statSync(process.cwd() + "/" + file).isDirectory())
+    .filter((f) => fs.statSync(`${process.cwd()}/${f}`).isDirectory())
     .filter((f) => !ignored.includes(f));
 }
 

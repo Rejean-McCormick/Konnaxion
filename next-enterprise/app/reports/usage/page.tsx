@@ -1,3 +1,2 @@
-﻿import { UsageDashboard } from '@/modules/insights/pages';
-
+﻿import { UsageDashboard } from "@/insights/pages";
 export default UsageDashboard;

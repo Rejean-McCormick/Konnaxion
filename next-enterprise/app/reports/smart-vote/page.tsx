@@ -1,3 +1,2 @@
-﻿import { SmartVoteDashboard } from '@/modules/insights/pages';
-
+﻿import { SmartVoteDashboard } from "@/insights/pages";
 export default SmartVoteDashboard;

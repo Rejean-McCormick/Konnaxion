@@ -1,3 +1,2 @@
-﻿import { InsightsHomePage } from '@/modules/insights/pages';
-
+﻿import { InsightsHomePage } from "@/insights/pages";
 export default InsightsHomePage;

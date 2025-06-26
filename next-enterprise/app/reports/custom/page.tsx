@@ -1,3 +1,2 @@
-﻿import { CustomBuilderPage } from '@/modules/insights/pages';
-
+﻿import { CustomBuilderPage } from "@/insights/pages";
 export default CustomBuilderPage;
