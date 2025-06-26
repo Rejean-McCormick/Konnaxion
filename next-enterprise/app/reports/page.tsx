@@ -1,9 +1,3 @@
-﻿import MainLayout from "@/shared/layout/MainLayout";
+﻿import { InsightsHomePage } from '@/modules/insights/pages';
 
-export default function Page() {
-  return (
-    <MainLayout>
-      <p className="text-gray-500">Placeholder for </p>
-    </MainLayout>
-  );
-}
+export default InsightsHomePage;

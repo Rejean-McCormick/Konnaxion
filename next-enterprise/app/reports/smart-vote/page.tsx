@@ -1,8 +1,3 @@
-﻿import MainLayout from '@/shared/layout/MainLayout';
-export default function Page() {
-  return (
-    <MainLayout>
-      <div className='text-gray-400'>📄 /reports/smart-vote (coming soon)</div>
-    </MainLayout>
-  );
-}
+﻿import { SmartVoteDashboard } from '@/modules/insights/pages';
+
+export default SmartVoteDashboard;

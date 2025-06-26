@@ -1,11 +1,15 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-const qc = new QueryClient();
+import QueryProvider from "@/shared/QueryProvider";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
-        <QueryClientProvider client={qc}>{children}</QueryClientProvider>
+        {/* Client-side provider lives inside its own client component */}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
