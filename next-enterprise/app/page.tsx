@@ -1,3 +1,9 @@
+import MainLayout from "@/shared/layout/MainLayout";
+
 export default function Home() {
-  return <div className="p-8 text-gray-500">Konnaxion frontend ready.</div>;
+  return (
+    <MainLayout>
+      <div className="text-gray-500">Konnaxion frontend ready.</div>
+    </MainLayout>
+  );
 }
