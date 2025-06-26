@@ -1,2 +1,2 @@
-﻿import { AdminConsole } from "@/admin/pages";
-export default AdminConsole;
+﻿import AdminConsolePage from '../../modules/admin/pages/AdminConsole';
+export default AdminConsolePage;

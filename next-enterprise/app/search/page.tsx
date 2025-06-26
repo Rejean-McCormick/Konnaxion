@@ -1,2 +1,2 @@
-﻿import { Search } from "@/global/pages";
-export default Search;
+﻿import SearchPage from '../../modules/global/pages/Search';
+export default SearchPage;

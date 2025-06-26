@@ -1,2 +1,2 @@
-﻿import { MyWork } from "@/global/pages";
-export default MyWork;
+﻿import MyWorkPage from '../../modules/global/pages/MyWork';
+export default MyWorkPage;
