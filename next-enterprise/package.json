@@ -14,7 +14,11 @@
     "storybook": "cross-env FORCE_COLOR=1 storybook dev -p 6006",
     "test-storybook": "cross-env FORCE_COLOR=1 test-storybook",
     "build-storybook": "cross-env FORCE_COLOR=1 storybook build",
-    "test": "cross-env FORCE_COLOR=1 jest --passWithNoTests",
+
+    "typecheck": "tsc --noEmit",
+    "test": "cross-env FORCE_COLOR=1 jest",
+    "test:ct": "playwright test -c playwright.ct.config.ts",
+
     "e2e:headless": "playwright test",
     "e2e:ui": "playwright test --ui",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
@@ -120,7 +124,6 @@
     "storybook": "^8.6.12",
     "tailwindcss": "^4.1.5",
     "ts-jest": "^29.3.2",
-    "tsc": "^2.0.4",
     "typed-query-selector": "^2.12.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.32.0",

@@ -1,1 +1,1 @@
-export { default as ThreadsPage } from "./ThreadsPage";
+export { default as ThreadsPage } from './ThreadsPage';
