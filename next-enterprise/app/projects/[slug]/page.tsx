@@ -1,9 +1,9 @@
-﻿import MainLayout from "@/shared/layout/MainLayout";
+﻿import MainLayout from '@/shared/layout/MainLayout';
 
 export default function Page() {
   return (
     <MainLayout>
-      <div className=\"text-gray-400\">📄 /projects/[slug] (coming soon)</div>
+      <p className='text-gray-500'>Placeholder for /projects/[slug]</p>
     </MainLayout>
   );
 }
