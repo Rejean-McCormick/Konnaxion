@@ -1,22 +1,17 @@
-import React, { ReactNode } from 'react';
-import { GlobalSearchBar } from './GlobalSearchBar';
+﻿"use client";
+import React, { PropsWithChildren } from "react";
+import { Layout } from "antd";
 
-interface AppShellProps {
-  children: ReactNode;
+/** Light-weight wrapper that gives every page a top‑nav + centred body. */
+export default function AppShell({ children }: PropsWithChildren) {
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      <Layout.Header className="text-white text-lg font-semibold px-8">
+        Konnaxion
+      </Layout.Header>
+      <Layout.Content className="p-8 max-w-5xl w-full mx-auto">
+        {children}
+      </Layout.Content>
+    </Layout>
+  );
 }
-
-export const AppShell: React.FC<AppShellProps> = ({ children }) => (
-  <div className="min-h-screen flex flex-col">
-    <header className="bg-gray-800 text-white p-4">
-      <div className="container mx-auto flex items-center">
-        <img src="/assets/logo-light.svg" alt="Konnaxion" className="h-8 mr-4" />
-        <GlobalSearchBar />
-      </div>
-    </header>
-    <div className="flex-1 bg-gray-50">{children}</div>
-    <footer className="bg-gray-100 text-center p-4">
-      © {new Date().getFullYear()} Konnaxion
-    </footer>
-  </div>
-);
-

@@ -1,2 +1,2 @@
-export { default as useLivePoll } from './useLivePoll';
-export { default as useThreads } from './useThreads';
+﻿export * from './useLivePoll';
+export * from './useThreads';

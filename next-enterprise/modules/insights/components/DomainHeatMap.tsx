@@ -1,18 +1,8 @@
-"use client";
-import { Heatmap } from "react-chartjs-2-heatmap";      // thin wrapper
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  Tooltip,
-} from "chart.js";
-
-ChartJS.register(CategoryScale, LinearScale, Tooltip);
-
-type Props = { labels: string[]; values: number[][] };
-
-export default function DomainHeatMap({ labels, values }: Props) {
-  const data = { labels, datasets: [{ label: "Domains", data: values }] };
-  return <Heatmap data={data} options={{ responsive: true }} />;
+export default function DomainHeatMap() {
+  return (
+    <div style={{ minHeight: 300, display: "flex", alignItems: "center", justifyContent: "center", color: "#bbb" }}>
+      {/* TODO: Implement heatmap with Chart.js or another library */}
+      <em>Heatmap chart not available (react-chartjs-2-heatmap does not exist)</em>
+    </div>
+  );
 }
-

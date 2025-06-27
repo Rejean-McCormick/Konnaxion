@@ -1,1 +1,1 @@
-export { default as useGlobalSearch } from './useGlobalSearch';
+﻿export { default as useGlobalSearch } from './useGlobalSearch';

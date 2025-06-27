@@ -1,19 +1,12 @@
+import { useEffect } from "react";
+import { io } from "socket.io-client";
 
-import { useEffect, useState } from "react";
-import { io, Socket } from "socket.io-client";
-
-export function useReportStream<T = unknown>() {
-  const [data, setData] = useState<T | null>(null);
-
+export default function useReportStream() {
   useEffect(() => {
-    const socket: Socket = io(process.env.NEXT_PUBLIC_API_BASE!, {
-      path: "/ws",
-      transports: ["websocket"],
-    }).emit("join-reports");
-
-    socket.on("report", setData);
-    return () => socket.disconnect();
+    const socket = io("/api/reports");
+    // ... listen to events
+    return () => {
+      socket.disconnect();
+    };
   }, []);
-
-  return data;
 }

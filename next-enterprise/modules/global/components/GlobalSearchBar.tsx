@@ -1,31 +1,28 @@
-'use client';
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+// File: modules/global/components/GlobalSearchBar.tsx
+'use client'
 
-export const GlobalSearchBar: React.FC = () => {
-  const [query, setQuery] = useState('');
-  const router = useRouter();
+import React, { useState } from 'react'
+import { Input } from 'antd'
+import { useRouter, useSearchParams } from 'next/navigation'
 
-  const onSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (query.trim()) {
-      router.push(`/search?q=${encodeURIComponent(query)}`);
+export function GlobalSearchBar() {
+  const [q, setQ] = useState(useSearchParams().get('q') ?? '')
+  const router = useRouter()
+
+  const onSearch = (value: string) => {
+    if (value.trim()) {
+      router.push(`/search?q=${encodeURIComponent(value.trim())}`)
     }
-  };
+  }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-1">
-      <input
-        type="text"
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        placeholder="Search…"
-        className="flex-1 px-3 py-1 rounded-l border border-gray-300"
-      />
-      <button type="submit" className="bg-blue-600 text-white px-4 rounded-r">
-        Go
-      </button>
-    </form>
-  );
-};
-
+    <Input.Search
+      placeholder="Search…"
+      value={q}
+      onChange={e => setQ(e.target.value)}
+      onSearch={onSearch}
+      enterButton
+      style={{ maxWidth: 400 }}
+    />
+  )
+}

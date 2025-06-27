@@ -1,21 +1,25 @@
-import React from 'react';
-import { useStats } from '../hooks/useStats';
+"use client";
+import React from "react";
+import { Card, Descriptions, Spin, Alert } from "antd";
+import useStats from "@/admin/hooks/useStats";
 
-export const UserStats: React.FC = () => {
+export default function UserStats() {
   const { data, isLoading, isError, error } = useStats();
-
-  if (isLoading) return <div>Loading statistics…</div>;
-  if (isError) return <div>Error loading stats: {error.message}</div>;
+  if (isLoading) return <Spin />;
+  if (isError)   return <Alert message={error.message} type="error" />;
+  if (!data)     return null;                         // TS18048 safe‑guard
 
   return (
-    <section className="p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-bold mb-2">User Statistics</h2>
-      <ul className="list-disc pl-5">
-        <li>Total users: {data.totalUsers}</li>
-        <li>Active users: {data.activeUsers}</li>
-        {data.newUsers !== undefined && <li>New users (24h): {data.newUsers}</li>}
-      </ul>
-    </section>
+    <Card title="User Statistics">
+      <Descriptions column={1}>
+        <Descriptions.Item label="Total users">{data.totalUsers}</Descriptions.Item>
+        <Descriptions.Item label="Active users">{data.activeUsers}</Descriptions.Item>
+        {data.newUsers != null && (
+          <Descriptions.Item label="New users (24 h)">
+            {data.newUsers}
+          </Descriptions.Item>
+        )}
+      </Descriptions>
+    </Card>
   );
-};
-
+}

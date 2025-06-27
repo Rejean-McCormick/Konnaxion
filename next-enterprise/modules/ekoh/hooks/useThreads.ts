@@ -1,10 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 
+export interface Thread {
+  id: string;
+  title: string;
+  url: string;
+  created_at: string;
+}
+
 export function useThreads() {
-  return useQuery({
+  return useQuery<Thread[], Error>({
     queryKey: ["ekoh-threads"],
-    queryFn: async () => (await api.get("/ekoh/threads")).data as Thread[],
+    queryFn: async () => (await api.get<Thread[]>("/ekoh/threads")).data,
     staleTime: 60_000,
   });
 }
@@ -17,9 +24,4 @@ export function useCreateThread() {
   });
 }
 
-export type Thread = {
-  id: string;
-  title: string;
-  url: string;           // mp3 file
-  created_at: string;
-};
+export default useThreads;

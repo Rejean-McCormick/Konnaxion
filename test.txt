@@ -1,0 +1,20 @@
+# 1. (Re)install deps
+pnpm install
+
+# 2. Type‐check only (no output)
+pnpm exec tsc --noEmit
+
+# 3. Lint
+pnpm lint
+
+# 4. Unit tests
+pnpm test
+
+# 5. Playwright E2E (headless)
+pnpm exec playwright test
+
+# 6. Playwright CT (if you’ve set up a CT config)
+pnpm exec playwright test --config=playwright.ct.config.ts
+
+# 7. Build Storybook
+pnpm run build-storybook

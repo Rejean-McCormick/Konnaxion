@@ -1,9 +1,9 @@
 "use client"; 
 import MainLayout from "@/shared/layout/MainLayout";
-import { useReportStream } from "../hooks/useReportStream";
+import useReportStream from "../hooks/useReportStream";
 
 export default function CustomBuilderPage() {
-  const live = useReportStream<Record<string, unknown>>();
+  const live = useReportStream();
 
   return (
     <MainLayout>

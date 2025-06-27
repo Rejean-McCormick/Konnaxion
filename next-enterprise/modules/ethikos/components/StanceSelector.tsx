@@ -10,7 +10,7 @@ export default function StanceSelector({
   topicId: string;
   current: "pro" | "neutral" | "con";
 }) {
-  const { mutate, isLoading } = useStances(topicId);
+  const { mutate, isPending } = useStances(topicId);
 
   return (
     <Radio.Group
@@ -20,7 +20,7 @@ export default function StanceSelector({
           onSuccess: () => message.success("Stance updated"),
         })
       }
-      disabled={isLoading}
+      disabled={false}
     >
       <Radio.Button value="pro">Pro</Radio.Button>
       <Radio.Button value="neutral">Neutral</Radio.Button>

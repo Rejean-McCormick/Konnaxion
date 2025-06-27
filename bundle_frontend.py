@@ -1,17 +1,11 @@
 #!/usr/bin/env python3
 r"""
-bundle_frontend.py –- Concatenate the relevant front-end files of a
-Next-js 13/Ant-Design/Tailwind project into a single text bundle.
-
-Usage
-------
-    # Assume next-enterprisePATH.txt lies next to this script
-    python bundle_frontend.py
-
-    # Or specify paths/output explicitly
-    python bundle_frontend.py --paths next-enterprisePATH.txt \
-                              --out   frontend_bundle.txt
+bundle_frontend.py –– Recursively scan and concatenate your
+Next.js/Ant-Design/Tailwind front-end sources into one file,
+automatically excluding generic folders and file types
+(e.g. node_modules, .next, images, lock/env files, IDE dirs, etc.).
 """
+
 from __future__ import annotations
 import argparse
 import pathlib
@@ -21,16 +15,23 @@ import sys
 from typing import List
 
 # ---------------------------------------------------------------------------
-# 1.  Selection rules --------------------------------------------------------
+# 1. Selection rules
 CODE_EXTS = r"\.(tsx?|jsx?|mjs|cjs|css|json)$"
 INCLUDE_RE = re.compile(CODE_EXTS, re.IGNORECASE)
 
 EXCLUDE_RE = re.compile(
-    r"([\\/](e2e|tests?|__tests__|coverage|node_modules|\.next|assets|public)"
-    r"|\.svg$)",
+    r"([\\/](?:"
+      r"e2e|tests?|__tests__|coverage|node_modules|\.next"
+      r"|assets|public|dist|out|build|\.cache|logs"
+      r"|\.git|\.vscode|\.idea"
+    r")"
+    r"|(?:^|[\\/])(?:Dockerfile|docker-compose\.ya?ml|\.gitignore|\.dockerignore)$"
+    r"|(?:\.(?:svg|png|jpe?g|gif|webp|ico|lock|log|env|ya?ml))$"
+    r")",
     re.IGNORECASE,
 )
 
+# The one-off files you still want at project root
 ROOT_INCLUDE = {
     "next.config.ts",
     "postcss.config.js",
@@ -44,100 +45,93 @@ ROOT_INCLUDE = {
     ".storybook/preview.ts",
 }
 
+def keep(path: pathlib.Path, root_dir: pathlib.Path) -> bool:
+    """
+    Return True if this file should be bundled:
+      1) Immediately drop anything matching EXCLUDE_RE anywhere in its path.
+      2) Whitelist ROOT_INCLUDE only if it lives directly under root_dir.
+      3) Otherwise include only if it matches your code extensions.
+    """
+    rel_str = str(path).replace("\\", "/")
+
+    # 1) Exclude first
+    if EXCLUDE_RE.search(rel_str):
+        return False
+
+    # 2) Allow root-level whitelisted configs
+    try:
+        rel = path.relative_to(root_dir)
+    except ValueError:
+        # outside of root_dir (unlikely), treat as non-whitelisted
+        rel = path
+    if path.name in ROOT_INCLUDE and len(rel.parts) == 1:
+        return True
+
+    # 3) Finally, include only code‐like extensions
+    return bool(INCLUDE_RE.search(path.name))
+
 # ---------------------------------------------------------------------------
-def keep(path: pathlib.Path) -> bool:
-    """True = file should be bundled."""
-    if str(path).replace("\\", "/").endswith(".storybook/main.ts"):
-        return True
-    if str(path).replace("\\", "/").endswith(".storybook/preview.ts"):
-        return True
-    return (
-        path.name in ROOT_INCLUDE
-        or bool(INCLUDE_RE.search(path.name)) and not EXCLUDE_RE.search(str(path))
-    )
-
-
-def resolve_path(base_dir: pathlib.Path, raw: str) -> pathlib.Path | None:
+# 2. Auto‐discover
+def scan_paths(root_dir: pathlib.Path) -> List[pathlib.Path]:
     """
-    Resolve `raw` relative to base_dir; if not found, try with the
-    'next-enterprise/' prefix (mirrors the backend helper).
+    Walk `root_dir` recursively, returning every file for which keep() is True.
     """
-    p = pathlib.Path(raw)
-    if not p.is_absolute():
-        p = base_dir / p
-    if p.exists():
-        return p
+    return [
+        p
+        for p in root_dir.rglob("*")
+        if p.is_file() and keep(p, root_dir)
+    ]
 
-    alt = base_dir / "next-enterprise" / raw
-    return alt if alt.exists() else None
-
-
-def read_paths(list_file: pathlib.Path) -> List[pathlib.Path]:
-    base_dir = list_file.parent
-    selected: list[pathlib.Path] = []
-    with list_file.open(encoding="utf-8") as fh:
-        for raw in fh:
-            raw = raw.strip().strip("\"'")
-            if not raw:
-                continue
-            p = resolve_path(base_dir, raw)
-            if p and keep(p):
-                selected.append(p)
-    return selected
-
-
+# ---------------------------------------------------------------------------
 def bundle(paths: List[pathlib.Path], out_file: pathlib.Path) -> None:
     missing: list[str] = []
     with out_file.open("w", encoding="utf-8") as out:
-        # header – absolute paths kept
+        # Header: absolute paths
         for p in paths:
             out.write(f"{p}\n")
         out.write("\n\n")
 
-        # body – file contents
+        # Body: file contents
         for p in paths:
             try:
                 with p.open("r", encoding="utf-8") as src:
                     out.write(f"# ==== {p} ====\n")
                     shutil.copyfileobj(src, out)
                     out.write("\n\n")
-            except Exception as exc:            # noqa: BLE001
+            except Exception as exc:
                 missing.append(f"{p}: {exc}")
 
     kept = len(paths) - len(missing)
-    print(f"👍  Bundle created: {out_file} ({kept} files)")
+    print(f"👍 Bundle created: {out_file} ({kept} files)")
     if missing:
-        print(f"⚠️  {len(missing)} file(s) missing or unreadable:")
+        print(f"⚠️ {len(missing)} file(s) unreadable:")
         for m in missing:
             print(f"   - {m}")
 
-
+# ---------------------------------------------------------------------------
 def main() -> None:
-    default_list = pathlib.Path(__file__).with_name("next-enterprisePATH.txt")
-
-    ap = argparse.ArgumentParser(description="Bundle Next-js front-end sources.")
-    ap.add_argument(
-        "--paths",
-        type=pathlib.Path,
-        default=default_list if default_list.exists() else None,
-        help="Text file listing project paths (default: next-enterprisePATH.txt).",
+    ap = argparse.ArgumentParser(
+        description="Bundle Next.js front-end sources (auto-scan + strict exclusion)."
     )
     ap.add_argument(
         "--out",
         type=pathlib.Path,
         default="frontend_bundle.txt",
-        help="Output concatenation file (default: frontend_bundle.txt).",
+        help="Output file (default: frontend_bundle.txt)",
     )
     args = ap.parse_args()
 
-    if args.paths is None:
-        sys.exit("❌  --paths missing and next-enterprisePATH.txt not found.")
+    # Locate project root: prefer next-enterprise/ if present
+    script_dir = pathlib.Path(__file__).parent
+    proj_root = script_dir / "next-enterprise"
+    if not proj_root.exists():
+        proj_root = script_dir
 
-    paths = read_paths(args.paths)
+    paths = scan_paths(proj_root)
     if not paths:
-        sys.exit("❌  No file matched the inclusion rules.")
-    bundle(paths, args.out)
+        sys.exit("❌ No files matched inclusion rules (check your paths/exclusions).")
 
+    bundle(paths, args.out)
 
 if __name__ == "__main__":
     main()

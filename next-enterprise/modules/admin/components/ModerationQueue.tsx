@@ -1,28 +1,38 @@
-import React from 'react';
-import { useModeration } from '../hooks/useModeration';
+﻿"use client";
+import React from "react";
+import { Card, List, Spin, Alert, Tag } from "antd";
+import useModeration, { ModerationItem } from "@/admin/hooks/useModeration";
 
-export const ModerationQueue: React.FC = () => {
+function ModerationQueue() {
   const { data, isLoading, isError, error } = useModeration();
 
-  if (isLoading) return <div>Loading moderation queue…</div>;
-  if (isError) return <div>Error loading queue: {error.message}</div>;
+  if (isLoading) return <Spin />;
+  if (isError) return <Alert message={error.message} type="error" />;
 
   return (
-    <section className="p-4 bg-white shadow rounded">
-      <h2 className="text-xl font-bold mb-2">Moderation Queue</h2>
-      <ul className="space-y-4">
-        {data.map(item => (
-          <li key={item.id} className="border p-3 rounded">
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>{item.type}</span>
-              <span>{new Date(item.createdAt).toLocaleString()}</span>
-            </div>
-            <p className="mt-1">By <strong>{item.userId}</strong>: {item.content}</p>
-            <p className="mt-1 text-red-600">Reason: {item.reason}</p>
-          </li>
-        ))}
-      </ul>
-    </section>
+    <Card title="Moderation Queue" style={{ marginTop: 16 }}>
+      <List<ModerationItem>
+        itemLayout="vertical"
+        dataSource={data}
+        renderItem={(item) => (
+          <List.Item key={item.id}>
+            <List.Item.Meta
+              title={
+                <>
+                  <Tag>{item.type}</Tag> by {item.userId}
+                </>
+              }
+              description={new Date(item.createdAt).toLocaleString()}
+            />
+            <p>{item.content}</p>
+            <p>
+              <strong>Reason:</strong> {item.reason}
+            </p>
+          </List.Item>
+        )}
+      />
+    </Card>
   );
-};
+}
 
+export default ModerationQueue;

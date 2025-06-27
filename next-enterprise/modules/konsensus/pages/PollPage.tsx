@@ -1,33 +1,36 @@
 "use client";
-import { useSearchParams } from "next/navigation";
-import MainLayout from "@/shared/layout/MainLayout";
+import React from "react";
+import { Card, Spin, Alert } from "antd";
 import { usePoll } from "../hooks/usePoll";
-import useLivePoll from "../hooks/useLivePoll";
-import PollBarChart from "../components/PollBarChart";
 import VoteButtons from "../components/VoteButtons";
 
+// Replace with actual poll id logic if dynamic, here we use a fixed id for simplicity
+const POLL_ID = "current"; 
+
 export default function PollPage() {
-  const id = useSearchParams().get("id") ?? "";
-  const { data, isLoading } = usePoll(id);
-  const live = useLivePoll(id) as typeof data | null;
+  const { data: poll, isLoading, isError, error } = usePoll(POLL_ID);
 
-  const poll = live ?? data;
+  // Example handler
+  const handleVote = (option: string) => {
+    // TODO: Implement real API call
+    console.log("Voted", option, "on poll", poll?.id);
+  };
 
-  if (isLoading || !poll) return <MainLayout><p>Loading…</p></MainLayout>;
+  if (isLoading) return <Spin />;
+  if (isError) return <Alert message={error?.message} type="error" />;
+  if (!poll) return null;
 
   return (
-    <MainLayout>
-      <h1 className="mb-6 text-xl font-semibold">{poll.question}</h1>
-      <PollBarChart
-        labels={poll.choices.map((c) => c.label)}
-        votes={poll.choices.map((c) => c.votes)}
-      />
-      <div className="mt-8">
-        <VoteButtons
-          pollId={poll.id}
-          choices={poll.choices.map((c) => c.label)}
-        />
-      </div>
-    </MainLayout>
+    <div className="container mx-auto py-8">
+      <Card title="Current Poll">
+        <h1 className="mb-6 text-xl font-semibold">{poll.question}</h1>
+        <div className="mb-4 flex gap-4">
+          <span>Yes: {poll.yes}</span>
+          <span>No: {poll.no}</span>
+        </div>
+        {/* Pass pollId and option labels to VoteButtons */}
+        <VoteButtons pollId={poll.id} options={["yes", "no"]} onVote={handleVote} />
+      </Card>
+    </div>
   );
 }

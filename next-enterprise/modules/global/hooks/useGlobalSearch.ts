@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/shared/api';
+﻿import { useQuery } from "@tanstack/react-query";
+import { api } from "@/shared/api";
 
 export interface GlobalSearchResult {
   id: string;
@@ -8,20 +8,14 @@ export interface GlobalSearchResult {
   path: string;
 }
 
-export function useGlobalSearch(query: string) {
-  return useQuery<GlobalSearchResult[], Error>(
-    ['global', 'search', query],
-    async () => {
-      const { data } = await api.get<{ results: GlobalSearchResult[] }>(
-        '/api/search',
-        { params: { q: query } }
-      );
-      return data.results;
-    },
-    {
-      enabled: Boolean(query),
-      staleTime: 1 * 60_000, // cache for 1m
-      retry: 1,
-    }
-  );
+/** Client‑side search against GET /api/search?q=… */
+export default function useGlobalSearch(query: string) {
+  return useQuery<GlobalSearchResult[], Error>({
+    queryKey: ["global-search", query],
+    queryFn: async () =>
+      (await api.get<GlobalSearchResult[]>("/api/search", { params: { q: query } })).data,
+    enabled: Boolean(query),
+    staleTime: 60_000,
+    retry: 1,
+  });
 }

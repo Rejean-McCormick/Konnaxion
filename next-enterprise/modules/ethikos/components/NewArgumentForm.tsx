@@ -33,7 +33,7 @@ export default function NewArgumentForm({ topicId }: { topicId: string }) {
         <TextArea rows={4} placeholder="Write your argument…" />
       </Form.Item>
 
-      <Button type="primary" htmlType="submit" loading={create.isLoading}>
+      <Button type="primary" htmlType="submit" loading={create.isPending}>
         Submit
       </Button>
     </Form>

@@ -1,26 +1,20 @@
-"use client";
+﻿"use client";
+import React from "react";
 import { Button } from "antd";
-import { useVote } from "../hooks/usePoll";
 
-export default function VoteButtons({
-  pollId,
-  choices,
-}: {
+// Explicit props: parent passes pollId and option list
+export interface VoteButtonsProps {
   pollId: string;
-  choices: string[];
-}) {
-  const { mutate, isLoading } = useVote(pollId);
+  options: string[];
+  onVote: (option: string) => void;
+}
 
+export default function VoteButtons({ pollId, options, onVote }: VoteButtonsProps) {
   return (
-    <div className="flex gap-4 flex-wrap">
-      {choices.map((label, idx) => (
-        <Button
-          key={idx}
-          type="primary"
-          loading={isLoading}
-          onClick={() => mutate(idx)}
-        >
-          {label}
+    <div className="flex gap-2">
+      {options.map((option) => (
+        <Button key={option} onClick={() => onVote(option)}>
+          {option.charAt(0).toUpperCase() + option.slice(1)}
         </Button>
       ))}
     </div>

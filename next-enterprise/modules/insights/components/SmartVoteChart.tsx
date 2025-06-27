@@ -1,4 +1,3 @@
-
 "use client";
 import {
   Chart as ChartJS,
@@ -8,6 +7,7 @@ import {
   LinearScale,
   Tooltip,
   Legend,
+  ChartDataset,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 
@@ -30,8 +30,18 @@ export default function SmartVoteChart({ labels, votes, scores }: Props) {
   const data = {
     labels,
     datasets: [
-      { type: "bar", label: "Votes", data: votes, yAxisID: "y" },
-      { type: "line", label: "Avg Score", data: scores, yAxisID: "y1" },
+      {
+        type: "bar" as const,
+        label: "Votes",
+        data: votes,
+        yAxisID: "y",
+      } as ChartDataset<"bar", number[]>,
+      {
+        type: "line" as const,
+        label: "Avg Score",
+        data: scores,
+        yAxisID: "y1",
+      } as ChartDataset<"line", number[]>,
     ],
   };
   const options = {

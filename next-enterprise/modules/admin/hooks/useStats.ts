@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/shared/api';
+﻿import { useQuery } from "@tanstack/react-query";
+import { api } from "@/shared/api";
 
 export interface AdminStats {
   totalUsers: number;
@@ -7,16 +7,11 @@ export interface AdminStats {
   newUsers?: number;
 }
 
-export function useStats() {
-  return useQuery<AdminStats, Error>(
-    ['admin', 'stats'],
-    async () => {
-      const { data } = await api.get<AdminStats>('/api/admin/stats');
-      return data;
-    },
-    {
-      staleTime: 5 * 60_000, // cache for 5m
-      retry: 1,
-    }
-  );
+export default function useStats() {
+  return useQuery<AdminStats, Error>({
+    queryKey: ["admin-stats"],
+    queryFn: async () => (await api.get<AdminStats>("/api/admin/stats")).data,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
 }

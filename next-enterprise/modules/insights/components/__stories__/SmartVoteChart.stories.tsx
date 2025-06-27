@@ -1,18 +1,14 @@
-// modules/insights/components/__stories__/SmartVoteChart.stories.tsx
-import { SmartVoteChart } from '../SmartVoteChart';
-import type { Meta } from '@storybook/react';
+import SmartVoteChart from '../SmartVoteChart';
 
 export default {
-  component: SmartVoteChart,
   title: 'Insights/SmartVoteChart',
-} as Meta;
+  component: SmartVoteChart,
+};
 
-export const Example = {
+export const Basic = {
   args: {
-    data: {
-      labels: ['2025-06-01', '2025-06-02'],
-      votes: [120, 150],
-      avg_score: [0.72, 0.75],
-    },
+    labels: ['Option 1', 'Option 2'],
+    votes: [42, 23],
+    scores: [1.3, 2.1],
   },
 };
