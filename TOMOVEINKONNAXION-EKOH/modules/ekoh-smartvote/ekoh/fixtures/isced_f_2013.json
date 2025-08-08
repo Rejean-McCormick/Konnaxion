@@ -1,0 +1,51 @@
+[
+  {
+    "code": "01",
+    "name": "Education",
+    "parent_code": null,
+    "depth": 0
+  },
+  {
+    "code": "011",
+    "name": "Education science",
+    "parent_code": "01",
+    "depth": 1
+  },
+  {
+    "code": "012",
+    "name": "Teacher training",
+    "parent_code": "01",
+    "depth": 1
+  },
+  {
+    "code": "02",
+    "name": "Arts and humanities",
+    "parent_code": null,
+    "depth": 0
+  },
+  {
+    "code": "021",
+    "name": "History and archeology",
+    "parent_code": "02",
+    "depth": 1
+  },
+  {
+    "code": "022",
+    "name": "Literature and linguistics",
+    "parent_code": "02",
+    "depth": 1
+  },
+  …
+  {
+    "code": "98",
+    "name": "Business and administration",
+    "parent_code": null,
+    "depth": 0
+  },
+  {
+    "code": "981",
+    "name": "Business administration",
+    "parent_code": "98",
+    "depth": 1
+  }
+]

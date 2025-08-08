@@ -1,0 +1,92 @@
+openapi: "3.0.3"
+info:
+  title: "EkoH & Smart Vote API"
+  description: "Auto-generated API spec. Run `drf-spectacular --file docs/openapi.yaml` to refresh."
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8000"
+paths:
+  /api/v1/ekoh/profile/{uid}/:
+    get:
+      summary: "Fetch a user’s expertise & ethics profile"
+      parameters:
+        - name: "uid"
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+  /api/v1/smart-vote/cast/:
+    post:
+      summary: "Cast a ballot"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ballot"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BallotResponse"
+components:
+  schemas:
+    Profile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        display_name:
+          type: string
+        confidentiality_level:
+          type: string
+        ethics_score:
+          type: number
+          format: decimal
+        expertise:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExpertiseScoreNested"
+    ExpertiseScoreNested:
+      type: object
+      properties:
+        domain_code:
+          type: string
+        domain_name:
+          type: string
+        weighted_score:
+          type: number
+          format: decimal
+    Ballot:
+      type: object
+      required: ["consultation", "target_id", "modality", "raw_value"]
+      properties:
+        consultation:
+          type: string
+          format: uuid
+        target_id:
+          type: string
+          format: uuid
+        modality:
+          type: string
+        raw_value:
+          type: number
+          format: decimal
+    BallotResponse:
+      allOf:
+        - $ref: "#/components/schemas/Ballot"
+      properties:
+        id:
+          type: integer
+        weighted_value:
+          type: number
+          format: decimal

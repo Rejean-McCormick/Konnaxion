@@ -1,0 +1,34 @@
+repos:
+  # Ruff — lint + fix
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  # Black — code formatter
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.12
+
+  # isort — import sorter (Black-compatible profile)
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile=black"]
+
+  # Prettier — JS / JSON / YAML formatting (front-end)
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.2.5"
+    hooks:
+      - id: prettier
+        additional_dependencies: ["prettier@3.2.5"]
+
+  # Check for large files accidentally committed
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files

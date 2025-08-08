@@ -1,0 +1,80 @@
+name: ekoh-smartvote
+
+on:
+  push:
+    paths:
+      - "modules/ekoh-smartvote/**"
+      - ".github/workflows/ekoh-smartvote.yml"
+  pull_request:
+    paths:
+      - "modules/ekoh-smartvote/**"
+      - ".github/workflows/ekoh-smartvote.yml"
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ekoh_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/ekoh_test
+      CELERY_BROKER_URL: redis://localhost:6379/0
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Install dependencies (no root)
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-root
+
+      - name: Run Ruff lint
+        run: poetry run ruff check modules
+
+      - name: Run Black (check-only)
+        run: poetry run black --check .
+
+      - name: Run test suite
+        run: |
+          poetry run python manage.py migrate --noinput
+          poetry run pytest -q

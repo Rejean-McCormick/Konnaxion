@@ -1,0 +1,44 @@
+# Default values for ekoh-smartvote chart.
+
+# Image settings
+image:
+  repository: ghcr.io/konnaxion/ekoh-smartvote
+  tag: "v0.1.0"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8000
+
+# Environment variables injected into both EkohSvc & VoteSvc
+env:
+  # EkoH multipliers & caps
+  EKOH_MULTIPLIER_CAP: "1.50"
+  RAW_WEIGHT_QUALITY:    "1.000"
+  RAW_WEIGHT_EXPERTISE:  "1.500"
+  RAW_WEIGHT_FREQUENCY:  "0.750"
+
+  # Smart Vote thresholds
+  SMARTVOTE_CONSENSUS_STRONG: "0.75"
+  SMARTVOTE_EMERGING_DELTA:   "0.15"
+
+  # Analytics & export
+  PROMETHEUS_BASE_URL:         "http://prometheus:9090"
+  EXPORT_MAX_ROWS:             "100000"
+
+# Resource requests & limits
+resources:
+  requests:
+    cpu:    250m
+    memory: 256Mi
+  limits:
+    cpu:    500m
+    memory: 512Mi
+
+# Horizontal Pod Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70

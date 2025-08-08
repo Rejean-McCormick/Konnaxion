@@ -1,0 +1,40 @@
+[tool.poetry]
+name = "ekoh-smartvote"
+version = "0.1.0"
+description = "Modular expertise & weighted voting for the Konnaxion platform"
+authors = ["Konnaxion Team <team@konnaxion.org>"]
+packages = [
+  { include = "konnaxion", from = "modules/ekoh-smartvote" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+# Web framework & REST
+django = "^4.2"
+djangorestframework = "^3.15"
+drf-spectacular = "^0.27"
+
+# Async tasks & messaging
+celery = "^5.3"
+redis = "^5.0"
+aiokafka = "^0.10"
+
+# Database
+psycopg = { extras = ["binary", "pool"], version = "^3.1" }
+
+# Misc
+python-dotenv = "^1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-django = "^4.8"
+pytest-asyncio = "^0.23"
+ruff = "^0.4"
+black = "^24.4"
+isort = "^5.13"
+pre-commit = "^3.6"
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"

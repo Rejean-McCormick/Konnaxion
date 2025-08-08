@@ -1,0 +1,86 @@
+Here’s a concise, numbered **“Post-scaffold checklist”** you can keep handy. Once you’ve coded the 24 files, work through these to finish setup, validate, and harden before shipping:
+
+1. **Generate & apply migrations**
+
+   ```bash
+   python manage.py makemigrations ekoh smart_vote
+   python manage.py migrate
+   ```
+
+   Review each generated `0002_…` migration to ensure it matches the spec (indexes, constraints, schema name).
+
+2. **Load the taxonomy fixture**
+
+   ```bash
+   python manage.py load_isced
+   ```
+
+   Confirm `expertise_category` contains \~169 entries (26 broad + 143 detailed).
+
+3. **Run the initial test suite**
+
+   ```bash
+   pytest -q
+   ```
+
+   Flesh out any failing tests in `ekoh/tests/` and `smart_vote/tests/` to cover at least basic CRUD and service logic.
+
+4. **Wire up Celery & broker**
+
+   * Start Redis + `celery -A config worker --beat --loglevel=INFO`
+   * Trigger `ekoh_score_recalc` and `contextual_analysis_batch` manually (`celery call`).
+   * Verify entries in `score_history` and `context_analysis_log`.
+
+5. **Configure & test Kafka flow**
+
+   * Start Redpanda (`docker compose up kafka`).
+   * Publish a test `vote.cast` message via `aiokafka` script.
+   * Verify `vote_result` table updates and ledger entries.
+
+6. **Execute partition helper SQL**
+
+   ```bash
+   psql ekoh -f infra/db/partition_helper.sql
+   ```
+
+   Check that new monthly partitions for `vote`, `vote_ledger`, and `score_history` appear.
+
+7. **Smoke-test the REST APIs**
+
+   ```bash
+   curl http://localhost:8000/api/v1/ekoh/profile/<your-user-id>
+   curl -X POST http://localhost:8000/api/v1/smart-vote/cast … 
+   ```
+
+   Ensure you get valid JSON responses and correct error codes (400, 409, etc.).
+
+8. **Update & validate Docker-Compose**
+
+   * Confirm `make dev-up` still brings up all services and app logs show no errors.
+   * Verify fixture loader and migrations run on container start.
+
+9. **Finalize CI workflow**
+
+   * Commit `.github/workflows/ekoh-smartvote.yml` so every PR runs lint, tests, and a quick build.
+   * Merge to `main` only after green builds.
+
+10. **Deploy Helm chart to staging**
+
+    ```bash
+    helm upgrade --install ekoh-smartvote charts/ekoh-smartvote \
+      --values charts/ekoh-smartvote/values.yaml \
+      --namespace konnaxion-intel
+    ```
+
+    Verify pods, migrations, and provisional Ingress work.
+
+11. **Document & hand over**
+
+    * Update `README.md` with any new commands or caveats.
+    * Cross-link to `01-db_schema.md`, `03-technical_spec.md`, and Annex A for the final architecture.
+    * Tag release `v0.1.0-scaffold-complete`.
+
+12. **Plan the next sprint**
+    Tackle advanced features: contextual-analysis AI integration, partition pruning automation, real-time WebSocket updates, and front-end React pages.
+
+Keep this list open in your editor or Slack channel so nothing slips through the cracks once the code’s in place.
