@@ -1,0 +1,479 @@
+system: Konnaxion
+actors:
+- name: User
+  type: person
+externals: []
+infra:
+  docker:
+  - Backups\26 juin\backend\docker-compose.docs.yml
+  - Backups\26 juin\backend\docker-compose.local.yml
+  - Backups\26 juin\backend\docker-compose.production.yml
+  - Backups\5 juin\docker-compose.docs.yml
+  - Backups\5 juin\docker-compose.local.yml
+  - Backups\5 juin\docker-compose.production.yml
+  - Backups\6 juin\docker-compose.docs.yml
+  - Backups\6 juin\docker-compose.local.yml
+  - Backups\6 juin\docker-compose.production.yml
+  - konnaxion\docker-compose.docs.yml
+  - konnaxion\docker-compose.local.yml
+  - konnaxion\docker-compose.production.yml
+  - TOMOVEINKONNAXION-EKOH\docker-compose.dev.yml
+  services:
+  - name: docs
+    image: konnaxion_local_docs
+    ports:
+    - 9000:9000
+    depends_on: null
+    environment_keys: null
+  - name: django
+    image: konnaxion_local_django
+    ports:
+    - 8000:8000
+    depends_on: &id001
+    - postgres
+    - redis
+    - mailpit
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: mailpit
+    image: docker.io/axllent/mailpit:latest
+    ports:
+    - 8025:8025
+    depends_on: null
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_local_celeryworker
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_local_celerybeat
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: flower
+    image: konnaxion_local_flower
+    ports:
+    - 5555:5555
+    depends_on: *id001
+    environment_keys: null
+  - name: django
+    image: konnaxion_production_django
+    ports: null
+    depends_on: &id002
+    - postgres
+    - redis
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: traefik
+    image: konnaxion_production_traefik
+    ports:
+    - 0.0.0.0:80:80
+    - 0.0.0.0:443:443
+    - 0.0.0.0:5555:5555
+    depends_on:
+    - django
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_production_celeryworker
+    ports: null
+    depends_on: *id002
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_production_celerybeat
+    ports: null
+    depends_on: *id002
+    environment_keys: null
+  - name: flower
+    image: konnaxion_production_flower
+    ports: null
+    depends_on: *id002
+    environment_keys: null
+  - name: nginx
+    image: konnaxion_production_nginx
+    ports: null
+    depends_on:
+    - django
+    environment_keys: null
+  - name: docs
+    image: konnaxion_local_docs
+    ports:
+    - 9000:9000
+    depends_on: null
+    environment_keys: null
+  - name: django
+    image: konnaxion_local_django
+    ports:
+    - 8000:8000
+    depends_on: &id003
+    - postgres
+    - redis
+    - mailpit
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: mailpit
+    image: docker.io/axllent/mailpit:latest
+    ports:
+    - 8025:8025
+    depends_on: null
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_local_celeryworker
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_local_celerybeat
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: flower
+    image: konnaxion_local_flower
+    ports:
+    - 5555:5555
+    depends_on: *id003
+    environment_keys: null
+  - name: django
+    image: konnaxion_production_django
+    ports: null
+    depends_on: &id004
+    - postgres
+    - redis
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: traefik
+    image: konnaxion_production_traefik
+    ports:
+    - 0.0.0.0:80:80
+    - 0.0.0.0:443:443
+    - 0.0.0.0:5555:5555
+    depends_on:
+    - django
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_production_celeryworker
+    ports: null
+    depends_on: *id004
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_production_celerybeat
+    ports: null
+    depends_on: *id004
+    environment_keys: null
+  - name: flower
+    image: konnaxion_production_flower
+    ports: null
+    depends_on: *id004
+    environment_keys: null
+  - name: nginx
+    image: konnaxion_production_nginx
+    ports: null
+    depends_on:
+    - django
+    environment_keys: null
+  - name: docs
+    image: konnaxion_local_docs
+    ports:
+    - 9000:9000
+    depends_on: null
+    environment_keys: null
+  - name: django
+    image: konnaxion_local_django
+    ports:
+    - 8000:8000
+    depends_on: &id005
+    - postgres
+    - redis
+    - mailpit
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: mailpit
+    image: docker.io/axllent/mailpit:latest
+    ports:
+    - 8025:8025
+    depends_on: null
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_local_celeryworker
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_local_celerybeat
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: flower
+    image: konnaxion_local_flower
+    ports:
+    - 5555:5555
+    depends_on: *id005
+    environment_keys: null
+  - name: django
+    image: konnaxion_production_django
+    ports: null
+    depends_on: &id006
+    - postgres
+    - redis
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: traefik
+    image: konnaxion_production_traefik
+    ports:
+    - 0.0.0.0:80:80
+    - 0.0.0.0:443:443
+    - 0.0.0.0:5555:5555
+    depends_on:
+    - django
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_production_celeryworker
+    ports: null
+    depends_on: *id006
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_production_celerybeat
+    ports: null
+    depends_on: *id006
+    environment_keys: null
+  - name: flower
+    image: konnaxion_production_flower
+    ports: null
+    depends_on: *id006
+    environment_keys: null
+  - name: nginx
+    image: konnaxion_production_nginx
+    ports: null
+    depends_on:
+    - django
+    environment_keys: null
+  - name: docs
+    image: konnaxion_local_docs
+    ports:
+    - 9000:9000
+    depends_on: null
+    environment_keys: null
+  - name: django
+    image: konnaxion_local_django
+    ports:
+    - 8000:8000
+    depends_on: &id007
+    - postgres
+    - redis
+    - mailpit
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: mailpit
+    image: docker.io/axllent/mailpit:latest
+    ports:
+    - 8025:8025
+    depends_on: null
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_local_celeryworker
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_local_celerybeat
+    ports: []
+    depends_on:
+    - redis
+    - postgres
+    - mailpit
+    environment_keys: null
+  - name: flower
+    image: konnaxion_local_flower
+    ports:
+    - 5555:5555
+    depends_on: *id007
+    environment_keys: null
+  - name: django
+    image: konnaxion_production_django
+    ports: null
+    depends_on: &id008
+    - postgres
+    - redis
+    environment_keys: null
+  - name: postgres
+    image: konnaxion_production_postgres
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: traefik
+    image: konnaxion_production_traefik
+    ports:
+    - 0.0.0.0:80:80
+    - 0.0.0.0:443:443
+    - 0.0.0.0:5555:5555
+    depends_on:
+    - django
+    environment_keys: null
+  - name: redis
+    image: docker.io/redis:6
+    ports: null
+    depends_on: null
+    environment_keys: null
+  - name: celeryworker
+    image: konnaxion_production_celeryworker
+    ports: null
+    depends_on: *id008
+    environment_keys: null
+  - name: celerybeat
+    image: konnaxion_production_celerybeat
+    ports: null
+    depends_on: *id008
+    environment_keys: null
+  - name: flower
+    image: konnaxion_production_flower
+    ports: null
+    depends_on: *id008
+    environment_keys: null
+  - name: nginx
+    image: konnaxion_production_nginx
+    ports: null
+    depends_on:
+    - django
+    environment_keys: null
+  - name: db
+    image: postgres:15
+    ports:
+    - 5432:5432
+    depends_on: null
+    environment_keys:
+    - POSTGRES_DB
+    - POSTGRES_PASSWORD
+    - POSTGRES_USER
+  - name: redis
+    image: redis:7
+    ports:
+    - 6379:6379
+    depends_on: null
+    environment_keys: null
+  - name: kafka
+    image: vectorized/redpanda:v23.2.13
+    ports:
+    - 9092:9092
+    depends_on: null
+    environment_keys: null
+  - name: app
+    image: null
+    ports:
+    - 8000:8000
+    depends_on:
+    - db
+    - redis
+    - kafka
+    environment_keys:
+    - CELERY_BROKER_URL
+    - DJANGO_SETTINGS_MODULE
+    - KAFKA_BOOTSTRAP_SERVERS
+  - name: worker
+    image: null
+    ports: null
+    depends_on:
+    - db
+    - redis
+    - kafka
+    environment_keys:
+    - CELERY_BROKER_URL
+    - DJANGO_SETTINGS_MODULE
+    - KAFKA_BOOTSTRAP_SERVERS
+  - name: beat
+    image: null
+    ports: null
+    depends_on:
+    - worker
+    environment_keys:
+    - CELERY_BROKER_URL
+    - DJANGO_SETTINGS_MODULE
+  k8s: []
+  terraform: []
+containers: []
+datastores: []
+messaging: []
+relations: []

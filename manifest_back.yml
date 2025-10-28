@@ -1,0 +1,140 @@
+system: Konnaxion
+actors:
+- name: User
+  type: person
+externals: []
+infra:
+  docker:
+  - docker-compose.docs.yml
+  - docker-compose.local.yml
+  - docker-compose.production.yml
+  k8s: []
+  terraform: []
+containers:
+- name: Api
+  tech: Django/DRF
+  src_paths:
+  - ./
+  endpoints_in:
+  - method: ANY
+    path: /users/
+  - method: ANY
+    path: /ethikos/topics/
+  - method: ANY
+    path: /ethikos/stances/
+  - method: ANY
+    path: /ethikos/arguments/
+  - method: ANY
+    path: /keenkonnect/projects/
+  - method: ANY
+    path: /kollective/votes/
+  - method: ANY
+    path: /konnected/resources/
+  - method: ANY
+    path: /kreative/artworks/
+  - method: ANY
+    path: /kreative/galleries/
+  - method: ANY
+    path: /about/
+  - method: ANY
+    path: /users/
+  - method: ANY
+    path: /accounts/
+  - method: ANY
+    path: /api/
+  - method: ANY
+    path: /api/auth-token/
+  - method: ANY
+    path: /api/schema/
+  - method: ANY
+    path: /api/docs/
+  - method: ANY
+    path: /400/
+  - method: ANY
+    path: /403/
+  - method: ANY
+    path: /404/
+  - method: ANY
+    path: /500/
+  - method: ANY
+    path: /__debug__/
+  - method: ANY
+    path: /api/ethikos/
+  - method: ANY
+    path: /~redirect/
+  - method: ANY
+    path: /~update/
+  - method: ANY
+    path: /<str:username>/
+  metadata:
+    http_calls_out: []
+    installed_apps:
+    - whitenoise.runserver_nostatic
+    auth_backends:
+    - django.contrib.auth.backends.ModelBackend
+    - allauth.account.auth_backends.AuthenticationBackend
+    rest_framework:
+      auth: []
+      permissions: []
+      throttle: []
+      pagination: []
+    models:
+    - AICatalogueEntry
+    - ArchiveDocument
+    - ArtworkTag
+    - CollabSession
+    - ConfidentialitySetting
+    - ContextAnalysisLog
+    - CulturalPartner
+    - DigitalArchive
+    - EmergingExpert
+    - EthikosArgument
+    - EthikosCategory
+    - EthikosStance
+    - EthikosTopic
+    - ExpertiseCategory
+    - Gallery
+    - GalleryArtwork
+    - IntegrationMapping
+    - KreativeArtwork
+    - Project
+    - ProjectMessage
+    - ProjectRating
+    - ProjectResource
+    - ProjectTask
+    - ProjectTeam
+    - ScoreConfiguration
+    - ScoreHistory
+    - Tag
+    - TimeStampedModel
+    - TraditionEntry
+    - UserEthicsScore
+    - UserExpertiseScore
+    - VirtualExhibition
+    - Vote
+    - VoteModality
+    - VoteResult
+    celery_tasks:
+    - get_users_count
+- name: Worker
+  tech: Celery
+  src_paths:
+  - ./
+  metadata:
+    tasks:
+    - get_users_count
+- name: Realtime
+  tech: Django Channels
+  src_paths:
+  - ./
+datastores:
+- name: appdb
+  engine: PostgreSQL
+messaging:
+- queue: celery
+  broker: Redis
+  producers:
+  - Api
+  consumers:
+  - Worker
+relations: []

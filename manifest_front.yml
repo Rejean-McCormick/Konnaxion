@@ -1,0 +1,21 @@
+system: Konnaxion
+actors:
+- name: User
+  type: person
+externals: []
+infra:
+  docker: []
+  k8s: []
+  terraform: []
+containers:
+- name: WebApp
+  tech: Next.js
+  src_paths:
+  - ./
+  metadata:
+    ui_pages: []
+    has_middleware: false
+    has_next_config: true
+datastores: []
+messaging: []
+relations: []

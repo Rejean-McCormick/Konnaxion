@@ -775,6 +775,10 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
+ACCOUNT_EMAIL_REQUIRED     = True
+
+# --- EkoH & Smart-Vote additions ---
+from .settings_addons import *
 
 
 # ==== C:\MonCode\KonnaxionV14\konnaxion\config\settings\local.py ====
@@ -1248,17 +1252,7 @@ https://cookiecutter-django.readthedocs.io/en/latest/5-help/faq.html#why-is-ther
 
 # ==== C:\MonCode\KonnaxionV14\konnaxion\konnaxion\ethikos\admin.py ====
 # konnaxion/ethikos/admin.py
-"""
-Admin site configuration for the ethikos module (v14-aligned).
-
-• TimestampMixin ajoute created_at / updated_at **uniquement** si
-  ces champs existent (évite admin E033 / E127 / E035).
-• Tout ModelAdmin qui définit autocomplete_fields déclare
-  également search_fields (évite admin E040).
-"""
-
 from __future__ import annotations
-
 from typing import Sequence
 
 from django.apps import apps
@@ -1273,42 +1267,31 @@ from .models import (
     EthikosTopic,
 )
 
-# ──────────────────────────── Mix‑in ────────────────────────────
+# ───────── Mix-in to show created/updated columns ─────────
 class TimestampMixin(admin.ModelAdmin):
-    """
-    Ajoute dynamiquement les colonnes/readonly « created_at » et « updated_at »
-    si elles existent sur le modèle.
-    """
-
     date_hierarchy = "created_at"
 
-    # — helpers — #
     def _time_fields(self) -> set[str]:
-        return {"created_at", "updated_at"} & {
-            f.name for f in self.model._meta.get_fields()
-        }
+        return {"created_at", "updated_at"} & {f.name for f in self.model._meta.get_fields()}
 
-    # — overrides — #
-    def get_readonly_fields(
-        self, request, obj=None  # noqa: D401
-    ) -> Sequence[str]:  # type: ignore[override]
+    def get_readonly_fields(self, request, obj=None) -> Sequence[str]:
         return (*super().get_readonly_fields(request, obj), *self._time_fields())
 
-    def get_list_display(self, request):  # type: ignore[override]
+    def get_list_display(self, request):
         cols = list(super().get_list_display(request))
         for f in self._time_fields():
             if f not in cols:
                 cols.append(f)
         return tuple(cols)
 
-# ───────────────── Category (lookup) ─────────────────
+# ───────── Category ─────────
 @admin.register(EthikosCategory)
 class EthikosCategoryAdmin(admin.ModelAdmin):
     list_display = ("name", "description")
     search_fields = ("name",)
     list_per_page = 30
 
-# ───────────────────── Topic (core) ──────────────────
+# ───────── Topic ─────────
 @admin.register(EthikosTopic)
 class EthikosTopicAdmin(TimestampMixin):
     list_display = (
@@ -1328,14 +1311,18 @@ class EthikosTopicAdmin(TimestampMixin):
 
     @admin.display(description=_("status"), ordering="status")
     def status_badge(self, obj: EthikosTopic) -> str:
-        colour = "green" if obj.status == EthikosTopic.OPEN else "red"
+        colour = {
+            EthikosTopic.OPEN: "green",
+            EthikosTopic.CLOSED: "red",
+            EthikosTopic.ARCHIVED: "grey",
+        }.get(obj.status, "black")
         return format_html(
             '<span style="color:{};font-weight:600;">{}</span>',
             colour,
             obj.get_status_display(),
         )
 
-# ──────────────────── Stance (vote) ─────────────────
+# ───────── Stance ─────────
 @admin.register(EthikosStance)
 class EthikosStanceAdmin(admin.ModelAdmin):
     list_display = ("user", "topic", "value", "timestamp")
@@ -1344,7 +1331,7 @@ class EthikosStanceAdmin(admin.ModelAdmin):
     autocomplete_fields = ("user", "topic")
     ordering = ("-timestamp",)
 
-# ─────────────────── Argument (comment) ──────────────
+# ───────── Argument ─────────
 @admin.register(EthikosArgument)
 class EthikosArgumentAdmin(TimestampMixin):
     list_display = ("short_content", "topic", "user", "side", "is_hidden")
@@ -1357,9 +1344,9 @@ class EthikosArgumentAdmin(TimestampMixin):
     def short_content(self, obj: EthikosArgument) -> str:
         return (obj.content[:60] + "…") if len(obj.content) > 60 else obj.content
 
-# ──────────────── Auto‑enregistrement générique ────────────────
-ethikos_cfg = apps.get_app_config("ethikos")
-for mdl in ethikos_cfg.get_models():
+# ───────── Fallback auto-registration ─────────
+cfg = apps.get_app_config("ethikos")
+for mdl in cfg.get_models():
     if not admin.site.is_registered(mdl):
         admin.site.register(mdl)
 
@@ -1429,82 +1416,83 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 
-# ────────────────────────────────────────────────────────────────
-#  Constants that must be available *before* the model class body
-# ────────────────────────────────────────────────────────────────
-STANCE_MIN = -3          # ← adjust if your spec says otherwise
-STANCE_MAX = 3
+# ───────────────────────────────────────────────────
+STANCE_MIN, STANCE_MAX = -3, 3
+# ───────────────────────────────────────────────────
 
-# ────────────────────────────────────────────────────────────────
-#  Lookup tables
-# ────────────────────────────────────────────────────────────────
 class EthikosCategory(models.Model):
-    """Topic grouping (Politics, Bio-ethics, Tech-policy, …)."""
-    name        = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True)
     description = models.TextField(blank=True)
 
     class Meta:
         ordering = ("name",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
 
 class EthikosTopic(models.Model):
     """One debate question."""
-    OPEN,  CLOSED = "open", "closed"
-    STATUS_CHOICES = [(OPEN, "Open"), (CLOSED, "Closed")]
+    OPEN, CLOSED, ARCHIVED = "open", "closed", "archived"
+    STATUS_CHOICES = [
+        (OPEN, "Open"),
+        (CLOSED, "Closed"),
+        (ARCHIVED, "Archived"),
+    ]
 
-    title       = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     description = models.TextField()
-    category    = models.ForeignKey(
+    category = models.ForeignKey(
         EthikosCategory, on_delete=models.PROTECT, related_name="topics"
     )
     expertise_category = models.ForeignKey(
-        "kollective_intelligence.ExpertiseCategory", null=True, blank=True,
-        on_delete=models.SET_NULL,
+        "kollective_intelligence.ExpertiseCategory",
+        null=True, blank=True, on_delete=models.SET_NULL,
     )
-    created_by  = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
         related_name="ethikos_topics",
     )
-    status         = models.CharField(max_length=6,
-                                      choices=STATUS_CHOICES, default=OPEN)
-    total_votes    = models.PositiveIntegerField(default=0)  # denormalised
-    last_activity  = models.DateTimeField(auto_now=True)
-    created_at     = models.DateTimeField(auto_now_add=True)
+
+    status = models.CharField(
+        max_length=8,              # fits “archived”
+        choices=STATUS_CHOICES,
+        default=OPEN,
+    )
+    total_votes = models.PositiveIntegerField(default=0)
+    last_activity = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ("-created_at",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.title
 
 
-# ────────────────────────────────────────────────────────────────
-#  Main data models
-# ────────────────────────────────────────────────────────────────
 class EthikosStance(models.Model):
-    """One user’s current stance on a topic (−3 … +3)."""
-    user   = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
         related_name="ethikos_stances",
     )
-    topic  = models.ForeignKey(
-        EthikosTopic, on_delete=models.CASCADE, related_name="stances",
+    topic = models.ForeignKey(
+        EthikosTopic,
+        on_delete=models.CASCADE,
+        related_name="stances",
     )
-    value  = models.SmallIntegerField(
-        validators=[MinValueValidator(STANCE_MIN),
-                    MaxValueValidator(STANCE_MAX)]
+    value = models.SmallIntegerField(
+        validators=[
+            MinValueValidator(STANCE_MIN),
+            MaxValueValidator(STANCE_MAX),
+        ]
     )
     timestamp = models.DateTimeField(auto_now=True)
 
     class Meta:
         unique_together = ("user", "topic")
-        indexes = [
-            models.Index(fields=("topic",)),
-            models.Index(fields=("user",)),
-        ]
+        indexes = [models.Index(fields=("topic",)), models.Index(fields=("user",))]
         constraints = [
             models.CheckConstraint(
                 name="stance_value_between_-3_and_3",
@@ -1512,39 +1500,41 @@ class EthikosStance(models.Model):
             ),
         ]
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.user} → {self.topic} = {self.value}"
 
 
 class EthikosArgument(models.Model):
-    """Threaded discussion posts belonging to a topic."""
     PRO, CON = "pro", "con"
     SIDE_CHOICES = [(PRO, "Pro"), (CON, "Con")]
 
     topic = models.ForeignKey(
-        EthikosTopic, on_delete=models.CASCADE, related_name="arguments",
+        EthikosTopic, on_delete=models.CASCADE, related_name="arguments"
     )
     user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
         related_name="ethikos_arguments",
     )
     content = models.TextField()
-    parent  = models.ForeignKey(
-        "self", null=True, blank=True, on_delete=models.CASCADE,
+    parent = models.ForeignKey(
+        "self",
+        null=True, blank=True,
+        on_delete=models.CASCADE,
         related_name="replies",
     )
-    side      = models.CharField(max_length=3, choices=SIDE_CHOICES,
-                                 null=True, blank=True)
-    is_hidden = models.BooleanField(default=False)        # moderation flag
+    side = models.CharField(
+        max_length=3, choices=SIDE_CHOICES, null=True, blank=True
+    )
+    is_hidden = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        indexes  = [models.Index(fields=("topic",)),
-                    models.Index(fields=("user",))]
+        indexes = [models.Index(fields=("topic",)), models.Index(fields=("user",))]
         ordering = ("created_at",)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return f"{self.user} on {self.topic}"
 
 
@@ -2329,7 +2319,7 @@ from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-
+# -- Simple reusable tag --
 class Tag(models.Model):
     """
     Simple tagging table that can be reused by other apps.
@@ -2340,10 +2330,10 @@ class Tag(models.Model):
         verbose_name = _("Tag")
         verbose_name_plural = _("Tags")
 
-    def __str__(self) -> str:  # pragma: no cover
+    def __str__(self):
         return self.name
 
-
+# -- Artwork and curation --
 class KreativeArtwork(models.Model):
     """
     A single piece of art uploaded by a user.
@@ -2366,8 +2356,8 @@ class KreativeArtwork(models.Model):
         max_length=10, choices=MediaType.choices, default=MediaType.IMAGE
     )
     year = models.PositiveIntegerField(null=True, blank=True)
-    medium = models.CharField(max_length=120, blank=True)        # e.g. “oil on canvas”
-    style = models.CharField(max_length=120, blank=True)         # e.g. “impressionism”
+    medium = models.CharField(max_length=120, blank=True)
+    style = models.CharField(max_length=120, blank=True)
     tags = models.ManyToManyField(Tag, through="ArtworkTag", blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -2376,18 +2366,20 @@ class KreativeArtwork(models.Model):
         verbose_name_plural = _("Artworks")
         ordering = ["-created_at"]
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return self.title
 
-
 class ArtworkTag(models.Model):
+    """
+    Through-table for artwork <-> tag, for ManyToMany.
+    """
     artwork = models.ForeignKey(KreativeArtwork, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("artwork", "tag")
 
-
+# -- Gallery and ordering --
 class Gallery(models.Model):
     """
     A curated set of artworks.
@@ -2411,9 +2403,8 @@ class Gallery(models.Model):
         verbose_name_plural = _("Galleries")
         ordering = ["-created_at"]
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return self.title
-
 
 class GalleryArtwork(models.Model):
     """
@@ -2427,7 +2418,7 @@ class GalleryArtwork(models.Model):
         unique_together = ("gallery", "artwork")
         ordering = ["order"]
 
-
+# -- Co-creation room --
 class CollabSession(models.Model):
     """
     Real-time co-creation room (painting, music, etc.).
@@ -2460,7 +2451,7 @@ class CollabSession(models.Model):
         verbose_name_plural = _("Collaboration Sessions")
         ordering = ["-started_at"]
 
-
+# -- Cultural heritage/tradition entry --
 class TraditionEntry(models.Model):
     """
     Cultural-heritage submission for Konservation archive.
@@ -2493,8 +2484,80 @@ class TraditionEntry(models.Model):
         verbose_name_plural = _("Tradition Entries")
         ordering = ["-submitted_at"]
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return self.title
+
+# -- NEW: VirtualExhibition, DigitalArchive, ArchiveDocument, AICatalogueEntry, CulturalPartner --
+class VirtualExhibition(models.Model):
+    """
+    Online curated show.
+    """
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Virtual Exhibition")
+        verbose_name_plural = _("Virtual Exhibitions")
+
+    def __str__(self):
+        return self.name
+
+class DigitalArchive(models.Model):
+    """
+    Stored artwork master entry (collection/archive).
+    """
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    url = models.URLField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Digital Archive")
+        verbose_name_plural = _("Digital Archives")
+
+    def __str__(self):
+        return self.title
+
+class ArchiveDocument(models.Model):
+    """
+    Documents linked to archives (e.g., image, PDF, scan).
+    """
+    archive = models.ForeignKey(DigitalArchive, on_delete=models.CASCADE, related_name="documents")
+    document_type = models.CharField(max_length=64)
+    url = models.URLField()
+    metadata = models.JSONField(blank=True, default=dict)
+
+    class Meta:
+        verbose_name = _("Archive Document")
+        verbose_name_plural = _("Archive Documents")
+
+class AICatalogueEntry(models.Model):
+    """
+    AI-generated tags/classification for an archive document.
+    """
+    archive_document = models.ForeignKey(ArchiveDocument, on_delete=models.CASCADE, related_name="ai_entries")
+    tags = models.JSONField(blank=True, default=list)
+    classification = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        verbose_name = _("AI Catalogue Entry")
+        verbose_name_plural = _("AI Catalogue Entries")
+
+class CulturalPartner(models.Model):
+    """
+    Museum/heritage sources or partners.
+    """
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=64)
+    contact_info = models.JSONField(blank=True, default=dict)
+
+    class Meta:
+        verbose_name = _("Cultural Partner")
+        verbose_name_plural = _("Cultural Partners")
+
+    def __str__(self):
+        return self.name
 
 
 # ==== C:\MonCode\KonnaxionV14\konnaxion\konnaxion\kreative\serializers.py ====
