@@ -133,3 +133,9 @@ compose/**/nginx/certs/
 !next-enterprise/package.json
 !next-enterprise/tsconfig.json
 !*.md
+
+###
+
+node_modules/
+.pnpm/
+.ignored_node_modules/
