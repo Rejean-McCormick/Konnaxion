@@ -162,7 +162,7 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
           placement="right"
           width={400}
           onClose={closeDrawer}
-          visible={drawerVisible}
+          open={drawerVisible}
         >
           {selectedTeam && (
             <div>

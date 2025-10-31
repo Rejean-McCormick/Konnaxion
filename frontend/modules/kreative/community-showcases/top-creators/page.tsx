@@ -1,11 +1,12 @@
-'use client'
+'use client';
+"use client";
 
 // File: /pages/kreative/community-showcases/top-creators.tsx
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
 import { Table, Avatar, Select, Typography, Space, Button } from 'antd';
 import { TrophyOutlined } from '@ant-design/icons';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -98,7 +99,7 @@ const TopCreators: NextPage = () => {
       render: (text: any, record: Creator) => (
         <Space>
           <Avatar src={record.avatar} />
-          <Button type="link" onClick={() => Router.push(`/kreative/profile/${record.id}`)}>
+          <Button type="link" onClick={() => router.push(`/kreative/profile/${record.id}`)}>
             {record.name}
           </Button>
         </Space>

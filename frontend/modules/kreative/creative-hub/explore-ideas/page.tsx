@@ -1,11 +1,12 @@
-'use client'
+'use client';
+"use client";
 
 // File: /pages/kreative/creative-hub/explore-ideas.tsx
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
 import { Row, Col, Card, Input, Select, Typography, Space, Pagination } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -107,7 +108,8 @@ const ExploreIdeasPage: NextPage = () => {
 
   // Navigate to the idea detail page when a card is clicked.
   const handleCardClick = (idea: CreativeIdea) => {
-    Router.push(`/kreative/creative-hub/idea/${idea.id}`);
+    const router = useRouter();
+    router.push(`/kreative/creative-hub/idea/${idea.id}`);
   };
 
   return (

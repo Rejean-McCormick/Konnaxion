@@ -250,7 +250,7 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
           title={selectedProject?.name}
           placement="right"
           onClose={closeDrawer}
-          visible={drawerVisible}
+          open={drawerVisible}
           width={400}
         >
           {selectedProject && (

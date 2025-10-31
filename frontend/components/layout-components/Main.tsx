@@ -9,15 +9,15 @@ const StyledMain = styled(
   transition: 0.2s all;
 
   /* décalage = largeur réelle du sider (ouvert) */
-  margin-left: var(--ant-layout-sider-width);
+  margin-left: 256px;
 
-  background: var(--ant-layout-color-bg-layout);
+  background: var(--ant-color-bg-layout);
 
   /* décalage quand le sider est réduit */
   ${({ collapsed }) =>
     collapsed &&
     css`
-      margin-left: var(--ant-layout-sider-collapsed-width);
+      margin-left: 80px;
     `}
 
   @media (max-width: 575.98px) {

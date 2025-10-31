@@ -133,7 +133,6 @@ const ExamDashboardResults: NextPage = () => {
           </Row>
         </Card>
       )}
-
       {/* Section Résumé des résultats pour le dernier examen terminé */}
       {examResultsData.length > 0 && (
         <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
@@ -158,7 +157,6 @@ const ExamDashboardResults: NextPage = () => {
           </Row>
         </Card>
       )}
-
       {/* Tableau historique des examens */}
       <Card title="Exam History" style={{ marginBottom: 24 }}>
         <Table
@@ -168,7 +166,6 @@ const ExamDashboardResults: NextPage = () => {
           pagination={{ pageSize: 5 }}
         />
       </Card>
-
       {/* Liste des certifications obtenues */}
       <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
         <List
@@ -189,7 +186,6 @@ const ExamDashboardResults: NextPage = () => {
           )}
         />
       </Card>
-
       {/* Section Prochaines Étapes */}
       <Card>
         <Alert
@@ -203,13 +199,12 @@ const ExamDashboardResults: NextPage = () => {
           </Button>
         </div>
       </Card>
-
       {/* Drawer pour détailler l'examen sélectionné */}
       <Drawer
         title="Exam Details"
         placement="right"
         onClose={() => setDrawerVisible(false)}
-        visible={drawerVisible}
+        open={drawerVisible}
       >
         {selectedExam && (
           <>

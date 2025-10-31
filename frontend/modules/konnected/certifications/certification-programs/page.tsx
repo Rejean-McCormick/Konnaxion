@@ -127,7 +127,6 @@ const CertificationPrograms: NextPage = () => {
           </Select>
         </Col>
       </Row>
-
       <Row gutter={[16, 16]}>
         {paginatedPrograms.map((program) => (
           <Col xs={24} sm={12} md={8} key={program.id}>
@@ -152,7 +151,6 @@ const CertificationPrograms: NextPage = () => {
           </Col>
         ))}
       </Row>
-
       {filteredPrograms.length > pageSize && (
         <Row justify="center" style={{ marginTop: 24 }}>
           <Pagination
@@ -163,13 +161,12 @@ const CertificationPrograms: NextPage = () => {
           />
         </Row>
       )}
-
       {/* Drawer de détails du programme */}
       <Drawer
         title={selectedProgram?.title}
         placement="right"
         onClose={closeDrawer}
-        visible={drawerVisible}
+        open={drawerVisible}
       >
         {selectedProgram && (
           <>

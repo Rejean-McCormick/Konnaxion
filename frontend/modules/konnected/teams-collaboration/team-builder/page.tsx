@@ -1,4 +1,5 @@
-'use client'
+'use client';
+"use client";
 
 // File: /pages/konnected/teams-collaboration/team-builder.tsx
 import React, { useState } from 'react';
@@ -17,7 +18,7 @@ import {
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -45,10 +46,11 @@ const TeamBuilder: NextPage = () => {
 
   // Gestion de la soumission du formulaire complet (création de l'équipe)
   const onFinish = (values: any) => {
+    const router = useRouter();
     console.log('Team Created:', values);
     message.success('L’équipe a été créée avec succès et les invitations ont été envoyées!');
     // Redirection vers "My Teams"
-    Router.push('/konnected/teams-collaboration/my-teams');
+    router.push('/konnected/teams-collaboration/my-teams');
   };
 
   // Définition des titres des étapes

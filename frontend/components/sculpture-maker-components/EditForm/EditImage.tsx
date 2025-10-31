@@ -1,4 +1,5 @@
-'use client'
+'use client';
+"use client";
 
 /**
  * Description: Image edit component for sculpture
@@ -9,7 +10,7 @@ import { Upload, Button, Icon, message, Row, Modal } from 'antd'
 import { useState } from 'react'
 import { ColStyled } from '../style'
 import api from '../../../api'
-import Router from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 const { confirm } = Modal
 
@@ -115,14 +116,14 @@ const EditImage = ({ accessionId, _name, images }) => {
           type="primary"
           loading={isSubmitting}
           onClick={() =>
-            Router.push('/sculptures/id/[id]', `/sculptures/id/${accessionId}`)
+            router.push(`/sculptures/id/${accessionId}`)
           }
         >
           Finish
         </Button>
       </ColStyled>
     </Row>
-  )
+  );
 }
 
 export default EditImage

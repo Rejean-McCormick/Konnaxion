@@ -74,7 +74,7 @@ const SculptureComment = ({
   const formattedComments = comments.map(x => ({
     commentId: x.commentId,
     author: (
-      <Link href="/users/id/[id]" as={`/users/id/${x.user.userId}`}>
+      <Link href={`/users/id/${x.user.userId}`}>
         <a
           style={{
             fontSize: 14,

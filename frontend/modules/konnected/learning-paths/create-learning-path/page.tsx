@@ -228,11 +228,10 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
           Save & Publish Path
         </Button>
       </div>
-
       {/* Modal pour Ajouter/Éditer une étape */}
       <Modal
         title={editingStepIndex !== null ? "Edit Step" : "Add New Step"}
-        visible={stepModalVisible}
+        open={stepModalVisible}
         onOk={handleStepModalOk}
         onCancel={handleStepModalCancel}
       >

@@ -1,8 +1,9 @@
+"use client";
 // File: /pages/konnected/teams-collaboration/project-workspaces.tsx
 import React from 'react';
 import { NextPage } from 'next';
 import { Table, Button, Tag, Typography, Space, message } from 'antd';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -53,6 +54,7 @@ const workspaceData: Workspace[] = [
 const ProjectWorkspaces: NextPage = () => {
   // Gestion de l'action sur un workspace
   const handleWorkspaceAction = (workspace: Workspace) => {
+    const router = useRouter();
     if (!workspace.isLaunched && workspace.userRole === 'Leader') {
       // Pour un workspace non lancé accessible aux leaders, déclenchement de l'action de lancement
       console.log(`Launching workspace: ${workspace.projectName}`);
@@ -60,7 +62,7 @@ const ProjectWorkspaces: NextPage = () => {
       message.success(`Workspace ${workspace.projectName} lancé avec succès.`);
     } else {
       // Pour un workspace lancé, naviguer vers la page du workspace
-      Router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
+      router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
     }
   };
 
@@ -119,7 +121,7 @@ const ProjectWorkspaces: NextPage = () => {
       <Space style={{ marginBottom: 16 }}>
         <Button
           type="primary"
-          onClick={() => Router.push('/konnected/teams-collaboration/launch-new-workspace')}
+          onClick={() => router.push('/konnected/teams-collaboration/launch-new-workspace')}
         >
           Launch New Workspace
         </Button>

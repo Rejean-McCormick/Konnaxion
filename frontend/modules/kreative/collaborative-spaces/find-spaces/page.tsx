@@ -1,4 +1,5 @@
-'use client'
+'use client';
+"use client";
 
 // File: /pages/kreative/collaborative-spaces/find-spaces.tsx
 import React, { useState, useMemo } from 'react';
@@ -17,7 +18,7 @@ import {
   message,
 } from 'antd';
 import { SearchOutlined, UserAddOutlined } from '@ant-design/icons';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -125,11 +126,12 @@ const FindSpaces: NextPage = () => {
 
   // Handle join action.
   const handleJoin = (space: CollaborativeSpace) => {
+    const router = useRouter();
     if (space.joinType === 'open') {
       // Direct join.
       message.success(`You have joined "${space.name}"!`);
       // Optionally, redirect to the space's main page.
-      Router.push(`/kreative/collaborative-spaces/${space.id}`);
+      router.push(`/kreative/collaborative-spaces/${space.id}`);
     } else {
       // For invite-only, open a modal.
       setSelectedSpace(space);
@@ -205,7 +207,6 @@ const FindSpaces: NextPage = () => {
           </Select>
         </Space>
       </Space>
-
       {/* Render the list of space cards */}
       <Row gutter={[24, 24]}>
         {paginatedSpaces.map((space) => (
@@ -220,8 +221,9 @@ const FindSpaces: NextPage = () => {
                 </Button>,
               ]}
               onClick={() => {
+                const router = useRouter();
                 // Optionally, clicking the card can navigate to a space detail view.
-                Router.push(`/kreative/collaborative-spaces/${space.id}`);
+                router.push(`/kreative/collaborative-spaces/${space.id}`);
               }}
             >
               <Card.Meta
@@ -236,7 +238,6 @@ const FindSpaces: NextPage = () => {
           </Col>
         ))}
       </Row>
-
       {/* Pagination */}
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <Pagination
@@ -246,11 +247,10 @@ const FindSpaces: NextPage = () => {
           onChange={(page) => setCurrentPage(page)}
         />
       </div>
-
       {/* Modal for Invite-Only Join Request */}
       <Modal
         title="Request to Join Space"
-        visible={joinModalVisible}
+        open={joinModalVisible}
         onOk={confirmJoinRequest}
         onCancel={() => setJoinModalVisible(false)}
         okText="Send Request"

@@ -54,7 +54,7 @@ const MakerCreate = ({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Add new maker"
       onOk={handleOk}
       onCancel={handleCancel}
@@ -138,7 +138,7 @@ const MakerCreate = ({
         </CustomFormItem>
       </Form>
     </Modal>
-  )
+  );
 }
 
 export default Form.create({

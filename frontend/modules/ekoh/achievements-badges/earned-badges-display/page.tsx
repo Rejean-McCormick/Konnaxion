@@ -174,7 +174,7 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
         {/* Modal pour afficher les détails du badge */}
         <Modal
           title={selectedBadge?.name}
-          visible={modalVisible}
+          open={modalVisible}
           onOk={() => setModalVisible(false)}
           onCancel={() => setModalVisible(false)}
           footer={null}

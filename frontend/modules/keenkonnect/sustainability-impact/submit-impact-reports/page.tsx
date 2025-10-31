@@ -133,7 +133,7 @@ const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) =
         {/* Modal de confirmation */}
         <Modal
           title="Report Submitted"
-          visible={modalVisible}
+          open={modalVisible}
           onOk={handleModalOk}
           onCancel={handleModalOk}
           footer={[

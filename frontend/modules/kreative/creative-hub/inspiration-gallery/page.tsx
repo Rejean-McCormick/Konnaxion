@@ -164,7 +164,6 @@ const InspirationGallery: NextPage = () => {
         <TabPane tab="Painting" key="Painting" />
         <TabPane tab="Digital Art" key="Digital Art" />
       </Tabs>
-
       {/* Gallery Grid */}
       <Row gutter={[16, 16]}>
         {paginatedWorks.map((work) => (
@@ -212,7 +211,6 @@ const InspirationGallery: NextPage = () => {
           </Col>
         ))}
       </Row>
-
       {/* Pagination */}
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <Pagination
@@ -222,10 +220,9 @@ const InspirationGallery: NextPage = () => {
           onChange={(page) => setCurrentPage(page)}
         />
       </div>
-
       {/* Modal for work details */}
       <Modal
-        visible={modalVisible}
+        open={modalVisible}
         footer={null}
         onCancel={closeModal}
         width={800}

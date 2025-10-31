@@ -1,4 +1,5 @@
-'use client'
+'use client';
+"use client";
 
 /**
  * Description: User management components
@@ -12,7 +13,7 @@ import api from '../../api'
 import Loading from '../Loading'
 import Error from 'next/error'
 import moment from 'moment'
-import Router from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import { convertNonAccent } from '../shared/utils'
 
 const UserList = () => {
@@ -241,9 +242,10 @@ const UserList = () => {
             onRow={(record, _) => {
               return {
                 onClick: () => {
-                  Router.push('/users/id/[id]', `/users/id/${record.key}`)
+                  const router = useRouter();
+                  router.push(`/users/id/${record.key}`)
                 }
-              }
+              };
             }}
             style={{
               maxWidth: 1100
@@ -252,7 +254,7 @@ const UserList = () => {
         </CardStyled>
       </ColStyled>
     </Row>
-  )
+  );
 }
 
 export default UserList

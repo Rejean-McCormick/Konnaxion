@@ -1,3 +1,4 @@
+"use client";
 /**
  * Description: Sculpture table with support for sorting according to likes, comments and visits
  * Author: Hieu Chu
@@ -6,7 +7,7 @@
 import { Table } from 'antd'
 import { CardStyled } from './style'
 import styled from 'styled-components'
-import Router from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 const StyledTable = styled(Table)`
   .ant-table table {
@@ -59,11 +60,12 @@ export default ({ sculptures }) => {
         onRow={(record, _) => {
           return {
             onClick: () => {
-              Router.push('/sculptures/id/[id]', `/sculptures/id/${record.key}`)
+              const router = useRouter();
+              router.push(`/sculptures/id/${record.key}`)
             }
-          }
+          };
         }}
       />
     </CardStyled>
-  )
+  );
 }

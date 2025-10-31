@@ -1,10 +1,11 @@
-'use client'
+'use client';
+"use client";
 
 // File: /pages/kreative/idea-incubator/my-ideas.tsx
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
 import { List, Button, Badge, Input, Select, Space, Typography } from 'antd';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -87,7 +88,6 @@ const MyIdeasPage: NextPage = () => {
           </Select>
         </Space>
       </Space>
-
       {/* Ideas List */}
       <List
         itemLayout="vertical"
@@ -98,11 +98,11 @@ const MyIdeasPage: NextPage = () => {
             actions={[
               <Button
                 type="primary"
-                onClick={() => Router.push(`/kreative/idea-incubator/edit/${idea.id}`)}
+                onClick={() => router.push(`/kreative/idea-incubator/edit/${idea.id}`)}
               >
                 Edit
               </Button>,
-              <Button onClick={() => Router.push(`/kreative/idea-incubator/view/${idea.id}`)}>
+              <Button onClick={() => router.push(`/kreative/idea-incubator/view/${idea.id}`)}>
                 View
               </Button>,
             ]}

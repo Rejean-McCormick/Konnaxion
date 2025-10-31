@@ -1,4 +1,5 @@
-'use client'
+'use client';
+"use client";
 
 /**
  * Description: Upload image component when creating new sculpture
@@ -9,7 +10,7 @@ import { Upload, Button, Icon, message, Row, Modal } from 'antd'
 import { useState } from 'react'
 import { CardStyled, ColStyled } from '../style'
 import api from '../../../api'
-import Router from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import Head from 'next/head'
 
 const { confirm } = Modal
@@ -119,10 +120,7 @@ const SculptureUploadImage = ({ sculpture }) => {
             <Button
               type="primary"
               onClick={() =>
-                Router.push(
-                  '/sculptures/id/[id]',
-                  `/sculptures/id/${accessionId}`
-                )
+                router.push(`/sculptures/id/${accessionId}`)
               }
             >
               Finish
@@ -131,7 +129,7 @@ const SculptureUploadImage = ({ sculpture }) => {
         </ColStyled>
       </Row>
     </>
-  )
+  );
 }
 
 export default SculptureUploadImage

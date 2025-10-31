@@ -1,11 +1,12 @@
-'use client'
+'use client';
+"use client";
 
 // File: /pages/kreative/community-showcases/featured-projects.tsx
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
 import { Card, Row, Col, Input, Select, Modal, Pagination, Typography, Badge, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -129,7 +130,6 @@ const FeaturedProjects: NextPage = () => {
           {/* Add more categories as needed */}
         </Select>
       </Space>
-
       {/* Projects Grid */}
       <Row gutter={[24, 24]}>
         {paginatedProjects.map((project) => (
@@ -161,7 +161,6 @@ const FeaturedProjects: NextPage = () => {
           </Col>
         ))}
       </Row>
-
       {/* Pagination */}
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <Pagination
@@ -171,10 +170,9 @@ const FeaturedProjects: NextPage = () => {
           onChange={(page) => setCurrentPage(page)}
         />
       </div>
-
       {/* Modal for Project Details */}
       <Modal
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={closeModal}
         footer={null}
         width={800}
@@ -192,7 +190,7 @@ const FeaturedProjects: NextPage = () => {
               <p style={{ marginTop: 12 }}>{selectedProject.description}</p>
               <Button
                 type="primary"
-                onClick={() => Router.push(`/kreative/community-showcases/featured-projects/${selectedProject.id}`)}
+                onClick={() => router.push(`/kreative/community-showcases/featured-projects/${selectedProject.id}`)}
               >
                 View Details
               </Button>

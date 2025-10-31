@@ -115,10 +115,7 @@ const UserComments = ({ comments, deleteComment }) => {
               {moment(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
-          <Link
-            href="/sculptures/id/[id]"
-            as={`/sculptures/id/${x.sculpture.accessionId}`}
-          >
+          <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
             <a
               style={{
                 fontSize: 14

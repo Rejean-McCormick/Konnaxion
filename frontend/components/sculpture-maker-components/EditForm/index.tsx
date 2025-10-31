@@ -1,4 +1,5 @@
-'use client'
+'use client';
+"use client";
 
 /**
  * Description: Sculpture Edit Page component
@@ -8,7 +9,7 @@
 import { CardStyled, ColStyled } from '../style'
 import { Row, Modal, Button, Icon, message, notification } from 'antd'
 import SculptureEdit from './SculptureEdit'
-import Router, { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react'
 import api from '../../../api'
 import Loading from '../../Loading'
@@ -53,10 +54,11 @@ const SculptureEditForm = () => {
         }
       },
       onOk: async () => {
+        const router = useRouter();
         try {
           const _result = await api.delete(`/sculpture/${sculptureId}`)
           message.success('Deleted sculpture successfully!', 2)
-          Router.push('/sculptures')
+          router.push('/sculptures')
         } catch (error) {
           notification.error({
             message: 'Error',

@@ -1,11 +1,12 @@
-'use client'
+'use client';
+"use client";
 
 // File: /pages/kreative/collaborative-spaces/my-spaces.tsx
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
 import { List, Button, Input, Select, Badge, Avatar, Space, Row, Col, Typography } from 'antd';
 import { TeamOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import Router from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -74,7 +75,8 @@ const MySpacesPage: NextPage = () => {
 
   // Function to handle entering a space.
   const enterSpace = (id: string) => {
-    Router.push(`/kreative/collaborative-spaces/${id}`);
+    const router = useRouter();
+    router.push(`/kreative/collaborative-spaces/${id}`);
   };
 
   return (
@@ -107,13 +109,12 @@ const MySpacesPage: NextPage = () => {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => Router.push('/kreative/collaborative-spaces/create')}
+            onClick={() => router.push('/kreative/collaborative-spaces/create')}
           >
             Start a New Space
           </Button>
         </Col>
       </Row>
-
       {/* Collaborative Spaces List */}
       <List
         itemLayout="horizontal"

@@ -1,4 +1,5 @@
-'use client'
+'use client';
+"use client";
 
 /**
  * Description: Sculpture edit page component
@@ -12,7 +13,7 @@ import { FlyToInterpolator } from 'react-map-gl'
 import Map from '../../map-components'
 import EditFormTextFields from './EditFormTextFields'
 import api from '../../../api'
-import Router from 'next/navigation'
+import { useRouter } from 'next/navigation';
 
 const SculptureEdit = ({
   form,
@@ -65,6 +66,7 @@ const SculptureEdit = ({
   const handleSubmit = e => {
     e.preventDefault()
     form.validateFields(async (err, values) => {
+      const router = useRouter();
       if (!err) {
         // remember to convert lat and long to numeric type
         console.log('Received values of form: ', values)
@@ -89,10 +91,7 @@ const SculptureEdit = ({
           const _result = (await api.patch('/sculpture', values)).data
           message.success('Updated sculpture details successfully!', 2)
           setSubmitting(false)
-          Router.push(
-            '/sculptures/id/[id]',
-            `/sculptures/id/${values.accessionId}`
-          )
+          router.push(`/sculptures/id/${values.accessionId}`)
         } catch (e) {
           setSubmitting(false)
           message.error(e.response.data.message)

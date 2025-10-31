@@ -50,7 +50,7 @@ const SculptureCard = ({
     (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
   )
   return (
-    <Link href="/sculptures/id/[id]" as={`/sculptures/id/${accessionId}`}>
+    <Link href={`/sculptures/id/${accessionId}`}>
       <a style={{ display: 'inline-block', width: '100%' }}>
         <ShadowCard
           cover={
@@ -66,10 +66,10 @@ const SculptureCard = ({
                 />
               </div>
             ) : (
-              <EmptyImage
+              (<EmptyImage
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description="No Images"
-              />
+              />)
               // <div style={{ height: 450, border: '1px solid black' }}>hey</div>
             )
           }
@@ -89,7 +89,7 @@ const SculptureCard = ({
         </ShadowCard>
       </a>
     </Link>
-  )
+  );
 }
 
 export const SculptureCardDescription = ({

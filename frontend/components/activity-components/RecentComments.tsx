@@ -60,7 +60,7 @@ const RecentComments = ({ comments, deleteComment }) => {
   )
   const formattedComments = comments.map(x => ({
     author: (
-      <Link href="/users/id/[id]" as={`/users/id/${x.user.userId}`}>
+      <Link href={`/users/id/${x.user.userId}`}>
         <a
           style={{
             fontSize: 14,
@@ -116,10 +116,7 @@ const RecentComments = ({ comments, deleteComment }) => {
               {moment(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
-          <Link
-            href="/sculptures/id/[id]"
-            as={`/sculptures/id/${x.sculpture.accessionId}`}
-          >
+          <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
             <a
               style={{
                 fontSize: 14

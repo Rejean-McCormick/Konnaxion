@@ -207,7 +207,7 @@ const AccountPreferencesPage: NextPage = () => {
             </Button>
             <Modal
               title="Confirm Account Deletion"
-              visible={isModalVisible}
+              open={isModalVisible}
               onOk={handleDeleteConfirm}
               onCancel={handleDeleteCancel}
               okText="Delete"

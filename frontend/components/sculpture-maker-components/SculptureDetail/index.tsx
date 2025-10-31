@@ -112,16 +112,12 @@ const SculptureDetail = () => {
       <Head>
         <title>{name} - UOW Sculptures</title>
       </Head>
-
       <Row gutter={16}>
         <ColStyled xs={24} lg={15}>
           <CardStyled
             title="Sculpture Details"
             extra={
-              <Link
-                href="/sculptures/id/[id]/edit"
-                as={`/sculptures/id/${id}/edit`}
-              >
+              <Link href={`/sculptures/id/${id}/edit`}>
                 <a>
                   <Button icon="edit">Edit details</Button>
                 </a>
@@ -274,7 +270,7 @@ const SculptureDetail = () => {
         </ColStyled>
       </Row>
     </>
-  )
+  );
 }
 
 export default SculptureDetail

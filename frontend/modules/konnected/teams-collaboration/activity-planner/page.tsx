@@ -183,11 +183,10 @@ const ActivityPlanner: NextPage = () => {
           </Button>
         </Col>
       </Row>
-
       {/* Modal pour ajouter un nouvel événement */}
       <Modal
         title="Add New Activity"
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={() => {
           setModalVisible(false);
           form.resetFields();

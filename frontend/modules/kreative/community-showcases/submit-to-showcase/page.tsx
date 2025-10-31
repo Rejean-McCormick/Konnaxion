@@ -97,11 +97,10 @@ const SubmitToShowcase: NextPage = () => {
           </Button>
         </Form.Item>
       </Form>
-
       {/* Confirmation Modal */}
       <Modal
         title="Submission Received"
-        visible={modalVisible}
+        open={modalVisible}
         onOk={handleModalOk}
         onCancel={() => setModalVisible(false)}
         okText="Ok"

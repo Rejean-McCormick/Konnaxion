@@ -13,7 +13,7 @@ const RecentVisits = ({ visits }) => {
   )
   const formattedComments = visits.map(x => ({
     author: (
-      <Link href="/users/id/[id]" as={`/users/id/${x.user.userId}`}>
+      <Link href={`/users/id/${x.user.userId}`}>
         <a
           style={{
             fontSize: 14,
@@ -64,10 +64,7 @@ const RecentVisits = ({ visits }) => {
         >
           visited{' '}
         </span>
-        <Link
-          href="/sculptures/id/[id]"
-          as={`/sculptures/id/${x.sculpture.accessionId}`}
-        >
+        <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
           <a
             style={{
               fontSize: 14

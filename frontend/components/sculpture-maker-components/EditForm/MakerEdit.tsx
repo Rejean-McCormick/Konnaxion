@@ -68,7 +68,7 @@ const MakerEdit = ({
 
   return (
     <Modal
-      visible={visible}
+      open={visible}
       title="Edit maker details"
       onOk={handleOk}
       onCancel={handleCancel}
@@ -157,7 +157,7 @@ const MakerEdit = ({
         </CustomFormItem>
       </Form>
     </Modal>
-  )
+  );
 }
 
 export default Form.create({
