@@ -1,4 +1,4 @@
-system: Konnaxion
+system: MonApp
 actors:
 - name: User
   type: person

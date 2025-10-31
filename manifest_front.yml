@@ -1,4 +1,4 @@
-system: Konnaxion
+system: MonApp
 actors:
 - name: User
   type: person
@@ -16,6 +16,9 @@ containers:
     ui_pages: []
     has_middleware: false
     has_next_config: true
+  calls_out:
+  - method: POST
+    path: post
 datastores: []
 messaging: []
 relations: []

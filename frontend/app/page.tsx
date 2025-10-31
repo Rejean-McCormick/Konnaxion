@@ -1,9 +1,15 @@
-import MainLayout from "@/shared/layout/MainLayout";
+// app/page.tsx
+import PageContainer from "@/components/PageContainer";
 
-export default function Home() {
+export const metadata = {
+  title: "Accueil",
+  description: "Point d’entrée",
+};
+
+export default function Page() {
   return (
-    <MainLayout>
-      <div className="text-gray-500">Konnaxion frontend ready.</div>
-    </MainLayout>
+    <PageContainer title="Accueil">
+      <p>Bienvenue. Cette page affiche uniquement le PageContainer et son contenu.</p>
+    </PageContainer>
   );
 }
