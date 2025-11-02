@@ -1,3 +1,5 @@
+'use client'
+
 export async function downloadCsv(endpoint: string, params?: Record<string, unknown>) {
   const qs = new URLSearchParams(params as Record<string, string>).toString();
   const url = `/api/reports/${endpoint}?${qs}&format=csv`;

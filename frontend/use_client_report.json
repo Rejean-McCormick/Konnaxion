@@ -1,0 +1,2192 @@
+[
+  {
+    "file": "instrumentation.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "next.config.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "playwright.config.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "playwright.ct.config.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "playwright.smoke.config.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": ".storybook\\main.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": ".storybook\\preview.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\layout.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\CustomComment.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\PageContainer.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\TagsList.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\ThemeSwitcher.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "context\\ThemeContext.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "hooks\\useExpertiseTags.ts",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "hooks\\usePageTitle.ts",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "hooks\\useReputationEvents.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "routes\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "routes\\routesEkoh.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "routes\\routesEthikos.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "routes\\routesKeenkonnect.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "routes\\routesKonnected.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "routes\\routesKreative.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "services\\admin.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\decide.mock.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\decide.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\deliberate.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\impact.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\learn.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\pulse.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\trust.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "services\\_request.ts",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "shared\\api.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "shared\\downloadCsv.ts",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "shared\\QueryProvider.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "tests\\routes-tests.spec.ts",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "tests\\routes.spec.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\cyberTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\darkTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\funkyTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\kktheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\lightTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\minimalTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\modernTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\oceanTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "theme\\sunsetTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "_e2e\\example.spec.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\components\\ThemeSwitcher.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\cyberTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\darkTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\funkyTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\kktheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\lightTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\minimalTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\modernTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\oceanTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\theme\\sunsetTheme.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "src\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "shared\\layout\\MainLayout.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "shared\\services\\admin.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "shared\\services\\search.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\idea-incubator\\my-ideas\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\idea-incubator\\create-new-idea\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\idea-incubator\\collaborate-on-ideas\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\dashboard\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\creative-hub\\submit-creative-work\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\creative-hub\\inspiration-gallery\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\creative-hub\\explore-ideas\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\community-showcases\\top-creators\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\community-showcases\\submit-to-showcase\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\community-showcases\\featured-projects\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\collaborative-spaces\\start-new-space\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\collaborative-spaces\\my-spaces\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kreative\\collaborative-spaces\\find-spaces\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\components\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\components\\OpportunityList.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\components\\ProfileCard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\hooks\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\hooks\\useOpportunities.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\hooks\\useProfiles.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\pages\\ConnectCenter.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\pages\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\kontact\\pages\\PublicProfile.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\ConsultationForm.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\ConsultationList.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\ConsultationVotePanel.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\ImpactTimeline.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\ResultsChart.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\ResultsDashboard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\SuggestionBoard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\components\\SuggestionsBoard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\hooks\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\hooks\\useConsultation.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\hooks\\useConsultationResults.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\hooks\\useConsultations.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\hooks\\useConsultationVote.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\hooks\\useImpact.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\hooks\\useSuggestions.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\pages\\ConsultationDetailPage.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\pages\\ConsultationHub.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\pages\\ConsultationsHomePage.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\pages\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\pages\\ResultsPage.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsultations\\pages\\SuggestionPage.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsensus\\components\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsensus\\components\\PollBarChart.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsensus\\components\\VoteButtons.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsensus\\hooks\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsensus\\hooks\\useLivePoll.ts",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\konsensus\\hooks\\usePoll.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsensus\\pages\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konsensus\\pages\\PollPage.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\teams-collaboration\\team-builder\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\teams-collaboration\\project-workspaces\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\teams-collaboration\\my-teams\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\teams-collaboration\\activity-planner\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\learning-paths\\my-learning-path\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\learning-paths\\manage-existing-paths\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\learning-paths\\create-learning-path\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\learning-library\\search-filters\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\learning-library\\recommended-resources\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\learning-library\\offline-content\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\learning-library\\browse-resources\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\dashboard\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\community-discussions\\start-new-discussion\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\community-discussions\\moderation\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\community-discussions\\active-threads\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\certifications\\exam-registration\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\certifications\\exam-preparation\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\certifications\\exam-dashboard-results\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\konnected\\certifications\\certification-programs\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\workspaces\\my-workspaces\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\workspaces\\launch-new-workspace\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\workspaces\\browse-available-workspaces\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\user-reputation\\view-reputation-ekoh\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\user-reputation\\manage-expertise-areas\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\user-reputation\\account-preferences\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\sustainability-impact\\track-project-impact\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\sustainability-impact\\sustainability-dashboard\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\sustainability-impact\\submit-impact-reports\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\projects\\project-workspace\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\projects\\my-projects\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\projects\\create-new-project\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\projects\\browse-projects\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\knowledge\\upload-new-document\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\knowledge\\search-filter-documents\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\knowledge\\document-management\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\knowledge\\browse-repository\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\dashboard\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\ai-team-matching\\my-matches\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\ai-team-matching\\match-preferences\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\keenkonnect\\ai-team-matching\\find-teams\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\DomainHeatMap.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\ErrorRateSparkline.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\ExportCSVButton.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\LatencySLOGauge.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\SmartVoteChart.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\TimeRangePicker.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\UsageBigNumbers.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\hooks\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\hooks\\useReport.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\hooks\\useReportStream.ts",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\insights\\pages\\CustomBuilderPage.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\pages\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\pages\\InsightsHomePage.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\pages\\PerfDashboard.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\pages\\SmartVoteDashboard.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\pages\\UsageDashboard.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\hooks\\__tests__\\useReport.test.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\insights\\components\\__stories__\\SmartVoteChart.stories.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\components\\AppShell.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\components\\GlobalSearchBar.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\components\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\hooks\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\hooks\\useGlobalSearch.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\pages\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\pages\\MyWork.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\global\\pages\\Search.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ethikos\\trust\\badges\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\trust\\credentials\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ethikos\\trust\\profile\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\pulse\\health\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\pulse\\live\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\pulse\\overview\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\pulse\\trends\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\learn\\changelog\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\learn\\glossary\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ethikos\\learn\\guides\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\impact\\feedback\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ethikos\\impact\\outcomes\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\impact\\tracker\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\deliberate\\elite\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ethikos\\deliberate\\guidelines\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\deliberate\\[topic]\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ethikos\\decide\\elite\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\decide\\methodology\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\decide\\public\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ethikos\\decide\\results\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\admin\\audit\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\admin\\moderation\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ethikos\\admin\\roles\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "modules\\ekoh\\voting-influence\\current-voting-weight\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ekoh\\overview-analytics\\current-ekoh-score\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ekoh\\expertise-areas\\view-current-expertise\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ekoh\\dashboard\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\ekoh\\achievements-badges\\earned-badges-display\\components\\CommonWidget\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\components\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\components\\ModerationQueue.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\components\\UserStats.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\hooks\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\hooks\\useModeration.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\hooks\\useStats.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\pages\\AdminConsole.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "modules\\admin\\pages\\index.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "ct\\insights\\SmartVoteChart.ct.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\activity-components\\index.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\activity-components\\RecentComments.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\activity-components\\RecentLikes.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\activity-components\\RecentVisits.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\activity-components\\style.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\auth0-components\\index.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\Button\\Button.stories.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\Button\\Button.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\charts\\ChartCard.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\CommentCard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\index.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\LikeCard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\LineChart.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\SculptureTable.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\StatisticCard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\style.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\UserCard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\UserPieChart.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\dashboard-components\\VisitCard.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\layout-components\\Drawer.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\layout-components\\Header.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\layout-components\\LogoTitle.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\layout-components\\Main.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\layout-components\\MainLayout.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\layout-components\\Menu.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\layout-components\\Sider.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\map-components\\ControlPanel.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\map-components\\index.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\map-components\\Map.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\map-components\\MapMarker.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\map-components\\StaticMap.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\MakerList.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\SculptureGrid.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\style.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\shared\\utils.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\Tooltip\\Tooltip.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\user-components\\index.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\user-components\\style.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\user-components\\UserComments.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\user-components\\UserLikes.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\user-components\\UserProfile.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\user-components\\UserVisit.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\CreateForm\\CreateFormTextFields.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\CreateForm\\index.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\CreateForm\\MakerCreate.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\CreateForm\\SculptureCreate.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\CreateForm\\SculptureUploadImage.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\EditForm\\EditFormTextFields.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\EditForm\\EditImage.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\EditForm\\index.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\EditForm\\MakerEdit.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\EditForm\\SculptureEdit.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\SculptureDetail\\index.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\SculptureDetail\\SculptureComment.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "components\\sculpture-maker-components\\SculptureDetail\\SculptureTrend.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ekoh\\layout.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\layout.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\layout.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\layout.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\konsensus\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\layout.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\dashboard\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\idea-incubator\\collaborate-on-ideas\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\idea-incubator\\create-new-idea\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\idea-incubator\\my-ideas\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\creative-hub\\explore-ideas\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\creative-hub\\inspiration-gallery\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\creative-hub\\submit-creative-work\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\community-showcases\\featured-projects\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\community-showcases\\submit-to-showcase\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\community-showcases\\top-creators\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\collaborative-spaces\\find-spaces\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\collaborative-spaces\\my-spaces\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\kreative\\collaborative-spaces\\start-new-space\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\dashboard\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\teams-collaboration\\activity-planner\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\teams-collaboration\\my-teams\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\teams-collaboration\\project-workspaces\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\teams-collaboration\\team-builder\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\learning-paths\\create-learning-path\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\learning-paths\\manage-existing-paths\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\learning-paths\\my-learning-path\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\learning-library\\browse-resources\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\learning-library\\offline-content\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\learning-library\\recommended-resources\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\learning-library\\search-filters\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\community-discussions\\active-threads\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\community-discussions\\moderation\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\community-discussions\\start-new-discussion\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\certifications\\certification-programs\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\certifications\\exam-dashboard-results\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\certifications\\exam-preparation\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\konnected\\certifications\\exam-registration\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\dashboard\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\workspaces\\browse-available-workspaces\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\workspaces\\launch-new-workspace\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\workspaces\\my-workspaces\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\user-reputation\\account-preferences\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\user-reputation\\manage-expertise-areas\\page.tsx",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\user-reputation\\view-reputation-ekoh\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\sustainability-impact\\submit-impact-reports\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\sustainability-impact\\sustainability-dashboard\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\sustainability-impact\\track-project-impact\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\projects\\browse-projects\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\projects\\create-new-project\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\projects\\my-projects\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\projects\\project-workspace\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\knowledge\\browse-repository\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\knowledge\\document-management\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\knowledge\\search-filter-documents\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\knowledge\\upload-new-document\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\ai-team-matching\\find-teams\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\ai-team-matching\\match-preferences\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\keenkonnect\\ai-team-matching\\my-matches\\page.tsx",
+    "needs_client": false,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\trust\\badges\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\trust\\credentials\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\trust\\profile\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\pulse\\health\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\pulse\\live\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\pulse\\overview\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\pulse\\trends\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\learn\\changelog\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\learn\\glossary\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\learn\\guides\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\impact\\feedback\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\impact\\outcomes\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\impact\\tracker\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\deliberate\\elite\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\deliberate\\guidelines\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\deliberate\\[topic]\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\decide\\elite\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\decide\\methodology\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\decide\\public\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\decide\\results\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ethikos\\admin\\audit\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\admin\\moderation\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ethikos\\admin\\roles\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ekoh\\dashboard\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ekoh\\voting-influence\\current-voting-weight\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ekoh\\overview-analytics\\current-ekoh-score\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\ekoh\\expertise-areas\\view-current-expertise\\page.tsx",
+    "needs_client": true,
+    "has_use_client": false,
+    "action": "inserted"
+  },
+  {
+    "file": "app\\ekoh\\achievements-badges\\earned-badges-display\\page.tsx",
+    "needs_client": true,
+    "has_use_client": true,
+    "action": "none"
+  },
+  {
+    "file": "app\\api\\health\\route.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\api\\search\\route.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\api\\admin\\moderation\\route.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  },
+  {
+    "file": "app\\api\\admin\\stats\\route.ts",
+    "needs_client": false,
+    "has_use_client": false,
+    "action": "none"
+  }
+]

@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Badge, Card, Progress, Tooltip } from 'antd';
 import { useRequest } from 'ahooks';

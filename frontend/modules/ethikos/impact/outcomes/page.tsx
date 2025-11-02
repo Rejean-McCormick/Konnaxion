@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import { Tabs } from 'antd';
 import { Line, Bar } from '@ant-design/plots';

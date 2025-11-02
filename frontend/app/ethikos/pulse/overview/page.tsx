@@ -1,3 +1,5 @@
+'use client'
+
 // pages/ethikos/pulse/overview.tsx
 import {
   PageContainer,

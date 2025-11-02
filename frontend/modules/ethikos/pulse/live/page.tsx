@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import { Badge, Space } from 'antd';
 import { useInterval, useRequest } from 'ahooks';

@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Tabs } from 'antd';
 import { useRequest } from 'ahooks';

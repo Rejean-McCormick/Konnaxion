@@ -1,3 +1,5 @@
+'use client'
+
 // pages/ekoh/voting-influence/current-voting-weight/index.tsx
 import React from 'react';
 import Head from 'next/head';

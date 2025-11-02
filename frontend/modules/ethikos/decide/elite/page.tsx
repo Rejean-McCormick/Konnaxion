@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProTable, StatisticCard } from '@ant-design/pro-components';
 import { Progress, Statistic } from 'antd';
 import { useRequest } from 'ahooks';

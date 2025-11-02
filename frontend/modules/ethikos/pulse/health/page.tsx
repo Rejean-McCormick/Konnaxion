@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Pie, Radar } from '@ant-design/plots';
 import { useRequest } from 'ahooks';

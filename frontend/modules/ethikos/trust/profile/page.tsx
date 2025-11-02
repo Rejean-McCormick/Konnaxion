@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Avatar, Descriptions, Tag, Timeline } from 'antd';
 import { useRequest } from 'ahooks';

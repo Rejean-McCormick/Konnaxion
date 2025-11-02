@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Switch, Tag } from 'antd';
 import { useRequest } from 'ahooks';

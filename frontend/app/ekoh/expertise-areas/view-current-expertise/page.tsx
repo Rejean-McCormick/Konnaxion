@@ -1,3 +1,5 @@
+'use client'
+
 // pages/ekoh/expertise-areas/view-current-expertise/index.tsx
 import React from 'react';
 import Head from 'next/head';

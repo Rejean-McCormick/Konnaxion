@@ -1,3 +1,5 @@
+'use client'
+
 import { PageContainer } from '@ant-design/pro-components';
 import { Collapse, Anchor, Typography } from 'antd';
 import { useRequest } from 'ahooks';

@@ -1,3 +1,5 @@
+'use client'
+
 // fichier: Front1/services/_request.ts
 import axios from 'axios';
 
