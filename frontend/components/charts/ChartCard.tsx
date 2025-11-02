@@ -1,4 +1,5 @@
 // components/charts/ChartCard.tsx
+'use client';
 import React from 'react';
 import { Line, Area } from '@ant-design/plots';
 

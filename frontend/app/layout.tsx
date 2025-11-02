@@ -1,16 +1,14 @@
-import QueryProvider from "@/shared/QueryProvider";
+import { ThemeProvider } from '@/context/ThemeContext'
+import QueryProvider from '@/shared/QueryProvider'
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        {/* Client-side provider lives inside its own client component */}
-        <QueryProvider>{children}</QueryProvider>
+        <ThemeProvider>
+          <QueryProvider>{children}</QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }

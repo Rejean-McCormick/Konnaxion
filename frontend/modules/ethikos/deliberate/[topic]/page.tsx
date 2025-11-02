@@ -1,17 +1,15 @@
-'use client';
-"use client";
+'use client'
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Comment, Timeline, Typography } from 'antd';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchTopicDetail } from '@/services/deliberate';
 
 export default function TopicDetail() {
-  const params = useParams();
-  const {} = useRouter();
-  const topicId = params.topic as string;
+  const { query } = useRouter();
+  const topicId = query.topic as string;
 
   usePageTitle(`Deliberate · ${topicId}`);
 

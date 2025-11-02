@@ -1,75 +1,45 @@
-import React from 'react';
-import { DashboardOutlined } from '@ant-design/icons';
+'use client'
 
-/* ------------------------------------------------------------------
-   Pages  – App Router : on importe chaque “page” explicite
-   ---------------------------------------------------------------- */
-import EkohDashboard         from '@/ekoh/dashboard/page';
-import CurrentEkohScore      from '@/ekoh/overview-analytics/current-ekoh-score/page';
-import CurrentVotingWeight   from '@/ekoh/voting-influence/current-voting-weight/page';
-import ViewCurrentExpertise  from '@/ekoh/expertise-areas/view-current-expertise/page';
-import EarnedBadgesDisplay   from '@/ekoh/achievements-badges/earned-badges-display/page';
+import React from 'react'
+import { DashboardOutlined } from '@ant-design/icons'
 
-/* ------------------------------------------------------------------
-   Type Route (inchangé, sauf component : accepte maintenant un
-   Component Type OU un nœud React)
-   ---------------------------------------------------------------- */
-export interface Route {
-  path: string;
-  name: string;
-  rtlName?: string;
-  icon?: React.ReactNode;
-  component?: React.ComponentType | React.ReactNode;
-  layout?: string;
-  collapse?: boolean;
-  state?: string;
-  views?: Route[];
+// Type local minimal pour éviter toute dépendance
+type Route = { path?: string; name: string; icon?: React.ReactNode; views?: Route[] }
+
+const directDashboard: Route = { path: '/ekoh/dashboard', name: 'Dashboard', icon: <DashboardOutlined /> }
+
+const achievements_badgesGroup: Route = {
+  name: 'Achievements Badges',
+  views: [
+    { path: '/ekoh/achievements-badges/earned-badges-display', name: 'Earned Badges Display' },
+    { path: '/ekoh/achievements-badges/earned-badges-display/index.test', name: 'Index.test' }
+  ]
 }
 
-/* ------------------------------------------------------------------
-   Flat routes : Ekoh ne comporte pas de sous‑menus
-   ---------------------------------------------------------------- */
-const ekohRoutes: Route[] = [
-  {
-    path:   '/ekoh/dashboard',
-    name:   'Dashboard',
-    rtlName:'Dashboard',
-    icon:   <DashboardOutlined />,   // icône thémée Ant Design
-    component: EkohDashboard,
-    layout: '/ekoh',
-  },
-  {
-    path:   '/ekoh/overview-analytics/current-ekoh-score',
-    name:   'Overview & Analytics',
-    rtlName:'Overview & Analytics',
-    icon:   null,
-    component: CurrentEkohScore,
-    layout: '/ekoh',
-  },
-  {
-    path:   '/ekoh/voting-influence/current-voting-weight',
-    name:   'Voting Influence',
-    rtlName:'Voting Influence',
-    icon:   null,
-    component: CurrentVotingWeight,
-    layout: '/ekoh',
-  },
-  {
-    path:   '/ekoh/expertise-areas/view-current-expertise',
-    name:   'Expertise Areas',
-    rtlName:'Expertise Areas',
-    icon:   null,
-    component: ViewCurrentExpertise,
-    layout: '/ekoh',
-  },
-  {
-    path:   '/ekoh/achievements-badges/earned-badges-display',
-    name:   'Achievements & Badges',
-    rtlName:'Achievements & Badges',
-    icon:   null,
-    component: EarnedBadgesDisplay,
-    layout: '/ekoh',
-  },
-];
+const overview_analyticsGroup: Route = {
+  name: 'Overview Analytics',
+  views: [
+    { path: '/ekoh/overview-analytics/current-ekoh-score', name: 'Current Ekoh Score' },
+    { path: '/ekoh/overview-analytics/current-ekoh-score/index.test', name: 'Index.test' }
+  ]
+}
 
-export default ekohRoutes;
+const voting_influenceGroup: Route = {
+  name: 'Voting Influence',
+  views: [
+    { path: '/ekoh/voting-influence/current-voting-weight', name: 'Current Voting Weight' },
+    { path: '/ekoh/voting-influence/current-voting-weight/index.test', name: 'Index.test' }
+  ]
+}
+
+const expertise_areasGroup: Route = {
+  name: 'Expertise Areas',
+  views: [
+    { path: '/ekoh/expertise-areas/view-current-expertise', name: 'View Current Expertise' },
+    { path: '/ekoh/expertise-areas/view-current-expertise/index.test', name: 'Index.test' }
+  ]
+}
+
+const routes: Route[] = [directDashboard, achievements_badgesGroup, expertise_areasGroup, overview_analyticsGroup, voting_influenceGroup]
+
+export default routes

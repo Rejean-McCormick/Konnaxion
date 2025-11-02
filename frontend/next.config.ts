@@ -1,12 +1,12 @@
+// next.config.ts
 import withBundleAnalyzer from "@next/bundle-analyzer"
-import { type NextConfig } from "next"
+import type { NextConfig } from "next"
 import { env } from "./env.mjs"
 
 const config: NextConfig = {
   reactStrictMode: true,
-  logging: {
-    fetches: { fullUrl: true },
-  },
+  compiler: { styledComponents: true },
+  logging: { fetches: { fullUrl: true } },
   async rewrites() {
     return [
       // proxy local API vers le backend
@@ -20,8 +20,5 @@ const config: NextConfig = {
   },
 }
 
-const withAnalyzer = withBundleAnalyzer({
-  enabled: env.ANALYZE === "true",
-})
-
+const withAnalyzer = withBundleAnalyzer({ enabled: env.ANALYZE === "true" })
 export default env.ANALYZE ? withAnalyzer(config) : config

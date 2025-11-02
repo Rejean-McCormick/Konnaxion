@@ -1,0 +1,992 @@
+
+===== BEGIN config/__init__.py =====
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from .celery_app import app as celery_app
+
+__all__ = ("celery_app",)
+
+===== END config/__init__.py =====
+
+
+===== BEGIN config/api_router.py =====
+"""
+Central DRF router for every Konnaxion v14 API endpoint.
+`config/urls.py` only needs:
+    path("api/", include("config.api_router"))
+"""
+
+from django.conf import settings
+from rest_framework.routers import DefaultRouter, SimpleRouter
+
+# ── Core / Users ──────────────────────────────────────────
+from konnaxion.users.api.views import UserViewSet
+
+# ── ethiKos ───────────────────────────────────────────────
+from konnaxion.ethikos.api_views import (
+    TopicViewSet,
+    StanceViewSet,
+    ArgumentViewSet,
+)
+
+# ── keenKonnect ───────────────────────────────────────────
+from konnaxion.keenkonnect.api_views import ProjectViewSet
+
+# ── Kollective Intelligence ───────────────────────────────
+from konnaxion.kollective_intelligence.api_views import VoteViewSet
+
+# ── KonnectED (Knowledge-library) ─────────────────────────
+from konnaxion.konnected.api_views import KnowledgeResourceViewSet
+
+# ── Kreative ──────────────────────────────────────────────
+from konnaxion.kreative.api_views import (
+    KreativeArtworkViewSet,
+    GalleryViewSet,
+)
+
+# ---------------------------------------------------------------------------
+
+router = DefaultRouter() if settings.DEBUG else SimpleRouter()
+
+# Core / Users
+router.register("users", UserViewSet, basename="user")
+
+# ethiKos
+router.register("ethikos/topics",    TopicViewSet,    basename="ethikos-topic")
+router.register("ethikos/stances",   StanceViewSet,   basename="ethikos-stance")
+router.register("ethikos/arguments", ArgumentViewSet, basename="ethikos-argument")
+
+# keenKonnect
+router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-project")
+
+# Kollective Intelligence
+router.register("kollective/votes", VoteViewSet, basename="kollective-vote")
+
+# KonnectED (knowledge resources)
+router.register(
+    "konnected/resources",
+    KnowledgeResourceViewSet,
+    basename="konnected-resource",
+)
+
+# Kreative
+router.register(
+    "kreative/artworks",      # REST path
+    KreativeArtworkViewSet,
+    basename="kreative-artwork",
+)
+router.register(
+    "kreative/galleries",
+    GalleryViewSet,
+    basename="kreative-gallery",
+)
+
+# ---------------------------------------------------------------------------
+
+app_name = "api"
+urlpatterns = router.urls
+
+===== END config/api_router.py =====
+
+
+===== BEGIN config/asgi.py =====
+"""
+ASGI config for Konnaxion project.
+
+It exposes the ASGI callable as a module-level variable named ``application``.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/dev/howto/deployment/asgi/
+
+"""
+
+import os
+import sys
+from pathlib import Path
+
+from django.core.asgi import get_asgi_application
+
+# This allows easy placement of apps within the interior
+# konnaxion directory.
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+sys.path.append(str(BASE_DIR / "konnaxion"))
+
+# If DJANGO_SETTINGS_MODULE is unset, default to the local settings
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+
+# This application object is used by any ASGI server configured to use this file.
+django_application = get_asgi_application()
+
+# Import websocket application here, so apps from django_application are loaded first
+from config.websocket import websocket_application  # noqa: E402
+
+
+async def application(scope, receive, send):
+    if scope["type"] == "http":
+        await django_application(scope, receive, send)
+    elif scope["type"] == "websocket":
+        await websocket_application(scope, receive, send)
+    else:
+        msg = f"Unknown scope type {scope['type']}"
+        raise NotImplementedError(msg)
+
+===== END config/asgi.py =====
+
+
+===== BEGIN config/celery_app.py =====
+import os
+
+from celery import Celery
+from celery.signals import setup_logging
+
+# set the default Django settings module for the 'celery' program.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+
+app = Celery("konnaxion")
+
+# Using a string here means the worker doesn't have to serialize
+# the configuration object to child processes.
+# - namespace='CELERY' means all celery-related configuration keys
+#   should have a `CELERY_` prefix.
+app.config_from_object("django.conf:settings", namespace="CELERY")
+
+
+@setup_logging.connect
+def config_loggers(*args, **kwargs):
+    from logging.config import dictConfig
+
+    from django.conf import settings
+
+    dictConfig(settings.LOGGING)
+
+
+# Load task modules from all registered Django app configs.
+app.autodiscover_tasks()
+
+===== END config/celery_app.py =====
+
+
+===== BEGIN config/settings/__init__.py =====
+
+===== END config/settings/__init__.py =====
+
+
+===== BEGIN config/settings/base.py =====
+# ruff: noqa: ERA001, E501
+"""Base settings to build other settings files upon."""
+
+import ssl
+from pathlib import Path
+
+import environ
+
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+# konnaxion/
+APPS_DIR = BASE_DIR / "konnaxion"
+env = environ.Env()
+
+READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
+if READ_DOT_ENV_FILE:
+    # OS environment variables take precedence over variables from .env
+    env.read_env(str(BASE_DIR / ".env"))
+
+# GENERAL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#debug
+DEBUG = env.bool("DJANGO_DEBUG", False)
+# Local time zone. Choices are
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# though not all of them may be available with every OS.
+# In Windows, this must be set to your system time zone.
+TIME_ZONE = "UTC"
+# https://docs.djangoproject.com/en/dev/ref/settings/#language-code
+LANGUAGE_CODE = "en-us"
+# https://docs.djangoproject.com/en/dev/ref/settings/#languages
+# from django.utils.translation import gettext_lazy as _
+# LANGUAGES = [
+#     ('en', _('English')),
+#     ('fr-fr', _('French')),
+#     ('pt-br', _('Portuguese')),
+# ]
+# https://docs.djangoproject.com/en/dev/ref/settings/#site-id
+SITE_ID = 1
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
+USE_I18N = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#use-tz
+USE_TZ = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
+LOCALE_PATHS = [str(BASE_DIR / "locale")]
+
+# DATABASES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#databases
+DATABASES = {"default": env.db("DATABASE_URL")}
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
+# https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# URLS
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#root-urlconf
+ROOT_URLCONF = "config.urls"
+# https://docs.djangoproject.com/en/dev/ref/settings/#wsgi-application
+WSGI_APPLICATION = "config.wsgi.application"
+
+# APPS
+# ------------------------------------------------------------------------------
+DJANGO_APPS = [
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.sites",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    # "django.contrib.humanize", # Handy template tags
+    "django.contrib.admin",
+    "django.forms",
+]
+THIRD_PARTY_APPS = [
+    "crispy_forms",
+    "crispy_bootstrap5",
+    "allauth",
+    "allauth.account",
+    "allauth.mfa",
+    "allauth.socialaccount",
+    "django_celery_beat",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "corsheaders",
+    "drf_spectacular",
+]
+
+LOCAL_APPS = [
+    "konnaxion.users",                    
+    "konnaxion.kollective_intelligence",  
+    "konnaxion.ethikos",                  
+    "konnaxion.keenkonnect",              
+    "konnaxion.konnected",               
+    "konnaxion.kreative",                 
+]
+# https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
+INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+# MIGRATIONS
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
+MIGRATION_MODULES = {"sites": "konnaxion.contrib.sites.migrations"}
+
+# AUTHENTICATION
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+]
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
+AUTH_USER_MODEL = "users.User"
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
+LOGIN_REDIRECT_URL = "users:redirect"
+# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+LOGIN_URL = "account_login"
+
+# PASSWORDS
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
+PASSWORD_HASHERS = [
+    # https://docs.djangoproject.com/en/dev/topics/auth/passwords/#using-argon2-with-django
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
+]
+# https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+]
+
+# MIDDLEWARE
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#middleware
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+]
+
+# STATIC
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#static-root
+STATIC_ROOT = str(BASE_DIR / "staticfiles")
+# https://docs.djangoproject.com/en/dev/ref/settings/#static-url
+STATIC_URL = "/static/"
+# https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#std:setting-STATICFILES_DIRS
+STATICFILES_DIRS = [str(APPS_DIR / "static")]
+# https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/#staticfiles-finders
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+]
+
+# MEDIA
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#media-root
+MEDIA_ROOT = str(APPS_DIR / "media")
+# https://docs.djangoproject.com/en/dev/ref/settings/#media-url
+MEDIA_URL = "/media/"
+
+# TEMPLATES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#templates
+TEMPLATES = [
+    {
+        # https://docs.djangoproject.com/en/dev/ref/settings/#std:setting-TEMPLATES-BACKEND
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        # https://docs.djangoproject.com/en/dev/ref/settings/#dirs
+        "DIRS": [str(APPS_DIR / "templates")],
+        # https://docs.djangoproject.com/en/dev/ref/settings/#app-dirs
+        "APP_DIRS": True,
+        "OPTIONS": {
+            # https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.messages.context_processors.messages",
+                "konnaxion.users.context_processors.allauth_settings",
+            ],
+        },
+    },
+]
+
+# https://docs.djangoproject.com/en/dev/ref/settings/#form-renderer
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+
+# http://django-crispy-forms.readthedocs.io/en/latest/install.html#template-packs
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+# FIXTURES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#fixture-dirs
+FIXTURE_DIRS = (str(APPS_DIR / "fixtures"),)
+
+# SECURITY
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-httponly
+SESSION_COOKIE_HTTPONLY = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#csrf-cookie-httponly
+CSRF_COOKIE_HTTPONLY = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#x-frame-options
+X_FRAME_OPTIONS = "DENY"
+
+# EMAIL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+EMAIL_BACKEND = env(
+    "DJANGO_EMAIL_BACKEND",
+    default="django.core.mail.backends.smtp.EmailBackend",
+)
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-timeout
+EMAIL_TIMEOUT = 5
+
+# ADMIN
+# ------------------------------------------------------------------------------
+# Django Admin URL.
+ADMIN_URL = "admin/"
+# https://docs.djangoproject.com/en/dev/ref/settings/#admins
+ADMINS = [("""Rejean McCormick""", "boatbuilder610@gmail.com")]
+# https://docs.djangoproject.com/en/dev/ref/settings/#managers
+MANAGERS = ADMINS
+# https://cookiecutter-django.readthedocs.io/en/latest/settings.html#other-environment-settings
+# Force the `admin` sign in process to go through the `django-allauth` workflow
+DJANGO_ADMIN_FORCE_ALLAUTH = env.bool("DJANGO_ADMIN_FORCE_ALLAUTH", default=False)
+
+# LOGGING
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#logging
+# See https://docs.djangoproject.com/en/dev/topics/logging for
+# more details on how to customize your logging configuration.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {"level": "INFO", "handlers": ["console"]},
+}
+
+REDIS_URL = env("REDIS_URL", default="redis://redis:6379/0")
+REDIS_SSL = REDIS_URL.startswith("rediss://")
+
+# Celery
+# ------------------------------------------------------------------------------
+if USE_TZ:
+    # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-timezone
+    CELERY_TIMEZONE = TIME_ZONE
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-broker_url
+CELERY_BROKER_URL = REDIS_URL
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
+CELERY_BROKER_USE_SSL = {"ssl_cert_reqs": ssl.CERT_NONE} if REDIS_SSL else None
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_backend
+CELERY_RESULT_BACKEND = REDIS_URL
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#redis-backend-use-ssl
+CELERY_REDIS_BACKEND_USE_SSL = CELERY_BROKER_USE_SSL
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-extended
+CELERY_RESULT_EXTENDED = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-backend-always-retry
+# https://github.com/celery/celery/pull/6122
+CELERY_RESULT_BACKEND_ALWAYS_RETRY = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#result-backend-max-retries
+CELERY_RESULT_BACKEND_MAX_RETRIES = 10
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-accept_content
+CELERY_ACCEPT_CONTENT = ["json"]
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-task_serializer
+CELERY_TASK_SERIALIZER = "json"
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_serializer
+CELERY_RESULT_SERIALIZER = "json"
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-time-limit
+# TODO: set to whatever value is adequate in your circumstances
+CELERY_TASK_TIME_LIMIT = 5 * 60
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-soft-time-limit
+# TODO: set to whatever value is adequate in your circumstances
+CELERY_TASK_SOFT_TIME_LIMIT = 60
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-scheduler
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-send-task-events
+CELERY_WORKER_SEND_TASK_EVENTS = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#std-setting-task_send_sent_event
+CELERY_TASK_SEND_SENT_EVENT = True
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-hijack-root-logger
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+# django-allauth
+# ------------------------------------------------------------------------------
+ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
+# https://docs.allauth.org/en/latest/account/configuration.html
+ACCOUNT_LOGIN_METHODS = {"username"}
+# https://docs.allauth.org/en/latest/account/configuration.html
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+# https://docs.allauth.org/en/latest/account/configuration.html
+ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+# https://docs.allauth.org/en/latest/account/configuration.html
+ACCOUNT_ADAPTER = "konnaxion.users.adapters.AccountAdapter"
+# https://docs.allauth.org/en/latest/account/forms.html
+ACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSignupForm"}
+# https://docs.allauth.org/en/latest/socialaccount/configuration.html
+SOCIALACCOUNT_ADAPTER = "konnaxion.users.adapters.SocialAccountAdapter"
+# https://docs.allauth.org/en/latest/socialaccount/configuration.html
+SOCIALACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSocialSignupForm"}
+
+# django-rest-framework
+# -------------------------------------------------------------------------------
+# django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+# django-cors-headers - https://github.com/adamchainz/django-cors-headers#setup
+CORS_URLS_REGEX = r"^/api/.*$"
+
+# By Default swagger ui is available only to admin user(s). You can change permission classes to change that
+# See more configuration options at https://drf-spectacular.readthedocs.io/en/latest/settings.html#settings
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Konnaxion API",
+    "DESCRIPTION": "Documentation of API endpoints of Konnaxion",
+    "VERSION": "1.0.0",
+    "SERVE_PERMISSIONS": ["rest_framework.permissions.IsAdminUser"],
+    "SCHEMA_PATH_PREFIX": "/api/",
+}
+# Your stuff...
+# ------------------------------------------------------------------------------
+ACCOUNT_EMAIL_REQUIRED     = True
+
+# --- EkoH & Smart-Vote additions ---
+from .settings_addons import *
+
+===== END config/settings/base.py =====
+
+
+===== BEGIN config/settings/local.py =====
+# ruff: noqa: E501
+from .base import *  # noqa: F403
+from .base import INSTALLED_APPS
+from .base import MIDDLEWARE
+from .base import env
+
+# GENERAL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#debug
+DEBUG = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
+SECRET_KEY = env(
+    "DJANGO_SECRET_KEY",
+    default="1uAiupbsbxcv5FQQB9QY7kmYrwnfquI0vsrT5sEBx0AQdLjiCWq6m6X6bClGW2qh",
+)
+# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
+
+# CACHES
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#caches
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "",
+    },
+}
+
+# EMAIL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-host
+EMAIL_HOST = env("EMAIL_HOST", default="mailpit")
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-port
+EMAIL_PORT = 1025
+
+# WhiteNoise
+# ------------------------------------------------------------------------------
+# http://whitenoise.evans.io/en/latest/django.html#using-whitenoise-in-development
+INSTALLED_APPS = ["whitenoise.runserver_nostatic", *INSTALLED_APPS]
+
+
+# django-debug-toolbar
+# ------------------------------------------------------------------------------
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#prerequisites
+INSTALLED_APPS += ["debug_toolbar"]
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#middleware
+MIDDLEWARE += ["debug_toolbar.middleware.DebugToolbarMiddleware"]
+# https://django-debug-toolbar.readthedocs.io/en/latest/configuration.html#debug-toolbar-config
+DEBUG_TOOLBAR_CONFIG = {
+    "DISABLE_PANELS": [
+        "debug_toolbar.panels.redirects.RedirectsPanel",
+        # Disable profiling panel due to an issue with Python 3.12:
+        # https://github.com/jazzband/django-debug-toolbar/issues/1875
+        "debug_toolbar.panels.profiling.ProfilingPanel",
+    ],
+    "SHOW_TEMPLATE_CONTEXT": True,
+}
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#internal-ips
+INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
+if env("USE_DOCKER") == "yes":
+    import socket
+
+    hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
+    INTERNAL_IPS += [".".join(ip.split(".")[:-1] + ["1"]) for ip in ips]
+    # RunServerPlus
+    # ------------------------------------------------------------------------------
+    # This is a custom setting for RunServerPlus to fix reloader issue in Windows docker environment
+    # Werkzeug reloader type [auto, watchdog, or stat]
+    RUNSERVERPLUS_POLLER_RELOADER_TYPE = 'stat'
+    # If you have CPU and IO load issues, you can increase this poller interval e.g) 5
+    RUNSERVERPLUS_POLLER_RELOADER_INTERVAL = 1
+
+# django-extensions
+# ------------------------------------------------------------------------------
+# https://django-extensions.readthedocs.io/en/latest/installation_instructions.html#configuration
+INSTALLED_APPS += ["django_extensions"]
+# Celery
+# ------------------------------------------------------------------------------
+
+# https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-eager-propagates
+CELERY_TASK_EAGER_PROPAGATES = True
+# Your stuff...
+# ------------------------------------------------------------------------------
+
+===== END config/settings/local.py =====
+
+
+===== BEGIN config/settings/production.py =====
+# ruff: noqa: E501
+import logging
+
+import sentry_sdk
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
+
+from .base import *  # noqa: F403
+from .base import DATABASES
+from .base import INSTALLED_APPS
+from .base import REDIS_URL
+from .base import SPECTACULAR_SETTINGS
+from .base import env
+
+# GENERAL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
+SECRET_KEY = env("DJANGO_SECRET_KEY")
+# https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["konnaxion.local"])
+
+# DATABASES
+# ------------------------------------------------------------------------------
+DATABASES["default"]["CONN_MAX_AGE"] = env.int("CONN_MAX_AGE", default=60)
+
+# CACHES
+# ------------------------------------------------------------------------------
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": REDIS_URL,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            # Mimicking memcache behavior.
+            # https://github.com/jazzband/django-redis#memcached-exceptions-behavior
+            "IGNORE_EXCEPTIONS": True,
+        },
+    },
+}
+
+# SECURITY
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-ssl-redirect
+SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+# https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-secure
+SESSION_COOKIE_SECURE = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#session-cookie-name
+SESSION_COOKIE_NAME = "__Secure-sessionid"
+# https://docs.djangoproject.com/en/dev/ref/settings/#csrf-cookie-secure
+CSRF_COOKIE_SECURE = True
+# https://docs.djangoproject.com/en/dev/ref/settings/#csrf-cookie-name
+CSRF_COOKIE_NAME = "__Secure-csrftoken"
+# https://docs.djangoproject.com/en/dev/topics/security/#ssl-https
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-seconds
+# TODO: set this to 60 seconds first and then to 518400 once you prove the former works
+SECURE_HSTS_SECONDS = 60
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-include-subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool(
+    "DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS",
+    default=True,
+)
+# https://docs.djangoproject.com/en/dev/ref/settings/#secure-hsts-preload
+SECURE_HSTS_PRELOAD = env.bool("DJANGO_SECURE_HSTS_PRELOAD", default=True)
+# https://docs.djangoproject.com/en/dev/ref/middleware/#x-content-type-options-nosniff
+SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
+    "DJANGO_SECURE_CONTENT_TYPE_NOSNIFF",
+    default=True,
+)
+
+# STATIC & MEDIA
+# ------------------------
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+# EMAIL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#default-from-email
+DEFAULT_FROM_EMAIL = env(
+    "DJANGO_DEFAULT_FROM_EMAIL",
+    default="Konnaxion <noreply@konnaxion.local>",
+)
+# https://docs.djangoproject.com/en/dev/ref/settings/#server-email
+SERVER_EMAIL = env("DJANGO_SERVER_EMAIL", default=DEFAULT_FROM_EMAIL)
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-subject-prefix
+EMAIL_SUBJECT_PREFIX = env(
+    "DJANGO_EMAIL_SUBJECT_PREFIX",
+    default="[Konnaxion] ",
+)
+ACCOUNT_EMAIL_SUBJECT_PREFIX = EMAIL_SUBJECT_PREFIX
+
+# ADMIN
+# ------------------------------------------------------------------------------
+# Django Admin URL regex.
+ADMIN_URL = env("DJANGO_ADMIN_URL")
+
+# Anymail
+# ------------------------------------------------------------------------------
+# https://anymail.readthedocs.io/en/stable/installation/#installing-anymail
+INSTALLED_APPS += ["anymail"]
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+# https://anymail.readthedocs.io/en/stable/installation/#anymail-settings-reference
+# https://anymail.readthedocs.io/en/stable/esps
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+ANYMAIL = {}
+
+
+# LOGGING
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#logging
+# See https://docs.djangoproject.com/en/dev/topics/logging for
+# more details on how to customize your logging configuration.
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "verbose": {
+            "format": "%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
+    },
+    "root": {"level": "INFO", "handlers": ["console"]},
+    "loggers": {
+        "django.db.backends": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+        # Errors logged by the SDK itself
+        "sentry_sdk": {"level": "ERROR", "handlers": ["console"], "propagate": False},
+        "django.security.DisallowedHost": {
+            "level": "ERROR",
+            "handlers": ["console"],
+            "propagate": False,
+        },
+    },
+}
+
+# Sentry
+# ------------------------------------------------------------------------------
+SENTRY_DSN = env("SENTRY_DSN")
+SENTRY_LOG_LEVEL = env.int("DJANGO_SENTRY_LOG_LEVEL", logging.INFO)
+
+sentry_logging = LoggingIntegration(
+    level=SENTRY_LOG_LEVEL,  # Capture info and above as breadcrumbs
+    event_level=logging.ERROR,  # Send errors as events
+)
+integrations = [
+    sentry_logging,
+    DjangoIntegration(),
+    CeleryIntegration(),
+    RedisIntegration(),
+]
+sentry_sdk.init(
+    dsn=SENTRY_DSN,
+    integrations=integrations,
+    environment=env("SENTRY_ENVIRONMENT", default="production"),
+    traces_sample_rate=env.float("SENTRY_TRACES_SAMPLE_RATE", default=0.0),
+)
+
+# django-rest-framework
+# -------------------------------------------------------------------------------
+# Tools that generate code samples can use SERVERS to point to the correct domain
+SPECTACULAR_SETTINGS["SERVERS"] = [
+    {"url": "https://konnaxion.local", "description": "Production server"},
+]
+# Your stuff...
+# ------------------------------------------------------------------------------
+
+===== END config/settings/production.py =====
+
+
+===== BEGIN config/settings/test.py =====
+"""
+With these settings, tests run faster.
+"""
+
+from .base import *  # noqa: F403
+from .base import TEMPLATES
+from .base import env
+
+# GENERAL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#secret-key
+SECRET_KEY = env(
+    "DJANGO_SECRET_KEY",
+    default="y5jf2SIxaBqlJhJS6nOZ7wGWgxs7UJ0Wtgltt2l5tYf9KdlLNs7BSKeCE58YDZqy",
+)
+# https://docs.djangoproject.com/en/dev/ref/settings/#test-runner
+TEST_RUNNER = "django.test.runner.DiscoverRunner"
+
+# PASSWORDS
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#password-hashers
+PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+# EMAIL
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#email-backend
+EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
+
+# DEBUGGING FOR TEMPLATES
+# ------------------------------------------------------------------------------
+TEMPLATES[0]["OPTIONS"]["debug"] = True  # type: ignore[index]
+
+# MEDIA
+# ------------------------------------------------------------------------------
+# https://docs.djangoproject.com/en/dev/ref/settings/#media-url
+MEDIA_URL = "http://media.testserver/"
+# Your stuff...
+# ------------------------------------------------------------------------------
+
+===== END config/settings/test.py =====
+
+
+===== BEGIN config/urls.py =====
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import include
+from django.urls import path
+from django.views import defaults as default_views
+from django.views.generic import TemplateView
+from drf_spectacular.views import SpectacularAPIView
+from drf_spectacular.views import SpectacularSwaggerView
+from rest_framework.authtoken.views import obtain_auth_token
+
+urlpatterns = [
+    path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+    path(
+        "about/",
+        TemplateView.as_view(template_name="pages/about.html"),
+        name="about",
+    ),
+    # Django Admin, use {% url 'admin:index' %}
+    path(settings.ADMIN_URL, admin.site.urls),
+    # User management
+    path("users/", include("konnaxion.users.urls", namespace="users")),
+    path("accounts/", include("allauth.urls")),
+    # Your stuff: custom urls includes go here
+    # ...
+    # Media files
+    *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
+]
+if settings.DEBUG:
+    # Static file serving when using Gunicorn + Uvicorn for local web socket development
+    urlpatterns += staticfiles_urlpatterns()
+
+# API URLS
+urlpatterns += [
+    # API base url
+    path("api/", include("config.api_router")),
+    # DRF auth token
+    path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
+    path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="api-schema"),
+        name="api-docs",
+    ),
+]
+
+if settings.DEBUG:
+    # This allows the error pages to be debugged during development, just visit
+    # these url in browser to see how these error pages look like.
+    urlpatterns += [
+        path(
+            "400/",
+            default_views.bad_request,
+            kwargs={"exception": Exception("Bad Request!")},
+        ),
+        path(
+            "403/",
+            default_views.permission_denied,
+            kwargs={"exception": Exception("Permission Denied")},
+        ),
+        path(
+            "404/",
+            default_views.page_not_found,
+            kwargs={"exception": Exception("Page not Found")},
+        ),
+        path("500/", default_views.server_error),
+    ]
+    if "debug_toolbar" in settings.INSTALLED_APPS:
+        import debug_toolbar
+
+        urlpatterns = [
+            path("__debug__/", include(debug_toolbar.urls)),
+            *urlpatterns,
+        ]
+
+===== END config/urls.py =====
+
+
+===== BEGIN config/websocket.py =====
+async def websocket_application(scope, receive, send):
+    while True:
+        event = await receive()
+
+        if event["type"] == "websocket.connect":
+            await send({"type": "websocket.accept"})
+
+        if event["type"] == "websocket.disconnect":
+            break
+
+        if event["type"] == "websocket.receive":
+            if event["text"] == "ping":
+                await send({"type": "websocket.send", "text": "pong!"})
+
+===== END config/websocket.py =====
+
+
+===== BEGIN config/wsgi.py =====
+"""
+WSGI config for Konnaxion project.
+
+This module contains the WSGI application used by Django's development server
+and any production WSGI deployments. It should expose a module-level variable
+named ``application``. Django's ``runserver`` and ``runfcgi`` commands discover
+this application via the ``WSGI_APPLICATION`` setting.
+
+Usually you will have the standard Django WSGI application here, but it also
+might make sense to replace the whole Django WSGI application with a custom one
+that later delegates to the Django one. For example, you could introduce WSGI
+middleware here, or combine a Django application with an application of another
+framework.
+
+"""
+
+import os
+import sys
+from pathlib import Path
+
+from django.core.wsgi import get_wsgi_application
+
+# This allows easy placement of apps within the interior
+# konnaxion directory.
+BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+sys.path.append(str(BASE_DIR / "konnaxion"))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.production")
+
+# This application object is used by any WSGI server configured to use this
+# file. This includes Django's development server, if the WSGI_APPLICATION
+# setting points here.
+application = get_wsgi_application()
+
+===== END config/wsgi.py =====
+

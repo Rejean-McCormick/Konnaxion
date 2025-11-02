@@ -1,0 +1,612 @@
+
+===== BEGIN components\CommonWidget\page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END components\CommonWidget\page.tsx =====
+
+
+===== BEGIN components\ThemeSwitcher.tsx =====
+import React from 'react';
+import { Button } from 'antd';
+import { useTheme } from '@/context/ThemeContext';
+
+const ThemeSwitcher: React.FC = () => {
+  const { token, cycleTheme } = useTheme();   // token contient label + icon
+
+  return (
+    <Button onClick={cycleTheme}>
+      {token.icon ? `${token.icon} ` : ''}{token.label ?? 'Theme'}
+    </Button>
+  );
+};
+
+export default ThemeSwitcher;
+
+===== END components\ThemeSwitcher.tsx =====
+
+
+===== BEGIN concatv2.py =====
+#!/usr/bin/env python3
+"""
+Concatène tous les fichiers texte du dossier du script et de ses sous-dossiers.
+Par défaut, écrit le résultat dans "Code_<nom_dossier>_<YYYYMMDD_HHMMSS>.txt" à la racine du script.
+
+Usage simple :
+    python concatv1.py
+
+Options :
+    -o, --out         Fichier de sortie (prioritaire sur le nom auto)
+    --ext             Extensions personnalisées (csv) ex: "tsx,tx,ts,js,md"
+    --include         Glob d'inclusion relatif (répétable)
+    --exclude         Glob d'exclusion relatif (répétable)
+    --max-size        Taille max par fichier en octets (défaut: 2000000)
+    --no-headers      Désactive les entêtes BEGIN/END par fichier
+"""
+from __future__ import annotations
+
+import argparse
+import fnmatch
+import os
+from pathlib import Path
+from typing import Set, List, Optional
+from datetime import datetime
+
+DEFAULT_EXTS: Set[str] = {
+    ".tx", ".md", ".markdown",
+    ".json", ".yaml", ".yml", ".xml", ".toml", ".ini", ".cfg", ".conf", ".properties",
+    ".html", ".htm", ".css", ".scss", ".less",
+    ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs",
+    ".py", ".pyi", ".ipynb",
+    ".java", ".kt", ".swift", ".rb", ".php", ".go", ".rs",
+    ".c", ".h", ".cpp", ".cc", ".hpp", ".cs",
+    ".sql",
+    ".sh", ".bash", ".zsh", ".fish", ".ps1", ".bat",
+    ".tex", ".bib",
+    ".graphql", ".gql",
+    ".gradle",
+    ".pl", ".lua", ".r",
+    ".env",
+}
+
+NAMES_WITHOUT_EXT: Set[str] = {
+    "Dockerfile", "Makefile", "CMakeLists.txt",
+    ".gitignore", ".gitattributes", ".editorconfig",
+    "Procfile", "Gemfile", "requirements.txt", "Pipfile", "poetry.lock",
+    "package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "tsconfig.json", "eslint.config.js", ".eslintrc", ".prettierrc",
+}
+
+DEFAULT_EXCLUDE_DIRS: Set[str] = {
+    ".git", ".hg", ".svn",
+    "node_modules", ".next", ".nuxt",
+    "dist", "build", "out", "coverage", ".cache",
+    ".venv", "venv", "__pycache__",
+    "target", "bin", "obj",
+}
+
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="Concatène les fichiers texte du projet dans un seul fichier.")
+    p.add_argument("-o", "--out", default=None, help="Fichier de sortie (facultatif)")
+    p.add_argument("--ext", help="Extensions additionnelles ou personnalisées, séparées par des virgules")
+    p.add_argument("--include", action="append", default=[], help="Glob d'inclusion relatif à la racine (répétable)")
+    p.add_argument("--exclude", action="append", default=[], help="Glob d'exclusion relatif à la racine (répétable)")
+    p.add_argument("--max-size", type=int, default=2_000_000, help="Taille max par fichier en octets")
+    p.add_argument("--no-headers", action="store_true", help="Ne pas imprimer d'entêtes par fichier")
+    return p.parse_args()
+
+
+def normalize_exts(exts_csv: Optional[str]) -> Set[str]:
+    if not exts_csv:
+        return set(DEFAULT_EXTS)
+    parts = [e.strip().lower() for e in exts_csv.split(",") if e.strip()]
+    normed = set()
+    for e in parts:
+        if not e.startswith("."):
+            e = "." + e
+        normed.add(e)
+    return normed
+
+
+def is_probably_text(sample: bytes) -> bool:
+    if not sample:
+        return True
+    if b"\x00" in sample:
+        return False
+    try:
+        sample.decode("utf-8")
+        return True
+    except UnicodeDecodeError:
+        pass
+    ctrl_hits = 0
+    for b in sample:
+        if b < 32 and b not in (9, 10, 13):  # \t \n \r
+            ctrl_hits += 1
+    return (ctrl_hits / max(1, len(sample))) < 0.01
+
+
+def pick_encoding(path: Path) -> Optional[str]:
+    try:
+        with path.open("rb") as f:
+            sample = f.read(32768)
+    except Exception:
+        return None
+    if not is_probably_text(sample):
+        return None
+    for enc in ("utf-8", "utf-8-sig", "utf-16", "cp1252", "latin-1"):
+        try:
+            sample.decode(enc)
+            return enc
+        except UnicodeDecodeError:
+            continue
+    return "latin-1"
+
+
+def relpath(base: Path, p: Path) -> str:
+    try:
+        return str(p.relative_to(base))
+    except Exception:
+        return str(p)
+
+
+def should_include_file(base: Path, file_path: Path, allowed_exts: Set[str],
+                        include_globs: List[str], exclude_globs: List[str],
+                        max_size: int, out_path: Path) -> bool:
+    if not file_path.is_file():
+        return False
+    if file_path == out_path:
+        return False
+    if file_path.suffix.lower() == ".txt":
+        return False  # exclusion explicite
+    try:
+        if file_path.stat().st_size > max_size:
+            return False
+    except Exception:
+        return False
+    rel = relpath(base, file_path)
+    for pat in exclude_globs:
+        if fnmatch.fnmatch(rel, pat):
+            return False
+    if include_globs:
+        ok = any(fnmatch.fnmatch(rel, pat) for pat in include_globs)
+        if not ok:
+            return False
+    if file_path.suffix.lower() in allowed_exts or file_path.name in NAMES_WITHOUT_EXT:
+        return True
+    enc = pick_encoding(file_path)
+    return enc is not None
+
+
+def main() -> None:
+    args = parse_args()
+    base_dir = Path(__file__).resolve().parent
+
+    if args.out:
+        out_path = (base_dir / args.out).resolve()
+    else:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        out_name = f"Code_{base_dir.name}_{stamp}.txt"
+        out_path = (base_dir / out_name).resolve()
+
+    allowed_exts = normalize_exts(args.ext)
+    include_globs = list(args.include or [])
+    exclude_globs = list(args.exclude or [])
+
+    selected: List[Path] = []
+    for root, dirs, files in os.walk(base_dir, followlinks=False):
+        dirs[:] = [d for d in dirs if d not in DEFAULT_EXCLUDE_DIRS]
+        root_path = Path(root)
+        for name in files:
+            fp = root_path / name
+            if should_include_file(base_dir, fp, allowed_exts, include_globs, exclude_globs, args.max_size, out_path):
+                selected.append(fp)
+
+    selected.sort(key=lambda p: relpath(base_dir, p).lower())
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with out_path.open("w", encoding="utf-8", newline="\n") as out:
+        for p in selected:
+            enc = pick_encoding(p) or "utf-8"
+            if not args.no_headers:
+                out.write(f"\n===== BEGIN {relpath(base_dir, p)} =====\n")
+            try:
+                with p.open("r", encoding=enc, errors="strict") as f:
+                    for line in f:
+                        out.write(line)
+            except UnicodeDecodeError:
+                with p.open("r", encoding="latin-1", errors="replace") as f:
+                    for line in f:
+                        out.write(line)
+            if not args.no_headers:
+                out.write(f"\n===== END {relpath(base_dir, p)} =====\n")
+            out.write("\n")
+
+    print(f"{len(selected)} fichier(s) concaténé(s) -> {relpath(base_dir, out_path)}")
+
+
+if __name__ == "__main__":
+    main()
+
+===== END concatv2.py =====
+
+
+===== BEGIN theme\cyberTheme.ts =====
+import { theme } from 'antd';
+const { darkAlgorithm } = theme;
+
+export default {
+  label           : 'Cyber',
+  icon            : '🕶️',
+
+  algorithm       : darkAlgorithm,
+  colorPrimary    : '#39ff14',
+  colorBgLayout   : '#000c1a',
+  colorBgContainer: '#000c1a',
+  colorTextBase   : '#aefaff',
+
+  bgMain   : '#000c1a',
+  bgLight  : '#001627',
+  bgDark   : '#00e0ff1a',
+  textMain : '#aefaff',
+  accent   : '#39ff14',
+} as const;
+
+===== END theme\cyberTheme.ts =====
+
+
+===== BEGIN theme\darkTheme.ts =====
+import { theme } from 'antd';
+const { darkAlgorithm } = theme;
+
+export default {
+  label           : 'Dark',
+  icon            : '🌙',
+
+  algorithm       : darkAlgorithm,
+  colorPrimary    : '#00c4ff',
+  colorBgLayout   : '#18181c',
+  colorBgContainer: '#18181c',
+  colorTextBase   : '#f0f0f0',
+
+  bgMain   : '#18181c',
+  bgLight  : '#24242a',
+  bgDark   : '#0d0d10',
+  textMain : '#f0f0f0',
+  accent   : '#00c4ff',
+} as const;
+
+===== END theme\darkTheme.ts =====
+
+
+===== BEGIN theme\funkyTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Funky Disco',
+  icon          : '🪩',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF69B4',   // Hot Pink
+  colorLink              : '#00FFFF',   // Cyan
+  colorLinkHover         : '#7FFFD4',   // Aquamarine
+
+  // Texte (pour --ant-color-text et --ant-color-text-base)
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+  colorTextTertiary      : '#E0E0E0',
+  colorTextPlaceholder   : '#BBBBBB',
+  colorTextDisabled      : '#777777',
+
+  // Arrondis / typo
+  borderRadius           : 8,
+  fontFamily             : '"Comic Sans MS", cursive, sans-serif',
+
+  // Fonds généraux
+  colorBgLayout          : '#1E1E2F',
+  colorBgContainer       : '#2E1A47',
+  colorBgElevated        : '#41295A',
+  colorBgMask            : 'rgba(0,0,0,0.6)',
+  colorBgSpotlight       : '#FFD700',
+  colorBgSolid           : '#FF4500',
+  colorBgSolidHover      : '#FF6347',
+
+  // Menu / Sidebar (raw keys custom)
+  menuBg                 : '#2E1A47',
+  menuItemHoverBg        : '#584F8E',
+  menuItemSelectedBg     : '#7D5BA6',
+  menuItemTextColor      : '#FFFFFF',
+
+  // Dropdown / Popconfirm
+  dropdownBg             : '#383838',
+  dropdownItemHoverBg    : '#4A4A4A',
+  colorBgPopconfirm      : '#383838',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF69B4',
+  colorSplit             : '#884EA0',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+
+  // Espacements & typo
+  fontSize               : 14,
+  fontSizeLG             : 18,
+  paddingContentHorizontalLG: 24,
+  paddingContentVerticalLG  : 24,
+
+  // Variables perso (si vous les exposez sur <html>)
+  bgMain   : '#1E1E2F',
+  bgLight  : '#2E1A47',
+  bgDark   : '#0F0B20',
+  textMain : '#FFFFFF',
+  accent   : '#00FF00',
+} as const
+
+===== END theme\funkyTheme.ts =====
+
+
+===== BEGIN theme\index.ts =====
+// theme/index.ts
+import light        from './lightTheme';
+import dark         from './darkTheme';
+import funky        from './funkyTheme';
+import cyber        from './cyberTheme';
+import kktheme      from './kktheme';
+import sunsetTheme  from './sunsetTheme';
+import oceanTheme   from './oceanTheme';
+import minimalTheme from './minimalTheme';
+import modernTheme  from './modernTheme';
+
+export const themes = {
+  light,
+  dark,
+  funky,
+  cyber,
+  kktheme,
+  sunsetTheme,
+  oceanTheme,
+  minimalTheme,
+  modernTheme,
+} as const;
+
+export type ThemeType = keyof typeof themes;
+
+/* --- NOUVEAU : liste prête à l’emploi pour les consommateurs ------ */
+export const themeKeys = Object.keys(themes) as ThemeType[];
+
+export default themes;
+
+===== END theme\index.ts =====
+
+
+===== BEGIN theme\kktheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'KK',
+  icon            : '🦄',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#1e6864',
+  colorPrimaryBg  : '#1e68641a',
+  colorBgLayout   : '#f0fefa',
+  colorBgContainer: '#e0f7f5',
+  colorTextBase   : '#05332b',
+
+  bgMain   : '#f0fefa',
+  bgLight  : '#e0f7f5',
+  bgDark   : '#1e6864',
+  textMain : '#05332b',
+  accent   : '#1e6864',
+} as const;
+
+===== END theme\kktheme.ts =====
+
+
+===== BEGIN theme\lightTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'Light',
+  icon            : '☀️',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#3b82f6',
+  colorBgLayout   : '#ffffff',
+  colorBgContainer: '#ffffff',
+  colorTextBase   : '#141414',
+
+  bgMain   : '#ffffff',
+  bgLight  : '#f5f5f5',
+  bgDark   : '#e5e5e5',
+  textMain : '#141414',
+  accent   : '#3b82f6',
+} as const;
+
+===== END theme\lightTheme.ts =====
+
+
+===== BEGIN theme\minimalTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'Minimal',
+  icon            : '⚪️',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#888888',
+  colorPrimaryBg  : '#8888881a',
+  colorBgLayout   : '#fafafa',
+  colorBgContainer: '#f5f5f5',
+  colorTextBase   : '#333333',
+
+  bgMain   : '#fafafa',
+  bgLight  : '#f5f5f5',
+  bgDark   : '#888888',
+  textMain : '#333333',
+  accent   : '#888888',
+} as const;
+
+===== END theme\minimalTheme.ts =====
+
+
+===== BEGIN theme\modernTheme.ts =====
+import type { ThemeObject } from './types';
+import { theme }             from 'antd';
+const { defaultAlgorithm } = theme;
+
+const modernTheme: ThemeObject = {
+  label       : 'Modern',
+  icon        : '🖌️',
+
+  algorithm   : defaultAlgorithm,
+  colorPrimary: '#475569',
+  colorInfo   : '#2563eb',
+  colorSuccess: '#22c55e',
+  colorWarning: '#facc15',
+  colorError  : '#ef4444',
+
+  colorBgLayout   : '#f9fafb',
+  colorBgContainer: '#ffffff',
+  colorTextBase   : '#0f172a',
+
+  borderRadiusLG : 16,
+  controlHeight  : 40,
+
+  /* raw Tailwind vars (R G B) */
+  bgMain    : '249 250 251',
+  bgLight   : '255 255 255',
+  bgDark    : '226 232 240',
+  textMain  : '15 23 42',
+  accent    : '71 85 105',
+};
+
+export default modernTheme;
+
+===== END theme\modernTheme.ts =====
+
+
+===== BEGIN theme\oceanTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Ocean',
+  icon          : '🌊',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#1E90FF',
+  colorLink              : '#00BFFF',
+  colorLinkHover         : '#87CEFA',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#ADD8E6',
+
+  // Fonds
+  colorBgLayout          : '#001F3F',
+  colorBgContainer       : '#002B5C',
+  colorBgElevated        : '#003366',
+  
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#001F3F',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#004080',
+  colorMenuItemSelectedBg: '#00509E',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#1E90FF',
+  colorSplit             : '#004080',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+  
+  // entete tableaux
+  tableHeaderBg : '#24242A',
+} as const
+
+===== END theme\oceanTheme.ts =====
+
+
+===== BEGIN theme\sunsetTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Sunset',
+  icon          : '🌅',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF4500',
+  colorLink              : '#FF8C00',
+  colorLinkHover         : '#FFA500',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+
+  // Fonds
+  colorBgLayout          : '#2E1E1E',
+  colorBgContainer       : '#3C1E1E',
+  colorBgElevated        : '#4A2A2A',
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#2E1E1E',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#662222',
+  colorMenuItemSelectedBg: '#880000',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF4500',
+  colorSplit             : '#884A2E',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+} as const
+
+===== END theme\sunsetTheme.ts =====
+

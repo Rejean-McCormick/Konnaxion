@@ -1,11 +1,6 @@
-// File: /components/layout-components/Header.tsx
 'use client'
 
-import {
-  Layout,
-  Dropdown,
-  Breadcrumb,
-} from 'antd'
+import { Layout, Dropdown, Breadcrumb } from 'antd'
 import {
   UserOutlined,
   LogoutOutlined,
@@ -30,7 +25,7 @@ const NavBar = styled.div`
 `
 
 const Crumb = styled(Breadcrumb)`
-  margin-left: 20px; /* ← espace de 20px depuis le toggle */
+  margin-left: 20px; /* espace après le toggle */
   color: var(--ant-color-text);
   .ant-breadcrumb-separator {
     color: var(--ant-color-text-secondary);
@@ -100,7 +95,10 @@ export default function HeaderBar({
     return crumbs.map(c => ({
       key: c.path ?? c.name,
       title: c.path ? (
-        <Link href={c.path} style={{ color: 'var(--ant-color-text)' }}>
+        <Link
+          href={{ pathname: c.path, query: { sidebar: selectedSidebar } }}
+          style={{ color: 'var(--ant-color-text)' }}
+        >
           {c.name}
         </Link>
       ) : (
@@ -121,14 +119,11 @@ export default function HeaderBar({
       }}
     >
       <NavBar>
-       {/* Toggle sidebar */}
-       <div
-         onClick={handleToggle}
-         style={{
-           cursor: 'pointer',
-           marginRight: 20,            /* ← 20px d’espace après le bouton */
-         }}
-       >
+        {/* Toggle sidebar */}
+        <div
+          onClick={handleToggle}
+          style={{ cursor: 'pointer', marginRight: 20 }}
+        >
           {collapsed ? (
             <MenuUnfoldOutlined style={{ fontSize: 20, color: 'var(--ant-color-text)' }} />
           ) : (
@@ -136,10 +131,10 @@ export default function HeaderBar({
           )}
         </div>
 
-        {/* Fil d’Ariane, 20px après le toggle */}
+        {/* Fil d’Ariane */}
         <Crumb items={breadcrumbItems} />
 
-        {/* Espace droit : switcher + compte */}
+        {/* Zone droite : thème + compte */}
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
           <ThemeSwitcher />
 

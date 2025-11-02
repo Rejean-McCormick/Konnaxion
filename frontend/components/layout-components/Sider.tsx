@@ -7,7 +7,7 @@ const { Sider } = Layout
 
 /* Sider fixe alimenté par les variables Ant Design */
 const FixedSider = styled(Sider)`
-  background : var(--ant-layout-color-bg-sider) !important;
+  background : var(--ant-color-bg-container) !important;
   overflow   : auto;
   height     : 100vh;
   position   : fixed;

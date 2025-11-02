@@ -1,0 +1,32 @@
+BEGIN FILE: backend\.envs\.local\.django
+--------------------------------------------------------------------------------
+# ── Core Django settings ───────────────────────────────────
+DJANGO_SECRET_KEY=***REDACTED***
+DJANGO_ALLOWED_HOSTS=***REDACTED***
+DJANGO_DEBUG=***REDACTED***
+
+# ── Database connection string ─────────────────────────────
+DATABASE_URL=***REDACTED***
+
+# ── Optional: seed an admin account headlessly ─────────────
+DJANGO_SUPERUSER_USERNAME=***REDACTED***
+DJANGO_SUPERUSER_EMAIL=***REDACTED***
+DJANGO_SUPERUSER_PASSWORD=***REDACTED***
+USE_DOCKER=***REDACTED***
+
+--------------------------------------------------------------------------------
+END FILE: backend\.envs\.local\.django
+
+================================================================================
+BEGIN FILE: backend\.envs\.local\.postgres
+--------------------------------------------------------------------------------
+# ── PostgreSQL container bootstrap ─────────────────────────
+POSTGRES_USER=***REDACTED***
+POSTGRES_PASSWORD=***REDACTED***
+POSTGRES_DB=***REDACTED***
+POSTGRES_HOST=***REDACTED***
+POSTGRES_PORT=***REDACTED***
+
+--------------------------------------------------------------------------------
+END FILE: backend\.envs\.local\.postgres
+

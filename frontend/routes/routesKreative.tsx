@@ -1,106 +1,61 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { DashboardOutlined } from '@ant-design/icons';
+import React from 'react'
+import { DashboardOutlined } from '@ant-design/icons'
 
-// Dashboard
-import Dashboard          from '@/kreative/dashboard/page';
+// Type local minimal pour éviter toute dépendance
+type Route = { path?: string; name: string; icon?: React.ReactNode; views?: Route[] }
 
-// Creative Hub
-import ExploreIdeas        from '@/kreative/creative-hub/explore-ideas/page';
-import InspirationGallery  from '@/kreative/creative-hub/inspiration-gallery/page';
-import SubmitCreativeWork  from '@/kreative/creative-hub/submit-creative-work/page';
+const directDashboard: Route = { path: '/kreative/dashboard', name: 'Dashboard', icon: <DashboardOutlined /> }
 
-// Idea Incubator
-import MyIdeas            from '@/kreative/idea-incubator/my-ideas/page';
-import CreateNewIdea      from '@/kreative/idea-incubator/create-new-idea/page';
-import CollaborateOnIdeas from '@/kreative/idea-incubator/collaborate-on-ideas/page';
-
-// Collaborative Spaces
-import MySpaces      from '@/kreative/collaborative-spaces/my-spaces/page';
-import FindSpaces    from '@/kreative/collaborative-spaces/find-spaces/page';
-import StartNewSpace from '@/kreative/collaborative-spaces/start-new-space/page';
-
-// Community Showcases
-import FeaturedProjects from '@/kreative/community-showcases/featured-projects/page';
-import TopCreators      from '@/kreative/community-showcases/top-creators/page';
-import SubmitToShowcase from '@/kreative/community-showcases/submit-to-showcase/page';
-
-interface Route {
-  path: string;
-  name: string;
-  rtlName?: string;
-  icon?: React.ReactNode;
-  component?: React.ComponentType<any>;
-  layout?: string;
-  collapse?: boolean;
-  state?: string;
-  views?: Route[];
+const collaborative_spacesGroup: Route = {
+  name: 'Collaborative Spaces',
+  views: [
+    { path: '/kreative/collaborative-spaces/find-spaces', name: 'Find Spaces' },
+    { path: '/kreative/collaborative-spaces/start-new-space', name: 'Start New Space' },
+    { path: '/kreative/collaborative-spaces/my-spaces', name: 'My Spaces' },
+    { path: '/kreative/collaborative-spaces/find-spaces/index.test', name: 'Index.test' },
+    { path: '/kreative/collaborative-spaces/start-new-space/index.test', name: 'Index.test' },
+    { path: '/kreative/collaborative-spaces/my-spaces/index.test', name: 'Index.test' }
+  ]
 }
 
-const directDashboard: Route = {
-  path: '/kreative/dashboard',
-  name: 'Dashboard',
-  rtlName: 'Dashboard',
-  icon: <DashboardOutlined />,
-  component: Dashboard,
-  layout: '/kreative',
-};
-
-const creativeHub: Route = {
-  collapse: true,
-  name: 'Creative Hub',
-  rtlName: 'Creative Hub',
-  state: 'creativeHub',
-  views: [
-    { path: '/kreative/creative-hub/explore-ideas',       name: 'Explore Ideas',      component: ExploreIdeas,       layout: '/kreative' },
-    { path: '/kreative/creative-hub/inspiration-gallery', name: 'Inspiration Gallery',component: InspirationGallery, layout: '/kreative' },
-    { path: '/kreative/creative-hub/submit-creative-work',name: 'Submit Creative Work',component: SubmitCreativeWork, layout: '/kreative' },
-  ],
-};
-
-const ideaIncubator: Route = {
-  collapse: true,
-  name: 'Idea Incubator',
-  rtlName: 'Idea Incubator',
-  state: 'ideaIncubator',
-  views: [
-    { path: '/kreative/idea-incubator/my-ideas',            name: 'My Ideas',           component: MyIdeas,            layout: '/kreative' },
-    { path: '/kreative/idea-incubator/create-new-idea',     name: 'Create New Idea',    component: CreateNewIdea,      layout: '/kreative' },
-    { path: '/kreative/idea-incubator/collaborate-on-ideas',name: 'Collaborate on Ideas',component: CollaborateOnIdeas, layout: '/kreative' },
-  ],
-};
-
-const collaborativeSpaces: Route = {
-  collapse: true,
-  name: 'Collaborative Spaces',
-  rtlName: 'Collaborative Spaces',
-  state: 'collaborativeSpaces',
-  views: [
-    { path: '/kreative/collaborative-spaces/my-spaces',      name: 'My Spaces',           component: MySpaces,      layout: '/kreative' },
-    { path: '/kreative/collaborative-spaces/find-spaces',    name: 'Find Spaces',         component: FindSpaces,    layout: '/kreative' },
-    { path: '/kreative/collaborative-spaces/start-new-space',name: 'Start a New Space',   component: StartNewSpace, layout: '/kreative' },
-  ],
-};
-
-const communityShowcases: Route = {
-  collapse: true,
+const community_showcasesGroup: Route = {
   name: 'Community Showcases',
-  rtlName: 'Community Showcases',
-  state: 'communityShowcases',
   views: [
-    { path: '/kreative/community-showcases/featured-projects',name: 'Featured Projects', component: FeaturedProjects, layout: '/kreative' },
-    { path: '/kreative/community-showcases/top-creators',      name: 'Top Creators',      component: TopCreators,      layout: '/kreative' },
-    { path: '/kreative/community-showcases/submit-to-showcase',name: 'Submit to Showcase',component: SubmitToShowcase, layout: '/kreative' },
-  ],
-};
+    { path: '/kreative/community-showcases/featured-projects', name: 'Featured Projects' },
+    { path: '/kreative/community-showcases/top-creators', name: 'Top Creators' },
+    { path: '/kreative/community-showcases/submit-to-showcase', name: 'Submit To Showcase' },
+    { path: '/kreative/community-showcases/featured-projects/index.test', name: 'Index.test' },
+    { path: '/kreative/community-showcases/top-creators/index.test', name: 'Index.test' },
+    { path: '/kreative/community-showcases/submit-to-showcase/index.test', name: 'Index.test' }
+  ]
+}
 
-const routes: Route[] = [
-  directDashboard,
-  creativeHub,
-  ideaIncubator,
-  collaborativeSpaces,
-  communityShowcases,
-];
+const creative_hubGroup: Route = {
+  name: 'Creative Hub',
+  views: [
+    { path: '/kreative/creative-hub/explore-ideas', name: 'Explore Ideas' },
+    { path: '/kreative/creative-hub/submit-creative-work', name: 'Submit Creative Work' },
+    { path: '/kreative/creative-hub/inspiration-gallery', name: 'Inspiration Gallery' },
+    { path: '/kreative/creative-hub/submit-creative-work/index.test', name: 'Index.test' },
+    { path: '/kreative/creative-hub/inspiration-gallery/index.test', name: 'Index.test' },
+    { path: '/kreative/creative-hub/explore-ideas/index.test', name: 'Index.test' }
+  ]
+}
 
-export default routes;
+const idea_incubatorGroup: Route = {
+  name: 'Idea Incubator',
+  views: [
+    { path: '/kreative/idea-incubator/collaborate-on-ideas', name: 'Collaborate On Ideas' },
+    { path: '/kreative/idea-incubator/create-new-idea', name: 'Create New Idea' },
+    { path: '/kreative/idea-incubator/my-ideas', name: 'My Ideas' },
+    { path: '/kreative/idea-incubator/collaborate-on-ideas/index.test', name: 'Index.test' },
+    { path: '/kreative/idea-incubator/create-new-idea/index.test', name: 'Index.test' },
+    { path: '/kreative/idea-incubator/my-ideas/index.test', name: 'Index.test' }
+  ]
+}
+
+const routes: Route[] = [directDashboard, collaborative_spacesGroup, community_showcasesGroup, creative_hubGroup, idea_incubatorGroup]
+
+export default routes

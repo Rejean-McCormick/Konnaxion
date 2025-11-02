@@ -1,6 +1,4 @@
-'use client';
-"use client";
-import { useParams } from "next/navigation";
+'use client'
 
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import { Input } from 'antd';
@@ -23,7 +21,7 @@ export default function Glossary() {
   ];
 
   const filtered = data?.items.filter(
-    (t: Term) => t.term.toLowerCase().includes(params.toLowerCase()),
+    (t: Term) => t.term.toLowerCase().includes(query.toLowerCase()),
   );
 
   return (

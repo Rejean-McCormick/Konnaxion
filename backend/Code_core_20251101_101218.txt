@@ -1,0 +1,591 @@
+
+===== BEGIN docker-compose.docs.yml =====
+services:
+  docs:
+    image: konnaxion_local_docs
+    container_name: konnaxion_local_docs
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./konnaxion:/app/konnaxion:z
+    ports:
+      - '9000:9000'
+    command: /start-docs
+
+===== END docker-compose.docs.yml =====
+
+
+===== BEGIN docker-compose.local.yml =====
+volumes:
+  konnaxion_local_postgres_data: {}
+  konnaxion_local_postgres_data_backups: {}
+  konnaxion_local_redis_data: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/local/django/Dockerfile
+    image: konnaxion_local_django
+    container_name: konnaxion_local_django
+    depends_on:
+      - postgres
+      - redis
+      - mailpit
+    volumes:
+      - .:/app:z
+    env_file:
+      - ./.envs/.local/.django
+      - ./.envs/.local/.postgres
+    ports:
+      - '8000:8000'
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: konnaxion_production_postgres
+    container_name: konnaxion_local_postgres
+    volumes:
+      - konnaxion_local_postgres_data:/var/lib/postgresql/data
+      - konnaxion_local_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.local/.postgres
+
+  mailpit:
+    image: docker.io/axllent/mailpit:latest
+    container_name: konnaxion_local_mailpit
+    ports:
+      - "8025:8025"
+
+  redis:
+    image: docker.io/redis:6
+    container_name: konnaxion_local_redis
+    volumes:
+      - konnaxion_local_redis_data:/data
+
+  celeryworker:
+    <<: *django
+    image: konnaxion_local_celeryworker
+    container_name: konnaxion_local_celeryworker
+    depends_on:
+      - redis
+      - postgres
+      - mailpit
+    ports: []
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: konnaxion_local_celerybeat
+    container_name: konnaxion_local_celerybeat
+    depends_on:
+      - redis
+      - postgres
+      - mailpit
+    ports: []
+    command: /start-celerybeat
+
+  flower:
+    <<: *django          # héritage commun
+    image: konnaxion_local_flower
+    container_name: konnaxion_local_flower
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CELERY_FLOWER_USER=admin        # choisissez des valeurs
+      - CELERY_FLOWER_PASSWORD=admin123 # plus sûres en prod
+    command: /start-flower
+===== END docker-compose.local.yml =====
+
+
+===== BEGIN docker-compose.production.yml =====
+volumes:
+  production_postgres_data: {}
+  production_postgres_data_backups: {}
+  production_traefik: {}
+  production_django_media: {}
+  
+  production_redis_data: {}
+  
+
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+
+    image: konnaxion_production_django
+    volumes:
+      - production_django_media:/app/konnaxion/media
+    depends_on:
+      - postgres
+      - redis
+    env_file:
+      - ./.envs/.production/.django
+      - ./.envs/.production/.postgres
+    command: /start
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./compose/production/postgres/Dockerfile
+    image: konnaxion_production_postgres
+    volumes:
+      - production_postgres_data:/var/lib/postgresql/data
+      - production_postgres_data_backups:/backups
+    env_file:
+      - ./.envs/.production/.postgres
+
+  traefik:
+    build:
+      context: .
+      dockerfile: ./compose/production/traefik/Dockerfile
+    image: konnaxion_production_traefik
+    depends_on:
+      - django
+    volumes:
+      - production_traefik:/etc/traefik/acme
+    ports:
+      - '0.0.0.0:80:80'
+      - '0.0.0.0:443:443'
+      - '0.0.0.0:5555:5555'
+
+  redis:
+    image: docker.io/redis:6
+    
+    volumes:
+      - production_redis_data:/data
+    
+
+  celeryworker:
+    <<: *django
+    image: konnaxion_production_celeryworker
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: konnaxion_production_celerybeat
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: konnaxion_production_flower
+    command: /start-flower
+
+  nginx:
+    build:
+      context: .
+      dockerfile: ./compose/production/nginx/Dockerfile
+    image: konnaxion_production_nginx
+    depends_on:
+      - django
+    volumes:
+      - production_django_media:/usr/share/nginx/media:ro
+
+===== END docker-compose.production.yml =====
+
+
+===== BEGIN manage.py =====
+#!/usr/bin/env python
+"""Django's command-line utility for administrative tasks."""
+import os
+import sys
+from pathlib import Path
+
+
+def main():
+    """Run administrative tasks."""
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
+
+    try:
+        from django.core.management import execute_from_command_line
+    except ImportError as exc:
+        raise ImportError(  # noqa: TRY003
+            "Couldn't import Django. Are you sure it's installed and "  # noqa: EM101
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?",
+        ) from exc
+
+    # This allows easy placement of apps within the interior
+    # konnaxion directory.
+    current_path = Path(__file__).parent.resolve()
+    sys.path.append(str(current_path / "konnaxion"))
+
+    execute_from_command_line(sys.argv)
+
+
+if __name__ == "__main__":
+    main()
+
+===== END manage.py =====
+
+
+===== BEGIN merge_production_dotenvs_in_dotenv.py =====
+from collections.abc import Sequence
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent.resolve()
+PRODUCTION_DOTENVS_DIR = BASE_DIR / ".envs" / ".production"
+PRODUCTION_DOTENV_FILES = [
+    PRODUCTION_DOTENVS_DIR / ".django",
+    PRODUCTION_DOTENVS_DIR / ".postgres",
+]
+DOTENV_FILE = BASE_DIR / ".env"
+
+
+def merge(
+    output_file: Path,
+    files_to_merge: Sequence[Path],
+) -> None:
+    merged_content = ""
+    for merge_file in files_to_merge:
+        merged_content += merge_file.read_text()
+        merged_content += "\n"
+    output_file.write_text(merged_content)
+
+
+if __name__ == "__main__":
+    merge(DOTENV_FILE, PRODUCTION_DOTENV_FILES)
+
+===== END merge_production_dotenvs_in_dotenv.py =====
+
+
+===== BEGIN pyproject.toml =====
+# ==== pytest ====
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--ds=config.settings.test --reuse-db --import-mode=importlib"
+python_files = [
+    "tests.py",
+    "test_*.py",
+]
+
+# ==== Coverage ====
+[tool.coverage.run]
+include = ["konnaxion/**"]
+omit = ["*/migrations/*", "*/tests/*"]
+plugins = ["django_coverage_plugin"]
+
+# ==== mypy ====
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+ignore_missing_imports = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+plugins = [
+    "mypy_django_plugin.main",
+    "mypy_drf_plugin.main",
+]
+
+[[tool.mypy.overrides]]
+# Django migrations should not produce any errors:
+module = "*.migrations.*"
+ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = "config.settings.test"
+
+# ==== djLint ====
+[tool.djlint]
+blank_line_after_tag = "load,extends"
+close_void_tags = true
+format_css = true
+format_js = true
+# TODO: remove T002 when fixed https://github.com/djlint/djLint/issues/687
+ignore = "H006,H030,H031,T002"
+include = "H017,H035"
+indent = 2
+max_line_length = 119
+profile = "django"
+
+[tool.djlint.css]
+indent_size = 2
+
+[tool.djlint.js]
+indent_size = 2
+
+[tool.ruff]
+target-version = "py312"
+# Exclude a variety of commonly ignored directories.
+extend-exclude = [
+    "*/migrations/*.py",
+    "staticfiles/*",
+]
+
+[tool.ruff.lint]
+select = [
+  "F",
+  "E",
+  "W",
+  "C90",
+  "I",
+  "N",
+  "UP",
+  "YTT",
+  # "ANN", # flake8-annotations: we should support this in the future but 100+ errors atm
+  "ASYNC",
+  "S",
+  "BLE",
+  "FBT",
+  "B",
+  "A",
+  "COM",
+  "C4",
+  "DTZ",
+  "T10",
+  "DJ",
+  "EM",
+  "EXE",
+  "FA",
+  'ISC',
+  "ICN",
+  "G",
+  'INP',
+  'PIE',
+  "T20",
+  'PYI',
+  'PT',
+  "Q",
+  "RSE",
+  "RET",
+  "SLF",
+  "SLOT",
+  "SIM",
+  "TID",
+  "TC",
+  "INT",
+  # "ARG", # Unused function argument
+  "PTH",
+  "ERA",
+  "PD",
+  "PGH",
+  "PL",
+  "TRY",
+  "FLY",
+  # "NPY",
+  # "AIR",
+  "PERF",
+  # "FURB",
+  # "LOG",
+  "RUF",
+]
+ignore = [
+  "S101", # Use of assert detected https://docs.astral.sh/ruff/rules/assert/
+  "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+  "SIM102", # sometimes it's better to nest
+  "UP038", # Checks for uses of isinstance/issubclass that take a tuple
+          # of types for comparison.
+          # Deactivated because it can make the code slow:
+          # https://github.com/astral-sh/ruff/issues/7871
+]
+# The fixes in extend-unsafe-fixes will require
+# provide the `--unsafe-fixes` flag when fixing.
+extend-unsafe-fixes = [
+  "UP038",
+]
+
+[tool.ruff.lint.isort]
+force-single-line = true
+
+===== END pyproject.toml =====
+
+
+===== BEGIN README.md =====
+# Konnaxion
+
+Our Project
+
+[![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
+License: MIT
+
+## Settings
+
+Moved to [settings](https://cookiecutter-django.readthedocs.io/en/latest/1-getting-started/settings.html).
+
+## Basic Commands
+
+### Setting Up Your Users
+
+- To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
+
+- To create a **superuser account**, use this command:
+
+      $ python manage.py createsuperuser
+
+For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
+
+### Type checks
+
+Running type checks with mypy:
+
+    $ mypy konnaxion
+
+### Test coverage
+
+To run the tests, check your test coverage, and generate an HTML coverage report:
+
+    $ coverage run -m pytest
+    $ coverage html
+    $ open htmlcov/index.html
+
+#### Running tests with pytest
+
+    $ pytest
+
+### Live reloading and Sass CSS compilation
+
+Moved to [Live reloading and SASS compilation](https://cookiecutter-django.readthedocs.io/en/latest/2-local-development/developing-locally.html#using-webpack-or-gulp).
+
+### Celery
+
+This app comes with Celery.
+
+To run a celery worker:
+
+```bash
+cd konnaxion
+celery -A config.celery_app worker -l info
+```
+
+Please note: For Celery's import magic to work, it is important _where_ the celery commands are run. If you are in the same folder with _manage.py_, you should be right.
+
+To run [periodic tasks](https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html), you'll need to start the celery beat scheduler service. You can start it as a standalone process:
+
+```bash
+cd konnaxion
+celery -A config.celery_app beat
+```
+
+or you can embed the beat service inside a worker with the `-B` option (not recommended for production use):
+
+```bash
+cd konnaxion
+celery -A config.celery_app worker -B -l info
+```
+
+### Email Server
+
+In development, it is often nice to be able to see emails that are being sent from your application. For that reason local SMTP server [Mailpit](https://github.com/axllent/mailpit) with a web interface is available as docker container.
+
+Container mailpit will start automatically when you will run all docker containers.
+Please check [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/2-local-development/developing-locally-docker.html) for more details how to start all containers.
+
+With Mailpit running, to view messages that are sent by your application, open your browser and go to `http://127.0.0.1:8025`
+
+### Sentry
+
+Sentry is an error logging aggregator service. You can sign up for a free account at <https://sentry.io/signup/?code=cookiecutter> or download and host it yourself.
+The system is set up with reasonable defaults, including 404 logging and integration with the WSGI application.
+
+You must set the DSN url in production.
+
+## Deployment
+
+The following details how to deploy this application.
+
+### Docker
+
+See detailed [cookiecutter-django Docker documentation](https://cookiecutter-django.readthedocs.io/en/latest/3-deployment/deployment-with-docker.html).
+
+===== END README.md =====
+
+
+===== BEGIN requirements/base.txt =====
+python-slugify==8.0.4  # https://github.com/un33k/python-slugify
+Pillow==11.2.1 # pyup: != 11.2.0  # https://github.com/python-pillow/Pillow
+argon2-cffi==25.1.0  # https://github.com/hynek/argon2_cffi
+whitenoise==6.9.0  # https://github.com/evansd/whitenoise
+redis==6.2.0  # https://github.com/redis/redis-py
+hiredis==3.2.1  # https://github.com/redis/hiredis-py
+celery==5.5.3  # pyup: < 6.0  # https://github.com/celery/celery
+django-celery-beat==2.8.1  # https://github.com/celery/django-celery-beat
+flower==2.0.1  # https://github.com/mher/flower
+uvicorn[standard]==0.34.3  # https://github.com/encode/uvicorn
+uvicorn-worker==0.3.0  # https://github.com/Kludex/uvicorn-worker
+
+# Django
+# ------------------------------------------------------------------------------
+django==5.1.9  # pyup: < 5.2 # https://www.djangoproject.com/
+django-environ==0.12.0  # https://github.com/joke2k/django-environ
+django-model-utils==5.0.0  # https://github.com/jazzband/django-model-utils
+django-allauth[mfa]==65.9.0  # https://github.com/pennersr/django-allauth
+django-crispy-forms==2.4  # https://github.com/django-crispy-forms/django-crispy-forms
+crispy-bootstrap5==2025.4  # https://github.com/django-crispy-forms/crispy-bootstrap5
+django-redis==5.4.0  # https://github.com/jazzband/django-redis
+# Django REST Framework
+djangorestframework==3.16.0  # https://github.com/encode/django-rest-framework
+django-cors-headers==4.7.0  # https://github.com/adamchainz/django-cors-headers
+# DRF-spectacular for api documentation
+drf-spectacular==0.28.0  # https://github.com/tfranzel/drf-spectacular
+
+===== END requirements/base.txt =====
+
+
+===== BEGIN requirements/local.txt =====
+-r production.txt
+
+Werkzeug[watchdog]==3.1.3 # https://github.com/pallets/werkzeug
+ipdb==0.13.13  # https://github.com/gotcha/ipdb
+psycopg[c]==3.2.9  # https://github.com/psycopg/psycopg
+watchfiles==1.0.5  # https://github.com/samuelcolvin/watchfiles
+
+# Testing
+# ------------------------------------------------------------------------------
+mypy==1.15.0  # https://github.com/python/mypy
+django-stubs[compatible-mypy]==5.2.0  # https://github.com/typeddjango/django-stubs
+pytest==8.4.0  # https://github.com/pytest-dev/pytest
+pytest-sugar==1.0.0  # https://github.com/Teemu/pytest-sugar
+djangorestframework-stubs==3.16.0  # https://github.com/typeddjango/djangorestframework-stubs
+
+# Documentation
+# ------------------------------------------------------------------------------
+sphinx==8.2.3 # pyup: != 8.3.0  # https://github.com/sphinx-doc/sphinx
+sphinx-autobuild==2024.10.3 # https://github.com/GaretJax/sphinx-autobuild
+
+# Code quality
+# ------------------------------------------------------------------------------
+ruff==0.11.12  # https://github.com/astral-sh/ruff
+coverage==7.8.2  # https://github.com/nedbat/coveragepy
+djlint==1.36.4  # https://github.com/Riverside-Healthcare/djLint
+pre-commit==4.2.0  # https://github.com/pre-commit/pre-commit
+
+# Django
+# ------------------------------------------------------------------------------
+factory-boy==3.3.2  # https://github.com/FactoryBoy/factory_boy
+
+django-debug-toolbar==5.2.0  # https://github.com/jazzband/django-debug-toolbar
+django-extensions==4.1  # https://github.com/django-extensions/django-extensions
+django-coverage-plugin==3.1.0  # https://github.com/nedbat/django_coverage_plugin
+pytest-django==4.11.1  # https://github.com/pytest-dev/pytest-django
+
+===== END requirements/local.txt =====
+
+
+===== BEGIN requirements/production.txt =====
+# PRECAUTION: avoid production dependencies that aren't in development
+
+-r base.txt
+
+gunicorn==23.0.0  # https://github.com/benoitc/gunicorn
+psycopg[c]==3.2.9  # https://github.com/psycopg/psycopg
+sentry-sdk==2.29.1  # https://github.com/getsentry/sentry-python
+
+# Django
+# ------------------------------------------------------------------------------
+django-anymail==13.0  # https://github.com/anymail/django-anymail
+
+===== END requirements/production.txt =====
+
