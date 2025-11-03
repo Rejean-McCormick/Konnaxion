@@ -1,3 +1,648 @@
+===== TOC (25 fichiers) =====
+1. C:\MyCode\Konnaxionv14\frontend\.all-contributorsrc
+2. C:\MyCode\Konnaxionv14\frontend\.prettierignore
+3. C:\MyCode\Konnaxionv14\frontend\.releaserc
+4. C:\MyCode\Konnaxionv14\frontend\env.mjs
+5. C:\MyCode\Konnaxionv14\frontend\eslint.config.mjs
+6. C:\MyCode\Konnaxionv14\frontend\instrumentation.ts
+7. C:\MyCode\Konnaxionv14\frontend\jest.config.js
+8. C:\MyCode\Konnaxionv14\frontend\jest.polyfills.js
+9. C:\MyCode\Konnaxionv14\frontend\jest.setup.js
+10. C:\MyCode\Konnaxionv14\frontend\LICENSE
+11. C:\MyCode\Konnaxionv14\frontend\next.config.ts
+12. C:\MyCode\Konnaxionv14\frontend\package.json
+13. C:\MyCode\Konnaxionv14\frontend\playwright.config.ts
+14. C:\MyCode\Konnaxionv14\frontend\playwright.ct.config.ts
+15. C:\MyCode\Konnaxionv14\frontend\playwright.smoke.config.ts
+16. C:\MyCode\Konnaxionv14\frontend\pnpm-lock.yaml
+17. C:\MyCode\Konnaxionv14\frontend\postcss.config.js
+18. C:\MyCode\Konnaxionv14\frontend\prettier.config.js
+19. C:\MyCode\Konnaxionv14\frontend\README.md
+20. C:\MyCode\Konnaxionv14\frontend\renovate.json
+21. C:\MyCode\Konnaxionv14\frontend\report-bundle-size.js
+22. C:\MyCode\Konnaxionv14\frontend\routes.json
+23. C:\MyCode\Konnaxionv14\frontend\scripts\find-routes-tests.mjs
+24. C:\MyCode\Konnaxionv14\frontend\scripts\find-routes.mjs
+25. C:\MyCode\Konnaxionv14\frontend\tsconfig.json
+===== END TOC =====
+
+
+===== BEGIN .all-contributorsrc =====
+{
+  "projectName": "next-enterprise",
+  "projectOwner": "Blazity",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": true,
+  "commitConvention": "angular",
+  "contributors": [
+    {
+      "login": "bmstefanski",
+      "name": "Bart Stefanski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28964599?v=4",
+      "profile": "https://bstefanski.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "jjablonski-it",
+      "name": "Jakub Jabłoński",
+      "avatar_url": "https://avatars.githubusercontent.com/u/51968772?v=4",
+      "profile": "https://github.com/jjablonski-it",
+      "contributions": [
+        "infra"
+      ]
+    },
+    {
+      "login": "neg4n",
+      "name": "Igor Klepacki",
+      "avatar_url": "https://avatars.githubusercontent.com/u/57688858?v=4",
+      "profile": "https://neg4n.dev/",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "linkToUsage": true,
+  "commitType": "docs"
+}
+
+===== END .all-contributorsrc =====
+
+
+===== BEGIN .prettierignore =====
+.next
+node_modules
+===== END .prettierignore =====
+
+
+===== BEGIN .releaserc =====
+{
+  branches: ["main"],
+  "plugins":
+    [
+      ["@semantic-release/npm", { "npmPublish": false }],
+      "@semantic-release/release-notes-generator",
+      "@semantic-release/github",
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/git",
+      "@semantic-release/changelog",
+    ],
+}
+
+===== END .releaserc =====
+
+
+===== BEGIN env.mjs =====
+import { createEnv } from "@t3-oss/env-nextjs";
+import { z } from "zod";
+
+export const env = createEnv({
+  server: {
+    ANALYZE: z
+      .enum(["true", "false"])
+      .optional()
+      .transform((v) => v === "true"),
+
+    // ← add this line
+    NEXT_PUBLIC_API_BASE: z.string().url().default("http://localhost:8000"),
+  },
+
+  client: {
+    // expose to the browser as well
+    NEXT_PUBLIC_API_BASE: z.string().url().default("http://localhost:8000"),
+  },
+
+  runtimeEnv: {
+    ANALYZE: process.env.ANALYZE,
+    NEXT_PUBLIC_API_BASE: process.env.NEXT_PUBLIC_API_BASE,
+  },
+});
+
+===== END env.mjs =====
+
+
+===== BEGIN eslint.config.mjs =====
+import * as fs from "fs";
+
+// import eslintPluginTailwindcss from "eslint-plugin-tailwindcss";  // optional
+import eslintPluginImport from "eslint-plugin-import";
+import eslintPluginNext from "@next/eslint-plugin-next";
+import eslintPluginStorybook from "eslint-plugin-storybook";
+import typescriptEslint from "typescript-eslint";
+
+const eslintIgnore = [
+  ".git/",
+  ".next/",
+  "node_modules/",
+  "dist/",
+  "build/",
+  "coverage/",
+  "*.min.js",
+  "*.config.js",
+  "*.d.ts",
+];
+
+const config = typescriptEslint.config(
+  // ➊ baseline
+  { ignores: eslintIgnore },
+
+  // ➋ add Storybook rules
+  ...eslintPluginStorybook.configs["flat/recommended"],
+
+  // ➌ base TS rules
+  typescriptEslint.configs.recommended,
+
+  // ➍ import-plugin recommended
+  eslintPluginImport.flatConfigs.recommended,
+
+  // ➎ Next.js plugin
+  {
+    plugins: {
+      "@next/next": eslintPluginNext,
+    },
+    rules: {
+      ...eslintPluginNext.configs.recommended.rules,
+      ...eslintPluginNext.configs["core-web-vitals"].rules,
+    },
+  },
+
+  // ➏ **our project-specific settings & rules**
+  {
+    settings: {
+      tailwindcss: {
+        callees: ["classnames", "clsx", "ctl", "cn", "cva"],
+      },
+      "import/resolver": {
+        /* ---- make eslint-plugin-import understand TS aliases ---- */
+        typescript: {
+          project: ["./tsconfig.json"], // array form is preferred
+          alwaysTryTypes: true,
+        },
+        /* --------------------------------------------------------- */
+        node: {
+          moduleDirectory: ["node_modules", "./"],
+        },
+      },
+    },
+
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+      ],
+
+      "sort-imports": [
+        "error",
+        { ignoreCase: true, ignoreDeclarationSort: true },
+      ],
+
+      /* group & alphabetise imports; include @/modules alias */
+      "import/order": [
+        "warn",
+        {
+          groups: ["external", "builtin", "internal", "sibling", "parent", "index"],
+          pathGroups: [
+            ...getDirectoriesToSort().map((d) => ({
+              pattern: `${d}/**`,
+              group: "internal",
+            })),
+            { pattern: "env", group: "internal" },
+            { pattern: "theme", group: "internal" },
+            { pattern: "public/**", group: "internal", position: "after" },
+          ],
+          pathGroupsExcludedImportTypes: ["internal"],
+          alphabetize: { order: "asc", caseInsensitive: true },
+        },
+      ],
+    },
+  },
+);
+
+/* -------- helper ------------------------------------------------ */
+function getDirectoriesToSort() {
+  const ignored = [".git", ".next", ".vscode", "node_modules"];
+  return fs
+    .readdirSync(process.cwd())
+    .filter((f) => fs.statSync(`${process.cwd()}/${f}`).isDirectory())
+    .filter((f) => !ignored.includes(f));
+}
+
+export default config;
+
+===== END eslint.config.mjs =====
+
+
+===== BEGIN instrumentation.ts =====
+import { registerOTel } from "@vercel/otel"
+
+export function register() {
+  registerOTel("next-app")
+}
+
+===== END instrumentation.ts =====
+
+
+===== BEGIN jest.config.js =====
+// jest.config.js
+const nextJest = require('next/jest');
+const createJestConfig = nextJest({ dir: './' });
+
+module.exports = createJestConfig({
+  setupFiles: ['<rootDir>/jest.polyfills.js'],          // NEW – runs before env loads
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  testEnvironment: 'jest-environment-jsdom',
+
+  moduleDirectories: ['node_modules', '<rootDir>'],     // ⬅️ absolute “@/” now resolves
+  moduleNameMapper: { '^@/(.*)$': '<rootDir>/$1' },
+
+  modulePathIgnorePatterns: ['<rootDir>/dist/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/e2e/',
+    '<rootDir>/ct/',
+    '\\.ct\\.tsx?$',
+    '/node_modules/',
+    '/\\.next/',
+  ],
+});
+
+===== END jest.config.js =====
+
+
+===== BEGIN jest.polyfills.js =====
+// jest.polyfills.js
+const { TextEncoder, TextDecoder } = require('util');
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
+===== END jest.polyfills.js =====
+
+
+===== BEGIN jest.setup.js =====
+// Learn more: https://github.com/testing-library/jest-dom
+import "@testing-library/jest-dom"
+import { TextEncoder, TextDecoder } from 'util';
+
+global.TextEncoder  = TextEncoder;
+global.TextDecoder  = TextDecoder;
+===== END jest.setup.js =====
+
+
+===== BEGIN LICENSE =====
+MIT License
+
+Copyright (c) 2023 Blazity
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+===== END LICENSE =====
+
+
+===== BEGIN next.config.ts =====
+// next.config.ts
+import withBundleAnalyzer from "@next/bundle-analyzer"
+import type { NextConfig } from "next"
+import { env } from "./env.mjs"
+
+const baseConfig: NextConfig = {
+  reactStrictMode: true,
+  compiler: { styledComponents: true },
+  logging: { fetches: { fullUrl: true } },
+
+  // TEMP : ne bloque pas la build sur les erreurs ESLint
+  // (remets à false quand le lint sera corrigé)
+  eslint: { ignoreDuringBuilds: true },
+
+  // Important : pas d'optimizePackageImports sur "antd"
+  // (c'est ce qui déclenchait les erreurs __barrel_optimize__)
+  // experimental: { optimizePackageImports: undefined },
+
+  async rewrites() {
+    return [
+      { source: "/api/:path*", destination: "http://localhost:8000/:path*" },
+      { source: "/healthz", destination: "/api/health" },
+      { source: "/api/healthz", destination: "/api/health" },
+      { source: "/health", destination: "/api/health" },
+      { source: "/ping", destination: "/api/health" },
+    ]
+  },
+}
+
+const withAnalyzer = withBundleAnalyzer({ enabled: env.ANALYZE === "true" })
+export default (env.ANALYZE === "true" ? withAnalyzer(baseConfig) : baseConfig)
+
+===== END next.config.ts =====
+
+
+===== BEGIN package.json =====
+{
+  "name": "next-enterprise",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env FORCE_COLOR=1 next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "prettier": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",
+    "prettier:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
+    "analyze": "cross-env ANALYZE=true next build",
+    "storybook": "cross-env FORCE_COLOR=1 storybook dev -p 6006",
+    "test-storybook": "cross-env FORCE_COLOR=1 test-storybook",
+    "build-storybook": "cross-env FORCE_COLOR=1 storybook build",
+    "typecheck": "tsc --noEmit",
+    "test": "cross-env FORCE_COLOR=1 jest",
+    "test:ct": "playwright test -c playwright.ct.config.ts",
+    "e2e:headless": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "postinstall": "npx patch-package -y",
+    "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg",
+    "routes:gen": "node scripts/find-routes.mjs",
+    "routes:gen:test": "node scripts/find-routes-tests.mjs",
+    "smoke:dev": "playwright test -c playwright.smoke.config.ts",
+    "smoke:gate": "cross-env SMOKE_GATE=1 playwright test -c playwright.smoke.config.ts",
+    "pw:install": "playwright install"
+  },
+  "dependencies": {
+    "@ant-design/compatible": "^5.1.4",
+    "@ant-design/icons": "^6.1.0",
+    "@ant-design/plots": "^2.6.6",
+    "@ant-design/pro-components": "2.8.10",
+    "@next/bundle-analyzer": "^15.3.1",
+    "@radix-ui/react-accordion": "^1.1.2",
+    "@radix-ui/react-checkbox": "^1.3.1",
+    "@radix-ui/react-dialog": "^1.1.13",
+    "@radix-ui/react-dropdown-menu": "^2.1.14",
+    "@radix-ui/react-form": "^0.0.3",
+    "@radix-ui/react-label": "^2.1.6",
+    "@radix-ui/react-popover": "^1.1.13",
+    "@radix-ui/react-radio-group": "^1.3.6",
+    "@radix-ui/react-scroll-area": "^1.2.8",
+    "@radix-ui/react-select": "2.0.0",
+    "@radix-ui/react-slider": "^1.3.4",
+    "@radix-ui/react-switch": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.11",
+    "@radix-ui/react-toggle-group": "^1.1.9",
+    "@radix-ui/react-tooltip": "^1.2.6",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/commit-analyzer": "12.0.0",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^10.3.5",
+    "@semantic-release/npm": "^12.0.1",
+    "@semantic-release/release-notes-generator": "^13.0.0",
+    "@t3-oss/env-nextjs": "^0.10.1",
+    "@tanstack/react-query": "^5.90.6",
+    "@types/styled-components": "^5.1.35",
+    "ahooks": "^3.9.6",
+    "antd": "5.26.2",
+    "axios": "^1.13.1",
+    "chart.js": "^4",
+    "class-variance-authority": "^0.7.0",
+    "dayjs": "^1.11.19",
+    "lodash": "^4.17.21",
+    "moment": "^2.30.1",
+    "next": "15.3.1",
+    "nookies": "^2.5.2",
+    "react": "18.2.0",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "18.2.0",
+    "react-use-audio-recorder": "^0.4.2",
+    "recharts": "^3.3.0",
+    "socket.io-client": "^4.8.1",
+    "styled-components": "^6.1.19",
+    "tailwind-merge": "^2.6.0",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/plugin-syntax-flow": "^7.27.1",
+    "@babel/plugin-transform-optional-chaining": "^7.27.1",
+    "@babel/plugin-transform-react-jsx": "^7.27.1",
+    "@eslint/eslintrc": "^3.3.1",
+    "@jest/globals": "^29.7.0",
+    "@next/eslint-plugin-next": "15.3.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/resources": "^1.19.0",
+    "@opentelemetry/sdk-trace-base": "^1.19.0",
+    "@opentelemetry/sdk-trace-web": "^1.19.0",
+    "@opentelemetry/semantic-conventions": "^1.19.0",
+    "@playwright/experimental-ct-react": "^1.53.1",
+    "@playwright/test": "1.56.1",
+    "@storybook/addon-controls": "^8.6.12",
+    "@storybook/addon-essentials": "^8.6.12",
+    "@storybook/addon-interactions": "^8.6.12",
+    "@storybook/addon-links": "^8.6.12",
+    "@storybook/blocks": "^8.6.12",
+    "@storybook/nextjs": "^8.6.12",
+    "@storybook/react": "^8.6.12",
+    "@storybook/test": "^8.6.12",
+    "@storybook/test-runner": "^0.21.3",
+    "@testing-library/jest-dom": "^6.1.4",
+    "@testing-library/react": "^14.3.1",
+    "@total-typescript/ts-reset": "^0.5.1",
+    "@types/jest": "^29.5.10",
+    "@types/node": "^20.17.43",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "@vercel/otel": "^1.14.0",
+    "all-contributors-cli": "^6.26.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.26.0",
+    "eslint-config-next": "15.3.1",
+    "eslint-config-prettier": "^10.1.2",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-storybook": "^0.11.6",
+    "eslint-plugin-tailwindcss": "^3.18.0",
+    "fetch-mock": "^9.11.0",
+    "glob": "^11.0.3",
+    "gzip-size": "6.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jscodeshift": "^17.3.0",
+    "mkdirp": "^3.0.1",
+    "patch-package": "^8.0.0",
+    "picocolors": "^1.1.1",
+    "postcss": "^8.5.3",
+    "postcss-import": "^16.1.0",
+    "postinstall-postinstall": "^2.1.0",
+    "prettier": "3.0.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
+    "semantic-release": "^22.0.12",
+    "storybook": "^8.6.12",
+    "tailwindcss": "^3.4.18",
+    "tailwindcss-animate": "^1.0.7",
+    "ts-jest": "^29.3.2",
+    "typed-query-selector": "^2.12.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2",
+    "webpack": "5.89.0"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@10.20.0",
+  "pnpm": {
+    "overrides": {
+      "react": "18.2.0",
+      "react-dom": "18.2.0"
+    },
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "core-js",
+      "core-js-pure",
+      "esbuild",
+      "postinstall-postinstall",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}
+
+===== END package.json =====
+
+
+===== BEGIN playwright.config.ts =====
+import { defineConfig, devices } from "@playwright/test"
+
+/**
+ * Read environment variables from file.
+ * https://github.com/motdotla/dotenv
+ */
+// require('dotenv').config();
+
+/**
+ * See https://playwright.dev/docs/test-configuration.
+ */
+export default defineConfig({
+  testDir: "./e2e",
+  /* Run tests in files in parallel */
+  fullyParallel: true,
+  /* Fail the build on CI if you accidentally left test.only in the source code. */
+  forbidOnly: !!process.env.CI,
+  /* Retry on CI only */
+  retries: process.env.CI ? 2 : 0,
+  /* Opt out of parallel tests on CI. */
+  workers: process.env.CI ? 1 : undefined,
+  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
+  reporter: "html",
+  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  use: {
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    baseURL: "http://127.0.0.1:3000",
+
+    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    trace: "on-first-retry",
+  },
+
+  /* Configure projects for major browsers */
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"] },
+    },
+
+    {
+      name: "firefox",
+      use: { ...devices["Desktop Firefox"] },
+    },
+
+    {
+      name: "webkit",
+      use: { ...devices["Desktop Safari"] },
+    },
+
+    /* Test against mobile viewports. */
+    // {
+    //   name: 'Mobile Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
+    // {
+    //   name: 'Mobile Safari',
+    //   use: { ...devices['iPhone 12'] },
+    // },
+
+    /* Test against branded browsers. */
+    // {
+    //   name: 'Microsoft Edge',
+    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
+    // },
+    // {
+    //   name: 'Google Chrome',
+    //   use: { ..devices['Desktop Chrome'], channel: 'chrome' },
+    // },
+  ],
+
+  /* Run your local dev server before starting the tests */
+  webServer: {
+    command: "pnpm dev",
+    url: "http://127.0.0.1:3000",
+    reuseExistingServer: !process.env.CI,
+  },
+})
+
+===== END playwright.config.ts =====
+
+
+===== BEGIN playwright.ct.config.ts =====
+// playwright.ct.config.ts
+import { defineConfig, devices } from '@playwright/experimental-ct-react';
+
+export default defineConfig({
+  testDir: './ct',
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }]
+});
+
+===== END playwright.ct.config.ts =====
+
+
+===== BEGIN playwright.smoke.config.ts =====
+// playwright.smoke.config.ts
+import { defineConfig } from '@playwright/test'
+
+export default defineConfig({
+  testDir: 'tests',
+  testMatch: ['routes.spec.ts'],          // ← uniquement les pages réelles
+  testIgnore: ['**/_e2e/**', '_e2e/**', '**/e2e/**', 'e2e/**'],
+  reporter: 'list',
+  workers: 1,
+  timeout: 90_000,
+  expect: { timeout: 10_000 },
+  projects: [
+    { name: 'chromium', use: { browserName: 'chromium' } }
+  ],
+})
+
+===== END playwright.smoke.config.ts =====
+
+
+===== BEGIN pnpm-lock.yaml =====
 lockfileVersion: '9.0'
 
 settings:
@@ -20300,3 +20945,532 @@ snapshots:
   yoctocolors@2.1.2: {}
 
   zod@3.25.76: {}
+
+===== END pnpm-lock.yaml =====
+
+
+===== BEGIN postcss.config.js =====
+module.exports = {
+  plugins: {
+    'postcss-import': {},
+    tailwindcss: {},
+    autoprefixer: {}
+  }
+};
+
+===== END postcss.config.js =====
+
+
+===== BEGIN prettier.config.js =====
+module.exports = {
+  plugins: ["prettier-plugin-tailwindcss"],
+  trailingComma: "es5",
+  tabWidth: 2,
+  printWidth: 120,
+  semi: false,
+}
+
+===== END prettier.config.js =====
+
+
+===== BEGIN README.md =====
+
+# [Next.js Enterprise Boilerplate](https://blazity.com/open-source/nextjs-enterprise-boilerplate) 
+
+A production-ready template for building enterprise applications with Next.js. This boilerplate provides a solid foundation with carefully selected technologies and ready-to-go infrastructure to help you develop high-quality applications efficiently.
+
+## Motivation
+
+While most Next.js boilerplates focus on individual developer needs with excessive complexity, **next-enterprise** prioritizes strategic simplicity for enterprise teams. It offers a streamlined foundation with high-impact features that maximize developer productivity and accelerate time-to-market for business-critical applications.
+
+<a href="https://blazity.com/">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="/assets/blazity-logo-dark.svg">
+  <source media="(prefers-color-scheme: light)" srcset="/assets/blazity-logo-light.svg">
+  <img alt="Logo" align="right" height="80" src="/assets/blazity-logo-light.svg">
+</picture>
+</a>
+
+> [!NOTE]
+> **Blazity** is a group of Next.js architects. We help organizations architect, optimize, and deploy high-performance Next.js applications at scale. Contact us at [contact@blazity.com](https://blazity.com) if you’d like to talk about your project.
+
+
+
+## Documentation
+
+There is a separate documentation that explains its functionality, highlights core business values and technical decisions, provides guidelines for future development, and includes architectural diagrams.
+
+We encourage you to [visit our docs (docs.blazity.com)](https://docs.blazity.com) to learn more
+
+## Integrated features
+
+### Boilerplate
+With this template you will get all the boilerplate features included:
+
+* [Next.js 15](https://nextjs.org/) - Performance-optimized configuration using App Directory
+* [Tailwind CSS v4](https://tailwindcss.com/) - Utility-first CSS framework for efficient UI development
+* [ESlint 9](https://eslint.org/) and [Prettier](https://prettier.io/) - Code consistency and error prevention
+* [Corepack](https://github.com/nodejs/corepack) & [pnpm](https://pnpm.io/) as the package manager - For project management without compromises 
+* [Strict TypeScript](https://www.typescriptlang.org/) - Enhanced type safety with carefully crafted config and [ts-reset](https://github.com/total-typescript/ts-reset) library
+* [GitHub Actions](https://github.com/features/actions) - Pre-configured workflows including bundle size and performance tracking
+* Perfect Lighthouse score - Optimized performance metrics
+* [Bundle analyzer](https://www.npmjs.com/package/@next/bundle-analyzer) - Monitor and manage bundle size during development
+* Testing suite - [Jest](https://jestjs.io/), [React Testing Library](https://testing-library.com/react), and [Playwright](https://playwright.dev/) for comprehensive testing
+* [Storybook](https://storybook.js.org/) - Component development and documentation
+* Advanced testing - Smoke and acceptance testing capabilities
+* [Conventional commits](https://www.conventionalcommits.org/) - Standardized commit history management
+* [Observability](https://opentelemetry.io/) - Open Telemetry integration
+* [Absolute imports](https://nextjs.org/docs/advanced-features/module-path-aliases) - Simplified import structure
+* [Health checks](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) - Kubernetes-compatible monitoring
+* [Radix UI](https://www.radix-ui.com/) - Headless components for customization
+* [CVA](http://cva.style/) (Class Variance Authority) - Consistent design system creation
+* [Renovate BOT](https://www.whitesourcesoftware.com/free-developer-tools/renovate) - Automated dependency and security updates
+* [Patch-package](https://www.npmjs.com/package/patch-package) - External dependency fixes without compromises
+* Component relationship tools - Graph for managing coupling and cohesion
+* [Semantic Release](https://github.com/semantic-release/semantic-release) - Automated changelog generation
+* [T3 Env](https://env.t3.gg/) - Streamlined environment variable management
+
+### Infrastructure & deployments
+
+#### Vercel
+
+Easily deploy your Next.js app with [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=github&utm_campaign=next-enterprise) by clicking the button below:
+
+[![Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/Blazity/next-enterprise)
+
+#### Custom cloud infrastructure
+
+**next-enterprise** offers dedicated infrastructure as code (IaC) solutions built with Terraform, designed specifically for deploying Next.js applications based on our extensive experience working with enterprise clients.
+
+Learn more in our [documentation (docs.blazity.com)][docs] how to quickstart with the deployments using simple CLI.
+
+#### Available cloud providers and theirs features:
+
+* **AWS (Amazon Web Services)**
+  * Automated provisioning of AWS infrastructure
+  * Scalable & secure setup using:
+     * VPC - Isolated network infrastructure
+     * Elastic Container Service (ECS) - Container orchestration
+     * Elastic Container Registry (ECR) - Container image storage
+     * Application Load Balancer - Traffic distribution
+     * S3 + CloudFront - Static asset delivery and caching
+     * AWS WAF - Web Application Firewall protection
+     * Redis Cluster - Caching
+  * CI/CD ready - Continuous integration and deployment pipeline
+
+*... more coming soon*
+
+### Team & maintenance
+
+**next-enterprise** is backed and maintained by [Blazity](https://blazity.com), providing up to date security features and integrated feature updates.
+
+#### Active maintainers
+
+- Igor Klepacki ([neg4n](https://github.com/neg4n)) - Open Source Software Developer
+- Tomasz Czechowski ([tomaszczechowski](https://github.com/tomaszczechowski)) - Solutions Architect & DevOps
+- Jakub Jabłoński ([jjablonski-it](https://github.com/jjablonski-it)) - Head of Integrations
+
+#### All-time contributors
+[bmstefanski](https://github.com/bmstefanski)
+
+## License
+
+MIT
+
+
+[docs]: https://docs.blazity.com/next-enterprise/deployments/enterprise-cli
+
+===== END README.md =====
+
+
+===== BEGIN renovate.json =====
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "enabled": false,
+      "matchPackagePatterns": ["*"]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true
+  },
+  "osvVulnerabilityAlerts": true
+}
+
+===== END renovate.json =====
+
+
+===== BEGIN report-bundle-size.js =====
+#!/usr/bin/env node
+/* eslint-disable no-console */
+/**
+ * Copyright (c) HashiCorp, Inc.
+ * SPDX-License-Identifier: MPL-2.0
+ */
+
+// edited to work with the appdir by @raphaelbadia
+
+const gzSize = require("gzip-size")
+const mkdirp = require("mkdirp")
+const fs = require("fs")
+const path = require("path")
+
+// Pull options from `package.json`
+const options = getOptions()
+const BUILD_OUTPUT_DIRECTORY = getBuildOutputDirectory(options)
+
+// first we check to make sure that the build output directory exists
+const nextMetaRoot = path.join(process.cwd(), BUILD_OUTPUT_DIRECTORY)
+try {
+  fs.accessSync(nextMetaRoot, fs.constants.R_OK)
+} catch (err) {
+  console.error(
+    `No build output found at "${nextMetaRoot}" - you may not have your working directory set correctly, or not have run "next build".`
+  )
+  process.exit(1)
+}
+
+// if so, we can import the build manifest
+const buildMeta = require(path.join(nextMetaRoot, "build-manifest.json"))
+const appDirMeta = require(path.join(nextMetaRoot, "app-build-manifest.json"))
+
+// this memory cache ensures we dont read any script file more than once
+// bundles are often shared between pages
+const memoryCache = {}
+
+// since _app is the template that all other pages are rendered into,
+// every page must load its scripts. we'll measure its size here
+const globalBundle = buildMeta.pages["/_app"]
+const globalBundleSizes = getScriptSizes(globalBundle)
+
+// next, we calculate the size of each page's scripts, after
+// subtracting out the global scripts
+const allPageSizes = Object.values(buildMeta.pages).reduce((acc, scriptPaths, i) => {
+  const pagePath = Object.keys(buildMeta.pages)[i]
+  const scriptSizes = getScriptSizes(scriptPaths.filter((scriptPath) => !globalBundle.includes(scriptPath)))
+
+  acc[pagePath] = scriptSizes
+
+  return acc
+}, {})
+
+const globalAppDirBundle = buildMeta.rootMainFiles
+const globalAppDirBundleSizes = getScriptSizes(globalAppDirBundle)
+
+const allAppDirSizes = Object.values(appDirMeta.pages).reduce((acc, scriptPaths, i) => {
+  const pagePath = Object.keys(appDirMeta.pages)[i]
+  const scriptSizes = getScriptSizes(scriptPaths.filter((scriptPath) => !globalAppDirBundle.includes(scriptPath)))
+  acc[pagePath] = scriptSizes
+
+  return acc
+}, {})
+
+// format and write the output
+const rawData = JSON.stringify({
+  ...allAppDirSizes,
+  __global: globalAppDirBundleSizes,
+})
+
+// log ouputs to the gh actions panel
+console.log(rawData)
+
+mkdirp.sync(path.join(nextMetaRoot, "analyze/"))
+fs.writeFileSync(path.join(nextMetaRoot, "analyze/__bundle_analysis.json"), rawData)
+
+// --------------
+// Util Functions
+// --------------
+
+// given an array of scripts, return the total of their combined file sizes
+function getScriptSizes(scriptPaths) {
+  const res = scriptPaths.reduce(
+    (acc, scriptPath) => {
+      const [rawSize, gzipSize] = getScriptSize(scriptPath)
+      acc.raw += rawSize
+      acc.gzip += gzipSize
+
+      return acc
+    },
+    { raw: 0, gzip: 0 }
+  )
+
+  return res
+}
+
+// given an individual path to a script, return its file size
+function getScriptSize(scriptPath) {
+  const encoding = "utf8"
+  const p = path.join(nextMetaRoot, scriptPath)
+
+  let rawSize, gzipSize
+  if (Object.keys(memoryCache).includes(p)) {
+    rawSize = memoryCache[p][0]
+    gzipSize = memoryCache[p][1]
+  } else {
+    const textContent = fs.readFileSync(p, encoding)
+    rawSize = Buffer.byteLength(textContent, encoding)
+    gzipSize = gzSize.sync(textContent)
+    memoryCache[p] = [rawSize, gzipSize]
+  }
+
+  return [rawSize, gzipSize]
+}
+
+/**
+ * Reads options from `package.json`
+ */
+function getOptions(pathPrefix = process.cwd()) {
+  const pkg = require(path.join(pathPrefix, "package.json"))
+
+  return { ...pkg.nextBundleAnalysis, name: pkg.name }
+}
+
+/**
+ * Gets the output build directory, defaults to `.next`
+ *
+ * @param {object} options the options parsed from package.json.nextBundleAnalysis using `getOptions`
+ * @returns {string}
+ */
+function getBuildOutputDirectory(options) {
+  return options.buildOutputDirectory || ".next"
+}
+
+===== END report-bundle-size.js =====
+
+
+===== BEGIN routes.json =====
+[
+  "/",
+  "/ekoh/achievements-badges/earned-badges-display",
+  "/ekoh/dashboard",
+  "/ekoh/expertise-areas/view-current-expertise",
+  "/ekoh/overview-analytics/current-ekoh-score",
+  "/ekoh/voting-influence/current-voting-weight",
+  "/ethikos/admin/audit",
+  "/ethikos/admin/moderation",
+  "/ethikos/admin/roles",
+  "/ethikos/decide/elite",
+  "/ethikos/decide/methodology",
+  "/ethikos/decide/public",
+  "/ethikos/decide/results",
+  "/ethikos/deliberate/elite",
+  "/ethikos/deliberate/guidelines",
+  "/ethikos/impact/feedback",
+  "/ethikos/impact/outcomes",
+  "/ethikos/impact/tracker",
+  "/ethikos/learn/changelog",
+  "/ethikos/learn/glossary",
+  "/ethikos/learn/guides",
+  "/ethikos/pulse/health",
+  "/ethikos/pulse/live",
+  "/ethikos/pulse/overview",
+  "/ethikos/pulse/trends",
+  "/ethikos/trust/badges",
+  "/ethikos/trust/credentials",
+  "/ethikos/trust/profile",
+  "/keenkonnect/ai-team-matching/find-teams",
+  "/keenkonnect/ai-team-matching/match-preferences",
+  "/keenkonnect/ai-team-matching/my-matches",
+  "/keenkonnect/dashboard",
+  "/keenkonnect/knowledge/browse-repository",
+  "/keenkonnect/knowledge/document-management",
+  "/keenkonnect/knowledge/search-filter-documents",
+  "/keenkonnect/knowledge/upload-new-document",
+  "/keenkonnect/projects/browse-projects",
+  "/keenkonnect/projects/create-new-project",
+  "/keenkonnect/projects/my-projects",
+  "/keenkonnect/projects/project-workspace",
+  "/keenkonnect/sustainability-impact/submit-impact-reports",
+  "/keenkonnect/sustainability-impact/sustainability-dashboard",
+  "/keenkonnect/sustainability-impact/track-project-impact",
+  "/keenkonnect/user-reputation/account-preferences",
+  "/keenkonnect/user-reputation/manage-expertise-areas",
+  "/keenkonnect/user-reputation/view-reputation-ekoh",
+  "/keenkonnect/workspaces/browse-available-workspaces",
+  "/keenkonnect/workspaces/launch-new-workspace",
+  "/keenkonnect/workspaces/my-workspaces",
+  "/konnected/certifications/certification-programs",
+  "/konnected/certifications/exam-dashboard-results",
+  "/konnected/certifications/exam-preparation",
+  "/konnected/certifications/exam-registration",
+  "/konnected/community-discussions/active-threads",
+  "/konnected/community-discussions/moderation",
+  "/konnected/community-discussions/start-new-discussion",
+  "/konnected/dashboard",
+  "/konnected/learning-library/browse-resources",
+  "/konnected/learning-library/offline-content",
+  "/konnected/learning-library/recommended-resources",
+  "/konnected/learning-library/search-filters",
+  "/konnected/learning-paths/create-learning-path",
+  "/konnected/learning-paths/manage-existing-paths",
+  "/konnected/learning-paths/my-learning-path",
+  "/konnected/teams-collaboration/activity-planner",
+  "/konnected/teams-collaboration/my-teams",
+  "/konnected/teams-collaboration/project-workspaces",
+  "/konnected/teams-collaboration/team-builder",
+  "/konsensus",
+  "/kreative/collaborative-spaces/find-spaces",
+  "/kreative/collaborative-spaces/my-spaces",
+  "/kreative/collaborative-spaces/start-new-space",
+  "/kreative/community-showcases/featured-projects",
+  "/kreative/community-showcases/submit-to-showcase",
+  "/kreative/community-showcases/top-creators",
+  "/kreative/creative-hub/explore-ideas",
+  "/kreative/creative-hub/inspiration-gallery",
+  "/kreative/creative-hub/submit-creative-work",
+  "/kreative/dashboard",
+  "/kreative/idea-incubator/collaborate-on-ideas",
+  "/kreative/idea-incubator/create-new-idea",
+  "/kreative/idea-incubator/my-ideas"
+]
+===== END routes.json =====
+
+
+===== BEGIN scripts/find-routes-tests.mjs =====
+import { promises as fs } from 'fs'
+import { join, relative } from 'path'
+
+const APP = join(process.cwd(), 'app')
+
+async function walk(dir, acc = []) {
+  const ents = await fs.readdir(dir, { withFileTypes: true })
+  for (const e of ents) {
+    const p = join(dir, e.name)
+    if (e.isDirectory()) await walk(p, acc)
+    if (e.isFile() && e.name === 'page.tsx' && p.includes(join('index.test', 'page.tsx'))) {
+      acc.push(p)
+    }
+  }
+  return acc
+}
+
+const files = await walk(APP)
+const urls = Array.from(new Set(files.map(f => {
+  const rel = relative(APP, f).replace(/\\/g, '/')
+  if (rel === 'page.tsx') return '/'                       // par cohérence
+  return '/' + rel.replace(/\/page\.tsx$/, '')
+})
+  .filter(u => !/\[.+\]/.test(u))                          // exclut dynamiques
+)).sort()
+
+await fs.writeFile('routes-tests.json', JSON.stringify(urls, null, 2))
+console.log(`found ${urls.length} test routes`)
+
+===== END scripts/find-routes-tests.mjs =====
+
+
+===== BEGIN scripts/find-routes.mjs =====
+import { promises as fs } from 'fs'
+import { join, relative } from 'path'
+
+const APP = join(process.cwd(), 'app')
+const isGroup = s => /^\(.*\)$/.test(s)
+const isDyn = s => /\[.+\]/.test(s)
+const isTestSeg = s => s === 'index.test' || s.endsWith('.test')
+
+async function walk(dir, acc = []) {
+  const ents = await fs.readdir(dir, { withFileTypes: true })
+  for (const e of ents) {
+    const p = join(dir, e.name)
+    if (e.isDirectory()) await walk(p, acc)
+    if (e.isFile() && e.name === 'page.tsx') acc.push(p)
+  }
+  return acc
+}
+
+const files = await walk(APP)
+const urls = Array.from(new Set(files.map(f => {
+  const rel = relative(APP, f).replace(/\\/g, '/')
+  if (rel === 'page.tsx') return '/'                       // corrige /page.tsx → /
+  return '/' + rel.replace(/\/page\.tsx$/, '')
+})
+  .filter(u => !u.includes('/api/'))
+  .filter(u => !u.split('/').some(isGroup))
+  .filter(u => !u.split('/').some(isDyn))
+  .filter(u => !u.split('/').some(isTestSeg))              // exclut index.test
+)).sort()
+
+await fs.writeFile('routes.json', JSON.stringify(urls, null, 2))
+console.log(`found ${urls.length} routes`)
+
+===== END scripts/find-routes.mjs =====
+
+
+===== BEGIN tsconfig.json =====
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Next.js",
+
+  "compilerOptions": {
+    // ---- base ----
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+
+    // ---- path aliases (modules d'abord, puis app/pages, puis fallback) ----
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["components/*", "src/components/*"],
+      "@/components/layout-components/*": ["components/layout-components/*"],
+      "@/layouts/*": ["components/layout-components/*"],
+      "@/context/*": ["context/*"],
+      "@/theme/*": ["theme/*"],
+
+      "@/shared/*": ["shared/*"],
+      "@/modules/*": ["modules/*"],
+      "@/insights/*": ["modules/insights/*"],
+      "@/konsensus/*": ["modules/konsensus/*"],
+      "@/konsultations/*": ["modules/konsultations/*"],
+      "@/kontact/*": ["modules/kontact/*"],
+      "@/global/*": ["modules/global/*"],
+      "@/admin/*": ["modules/admin/*"],
+
+      "@/ekoh/*":        ["modules/ekoh/*",        "app/ekoh/*",        "pages/ekoh/*"],
+      "@/ethikos/*":     ["modules/ethikos/*",     "app/ethikos/*",     "pages/ethikos/*"],
+      "@/keenkonnect/*": ["modules/keenkonnect/*", "app/keenkonnect/*", "pages/keenkonnect/*"],
+      "@/konnected/*":   ["modules/konnected/*",   "app/konnected/*",   "pages/konnected/*"],
+      "@/kreative/*":    ["modules/kreative/*",    "app/kreative/*",    "pages/kreative/*"],
+
+      "@/pages/*": ["pages/*"],
+      "@/*": ["modules/*", "pages/*", "app/*", "*"]
+    },
+
+    // ---- types & plugins ----
+    "types": ["node", "jest", "@testing-library/jest-dom"],
+    "plugins": [{ "name": "next" }]
+  },
+
+  // ---- fichiers pris en compte ----
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mjs",
+    "jest.config.js",
+    ".next/types/**/*.ts",
+    "eslint.config.mjs"
+  ],
+
+  // Par défaut on n’exclut que node_modules pour ne rien perdre.
+  // Si besoin de “verdir” temporairement le build, ajoutez ici des modules à ignorer.
+  "exclude": ["node_modules"]
+}
+
+===== END tsconfig.json =====
+

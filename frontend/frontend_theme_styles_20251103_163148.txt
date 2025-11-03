@@ -1,0 +1,775 @@
+===== TOC (21 fichiers) =====
+1. C:\MyCode\Konnaxionv14\frontend\src\theme\cyberTheme.ts
+2. C:\MyCode\Konnaxionv14\frontend\src\theme\darkTheme.ts
+3. C:\MyCode\Konnaxionv14\frontend\src\theme\funkyTheme.ts
+4. C:\MyCode\Konnaxionv14\frontend\src\theme\index.ts
+5. C:\MyCode\Konnaxionv14\frontend\src\theme\kktheme.ts
+6. C:\MyCode\Konnaxionv14\frontend\src\theme\lightTheme.ts
+7. C:\MyCode\Konnaxionv14\frontend\src\theme\minimalTheme.ts
+8. C:\MyCode\Konnaxionv14\frontend\src\theme\modernTheme.ts
+9. C:\MyCode\Konnaxionv14\frontend\src\theme\oceanTheme.ts
+10. C:\MyCode\Konnaxionv14\frontend\src\theme\sunsetTheme.ts
+11. C:\MyCode\Konnaxionv14\frontend\styles\tailwind.css
+12. C:\MyCode\Konnaxionv14\frontend\theme\cyberTheme.ts
+13. C:\MyCode\Konnaxionv14\frontend\theme\darkTheme.ts
+14. C:\MyCode\Konnaxionv14\frontend\theme\funkyTheme.ts
+15. C:\MyCode\Konnaxionv14\frontend\theme\index.ts
+16. C:\MyCode\Konnaxionv14\frontend\theme\kktheme.ts
+17. C:\MyCode\Konnaxionv14\frontend\theme\lightTheme.ts
+18. C:\MyCode\Konnaxionv14\frontend\theme\minimalTheme.ts
+19. C:\MyCode\Konnaxionv14\frontend\theme\modernTheme.ts
+20. C:\MyCode\Konnaxionv14\frontend\theme\oceanTheme.ts
+21. C:\MyCode\Konnaxionv14\frontend\theme\sunsetTheme.ts
+===== END TOC =====
+
+
+===== BEGIN src/theme/cyberTheme.ts =====
+import { theme } from 'antd';
+const { darkAlgorithm } = theme;
+
+export default {
+  label           : 'Cyber',
+  icon            : '🕶️',
+
+  algorithm       : darkAlgorithm,
+  colorPrimary    : '#39ff14',
+  colorBgLayout   : '#000c1a',
+  colorBgContainer: '#000c1a',
+  colorTextBase   : '#aefaff',
+
+  bgMain   : '#000c1a',
+  bgLight  : '#001627',
+  bgDark   : '#00e0ff1a',
+  textMain : '#aefaff',
+  accent   : '#39ff14',
+} as const;
+
+===== END src/theme/cyberTheme.ts =====
+
+
+===== BEGIN src/theme/darkTheme.ts =====
+import { theme } from 'antd';
+const { darkAlgorithm } = theme;
+
+export default {
+  label           : 'Dark',
+  icon            : '🌙',
+
+  algorithm       : darkAlgorithm,
+  colorPrimary    : '#00c4ff',
+  colorBgLayout   : '#18181c',
+  colorBgContainer: '#18181c',
+  colorTextBase   : '#f0f0f0',
+
+  bgMain   : '#18181c',
+  bgLight  : '#24242a',
+  bgDark   : '#0d0d10',
+  textMain : '#f0f0f0',
+  accent   : '#00c4ff',
+} as const;
+
+===== END src/theme/darkTheme.ts =====
+
+
+===== BEGIN src/theme/funkyTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Funky Disco',
+  icon          : '🪩',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF69B4',   // Hot Pink
+  colorLink              : '#00FFFF',   // Cyan
+  colorLinkHover         : '#7FFFD4',   // Aquamarine
+
+  // Texte (pour --ant-color-text et --ant-color-text-base)
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+  colorTextTertiary      : '#E0E0E0',
+  colorTextPlaceholder   : '#BBBBBB',
+  colorTextDisabled      : '#777777',
+
+  // Arrondis / typo
+  borderRadius           : 8,
+  fontFamily             : '"Comic Sans MS", cursive, sans-serif',
+
+  // Fonds généraux
+  colorBgLayout          : '#1E1E2F',
+  colorBgContainer       : '#2E1A47',
+  colorBgElevated        : '#41295A',
+  colorBgMask            : 'rgba(0,0,0,0.6)',
+  colorBgSpotlight       : '#FFD700',
+  colorBgSolid           : '#FF4500',
+  colorBgSolidHover      : '#FF6347',
+
+  // Menu / Sidebar (raw keys custom)
+  menuBg                 : '#2E1A47',
+  menuItemHoverBg        : '#584F8E',
+  menuItemSelectedBg     : '#7D5BA6',
+  menuItemTextColor      : '#FFFFFF',
+
+  // Dropdown / Popconfirm
+  dropdownBg             : '#383838',
+  dropdownItemHoverBg    : '#4A4A4A',
+  colorBgPopconfirm      : '#383838',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF69B4',
+  colorSplit             : '#884EA0',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+
+  // Espacements & typo
+  fontSize               : 14,
+  fontSizeLG             : 18,
+  paddingContentHorizontalLG: 24,
+  paddingContentVerticalLG  : 24,
+
+  // Variables perso (si vous les exposez sur <html>)
+  bgMain   : '#1E1E2F',
+  bgLight  : '#2E1A47',
+  bgDark   : '#0F0B20',
+  textMain : '#FFFFFF',
+  accent   : '#00FF00',
+} as const
+
+===== END src/theme/funkyTheme.ts =====
+
+
+===== BEGIN src/theme/index.ts =====
+// theme/index.ts
+import light        from './lightTheme';
+import dark         from './darkTheme';
+import funky        from './funkyTheme';
+import cyber        from './cyberTheme';
+import kktheme      from './kktheme';
+import sunsetTheme  from './sunsetTheme';
+import oceanTheme   from './oceanTheme';
+import minimalTheme from './minimalTheme';
+import modernTheme  from './modernTheme';
+
+export const themes = {
+  light,
+  dark,
+  funky,
+  cyber,
+  kktheme,
+  sunsetTheme,
+  oceanTheme,
+  minimalTheme,
+  modernTheme,
+} as const;
+
+export type ThemeType = keyof typeof themes;
+
+/* --- NOUVEAU : liste prête à l’emploi pour les consommateurs ------ */
+export const themeKeys = Object.keys(themes) as ThemeType[];
+
+export default themes;
+
+===== END src/theme/index.ts =====
+
+
+===== BEGIN src/theme/kktheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'KK',
+  icon            : '🦄',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#1e6864',
+  colorPrimaryBg  : '#1e68641a',
+  colorBgLayout   : '#f0fefa',
+  colorBgContainer: '#e0f7f5',
+  colorTextBase   : '#05332b',
+
+  bgMain   : '#f0fefa',
+  bgLight  : '#e0f7f5',
+  bgDark   : '#1e6864',
+  textMain : '#05332b',
+  accent   : '#1e6864',
+} as const;
+
+===== END src/theme/kktheme.ts =====
+
+
+===== BEGIN src/theme/lightTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'Light',
+  icon            : '☀️',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#3b82f6',
+  colorBgLayout   : '#ffffff',
+  colorBgContainer: '#ffffff',
+  colorTextBase   : '#141414',
+
+  bgMain   : '#ffffff',
+  bgLight  : '#f5f5f5',
+  bgDark   : '#e5e5e5',
+  textMain : '#141414',
+  accent   : '#3b82f6',
+} as const;
+
+===== END src/theme/lightTheme.ts =====
+
+
+===== BEGIN src/theme/minimalTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'Minimal',
+  icon            : '⚪️',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#888888',
+  colorPrimaryBg  : '#8888881a',
+  colorBgLayout   : '#fafafa',
+  colorBgContainer: '#f5f5f5',
+  colorTextBase   : '#333333',
+
+  bgMain   : '#fafafa',
+  bgLight  : '#f5f5f5',
+  bgDark   : '#888888',
+  textMain : '#333333',
+  accent   : '#888888',
+} as const;
+
+===== END src/theme/minimalTheme.ts =====
+
+
+===== BEGIN src/theme/modernTheme.ts =====
+import type { ThemeObject } from './types';
+import { theme }             from 'antd';
+const { defaultAlgorithm } = theme;
+
+const modernTheme: ThemeObject = {
+  label       : 'Modern',
+  icon        : '🖌️',
+
+  algorithm   : defaultAlgorithm,
+  colorPrimary: '#475569',
+  colorInfo   : '#2563eb',
+  colorSuccess: '#22c55e',
+  colorWarning: '#facc15',
+  colorError  : '#ef4444',
+
+  colorBgLayout   : '#f9fafb',
+  colorBgContainer: '#ffffff',
+  colorTextBase   : '#0f172a',
+
+  borderRadiusLG : 16,
+  controlHeight  : 40,
+
+  /* raw Tailwind vars (R G B) */
+  bgMain    : '249 250 251',
+  bgLight   : '255 255 255',
+  bgDark    : '226 232 240',
+  textMain  : '15 23 42',
+  accent    : '71 85 105',
+};
+
+export default modernTheme;
+
+===== END src/theme/modernTheme.ts =====
+
+
+===== BEGIN src/theme/oceanTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Ocean',
+  icon          : '🌊',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#1E90FF',
+  colorLink              : '#00BFFF',
+  colorLinkHover         : '#87CEFA',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#ADD8E6',
+
+  // Fonds
+  colorBgLayout          : '#001F3F',
+  colorBgContainer       : '#002B5C',
+  colorBgElevated        : '#003366',
+  
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#001F3F',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#004080',
+  colorMenuItemSelectedBg: '#00509E',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#1E90FF',
+  colorSplit             : '#004080',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+  
+  // entete tableaux
+  tableHeaderBg : '#24242A',
+} as const
+
+===== END src/theme/oceanTheme.ts =====
+
+
+===== BEGIN src/theme/sunsetTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Sunset',
+  icon          : '🌅',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF4500',
+  colorLink              : '#FF8C00',
+  colorLinkHover         : '#FFA500',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+
+  // Fonds
+  colorBgLayout          : '#2E1E1E',
+  colorBgContainer       : '#3C1E1E',
+  colorBgElevated        : '#4A2A2A',
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#2E1E1E',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#662222',
+  colorMenuItemSelectedBg: '#880000',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF4500',
+  colorSplit             : '#884A2E',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+} as const
+
+===== END src/theme/sunsetTheme.ts =====
+
+
+===== BEGIN styles/tailwind.css =====
+@import 'tailwindcss';
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+@import "antd/dist/reset.css";
+
+===== END styles/tailwind.css =====
+
+
+===== BEGIN theme/cyberTheme.ts =====
+import { theme } from 'antd';
+const { darkAlgorithm } = theme;
+
+export default {
+  label           : 'Cyber',
+  icon            : '🕶️',
+
+  algorithm       : darkAlgorithm,
+  colorPrimary    : '#39ff14',
+  colorBgLayout   : '#000c1a',
+  colorBgContainer: '#000c1a',
+  colorTextBase   : '#aefaff',
+
+  bgMain   : '#000c1a',
+  bgLight  : '#001627',
+  bgDark   : '#00e0ff1a',
+  textMain : '#aefaff',
+  accent   : '#39ff14',
+} as const;
+
+===== END theme/cyberTheme.ts =====
+
+
+===== BEGIN theme/darkTheme.ts =====
+import { theme } from 'antd';
+const { darkAlgorithm } = theme;
+
+export default {
+  label           : 'Dark',
+  icon            : '🌙',
+
+  algorithm       : darkAlgorithm,
+  colorPrimary    : '#00c4ff',
+  colorBgLayout   : '#18181c',
+  colorBgContainer: '#18181c',
+  colorTextBase   : '#f0f0f0',
+
+  bgMain   : '#18181c',
+  bgLight  : '#24242a',
+  bgDark   : '#0d0d10',
+  textMain : '#f0f0f0',
+  accent   : '#00c4ff',
+} as const;
+
+===== END theme/darkTheme.ts =====
+
+
+===== BEGIN theme/funkyTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Funky Disco',
+  icon          : '🪩',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF69B4',   // Hot Pink
+  colorLink              : '#00FFFF',   // Cyan
+  colorLinkHover         : '#7FFFD4',   // Aquamarine
+
+  // Texte (pour --ant-color-text et --ant-color-text-base)
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+  colorTextTertiary      : '#E0E0E0',
+  colorTextPlaceholder   : '#BBBBBB',
+  colorTextDisabled      : '#777777',
+
+  // Arrondis / typo
+  borderRadius           : 8,
+  fontFamily             : '"Comic Sans MS", cursive, sans-serif',
+
+  // Fonds généraux
+  colorBgLayout          : '#1E1E2F',
+  colorBgContainer       : '#2E1A47',
+  colorBgElevated        : '#41295A',
+  colorBgMask            : 'rgba(0,0,0,0.6)',
+  colorBgSpotlight       : '#FFD700',
+  colorBgSolid           : '#FF4500',
+  colorBgSolidHover      : '#FF6347',
+
+  // Menu / Sidebar (raw keys custom)
+  menuBg                 : '#2E1A47',
+  menuItemHoverBg        : '#584F8E',
+  menuItemSelectedBg     : '#7D5BA6',
+  menuItemTextColor      : '#FFFFFF',
+
+  // Dropdown / Popconfirm
+  dropdownBg             : '#383838',
+  dropdownItemHoverBg    : '#4A4A4A',
+  colorBgPopconfirm      : '#383838',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF69B4',
+  colorSplit             : '#884EA0',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+
+  // Espacements & typo
+  fontSize               : 14,
+  fontSizeLG             : 18,
+  paddingContentHorizontalLG: 24,
+  paddingContentVerticalLG  : 24,
+
+  // Variables perso (si vous les exposez sur <html>)
+  bgMain   : '#1E1E2F',
+  bgLight  : '#2E1A47',
+  bgDark   : '#0F0B20',
+  textMain : '#FFFFFF',
+  accent   : '#00FF00',
+} as const
+
+===== END theme/funkyTheme.ts =====
+
+
+===== BEGIN theme/index.ts =====
+// theme/index.ts
+import light        from './lightTheme';
+import dark         from './darkTheme';
+import funky        from './funkyTheme';
+import cyber        from './cyberTheme';
+import kktheme      from './kktheme';
+import sunsetTheme  from './sunsetTheme';
+import oceanTheme   from './oceanTheme';
+import minimalTheme from './minimalTheme';
+import modernTheme  from './modernTheme';
+
+export const themes = {
+  light,
+  dark,
+  funky,
+  cyber,
+  kktheme,
+  sunsetTheme,
+  oceanTheme,
+  minimalTheme,
+  modernTheme,
+} as const;
+
+export type ThemeType = keyof typeof themes;
+
+/* --- NOUVEAU : liste prête à l’emploi pour les consommateurs ------ */
+export const themeKeys = Object.keys(themes) as ThemeType[];
+
+export default themes;
+
+===== END theme/index.ts =====
+
+
+===== BEGIN theme/kktheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'KK',
+  icon            : '🦄',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#1e6864',
+  colorPrimaryBg  : '#1e68641a',
+  colorBgLayout   : '#f0fefa',
+  colorBgContainer: '#e0f7f5',
+  colorTextBase   : '#05332b',
+
+  bgMain   : '#f0fefa',
+  bgLight  : '#e0f7f5',
+  bgDark   : '#1e6864',
+  textMain : '#05332b',
+  accent   : '#1e6864',
+} as const;
+
+===== END theme/kktheme.ts =====
+
+
+===== BEGIN theme/lightTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'Light',
+  icon            : '☀️',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#3b82f6',
+  colorBgLayout   : '#ffffff',
+  colorBgContainer: '#ffffff',
+  colorTextBase   : '#141414',
+
+  bgMain   : '#ffffff',
+  bgLight  : '#f5f5f5',
+  bgDark   : '#e5e5e5',
+  textMain : '#141414',
+  accent   : '#3b82f6',
+} as const;
+
+===== END theme/lightTheme.ts =====
+
+
+===== BEGIN theme/minimalTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'Minimal',
+  icon            : '⚪️',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#888888',
+  colorPrimaryBg  : '#8888881a',
+  colorBgLayout   : '#fafafa',
+  colorBgContainer: '#f5f5f5',
+  colorTextBase   : '#333333',
+
+  bgMain   : '#fafafa',
+  bgLight  : '#f5f5f5',
+  bgDark   : '#888888',
+  textMain : '#333333',
+  accent   : '#888888',
+} as const;
+
+===== END theme/minimalTheme.ts =====
+
+
+===== BEGIN theme/modernTheme.ts =====
+import type { ThemeObject } from './types';
+import { theme }             from 'antd';
+const { defaultAlgorithm } = theme;
+
+const modernTheme: ThemeObject = {
+  label       : 'Modern',
+  icon        : '🖌️',
+
+  algorithm   : defaultAlgorithm,
+  colorPrimary: '#475569',
+  colorInfo   : '#2563eb',
+  colorSuccess: '#22c55e',
+  colorWarning: '#facc15',
+  colorError  : '#ef4444',
+
+  colorBgLayout   : '#f9fafb',
+  colorBgContainer: '#ffffff',
+  colorTextBase   : '#0f172a',
+
+  borderRadiusLG : 16,
+  controlHeight  : 40,
+
+  /* raw Tailwind vars (R G B) */
+  bgMain    : '249 250 251',
+  bgLight   : '255 255 255',
+  bgDark    : '226 232 240',
+  textMain  : '15 23 42',
+  accent    : '71 85 105',
+};
+
+export default modernTheme;
+
+===== END theme/modernTheme.ts =====
+
+
+===== BEGIN theme/oceanTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Ocean',
+  icon          : '🌊',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#1E90FF',
+  colorLink              : '#00BFFF',
+  colorLinkHover         : '#87CEFA',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#ADD8E6',
+
+  // Fonds
+  colorBgLayout          : '#001F3F',
+  colorBgContainer       : '#002B5C',
+  colorBgElevated        : '#003366',
+  
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#001F3F',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#004080',
+  colorMenuItemSelectedBg: '#00509E',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#1E90FF',
+  colorSplit             : '#004080',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+  
+  // entete tableaux
+  tableHeaderBg : '#24242A',
+} as const
+
+===== END theme/oceanTheme.ts =====
+
+
+===== BEGIN theme/sunsetTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Sunset',
+  icon          : '🌅',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF4500',
+  colorLink              : '#FF8C00',
+  colorLinkHover         : '#FFA500',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+
+  // Fonds
+  colorBgLayout          : '#2E1E1E',
+  colorBgContainer       : '#3C1E1E',
+  colorBgElevated        : '#4A2A2A',
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#2E1E1E',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#662222',
+  colorMenuItemSelectedBg: '#880000',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF4500',
+  colorSplit             : '#884A2E',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+} as const
+
+===== END theme/sunsetTheme.ts =====
+

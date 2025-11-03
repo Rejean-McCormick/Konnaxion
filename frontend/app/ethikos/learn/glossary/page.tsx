@@ -1,5 +1,4 @@
 'use client';
-"use client";
 import { useParams } from "next/navigation";
 
 import { PageContainer, ProTable } from '@ant-design/pro-components';

@@ -1,5 +1,4 @@
 'use client';
-"use client";
 
 /**
  * Description: Sculpture Edit Page component

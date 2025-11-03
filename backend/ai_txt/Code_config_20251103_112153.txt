@@ -1,3 +1,19 @@
+===== TOC (13 fichiers) =====
+0001  C:\MyCode\Konnaxionv14\backend\config\__init__.py
+0002  C:\MyCode\Konnaxionv14\backend\config\api_router.py
+0003  C:\MyCode\Konnaxionv14\backend\config\asgi.py
+0004  C:\MyCode\Konnaxionv14\backend\config\celery_app.py
+0005  C:\MyCode\Konnaxionv14\backend\config\settings\__init__.py
+0006  C:\MyCode\Konnaxionv14\backend\config\settings\base.py
+0007  C:\MyCode\Konnaxionv14\backend\config\settings\local.py
+0008  C:\MyCode\Konnaxionv14\backend\config\settings\production.py
+0009  C:\MyCode\Konnaxionv14\backend\config\settings\settings_addons.py
+0010  C:\MyCode\Konnaxionv14\backend\config\settings\test.py
+0011  C:\MyCode\Konnaxionv14\backend\config\urls.py
+0012  C:\MyCode\Konnaxionv14\backend\config\websocket.py
+0013  C:\MyCode\Konnaxionv14\backend\config\wsgi.py
+===== END TOC =====
+
 
 ===== BEGIN config/__init__.py =====
 # This will make sure the app is always imported when
@@ -811,6 +827,13 @@ SPECTACULAR_SETTINGS["SERVERS"] = [
 # ------------------------------------------------------------------------------
 
 ===== END config/settings/production.py =====
+
+
+===== BEGIN config/settings/settings_addons.py =====
+﻿# Optional project overrides for local/dev.
+# Intentionally left blank.
+
+===== END config/settings/settings_addons.py =====
 
 
 ===== BEGIN config/settings/test.py =====

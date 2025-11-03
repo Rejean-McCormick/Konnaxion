@@ -1,29 +1,32 @@
 'use client'
 
-import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { List, Rate, Input, Button, Empty } from 'antd';
-import { Comment } from '@ant-design/compatible';import { useRequest } from 'ahooks';
-import { useState } from 'react';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchFeedback, submitFeedback } from '@/services/impact';
+import { useState } from 'react'
+import { useRequest } from 'ahooks'
+
+import { PageContainer, ProCard } from '@ant-design/pro-components'
+import { Comment } from '@ant-design/compatible'
+import { Button, Empty, Input, List, Rate } from 'antd'
+
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchFeedback, submitFeedback } from '@/services/impact'
 
 export default function FeedbackLoops() {
-  usePageTitle('Impact · Feedback');
+  usePageTitle('Impact · Feedback')
 
-  const { data, loading, mutate } = useRequest(fetchFeedback);
-  const [message, setMessage] = useState('');
-  const [stars, setStars] = useState<number>(0);
-  const [sending, setSending] = useState(false);
+  const { data, loading, mutate } = useRequest(fetchFeedback)
+  const [message, setMessage] = useState('')
+  const [stars, setStars] = useState<number>(0)
+  const [sending, setSending] = useState(false)
 
   const send = async () => {
-    if (!message.trim()) return;
-    setSending(true);
-    await submitFeedback({ body: message.trim(), rating: stars || undefined });
-    setMessage('');
-    setStars(0);
-    mutate();
-    setSending(false);
-  };
+    if (!message.trim()) return
+    setSending(true)
+    await submitFeedback({ body: message.trim(), rating: stars || undefined })
+    setMessage('')
+    setStars(0)
+    await mutate()
+    setSending(false)
+  }
 
   return (
     <PageContainer ghost loading={loading}>
@@ -33,7 +36,7 @@ export default function FeedbackLoops() {
           rows={3}
           placeholder="Tell us what worked or what didn’t…"
           value={message}
-          onChange={e => setMessage(e.target.value)}
+          onChange={(e) => setMessage(e.target.value)}
           style={{ marginTop: 8 }}
         />
         <Button type="primary" onClick={send} loading={sending} style={{ marginTop: 8 }}>
@@ -42,11 +45,11 @@ export default function FeedbackLoops() {
       </ProCard>
 
       <ProCard title="Community Feedback" ghost style={{ marginTop: 24 }}>
-        {data?.items.length ? (
+        {data?.items?.length ? (
           <List
-            dataSource={data.items}
-            renderItem={f => (
-              <li>
+            dataSource={data?.items ?? []}
+            renderItem={(f) => (
+              <li key={f.id}>
                 <Comment
                   author={f.author}
                   datetime={f.createdAt}
@@ -65,5 +68,5 @@ export default function FeedbackLoops() {
         )}
       </ProCard>
     </PageContainer>
-  );
+  )
 }

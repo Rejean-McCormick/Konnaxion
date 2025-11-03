@@ -1,5 +1,4 @@
 'use client';
-"use client";
 
 // File: /pages/kreative/collaborative-spaces/my-spaces.tsx
 import React, { useState, useMemo } from 'react';

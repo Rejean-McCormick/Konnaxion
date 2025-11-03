@@ -1,8 +1,8 @@
 'use client';
-"use client";
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Comment, Timeline, Typography } from 'antd';
+import { Comment, Timeline, Typography } from '@ant-design/compatible';
+import '@ant-design/compatible/assets/index.css'
 import { useRouter, useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';

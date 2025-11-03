@@ -1,5 +1,4 @@
 'use client';
-"use client";
 
 // File: /pages/kreative/creative-hub/explore-ideas.tsx
 import React, { useState, useMemo } from 'react';

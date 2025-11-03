@@ -1,0 +1,4587 @@
+===== TOC (156 fichiers) =====
+1. C:\MyCode\Konnaxionv14\frontend\modules\admin\components\index.ts
+2. C:\MyCode\Konnaxionv14\frontend\modules\admin\components\ModerationQueue.tsx
+3. C:\MyCode\Konnaxionv14\frontend\modules\admin\components\UserStats.tsx
+4. C:\MyCode\Konnaxionv14\frontend\modules\admin\hooks\index.ts
+5. C:\MyCode\Konnaxionv14\frontend\modules\admin\hooks\useModeration.ts
+6. C:\MyCode\Konnaxionv14\frontend\modules\admin\hooks\useStats.ts
+7. C:\MyCode\Konnaxionv14\frontend\modules\admin\pages\AdminConsole.tsx
+8. C:\MyCode\Konnaxionv14\frontend\modules\admin\pages\index.ts
+9. C:\MyCode\Konnaxionv14\frontend\modules\concatv3.py
+10. C:\MyCode\Konnaxionv14\frontend\modules\ekoh\achievements-badges\earned-badges-display\components\CommonWidget\page.tsx
+11. C:\MyCode\Konnaxionv14\frontend\modules\ekoh\dashboard\components\CommonWidget\page.tsx
+12. C:\MyCode\Konnaxionv14\frontend\modules\ekoh\expertise-areas\view-current-expertise\components\CommonWidget\page.tsx
+13. C:\MyCode\Konnaxionv14\frontend\modules\ekoh\overview-analytics\current-ekoh-score\components\CommonWidget\page.tsx
+14. C:\MyCode\Konnaxionv14\frontend\modules\ekoh\voting-influence\current-voting-weight\components\CommonWidget\page.tsx
+15. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\admin\audit\page.tsx
+16. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\admin\moderation\page.tsx
+17. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\admin\roles\page.tsx
+18. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\elite\page.tsx
+19. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\methodology\page.tsx
+20. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\public\page.tsx
+21. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\results\page.tsx
+22. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\deliberate\[topic]\page.tsx
+23. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\deliberate\elite\page.tsx
+24. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\deliberate\guidelines\page.tsx
+25. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\impact\feedback\page.tsx
+26. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\impact\outcomes\page.tsx
+27. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\impact\tracker\page.tsx
+28. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\learn\changelog\page.tsx
+29. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\learn\glossary\page.tsx
+30. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\learn\guides\page.tsx
+31. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\pulse\health\page.tsx
+32. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\pulse\live\page.tsx
+33. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\pulse\overview\page.tsx
+34. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\pulse\trends\page.tsx
+35. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\trust\badges\page.tsx
+36. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\trust\credentials\page.tsx
+37. C:\MyCode\Konnaxionv14\frontend\modules\ethikos\trust\profile\page.tsx
+38. C:\MyCode\Konnaxionv14\frontend\modules\global\components\AppShell.tsx
+39. C:\MyCode\Konnaxionv14\frontend\modules\global\components\GlobalSearchBar.tsx
+40. C:\MyCode\Konnaxionv14\frontend\modules\global\components\index.ts
+41. C:\MyCode\Konnaxionv14\frontend\modules\global\hooks\index.ts
+42. C:\MyCode\Konnaxionv14\frontend\modules\global\hooks\useGlobalSearch.ts
+43. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\index.ts
+44. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\MyWork.tsx
+45. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\Search.tsx
+46. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\__stories__\SmartVoteChart.stories.tsx
+47. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\DomainHeatMap.tsx
+48. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\ErrorRateSparkline.tsx
+49. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\ExportCSVButton.tsx
+50. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\index.ts
+51. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\LatencySLOGauge.tsx
+52. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\SmartVoteChart.tsx
+53. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\TimeRangePicker.tsx
+54. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\UsageBigNumbers.tsx
+55. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\__tests__\useReport.test.tsx
+56. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\index.ts
+57. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\useReport.ts
+58. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\useReportStream.ts
+59. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\CustomBuilderPage.tsx
+60. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\index.ts
+61. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\InsightsHomePage.tsx
+62. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\PerfDashboard.tsx
+63. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\SmartVoteDashboard.tsx
+64. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\UsageDashboard.tsx
+65. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\find-teams\components\CommonWidget\page.tsx
+66. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\match-preferences\components\CommonWidget\page.tsx
+67. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\my-matches\components\CommonWidget\page.tsx
+68. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\dashboard\components\CommonWidget\page.tsx
+69. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\browse-repository\components\CommonWidget\page.tsx
+70. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\document-management\components\CommonWidget\page.tsx
+71. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\search-filter-documents\components\CommonWidget\page.tsx
+72. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\upload-new-document\components\CommonWidget\page.tsx
+73. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\browse-projects\components\CommonWidget\page.tsx
+74. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\create-new-project\components\CommonWidget\page.tsx
+75. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\my-projects\components\CommonWidget\page.tsx
+76. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\project-workspace\components\CommonWidget\page.tsx
+77. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\submit-impact-reports\components\CommonWidget\page.tsx
+78. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\sustainability-dashboard\components\CommonWidget\page.tsx
+79. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\track-project-impact\components\CommonWidget\page.tsx
+80. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\account-preferences\components\CommonWidget\page.tsx
+81. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\manage-expertise-areas\components\CommonWidget\page.tsx
+82. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\view-reputation-ekoh\components\CommonWidget\page.tsx
+83. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\browse-available-workspaces\components\CommonWidget\page.tsx
+84. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\launch-new-workspace\components\CommonWidget\page.tsx
+85. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\my-workspaces\components\CommonWidget\page.tsx
+86. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\certification-programs\components\CommonWidget\page.tsx
+87. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-dashboard-results\components\CommonWidget\page.tsx
+88. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-preparation\components\CommonWidget\page.tsx
+89. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-registration\components\CommonWidget\page.tsx
+90. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\active-threads\components\CommonWidget\page.tsx
+91. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\moderation\components\CommonWidget\page.tsx
+92. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\start-new-discussion\components\CommonWidget\page.tsx
+93. C:\MyCode\Konnaxionv14\frontend\modules\konnected\dashboard\components\CommonWidget\page.tsx
+94. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\browse-resources\components\CommonWidget\page.tsx
+95. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\offline-content\components\CommonWidget\page.tsx
+96. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\recommended-resources\components\CommonWidget\page.tsx
+97. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\search-filters\components\CommonWidget\page.tsx
+98. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\create-learning-path\components\CommonWidget\page.tsx
+99. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\manage-existing-paths\components\CommonWidget\page.tsx
+100. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\my-learning-path\components\CommonWidget\page.tsx
+101. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\activity-planner\components\CommonWidget\page.tsx
+102. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\my-teams\components\CommonWidget\page.tsx
+103. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\project-workspaces\components\CommonWidget\page.tsx
+104. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\team-builder\components\CommonWidget\page.tsx
+105. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\index.ts
+106. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\PollBarChart.tsx
+107. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\VoteButtons.tsx
+108. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\index.ts
+109. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\useLivePoll.ts
+110. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\usePoll.ts
+111. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\pages\index.ts
+112. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\pages\PollPage.tsx
+113. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationForm.tsx
+114. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationList.tsx
+115. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationVotePanel.tsx
+116. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ImpactTimeline.tsx
+117. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\index.ts
+118. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ResultsChart.tsx
+119. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ResultsDashboard.tsx
+120. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\SuggestionBoard.tsx
+121. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\SuggestionsBoard.tsx
+122. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\index.ts
+123. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultation.ts
+124. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultationResults.ts
+125. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultations.ts
+126. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultationVote.ts
+127. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useImpact.ts
+128. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useSuggestions.ts
+129. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationDetailPage.tsx
+130. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationHub.tsx
+131. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationsHomePage.tsx
+132. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\index.ts
+133. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ResultsPage.tsx
+134. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\SuggestionPage.tsx
+135. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\index.ts
+136. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\OpportunityList.tsx
+137. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\ProfileCard.tsx
+138. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\index.ts
+139. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\useOpportunities.ts
+140. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\useProfiles.ts
+141. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\ConnectCenter.tsx
+142. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\index.ts
+143. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\PublicProfile.tsx
+144. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\find-spaces\components\CommonWidget\page.tsx
+145. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\my-spaces\components\CommonWidget\page.tsx
+146. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\start-new-space\components\CommonWidget\page.tsx
+147. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\featured-projects\components\CommonWidget\page.tsx
+148. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\submit-to-showcase\components\CommonWidget\page.tsx
+149. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\top-creators\components\CommonWidget\page.tsx
+150. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\explore-ideas\components\CommonWidget\page.tsx
+151. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\inspiration-gallery\components\CommonWidget\page.tsx
+152. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\submit-creative-work\components\CommonWidget\page.tsx
+153. C:\MyCode\Konnaxionv14\frontend\modules\kreative\dashboard\components\CommonWidget\page.tsx
+154. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\collaborate-on-ideas\components\CommonWidget\page.tsx
+155. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\create-new-idea\components\CommonWidget\page.tsx
+156. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\my-ideas\components\CommonWidget\page.tsx
+===== END TOC =====
+
+
+===== BEGIN modules/admin/components/index.ts =====
+﻿export { default as ModerationQueue } from "./ModerationQueue";
+export { default as UserStats       } from "./UserStats";
+
+===== END modules/admin/components/index.ts =====
+
+
+===== BEGIN modules/admin/components/ModerationQueue.tsx =====
+﻿"use client";
+import React from "react";
+import { Card, List, Spin, Alert, Tag } from "antd";
+import useModeration, { ModerationItem } from "@/admin/hooks/useModeration";
+
+function ModerationQueue() {
+  const { data, isLoading, isError, error } = useModeration();
+
+  if (isLoading) return <Spin />;
+  if (isError) return <Alert message={error.message} type="error" />;
+
+  return (
+    <Card title="Moderation Queue" style={{ marginTop: 16 }}>
+      <List<ModerationItem>
+        itemLayout="vertical"
+        dataSource={data}
+        renderItem={(item) => (
+          <List.Item key={item.id}>
+            <List.Item.Meta
+              title={
+                <>
+                  <Tag>{item.type}</Tag> by {item.userId}
+                </>
+              }
+              description={new Date(item.createdAt).toLocaleString()}
+            />
+            <p>{item.content}</p>
+            <p>
+              <strong>Reason:</strong> {item.reason}
+            </p>
+          </List.Item>
+        )}
+      />
+    </Card>
+  );
+}
+
+export default ModerationQueue;
+
+===== END modules/admin/components/ModerationQueue.tsx =====
+
+
+===== BEGIN modules/admin/components/UserStats.tsx =====
+"use client";
+import React from "react";
+import { Card, Descriptions, Spin, Alert } from "antd";
+import useStats from "@/admin/hooks/useStats";
+
+export default function UserStats() {
+  const { data, isLoading, isError, error } = useStats();
+  if (isLoading) return <Spin />;
+  if (isError)   return <Alert message={error.message} type="error" />;
+  if (!data)     return null;                         // TS18048 safe‑guard
+
+  return (
+    <Card title="User Statistics">
+      <Descriptions column={1}>
+        <Descriptions.Item label="Total users">{data.totalUsers}</Descriptions.Item>
+        <Descriptions.Item label="Active users">{data.activeUsers}</Descriptions.Item>
+        {data.newUsers != null && (
+          <Descriptions.Item label="New users (24 h)">
+            {data.newUsers}
+          </Descriptions.Item>
+        )}
+      </Descriptions>
+    </Card>
+  );
+}
+
+===== END modules/admin/components/UserStats.tsx =====
+
+
+===== BEGIN modules/admin/hooks/index.ts =====
+﻿export { default as useModeration } from "./useModeration";
+export { default as useStats       } from "./useStats";
+
+===== END modules/admin/hooks/index.ts =====
+
+
+===== BEGIN modules/admin/hooks/useModeration.ts =====
+﻿import { useQuery } from "@tanstack/react-query";
+import { api } from "@/shared/api";
+
+export interface ModerationItem {
+  id: string;
+  type: string;
+  content: string;
+  reason: string;
+  userId: string;
+  createdAt: string;
+}
+
+export default function useModeration() {
+  return useQuery<ModerationItem[], Error>({
+    queryKey: ["admin-moderation"],
+    queryFn: async () =>
+      (await api.get<ModerationItem[]>("/api/admin/moderation")).data,
+    staleTime: 2 * 60_000,
+    retry: 1,
+  });
+}
+
+===== END modules/admin/hooks/useModeration.ts =====
+
+
+===== BEGIN modules/admin/hooks/useStats.ts =====
+﻿import { useQuery } from "@tanstack/react-query";
+import { api } from "@/shared/api";
+
+export interface AdminStats {
+  totalUsers: number;
+  activeUsers: number;
+  newUsers?: number;
+}
+
+export default function useStats() {
+  return useQuery<AdminStats, Error>({
+    queryKey: ["admin-stats"],
+    queryFn: async () => (await api.get<AdminStats>("/api/admin/stats")).data,
+    staleTime: 5 * 60_000,
+    retry: 1,
+  });
+}
+
+===== END modules/admin/hooks/useStats.ts =====
+
+
+===== BEGIN modules/admin/pages/AdminConsole.tsx =====
+"use client";
+import React from "react";
+import AppShell from "@/global/components/AppShell";
+import { ModerationQueue, UserStats } from "@/admin/components";
+
+export default function AdminConsole() {
+  return (
+    <AppShell>
+      <main className="container mx-auto p-8">
+        <h1 className="text-2xl font-bold mb-6">Admin Console</h1>
+        <div className="grid gap-6 md:grid-cols-2">
+          <UserStats />
+          <ModerationQueue />
+        </div>
+      </main>
+    </AppShell>
+  );
+}
+
+===== END modules/admin/pages/AdminConsole.tsx =====
+
+
+===== BEGIN modules/admin/pages/index.ts =====
+export { default as AdminConsole } from './AdminConsole';
+
+===== END modules/admin/pages/index.ts =====
+
+
+===== BEGIN modules/concatv3.py =====
+#!/usr/bin/env python3
+"""
+Concatène tous les fichiers texte du dossier du script et de ses sous-dossiers.
+Par défaut, écrit le résultat dans "Code_<nom_dossier>_<YYYYMMDD_HHMMSS>.txt" à la racine du script.
+"""
+
+from __future__ import annotations
+import argparse
+import fnmatch
+import os
+from pathlib import Path
+from typing import Set, List, Optional
+from datetime import datetime
+
+DEFAULT_EXTS: Set[str] = {
+    ".tx", ".md", ".markdown",
+    ".json", ".yaml", ".yml", ".xml", ".toml", ".ini", ".cfg", ".conf", ".properties",
+    ".html", ".htm", ".css", ".scss", ".less",
+    ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs",
+    ".py", ".pyi", ".ipynb",
+    ".java", ".kt", ".swift", ".rb", ".php", ".go", ".rs",
+    ".c", ".h", ".cpp", ".cc", ".hpp", ".cs",
+    ".sql",
+    ".sh", ".bash", ".zsh", ".fish", ".ps1", ".bat",
+    ".tex", ".bib",
+    ".graphql", ".gql",
+    ".gradle",
+    ".pl", ".lua", ".r",
+    ".env",
+}
+
+NAMES_WITHOUT_EXT: Set[str] = {
+    "Dockerfile", "Makefile", "CMakeLists.txt",
+    ".gitignore", ".gitattributes", ".editorconfig",
+    "Procfile", "Gemfile", "requirements.txt", "Pipfile", "poetry.lock",
+    "package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "tsconfig.json", "eslint.config.js", ".eslintrc", ".prettierrc",
+}
+
+DEFAULT_EXCLUDE_DIRS: Set[str] = {
+    ".git", ".hg", ".svn",
+    "node_modules", ".next", ".nuxt",
+    "dist", "build", "out", "coverage", ".cache",
+    ".venv", "venv", "__pycache__",
+    "target", "bin", "obj",
+}
+
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="Concatène les fichiers texte du projet dans un seul fichier.")
+    p.add_argument("-o", "--out", default=None, help="Fichier de sortie (facultatif)")
+    p.add_argument("--ext", help="Extensions additionnelles ou personnalisées, séparées par des virgules")
+    p.add_argument("--include", action="append", default=[], help="Glob d'inclusion relatif à la racine (répétable)")
+    p.add_argument("--exclude", action="append", default=[], help="Glob d'exclusion relatif à la racine (répétable)")
+    p.add_argument("--max-size", type=int, default=2_000_000, help="Taille max par fichier en octets")
+    p.add_argument("--no-headers", action="store_true", help="Ne pas imprimer d'entêtes par fichier")
+    return p.parse_args()
+
+
+def normalize_exts(exts_csv: Optional[str]) -> Set[str]:
+    if not exts_csv:
+        return set(DEFAULT_EXTS)
+    parts = [e.strip().lower() for e in exts_csv.split(",") if e.strip()]
+    normed = set()
+    for e in parts:
+        if not e.startswith("."):
+            e = "." + e
+        normed.add(e)
+    return normed
+
+
+def is_probably_text(sample: bytes) -> bool:
+    if not sample:
+        return True
+    if b"\x00" in sample:
+        return False
+    try:
+        sample.decode("utf-8")
+        return True
+    except UnicodeDecodeError:
+        pass
+    ctrl_hits = 0
+    for b in sample:
+        if b < 32 and b not in (9, 10, 13):
+            ctrl_hits += 1
+    return (ctrl_hits / max(1, len(sample))) < 0.01
+
+
+def pick_encoding(path: Path) -> Optional[str]:
+    try:
+        with path.open("rb") as f:
+            sample = f.read(32768)
+    except Exception:
+        return None
+    if not is_probably_text(sample):
+        return None
+    for enc in ("utf-8", "utf-8-sig", "utf-16", "cp1252", "latin-1"):
+        try:
+            sample.decode(enc)
+            return enc
+        except UnicodeDecodeError:
+            continue
+    return "latin-1"
+
+
+def relpath(base: Path, p: Path) -> str:
+    try:
+        return str(p.relative_to(base))
+    except Exception:
+        return str(p)
+
+
+def should_include_file(base: Path, file_path: Path, allowed_exts: Set[str],
+                        include_globs: List[str], exclude_globs: List[str],
+                        max_size: int, out_path: Path) -> bool:
+    if not file_path.is_file():
+        return False
+    if file_path == out_path:
+        return False
+    if file_path.suffix.lower() == ".txt":
+        return False
+    try:
+        if file_path.stat().st_size > max_size:
+            return False
+    except Exception:
+        return False
+    rel = relpath(base, file_path)
+    for pat in exclude_globs:
+        if fnmatch.fnmatch(rel, pat):
+            return False
+    if include_globs:
+        ok = any(fnmatch.fnmatch(rel, pat) for pat in include_globs)
+        if not ok:
+            return False
+    if file_path.suffix.lower() in allowed_exts or file_path.name in NAMES_WITHOUT_EXT:
+        return True
+    enc = pick_encoding(file_path)
+    return enc is not None
+
+
+def main() -> None:
+    args = parse_args()
+    base_dir = Path(__file__).resolve().parent
+    self_path = Path(__file__).resolve()
+
+    if args.out:
+        out_path = (base_dir / args.out).resolve()
+    else:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        out_name = f"Code_{base_dir.name}_{stamp}.txt"
+        out_path = (base_dir / out_name).resolve()
+
+    allowed_exts = normalize_exts(args.ext)
+    include_globs = list(args.include or [])
+    exclude_globs = list(args.exclude or [])
+
+    selected: List[Path] = []
+    for root, dirs, files in os.walk(base_dir, followlinks=False):
+        dirs[:] = [d for d in dirs if d not in DEFAULT_EXCLUDE_DIRS]
+        root_path = Path(root)
+        for name in files:
+            fp = root_path / name
+            # exclure le script exécuté lui-même
+            try:
+                if fp.resolve() == self_path:
+                    continue
+            except Exception:
+                pass
+            if should_include_file(base_dir, fp, allowed_exts, include_globs, exclude_globs, args.max_size, out_path):
+                selected.append(fp)
+
+    selected.sort(key=lambda p: relpath(base_dir, p).lower())
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with out_path.open("w", encoding="utf-8", newline="\n") as out:
+        for p in selected:
+            enc = pick_encoding(p) or "utf-8"
+            if not args.no_headers:
+                out.write(f"\n===== BEGIN {relpath(base_dir, p)} =====\n")
+            try:
+                with p.open("r", encoding=enc, errors="strict") as f:
+                    for line in f:
+                        out.write(line)
+            except UnicodeDecodeError:
+                with p.open("r", encoding="latin-1", errors="replace") as f:
+                    for line in f:
+                        out.write(line)
+            if not args.no_headers:
+                out.write(f"\n===== END {relpath(base_dir, p)} =====\n")
+            out.write("\n")
+
+    print(f"{len(selected)} fichier(s) concaténé(s) -> {relpath(base_dir, out_path)}")
+
+
+if __name__ == "__main__":
+    main()
+
+===== END modules/concatv3.py =====
+
+
+===== BEGIN modules/ekoh/achievements-badges/earned-badges-display/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/ekoh/achievements-badges/earned-badges-display/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/ekoh/dashboard/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/ekoh/dashboard/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/ekoh/expertise-areas/view-current-expertise/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/ekoh/expertise-areas/view-current-expertise/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/ekoh/overview-analytics/current-ekoh-score/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/ekoh/overview-analytics/current-ekoh-score/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/ekoh/voting-influence/current-voting-weight/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/ekoh/voting-influence/current-voting-weight/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/ethikos/admin/audit/page.tsx =====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Tag } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchAuditLogs } from '@/services/admin';
+
+type LogRow = {
+  id: string;
+  actor: string;
+  action: string;
+  target: string;
+  severity: 'info' | 'warn' | 'critical';
+  ts: string;
+};
+
+export default function AuditLogs() {
+  usePageTitle('Admin · Audit Logs');
+
+  const { data, loading } = useRequest(fetchAuditLogs);
+
+  const columns = [
+    { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
+    { title: 'Actor', dataIndex: 'actor', width: 120 },
+    { title: 'Action', dataIndex: 'action', width: 200 },
+    { title: 'Target', dataIndex: 'target', ellipsis: true },
+    {
+      title: 'Severity',
+      dataIndex: 'severity',
+      width: 120,
+      render: (v: LogRow['severity']) => (
+        <Tag color={v === 'critical' ? 'red' : v === 'warn' ? 'orange' : 'blue'}>{v}</Tag>
+      ),
+      filters: [
+        { text: 'Info', value: 'info' },
+        { text: 'Warn', value: 'warn' },
+        { text: 'Critical', value: 'critical' },
+      ],
+      onFilter: (val: any, row: LogRow) => row.severity === val,
+    },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<LogRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={{ pageSize: 15 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/admin/audit/page.tsx =====
+
+
+===== BEGIN modules/ethikos/admin/moderation/page.tsx =====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Tag, Popconfirm, Button } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchModerationQueue, actOnReport } from '@/services/admin';
+
+type Report = {
+  id: string;
+  content: string;
+  reporter: string;
+  type: 'Spam' | 'Harassment' | 'Misinformation';
+  status: 'Pending' | 'Resolved';
+};
+
+export default function Moderation() {
+  usePageTitle('Admin · Moderation');
+
+  const { data, loading, mutate } = useRequest(fetchModerationQueue);
+
+  const action = async (id: string, approve: boolean) => {
+    await actOnReport(id, approve);
+    mutate();
+  };
+
+  const columns = [
+    { title: 'Content', dataIndex: 'content', ellipsis: true },
+    { title: 'Reporter', dataIndex: 'reporter', width: 120 },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      width: 140,
+      render: (v: Report['type']) => <Tag color="orange">{v}</Tag>,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      width: 120,
+      render: (v: Report['status']) => (
+        <Tag color={v === 'Pending' ? 'gold' : 'green'}>{v}</Tag>
+      ),
+    },
+    {
+      title: 'Actions',
+      width: 160,
+      render: (_: any, row: Report) =>
+        row.status === 'Pending' && (
+          <>
+            <Popconfirm title="Remove content?" onConfirm={() => action(row.id, true)}>
+              <Button size="small" danger>
+                Remove
+              </Button>
+            </Popconfirm>
+            <Popconfirm title="Dismiss report?" onConfirm={() => action(row.id, false)}>
+              <Button size="small" style={{ marginLeft: 8 }}>
+                Dismiss
+              </Button>
+            </Popconfirm>
+          </>
+        ),
+    },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<Report>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={{ pageSize: 10 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/admin/moderation/page.tsx =====
+
+
+===== BEGIN modules/ethikos/admin/roles/page.tsx =====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Switch, Tag } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchRoles, toggleRole } from '@/services/admin';
+
+type RoleRow = { id: string; name: string; userCount: number; enabled: boolean };
+
+export default function RoleManagement() {
+  usePageTitle('Admin · Role Management');
+
+  const { data, loading, mutate } = useRequest(fetchRoles);
+
+  const columns = [
+    { title: 'Role', dataIndex: 'name', width: 200 },
+    {
+      title: 'Users',
+      dataIndex: 'userCount',
+      width: 100,
+      render: (v: number) => <Tag>{v}</Tag>,
+    },
+    {
+      title: 'Enabled',
+      dataIndex: 'enabled',
+      width: 120,
+      render: (v: boolean, row: RoleRow) => (
+        <Switch
+          checked={v}
+          onChange={async () => {
+            await toggleRole(row.id, !v);
+            mutate();
+          }}
+        />
+      ),
+    },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<RoleRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={false}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/admin/roles/page.tsx =====
+
+
+===== BEGIN modules/ethikos/decide/elite/page.tsx =====
+'use client'
+
+import { PageContainer, ProTable, StatisticCard } from '@ant-design/pro-components';
+import { Progress, Statistic } from 'antd';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchEliteBallots } from '@/services/decide';
+import type { Ballot } from '@/types';
+
+export default function EliteBallots() {
+  usePageTitle('Decide · Elite Ballots');
+
+  const { data, loading } = useRequest(fetchEliteBallots);
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', width: 260 },
+    {
+      title: 'Closes In',
+      dataIndex: 'closesAt',
+      width: 180,
+render: (v: string) => (
+  <Statistic.Countdown value={dayjs(v)} format="D[d] HH:mm:ss" />
+),
+    },
+    {
+      title: 'Turnout',
+      dataIndex: 'turnout',
+      width: 160,
+      render: (v: number) => <Progress type="circle" percent={v} />,
+    },
+    { title: 'Scope', dataIndex: 'scope', width: 100 },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<Ballot & { turnout: number }>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.ballots}
+        pagination={{ pageSize: 8 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/decide/elite/page.tsx =====
+
+
+===== BEGIN modules/ethikos/decide/methodology/page.tsx =====
+'use client'
+
+import { PageContainer } from '@ant-design/pro-components';
+import { Typography, Collapse, Steps, Alert } from 'antd';
+import usePageTitle from '@/hooks/usePageTitle';
+
+export default function Methodology() {
+  usePageTitle('Decide · Methodology');
+
+  return (
+    <PageContainer ghost>
+      <Typography.Title>How We Count Votes</Typography.Title>
+
+      <Collapse
+        items={[
+          {
+            key: 'weighting',
+            label: '1 · Stake-weighted counting',
+            children: (
+              <Typography.Paragraph>
+                Each ballot is tallied with quadratic weighting to dampen plutocratic influence…
+              </Typography.Paragraph>
+            ),
+          },
+          {
+            key: 'verification',
+            label: '2 · Identity verification',
+            children: (
+              <Typography.Paragraph>
+                Voters authenticate via the Desjardins meritocratic ID layer…
+              </Typography.Paragraph>
+            ),
+          },
+        ]}
+      />
+
+      <Steps
+        current={3}
+        items={[
+          { title: 'Propose' },
+          { title: 'Deliberate' },
+          { title: 'Vote' },
+          { title: 'Audit' },
+        ]}
+        style={{ marginTop: 40 }}
+      />
+
+      <Alert
+        type="info"
+        message="Open data"
+        description="Raw ballots are published (SHA-256 hashed) after a 72-hour cooling-off period."
+        showIcon
+        style={{ marginTop: 24 }}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/decide/methodology/page.tsx =====
+
+
+===== BEGIN modules/ethikos/decide/public/page.tsx =====
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import { Select, Space, Input, Popconfirm, Progress, Radio, Slider } from 'antd'
+import axios from 'axios'
+import usePageTitle from '@/hooks/usePageTitle'
+
+interface Category { id: number; name: string }
+interface Format   { id: number; name: string }
+interface PublicTopic {
+  id: number
+  question: string
+  description?: string
+  debatecategory_id: number
+  responseformat_id: number
+  turnout: number
+  options?: string[]
+  scaleLabels?: string[]
+}
+
+export default function PublicVotePage() {
+  usePageTitle('Decide · Public Voting')
+
+  const [categories, setCategories] = useState<Category[]>([])
+  const [formats, setFormats]       = useState<Format[]>([])
+  const [topicsData, setTopicsData] = useState<{ results: PublicTopic[]; count: number }>({ results: [], count: 0 })
+  const [activeCat, setActiveCat]   = useState<number | 'all'>('all')
+  const [activeFormats, setActiveFormats] = useState<number[]>([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [page, setPage]             = useState<number>(1)
+  const pageSize = 20
+
+  // 1. Load categories & formats
+  useEffect(() => {
+    axios
+      .get<Category[]>('/api/home/debatecategory/', { params: { is_deleted: false } })
+      .then(r => setCategories(r.data))
+    axios
+      .get<Format[]>('/api/home/responseformat/', { params: { is_deleted: false } })
+      .then(r => setFormats(r.data))
+  }, [])
+
+  // 2. Load topics with filters & pagination
+  useEffect(() => {
+    axios
+      .get<{ results: PublicTopic[]; count: number }>('/api/home/debatetopic/', {
+        params: {
+          is_active: true,
+          is_deleted: false,
+          debatecategory_id: activeCat === 'all' ? undefined : activeCat,
+          responseformat_id: activeFormats,
+          search: searchTerm,
+          page,
+          page_size: pageSize,
+          ordering: '-created_at',
+        },
+      })
+      .then(r => setTopicsData(r.data))
+  }, [activeCat, activeFormats, searchTerm, page])
+
+  // 3. Submit a vote and refresh
+  const vote = async (row: PublicTopic, value: any) => {
+    await axios.post('/api/home/publicvote/', { topic_id: row.id, value })
+    // refresh current page
+    axios
+      .get<{ results: PublicTopic[]; count: number }>('/api/home/debatetopic/', {
+        params: {
+          is_active: true,
+          is_deleted: false,
+          debatecategory_id: activeCat === 'all' ? undefined : activeCat,
+          responseformat_id: activeFormats,
+          search: searchTerm,
+          page,
+          page_size: pageSize,
+          ordering: '-created_at',
+        },
+      })
+      .then(r => setTopicsData(r.data))
+  }
+
+  // 4. Render vote input based on format
+  const renderVoteInput = (row: PublicTopic) => {
+    const handleChange = (e: any) => {
+      const val = e?.target?.value ?? e
+      vote(row, val)
+    }
+
+    switch (row.responseformat_id) {
+      case 1: // binary (Yes/No)
+        return (
+          <Radio.Group
+            options={(row.options ?? ['Yes', 'No']).map(v => ({ label: v, value: v }))}
+            onChange={handleChange}
+          />
+        )
+      case 2: // multiple choice
+        return (
+          <Radio.Group
+            options={(row.options ?? []).map(v => ({ label: v, value: v }))}
+            onChange={handleChange}
+          />
+        )
+      case 3: // scale
+        const labels = row.scaleLabels ?? ['1', '2', '3', '4', '5']
+        return (
+          <Space direction="vertical" size={4}>
+            <Slider
+              min={0}
+              max={labels.length - 1}
+              step={1}
+              tooltip={{ formatter: idx => labels[idx] }}
+              onAfterChange={handleChange}
+            />
+          </Space>
+        )
+      default:
+        return null
+    }
+  }
+
+  const columns = [
+    { title: 'Question', dataIndex: 'question', width: 360 },
+    {
+      title: 'Vote',
+      dataIndex: 'vote',
+      render: (_: any, row: PublicTopic) => (
+        <Popconfirm title="Confirm your vote?" onConfirm={() => {}}>
+          {renderVoteInput(row)}
+        </Popconfirm>
+      ),
+    },
+    {
+      title: 'Turnout',
+      dataIndex: 'turnout',
+      render: (v: number) => <Progress percent={v} size="small" />,
+    },
+  ]
+
+  return (
+    <PageContainer ghost>
+      <Space wrap style={{ marginBottom: 16 }}>
+        <Select
+          placeholder="Catégorie"
+          allowClear
+          value={activeCat}
+          onChange={val => { setActiveCat(val); setPage(1) }}
+          style={{ width: 200 }}
+          options={[
+            { label: 'All', value: 'all' },
+            ...categories.map(c => ({ label: c.name, value: c.id })),
+          ]}
+        />
+        <Select
+          mode="multiple"
+          placeholder="Formats"
+          value={activeFormats}
+          onChange={val => { setActiveFormats(val); setPage(1) }}
+          style={{ width: 200 }}
+          options={formats.map(f => ({ label: f.name, value: f.id }))}
+        />
+        <Input.Search
+          placeholder="Rechercher…"
+          onSearch={val => { setSearchTerm(val); setPage(1) }}
+          style={{ width: 260 }}
+        />
+      </Space>
+
+      <ProTable<PublicTopic>
+        rowKey="id"
+        columns={columns as any}
+        dataSource={topicsData.results}
+        pagination={{
+          total: topicsData.count,
+          current: page,
+          pageSize,
+          onChange: setPage,
+        }}
+        search={false}
+      />
+    </PageContainer>
+  )
+}
+
+===== END modules/ethikos/decide/public/page.tsx =====
+
+
+===== BEGIN modules/ethikos/decide/results/page.tsx =====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Tag } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchDecisionResults } from '@/services/decide';
+
+type ResultRow = {
+  id: string;
+  title: string;
+  scope: 'Elite' | 'Public';
+  passed: boolean;
+  closesAt: string;
+  region: string;
+};
+
+export default function ResultsArchive() {
+  usePageTitle('Decide · Results Archive');
+
+  const { data, loading } = useRequest(fetchDecisionResults);
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', width: 260 },
+    {
+      title: 'Result',
+      dataIndex: 'passed',
+      width: 120,
+      render: (v: boolean) => (
+        <Tag color={v ? 'green' : 'red'}>{v ? 'PASSED' : 'REJECTED'}</Tag>
+      ),
+      filters: [
+        { text: 'Passed', value: 'true' },
+        { text: 'Rejected', value: 'false' },
+      ],
+      onFilter: (val: any, row: ResultRow) => String(row.passed) === val,
+    },
+    { title: 'Scope', dataIndex: 'scope', width: 120, filters: true },
+    { title: 'Region', dataIndex: 'region', width: 140, filters: true },
+    { title: 'Closed', dataIndex: 'closesAt', valueType: 'date' },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<ResultRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={{ pageSize: 10 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/decide/results/page.tsx =====
+
+
+===== BEGIN modules/ethikos/deliberate/[topic]/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Comment, Timeline, Typography } from 'antd';
+import { useRouter } from 'next/navigation';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchTopicDetail } from '@/services/deliberate';
+
+export default function TopicDetail() {
+  const { query } = useRouter();
+  const topicId = query.topic as string;
+
+  usePageTitle(`Deliberate · ${topicId}`);
+
+  const { data, loading } = useRequest(() => fetchTopicDetail(topicId), {
+    ready: !!topicId,
+  });
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Typography.Title level={3}>{data?.title}</Typography.Title>
+
+      <ProCard title="Statements Thread" ghost>
+        <Timeline>
+          {data?.statements.map(s => (
+            <Timeline.Item key={s.id}>
+              <Comment
+                author={s.author}
+                datetime={s.createdAt}
+                content={<Typography.Paragraph>{s.body}</Typography.Paragraph>}
+              />
+            </Timeline.Item>
+          ))}
+        </Timeline>
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/deliberate/[topic]/page.tsx =====
+
+
+===== BEGIN modules/ethikos/deliberate/elite/page.tsx =====
+'use client'
+
+import React from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  ModalForm,
+  ProFormText,
+  ProFormSelect,
+} from '@ant-design/pro-components';
+import {
+  Badge,
+  Button,
+  Drawer,
+  Empty,
+  Space,
+  Tag,
+  Tooltip,
+  message,
+} from 'antd';
+import { useRequest, useInterval } from 'ahooks';
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  FireOutlined,
+} from '@ant-design/icons';
+import dayjs from 'dayjs';
+
+import usePageTitle from '@/hooks/usePageTitle';
+import {
+  fetchEliteTopics,
+  createEliteTopic,
+  fetchTopicPreview,
+} from '@/services/deliberate';
+import type { Topic } from '@/types';
+
+/* ------------------------------------------------------------------ */
+/*  Derived types                                                      */
+/* ------------------------------------------------------------------ */
+
+interface TopicRow extends Topic {
+  createdAt: string;
+  lastActivity: string;
+  hot: boolean; // computed server-side: stanceCount increased >= 20% in 24 h
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
+
+export default function EliteAgora() {
+  usePageTitle('Deliberate · Elite Agora');
+
+  /* ---------- data ---------- */
+  const { data, loading, refresh } = useRequest(fetchEliteTopics);
+  useInterval(refresh, 60_000); // poll every minute
+
+  /* ---------- drawer state ---------- */
+  const [previewId, setPreviewId] = React.useState<string | null>(null);
+  const {
+    data: preview,
+    loading: previewLoading,
+    run: loadPreview,
+  } = useRequest((id: string) => fetchTopicPreview(id), { manual: true });
+
+  /* ---------- open drawer ---------- */
+  const openPreview = (row: TopicRow) => {
+    setPreviewId(row.id);
+    loadPreview(row.id);
+  };
+
+  /* ---------- KPI header ---------- */
+  const headerStats = [
+    {
+      label: 'Open topics',
+      value: data?.list.length ?? 0,
+    },
+    {
+      label: 'Avg stances / topic',
+      value:
+        data && data.list.length
+          ? Math.round(
+              data.list.reduce((sum, t) => sum + t.stanceCount, 0) /
+                data.list.length,
+            )
+          : 0,
+    },
+    {
+      label: 'Hot topics',
+      value: data?.list.filter((t) => t.hot).length ?? 0,
+    },
+  ];
+
+  /* ---------- columns ---------- */
+  const columns = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      render: (_: any, row: TopicRow) => (
+        <a onClick={() => openPreview(row)}>{row.title}</a>
+      ),
+    },
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      filters: true,
+      render: (v: string) => <Tag color="geekblue">{v}</Tag>,
+    },
+    {
+      title: 'Stances',
+      dataIndex: 'stanceCount',
+      sorter: true,
+      align: 'right' as const,
+    },
+    {
+      title: 'Last activity',
+      dataIndex: 'lastActivity',
+      valueType: 'fromNow',
+    },
+    {
+      title: '',
+      dataIndex: 'hot',
+      width: 60,
+      render: (v: boolean) =>
+        v ? (
+          <Tooltip title="Trending">
+            <FireOutlined style={{ color: '#fa541c' }} />
+          </Tooltip>
+        ) : null,
+    },
+  ];
+
+  /* ---------- render ---------- */
+  return (
+    <PageContainer
+      ghost
+      loading={loading}
+      extra={
+        <Space>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={refresh}
+            type="text"
+            title="Refresh list"
+          />
+          {/* role check goes here */}
+          <NewTopicButton onCreated={refresh} />
+        </Space>
+      }
+    >
+      {/* KPI summary */}
+      <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+        {headerStats.map((k) => (
+          <StatisticCard
+            key={k.label}
+            colSpan={{ xs: 24, sm: 8 }}
+            statistic={{ title: k.label, value: k.value }}
+          />
+        ))}
+      </ProCard>
+
+      {/* list */}
+      <ProTable<TopicRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.list}
+        search={{
+          labelWidth: 90,
+          filterType: 'light',
+        }}
+        pagination={{ pageSize: 10 }}
+      />
+
+      {/* preview drawer */}
+      <Drawer
+        width={520}
+        open={!!previewId}
+        onClose={() => setPreviewId(null)}
+        title={preview?.title || 'Preview'}
+      >
+        {previewLoading ? (
+          <Empty description="Loading…" />
+        ) : preview ? (
+          <>
+            <p>
+              <strong>Category:</strong> {preview.category}
+            </p>
+            <p>
+              <strong>Opened:</strong>{' '}
+              {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+            </p>
+            <h4>Latest statements</h4>
+            <ul>
+              {preview.latest.map((s) => (
+                <li key={s.id}>
+                  <em>{s.author}</em> — {s.body}
+                </li>
+              ))}
+            </ul>
+            <Button
+              type="primary"
+              onClick={() =>
+                window.location.assign(`/ethikos/deliberate/${preview.id}`)
+              }
+            >
+              Go to thread →
+            </Button>
+          </>
+        ) : (
+          <Empty />
+        )}
+      </Drawer>
+    </PageContainer>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  New Topic modal                                                    */
+/* ------------------------------------------------------------------ */
+
+function NewTopicButton({ onCreated }: { onCreated: () => void }) {
+  const [visible, setVisible] = React.useState(false);
+
+  const { runAsync, loading } = useRequest(createEliteTopic, {
+    manual: true,
+    onSuccess: () => {
+      message.success('Topic created 🎉');
+      setVisible(false);
+      onCreated();
+    },
+  });
+
+  return (
+    <>
+      <Button
+        icon={<PlusOutlined />}
+        type="primary"
+        onClick={() => setVisible(true)}
+      >
+        New Topic
+      </Button>
+      <ModalForm
+        title="Create new topic"
+        open={visible}
+        onOpenChange={setVisible}
+        onFinish={async (values) => {
+          await runAsync(values);
+          return true;
+        }}
+        submitter={{ submitButtonProps: { loading } }}
+      >
+        <ProFormText
+          name="title"
+          label="Title"
+          rules={[{ required: true, min: 10 }]}
+        />
+        <ProFormSelect
+          name="category"
+          label="Category"
+          options={[
+            { label: 'AI Policy', value: 'AI Policy' },
+            { label: 'Biotech', value: 'Biotech' },
+            { label: 'Ethics', value: 'Ethics' },
+          ]}
+          rules={[{ required: true }]}
+        />
+      </ModalForm>
+    </>
+  );
+}
+
+===== END modules/ethikos/deliberate/elite/page.tsx =====
+
+
+===== BEGIN modules/ethikos/deliberate/guidelines/page.tsx =====
+'use client'
+
+import { PageContainer } from '@ant-design/pro-components';
+import { Typography, Anchor, Divider } from 'antd';
+import usePageTitle from '@/hooks/usePageTitle';
+
+export default function Guidelines() {
+  usePageTitle('Deliberate · Guidelines');
+
+  return (
+    <PageContainer ghost>
+      <Anchor
+        affix
+        items={[
+          { key: 'etiquette', href: '#etiquette', title: '1. Etiquette' },
+          { key: 'evidence', href: '#evidence', title: '2. Evidence Rules' },
+          { key: 'moderation', href: '#moderation', title: '3. Moderation & Appeals' },
+        ]}
+      />
+
+      <Typography.Title id="etiquette" level={3}>
+        1. Etiquette
+      </Typography.Title>
+      <Typography.Paragraph>
+        • Be concise, civil, and on-topic. Personal attacks and profanity are removed.
+      </Typography.Paragraph>
+
+      <Divider />
+
+      <Typography.Title id="evidence" level={3}>
+        2. Evidence Rules
+      </Typography.Title>
+      <Typography.Paragraph>
+        • Claims must cite peer-reviewed sources or official data. Unsupported assertions can be flagged.
+      </Typography.Paragraph>
+
+      <Divider />
+
+      <Typography.Title id="moderation" level={3}>
+        3. Moderation & Appeals
+      </Typography.Title>
+      <Typography.Paragraph>
+        • First strike = comment hidden. Second strike = 24 h read-only. Appeals via “Request review” button.
+      </Typography.Paragraph>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/deliberate/guidelines/page.tsx =====
+
+
+===== BEGIN modules/ethikos/impact/feedback/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { List, Rate, Input, Button, Empty } from 'antd';
+import { Comment } from '@ant-design/compatible';import { useRequest } from 'ahooks';
+import { useState } from 'react';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchFeedback, submitFeedback } from '@/services/impact';
+
+export default function FeedbackLoops() {
+  usePageTitle('Impact · Feedback');
+
+  const { data, loading, mutate } = useRequest(fetchFeedback);
+  const [message, setMessage] = useState('');
+  const [stars, setStars] = useState<number>(0);
+  const [sending, setSending] = useState(false);
+
+  const send = async () => {
+    if (!message.trim()) return;
+    setSending(true);
+    await submitFeedback({ body: message.trim(), rating: stars || undefined });
+    setMessage('');
+    setStars(0);
+    mutate();
+    setSending(false);
+  };
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProCard title="Add your feedback" ghost>
+        <Rate onChange={setStars} value={stars} />
+        <Input.TextArea
+          rows={3}
+          placeholder="Tell us what worked or what didn’t…"
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          style={{ marginTop: 8 }}
+        />
+        <Button type="primary" onClick={send} loading={sending} style={{ marginTop: 8 }}>
+          Submit
+        </Button>
+      </ProCard>
+
+      <ProCard title="Community Feedback" ghost style={{ marginTop: 24 }}>
+        {data?.items.length ? (
+          <List
+            dataSource={data.items}
+            renderItem={f => (
+              <li>
+                <Comment
+                  author={f.author}
+                  datetime={f.createdAt}
+                  content={
+                    <>
+                      {f.rating !== undefined && <Rate disabled value={f.rating} />}
+                      <p style={{ marginTop: 4 }}>{f.body}</p>
+                    </>
+                  }
+                />
+              </li>
+            )}
+          />
+        ) : (
+          <Empty description="No feedback yet" />
+        )}
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/impact/feedback/page.tsx =====
+
+
+===== BEGIN modules/ethikos/impact/outcomes/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
+import { Tabs } from 'antd';
+import { Line, Bar } from '@ant-design/plots';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchImpactOutcomes } from '@/services/impact';
+
+export default function Outcomes() {
+  usePageTitle('Impact · Outcomes');
+
+  const { data, loading } = useRequest(fetchImpactOutcomes);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProCard gutter={16} wrap>
+        {data?.kpis.map(k => (
+          <StatisticCard
+            key={k.label}
+            statistic={{ title: k.label, value: k.value, suffix: k.delta && '%' }}
+          />
+        ))}
+      </ProCard>
+
+      <Tabs
+        items={data?.charts.map((c, i) => ({
+          key: i.toString(),
+          label: c.title,
+          children: (
+            <ProCard ghost>
+              {c.type === 'line' && <Line {...c.config} />}
+              {c.type === 'bar' && <Bar {...c.config} />}
+            </ProCard>
+          ),
+        }))}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/impact/outcomes/page.tsx =====
+
+
+===== BEGIN modules/ethikos/impact/tracker/page.tsx =====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Tag, Select } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchImpactTracker, patchImpactStatus } from '@/services/impact';
+
+type TrackerRow = {
+  id: string;
+  title: string;
+  owner: string;
+  status: 'Planned' | 'In-Progress' | 'Completed' | 'Blocked';
+  updatedAt: string;
+};
+
+export default function ImpactTracker() {
+  usePageTitle('Impact · Tracker');
+
+  const { data, loading, mutate } = useRequest(fetchImpactTracker);
+
+  const onStatusChange = async (id: string, status: TrackerRow['status']) => {
+    await patchImpactStatus(id, status);
+    mutate(d => ({
+      items: d!.items.map(r => (r.id === id ? { ...r, status } : r)),
+    }));
+  };
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', width: 260 },
+    { title: 'Owner', dataIndex: 'owner', width: 160 },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      width: 160,
+      render: (v: TrackerRow['status'], row: TrackerRow) => (
+        <Select
+          value={v}
+          options={[
+            { value: 'Planned', label: 'Planned' },
+            { value: 'In-Progress', label: 'In-Progress' },
+            { value: 'Completed', label: 'Completed' },
+            { value: 'Blocked', label: 'Blocked' },
+          ]}
+          onChange={val => onStatusChange(row.id, val)}
+        />
+      ),
+    },
+    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'fromNow', sorter: true },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<TrackerRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={{ pageSize: 12 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/impact/tracker/page.tsx =====
+
+
+===== BEGIN modules/ethikos/learn/changelog/page.tsx =====
+'use client'
+
+import { PageContainer } from '@ant-design/pro-components';
+import { Timeline, Tag } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchChangelog } from '@/services/learn';
+
+export default function Changelog() {
+  usePageTitle('Learn · Changelog');
+
+  const { data, loading } = useRequest(fetchChangelog);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Timeline>
+        {data?.entries.map(e => (
+          <Timeline.Item key={e.version} label={e.date}>
+            <strong>{e.version}</strong>{' '}
+            {e.tags.map(t => (
+              <Tag key={t} color={t === 'NEW' ? 'green' : t === 'FIX' ? 'blue' : 'default'}>
+                {t}
+              </Tag>
+            ))}
+            <ul style={{ marginTop: 4 }}>
+              {e.notes.map((n: string, i: number) => (
+                <li key={i}>{n}</li>
+              ))}
+            </ul>
+          </Timeline.Item>
+        ))}
+      </Timeline>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/learn/changelog/page.tsx =====
+
+
+===== BEGIN modules/ethikos/learn/glossary/page.tsx =====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Input } from 'antd';
+import { useState } from 'react';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchGlossary } from '@/services/learn';
+
+type Term = { id: string; term: string; definition: string };
+
+export default function Glossary() {
+  usePageTitle('Learn · Glossary');
+
+  const { data, loading } = useRequest(fetchGlossary);
+  const [query, setQuery] = useState('');
+
+  const columns = [
+    { title: 'Term', dataIndex: 'term', width: 200 },
+    { title: 'Definition', dataIndex: 'definition' },
+  ];
+
+  const filtered = data?.items.filter(
+    (t: Term) => t.term.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Input.Search
+        placeholder="Search term…"
+        allowClear
+        style={{ marginBottom: 16, maxWidth: 320 }}
+        onChange={e => setQuery(e.target.value)}
+      />
+
+      <ProTable<Term>
+        rowKey="id"
+        columns={columns}
+        dataSource={filtered}
+        pagination={{ pageSize: 20 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/learn/glossary/page.tsx =====
+
+
+===== BEGIN modules/ethikos/learn/guides/page.tsx =====
+'use client'
+
+import { PageContainer } from '@ant-design/pro-components';
+import { Collapse, Anchor, Typography } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchGuides } from '@/services/learn';
+
+export default function Guides() {
+  usePageTitle('Learn · Guides');
+
+  const { data, loading } = useRequest(fetchGuides);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Anchor
+        affix
+        items={data?.sections.map(s => ({
+          key: s.id,
+          href: `#${s.id}`,
+          title: s.title,
+        }))}
+      />
+
+      <Collapse
+        accordion
+        items={data?.sections.map(s => ({
+          key: s.id,
+          label: <Typography.Text id={s.id}>{s.title}</Typography.Text>,
+          children: <Typography.Paragraph>{s.content}</Typography.Paragraph>,
+        }))}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/learn/guides/page.tsx =====
+
+
+===== BEGIN modules/ethikos/pulse/health/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Pie, Radar } from '@ant-design/plots';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchPulseHealth } from '@/services/pulse';
+
+export default function PulseHealth() {
+  usePageTitle('Pulse · Participation Health');
+
+  const { data, loading } = useRequest(fetchPulseHealth);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProCard gutter={16} wrap>
+        <ProCard colSpan={12} title="Diversity Radar">
+          <Radar {...data?.radarConfig} />
+        </ProCard>
+
+        <ProCard colSpan={12} title="Ethics Score Breakdown">
+          <Pie {...data?.pieConfig} />
+        </ProCard>
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/pulse/health/page.tsx =====
+
+
+===== BEGIN modules/ethikos/pulse/live/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
+import { Badge, Space } from 'antd';
+import { useInterval, useRequest } from 'ahooks';
+import ChartCard from '@/components/charts/ChartCard';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchPulseLiveData } from '@/services/pulse';   // ← correct import
+
+export default function PulseLive() {
+  usePageTitle('Pulse · Live Metrics');
+
+  // custom hook (polls every 20 s)
+  const { data, loading, refresh } = usePulseLive(true);
+
+  // manual refresh safety-net
+  useInterval(refresh, 20_000);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProCard gutter={16} wrap>
+        {data?.counters.map(c => (
+          <StatisticCard
+            key={c.label}
+            statistic={{
+              title: (
+                <Space>
+                  {c.label}
+                  <Badge status={c.trend > 0 ? 'success' : c.trend < 0 ? 'error' : 'default'} />
+                </Space>
+              ),
+              value: c.value,
+              precision: 0,
+            }}
+            chart={<ChartCard type="tinyLine" data={c.history} height={50} />}
+          />
+        ))}
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Local data-fetching hook                                           */
+/* ------------------------------------------------------------------ */
+function usePulseLive(polling = false) {
+  return useRequest(fetchPulseLiveData, {
+    pollingInterval: polling ? 20_000 : undefined,
+  });
+}
+
+===== END modules/ethikos/pulse/live/page.tsx =====
+
+
+===== BEGIN modules/ethikos/pulse/overview/page.tsx =====
+'use client'
+
+// pages/ethikos/pulse/overview.tsx
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import { Badge, Button, Empty, Skeleton, Space, Tooltip } from 'antd';
+import { SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import ChartCard from '@/components/charts/ChartCard';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchPulseOverview } from '@/services/pulse';
+
+/* ------------------------------------------------------------------ */
+/*  Data-fetching hook                                                 */
+/* ------------------------------------------------------------------ */
+
+function usePulseOverview() {
+  const req = useRequest(fetchPulseOverview, { refreshDeps: [] });
+  return req;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
+
+export default function PulseOverview() {
+  usePageTitle('Pulse · Overview');
+
+  const { data, loading, error, refresh } = usePulseOverview();
+  const lastUpdated = data ? dayjs(data.refreshedAt).format('HH:mm:ss') : null;
+
+  /* ---------- loading skeleton ---------- */
+  if (loading && !data) {
+    return (
+      <PageContainer ghost>
+        <Skeleton active />
+      </PageContainer>
+    );
+  }
+
+  /* ---------- error state ---------- */
+  if (error) {
+    return (
+      <PageContainer ghost>
+        <Empty
+          description="Failed to load metrics"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        >
+          <Button icon={<SyncOutlined />} onClick={refresh}>
+            Retry
+          </Button>
+        </Empty>
+      </PageContainer>
+    );
+  }
+
+  /* ---------- empty state ---------- */
+  if (data && data.kpis.length === 0) {
+    return (
+      <PageContainer ghost>
+        <Empty description="No KPI data yet" />
+      </PageContainer>
+    );
+  }
+
+  /* ---------- happy path ---------- */
+  return (
+    <PageContainer
+      ghost
+      extra={
+        <Space>
+          {lastUpdated && (
+            <Badge
+              count={
+                <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+                  <ClockCircleOutlined style={{ color: '#52c41a' }} />
+                </Tooltip>
+              }
+            />
+          )}
+          <Button
+            icon={<SyncOutlined />}
+            onClick={refresh}
+            size="small"
+            type="text"
+          />
+        </Space>
+      }
+    >
+      <ProCard gutter={[16, 16]} wrap>
+        {data!.kpis.map((kpi) => (
+          <StatisticCard
+            key={kpi.label}
+            colSpan={{
+              xs: 24,
+              sm: 12,
+              md: 12,
+              lg: 6,
+            }}
+            statistic={{
+              title: kpi.label,
+              value: kpi.value,
+              suffix: kpi.delta !== undefined ? '%' : undefined,
+              description:
+                kpi.delta !== undefined ? (
+                  <span
+                    style={{
+                      color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                    }}
+                  >
+                    {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
+                  </span>
+                ) : null,
+            }}
+            chart={
+              <ChartCard
+                type="area"
+                height={60}
+                data={kpi.history.map((h) => ({
+                  x: h.date,
+                  y: h.value,
+                }))}
+                tooltip={{
+                  formatter: (datum: any) =>
+                    `${dayjs(datum.x).format('MMM D')}: ${datum.y}`,
+                }}
+              />
+            }
+          />
+        ))}
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/pulse/overview/page.tsx =====
+
+
+===== BEGIN modules/ethikos/pulse/trends/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Tabs } from 'antd';
+import { useRequest } from 'ahooks';
+import { Line, Area, Heatmap } from '@ant-design/plots';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchPulseTrends } from '@/services/pulse';
+
+export default function PulseTrends() {
+  usePageTitle('Pulse · Trends');
+
+  const { data, loading } = useRequest(fetchPulseTrends);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Tabs
+        items={data?.charts.map((c, idx) => ({
+          key: idx.toString(),
+          label: c.title,
+          children: (
+            <ProCard ghost>
+              {c.type === 'line' && <Line {...c.config} />}
+              {c.type === 'area' && <Area {...c.config} />}
+              {c.type === 'heatmap' && <Heatmap {...c.config} />}
+            </ProCard>
+          ),
+        }))}
+      />
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/pulse/trends/page.tsx =====
+
+
+===== BEGIN modules/ethikos/trust/badges/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Badge, Card, Progress, Tooltip } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchUserBadges } from '@/services/trust';
+
+export default function Badges() {
+  usePageTitle('Trust · Badges');
+
+  const { data, loading } = useRequest(fetchUserBadges);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProCard gutter={16} wrap>
+        {data?.earned.map(b => (
+          <Badge.Ribbon text="Earned" color="green" key={b.id}>
+            <Card title={b.name} style={{ width: 220, marginBottom: 16 }}>
+              <p>{b.desc}</p>
+            </Card>
+          </Badge.Ribbon>
+        ))}
+
+        {data?.progress.map(p => (
+          <Tooltip title={`${p.current}/${p.required}`} key={p.id}>
+            <Card title={p.name} bordered={false} style={{ width: 220, marginBottom: 16 }}>
+              <Progress percent={Math.round((p.current / p.required) * 100)} />
+            </Card>
+          </Tooltip>
+        ))}
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/trust/badges/page.tsx =====
+
+
+===== BEGIN modules/ethikos/trust/credentials/page.tsx =====
+'use client'
+
+import { PageContainer } from '@ant-design/pro-components';
+import { Upload, Button, Result } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
+import { useState } from 'react';
+import usePageTitle from '@/hooks/usePageTitle';
+import { uploadCredential } from '@/services/trust';
+
+export default function Credentials() {
+  usePageTitle('Trust · Credentials');
+
+  const [done, setDone] = useState(false);
+
+  const props = {
+    name: 'file',
+    multiple: false,
+    customRequest: async ({ file, onSuccess, onError }: any) => {
+      try {
+        await uploadCredential(file as File);
+        onSuccess('ok');
+        setDone(true);
+      } catch {
+        onError();
+      }
+    },
+  };
+
+  return (
+    <PageContainer ghost>
+      {done ? (
+        <Result
+          status="success"
+          title="Document uploaded!"
+          subTitle="Your credential is pending verification."
+          extra={<Button type="primary" onClick={() => setDone(false)}>Upload another</Button>}
+        />
+      ) : (
+        <Upload.Dragger {...props} accept=".pdf,.jpg,.png">
+          <p className="ant-upload-drag-icon">
+            <InboxOutlined />
+          </p>
+          <p className="ant-upload-text">Click or drag file to this area to upload</p>
+          <p className="ant-upload-hint">Supported: PDF / JPG / PNG &nbsp;·&nbsp; Max 5 MB</p>
+        </Upload.Dragger>
+      )}
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/trust/credentials/page.tsx =====
+
+
+===== BEGIN modules/ethikos/trust/profile/page.tsx =====
+'use client'
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Avatar, Descriptions, Tag, Timeline } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchUserProfile } from '@/services/trust';
+
+export default function MyProfile() {
+  usePageTitle('Trust · My Profile');
+
+  const { data, loading } = useRequest(fetchUserProfile);
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProCard split="vertical">
+        <ProCard colSpan="25%">
+          <Avatar size={120} src={data?.avatar} />
+          <Descriptions size="small" column={1} style={{ marginTop: 16 }}>
+            <Descriptions.Item label="Name">{data?.name}</Descriptions.Item>
+            <Descriptions.Item label="Joined">{data?.joined}</Descriptions.Item>
+            <Descriptions.Item label="Reputation">
+              <Tag color="blue">{data?.score}</Tag>
+            </Descriptions.Item>
+          </Descriptions>
+        </ProCard>
+        <ProCard title="Recent Activity" ghost>
+          <Timeline>
+            {data?.activity.map(a => (
+              <Timeline.Item key={a.id}>
+                {a.when} · {a.text}
+              </Timeline.Item>
+            ))}
+          </Timeline>
+        </ProCard>
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+===== END modules/ethikos/trust/profile/page.tsx =====
+
+
+===== BEGIN modules/global/components/AppShell.tsx =====
+﻿"use client";
+import React, { PropsWithChildren } from "react";
+import { Layout } from "antd";
+
+/** Light-weight wrapper that gives every page a top‑nav + centred body. */
+export default function AppShell({ children }: PropsWithChildren) {
+  return (
+    <Layout style={{ minHeight: "100vh" }}>
+      <Layout.Header className="text-white text-lg font-semibold px-8">
+        Konnaxion
+      </Layout.Header>
+      <Layout.Content className="p-8 max-w-5xl w-full mx-auto">
+        {children}
+      </Layout.Content>
+    </Layout>
+  );
+}
+
+===== END modules/global/components/AppShell.tsx =====
+
+
+===== BEGIN modules/global/components/GlobalSearchBar.tsx =====
+// File: modules/global/components/GlobalSearchBar.tsx
+'use client'
+
+import React, { useState } from 'react'
+import { Input } from 'antd'
+import { useRouter, useSearchParams } from 'next/navigation'
+
+export function GlobalSearchBar() {
+  const [q, setQ] = useState(useSearchParams().get('q') ?? '')
+  const router = useRouter()
+
+  const onSearch = (value: string) => {
+    if (value.trim()) {
+      router.push(`/search?q=${encodeURIComponent(value.trim())}`)
+    }
+  }
+
+  return (
+    <Input.Search
+      placeholder="Search…"
+      value={q}
+      onChange={e => setQ(e.target.value)}
+      onSearch={onSearch}
+      enterButton
+      style={{ maxWidth: 400 }}
+    />
+  )
+}
+
+===== END modules/global/components/GlobalSearchBar.tsx =====
+
+
+===== BEGIN modules/global/components/index.ts =====
+﻿export { default as AppShell        } from "./AppShell";
+
+===== END modules/global/components/index.ts =====
+
+
+===== BEGIN modules/global/hooks/index.ts =====
+﻿export { default as useGlobalSearch } from './useGlobalSearch';
+
+===== END modules/global/hooks/index.ts =====
+
+
+===== BEGIN modules/global/hooks/useGlobalSearch.ts =====
+﻿import { useQuery } from "@tanstack/react-query";
+import { api } from "@/shared/api";
+
+export interface GlobalSearchResult {
+  id: string;
+  title: string;
+  snippet: string;
+  path: string;
+}
+
+/** Client‑side search against GET /api/search?q=… */
+export default function useGlobalSearch(query: string) {
+  return useQuery<GlobalSearchResult[], Error>({
+    queryKey: ["global-search", query],
+    queryFn: async () =>
+      (await api.get<GlobalSearchResult[]>("/api/search", { params: { q: query } })).data,
+    enabled: Boolean(query),
+    staleTime: 60_000,
+    retry: 1,
+  });
+}
+
+===== END modules/global/hooks/useGlobalSearch.ts =====
+
+
+===== BEGIN modules/global/pages/index.ts =====
+export { default as MyWork } from './MyWork';
+export { default as Search } from './Search';
+
+===== END modules/global/pages/index.ts =====
+
+
+===== BEGIN modules/global/pages/MyWork.tsx =====
+"use client";
+import AppShell from "../components/AppShell";
+
+export default function MyWork() {
+  return (
+    <AppShell>
+      <h1 className="text-xl font-semibold mb-4">My work</h1>
+      <p>Coming soon…</p>
+    </AppShell>
+  );
+}
+
+===== END modules/global/pages/MyWork.tsx =====
+
+
+===== BEGIN modules/global/pages/Search.tsx =====
+"use client";
+import { useSearchParams } from "next/navigation";
+import { Alert, List, Spin } from "antd";
+import AppShell from "@/global/components/AppShell";
+import useGlobalSearch, { GlobalSearchResult } from "@/global/hooks/useGlobalSearch";
+
+export default function GlobalSearchPage() {
+  const q = useSearchParams().get("q") ?? "";
+  const { data, isLoading, isError, error } = useGlobalSearch(q);
+
+  return (
+    <AppShell>
+      {isLoading && <Spin />}
+      {isError && <Alert message={error.message} type="error" />}
+      {data && (
+        <List<GlobalSearchResult>
+          itemLayout="vertical"
+          dataSource={data}
+          renderItem={(item) => (
+            <List.Item key={item.id}>
+              <List.Item.Meta
+                title={<a href={item.path}>{item.title}</a>}
+                description={item.snippet}
+              />
+            </List.Item>
+          )}
+        />
+      )}
+    </AppShell>
+  );
+}
+
+===== END modules/global/pages/Search.tsx =====
+
+
+===== BEGIN modules/insights/components/__stories__/SmartVoteChart.stories.tsx =====
+import SmartVoteChart from '../SmartVoteChart';
+
+export default {
+  title: 'Insights/SmartVoteChart',
+  component: SmartVoteChart,
+};
+
+export const Basic = {
+  args: {
+    labels: ['Option 1', 'Option 2'],
+    votes: [42, 23],
+    scores: [1.3, 2.1],
+  },
+};
+
+===== END modules/insights/components/__stories__/SmartVoteChart.stories.tsx =====
+
+
+===== BEGIN modules/insights/components/DomainHeatMap.tsx =====
+export default function DomainHeatMap() {
+  return (
+    <div style={{ minHeight: 300, display: "flex", alignItems: "center", justifyContent: "center", color: "#bbb" }}>
+      {/* TODO: Implement heatmap with Chart.js or another library */}
+      <em>Heatmap chart not available (react-chartjs-2-heatmap does not exist)</em>
+    </div>
+  );
+}
+
+===== END modules/insights/components/DomainHeatMap.tsx =====
+
+
+===== BEGIN modules/insights/components/ErrorRateSparkline.tsx =====
+"use client";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+ChartJS.register(LineElement, CategoryScale, LinearScale, Tooltip);
+
+export default function ErrorRateSparkline({
+  labels,
+  rates,
+}: {
+  labels: string[];
+  rates: number[];
+}) {
+  const data = {
+    labels,
+    datasets: [
+      {
+        data: rates,
+        fill: false,
+        tension: 0.3,
+        borderWidth: 2,
+      },
+    ],
+  };
+  return <Line data={data} options={{ plugins: { legend: { display: false } } }} />;
+}
+
+
+===== END modules/insights/components/ErrorRateSparkline.tsx =====
+
+
+===== BEGIN modules/insights/components/ExportCSVButton.tsx =====
+"use client";
+import { Button } from "antd";
+import { DownloadOutlined } from "@ant-design/icons";
+import { downloadCsv } from "@/shared/downloadCsv";
+
+export default function ExportCSVButton({
+  endpoint,
+  params,
+}: {
+  endpoint: string;
+  params?: Record<string, unknown>;
+}) {
+  return (
+    <Button
+      type="primary"
+      icon={<DownloadOutlined />}
+      onClick={() => downloadCsv(endpoint, params)}
+    >
+      Export CSV
+    </Button>
+  );
+}
+
+===== END modules/insights/components/ExportCSVButton.tsx =====
+
+
+===== BEGIN modules/insights/components/index.ts =====
+﻿export { default as SmartVoteChart } from './SmartVoteChart';
+export { default as DomainHeatMap }  from './DomainHeatMap';
+
+===== END modules/insights/components/index.ts =====
+
+
+===== BEGIN modules/insights/components/LatencySLOGauge.tsx =====
+"use client";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+export default function LatencySLOGauge({
+  valueMs,
+  sloMs,
+}: {
+  valueMs: number;
+  sloMs: number;
+}) {
+  const pct = Math.min(100, (valueMs / sloMs) * 100);
+  const data = {
+    labels: ["Latency", "Budget"],
+    datasets: [
+      {
+        data: [pct, 100 - pct],
+        backgroundColor: ["#3b82f6", "#e5e7eb"],
+        borderWidth: 0,
+      },
+    ],
+  };
+  return (
+    <div className="w-48">
+      <Doughnut data={data} options={{ cutout: "70%" }} />
+      <p className="text-center -mt-14 text-xl font-semibold">{valueMs} ms</p>
+    </div>
+  );
+}
+
+
+===== END modules/insights/components/LatencySLOGauge.tsx =====
+
+
+===== BEGIN modules/insights/components/SmartVoteChart.tsx =====
+"use client";
+import {
+  Chart as ChartJS,
+  BarElement,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  ChartDataset,
+} from "chart.js";
+import { Chart } from "react-chartjs-2";
+
+ChartJS.register(
+  BarElement,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+);
+
+type Props = {
+  labels: string[];
+  votes: number[];
+  scores: number[];
+};
+
+export default function SmartVoteChart({ labels, votes, scores }: Props) {
+  const data = {
+    labels,
+    datasets: [
+      {
+        type: "bar" as const,
+        label: "Votes",
+        data: votes,
+        yAxisID: "y",
+      } as ChartDataset<"bar", number[]>,
+      {
+        type: "line" as const,
+        label: "Avg Score",
+        data: scores,
+        yAxisID: "y1",
+      } as ChartDataset<"line", number[]>,
+    ],
+  };
+  const options = {
+    responsive: true,
+    interaction: { mode: "index" as const, intersect: false },
+    scales: {
+      y: { beginAtZero: true },
+      y1: { beginAtZero: true, position: "right" as const },
+    },
+  };
+  return <Chart type="bar" data={data} options={options} />;
+}
+
+===== END modules/insights/components/SmartVoteChart.tsx =====
+
+
+===== BEGIN modules/insights/components/TimeRangePicker.tsx =====
+"use client";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
+
+type Range = [dayjs.Dayjs, dayjs.Dayjs];
+
+export default function TimeRangePicker({
+  value,
+  onChange,
+}: {
+  value: Range;
+  onChange: (val: Range) => void;
+}) {
+  return (
+    <DatePicker.RangePicker
+      className="mb-6"
+      value={value}
+      onChange={(val) => onChange(val as Range)}
+      allowClear={false}
+    />
+  );
+}
+
+
+===== END modules/insights/components/TimeRangePicker.tsx =====
+
+
+===== BEGIN modules/insights/components/UsageBigNumbers.tsx =====
+
+type Item = { label: string; value: number };
+
+export default function UsageBigNumbers({ items }: { items: Item[] }) {
+  return (
+    <div className="grid grid-cols-3 gap-6">
+      {items.map((it) => (
+        <div key={it.label} className="p-6 bg-white rounded shadow">
+          <div className="text-3xl font-bold">{it.value.toLocaleString()}</div>
+          <div className="text-gray-500">{it.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+===== END modules/insights/components/UsageBigNumbers.tsx =====
+
+
+===== BEGIN modules/insights/hooks/__tests__/useReport.test.tsx =====
+import { renderHook, waitFor } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useReport } from '../useReport';
+
+// ── mock the shared api instance (relative path = 3 levels up) ────────────────
+jest.mock('../../../../shared/api', () => ({
+  api: {
+    get: jest.fn().mockResolvedValue({
+      data: { labels: ['A'], votes: [10], avg_score: [0.7] },
+    }),
+  },
+}));
+// ──────────────────────────────────────────────────────────────────────────────
+
+const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
+test('returns mocked report data', async () => {
+  const { result } = renderHook(
+    () => useReport('smart-vote', { range: '7d' }),
+    { wrapper: ({ children }) => <QueryClientProvider client={qc}>{children}</QueryClientProvider> }
+  );
+
+  // initial React-Query status is 'pending'
+  expect(result.current.status).toBe('pending');
+
+  // wait until data arrives
+  await waitFor(() => expect(result.current.data).toBeDefined());
+
+  expect(result.current.data?.votes).toEqual([10]);
+});
+
+===== END modules/insights/hooks/__tests__/useReport.test.tsx =====
+
+
+===== BEGIN modules/insights/hooks/index.ts =====
+﻿export { default as useReport }       from './useReport';
+export { default as useReportStream } from './useReportStream';
+
+===== END modules/insights/hooks/index.ts =====
+
+
+===== BEGIN modules/insights/hooks/useReport.ts =====
+
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/shared/api";
+
+type SmartVoteResp = { labels: string[]; votes: number[]; avg_score: number[] };
+type UsageResp = { labels: string[]; mau: number[]; projects: number[]; docs: number[] };
+type PerfResp = { labels: string[]; p95_latency: number[]; error_rate: number[] };
+
+type EndpointMap = {
+  "smart-vote": SmartVoteResp;
+  usage: UsageResp;
+  perf: PerfResp;
+};
+
+export function useReport<E extends keyof EndpointMap>(
+  endpoint: E,
+  params?: Record<string, unknown>,
+) {
+  return useQuery<EndpointMap[E]>({
+    queryKey: [endpoint, params],
+    queryFn: async () =>
+      (await api.get(`/reports/${endpoint}`, { params })).data,
+    staleTime: 300_000,
+  });
+}
+
+===== END modules/insights/hooks/useReport.ts =====
+
+
+===== BEGIN modules/insights/hooks/useReportStream.ts =====
+'use client'
+
+import { useEffect } from "react";
+import { io } from "socket.io-client";
+
+export default function useReportStream() {
+  useEffect(() => {
+    const socket = io("/api/reports");
+    // ... listen to events
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+}
+
+===== END modules/insights/hooks/useReportStream.ts =====
+
+
+===== BEGIN modules/insights/pages/CustomBuilderPage.tsx =====
+"use client"; 
+import MainLayout from "@/shared/layout/MainLayout";
+import useReportStream from "../hooks/useReportStream";
+
+export default function CustomBuilderPage() {
+  const live = useReportStream();
+
+  return (
+    <MainLayout>
+      <h1 className="mb-6 text-xl font-semibold">Custom report builder</h1>
+      <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto">
+        {JSON.stringify(live ?? {}, null, 2)}
+      </pre>
+    </MainLayout>
+  );
+}
+
+===== END modules/insights/pages/CustomBuilderPage.tsx =====
+
+
+===== BEGIN modules/insights/pages/index.ts =====
+export { default as CustomBuilderPage } from './CustomBuilderPage';
+export { default as InsightsHomePage } from './InsightsHomePage';
+export { default as PerfDashboard } from './PerfDashboard';
+export { default as SmartVoteDashboard } from './SmartVoteDashboard';
+export { default as UsageDashboard } from './UsageDashboard';
+
+===== END modules/insights/pages/index.ts =====
+
+
+===== BEGIN modules/insights/pages/InsightsHomePage.tsx =====
+
+import MainLayout from "@/shared/layout/MainLayout";
+import Link from "next/link";
+
+export default function InsightsHomePage() {
+  const links = [
+    ["smart-vote", "Smart-Vote dashboard"],
+    ["usage", "Usage dashboard"],
+    ["perf", "Performance dashboard"],
+    ["custom", "Custom report builder"],
+  ];
+  return (
+    <MainLayout>
+      <h1 className="mb-6 text-xl font-semibold">Insights</h1>
+      <ul className="space-y-4 text-blue-600 underline">
+        {links.map(([slug, label]) => (
+          <li key={slug}>
+            <Link href={`/reports/${slug}`}>{label}</Link>
+          </li>
+        ))}
+      </ul>
+    </MainLayout>
+  );
+}
+
+===== END modules/insights/pages/InsightsHomePage.tsx =====
+
+
+===== BEGIN modules/insights/pages/PerfDashboard.tsx =====
+"use client"; 
+import MainLayout from "@/shared/layout/MainLayout";
+import { useReport } from "../hooks/useReport";
+import LatencySLOGauge from "../components/LatencySLOGauge";
+import ErrorRateSparkline from "../components/ErrorRateSparkline";
+
+export default function PerfDashboard() {
+  const { data, isLoading } = useReport("perf", { range: "24h" });
+
+  if (isLoading || !data) {
+    return (
+      <MainLayout>
+        <p>Loading…</p>
+      </MainLayout>
+    );
+  }
+
+  return (
+    <MainLayout>
+      <h2 className="mb-4 font-semibold">Latency (p95 vs SLO)</h2>
+      <LatencySLOGauge valueMs={data.p95_latency.at(-1) ?? 0} sloMs={300} />
+
+      <h2 className="mt-10 mb-4 font-semibold">Error Rate</h2>
+      <ErrorRateSparkline labels={data.labels} rates={data.error_rate} />
+    </MainLayout>
+  );
+}
+
+===== END modules/insights/pages/PerfDashboard.tsx =====
+
+
+===== BEGIN modules/insights/pages/SmartVoteDashboard.tsx =====
+"use client"; 
+import { useState } from "react";
+import dayjs from "dayjs";
+
+import MainLayout from "@/shared/layout/MainLayout";
+import { useReport } from "../hooks/useReport";
+import SmartVoteChart from "../components/SmartVoteChart";
+import TimeRangePicker from "../components/TimeRangePicker";
+import ExportCSVButton from "../components/ExportCSVButton";
+
+export default function SmartVoteDashboard() {
+  const [range, setRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
+    dayjs().subtract(30, "day"),
+    dayjs(),
+  ]);
+
+  const params = { from: range[0].toISOString(), to: range[1].toISOString() };
+  const { data, isLoading } = useReport("smart-vote", params);
+
+  return (
+    <MainLayout>
+      <div className="flex items-center justify-between mb-6">
+        <TimeRangePicker value={range} onChange={setRange} />
+        <ExportCSVButton endpoint="smart-vote" params={params} />
+      </div>
+
+      {isLoading || !data ? (
+        <p>Loading…</p>
+      ) : (
+        <SmartVoteChart
+          labels={data.labels}
+          votes={data.votes}
+          scores={data.avg_score}
+        />
+      )}
+    </MainLayout>
+  );
+}
+
+===== END modules/insights/pages/SmartVoteDashboard.tsx =====
+
+
+===== BEGIN modules/insights/pages/UsageDashboard.tsx =====
+"use client"; 
+import MainLayout from "@/shared/layout/MainLayout";
+import { useReport } from "../hooks/useReport";
+import UsageBigNumbers from "../components/UsageBigNumbers";
+
+export default function UsageDashboard() {
+  const { data, isLoading } = useReport("usage");
+
+  if (isLoading || !data) {
+    return (
+      <MainLayout>
+        <p>Loading…</p>
+      </MainLayout>
+    );
+  }
+
+  const items = [
+    { label: "Monthly Active Users", value: data.mau.at(-1) ?? 0 },
+    { label: "Projects", value: data.projects.at(-1) ?? 0 },
+    { label: "Docs Indexed", value: data.docs.at(-1) ?? 0 },
+  ];
+
+  return (
+    <MainLayout>
+      <UsageBigNumbers items={items} />
+    </MainLayout>
+  );
+}
+
+===== END modules/insights/pages/UsageDashboard.tsx =====
+
+
+===== BEGIN modules/keenkonnect/ai-team-matching/find-teams/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/ai-team-matching/find-teams/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/ai-team-matching/match-preferences/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/ai-team-matching/match-preferences/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/ai-team-matching/my-matches/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/ai-team-matching/my-matches/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/dashboard/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/dashboard/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/knowledge/browse-repository/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/knowledge/browse-repository/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/knowledge/document-management/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/knowledge/document-management/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/knowledge/search-filter-documents/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/knowledge/search-filter-documents/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/knowledge/upload-new-document/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/knowledge/upload-new-document/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/projects/browse-projects/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/projects/browse-projects/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/projects/create-new-project/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/projects/create-new-project/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/projects/my-projects/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/projects/my-projects/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/projects/project-workspace/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/projects/project-workspace/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/sustainability-impact/submit-impact-reports/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/sustainability-impact/submit-impact-reports/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/sustainability-impact/sustainability-dashboard/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/sustainability-impact/sustainability-dashboard/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/sustainability-impact/track-project-impact/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/sustainability-impact/track-project-impact/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/user-reputation/account-preferences/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/user-reputation/account-preferences/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/user-reputation/manage-expertise-areas/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/user-reputation/manage-expertise-areas/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/user-reputation/view-reputation-ekoh/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/user-reputation/view-reputation-ekoh/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/workspaces/browse-available-workspaces/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/workspaces/browse-available-workspaces/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/workspaces/launch-new-workspace/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/workspaces/launch-new-workspace/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/keenkonnect/workspaces/my-workspaces/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/keenkonnect/workspaces/my-workspaces/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/certifications/certification-programs/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/certifications/certification-programs/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/certifications/exam-dashboard-results/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/certifications/exam-dashboard-results/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/certifications/exam-preparation/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/certifications/exam-preparation/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/certifications/exam-registration/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/certifications/exam-registration/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/community-discussions/active-threads/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/community-discussions/active-threads/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/community-discussions/moderation/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/community-discussions/moderation/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/community-discussions/start-new-discussion/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/community-discussions/start-new-discussion/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/dashboard/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/dashboard/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/learning-library/browse-resources/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/learning-library/browse-resources/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/learning-library/offline-content/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/learning-library/offline-content/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/learning-library/recommended-resources/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/learning-library/recommended-resources/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/learning-library/search-filters/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/learning-library/search-filters/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/learning-paths/create-learning-path/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/learning-paths/create-learning-path/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/learning-paths/manage-existing-paths/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/learning-paths/manage-existing-paths/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/learning-paths/my-learning-path/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/learning-paths/my-learning-path/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/teams-collaboration/activity-planner/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/teams-collaboration/activity-planner/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/teams-collaboration/my-teams/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/teams-collaboration/my-teams/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/teams-collaboration/project-workspaces/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/teams-collaboration/project-workspaces/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konnected/teams-collaboration/team-builder/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/konnected/teams-collaboration/team-builder/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/konsensus/components/index.ts =====
+﻿export { VoteButtons } from './VoteButtons';
+
+===== END modules/konsensus/components/index.ts =====
+
+
+===== BEGIN modules/konsensus/components/PollBarChart.tsx =====
+"use client";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
+
+export default function PollBarChart({
+  labels,
+  votes,
+}: {
+  labels: string[];
+  votes: number[];
+}) {
+  const data = { labels, datasets: [{ label: "Votes", data: votes }] };
+  return <Bar data={data} options={{ responsive: true }} />;
+}
+
+===== END modules/konsensus/components/PollBarChart.tsx =====
+
+
+===== BEGIN modules/konsensus/components/VoteButtons.tsx =====
+﻿"use client";
+import React from "react";
+import { Button } from "antd";
+
+// Explicit props: parent passes pollId and option list
+export interface VoteButtonsProps {
+  pollId: string;
+  options: string[];
+  onVote: (option: string) => void;
+}
+
+export default function VoteButtons({ pollId, options, onVote }: VoteButtonsProps) {
+  return (
+    <div className="flex gap-2">
+      {options.map((option) => (
+        <Button key={option} onClick={() => onVote(option)}>
+          {option.charAt(0).toUpperCase() + option.slice(1)}
+        </Button>
+      ))}
+    </div>
+  );
+}
+
+===== END modules/konsensus/components/VoteButtons.tsx =====
+
+
+===== BEGIN modules/konsensus/hooks/index.ts =====
+﻿export * from './usePoll';
+
+===== END modules/konsensus/hooks/index.ts =====
+
+
+===== BEGIN modules/konsensus/hooks/useLivePoll.ts =====
+'use client'
+
+import { useEffect } from "react";
+import { io } from "socket.io-client";
+
+export default function useLivePoll(id: string) {
+  useEffect(() => {
+    const socket = io(`/api/poll/${id}`);
+    // ... listen to events
+    return () => {
+      socket.disconnect();
+    };
+  }, [id]);
+}
+
+===== END modules/konsensus/hooks/useLivePoll.ts =====
+
+
+===== BEGIN modules/konsensus/hooks/usePoll.ts =====
+﻿import { useQuery } from "@tanstack/react-query";
+import { api } from "@/shared/api";
+
+export function usePoll(id: string) {
+  return useQuery({
+    queryKey: ["poll", id],
+    queryFn: async () => (await api.get(`/api/polls/${id}`)).data,
+    staleTime: 30000,
+    retry: 1,
+  });
+}
+
+===== END modules/konsensus/hooks/usePoll.ts =====
+
+
+===== BEGIN modules/konsensus/pages/index.ts =====
+export { default as PollPage } from './PollPage';
+
+===== END modules/konsensus/pages/index.ts =====
+
+
+===== BEGIN modules/konsensus/pages/PollPage.tsx =====
+"use client";
+import React from "react";
+import { Card, Spin, Alert } from "antd";
+import { usePoll } from "../hooks/usePoll";
+import VoteButtons from "../components/VoteButtons";
+
+// Replace with actual poll id logic if dynamic, here we use a fixed id for simplicity
+const POLL_ID = "current"; 
+
+export default function PollPage() {
+  const { data: poll, isLoading, isError, error } = usePoll(POLL_ID);
+
+  // Example handler
+  const handleVote = (option: string) => {
+    // TODO: Implement real API call
+    console.log("Voted", option, "on poll", poll?.id);
+  };
+
+  if (isLoading) return <Spin />;
+  if (isError) return <Alert message={error?.message} type="error" />;
+  if (!poll) return null;
+
+  return (
+    <div className="container mx-auto py-8">
+      <Card title="Current Poll">
+        <h1 className="mb-6 text-xl font-semibold">{poll.question}</h1>
+        <div className="mb-4 flex gap-4">
+          <span>Yes: {poll.yes}</span>
+          <span>No: {poll.no}</span>
+        </div>
+        {/* Pass pollId and option labels to VoteButtons */}
+        <VoteButtons pollId={poll.id} options={["yes", "no"]} onVote={handleVote} />
+      </Card>
+    </div>
+  );
+}
+
+===== END modules/konsensus/pages/PollPage.tsx =====
+
+
+===== BEGIN modules/konsultations/components/ConsultationForm.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/ConsultationForm.tsx =====
+
+
+===== BEGIN modules/konsultations/components/ConsultationList.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/ConsultationList.tsx =====
+
+
+===== BEGIN modules/konsultations/components/ConsultationVotePanel.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/ConsultationVotePanel.tsx =====
+
+
+===== BEGIN modules/konsultations/components/ImpactTimeline.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/ImpactTimeline.tsx =====
+
+
+===== BEGIN modules/konsultations/components/index.ts =====
+﻿export { default as ConsultationForm }   from './ConsultationForm';
+export { default as ConsultationList }   from './ConsultationList';
+export { default as ConsultationVotePanel } from './ConsultationVotePanel';
+export { default as ImpactTimeline }     from './ImpactTimeline';
+export { default as ResultsChart }       from './ResultsChart';
+export { default as ResultsDashboard }   from './ResultsDashboard';
+export { default as SuggestionBoard }    from './SuggestionBoard';
+export { default as SuggestionsBoard }   from './SuggestionsBoard';
+
+===== END modules/konsultations/components/index.ts =====
+
+
+===== BEGIN modules/konsultations/components/ResultsChart.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/ResultsChart.tsx =====
+
+
+===== BEGIN modules/konsultations/components/ResultsDashboard.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/ResultsDashboard.tsx =====
+
+
+===== BEGIN modules/konsultations/components/SuggestionBoard.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/SuggestionBoard.tsx =====
+
+
+===== BEGIN modules/konsultations/components/SuggestionsBoard.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/components/SuggestionsBoard.tsx =====
+
+
+===== BEGIN modules/konsultations/hooks/index.ts =====
+﻿export { default as useConsultation }        from './useConsultation';
+export { default as useConsultationResults } from './useConsultationResults';
+export { default as useConsultations }       from './useConsultations';
+export { default as useConsultationVote }    from './useConsultationVote';
+export { default as useImpact }              from './useImpact';
+export { default as useSuggestions }         from './useSuggestions';
+
+===== END modules/konsultations/hooks/index.ts =====
+
+
+===== BEGIN modules/konsultations/hooks/useConsultation.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/konsultations/hooks/useConsultation.ts =====
+
+
+===== BEGIN modules/konsultations/hooks/useConsultationResults.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/konsultations/hooks/useConsultationResults.ts =====
+
+
+===== BEGIN modules/konsultations/hooks/useConsultations.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/konsultations/hooks/useConsultations.ts =====
+
+
+===== BEGIN modules/konsultations/hooks/useConsultationVote.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/konsultations/hooks/useConsultationVote.ts =====
+
+
+===== BEGIN modules/konsultations/hooks/useImpact.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/konsultations/hooks/useImpact.ts =====
+
+
+===== BEGIN modules/konsultations/hooks/useSuggestions.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/konsultations/hooks/useSuggestions.ts =====
+
+
+===== BEGIN modules/konsultations/pages/ConsultationDetailPage.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/pages/ConsultationDetailPage.tsx =====
+
+
+===== BEGIN modules/konsultations/pages/ConsultationHub.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/pages/ConsultationHub.tsx =====
+
+
+===== BEGIN modules/konsultations/pages/ConsultationsHomePage.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/pages/ConsultationsHomePage.tsx =====
+
+
+===== BEGIN modules/konsultations/pages/index.ts =====
+export { default as ConsultationDetailPage } from './ConsultationDetailPage';
+export { default as ConsultationHub } from './ConsultationHub';
+export { default as ConsultationsHomePage } from './ConsultationsHomePage';
+export { default as ResultsPage } from './ResultsPage';
+export { default as SuggestionPage } from './SuggestionPage';
+
+===== END modules/konsultations/pages/index.ts =====
+
+
+===== BEGIN modules/konsultations/pages/ResultsPage.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/pages/ResultsPage.tsx =====
+
+
+===== BEGIN modules/konsultations/pages/SuggestionPage.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/konsultations/pages/SuggestionPage.tsx =====
+
+
+===== BEGIN modules/kontact/components/index.ts =====
+﻿export { default as OpportunityList } from './OpportunityList';
+export { default as ProfileCard }    from './ProfileCard';
+
+===== END modules/kontact/components/index.ts =====
+
+
+===== BEGIN modules/kontact/components/OpportunityList.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/kontact/components/OpportunityList.tsx =====
+
+
+===== BEGIN modules/kontact/components/ProfileCard.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/kontact/components/ProfileCard.tsx =====
+
+
+===== BEGIN modules/kontact/hooks/index.ts =====
+﻿export { default as useOpportunities } from './useOpportunities';
+export { default as useProfiles }      from './useProfiles';
+
+===== END modules/kontact/hooks/index.ts =====
+
+
+===== BEGIN modules/kontact/hooks/useOpportunities.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/kontact/hooks/useOpportunities.ts =====
+
+
+===== BEGIN modules/kontact/hooks/useProfiles.ts =====
+﻿export default function stub() { /* TODO */ }
+
+===== END modules/kontact/hooks/useProfiles.ts =====
+
+
+===== BEGIN modules/kontact/pages/ConnectCenter.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/kontact/pages/ConnectCenter.tsx =====
+
+
+===== BEGIN modules/kontact/pages/index.ts =====
+export { default as ConnectCenter } from './ConnectCenter';
+export { default as PublicProfile } from './PublicProfile';
+
+===== END modules/kontact/pages/index.ts =====
+
+
+===== BEGIN modules/kontact/pages/PublicProfile.tsx =====
+﻿export default function Stub() { return null }
+
+===== END modules/kontact/pages/PublicProfile.tsx =====
+
+
+===== BEGIN modules/kreative/collaborative-spaces/find-spaces/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/collaborative-spaces/find-spaces/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/collaborative-spaces/my-spaces/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/collaborative-spaces/my-spaces/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/collaborative-spaces/start-new-space/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/collaborative-spaces/start-new-space/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/community-showcases/featured-projects/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/community-showcases/featured-projects/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/community-showcases/submit-to-showcase/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/community-showcases/submit-to-showcase/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/community-showcases/top-creators/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/community-showcases/top-creators/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/creative-hub/explore-ideas/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/creative-hub/explore-ideas/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/creative-hub/inspiration-gallery/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/creative-hub/inspiration-gallery/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/creative-hub/submit-creative-work/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/creative-hub/submit-creative-work/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/dashboard/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/dashboard/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/idea-incubator/collaborate-on-ideas/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/idea-incubator/collaborate-on-ideas/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/idea-incubator/create-new-idea/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/idea-incubator/create-new-idea/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN modules/kreative/idea-incubator/my-ideas/components/CommonWidget/page.tsx =====
+// pages/pageTemplate/components/CommonWidget.tsx
+import React from 'react';
+import styles from './CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetDescription}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END modules/kreative/idea-incubator/my-ideas/components/CommonWidget/page.tsx =====
+

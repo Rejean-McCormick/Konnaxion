@@ -1,5 +1,4 @@
 'use client';
-"use client";
 
 // File: /pages/konnected/teams-collaboration/team-builder.tsx
 import React, { useState } from 'react';

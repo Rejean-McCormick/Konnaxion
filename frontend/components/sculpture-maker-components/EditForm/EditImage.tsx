@@ -1,5 +1,4 @@
 'use client';
-"use client";
 
 /**
  * Description: Image edit component for sculpture

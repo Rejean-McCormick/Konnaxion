@@ -1,5 +1,4 @@
 'use client';
-"use client";
 
 /**
  * Description: Upload image component when creating new sculpture
