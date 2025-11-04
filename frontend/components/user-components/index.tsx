@@ -14,7 +14,7 @@ import { SearchOutlined } from '@ant-design/icons'
 import { Comment } from '@ant-design/compatible'
 
 import { ColStyled, CardStyled, StyledTable } from './style'
-import api from '../../api'
+import api from '@/services/_request'
 import Loading from '../Loading'
 import NextError from 'next/error'
 import { convertNonAccent } from '../shared/utils'

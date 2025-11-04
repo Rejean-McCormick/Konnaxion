@@ -11,19 +11,21 @@ import {
   List,
   Comment,
   Card,
-  Icon,
   Dropdown,
-  Menu,
   Modal,
   message,
   Button,
-  Empty
+  Empty,
+  Input
 } from 'antd'
+import type { MenuProps } from 'antd'
+import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
 import { useState } from 'react'
-import TextArea from 'antd/lib/input/TextArea'
+
 const { confirm } = Modal
+const { TextArea } = Input
 
 const SculptureComment = ({
   comments,
@@ -36,11 +38,10 @@ const SculptureComment = ({
       new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
   )
 
-  const handleDelete = e => {
-    console.log(e.key)
+  const handleDelete: MenuProps['onClick'] = e => {
     confirm({
       title: 'Delete this comment permanently?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -52,10 +53,11 @@ const SculptureComment = ({
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/comment/${e.key}`)
+          await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
-          deleteComment(e.key)
+          deleteComment(e.key as string)
         } catch (error) {
+          // @ts-ignore
           message.error(error.response.data.message)
         }
       }
@@ -65,11 +67,9 @@ const SculptureComment = ({
   const [submitting, setSubmitting] = useState(false)
   const [value, setValue] = useState('')
 
-  const getMenu = commentId => (
-    <Menu onClick={handleDelete}>
-      <Menu.Item key={commentId}>Delete comment</Menu.Item>
-    </Menu>
-  )
+  const getMenuItems = (commentId: string): MenuProps['items'] => [
+    { key: commentId, label: 'Delete comment' }
+  ]
 
   const formattedComments = comments.map(x => ({
     commentId: x.commentId,
@@ -98,11 +98,7 @@ const SculptureComment = ({
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         {x.content
           .trim()
           .split('\n')
@@ -112,18 +108,9 @@ const SculptureComment = ({
       </div>
     ),
     datetime: (
-      <div
-        style={{
-          display: 'flex'
-        }}
-      >
+      <div style={{ display: 'flex' }}>
         <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <div
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <div style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.createdTime).fromNow()}
           </div>
         </Tooltip>
@@ -134,8 +121,11 @@ const SculptureComment = ({
             marginLeft: 'auto'
           }}
         >
-          <Dropdown overlay={getMenu(x.commentId)} trigger={['click']}>
-            <Icon type="more" />
+          <Dropdown
+            menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
+            trigger={['click']}
+          >
+            <MoreOutlined />
           </Dropdown>
         </div>
       </div>
@@ -155,10 +145,7 @@ const SculptureComment = ({
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Comments"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
           )
         }}
         renderItem={item => (
@@ -213,10 +200,8 @@ const Editor = ({
   <>
     <div style={{ marginBottom: 12 }}>
       <TextArea
-        autosize={{ minRows: 2 }}
-        onChange={e => {
-          setValue(e.target.value)
-        }}
+        autoSize={{ minRows: 2 }}
+        onChange={e => setValue(e.target.value)}
         value={value}
       />
     </div>
@@ -228,16 +213,18 @@ const Editor = ({
         onClick={async () => {
           setSubmitting(true)
           try {
-            const result = (await api.post('/comment', {
-              sculptureId,
-              content: value
-            })).data
+            const result = (
+              await api.post('/comment', {
+                sculptureId,
+                content: value
+              })
+            ).data
             setSubmitting(false)
             setValue('')
-            console.log(result)
             addComment(result)
           } catch (e) {
             setSubmitting(false)
+            // @ts-ignore
             message.error(e.response.data.message)
           }
         }}

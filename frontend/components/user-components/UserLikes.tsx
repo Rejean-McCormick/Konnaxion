@@ -52,18 +52,9 @@ const UserLikes = ({ likes }) => {
       </div>
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         <Tooltip title={moment(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.likedTime).fromNow()}
           </span>
         </Tooltip>
@@ -84,20 +75,12 @@ const UserLikes = ({ likes }) => {
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Likes"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Likes" />
           )
         }}
         renderItem={item => (
           <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              className="comment"
-            />
+            <Comment author={item.author} avatar={item.avatar} content={item.content} className="comment" />
           </li>
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}

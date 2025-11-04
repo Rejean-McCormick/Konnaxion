@@ -10,24 +10,25 @@ import {
   Comment,
   Card,
   Dropdown,
-  Icon,
   message,
-  Menu,
   Modal,
-  Empty
+  Empty,
+  Input
 } from 'antd'
+import type { MenuProps } from 'antd'
+import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 
 const { confirm } = Modal
+const { TextArea } = Input
 
 import Link from 'next/link'
-import api from '../../api'
+import api from '@/services/_request'
 
 const UserComments = ({ comments, deleteComment }) => {
-  const handleDelete = e => {
-    console.log(e.key)
+  const handleDelete: MenuProps['onClick'] = e => {
     confirm({
       title: 'Delete this comment permanently?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -39,26 +40,25 @@ const UserComments = ({ comments, deleteComment }) => {
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/comment/${e.key}`)
+          await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
-          deleteComment(e.key)
-        } catch (error) {
-          message.error(error.response.data.message)
+          deleteComment(e.key as string)
+        } catch (error: any) {
+          message.error(error.response?.data?.message || 'Error')
         }
       }
     })
   }
 
-  const getMenu = commentId => (
-    <Menu onClick={handleDelete}>
-      <Menu.Item key={commentId}>Delete comment</Menu.Item>
-    </Menu>
-  )
+  const getMenuItems = (commentId: string): MenuProps['items'] => [
+    { key: commentId, label: 'Delete comment' }
+  ]
 
   comments.sort(
     (a, b) =>
       new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
   )
+
   const formattedComments = comments.map(x => ({
     author: (
       <span
@@ -83,11 +83,7 @@ const UserComments = ({ comments, deleteComment }) => {
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         {x.content
           .trim()
           .split('\n')
@@ -97,32 +93,15 @@ const UserComments = ({ comments, deleteComment }) => {
       </div>
     ),
     datetime: (
-      <div
-        style={{
-          display: 'flex'
-        }}
-      >
+      <div style={{ display: 'flex' }}>
         <div>
-          <Tooltip
-            title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}
-          >
-            <span
-              style={{
-                fontSize: 14,
-                color: 'rgba(0, 0, 0, 0.35)'
-              }}
-            >
+          <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
               {moment(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
           <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-            <a
-              style={{
-                fontSize: 14
-              }}
-            >
-              {x.sculpture.name}
-            </a>
+            <a style={{ fontSize: 14 }}>{x.sculpture.name}</a>
           </Link>
         </div>
 
@@ -133,8 +112,11 @@ const UserComments = ({ comments, deleteComment }) => {
             marginLeft: 'auto'
           }}
         >
-          <Dropdown overlay={getMenu(x.commentId)} trigger={['click']}>
-            <Icon type="more" />
+          <Dropdown
+            menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
+            trigger={['click']}
+          >
+            <MoreOutlined />
           </Dropdown>
         </div>
       </div>
@@ -153,10 +135,7 @@ const UserComments = ({ comments, deleteComment }) => {
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Comments"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
           )
         }}
         renderItem={item => (
@@ -172,6 +151,11 @@ const UserComments = ({ comments, deleteComment }) => {
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
       />
+
+      {/* quick reply editor */}
+      <div style={{ padding: '16px 24px' }}>
+        <TextArea disabled placeholder="Use admin screen to reply" />
+      </div>
     </Card>
   )
 }

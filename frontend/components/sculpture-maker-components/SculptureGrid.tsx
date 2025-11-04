@@ -14,25 +14,25 @@ import {
   Input,
   Empty,
   Button,
-  Dropdown,
-  Icon,
-  Menu
+  Dropdown
 } from 'antd'
+import type { MenuProps } from 'antd'
+import {
+  PlusOutlined,
+  SortAscendingOutlined,
+  DownOutlined,
+  HeartTwoTone,
+  MessageTwoTone,
+  EnvironmentOutlined
+} from '@ant-design/icons'
 const { Text } = Typography
 const { Meta } = Card
 const { Search } = Input
 import Link from 'next/link'
-import {
-  ColStyled,
-  CardStyled,
-  DescriptionIcon,
-  ShadowCard,
-  Subtitle,
-  EmptyImage
-} from './style'
+import { ColStyled, CardStyled, ShadowCard, Subtitle, EmptyImage } from './style'
 import Loading from '../Loading'
 import Error from 'next/error'
-import api from '../../api'
+import api from '@/services/_request'
 
 const SculptureCard = ({
   info: {
@@ -66,14 +66,13 @@ const SculptureCard = ({
                 />
               </div>
             ) : (
-              (<EmptyImage
+              <EmptyImage
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description="No Images"
-              />)
-              // <div style={{ height: 450, border: '1px solid black' }}>hey</div>
+              />
             )
           }
-          bordered={true}
+          bordered
         >
           <Meta
             title={name}
@@ -89,7 +88,7 @@ const SculptureCard = ({
         </ShadowCard>
       </a>
     </Link>
-  );
+  )
 }
 
 export const SculptureCardDescription = ({
@@ -101,22 +100,16 @@ export const SculptureCardDescription = ({
   return (
     <>
       <Subtitle type="secondary">{makerName}</Subtitle>
+
       <Tooltip placement="top" title="Likes">
-        <DescriptionIcon
-          type="heart"
-          theme="twoTone"
-          twoToneColor="#eb2f96"
-          style={{ marginRight: 4 }}
-        />
+        <HeartTwoTone twoToneColor="#eb2f96" style={{ marginRight: 4 }} />
         <Text type="secondary" style={{ marginRight: 8 }}>
           {totalLikes}
         </Text>
       </Tooltip>
 
       <Tooltip placement="top" title="Comments">
-        <DescriptionIcon
-          type="message"
-          theme="twoTone"
+        <MessageTwoTone
           twoToneColor="rgb(205, 34, 255)"
           style={{ marginRight: 4 }}
         />
@@ -126,10 +119,7 @@ export const SculptureCardDescription = ({
       </Tooltip>
 
       <Tooltip placement="top" title="Visits">
-        <DescriptionIcon
-          type="environment"
-          style={{ color: '#F73F3F', marginRight: 3 }}
-        />
+        <EnvironmentOutlined style={{ color: '#F73F3F', marginRight: 3 }} />
         <Text type="secondary" style={{ marginRight: 4 }}>
           {totalVisits}
         </Text>
@@ -163,17 +153,13 @@ const SculptureGrid = () => {
   useEffect(() => {
     const fetchSculpture = async () => {
       try {
-        let { data } = await api.get('/sculpture')
+        const { data } = await api.get('/sculpture')
         data.sort((a, b) => a.name.localeCompare(b.name))
-        console.log(data)
         setOriginalList(data)
         setFilteredList(data)
       } catch (e) {
         const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        setError({ statusCode, message })
       }
       setLoading(false)
     }
@@ -181,28 +167,23 @@ const SculptureGrid = () => {
     fetchSculpture()
   }, [])
 
-  // Menu handler
-  function handleMenuClick(e) {
-    // console.log('click', e.key)
+  const handleMenuClick: MenuProps['onClick'] = e => {
     setSort(e.key)
-    setFilteredList(filteredList => sortBy(filteredList, e.key))
+    setFilteredList(filtered => sortBy(filtered, e.key))
   }
 
-  // Menu list UI overlay
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      <Menu.Item key="Default">Default</Menu.Item>
-      <Menu.Item key="Likes">Likes</Menu.Item>
-      <Menu.Item key="Comments">Comments</Menu.Item>
-      <Menu.Item key="Visits">Visits</Menu.Item>
-    </Menu>
-  )
+  const menuItems: MenuProps['items'] = [
+    { key: 'Default', label: 'Default' },
+    { key: 'Likes', label: 'Likes' },
+    { key: 'Comments', label: 'Comments' },
+    { key: 'Visits', label: 'Visits' }
+  ]
 
   const handleChange = e => {
     const input = e.target.value
     if (input.length >= 3) {
-      let newList = originalList.filter(sculpture => {
-        let makerName =
+      const newList = originalList.filter(sculpture => {
+        const makerName =
           sculpture.primaryMaker.firstName +
           ' ' +
           sculpture.primaryMaker.lastName
@@ -221,8 +202,7 @@ const SculptureGrid = () => {
   }
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
 
   return (
     <Row gutter={16}>
@@ -232,7 +212,7 @@ const SculptureGrid = () => {
           extra={
             <Link href="/sculptures/create">
               <a>
-                <Button type="primary" icon="plus">
+                <Button type="primary" icon={<PlusOutlined />}>
                   Add new sculpture
                 </Button>
               </a>
@@ -252,15 +232,15 @@ const SculptureGrid = () => {
               placeholder="Enter search term"
               onChange={handleChange}
               size="large"
-              style={{
-                marginRight: 8
-              }}
+              style={{ marginRight: 8 }}
             />
 
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown
+              menu={{ items: menuItems, onClick: handleMenuClick }}
+              trigger={['click']}
+            >
               <Button size="large">
-                <Icon type="sort-ascending" /> {currentSort}{' '}
-                <Icon type="down" />
+                <SortAscendingOutlined /> {currentSort} <DownOutlined />
               </Button>
             </Dropdown>
           </div>

@@ -1,29 +1,53 @@
 'use client'
 
-// fichier: Front1/services/_request.ts
-import axios from 'axios';
+import axios, {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  InternalAxiosRequestConfig,
+} from 'axios'
 
-const apiRequest = axios.create({
+const apiRequest: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_BASE || '/api',
   withCredentials: true,
-  xsrfCookieName: 'csrftoken',       // Utiliser le cookie CSRF de Django
-  xsrfHeaderName: 'X-CSRFToken',    // Envoyer le header CSRF approprié
-});
+  xsrfCookieName: 'csrftoken',
+  xsrfHeaderName: 'X-CSRFToken',
+  timeout: 15000,
+})
 
-/* ---------- Optional interceptors ---------- */
-// Add auth token, global error toast, etc.
-apiRequest.interceptors.request.use(cfg => {
-  // const token = localStorage.getItem('token');
-  // if (token) cfg.headers.Authorization = `Bearer ${token}`;
-  return cfg;
-});
+apiRequest.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
+  // Exemple d’auth:
+  // const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+  // if (t) cfg.headers.Authorization = `Bearer ${t}`
+  return cfg
+})
 
 apiRequest.interceptors.response.use(
-  res => res.data,
-  err => {
-    // You can hook a global notification here if you like
-    return Promise.reject(err);
-  },
-);
+  (res) => (res.data ?? res),
+  (err) => Promise.reject(err),
+)
 
-export default apiRequest;
+type Cfg = AxiosRequestConfig
+
+export async function get<T>(url: string, config?: Cfg): Promise<T> {
+  // l’intercepteur renvoie déjà le payload
+  return apiRequest.get<T>(url, config) as unknown as Promise<T>
+}
+
+export async function post<T>(url: string, body?: any, config?: Cfg): Promise<T> {
+  return apiRequest.post<T>(url, body, config) as unknown as Promise<T>
+}
+
+export async function put<T>(url: string, body?: any, config?: Cfg): Promise<T> {
+  return apiRequest.put<T>(url, body, config) as unknown as Promise<T>
+}
+
+export async function patch<T>(url: string, body?: any, config?: Cfg): Promise<T> {
+  return apiRequest.patch<T>(url, body, config) as unknown as Promise<T>
+}
+
+export async function del<T>(url: string, config?: Cfg): Promise<T> {
+  return apiRequest.delete<T>(url, config) as unknown as Promise<T>
+}
+
+export default apiRequest

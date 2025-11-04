@@ -1,4 +1,4 @@
-===== TOC (62 fichiers) =====
+===== TOC (65 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\components\activity-components\index.tsx
 2. C:\MyCode\Konnaxionv14\frontend\components\activity-components\RecentComments.tsx
 3. C:\MyCode\Konnaxionv14\frontend\components\activity-components\RecentLikes.tsx
@@ -8,59 +8,62 @@
 7. C:\MyCode\Konnaxionv14\frontend\components\Button\Button.stories.tsx
 8. C:\MyCode\Konnaxionv14\frontend\components\Button\Button.tsx
 9. C:\MyCode\Konnaxionv14\frontend\components\charts\ChartCard.tsx
-10. C:\MyCode\Konnaxionv14\frontend\components\concatv3.py
-11. C:\MyCode\Konnaxionv14\frontend\components\CustomComment.tsx
-12. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\CommentCard.tsx
-13. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\index.tsx
-14. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LikeCard.tsx
-15. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LineChart.tsx
-16. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\SculptureTable.tsx
-17. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\StatisticCard.tsx
-18. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\style.tsx
-19. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
-20. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserPieChart.tsx
-21. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\VisitCard.tsx
-22. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Drawer.tsx
-23. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Header.tsx
-24. C:\MyCode\Konnaxionv14\frontend\components\layout-components\LogoTitle.tsx
-25. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Main.tsx
-26. C:\MyCode\Konnaxionv14\frontend\components\layout-components\MainLayout.tsx
-27. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Menu.tsx
-28. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Sider.tsx
-29. C:\MyCode\Konnaxionv14\frontend\components\map-components\ControlPanel.tsx
-30. C:\MyCode\Konnaxionv14\frontend\components\map-components\index.tsx
-31. C:\MyCode\Konnaxionv14\frontend\components\map-components\Map.tsx
-32. C:\MyCode\Konnaxionv14\frontend\components\map-components\MapMarker.tsx
-33. C:\MyCode\Konnaxionv14\frontend\components\map-components\StaticMap.tsx
-34. C:\MyCode\Konnaxionv14\frontend\components\PageContainer.tsx
-35. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\CreateFormTextFields.tsx
-36. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\index.tsx
-37. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\MakerCreate.tsx
-38. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\SculptureCreate.tsx
-39. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\SculptureUploadImage.tsx
-40. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\EditFormTextFields.tsx
-41. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\EditImage.tsx
-42. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\index.tsx
-43. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\MakerEdit.tsx
-44. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\SculptureEdit.tsx
-45. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\MakerList.tsx
-46. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureDetail\index.tsx
-47. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureDetail\SculptureComment.tsx
-48. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureDetail\SculptureTrend.tsx
-49. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureGrid.tsx
-50. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\style.tsx
-51. C:\MyCode\Konnaxionv14\frontend\components\shared\utils.tsx
-52. C:\MyCode\Konnaxionv14\frontend\components\TagsList.tsx
-53. C:\MyCode\Konnaxionv14\frontend\components\ThemeSwitcher.tsx
-54. C:\MyCode\Konnaxionv14\frontend\components\Tooltip\Tooltip.tsx
-55. C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
-56. C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx
-57. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserComments.tsx
-58. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
-59. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
-60. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
-61. C:\MyCode\Konnaxionv14\frontend\src\components\CommonWidget\page.tsx
-62. C:\MyCode\Konnaxionv14\frontend\src\components\ThemeSwitcher.tsx
+10. C:\MyCode\Konnaxionv14\frontend\components\compat\Comment.tsx
+11. C:\MyCode\Konnaxionv14\frontend\components\compat\Icon.tsx
+12. C:\MyCode\Konnaxionv14\frontend\components\concatv3.py
+13. C:\MyCode\Konnaxionv14\frontend\components\CustomComment.tsx
+14. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\CommentCard.tsx
+15. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\index.tsx
+16. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LikeCard.tsx
+17. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LineChart.tsx
+18. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\SculptureTable.tsx
+19. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\StatisticCard.tsx
+20. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\style.tsx
+21. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
+22. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserPieChart.tsx
+23. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\VisitCard.tsx
+24. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Drawer.tsx
+25. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Header.tsx
+26. C:\MyCode\Konnaxionv14\frontend\components\layout-components\LogoTitle.tsx
+27. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Main.tsx
+28. C:\MyCode\Konnaxionv14\frontend\components\layout-components\MainLayout.tsx
+29. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Menu.tsx
+30. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Sider.tsx
+31. C:\MyCode\Konnaxionv14\frontend\components\Loading.tsx
+32. C:\MyCode\Konnaxionv14\frontend\components\map-components\ControlPanel.tsx
+33. C:\MyCode\Konnaxionv14\frontend\components\map-components\index.tsx
+34. C:\MyCode\Konnaxionv14\frontend\components\map-components\Map.tsx
+35. C:\MyCode\Konnaxionv14\frontend\components\map-components\MapMarker.tsx
+36. C:\MyCode\Konnaxionv14\frontend\components\map-components\StaticMap.tsx
+37. C:\MyCode\Konnaxionv14\frontend\components\PageContainer.tsx
+38. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\CreateFormTextFields.tsx
+39. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\index.tsx
+40. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\MakerCreate.tsx
+41. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\SculptureCreate.tsx
+42. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\SculptureUploadImage.tsx
+43. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\EditFormTextFields.tsx
+44. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\EditImage.tsx
+45. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\index.tsx
+46. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\MakerEdit.tsx
+47. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\SculptureEdit.tsx
+48. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\MakerList.tsx
+49. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureDetail\index.tsx
+50. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureDetail\SculptureComment.tsx
+51. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureDetail\SculptureTrend.tsx
+52. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureGrid.tsx
+53. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\style.tsx
+54. C:\MyCode\Konnaxionv14\frontend\components\shared\utils.tsx
+55. C:\MyCode\Konnaxionv14\frontend\components\TagsList.tsx
+56. C:\MyCode\Konnaxionv14\frontend\components\ThemeSwitcher.tsx
+57. C:\MyCode\Konnaxionv14\frontend\components\Tooltip\Tooltip.tsx
+58. C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
+59. C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx
+60. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserComments.tsx
+61. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
+62. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
+63. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
+64. C:\MyCode\Konnaxionv14\frontend\src\components\CommonWidget\page.tsx
+65. C:\MyCode\Konnaxionv14\frontend\src\components\ThemeSwitcher.tsx
 ===== END TOC =====
 
 
@@ -829,6 +832,79 @@ export default function ChartCard({
 }
 
 ===== END components/charts/ChartCard.tsx =====
+
+
+===== BEGIN components/compat/Comment.tsx =====
+// components/compat/Comment.tsx
+import React from 'react'
+import { Avatar, List, Typography } from 'antd'
+
+type Props = {
+  author?: React.ReactNode
+  avatar?: React.ReactNode
+  content?: React.ReactNode
+  datetime?: React.ReactNode
+  className?: string
+  actions?: React.ReactNode[]
+}
+
+export default function Comment({ author, avatar, content, datetime, className, actions }: Props) {
+  return (
+    <List.Item className={className} actions={actions}>
+      <List.Item.Meta
+        avatar={avatar}
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>{author}</span>
+            {datetime ? <Typography.Text type="secondary">{datetime}</Typography.Text> : null}
+          </div>
+        }
+        description={content}
+      />
+    </List.Item>
+  )
+}
+
+===== END components/compat/Comment.tsx =====
+
+
+===== BEGIN components/compat/Icon.tsx =====
+// components/compat/Icon.tsx
+import React from 'react'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  LikeOutlined,
+  MessageOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+  InfoCircleOutlined,
+  WarningOutlined,
+  ArrowRightOutlined,
+  ArrowLeftOutlined,
+} from '@ant-design/icons'
+
+const MAP: Record<string, React.ComponentType<any>> = {
+  delete: DeleteOutlined,
+  edit: EditOutlined,
+  like: LikeOutlined,
+  message: MessageOutlined,
+  loading: LoadingOutlined,
+  plus: PlusOutlined,
+  'info-circle': InfoCircleOutlined,
+  warning: WarningOutlined,
+  'arrow-right': ArrowRightOutlined,
+  'arrow-left': ArrowLeftOutlined,
+}
+
+type Props = { type: string } & React.HTMLAttributes<HTMLSpanElement>
+
+export default function Icon({ type, ...rest }: Props) {
+  const C = MAP[type] ?? InfoCircleOutlined
+  return <C {...rest} />
+}
+
+===== END components/compat/Icon.tsx =====
 
 
 ===== BEGIN components/concatv3.py =====
@@ -2239,6 +2315,20 @@ export default function SiderWrapper({
 }
 
 ===== END components/layout-components/Sider.tsx =====
+
+
+===== BEGIN components/Loading.tsx =====
+// components/Loading.tsx
+import { Spin } from 'antd'
+export default function Loading() {
+  return (
+    <div style={{ padding: 24, textAlign: 'center' }}>
+      <Spin />
+    </div>
+  )
+}
+
+===== END components/Loading.tsx =====
 
 
 ===== BEGIN components/map-components/ControlPanel.tsx =====

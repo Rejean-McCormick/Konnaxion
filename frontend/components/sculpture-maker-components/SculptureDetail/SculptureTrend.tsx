@@ -12,7 +12,8 @@ import {
   LikeCard,
   CommentCard
 } from '../../dashboard-components/'
-import { Dropdown, Icon, Menu, DatePicker } from 'antd'
+import { Popover, DatePicker, Button } from 'antd'
+import { MoreOutlined } from '@ant-design/icons'
 
 const { RangePicker } = DatePicker
 
@@ -25,15 +26,14 @@ import { CardStyled, ShadowCard } from '../../dashboard-components/style'
 
 const formatDailyData = rawData => {
   const result = []
-  for (let date of Object.keys(rawData)) {
+  for (const date of Object.keys(rawData)) {
     result.push({
       x: moment(date).format('MMM D YYYY'),
       y: rawData[date]
     })
   }
   // sort in correct order
-  result.sort((a, b) => moment(a.x).valueOf() - moment(b.x).valueOf)
-
+  result.sort((a, b) => moment(a.x).valueOf() - moment(b.x).valueOf())
   return result
 }
 
@@ -119,9 +119,6 @@ const SculptureTrend = ({
         const DAILY_COMMENTS_CHANGE =
           DAILY_COMMENTS -
           DEFAULT_COMMENT_DATA[DEFAULT_COMMENT_DATA.length - 2].y
-        console.log(DEFAULT_COMMENT_DATA)
-        console.log('c:', DAILY_COMMENTS)
-        console.log('change:', DAILY_COMMENTS_CHANGE)
 
         setState(state => ({
           ...state,
@@ -140,10 +137,7 @@ const SculptureTrend = ({
         }))
       } catch (e) {
         const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        setError({ statusCode, message })
       }
       setLoading(false)
     }
@@ -161,47 +155,35 @@ const SculptureTrend = ({
   const dateFormat = 'MMM D YYYY'
   const staticToday = moment(new Date())
 
-  const generateMenu = (startDate, endDate) => {
-    const disabledDate = current => {
-      return current.valueOf() > staticToday.valueOf()
-    }
-
+  const renderPicker = (startDate, endDate) => {
+    const disabledDate = current => current.valueOf() > staticToday.valueOf()
     return (
-      <Menu className="date-menu">
-        <RangePicker
-          defaultValue={[startDate, endDate]}
-          value={[startDate, endDate]}
-          format={dateFormat}
-          size="large"
-          allowClear={false}
-          separator="-"
-          disabledDate={disabledDate}
-          ranges={{
-            'Past week': [
-              moment(staticToday).subtract(7, 'days'),
-              moment(staticToday)
-            ],
-            'Past 2 weeks': [
-              moment(staticToday).subtract(14, 'days'),
-              moment(staticToday)
-            ],
-            'Past month': [
-              moment(staticToday).subtract(30, 'days'),
-              moment(staticToday)
-            ]
-          }}
-          onChange={date => {
-            console.log(date)
-            if (date[0].valueOf() !== date[1].valueOf()) {
-              console.log('not the same')
-              setStartDate(date[0])
-              setEndDate(date[1])
-            } else {
-              console.log('the same')
-            }
-          }}
-        />
-      </Menu>
+      <RangePicker
+        defaultValue={[startDate, endDate]}
+        value={[startDate, endDate]}
+        format={dateFormat}
+        size="large"
+        allowClear={false}
+        separator="-"
+        disabledDate={disabledDate}
+        ranges={{
+          'Past week': [moment(staticToday).subtract(7, 'days'), moment(staticToday)],
+          'Past 2 weeks': [
+            moment(staticToday).subtract(14, 'days'),
+            moment(staticToday)
+          ],
+          'Past month': [
+            moment(staticToday).subtract(30, 'days'),
+            moment(staticToday)
+          ]
+        }}
+        onChange={date => {
+          if (date[0].valueOf() !== date[1].valueOf()) {
+            setStartDate(date[0])
+            setEndDate(date[1])
+          }
+        }}
+      />
     )
   }
 
@@ -221,20 +203,15 @@ const SculptureTrend = ({
   } = state
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
 
   return (
     <CardStyled
       title="Trends"
       extra={
-        <Dropdown
-          overlay={generateMenu(startDate, endDate)}
-          trigger={['click']}
-          placement="bottomRight"
-        >
-          <Icon type="more" />
-        </Dropdown>
+        <Popover content={renderPicker(startDate, endDate)} trigger="click" placement="bottomRight">
+          <Button type="text" icon={<MoreOutlined />} />
+        </Popover>
       }
       type="stats"
       style={{ marginTop: 12 }}

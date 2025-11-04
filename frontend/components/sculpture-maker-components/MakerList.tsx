@@ -6,10 +6,11 @@
  */
 
 import { useState, useEffect } from 'react'
-import { Row, Divider, Modal, Icon, message, notification, Button } from 'antd'
+import { Row, Divider, Modal, message, notification, Button } from 'antd'
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { ColStyled, CardStyled, StyledTable } from './style'
 import MakerEdit from './EditForm/MakerEdit'
-import api from '../../api'
+import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import MakerCreate from './CreateForm/MakerCreate'
@@ -22,17 +23,17 @@ const MakerList = () => {
       try {
         const data = (await api.get('/maker/')).data
 
-        let formattedData = data.map(maker => {
+        let formattedData = data.map((maker: any) => {
           let formattedMaker = { ...maker }
           formattedMaker.key = maker.id
           return formattedMaker
         })
 
-        formattedData.sort((a, b) => a.firstName.localeCompare(b.firstName))
+        formattedData.sort((a: any, b: any) => a.firstName.localeCompare(b.firstName))
 
         console.log(formattedData)
         setMakerList(formattedData)
-      } catch (e) {
+      } catch (e: any) {
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -44,15 +45,15 @@ const MakerList = () => {
     fetchMakerList()
   }, [])
 
-  const [makerList, setMakerList] = useState([])
+  const [makerList, setMakerList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<any>(null)
 
   const [showModal, setShowModal] = useState(false)
   const [showModalCreate, setShowModalCreate] = useState(false)
 
   const [currentMakerId, setCurrentMakerId] = useState('')
-  const openModal = makerId => {
+  const openModal = (makerId: string) => {
     setCurrentMakerId(makerId)
     setShowModal(true)
   }
@@ -67,7 +68,7 @@ const MakerList = () => {
   const getCurrentMaker = () =>
     makerList.find(x => x.id === currentMakerId) || {}
 
-  const editMaker = maker => {
+  const editMaker = (maker: any) => {
     setMakerList(list =>
       list.map(x => {
         if (x.id === maker.id) {
@@ -78,19 +79,19 @@ const MakerList = () => {
     )
   }
 
-  const deleteMaker = makerId => {
+  const deleteMaker = (makerId: string) => {
     setMakerList(list => list.filter(x => x.id !== makerId))
   }
 
-  const addMaker = maker => {
+  const addMaker = (maker: any) => {
     maker.key = maker.id
     setMakerList(list => [...list, maker])
   }
 
-  const handleDelete = makerId => {
+  const handleDelete = (makerId: string) => {
     confirm({
       title: 'Do you want to remove this maker?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -102,14 +103,14 @@ const MakerList = () => {
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/maker/${makerId}`)
+          await api.delete(`/maker/${makerId}`)
           deleteMaker(makerId)
           message.success('Deleted maker successfully!', 2)
         } catch (error) {
           notification.error({
             message: 'Error',
             description:
-              'There has been internal server error or the maker you\'re trying to delete is currently associated with a sculpture.'
+              "There has been internal server error or the maker you're trying to delete is currently associated with a sculpture."
           })
         }
       }
@@ -121,7 +122,7 @@ const MakerList = () => {
       title: 'Maker name',
       key: 'makerName',
       width: '22%',
-      render: (_, record) => {
+      render: (_: any, record: any) => {
         const { firstName, lastName, wikiUrl } = record
         const makerName = firstName + ' ' + lastName
         if (!wikiUrl) {
@@ -140,7 +141,7 @@ const MakerList = () => {
       title: 'Born - Passed away',
       key: 'year',
       width: '28%',
-      render: (_, record) => {
+      render: (_: any, record: any) => {
         let { birthYear, deathYear } = record
         if (!birthYear) birthYear = 'N/A'
         if (!deathYear) deathYear = 'N/A'
@@ -150,7 +151,7 @@ const MakerList = () => {
     {
       title: 'Action',
       key: 'action',
-      render: record => (
+      render: (record: any) => (
         <span>
           <a onClick={() => openModal(record.key)}>Edit</a>
           <Divider type="vertical" />
@@ -170,7 +171,7 @@ const MakerList = () => {
         <CardStyled
           title="Maker List"
           extra={
-            <Button type="primary" icon="plus" onClick={openModalCreate}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openModalCreate}>
               Add new maker
             </Button>
           }

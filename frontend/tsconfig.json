@@ -45,7 +45,7 @@
       "@/kreative/*":    ["modules/kreative/*",    "app/kreative/*",    "pages/kreative/*"],
 
       "@/pages/*": ["pages/*"],
-      "@/*": ["modules/*", "pages/*", "app/*", "*"]
+      "@/*": ["modules/*", "pages/*", "app/*", "src/*", "*"]
     },
 
     // ---- types & plugins ----

@@ -1,50 +1,41 @@
-// services/deliberate.ts
-import apiRequest from './_request';
-import type { Topic } from '@/types';
+import { get, post } from './_request'
+import type { Topic } from '@/types'
 
-/* ------------------------------------------------------------------ *
- * 1 · Elite topics list                                               *
- * ------------------------------------------------------------------ */
+/** GET /deliberate/elite/topics */
 export async function fetchEliteTopics(): Promise<{
   list: (Topic & {
-    createdAt: string;
-    lastActivity: string;
-    hot: boolean;
-  })[];
+    createdAt: string
+    lastActivity: string
+    hot: boolean
+  })[]
 }> {
-  return apiRequest.get('deliberate/elite/topics');
+  return get('deliberate/elite/topics')
 }
 
-/* ------------------------------------------------------------------ *
- * 2 · Drawer preview                                                  *
- * ------------------------------------------------------------------ */
+/** GET /deliberate/topics/:id/preview */
 export async function fetchTopicPreview(id: string): Promise<{
-  id: string;
-  title: string;
-  category: string;
-  createdAt: string;
-  latest: { id: string; author: string; body: string }[];
+  id: string
+  title: string
+  category: string
+  createdAt: string
+  latest: { id: string; author: string; body: string }[]
 }> {
-  return apiRequest.get(`deliberate/topics/${id}/preview`);
+  return get(`deliberate/topics/${id}/preview`)
 }
 
-/* ------------------------------------------------------------------ *
- * 3 · Create a new elite topic                                        *
- * ------------------------------------------------------------------ */
+/** POST /deliberate/elite/topics */
 export async function createEliteTopic(payload: {
-  title: string;
-  category: string;
-}) {
-  return apiRequest.post('deliberate/elite/topics', payload);
+  title: string
+  category: string
+}): Promise<{ id: string }> {
+  return post('deliberate/elite/topics', payload)
 }
 
-/* ------------------------------------------------------------------ *
- * 4 · Topic details                                                   *
- * ------------------------------------------------------------------ */
+/** GET /deliberate/topics/:id */
 export async function fetchTopicDetail(id: string): Promise<{
-  id: string;
-  title: string;
-  statements: { id: string; author: string; body: string; createdAt: string }[];
+  id: string
+  title: string
+  statements: { id: string; author: string; body: string; createdAt: string }[]
 }> {
-  return apiRequest.get(`deliberate/topics/${id}`);
+  return get(`deliberate/topics/${id}`)
 }

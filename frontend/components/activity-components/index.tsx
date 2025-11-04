@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react'
 import { Row } from 'antd'
 import { ColStyled } from './style'
-import api from '../../api'
+import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import Head from 'next/head'

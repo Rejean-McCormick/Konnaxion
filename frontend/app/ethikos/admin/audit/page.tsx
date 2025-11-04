@@ -20,10 +20,10 @@ type AuditPayload = { items: LogRow[] }
 export default function AuditLogs() {
   usePageTitle('Admin · Audit Logs')
 
-  // On force la donnée au payload JSON (pas l'AxiosResponse)
-  const { data, loading } = useRequest<AuditPayload>(async () => {
+  // app/ethikos/admin/audit/page.tsx
+  const { data, loading } = useRequest<AuditPayload, []>(async () => {
     const res = await fetchAuditLogs()
-    return (res as any).data ?? (res as AuditPayload)
+    return res.data
   })
 
   const columns: ProColumns<LogRow>[] = [
@@ -40,7 +40,7 @@ export default function AuditLogs() {
         { text: 'Warn', value: 'warn' },
         { text: 'Critical', value: 'critical' },
       ],
-      onFilter: (val, row) => row.severity === val,
+      onFilter: (val, row) => row.severity === (val as LogRow['severity']),
       render: (_, row) => (
         <Tag color={row.severity === 'critical' ? 'red' : row.severity === 'warn' ? 'orange' : 'blue'}>
           {row.severity}
@@ -54,7 +54,7 @@ export default function AuditLogs() {
       <ProTable<LogRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={{ pageSize: 15 }}
         search={false}
       />

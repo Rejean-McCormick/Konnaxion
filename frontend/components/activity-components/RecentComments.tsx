@@ -11,7 +11,7 @@ import { ExclamationCircleOutlined, EllipsisOutlined } from '@ant-design/icons'
 const { confirm } = Modal
 
 import Link from 'next/link'
-import api from '../../api'
+import api from '@/services/_request'
 
 const RecentComments = ({ comments, deleteComment }) => {
   const handleDelete = (e: { key: string }) => {
