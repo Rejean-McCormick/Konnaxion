@@ -160,17 +160,9 @@ export default RecentActivity
  */
 
 import moment from 'moment'
-import {
-  Tooltip,
-  List,
-  Comment,
-  Card,
-  Dropdown,
-  Icon,
-  message,
-  Menu,
-  Modal
-} from 'antd'
+import { Tooltip, List, Card, Dropdown, message, Modal } from 'antd'
+import { Comment } from '@ant-design/compatible'
+import { ExclamationCircleOutlined, EllipsisOutlined } from '@ant-design/icons'
 
 const { confirm } = Modal
 
@@ -178,11 +170,11 @@ import Link from 'next/link'
 import api from '../../api'
 
 const RecentComments = ({ comments, deleteComment }) => {
-  const handleDelete = e => {
+  const handleDelete = (e: { key: string }) => {
     console.log(e.key)
     confirm({
       title: 'Delete this comment permanently?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -194,26 +186,21 @@ const RecentComments = ({ comments, deleteComment }) => {
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/comment/${e.key}`)
+          await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
           deleteComment(e.key)
-        } catch (error) {
-          message.error(error.response.data.message)
+        } catch (error: any) {
+          message.error(error?.response?.data?.message || 'Failed to delete')
         }
       }
     })
   }
 
-  const getMenu = commentId => (
-    <Menu onClick={handleDelete}>
-      <Menu.Item key={commentId}>Delete comment</Menu.Item>
-    </Menu>
-  )
-
   comments.sort(
     (a, b) =>
       new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
   )
+
   const formattedComments = comments.map(x => ({
     author: (
       <Link href={`/users/id/${x.user.userId}`}>
@@ -240,11 +227,7 @@ const RecentComments = ({ comments, deleteComment }) => {
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         {x.content
           .trim()
           .split('\n')
@@ -254,32 +237,15 @@ const RecentComments = ({ comments, deleteComment }) => {
       </div>
     ),
     datetime: (
-      <div
-        style={{
-          display: 'flex'
-        }}
-      >
+      <div style={{ display: 'flex' }}>
         <div>
-          <Tooltip
-            title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}
-          >
-            <span
-              style={{
-                fontSize: 14,
-                color: 'rgba(0, 0, 0, 0.35)'
-              }}
-            >
+          <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
               {moment(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
           <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-            <a
-              style={{
-                fontSize: 14
-              }}
-            >
-              {x.sculpture.name}
-            </a>
+            <a style={{ fontSize: 14 }}>{x.sculpture.name}</a>
           </Link>
         </div>
 
@@ -290,8 +256,14 @@ const RecentComments = ({ comments, deleteComment }) => {
             marginLeft: 'auto'
           }}
         >
-          <Dropdown overlay={getMenu(x.commentId)} trigger={['click']}>
-            <Icon type="more" />
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: [{ key: x.commentId, label: 'Delete comment' }],
+              onClick: handleDelete
+            }}
+          >
+            <EllipsisOutlined />
           </Dropdown>
         </div>
       </div>
@@ -449,30 +421,47 @@ export default RecentLikes
  */
 
 import moment from 'moment'
-import { Tooltip, List, CustomComment, Card } from 'antd'
+import { Tooltip, List, Card } from 'antd'
+import { Comment } from '@ant-design/compatible'
 import Link from 'next/link'
 
-const RecentVisits = ({ visits }) => {
-  visits.sort(
+type VisitItem = {
+  visitTime: string | Date
+  user: {
+    userId: string
+    nickname?: string
+    name?: string
+    picture: string
+  }
+  sculpture: {
+    accessionId: string
+    name: string
+  }
+}
+
+type RecentVisitsProps = {
+  visits: VisitItem[]
+}
+
+const RecentVisits = ({ visits }: RecentVisitsProps) => {
+  const sorted = [...visits].sort(
     (a, b) => new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
   )
-  const formattedComments = visits.map(x => ({
+
+  const formattedComments = sorted.map(x => ({
+    key: `${x.user.userId}-${x.visitTime}-${x.sculpture.accessionId}`,
     author: (
-      <Link href={`/users/id/${x.user.userId}`}>
-        <a
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: 'rgba(0, 0, 0, 0.65)'
-          }}
-        >
-          {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
-        </a>
+      <Link
+        href={`/users/id/${x.user.userId}`}
+        style={{ fontSize: 14, fontWeight: 500, color: 'rgba(0, 0, 0, 0.65)' }}
+      >
+        {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
       </Link>
     ),
     avatar: (
       <img
         src={x.user.picture}
+        alt=""
         style={{
           width: 42,
           height: 42,
@@ -482,18 +471,9 @@ const RecentVisits = ({ visits }) => {
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         <Tooltip title={moment(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.visitTime).fromNow()}
           </span>
         </Tooltip>
@@ -501,22 +481,14 @@ const RecentVisits = ({ visits }) => {
     ),
     datetime: (
       <div>
-        <span
-          style={{
-            fontSize: 14,
-            color: 'rgba(0, 0, 0, 0.35)'
-          }}
-        >
+        <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
           visited{' '}
         </span>
-        <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-          <a
-            style={{
-              fontSize: 14
-            }}
-          >
-            {x.sculpture.name}
-          </a>
+        <Link
+          href={`/sculptures/id/${x.sculpture.accessionId}`}
+          style={{ fontSize: 14 }}
+        >
+          {x.sculpture.name}
         </Link>
       </div>
     )
@@ -534,7 +506,7 @@ const RecentVisits = ({ visits }) => {
         dataSource={formattedComments}
         className="comment-list"
         renderItem={item => (
-          <li>
+          <li key={item.key}>
             <Comment
               author={item.author}
               avatar={item.avatar}
@@ -1361,13 +1333,32 @@ export default StatisticCard;
  * Author: Hieu Chu
  */
 
-import { Card, Tooltip, Icon, Divider, Col } from 'antd'
+import React from 'react'
+import { Card, Tooltip, Divider, Col } from 'antd'
 import { NumberInfo } from 'ant-design-pro'
 import styled from 'styled-components'
+import {
+  InfoCircleOutlined,
+  CaretDownOutlined,
+  CaretUpOutlined,
+} from '@ant-design/icons'
+import * as AntIcons from '@ant-design/icons'
 
-export const CardStyled = props => {
-  const bodyStyle = {
-    padding: '20px 24px 8px'
+/** helper: map legacy Icon `type` strings (e.g. "shopping-cart") to v4 components */
+const legacyTypeToIcon = (type?: string) => {
+  if (!type) return null
+  const pascal =
+    type
+      .split('-')
+      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+      .join('') + 'Outlined'
+  // @ts-ignore dynamic lookup
+  return (AntIcons as any)[pascal] || null
+}
+
+export const CardStyled = (props: any) => {
+  const bodyStyle: React.CSSProperties = {
+    padding: '20px 24px 8px',
   }
   if (props.type === 'stats') {
     bodyStyle.padding = '20px 16px 16px'
@@ -1375,7 +1366,7 @@ export const CardStyled = props => {
   return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
 }
 
-export const NumberInfoStyled = props => (
+export const NumberInfoStyled = (props: any) => (
   <NumberInfo
     {...props}
     total={<span style={{ fontSize: 30 }}>{props.total.toLocaleString()}</span>}
@@ -1383,24 +1374,40 @@ export const NumberInfoStyled = props => (
   />
 )
 
-export const HelperIcon = props => (
+export const HelperIcon = (props: any) => (
   <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
     <Tooltip {...props} placement="topLeft" arrowPointAtCenter={true}>
-      <Icon
-        type="info-circle"
-        style={{ verticalAlign: -3, cursor: 'pointer' }}
-      />
+      <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
     </Tooltip>
   </div>
 )
 
-export const MainIcon = props => (
-  <div style={{ marginRight: 16 }}>
-    <Icon {...props} style={{ ...props.style, fontSize: 54 }} />
-  </div>
-)
+/**
+ * Backward compatible MainIcon.
+ * Preferred: <MainIcon icon={<YourIcon />} />
+ * Legacy support: <MainIcon type="shopping-cart" />
+ */
+export const MainIcon = (props: any) => {
+  const { icon, type, style, ...rest } = props
+  const Resolved = icon
+    ? icon
+    : (() => {
+        const Comp = legacyTypeToIcon(type)
+        return Comp ? <Comp /> : null
+      })()
 
-export const CardFooter = props => {
+  return (
+    <div style={{ marginRight: 16 }} {...rest}>
+      {React.isValidElement(Resolved)
+        ? React.cloneElement(Resolved as React.ReactElement, {
+            style: { ...(Resolved.props?.style || {}), ...(style || {}), fontSize: 54 },
+          })
+        : null}
+    </div>
+  )
+}
+
+export const CardFooter = (props: any) => {
   return (
     <div style={{ position: 'relative', zIndex: 99 }}>
       <span>{props.title}:</span>
@@ -1413,17 +1420,11 @@ export const CardFooter = props => {
             {props.change.toLocaleString()}
           </span>
 
-          {/* Up/down icon  */}
+          {/* Up/down icon */}
           {props.change < 0 ? (
-            <Icon
-              type="caret-down"
-              style={{ color: '#f5222d', verticalAlign: 'text-bottom' }}
-            />
+            <CaretDownOutlined style={{ color: '#f5222d', verticalAlign: 'text-bottom' }} />
           ) : (
-            <Icon
-              type="caret-up"
-              style={{ color: '#52c41a', verticalAlign: 'middle' }}
-            />
+            <CaretUpOutlined style={{ color: '#52c41a', verticalAlign: 'middle' }} />
           )}
         </span>
       </Tooltip>
@@ -6577,7 +6578,8 @@ export default UserProfile
  */
 
 import moment from 'moment'
-import { Tooltip, List, Comment, Card, Empty } from 'antd'
+import { Tooltip, List, Card, Empty } from 'antd'
+import { Comment } from '@ant-design/compatible'
 import Link from 'next/link'
 
 const UserVisit = ({ visits }) => {
@@ -6624,18 +6626,9 @@ const UserVisit = ({ visits }) => {
       </div>
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         <Tooltip title={moment(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.visitTime).fromNow()}
           </span>
         </Tooltip>
@@ -6656,20 +6649,12 @@ const UserVisit = ({ visits }) => {
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Visits"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
           )
         }}
         renderItem={item => (
           <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              className="comment"
-            />
+            <Comment author={item.author} avatar={item.avatar} content={item.content} className="comment" />
           </li>
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}

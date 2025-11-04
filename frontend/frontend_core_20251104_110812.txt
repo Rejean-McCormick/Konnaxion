@@ -455,7 +455,6 @@ export default (env.ANALYZE === "true" ? withAnalyzer(baseConfig) : baseConfig)
     "@storybook/addon-controls": "^8.6.12",
     "@storybook/addon-essentials": "^8.6.12",
     "@storybook/addon-interactions": "^8.6.12",
-    "@storybook/addon-links": "^8.6.12",
     "@storybook/blocks": "^8.6.12",
     "@storybook/nextjs": "^8.6.12",
     "@storybook/react": "^8.6.12",
@@ -472,6 +471,7 @@ export default (env.ANALYZE === "true" ? withAnalyzer(baseConfig) : baseConfig)
     "@typescript-eslint/parser": "^8.46.2",
     "@vercel/otel": "^1.14.0",
     "all-contributors-cli": "^6.26.1",
+    "autoprefixer": "^10.4.21",
     "cross-env": "^7.0.3",
     "eslint": "^9.26.0",
     "eslint-config-next": "15.3.1",
@@ -853,9 +853,6 @@ importers:
       '@storybook/addon-interactions':
         specifier: ^8.6.12
         version: 8.6.14(storybook@8.6.14(prettier@3.0.3))
-      '@storybook/addon-links':
-        specifier: ^8.6.12
-        version: 8.6.14(react@18.2.0)(storybook@8.6.14(prettier@3.0.3))
       '@storybook/blocks':
         specifier: ^8.6.12
         version: 8.6.14(react-dom@18.2.0(react@18.2.0))(react@18.2.0)(storybook@8.6.14(prettier@3.0.3))
@@ -904,6 +901,9 @@ importers:
       all-contributors-cli:
         specifier: ^6.26.1
         version: 6.26.1
+      autoprefixer:
+        specifier: ^10.4.21
+        version: 10.4.21(postcss@8.5.6)
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
@@ -3937,15 +3937,6 @@ packages:
     peerDependencies:
       storybook: ^8.6.14
 
-  '@storybook/addon-links@8.6.14':
-    resolution: {integrity: sha512-DRlXHIyZzOruAZkxmXfVgTF+4d6K27pFcH4cUsm3KT1AXuZbr23lb5iZHpUZoG6lmU85Sru4xCEgewSTXBIe1w==}
-    peerDependencies:
-      react: 18.2.0
-      storybook: ^8.6.14
-    peerDependenciesMeta:
-      react:
-        optional: true
-
   '@storybook/addon-measure@8.6.14':
     resolution: {integrity: sha512-1Tlyb72NX8aAqm6I6OICsUuGOP6hgnXcuFlXucyhKomPa6j3Eu2vKu561t/f0oGtAK2nO93Z70kVaEh5X+vaGw==}
     peerDependencies:
@@ -4946,6 +4937,13 @@ packages:
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
+
+  autoprefixer@10.4.21:
+    resolution: {integrity: sha512-O+A6LWV5LDHSJD3LjHYoNi4VLsj/Whi7k6zG12xTYaU4cQ8oxQGckXNX8cRHK5yOZ/ppVHe0ZBXGzSV9jXdVbQ==}
+    engines: {node: ^10 || ^12 || >=14}
+    hasBin: true
+    peerDependencies:
+      postcss: ^8.1.0
 
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -6370,6 +6368,9 @@ packages:
     resolution: {integrity: sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==}
     engines: {node: '>= 6'}
 
+  fraction.js@4.3.7:
+    resolution: {integrity: sha512-ZsDfxO51wGAXREY55a7la9LScWpwv9RxIrYABrlvOFBlH/ShPnrtsXeuUIfXKKOVicNxQ+o8JTbJvjS4M89yew==}
+
   from2@2.3.0:
     resolution: {integrity: sha512-OMcX/4IC/uqEPVgGeyfN22LJk6AZrMkRZHxcHBMBvHScDGgwTm2GT2Wkgtocyd3JfZffjj2kYUDXXII0Fk9W0g==}
 
@@ -7693,6 +7694,10 @@ packages:
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
+    engines: {node: '>=0.10.0'}
+
+  normalize-range@0.1.2:
+    resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
 
   normalize-url@8.1.0:
@@ -13662,14 +13667,6 @@ snapshots:
       storybook: 8.6.14(prettier@3.0.3)
       ts-dedent: 2.2.0
 
-  '@storybook/addon-links@8.6.14(react@18.2.0)(storybook@8.6.14(prettier@3.0.3))':
-    dependencies:
-      '@storybook/global': 5.0.0
-      storybook: 8.6.14(prettier@3.0.3)
-      ts-dedent: 2.2.0
-    optionalDependencies:
-      react: 18.2.0
-
   '@storybook/addon-measure@8.6.14(storybook@8.6.14(prettier@3.0.3))':
     dependencies:
       '@storybook/global': 5.0.0
@@ -14928,6 +14925,16 @@ snapshots:
   async@3.2.6: {}
 
   asynckit@0.4.0: {}
+
+  autoprefixer@10.4.21(postcss@8.5.6):
+    dependencies:
+      browserslist: 4.27.0
+      caniuse-lite: 1.0.30001753
+      fraction.js: 4.3.7
+      normalize-range: 0.1.2
+      picocolors: 1.1.1
+      postcss: 8.5.6
+      postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
     dependencies:
@@ -16689,6 +16696,8 @@ snapshots:
       hasown: 2.0.2
       mime-types: 2.1.35
 
+  fraction.js@4.3.7: {}
+
   from2@2.3.0:
     dependencies:
       inherits: 2.0.4
@@ -18284,6 +18293,8 @@ snapshots:
       validate-npm-package-license: 3.0.4
 
   normalize-path@3.0.0: {}
+
+  normalize-range@0.1.2: {}
 
   normalize-url@8.1.0: {}
 

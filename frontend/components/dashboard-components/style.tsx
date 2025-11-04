@@ -3,13 +3,32 @@
  * Author: Hieu Chu
  */
 
-import { Card, Tooltip, Icon, Divider, Col } from 'antd'
+import React from 'react'
+import { Card, Tooltip, Divider, Col } from 'antd'
 import { NumberInfo } from 'ant-design-pro'
 import styled from 'styled-components'
+import {
+  InfoCircleOutlined,
+  CaretDownOutlined,
+  CaretUpOutlined,
+} from '@ant-design/icons'
+import * as AntIcons from '@ant-design/icons'
 
-export const CardStyled = props => {
-  const bodyStyle = {
-    padding: '20px 24px 8px'
+/** helper: map legacy Icon `type` strings (e.g. "shopping-cart") to v4 components */
+const legacyTypeToIcon = (type?: string) => {
+  if (!type) return null
+  const pascal =
+    type
+      .split('-')
+      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+      .join('') + 'Outlined'
+  // @ts-ignore dynamic lookup
+  return (AntIcons as any)[pascal] || null
+}
+
+export const CardStyled = (props: any) => {
+  const bodyStyle: React.CSSProperties = {
+    padding: '20px 24px 8px',
   }
   if (props.type === 'stats') {
     bodyStyle.padding = '20px 16px 16px'
@@ -17,7 +36,7 @@ export const CardStyled = props => {
   return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
 }
 
-export const NumberInfoStyled = props => (
+export const NumberInfoStyled = (props: any) => (
   <NumberInfo
     {...props}
     total={<span style={{ fontSize: 30 }}>{props.total.toLocaleString()}</span>}
@@ -25,24 +44,40 @@ export const NumberInfoStyled = props => (
   />
 )
 
-export const HelperIcon = props => (
+export const HelperIcon = (props: any) => (
   <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
     <Tooltip {...props} placement="topLeft" arrowPointAtCenter={true}>
-      <Icon
-        type="info-circle"
-        style={{ verticalAlign: -3, cursor: 'pointer' }}
-      />
+      <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
     </Tooltip>
   </div>
 )
 
-export const MainIcon = props => (
-  <div style={{ marginRight: 16 }}>
-    <Icon {...props} style={{ ...props.style, fontSize: 54 }} />
-  </div>
-)
+/**
+ * Backward compatible MainIcon.
+ * Preferred: <MainIcon icon={<YourIcon />} />
+ * Legacy support: <MainIcon type="shopping-cart" />
+ */
+export const MainIcon = (props: any) => {
+  const { icon, type, style, ...rest } = props
+  const Resolved = icon
+    ? icon
+    : (() => {
+        const Comp = legacyTypeToIcon(type)
+        return Comp ? <Comp /> : null
+      })()
 
-export const CardFooter = props => {
+  return (
+    <div style={{ marginRight: 16 }} {...rest}>
+      {React.isValidElement(Resolved)
+        ? React.cloneElement(Resolved as React.ReactElement, {
+            style: { ...(Resolved.props?.style || {}), ...(style || {}), fontSize: 54 },
+          })
+        : null}
+    </div>
+  )
+}
+
+export const CardFooter = (props: any) => {
   return (
     <div style={{ position: 'relative', zIndex: 99 }}>
       <span>{props.title}:</span>
@@ -55,17 +90,11 @@ export const CardFooter = props => {
             {props.change.toLocaleString()}
           </span>
 
-          {/* Up/down icon  */}
+          {/* Up/down icon */}
           {props.change < 0 ? (
-            <Icon
-              type="caret-down"
-              style={{ color: '#f5222d', verticalAlign: 'text-bottom' }}
-            />
+            <CaretDownOutlined style={{ color: '#f5222d', verticalAlign: 'text-bottom' }} />
           ) : (
-            <Icon
-              type="caret-up"
-              style={{ color: '#52c41a', verticalAlign: 'middle' }}
-            />
+            <CaretUpOutlined style={{ color: '#52c41a', verticalAlign: 'middle' }} />
           )}
         </span>
       </Tooltip>

@@ -4,30 +4,47 @@
  */
 
 import moment from 'moment'
-import { Tooltip, List, CustomComment, Card } from 'antd'
+import { Tooltip, List, Card } from 'antd'
+import { Comment } from '@ant-design/compatible'
 import Link from 'next/link'
 
-const RecentVisits = ({ visits }) => {
-  visits.sort(
+type VisitItem = {
+  visitTime: string | Date
+  user: {
+    userId: string
+    nickname?: string
+    name?: string
+    picture: string
+  }
+  sculpture: {
+    accessionId: string
+    name: string
+  }
+}
+
+type RecentVisitsProps = {
+  visits: VisitItem[]
+}
+
+const RecentVisits = ({ visits }: RecentVisitsProps) => {
+  const sorted = [...visits].sort(
     (a, b) => new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
   )
-  const formattedComments = visits.map(x => ({
+
+  const formattedComments = sorted.map(x => ({
+    key: `${x.user.userId}-${x.visitTime}-${x.sculpture.accessionId}`,
     author: (
-      <Link href={`/users/id/${x.user.userId}`}>
-        <a
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: 'rgba(0, 0, 0, 0.65)'
-          }}
-        >
-          {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
-        </a>
+      <Link
+        href={`/users/id/${x.user.userId}`}
+        style={{ fontSize: 14, fontWeight: 500, color: 'rgba(0, 0, 0, 0.65)' }}
+      >
+        {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
       </Link>
     ),
     avatar: (
       <img
         src={x.user.picture}
+        alt=""
         style={{
           width: 42,
           height: 42,
@@ -37,18 +54,9 @@ const RecentVisits = ({ visits }) => {
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         <Tooltip title={moment(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.visitTime).fromNow()}
           </span>
         </Tooltip>
@@ -56,22 +64,14 @@ const RecentVisits = ({ visits }) => {
     ),
     datetime: (
       <div>
-        <span
-          style={{
-            fontSize: 14,
-            color: 'rgba(0, 0, 0, 0.35)'
-          }}
-        >
+        <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
           visited{' '}
         </span>
-        <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-          <a
-            style={{
-              fontSize: 14
-            }}
-          >
-            {x.sculpture.name}
-          </a>
+        <Link
+          href={`/sculptures/id/${x.sculpture.accessionId}`}
+          style={{ fontSize: 14 }}
+        >
+          {x.sculpture.name}
         </Link>
       </div>
     )
@@ -89,7 +89,7 @@ const RecentVisits = ({ visits }) => {
         dataSource={formattedComments}
         className="comment-list"
         renderItem={item => (
-          <li>
+          <li key={item.key}>
             <Comment
               author={item.author}
               avatar={item.avatar}

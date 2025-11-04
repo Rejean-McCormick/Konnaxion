@@ -1,29 +1,27 @@
-'use client';
-import { useParams } from "next/navigation";
+'use client'
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import { Input } from 'antd'
+import { useState } from 'react'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchGlossary } from '@/services/learn'
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Input } from 'antd';
-import { useState } from 'react';
-import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchGlossary } from '@/services/learn';
-
-type Term = { id: string; term: string; definition: string };
+type Term = { id: string; term: string; definition: string }
 
 export default function Glossary() {
-  usePageTitle('Learn · Glossary');
+  usePageTitle('Learn · Glossary')
 
-  const { data, loading } = useRequest(fetchGlossary);
-  const [query, setQuery] = useState('');
+  const { data, loading } = useRequest(fetchGlossary)
+  const [query, setQuery] = useState('')
 
   const columns = [
     { title: 'Term', dataIndex: 'term', width: 200 },
     { title: 'Definition', dataIndex: 'definition' },
-  ];
+  ]
 
-  const filtered = data?.items.filter(
-    (t: Term) => t.term.toLowerCase().includes(params.toLowerCase()),
-  );
+  const filtered = data?.items.filter((t: Term) =>
+    t.term.toLowerCase().includes(query.toLowerCase())
+  )
 
   return (
     <PageContainer ghost loading={loading}>
@@ -31,7 +29,7 @@ export default function Glossary() {
         placeholder="Search term…"
         allowClear
         style={{ marginBottom: 16, maxWidth: 320 }}
-        onChange={e => setQuery(e.target.value)}
+        onChange={(e) => setQuery(e.target.value)}
       />
 
       <ProTable<Term>
@@ -42,5 +40,5 @@ export default function Glossary() {
         search={false}
       />
     </PageContainer>
-  );
+  )
 }

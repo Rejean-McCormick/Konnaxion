@@ -3,14 +3,13 @@ import apiRequest from './_request';
 import type { Topic } from '@/types';
 
 /* ------------------------------------------------------------------ *
- * 1 · Elite-Agora topic list                                          *
+ * 1 · Elite topics list                                               *
  * ------------------------------------------------------------------ */
-
 export async function fetchEliteTopics(): Promise<{
   list: (Topic & {
     createdAt: string;
     lastActivity: string;
-    hot: boolean; // stance spike flag
+    hot: boolean;
   })[];
 }> {
   return apiRequest.get('deliberate/elite/topics');
@@ -19,7 +18,6 @@ export async function fetchEliteTopics(): Promise<{
 /* ------------------------------------------------------------------ *
  * 2 · Drawer preview                                                  *
  * ------------------------------------------------------------------ */
-
 export async function fetchTopicPreview(id: string): Promise<{
   id: string;
   title: string;
@@ -33,10 +31,20 @@ export async function fetchTopicPreview(id: string): Promise<{
 /* ------------------------------------------------------------------ *
  * 3 · Create a new elite topic                                        *
  * ------------------------------------------------------------------ */
-
 export async function createEliteTopic(payload: {
   title: string;
   category: string;
 }) {
   return apiRequest.post('deliberate/elite/topics', payload);
+}
+
+/* ------------------------------------------------------------------ *
+ * 4 · Topic details                                                   *
+ * ------------------------------------------------------------------ */
+export async function fetchTopicDetail(id: string): Promise<{
+  id: string;
+  title: string;
+  statements: { id: string; author: string; body: string; createdAt: string }[];
+}> {
+  return apiRequest.get(`deliberate/topics/${id}`);
 }

@@ -1,3 +1,5 @@
+// app/layout.tsx
+import '@/styles/tailwind.css'                // ← global Tailwind + reset AntD
 import { ThemeProvider } from '@/context/ThemeContext'
 import QueryProvider from '@/shared/QueryProvider'
 

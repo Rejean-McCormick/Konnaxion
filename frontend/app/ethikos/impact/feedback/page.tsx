@@ -39,7 +39,12 @@ export default function FeedbackLoops() {
           onChange={(e) => setMessage(e.target.value)}
           style={{ marginTop: 8 }}
         />
-        <Button type="primary" onClick={send} loading={sending} style={{ marginTop: 8 }}>
+        <Button
+          type="primary"
+          onClick={send}
+          loading={sending}
+          style={{ marginTop: 8 }}
+        >
           Submit
         </Button>
       </ProCard>

@@ -1,23 +1,35 @@
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Comment, Timeline, Typography } from '@ant-design/compatible';
-import '@ant-design/compatible/assets/index.css'
-import { useRouter, useParams } from 'next/navigation';
+import { Timeline, Typography } from 'antd';
+import { Comment } from '@ant-design/compatible';
+import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchTopicDetail } from '@/services/deliberate';
 
+type Statement = {
+  id: string;
+  author: string;
+  body: string;
+  createdAt: string;
+};
+
+type TopicDetail = {
+  id: string;
+  title: string;
+  statements: Statement[];
+};
+
 export default function TopicDetail() {
-  const params = useParams();
-  const {} = useRouter();
-  const topicId = params.topic as string;
+  const { topic } = useParams() as { topic: string };
 
-  usePageTitle(`Deliberate · ${topicId}`);
+  usePageTitle(`Deliberate · ${topic}`);
 
-  const { data, loading } = useRequest(() => fetchTopicDetail(topicId), {
-    ready: !!topicId,
-  });
+  const { data, loading } = useRequest<TopicDetail>(
+    () => fetchTopicDetail(topic),
+    { ready: !!topic }
+  );
 
   return (
     <PageContainer ghost loading={loading}>
@@ -25,7 +37,7 @@ export default function TopicDetail() {
 
       <ProCard title="Statements Thread" ghost>
         <Timeline>
-          {data?.statements.map(s => (
+          {data?.statements?.map((s) => (
             <Timeline.Item key={s.id}>
               <Comment
                 author={s.author}

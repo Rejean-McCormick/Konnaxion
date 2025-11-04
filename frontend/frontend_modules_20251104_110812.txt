@@ -262,7 +262,7 @@ export default function useModeration() {
   return useQuery<ModerationItem[], Error>({
     queryKey: ["admin-moderation"],
     queryFn: async () =>
-      (await api.get<ModerationItem[]>("/api/admin/moderation")).data,
+      (await api.get<ModerationItem[]>("/admin/moderation")).data,
     staleTime: 2 * 60_000,
     retry: 1,
   });
@@ -2352,7 +2352,9 @@ export function GlobalSearchBar() {
 
 
 ===== BEGIN modules/global/components/index.ts =====
-﻿export { default as AppShell        } from "./AppShell";
+﻿// C:\MyCode\Konnaxionv14\frontend\modules\global\components\index.ts
+export { default as AppShell } from './AppShell';
+export { GlobalSearchBar } from './GlobalSearchBar';
 
 ===== END modules/global/components/index.ts =====
 
@@ -2545,8 +2547,14 @@ export default function ExportCSVButton({
 
 
 ===== BEGIN modules/insights/components/index.ts =====
-﻿export { default as SmartVoteChart } from './SmartVoteChart';
-export { default as DomainHeatMap }  from './DomainHeatMap';
+﻿// C:\MyCode\Konnaxionv14\frontend\modules\insights\components\index.ts
+export { default as SmartVoteChart }     from './SmartVoteChart';
+export { default as DomainHeatMap }      from './DomainHeatMap';
+export { default as ErrorRateSparkline } from './ErrorRateSparkline';
+export { default as ExportCSVButton }    from './ExportCSVButton';
+export { default as LatencySLOGauge }    from './LatencySLOGauge';
+export { default as TimeRangePicker }    from './TimeRangePicker';
+export { default as UsageBigNumbers }    from './UsageBigNumbers';
 
 ===== END modules/insights/components/index.ts =====
 
@@ -3513,13 +3521,14 @@ export default CommonWidget;
 
 
 ===== BEGIN modules/konnected/certifications/exam-preparation/components/CommonWidget/page.tsx =====
-// pages/pageTemplate/components/CommonWidget.tsx
-import React from 'react';
-import styles from './CommonWidget.module.css';
+'use client'
+
+import React from 'react'
+import styles from './CommonWidget.module.css'
 
 interface CommonWidgetProps {
-  title: string;
-  description: string;
+  title: string
+  description: string
 }
 
 const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
@@ -3528,10 +3537,10 @@ const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
       <h2 className={styles.widgetTitle}>{title}</h2>
       <p className={styles.widgetDescription}>{description}</p>
     </div>
-  );
-};
+  )
+}
 
-export default CommonWidget;
+export default CommonWidget
 
 ===== END modules/konnected/certifications/exam-preparation/components/CommonWidget/page.tsx =====
 

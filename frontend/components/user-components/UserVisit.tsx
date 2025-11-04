@@ -4,7 +4,8 @@
  */
 
 import moment from 'moment'
-import { Tooltip, List, Comment, Card, Empty } from 'antd'
+import { Tooltip, List, Card, Empty } from 'antd'
+import { Comment } from '@ant-design/compatible'
 import Link from 'next/link'
 
 const UserVisit = ({ visits }) => {
@@ -51,18 +52,9 @@ const UserVisit = ({ visits }) => {
       </div>
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         <Tooltip title={moment(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.visitTime).fromNow()}
           </span>
         </Tooltip>
@@ -83,20 +75,12 @@ const UserVisit = ({ visits }) => {
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Visits"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
           )
         }}
         renderItem={item => (
           <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              className="comment"
-            />
+            <Comment author={item.author} avatar={item.avatar} content={item.content} className="comment" />
           </li>
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}

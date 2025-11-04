@@ -4,17 +4,9 @@
  */
 
 import moment from 'moment'
-import {
-  Tooltip,
-  List,
-  Comment,
-  Card,
-  Dropdown,
-  Icon,
-  message,
-  Menu,
-  Modal
-} from 'antd'
+import { Tooltip, List, Card, Dropdown, message, Modal } from 'antd'
+import { Comment } from '@ant-design/compatible'
+import { ExclamationCircleOutlined, EllipsisOutlined } from '@ant-design/icons'
 
 const { confirm } = Modal
 
@@ -22,11 +14,11 @@ import Link from 'next/link'
 import api from '../../api'
 
 const RecentComments = ({ comments, deleteComment }) => {
-  const handleDelete = e => {
+  const handleDelete = (e: { key: string }) => {
     console.log(e.key)
     confirm({
       title: 'Delete this comment permanently?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -38,26 +30,21 @@ const RecentComments = ({ comments, deleteComment }) => {
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/comment/${e.key}`)
+          await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
           deleteComment(e.key)
-        } catch (error) {
-          message.error(error.response.data.message)
+        } catch (error: any) {
+          message.error(error?.response?.data?.message || 'Failed to delete')
         }
       }
     })
   }
 
-  const getMenu = commentId => (
-    <Menu onClick={handleDelete}>
-      <Menu.Item key={commentId}>Delete comment</Menu.Item>
-    </Menu>
-  )
-
   comments.sort(
     (a, b) =>
       new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
   )
+
   const formattedComments = comments.map(x => ({
     author: (
       <Link href={`/users/id/${x.user.userId}`}>
@@ -84,11 +71,7 @@ const RecentComments = ({ comments, deleteComment }) => {
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         {x.content
           .trim()
           .split('\n')
@@ -98,32 +81,15 @@ const RecentComments = ({ comments, deleteComment }) => {
       </div>
     ),
     datetime: (
-      <div
-        style={{
-          display: 'flex'
-        }}
-      >
+      <div style={{ display: 'flex' }}>
         <div>
-          <Tooltip
-            title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}
-          >
-            <span
-              style={{
-                fontSize: 14,
-                color: 'rgba(0, 0, 0, 0.35)'
-              }}
-            >
+          <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
               {moment(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
           <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-            <a
-              style={{
-                fontSize: 14
-              }}
-            >
-              {x.sculpture.name}
-            </a>
+            <a style={{ fontSize: 14 }}>{x.sculpture.name}</a>
           </Link>
         </div>
 
@@ -134,8 +100,14 @@ const RecentComments = ({ comments, deleteComment }) => {
             marginLeft: 'auto'
           }}
         >
-          <Dropdown overlay={getMenu(x.commentId)} trigger={['click']}>
-            <Icon type="more" />
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items: [{ key: x.commentId, label: 'Delete comment' }],
+              onClick: handleDelete
+            }}
+          >
+            <EllipsisOutlined />
           </Dropdown>
         </div>
       </div>

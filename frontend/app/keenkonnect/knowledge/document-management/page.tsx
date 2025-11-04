@@ -4,8 +4,10 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Row, Col, Card, Button, Input, Timeline, Divider, CustomComment, List, Avatar, message } from 'antd';
+import { Row, Col, Card, Button, Input, Timeline, Divider, List, Avatar, message } from 'antd';
 import { SaveOutlined, UploadOutlined, EditOutlined } from '@ant-design/icons';
+import { Comment } from '@ant-design/compatible';
+//import '@ant-design/compatible/assets/index.css';
 import MainLayout from '@/components/layout-components/MainLayout';
 
 const { TextArea } = Input;

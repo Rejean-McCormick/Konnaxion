@@ -1,10 +1,11 @@
-// pages/pageTemplate/components/CommonWidget.tsx
-import React from 'react';
-import styles from './CommonWidget.module.css';
+'use client'
+
+import React from 'react'
+import styles from './CommonWidget.module.css'
 
 interface CommonWidgetProps {
-  title: string;
-  description: string;
+  title: string
+  description: string
 }
 
 const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
@@ -13,7 +14,7 @@ const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
       <h2 className={styles.widgetTitle}>{title}</h2>
       <p className={styles.widgetDescription}>{description}</p>
     </div>
-  );
-};
+  )
+}
 
-export default CommonWidget;
+export default CommonWidget
