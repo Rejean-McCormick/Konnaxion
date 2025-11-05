@@ -28,7 +28,7 @@
 
       "@/context/*": ["src/context/*", "context/*"],
       "@/theme/*": ["src/theme/*", "theme/*"],
-      "@/types": ["src/types/index.ts", "types/index.ts"],
+      "@/types": ["src/types/index.ts"],
       "@/types/*": ["src/types/*", "types/*"],
 
       "@/shared/*": ["shared/*"],
