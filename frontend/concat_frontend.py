@@ -14,7 +14,9 @@ Concatène les fichiers texte du frontend en sorties .txt par domaine, avec TOC 
   - frontend_hooks_context_<ts>.txt
   - frontend_theme_styles_<ts>.txt
   - frontend_tests_e2e_<ts>.txt
+  - frontend_types_<ts>.txt
   - frontend_misc_<ts>.txt
+  - frontend_small_<ts>.txt   <= nouveaux: fusion des petits groupes (≤ seuil)
 
 Par défaut : multi-sorties. Avec options (--out/--include/--exclude/--ext) : mono-fichier.
 """
@@ -43,6 +45,7 @@ DEFAULT_EXTS: Set[str] = {
     ".pl", ".lua", ".r",
     ".env",
     ".svg",
+    ".ndjson",
 }
 NAMES_WITHOUT_EXT: Set[str] = {
     "Dockerfile", "Makefile", "CMakeLists.txt",
@@ -85,6 +88,8 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--exclude", action="append", default=[], help="Glob d'exclusion relatif (répétable)")
     p.add_argument("--max-size", type=int, default=2_000_000, help="Taille max par fichier en octets")
     p.add_argument("--no-headers", action="store_true", help="Supprime les en-têtes BEGIN/END par fichier")
+    p.add_argument("--merge-small", type=int, default=4,
+                   help="Seuil de fusion des petits groupes (<= N fichiers). 0 pour désactiver.")
     return p.parse_args()
 
 def normalize_exts(exts_csv: Optional[str]) -> Set[str]:
@@ -189,7 +194,6 @@ def walk_select(base_dir: Path, allowed_exts: Set[str], include_globs: List[str]
 # ====== Écriture avec TOC ======
 def write_concat(base_dir: Path, files: List[Path], out_path: Path, no_headers: bool) -> int:
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    # Prépare la TOC en chemins absolus
     abs_paths: List[str] = []
     for p in files:
         try:
@@ -199,13 +203,11 @@ def write_concat(base_dir: Path, files: List[Path], out_path: Path, no_headers: 
 
     count = 0
     with out_path.open("w", encoding="utf-8", newline="\n") as out:
-        # TOC au tout début
         out.write(f"===== TOC ({len(files)} fichiers) =====\n")
         for i, ap in enumerate(abs_paths, 1):
             out.write(f"{i}. {ap}\n")
         out.write("===== END TOC =====\n\n")
 
-        # Contenu concaténé
         for p in files:
             enc = pick_encoding(p) or "utf-8"
             if not no_headers:
@@ -238,6 +240,11 @@ GROUPS: Dict[str, Tuple[List[str], List[str]]] = {
             "playwright.*.ts",
             "report-bundle-size.js",
             "scripts/*.mjs",
+            "scripts/codemods/*.js",
+            "api.ts",
+            "next-env.d.ts",
+            "reset.d.ts",
+            "scanpath*.py",
         ],
         OUT_EXCLUDES + TEST_DIRS
     ),
@@ -246,22 +253,83 @@ GROUPS: Dict[str, Tuple[List[str], List[str]]] = {
     "frontend_modules": (["modules/**"], OUT_EXCLUDES + TEST_DIRS),
     "frontend_shared": (["shared/**"], OUT_EXCLUDES + TEST_DIRS),
     "frontend_services": (["services/**"], OUT_EXCLUDES + TEST_DIRS),
-    "frontend_routes": (["routes/**", "routes.json", "scripts/find-routes.mjs"], OUT_EXCLUDES + TEST_DIRS),
+    "frontend_routes": (
+        [
+            "routes/**",
+            "routes.json",
+            "routes-tests.json",
+            "scripts/find-routes.mjs",
+            "scripts/find-routes-tests.mjs",
+        ],
+        OUT_EXCLUDES + TEST_DIRS
+    ),
     "frontend_hooks_context": (["hooks/**", "context/**"], OUT_EXCLUDES + TEST_DIRS),
     "frontend_theme_styles": (["theme/**", "src/theme/**", "styles/**"], OUT_EXCLUDES + TEST_DIRS),
-    "frontend_tests_e2e": (["tests/**", "_e2e/**", "playwright-report/index.html"], OUT_EXCLUDES),
-    "frontend_misc": (["assets/**/*.svg", "public/**/*.svg", "ct/**"], OUT_EXCLUDES + TEST_DIRS),
+    "frontend_tests_e2e": (
+        [
+            "tests/**",
+            "_e2e/**",
+            "playwright-report/*.html",
+            "playwright-report/*.ndjson",
+            "playwright-report/index-test/*.html",
+            "playwright-report/index-test/*.ndjson",
+            "playwright-smokeREADME.*",
+        ],
+        OUT_EXCLUDES
+    ),
+    "frontend_types": (["types/**", "src/types/**"], OUT_EXCLUDES + TEST_DIRS),
+    "frontend_misc": (
+        [
+            "assets/**/*.svg",
+            "public/**/*.svg",
+            "graph.svg",
+            "use_client_report.csv",
+            "use_client_report.json",
+            "ct/**",
+        ],
+        OUT_EXCLUDES + TEST_DIRS
+    ),
 }
 
 # ====== Modes d’exécution ======
-def run_multi_outputs(base_dir: Path, max_size: int, no_headers: bool) -> None:
+def run_multi_outputs(base_dir: Path, max_size: int, no_headers: bool, merge_small: int) -> None:
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     allowed_exts = set(DEFAULT_EXTS)
+
+    # 1) collecte de tous les fichiers par groupe
+    group_files: Dict[str, List[Path]] = {}
     for group_name, (incl, excl) in GROUPS.items():
         out_path = base_dir / f"{group_name}_{stamp}.txt"
         files = walk_select(base_dir, allowed_exts, incl, excl, max_size, out_path)
+        group_files[group_name] = files
+
+    # 2) détermine les petits groupes à fusionner
+    small_groups = []
+    if merge_small and merge_small > 0:
+        for g, files in group_files.items():
+            if len(files) <= merge_small:
+                small_groups.append(g)
+
+    # 3) écrit les gros groupes individuellement
+    for g, files in group_files.items():
+        if g in small_groups:
+            continue
+        out_path = base_dir / f"{g}_{stamp}.txt"
         n = write_concat(base_dir, files, out_path, no_headers)
-        print(f"{group_name}: {n} fichier(s) -> {out_path.name}")
+        print(f"{g}: {n} fichier(s) -> {out_path.name}")
+
+    # 4) fusionne et écrit le groupe small unique
+    if small_groups:
+        merged: List[Path] = []
+        for g in small_groups:
+            merged.extend(group_files[g])
+        # trie par chemin relatif pour une sortie stable
+        merged.sort(key=lambda p: relpath(base_dir, p).lower())
+        out_small = base_dir / f"frontend_small_{stamp}.txt"
+        n = write_concat(base_dir, merged, out_small, no_headers)
+        # Logs
+        small_list = ", ".join(small_groups)
+        print(f"frontend_small (fusion de: {small_list}): {n} fichier(s) -> {out_small.name}")
 
 def run_single_output(base_dir: Path, args: argparse.Namespace) -> None:
     if args.out:
@@ -282,7 +350,7 @@ def main() -> None:
     args = parse_args()
     base_dir = Path(__file__).resolve().parent
     if not any([args.out, args.ext, args.include, args.exclude]):
-        run_multi_outputs(base_dir, args.max_size, args.no_headers)
+        run_multi_outputs(base_dir, args.max_size, args.no_headers, args.merge_small)
     else:
         run_single_output(base_dir, args)
 

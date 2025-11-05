@@ -1,7 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Next.js",
-
   "compilerOptions": {
     // ---- base ----
     "target": "es5",
@@ -20,14 +19,17 @@
     "jsx": "preserve",
     "incremental": true,
 
-    // ---- path aliases (modules d'abord, puis app/pages, puis fallback) ----
+    // ---- path aliases (préférer src/, fallback temporaire) ----
     "baseUrl": ".",
     "paths": {
-      "@/components/*": ["components/*", "src/components/*"],
-      "@/components/layout-components/*": ["components/layout-components/*"],
-      "@/layouts/*": ["components/layout-components/*"],
-      "@/context/*": ["context/*"],
-      "@/theme/*": ["theme/*"],
+      "@/components/*": ["src/components/*", "components/*"],
+      "@/components/layout-components/*": ["src/components/layout-components/*", "components/layout-components/*"],
+      "@/layouts/*": ["src/components/layout-components/*", "components/layout-components/*"],
+
+      "@/context/*": ["src/context/*", "context/*"],
+      "@/theme/*": ["src/theme/*", "theme/*"],
+      "@/types": ["src/types/index.ts", "types/index.ts"],
+      "@/types/*": ["src/types/*", "types/*"],
 
       "@/shared/*": ["shared/*"],
       "@/modules/*": ["modules/*"],
@@ -45,7 +47,7 @@
       "@/kreative/*":    ["modules/kreative/*",    "app/kreative/*",    "pages/kreative/*"],
 
       "@/pages/*": ["pages/*"],
-      "@/*": ["modules/*", "pages/*", "app/*", "src/*", "*"]
+      "@/*": ["src/*", "modules/*", "app/*", "pages/*", "*"]
     },
 
     // ---- types & plugins ----
@@ -64,7 +66,6 @@
     "eslint.config.mjs"
   ],
 
-  // Par défaut on n’exclut que node_modules pour ne rien perdre.
-  // Si besoin de “verdir” temporairement le build, ajoutez ici des modules à ignorer.
+  // Par défaut on n’exclut que node_modules.
   "exclude": ["node_modules"]
 }

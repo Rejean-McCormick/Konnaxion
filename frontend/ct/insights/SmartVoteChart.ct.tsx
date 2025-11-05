@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/experimental-ct-react';
-import SmartVoteChart from '../SmartVoteChart';
+import SmartVoteChart from '../../modules/insights/components/SmartVoteChart';
 
 test('renders SmartVoteChart', async ({ mount }) => {
   const cmp = await mount(

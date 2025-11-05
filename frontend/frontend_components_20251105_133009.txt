@@ -1,4 +1,4 @@
-===== TOC (65 fichiers) =====
+===== TOC (64 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\components\activity-components\index.tsx
 2. C:\MyCode\Konnaxionv14\frontend\components\activity-components\RecentComments.tsx
 3. C:\MyCode\Konnaxionv14\frontend\components\activity-components\RecentLikes.tsx
@@ -54,16 +54,15 @@
 53. C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\style.tsx
 54. C:\MyCode\Konnaxionv14\frontend\components\shared\utils.tsx
 55. C:\MyCode\Konnaxionv14\frontend\components\TagsList.tsx
-56. C:\MyCode\Konnaxionv14\frontend\components\ThemeSwitcher.tsx
-57. C:\MyCode\Konnaxionv14\frontend\components\Tooltip\Tooltip.tsx
-58. C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
-59. C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx
-60. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserComments.tsx
-61. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
-62. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
-63. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
-64. C:\MyCode\Konnaxionv14\frontend\src\components\CommonWidget\page.tsx
-65. C:\MyCode\Konnaxionv14\frontend\src\components\ThemeSwitcher.tsx
+56. C:\MyCode\Konnaxionv14\frontend\components\Tooltip\Tooltip.tsx
+57. C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
+58. C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx
+59. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserComments.tsx
+60. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
+61. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
+62. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
+63. C:\MyCode\Konnaxionv14\frontend\src\components\CommonWidget\page.tsx
+64. C:\MyCode\Konnaxionv14\frontend\src\components\ThemeSwitcher.tsx
 ===== END TOC =====
 
 
@@ -78,7 +77,7 @@
 import { useState, useEffect } from 'react'
 import { Row } from 'antd'
 import { ColStyled } from './style'
-import api from '../../api'
+import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import Head from 'next/head'
@@ -170,7 +169,7 @@ import { ExclamationCircleOutlined, EllipsisOutlined } from '@ant-design/icons'
 const { confirm } = Modal
 
 import Link from 'next/link'
-import api from '../../api'
+import api from '@/services/_request'
 
 const RecentComments = ({ comments, deleteComment }) => {
   const handleDelete = (e: { key: string }) => {
@@ -4320,10 +4319,11 @@ export default Form.create({
  */
 
 import { useState, useEffect } from 'react'
-import { Row, Divider, Modal, Icon, message, notification, Button } from 'antd'
+import { Row, Divider, Modal, message, notification, Button } from 'antd'
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { ColStyled, CardStyled, StyledTable } from './style'
 import MakerEdit from './EditForm/MakerEdit'
-import api from '../../api'
+import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import MakerCreate from './CreateForm/MakerCreate'
@@ -4336,17 +4336,17 @@ const MakerList = () => {
       try {
         const data = (await api.get('/maker/')).data
 
-        let formattedData = data.map(maker => {
+        let formattedData = data.map((maker: any) => {
           let formattedMaker = { ...maker }
           formattedMaker.key = maker.id
           return formattedMaker
         })
 
-        formattedData.sort((a, b) => a.firstName.localeCompare(b.firstName))
+        formattedData.sort((a: any, b: any) => a.firstName.localeCompare(b.firstName))
 
         console.log(formattedData)
         setMakerList(formattedData)
-      } catch (e) {
+      } catch (e: any) {
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -4358,15 +4358,15 @@ const MakerList = () => {
     fetchMakerList()
   }, [])
 
-  const [makerList, setMakerList] = useState([])
+  const [makerList, setMakerList] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<any>(null)
 
   const [showModal, setShowModal] = useState(false)
   const [showModalCreate, setShowModalCreate] = useState(false)
 
   const [currentMakerId, setCurrentMakerId] = useState('')
-  const openModal = makerId => {
+  const openModal = (makerId: string) => {
     setCurrentMakerId(makerId)
     setShowModal(true)
   }
@@ -4381,7 +4381,7 @@ const MakerList = () => {
   const getCurrentMaker = () =>
     makerList.find(x => x.id === currentMakerId) || {}
 
-  const editMaker = maker => {
+  const editMaker = (maker: any) => {
     setMakerList(list =>
       list.map(x => {
         if (x.id === maker.id) {
@@ -4392,19 +4392,19 @@ const MakerList = () => {
     )
   }
 
-  const deleteMaker = makerId => {
+  const deleteMaker = (makerId: string) => {
     setMakerList(list => list.filter(x => x.id !== makerId))
   }
 
-  const addMaker = maker => {
+  const addMaker = (maker: any) => {
     maker.key = maker.id
     setMakerList(list => [...list, maker])
   }
 
-  const handleDelete = makerId => {
+  const handleDelete = (makerId: string) => {
     confirm({
       title: 'Do you want to remove this maker?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -4416,14 +4416,14 @@ const MakerList = () => {
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/maker/${makerId}`)
+          await api.delete(`/maker/${makerId}`)
           deleteMaker(makerId)
           message.success('Deleted maker successfully!', 2)
         } catch (error) {
           notification.error({
             message: 'Error',
             description:
-              'There has been internal server error or the maker you\'re trying to delete is currently associated with a sculpture.'
+              "There has been internal server error or the maker you're trying to delete is currently associated with a sculpture."
           })
         }
       }
@@ -4435,7 +4435,7 @@ const MakerList = () => {
       title: 'Maker name',
       key: 'makerName',
       width: '22%',
-      render: (_, record) => {
+      render: (_: any, record: any) => {
         const { firstName, lastName, wikiUrl } = record
         const makerName = firstName + ' ' + lastName
         if (!wikiUrl) {
@@ -4454,7 +4454,7 @@ const MakerList = () => {
       title: 'Born - Passed away',
       key: 'year',
       width: '28%',
-      render: (_, record) => {
+      render: (_: any, record: any) => {
         let { birthYear, deathYear } = record
         if (!birthYear) birthYear = 'N/A'
         if (!deathYear) deathYear = 'N/A'
@@ -4464,7 +4464,7 @@ const MakerList = () => {
     {
       title: 'Action',
       key: 'action',
-      render: record => (
+      render: (record: any) => (
         <span>
           <a onClick={() => openModal(record.key)}>Edit</a>
           <Divider type="vertical" />
@@ -4484,7 +4484,7 @@ const MakerList = () => {
         <CardStyled
           title="Maker List"
           extra={
-            <Button type="primary" icon="plus" onClick={openModalCreate}>
+            <Button type="primary" icon={<PlusOutlined />} onClick={openModalCreate}>
               Add new maker
             </Button>
           }
@@ -4814,19 +4814,21 @@ import {
   List,
   Comment,
   Card,
-  Icon,
   Dropdown,
-  Menu,
   Modal,
   message,
   Button,
-  Empty
+  Empty,
+  Input
 } from 'antd'
+import type { MenuProps } from 'antd'
+import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
 import { useState } from 'react'
-import TextArea from 'antd/lib/input/TextArea'
+
 const { confirm } = Modal
+const { TextArea } = Input
 
 const SculptureComment = ({
   comments,
@@ -4839,11 +4841,10 @@ const SculptureComment = ({
       new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
   )
 
-  const handleDelete = e => {
-    console.log(e.key)
+  const handleDelete: MenuProps['onClick'] = e => {
     confirm({
       title: 'Delete this comment permanently?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -4855,10 +4856,11 @@ const SculptureComment = ({
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/comment/${e.key}`)
+          await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
-          deleteComment(e.key)
+          deleteComment(e.key as string)
         } catch (error) {
+          // @ts-ignore
           message.error(error.response.data.message)
         }
       }
@@ -4868,11 +4870,9 @@ const SculptureComment = ({
   const [submitting, setSubmitting] = useState(false)
   const [value, setValue] = useState('')
 
-  const getMenu = commentId => (
-    <Menu onClick={handleDelete}>
-      <Menu.Item key={commentId}>Delete comment</Menu.Item>
-    </Menu>
-  )
+  const getMenuItems = (commentId: string): MenuProps['items'] => [
+    { key: commentId, label: 'Delete comment' }
+  ]
 
   const formattedComments = comments.map(x => ({
     commentId: x.commentId,
@@ -4901,11 +4901,7 @@ const SculptureComment = ({
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         {x.content
           .trim()
           .split('\n')
@@ -4915,18 +4911,9 @@ const SculptureComment = ({
       </div>
     ),
     datetime: (
-      <div
-        style={{
-          display: 'flex'
-        }}
-      >
+      <div style={{ display: 'flex' }}>
         <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <div
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <div style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.createdTime).fromNow()}
           </div>
         </Tooltip>
@@ -4937,8 +4924,11 @@ const SculptureComment = ({
             marginLeft: 'auto'
           }}
         >
-          <Dropdown overlay={getMenu(x.commentId)} trigger={['click']}>
-            <Icon type="more" />
+          <Dropdown
+            menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
+            trigger={['click']}
+          >
+            <MoreOutlined />
           </Dropdown>
         </div>
       </div>
@@ -4958,10 +4948,7 @@ const SculptureComment = ({
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Comments"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
           )
         }}
         renderItem={item => (
@@ -5016,10 +5003,8 @@ const Editor = ({
   <>
     <div style={{ marginBottom: 12 }}>
       <TextArea
-        autosize={{ minRows: 2 }}
-        onChange={e => {
-          setValue(e.target.value)
-        }}
+        autoSize={{ minRows: 2 }}
+        onChange={e => setValue(e.target.value)}
         value={value}
       />
     </div>
@@ -5031,16 +5016,18 @@ const Editor = ({
         onClick={async () => {
           setSubmitting(true)
           try {
-            const result = (await api.post('/comment', {
-              sculptureId,
-              content: value
-            })).data
+            const result = (
+              await api.post('/comment', {
+                sculptureId,
+                content: value
+              })
+            ).data
             setSubmitting(false)
             setValue('')
-            console.log(result)
             addComment(result)
           } catch (e) {
             setSubmitting(false)
+            // @ts-ignore
             message.error(e.response.data.message)
           }
         }}
@@ -5072,7 +5059,8 @@ import {
   LikeCard,
   CommentCard
 } from '../../dashboard-components/'
-import { Dropdown, Icon, Menu, DatePicker } from 'antd'
+import { Popover, DatePicker, Button } from 'antd'
+import { MoreOutlined } from '@ant-design/icons'
 
 const { RangePicker } = DatePicker
 
@@ -5085,15 +5073,14 @@ import { CardStyled, ShadowCard } from '../../dashboard-components/style'
 
 const formatDailyData = rawData => {
   const result = []
-  for (let date of Object.keys(rawData)) {
+  for (const date of Object.keys(rawData)) {
     result.push({
       x: moment(date).format('MMM D YYYY'),
       y: rawData[date]
     })
   }
   // sort in correct order
-  result.sort((a, b) => moment(a.x).valueOf() - moment(b.x).valueOf)
-
+  result.sort((a, b) => moment(a.x).valueOf() - moment(b.x).valueOf())
   return result
 }
 
@@ -5179,9 +5166,6 @@ const SculptureTrend = ({
         const DAILY_COMMENTS_CHANGE =
           DAILY_COMMENTS -
           DEFAULT_COMMENT_DATA[DEFAULT_COMMENT_DATA.length - 2].y
-        console.log(DEFAULT_COMMENT_DATA)
-        console.log('c:', DAILY_COMMENTS)
-        console.log('change:', DAILY_COMMENTS_CHANGE)
 
         setState(state => ({
           ...state,
@@ -5200,10 +5184,7 @@ const SculptureTrend = ({
         }))
       } catch (e) {
         const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        setError({ statusCode, message })
       }
       setLoading(false)
     }
@@ -5221,47 +5202,35 @@ const SculptureTrend = ({
   const dateFormat = 'MMM D YYYY'
   const staticToday = moment(new Date())
 
-  const generateMenu = (startDate, endDate) => {
-    const disabledDate = current => {
-      return current.valueOf() > staticToday.valueOf()
-    }
-
+  const renderPicker = (startDate, endDate) => {
+    const disabledDate = current => current.valueOf() > staticToday.valueOf()
     return (
-      <Menu className="date-menu">
-        <RangePicker
-          defaultValue={[startDate, endDate]}
-          value={[startDate, endDate]}
-          format={dateFormat}
-          size="large"
-          allowClear={false}
-          separator="-"
-          disabledDate={disabledDate}
-          ranges={{
-            'Past week': [
-              moment(staticToday).subtract(7, 'days'),
-              moment(staticToday)
-            ],
-            'Past 2 weeks': [
-              moment(staticToday).subtract(14, 'days'),
-              moment(staticToday)
-            ],
-            'Past month': [
-              moment(staticToday).subtract(30, 'days'),
-              moment(staticToday)
-            ]
-          }}
-          onChange={date => {
-            console.log(date)
-            if (date[0].valueOf() !== date[1].valueOf()) {
-              console.log('not the same')
-              setStartDate(date[0])
-              setEndDate(date[1])
-            } else {
-              console.log('the same')
-            }
-          }}
-        />
-      </Menu>
+      <RangePicker
+        defaultValue={[startDate, endDate]}
+        value={[startDate, endDate]}
+        format={dateFormat}
+        size="large"
+        allowClear={false}
+        separator="-"
+        disabledDate={disabledDate}
+        ranges={{
+          'Past week': [moment(staticToday).subtract(7, 'days'), moment(staticToday)],
+          'Past 2 weeks': [
+            moment(staticToday).subtract(14, 'days'),
+            moment(staticToday)
+          ],
+          'Past month': [
+            moment(staticToday).subtract(30, 'days'),
+            moment(staticToday)
+          ]
+        }}
+        onChange={date => {
+          if (date[0].valueOf() !== date[1].valueOf()) {
+            setStartDate(date[0])
+            setEndDate(date[1])
+          }
+        }}
+      />
     )
   }
 
@@ -5281,20 +5250,15 @@ const SculptureTrend = ({
   } = state
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
 
   return (
     <CardStyled
       title="Trends"
       extra={
-        <Dropdown
-          overlay={generateMenu(startDate, endDate)}
-          trigger={['click']}
-          placement="bottomRight"
-        >
-          <Icon type="more" />
-        </Dropdown>
+        <Popover content={renderPicker(startDate, endDate)} trigger="click" placement="bottomRight">
+          <Button type="text" icon={<MoreOutlined />} />
+        </Popover>
       }
       type="stats"
       style={{ marginTop: 12 }}
@@ -5364,25 +5328,25 @@ import {
   Input,
   Empty,
   Button,
-  Dropdown,
-  Icon,
-  Menu
+  Dropdown
 } from 'antd'
+import type { MenuProps } from 'antd'
+import {
+  PlusOutlined,
+  SortAscendingOutlined,
+  DownOutlined,
+  HeartTwoTone,
+  MessageTwoTone,
+  EnvironmentOutlined
+} from '@ant-design/icons'
 const { Text } = Typography
 const { Meta } = Card
 const { Search } = Input
 import Link from 'next/link'
-import {
-  ColStyled,
-  CardStyled,
-  DescriptionIcon,
-  ShadowCard,
-  Subtitle,
-  EmptyImage
-} from './style'
+import { ColStyled, CardStyled, ShadowCard, Subtitle, EmptyImage } from './style'
 import Loading from '../Loading'
 import Error from 'next/error'
-import api from '../../api'
+import api from '@/services/_request'
 
 const SculptureCard = ({
   info: {
@@ -5416,14 +5380,13 @@ const SculptureCard = ({
                 />
               </div>
             ) : (
-              (<EmptyImage
+              <EmptyImage
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
                 description="No Images"
-              />)
-              // <div style={{ height: 450, border: '1px solid black' }}>hey</div>
+              />
             )
           }
-          bordered={true}
+          bordered
         >
           <Meta
             title={name}
@@ -5439,7 +5402,7 @@ const SculptureCard = ({
         </ShadowCard>
       </a>
     </Link>
-  );
+  )
 }
 
 export const SculptureCardDescription = ({
@@ -5451,22 +5414,16 @@ export const SculptureCardDescription = ({
   return (
     <>
       <Subtitle type="secondary">{makerName}</Subtitle>
+
       <Tooltip placement="top" title="Likes">
-        <DescriptionIcon
-          type="heart"
-          theme="twoTone"
-          twoToneColor="#eb2f96"
-          style={{ marginRight: 4 }}
-        />
+        <HeartTwoTone twoToneColor="#eb2f96" style={{ marginRight: 4 }} />
         <Text type="secondary" style={{ marginRight: 8 }}>
           {totalLikes}
         </Text>
       </Tooltip>
 
       <Tooltip placement="top" title="Comments">
-        <DescriptionIcon
-          type="message"
-          theme="twoTone"
+        <MessageTwoTone
           twoToneColor="rgb(205, 34, 255)"
           style={{ marginRight: 4 }}
         />
@@ -5476,10 +5433,7 @@ export const SculptureCardDescription = ({
       </Tooltip>
 
       <Tooltip placement="top" title="Visits">
-        <DescriptionIcon
-          type="environment"
-          style={{ color: '#F73F3F', marginRight: 3 }}
-        />
+        <EnvironmentOutlined style={{ color: '#F73F3F', marginRight: 3 }} />
         <Text type="secondary" style={{ marginRight: 4 }}>
           {totalVisits}
         </Text>
@@ -5513,17 +5467,13 @@ const SculptureGrid = () => {
   useEffect(() => {
     const fetchSculpture = async () => {
       try {
-        let { data } = await api.get('/sculpture')
+        const { data } = await api.get('/sculpture')
         data.sort((a, b) => a.name.localeCompare(b.name))
-        console.log(data)
         setOriginalList(data)
         setFilteredList(data)
       } catch (e) {
         const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        setError({ statusCode, message })
       }
       setLoading(false)
     }
@@ -5531,28 +5481,23 @@ const SculptureGrid = () => {
     fetchSculpture()
   }, [])
 
-  // Menu handler
-  function handleMenuClick(e) {
-    // console.log('click', e.key)
+  const handleMenuClick: MenuProps['onClick'] = e => {
     setSort(e.key)
-    setFilteredList(filteredList => sortBy(filteredList, e.key))
+    setFilteredList(filtered => sortBy(filtered, e.key))
   }
 
-  // Menu list UI overlay
-  const menu = (
-    <Menu onClick={handleMenuClick}>
-      <Menu.Item key="Default">Default</Menu.Item>
-      <Menu.Item key="Likes">Likes</Menu.Item>
-      <Menu.Item key="Comments">Comments</Menu.Item>
-      <Menu.Item key="Visits">Visits</Menu.Item>
-    </Menu>
-  )
+  const menuItems: MenuProps['items'] = [
+    { key: 'Default', label: 'Default' },
+    { key: 'Likes', label: 'Likes' },
+    { key: 'Comments', label: 'Comments' },
+    { key: 'Visits', label: 'Visits' }
+  ]
 
   const handleChange = e => {
     const input = e.target.value
     if (input.length >= 3) {
-      let newList = originalList.filter(sculpture => {
-        let makerName =
+      const newList = originalList.filter(sculpture => {
+        const makerName =
           sculpture.primaryMaker.firstName +
           ' ' +
           sculpture.primaryMaker.lastName
@@ -5571,8 +5516,7 @@ const SculptureGrid = () => {
   }
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
 
   return (
     <Row gutter={16}>
@@ -5582,7 +5526,7 @@ const SculptureGrid = () => {
           extra={
             <Link href="/sculptures/create">
               <a>
-                <Button type="primary" icon="plus">
+                <Button type="primary" icon={<PlusOutlined />}>
                   Add new sculpture
                 </Button>
               </a>
@@ -5602,15 +5546,15 @@ const SculptureGrid = () => {
               placeholder="Enter search term"
               onChange={handleChange}
               size="large"
-              style={{
-                marginRight: 8
-              }}
+              style={{ marginRight: 8 }}
             />
 
-            <Dropdown overlay={menu} trigger={['click']}>
+            <Dropdown
+              menu={{ items: menuItems, onClick: handleMenuClick }}
+              trigger={['click']}
+            >
               <Button size="large">
-                <Icon type="sort-ascending" /> {currentSort}{' '}
-                <Icon type="down" />
+                <SortAscendingOutlined /> {currentSort} <DownOutlined />
               </Button>
             </Dropdown>
           </div>
@@ -5791,26 +5735,6 @@ export default function TagsList() {
 ===== END components/TagsList.tsx =====
 
 
-===== BEGIN components/ThemeSwitcher.tsx =====
-import React from 'react';
-import { Button } from 'antd';
-import { useTheme } from '@/context/ThemeContext';
-
-const ThemeSwitcher: React.FC = () => {
-  const { token, cycleTheme } = useTheme();   // token contient label + icon
-
-  return (
-    <Button onClick={cycleTheme}>
-      {token.icon ? `${token.icon} ` : ''}{token.label ?? 'Theme'}
-    </Button>
-  );
-};
-
-export default ThemeSwitcher;
-
-===== END components/ThemeSwitcher.tsx =====
-
-
 ===== BEGIN components/Tooltip/Tooltip.tsx =====
 "use client"
 
@@ -5908,7 +5832,7 @@ import { SearchOutlined } from '@ant-design/icons'
 import { Comment } from '@ant-design/compatible'
 
 import { ColStyled, CardStyled, StyledTable } from './style'
-import api from '../../api'
+import api from '@/services/_request'
 import Loading from '../Loading'
 import NextError from 'next/error'
 import { convertNonAccent } from '../shared/utils'
@@ -6123,7 +6047,8 @@ export default UserList
  */
 
 import styled from 'styled-components'
-import { Card, Col, Icon, Form, Typography, Empty, Table } from 'antd'
+import { Card, Col, Form, Typography, Empty, Table } from 'antd'
+import Icon from '../compat/Icon' // wrapper compat
 
 const { Text } = Typography
 
@@ -6206,24 +6131,25 @@ import {
   Comment,
   Card,
   Dropdown,
-  Icon,
   message,
-  Menu,
   Modal,
-  Empty
+  Empty,
+  Input
 } from 'antd'
+import type { MenuProps } from 'antd'
+import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 
 const { confirm } = Modal
+const { TextArea } = Input
 
 import Link from 'next/link'
-import api from '../../api'
+import api from '@/services/_request'
 
 const UserComments = ({ comments, deleteComment }) => {
-  const handleDelete = e => {
-    console.log(e.key)
+  const handleDelete: MenuProps['onClick'] = e => {
     confirm({
       title: 'Delete this comment permanently?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
@@ -6235,26 +6161,25 @@ const UserComments = ({ comments, deleteComment }) => {
       },
       onOk: async () => {
         try {
-          const _result = await api.delete(`/comment/${e.key}`)
+          await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
-          deleteComment(e.key)
-        } catch (error) {
-          message.error(error.response.data.message)
+          deleteComment(e.key as string)
+        } catch (error: any) {
+          message.error(error.response?.data?.message || 'Error')
         }
       }
     })
   }
 
-  const getMenu = commentId => (
-    <Menu onClick={handleDelete}>
-      <Menu.Item key={commentId}>Delete comment</Menu.Item>
-    </Menu>
-  )
+  const getMenuItems = (commentId: string): MenuProps['items'] => [
+    { key: commentId, label: 'Delete comment' }
+  ]
 
   comments.sort(
     (a, b) =>
       new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
   )
+
   const formattedComments = comments.map(x => ({
     author: (
       <span
@@ -6279,11 +6204,7 @@ const UserComments = ({ comments, deleteComment }) => {
       />
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         {x.content
           .trim()
           .split('\n')
@@ -6293,32 +6214,15 @@ const UserComments = ({ comments, deleteComment }) => {
       </div>
     ),
     datetime: (
-      <div
-        style={{
-          display: 'flex'
-        }}
-      >
+      <div style={{ display: 'flex' }}>
         <div>
-          <Tooltip
-            title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}
-          >
-            <span
-              style={{
-                fontSize: 14,
-                color: 'rgba(0, 0, 0, 0.35)'
-              }}
-            >
+          <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
               {moment(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
           <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-            <a
-              style={{
-                fontSize: 14
-              }}
-            >
-              {x.sculpture.name}
-            </a>
+            <a style={{ fontSize: 14 }}>{x.sculpture.name}</a>
           </Link>
         </div>
 
@@ -6329,8 +6233,11 @@ const UserComments = ({ comments, deleteComment }) => {
             marginLeft: 'auto'
           }}
         >
-          <Dropdown overlay={getMenu(x.commentId)} trigger={['click']}>
-            <Icon type="more" />
+          <Dropdown
+            menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
+            trigger={['click']}
+          >
+            <MoreOutlined />
           </Dropdown>
         </div>
       </div>
@@ -6349,10 +6256,7 @@ const UserComments = ({ comments, deleteComment }) => {
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Comments"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
           )
         }}
         renderItem={item => (
@@ -6368,6 +6272,11 @@ const UserComments = ({ comments, deleteComment }) => {
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
       />
+
+      {/* quick reply editor */}
+      <div style={{ padding: '16px 24px' }}>
+        <TextArea disabled placeholder="Use admin screen to reply" />
+      </div>
     </Card>
   )
 }
@@ -6432,18 +6341,9 @@ const UserLikes = ({ likes }) => {
       </div>
     ),
     content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
+      <div style={{ fontSize: 14 }}>
         <Tooltip title={moment(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
+          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
             {moment(x.likedTime).fromNow()}
           </span>
         </Tooltip>
@@ -6464,20 +6364,12 @@ const UserLikes = ({ likes }) => {
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Likes"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Likes" />
           )
         }}
         renderItem={item => (
           <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              className="comment"
-            />
+            <Comment author={item.author} avatar={item.avatar} content={item.content} className="comment" />
           </li>
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
@@ -6503,7 +6395,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Row, Descriptions } from 'antd'
 import { ColStyled, CardStyled } from './style'
-import api from '../../api'
+import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import Head from 'next/head'
