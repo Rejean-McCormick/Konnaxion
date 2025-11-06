@@ -86,13 +86,11 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
   const openDrawer = (team: Team) => {
     setSelectedTeam(team);
     setDrawerVisible(true);
-  };
 
   // Fermer le Drawer
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedTeam(null);
-  };
 
   return (
     <>
@@ -184,8 +182,7 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
       </div>
     </>
   );
-};
 
-FindTeams.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default FindTeams;

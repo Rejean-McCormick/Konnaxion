@@ -159,8 +159,7 @@ const MyProjects: NextPage & { getLayout?: (page: React.ReactElement) => React.R
       </div>
     </>
   );
-};
 
-MyProjects.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default MyProjects;

@@ -28,7 +28,6 @@ const ManageExpertiseAreas: NextPage = () => {
   const onFinish = (values: any) => {
     console.log('Updated Expertise Areas:', values);
     // Traitement complémentaire
-  };
 
   return (
     <PageContainer title="Manage Expertise Areas">
@@ -88,11 +87,9 @@ const ManageExpertiseAreas: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout
-ManageExpertiseAreas.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ManageExpertiseAreas;

@@ -105,12 +105,10 @@ export default function FeaturedProjectsPage(): JSX.Element {
   const openModal = (project: Project) => {
     setSelectedProject(project);
     setModalVisible(true);
-  };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedProject(null);
-  };
 
   return (
     <PageContainer title="Featured Projects">

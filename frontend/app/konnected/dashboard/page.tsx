@@ -180,11 +180,9 @@ const KonnectedDashboard: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via getLayout
-KonnectedDashboard.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default KonnectedDashboard;

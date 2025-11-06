@@ -44,12 +44,10 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       const { message, statusCode } = normalizeError(error);
       message.error('Please fill in the required fields.');
     }
-  };
 
   // Retour à l'étape précédente
   const prev = () => {
     setCurrentStep(currentStep - 1);
-  };
 
   // Soumission finale du formulaire
   const onFinish = async () => {
@@ -63,7 +61,6 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       const { message, statusCode } = normalizeError(error);
       message.error('Please fill in the required fields.');
     }
-  };
 
   // Rendu du contenu en fonction de l'étape
   const renderStepContent = (step: number) => {
@@ -157,7 +154,6 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       default:
         return null;
     }
-  };
 
   if (submitted) {
     return (
@@ -212,8 +208,7 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       </div>
     </>
   );
-};
 
-CreateNewProject.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default CreateNewProject;

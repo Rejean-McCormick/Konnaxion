@@ -4,7 +4,6 @@ import PageContainer from "@/components/PageContainer";
 export const metadata = {
   title: "Accueil",
   description: "Point d’entrée",
-};
 
 export default function Page() {
   return (

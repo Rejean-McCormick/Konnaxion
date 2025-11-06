@@ -94,7 +94,6 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
   const showBadgeDetails = (badge: Badge) => {
     setSelectedBadge(badge);
     setModalVisible(true);
-  };
 
   return (
     <>
@@ -194,8 +193,7 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
       </div>
     </>
   );
-};
 
-EarnedBadgesDisplay.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default EarnedBadgesDisplay;

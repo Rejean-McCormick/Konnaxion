@@ -86,8 +86,7 @@ const CurrentVotingWeight: NextPage & { getLayout?: (page: React.ReactElement) =
       </div>
     </>
   );
-};
 
-CurrentVotingWeight.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default CurrentVotingWeight;

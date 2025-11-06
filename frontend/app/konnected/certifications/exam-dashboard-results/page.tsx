@@ -36,7 +36,6 @@ const upcomingExam = {
   examName: 'Certification Exam Level 1',
   examDate: '2023-10-10 10:00',
   status: 'Registered',
-};
 
 // Historique des examens réalisés
 const examResultsData: ExamResult[] = [
@@ -232,11 +231,9 @@ const ExamDashboardResults: NextPage = () => {
       </Drawer>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via getLayout
-ExamDashboardResults.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ExamDashboardResults;

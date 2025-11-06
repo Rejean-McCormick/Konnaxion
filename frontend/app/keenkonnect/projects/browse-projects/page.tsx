@@ -127,12 +127,10 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
   const openDrawer = (project: Project) => {
     setSelectedProject(project);
     setDrawerVisible(true);
-  };
 
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedProject(null);
-  };
 
   return (
     <>
@@ -271,8 +269,7 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
       </div>
     </>
   );
-};
 
-BrowseProjects.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseProjects;

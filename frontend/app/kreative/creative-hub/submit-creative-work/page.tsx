@@ -32,7 +32,6 @@ const SubmitCreativeWork: NextPage = () => {
     let newFileList = [...info.fileList];
     // You might add further validations on file type/size here.
     setFileList(newFileList);
-  };
 
   const onFinish = (values: any) => {
     // Combine form values with file upload information.
@@ -40,12 +39,10 @@ const SubmitCreativeWork: NextPage = () => {
       ...values,
       // Here we simply include file info; in practice, the file(s) might need uploading to a server.
       file: fileList,
-    };
     console.log('Submitted Creative Work:', creativeWorkData);
     message.success('Votre œuvre créative a été soumise avec succès et est en attente d\'approbation!');
     // After submission, optionally redirect to the newly created work’s detail page or the gallery.
     router.push('/kreative/creative-hub/inspiration-gallery');
-  };
 
   return (
     <PageContainer title="Submit Creative Work">
@@ -135,10 +132,8 @@ const SubmitCreativeWork: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
-SubmitCreativeWork.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default SubmitCreativeWork;

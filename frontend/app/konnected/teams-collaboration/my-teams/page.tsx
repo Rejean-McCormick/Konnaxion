@@ -174,7 +174,6 @@ const TeamsCollaboration: NextPage = () => {
         />
       </div>
     );
-  };
 
   return (
     <PageContainer title="My Teams">
@@ -203,10 +202,8 @@ const TeamsCollaboration: NextPage = () => {
       `}</style>
     </PageContainer>
   );
-};
 
-TeamsCollaboration.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default TeamsCollaboration;

@@ -21,7 +21,6 @@ const MatchPreferencesPage: NextPage = () => {
     skillsSought: [],
     collaborationStyle: 'balanced',
     innovationExecution: 50, // 0 = Innovation focus, 100 = Execution focus
-  };
 
   // Calcul d'un indicateur de complétude (matching readiness)
   const computeReadiness = (values: any) => {
@@ -34,7 +33,6 @@ const MatchPreferencesPage: NextPage = () => {
     if (values.skillsOffered && values.skillsOffered.length > 0) completed++;
     if (values.skillsSought && values.skillsSought.length > 0) completed++;
     return Math.round((completed / totalFields) * 100);
-  };
 
   // State pour suivre la complétude du profil
   const [readiness, setReadiness] = useState<number>(computeReadiness(initialValues));
@@ -42,13 +40,11 @@ const MatchPreferencesPage: NextPage = () => {
   // Mise à jour de l'indicateur lors d'un changement dans le formulaire
   const onValuesChange = (_changedValues: any, allValues: any) => {
     setReadiness(computeReadiness(allValues));
-  };
 
   // Gestion de la soumission du formulaire
   const onFinish = (values: any) => {
     console.log('Preferences Saved: ', values);
     // Ajoutez ici une éventuelle intégration avec une API pour sauvegarder les préférences
-  };
 
   return (
     <PageContainer title="Match Preferences">
@@ -172,13 +168,11 @@ const MatchPreferencesPage: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
 // Si un layout global est utilisé via getLayout (_app.tsx), vous pouvez l'intégrer ainsi :
-MatchPreferencesPage.getLayout = (page: React.ReactNode) => {
+
   // Exemple d'enveloppement avec MainLayout :
   // return <MainLayout>{page}</MainLayout>;
   return page;
-};
 
 export default MatchPreferencesPage;

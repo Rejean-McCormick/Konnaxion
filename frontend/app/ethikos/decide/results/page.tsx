@@ -13,7 +13,6 @@ type ResultRow = {
   passed: boolean;
   closesAt: string;
   region: string;
-};
 
 export default function ResultsArchive() {
   usePageTitle('Decide · Results Archive');

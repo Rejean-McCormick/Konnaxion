@@ -29,7 +29,6 @@ const SubmitToShowcase: NextPage = () => {
     console.log('Submitted values:', values);
     // Here you would typically submit values to your API.
     setModalVisible(true);
-  };
 
   // Handle modal confirmation.
   const handleModalOk = () => {
@@ -37,7 +36,6 @@ const SubmitToShowcase: NextPage = () => {
     setModalVisible(false);
     // Redirect to the featured projects page or the user's submissions.
     router.push('/kreative/community-showcases/featured-projects');
-  };
 
   return (
     <PageContainer title="Submit to Showcase">
@@ -110,10 +108,8 @@ const SubmitToShowcase: NextPage = () => {
       </Modal>
     </PageContainer>
   );
-};
 
-SubmitToShowcase.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default SubmitToShowcase;

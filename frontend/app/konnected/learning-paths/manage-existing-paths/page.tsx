@@ -63,7 +63,6 @@ const ManageExistingPaths: NextPage = () => {
         message.success('Learning path deleted successfully');
       },
     });
-  };
 
   // Colonnes du tableau
   const columns = [
@@ -145,10 +144,8 @@ const ManageExistingPaths: NextPage = () => {
       )}
     </PageContainer>
   );
-};
 
-ManageExistingPaths.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ManageExistingPaths;

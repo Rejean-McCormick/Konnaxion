@@ -125,8 +125,7 @@ const BrowseRepository: NextPage & { getLayout?: (page: React.ReactElement) => R
       </div>
     </>
   );
-};
 
-BrowseRepository.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseRepository;

@@ -81,8 +81,7 @@ const ViewCurrentExpertise: NextPage & { getLayout?: (page: React.ReactElement) 
       </div>
     </>
   );
-};
 
-ViewCurrentExpertise.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default ViewCurrentExpertise;

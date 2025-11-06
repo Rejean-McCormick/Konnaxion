@@ -74,12 +74,10 @@ const ModerationPage: NextPage = () => {
   const handleApprove = (item: ModerationItem) => {
     message.success(`Content "${item.contentSnippet.substring(0, 20)}..." approved.`);
     // Ici, intégrez un appel API pour approuver l'élément
-  };
 
   const handleFlagUser = (item: ModerationItem) => {
     message.warning(`User ${item.author} has been flagged/warned.`);
     // Intégrez ici la logique de signalement de l'utilisateur
-  };
 
   const handleDelete = (item: ModerationItem) => {
     confirm({
@@ -94,7 +92,6 @@ const ModerationPage: NextPage = () => {
         // Intégrez ici la logique de suppression via API
       },
     });
-  };
 
   // Définition des colonnes du tableau
   const columns = [
@@ -175,10 +172,8 @@ const ModerationPage: NextPage = () => {
       />
     </PageContainer>
   );
-};
 
-ModerationPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ModerationPage;

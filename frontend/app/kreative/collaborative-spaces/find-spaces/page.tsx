@@ -136,7 +136,6 @@ const FindSpaces: NextPage = () => {
       setSelectedSpace(space);
       setJoinModalVisible(true);
     }
-  };
 
   // Confirm join request.
   const confirmJoinRequest = () => {
@@ -146,7 +145,6 @@ const FindSpaces: NextPage = () => {
     }
     setJoinModalVisible(false);
     setSelectedSpace(null);
-  };
 
   return (
     <PageContainer title="Find Spaces">
@@ -261,10 +259,8 @@ const FindSpaces: NextPage = () => {
       </Modal>
     </PageContainer>
   );
-};
 
-FindSpaces.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default FindSpaces;

@@ -12,7 +12,6 @@ type TrackerRow = {
   owner: string;
   status: 'Planned' | 'In-Progress' | 'Completed' | 'Blocked';
   updatedAt: string;
-};
 
 export default function ImpactTracker() {
   usePageTitle('Impact · Tracker');
@@ -24,7 +23,6 @@ export default function ImpactTracker() {
     mutate(d => ({
       items: d!.items.map(r => (r.id === id ? { ...r, status } : r)),
     }));
-  };
 
   const columns = [
     { title: 'Title', dataIndex: 'title', width: 260 },

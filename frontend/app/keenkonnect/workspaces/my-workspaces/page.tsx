@@ -87,11 +87,9 @@ const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React
     } else {
       router.push(`/keenkonnect/workspaces/launch-workspace?id=${ws.id}`);
     }
-  };
 
   const handleManageSettings = (ws: Workspace) => {
     router.push(`/keenkonnect/workspaces/manage-workspace?id=${ws.id}`);
-  };
 
   return (
     <>
@@ -163,8 +161,7 @@ const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React
       </div>
     </>
   );
-};
 
-MyWorkspaces.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default MyWorkspaces;

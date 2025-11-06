@@ -32,13 +32,11 @@ const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) =
       setSubmitting(false);
       setModalVisible(true);
     }, 1500);
-  };
 
   const handleModalOk = () => {
     setModalVisible(false);
     // Rediriger vers la page Track Project Impact après soumission
     router.push('/keenkonnect/sustainability-impact/track-project-impact');
-  };
 
   return (
     <>
@@ -147,8 +145,7 @@ const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) =
       </div>
     </>
   );
-};
 
-SubmitImpactReports.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default SubmitImpactReports;

@@ -33,7 +33,6 @@ const StartNewSpace: NextPage = () => {
   const handleFileChange = (info: any) => {
     // Prevent automatic upload and update fileList locally.
     setFileList([...info.fileList]);
-  };
 
   // Handler when the form is submitted.
   const onFinish = (values: any) => {
@@ -41,12 +40,10 @@ const StartNewSpace: NextPage = () => {
       ...values,
       // Include the file information from fileList (to be handled by an API).
       banner: fileList,
-    };
     console.log('New Space Data:', spaceData);
     message.success('Your new space has been created successfully!');
     // Optionally auto-join the user and then redirect to the space’s detail page.
     router.push('/kreative/collaborative-spaces/' + 'new-space-id'); // Replace 'new-space-id' with the actual ID.
-  };
 
   return (
     <PageContainer title="Start a New Space">
@@ -162,10 +159,8 @@ const StartNewSpace: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
-StartNewSpace.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default StartNewSpace;

@@ -109,7 +109,6 @@ export default function ExploreIdeasPage() {
 
   const handleCardClick = (idea: CreativeIdea) => {
     router.push(`/kreative/creative-hub/idea/${idea.id}`);
-  };
 
   return (
     <PageContainer title="Explore Ideas">

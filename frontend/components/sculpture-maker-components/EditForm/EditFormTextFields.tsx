@@ -206,7 +206,7 @@ export default ({
           })(
             <TextArea
               placeholder="Credit line"
-              autosize={{ minRows: 3, maxRows: 5 }}
+              autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
             />
           )}
@@ -220,7 +220,7 @@ export default ({
           })(
             <TextArea
               placeholder="Location details"
-              autosize={{ minRows: 3, maxRows: 5 }}
+              autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
             />
           )}

@@ -13,13 +13,11 @@ type Statement = {
   author: string;
   body: string;
   createdAt: string;
-};
 
 type TopicDetail = {
   id: string;
   title: string;
   statements: Statement[];
-};
 
 export default function TopicDetail() {
   const { topic } = useParams() as { topic: string };

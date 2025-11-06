@@ -194,8 +194,7 @@ const BrowseResources: NextPage & { getLayout?: (page: React.ReactElement) => Re
       </div>
     </>
   );
-};
 
-BrowseResources.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseResources;

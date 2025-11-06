@@ -22,7 +22,6 @@ const CreateNewIdea: NextPage = () => {
     message.success('Votre idée a été soumise avec succès !');
     // Redirect to the "My Ideas" page after submitting.
     router.push('/kreative/idea-incubator/my-ideas');
-  };
 
   return (
     <PageContainer title="Create New Idea">
@@ -84,11 +83,9 @@ const CreateNewIdea: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
 // Integrate with a global layout if required.
-CreateNewIdea.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default CreateNewIdea;

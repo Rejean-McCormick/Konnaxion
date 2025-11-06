@@ -73,7 +73,6 @@ const ExamPreparationPage: NextPage = () => {
     // Ici, vous pouvez rediriger vers un nouvel écran de quiz ou ouvrir un modal.
     // Pour cet exemple, nous affichons simplement un message de log.
     console.log('Starting practice exam...');
-  };
 
   return (
     <PageContainer title="Exam Preparation">
@@ -146,11 +145,9 @@ const ExamPreparationPage: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via getLayout
-ExamPreparationPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ExamPreparationPage;

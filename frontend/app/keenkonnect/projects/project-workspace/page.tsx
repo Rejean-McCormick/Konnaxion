@@ -24,7 +24,6 @@ const projectInfo = {
   ],
   // Indication si l’utilisateur est le propriétaire
   isOwner: true,
-};
 
 // Données simulées pour les tâches
 const tasksData = [
@@ -67,7 +66,6 @@ const ProjectWorkspace: NextPage & { getLayout?: (page: React.ReactElement) => R
   const handleEditProject = () => {
     // Redirige vers une page d'édition (exemple)
     router.push('/keenkonnect/projects/manage-project?id=1');
-  };
 
   return (
     <>
@@ -178,8 +176,7 @@ const ProjectWorkspace: NextPage & { getLayout?: (page: React.ReactElement) => R
       </div>
     </>
   );
-};
 
-ProjectWorkspace.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default ProjectWorkspace;

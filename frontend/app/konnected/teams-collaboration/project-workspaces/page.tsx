@@ -61,7 +61,6 @@ export default function ProjectWorkspacesPage() {
     }
     // Navigate to workspace
     router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
-  };
 
   const columns: ColumnsType<Workspace> = [
     {

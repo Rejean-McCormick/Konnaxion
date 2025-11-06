@@ -92,7 +92,6 @@ export default function Page() {
         ))}
       </ul>
     );
-  };
 
   /** Calendar selection uses Dayjs in AntD v5 */
   const handleDateSelect = (value: Dayjs) => {
@@ -100,7 +99,6 @@ export default function Page() {
     // preset only the date; time stays empty until user picks it
     form.setFieldsValue({ eventDate: value } as Partial<ActivityForm>);
     setModalVisible(true);
-  };
 
   /** Submit new event with strongly typed form values */
   const handleAddEvent = (values: ActivityForm) => {
@@ -118,14 +116,12 @@ export default function Page() {
       dateTime,
       owner,
       team,
-    };
 
     setEvents((prev) => [...prev, newEvent]);
     message.success('Activity added');
     form.resetFields();
     setPreSelectedDate(null);
     setModalVisible(false);
-  };
 
   return (
     <PageContainer title="Activity Planner">

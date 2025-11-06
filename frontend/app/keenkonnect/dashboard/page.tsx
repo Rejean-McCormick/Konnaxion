@@ -149,8 +149,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
       </div>
     </>
   );
-};
 
-KeenKonnectDashboard.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default KeenKonnectDashboard;

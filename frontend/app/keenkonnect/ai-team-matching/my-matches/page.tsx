@@ -110,15 +110,13 @@ const MyMatchesPage: NextPage = () => {
       </Tabs>
     </PageContainer>
   );
-};
 
 // Si votre projet utilise une méthode de layout global via getLayout (par exemple dans _app.tsx), vous pouvez l'intégrer ainsi :
-MyMatchesPage.getLayout = function getLayout(page: React.ReactNode) {
+
   // MainLayout est le layout global qui intègre header, sidebar, etc.
   // Assurez-vous de l'importer depuis le dossier correspondant (par ex. '@/layout-components/MainLayout')
   // Exemple :
   // return <MainLayout>{page}</MainLayout>;
   return page; // Pour l'exemple, on retourne la page directement
-};
 
 export default MyMatchesPage;

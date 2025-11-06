@@ -71,14 +71,12 @@ const OfflineContentPage: NextPage = () => {
               downloaded: true,
               lastUpdated: new Date().toLocaleString(),
               size: pkg.size || '100 MB',
-            };
           }
           return pkg;
         })
       );
       message.success(`Package "${id}" synced successfully!`);
     }, 2000);
-  };
 
   // Global "Sync All" action for all packages
   const handleSyncAll = () => {
@@ -97,7 +95,6 @@ const OfflineContentPage: NextPage = () => {
       );
       message.success('All packages synced successfully!');
     }, 2000);
-  };
 
   return (
     <PageContainer title="Offline Content">
@@ -142,11 +139,9 @@ const OfflineContentPage: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
 
 // Wrap the page with MainLayout
-OfflineContentPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default OfflineContentPage;

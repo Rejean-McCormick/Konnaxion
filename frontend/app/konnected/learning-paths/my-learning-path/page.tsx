@@ -38,7 +38,6 @@ const sampleLearningPath: LearningPath = {
     { id: '4', name: 'Responsive Design', completed: false },
     { id: '5', name: 'Basic React', completed: false },
   ],
-};
 
 const MyLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
   const router = useRouter();
@@ -49,7 +48,6 @@ const MyLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => Rea
   // Fonction pour naviguer vers la leçon sélectionnée
   const goToLesson = (lessonId: string) => {
     router.push(`/konnected/learning-library/lesson/${lessonId}`);
-  };
 
   return (
     <>
@@ -98,8 +96,7 @@ const MyLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => Rea
       </div>
     </>
   );
-};
 
-MyLearningPath.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default MyLearningPath;

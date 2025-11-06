@@ -23,7 +23,6 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
   const handleUploadChange = ({ fileList }: any) => {
     // Ce callback se contente de conserver le fileList dans le formulaire via antd.
     return fileList;
-  };
 
   const simulateUpload = () => {
     setUploading(true);
@@ -42,12 +41,10 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
         return prev + 20;
       });
     }, 500);
-  };
 
   const onFinish = async (values: any) => {
     console.log('Form values:', values);
     simulateUpload();
-  };
 
   if (submitted) {
     return (
@@ -164,8 +161,7 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
       </div>
     </>
   );
-};
 
-UploadNewDocument.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default UploadNewDocument;

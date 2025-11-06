@@ -28,7 +28,6 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
     lastModified: '2023-09-05',
     version: '2.0',
     language: 'English',
-  };
 
   // Historique des versions (Timeline)
   const versionHistory = [
@@ -58,14 +57,12 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
     // Simuler un appel API pour sauvegarder les modifications
     console.log('Saving changes:', documentContent);
     message.success('Changes saved successfully.');
-  };
 
   // Gestion de la publication d'une nouvelle version
   const handlePublishNewVersion = () => {
     // Simulation d'une publication
     console.log('Publishing new version...');
     message.success('New version published successfully.');
-  };
 
   return (
     <>
@@ -158,8 +155,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
       </div>
     </>
   );
-};
 
-DocumentManagement.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default DocumentManagement;

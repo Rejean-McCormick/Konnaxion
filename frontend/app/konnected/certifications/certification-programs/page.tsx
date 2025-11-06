@@ -88,13 +88,11 @@ const CertificationPrograms: NextPage = () => {
   const openDrawer = (program: CertificationProgram) => {
     setSelectedProgram(program);
     setDrawerVisible(true);
-  };
 
   // Fermeture du Drawer
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedProgram(null);
-  };
 
   return (
     <PageContainer title="Certification Programs">
@@ -201,11 +199,9 @@ const CertificationPrograms: NextPage = () => {
       </Drawer>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via getLayout
-CertificationPrograms.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default CertificationPrograms;

@@ -66,7 +66,6 @@ export default function MySpacesPage(): JSX.Element {
 
   const enterSpace = (id: string) => {
     router.push(`/kreative/collaborative-spaces/${id}`);
-  };
 
   return (
     <PageContainer title="My Spaces">

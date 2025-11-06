@@ -49,19 +49,16 @@ const ExamRegistration: NextPage = () => {
       .catch((info) => {
         console.log('Validation Failed:', info);
       });
-  };
 
   // Retour à l'étape précédente
   const prev = () => {
     setCurrentStep(currentStep - 1);
-  };
 
   // Traitement final de la soumission
   const onSubmit = () => {
     // Ici, vous pouvez intégrer un appel API ou une logique de paiement.
     message.success('Registration complete!');
     setRegistrationCompleted(true);
-  };
 
   // Rendu conditionnel du contenu selon l'étape courante
   const renderStepContent = () => {
@@ -134,7 +131,6 @@ const ExamRegistration: NextPage = () => {
       default:
         return null;
     }
-  };
 
   // Une fois l'inscription terminée, afficher une page de résultat
   if (registrationCompleted) {
@@ -183,11 +179,9 @@ const ExamRegistration: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
 // Correction: envelopper la page dans MainLayout via getLayout
-ExamRegistration.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ExamRegistration;

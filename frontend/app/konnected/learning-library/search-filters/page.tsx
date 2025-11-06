@@ -226,8 +226,7 @@ const SearchFilters: NextPage & { getLayout?: (page: React.ReactElement) => Reac
       </div>
     </>
   );
-};
 
-SearchFilters.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default SearchFilters;

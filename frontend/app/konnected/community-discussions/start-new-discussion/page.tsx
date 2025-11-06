@@ -20,7 +20,6 @@ const StartNewDiscussion: NextPage = () => {
     message.success('Votre discussion a été créée avec succès !');
     // Simuler la redirection vers la page de détail du thread créé, par exemple avec l'ID généré.
     router.push(`/konnected/community-discussions/thread/123`);
-  };
 
   return (
     <PageContainer title="Start New Discussion">
@@ -74,10 +73,8 @@ const StartNewDiscussion: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
-StartNewDiscussion.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default StartNewDiscussion;

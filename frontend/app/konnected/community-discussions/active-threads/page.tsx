@@ -119,7 +119,6 @@ const ActiveThreadsPage: NextPage = () => {
   const openThread = (thread: Thread) => {
     console.log('Ouvrir le thread:', thread.title);
     // Exemple de redirection : Router.push(`/konnected/community-discussions/thread/${thread.id}`);
-  };
 
   return (
     <PageContainer title="Active Threads">
@@ -207,10 +206,8 @@ const ActiveThreadsPage: NextPage = () => {
       </div>
     </PageContainer>
   );
-};
 
-ActiveThreadsPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ActiveThreadsPage;

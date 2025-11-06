@@ -12,7 +12,6 @@ const { Title, Text } = Typography;
 const featuredProject = {
   title: 'Dreamscape: A Visual Journey',
   imageUrl: 'https://via.placeholder.com/600x300.png?text=Featured+Project',
-};
 
 // Dummy data for Inspiration Gallery Preview (carousel items)
 const inspirationGallery = [
@@ -27,7 +26,6 @@ const topCreator = {
   name: 'Sophia Rivera',
   avatar: 'https://via.placeholder.com/80.png?text=S',
   stats: '48 Projects · 1200 Likes',
-};
 
 // Dummy data for Quick Links
 const quickLinks = [
@@ -124,10 +122,8 @@ const KreativeDashboard: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
 
-KreativeDashboard.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default KreativeDashboard;

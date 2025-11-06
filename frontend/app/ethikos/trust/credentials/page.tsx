@@ -24,7 +24,6 @@ export default function Credentials() {
         onError();
       }
     },
-  };
 
   return (
     <PageContainer ghost>

@@ -24,7 +24,6 @@ const ViewReputationEkoh: NextPage = () => {
   const reputation = {
     ekohScore: 1234,
     smartVoteWeight: 75, // exprimé en pourcentage
-  };
 
   const expertiseAreas: Expertise[] = [
     { id: '1', name: 'Frontend Development', weight: '30%' },
@@ -130,11 +129,9 @@ const ViewReputationEkoh: NextPage = () => {
       />
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout
-ViewReputationEkoh.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ViewReputationEkoh;

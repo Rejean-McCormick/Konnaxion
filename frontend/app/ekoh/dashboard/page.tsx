@@ -128,8 +128,7 @@ const EkohDashboard: NextPage & { getLayout?: (page: React.ReactElement) => Reac
       </div>
     </>
   );
-};
 
-EkohDashboard.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default EkohDashboard;

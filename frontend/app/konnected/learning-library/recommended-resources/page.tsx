@@ -56,7 +56,6 @@ const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) 
     // Pour la simulation, nous changeons l'ordre des ressources aléatoirement
     const shuffled = [...resources].sort(() => Math.random() - 0.5);
     setResources(shuffled);
-  };
 
   return (
     <>
@@ -103,8 +102,7 @@ const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) 
       </div>
     </>
   );
-};
 
-RecommendedResources.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default RecommendedResources;

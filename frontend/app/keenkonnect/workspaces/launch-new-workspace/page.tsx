@@ -47,11 +47,9 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       const { message, statusCode } = normalizeError(err);
       message.error('Please complete the required fields.');
     }
-  };
 
   const prev = () => {
     setCurrentStep(currentStep - 1);
-  };
 
   const onFinish = async () => {
     try {
@@ -64,7 +62,6 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       const { message, statusCode } = normalizeError(err);
       message.error('Please ensure all fields are correctly filled.');
     }
-  };
 
   const renderStepContent = (step: number) => {
     switch (step) {
@@ -159,7 +156,6 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       default:
         return null;
     }
-  };
 
   if (submitted) {
     return (
@@ -214,8 +210,7 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       </div>
     </>
   );
-};
 
-LaunchNewWorkspace.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default LaunchNewWorkspace;

@@ -108,7 +108,6 @@ const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElem
     } else {
       router.push(`/keenkonnect/workspaces/request-access?id=${workspace.id}`);
     }
-  };
 
   return (
     <>
@@ -199,8 +198,7 @@ const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElem
       </div>
     </>
   );
-};
 
-BrowseAvailableWorkspaces.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseAvailableWorkspaces;

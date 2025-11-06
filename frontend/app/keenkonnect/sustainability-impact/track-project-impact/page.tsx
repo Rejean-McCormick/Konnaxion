@@ -20,7 +20,6 @@ const sampleImpactMetrics = {
   carbonReduction: 1200, // in kg CO2 reduced
   peopleReached: 450,
   fundsSaved: 3000, // in dollars
-};
 
 // Données simulées pour l'évolution de l'impact dans le temps (line chart)
 const sampleImpactTrend = [
@@ -157,8 +156,7 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
       </div>
     </>
   );
-};
 
-TrackProjectImpact.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default TrackProjectImpact;

@@ -28,36 +28,29 @@ const AccountPreferencesPage: NextPage = () => {
   // Gestion des événements liés au Modal de suppression
   const showDeleteModal = () => {
     setIsModalVisible(true);
-  };
   const handleDeleteCancel = () => {
     setIsModalVisible(false);
-  };
   const handleDeleteConfirm = () => {
     // Ici, vous appellerez éventuellement une API pour la suppression de compte
     message.success("Account deletion requested.");
     setIsModalVisible(false);
-  };
 
   // Gestion des soumissions de formulaire pour chaque section
   const onFinishProfile = (values: any) => {
     console.log("Profile Info:", values);
     message.success("Profile info saved.");
-  };
 
   const onFinishSecurity = (values: any) => {
     console.log("Security Info:", values);
     message.success("Security info saved.");
-  };
 
   const onFinishNotifications = (values: any) => {
     console.log("Notifications Settings:", values);
     message.success("Notifications settings saved.");
-  };
 
   const onFinishPrivacy = (values: any) => {
     console.log("Privacy Settings:", values);
     message.success("Privacy settings saved.");
-  };
 
   return (
     <PageContainer title="Account & Preferences">
@@ -220,11 +213,9 @@ const AccountPreferencesPage: NextPage = () => {
       </Tabs>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via la fonction getLayout
-AccountPreferencesPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default AccountPreferencesPage;

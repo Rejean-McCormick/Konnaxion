@@ -192,8 +192,7 @@ const SearchFilterDocuments: NextPage & { getLayout?: (page: React.ReactElement)
       </div>
     </>
   );
-};
 
-SearchFilterDocuments.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default SearchFilterDocuments;

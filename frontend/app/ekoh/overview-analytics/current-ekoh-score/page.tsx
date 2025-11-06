@@ -151,6 +151,6 @@ const CurrentEkohScore: NextPage & { getLayout?: (page: React.ReactElement) => R
   )
 }
 
-CurrentEkohScore.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>
+
 
 export default CurrentEkohScore

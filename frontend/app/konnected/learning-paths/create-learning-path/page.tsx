@@ -57,7 +57,6 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
     setEditingStepIndex(null);
     stepForm.resetFields();
     setStepModalVisible(true);
-  };
 
   // Ouvrir la modal pour éditer un step existant
   const openEditStepModal = (index: number) => {
@@ -68,7 +67,6 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
       note: step.note,
     });
     setStepModalVisible(true);
-  };
 
   // Gestion de la soumission du step (ajout ou édition)
   const handleStepModalOk = async () => {
@@ -85,7 +83,6 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
         resourceName: resource.name,
         resourceType: resource.type,
         note: values.note || '',
-      };
       if (editingStepIndex !== null) {
         // Edition d'une étape existante
         const updatedSteps = [...steps];
@@ -100,11 +97,9 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
       const { message, statusCode } = normalizeError(error);
       message.error('Please complete the step form.');
     }
-  };
 
   const handleStepModalCancel = () => {
     setStepModalVisible(false);
-  };
 
   // Fonctions pour réordonner les steps
   const moveStepUp = (index: number) => {
@@ -112,19 +107,16 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
     const updatedSteps = [...steps];
     [updatedSteps[index - 1], updatedSteps[index]] = [updatedSteps[index], updatedSteps[index - 1]];
     setSteps(updatedSteps);
-  };
 
   const moveStepDown = (index: number) => {
     if (index === steps.length - 1) return;
     const updatedSteps = [...steps];
     [updatedSteps[index + 1], updatedSteps[index]] = [updatedSteps[index], updatedSteps[index + 1]];
     setSteps(updatedSteps);
-  };
 
   // Supprimer une étape
   const removeStep = (index: number) => {
     setSteps(prev => prev.filter((_, i) => i !== index));
-  };
 
   // Soumission finale du parcours
   const onSubmitPath = async () => {
@@ -141,7 +133,6 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
       const { message, statusCode } = normalizeError(error);
       message.error('Please complete the basic information form.');
     }
-  };
 
   if (submitted) {
     return (
@@ -259,8 +250,7 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
       </Modal>
     </>
   );
-};
 
-CreateLearningPath.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default CreateLearningPath;

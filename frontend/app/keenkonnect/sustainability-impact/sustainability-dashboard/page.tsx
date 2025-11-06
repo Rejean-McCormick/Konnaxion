@@ -26,7 +26,6 @@ const globalStats = {
   totalCO2Saved: 50000,       // en kilogrammes
   totalVolunteerHours: 1200,  // en heures
   totalProjects: 45,
-};
 
 // Impact distribution pour le donut chart
 const impactDistribution = [
@@ -150,8 +149,7 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
       </div>
     </>
   );
-};
 
-SustainabilityDashboard.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default SustainabilityDashboard;

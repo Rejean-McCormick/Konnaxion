@@ -133,19 +133,16 @@ export default function InspirationGalleryPage(): JSX.Element {
         w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w
       )
     );
-  };
 
   // Open Modal for work details.
   const openWorkModal = (work: CreativeWork) => {
     setSelectedWork(work);
     setModalVisible(true);
-  };
 
   // Close the details Modal.
   const closeModal = () => {
     setModalVisible(false);
     setSelectedWork(null);
-  };
 
   return (
     <PageContainer title="Inspiration Gallery">

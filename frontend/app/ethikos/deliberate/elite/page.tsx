@@ -69,7 +69,6 @@ export default function EliteAgora() {
   const openPreview = (row: TopicRow) => {
     setPreviewId(row.id);
     loadPreview(row.id);
-  };
 
   /* ---------- KPI header ---------- */
   const headerStats = [
