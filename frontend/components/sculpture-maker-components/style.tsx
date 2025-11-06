@@ -9,7 +9,7 @@ import { Card, Col, Icon, Form, Typography, Empty, Table } from 'antd'
 const { Text } = Typography
 
 export const CardStyled = props => (
-  <Card bodyStyle={{ padding: '20px 24px 20px' }} bordered={false} {...props} />
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
 )
 
 export const ColStyled = styled(Col)`

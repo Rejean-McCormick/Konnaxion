@@ -15,6 +15,7 @@ import Head from 'next/head'
 import RecentComments from './RecentComments'
 import RecentVisits from './RecentVisits'
 import RecentLikes from './RecentLikes'
+import { normalizeError } from "../../shared/errors";
 
 const RecentActivity = () => {
   const [comments, setComments] = useState([])
@@ -40,7 +41,8 @@ const RecentActivity = () => {
         console.log('comments', rawComments.data)
         console.log('visits', rawVisits.data)
         console.log('likes', rawLikes.data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,

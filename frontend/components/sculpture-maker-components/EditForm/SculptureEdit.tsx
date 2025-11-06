@@ -13,6 +13,7 @@ import Map from '../../map-components'
 import EditFormTextFields from './EditFormTextFields'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../shared/errors";
 
 const SculptureEdit = ({
   form,
@@ -91,7 +92,8 @@ const SculptureEdit = ({
           message.success('Updated sculpture details successfully!', 2)
           setSubmitting(false)
           router.push(`/sculptures/id/${values.accessionId}`)
-        } catch (e) {
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
           message.error(e.response.data.message)
         }

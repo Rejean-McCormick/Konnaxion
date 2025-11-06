@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { Input, Form, Button, Modal, message } from 'antd'
 import { CustomFormItem } from '../style'
 import api from '../../../api'
+import { normalizeError } from "../../../shared/errors";
 
 const MakerEdit = ({
   form: { getFieldDecorator, validateFields, resetFields },
@@ -58,7 +59,8 @@ const MakerEdit = ({
           handleCancel()
           resetFields()
           message.success('Updated maker details successfully!', 2)
-        } catch (e) {
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
           message.error(e.response.data.message)
         }

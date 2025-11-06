@@ -1,4 +1,4 @@
-import { get, post } from './_request'
+import { get, post, put, patch, del } from './_request'
 import type { Ballot } from '@/types'
 
 /** GET /decide/elite/ballots */

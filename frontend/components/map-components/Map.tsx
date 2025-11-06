@@ -3,7 +3,9 @@
  * Author: Hieu Chu
  */
 
-import ReactMapGL, {
+import type { CSSProperties } from 'react'
+import {
+  Map as ReactMapGL,
   Marker,
   NavigationControl,
   FullscreenControl,
@@ -14,48 +16,75 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import MapMarker from './MapMarker'
 import ControlPanel from './ControlPanel'
 
-const fullscreenControlStyle = {
+const fullscreenControlStyle: CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
   padding: '10px'
 }
 
-const navStyle = {
+const navStyle: CSSProperties = {
   position: 'absolute',
   top: 36,
   left: 0,
   padding: '10px'
 }
 
-const geolocateStyle = {
+const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
   right: 0,
   margin: 10
 }
 
-const Map = ({ view, setView, marker, setMarker }) => {
-  const token = process.env.MAPBOX_ACCESS_TOKEN
+type ViewState = {
+  latitude: number
+  longitude: number
+  zoom: number
+  pitch?: number
+  bearing?: number
+}
+
+type MarkerState = { markerLat: number; markerLng: number }
+
+type Props = {
+  view: ViewState
+  setView: (v: ViewState) => void
+  marker: MarkerState
+  setMarker: (m: MarkerState) => void
+}
+
+const Map = ({ view, setView, marker, setMarker }: Props) => {
+  const token = process.env.MAPBOX_ACCESS_TOKEN as string | undefined
   const { markerLat, markerLng } = marker
 
   return (
     <ReactMapGL
-      {...view}
-      width="100%"
-      height="100%"
-      mapboxApiAccessToken={token}
+      initialViewState={view}
+      viewState={view}
+      onMove={evt => {
+        const vs = evt.viewState
+        setView({
+          ...view,
+          latitude: vs.latitude,
+          longitude: vs.longitude,
+          zoom: vs.zoom,
+          pitch: vs.pitch,
+          bearing: vs.bearing,
+        })
+      }}
+      mapboxAccessToken={token}
       mapStyle="mapbox://styles/mapbox/streets-v11"
-      onViewportChange={viewport => setView({ ...view, ...viewport })}
-      onClick={e => console.log(e)}
+      style={{ width: '100%', height: '100%' }}
     >
       <Marker
         longitude={markerLng}
         latitude={markerLat}
         draggable
-        onDragEnd={({ lngLat: [markerLng, markerLat] }) =>
-          setMarker({ markerLat, markerLng })
-        }
+        onDragEnd={e => {
+          const { lng, lat } = e.lngLat
+          setMarker({ markerLat: lat, markerLng: lng })
+        }}
       >
         <MapMarker size={22} />
       </Marker>
@@ -63,6 +92,7 @@ const Map = ({ view, setView, marker, setMarker }) => {
       <div className="fullscreen" style={fullscreenControlStyle}>
         <FullscreenControl />
       </div>
+
       <div className="nav" style={navStyle}>
         <NavigationControl />
       </div>
@@ -72,9 +102,8 @@ const Map = ({ view, setView, marker, setMarker }) => {
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation
         showUserLocation
-        onViewportChange={viewport =>
-          setView({ ...view, ...viewport, zoom: 13 })
-        }
+        // Zoom d’accompagnement après géolocalisation
+        onGeolocate={() => setView({ ...view, zoom: 13 })}
       />
 
       <ControlPanel lat={markerLat} lng={markerLng} />

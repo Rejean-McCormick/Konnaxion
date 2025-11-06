@@ -1,23 +1,23 @@
 // services/admin.ts
-import apiRequest from './_request';
+import { get, post, put, patch, del } from './_request';
 
 // Moderation
 export async function fetchModerationQueue() {
-  return apiRequest.get('admin/moderation');
+  return get('admin/moderation');
 }
 export async function actOnReport(id: string, remove: boolean) {
-  return apiRequest.post(`admin/moderation/${id}`, { remove });
+  return post(`admin/moderation/${id}`, { remove });
 }
 
 // Roles
 export async function fetchRoles() {
-  return apiRequest.get('admin/roles');
+  return get('admin/roles');
 }
 export async function toggleRole(id: string, enabled: boolean) {
-  return apiRequest.patch(`admin/roles/${id}`, { enabled });
+  return patch(`admin/roles/${id}`, { enabled });
 }
 
 // Audit
 export async function fetchAuditLogs() {
-  return apiRequest.get('admin/audit');
+  return get('admin/audit');
 }

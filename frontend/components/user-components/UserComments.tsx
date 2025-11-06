@@ -3,7 +3,7 @@
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import {
   Tooltip,
   List,
@@ -23,6 +23,7 @@ const { TextArea } = Input
 
 import Link from 'next/link'
 import api from '@/services/_request'
+import { normalizeError } from "../../shared/errors";
 
 const UserComments = ({ comments, deleteComment }) => {
   const handleDelete: MenuProps['onClick'] = e => {
@@ -44,6 +45,7 @@ const UserComments = ({ comments, deleteComment }) => {
           message.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
         } catch (error: any) {
+          const { message, statusCode } = normalizeError(error);
           message.error(error.response?.data?.message || 'Error')
         }
       }
@@ -95,9 +97,9 @@ const UserComments = ({ comments, deleteComment }) => {
     datetime: (
       <div style={{ display: 'flex' }}>
         <div>
-          <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+          <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
             <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-              {moment(x.createdTime).fromNow()} in{' '}
+              {dayjs(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
           <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
@@ -127,7 +129,7 @@ const UserComments = ({ comments, deleteComment }) => {
     <Card
       title="Comments"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
     >
       <List
         itemLayout="horizontal"

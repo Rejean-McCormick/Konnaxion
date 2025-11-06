@@ -14,6 +14,7 @@ import TextFields from './CreateFormTextFields'
 import api from '../../../api'
 import Loading from '../../Loading'
 import Error from 'next/error'
+import { normalizeError } from "../../../shared/errors";
 
 const SculptureCreate = ({
   form,
@@ -55,7 +56,8 @@ const SculptureCreate = ({
         const data = (await api.get('/maker/')).data
         console.log(data)
         setMakerList(data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -120,7 +122,8 @@ const SculptureCreate = ({
           setSubmitting(false)
           setSculpture({ ...values })
           setStep(s => s + 1)
-        } catch (e) {
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
           message.error(e.response.data.message)
         }

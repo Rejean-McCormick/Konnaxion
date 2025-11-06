@@ -5,7 +5,12 @@
 
 import React, { PureComponent } from 'react'
 
-export default class ControlPanel extends PureComponent {
+type ControlPanelProps = {
+  lat: number
+  lng: number
+}
+
+export default class ControlPanel extends PureComponent<ControlPanelProps> {
   render() {
     const { lat, lng } = this.props
     return (

@@ -10,7 +10,7 @@ import Icon from '../compat/Icon' // wrapper compat
 const { Text } = Typography
 
 export const CardStyled = props => (
-  <Card bodyStyle={{ padding: '20px 24px 20px' }} bordered={false} {...props} />
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
 )
 
 export const ColStyled = styled(Col)`

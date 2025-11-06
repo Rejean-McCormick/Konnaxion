@@ -1,47 +1,44 @@
+'use client'
+
 /**
  * Description: Comment statistics card, including total comments and trend graph
  * Author: Hieu Chu
  */
 
+import React from 'react'
+import ChartCard from '@/components/charts/ChartCard'
 import {
   MainIcon,
   CardDivider,
   NumberInfoStyled,
   CardFooter,
-  BarContainer
+  BarContainer,
 } from './style'
 
-import dynamic from 'next/dynamic'
+type Point = { x: string | number; y: number }
 
-const MiniArea = dynamic(
-  import('ant-design-pro/lib/Charts').then(mod => mod.MiniArea),
-  { ssr: false }
-)
+interface Props {
+  TOTAL_COMMENTS: number
+  DAILY_COMMENTS: number
+  DAILY_COMMENTS_CHANGE: number
+  COMMENT_DATA: Point[]
+}
 
-export default ({
+export default function CommentCard({
   TOTAL_COMMENTS,
   DAILY_COMMENTS,
   DAILY_COMMENTS_CHANGE,
-  COMMENT_DATA
-}) => {
+  COMMENT_DATA,
+}: Props) {
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <MainIcon
-          type="message"
-          theme="twoTone"
-          twoToneColor="rgb(205, 34, 255)"
-        />
+        <MainIcon type="message" twoToneColor="rgb(205, 34, 255)" />
         <NumberInfoStyled subTitle="Comments" total={TOTAL_COMMENTS} />
       </div>
 
       <BarContainer>
-        <MiniArea
-          line
-          data={COMMENT_DATA}
-          borderColor="rgb(205, 34, 255)"
-          color="#feedff"
-        />
+        <ChartCard type="area" data={COMMENT_DATA} height={90} />
       </BarContainer>
 
       <CardDivider />

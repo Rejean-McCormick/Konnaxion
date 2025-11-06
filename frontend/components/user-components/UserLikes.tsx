@@ -3,7 +3,7 @@
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { Tooltip, List, Comment, Card, Empty } from 'antd'
 import Link from 'next/link'
 
@@ -53,9 +53,9 @@ const UserLikes = ({ likes }) => {
     ),
     content: (
       <div style={{ fontSize: 14 }}>
-        <Tooltip title={moment(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
+        <Tooltip title={dayjs(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
           <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {moment(x.likedTime).fromNow()}
+            {dayjs(x.likedTime).fromNow()}
           </span>
         </Tooltip>
       </div>
@@ -66,7 +66,7 @@ const UserLikes = ({ likes }) => {
     <Card
       title="Likes"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
       style={{ marginTop: 12 }}
     >
       <List

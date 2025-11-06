@@ -14,7 +14,7 @@ export default function Badges() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.earned.map(b => (
+        {data?.earned?.map((b) => (
           <Badge.Ribbon text="Earned" color="green" key={b.id}>
             <Card title={b.name} style={{ width: 220, marginBottom: 16 }}>
               <p>{b.desc}</p>
@@ -22,7 +22,7 @@ export default function Badges() {
           </Badge.Ribbon>
         ))}
 
-        {data?.progress.map(p => (
+        {data?.progress?.map((p) => (
           <Tooltip title={`${p.current}/${p.required}`} key={p.id}>
             <Card title={p.name} bordered={false} style={{ width: 220, marginBottom: 16 }}>
               <Progress percent={Math.round((p.current / p.required) * 100)} />

@@ -33,7 +33,7 @@ export const CardStyled = (props: any) => {
   if (props.type === 'stats') {
     bodyStyle.padding = '20px 16px 16px'
   }
-  return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
+  return <Card bodyStyle={bodyStyle} variant="borderless" {...props} />
 }
 
 export const NumberInfoStyled = (props: any) => (

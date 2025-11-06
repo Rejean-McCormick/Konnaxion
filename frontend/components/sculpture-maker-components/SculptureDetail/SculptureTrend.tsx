@@ -17,23 +17,24 @@ import { MoreOutlined } from '@ant-design/icons'
 
 const { RangePicker } = DatePicker
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useState, useEffect, useRef } from 'react'
 import Loading from '../../Loading'
 import Error from 'next/error'
 import api from '../../../api'
 import { CardStyled, ShadowCard } from '../../dashboard-components/style'
+import { normalizeError } from "../../../shared/errors";
 
 const formatDailyData = rawData => {
   const result = []
   for (const date of Object.keys(rawData)) {
     result.push({
-      x: moment(date).format('MMM D YYYY'),
+      x: dayjs(date).format('MMM D YYYY'),
       y: rawData[date]
     })
   }
   // sort in correct order
-  result.sort((a, b) => moment(a.x).valueOf() - moment(b.x).valueOf())
+  result.sort((a, b) => dayjs(a.x).valueOf() - dayjs(b.x).valueOf())
   return result
 }
 
@@ -47,8 +48,8 @@ const SculptureTrend = ({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const defaultEndDate = useRef(moment(new Date())).current
-  const defaultStartDate = useRef(moment(defaultEndDate).subtract(7, 'days'))
+  const defaultEndDate = useRef(dayjs(new Date())).current
+  const defaultStartDate = useRef(dayjs(defaultEndDate).subtract(7, 'days'))
     .current
 
   const [startDate, setStartDate] = useState(defaultStartDate)
@@ -135,7 +136,8 @@ const SculptureTrend = ({
           LIKE_DATA,
           COMMENT_DATA
         }))
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({ statusCode, message })
       }
@@ -153,7 +155,7 @@ const SculptureTrend = ({
   ])
 
   const dateFormat = 'MMM D YYYY'
-  const staticToday = moment(new Date())
+  const staticToday = dayjs(new Date())
 
   const renderPicker = (startDate, endDate) => {
     const disabledDate = current => current.valueOf() > staticToday.valueOf()
@@ -167,14 +169,14 @@ const SculptureTrend = ({
         separator="-"
         disabledDate={disabledDate}
         ranges={{
-          'Past week': [moment(staticToday).subtract(7, 'days'), moment(staticToday)],
+          'Past week': [dayjs(staticToday).subtract(7, 'days'), dayjs(staticToday)],
           'Past 2 weeks': [
-            moment(staticToday).subtract(14, 'days'),
-            moment(staticToday)
+            dayjs(staticToday).subtract(14, 'days'),
+            dayjs(staticToday)
           ],
           'Past month': [
-            moment(staticToday).subtract(30, 'days'),
-            moment(staticToday)
+            dayjs(staticToday).subtract(30, 'days'),
+            dayjs(staticToday)
           ]
         }}
         onChange={date => {

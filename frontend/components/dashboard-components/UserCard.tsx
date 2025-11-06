@@ -1,28 +1,35 @@
+'use client'
+
 /**
  * Description: User statistics card, including total users and trend graph
  * Author: Hieu Chu
  */
 
+import React from 'react'
+import ChartCard from '@/components/charts/ChartCard'
 import {
   MainIcon,
   CardDivider,
   NumberInfoStyled,
   CardFooter,
-  BarContainer
+  BarContainer,
 } from './style'
 
-import dynamic from 'next/dynamic'
-const MiniArea = dynamic(
-  import('ant-design-pro/lib/Charts').then(mod => mod.MiniArea),
-  { ssr: false }
-)
+type Point = { x: string | number; y: number }
 
-export default ({
+interface Props {
+  TOTAL_USERS: number
+  DAILY_USERS: number
+  DAILY_USERS_CHANGE: number
+  USER_DATA: Point[]
+}
+
+export default function UserCard({
   TOTAL_USERS,
   DAILY_USERS,
   DAILY_USERS_CHANGE,
-  USER_DATA
-}) => {
+  USER_DATA,
+}: Props) {
   return (
     <>
       <div style={{ display: 'flex' }}>
@@ -31,7 +38,7 @@ export default ({
       </div>
 
       <BarContainer>
-        <MiniArea line data={USER_DATA} />
+        <ChartCard type="area" data={USER_DATA} height={90} />
       </BarContainer>
 
       <CardDivider />

@@ -5,7 +5,9 @@
  * Author: Hieu Chu
  */
 
-import ReactMapGL, {
+import type { CSSProperties } from 'react'
+import {
+  Map as ReactMapGL,
   Marker,
   FullscreenControl,
   Popup,
@@ -16,14 +18,14 @@ import { useState } from 'react'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import MapMarker from './MapMarker'
 
-const fullscreenControlStyle = {
+const fullscreenControlStyle: CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
   padding: '10px'
 }
 
-const geolocateStyle = {
+const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
   right: 0,
@@ -35,48 +37,56 @@ const defaultLocation = {
   longitude: 150.87842788963476
 }
 
-const MyStaticMap = ({ markerLat, markerLng }) => {
-  const token = process.env.MAPBOX_ACCESS_TOKEN
+type StaticMapProps = {
+  markerLat?: number
+  markerLng?: number
+}
+
+const MyStaticMap = ({ markerLat, markerLng }: StaticMapProps) => {
+  const token = process.env.MAPBOX_ACCESS_TOKEN as string | undefined
+
   const [vp, setVp] = useState({
-    latitude: markerLat ? markerLat : defaultLocation.latitude,
-    longitude: markerLng ? markerLng : defaultLocation.longitude,
+    latitude: markerLat ?? defaultLocation.latitude,
+    longitude: markerLng ?? defaultLocation.longitude,
     zoom: 15,
     pitch: 50
   })
 
   return (
     <ReactMapGL
-      {...vp}
-      width="100%"
-      height="640px"
-      mapboxApiAccessToken={token}
-      mapStyle="mapbox://styles/mapbox/streets-v11"
-      onViewportChange={viewport => {
-        setVp(vp => ({ ...vp, ...viewport }))
+      initialViewState={vp}
+      viewState={vp}
+      onMove={evt => {
+        const vs = evt.viewState
+        setVp(v => ({
+          ...v,
+          latitude: vs.latitude,
+          longitude: vs.longitude,
+          zoom: vs.zoom,
+          pitch: vs.pitch,
+          bearing: vs.bearing
+        }))
       }}
+      mapboxAccessToken={token}
+      mapStyle="mapbox://styles/mapbox/streets-v11"
+      style={{ width: '100%', height: '640px' }}
     >
       <div>
-        {markerLat && (
+        {markerLat != null && markerLng != null && (
           <>
             <Marker longitude={markerLng} latitude={markerLat}>
               <MapMarker size={22} />
             </Marker>
 
             <Popup
-              tipSize={5}
               anchor="bottom"
               latitude={markerLat}
               longitude={markerLng}
               closeOnClick={false}
-              offsetTop={-20}
               closeButton={false}
+              offset={[0, -20]}
             >
-              <div
-                style={{
-                  marginLeft: 5,
-                  marginRight: 5
-                }}
-              >
+              <div style={{ marginLeft: 5, marginRight: 5 }}>
                 <div>Latitude: {markerLat}</div>
                 <div>Longitude: {markerLng}</div>
               </div>
@@ -93,8 +103,8 @@ const MyStaticMap = ({ markerLat, markerLng }) => {
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation
           showUserLocation
-          onViewportChange={viewport =>
-            setVp(vp => ({ ...vp, ...viewport, zoom: 14 }))
+          onGeolocate={() =>
+            setVp(v => ({ ...v, zoom: 14 }))
           }
         />
       </div>

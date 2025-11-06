@@ -1,0 +1,5 @@
+[TypeScript] exit=2
+[ESLint] exit=2
+[Next build] exit=1
+[Jest] exit=1
+[Playwright SMOKE] exit=1

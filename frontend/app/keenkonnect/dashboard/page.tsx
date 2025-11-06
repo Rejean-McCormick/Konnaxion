@@ -50,7 +50,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
         <Row gutter={[16, 16]}>
           {/* Recent Projects */}
           <Col xs={24} md={12}>
-            <Card title="Recent Projects" bordered={false}>
+            <Card title="Recent Projects" variant="borderless">
               <List
                 dataSource={recentProjects}
                 renderItem={(project) => (
@@ -64,7 +64,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
 
           {/* Repository Updates */}
           <Col xs={24} md={12}>
-            <Card title="Repository Updates" bordered={false}>
+            <Card title="Repository Updates" variant="borderless">
               <List
                 dataSource={repositoryUpdates}
                 renderItem={(resource) => (
@@ -78,7 +78,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
 
           {/* Active Collaboration */}
           <Col xs={24} md={12}>
-            <Card title="Active Collaboration" bordered={false}>
+            <Card title="Active Collaboration" variant="borderless">
               <List
                 dataSource={activeWorkspaces}
                 renderItem={(workspace) => (
@@ -92,7 +92,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
 
           {/* My Tasks */}
           <Col xs={24} md={12}>
-            <Card title="My Tasks" bordered={false}>
+            <Card title="My Tasks" variant="borderless">
               <List
                 dataSource={myTasks}
                 renderItem={(task) => (
@@ -132,7 +132,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
         </Row>
 
         {/* Notifications Preview */}
-        <Card title="Notifications" bordered={false}>
+        <Card title="Notifications" variant="borderless">
           {notifications.length > 0 ? (
             <List
               dataSource={notifications}

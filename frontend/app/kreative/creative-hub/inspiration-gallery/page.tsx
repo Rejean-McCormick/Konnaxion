@@ -18,7 +18,7 @@ import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
 interface CreativeWork {
@@ -88,13 +88,12 @@ const dummyWorks: CreativeWork[] = [
     id: '6',
     title: 'Virtual Reality',
     description: 'An innovative digital artwork blending real and virtual elements.',
-    creator: 'Frank Wilson',
+    creator: 'Felix Zhang',
     category: 'Digital Art',
     imageUrl: 'https://via.placeholder.com/400x300.png?text=Virtual+Reality',
-    likes: 89,
+    likes: 51,
     liked: false,
   },
-  // Add more dummy items as needed...
 ];
 
 const InspirationGallery: NextPage = () => {
@@ -201,9 +200,9 @@ const InspirationGallery: NextPage = () => {
                   <>
                     <Text>{work.creator}</Text>
                     <br />
-                    <Text type="secondary" ellipsis={{ rows: 2 }}>
+                    <Paragraph type="secondary" ellipsis={{ rows: 2 }}>
                       {work.description}
-                    </Text>
+                    </Paragraph>
                   </>
                 }
               />

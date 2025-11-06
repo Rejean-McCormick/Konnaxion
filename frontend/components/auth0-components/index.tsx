@@ -7,6 +7,7 @@
 
 import React, { useState, useEffect, useContext } from 'react'
 import { createAuth0Client } from '@auth0/auth0-spa-js'
+import { normalizeError } from "../../shared/errors";
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
   window.history.replaceState({}, document.title, window.location.pathname)
@@ -18,7 +19,7 @@ export const Auth0Provider = ({
   onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
   ...initOptions
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState()
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false)
   const [user, setUser] = useState()
   const [auth0Client, setAuth0] = useState()
   const [loading, setLoading] = useState(true)
@@ -53,7 +54,8 @@ export const Auth0Provider = ({
     setPopupOpen(true)
     try {
       await auth0Client.loginWithPopup(params)
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       console.error(error)
     } finally {
       setPopupOpen(false)

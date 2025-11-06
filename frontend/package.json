@@ -125,6 +125,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-storybook": "^0.11.6",
     "eslint-plugin-tailwindcss": "^3.18.0",
+    "fast-glob": "^3.3.3",
     "fetch-mock": "^9.11.0",
     "glob": "^11.0.3",
     "gzip-size": "6.0.0",

@@ -8,6 +8,7 @@ import { Steps, Button, Form, Input, Select, Result, Divider, message } from 'an
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../../shared/errors";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -42,7 +43,8 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       setWorkspaceData(prev => ({ ...prev, ...values }));
       setCurrentStep(currentStep + 1);
       form.resetFields();
-    } catch (err) {
+    } catch (err: unknown) {
+      const { message, statusCode } = normalizeError(err);
       message.error('Please complete the required fields.');
     }
   };
@@ -58,7 +60,8 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       // Simuler la création du workspace (appel API à intégrer ici)
       console.log('Workspace created with data:', { ...workspaceData, ...values });
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: unknown) {
+      const { message, statusCode } = normalizeError(err);
       message.error('Please ensure all fields are correctly filled.');
     }
   };

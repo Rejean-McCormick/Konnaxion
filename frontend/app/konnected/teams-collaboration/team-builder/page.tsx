@@ -25,6 +25,7 @@ const { Option } = Select;
 const TeamBuilder: NextPage = () => {
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [form] = Form.useForm();
+  const router = useRouter();
 
   // Passage à l'étape suivante après validation des champs de l'étape actuelle
   const next = () => {
@@ -43,20 +44,15 @@ const TeamBuilder: NextPage = () => {
     setCurrentStep(currentStep - 1);
   };
 
-  // Gestion de la soumission du formulaire complet (création de l'équipe)
+  // Soumission du formulaire complet
   const onFinish = (values: any) => {
-    const router = useRouter();
     console.log('Team Created:', values);
     message.success('L’équipe a été créée avec succès et les invitations ont été envoyées!');
-    // Redirection vers "My Teams"
     router.push('/konnected/teams-collaboration/my-teams');
   };
 
-  // Définition des titres des étapes
-  const steps = [
-    { title: 'Team Info' },
-    { title: 'Invite Members' },
-  ];
+  // Définition des étapes
+  const steps = [{ title: 'Team Info' }, { title: 'Invite Members' }];
 
   return (
     <PageContainer title="Team Builder">
@@ -65,6 +61,7 @@ const TeamBuilder: NextPage = () => {
           <Step key={item.title} title={item.title} />
         ))}
       </Steps>
+
       <Form form={form} layout="vertical" onFinish={onFinish}>
         {currentStep === 0 && (
           <>
@@ -75,6 +72,7 @@ const TeamBuilder: NextPage = () => {
             >
               <Input placeholder="Entrez le nom de l’équipe" />
             </Form.Item>
+
             <Form.Item
               label="Team Purpose/Goal"
               name="teamPurpose"
@@ -82,9 +80,11 @@ const TeamBuilder: NextPage = () => {
             >
               <Input placeholder="Quel est l’objectif de l’équipe ?" />
             </Form.Item>
+
             <Form.Item label="Team Description" name="teamDescription">
               <Input.TextArea rows={4} placeholder="Description optionnelle de l’équipe" />
             </Form.Item>
+
             <Form.Item label="Team Avatar" name="teamAvatar">
               <Upload name="avatar" listType="picture" maxCount={1}>
                 <Button icon={<UploadOutlined />}>Télécharger un avatar</Button>
@@ -98,24 +98,23 @@ const TeamBuilder: NextPage = () => {
             <Form.List name="invitedMembers">
               {(fields, { add, remove }) => (
                 <>
-                  {fields.map((field) => (
+                  {fields.map(({ key, name, ...restField }) => (
                     <Space
-                      key={field.key}
+                      key={String(name)} {/* clé garantie non-undefined */}
                       align="baseline"
                       style={{ display: 'flex', marginBottom: 8 }}
                     >
                       <Form.Item
-                        {...field}
-                        name={[field.name, 'email']}
-                        fieldKey={[field.fieldKey, 'email']}
+                        {...restField}
+                        name={[name, 'email']}
                         rules={[{ required: true, message: 'Veuillez saisir l’email du membre' }]}
                       >
                         <Input placeholder="Email du membre" />
                       </Form.Item>
+
                       <Form.Item
-                        {...field}
-                        name={[field.name, 'role']}
-                        fieldKey={[field.fieldKey, 'role']}
+                        {...restField}
+                        name={[name, 'role']}
                         rules={[{ required: true, message: 'Veuillez sélectionner un rôle' }]}
                       >
                         <Select placeholder="Rôle" style={{ width: 120 }}>
@@ -123,11 +122,13 @@ const TeamBuilder: NextPage = () => {
                           <Option value="Co-Lead">Co-Lead</Option>
                         </Select>
                       </Form.Item>
-                      <Button type="link" onClick={() => remove(field.name)}>
+
+                      <Button type="link" onClick={() => remove(name)}>
                         Supprimer
                       </Button>
                     </Space>
                   ))}
+
                   <Form.Item>
                     <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
                       Ajouter un membre
@@ -137,7 +138,7 @@ const TeamBuilder: NextPage = () => {
               )}
             </Form.List>
 
-            {/* Prévisualisation des membres invités via Avatar.Group */}
+            {/* Prévisualisation des membres invités */}
             {form.getFieldValue('invitedMembers') &&
               form.getFieldValue('invitedMembers').length > 0 && (
                 <Form.Item label="Invited Members Preview">

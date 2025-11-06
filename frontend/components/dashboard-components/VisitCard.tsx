@@ -1,50 +1,59 @@
-import {
-  MainIcon,
-  CardDivider,
-  NumberInfoStyled,
-  CardFooter,
-  HelperIcon,
-  BarContainer
-} from './style'
+'use client'
 
 /**
  * Description: Visit statistics card, including total visits and trend graph
  * Author: Hieu Chu
  */
 
-import dynamic from 'next/dynamic'
+import React from 'react'
+import ChartCard from '@/components/charts/ChartCard'
+import {
+  MainIcon,
+  CardDivider,
+  NumberInfoStyled,
+  CardFooter,
+  HelperIcon,
+  BarContainer,
+} from './style'
 
-const MiniArea = dynamic(
-  import('ant-design-pro/lib/Charts').then(mod => mod.MiniArea),
-  { ssr: false }
-)
+type Point = { x: string | number; y: number }
 
-export default ({
+interface Props {
+  TOTAL_VISITS: number
+  DAILY_VISITS: number
+  DAILY_VISITS_CHANGE: number
+  VISIT_DATA: Point[]
+  SINGLE_SCULPTURE?: boolean
+}
+
+export default function VisitCard({
   TOTAL_VISITS,
   DAILY_VISITS,
   DAILY_VISITS_CHANGE,
   VISIT_DATA,
-  SINGLE_SCULPTURE
-}) => (
-  <>
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <MainIcon type="environment" style={{ color: '#F73F3F' }} />
-      <NumberInfoStyled subTitle="Total visits" total={TOTAL_VISITS} />
-      {!SINGLE_SCULPTURE && (
-        <HelperIcon title="Total number of times sculptures have been visited" />
-      )}
-    </div>
+  SINGLE_SCULPTURE,
+}: Props) {
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <MainIcon type="environment" style={{ color: '#F73F3F' }} />
+        <NumberInfoStyled subTitle="Total visits" total={TOTAL_VISITS} />
+        {!SINGLE_SCULPTURE && (
+          <HelperIcon title="Total number of times sculptures have been visited" />
+        )}
+      </div>
 
-    <BarContainer>
-      <MiniArea line data={VISIT_DATA} borderColor="#F73F3F" color="#fff2f0" />
-    </BarContainer>
+      <BarContainer>
+        <ChartCard type="area" data={VISIT_DATA} height={90} />
+      </BarContainer>
 
-    <CardDivider />
+      <CardDivider />
 
-    <CardFooter
-      title="Daily visits"
-      value={DAILY_VISITS}
-      change={DAILY_VISITS_CHANGE}
-    />
-  </>
-)
+      <CardFooter
+        title="Daily visits"
+        value={DAILY_VISITS}
+        change={DAILY_VISITS_CHANGE}
+      />
+    </>
+  )
+}

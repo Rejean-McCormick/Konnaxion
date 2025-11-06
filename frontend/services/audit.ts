@@ -1,4 +1,4 @@
-import { get } from './_request'
+import { get, post, put, patch, del } from './_request'
 
 export interface LogRow {
   id: string

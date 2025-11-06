@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
+import { normalizeError } from "../shared/errors";
 
 const routes: string[] = JSON.parse(fs.readFileSync('routes.json', 'utf8'))
 const GATE = process.env.SMOKE_GATE === '1'
@@ -23,7 +24,8 @@ test.describe('Smoke all pages', () => {
       try {
         resp = await page.goto(`http://localhost:3000${p}`, { waitUntil: 'domcontentloaded', timeout: NAV_TMO })
       } catch (e: any) {
-        navErr = String(e?.message ?? e)
+        const { message, statusCode } = normalizeError(e);
+        navErr = String(message ?? e)
       }
       const status = resp?.status()
       const ok = !!resp?.ok()

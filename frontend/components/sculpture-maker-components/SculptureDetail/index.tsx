@@ -18,6 +18,7 @@ import Link from 'next/link'
 import Head from 'next/head'
 import SculptureComment from './SculptureComment'
 import SculptureTrend from './SculptureTrend'
+import { normalizeError } from "../../../shared/errors";
 
 const { Title } = Typography
 
@@ -41,7 +42,8 @@ const SculptureDetail = () => {
         setComments(rawComments.data)
         console.log('hhhh', rawComments.data)
         setSculpture(rawSculpture.data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,

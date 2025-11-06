@@ -15,7 +15,7 @@ export default function MyProfile() {
     <PageContainer ghost loading={loading}>
       <ProCard split="vertical">
         <ProCard colSpan="25%">
-          <Avatar size={120} src={data?.avatar} />
+          <Avatar size={120} src={data?.avatar ?? undefined} />
           <Descriptions size="small" column={1} style={{ marginTop: 16 }}>
             <Descriptions.Item label="Name">{data?.name}</Descriptions.Item>
             <Descriptions.Item label="Joined">{data?.joined}</Descriptions.Item>
@@ -26,7 +26,7 @@ export default function MyProfile() {
         </ProCard>
         <ProCard title="Recent Activity" ghost>
           <Timeline>
-            {data?.activity.map(a => (
+            {data?.activity?.map((a) => (
               <Timeline.Item key={a.id}>
                 {a.when} · {a.text}
               </Timeline.Item>

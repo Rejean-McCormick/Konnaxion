@@ -8,6 +8,7 @@ import { Form, Input, Select, Button, Modal, List, Card, Space, Divider, message
 import { ArrowUpOutlined, ArrowDownOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../../shared/errors";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -95,7 +96,8 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
         setSteps(prev => [...prev, newStep]);
       }
       setStepModalVisible(false);
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please complete the step form.');
     }
   };
@@ -135,7 +137,8 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
         steps,
       });
       setSubmitted(true);
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please complete the basic information form.');
     }
   };

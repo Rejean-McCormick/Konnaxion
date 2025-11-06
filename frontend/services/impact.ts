@@ -1,5 +1,5 @@
 // services/impact.ts
-import apiRequest from './_request';
+import { get, post, put, patch, del } from './_request';
 
 /* ------------------------------------------------------------------ *
  *  Tracker (Kanban / table)                                           *
@@ -19,7 +19,7 @@ export interface TrackerItem {
 export async function fetchImpactTracker(): Promise<{
   items: TrackerItem[];
 }> {
-  return apiRequest.get('impact/tracker');
+  return get('impact/tracker');
 }
 
 /** PATCH /impact/tracker/:id  (update status only) */
@@ -27,7 +27,7 @@ export async function patchImpactStatus(
   id: string,
   status: ImpactStatus,
 ): Promise<void> {
-  await apiRequest.patch(`impact/tracker/${id}`, { status });
+  await patch(`impact/tracker/${id}`, { status });
 }
 
 /* ------------------------------------------------------------------ *
@@ -51,7 +51,7 @@ export async function fetchImpactOutcomes(): Promise<{
   kpis: OutcomeKPI[];
   charts: OutcomeChart[];
 }> {
-  return apiRequest.get('impact/outcomes');
+  return get('impact/outcomes');
 }
 
 /* ------------------------------------------------------------------ *
@@ -70,7 +70,7 @@ export interface FeedbackItem {
 export async function fetchFeedback(): Promise<{
   items: FeedbackItem[];
 }> {
-  return apiRequest.get('impact/feedback');
+  return get('impact/feedback');
 }
 
 /** POST /impact/feedback */
@@ -78,5 +78,5 @@ export async function submitFeedback(payload: {
   body: string;
   rating?: number;
 }): Promise<void> {
-  await apiRequest.post('impact/feedback', payload);
+  await post('impact/feedback', payload);
 }

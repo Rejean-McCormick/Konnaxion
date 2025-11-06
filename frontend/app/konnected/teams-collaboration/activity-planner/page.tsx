@@ -21,7 +21,7 @@ import {
 import { PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
-import moment, { Moment } from 'moment';
+import dayjs, { Moment as Dayjs } from 'dayjs';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -32,7 +32,7 @@ interface ActivityEvent {
   title: string;
   description: string;
   // La date et l'heure de l'événement sont stockées sous forme d'objet moment
-  dateTime: Moment;
+  dateTime: Dayjs;
   owner: string;
   team: string;
 }
@@ -47,7 +47,7 @@ const ActivityPlanner: NextPage = () => {
       id: 'evt1',
       title: 'Team Meeting',
       description: 'Réunion d’équipe pour définir les prochaines étapes.',
-      dateTime: moment().add(2, 'days').hour(10).minute(0),
+      dateTime: dayjs().add(2, 'days').hour(10).minute(0),
       owner: 'Alice',
       team: 'Alpha Innovators',
     },
@@ -55,7 +55,7 @@ const ActivityPlanner: NextPage = () => {
       id: 'evt2',
       title: 'Sprint Planning',
       description: 'Planification du sprint avec présentation du backlog.',
-      dateTime: moment().add(4, 'days').hour(9).minute(30),
+      dateTime: dayjs().add(4, 'days').hour(9).minute(30),
       owner: 'Bob',
       team: 'Beta Coders',
     },
@@ -66,7 +66,7 @@ const ActivityPlanner: NextPage = () => {
   // État pour l'affichage du modal d'ajout d'événement
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   // Pour pré-remplir la date si l'utilisateur clique sur une date du calendrier
-  const [preSelectedDate, setPreSelectedDate] = useState<Moment | null>(null);
+  const [preSelectedDate, setPreSelectedDate] = useState<Dayjs | null>(null);
 
   const [form] = Form.useForm();
 
@@ -77,7 +77,7 @@ const ActivityPlanner: NextPage = () => {
       : events.filter((evt) => evt.team === selectedTeam);
 
   // Définition de la fonction de rendu d'une cellule de date dans le calendrier
-  const dateCellRender = (value: Moment) => {
+  const dateCellRender = (value: Dayjs) => {
     const listData = events.filter((evt) =>
       evt.dateTime.isSame(value, 'day')
     );
@@ -93,7 +93,7 @@ const ActivityPlanner: NextPage = () => {
   };
 
   // Lorsque l'utilisateur clique sur une date, ouvrir le modal avec la date pré-remplie
-  const handleDateSelect = (value: Moment) => {
+  const handleDateSelect = (value: Dayjs) => {
     setPreSelectedDate(value);
     form.setFieldsValue({
       eventDate: value,

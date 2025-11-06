@@ -33,6 +33,7 @@ import { ColStyled, CardStyled, ShadowCard, Subtitle, EmptyImage } from './style
 import Loading from '../Loading'
 import Error from 'next/error'
 import api from '@/services/_request'
+import { normalizeError } from "../../shared/errors";
 
 const SculptureCard = ({
   info: {
@@ -157,7 +158,8 @@ const SculptureGrid = () => {
         data.sort((a, b) => a.name.localeCompare(b.name))
         setOriginalList(data)
         setFilteredList(data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({ statusCode, message })
       }

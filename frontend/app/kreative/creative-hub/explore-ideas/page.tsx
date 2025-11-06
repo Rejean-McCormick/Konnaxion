@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
 interface CreativeIdea {
@@ -27,7 +27,7 @@ const creativeIdeasData: CreativeIdea[] = [
   {
     id: '1',
     title: 'The Beauty of Minimalism',
-    excerpt: 'Exploring the art of less is more in design and creative expression...',
+    excerpt: 'Exploring the art of less is more in design and creative expression.',
     author: 'Alice Martin',
     domain: 'Art',
     thumbnail: 'https://via.placeholder.com/300x200.png?text=Minimalism',
@@ -36,43 +36,44 @@ const creativeIdeasData: CreativeIdea[] = [
   },
   {
     id: '2',
-    title: 'Rhythms of the Night',
-    excerpt: 'A journey into experimental music and ambient soundscapes that evoke emotion...',
-    author: 'Brian Lee',
+    title: 'Soundscapes: Music and Emotion',
+    excerpt: 'How different chord progressions evoke specific emotional responses.',
+    author: 'Brian Chen',
     domain: 'Music',
-    thumbnail: 'https://via.placeholder.com/300x200.png?text=Rhythms+of+the+Night',
-    date: '2025-11-22T12:00:00Z',
-    popularity: 120,
+    thumbnail: 'https://via.placeholder.com/300x200.png?text=Soundscapes',
+    date: '2025-11-18T14:30:00Z',
+    popularity: 73,
   },
   {
     id: '3',
-    title: 'The Art of Storytelling',
-    excerpt: 'Discover how narrative techniques can transform creative writing into immersive experiences.',
-    author: 'Carla Gomez',
+    title: 'Writing with Constraints',
+    excerpt: 'Using constraints like lipograms to spark creativity.',
+    author: 'Caroline Dupont',
     domain: 'Writing',
-    thumbnail: 'https://via.placeholder.com/300x200.png?text=Storytelling',
-    date: '2025-11-18T09:30:00Z',
-    popularity: 95,
+    thumbnail: 'https://via.placeholder.com/300x200.png?text=Constraints',
+    date: '2025-11-15T09:00:00Z',
+    popularity: 55,
   },
   {
     id: '4',
-    title: 'Colorful Expressions',
-    excerpt: 'An exploration of abstract art that celebrates vibrant colors and bold compositions.',
-    author: 'Derek Fox',
+    title: 'Color Theory Basics',
+    excerpt: 'Understanding complementary and analogous color schemes.',
+    author: 'David Lopez',
     domain: 'Art',
-    thumbnail: 'https://via.placeholder.com/300x200.png?text=Colorful+Expressions',
-    date: '2025-11-25T08:45:00Z',
-    popularity: 110,
+    thumbnail: 'https://via.placeholder.com/300x200.png?text=Color+Theory',
+    date: '2025-11-10T11:45:00Z',
+    popularity: 61,
   },
-  // Add more items as needed...
 ];
 
 const ExploreIdeasPage: NextPage = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortOption, setSortOption] = useState<'newest' | 'popular'>('newest');
+
+  // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 6;
+  const pageSize = 9;
 
   // Filter and sort the creative ideas.
   const filteredIdeas = useMemo(() => {
@@ -116,7 +117,7 @@ const ExploreIdeasPage: NextPage = () => {
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Space wrap>
           <Input
-            placeholder="Search ideas..."
+            placeholder="Search ideas."
             prefix={<SearchOutlined />}
             value={searchQuery}
             onChange={(e) => {
@@ -167,9 +168,9 @@ const ExploreIdeasPage: NextPage = () => {
                 <Title level={4} ellipsis={{ rows: 1 }}>
                   {idea.title}
                 </Title>
-                <Text type="secondary" ellipsis={{ rows: 2 }}>
+                <Paragraph type="secondary" ellipsis={{ rows: 2 }}>
                   {idea.excerpt}
-                </Text>
+                </Paragraph>
                 <br />
                 <Text strong>By:</Text> {idea.author}
               </Card>

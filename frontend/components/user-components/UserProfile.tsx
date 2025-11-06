@@ -13,11 +13,12 @@ import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import Head from 'next/head'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { SculptureCardDescription } from '../sculpture-maker-components/SculptureGrid'
 import UserComments from './UserComments'
 import UserVisit from './UserVisit'
 import UserLikes from './UserLikes'
+import { normalizeError } from "../../shared/errors";
 
 const UserProfile = () => {
   const router = useRouter()
@@ -56,7 +57,8 @@ const UserProfile = () => {
         console.log('comments', rawComments.data)
         console.log('visits', rawVisits.data)
         console.log('likes', rawLikes.data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -145,7 +147,7 @@ const UserProfile = () => {
                 {connection}
               </Descriptions.Item>
               <Descriptions.Item label="Join date">
-                {moment(joinDate).format('D MMMM YYYY')}
+                {dayjs(joinDate).format('D MMMM YYYY')}
               </Descriptions.Item>
             </Descriptions>
           </CardStyled>

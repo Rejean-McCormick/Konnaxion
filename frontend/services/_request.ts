@@ -30,24 +30,28 @@ apiRequest.interceptors.response.use(
 type Cfg = AxiosRequestConfig
 
 export async function get<T>(url: string, config?: Cfg): Promise<T> {
-  // l’intercepteur renvoie déjà le payload
-  return apiRequest.get<T>(url, config) as unknown as Promise<T>
+    const res = await apiRequest.get<T>(url, config);
+    return (res as any).data as T;
 }
 
 export async function post<T>(url: string, body?: any, config?: Cfg): Promise<T> {
-  return apiRequest.post<T>(url, body, config) as unknown as Promise<T>
+    const res = await apiRequest.post<T>(url, body, config);
+    return (res as any).data as T;
 }
 
 export async function put<T>(url: string, body?: any, config?: Cfg): Promise<T> {
-  return apiRequest.put<T>(url, body, config) as unknown as Promise<T>
+    const res = await apiRequest.put<T>(url, body, config);
+    return (res as any).data as T;
 }
 
 export async function patch<T>(url: string, body?: any, config?: Cfg): Promise<T> {
-  return apiRequest.patch<T>(url, body, config) as unknown as Promise<T>
+    const res = await apiRequest.patch<T>(url, body, config);
+    return (res as any).data as T;
 }
 
 export async function del<T>(url: string, config?: Cfg): Promise<T> {
-  return apiRequest.delete<T>(url, config) as unknown as Promise<T>
+    const res = await apiRequest.delete<T>(url, config);
+    return (res as any).data as T;
 }
 
 export default apiRequest

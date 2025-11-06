@@ -7,7 +7,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 import { Row, Input, Button } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
@@ -18,6 +18,7 @@ import api from '@/services/_request'
 import Loading from '../Loading'
 import NextError from 'next/error'
 import { convertNonAccent } from '../shared/utils'
+import { normalizeError } from "../../shared/errors";
 
 const UserList = () => {
   const router = useRouter()
@@ -47,6 +48,7 @@ const UserList = () => {
 
         setUserList(users)
       } catch (e: any) {
+        const { message, statusCode } = normalizeError(e);
         const statusCode = e?.response?.data?.statusCode ?? 500
         const message = e?.response?.data?.message ?? 'Failed to load users'
         setError({ statusCode, message })
@@ -166,7 +168,7 @@ const UserList = () => {
     {
       title: 'Join date',
       key: 'joinDate',
-      render: (_: any, record: any) => <span>{moment(record.joinDate).format('D MMMM YYYY')}</span>,
+      render: (_: any, record: any) => <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>,
       sorter: (a: any, b: any) => new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
       sortDirections: ['ascend', 'descend'],
       width: '15%',

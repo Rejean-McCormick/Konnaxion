@@ -5,7 +5,7 @@
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import {
   Tooltip,
   List,
@@ -23,6 +23,7 @@ import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
 import { useState } from 'react'
+import { normalizeError } from "../../../shared/errors";
 
 const { confirm } = Modal
 const { TextArea } = Input
@@ -56,7 +57,8 @@ const SculptureComment = ({
           await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
-        } catch (error) {
+        } catch (error: unknown) {
+          const { message, statusCode } = normalizeError(error);
           // @ts-ignore
           message.error(error.response.data.message)
         }
@@ -109,9 +111,9 @@ const SculptureComment = ({
     ),
     datetime: (
       <div style={{ display: 'flex' }}>
-        <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+        <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
           <div style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {moment(x.createdTime).fromNow()}
+            {dayjs(x.createdTime).fromNow()}
           </div>
         </Tooltip>
         <div
@@ -136,7 +138,7 @@ const SculptureComment = ({
     <Card
       title="Comments"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
       style={{ marginTop: 12 }}
     >
       <List
@@ -222,7 +224,8 @@ const Editor = ({
             setSubmitting(false)
             setValue('')
             addComment(result)
-          } catch (e) {
+          } catch (e: unknown) {
+            const { message, statusCode } = normalizeError(e);
             setSubmitting(false)
             // @ts-ignore
             message.error(e.response.data.message)

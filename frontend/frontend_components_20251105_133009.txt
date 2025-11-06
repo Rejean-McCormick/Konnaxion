@@ -276,7 +276,7 @@ const RecentComments = ({ comments, deleteComment }) => {
     <Card
       title="Recent Comments"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
     >
       <List
         itemLayout="horizontal"
@@ -388,7 +388,7 @@ const RecentLikes = ({ likes }) => {
     <Card
       title="Recent Likes"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
     >
       <List
         itemLayout="horizontal"
@@ -500,7 +500,7 @@ const RecentVisits = ({ visits }: RecentVisitsProps) => {
     <Card
       title="Recent Visits"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
       style={{ marginTop: 12 }}
     >
       <List
@@ -541,7 +541,7 @@ import { Card, Col, Icon, Form, Typography, Empty, Table } from 'antd'
 const { Text } = Typography
 
 export const CardStyled = props => (
-  <Card bodyStyle={{ padding: '20px 24px 20px' }} bordered={false} {...props} />
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
 )
 
 export const ColStyled = styled(Col)`
@@ -1438,7 +1438,7 @@ export const CardStyled = (props: any) => {
   if (props.type === 'stats') {
     bodyStyle.padding = '20px 16px 16px'
   }
-  return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
+  return <Card bodyStyle={bodyStyle} variant="borderless" {...props} />
 }
 
 export const NumberInfoStyled = (props: any) => (
@@ -4939,7 +4939,7 @@ const SculptureComment = ({
     <Card
       title="Comments"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
       style={{ marginTop: 12 }}
     >
       <List
@@ -5599,7 +5599,7 @@ import { Card, Col, Icon, Form, Typography, Empty, Table } from 'antd'
 const { Text } = Typography
 
 export const CardStyled = props => (
-  <Card bodyStyle={{ padding: '20px 24px 20px' }} bordered={false} {...props} />
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
 )
 
 export const ColStyled = styled(Col)`
@@ -6053,7 +6053,7 @@ import Icon from '../compat/Icon' // wrapper compat
 const { Text } = Typography
 
 export const CardStyled = props => (
-  <Card bodyStyle={{ padding: '20px 24px 20px' }} bordered={false} {...props} />
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
 )
 
 export const ColStyled = styled(Col)`
@@ -6248,7 +6248,7 @@ const UserComments = ({ comments, deleteComment }) => {
     <Card
       title="Comments"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
     >
       <List
         itemLayout="horizontal"
@@ -6355,7 +6355,7 @@ const UserLikes = ({ likes }) => {
     <Card
       title="Likes"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
       style={{ marginTop: 12 }}
     >
       <List
@@ -6622,7 +6622,7 @@ const UserVisit = ({ visits }) => {
     <Card
       title="Visits"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
+      variant="borderless"
       style={{ marginTop: 12 }}
     >
       <List

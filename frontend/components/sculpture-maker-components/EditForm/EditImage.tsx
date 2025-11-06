@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { ColStyled } from '../style'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../shared/errors";
 
 const { confirm } = Modal
 
@@ -38,7 +39,8 @@ const EditImage = ({ accessionId, _name, images }) => {
             resolve(true)
             setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
             message.success('Deleted image successfully!', 2)
-          } catch (error) {
+          } catch (error: unknown) {
+            const { message, statusCode } = normalizeError(error);
             message.error(error.response.data.message)
             resolve(false)
           }
@@ -84,7 +86,8 @@ const EditImage = ({ accessionId, _name, images }) => {
       e.onSuccess(_result.data[0], e.file)
       hide()
       message.success('Uploaded image successfully!', 2)
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error(error.response.data.message)
       e.onError(error.response.data.message)
     }

@@ -7,6 +7,7 @@ import type { NextPage } from 'next';
 import { Steps, Button, Form, Input, Select, Upload, Result, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
+import { normalizeError } from "../../../../shared/errors";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -39,7 +40,8 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       setFormData((prev) => ({ ...prev, ...values }));
       setCurrentStep(currentStep + 1);
       form.resetFields();
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please fill in the required fields.');
     }
   };
@@ -57,7 +59,8 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       // Simulation d'enregistrement du projet.
       console.log('Project created with values:', { ...formData, ...values });
       setSubmitted(true);
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please fill in the required fields.');
     }
   };

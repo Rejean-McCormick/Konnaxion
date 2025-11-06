@@ -1,5 +1,5 @@
 // services/learn.ts
-import apiRequest from './_request';
+import { get, post, put, patch, del } from './_request';
 
 /* ---------- Changelog ---------- */
 
@@ -13,7 +13,7 @@ export interface ChangelogEntry {
 export async function fetchChangelog(): Promise<{
   entries: ChangelogEntry[];
 }> {
-  return apiRequest.get('learn/changelog');
+  return get('learn/changelog');
 }
 
 /* ---------- Guides ---------- */
@@ -27,7 +27,7 @@ export interface GuideSection {
 export async function fetchGuides(): Promise<{
   sections: GuideSection[];
 }> {
-  return apiRequest.get('learn/guides');
+  return get('learn/guides');
 }
 
 /* ---------- Glossary ---------- */
@@ -41,5 +41,5 @@ export interface GlossaryItem {
 export async function fetchGlossary(): Promise<{
   items: GlossaryItem[];
 }> {
-  return apiRequest.get('learn/glossary');
+  return get('learn/glossary');
 }

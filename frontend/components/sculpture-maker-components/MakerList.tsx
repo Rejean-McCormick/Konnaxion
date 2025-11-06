@@ -14,6 +14,7 @@ import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import MakerCreate from './CreateForm/MakerCreate'
+import { normalizeError } from "../../shared/errors";
 
 const { confirm } = Modal
 
@@ -34,6 +35,7 @@ const MakerList = () => {
         console.log(formattedData)
         setMakerList(formattedData)
       } catch (e: any) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -106,7 +108,8 @@ const MakerList = () => {
           await api.delete(`/maker/${makerId}`)
           deleteMaker(makerId)
           message.success('Deleted maker successfully!', 2)
-        } catch (error) {
+        } catch (error: unknown) {
+          const { message, statusCode } = normalizeError(error);
           notification.error({
             message: 'Error',
             description:
