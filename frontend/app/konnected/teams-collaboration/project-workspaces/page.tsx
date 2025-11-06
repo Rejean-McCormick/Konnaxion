@@ -1,15 +1,13 @@
-"use client";
-// File: /pages/konnected/teams-collaboration/project-workspaces.tsx
+'use client';
+
+// File: app/konnected/teams-collaboration/project-workspaces/page.tsx
 import React from 'react';
-import { NextPage } from 'next';
-import { Table, Button, Tag, Typography, Space, message } from 'antd';
+import { Table, Button, Tag, Space, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title } = Typography;
-
-// Interface décrivant la structure d'un workspace
+// Workspace data shape
 interface Workspace {
   id: string;
   projectName: string;
@@ -20,7 +18,7 @@ interface Workspace {
   userRole: 'Leader' | 'Member';
 }
 
-// Exemple de données de workspaces
+// Example data
 const workspaceData: Workspace[] = [
   {
     id: '1',
@@ -51,23 +49,21 @@ const workspaceData: Workspace[] = [
   },
 ];
 
-const ProjectWorkspaces: NextPage = () => {
-  // Gestion de l'action sur un workspace
+export default function ProjectWorkspacesPage() {
+  const router = useRouter(); // fixed: create router once at top level (rules of hooks)
+
   const handleWorkspaceAction = (workspace: Workspace) => {
-    const router = useRouter();
     if (!workspace.isLaunched && workspace.userRole === 'Leader') {
-      // Pour un workspace non lancé accessible aux leaders, déclenchement de l'action de lancement
-      console.log(`Launching workspace: ${workspace.projectName}`);
-      // Par exemple, appeler une API puis rediriger ou mettre à jour l'état
-      message.success(`Workspace ${workspace.projectName} lancé avec succès.`);
-    } else {
-      // Pour un workspace lancé, naviguer vers la page du workspace
-      router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
+      // Example: launch action
+      // TODO: call API then refresh or navigate
+      message.success(`Workspace ${workspace.projectName} launched successfully.`);
+      return;
     }
+    // Navigate to workspace
+    router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
   };
 
-  // Définition des colonnes du tableau
-  const columns = [
+  const columns: ColumnsType<Workspace> = [
     {
       title: 'Workspace/Project Name',
       dataIndex: 'projectName',
@@ -82,12 +78,8 @@ const ProjectWorkspaces: NextPage = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) =>
-        status === 'Active' ? (
-          <Tag color="green">Active</Tag>
-        ) : (
-          <Tag color="volcano">Inactive</Tag>
-        ),
+      render: (status: Workspace['status']) =>
+        status === 'Active' ? <Tag color="green">Active</Tag> : <Tag color="volcano">Inactive</Tag>,
     },
     {
       title: 'Online Members',
@@ -98,7 +90,7 @@ const ProjectWorkspaces: NextPage = () => {
     {
       title: 'Action',
       key: 'action',
-      render: (_: any, record: Workspace) => {
+      render: (_: unknown, record: Workspace) => {
         let buttonLabel = '';
         if (!record.isLaunched && record.userRole === 'Leader') {
           buttonLabel = 'Launch Workspace';
@@ -126,18 +118,15 @@ const ProjectWorkspaces: NextPage = () => {
           Launch New Workspace
         </Button>
       </Space>
-      <Table
-        columns={columns}
-        dataSource={workspaceData}
-        rowKey="id"
-        pagination={{ pageSize: 5 }}
-      />
+      <Table columns={columns} dataSource={workspaceData} rowKey="id" pagination={{ pageSize: 5 }} />
     </PageContainer>
   );
-};
+}
 
-ProjectWorkspaces.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ProjectWorkspaces;
+/*
+Notes:
+- Removed NextPage type and legacy static getLayout. In the App Router, use a layout.tsx file
+  in this route segment if you need a layout wrapper.
+- Fixed rule-of-hooks violation by moving useRouter() to the component top level.
+- Removed unused Typography/Title import.
+*/

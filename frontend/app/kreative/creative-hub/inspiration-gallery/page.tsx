@@ -1,8 +1,6 @@
-'use client'
+'use client';
 
-// File: /pages/kreative/creative-hub/inspiration-gallery.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import {
   Row,
   Col,
@@ -16,17 +14,17 @@ import {
 } from 'antd';
 import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text, Paragraph } = Typography;
-const { TabPane } = Tabs;
+
+type Category = 'All' | 'Photography' | 'Painting' | 'Digital Art';
 
 interface CreativeWork {
   id: string;
   title: string;
   description: string;
   creator: string;
-  category: 'Photography' | 'Painting' | 'Digital Art';
+  category: Exclude<Category, 'All'>;
   imageUrl: string;
   likes: number;
   liked?: boolean;
@@ -96,20 +94,29 @@ const dummyWorks: CreativeWork[] = [
   },
 ];
 
-const InspirationGallery: NextPage = () => {
+export default function InspirationGalleryPage(): JSX.Element {
   // State for category filtering, pagination, Modal, and works.
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<Category>('All');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 6;
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedWork, setSelectedWork] = useState<CreativeWork | null>(null);
   const [works, setWorks] = useState<CreativeWork[]>(dummyWorks);
 
+  // Tabs (AntD v5) items
+  const tabItems = useMemo(
+    () => [
+      { key: 'All', label: 'All' },
+      { key: 'Photography', label: 'Photography' },
+      { key: 'Painting', label: 'Painting' },
+      { key: 'Digital Art', label: 'Digital Art' },
+    ],
+    []
+  );
+
   // Filter works based on selected category.
   const filteredWorks = useMemo(() => {
-    if (selectedCategory === 'All') {
-      return works;
-    }
+    if (selectedCategory === 'All') return works;
     return works.filter((work) => work.category === selectedCategory);
   }, [selectedCategory, works]);
 
@@ -117,19 +124,13 @@ const InspirationGallery: NextPage = () => {
   const paginatedWorks = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return filteredWorks.slice(startIndex, startIndex + pageSize);
-  }, [filteredWorks, currentPage, pageSize]);
+  }, [filteredWorks, currentPage]);
 
   // Handle like toggle.
   const toggleLike = (id: string) => {
-    setWorks((prevWorks) =>
-      prevWorks.map((work) =>
-        work.id === id
-          ? {
-              ...work,
-              liked: !work.liked,
-              likes: work.liked ? work.likes - 1 : work.likes + 1,
-            }
-          : work
+    setWorks((prev) =>
+      prev.map((w) =>
+        w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w
       )
     );
   };
@@ -148,21 +149,18 @@ const InspirationGallery: NextPage = () => {
 
   return (
     <PageContainer title="Inspiration Gallery">
-      {/* Category Filter implemented as Tabs */}
+      {/* Category Filter (AntD v5 Tabs API) */}
       <Tabs
         activeKey={selectedCategory}
         onChange={(key) => {
-          setSelectedCategory(key);
+          setSelectedCategory(key as Category);
           setCurrentPage(1);
         }}
         type="card"
+        items={tabItems}
         style={{ marginBottom: 24 }}
-      >
-        <TabPane tab="All" key="All" />
-        <TabPane tab="Photography" key="Photography" />
-        <TabPane tab="Painting" key="Painting" />
-        <TabPane tab="Digital Art" key="Digital Art" />
-      </Tabs>
+      />
+
       {/* Gallery Grid */}
       <Row gutter={[16, 16]}>
         {paginatedWorks.map((work) => (
@@ -178,6 +176,7 @@ const InspirationGallery: NextPage = () => {
               }
               actions={[
                 <Button
+                  key="like"
                   type="text"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -200,7 +199,8 @@ const InspirationGallery: NextPage = () => {
                   <>
                     <Text>{work.creator}</Text>
                     <br />
-                    <Paragraph type="secondary" ellipsis={{ rows: 2 }}>
+                    {/* Replace ellipsis={{ rows: 2 }} with CSS line clamp */}
+                    <Paragraph type="secondary" className="lineClamp2">
                       {work.description}
                     </Paragraph>
                   </>
@@ -210,6 +210,7 @@ const InspirationGallery: NextPage = () => {
           </Col>
         ))}
       </Row>
+
       {/* Pagination */}
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <Pagination
@@ -219,13 +220,9 @@ const InspirationGallery: NextPage = () => {
           onChange={(page) => setCurrentPage(page)}
         />
       </div>
+
       {/* Modal for work details */}
-      <Modal
-        open={modalVisible}
-        footer={null}
-        onCancel={closeModal}
-        width={800}
-      >
+      <Modal open={modalVisible} footer={null} onCancel={closeModal} width={800}>
         {selectedWork && (
           <>
             <img
@@ -245,21 +242,23 @@ const InspirationGallery: NextPage = () => {
                   ) : (
                     <HeartOutlined style={{ fontSize: 20 }} />
                   )}
-                  <Text style={{ marginLeft: 4 }}>
-                    {selectedWork.likes} Likes
-                  </Text>
+                  <Text style={{ marginLeft: 4 }}>{selectedWork.likes} Likes</Text>
                 </Button>
               </Space>
             </div>
           </>
         )}
       </Modal>
+
+      <style jsx>{`
+        /* Multi-line clamp to replace AntD ellipsis { rows } */
+        .lineClamp2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </PageContainer>
   );
-};
-
-InspirationGallery.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default InspirationGallery;
+}

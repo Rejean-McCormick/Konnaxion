@@ -1,53 +1,52 @@
-'use client'
+'use client';
 
-/**
- * Description: Like statistics card, including total likes and trend graph
- * Author: Hieu Chu
- */
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { TinyLineConfig } from '@ant-design/plots';
 
-import React from 'react'
-import ChartCard from '@/components/charts/ChartCard'
-import {
-  MainIcon,
-  CardDivider,
-  NumberInfoStyled,
-  CardFooter,
-  BarContainer,
-} from './style'
+// SSR-safe dynamic import of TinyLine
+const TinyLine = dynamic(
+  () => import('@ant-design/plots').then((m) => m.TinyLine),
+  { ssr: false }
+);
 
-type Point = { x: string | number; y: number }
-
-interface Props {
-  TOTAL_LIKES: number
-  DAILY_LIKES: number
-  DAILY_LIKES_CHANGE: number
-  LIKE_DATA: Point[]
+export interface LikeCardProps {
+  title?: string;            // Default: 'Likes'
+  total: number;             // Total likes
+  trend?: number[];          // Sparkline series
+  loading?: boolean;
 }
 
-export default function LikeCard({
-  TOTAL_LIKES,
-  DAILY_LIKES,
-  DAILY_LIKES_CHANGE,
-  LIKE_DATA,
-}: Props) {
+const LikeCard: React.FC<LikeCardProps> = ({
+  title = 'Likes',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const data: number[] = Array.isArray(trend) ? trend : [];
+
+  const config: TinyLineConfig = {
+    data,
+    autoFit: true,
+    smooth: true,
+    height: 56,
+    padding: 0,
+    tooltip: {},
+  };
+
   return (
-    <>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <MainIcon type="heart" twoToneColor="#eb2f96" />
-        <NumberInfoStyled subTitle="Likes" total={TOTAL_LIKES} />
-      </div>
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <TinyLine {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
 
-      <BarContainer>
-        <ChartCard type="area" data={LIKE_DATA} height={90} />
-      </BarContainer>
-
-      <CardDivider />
-
-      <CardFooter
-        title="Daily likes"
-        value={DAILY_LIKES}
-        change={DAILY_LIKES_CHANGE}
-      />
-    </>
-  )
-}
+export default LikeCard;

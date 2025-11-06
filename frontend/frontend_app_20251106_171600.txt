@@ -3,96 +3,96 @@
 2. C:\MyCode\Konnaxionv14\frontend\app\api\admin\stats\route.ts
 3. C:\MyCode\Konnaxionv14\frontend\app\api\health\route.ts
 4. C:\MyCode\Konnaxionv14\frontend\app\api\search\route.ts
-5. C:\MyCode\Konnaxionv14\frontend\app\concatv3.py
-6. C:\MyCode\Konnaxionv14\frontend\app\ekoh\achievements-badges\earned-badges-display\page.tsx
-7. C:\MyCode\Konnaxionv14\frontend\app\ekoh\dashboard\page.tsx
-8. C:\MyCode\Konnaxionv14\frontend\app\ekoh\expertise-areas\view-current-expertise\page.tsx
-9. C:\MyCode\Konnaxionv14\frontend\app\ekoh\layout.tsx
-10. C:\MyCode\Konnaxionv14\frontend\app\ekoh\overview-analytics\current-ekoh-score\page.tsx
-11. C:\MyCode\Konnaxionv14\frontend\app\ekoh\voting-influence\current-voting-weight\page.tsx
-12. C:\MyCode\Konnaxionv14\frontend\app\ethikos\admin\audit\page.tsx
-13. C:\MyCode\Konnaxionv14\frontend\app\ethikos\admin\moderation\page.tsx
-14. C:\MyCode\Konnaxionv14\frontend\app\ethikos\admin\roles\page.tsx
-15. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\elite\page.tsx
-16. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\methodology\page.tsx
-17. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\public\page.tsx
-18. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\results\page.tsx
-19. C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\[topic]\page.tsx
-20. C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\elite\page.tsx
-21. C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\guidelines\page.tsx
-22. C:\MyCode\Konnaxionv14\frontend\app\ethikos\impact\feedback\page.tsx
-23. C:\MyCode\Konnaxionv14\frontend\app\ethikos\impact\outcomes\page.tsx
-24. C:\MyCode\Konnaxionv14\frontend\app\ethikos\impact\tracker\page.tsx
-25. C:\MyCode\Konnaxionv14\frontend\app\ethikos\layout.tsx
-26. C:\MyCode\Konnaxionv14\frontend\app\ethikos\learn\changelog\page.tsx
-27. C:\MyCode\Konnaxionv14\frontend\app\ethikos\learn\glossary\page.tsx
-28. C:\MyCode\Konnaxionv14\frontend\app\ethikos\learn\guides\page.tsx
-29. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\health\page.tsx
-30. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\live\page.tsx
-31. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\overview\page.tsx
-32. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\trends\page.tsx
-33. C:\MyCode\Konnaxionv14\frontend\app\ethikos\trust\badges\page.tsx
-34. C:\MyCode\Konnaxionv14\frontend\app\ethikos\trust\credentials\page.tsx
-35. C:\MyCode\Konnaxionv14\frontend\app\ethikos\trust\profile\page.tsx
-36. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx
-37. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\match-preferences\page.tsx
-38. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\my-matches\page.tsx
-39. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\dashboard\page.tsx
-40. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\browse-repository\page.tsx
-41. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx
-42. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx
-43. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx
-44. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\layout.tsx
-45. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\browse-projects\page.tsx
-46. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\create-new-project\page.tsx
-47. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\my-projects\page.tsx
-48. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\project-workspace\page.tsx
-49. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx
-50. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx
-51. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\track-project-impact\page.tsx
-52. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
-53. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx
-54. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\view-reputation-ekoh\page.tsx
-55. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\browse-available-workspaces\page.tsx
-56. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx
-57. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
-58. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx
-59. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
-60. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx
-61. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx
-62. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
-63. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx
-64. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
-65. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx
-66. C:\MyCode\Konnaxionv14\frontend\app\konnected\layout.tsx
-67. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\browse-resources\page.tsx
-68. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\offline-content\page.tsx
-69. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\recommended-resources\page.tsx
-70. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\search-filters\page.tsx
-71. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\create-learning-path\page.tsx
-72. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx
-73. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\my-learning-path\page.tsx
-74. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\activity-planner\page.tsx
-75. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
-76. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx
-77. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\team-builder\page.tsx
-78. C:\MyCode\Konnaxionv14\frontend\app\konsensus\page.tsx
-79. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
-80. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
-81. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx
-82. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
-83. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx
-84. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
-85. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
-86. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
-87. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
-88. C:\MyCode\Konnaxionv14\frontend\app\kreative\dashboard\page.tsx
-89. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\collaborate-on-ideas\page.tsx
-90. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
-91. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
-92. C:\MyCode\Konnaxionv14\frontend\app\kreative\layout.tsx
-93. C:\MyCode\Konnaxionv14\frontend\app\layout.tsx
-94. C:\MyCode\Konnaxionv14\frontend\app\page.tsx
+5. C:\MyCode\Konnaxionv14\frontend\app\ekoh\achievements-badges\earned-badges-display\page.tsx
+6. C:\MyCode\Konnaxionv14\frontend\app\ekoh\dashboard\page.tsx
+7. C:\MyCode\Konnaxionv14\frontend\app\ekoh\expertise-areas\view-current-expertise\page.tsx
+8. C:\MyCode\Konnaxionv14\frontend\app\ekoh\layout.tsx
+9. C:\MyCode\Konnaxionv14\frontend\app\ekoh\overview-analytics\current-ekoh-score\page.tsx
+10. C:\MyCode\Konnaxionv14\frontend\app\ekoh\voting-influence\current-voting-weight\page.tsx
+11. C:\MyCode\Konnaxionv14\frontend\app\ethikos\admin\audit\page.tsx
+12. C:\MyCode\Konnaxionv14\frontend\app\ethikos\admin\moderation\page.tsx
+13. C:\MyCode\Konnaxionv14\frontend\app\ethikos\admin\roles\page.tsx
+14. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\elite\page.tsx
+15. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\methodology\page.tsx
+16. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\public\page.tsx
+17. C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\results\page.tsx
+18. C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\[topic]\page.tsx
+19. C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\elite\page.tsx
+20. C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\guidelines\page.tsx
+21. C:\MyCode\Konnaxionv14\frontend\app\ethikos\impact\feedback\page.tsx
+22. C:\MyCode\Konnaxionv14\frontend\app\ethikos\impact\outcomes\page.tsx
+23. C:\MyCode\Konnaxionv14\frontend\app\ethikos\impact\tracker\page.tsx
+24. C:\MyCode\Konnaxionv14\frontend\app\ethikos\layout.tsx
+25. C:\MyCode\Konnaxionv14\frontend\app\ethikos\learn\changelog\page.tsx
+26. C:\MyCode\Konnaxionv14\frontend\app\ethikos\learn\glossary\page.tsx
+27. C:\MyCode\Konnaxionv14\frontend\app\ethikos\learn\guides\page.tsx
+28. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\health\page.tsx
+29. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\live\page.tsx
+30. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\overview\page.tsx
+31. C:\MyCode\Konnaxionv14\frontend\app\ethikos\pulse\trends\page.tsx
+32. C:\MyCode\Konnaxionv14\frontend\app\ethikos\trust\badges\page.tsx
+33. C:\MyCode\Konnaxionv14\frontend\app\ethikos\trust\credentials\page.tsx
+34. C:\MyCode\Konnaxionv14\frontend\app\ethikos\trust\profile\page.tsx
+35. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx
+36. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\match-preferences\page.tsx
+37. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\my-matches\page.tsx
+38. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\dashboard\page.tsx
+39. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\browse-repository\page.tsx
+40. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx
+41. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx
+42. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx
+43. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\layout.tsx
+44. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\browse-projects\page.tsx
+45. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\create-new-project\page.tsx
+46. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\my-projects\page.tsx
+47. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\project-workspace\page.tsx
+48. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx
+49. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx
+50. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\track-project-impact\page.tsx
+51. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
+52. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx
+53. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\view-reputation-ekoh\page.tsx
+54. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\browse-available-workspaces\page.tsx
+55. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx
+56. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
+57. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx
+58. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
+59. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx
+60. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx
+61. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
+62. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx
+63. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
+64. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx
+65. C:\MyCode\Konnaxionv14\frontend\app\konnected\layout.tsx
+66. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\browse-resources\page.tsx
+67. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\offline-content\page.tsx
+68. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\recommended-resources\page.tsx
+69. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\search-filters\page.tsx
+70. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\create-learning-path\page.tsx
+71. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx
+72. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\my-learning-path\page.tsx
+73. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\activity-planner\page.tsx
+74. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
+75. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx
+76. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\team-builder\page.tsx
+77. C:\MyCode\Konnaxionv14\frontend\app\konsensus\page.tsx
+78. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
+79. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
+80. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx
+81. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
+82. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx
+83. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
+84. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
+85. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
+86. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
+87. C:\MyCode\Konnaxionv14\frontend\app\kreative\dashboard\page.tsx
+88. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\collaborate-on-ideas\page.tsx
+89. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
+90. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
+91. C:\MyCode\Konnaxionv14\frontend\app\kreative\layout.tsx
+92. C:\MyCode\Konnaxionv14\frontend\app\layout.tsx
+93. C:\MyCode\Konnaxionv14\frontend\app\page.tsx
+94. C:\MyCode\Konnaxionv14\frontend\app\providers\AuthProvider.tsx
 ===== END TOC =====
 
 
@@ -206,207 +206,6 @@ export async function GET(request: NextRequest) {
 }
 
 ===== END app/api/search/route.ts =====
-
-
-===== BEGIN app/concatv3.py =====
-#!/usr/bin/env python3
-"""
-Concatène tous les fichiers texte du dossier du script et de ses sous-dossiers.
-Par défaut, écrit le résultat dans "Code_<nom_dossier>_<YYYYMMDD_HHMMSS>.txt" à la racine du script.
-"""
-
-from __future__ import annotations
-import argparse
-import fnmatch
-import os
-from pathlib import Path
-from typing import Set, List, Optional
-from datetime import datetime
-
-DEFAULT_EXTS: Set[str] = {
-    ".tx", ".md", ".markdown",
-    ".json", ".yaml", ".yml", ".xml", ".toml", ".ini", ".cfg", ".conf", ".properties",
-    ".html", ".htm", ".css", ".scss", ".less",
-    ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs",
-    ".py", ".pyi", ".ipynb",
-    ".java", ".kt", ".swift", ".rb", ".php", ".go", ".rs",
-    ".c", ".h", ".cpp", ".cc", ".hpp", ".cs",
-    ".sql",
-    ".sh", ".bash", ".zsh", ".fish", ".ps1", ".bat",
-    ".tex", ".bib",
-    ".graphql", ".gql",
-    ".gradle",
-    ".pl", ".lua", ".r",
-    ".env",
-}
-
-NAMES_WITHOUT_EXT: Set[str] = {
-    "Dockerfile", "Makefile", "CMakeLists.txt",
-    ".gitignore", ".gitattributes", ".editorconfig",
-    "Procfile", "Gemfile", "requirements.txt", "Pipfile", "poetry.lock",
-    "package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
-    "tsconfig.json", "eslint.config.js", ".eslintrc", ".prettierrc",
-}
-
-DEFAULT_EXCLUDE_DIRS: Set[str] = {
-    ".git", ".hg", ".svn",
-    "node_modules", ".next", ".nuxt",
-    "dist", "build", "out", "coverage", ".cache",
-    ".venv", "venv", "__pycache__",
-    "target", "bin", "obj",
-}
-
-
-def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="Concatène les fichiers texte du projet dans un seul fichier.")
-    p.add_argument("-o", "--out", default=None, help="Fichier de sortie (facultatif)")
-    p.add_argument("--ext", help="Extensions additionnelles ou personnalisées, séparées par des virgules")
-    p.add_argument("--include", action="append", default=[], help="Glob d'inclusion relatif à la racine (répétable)")
-    p.add_argument("--exclude", action="append", default=[], help="Glob d'exclusion relatif à la racine (répétable)")
-    p.add_argument("--max-size", type=int, default=2_000_000, help="Taille max par fichier en octets")
-    p.add_argument("--no-headers", action="store_true", help="Ne pas imprimer d'entêtes par fichier")
-    return p.parse_args()
-
-
-def normalize_exts(exts_csv: Optional[str]) -> Set[str]:
-    if not exts_csv:
-        return set(DEFAULT_EXTS)
-    parts = [e.strip().lower() for e in exts_csv.split(",") if e.strip()]
-    normed = set()
-    for e in parts:
-        if not e.startswith("."):
-            e = "." + e
-        normed.add(e)
-    return normed
-
-
-def is_probably_text(sample: bytes) -> bool:
-    if not sample:
-        return True
-    if b"\x00" in sample:
-        return False
-    try:
-        sample.decode("utf-8")
-        return True
-    except UnicodeDecodeError:
-        pass
-    ctrl_hits = 0
-    for b in sample:
-        if b < 32 and b not in (9, 10, 13):
-            ctrl_hits += 1
-    return (ctrl_hits / max(1, len(sample))) < 0.01
-
-
-def pick_encoding(path: Path) -> Optional[str]:
-    try:
-        with path.open("rb") as f:
-            sample = f.read(32768)
-    except Exception:
-        return None
-    if not is_probably_text(sample):
-        return None
-    for enc in ("utf-8", "utf-8-sig", "utf-16", "cp1252", "latin-1"):
-        try:
-            sample.decode(enc)
-            return enc
-        except UnicodeDecodeError:
-            continue
-    return "latin-1"
-
-
-def relpath(base: Path, p: Path) -> str:
-    try:
-        return str(p.relative_to(base))
-    except Exception:
-        return str(p)
-
-
-def should_include_file(base: Path, file_path: Path, allowed_exts: Set[str],
-                        include_globs: List[str], exclude_globs: List[str],
-                        max_size: int, out_path: Path) -> bool:
-    if not file_path.is_file():
-        return False
-    if file_path == out_path:
-        return False
-    if file_path.suffix.lower() == ".txt":
-        return False
-    try:
-        if file_path.stat().st_size > max_size:
-            return False
-    except Exception:
-        return False
-    rel = relpath(base, file_path)
-    for pat in exclude_globs:
-        if fnmatch.fnmatch(rel, pat):
-            return False
-    if include_globs:
-        ok = any(fnmatch.fnmatch(rel, pat) for pat in include_globs)
-        if not ok:
-            return False
-    if file_path.suffix.lower() in allowed_exts or file_path.name in NAMES_WITHOUT_EXT:
-        return True
-    enc = pick_encoding(file_path)
-    return enc is not None
-
-
-def main() -> None:
-    args = parse_args()
-    base_dir = Path(__file__).resolve().parent
-    self_path = Path(__file__).resolve()
-
-    if args.out:
-        out_path = (base_dir / args.out).resolve()
-    else:
-        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        out_name = f"Code_{base_dir.name}_{stamp}.txt"
-        out_path = (base_dir / out_name).resolve()
-
-    allowed_exts = normalize_exts(args.ext)
-    include_globs = list(args.include or [])
-    exclude_globs = list(args.exclude or [])
-
-    selected: List[Path] = []
-    for root, dirs, files in os.walk(base_dir, followlinks=False):
-        dirs[:] = [d for d in dirs if d not in DEFAULT_EXCLUDE_DIRS]
-        root_path = Path(root)
-        for name in files:
-            fp = root_path / name
-            # exclure le script exécuté lui-même
-            try:
-                if fp.resolve() == self_path:
-                    continue
-            except Exception:
-                pass
-            if should_include_file(base_dir, fp, allowed_exts, include_globs, exclude_globs, args.max_size, out_path):
-                selected.append(fp)
-
-    selected.sort(key=lambda p: relpath(base_dir, p).lower())
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-
-    with out_path.open("w", encoding="utf-8", newline="\n") as out:
-        for p in selected:
-            enc = pick_encoding(p) or "utf-8"
-            if not args.no_headers:
-                out.write(f"\n===== BEGIN {relpath(base_dir, p)} =====\n")
-            try:
-                with p.open("r", encoding=enc, errors="strict") as f:
-                    for line in f:
-                        out.write(line)
-            except UnicodeDecodeError:
-                with p.open("r", encoding="latin-1", errors="replace") as f:
-                    for line in f:
-                        out.write(line)
-            if not args.no_headers:
-                out.write(f"\n===== END {relpath(base_dir, p)} =====\n")
-            out.write("\n")
-
-    print(f"{len(selected)} fichier(s) concaténé(s) -> {relpath(base_dir, out_path)}")
-
-
-if __name__ == "__main__":
-    main()
-
-===== END app/concatv3.py =====
 
 
 ===== BEGIN app/ekoh/achievements-badges/earned-badges-display/page.tsx =====
@@ -1119,6 +918,7 @@ export default CurrentVotingWeight;
 
 
 ===== BEGIN app/ethikos/admin/audit/page.tsx =====
+// app/ethikos/admin/audit/page.tsx
 'use client'
 
 import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components'
@@ -1141,10 +941,9 @@ type AuditPayload = { items: LogRow[] }
 export default function AuditLogs() {
   usePageTitle('Admin · Audit Logs')
 
-  // app/ethikos/admin/audit/page.tsx
   const { data, loading } = useRequest<AuditPayload, []>(async () => {
     const res = await fetchAuditLogs()
-    return res.data
+    return res                     // ← was `res.data`
   })
 
   const columns: ProColumns<LogRow>[] = [
@@ -1189,79 +988,91 @@ export default function AuditLogs() {
 ===== BEGIN app/ethikos/admin/moderation/page.tsx =====
 'use client'
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Tag, Popconfirm, Button } from 'antd';
-import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchModerationQueue, actOnReport } from '@/services/admin';
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { Tag, Popconfirm, Button } from 'antd'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchModerationQueue, actOnReport } from '@/services/admin'
 
 type Report = {
-  id: string;
-  content: string;
-  reporter: string;
-  type: 'Spam' | 'Harassment' | 'Misinformation';
-  status: 'Pending' | 'Resolved';
-};
+  id: string
+  content: string
+  reporter: string
+  type: 'Spam' | 'Harassment' | 'Misinformation'
+  status: 'Pending' | 'Resolved'
+}
+
+type ModerationPayload = { items: Report[] }
 
 export default function Moderation() {
-  usePageTitle('Admin · Moderation');
+  usePageTitle('Admin · Moderation')
 
-  const { data, loading, mutate } = useRequest(fetchModerationQueue);
+  const { data, loading, mutate } = useRequest<ModerationPayload, []>(
+    async () => await fetchModerationQueue()
+  )
 
-  const action = async (id: string, approve: boolean) => {
-    await actOnReport(id, approve);
-    mutate();
-  };
+  const handleModeration = async (id: string, approve: boolean) => {
+    await actOnReport(id, approve)
+    await mutate()
+  }
 
-  const columns = [
+  const columns: ProColumns<Report>[] = [
     { title: 'Content', dataIndex: 'content', ellipsis: true },
     { title: 'Reporter', dataIndex: 'reporter', width: 120 },
     {
       title: 'Type',
       dataIndex: 'type',
       width: 140,
-      render: (v: Report['type']) => <Tag color="orange">{v}</Tag>,
+      render: (_, row) => <Tag color="orange">{row.type}</Tag>,
+      filters: [
+        { text: 'Spam', value: 'Spam' },
+        { text: 'Harassment', value: 'Harassment' },
+        { text: 'Misinformation', value: 'Misinformation' },
+      ],
+      onFilter: (val, row) => row.type === (val as Report['type']),
     },
     {
       title: 'Status',
       dataIndex: 'status',
       width: 120,
-      render: (v: Report['status']) => (
-        <Tag color={v === 'Pending' ? 'gold' : 'green'}>{v}</Tag>
+      render: (_, row) => (
+        <Tag color={row.status === 'Pending' ? 'gold' : 'green'}>{row.status}</Tag>
       ),
+      filters: [
+        { text: 'Pending', value: 'Pending' },
+        { text: 'Resolved', value: 'Resolved' },
+      ],
+      onFilter: (val, row) => row.status === (val as Report['status']),
     },
     {
       title: 'Actions',
-      width: 160,
-      render: (_: any, row: Report) =>
-        row.status === 'Pending' && (
+      width: 180,
+      render: (_, row) =>
+        row.status === 'Pending' ? (
           <>
-            <Popconfirm title="Remove content?" onConfirm={() => action(row.id, true)}>
-              <Button size="small" danger>
-                Remove
-              </Button>
+            <Popconfirm title="Remove content?" onConfirm={() => handleModeration(row.id, true)}>
+              <Button size="small" danger>Remove</Button>
             </Popconfirm>
-            <Popconfirm title="Dismiss report?" onConfirm={() => action(row.id, false)}>
-              <Button size="small" style={{ marginLeft: 8 }}>
-                Dismiss
-              </Button>
+            <Popconfirm title="Dismiss report?" onConfirm={() => handleModeration(row.id, false)}>
+              <Button size="small" style={{ marginLeft: 8 }}>Dismiss</Button>
             </Popconfirm>
           </>
-        ),
+        ) : null,
     },
-  ];
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
       <ProTable<Report>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={{ pageSize: 10 }}
         search={false}
       />
     </PageContainer>
-  );
+  )
 }
 
 ===== END app/ethikos/admin/moderation/page.tsx =====
@@ -2688,7 +2499,7 @@ export default function Badges() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.earned.map(b => (
+        {data?.earned?.map((b) => (
           <Badge.Ribbon text="Earned" color="green" key={b.id}>
             <Card title={b.name} style={{ width: 220, marginBottom: 16 }}>
               <p>{b.desc}</p>
@@ -2696,9 +2507,9 @@ export default function Badges() {
           </Badge.Ribbon>
         ))}
 
-        {data?.progress.map(p => (
+        {data?.progress?.map((p) => (
           <Tooltip title={`${p.current}/${p.required}`} key={p.id}>
-            <Card title={p.name} variant="borderless" style={{ width: 220, marginBottom: 16 }}>
+            <Card title={p.name} bordered={false} style={{ width: 220, marginBottom: 16 }}>
               <Progress percent={Math.round((p.current / p.required) * 100)} />
             </Card>
           </Tooltip>
@@ -2783,7 +2594,7 @@ export default function MyProfile() {
     <PageContainer ghost loading={loading}>
       <ProCard split="vertical">
         <ProCard colSpan="25%">
-          <Avatar size={120} src={data?.avatar} />
+          <Avatar size={120} src={data?.avatar ?? undefined} />
           <Descriptions size="small" column={1} style={{ marginTop: 16 }}>
             <Descriptions.Item label="Name">{data?.name}</Descriptions.Item>
             <Descriptions.Item label="Joined">{data?.joined}</Descriptions.Item>
@@ -2794,7 +2605,7 @@ export default function MyProfile() {
         </ProCard>
         <ProCard title="Recent Activity" ghost>
           <Timeline>
-            {data?.activity.map(a => (
+            {data?.activity?.map((a) => (
               <Timeline.Item key={a.id}>
                 {a.when} · {a.text}
               </Timeline.Item>
@@ -4475,6 +4286,7 @@ import type { NextPage } from 'next';
 import { Steps, Button, Form, Input, Select, Upload, Result, message } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
+import { normalizeError } from "../../../../shared/errors";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -4507,7 +4319,8 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       setFormData((prev) => ({ ...prev, ...values }));
       setCurrentStep(currentStep + 1);
       form.resetFields();
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please fill in the required fields.');
     }
   };
@@ -4525,7 +4338,8 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       // Simulation d'enregistrement du projet.
       console.log('Project created with values:', { ...formData, ...values });
       setSubmitted(true);
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please fill in the required fields.');
     }
   };
@@ -6242,6 +6056,7 @@ import { Steps, Button, Form, Input, Select, Result, Divider, message } from 'an
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../../shared/errors";
 
 const { Step } = Steps;
 const { Option } = Select;
@@ -6276,7 +6091,8 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       setWorkspaceData(prev => ({ ...prev, ...values }));
       setCurrentStep(currentStep + 1);
       form.resetFields();
-    } catch (err) {
+    } catch (err: unknown) {
+      const { message, statusCode } = normalizeError(err);
       message.error('Please complete the required fields.');
     }
   };
@@ -6292,7 +6108,8 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       // Simuler la création du workspace (appel API à intégrer ici)
       console.log('Workspace created with data:', { ...workspaceData, ...values });
       setSubmitted(true);
-    } catch (err) {
+    } catch (err: unknown) {
+      const { message, statusCode } = normalizeError(err);
       message.error('Please ensure all fields are correctly filled.');
     }
   };
@@ -8882,6 +8699,7 @@ import { Form, Input, Select, Button, Modal, List, Card, Space, Divider, message
 import { ArrowUpOutlined, ArrowDownOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../../shared/errors";
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -8969,7 +8787,8 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
         setSteps(prev => [...prev, newStep]);
       }
       setStepModalVisible(false);
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please complete the step form.');
     }
   };
@@ -9009,7 +8828,8 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
         steps,
       });
       setSubmitted(true);
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error('Please complete the basic information form.');
     }
   };
@@ -9409,11 +9229,10 @@ export default MyLearningPath;
 
 
 ===== BEGIN app/konnected/teams-collaboration/activity-planner/page.tsx =====
-'use client'
+'use client';
 
-// File: /pages/konnected/teams-collaboration/activity-planner.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
+import type { CalendarProps } from 'antd';
 import {
   Calendar,
   Modal,
@@ -9431,34 +9250,40 @@ import {
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
-import moment, { Moment } from 'moment';
+import dayjs, { Dayjs } from 'dayjs';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
-// Définition de l'interface pour un événement
+/** Domain types */
 interface ActivityEvent {
   id: string;
   title: string;
   description: string;
-  // La date et l'heure de l'événement sont stockées sous forme d'objet moment
-  dateTime: Moment;
+  /** Stored as Dayjs (AntD v5 default) */
+  dateTime: Dayjs;
   owner: string;
   team: string;
 }
 
-// Liste fictive d'équipes pour le filtre et le formulaire
+interface ActivityForm {
+  eventTitle: string;
+  eventDescription?: string;
+  eventDate: Dayjs;
+  eventTime: Dayjs;
+  team: string;
+  owner: string;
+}
+
+/** Team list for filter and form */
 const teamOptions = ['All', 'Alpha Innovators', 'Beta Coders', 'Gamma Team'];
 
-const ActivityPlanner: NextPage = () => {
-  // État pour la liste des événements
+export default function Page() {
   const [events, setEvents] = useState<ActivityEvent[]>([
     {
       id: 'evt1',
       title: 'Team Meeting',
       description: 'Réunion d’équipe pour définir les prochaines étapes.',
-      dateTime: moment().add(2, 'days').hour(10).minute(0),
+      dateTime: dayjs().add(2, 'day').hour(10).minute(0),
       owner: 'Alice',
       team: 'Alpha Innovators',
     },
@@ -9466,73 +9291,68 @@ const ActivityPlanner: NextPage = () => {
       id: 'evt2',
       title: 'Sprint Planning',
       description: 'Planification du sprint avec présentation du backlog.',
-      dateTime: moment().add(4, 'days').hour(9).minute(30),
+      dateTime: dayjs().add(4, 'day').hour(9).minute(30),
       owner: 'Bob',
       team: 'Beta Coders',
     },
-    // Ajoutez d'autres événements si besoin
   ]);
-  // État pour le filtrage par équipe
+
   const [selectedTeam, setSelectedTeam] = useState<string>('All');
-  // État pour l'affichage du modal d'ajout d'événement
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  // Pour pré-remplir la date si l'utilisateur clique sur une date du calendrier
-  const [preSelectedDate, setPreSelectedDate] = useState<Moment | null>(null);
+  const [preSelectedDate, setPreSelectedDate] = useState<Dayjs | null>(null);
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<ActivityForm>();
 
-  // Filtrage des événements en fonction de l'équipe sélectionnée
   const filteredEvents =
     selectedTeam === 'All'
       ? events
       : events.filter((evt) => evt.team === selectedTeam);
 
-  // Définition de la fonction de rendu d'une cellule de date dans le calendrier
-  const dateCellRender = (value: Moment) => {
-    const listData = events.filter((evt) =>
-      evt.dateTime.isSame(value, 'day')
-    );
-    return listData.length ? (
+  /** AntD v5: use `cellRender` for date cells */
+  const cellRender: CalendarProps<Dayjs>['cellRender'] = (value, info) => {
+    if (info.type !== 'date') return info.originNode;
+    const listData = events.filter((evt) => evt.dateTime.isSame(value, 'day'));
+    if (!listData.length) return info.originNode;
+
+    return (
       <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
         {listData.map((item) => (
           <li key={item.id}>
-            <Text style={{ fontSize: 10, color: '#1890ff' }}>{item.title}</Text>
+            <Text style={{ fontSize: 10 }}>{item.title}</Text>
           </li>
         ))}
       </ul>
-    ) : null;
+    );
   };
 
-  // Lorsque l'utilisateur clique sur une date, ouvrir le modal avec la date pré-remplie
-  const handleDateSelect = (value: Moment) => {
+  /** Calendar selection uses Dayjs in AntD v5 */
+  const handleDateSelect = (value: Dayjs) => {
     setPreSelectedDate(value);
-    form.setFieldsValue({
-      eventDate: value,
-      eventTime: null,
-    });
+    // preset only the date; time stays empty until user picks it
+    form.setFieldsValue({ eventDate: value } as Partial<ActivityForm>);
     setModalVisible(true);
   };
 
-  // Gestion de la soumission du formulaire d'ajout d'événement
-  const handleAddEvent = (values: any) => {
+  /** Submit new event with strongly typed form values */
+  const handleAddEvent = (values: ActivityForm) => {
     const { eventTitle, eventDescription, eventDate, eventTime, team, owner } =
       values;
-    // Combiner la date et l'heure pour obtenir la dateTime complète
-    const dateTime = eventDate.clone().set({
-      hour: eventTime.hour(),
-      minute: eventTime.minute(),
-      second: 0,
-    });
+
+    const dateTime = eventDate
+      .clone()
+      .set({ hour: eventTime.hour(), minute: eventTime.minute(), second: 0, millisecond: 0 });
+
     const newEvent: ActivityEvent = {
-      id: `evt${Date.now()}`, // Génération simple de l'ID
+      id: `evt${Date.now()}`,
       title: eventTitle,
-      description: eventDescription,
+      description: eventDescription ?? '',
       dateTime,
       owner,
       team,
     };
-    setEvents([...events, newEvent]);
-    message.success('L’événement a été ajouté.');
+
+    setEvents((prev) => [...prev, newEvent]);
+    message.success('Activity added');
     form.resetFields();
     setPreSelectedDate(null);
     setModalVisible(false);
@@ -9542,26 +9362,24 @@ const ActivityPlanner: NextPage = () => {
     <PageContainer title="Activity Planner">
       <Row gutter={[24, 24]}>
         <Col xs={24} md={16}>
-          <Calendar dateCellRender={dateCellRender} onSelect={handleDateSelect} />
+          <Calendar cellRender={cellRender} onSelect={handleDateSelect} />
         </Col>
+
         <Col xs={24} md={8}>
           <Title level={4}>Upcoming Activities</Title>
+
           <Select
             style={{ width: '100%', marginBottom: 16 }}
             value={selectedTeam}
-            onChange={(value) => setSelectedTeam(value)}
-          >
-            {teamOptions.map((team) => (
-              <Option key={team} value={team}>
-                {team}
-              </Option>
-            ))}
-          </Select>
+            onChange={(value: string) => setSelectedTeam(value)}
+            options={teamOptions.map((t) => ({ value: t, label: t }))}
+          />
+
           <List
-            dataSource={filteredEvents.sort((a, b) =>
-              a.dateTime.diff(b.dateTime)
+            dataSource={[...filteredEvents].sort((a, b) =>
+              a.dateTime.diff(b.dateTime),
             )}
-            renderItem={(item) => (
+            renderItem={(item: ActivityEvent) => (
               <List.Item>
                 <List.Item.Meta
                   title={item.title}
@@ -9580,6 +9398,7 @@ const ActivityPlanner: NextPage = () => {
               </List.Item>
             )}
           />
+
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -9594,7 +9413,7 @@ const ActivityPlanner: NextPage = () => {
           </Button>
         </Col>
       </Row>
-      {/* Modal pour ajouter un nouvel événement */}
+
       <Modal
         title="Add New Activity"
         open={modalVisible}
@@ -9605,56 +9424,52 @@ const ActivityPlanner: NextPage = () => {
         }}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleAddEvent}>
+        <Form<ActivityForm> form={form} layout="vertical" onFinish={handleAddEvent}>
           <Form.Item
             label="Event Title"
             name="eventTitle"
-            rules={[{ required: true, message: 'Veuillez saisir le titre de l’événement.' }]}
+            rules={[{ required: true, message: 'Please enter the event title.' }]}
           >
-            <Input placeholder="Entrez le titre de l’événement" />
+            <Input placeholder="Event title" />
           </Form.Item>
-          <Form.Item
-            label="Description"
-            name="eventDescription"
-          >
-            <Input.TextArea rows={3} placeholder="Description de l’événement" />
+
+          <Form.Item label="Description" name="eventDescription">
+            <Input.TextArea rows={3} placeholder="Event description" />
           </Form.Item>
+
           <Form.Item
             label="Date"
             name="eventDate"
-            initialValue={preSelectedDate ? preSelectedDate : null}
-            rules={[{ required: true, message: 'Veuillez sélectionner la date.' }]}
+            rules={[{ required: true, message: 'Please select a date.' }]}
           >
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
+
           <Form.Item
             label="Time"
             name="eventTime"
-            rules={[{ required: true, message: 'Veuillez sélectionner l’heure.' }]}
+            rules={[{ required: true, message: 'Please select a time.' }]}
           >
             <TimePicker style={{ width: '100%' }} format="HH:mm" />
           </Form.Item>
+
           <Form.Item
             label="Team"
             name="team"
-            rules={[{ required: true, message: 'Veuillez sélectionner l’équipe.' }]}
-            initialValue={teamOptions[1]} // Par défaut, par exemple, la première équipe réelle
+            rules={[{ required: true, message: 'Please select a team.' }]}
+            initialValue={teamOptions[1]}
           >
-            <Select>
-              {teamOptions.filter((t) => t !== 'All').map((team) => (
-                <Option key={team} value={team}>
-                  {team}
-                </Option>
-              ))}
-            </Select>
+            <Select options={teamOptions.filter((t) => t !== 'All').map((t) => ({ value: t, label: t }))} />
           </Form.Item>
+
           <Form.Item
             label="Owner"
             name="owner"
-            rules={[{ required: true, message: 'Veuillez saisir le nom du responsable.' }]}
+            rules={[{ required: true, message: 'Please enter the owner.' }]}
           >
-            <Input placeholder="Nom du responsable" />
+            <Input placeholder="Owner name" />
           </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               Add Activity
@@ -9664,13 +9479,7 @@ const ActivityPlanner: NextPage = () => {
       </Modal>
     </PageContainer>
   );
-};
-
-ActivityPlanner.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ActivityPlanner;
+}
 
 ===== END app/konnected/teams-collaboration/activity-planner/page.tsx =====
 
@@ -9893,18 +9702,16 @@ export default TeamsCollaboration;
 
 
 ===== BEGIN app/konnected/teams-collaboration/project-workspaces/page.tsx =====
-"use client";
-// File: /pages/konnected/teams-collaboration/project-workspaces.tsx
+'use client';
+
+// File: app/konnected/teams-collaboration/project-workspaces/page.tsx
 import React from 'react';
-import { NextPage } from 'next';
-import { Table, Button, Tag, Typography, Space, message } from 'antd';
+import { Table, Button, Tag, Space, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title } = Typography;
-
-// Interface décrivant la structure d'un workspace
+// Workspace data shape
 interface Workspace {
   id: string;
   projectName: string;
@@ -9915,7 +9722,7 @@ interface Workspace {
   userRole: 'Leader' | 'Member';
 }
 
-// Exemple de données de workspaces
+// Example data
 const workspaceData: Workspace[] = [
   {
     id: '1',
@@ -9946,23 +9753,21 @@ const workspaceData: Workspace[] = [
   },
 ];
 
-const ProjectWorkspaces: NextPage = () => {
-  // Gestion de l'action sur un workspace
+export default function ProjectWorkspacesPage() {
+  const router = useRouter(); // fixed: create router once at top level (rules of hooks)
+
   const handleWorkspaceAction = (workspace: Workspace) => {
-    const router = useRouter();
     if (!workspace.isLaunched && workspace.userRole === 'Leader') {
-      // Pour un workspace non lancé accessible aux leaders, déclenchement de l'action de lancement
-      console.log(`Launching workspace: ${workspace.projectName}`);
-      // Par exemple, appeler une API puis rediriger ou mettre à jour l'état
-      message.success(`Workspace ${workspace.projectName} lancé avec succès.`);
-    } else {
-      // Pour un workspace lancé, naviguer vers la page du workspace
-      router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
+      // Example: launch action
+      // TODO: call API then refresh or navigate
+      message.success(`Workspace ${workspace.projectName} launched successfully.`);
+      return;
     }
+    // Navigate to workspace
+    router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
   };
 
-  // Définition des colonnes du tableau
-  const columns = [
+  const columns: ColumnsType<Workspace> = [
     {
       title: 'Workspace/Project Name',
       dataIndex: 'projectName',
@@ -9977,12 +9782,8 @@ const ProjectWorkspaces: NextPage = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) =>
-        status === 'Active' ? (
-          <Tag color="green">Active</Tag>
-        ) : (
-          <Tag color="volcano">Inactive</Tag>
-        ),
+      render: (status: Workspace['status']) =>
+        status === 'Active' ? <Tag color="green">Active</Tag> : <Tag color="volcano">Inactive</Tag>,
     },
     {
       title: 'Online Members',
@@ -9993,7 +9794,7 @@ const ProjectWorkspaces: NextPage = () => {
     {
       title: 'Action',
       key: 'action',
-      render: (_: any, record: Workspace) => {
+      render: (_: unknown, record: Workspace) => {
         let buttonLabel = '';
         if (!record.isLaunched && record.userRole === 'Leader') {
           buttonLabel = 'Launch Workspace';
@@ -10021,21 +9822,18 @@ const ProjectWorkspaces: NextPage = () => {
           Launch New Workspace
         </Button>
       </Space>
-      <Table
-        columns={columns}
-        dataSource={workspaceData}
-        rowKey="id"
-        pagination={{ pageSize: 5 }}
-      />
+      <Table columns={columns} dataSource={workspaceData} rowKey="id" pagination={{ pageSize: 5 }} />
     </PageContainer>
   );
-};
+}
 
-ProjectWorkspaces.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ProjectWorkspaces;
+/*
+Notes:
+- Removed NextPage type and legacy static getLayout. In the App Router, use a layout.tsx file
+  in this route segment if you need a layout wrapper.
+- Fixed rule-of-hooks violation by moving useRouter() to the component top level.
+- Removed unused Typography/Title import.
+*/
 
 ===== END app/konnected/teams-collaboration/project-workspaces/page.tsx =====
 
@@ -10043,184 +9841,193 @@ export default ProjectWorkspaces;
 ===== BEGIN app/konnected/teams-collaboration/team-builder/page.tsx =====
 'use client';
 
-// File: /pages/konnected/teams-collaboration/team-builder.tsx
-import React, { useState } from 'react';
-import { NextPage } from 'next';
-import {
-  Form,
-  Input,
-  Button,
-  Steps,
-  Upload,
-  message,
-  Avatar,
-  Select,
-  Space,
-} from 'antd';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
+import React, { useMemo, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-components';
+import { Steps, Form, Input, Button, Space, Table, Typography, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 
-const { Step } = Steps;
-const { Option } = Select;
+type TeamInfo = {
+  name: string;
+  description?: string;
+};
 
-const TeamBuilder: NextPage = () => {
+type Member = {
+  id?: string;       // may be undefined when newly added
+  email: string;
+  role?: string;
+};
+
+export default function TeamBuilderPage() {
+  const router = useRouter();
+
+  // ----- Step state -----
   const [currentStep, setCurrentStep] = useState<number>(0);
-  const [form] = Form.useForm();
 
-  // Passage à l'étape suivante après validation des champs de l'étape actuelle
-  const next = () => {
-    form
-      .validateFields()
-      .then(() => {
-        setCurrentStep(currentStep + 1);
-      })
-      .catch(() => {
-        message.error('Veuillez compléter les champs obligatoires.');
-      });
-  };
+  const steps = useMemo(
+    () => [{ title: 'Team Info' }, { title: 'Invite Members' }],
+    []
+  );
 
-  // Retour à l'étape précédente
-  const prev = () => {
-    setCurrentStep(currentStep - 1);
-  };
+  // ----- Form state -----
+  const [teamInfoForm] = Form.useForm<TeamInfo>();
+  const [inviteForm] = Form.useForm<Member>();
 
-  // Gestion de la soumission du formulaire complet (création de l'équipe)
-  const onFinish = (values: any) => {
-    const router = useRouter();
-    console.log('Team Created:', values);
-    message.success('L’équipe a été créée avec succès et les invitations ont été envoyées!');
-    // Redirection vers "My Teams"
-    router.push('/konnected/teams-collaboration/my-teams');
-  };
+  const [teamInfo, setTeamInfo] = useState<TeamInfo>({ name: '' });
+  const [members, setMembers] = useState<Member[]>([]);
 
-  // Définition des titres des étapes
-  const steps = [
-    { title: 'Team Info' },
-    { title: 'Invite Members' },
+  // ----- Table columns with safe row keys -----
+  const columns: ColumnsType<Member> = [
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      render: (text: string) => <Typography.Text>{text}</Typography.Text>,
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+      render: (text?: string) => <Typography.Text>{text || 'Member'}</Typography.Text>,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          <Button
+            onClick={() =>
+              setMembers((prev) =>
+                prev.filter((m) => (m.id ?? m.email) !== (record.id ?? record.email))
+              )
+            }
+          >
+            Remove
+          </Button>
+        </Space>
+      ),
+    },
   ];
+
+  // ----- Handlers -----
+  const submitTeamInfo = async () => {
+    try {
+      const values = await teamInfoForm.validateFields();
+      setTeamInfo(values);
+      setCurrentStep(1);
+    } catch {
+      // validation errors are shown by antd
+    }
+  };
+
+  const addMember = async () => {
+    try {
+      const values = await inviteForm.validateFields();
+      // ensure a stable non-undefined key; prefer provided id else generate from email
+      const stableId = values.id && values.id.trim().length > 0
+        ? values.id
+        : `${values.email.toLowerCase()}-${Date.now()}`;
+
+      setMembers((prev) => {
+        // dedupe by email
+        if (prev.some((m) => m.email.toLowerCase() === values.email.toLowerCase())) {
+          message.warning('This email is already invited.');
+          return prev;
+        }
+        return [...prev, { ...values, id: stableId }];
+      });
+      inviteForm.resetFields();
+    } catch {
+      // validation errors are shown by antd
+    }
+  };
+
+  const finish = async () => {
+    // TODO: replace with actual API call
+    message.success('Team created');
+    router.push('/konnected/teams-collaboration/project-workspaces');
+  };
 
   return (
     <PageContainer title="Team Builder">
-      <Steps current={currentStep} style={{ marginBottom: 24 }}>
-        {steps.map((item) => (
-          <Step key={item.title} title={item.title} />
-        ))}
-      </Steps>
-      <Form form={form} layout="vertical" onFinish={onFinish}>
+      <Space direction="vertical" style={{ width: '100%' }} size="large">
+        <Steps current={currentStep} items={steps} />
+
         {currentStep === 0 && (
-          <>
+          <Form
+            form={teamInfoForm}
+            layout="vertical"
+            initialValues={teamInfo}
+            onFinish={submitTeamInfo}
+          >
             <Form.Item
-              label="Team Name"
-              name="teamName"
-              rules={[{ required: true, message: 'Veuillez saisir le nom de l’équipe.' }]}
+              label="Team name"
+              name="name"
+              rules={[{ required: true, message: 'Please enter a team name' }]}
             >
-              <Input placeholder="Entrez le nom de l’équipe" />
+              <Input placeholder="e.g. Product Growth" />
             </Form.Item>
-            <Form.Item
-              label="Team Purpose/Goal"
-              name="teamPurpose"
-              rules={[{ required: true, message: 'Veuillez indiquer le but de l’équipe.' }]}
-            >
-              <Input placeholder="Quel est l’objectif de l’équipe ?" />
+
+            <Form.Item label="Description" name="description">
+              <Input.TextArea placeholder="Optional description" autoSize={{ minRows: 3 }} />
             </Form.Item>
-            <Form.Item label="Team Description" name="teamDescription">
-              <Input.TextArea rows={4} placeholder="Description optionnelle de l’équipe" />
-            </Form.Item>
-            <Form.Item label="Team Avatar" name="teamAvatar">
-              <Upload name="avatar" listType="picture" maxCount={1}>
-                <Button icon={<UploadOutlined />}>Télécharger un avatar</Button>
-              </Upload>
-            </Form.Item>
-          </>
+
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Next
+              </Button>
+            </Space>
+          </Form>
         )}
 
         {currentStep === 1 && (
           <>
-            <Form.List name="invitedMembers">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map((field) => (
-                    <Space
-                      key={field.key}
-                      align="baseline"
-                      style={{ display: 'flex', marginBottom: 8 }}
-                    >
-                      <Form.Item
-                        {...field}
-                        name={[field.name, 'email']}
-                        fieldKey={[field.fieldKey, 'email']}
-                        rules={[{ required: true, message: 'Veuillez saisir l’email du membre' }]}
-                      >
-                        <Input placeholder="Email du membre" />
-                      </Form.Item>
-                      <Form.Item
-                        {...field}
-                        name={[field.name, 'role']}
-                        fieldKey={[field.fieldKey, 'role']}
-                        rules={[{ required: true, message: 'Veuillez sélectionner un rôle' }]}
-                      >
-                        <Select placeholder="Rôle" style={{ width: 120 }}>
-                          <Option value="Member">Member</Option>
-                          <Option value="Co-Lead">Co-Lead</Option>
-                        </Select>
-                      </Form.Item>
-                      <Button type="link" onClick={() => remove(field.name)}>
-                        Supprimer
-                      </Button>
-                    </Space>
-                  ))}
-                  <Form.Item>
-                    <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
-                      Ajouter un membre
-                    </Button>
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
+            <Form form={inviteForm} layout="inline" onFinish={addMember}>
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: 'Email required' },
+                  { type: 'email', message: 'Invalid email' },
+                ]}
+              >
+                <Input placeholder="member@example.com" />
+              </Form.Item>
 
-            {/* Prévisualisation des membres invités via Avatar.Group */}
-            {form.getFieldValue('invitedMembers') &&
-              form.getFieldValue('invitedMembers').length > 0 && (
-                <Form.Item label="Invited Members Preview">
-                  <Avatar.Group>
-                    {form.getFieldValue('invitedMembers').map((member: any, index: number) => (
-                      <Avatar key={index} style={{ backgroundColor: '#87d068' }}>
-                        {member.email.charAt(0).toUpperCase()}
-                      </Avatar>
-                    ))}
-                  </Avatar.Group>
-                </Form.Item>
-              )}
+              <Form.Item name="role" initialValue="Member">
+                <Input placeholder="Role (optional)" />
+              </Form.Item>
+
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Add
+                </Button>
+              </Form.Item>
+            </Form>
+
+            <Table<Member>
+              dataSource={members}
+              columns={columns}
+              // rowKey fix: never undefined
+              rowKey={(record) => record.id ?? record.email}
+              pagination={false}
+            />
+
+            <Space>
+              <Button onClick={() => setCurrentStep(0)}>Back</Button>
+              <Button
+                type="primary"
+                onClick={finish}
+                disabled={!teamInfo.name || members.length === 0}
+              >
+                Create team
+              </Button>
+            </Space>
           </>
         )}
-
-        <Form.Item>
-          <Space>
-            {currentStep > 0 && <Button onClick={prev}>Précédent</Button>}
-            {currentStep < steps.length - 1 && (
-              <Button type="primary" onClick={next}>
-                Suivant
-              </Button>
-            )}
-            {currentStep === steps.length - 1 && (
-              <Button type="primary" htmlType="submit">
-                Créer l’équipe
-              </Button>
-            )}
-          </Space>
-        </Form.Item>
-      </Form>
+      </Space>
     </PageContainer>
   );
-};
-
-TeamBuilder.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default TeamBuilder;
+}
 
 ===== END app/konnected/teams-collaboration/team-builder/page.tsx =====
 
@@ -10510,29 +10317,25 @@ export default FindSpaces;
 ===== BEGIN app/kreative/collaborative-spaces/my-spaces/page.tsx =====
 'use client';
 
-// File: /pages/kreative/collaborative-spaces/my-spaces.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import { List, Button, Input, Select, Badge, Avatar, Space, Row, Col, Typography } from 'antd';
 import { TeamOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
-// Define an interface for a collaborative space.
+// Collaborative space model
 interface CollaborativeSpace {
   id: string;
   name: string;
   topic: string;
   membersCount: number;
   category: 'Studio' | 'Club' | 'Community';
-  unreadCount: number; // Number of unread messages or new activity.
+  unreadCount: number;
 }
 
-// Dummy data for collaborative spaces.
+// Demo data
 const dummySpaces: CollaborativeSpace[] = [
   {
     id: '1',
@@ -10558,33 +10361,27 @@ const dummySpaces: CollaborativeSpace[] = [
     category: 'Community',
     unreadCount: 5,
   },
-  // Additional spaces can be added here.
 ];
 
-const MySpacesPage: NextPage = () => {
-  // State for category filtering.
+export default function MySpacesPage(): JSX.Element {
+  const router = useRouter();
+
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  // State for search query.
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Filter spaces based on selected category and search input.
   const filteredSpaces = useMemo(() => {
     let spaces = dummySpaces;
     if (selectedCategory !== 'All') {
-      spaces = spaces.filter((space) => space.category === selectedCategory);
+      spaces = spaces.filter((s) => s.category === selectedCategory);
     }
     if (searchQuery.trim() !== '') {
-      spaces = spaces.filter((space) =>
-        space.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        space.topic.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const q = searchQuery.toLowerCase();
+      spaces = spaces.filter((s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q));
     }
     return spaces;
   }, [selectedCategory, searchQuery]);
 
-  // Function to handle entering a space.
   const enterSpace = (id: string) => {
-    const router = useRouter();
     router.push(`/kreative/collaborative-spaces/${id}`);
   };
 
@@ -10593,7 +10390,6 @@ const MySpacesPage: NextPage = () => {
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Col>
           <Space>
-            {/* Search Input */}
             <Input
               placeholder="Search spaces..."
               prefix={<SearchOutlined />}
@@ -10601,17 +10397,17 @@ const MySpacesPage: NextPage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: 300 }}
             />
-            {/* Category Filter */}
             <Select
               value={selectedCategory}
-              onChange={(value) => setSelectedCategory(value)}
-              style={{ width: 180 }}
-            >
-              <Option value="All">All Categories</Option>
-              <Option value="Studio">Studio</Option>
-              <Option value="Club">Club</Option>
-              <Option value="Community">Community</Option>
-            </Select>
+              onChange={setSelectedCategory}
+              style={{ width: 200 }}
+              options={[
+                { value: 'All', label: 'All Categories' },
+                { value: 'Studio', label: 'Studio' },
+                { value: 'Club', label: 'Club' },
+                { value: 'Community', label: 'Community' },
+              ]}
+            />
           </Space>
         </Col>
         <Col>
@@ -10624,16 +10420,19 @@ const MySpacesPage: NextPage = () => {
           </Button>
         </Col>
       </Row>
-      {/* Collaborative Spaces List */}
+
       <List
         itemLayout="horizontal"
         dataSource={filteredSpaces}
         renderItem={(space: CollaborativeSpace) => (
-          <List.Item key={space.id} actions={[
-            <Button type="primary" onClick={() => enterSpace(space.id)}>
-              Enter Space
-            </Button>,
-          ]}>
+          <List.Item
+            key={space.id}
+            actions={[
+              <Button key="enter" type="primary" onClick={() => enterSpace(space.id)}>
+                Enter Space
+              </Button>,
+            ]}
+          >
             <List.Item.Meta
               avatar={
                 space.unreadCount > 0 ? (
@@ -10646,9 +10445,11 @@ const MySpacesPage: NextPage = () => {
               }
               title={<Title level={4} style={{ margin: 0 }}>{space.name}</Title>}
               description={
-                <Space direction="vertical">
-                  <Text strong>Topic:</Text> <Text>{space.topic}</Text>
-                  <Text strong>Members:</Text> <Text>{space.membersCount}</Text>
+                <Space direction="vertical" size={0}>
+                  <Text strong>Topic:</Text>
+                  <Text>{space.topic}</Text>
+                  <Text strong>Members:</Text>
+                  <Text>{space.membersCount}</Text>
                 </Space>
               }
             />
@@ -10657,13 +10458,7 @@ const MySpacesPage: NextPage = () => {
       />
     </PageContainer>
   );
-};
-
-MySpacesPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default MySpacesPage;
+}
 
 ===== END app/kreative/collaborative-spaces/my-spaces/page.tsx =====
 
@@ -10846,18 +10641,26 @@ export default StartNewSpace;
 ===== BEGIN app/kreative/community-showcases/featured-projects/page.tsx =====
 'use client';
 
-// File: /pages/kreative/community-showcases/featured-projects.tsx
+// File: app/kreative/community-showcases/featured-projects/page.tsx
 import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
-import { Card, Row, Col, Input, Select, Modal, Pagination, Typography, Badge, Space } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import {
+  Card,
+  Row,
+  Col,
+  Input,
+  Select,
+  Modal,
+  Pagination,
+  Typography,
+  Badge,
+  Space,
+  Button, // fixed: ensure Button is imported
+} from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Title, Text, Paragraph } = Typography;
 
 interface Project {
   id: string;
@@ -10872,7 +10675,8 @@ const dummyProjects: Project[] = [
   {
     id: '1',
     title: 'Project Sunrise',
-    description: 'An inspiring project that captures the beauty of dawn with innovative photo techniques and a vivid color palette.',
+    description:
+      'An inspiring project that captures the beauty of dawn with innovative photo techniques and a vivid color palette.',
     creator: 'Alice Johnson',
     coverImage: 'https://via.placeholder.com/400x300.png?text=Project+Sunrise',
     category: 'Photography',
@@ -10880,7 +10684,8 @@ const dummyProjects: Project[] = [
   {
     id: '2',
     title: 'Digital Dreamscape',
-    description: 'A surreal digital art piece combining abstract concepts with vibrant colors to evoke emotion.',
+    description:
+      'A surreal digital art piece combining abstract concepts with vibrant colors to evoke emotion.',
     creator: 'Bob Smith',
     coverImage: 'https://via.placeholder.com/400x300.png?text=Digital+Dreamscape',
     category: 'Digital Art',
@@ -10888,7 +10693,8 @@ const dummyProjects: Project[] = [
   {
     id: '3',
     title: 'Urban Poetry',
-    description: 'A mixed-media project blending urban photography with spoken word performance, reimagining cityscapes in a poetic light.',
+    description:
+      'A mixed-media project blending urban photography with spoken word performance, reimagining cityscapes in a poetic light.',
     creator: 'Carol Lee',
     coverImage: 'https://via.placeholder.com/400x300.png?text=Urban+Poetry',
     category: 'Mixed Media',
@@ -10896,20 +10702,22 @@ const dummyProjects: Project[] = [
   {
     id: '4',
     title: 'Vintage Revival',
-    description: 'A creative reinterpretation of vintage art styles merged with modern design sensibilities.',
+    description:
+      'A creative reinterpretation of vintage art styles merged with modern design sensibilities.',
     creator: 'David Kim',
     coverImage: 'https://via.placeholder.com/400x300.png?text=Vintage+Revival',
     category: 'Painting',
   },
-  // Add additional project entries as needed.
 ];
 
-const FeaturedProjects: NextPage = () => {
+export default function FeaturedProjectsPage(): JSX.Element {
+  const router = useRouter(); // fixed: useRouter from next/navigation
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  
+
   // Pagination state.
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 4;
@@ -10918,13 +10726,13 @@ const FeaturedProjects: NextPage = () => {
   const filteredProjects = useMemo(() => {
     let projects = dummyProjects;
     if (selectedCategory !== 'All') {
-      projects = projects.filter(project => project.category === selectedCategory);
+      projects = projects.filter((project) => project.category === selectedCategory);
     }
     if (searchQuery.trim() !== '') {
       projects = projects.filter(
-        project =>
+        (project) =>
           project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          project.description.toLowerCase().includes(searchQuery.toLowerCase())
+          project.description.toLowerCase().includes(searchQuery.toLowerCase()),
       );
     }
     return projects;
@@ -10950,7 +10758,7 @@ const FeaturedProjects: NextPage = () => {
       {/* Filter Section */}
       <Space wrap style={{ marginBottom: 24 }}>
         <Input
-          placeholder="Search projects..."
+          placeholder="Search projects."
           prefix={<SearchOutlined />}
           value={searchQuery}
           onChange={(e) => {
@@ -10959,22 +10767,25 @@ const FeaturedProjects: NextPage = () => {
           }}
           style={{ width: 300 }}
         />
+
+        {/* refactor: avoid deprecated Select.Option, use options prop */}
         <Select
           value={selectedCategory}
           onChange={(value) => {
             setSelectedCategory(value);
             setCurrentPage(1);
           }}
-          style={{ width: 200 }}
-        >
-          <Option value="All">All Categories</Option>
-          <Option value="Photography">Photography</Option>
-          <Option value="Digital Art">Digital Art</Option>
-          <Option value="Mixed Media">Mixed Media</Option>
-          <Option value="Painting">Painting</Option>
-          {/* Add more categories as needed */}
-        </Select>
+          style={{ width: 220 }}
+          options={[
+            { value: 'All', label: 'All Categories' },
+            { value: 'Photography', label: 'Photography' },
+            { value: 'Digital Art', label: 'Digital Art' },
+            { value: 'Mixed Media', label: 'Mixed Media' },
+            { value: 'Painting', label: 'Painting' },
+          ]}
+        />
       </Space>
+
       {/* Projects Grid */}
       <Row gutter={[24, 24]}>
         {paginatedProjects.map((project) => (
@@ -10995,8 +10806,10 @@ const FeaturedProjects: NextPage = () => {
                   title={project.title}
                   description={
                     <>
-                      <Text ellipsis={{ rows: 2 }}>{project.description}</Text>
-                      <br />
+                      {/* fix: remove ellipsis={{ rows: 2 }} which is incompatible in your setup */}
+                      <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
+                        {project.description}
+                      </Paragraph>
                       <Text type="secondary">By {project.creator}</Text>
                     </>
                   }
@@ -11006,6 +10819,7 @@ const FeaturedProjects: NextPage = () => {
           </Col>
         ))}
       </Row>
+
       {/* Pagination */}
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <Pagination
@@ -11015,13 +10829,9 @@ const FeaturedProjects: NextPage = () => {
           onChange={(page) => setCurrentPage(page)}
         />
       </div>
+
       {/* Modal for Project Details */}
-      <Modal
-        open={modalVisible}
-        onCancel={closeModal}
-        footer={null}
-        width={800}
-      >
+      <Modal open={modalVisible} onCancel={closeModal} footer={null} width={800}>
         {selectedProject && (
           <div>
             <img
@@ -11035,7 +10845,11 @@ const FeaturedProjects: NextPage = () => {
               <p style={{ marginTop: 12 }}>{selectedProject.description}</p>
               <Button
                 type="primary"
-                onClick={() => router.push(`/kreative/community-showcases/featured-projects/${selectedProject.id}`)}
+                onClick={() =>
+                  router.push(
+                    `/kreative/community-showcases/featured-projects/${selectedProject.id}`,
+                  )
+                }
               >
                 View Details
               </Button>
@@ -11043,15 +10857,19 @@ const FeaturedProjects: NextPage = () => {
           </div>
         )}
       </Modal>
+
+      {/* multi-line clamp replacement for deprecated Typography ellipsis rows */}
+      <style jsx>{`
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </PageContainer>
   );
-};
-
-FeaturedProjects.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default FeaturedProjects;
+}
 
 ===== END app/kreative/community-showcases/featured-projects/page.tsx =====
 
@@ -11183,102 +11001,54 @@ export default SubmitToShowcase;
 ===== BEGIN app/kreative/community-showcases/top-creators/page.tsx =====
 'use client';
 
-
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React from 'react';
 import { Table, Avatar, Select, Typography, Space, Button } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { TrophyOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
-
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
-// Define the interface for a creator.
+type TimeFrame = 'all-time' | 'this-month';
+
 interface Creator {
   id: string;
   name: string;
   avatar: string;
   contributions: number;
   specialty: string;
-  // Optionally, include a field to determine ranking within a time frame if needed.
-  // For our dummy data, we will assume this value is already computed.
 }
 
-// Dummy data for creators.
-const dummyCreators: Creator[] = [
-  {
-    id: '1',
-    name: 'Alice Johnson',
-    avatar: 'https://via.placeholder.com/80.png?text=A',
-    contributions: 125,
-    specialty: 'Digital Art',
-  },
-  {
-    id: '2',
-    name: 'Bob Smith',
-    avatar: 'https://via.placeholder.com/80.png?text=B',
-    contributions: 110,
-    specialty: 'Photography',
-  },
-  {
-    id: '3',
-    name: 'Carol Lee',
-    avatar: 'https://via.placeholder.com/80.png?text=C',
-    contributions: 105,
-    specialty: 'Mixed Media',
-  },
-  {
-    id: '4',
-    name: 'David Kim',
-    avatar: 'https://via.placeholder.com/80.png?text=D',
-    contributions: 95,
-    specialty: 'Painting',
-  },
-  {
-    id: '5',
-    name: 'Eva Martinez',
-    avatar: 'https://via.placeholder.com/80.png?text=E',
-    contributions: 88,
-    specialty: 'Illustration',
-  },
-  // Add additional dummy entries as needed.
+const creatorsData: Creator[] = [
+  { id: '1', name: 'Alice Johnson', avatar: 'https://via.placeholder.com/80.png?text=A', contributions: 125, specialty: 'Digital Art' },
+  { id: '2', name: 'Bob Smith', avatar: 'https://via.placeholder.com/80.png?text=B', contributions: 110, specialty: 'Photography' },
+  { id: '3', name: 'Carol Lee', avatar: 'https://via.placeholder.com/80.png?text=C', contributions: 105, specialty: 'Mixed Media' },
+  { id: '4', name: 'David Kim', avatar: 'https://via.placeholder.com/80.png?text=D', contributions: 95, specialty: 'Painting' },
+  { id: '5', name: 'Eva Martinez', avatar: 'https://via.placeholder.com/80.png?text=E', contributions: 88, specialty: 'Illustration' },
 ];
 
-const TopCreators: NextPage = () => {
-  // State for filtering by time frame.
-  const [timeFrame, setTimeFrame] = useState<'all-time' | 'this-month'>('all-time');
+export default function TopCreatorsPage(): JSX.Element {
+  const router = useRouter();
+  const [timeFrame, setTimeFrame] = React.useState<TimeFrame>('all-time');
 
-  // For demonstration, we'll assume that "this-month" filtering returns a subset.
-  // In production, this logic would use real data.
-  const filteredCreators = useMemo(() => {
-    if (timeFrame === 'this-month') {
-      // Return a subset of creators (for demo, we'll take the first three)
-      return dummyCreators.slice(0, 3);
-    }
-    return dummyCreators;
+  const data = React.useMemo<Creator[]>(() => {
+    return timeFrame === 'this-month' ? creatorsData.slice(0, 3) : creatorsData;
   }, [timeFrame]);
 
-  // Define table columns.
-  const columns = [
+  const columns: ColumnsType<Creator> = [
     {
       title: 'Rank',
       key: 'rank',
-      render: (_: any, _record: Creator, index: number) => {
-        // For top 3, display a trophy icon; otherwise, show the numeric rank.
-        if (index < 3) {
-          return <TrophyOutlined style={{ fontSize: 20, color: '#faad14' }} />;
-        }
-        return <Text>{index + 1}</Text>;
-      },
       width: 80,
+      render: (_value, _record, index) =>
+        index < 3 ? <TrophyOutlined style={{ fontSize: 20, color: '#faad14' }} /> : <Text>{index + 1}</Text>,
     },
     {
       title: 'Creator',
       key: 'creator',
-      render: (text: any, record: Creator) => (
+      width: 250,
+      render: (_value, record) => (
         <Space>
           <Avatar src={record.avatar} />
           <Button type="link" onClick={() => router.push(`/kreative/profile/${record.id}`)}>
@@ -11286,14 +11056,13 @@ const TopCreators: NextPage = () => {
           </Button>
         </Space>
       ),
-      width: 250,
     },
     {
       title: 'Contributions',
       dataIndex: 'contributions',
       key: 'contributions',
-      render: (value: number) => <Text>{value}</Text>,
       width: 150,
+      render: (value: number) => <Text>{value}</Text>,
     },
     {
       title: 'Specialty',
@@ -11310,29 +11079,25 @@ const TopCreators: NextPage = () => {
           <Text strong>Filter by Time Frame:</Text>
           <Select
             value={timeFrame}
-            onChange={(value: 'all-time' | 'this-month') => setTimeFrame(value)}
+            onChange={(v) => setTimeFrame(v as TimeFrame)}
             style={{ width: 180 }}
-          >
-            <Option value="all-time">All Time</Option>
-            <Option value="this-month">This Month</Option>
-          </Select>
+            options={[
+              { value: 'all-time', label: 'All Time' },
+              { value: 'this-month', label: 'This Month' },
+            ]}
+          />
         </Space>
       </Space>
-      <Table
+
+      <Table<Creator>
         columns={columns}
-        dataSource={filteredCreators}
+        dataSource={data}
         rowKey="id"
         pagination={{ pageSize: 5 }}
       />
     </PageContainer>
   );
-};
-
-TopCreators.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default TopCreators;
+}
 
 ===== END app/kreative/community-showcases/top-creators/page.tsx =====
 
@@ -11340,34 +11105,33 @@ export default TopCreators;
 ===== BEGIN app/kreative/creative-hub/explore-ideas/page.tsx =====
 'use client';
 
-// File: /pages/kreative/creative-hub/explore-ideas.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import { Row, Col, Card, Input, Select, Typography, Space, Pagination } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Title, Text, Paragraph } = Typography;
+
+type Domain = 'Art' | 'Music' | 'Writing';
+type SortOpt = 'newest' | 'popular';
 
 interface CreativeIdea {
   id: string;
   title: string;
   excerpt: string;
   author: string;
-  domain: string;       // e.g., 'Art', 'Music', 'Writing'
-  thumbnail: string;    // URL for a thumbnail image
-  date: string;         // ISO date string for "newest" sort
-  popularity: number;   // e.g., number of likes/views for "most popular" sort
+  domain: Domain;        // e.g., 'Art', 'Music', 'Writing'
+  thumbnail: string;     // URL for a thumbnail image
+  date: string;          // ISO date string for "newest" sort
+  popularity: number;    // e.g., likes/views for "most popular" sort
 }
 
 const creativeIdeasData: CreativeIdea[] = [
   {
     id: '1',
     title: 'The Beauty of Minimalism',
-    excerpt: 'Exploring the art of less is more in design and creative expression...',
+    excerpt: 'Exploring the art of less is more in design and creative expression.',
     author: 'Alice Martin',
     domain: 'Art',
     thumbnail: 'https://via.placeholder.com/300x200.png?text=Minimalism',
@@ -11376,66 +11140,69 @@ const creativeIdeasData: CreativeIdea[] = [
   },
   {
     id: '2',
-    title: 'Rhythms of the Night',
-    excerpt: 'A journey into experimental music and ambient soundscapes that evoke emotion...',
-    author: 'Brian Lee',
+    title: 'Soundscapes: Music and Emotion',
+    excerpt: 'How different chord progressions evoke specific emotional responses.',
+    author: 'Brian Chen',
     domain: 'Music',
-    thumbnail: 'https://via.placeholder.com/300x200.png?text=Rhythms+of+the+Night',
-    date: '2025-11-22T12:00:00Z',
-    popularity: 120,
+    thumbnail: 'https://via.placeholder.com/300x200.png?text=Soundscapes',
+    date: '2025-11-18T14:30:00Z',
+    popularity: 73,
   },
   {
     id: '3',
-    title: 'The Art of Storytelling',
-    excerpt: 'Discover how narrative techniques can transform creative writing into immersive experiences.',
-    author: 'Carla Gomez',
+    title: 'Writing with Constraints',
+    excerpt: 'Using constraints like lipograms to spark creativity.',
+    author: 'Caroline Dupont',
     domain: 'Writing',
-    thumbnail: 'https://via.placeholder.com/300x200.png?text=Storytelling',
-    date: '2025-11-18T09:30:00Z',
-    popularity: 95,
+    thumbnail: 'https://via.placeholder.com/300x200.png?text=Constraints',
+    date: '2025-11-15T09:00:00Z',
+    popularity: 55,
   },
   {
     id: '4',
-    title: 'Colorful Expressions',
-    excerpt: 'An exploration of abstract art that celebrates vibrant colors and bold compositions.',
-    author: 'Derek Fox',
+    title: 'Color Theory Basics',
+    excerpt: 'Understanding complementary and analogous color schemes.',
+    author: 'David Lopez',
     domain: 'Art',
-    thumbnail: 'https://via.placeholder.com/300x200.png?text=Colorful+Expressions',
-    date: '2025-11-25T08:45:00Z',
-    popularity: 110,
+    thumbnail: 'https://via.placeholder.com/300x200.png?text=Color+Theory',
+    date: '2025-11-10T11:45:00Z',
+    popularity: 61,
   },
-  // Add more items as needed...
 ];
 
-const ExploreIdeasPage: NextPage = () => {
+export default function ExploreIdeasPage() {
+  const router = useRouter();
+
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [sortOption, setSortOption] = useState<'newest' | 'popular'>('newest');
+  const [selectedCategory, setSelectedCategory] = useState<'All' | Domain>('All');
+  const [sortOption, setSortOption] = useState<SortOpt>('newest');
+
+  // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 6;
+  const pageSize = 9;
 
   // Filter and sort the creative ideas.
   const filteredIdeas = useMemo(() => {
-    // Clone the data to avoid mutating the original array.
     let ideas = [...creativeIdeasData];
 
     if (selectedCategory !== 'All') {
       ideas = ideas.filter((idea) => idea.domain === selectedCategory);
     }
-    if (searchQuery.trim() !== '') {
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
       ideas = ideas.filter(
         (idea) =>
-          idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          idea.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+          idea.title.toLowerCase().includes(q) ||
+          idea.excerpt.toLowerCase().includes(q)
       );
     }
-    if (sortOption === 'newest') {
-      ideas = ideas.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-    } else if (sortOption === 'popular') {
-      ideas = ideas.sort((a, b) => b.popularity - a.popularity);
-    }
+    ideas =
+      sortOption === 'newest'
+        ? ideas.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+        : ideas.sort((a, b) => b.popularity - a.popularity);
+
     return ideas;
   }, [searchQuery, selectedCategory, sortOption]);
 
@@ -11445,9 +11212,7 @@ const ExploreIdeasPage: NextPage = () => {
     return filteredIdeas.slice(startIndex, startIndex + pageSize);
   }, [filteredIdeas, currentPage]);
 
-  // Navigate to the idea detail page when a card is clicked.
   const handleCardClick = (idea: CreativeIdea) => {
-    const router = useRouter();
     router.push(`/kreative/creative-hub/idea/${idea.id}`);
   };
 
@@ -11456,7 +11221,7 @@ const ExploreIdeasPage: NextPage = () => {
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Space wrap>
           <Input
-            placeholder="Search ideas..."
+            placeholder="Search ideas."
             prefix={<SearchOutlined />}
             value={searchQuery}
             onChange={(e) => {
@@ -11465,31 +11230,36 @@ const ExploreIdeasPage: NextPage = () => {
             }}
             style={{ width: 300 }}
           />
+
           <Select
             value={selectedCategory}
-            onChange={(value) => {
+            onChange={(value: 'All' | Domain) => {
               setSelectedCategory(value);
               setCurrentPage(1);
             }}
+            options={[
+              { value: 'All', label: 'All Domains' },
+              { value: 'Art', label: 'Art' },
+              { value: 'Music', label: 'Music' },
+              { value: 'Writing', label: 'Writing' },
+            ]}
             style={{ width: 180 }}
-          >
-            <Option value="All">All Domains</Option>
-            <Option value="Art">Art</Option>
-            <Option value="Music">Music</Option>
-            <Option value="Writing">Writing</Option>
-          </Select>
+          />
+
           <Select
             value={sortOption}
-            onChange={(value) => {
+            onChange={(value: SortOpt) => {
               setSortOption(value);
               setCurrentPage(1);
             }}
+            options={[
+              { value: 'newest', label: 'Newest' },
+              { value: 'popular', label: 'Most Popular' },
+            ]}
             style={{ width: 180 }}
-          >
-            <Option value="newest">Newest</Option>
-            <Option value="popular">Most Popular</Option>
-          </Select>
+          />
         </Space>
+
         <Row gutter={[24, 24]}>
           {paginatedIdeas.map((idea) => (
             <Col key={idea.id} xs={24} sm={12} md={8}>
@@ -11504,18 +11274,22 @@ const ExploreIdeasPage: NextPage = () => {
                 }
                 onClick={() => handleCardClick(idea)}
               >
-                <Title level={4} ellipsis={{ rows: 1 }}>
+                {/* Single-line title clamp without AntD ellipsis rows */}
+                <Title level={4} className="clamp-1" style={{ marginBottom: 8 }}>
                   {idea.title}
                 </Title>
-                <Text type="secondary" ellipsis={{ rows: 2 }}>
+
+                {/* Multi-line summary clamp without AntD ellipsis rows */}
+                <Paragraph className="clamp-2" type="secondary" style={{ marginBottom: 12 }}>
                   {idea.excerpt}
-                </Text>
-                <br />
+                </Paragraph>
+
                 <Text strong>By:</Text> {idea.author}
               </Card>
             </Col>
           ))}
         </Row>
+
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <Pagination
             current={currentPage}
@@ -11525,25 +11299,31 @@ const ExploreIdeasPage: NextPage = () => {
           />
         </div>
       </Space>
+
+      <style jsx>{`
+        .clamp-1 {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </PageContainer>
   );
-};
-
-ExploreIdeasPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ExploreIdeasPage;
+}
 
 ===== END app/kreative/creative-hub/explore-ideas/page.tsx =====
 
 
 ===== BEGIN app/kreative/creative-hub/inspiration-gallery/page.tsx =====
-'use client'
+'use client';
 
-// File: /pages/kreative/creative-hub/inspiration-gallery.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import {
   Row,
   Col,
@@ -11557,17 +11337,17 @@ import {
 } from 'antd';
 import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title, Text } = Typography;
-const { TabPane } = Tabs;
+const { Title, Text, Paragraph } = Typography;
+
+type Category = 'All' | 'Photography' | 'Painting' | 'Digital Art';
 
 interface CreativeWork {
   id: string;
   title: string;
   description: string;
   creator: string;
-  category: 'Photography' | 'Painting' | 'Digital Art';
+  category: Exclude<Category, 'All'>;
   imageUrl: string;
   likes: number;
   liked?: boolean;
@@ -11629,29 +11409,37 @@ const dummyWorks: CreativeWork[] = [
     id: '6',
     title: 'Virtual Reality',
     description: 'An innovative digital artwork blending real and virtual elements.',
-    creator: 'Frank Wilson',
+    creator: 'Felix Zhang',
     category: 'Digital Art',
     imageUrl: 'https://via.placeholder.com/400x300.png?text=Virtual+Reality',
-    likes: 89,
+    likes: 51,
     liked: false,
   },
-  // Add more dummy items as needed...
 ];
 
-const InspirationGallery: NextPage = () => {
+export default function InspirationGalleryPage(): JSX.Element {
   // State for category filtering, pagination, Modal, and works.
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedCategory, setSelectedCategory] = useState<Category>('All');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 6;
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedWork, setSelectedWork] = useState<CreativeWork | null>(null);
   const [works, setWorks] = useState<CreativeWork[]>(dummyWorks);
 
+  // Tabs (AntD v5) items
+  const tabItems = useMemo(
+    () => [
+      { key: 'All', label: 'All' },
+      { key: 'Photography', label: 'Photography' },
+      { key: 'Painting', label: 'Painting' },
+      { key: 'Digital Art', label: 'Digital Art' },
+    ],
+    []
+  );
+
   // Filter works based on selected category.
   const filteredWorks = useMemo(() => {
-    if (selectedCategory === 'All') {
-      return works;
-    }
+    if (selectedCategory === 'All') return works;
     return works.filter((work) => work.category === selectedCategory);
   }, [selectedCategory, works]);
 
@@ -11659,19 +11447,13 @@ const InspirationGallery: NextPage = () => {
   const paginatedWorks = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return filteredWorks.slice(startIndex, startIndex + pageSize);
-  }, [filteredWorks, currentPage, pageSize]);
+  }, [filteredWorks, currentPage]);
 
   // Handle like toggle.
   const toggleLike = (id: string) => {
-    setWorks((prevWorks) =>
-      prevWorks.map((work) =>
-        work.id === id
-          ? {
-              ...work,
-              liked: !work.liked,
-              likes: work.liked ? work.likes - 1 : work.likes + 1,
-            }
-          : work
+    setWorks((prev) =>
+      prev.map((w) =>
+        w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w
       )
     );
   };
@@ -11690,21 +11472,18 @@ const InspirationGallery: NextPage = () => {
 
   return (
     <PageContainer title="Inspiration Gallery">
-      {/* Category Filter implemented as Tabs */}
+      {/* Category Filter (AntD v5 Tabs API) */}
       <Tabs
         activeKey={selectedCategory}
         onChange={(key) => {
-          setSelectedCategory(key);
+          setSelectedCategory(key as Category);
           setCurrentPage(1);
         }}
         type="card"
+        items={tabItems}
         style={{ marginBottom: 24 }}
-      >
-        <TabPane tab="All" key="All" />
-        <TabPane tab="Photography" key="Photography" />
-        <TabPane tab="Painting" key="Painting" />
-        <TabPane tab="Digital Art" key="Digital Art" />
-      </Tabs>
+      />
+
       {/* Gallery Grid */}
       <Row gutter={[16, 16]}>
         {paginatedWorks.map((work) => (
@@ -11720,6 +11499,7 @@ const InspirationGallery: NextPage = () => {
               }
               actions={[
                 <Button
+                  key="like"
                   type="text"
                   onClick={(e) => {
                     e.stopPropagation();
@@ -11742,9 +11522,10 @@ const InspirationGallery: NextPage = () => {
                   <>
                     <Text>{work.creator}</Text>
                     <br />
-                    <Text type="secondary" ellipsis={{ rows: 2 }}>
+                    {/* Replace ellipsis={{ rows: 2 }} with CSS line clamp */}
+                    <Paragraph type="secondary" className="lineClamp2">
                       {work.description}
-                    </Text>
+                    </Paragraph>
                   </>
                 }
               />
@@ -11752,6 +11533,7 @@ const InspirationGallery: NextPage = () => {
           </Col>
         ))}
       </Row>
+
       {/* Pagination */}
       <div style={{ textAlign: 'center', marginTop: 24 }}>
         <Pagination
@@ -11761,13 +11543,9 @@ const InspirationGallery: NextPage = () => {
           onChange={(page) => setCurrentPage(page)}
         />
       </div>
+
       {/* Modal for work details */}
-      <Modal
-        open={modalVisible}
-        footer={null}
-        onCancel={closeModal}
-        width={800}
-      >
+      <Modal open={modalVisible} footer={null} onCancel={closeModal} width={800}>
         {selectedWork && (
           <>
             <img
@@ -11787,24 +11565,26 @@ const InspirationGallery: NextPage = () => {
                   ) : (
                     <HeartOutlined style={{ fontSize: 20 }} />
                   )}
-                  <Text style={{ marginLeft: 4 }}>
-                    {selectedWork.likes} Likes
-                  </Text>
+                  <Text style={{ marginLeft: 4 }}>{selectedWork.likes} Likes</Text>
                 </Button>
               </Space>
             </div>
           </>
         )}
       </Modal>
+
+      <style jsx>{`
+        /* Multi-line clamp to replace AntD ellipsis { rows } */
+        .lineClamp2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </PageContainer>
   );
-};
-
-InspirationGallery.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default InspirationGallery;
+}
 
 ===== END app/kreative/creative-hub/inspiration-gallery/page.tsx =====
 
@@ -12494,13 +12274,19 @@ export default function SegmentLayout({ children }: { children: React.ReactNode 
 import '@/styles/tailwind.css'                // ← global Tailwind + reset AntD
 import { ThemeProvider } from '@/context/ThemeContext'
 import QueryProvider from '@/shared/QueryProvider'
+import "../src/dayjs-setup"
+import AuthProvider from './providers/AuthProvider'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
         <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
+          <QueryProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>
@@ -12528,4 +12314,21 @@ export default function Page() {
 }
 
 ===== END app/page.tsx =====
+
+
+===== BEGIN app/providers/AuthProvider.tsx =====
+// app/providers/AuthProvider.tsx
+'use client';
+
+import React from 'react';
+
+/**
+ * Auth provider wrapper for App Router.
+ * No SDK import needed — Auth0 sessions are handled by middleware.
+ */
+export default function AuthProvider({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
+}
+
+===== END app/providers/AuthProvider.tsx =====
 

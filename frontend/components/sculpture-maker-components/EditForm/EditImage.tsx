@@ -5,12 +5,13 @@
  * Author: Hieu Chu
  */
 
-import { Upload, Button, Icon, message, Row, Modal } from 'antd'
+import { Upload, Button, message, Row, Modal } from 'antd';
 import { useState } from 'react'
 import { ColStyled } from '../style'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
 import { normalizeError } from "../../../shared/errors";
+import Icon from '@/components/compat/Icon';
 
 const { confirm } = Modal
 

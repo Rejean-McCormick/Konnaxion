@@ -17,6 +17,7 @@ import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
+import Icon from '@/components/compat/Icon';
 
 
 const { TextArea } = Input;

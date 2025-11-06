@@ -1,181 +1,189 @@
 'use client';
 
-// File: /pages/konnected/teams-collaboration/team-builder.tsx
-import React, { useState } from 'react';
-import { NextPage } from 'next';
-import {
-  Form,
-  Input,
-  Button,
-  Steps,
-  Upload,
-  message,
-  Avatar,
-  Select,
-  Space,
-} from 'antd';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
+import React, { useMemo, useState } from 'react';
+import { PageContainer } from '@ant-design/pro-components';
+import { Steps, Form, Input, Button, Space, Table, Typography, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 
-const { Step } = Steps;
-const { Option } = Select;
+type TeamInfo = {
+  name: string;
+  description?: string;
+};
 
-const TeamBuilder: NextPage = () => {
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [form] = Form.useForm();
+type Member = {
+  id?: string;       // may be undefined when newly added
+  email: string;
+  role?: string;
+};
+
+export default function TeamBuilderPage() {
   const router = useRouter();
 
-  // Passage à l'étape suivante après validation des champs de l'étape actuelle
-  const next = () => {
-    form
-      .validateFields()
-      .then(() => {
-        setCurrentStep(currentStep + 1);
-      })
-      .catch(() => {
-        message.error('Veuillez compléter les champs obligatoires.');
+  // ----- Step state -----
+  const [currentStep, setCurrentStep] = useState<number>(0);
+
+  const steps = useMemo(
+    () => [{ title: 'Team Info' }, { title: 'Invite Members' }],
+    []
+  );
+
+  // ----- Form state -----
+  const [teamInfoForm] = Form.useForm<TeamInfo>();
+  const [inviteForm] = Form.useForm<Member>();
+
+  const [teamInfo, setTeamInfo] = useState<TeamInfo>({ name: '' });
+  const [members, setMembers] = useState<Member[]>([]);
+
+  // ----- Table columns with safe row keys -----
+  const columns: ColumnsType<Member> = [
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+      render: (text: string) => <Typography.Text>{text}</Typography.Text>,
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+      render: (text?: string) => <Typography.Text>{text || 'Member'}</Typography.Text>,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, record) => (
+        <Space>
+          <Button
+            onClick={() =>
+              setMembers((prev) =>
+                prev.filter((m) => (m.id ?? m.email) !== (record.id ?? record.email))
+              )
+            }
+          >
+            Remove
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  // ----- Handlers -----
+  const submitTeamInfo = async () => {
+    try {
+      const values = await teamInfoForm.validateFields();
+      setTeamInfo(values);
+      setCurrentStep(1);
+    } catch {
+      // validation errors are shown by antd
+    }
+  };
+
+  const addMember = async () => {
+    try {
+      const values = await inviteForm.validateFields();
+      // ensure a stable non-undefined key; prefer provided id else generate from email
+      const stableId = values.id && values.id.trim().length > 0
+        ? values.id
+        : `${values.email.toLowerCase()}-${Date.now()}`;
+
+      setMembers((prev) => {
+        // dedupe by email
+        if (prev.some((m) => m.email.toLowerCase() === values.email.toLowerCase())) {
+          message.warning('This email is already invited.');
+          return prev;
+        }
+        return [...prev, { ...values, id: stableId }];
       });
+      inviteForm.resetFields();
+    } catch {
+      // validation errors are shown by antd
+    }
   };
 
-  // Retour à l'étape précédente
-  const prev = () => {
-    setCurrentStep(currentStep - 1);
+  const finish = async () => {
+    // TODO: replace with actual API call
+    message.success('Team created');
+    router.push('/konnected/teams-collaboration/project-workspaces');
   };
-
-  // Soumission du formulaire complet
-  const onFinish = (values: any) => {
-    console.log('Team Created:', values);
-    message.success('L’équipe a été créée avec succès et les invitations ont été envoyées!');
-    router.push('/konnected/teams-collaboration/my-teams');
-  };
-
-  // Définition des étapes
-  const steps = [{ title: 'Team Info' }, { title: 'Invite Members' }];
 
   return (
     <PageContainer title="Team Builder">
-      <Steps current={currentStep} style={{ marginBottom: 24 }}>
-        {steps.map((item) => (
-          <Step key={item.title} title={item.title} />
-        ))}
-      </Steps>
+      <Space direction="vertical" style={{ width: '100%' }} size="large">
+        <Steps current={currentStep} items={steps} />
 
-      <Form form={form} layout="vertical" onFinish={onFinish}>
         {currentStep === 0 && (
-          <>
+          <Form
+            form={teamInfoForm}
+            layout="vertical"
+            initialValues={teamInfo}
+            onFinish={submitTeamInfo}
+          >
             <Form.Item
-              label="Team Name"
-              name="teamName"
-              rules={[{ required: true, message: 'Veuillez saisir le nom de l’équipe.' }]}
+              label="Team name"
+              name="name"
+              rules={[{ required: true, message: 'Please enter a team name' }]}
             >
-              <Input placeholder="Entrez le nom de l’équipe" />
+              <Input placeholder="e.g. Product Growth" />
             </Form.Item>
 
-            <Form.Item
-              label="Team Purpose/Goal"
-              name="teamPurpose"
-              rules={[{ required: true, message: 'Veuillez indiquer le but de l’équipe.' }]}
-            >
-              <Input placeholder="Quel est l’objectif de l’équipe ?" />
+            <Form.Item label="Description" name="description">
+              <Input.TextArea placeholder="Optional description" autoSize={{ minRows: 3 }} />
             </Form.Item>
 
-            <Form.Item label="Team Description" name="teamDescription">
-              <Input.TextArea rows={4} placeholder="Description optionnelle de l’équipe" />
-            </Form.Item>
-
-            <Form.Item label="Team Avatar" name="teamAvatar">
-              <Upload name="avatar" listType="picture" maxCount={1}>
-                <Button icon={<UploadOutlined />}>Télécharger un avatar</Button>
-              </Upload>
-            </Form.Item>
-          </>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Next
+              </Button>
+            </Space>
+          </Form>
         )}
 
         {currentStep === 1 && (
           <>
-            <Form.List name="invitedMembers">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <Space
-                      key={String(name)} {/* clé garantie non-undefined */}
-                      align="baseline"
-                      style={{ display: 'flex', marginBottom: 8 }}
-                    >
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'email']}
-                        rules={[{ required: true, message: 'Veuillez saisir l’email du membre' }]}
-                      >
-                        <Input placeholder="Email du membre" />
-                      </Form.Item>
+            <Form form={inviteForm} layout="inline" onFinish={addMember}>
+              <Form.Item
+                name="email"
+                rules={[
+                  { required: true, message: 'Email required' },
+                  { type: 'email', message: 'Invalid email' },
+                ]}
+              >
+                <Input placeholder="member@example.com" />
+              </Form.Item>
 
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'role']}
-                        rules={[{ required: true, message: 'Veuillez sélectionner un rôle' }]}
-                      >
-                        <Select placeholder="Rôle" style={{ width: 120 }}>
-                          <Option value="Member">Member</Option>
-                          <Option value="Co-Lead">Co-Lead</Option>
-                        </Select>
-                      </Form.Item>
+              <Form.Item name="role" initialValue="Member">
+                <Input placeholder="Role (optional)" />
+              </Form.Item>
 
-                      <Button type="link" onClick={() => remove(name)}>
-                        Supprimer
-                      </Button>
-                    </Space>
-                  ))}
+              <Form.Item>
+                <Button type="primary" htmlType="submit">
+                  Add
+                </Button>
+              </Form.Item>
+            </Form>
 
-                  <Form.Item>
-                    <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
-                      Ajouter un membre
-                    </Button>
-                  </Form.Item>
-                </>
-              )}
-            </Form.List>
+            <Table<Member>
+              dataSource={members}
+              columns={columns}
+              // rowKey fix: never undefined
+              rowKey={(record) => record.id ?? record.email}
+              pagination={false}
+            />
 
-            {/* Prévisualisation des membres invités */}
-            {form.getFieldValue('invitedMembers') &&
-              form.getFieldValue('invitedMembers').length > 0 && (
-                <Form.Item label="Invited Members Preview">
-                  <Avatar.Group>
-                    {form.getFieldValue('invitedMembers').map((member: any, index: number) => (
-                      <Avatar key={index} style={{ backgroundColor: '#87d068' }}>
-                        {member.email.charAt(0).toUpperCase()}
-                      </Avatar>
-                    ))}
-                  </Avatar.Group>
-                </Form.Item>
-              )}
+            <Space>
+              <Button onClick={() => setCurrentStep(0)}>Back</Button>
+              <Button
+                type="primary"
+                onClick={finish}
+                disabled={!teamInfo.name || members.length === 0}
+              >
+                Create team
+              </Button>
+            </Space>
           </>
         )}
-
-        <Form.Item>
-          <Space>
-            {currentStep > 0 && <Button onClick={prev}>Précédent</Button>}
-            {currentStep < steps.length - 1 && (
-              <Button type="primary" onClick={next}>
-                Suivant
-              </Button>
-            )}
-            {currentStep === steps.length - 1 && (
-              <Button type="primary" htmlType="submit">
-                Créer l’équipe
-              </Button>
-            )}
-          </Space>
-        </Form.Item>
-      </Form>
+      </Space>
     </PageContainer>
   );
-};
-
-TeamBuilder.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default TeamBuilder;
+}

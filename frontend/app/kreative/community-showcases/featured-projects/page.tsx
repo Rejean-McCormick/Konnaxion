@@ -1,8 +1,8 @@
 'use client';
 
-// File: /pages/kreative/community-showcases/featured-projects.tsx
+// File: app/kreative/community-showcases/featured-projects/page.tsx
 import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import { useRouter } from 'next/navigation';
 import {
   Card,
   Row,
@@ -14,15 +14,12 @@ import {
   Typography,
   Badge,
   Space,
-  Button,            // ← ajout
+  Button, // fixed: ensure Button is imported
 } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Title, Text, Paragraph } = Typography;
 
 interface Project {
   id: string;
@@ -70,11 +67,11 @@ const dummyProjects: Project[] = [
     coverImage: 'https://via.placeholder.com/400x300.png?text=Vintage+Revival',
     category: 'Painting',
   },
-  // Add additional project entries as needed.
 ];
 
-const FeaturedProjects: NextPage = () => {
-  const router = useRouter(); // ← ajout
+export default function FeaturedProjectsPage(): JSX.Element {
+  const router = useRouter(); // fixed: useRouter from next/navigation
+
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -129,21 +126,23 @@ const FeaturedProjects: NextPage = () => {
           }}
           style={{ width: 300 }}
         />
+
+        {/* refactor: avoid deprecated Select.Option, use options prop */}
         <Select
           value={selectedCategory}
           onChange={(value) => {
             setSelectedCategory(value);
             setCurrentPage(1);
           }}
-          style={{ width: 200 }}
-        >
-          <Option value="All">All Categories</Option>
-          <Option value="Photography">Photography</Option>
-          <Option value="Digital Art">Digital Art</Option>
-          <Option value="Mixed Media">Mixed Media</Option>
-          <Option value="Painting">Painting</Option>
-          {/* Add more categories as needed */}
-        </Select>
+          style={{ width: 220 }}
+          options={[
+            { value: 'All', label: 'All Categories' },
+            { value: 'Photography', label: 'Photography' },
+            { value: 'Digital Art', label: 'Digital Art' },
+            { value: 'Mixed Media', label: 'Mixed Media' },
+            { value: 'Painting', label: 'Painting' },
+          ]}
+        />
       </Space>
 
       {/* Projects Grid */}
@@ -166,8 +165,10 @@ const FeaturedProjects: NextPage = () => {
                   title={project.title}
                   description={
                     <>
-                      <Text ellipsis={{ rows: 2 }}>{project.description}</Text>
-                      <br />
+                      {/* fix: remove ellipsis={{ rows: 2 }} which is incompatible in your setup */}
+                      <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
+                        {project.description}
+                      </Paragraph>
                       <Text type="secondary">By {project.creator}</Text>
                     </>
                   }
@@ -215,12 +216,16 @@ const FeaturedProjects: NextPage = () => {
           </div>
         )}
       </Modal>
+
+      {/* multi-line clamp replacement for deprecated Typography ellipsis rows */}
+      <style jsx>{`
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </PageContainer>
   );
-};
-
-FeaturedProjects.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default FeaturedProjects;
+}

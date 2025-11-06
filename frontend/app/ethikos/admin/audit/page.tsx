@@ -1,3 +1,4 @@
+// app/ethikos/admin/audit/page.tsx
 'use client'
 
 import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components'
@@ -20,10 +21,9 @@ type AuditPayload = { items: LogRow[] }
 export default function AuditLogs() {
   usePageTitle('Admin · Audit Logs')
 
-  // app/ethikos/admin/audit/page.tsx
   const { data, loading } = useRequest<AuditPayload, []>(async () => {
     const res = await fetchAuditLogs()
-    return res.data
+    return res                     // ← was `res.data`
   })
 
   const columns: ProColumns<LogRow>[] = [

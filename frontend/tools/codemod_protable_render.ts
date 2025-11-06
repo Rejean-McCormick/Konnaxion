@@ -1,12 +1,10 @@
 #!/usr/bin/env ts-node
-// Codemod ProTable: normalise render(...) vers render(dom, entity, index, action, schema)
-// Sûr par défaut: rebinde l'ancien "v" à row[dataIndex] seulement si dataIndex est littéral.
-// Dépendances: ts-morph, ts-node, typescript
-// Exemples d'exécution:
+// Codemod ProTable: normalize render(...) -> render(dom, entity, index, action, schema)
+// Safe-by-default. Rebind "v" -> row[dataIndex] uniquement si dataIndex est littéral.
+// Run:
 //   pnpm ts-node tools/codemod_protable_render.ts --include "app/**/*.tsx,modules/**/*.tsx,components/**/*.tsx" --dry
 //   pnpm ts-node tools/codemod_protable_render.ts --include "app/**/*.tsx,modules/**/*.tsx,components/**/*.tsx" --apply
-// Option tsconfig si besoin:
-//   --tsconfig apps/frontend/tsconfig.json
+// Optionnel: --tsconfig apps/frontend/tsconfig.json
 
 import {
   Project,
@@ -16,7 +14,6 @@ import {
   ArrowFunction,
   FunctionExpression,
   PropertyAssignment,
-  Block,
 } from 'ts-morph';
 import * as fs from 'fs';
 
@@ -36,268 +33,233 @@ function parseArgs(): Options {
   for (let i = 0; i < args.length; i++) {
     const a = args[i];
     if (a === '--dry') opts.dry = true;
-    else if (a === '--apply') {
-      opts.apply = true;
-      opts.dry = false;
-    } else if (a === '--tsconfig') {
-      const next = args[i + 1];
-      if (next) { opts.tsconfig = next; i++; }
-    } else if (a === '--include') {
-      const next = args[i + 1];
-      if (next) {
-        opts.include = next.split(',').map((s) => s.trim()).filter(Boolean);
-        i++;
-      }
-    } else if (a === '--exclude') {
-      const next = args[i + 1];
-      if (next) {
-        opts.exclude = next.split(',').map((s) => s.trim()).filter(Boolean);
-        i++;
-      }
-    }
+    else if (a === '--apply') { opts.apply = true; opts.dry = false; }
+    else if (a === '--tsconfig') { const next = args[i + 1]; if (next) { opts.tsconfig = next; i++; } }
+    else if (a === '--include') { const next = args[i + 1]; if (next) { opts.include = next.split(',').map(s => s.trim()).filter(Boolean); i++; } }
+    else if (a === '--exclude') { const next = args[i + 1]; if (next) { opts.exclude = next.split(',').map(s => s.trim()).filter(Boolean); i++; } }
   }
-  if (opts.include.length === 0) {
-    opts.include = ['app/**/*.tsx', 'modules/**/*.tsx', 'components/**/*.tsx'];
-  }
-  if (opts.exclude.length === 0) {
-    opts.exclude = ['**/node_modules/**', '**/.next/**', '**/*.d.ts'];
-  }
+  if (opts.include.length === 0) opts.include = ['app/**/*.tsx', 'modules/**/*.tsx', 'components/**/*.tsx'];
+  if (opts.exclude.length === 0) opts.exclude = ['**/node_modules/**', '**/.next/**', '**/*.d.ts'];
   return opts;
 }
 
 function hasProp(obj: ObjectLiteralExpression, name: string) {
   return !!obj.getProperty(name);
 }
-
 function getProp(obj: ObjectLiteralExpression, name: string): PropertyAssignment | undefined {
   const p = obj.getProperty(name);
   if (!p) return undefined;
   return Node.isPropertyAssignment(p) ? p : undefined;
 }
-
 function getStringLiteralValue(pa: PropertyAssignment): string | undefined {
   const init = pa.getInitializer();
   if (!init) return undefined;
   if (Node.isStringLiteral(init)) return init.getLiteralText();
   return undefined;
 }
-
 function getArrayOfStringLiterals(pa: PropertyAssignment): string[] | undefined {
   const init = pa.getInitializer();
   if (!init || !Node.isArrayLiteralExpression(init)) return undefined;
-  const parts: string[] = [];
+  const out: string[] = [];
   for (const el of init.getElements()) {
-    if (Node.isStringLiteral(el)) parts.push(el.getLiteralText());
+    if (Node.isStringLiteral(el)) out.push(el.getLiteralText());
     else return undefined;
   }
-  return parts;
+  return out;
 }
-
 function buildAccess(rowName: string, pathParts: string[]): string {
   if (pathParts.length === 0) return rowName;
-  const dotSafe = pathParts.every((p) => /^[A-Za-z_$][\w$]*$/.test(p));
+  const dotSafe = pathParts.every(p => /^[A-Za-z_$][\w$]*$/.test(p));
   if (dotSafe) return rowName + '?.' + pathParts.join('?.');
   return pathParts.reduce((acc, seg) => acc + `[${JSON.stringify(seg)}]`, rowName);
 }
-
-function idUsedIn(fn: ArrowFunction | FunctionExpression, name: string): boolean {
+function idUsedIn(fn: ArrowFunction | FunctionExpression, name?: string): boolean {
+  if (!name) return false;
   const body = fn.getBody();
   const ids = body.getDescendantsOfKind(SyntaxKind.Identifier);
-  return ids.some((id) => id.getText() === name);
+  return ids.some(id => id.getText() === name);
 }
-
-function ensureBlockBody(fn: ArrowFunction | FunctionExpression): Block {
-  const body = fn.getBody();
-  if (!Node.isBlock(body)) {
-    const expr = body.getText();
-    fn.setBodyText((w) => {
-      w.writeLine('{');
-      w.writeLine(`  return ${expr};`);
-      w.writeLine('}');
-    });
-  }
-  const newBody = fn.getBody();
-  if (Node.isBlock(newBody)) return newBody;
-  // Fallback ultra conservateur
-  fn.setBodyText((w) => { w.writeLine('{'); w.writeLine('  return null;'); w.writeLine('}'); });
-  return fn.getBody() as Block;
-}
-
-function ensureParams(fn: ArrowFunction | FunctionExpression, names: { dom: string; row: string }) {
+function setParams(fn: ArrowFunction | FunctionExpression, names: string[]) {
   for (const p of fn.getParameters()) p.remove();
-  fn.addParameter({ name: names.dom });
-  fn.addParameter({ name: names.row });
-  fn.addParameter({ name: 'index' });
-  fn.addParameter({ name: 'action' });
-  fn.addParameter({ name: 'schema' });
+  for (const n of names) fn.addParameter({ name: n });
 }
-
-function renameFirstParamOnly(fn: ArrowFunction | FunctionExpression, newName: string) {
-  const ps = fn.getParameters();
-  if (ps.length === 0) return;
-  ps[0].rename(newName);
-  if (ps.length === 1) fn.addParameter({ name: 'row' });
-  const names = ['index', 'action', 'schema'];
-  while (fn.getParameters().length < 5) {
-    const next = names[fn.getParameters().length - 2] ?? 'index';
-    fn.addParameter({ name: next });
-  }
-}
-
-function addHoistedValueVar(fn: ArrowFunction | FunctionExpression, varName: string, exprText: string) {
+function addHoistToBlock(fn: ArrowFunction | FunctionExpression, varName: string, exprText: string) {
   const body = fn.getBody();
   if (!Node.isBlock(body)) return;
-  const stmts = body.getStatements();
   const decl = `const ${varName} = ${exprText};`;
+  const stmts = body.getStatements();
   if (stmts.length > 0) body.insertStatements(0, decl);
   else body.addStatements(decl);
 }
-
+function replaceArrowWithBlock(fn: ArrowFunction, params: string[], hoists: string[], returnExpr: string) {
+  const newText =
+    `(${params.join(', ')}) => {\n` +
+    (hoists.length ? '  ' + hoists.join('\n  ') + '\n' : '') +
+    `  return ${returnExpr};\n` +
+    `}`;
+  fn.replaceWithText(newText);
+}
 function isLikelyColumnObject(obj: ObjectLiteralExpression): boolean {
+  if ((obj as any).wasForgotten && (obj as any).wasForgotten()) return false;
   if (!hasProp(obj, 'render')) return false;
-  if (hasProp(obj, 'dataIndex') || hasProp(obj, 'title') || hasProp(obj, 'valueType') || hasProp(obj, 'valueEnum')) {
-    return true;
-  }
+  if (hasProp(obj, 'dataIndex') || hasProp(obj, 'title') || hasProp(obj, 'valueType') || hasProp(obj, 'valueEnum')) return true;
   return false;
 }
 
 const opts = parseArgs();
-
 const tsconfig =
   opts.tsconfig && fs.existsSync(opts.tsconfig)
     ? opts.tsconfig
-    : fs.existsSync('tsconfig.json')
-    ? 'tsconfig.json'
-    : undefined;
+    : fs.existsSync('tsconfig.json') ? 'tsconfig.json' : undefined;
 
 const project = new Project(
   tsconfig ? { tsConfigFilePath: tsconfig } : { useInMemoryFileSystem: false, skipAddingFilesFromTsConfig: true }
 );
 
-// Ajoute les fichiers
-for (const pattern of opts.include) {
-  project.addSourceFilesAtPaths(pattern);
-}
+// Ajout fichiers
+for (const pattern of opts.include) project.addSourceFilesAtPaths(pattern);
 
-// Exclusions simples (chemin contient le fragment)
-const files = project.getSourceFiles().filter((sf) => {
-  const fp = sf.getFilePath();
-  return !opts.exclude.some((ex) => fp.includes(ex.replace('**/', '')));
-});
+// Exclusions
+const filePaths = project.getSourceFiles()
+  .filter(sf => !opts.exclude.some(ex => sf.getFilePath().includes(ex.replace('**/', ''))))
+  .map(sf => sf.getFilePath());
 
 const notes: Note[] = [];
 let changedCount = 0;
 
 function processFile(filePath: string, notes: Note[]): boolean {
-  let changed = false;
   const sf = project.getSourceFile(filePath);
   if (!sf) return false;
 
-  const objects = sf.getDescendantsOfKind(SyntaxKind.ObjectLiteralExpression);
-  for (const obj of objects) {
-    if (!isLikelyColumnObject(obj)) continue;
+  let fileChanged = false;
 
-    const renderProp = getProp(obj, 'render');
-    if (!renderProp) continue;
+  // Passes successives pour éviter les nœuds oubliés
+  outer: while (true) {
+    let mutatedThisPass = false;
 
-    const init = renderProp.getInitializer();
-    if (!init) continue;
+    const objects = sf.getDescendantsOfKind(SyntaxKind.ObjectLiteralExpression);
+    for (const obj of objects) {
+      if ((obj as any).wasForgotten && (obj as any).wasForgotten()) continue;
 
-    const fnArrow = Node.isArrowFunction(init) ? (init as ArrowFunction) : undefined;
-    const fnFunc = Node.isFunctionExpression(init) ? (init as FunctionExpression) : undefined;
-    const fn = fnArrow ?? fnFunc;
-    if (!fn) continue;
+      let looksLikeColumn = false;
+      try { looksLikeColumn = isLikelyColumnObject(obj); } catch { continue; }
+      if (!looksLikeColumn) continue;
 
-    const params = fn.getParameters();
-    const p0 = params[0];
-    const p1 = params[1];
-    const p0Name = p0 ? p0.getName() : undefined;
-    const p1Name = p1 ? p1.getName() : 'row';
+      const renderProp = getProp(obj, 'render');
+      if (!renderProp) continue;
+      if ((renderProp as any).wasForgotten && (renderProp as any).wasForgotten()) continue;
 
-    const diProp = getProp(obj, 'dataIndex');
-    let diParts: string[] | undefined = undefined;
-    if (diProp) {
-      const s = getStringLiteralValue(diProp);
-      const arr = getArrayOfStringLiterals(diProp);
-      if (s) diParts = [s];
-      else if (arr) diParts = arr;
-    }
+      const init = renderProp.getInitializer();
+      if (!init) continue;
 
-    const file = sf.getFilePath();
-    const line = fn.getStartLineNumber();
-
-    // 0) S'assure d'un corps bloc
-    ensureBlockBody(fn);
-
-    // 1) Aucun paramètre -> normalisation de signature
-    if (!p0) {
-      ensureParams(fn, { dom: '_dom', row: 'row' });
-      notes.push({ file, line, message: 'render(): normalized (no params)' });
-      changed = true;
-      continue;
-    }
-
-    // 2) Un seul param
-    if (params.length === 1) {
-      const usesP0 = p0Name ? idUsedIn(fn, p0Name) : false;
-      if (!usesP0) {
-        ensureParams(fn, { dom: '_dom', row: 'row' });
-        notes.push({ file, line, message: 'render(v): v unused -> normalized signature' });
-        changed = true;
+      const fnArrow = Node.isArrowFunction(init) ? (init as ArrowFunction) : undefined;
+      const fnFunc  = Node.isFunctionExpression(init) ? (init as FunctionExpression) : undefined;
+      let fn: ArrowFunction | FunctionExpression | undefined = fnArrow ?? fnFunc;
+      if (!fn) {
+        notes.push({ file: sf.getFilePath(), line: renderProp.getStartLineNumber(), message: 'SKIP render: not an arrow/function expression' });
         continue;
       }
-      if (diParts && p0Name) {
-        ensureParams(fn, { dom: '_dom', row: 'row' });
-        addHoistedValueVar(fn, p0Name, buildAccess('row', diParts));
-        notes.push({ file, line, message: `render(v): rebind '${p0Name}' to row[dataIndex]` });
-        changed = true;
-        continue;
-      } else {
-        notes.push({ file, line, message: 'SKIP render(v): no literal dataIndex -> manual review' });
+
+      // Capture état avant modif
+      const params0 = fn.getParameters();
+      const p0 = params0[0];
+      const p1 = params0[1];
+      const p0Name = p0 ? p0.getName() : undefined;
+      const p1Name = p1 ? p1.getName() : 'row';
+
+      const diProp = getProp(obj, 'dataIndex');
+      let diParts: string[] | undefined;
+      if (diProp) {
+        const s = getStringLiteralValue(diProp);
+        const arr = getArrayOfStringLiterals(diProp);
+        diParts = s ? [s] : arr;
+      }
+
+      const usesP0 = idUsedIn(fn, p0Name);
+      const needHoist = !!(usesP0 && diParts && p0Name);
+      const file = sf.getFilePath();
+      const line = fn.getStartLineNumber();
+
+      try {
+        // Si arrow à corps expression: reconstruire en bloc
+        if (fnArrow && !Node.isBlock(fnArrow.getBody())) {
+          const bodyExpr = fnArrow.getBody().getText();
+          const newParams = ['_dom', 'row', 'index', 'action', 'schema'];
+          const hoists = needHoist ? [`const ${p0Name} = ${buildAccess(p1Name || 'row', diParts!)};`] : [];
+          replaceArrowWithBlock(fnArrow, newParams, hoists, bodyExpr);
+          notes.push({ file, line, message: needHoist ? 'render(expr): rebuilt with hoist' : 'render(expr): rebuilt as block' });
+          mutatedThisPass = true; fileChanged = true;
+          continue outer;
+        }
+
+        // Arrow bloc ou function expression
+        // Cas sans paramètre initial
+        if (!p0) {
+          setParams(fn, ['_dom', 'row', 'index', 'action', 'schema']);
+          notes.push({ file, line, message: 'render(): normalized (no params)' });
+          mutatedThisPass = true; fileChanged = true;
+          continue outer;
+        }
+
+        // Cas 1 seul param
+        if (params0.length === 1) {
+          if (!usesP0) {
+            setParams(fn, ['_dom', 'row', 'index', 'action', 'schema']);
+            notes.push({ file, line, message: 'render(v): v unused -> normalized signature' });
+            mutatedThisPass = true; fileChanged = true;
+            continue outer;
+          }
+          if (needHoist) {
+            setParams(fn, ['_dom', 'row', 'index', 'action', 'schema']);
+            addHoistToBlock(fn, p0Name!, buildAccess('row', diParts!));
+            notes.push({ file, line, message: 'render(v): hoisted v=row[dataIndex]' });
+            mutatedThisPass = true; fileChanged = true;
+            continue outer;
+          } else {
+            notes.push({ file, line, message: 'SKIP render(v): no literal dataIndex -> manual review' });
+            continue;
+          }
+        }
+
+        // Cas 2+ params
+        if (!usesP0) {
+          setParams(fn, ['_dom', 'row', 'index', 'action', 'schema']);
+          notes.push({ file, line, message: 'render(v, row): v unused -> normalized signature' });
+          mutatedThisPass = true; fileChanged = true;
+          continue outer;
+        }
+        if (needHoist) {
+          setParams(fn, ['_dom', 'row', 'index', 'action', 'schema']);
+          addHoistToBlock(fn, p0Name!, buildAccess(p1Name || 'row', diParts!));
+          notes.push({ file, line, message: `render(v, ${p1Name || 'row'}): hoisted v=${p1Name || 'row'}[dataIndex]` });
+          mutatedThisPass = true; fileChanged = true;
+          continue outer;
+        } else {
+          notes.push({ file, line, message: 'SKIP render(v, row): no literal dataIndex -> manual review' });
+          continue;
+        }
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        notes.push({ file, line, message: `SKIP (transform error): ${msg}` });
         continue;
       }
     }
 
-    // 3) Deux+ paramètres
-    const usesP0 = p0Name ? idUsedIn(fn, p0Name) : false;
-    if (!usesP0) {
-      renameFirstParamOnly(fn, '_dom');
-      notes.push({ file, line, message: 'render(v, row): v unused -> normalized signature' });
-      changed = true;
-      continue;
-    }
-
-    if (diParts && p0Name) {
-      const rowParamName = p1Name || 'row';
-      renameFirstParamOnly(fn, '_dom');
-      addHoistedValueVar(fn, p0Name, buildAccess(rowParamName, diParts));
-      notes.push({
-        file,
-        line,
-        message: `render(v, ${rowParamName}): rebind '${p0Name}' to ${rowParamName}[dataIndex]`,
-      });
-      changed = true;
-      continue;
-    } else {
-      notes.push({ file, line, message: 'SKIP render(v, row): no literal dataIndex -> manual review' });
-      continue;
-    }
+    if (!mutatedThisPass) break;
   }
 
-  return changed;
+  return fileChanged;
 }
 
-for (const sf of files) {
-  const changed = processFile(sf.getFilePath(), notes);
+for (const fp of filePaths) {
+  const changed = processFile(fp, notes);
   if (changed) changedCount++;
 }
 
-if (!opts.dry) {
-  project.saveSync();
-}
+if (!opts.dry) project.saveSync();
 
 const summary = {
-  filesScanned: files.length,
+  filesScanned: filePaths.length,
   filesChanged: changedCount,
   dryRun: opts.dry,
   tsconfig: tsconfig || '(none)',
@@ -314,8 +276,6 @@ if (notes.length) {
   }, {});
   for (const [file, list] of Object.entries(grouped)) {
     console.log('\n' + file);
-    for (const n of list) {
-      console.log(`  L${n.line}: ${n.message}`);
-    }
+    for (const n of list) console.log(`  L${n.line}: ${n.message}`);
   }
 }

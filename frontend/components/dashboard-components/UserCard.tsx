@@ -1,53 +1,51 @@
-'use client'
+'use client';
 
-/**
- * Description: User statistics card, including total users and trend graph
- * Author: Hieu Chu
- */
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { TinyColumnConfig } from '@ant-design/plots';
 
-import React from 'react'
-import ChartCard from '@/components/charts/ChartCard'
-import {
-  MainIcon,
-  CardDivider,
-  NumberInfoStyled,
-  CardFooter,
-  BarContainer,
-} from './style'
+// SSR-safe dynamic import of TinyColumn
+const TinyColumn = dynamic(
+  () => import('@ant-design/plots').then((m) => m.TinyColumn),
+  { ssr: false }
+);
 
-type Point = { x: string | number; y: number }
-
-interface Props {
-  TOTAL_USERS: number
-  DAILY_USERS: number
-  DAILY_USERS_CHANGE: number
-  USER_DATA: Point[]
+export interface UserCardProps {
+  title?: string;                       // Default: 'New Users'
+  total: number;                        // Total users (or new users)
+  trend?: number[];                     // Tiny column series (e.g., daily counts)
+  loading?: boolean;
 }
 
-export default function UserCard({
-  TOTAL_USERS,
-  DAILY_USERS,
-  DAILY_USERS_CHANGE,
-  USER_DATA,
-}: Props) {
+const UserCard: React.FC<UserCardProps> = ({
+  title = 'New Users',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const data: number[] = Array.isArray(trend) ? trend : [];
+
+  const config: TinyColumnConfig = {
+    data,
+    autoFit: true,
+    height: 56,
+    padding: 0,
+    tooltip: {},
+  };
+
   return (
-    <>
-      <div style={{ display: 'flex' }}>
-        <MainIcon type="team" style={{ color: 'rgb(24, 144, 255)' }} />
-        <NumberInfoStyled subTitle="Total users" total={TOTAL_USERS} />
-      </div>
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <TinyColumn {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
 
-      <BarContainer>
-        <ChartCard type="area" data={USER_DATA} height={90} />
-      </BarContainer>
-
-      <CardDivider />
-
-      <CardFooter
-        title="Daily users"
-        value={DAILY_USERS}
-        change={DAILY_USERS_CHANGE}
-      />
-    </>
-  )
-}
+export default UserCard;

@@ -1,8 +1,7 @@
-'use client'
+'use client';
 
-// File: /pages/konnected/teams-collaboration/activity-planner.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
+import type { CalendarProps } from 'antd';
 import {
   Calendar,
   Modal,
@@ -20,34 +19,40 @@ import {
 } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
-import dayjs, { Moment as Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
-// Définition de l'interface pour un événement
+/** Domain types */
 interface ActivityEvent {
   id: string;
   title: string;
   description: string;
-  // La date et l'heure de l'événement sont stockées sous forme d'objet moment
+  /** Stored as Dayjs (AntD v5 default) */
   dateTime: Dayjs;
   owner: string;
   team: string;
 }
 
-// Liste fictive d'équipes pour le filtre et le formulaire
+interface ActivityForm {
+  eventTitle: string;
+  eventDescription?: string;
+  eventDate: Dayjs;
+  eventTime: Dayjs;
+  team: string;
+  owner: string;
+}
+
+/** Team list for filter and form */
 const teamOptions = ['All', 'Alpha Innovators', 'Beta Coders', 'Gamma Team'];
 
-const ActivityPlanner: NextPage = () => {
-  // État pour la liste des événements
+export default function Page() {
   const [events, setEvents] = useState<ActivityEvent[]>([
     {
       id: 'evt1',
       title: 'Team Meeting',
       description: 'Réunion d’équipe pour définir les prochaines étapes.',
-      dateTime: dayjs().add(2, 'days').hour(10).minute(0),
+      dateTime: dayjs().add(2, 'day').hour(10).minute(0),
       owner: 'Alice',
       team: 'Alpha Innovators',
     },
@@ -55,73 +60,68 @@ const ActivityPlanner: NextPage = () => {
       id: 'evt2',
       title: 'Sprint Planning',
       description: 'Planification du sprint avec présentation du backlog.',
-      dateTime: dayjs().add(4, 'days').hour(9).minute(30),
+      dateTime: dayjs().add(4, 'day').hour(9).minute(30),
       owner: 'Bob',
       team: 'Beta Coders',
     },
-    // Ajoutez d'autres événements si besoin
   ]);
-  // État pour le filtrage par équipe
+
   const [selectedTeam, setSelectedTeam] = useState<string>('All');
-  // État pour l'affichage du modal d'ajout d'événement
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  // Pour pré-remplir la date si l'utilisateur clique sur une date du calendrier
   const [preSelectedDate, setPreSelectedDate] = useState<Dayjs | null>(null);
 
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<ActivityForm>();
 
-  // Filtrage des événements en fonction de l'équipe sélectionnée
   const filteredEvents =
     selectedTeam === 'All'
       ? events
       : events.filter((evt) => evt.team === selectedTeam);
 
-  // Définition de la fonction de rendu d'une cellule de date dans le calendrier
-  const dateCellRender = (value: Dayjs) => {
-    const listData = events.filter((evt) =>
-      evt.dateTime.isSame(value, 'day')
-    );
-    return listData.length ? (
+  /** AntD v5: use `cellRender` for date cells */
+  const cellRender: CalendarProps<Dayjs>['cellRender'] = (value, info) => {
+    if (info.type !== 'date') return info.originNode;
+    const listData = events.filter((evt) => evt.dateTime.isSame(value, 'day'));
+    if (!listData.length) return info.originNode;
+
+    return (
       <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
         {listData.map((item) => (
           <li key={item.id}>
-            <Text style={{ fontSize: 10, color: '#1890ff' }}>{item.title}</Text>
+            <Text style={{ fontSize: 10 }}>{item.title}</Text>
           </li>
         ))}
       </ul>
-    ) : null;
+    );
   };
 
-  // Lorsque l'utilisateur clique sur une date, ouvrir le modal avec la date pré-remplie
+  /** Calendar selection uses Dayjs in AntD v5 */
   const handleDateSelect = (value: Dayjs) => {
     setPreSelectedDate(value);
-    form.setFieldsValue({
-      eventDate: value,
-      eventTime: null,
-    });
+    // preset only the date; time stays empty until user picks it
+    form.setFieldsValue({ eventDate: value } as Partial<ActivityForm>);
     setModalVisible(true);
   };
 
-  // Gestion de la soumission du formulaire d'ajout d'événement
-  const handleAddEvent = (values: any) => {
+  /** Submit new event with strongly typed form values */
+  const handleAddEvent = (values: ActivityForm) => {
     const { eventTitle, eventDescription, eventDate, eventTime, team, owner } =
       values;
-    // Combiner la date et l'heure pour obtenir la dateTime complète
-    const dateTime = eventDate.clone().set({
-      hour: eventTime.hour(),
-      minute: eventTime.minute(),
-      second: 0,
-    });
+
+    const dateTime = eventDate
+      .clone()
+      .set({ hour: eventTime.hour(), minute: eventTime.minute(), second: 0, millisecond: 0 });
+
     const newEvent: ActivityEvent = {
-      id: `evt${Date.now()}`, // Génération simple de l'ID
+      id: `evt${Date.now()}`,
       title: eventTitle,
-      description: eventDescription,
+      description: eventDescription ?? '',
       dateTime,
       owner,
       team,
     };
-    setEvents([...events, newEvent]);
-    message.success('L’événement a été ajouté.');
+
+    setEvents((prev) => [...prev, newEvent]);
+    message.success('Activity added');
     form.resetFields();
     setPreSelectedDate(null);
     setModalVisible(false);
@@ -131,26 +131,24 @@ const ActivityPlanner: NextPage = () => {
     <PageContainer title="Activity Planner">
       <Row gutter={[24, 24]}>
         <Col xs={24} md={16}>
-          <Calendar dateCellRender={dateCellRender} onSelect={handleDateSelect} />
+          <Calendar cellRender={cellRender} onSelect={handleDateSelect} />
         </Col>
+
         <Col xs={24} md={8}>
           <Title level={4}>Upcoming Activities</Title>
+
           <Select
             style={{ width: '100%', marginBottom: 16 }}
             value={selectedTeam}
-            onChange={(value) => setSelectedTeam(value)}
-          >
-            {teamOptions.map((team) => (
-              <Option key={team} value={team}>
-                {team}
-              </Option>
-            ))}
-          </Select>
+            onChange={(value: string) => setSelectedTeam(value)}
+            options={teamOptions.map((t) => ({ value: t, label: t }))}
+          />
+
           <List
-            dataSource={filteredEvents.sort((a, b) =>
-              a.dateTime.diff(b.dateTime)
+            dataSource={[...filteredEvents].sort((a, b) =>
+              a.dateTime.diff(b.dateTime),
             )}
-            renderItem={(item) => (
+            renderItem={(item: ActivityEvent) => (
               <List.Item>
                 <List.Item.Meta
                   title={item.title}
@@ -169,6 +167,7 @@ const ActivityPlanner: NextPage = () => {
               </List.Item>
             )}
           />
+
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -183,7 +182,7 @@ const ActivityPlanner: NextPage = () => {
           </Button>
         </Col>
       </Row>
-      {/* Modal pour ajouter un nouvel événement */}
+
       <Modal
         title="Add New Activity"
         open={modalVisible}
@@ -194,56 +193,52 @@ const ActivityPlanner: NextPage = () => {
         }}
         footer={null}
       >
-        <Form form={form} layout="vertical" onFinish={handleAddEvent}>
+        <Form<ActivityForm> form={form} layout="vertical" onFinish={handleAddEvent}>
           <Form.Item
             label="Event Title"
             name="eventTitle"
-            rules={[{ required: true, message: 'Veuillez saisir le titre de l’événement.' }]}
+            rules={[{ required: true, message: 'Please enter the event title.' }]}
           >
-            <Input placeholder="Entrez le titre de l’événement" />
+            <Input placeholder="Event title" />
           </Form.Item>
-          <Form.Item
-            label="Description"
-            name="eventDescription"
-          >
-            <Input.TextArea rows={3} placeholder="Description de l’événement" />
+
+          <Form.Item label="Description" name="eventDescription">
+            <Input.TextArea rows={3} placeholder="Event description" />
           </Form.Item>
+
           <Form.Item
             label="Date"
             name="eventDate"
-            initialValue={preSelectedDate ? preSelectedDate : null}
-            rules={[{ required: true, message: 'Veuillez sélectionner la date.' }]}
+            rules={[{ required: true, message: 'Please select a date.' }]}
           >
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
+
           <Form.Item
             label="Time"
             name="eventTime"
-            rules={[{ required: true, message: 'Veuillez sélectionner l’heure.' }]}
+            rules={[{ required: true, message: 'Please select a time.' }]}
           >
             <TimePicker style={{ width: '100%' }} format="HH:mm" />
           </Form.Item>
+
           <Form.Item
             label="Team"
             name="team"
-            rules={[{ required: true, message: 'Veuillez sélectionner l’équipe.' }]}
-            initialValue={teamOptions[1]} // Par défaut, par exemple, la première équipe réelle
+            rules={[{ required: true, message: 'Please select a team.' }]}
+            initialValue={teamOptions[1]}
           >
-            <Select>
-              {teamOptions.filter((t) => t !== 'All').map((team) => (
-                <Option key={team} value={team}>
-                  {team}
-                </Option>
-              ))}
-            </Select>
+            <Select options={teamOptions.filter((t) => t !== 'All').map((t) => ({ value: t, label: t }))} />
           </Form.Item>
+
           <Form.Item
             label="Owner"
             name="owner"
-            rules={[{ required: true, message: 'Veuillez saisir le nom du responsable.' }]}
+            rules={[{ required: true, message: 'Please enter the owner.' }]}
           >
-            <Input placeholder="Nom du responsable" />
+            <Input placeholder="Owner name" />
           </Form.Item>
+
           <Form.Item>
             <Button type="primary" htmlType="submit" block>
               Add Activity
@@ -253,10 +248,4 @@ const ActivityPlanner: NextPage = () => {
       </Modal>
     </PageContainer>
   );
-};
-
-ActivityPlanner.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ActivityPlanner;
+}

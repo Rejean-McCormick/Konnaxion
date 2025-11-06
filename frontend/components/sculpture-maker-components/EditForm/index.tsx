@@ -5,11 +5,9 @@
  * Author: Hieu Chu
  */
 
-import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import Head from 'next/head';
-import Error from 'next/error';
-import { Row, Modal, Button, message, notification } from 'antd';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { Row, Modal, Button, message, notification, Result } from 'antd';
 import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { CardStyled, ColStyled } from '../style';
@@ -18,15 +16,17 @@ import EditImage from './EditImage';
 
 // NOTE: API legacy import conservé tel que dans la base
 import api from '../../../api';
-import { normalizeError } from "../../../shared/errors";
+import { normalizeError } from '../../../shared/errors';
 
-const defaultPosition = [-34.40581053569814, 150.87842788963476];
+const defaultPosition: [number, number] = [-34.40581053569814, 150.87842788963476];
 const { confirm } = Modal;
 
 const tabList = [
   { key: 'tab1', tab: 'Edit text details' },
   { key: 'tab2', tab: 'Edit images' },
-];
+] as const;
+
+type TabKey = (typeof tabList)[number]['key'];
 
 type Maker = {
   firstName?: string;
@@ -56,16 +56,22 @@ type HttpError = { statusCode: number; message: string };
 
 const SculptureEditForm = () => {
   const router = useRouter();
-  const params = useParams() as { id?: string };
-  const sculptureId = params?.id;
+  const params = useParams<{ id?: string; sculptureId?: string }>();
+  const searchParams = useSearchParams();
+
+  // Prefer dynamic segment names, then fallback to query ?id=
+  const sculptureId = useMemo(
+    () => params?.sculptureId ?? params?.id ?? searchParams.get('id') ?? undefined,
+    [params, searchParams]
+  );
 
   const [initialData, setInitialData] = useState<InitialData | null>(null);
-  const [makerList, setMakerList] = useState<any[]>([]);
-  const [tabKey, setTabKey] = useState<'tab1' | 'tab2'>('tab1');
-  const [loading, setLoading] = useState(true);
+  const [makerList, setMakerList] = useState<Maker[]>([]);
+  const [tabKey, setTabKey] = useState<TabKey>('tab1');
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<HttpError | null>(null);
 
-  const handleTabChange = (key: 'tab1' | 'tab2') => setTabKey(key);
+  const handleTabChange = (key: TabKey) => setTabKey(key);
 
   const handleDelete = () => {
     confirm({
@@ -74,21 +80,18 @@ const SculptureEditForm = () => {
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: { background: '#ff4d4f', borderColor: '#ff4d4f' },
-      },
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
       onOk: async () => {
         try {
           if (!sculptureId) return;
           await api.delete(`/sculpture/${sculptureId}`);
           message.success('Deleted sculpture successfully!', 2);
           router.push('/sculptures');
-        } catch (e: any) {
-          const { message, statusCode } = normalizeError(e);
+        } catch (e: unknown) {
+          const { message: errMsg } = normalizeError(e);
           notification.error({
-            message: 'Error',
-            description:
-              "There has been internal server error or the maker you're trying to delete is currently associated with a sculpture.",
+            message: 'Delete failed',
+            description: errMsg || 'Unexpected error while deleting the sculpture.',
           });
         }
       },
@@ -97,21 +100,25 @@ const SculptureEditForm = () => {
 
   useEffect(() => {
     const fetchInitialForm = async () => {
-      if (!sculptureId) return;
+      if (!sculptureId) {
+        setLoading(false);
+        return;
+      }
       try {
-        const data: InitialData = (await api.get(`/sculpture/${sculptureId}`)).data;
+        const { data } = await api.get<InitialData>(`/sculpture/${sculptureId}`);
+        const next: InitialData = {
+          ...data,
+          latitude: data.latitude != null ? Number(data.latitude) : data.latitude ?? null,
+          longitude: data.longitude != null ? Number(data.longitude) : data.longitude ?? null,
+          images: Array.isArray(data.images) ? data.images : [],
+        };
+        setInitialData(next);
 
-        if (data.latitude != null) data.latitude = Number(data.latitude);
-        if (data.longitude != null) data.longitude = Number(data.longitude);
-
-        setInitialData({ ...data });
-
-        const makerData = (await api.get('/maker/')).data;
-        setMakerList(makerData);
-      } catch (e: any) {
-        const { message, statusCode } = normalizeError(e);
-        const { statusCode, message: msg } = e?.response?.data ?? { statusCode: 500, message: 'Unknown error' };
-        setError({ statusCode, message: msg });
+        const makersRes = await api.get<Maker[]>('/maker/');
+        setMakerList(Array.isArray(makersRes.data) ? makersRes.data : []);
+      } catch (e: unknown) {
+        const { statusCode = 500, message: errMsg = 'Unknown error' } = normalizeError(e);
+        setError({ statusCode, message: errMsg });
       } finally {
         setLoading(false);
       }
@@ -120,58 +127,70 @@ const SculptureEditForm = () => {
   }, [sculptureId]);
 
   if (loading) return null;
-  if (error) return <Error statusCode={error.statusCode} title={error.message} />;
+
+  if (error) {
+    const status = (['404', '403', '500'] as const).includes(String(error.statusCode) as any)
+      ? (String(error.statusCode) as '404' | '403' | '500')
+      : 'error';
+    return (
+      <Result
+        status={status}
+        title={error.message}
+        subTitle={`Error ${error.statusCode}`}
+        extra={
+          <Button type="primary" onClick={() => router.back()}>
+            Go Back
+          </Button>
+        }
+      />
+    );
+  }
+
   if (!initialData) return null;
 
-  // Tri des images en toute sécurité
-  const sortedImages = [...(initialData.images ?? [])].sort(
+  const sortedImages: ImageItem[] = [...(initialData.images ?? [])].sort(
     (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
   );
 
   return (
-    <>
-      <Head>
-        <title>Edit {initialData.name} - UOW Sculptures</title>
-      </Head>
-      <Row gutter={16}>
-        <ColStyled xs={24}>
-          <CardStyled
-            title={`Edit details for ${initialData.name}`}
-            tabList={tabList}
-            activeTabKey={tabKey}
-            onTabChange={handleTabChange}
-            extra={
-              <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
-                Delete
-              </Button>
-            }
-          >
-            <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
-              <SculptureEdit
-                defaultPosition={defaultPosition}
-                initialData={{ ...initialData, images: sortedImages }}
-                makerList={makerList}
-                setMakerList={setMakerList}
-              />
-            </div>
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled
+          title={`Edit details for ${initialData.name}`}
+          tabList={tabList as unknown as { key: string; tab: string }[]}
+          activeTabKey={tabKey}
+          onTabChange={handleTabChange as (key: string) => void}
+          extra={
+            <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
+              Delete
+            </Button>
+          }
+        >
+          <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
+            <SculptureEdit
+              defaultPosition={defaultPosition}
+              initialData={{ ...initialData, images: sortedImages }}
+              makerList={makerList}
+              setMakerList={setMakerList}
+            />
+          </div>
 
-            <div style={{ display: tabKey === 'tab2' ? 'block' : 'none' }}>
-              <EditImage
-                accessionId={initialData.accessionId}
-                _name={initialData.name} // NOTE: le composant attend `_name` (pas `name`)
-                images={sortedImages.map((img) => ({
-                  ...img,
-                  uid: img.id,
-                  thumbUrl: img.url,
-                  preview: img.url,
-                  status: 'done',
-                }))}
-              />
-            </div>
-          </CardStyled>
-        </ColStyled>
-      </Row>
-    </>
+          <div style={{ display: tabKey === 'tab2' ? 'block' : 'none' }}>
+            <EditImage
+              accessionId={initialData.accessionId}
+              _name={initialData.name} // NOTE: the component expects `_name`
+              images={sortedImages.map((img) => ({
+                ...img,
+                uid: img.id,
+                thumbUrl: img.url,
+                preview: img.url,
+                status: 'done',
+              }))}
+            />
+          </div>
+        </CardStyled>
+      </ColStyled>
+    </Row>
   );
 };
 

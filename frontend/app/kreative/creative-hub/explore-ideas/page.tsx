@@ -1,26 +1,25 @@
 'use client';
 
-// File: /pages/kreative/creative-hub/explore-ideas.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import { Row, Col, Card, Input, Select, Typography, Space, Pagination } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text, Paragraph } = Typography;
-const { Option } = Select;
+
+type Domain = 'Art' | 'Music' | 'Writing';
+type SortOpt = 'newest' | 'popular';
 
 interface CreativeIdea {
   id: string;
   title: string;
   excerpt: string;
   author: string;
-  domain: string;       // e.g., 'Art', 'Music', 'Writing'
-  thumbnail: string;    // URL for a thumbnail image
-  date: string;         // ISO date string for "newest" sort
-  popularity: number;   // e.g., number of likes/views for "most popular" sort
+  domain: Domain;        // e.g., 'Art', 'Music', 'Writing'
+  thumbnail: string;     // URL for a thumbnail image
+  date: string;          // ISO date string for "newest" sort
+  popularity: number;    // e.g., likes/views for "most popular" sort
 }
 
 const creativeIdeasData: CreativeIdea[] = [
@@ -66,10 +65,12 @@ const creativeIdeasData: CreativeIdea[] = [
   },
 ];
 
-const ExploreIdeasPage: NextPage = () => {
+export default function ExploreIdeasPage() {
+  const router = useRouter();
+
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [sortOption, setSortOption] = useState<'newest' | 'popular'>('newest');
+  const [selectedCategory, setSelectedCategory] = useState<'All' | Domain>('All');
+  const [sortOption, setSortOption] = useState<SortOpt>('newest');
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -77,26 +78,26 @@ const ExploreIdeasPage: NextPage = () => {
 
   // Filter and sort the creative ideas.
   const filteredIdeas = useMemo(() => {
-    // Clone the data to avoid mutating the original array.
     let ideas = [...creativeIdeasData];
 
     if (selectedCategory !== 'All') {
       ideas = ideas.filter((idea) => idea.domain === selectedCategory);
     }
-    if (searchQuery.trim() !== '') {
+    const q = searchQuery.trim().toLowerCase();
+    if (q) {
       ideas = ideas.filter(
         (idea) =>
-          idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          idea.excerpt.toLowerCase().includes(searchQuery.toLowerCase())
+          idea.title.toLowerCase().includes(q) ||
+          idea.excerpt.toLowerCase().includes(q)
       );
     }
-    if (sortOption === 'newest') {
-      ideas = ideas.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-    } else if (sortOption === 'popular') {
-      ideas = ideas.sort((a, b) => b.popularity - a.popularity);
-    }
+    ideas =
+      sortOption === 'newest'
+        ? ideas.sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+        : ideas.sort((a, b) => b.popularity - a.popularity);
+
     return ideas;
   }, [searchQuery, selectedCategory, sortOption]);
 
@@ -106,9 +107,7 @@ const ExploreIdeasPage: NextPage = () => {
     return filteredIdeas.slice(startIndex, startIndex + pageSize);
   }, [filteredIdeas, currentPage]);
 
-  // Navigate to the idea detail page when a card is clicked.
   const handleCardClick = (idea: CreativeIdea) => {
-    const router = useRouter();
     router.push(`/kreative/creative-hub/idea/${idea.id}`);
   };
 
@@ -126,31 +125,36 @@ const ExploreIdeasPage: NextPage = () => {
             }}
             style={{ width: 300 }}
           />
+
           <Select
             value={selectedCategory}
-            onChange={(value) => {
+            onChange={(value: 'All' | Domain) => {
               setSelectedCategory(value);
               setCurrentPage(1);
             }}
+            options={[
+              { value: 'All', label: 'All Domains' },
+              { value: 'Art', label: 'Art' },
+              { value: 'Music', label: 'Music' },
+              { value: 'Writing', label: 'Writing' },
+            ]}
             style={{ width: 180 }}
-          >
-            <Option value="All">All Domains</Option>
-            <Option value="Art">Art</Option>
-            <Option value="Music">Music</Option>
-            <Option value="Writing">Writing</Option>
-          </Select>
+          />
+
           <Select
             value={sortOption}
-            onChange={(value) => {
+            onChange={(value: SortOpt) => {
               setSortOption(value);
               setCurrentPage(1);
             }}
+            options={[
+              { value: 'newest', label: 'Newest' },
+              { value: 'popular', label: 'Most Popular' },
+            ]}
             style={{ width: 180 }}
-          >
-            <Option value="newest">Newest</Option>
-            <Option value="popular">Most Popular</Option>
-          </Select>
+          />
         </Space>
+
         <Row gutter={[24, 24]}>
           {paginatedIdeas.map((idea) => (
             <Col key={idea.id} xs={24} sm={12} md={8}>
@@ -165,18 +169,22 @@ const ExploreIdeasPage: NextPage = () => {
                 }
                 onClick={() => handleCardClick(idea)}
               >
-                <Title level={4} ellipsis={{ rows: 1 }}>
+                {/* Single-line title clamp without AntD ellipsis rows */}
+                <Title level={4} className="clamp-1" style={{ marginBottom: 8 }}>
                   {idea.title}
                 </Title>
-                <Paragraph type="secondary" ellipsis={{ rows: 2 }}>
+
+                {/* Multi-line summary clamp without AntD ellipsis rows */}
+                <Paragraph className="clamp-2" type="secondary" style={{ marginBottom: 12 }}>
                   {idea.excerpt}
                 </Paragraph>
-                <br />
+
                 <Text strong>By:</Text> {idea.author}
               </Card>
             </Col>
           ))}
         </Row>
+
         <div style={{ textAlign: 'center', marginTop: 24 }}>
           <Pagination
             current={currentPage}
@@ -186,12 +194,20 @@ const ExploreIdeasPage: NextPage = () => {
           />
         </div>
       </Space>
+
+      <style jsx>{`
+        .clamp-1 {
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+        .clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
     </PageContainer>
   );
-};
-
-ExploreIdeasPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ExploreIdeasPage;
+}

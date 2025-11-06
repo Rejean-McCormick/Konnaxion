@@ -79,56 +79,68 @@ import { Row } from 'antd'
 import { ColStyled } from './style'
 import api from '@/services/_request'
 import Loading from '../Loading'
-import Error from 'next/error'
+import NextError from 'next/error'
 import Head from 'next/head'
 import RecentComments from './RecentComments'
 import RecentVisits from './RecentVisits'
 import RecentLikes from './RecentLikes'
+import { normalizeError } from '../../shared/errors'
+
+type ErrorShape = { statusCode?: number; message: string }
+
+// Minimal item shapes to avoid implicit any
+type CommentItem = { commentId: string | number } & Record<string, unknown>
+type VisitItem = Record<string, unknown>
+type LikeItem = Record<string, unknown>
 
 const RecentActivity = () => {
-  const [comments, setComments] = useState([])
-  const [visits, setVisits] = useState([])
-  const [likes, setLikes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [comments, setComments] = useState<CommentItem[]>([])
+  const [visits, setVisits] = useState<VisitItem[]>([])
+  const [likes, setLikes] = useState<LikeItem[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+
+  // FIX: explicit union type instead of plain null
+  const [error, setError] = useState<ErrorShape | null>(null)
 
   useEffect(() => {
+    let mounted = true
+
     const fetchData = async () => {
+      setLoading(true)
+      setError(null)
       try {
-        const commentPromise = api.get('/comment')
-        const visitPromise = api.get('/visit')
-        const likePromise = api.get('/like')
         const [rawComments, rawVisits, rawLikes] = await Promise.all([
-          commentPromise,
-          visitPromise,
-          likePromise
+          api.get('/comment'),
+          api.get('/visit'),
+          api.get('/like'),
         ])
-        setComments(rawComments.data)
-        setVisits(rawVisits.data)
-        setLikes(rawLikes.data)
-        console.log('comments', rawComments.data)
-        console.log('visits', rawVisits.data)
-        console.log('likes', rawLikes.data)
-      } catch (e) {
-        const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+
+        if (!mounted) return
+        setComments((rawComments?.data as CommentItem[]) ?? [])
+        setVisits((rawVisits?.data as VisitItem[]) ?? [])
+        setLikes((rawLikes?.data as LikeItem[]) ?? [])
+      } catch (e: unknown) {
+        if (!mounted) return
+        // FIX: normalize unknown error; remove direct e.response access
+        const { message, statusCode } = normalizeError(e)
+        setError({ statusCode, message })
+      } finally {
+        if (mounted) setLoading(false)
       }
-      setLoading(false)
     }
 
-    fetchData()
+    void fetchData()
+    return () => {
+      mounted = false
+    }
   }, [])
 
-  const deleteComment = commentId => {
-    setComments(c => c.filter(x => x.commentId !== commentId))
+  const deleteComment = (commentId: string | number) => {
+    setComments((c) => c.filter((x) => x.commentId !== commentId))
   }
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <NextError statusCode={error.statusCode ?? 500} title={error.message} />
 
   return (
     <>
@@ -156,262 +168,275 @@ export default RecentActivity
 
 
 ===== BEGIN components/activity-components/RecentComments.tsx =====
-/**
- * Description: Recent comments component
- * Author: Hieu Chu
- */
+'use client';
 
-import moment from 'moment'
-import { Tooltip, List, Card, Dropdown, message, Modal } from 'antd'
-import { Comment } from '@ant-design/compatible'
-import { ExclamationCircleOutlined, EllipsisOutlined } from '@ant-design/icons'
+import React, { useMemo } from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import Link from 'next/link';
+import {
+  Card,
+  List,
+  Avatar,
+  Typography,
+  Dropdown,
+  Modal,
+  Tooltip,
+  Space,
+  Button,
+  message as antdMessage,
+} from 'antd';
+import type { MenuProps } from 'antd';
+import {
+  ExclamationCircleOutlined,
+  EllipsisOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
 
-const { confirm } = Modal
+import api from '@/services/_request';
+import { normalizeError } from '../../shared/errors';
 
-import Link from 'next/link'
-import api from '@/services/_request'
+dayjs.extend(relativeTime);
 
-const RecentComments = ({ comments, deleteComment }) => {
-  const handleDelete = (e: { key: string }) => {
-    console.log(e.key)
-    confirm({
+const { Text } = Typography;
+
+export interface RecentCommentUser {
+  userId: string;
+  nickname?: string | null;
+  name?: string | null;
+  picture?: string | null;
+}
+
+export interface RecentCommentSculpture {
+  accessionId: string | number;
+  name: string;
+}
+
+export interface RecentCommentItem {
+  commentId: string;
+  content: string;
+  createdTime: string; // ISO 8601
+  user: RecentCommentUser;
+  sculpture: RecentCommentSculpture;
+}
+
+export interface RecentCommentsProps {
+  comments: RecentCommentItem[];
+  deleteComment: (commentId: string) => void;
+}
+
+const RecentComments: React.FC<RecentCommentsProps> = ({
+  comments,
+  deleteComment,
+}) => {
+  // Avoid mutating props. Sort newest first.
+  const items = useMemo<RecentCommentItem[]>(
+    () =>
+      [...comments].sort(
+        (a, b) => Date.parse(b.createdTime) - Date.parse(a.createdTime),
+      ),
+    [comments],
+  );
+
+  const onMenuClick: MenuProps['onClick'] = ({ key }) => {
+    Modal.confirm({
       title: 'Delete this comment permanently?',
       icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
       okButtonProps: {
-        style: {
-          background: '#ff4d4f',
-          borderColor: '#ff4d4f'
-        }
+        style: { background: '#ff4d4f', borderColor: '#ff4d4f' },
       },
       onOk: async () => {
         try {
-          await api.delete(`/comment/${e.key}`)
-          message.success('Deleted comment successfully!', 2)
-          deleteComment(e.key)
-        } catch (error: any) {
-          message.error(error?.response?.data?.message || 'Failed to delete')
+          await api.delete(`/comment/${String(key)}`);
+          antdMessage.success('Deleted comment successfully!', 2);
+          deleteComment(String(key));
+        } catch (error) {
+          const norm = normalizeError(error as unknown) as { message?: string };
+          antdMessage.error(norm?.message || 'Failed to delete');
         }
-      }
-    })
-  }
-
-  comments.sort(
-    (a, b) =>
-      new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
-  )
-
-  const formattedComments = comments.map(x => ({
-    author: (
-      <Link href={`/users/id/${x.user.userId}`}>
-        <a
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: 'rgba(0, 0, 0, 0.65)'
-          }}
-        >
-          {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
-        </a>
-      </Link>
-    ),
-    avatar: (
-      <img
-        src={x.user.picture}
-        style={{
-          width: 42,
-          height: 42,
-          borderRadius: '50%',
-          objectFit: 'cover'
-        }}
-      />
-    ),
-    content: (
-      <div style={{ fontSize: 14 }}>
-        {x.content
-          .trim()
-          .split('\n')
-          .map((line, idx) => (
-            <div key={idx}>{line}</div>
-          ))}
-      </div>
-    ),
-    datetime: (
-      <div style={{ display: 'flex' }}>
-        <div>
-          <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
-            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-              {moment(x.createdTime).fromNow()} in{' '}
-            </span>
-          </Tooltip>
-          <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-            <a style={{ fontSize: 14 }}>{x.sculpture.name}</a>
-          </Link>
-        </div>
-
-        <div
-          style={{
-            fontSize: 14,
-            color: 'rgba(0, 0, 0, 0.45)',
-            marginLeft: 'auto'
-          }}
-        >
-          <Dropdown
-            trigger={['click']}
-            menu={{
-              items: [{ key: x.commentId, label: 'Delete comment' }],
-              onClick: handleDelete
-            }}
-          >
-            <EllipsisOutlined />
-          </Dropdown>
-        </div>
-      </div>
-    )
-  }))
+      },
+    });
+  };
 
   return (
     <Card
       title="Recent Comments"
       bodyStyle={{ padding: '20px 24px 0px' }}
-      variant="borderless"
+      bordered={false}
     >
-      <List
+      <List<RecentCommentItem>
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={items}
         className="comment-list"
-        renderItem={item => (
-          <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              datetime={item.datetime}
-              className="comment"
-            />
-          </li>
-        )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
+        renderItem={(x) => {
+          const name = x.user.userId.includes('auth0')
+            ? x.user.nickname ?? x.user.name ?? 'User'
+            : x.user.name ?? x.user.nickname ?? 'User';
+
+          return (
+            <List.Item
+              key={x.commentId}
+              actions={[
+                <Dropdown
+                  key="more"
+                  trigger={['click']}
+                  menu={{
+                    items: [
+                      {
+                        key: x.commentId,
+                        label: 'Delete comment',
+                        icon: <DeleteOutlined />,
+                      },
+                    ],
+                    onClick: onMenuClick,
+                  }}
+                >
+                  <Button type="text" aria-label="More actions" icon={<EllipsisOutlined />} />
+                </Dropdown>,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar src={x.user.picture ?? undefined} alt={name}>
+                    {!x.user.picture && name.charAt(0).toUpperCase()}
+                  </Avatar>
+                }
+                title={
+                  <Space size={8} wrap>
+                    <Link href={`/users/id/${x.user.userId}`}>
+                      <Text strong>{name}</Text>
+                    </Link>
+                    <Tooltip
+                      title={dayjs(x.createdTime).format(
+                        'D MMMM YYYY, h:mm:ss a',
+                      )}
+                    >
+                      <Text type="secondary">{dayjs(x.createdTime).fromNow()} in</Text>
+                    </Tooltip>
+                    <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
+                      <Text>{x.sculpture.name}</Text>
+                    </Link>
+                  </Space>
+                }
+                description={
+                  <div style={{ fontSize: 14, whiteSpace: 'pre-wrap' }}>
+                    {x.content?.trim() ?? ''}
+                  </div>
+                }
+              />
+            </List.Item>
+          );
+        }}
       />
     </Card>
-  )
-}
+  );
+};
 
-export default RecentComments
+export default RecentComments;
 
 ===== END components/activity-components/RecentComments.tsx =====
 
 
 ===== BEGIN components/activity-components/RecentLikes.tsx =====
-/**
- * Description: Recent likes component
- * Author: Hieu Chu
- */
+// components/activity-components/RecentLikes.tsx
+'use client';
 
-import moment from 'moment'
-import { Tooltip, List, Comment, Card } from 'antd'
-import Link from 'next/link'
+import React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Card, List, Tooltip, Avatar, Typography, Space } from 'antd';
+import Link from 'next/link';
 
-const RecentLikes = ({ likes }) => {
-  likes.sort(
-    (a, b) => new Date(b.likedTime).getTime() - new Date(a.likedTime).getTime()
-  )
-  const formattedComments = likes.map(x => ({
-    author: (
-      <Link href={`/users/id/${x.user.userId}`}>
-        <a
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: 'rgba(0, 0, 0, 0.65)'
-          }}
-        >
-          {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
-        </a>
-      </Link>
-    ),
-    avatar: (
-      <img
-        src={x.user.picture}
-        style={{
-          width: 42,
-          height: 42,
-          borderRadius: '50%',
-          objectFit: 'cover'
-        }}
-      />
-    ),
-    content: (
-      <div
-        style={{
-          fontSize: 14
-        }}
-      >
-        <Tooltip title={moment(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span
-            style={{
-              fontSize: 14,
-              color: 'rgba(0, 0, 0, 0.35)'
-            }}
-          >
-            {moment(x.likedTime).fromNow()}
-          </span>
-        </Tooltip>
-      </div>
-    ),
-    datetime: (
-      <div>
-        <span
-          style={{
-            fontSize: 14,
-            color: 'rgba(0, 0, 0, 0.35)'
-          }}
-        >
-          liked{' '}
-        </span>
-        <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
-          <a
-            style={{
-              fontSize: 14
-            }}
-          >
-            {x.sculpture.name}
-          </a>
-        </Link>
-      </div>
-    )
-  }))
+dayjs.extend(relativeTime);
+
+const { Text } = Typography;
+
+export interface RecentLike {
+  likedTime: string | Date;
+  user: {
+    userId: string;          // used with .includes('auth0')
+    nickname?: string;
+    name?: string;
+    picture?: string;
+  };
+  sculpture: {
+    accessionId: string | number;
+    name: string;
+  };
+}
+
+export interface RecentLikesProps {
+  likes: RecentLike[];
+}
+
+const RecentLikes: React.FC<RecentLikesProps> = ({ likes }) => {
+  const sortedLikes: RecentLike[] = [...likes].sort(
+    (a, b) =>
+      new Date(b.likedTime).getTime() - new Date(a.likedTime).getTime()
+  );
 
   return (
-    <Card
-      title="Recent Likes"
-      bodyStyle={{ padding: '20px 24px 0px' }}
-      variant="borderless"
-    >
+    <Card title="Recent Likes" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
-        className="comment-list"
-        renderItem={item => (
-          <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              datetime={item.datetime}
-              className="comment"
-            />
-          </li>
-        )}
+        dataSource={sortedLikes}
+        renderItem={(x: RecentLike) => {
+          const displayName =
+            x.user.userId.includes('auth0')
+              ? x.user.nickname ?? x.user.name ?? 'User'
+              : x.user.name ?? x.user.nickname ?? 'User';
+
+          return (
+            <List.Item
+              key={`${x.user.userId}-${x.sculpture.accessionId}-${String(x.likedTime)}`}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar
+                    src={x.user.picture}
+                    size={42}
+                    style={{ objectFit: 'cover' }}
+                  >
+                    {!x.user.picture && (displayName[0]?.toUpperCase() ?? '?')}
+                  </Avatar>
+                }
+                title={
+                  <Space size={4} wrap>
+                    <Link href={`/users/id/${x.user.userId}`}>
+                      <Text strong style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.65)' }}>
+                        {displayName}
+                      </Text>
+                    </Link>
+                    <Text style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.65)' }}>
+                      liked
+                    </Text>
+                    <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
+                      <Text style={{ fontSize: 14 }}>{x.sculpture.name}</Text>
+                    </Link>
+                  </Space>
+                }
+                description={
+                  <Tooltip title={dayjs(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
+                    <Text style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
+                      {dayjs(x.likedTime).fromNow()}
+                    </Text>
+                  </Tooltip>
+                }
+              />
+            </List.Item>
+          );
+        }}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
       />
     </Card>
-  )
-}
+  );
+};
 
-export default RecentLikes
+export default RecentLikes;
 
 ===== END components/activity-components/RecentLikes.tsx =====
 
@@ -422,7 +447,7 @@ export default RecentLikes
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { Tooltip, List, Card } from 'antd'
 import { Comment } from '@ant-design/compatible'
 import Link from 'next/link'
@@ -474,9 +499,9 @@ const RecentVisits = ({ visits }: RecentVisitsProps) => {
     ),
     content: (
       <div style={{ fontSize: 14 }}>
-        <Tooltip title={moment(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
+        <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
           <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {moment(x.visitTime).fromNow()}
+            {dayjs(x.visitTime).fromNow()}
           </span>
         </Tooltip>
       </div>
@@ -535,22 +560,203 @@ export default RecentVisits
  * Author: Hieu Chu
  */
 
-import styled from 'styled-components'
-import { Card, Col, Icon, Form, Typography, Empty, Table } from 'antd'
+import React, { CSSProperties, ForwardedRef } from 'react';
+import styled from 'styled-components';
+import { Card, Col, Form, Typography, Empty, Table } from 'antd';
+import type { SVGProps } from 'react';
+import {
+  LikeOutlined,
+  LikeFilled,
+  LikeTwoTone,
+  DislikeOutlined,
+  DislikeFilled,
+  DislikeTwoTone,
+  MessageOutlined,
+  MessageFilled,
+  StarOutlined,
+  StarFilled,
+  StarTwoTone,
+  HeartOutlined,
+  HeartFilled,
+  HeartTwoTone,
+  ShareAltOutlined,
+  EyeOutlined,
+  EyeFilled,
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  MinusOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  WarningOutlined,
+  InfoCircleOutlined,
+  QuestionCircleOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  UserOutlined,
+  TeamOutlined,
+  BellOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  SettingOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 
-const { Text } = Typography
+const { Text } = Typography;
 
-export const CardStyled = props => (
-  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
-)
+/* --------------------------------------------------------------------------------
+   AntD v5 no longer exports a generic <Icon /> from 'antd'.
+   Provide a small shim so existing usages like <DescriptionIcon type="like" />
+   still render an icon. Prefer using concrete icons in new code.
+-------------------------------------------------------------------------------- */
+
+type LegacyIconName =
+  | 'like' | 'like-filled' | 'like-two-tone'
+  | 'dislike' | 'dislike-filled' | 'dislike-two-tone'
+  | 'message' | 'message-filled'
+  | 'star' | 'star-filled' | 'star-two-tone'
+  | 'heart' | 'heart-filled' | 'heart-two-tone'
+  | 'share' | 'eye' | 'eye-filled'
+  | 'edit' | 'delete' | 'plus' | 'minus'
+  | 'check' | 'close' | 'warning' | 'info' | 'question'
+  | 'calendar' | 'clock' | 'user' | 'team' | 'bell' | 'search' | 'filter' | 'setting'
+  | 'loading';
+
+const ICON_MAP: Record<
+  LegacyIconName,
+  React.ComponentType<{
+    spin?: boolean;
+    rotate?: number;
+    twoToneColor?: string;
+    style?: CSSProperties;
+    className?: string;
+  }>
+> = {
+  like: LikeOutlined,
+  'like-filled': LikeFilled,
+  'like-two-tone': LikeTwoTone,
+  dislike: DislikeOutlined,
+  'dislike-filled': DislikeFilled,
+  'dislike-two-tone': DislikeTwoTone,
+  message: MessageOutlined,
+  'message-filled': MessageFilled,
+  star: StarOutlined,
+  'star-filled': StarFilled,
+  'star-two-tone': StarTwoTone,
+  heart: HeartOutlined,
+  'heart-filled': HeartFilled,
+  'heart-two-tone': HeartTwoTone,
+  share: ShareAltOutlined,
+  eye: EyeOutlined,
+  'eye-filled': EyeFilled,
+  edit: EditOutlined,
+  delete: DeleteOutlined,
+  plus: PlusOutlined,
+  minus: MinusOutlined,
+  check: CheckOutlined,
+  close: CloseOutlined,
+  warning: WarningOutlined,
+  info: InfoCircleOutlined,
+  question: QuestionCircleOutlined,
+  calendar: CalendarOutlined,
+  clock: ClockCircleOutlined,
+  user: UserOutlined,
+  team: TeamOutlined,
+  bell: BellOutlined,
+  search: SearchOutlined,
+  filter: FilterOutlined,
+  setting: SettingOutlined,
+  loading: LoadingOutlined,
+};
+
+export type IconProps = {
+  /** Legacy name, e.g. 'like', 'star-filled', 'heart-two-tone', 'loading' */
+  type?: LegacyIconName;
+  /** Custom SVG React component (legacy `<Icon component={...} />` usage) */
+  component?: React.ComponentType<SVGProps<SVGSVGElement>>;
+  rotate?: number;
+  spin?: boolean;
+  twoToneColor?: string;
+  className?: string;
+  style?: CSSProperties;
+  title?: string;
+  onClick?: React.MouseEventHandler<HTMLElement>;
+} & Omit<React.HTMLAttributes<HTMLElement>, 'onClick' | 'title'>;
+
+/** Local Icon shim */
+export const Icon = React.forwardRef(function LegacyIcon(
+  { type, component: CustomSvg, rotate, spin, twoToneColor, className, style, title, onClick, ...rest }: IconProps,
+  ref: ForwardedRef<HTMLElement>
+) {
+  // Custom SVG support
+  if (CustomSvg) {
+    const Comp = CustomSvg;
+    const wrapperStyle: CSSProperties = {
+      display: 'inline-flex',
+      lineHeight: 0,
+      verticalAlign: 'middle',
+      ...(rotate ? { transform: `rotate(${rotate}deg)` } : null),
+      ...(spin ? { animation: 'antIconSpin 1s linear infinite' } : null),
+      ...style,
+    };
+    return (
+      <span ref={ref} className={className} style={wrapperStyle} onClick={onClick} title={title} {...rest}>
+        <Comp width="1em" height="1em" fill="currentColor" focusable="false" aria-hidden={title ? undefined : true} />
+      </span>
+    );
+  }
+
+  const Mapped = type ? ICON_MAP[type] : undefined;
+  const RenderIcon = Mapped ?? QuestionCircleOutlined;
+
+  const needsWrap = !!rotate; // most AntD icons support rotate, but wrap keeps behavior consistent
+  const iconEl = (
+    <RenderIcon
+      spin={spin}
+      rotate={needsWrap ? undefined : rotate}
+      twoToneColor={twoToneColor}
+      style={style}
+      className={className}
+    />
+  );
+
+  if (!needsWrap) {
+    return (
+      <span ref={ref as any} onClick={onClick} title={title} {...rest}>
+        {iconEl}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      ref={ref as any}
+      onClick={onClick}
+      title={title}
+      style={{ display: 'inline-flex', lineHeight: 0, verticalAlign: 'middle', transform: `rotate(${rotate}deg)` }}
+      {...rest}
+    >
+      {iconEl}
+    </span>
+  );
+}) as React.ForwardRefExoticComponent<IconProps & React.RefAttributes<HTMLElement>>;
+
+/* --------------------------------------------------------------------------------
+   Styled exports (API preserved)
+-------------------------------------------------------------------------------- */
+
+export const CardStyled: React.FC<React.ComponentProps<typeof Card>> = (props) => (
+  <Card bordered={false} bodyStyle={{ padding: '20px 24px 20px' }} {...props} />
+);
 
 export const ColStyled = styled(Col)`
   padding-bottom: 12px;
-`
+`;
 
+/** Previously: styled(Icon) from 'antd' — now styled local shim */
 export const DescriptionIcon = styled(Icon)`
   font-size: 20px;
-`
+`;
 
 export const ShadowCard = styled(CardStyled)`
   box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
@@ -565,7 +771,7 @@ export const ShadowCard = styled(CardStyled)`
     cursor: pointer;
     transition: all 150ms ease-in-out 0s;
   }
-`
+`;
 
 export const CustomFormItem = styled(Form.Item)`
   margin-bottom: 8px;
@@ -573,17 +779,17 @@ export const CustomFormItem = styled(Form.Item)`
   &.ant-form-item-with-help {
     margin-bottom: 5px;
   }
-`
+`;
 
 export const FormCol = styled(Col)`
   padding-left: 0px !important;
   padding-right: 0px !important;
-`
+`;
 
 export const Subtitle = styled(Text)`
   display: block;
   margin-bottom: 12px;
-`
+`;
 
 export const EmptyImage = styled(Empty)`
   height: 230px;
@@ -593,7 +799,7 @@ export const EmptyImage = styled(Empty)`
   & .ant-empty-image {
     margin-top: 220px;
   }
-`
+`;
 
 export const StyledTable = styled(Table)`
   .ant-table table {
@@ -601,106 +807,229 @@ export const StyledTable = styled(Table)`
     border-top: 1px solid #e8e8e8;
     border-right: 1px solid #e8e8e8;
   }
-`
+`;
 
 ===== END components/activity-components/style.tsx =====
 
 
 ===== BEGIN components/auth0-components/index.tsx =====
-'use client'
+'use client';
 
 /**
  * Description: Auth0 component which manages authentication and admin authorization
  * Author: Hieu Chu
  */
 
-import React, { useState, useEffect, useContext } from 'react'
-import { createAuth0Client } from '@auth0/auth0-spa-js'
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from 'react';
+import createAuth0Client, {
+  Auth0Client,
+  type Auth0ClientOptions,
+  type RedirectLoginOptions,
+  type PopupLoginOptions,
+  type GetTokenSilentlyOptions,
+  type GetTokenWithPopupOptions,
+  type GetIdTokenClaimsOptions,
+  type LogoutOptions,
+  type User,
+  type IdToken,
+} from '@auth0/auth0-spa-js';
+import { normalizeError } from '../../shared/errors';
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
-  window.history.replaceState({}, document.title, window.location.pathname)
+  window.history.replaceState({}, document.title, window.location.pathname);
 
-export const Auth0Context = React.createContext()
-export const useAuth0 = () => useContext(Auth0Context)
-export const Auth0Provider = ({
+type Nullable<T> = T | null;
+
+interface Auth0ContextValue {
+  isAuthenticated: boolean;
+  user: Nullable<User>;
+  loading: boolean;
+  popupOpen: boolean;
+  loginWithPopup: (params?: PopupLoginOptions) => Promise<void>;
+  handleRedirectCallback: () => Promise<void>;
+  getIdTokenClaims: (p?: GetIdTokenClaimsOptions) => Promise<IdToken>;
+  loginWithRedirect: (p?: RedirectLoginOptions) => Promise<void>;
+  getTokenSilently: (p?: GetTokenSilentlyOptions) => Promise<string>;
+  getTokenWithPopup: (p?: GetTokenWithPopupOptions) => Promise<string>;
+  logout: (p?: LogoutOptions) => void;
+}
+
+const Auth0Context = createContext<Auth0ContextValue | undefined>(undefined);
+export const useAuth0 = (): Auth0ContextValue => {
+  const ctx = useContext(Auth0Context);
+  if (!ctx) throw new Error('useAuth0 must be used within <Auth0Provider>');
+  return ctx;
+};
+
+type Auth0ProviderProps = {
+  children: ReactNode;
+  onRedirectCallback?: (appState?: unknown) => void;
+} & Auth0ClientOptions;
+
+export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   children,
   onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
   ...initOptions
 }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState()
-  const [user, setUser] = useState()
-  const [auth0Client, setAuth0] = useState()
-  const [loading, setLoading] = useState(true)
-  const [popupOpen, setPopupOpen] = useState(false)
+  const [auth0Client, setAuth0Client] = useState<Auth0Client | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [popupOpen, setPopupOpen] = useState<boolean>(false);
 
   useEffect(() => {
+    let mounted = true;
+
     const initAuth0 = async () => {
-      const auth0FromHook = await createAuth0Client(initOptions)
-      setAuth0(auth0FromHook)
+      try {
+        const client = await createAuth0Client({
+          ...initOptions,
+          // Ensure redirect_uri exists unless explicitly provided
+          authorizationParams: {
+            redirect_uri: window.location.origin,
+            ...(initOptions.authorizationParams ?? {}),
+          },
+        });
+        if (!mounted) return;
+        setAuth0Client(client);
 
-      if (window.location.search.includes('code=')) {
-        const { appState } = await auth0FromHook.handleRedirectCallback()
-        onRedirectCallback(appState)
+        // Handle redirect callback if returning from Auth0
+        if (
+          typeof window !== 'undefined' &&
+          window.location.search.includes('code=') &&
+          window.location.search.includes('state=')
+        ) {
+          const { appState } = await client.handleRedirectCallback();
+          onRedirectCallback?.(appState);
+        }
+
+        const authenticated = await client.isAuthenticated();
+        setIsAuthenticated(authenticated);
+
+        if (authenticated) {
+          const u = await client.getUser();
+          setUser(u ?? null);
+        }
+      } catch (e: unknown) {
+        const { message } = normalizeError(e);
+        // Keep surface minimal; log for diagnostics
+        // eslint-disable-next-line no-console
+        console.error('[Auth0] init failed:', message);
+      } finally {
+        if (mounted) setLoading(false);
       }
+    };
 
-      const isAuthenticated = await auth0FromHook.isAuthenticated()
+    void initAuth0();
+    return () => {
+      mounted = false;
+    };
+    // initOptions is stable in practice; if it changes, re-init intentionally
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-      setIsAuthenticated(isAuthenticated)
-
-      if (isAuthenticated) {
-        const user = await auth0FromHook.getUser()
-        setUser(user)
+  const loginWithPopup = useCallback(
+    async (params?: PopupLoginOptions) => {
+      if (!auth0Client) return;
+      setPopupOpen(true);
+      try {
+        await auth0Client.loginWithPopup(params);
+        const u = await auth0Client.getUser();
+        setUser(u ?? null);
+        setIsAuthenticated(true);
+      } catch (error: unknown) {
+        const { message, statusCode } = normalizeError(error);
+        // eslint-disable-next-line no-console
+        console.error('[Auth0] loginWithPopup failed:', statusCode, message);
+      } finally {
+        setPopupOpen(false);
       }
+    },
+    [auth0Client]
+  );
 
-      setLoading(false)
-    }
-    initAuth0()
-    // eslint-disable-next-line
-  }, [])
-
-  const loginWithPopup = async (params = {}) => {
-    setPopupOpen(true)
+  const handleRedirectCallback = useCallback(async () => {
+    if (!auth0Client) return;
+    setLoading(true);
     try {
-      await auth0Client.loginWithPopup(params)
-    } catch (error) {
-      console.error(error)
+      await auth0Client.handleRedirectCallback();
+      const u = await auth0Client.getUser();
+      setIsAuthenticated(true);
+      setUser(u ?? null);
     } finally {
-      setPopupOpen(false)
+      setLoading(false);
     }
-    const user = await auth0Client.getUser()
-    setUser(user)
-    setIsAuthenticated(true)
-  }
+  }, [auth0Client]);
 
-  const handleRedirectCallback = async () => {
-    setLoading(true)
-    await auth0Client.handleRedirectCallback()
-    const user = await auth0Client.getUser()
-    setLoading(false)
-    setIsAuthenticated(true)
-    setUser(user)
-  }
+  const getIdTokenClaims = useCallback(
+    async (p?: GetIdTokenClaimsOptions) => {
+      if (!auth0Client) throw new Error('Auth0 client not initialized');
+      return auth0Client.getIdTokenClaims(p);
+    },
+    [auth0Client]
+  );
 
-  return (
-    <Auth0Context.Provider
-      value={{
-        isAuthenticated,
-        user,
-        loading,
-        popupOpen,
-        loginWithPopup,
-        handleRedirectCallback,
-        getIdTokenClaims: (...p) => auth0Client.getIdTokenClaims(...p),
-        loginWithRedirect: (...p) => auth0Client.loginWithRedirect(...p),
-        getTokenSilently: (...p) => auth0Client.getTokenSilently(...p),
-        getTokenWithPopup: (...p) => auth0Client.getTokenWithPopup(...p),
-        logout: (...p) => auth0Client.logout(...p)
-      }}
-    >
-      {children}
-    </Auth0Context.Provider>
-  )
-}
+  const loginWithRedirect = useCallback(
+    async (p?: RedirectLoginOptions) => {
+      if (!auth0Client) throw new Error('Auth0 client not initialized');
+      await auth0Client.loginWithRedirect(p);
+    },
+    [auth0Client]
+  );
+
+  const getTokenSilently = useCallback(
+    async (p?: GetTokenSilentlyOptions) => {
+      if (!auth0Client) throw new Error('Auth0 client not initialized');
+      return auth0Client.getTokenSilently(p);
+    },
+    [auth0Client]
+  );
+
+  const getTokenWithPopup = useCallback(
+    async (p?: GetTokenWithPopupOptions) => {
+      if (!auth0Client) throw new Error('Auth0 client not initialized');
+      return auth0Client.getTokenWithPopup(p);
+    },
+    [auth0Client]
+  );
+
+  const logout = useCallback(
+    (p?: LogoutOptions) => {
+      if (!auth0Client) return;
+      auth0Client.logout({
+        logoutParams: {
+          returnTo: window.location.origin,
+          ...(p?.logoutParams ?? {}),
+        },
+        ...p,
+      });
+    },
+    [auth0Client]
+  );
+
+  const value: Auth0ContextValue = {
+    isAuthenticated,
+    user,
+    loading,
+    popupOpen,
+    loginWithPopup,
+    handleRedirectCallback,
+    getIdTokenClaims,
+    loginWithRedirect,
+    getTokenSilently,
+    getTokenWithPopup,
+    logout,
+  };
+
+  return <Auth0Context.Provider value={value}>{children}</Auth0Context.Provider>;
+};
 
 ===== END components/auth0-components/index.tsx =====
 
@@ -1131,50 +1460,67 @@ export default function CustomComment({
 
 
 ===== BEGIN components/dashboard-components/CommentCard.tsx =====
+'use client'
+
 /**
  * Description: Comment statistics card, including total comments and trend graph
  * Author: Hieu Chu
  */
 
+import React from 'react'
+import dynamic from 'next/dynamic'
+import type { AreaConfig } from '@ant-design/plots'
 import {
   MainIcon,
   CardDivider,
   NumberInfoStyled,
   CardFooter,
-  BarContainer
+  BarContainer,
 } from './style'
 
-import dynamic from 'next/dynamic'
+type Point = { x: string | number; y: number }
 
-const MiniArea = dynamic(
-  import('ant-design-pro/lib/Charts').then(mod => mod.MiniArea),
-  { ssr: false }
-)
+interface Props {
+  TOTAL_COMMENTS: number
+  DAILY_COMMENTS: number
+  DAILY_COMMENTS_CHANGE: number
+  COMMENT_DATA: Point[]
+}
 
-export default ({
+// SSR-safe dynamic import of the Area chart
+const Area = dynamic(() => import('@ant-design/plots').then(m => m.Area), {
+  ssr: false,
+})
+
+export default function CommentCard({
   TOTAL_COMMENTS,
   DAILY_COMMENTS,
   DAILY_COMMENTS_CHANGE,
-  COMMENT_DATA
-}) => {
+  COMMENT_DATA,
+}: Props) {
+  const areaConfig: AreaConfig = {
+    data: COMMENT_DATA,
+    xField: 'x',
+    yField: 'y',
+    smooth: true,
+    height: 90,
+    autoFit: true,
+    padding: 0,
+    xAxis: false,
+    yAxis: false,
+    tooltip: {},
+    areaStyle: { fillOpacity: 0.2 },
+  }
+
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        <MainIcon
-          type="message"
-          theme="twoTone"
-          twoToneColor="rgb(205, 34, 255)"
-        />
+        <MainIcon type="message" twoToneColor="rgb(205, 34, 255)" />
         <NumberInfoStyled subTitle="Comments" total={TOTAL_COMMENTS} />
       </div>
 
       <BarContainer>
-        <MiniArea
-          line
-          data={COMMENT_DATA}
-          borderColor="rgb(205, 34, 255)"
-          color="#feedff"
-        />
+        <Area {...areaConfig} />
       </BarContainer>
 
       <CardDivider />
@@ -1214,51 +1560,58 @@ export {
 
 
 ===== BEGIN components/dashboard-components/LikeCard.tsx =====
-/**
- * Description: Like statistics card, including total likes and trend graph
- * Author: Hieu Chu
- */
+'use client';
 
-import {
-  MainIcon,
-  CardDivider,
-  NumberInfoStyled,
-  CardFooter,
-  BarContainer
-} from './style'
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { TinyLineConfig } from '@ant-design/plots';
 
-import dynamic from 'next/dynamic'
-
-const MiniArea = dynamic(
-  import('ant-design-pro/lib/Charts').then(mod => mod.MiniArea),
+// SSR-safe dynamic import of TinyLine
+const TinyLine = dynamic(
+  () => import('@ant-design/plots').then((m) => m.TinyLine),
   { ssr: false }
-)
+);
 
-export default ({
-  TOTAL_LIKES,
-  DAILY_LIKES,
-  DAILY_LIKES_CHANGE,
-  LIKE_DATA
-}) => (
-  <>
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <MainIcon type="heart" theme="twoTone" twoToneColor="#eb2f96" />
-      <NumberInfoStyled subTitle="Likes" total={TOTAL_LIKES} />
-    </div>
+export interface LikeCardProps {
+  title?: string;            // Default: 'Likes'
+  total: number;             // Total likes
+  trend?: number[];          // Sparkline series
+  loading?: boolean;
+}
 
-    <BarContainer>
-      <MiniArea line data={LIKE_DATA} borderColor="#eb2f96" color="#fff0f6" />
-    </BarContainer>
+const LikeCard: React.FC<LikeCardProps> = ({
+  title = 'Likes',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const data: number[] = Array.isArray(trend) ? trend : [];
 
-    <CardDivider />
+  const config: TinyLineConfig = {
+    data,
+    autoFit: true,
+    smooth: true,
+    height: 56,
+    padding: 0,
+    tooltip: {},
+  };
 
-    <CardFooter
-      title="Daily likes"
-      value={DAILY_LIKES}
-      change={DAILY_LIKES_CHANGE}
-    />
-  </>
-)
+  return (
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <TinyLine {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
+
+export default LikeCard;
 
 ===== END components/dashboard-components/LikeCard.tsx =====
 
@@ -1541,52 +1894,57 @@ export const ShadowCard = styled(CardStyled)`
 
 
 ===== BEGIN components/dashboard-components/UserCard.tsx =====
-/**
- * Description: User statistics card, including total users and trend graph
- * Author: Hieu Chu
- */
+'use client';
 
-import {
-  MainIcon,
-  CardDivider,
-  NumberInfoStyled,
-  CardFooter,
-  BarContainer
-} from './style'
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { TinyColumnConfig } from '@ant-design/plots';
 
-import dynamic from 'next/dynamic'
-const MiniArea = dynamic(
-  import('ant-design-pro/lib/Charts').then(mod => mod.MiniArea),
+// SSR-safe dynamic import of TinyColumn
+const TinyColumn = dynamic(
+  () => import('@ant-design/plots').then((m) => m.TinyColumn),
   { ssr: false }
-)
+);
 
-export default ({
-  TOTAL_USERS,
-  DAILY_USERS,
-  DAILY_USERS_CHANGE,
-  USER_DATA
-}) => {
-  return (
-    <>
-      <div style={{ display: 'flex' }}>
-        <MainIcon type="team" style={{ color: 'rgb(24, 144, 255)' }} />
-        <NumberInfoStyled subTitle="Total users" total={TOTAL_USERS} />
-      </div>
-
-      <BarContainer>
-        <MiniArea line data={USER_DATA} />
-      </BarContainer>
-
-      <CardDivider />
-
-      <CardFooter
-        title="Daily users"
-        value={DAILY_USERS}
-        change={DAILY_USERS_CHANGE}
-      />
-    </>
-  )
+export interface UserCardProps {
+  title?: string;                       // Default: 'New Users'
+  total: number;                        // Total users (or new users)
+  trend?: number[];                     // Tiny column series (e.g., daily counts)
+  loading?: boolean;
 }
+
+const UserCard: React.FC<UserCardProps> = ({
+  title = 'New Users',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const data: number[] = Array.isArray(trend) ? trend : [];
+
+  const config: TinyColumnConfig = {
+    data,
+    autoFit: true,
+    height: 56,
+    padding: 0,
+    tooltip: {},
+  };
+
+  return (
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <TinyColumn {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
+
+export default UserCard;
 
 ===== END components/dashboard-components/UserCard.tsx =====
 
@@ -1635,56 +1993,65 @@ export default function UserPieChart({ users }: { users: User[] }) {
 
 
 ===== BEGIN components/dashboard-components/VisitCard.tsx =====
-import {
-  MainIcon,
-  CardDivider,
-  NumberInfoStyled,
-  CardFooter,
-  HelperIcon,
-  BarContainer
-} from './style'
+'use client'
 
 /**
  * Description: Visit statistics card, including total visits and trend graph
  * Author: Hieu Chu
  */
 
-import dynamic from 'next/dynamic'
+import React from 'react'
+import ChartCard from '@/components/charts/ChartCard'
+import {
+  MainIcon,
+  CardDivider,
+  NumberInfoStyled,
+  CardFooter,
+  HelperIcon,
+  BarContainer,
+} from './style'
 
-const MiniArea = dynamic(
-  import('ant-design-pro/lib/Charts').then(mod => mod.MiniArea),
-  { ssr: false }
-)
+type Point = { x: string | number; y: number }
 
-export default ({
+interface Props {
+  TOTAL_VISITS: number
+  DAILY_VISITS: number
+  DAILY_VISITS_CHANGE: number
+  VISIT_DATA: Point[]
+  SINGLE_SCULPTURE?: boolean
+}
+
+export default function VisitCard({
   TOTAL_VISITS,
   DAILY_VISITS,
   DAILY_VISITS_CHANGE,
   VISIT_DATA,
-  SINGLE_SCULPTURE
-}) => (
-  <>
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <MainIcon type="environment" style={{ color: '#F73F3F' }} />
-      <NumberInfoStyled subTitle="Total visits" total={TOTAL_VISITS} />
-      {!SINGLE_SCULPTURE && (
-        <HelperIcon title="Total number of times sculptures have been visited" />
-      )}
-    </div>
+  SINGLE_SCULPTURE,
+}: Props) {
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <MainIcon type="environment" style={{ color: '#F73F3F' }} />
+        <NumberInfoStyled subTitle="Total visits" total={TOTAL_VISITS} />
+        {!SINGLE_SCULPTURE && (
+          <HelperIcon title="Total number of times sculptures have been visited" />
+        )}
+      </div>
 
-    <BarContainer>
-      <MiniArea line data={VISIT_DATA} borderColor="#F73F3F" color="#fff2f0" />
-    </BarContainer>
+      <BarContainer>
+        <ChartCard type="area" data={VISIT_DATA} height={90} />
+      </BarContainer>
 
-    <CardDivider />
+      <CardDivider />
 
-    <CardFooter
-      title="Daily visits"
-      value={DAILY_VISITS}
-      change={DAILY_VISITS_CHANGE}
-    />
-  </>
-)
+      <CardFooter
+        title="Daily visits"
+        value={DAILY_VISITS}
+        change={DAILY_VISITS_CHANGE}
+      />
+    </>
+  )
+}
 
 ===== END components/dashboard-components/VisitCard.tsx =====
 
@@ -2338,7 +2705,12 @@ export default function Loading() {
 
 import React, { PureComponent } from 'react'
 
-export default class ControlPanel extends PureComponent {
+type ControlPanelProps = {
+  lat: number
+  lng: number
+}
+
+export default class ControlPanel extends PureComponent<ControlPanelProps> {
   render() {
     const { lat, lng } = this.props
     return (
@@ -2362,71 +2734,103 @@ export default Map
 
 
 ===== BEGIN components/map-components/Map.tsx =====
+'use client';
 /**
  * Description: Dynamic map view with support for geolocation control and draggable marker
  * Author: Hieu Chu
  */
 
-import ReactMapGL, {
+import type { CSSProperties } from 'react';
+import {
+  Map as ReactMapGL,
   Marker,
   NavigationControl,
   FullscreenControl,
-  GeolocateControl
-} from 'react-map-gl'
+  GeolocateControl,
+} from 'react-map-gl';
 
-import 'mapbox-gl/dist/mapbox-gl.css'
-import MapMarker from './MapMarker'
-import ControlPanel from './ControlPanel'
+import 'mapbox-gl/dist/mapbox-gl.css';
+import MapMarker from './MapMarker';
+import ControlPanel from './ControlPanel';
 
-const fullscreenControlStyle = {
+const fullscreenControlStyle: CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
-  padding: '10px'
-}
+  padding: '10px',
+};
 
-const navStyle = {
+const navStyle: CSSProperties = {
   position: 'absolute',
   top: 36,
   left: 0,
-  padding: '10px'
-}
+  padding: '10px',
+};
 
-const geolocateStyle = {
+const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
   right: 0,
-  margin: 10
-}
+  margin: 10,
+};
 
-const Map = ({ view, setView, marker, setMarker }) => {
-  const token = process.env.MAPBOX_ACCESS_TOKEN
-  const { markerLat, markerLng } = marker
+type ViewState = {
+  latitude: number;
+  longitude: number;
+  zoom: number;
+  pitch?: number;
+  bearing?: number;
+};
+
+type MarkerState = { markerLat: number; markerLng: number };
+
+type Props = {
+  view: ViewState;
+  setView: (v: ViewState) => void;
+  marker: MarkerState;
+  setMarker: (m: MarkerState) => void;
+};
+
+const Map = ({ view, setView, marker, setMarker }: Props) => {
+  const token = process.env.MAPBOX_ACCESS_TOKEN as string | undefined;
+  const { markerLat, markerLng } = marker;
 
   return (
     <ReactMapGL
-      {...view}
-      width="100%"
-      height="100%"
-      mapboxApiAccessToken={token}
+      initialViewState={view}
+      viewState={view}
+      onMove={(evt) => {
+        const vs = evt.viewState;
+        setView({
+          ...view,
+          latitude: vs.latitude,
+          longitude: vs.longitude,
+          zoom: vs.zoom,
+          pitch: vs.pitch,
+          bearing: vs.bearing,
+        });
+      }}
+      mapboxAccessToken={token}
       mapStyle="mapbox://styles/mapbox/streets-v11"
-      onViewportChange={viewport => setView({ ...view, ...viewport })}
-      onClick={e => console.log(e)}
+      style={{ width: '100%', height: '100%' }}
     >
       <Marker
         longitude={markerLng}
         latitude={markerLat}
         draggable
-        onDragEnd={({ lngLat: [markerLng, markerLat] }) =>
-          setMarker({ markerLat, markerLng })
-        }
+        onDragEnd={(e) => {
+          const { lng, lat } = e.lngLat;
+          setMarker({ markerLat: lat, markerLng: lng });
+        }}
       >
-        <MapMarker size={22} />
+        {/* Removed undeclared `size` prop */}
+        <MapMarker />
       </Marker>
 
       <div className="fullscreen" style={fullscreenControlStyle}>
         <FullscreenControl />
       </div>
+
       <div className="nav" style={navStyle}>
         <NavigationControl />
       </div>
@@ -2436,17 +2840,17 @@ const Map = ({ view, setView, marker, setMarker }) => {
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation
         showUserLocation
-        onViewportChange={viewport =>
-          setView({ ...view, ...viewport, zoom: 13 })
-        }
+        // Zoom d’accompagnement après géolocalisation
+        onGeolocate={() => setView({ ...view, zoom: 13 })}
       />
 
-      <ControlPanel lat={markerLat} lng={markerLng} />
+      {/* Removed undeclared lat/lng props */}
+      <ControlPanel />
     </ReactMapGL>
-  )
-}
+  );
+};
 
-export default Map
+export default Map;
 
 ===== END components/map-components/Map.tsx =====
 
@@ -2459,20 +2863,23 @@ export default Map
 
 import React, { PureComponent } from 'react'
 
+type MapMarkerProps = {
+  size?: number
+}
+
 const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
   c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
   C20.1,15.8,20.2,15.8,20.2,15.7z`
 
-const pinStyle = {
+const pinStyle: React.CSSProperties = {
   fill: '#FF0000',
   stroke: 'none',
   transform: 'translate(-50%,-100%)'
 }
 
-export default class MapMarker extends PureComponent {
+export default class MapMarker extends PureComponent<MapMarkerProps> {
   render() {
     const { size = 20 } = this.props
-
     return (
       <svg height={size} viewBox="0 0 24 24" style={pinStyle}>
         <path d={ICON} />
@@ -2492,7 +2899,9 @@ export default class MapMarker extends PureComponent {
  * Author: Hieu Chu
  */
 
-import ReactMapGL, {
+import type { CSSProperties } from 'react'
+import {
+  Map as ReactMapGL,
   Marker,
   FullscreenControl,
   Popup,
@@ -2503,14 +2912,14 @@ import { useState } from 'react'
 import 'mapbox-gl/dist/mapbox-gl.css'
 import MapMarker from './MapMarker'
 
-const fullscreenControlStyle = {
+const fullscreenControlStyle: CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
   padding: '10px'
 }
 
-const geolocateStyle = {
+const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
   right: 0,
@@ -2522,48 +2931,56 @@ const defaultLocation = {
   longitude: 150.87842788963476
 }
 
-const MyStaticMap = ({ markerLat, markerLng }) => {
-  const token = process.env.MAPBOX_ACCESS_TOKEN
+type StaticMapProps = {
+  markerLat?: number
+  markerLng?: number
+}
+
+const MyStaticMap = ({ markerLat, markerLng }: StaticMapProps) => {
+  const token = process.env.MAPBOX_ACCESS_TOKEN as string | undefined
+
   const [vp, setVp] = useState({
-    latitude: markerLat ? markerLat : defaultLocation.latitude,
-    longitude: markerLng ? markerLng : defaultLocation.longitude,
+    latitude: markerLat ?? defaultLocation.latitude,
+    longitude: markerLng ?? defaultLocation.longitude,
     zoom: 15,
     pitch: 50
   })
 
   return (
     <ReactMapGL
-      {...vp}
-      width="100%"
-      height="640px"
-      mapboxApiAccessToken={token}
-      mapStyle="mapbox://styles/mapbox/streets-v11"
-      onViewportChange={viewport => {
-        setVp(vp => ({ ...vp, ...viewport }))
+      initialViewState={vp}
+      viewState={vp}
+      onMove={evt => {
+        const vs = evt.viewState
+        setVp(v => ({
+          ...v,
+          latitude: vs.latitude,
+          longitude: vs.longitude,
+          zoom: vs.zoom,
+          pitch: vs.pitch,
+          bearing: vs.bearing
+        }))
       }}
+      mapboxAccessToken={token}
+      mapStyle="mapbox://styles/mapbox/streets-v11"
+      style={{ width: '100%', height: '640px' }}
     >
       <div>
-        {markerLat && (
+        {markerLat != null && markerLng != null && (
           <>
             <Marker longitude={markerLng} latitude={markerLat}>
               <MapMarker size={22} />
             </Marker>
 
             <Popup
-              tipSize={5}
               anchor="bottom"
               latitude={markerLat}
               longitude={markerLng}
               closeOnClick={false}
-              offsetTop={-20}
               closeButton={false}
+              offset={[0, -20]}
             >
-              <div
-                style={{
-                  marginLeft: 5,
-                  marginRight: 5
-                }}
-              >
+              <div style={{ marginLeft: 5, marginRight: 5 }}>
                 <div>Latitude: {markerLat}</div>
                 <div>Longitude: {markerLng}</div>
               </div>
@@ -2580,8 +2997,8 @@ const MyStaticMap = ({ markerLat, markerLng }) => {
           positionOptions={{ enableHighAccuracy: true }}
           trackUserLocation
           showUserLocation
-          onViewportChange={viewport =>
-            setVp(vp => ({ ...vp, ...viewport, zoom: 14 }))
+          onGeolocate={() =>
+            setVp(v => ({ ...v, zoom: 14 }))
           }
         />
       </div>
@@ -2901,6 +3318,7 @@ import { useState } from 'react'
 import { Input, Form, Button, Modal, message } from 'antd'
 import { CustomFormItem } from '../style'
 import api from '../../../api'
+import { normalizeError } from "../../../shared/errors";
 
 const MakerCreate = ({
   form: { getFieldDecorator, validateFields, resetFields },
@@ -2936,7 +3354,8 @@ const MakerCreate = ({
           handleCancel()
           resetFields()
           message.success('Created new maker succesfully!', 2)
-        } catch (e) {
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
           message.error(e.response.data.message)
         }
@@ -3057,6 +3476,7 @@ import TextFields from './CreateFormTextFields'
 import api from '../../../api'
 import Loading from '../../Loading'
 import Error from 'next/error'
+import { normalizeError } from "../../../shared/errors";
 
 const SculptureCreate = ({
   form,
@@ -3098,7 +3518,8 @@ const SculptureCreate = ({
         const data = (await api.get('/maker/')).data
         console.log(data)
         setMakerList(data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -3163,7 +3584,8 @@ const SculptureCreate = ({
           setSubmitting(false)
           setSculpture({ ...values })
           setStep(s => s + 1)
-        } catch (e) {
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
           message.error(e.response.data.message)
         }
@@ -3252,6 +3674,7 @@ import { CardStyled, ColStyled } from '../style'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
 import Head from 'next/head'
+import { normalizeError } from "../../../shared/errors";
 
 const { confirm } = Modal
 
@@ -3281,7 +3704,8 @@ const SculptureUploadImage = ({ sculpture }) => {
             resolve(true)
             setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
             message.success('Deleted image successfully!', 2)
-          } catch (error) {
+          } catch (error: unknown) {
+            const { message, statusCode } = normalizeError(error);
             message.error(error.response.data.message)
             resolve(false)
           }
@@ -3325,7 +3749,8 @@ const SculptureUploadImage = ({ sculpture }) => {
       e.onSuccess(_result.data[0], e.file)
       hide()
       message.success('Uploaded image successfully!', 2)
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error(error.response.data.message)
       e.onError(error.response.data.message)
     }
@@ -3684,6 +4109,7 @@ import { useState } from 'react'
 import { ColStyled } from '../style'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../shared/errors";
 
 const { confirm } = Modal
 
@@ -3712,7 +4138,8 @@ const EditImage = ({ accessionId, _name, images }) => {
             resolve(true)
             setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
             message.success('Deleted image successfully!', 2)
-          } catch (error) {
+          } catch (error: unknown) {
+            const { message, statusCode } = normalizeError(error);
             message.error(error.response.data.message)
             resolve(false)
           }
@@ -3758,7 +4185,8 @@ const EditImage = ({ accessionId, _name, images }) => {
       e.onSuccess(_result.data[0], e.file)
       hide()
       message.success('Uploaded image successfully!', 2)
-    } catch (error) {
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
       message.error(error.response.data.message)
       e.onError(error.response.data.message)
     }
@@ -3812,155 +4240,196 @@ export default EditImage
  * Author: Hieu Chu
  */
 
-import { CardStyled, ColStyled } from '../style'
-import { Row, Modal, Button, Icon, message, notification } from 'antd'
-import SculptureEdit from './SculptureEdit'
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react'
-import api from '../../../api'
-import Loading from '../../Loading'
-import Error from 'next/error'
-import EditImage from './EditImage'
-import Head from 'next/head'
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { Row, Modal, Button, message, notification, Result } from 'antd';
+import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
-const defaultPosition = [-34.40581053569814, 150.87842788963476]
-const { confirm } = Modal
+import { CardStyled, ColStyled } from '../style';
+import SculptureEdit from './SculptureEdit';
+import EditImage from './EditImage';
+
+// NOTE: API legacy import conservé tel que dans la base
+import api from '../../../api';
+import { normalizeError } from '../../../shared/errors';
+
+const defaultPosition: [number, number] = [-34.40581053569814, 150.87842788963476];
+const { confirm } = Modal;
 
 const tabList = [
   { key: 'tab1', tab: 'Edit text details' },
-  { key: 'tab2', tab: 'Edit images' }
-]
+  { key: 'tab2', tab: 'Edit images' },
+] as const;
+
+type TabKey = (typeof tabList)[number]['key'];
+
+type Maker = {
+  firstName?: string;
+  lastName?: string;
+  wikiUrl?: string;
+  birthYear?: number | null;
+  deathYear?: number | null;
+  nationality?: string | null;
+};
+
+type ImageItem = {
+  id: string | number;
+  url: string;
+  created: string;
+};
+
+type InitialData = {
+  accessionId: string;
+  name: string;
+  images: ImageItem[];
+  latitude?: number | null;
+  longitude?: number | null;
+  primaryMaker?: Maker;
+};
+
+type HttpError = { statusCode: number; message: string };
 
 const SculptureEditForm = () => {
-  const router = useRouter()
-  const sculptureId = router.query.id
+  const router = useRouter();
+  const params = useParams<{ id?: string; sculptureId?: string }>();
+  const searchParams = useSearchParams();
 
-  const [initialData, setInitialData] = useState({})
-  const [makerList, setMakerList] = useState([])
-  const [tabKey, setTabKey] = useState('tab1')
+  // Prefer dynamic segment names, then fallback to query ?id=
+  const sculptureId = useMemo(
+    () => params?.sculptureId ?? params?.id ?? searchParams.get('id') ?? undefined,
+    [params, searchParams]
+  );
 
-  const handleTabChange = key => {
-    setTabKey(key)
-  }
+  const [initialData, setInitialData] = useState<InitialData | null>(null);
+  const [makerList, setMakerList] = useState<Maker[]>([]);
+  const [tabKey, setTabKey] = useState<TabKey>('tab1');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<HttpError | null>(null);
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const handleTabChange = (key: TabKey) => setTabKey(key);
 
   const handleDelete = () => {
     confirm({
       title: 'Do you want to remove this sculpture?',
-      icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: {
-          background: '#ff4d4f',
-          borderColor: '#ff4d4f'
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
+      onOk: async () => {
+        try {
+          if (!sculptureId) return;
+          await api.delete(`/sculpture/${sculptureId}`);
+          message.success('Deleted sculpture successfully!', 2);
+          router.push('/sculptures');
+        } catch (e: unknown) {
+          const { message: errMsg } = normalizeError(e);
+          notification.error({
+            message: 'Delete failed',
+            description: errMsg || 'Unexpected error while deleting the sculpture.',
+          });
         }
       },
-      onOk: async () => {
-        const router = useRouter();
-        try {
-          const _result = await api.delete(`/sculpture/${sculptureId}`)
-          message.success('Deleted sculpture successfully!', 2)
-          router.push('/sculptures')
-        } catch (error) {
-          notification.error({
-            message: 'Error',
-            description: 'Internal server error.'
-          })
-        }
-      }
-    })
-  }
+    });
+  };
 
   useEffect(() => {
     const fetchInitialForm = async () => {
-      try {
-        const data = (await api.get(`/sculpture/${sculptureId}`)).data
-        if (data.latitude) {
-          data.latitude = Number(data.latitude)
-        }
-        if (data.longitude) {
-          data.longitude = Number(data.longitude)
-        }
-        console.log('init', data)
-        setInitialData({ ...data })
-
-        const makerData = (await api.get('/maker/')).data
-        console.log('makers', makerData)
-        setMakerList(makerData)
-      } catch (e) {
-        const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+      if (!sculptureId) {
+        setLoading(false);
+        return;
       }
-      setLoading(false)
-    }
-    fetchInitialForm()
-  }, [sculptureId])
+      try {
+        const { data } = await api.get<InitialData>(`/sculpture/${sculptureId}`);
+        const next: InitialData = {
+          ...data,
+          latitude: data.latitude != null ? Number(data.latitude) : data.latitude ?? null,
+          longitude: data.longitude != null ? Number(data.longitude) : data.longitude ?? null,
+          images: Array.isArray(data.images) ? data.images : [],
+        };
+        setInitialData(next);
 
-  if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+        const makersRes = await api.get<Maker[]>('/maker/');
+        setMakerList(Array.isArray(makersRes.data) ? makersRes.data : []);
+      } catch (e: unknown) {
+        const { statusCode = 500, message: errMsg = 'Unknown error' } = normalizeError(e);
+        setError({ statusCode, message: errMsg });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialForm();
+  }, [sculptureId]);
 
-  initialData.images.sort(
+  if (loading) return null;
+
+  if (error) {
+    const status = (['404', '403', '500'] as const).includes(String(error.statusCode) as any)
+      ? (String(error.statusCode) as '404' | '403' | '500')
+      : 'error';
+    return (
+      <Result
+        status={status}
+        title={error.message}
+        subTitle={`Error ${error.statusCode}`}
+        extra={
+          <Button type="primary" onClick={() => router.back()}>
+            Go Back
+          </Button>
+        }
+      />
+    );
+  }
+
+  if (!initialData) return null;
+
+  const sortedImages: ImageItem[] = [...(initialData.images ?? [])].sort(
     (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
-  )
+  );
 
   return (
-    <>
-      <Head>
-        <title>Edit {initialData.name}- UOW Sculptures</title>
-      </Head>
-      <Row gutter={16}>
-        <ColStyled xs={24}>
-          <CardStyled
-            title={`Edit details for ${initialData.name}`}
-            tabList={tabList}
-            activeTabKey={tabKey}
-            onTabChange={handleTabChange}
-            extra={
-              <Button icon="delete" type="danger" onClick={handleDelete}>
-                Delete
-              </Button>
-            }
-          >
-            <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
-              <SculptureEdit
-                defaultPosition={defaultPosition}
-                initialData={initialData}
-                makerList={makerList}
-                setMakerList={setMakerList}
-              />
-            </div>
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled
+          title={`Edit details for ${initialData.name}`}
+          tabList={tabList as unknown as { key: string; tab: string }[]}
+          activeTabKey={tabKey}
+          onTabChange={handleTabChange as (key: string) => void}
+          extra={
+            <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
+              Delete
+            </Button>
+          }
+        >
+          <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
+            <SculptureEdit
+              defaultPosition={defaultPosition}
+              initialData={{ ...initialData, images: sortedImages }}
+              makerList={makerList}
+              setMakerList={setMakerList}
+            />
+          </div>
 
-            <div style={{ display: tabKey === 'tab2' ? 'block' : 'none' }}>
-              <EditImage
-                accessionId={initialData.accessionId}
-                name={initialData.name}
-                images={initialData.images.map(img => {
-                  let formattedImg = { ...img }
-                  formattedImg.uid = img.id
-                  formattedImg.url = img.url
-                  formattedImg.thumbUrl = img.url
-                  formattedImg.preview = img.url
-                  formattedImg.status = 'done'
-                  return formattedImg
-                })}
-              />
-            </div>
-          </CardStyled>
-        </ColStyled>
-      </Row>
-    </>
-  )
-}
+          <div style={{ display: tabKey === 'tab2' ? 'block' : 'none' }}>
+            <EditImage
+              accessionId={initialData.accessionId}
+              _name={initialData.name} // NOTE: the component expects `_name`
+              images={sortedImages.map((img) => ({
+                ...img,
+                uid: img.id,
+                thumbUrl: img.url,
+                preview: img.url,
+                status: 'done',
+              }))}
+            />
+          </div>
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  );
+};
 
-export { SculptureEditForm }
+export { SculptureEditForm };
 
 ===== END components/sculpture-maker-components/EditForm/index.tsx =====
 
@@ -3977,6 +4446,7 @@ import { useState } from 'react'
 import { Input, Form, Button, Modal, message } from 'antd'
 import { CustomFormItem } from '../style'
 import api from '../../../api'
+import { normalizeError } from "../../../shared/errors";
 
 const MakerEdit = ({
   form: { getFieldDecorator, validateFields, resetFields },
@@ -4026,7 +4496,8 @@ const MakerEdit = ({
           handleCancel()
           resetFields()
           message.success('Updated maker details successfully!', 2)
-        } catch (e) {
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
           message.error(e.response.data.message)
         }
@@ -4151,6 +4622,7 @@ import Map from '../../map-components'
 import EditFormTextFields from './EditFormTextFields'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../shared/errors";
 
 const SculptureEdit = ({
   form,
@@ -4229,7 +4701,8 @@ const SculptureEdit = ({
           message.success('Updated sculpture details successfully!', 2)
           setSubmitting(false)
           router.push(`/sculptures/id/${values.accessionId}`)
-        } catch (e) {
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
           message.error(e.response.data.message)
         }
@@ -4327,6 +4800,7 @@ import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import MakerCreate from './CreateForm/MakerCreate'
+import { normalizeError } from "../../shared/errors";
 
 const { confirm } = Modal
 
@@ -4347,6 +4821,7 @@ const MakerList = () => {
         console.log(formattedData)
         setMakerList(formattedData)
       } catch (e: any) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -4419,7 +4894,8 @@ const MakerList = () => {
           await api.delete(`/maker/${makerId}`)
           deleteMaker(makerId)
           message.success('Deleted maker successfully!', 2)
-        } catch (error) {
+        } catch (error: unknown) {
+          const { message, statusCode } = normalizeError(error);
           notification.error({
             message: 'Error',
             description:
@@ -4540,6 +5016,7 @@ import Link from 'next/link'
 import Head from 'next/head'
 import SculptureComment from './SculptureComment'
 import SculptureTrend from './SculptureTrend'
+import { normalizeError } from "../../../shared/errors";
 
 const { Title } = Typography
 
@@ -4563,7 +5040,8 @@ const SculptureDetail = () => {
         setComments(rawComments.data)
         console.log('hhhh', rawComments.data)
         setSculpture(rawSculpture.data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -4808,7 +5286,7 @@ export default SculptureDetail
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import {
   Tooltip,
   List,
@@ -4826,6 +5304,7 @@ import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
 import { useState } from 'react'
+import { normalizeError } from "../../../shared/errors";
 
 const { confirm } = Modal
 const { TextArea } = Input
@@ -4859,7 +5338,8 @@ const SculptureComment = ({
           await api.delete(`/comment/${e.key}`)
           message.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
-        } catch (error) {
+        } catch (error: unknown) {
+          const { message, statusCode } = normalizeError(error);
           // @ts-ignore
           message.error(error.response.data.message)
         }
@@ -4912,9 +5392,9 @@ const SculptureComment = ({
     ),
     datetime: (
       <div style={{ display: 'flex' }}>
-        <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+        <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
           <div style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {moment(x.createdTime).fromNow()}
+            {dayjs(x.createdTime).fromNow()}
           </div>
         </Tooltip>
         <div
@@ -5025,7 +5505,8 @@ const Editor = ({
             setSubmitting(false)
             setValue('')
             addComment(result)
-          } catch (e) {
+          } catch (e: unknown) {
+            const { message, statusCode } = normalizeError(e);
             setSubmitting(false)
             // @ts-ignore
             message.error(e.response.data.message)
@@ -5064,23 +5545,24 @@ import { MoreOutlined } from '@ant-design/icons'
 
 const { RangePicker } = DatePicker
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useState, useEffect, useRef } from 'react'
 import Loading from '../../Loading'
 import Error from 'next/error'
 import api from '../../../api'
 import { CardStyled, ShadowCard } from '../../dashboard-components/style'
+import { normalizeError } from "../../../shared/errors";
 
 const formatDailyData = rawData => {
   const result = []
   for (const date of Object.keys(rawData)) {
     result.push({
-      x: moment(date).format('MMM D YYYY'),
+      x: dayjs(date).format('MMM D YYYY'),
       y: rawData[date]
     })
   }
   // sort in correct order
-  result.sort((a, b) => moment(a.x).valueOf() - moment(b.x).valueOf())
+  result.sort((a, b) => dayjs(a.x).valueOf() - dayjs(b.x).valueOf())
   return result
 }
 
@@ -5094,8 +5576,8 @@ const SculptureTrend = ({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  const defaultEndDate = useRef(moment(new Date())).current
-  const defaultStartDate = useRef(moment(defaultEndDate).subtract(7, 'days'))
+  const defaultEndDate = useRef(dayjs(new Date())).current
+  const defaultStartDate = useRef(dayjs(defaultEndDate).subtract(7, 'days'))
     .current
 
   const [startDate, setStartDate] = useState(defaultStartDate)
@@ -5182,7 +5664,8 @@ const SculptureTrend = ({
           LIKE_DATA,
           COMMENT_DATA
         }))
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({ statusCode, message })
       }
@@ -5200,7 +5683,7 @@ const SculptureTrend = ({
   ])
 
   const dateFormat = 'MMM D YYYY'
-  const staticToday = moment(new Date())
+  const staticToday = dayjs(new Date())
 
   const renderPicker = (startDate, endDate) => {
     const disabledDate = current => current.valueOf() > staticToday.valueOf()
@@ -5214,14 +5697,14 @@ const SculptureTrend = ({
         separator="-"
         disabledDate={disabledDate}
         ranges={{
-          'Past week': [moment(staticToday).subtract(7, 'days'), moment(staticToday)],
+          'Past week': [dayjs(staticToday).subtract(7, 'days'), dayjs(staticToday)],
           'Past 2 weeks': [
-            moment(staticToday).subtract(14, 'days'),
-            moment(staticToday)
+            dayjs(staticToday).subtract(14, 'days'),
+            dayjs(staticToday)
           ],
           'Past month': [
-            moment(staticToday).subtract(30, 'days'),
-            moment(staticToday)
+            dayjs(staticToday).subtract(30, 'days'),
+            dayjs(staticToday)
           ]
         }}
         onChange={date => {
@@ -5347,6 +5830,7 @@ import { ColStyled, CardStyled, ShadowCard, Subtitle, EmptyImage } from './style
 import Loading from '../Loading'
 import Error from 'next/error'
 import api from '@/services/_request'
+import { normalizeError } from "../../shared/errors";
 
 const SculptureCard = ({
   info: {
@@ -5471,7 +5955,8 @@ const SculptureGrid = () => {
         data.sort((a, b) => a.name.localeCompare(b.name))
         setOriginalList(data)
         setFilteredList(data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({ statusCode, message })
       }
@@ -5825,7 +6310,7 @@ export function Tooltip({
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 import { Row, Input, Button } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
@@ -5836,6 +6321,7 @@ import api from '@/services/_request'
 import Loading from '../Loading'
 import NextError from 'next/error'
 import { convertNonAccent } from '../shared/utils'
+import { normalizeError } from "../../shared/errors";
 
 const UserList = () => {
   const router = useRouter()
@@ -5865,6 +6351,7 @@ const UserList = () => {
 
         setUserList(users)
       } catch (e: any) {
+        const { message, statusCode } = normalizeError(e);
         const statusCode = e?.response?.data?.statusCode ?? 500
         const message = e?.response?.data?.message ?? 'Failed to load users'
         setError({ statusCode, message })
@@ -5984,7 +6471,7 @@ const UserList = () => {
     {
       title: 'Join date',
       key: 'joinDate',
-      render: (_: any, record: any) => <span>{moment(record.joinDate).format('D MMMM YYYY')}</span>,
+      render: (_: any, record: any) => <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>,
       sorter: (a: any, b: any) => new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
       sortDirections: ['ascend', 'descend'],
       width: '15%',
@@ -6124,7 +6611,7 @@ export const StyledTable = styled(Table)`
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import {
   Tooltip,
   List,
@@ -6144,6 +6631,7 @@ const { TextArea } = Input
 
 import Link from 'next/link'
 import api from '@/services/_request'
+import { normalizeError } from "../../shared/errors";
 
 const UserComments = ({ comments, deleteComment }) => {
   const handleDelete: MenuProps['onClick'] = e => {
@@ -6165,6 +6653,7 @@ const UserComments = ({ comments, deleteComment }) => {
           message.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
         } catch (error: any) {
+          const { message, statusCode } = normalizeError(error);
           message.error(error.response?.data?.message || 'Error')
         }
       }
@@ -6216,9 +6705,9 @@ const UserComments = ({ comments, deleteComment }) => {
     datetime: (
       <div style={{ display: 'flex' }}>
         <div>
-          <Tooltip title={moment(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+          <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
             <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-              {moment(x.createdTime).fromNow()} in{' '}
+              {dayjs(x.createdTime).fromNow()} in{' '}
             </span>
           </Tooltip>
           <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
@@ -6292,7 +6781,7 @@ export default UserComments
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { Tooltip, List, Comment, Card, Empty } from 'antd'
 import Link from 'next/link'
 
@@ -6342,9 +6831,9 @@ const UserLikes = ({ likes }) => {
     ),
     content: (
       <div style={{ fontSize: 14 }}>
-        <Tooltip title={moment(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
+        <Tooltip title={dayjs(x.likedTime).format('D MMMM YYYY, h:mm:ss a')}>
           <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {moment(x.likedTime).fromNow()}
+            {dayjs(x.likedTime).fromNow()}
           </span>
         </Tooltip>
       </div>
@@ -6399,11 +6888,12 @@ import api from '@/services/_request'
 import Loading from '../Loading'
 import Error from 'next/error'
 import Head from 'next/head'
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { SculptureCardDescription } from '../sculpture-maker-components/SculptureGrid'
 import UserComments from './UserComments'
 import UserVisit from './UserVisit'
 import UserLikes from './UserLikes'
+import { normalizeError } from "../../shared/errors";
 
 const UserProfile = () => {
   const router = useRouter()
@@ -6442,7 +6932,8 @@ const UserProfile = () => {
         console.log('comments', rawComments.data)
         console.log('visits', rawVisits.data)
         console.log('likes', rawLikes.data)
-      } catch (e) {
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e);
         const { statusCode, message } = e.response.data
         setError({
           statusCode,
@@ -6531,7 +7022,7 @@ const UserProfile = () => {
                 {connection}
               </Descriptions.Item>
               <Descriptions.Item label="Join date">
-                {moment(joinDate).format('D MMMM YYYY')}
+                {dayjs(joinDate).format('D MMMM YYYY')}
               </Descriptions.Item>
             </Descriptions>
           </CardStyled>
@@ -6559,7 +7050,7 @@ export default UserProfile
  * Author: Hieu Chu
  */
 
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { Tooltip, List, Card, Empty } from 'antd'
 import { Comment } from '@ant-design/compatible'
 import Link from 'next/link'
@@ -6609,9 +7100,9 @@ const UserVisit = ({ visits }) => {
     ),
     content: (
       <div style={{ fontSize: 14 }}>
-        <Tooltip title={moment(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
+        <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
           <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {moment(x.visitTime).fromNow()}
+            {dayjs(x.visitTime).fromNow()}
           </span>
         </Tooltip>
       </div>

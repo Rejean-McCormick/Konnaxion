@@ -10,58 +10,68 @@ import { Row } from 'antd'
 import { ColStyled } from './style'
 import api from '@/services/_request'
 import Loading from '../Loading'
-import Error from 'next/error'
+import NextError from 'next/error'
 import Head from 'next/head'
 import RecentComments from './RecentComments'
 import RecentVisits from './RecentVisits'
 import RecentLikes from './RecentLikes'
-import { normalizeError } from "../../shared/errors";
+import { normalizeError } from '../../shared/errors'
+
+type ErrorShape = { statusCode?: number; message: string }
+
+// Minimal item shapes to avoid implicit any
+type CommentItem = { commentId: string | number } & Record<string, unknown>
+type VisitItem = Record<string, unknown>
+type LikeItem = Record<string, unknown>
 
 const RecentActivity = () => {
-  const [comments, setComments] = useState([])
-  const [visits, setVisits] = useState([])
-  const [likes, setLikes] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [comments, setComments] = useState<CommentItem[]>([])
+  const [visits, setVisits] = useState<VisitItem[]>([])
+  const [likes, setLikes] = useState<LikeItem[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+
+  // FIX: explicit union type instead of plain null
+  const [error, setError] = useState<ErrorShape | null>(null)
 
   useEffect(() => {
+    let mounted = true
+
     const fetchData = async () => {
+      setLoading(true)
+      setError(null)
       try {
-        const commentPromise = api.get('/comment')
-        const visitPromise = api.get('/visit')
-        const likePromise = api.get('/like')
         const [rawComments, rawVisits, rawLikes] = await Promise.all([
-          commentPromise,
-          visitPromise,
-          likePromise
+          api.get('/comment'),
+          api.get('/visit'),
+          api.get('/like'),
         ])
-        setComments(rawComments.data)
-        setVisits(rawVisits.data)
-        setLikes(rawLikes.data)
-        console.log('comments', rawComments.data)
-        console.log('visits', rawVisits.data)
-        console.log('likes', rawLikes.data)
+
+        if (!mounted) return
+        setComments((rawComments?.data as CommentItem[]) ?? [])
+        setVisits((rawVisits?.data as VisitItem[]) ?? [])
+        setLikes((rawLikes?.data as LikeItem[]) ?? [])
       } catch (e: unknown) {
-        const { message, statusCode } = normalizeError(e);
-        const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        if (!mounted) return
+        // FIX: normalize unknown error; remove direct e.response access
+        const { message, statusCode } = normalizeError(e)
+        setError({ statusCode, message })
+      } finally {
+        if (mounted) setLoading(false)
       }
-      setLoading(false)
     }
 
-    fetchData()
+    void fetchData()
+    return () => {
+      mounted = false
+    }
   }, [])
 
-  const deleteComment = commentId => {
-    setComments(c => c.filter(x => x.commentId !== commentId))
+  const deleteComment = (commentId: string | number) => {
+    setComments((c) => c.filter((x) => x.commentId !== commentId))
   }
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <NextError statusCode={error.statusCode ?? 500} title={error.message} />
 
   return (
     <>

@@ -46,24 +46,28 @@ apiRequest.interceptors.response.use(
 type Cfg = AxiosRequestConfig
 
 export async function get<T>(url: string, config?: Cfg): Promise<T> {
-  // l’intercepteur renvoie déjà le payload
-  return apiRequest.get<T>(url, config) as unknown as Promise<T>
+    const res = await apiRequest.get<T>(url, config);
+    return (res as any).data as T;
 }
 
 export async function post<T>(url: string, body?: any, config?: Cfg): Promise<T> {
-  return apiRequest.post<T>(url, body, config) as unknown as Promise<T>
+    const res = await apiRequest.post<T>(url, body, config);
+    return (res as any).data as T;
 }
 
 export async function put<T>(url: string, body?: any, config?: Cfg): Promise<T> {
-  return apiRequest.put<T>(url, body, config) as unknown as Promise<T>
+    const res = await apiRequest.put<T>(url, body, config);
+    return (res as any).data as T;
 }
 
 export async function patch<T>(url: string, body?: any, config?: Cfg): Promise<T> {
-  return apiRequest.patch<T>(url, body, config) as unknown as Promise<T>
+    const res = await apiRequest.patch<T>(url, body, config);
+    return (res as any).data as T;
 }
 
 export async function del<T>(url: string, config?: Cfg): Promise<T> {
-  return apiRequest.delete<T>(url, config) as unknown as Promise<T>
+    const res = await apiRequest.delete<T>(url, config);
+    return (res as any).data as T;
 }
 
 export default apiRequest
@@ -73,34 +77,34 @@ export default apiRequest
 
 ===== BEGIN services/admin.ts =====
 // services/admin.ts
-import apiRequest from './_request';
+import { get, post, put, patch, del } from './_request';
 
 // Moderation
 export async function fetchModerationQueue() {
-  return apiRequest.get('admin/moderation');
+  return get('admin/moderation');
 }
 export async function actOnReport(id: string, remove: boolean) {
-  return apiRequest.post(`admin/moderation/${id}`, { remove });
+  return post(`admin/moderation/${id}`, { remove });
 }
 
 // Roles
 export async function fetchRoles() {
-  return apiRequest.get('admin/roles');
+  return get('admin/roles');
 }
 export async function toggleRole(id: string, enabled: boolean) {
-  return apiRequest.patch(`admin/roles/${id}`, { enabled });
+  return patch(`admin/roles/${id}`, { enabled });
 }
 
 // Audit
 export async function fetchAuditLogs() {
-  return apiRequest.get('admin/audit');
+  return get('admin/audit');
 }
 
 ===== END services/admin.ts =====
 
 
 ===== BEGIN services/audit.ts =====
-import { get } from './_request'
+import { get, post, put, patch, del } from './_request'
 
 export interface LogRow {
   id: string
@@ -226,7 +230,7 @@ export async function submitPublicVote(topicId: string, value: string | number) 
 
 
 ===== BEGIN services/decide.ts =====
-import { get, post } from './_request'
+import { get, post, put, patch, del } from './_request'
 import type { Ballot } from '@/types'
 
 /** GET /decide/elite/ballots */
@@ -269,7 +273,7 @@ export async function fetchDecisionResults(): Promise<{
 
 
 ===== BEGIN services/deliberate.ts =====
-import { get, post } from './_request'
+import { get, post, put, patch, del } from './_request'
 import type { Topic } from '@/types'
 
 /** GET /deliberate/elite/topics */
@@ -316,7 +320,7 @@ export async function fetchTopicDetail(id: string): Promise<{
 
 ===== BEGIN services/impact.ts =====
 // services/impact.ts
-import apiRequest from './_request';
+import { get, post, put, patch, del } from './_request';
 
 /* ------------------------------------------------------------------ *
  *  Tracker (Kanban / table)                                           *
@@ -336,7 +340,7 @@ export interface TrackerItem {
 export async function fetchImpactTracker(): Promise<{
   items: TrackerItem[];
 }> {
-  return apiRequest.get('impact/tracker');
+  return get('impact/tracker');
 }
 
 /** PATCH /impact/tracker/:id  (update status only) */
@@ -344,7 +348,7 @@ export async function patchImpactStatus(
   id: string,
   status: ImpactStatus,
 ): Promise<void> {
-  await apiRequest.patch(`impact/tracker/${id}`, { status });
+  await patch(`impact/tracker/${id}`, { status });
 }
 
 /* ------------------------------------------------------------------ *
@@ -368,7 +372,7 @@ export async function fetchImpactOutcomes(): Promise<{
   kpis: OutcomeKPI[];
   charts: OutcomeChart[];
 }> {
-  return apiRequest.get('impact/outcomes');
+  return get('impact/outcomes');
 }
 
 /* ------------------------------------------------------------------ *
@@ -387,7 +391,7 @@ export interface FeedbackItem {
 export async function fetchFeedback(): Promise<{
   items: FeedbackItem[];
 }> {
-  return apiRequest.get('impact/feedback');
+  return get('impact/feedback');
 }
 
 /** POST /impact/feedback */
@@ -395,7 +399,7 @@ export async function submitFeedback(payload: {
   body: string;
   rating?: number;
 }): Promise<void> {
-  await apiRequest.post('impact/feedback', payload);
+  await post('impact/feedback', payload);
 }
 
 ===== END services/impact.ts =====
@@ -413,7 +417,7 @@ export * from './pulse'
 
 ===== BEGIN services/learn.ts =====
 // services/learn.ts
-import apiRequest from './_request';
+import { get, post, put, patch, del } from './_request';
 
 /* ---------- Changelog ---------- */
 
@@ -427,7 +431,7 @@ export interface ChangelogEntry {
 export async function fetchChangelog(): Promise<{
   entries: ChangelogEntry[];
 }> {
-  return apiRequest.get('learn/changelog');
+  return get('learn/changelog');
 }
 
 /* ---------- Guides ---------- */
@@ -441,7 +445,7 @@ export interface GuideSection {
 export async function fetchGuides(): Promise<{
   sections: GuideSection[];
 }> {
-  return apiRequest.get('learn/guides');
+  return get('learn/guides');
 }
 
 /* ---------- Glossary ---------- */
@@ -455,14 +459,14 @@ export interface GlossaryItem {
 export async function fetchGlossary(): Promise<{
   items: GlossaryItem[];
 }> {
-  return apiRequest.get('learn/glossary');
+  return get('learn/glossary');
 }
 
 ===== END services/learn.ts =====
 
 
 ===== BEGIN services/pulse.ts =====
-import { get } from './_request'
+import { get, post, put, patch, del } from './_request'
 import type { KPI } from '@/types'
 
 export interface KPIWithHistory extends KPI {
@@ -521,20 +525,52 @@ export async function fetchPulseHealth(): Promise<HealthResponse> {
 
 ===== BEGIN services/trust.ts =====
 // services/trust.ts
-import apiRequest from './_request';
+import { get, post, put, patch, del } from './_request'
 
-export async function fetchUserProfile() {
-  return apiRequest.get('trust/profile');
+export interface ActivityItem {
+  id: string
+  when: string
+  text: string
 }
 
-export async function uploadCredential(file: File) {
-  const form = new FormData();
-  form.append('file', file);
-  return apiRequest.post('trust/credentials', form);
+export interface UserProfile {
+  avatar: string | null
+  name: string
+  joined: string
+  score: number
+  activity: ActivityItem[]
 }
 
-export async function fetchUserBadges() {
-  return apiRequest.get('trust/badges');
+export interface EarnedBadge {
+  id: string
+  name: string
+  desc?: string
+}
+
+export interface BadgeProgress {
+  id: string
+  name: string
+  current: number
+  required: number
+}
+
+export interface UserBadges {
+  earned: EarnedBadge[]
+  progress: BadgeProgress[]
+}
+
+export async function fetchUserProfile(): Promise<UserProfile> {
+  return get<UserProfile>('trust/profile')
+}
+
+export async function uploadCredential(file: File): Promise<void> {
+  const form = new FormData()
+  form.append('file', file)
+  await post<void>('trust/credentials', form)
+}
+
+export async function fetchUserBadges(): Promise<UserBadges> {
+  return get<UserBadges>('trust/badges')
 }
 
 ===== END services/trust.ts =====

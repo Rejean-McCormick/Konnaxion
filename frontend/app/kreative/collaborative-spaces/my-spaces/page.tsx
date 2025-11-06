@@ -1,28 +1,24 @@
 'use client';
 
-// File: /pages/kreative/collaborative-spaces/my-spaces.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import { List, Button, Input, Select, Badge, Avatar, Space, Row, Col, Typography } from 'antd';
 import { TeamOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
-// Define an interface for a collaborative space.
+// Collaborative space model
 interface CollaborativeSpace {
   id: string;
   name: string;
   topic: string;
   membersCount: number;
   category: 'Studio' | 'Club' | 'Community';
-  unreadCount: number; // Number of unread messages or new activity.
+  unreadCount: number;
 }
 
-// Dummy data for collaborative spaces.
+// Demo data
 const dummySpaces: CollaborativeSpace[] = [
   {
     id: '1',
@@ -48,33 +44,27 @@ const dummySpaces: CollaborativeSpace[] = [
     category: 'Community',
     unreadCount: 5,
   },
-  // Additional spaces can be added here.
 ];
 
-const MySpacesPage: NextPage = () => {
-  // State for category filtering.
+export default function MySpacesPage(): JSX.Element {
+  const router = useRouter();
+
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  // State for search query.
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Filter spaces based on selected category and search input.
   const filteredSpaces = useMemo(() => {
     let spaces = dummySpaces;
     if (selectedCategory !== 'All') {
-      spaces = spaces.filter((space) => space.category === selectedCategory);
+      spaces = spaces.filter((s) => s.category === selectedCategory);
     }
     if (searchQuery.trim() !== '') {
-      spaces = spaces.filter((space) =>
-        space.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        space.topic.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const q = searchQuery.toLowerCase();
+      spaces = spaces.filter((s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q));
     }
     return spaces;
   }, [selectedCategory, searchQuery]);
 
-  // Function to handle entering a space.
   const enterSpace = (id: string) => {
-    const router = useRouter();
     router.push(`/kreative/collaborative-spaces/${id}`);
   };
 
@@ -83,7 +73,6 @@ const MySpacesPage: NextPage = () => {
       <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
         <Col>
           <Space>
-            {/* Search Input */}
             <Input
               placeholder="Search spaces..."
               prefix={<SearchOutlined />}
@@ -91,17 +80,17 @@ const MySpacesPage: NextPage = () => {
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: 300 }}
             />
-            {/* Category Filter */}
             <Select
               value={selectedCategory}
-              onChange={(value) => setSelectedCategory(value)}
-              style={{ width: 180 }}
-            >
-              <Option value="All">All Categories</Option>
-              <Option value="Studio">Studio</Option>
-              <Option value="Club">Club</Option>
-              <Option value="Community">Community</Option>
-            </Select>
+              onChange={setSelectedCategory}
+              style={{ width: 200 }}
+              options={[
+                { value: 'All', label: 'All Categories' },
+                { value: 'Studio', label: 'Studio' },
+                { value: 'Club', label: 'Club' },
+                { value: 'Community', label: 'Community' },
+              ]}
+            />
           </Space>
         </Col>
         <Col>
@@ -114,16 +103,19 @@ const MySpacesPage: NextPage = () => {
           </Button>
         </Col>
       </Row>
-      {/* Collaborative Spaces List */}
+
       <List
         itemLayout="horizontal"
         dataSource={filteredSpaces}
         renderItem={(space: CollaborativeSpace) => (
-          <List.Item key={space.id} actions={[
-            <Button type="primary" onClick={() => enterSpace(space.id)}>
-              Enter Space
-            </Button>,
-          ]}>
+          <List.Item
+            key={space.id}
+            actions={[
+              <Button key="enter" type="primary" onClick={() => enterSpace(space.id)}>
+                Enter Space
+              </Button>,
+            ]}
+          >
             <List.Item.Meta
               avatar={
                 space.unreadCount > 0 ? (
@@ -136,9 +128,11 @@ const MySpacesPage: NextPage = () => {
               }
               title={<Title level={4} style={{ margin: 0 }}>{space.name}</Title>}
               description={
-                <Space direction="vertical">
-                  <Text strong>Topic:</Text> <Text>{space.topic}</Text>
-                  <Text strong>Members:</Text> <Text>{space.membersCount}</Text>
+                <Space direction="vertical" size={0}>
+                  <Text strong>Topic:</Text>
+                  <Text>{space.topic}</Text>
+                  <Text strong>Members:</Text>
+                  <Text>{space.membersCount}</Text>
                 </Space>
               }
             />
@@ -147,10 +141,4 @@ const MySpacesPage: NextPage = () => {
       />
     </PageContainer>
   );
-};
-
-MySpacesPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default MySpacesPage;
+}

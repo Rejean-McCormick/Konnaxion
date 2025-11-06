@@ -1,4 +1,4 @@
-===== TOC (10 fichiers) =====
+===== TOC (11 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\context\ThemeContext.tsx
 2. C:\MyCode\Konnaxionv14\frontend\ct\insights\SmartVoteChart.ct.tsx
 3. C:\MyCode\Konnaxionv14\frontend\graph.svg
@@ -6,9 +6,10 @@
 5. C:\MyCode\Konnaxionv14\frontend\hooks\usePageTitle.ts
 6. C:\MyCode\Konnaxionv14\frontend\hooks\useReputationEvents.ts
 7. C:\MyCode\Konnaxionv14\frontend\src\types\index.ts
-8. C:\MyCode\Konnaxionv14\frontend\types\index.ts
-9. C:\MyCode\Konnaxionv14\frontend\use_client_report.csv
-10. C:\MyCode\Konnaxionv14\frontend\use_client_report.json
+8. C:\MyCode\Konnaxionv14\frontend\types\activity.ts
+9. C:\MyCode\Konnaxionv14\frontend\types\index.ts
+10. C:\MyCode\Konnaxionv14\frontend\use_client_report.csv
+11. C:\MyCode\Konnaxionv14\frontend\use_client_report.json
 ===== END TOC =====
 
 
@@ -350,6 +351,61 @@ export interface KPI {
 }
 
 ===== END src/types/index.ts =====
+
+
+===== BEGIN types/activity.ts =====
+// types/activity.ts
+import type React from 'react';
+
+export interface ActivityUser {
+  userId: string;
+  nickname?: string;
+  name?: string;
+  picture: string;
+}
+
+export interface ActivitySculptureImage {
+  url: string;
+  created: string | Date;
+}
+
+export interface ActivitySculpture {
+  accessionId?: string;
+  name: string;
+  images?: ActivitySculptureImage[];
+}
+
+export interface ActivityCommentItem {
+  commentId: string;
+  content: string;
+  createdTime: string | Date;
+  user: ActivityUser;
+  sculpture: ActivitySculpture;
+}
+
+export interface ActivityLikeItem {
+  likedTime: string | Date;
+  user: ActivityUser;
+  sculptureId?: string;
+  sculpture: ActivitySculpture;
+}
+
+export interface ActivityVisitItem {
+  visitTime: string | Date;
+  user: ActivityUser;
+  sculptureId?: string;
+  sculpture: ActivitySculpture;
+}
+
+export interface ActivityListItemView {
+  key?: string;
+  author: React.ReactNode;
+  avatar: React.ReactNode;
+  content: React.ReactNode;
+  datetime?: React.ReactNode;
+}
+
+===== END types/activity.ts =====
 
 
 ===== BEGIN types/index.ts =====

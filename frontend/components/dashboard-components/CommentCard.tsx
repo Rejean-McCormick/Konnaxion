@@ -6,7 +6,8 @@
  */
 
 import React from 'react'
-import ChartCard from '@/components/charts/ChartCard'
+import dynamic from 'next/dynamic'
+import type { AreaConfig } from '@ant-design/plots'
 import {
   MainIcon,
   CardDivider,
@@ -24,12 +25,31 @@ interface Props {
   COMMENT_DATA: Point[]
 }
 
+// SSR-safe dynamic import of the Area chart
+const Area = dynamic(() => import('@ant-design/plots').then(m => m.Area), {
+  ssr: false,
+})
+
 export default function CommentCard({
   TOTAL_COMMENTS,
   DAILY_COMMENTS,
   DAILY_COMMENTS_CHANGE,
   COMMENT_DATA,
 }: Props) {
+  const areaConfig: AreaConfig = {
+    data: COMMENT_DATA,
+    xField: 'x',
+    yField: 'y',
+    smooth: true,
+    height: 90,
+    autoFit: true,
+    padding: 0,
+    xAxis: false,
+    yAxis: false,
+    tooltip: {},
+    areaStyle: { fillOpacity: 0.2 },
+  }
+
   return (
     <>
       <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -38,7 +58,7 @@ export default function CommentCard({
       </div>
 
       <BarContainer>
-        <ChartCard type="area" data={COMMENT_DATA} height={90} />
+        <Area {...areaConfig} />
       </BarContainer>
 
       <CardDivider />

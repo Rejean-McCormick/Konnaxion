@@ -6,7 +6,8 @@
  */
 
 import { useState } from 'react'
-import { Input, Icon, Select, Divider } from 'antd'
+import { Input, Select, Divider } from 'antd';
+import Icon from '@/components/compat/Icon';
 const { TextArea } = Input
 import { FormCol, CustomFormItem } from '../style'
 import { validateLatitude, validateLongitude } from '../../shared/utils'
