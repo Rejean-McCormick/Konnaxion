@@ -133,7 +133,7 @@ export default function PublicVotePage() {
     {
       title: 'Turnout',
       dataIndex: 'turnout',
-      render: (v: number) => <Progress percent={v} size="small" />,
+      render: (v, row) => <Progress percent={v} size="small" />,
     },
   ]
 

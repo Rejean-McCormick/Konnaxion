@@ -1,182 +1,232 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/projects/project-workspace/index.tsx
-import React from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Card, Tabs, Row, Col, Avatar, List, Button, Divider } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
-import MainLayout from '@/components/layout-components/MainLayout';
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { Row, Col, Card, List, Avatar, Tag, Space, Button, Progress, Typography, Timeline } from 'antd';
+import PageContainer from '@/components/PageContainer';
 
-const { TabPane } = Tabs;
+const { Title, Text } = Typography;
 
-// Données simulées pour le projet
-const projectInfo = {
-  title: 'Project Alpha',
-  description: 'This project is focused on developing innovative renewable energy solutions.',
-  status: 'Active',
-  startDate: '2023-08-01',
-  recentUpdates: [
-    'Updated project roadmap',
-    'Invited a new team member: Alice',
-    'Milestone reached: Prototype completed'
-  ],
-  // Indication si l’utilisateur est le propriétaire
-  isOwner: true,
+type TaskStatus = 'todo' | 'in-progress' | 'done';
 
-// Données simulées pour les tâches
-const tasksData = [
-  { key: '1', task: 'Finalize proposal', assignee: 'Alice', status: 'In Progress', dueDate: '2023-09-15' },
-  { key: '2', task: 'Design prototype', assignee: 'Bob', status: 'Pending', dueDate: '2023-09-20' },
-  { key: '3', task: 'Test prototype', assignee: 'Charlie', status: 'Completed', dueDate: '2023-09-10' },
+type Task = {
+  id: string;
+  title: string;
+  assignee: string;
+  status: TaskStatus;
+  progress?: number;
+};
+
+type FileItem = {
+  id: string;
+  name: string;
+  uploader: string;
+  size: string;
+};
+
+type Discussion = {
+  id: string;
+  author: string;
+  message: string;
+  time: string;
+};
+
+type Member = {
+  id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+};
+
+const tasksData: Task[] = [
+  { id: 't1', title: 'Define project scope', assignee: 'Alice', status: 'done', progress: 100 },
+  { id: 't2', title: 'Design wireframes', assignee: 'Bob', status: 'in-progress', progress: 60 },
+  { id: 't3', title: 'API contract', assignee: 'Chloé', status: 'todo', progress: 0 },
 ];
 
-// Données simulées pour les fichiers
-const filesData = [
-  { key: '1', name: 'Project Roadmap.pdf', action: 'Download' },
-  { key: '2', name: 'Technical Specs.docx', action: 'Download' },
+const filesData: FileItem[] = [
+  { id: 'f1', name: 'requirements.pdf', uploader: 'Alice', size: '214 KB' },
+  { id: 'f2', name: 'wireframes.fig', uploader: 'Bob', size: '1.2 MB' },
+  { id: 'f3', name: 'api-contract.yaml', uploader: 'Chloé', size: '36 KB' },
 ];
 
-// Données simulées pour la discussion (dummy messages)
-const discussionData = [
-  { id: '1', author: 'Alice', message: 'Let’s schedule a meeting to discuss the prototype.', time: '10:15 AM' },
-  { id: '2', author: 'Bob', message: 'I think we should also consider cost efficiency.', time: '10:20 AM' },
+const discussionData: Discussion[] = [
+  { id: 'd1', author: 'Alice', message: 'I pushed the latest requirements.', time: 'Today 09:42' },
+  { id: 'd2', author: 'Bob', message: 'Wireframes homepage v2 ready.', time: 'Yesterday 18:05' },
+  { id: 'd3', author: 'Chloé', message: 'Starting the API contract draft.', time: 'Yesterday 11:17' },
 ];
 
-// Données simulées pour la timeline / activité du projet
-const timelineData = [
-  { key: '1', time: '2023-08-05', event: 'Project kickoff meeting held.' },
-  { key: '2', time: '2023-08-20', event: 'Concept design approved.' },
-  { key: '3', time: '2023-09-01', event: 'Prototype completed.' },
+const projectMembers: Member[] = [
+  { id: 'm1', name: 'Alice Martin', role: 'PM', avatar: '' },
+  { id: 'm2', name: 'Bob Leroy', role: 'Designer', avatar: '' },
+  { id: 'm3', name: 'Chloé Durand', role: 'Backend', avatar: '' },
+  { id: 'm4', name: 'Diego Ruiz', role: 'Frontend', avatar: '' },
 ];
 
-// Données simulées pour la liste des membres
-const projectMembers = [
-  { key: '1', name: 'Alice', role: 'Owner', avatar: '/avatars/alice.png' },
-  { key: '2', name: 'Bob', role: 'Member', avatar: '/avatars/bob.png' },
-  { key: '3', name: 'Charlie', role: 'Member', avatar: '/avatars/charlie.png' },
-  { key: '4', name: 'Diana', role: 'Member', avatar: '/avatars/diana.png' },
-];
+function statusTag(status: TaskStatus) {
+  switch (status) {
+    case 'done':
+      return <Tag color="green">Done</Tag>;
+    case 'in-progress':
+      return <Tag color="blue">In progress</Tag>;
+    default:
+      return <Tag>To do</Tag>;
+  }
+}
 
-const ProjectWorkspace: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
-  const router = useRouter();
+export default function ProjectWorkspacePage() {
+  const [tasks, setTasks] = useState<Task[]>(tasksData);
 
-  // Pour simuler l'action de modification du projet (si propriétaire)
-  const handleEditProject = () => {
-    // Redirige vers une page d'édition (exemple)
-    router.push('/keenkonnect/projects/manage-project?id=1');
+  const markDone = (id: string) => {
+    setTasks(prev =>
+      prev.map(t => (t.id === id ? { ...t, status: 'done', progress: 100 } : t)),
+    );
+  };
 
   return (
-    <>
-      <Head>
-        <title>Project Workspace</title>
-        <meta name="description" content="Collaboration tools for your project workspace." />
-      </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête du Workspace */}
-        <Row justify="space-between" align="middle" className="mb-4">
-          <h1 className="text-2xl font-bold">{projectInfo.title}</h1>
-          {projectInfo.isOwner && (
-            <Button icon={<EditOutlined />} onClick={handleEditProject}>
-              Edit Project
-            </Button>
-          )}
-        </Row>
-        <p>{projectInfo.description}</p>
-        <Divider />
+    <PageContainer title="Project Workspace">
+      <Space direction="vertical" size={16} style={{ width: '100%' }}>
+        {/* Overview */}
+        <Card>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Space direction="vertical" size={8}>
+                <Text type="secondary">Total tasks</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  {tasks.length}
+                </Title>
+              </Space>
+            </Col>
+            <Col xs={24} md={8}>
+              <Space direction="vertical" size={8}>
+                <Text type="secondary">In progress</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  {tasks.filter(t => t.status === 'in-progress').length}
+                </Title>
+              </Space>
+            </Col>
+            <Col xs={24} md={8}>
+              <Space direction="vertical" size={8}>
+                <Text type="secondary">Done</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  {tasks.filter(t => t.status === 'done').length}
+                </Title>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
 
-        <Row gutter={16}>
-          {/* Contenu principal avec onglets */}
-          <Col xs={24} md={18}>
-            <Card>
-              <Tabs defaultActiveKey="overview">
-                <TabPane tab="Overview" key="overview">
-                  <p><strong>Status:</strong> {projectInfo.status}</p>
-                  <p><strong>Start Date:</strong> {projectInfo.startDate}</p>
-                  <p><strong>Members:</strong> {projectMembers.length}</p>
-                  <p><strong>Recent Updates:</strong></p>
-                  <List
-                    dataSource={projectInfo.recentUpdates}
-                    renderItem={(item) => <List.Item>{item}</List.Item>}
-                  />
-                </TabPane>
-
-                <TabPane tab="Tasks" key="tasks">
-                  <p>Task List:</p>
-                  <List
-                    dataSource={tasksData}
-                    renderItem={(task) => (
-                      <List.Item>
-                        <List.Item.Meta
-                          title={`${task.task} (Assignee: ${task.assignee})`}
-                          description={`Status: ${task.status} | Due Date: ${task.dueDate}`}
-                        />
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-
-                <TabPane tab="Files" key="files">
-                  <List
-                    dataSource={filesData}
-                    renderItem={(file) => (
-                      <List.Item>
-                        <List.Item.Meta
-                          title={file.name}
-                          description={file.action}
-                        />
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-
-                <TabPane tab="Discussion" key="discussion">
-                  <List
-                    dataSource={discussionData}
-                    renderItem={(msg) => (
-                      <List.Item>
-                        <List.Item.Meta
-                          avatar={<Avatar src={`/avatars/${msg.author.toLowerCase()}.png`} />}
-                          title={msg.author}
-                          description={`${msg.message} (${msg.time})`}
-                        />
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-
-                <TabPane tab="Timeline" key="timeline">
-                  <List
-                    dataSource={timelineData}
-                    renderItem={(event) => (
-                      <List.Item>
-                        <strong>{event.time}</strong>: {event.event}
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-              </Tabs>
+        <Row gutter={[16, 16]}>
+          {/* Tasks */}
+          <Col xs={24} lg={12}>
+            <Card title="Tasks">
+              <List
+                dataSource={tasks}
+                renderItem={(item) => (
+                  <List.Item
+                    actions={[
+                      item.status !== 'done' ? (
+                        <Button key="done" size="small" onClick={() => markDone(item.id)}>
+                          Mark done
+                        </Button>
+                      ) : null,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      title={
+                        <Space size={8}>
+                          <Text>{item.title}</Text>
+                          {statusTag(item.status)}
+                        </Space>
+                      }
+                      description={<Text type="secondary">Assignee: {item.assignee}</Text>}
+                    />
+                    <div style={{ minWidth: 120 }}>
+                      <Progress percent={item.progress ?? 0} size="small" />
+                    </div>
+                  </List.Item>
+                )}
+              />
             </Card>
           </Col>
 
-          {/* Sidebar : liste des membres */}
-          <Col xs={24} md={6}>
-            <Card title="Project Members">
-              <Avatar.Group>
-                {projectMembers.map(member => (
-                  <Avatar key={member.key} src={member.avatar} title={`${member.name} (${member.role})`} />
-                ))}
-              </Avatar.Group>
-              <Divider />
-              <p><strong>Online:</strong> {/* Vous pouvez ajouter un indicateur ici */}2/4 currently online</p>
+          {/* Files */}
+          <Col xs={24} lg={12}>
+            <Card title="Files">
+              <List
+                dataSource={filesData}
+                renderItem={(file) => (
+                  <List.Item actions={[<Button key="download" type="link">Download</Button>]}>
+                    <List.Item.Meta
+                      avatar={<Avatar>{file.name.slice(0, 1).toUpperCase()}</Avatar>}
+                      title={file.name}
+                      description={
+                        <Text type="secondary">
+                          Uploaded by {file.uploader} • {file.size}
+                        </Text>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
             </Card>
           </Col>
         </Row>
-      </div>
-    </>
+
+        <Row gutter={[16, 16]}>
+          {/* Discussion */}
+          <Col xs={24} lg={12}>
+            <Card title="Discussion">
+              <List
+                dataSource={discussionData}
+                renderItem={(msg) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<Avatar>{msg.author.slice(0, 1).toUpperCase()}</Avatar>}
+                      title={
+                        <Space direction="horizontal" size={8}>
+                          <Text strong>{msg.author}</Text>
+                          <Text type="secondary">{msg.time}</Text>
+                        </Space>
+                      }
+                      description={msg.message}
+                    />
+                  </List.Item>
+                )}
+              />
+            </Card>
+          </Col>
+
+          {/* Timeline */}
+          <Col xs={24} lg={12}>
+            <Card title="Timeline">
+              <Timeline
+                items={[
+                  { color: 'green', children: 'Project created' },
+                  { color: 'blue', children: 'Wireframes v2 shared' },
+                  { color: 'gray', children: 'API contract drafting' },
+                ]}
+              />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Team */}
+        <Card title="Team">
+          <List
+            grid={{ gutter: 16, xs: 2, sm: 3, md: 4, lg: 4 }}
+            dataSource={projectMembers}
+            renderItem={(member) => (
+              <List.Item>
+                <Space direction="vertical" align="center" style={{ width: '100%' }}>
+                  <Avatar size={56}>{member.name.slice(0, 1).toUpperCase()}</Avatar>
+                  <Text strong>{member.name}</Text>
+                  <Text type="secondary">{member.role}</Text>
+                </Space>
+              </List.Item>
+            )}
+          />
+        </Card>
+      </Space>
+    </PageContainer>
   );
-
-
-
-export default ProjectWorkspace;
+}

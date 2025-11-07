@@ -3,8 +3,7 @@
 // File: /pages/konnected/certifications/exam-registration.tsx
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import {
-  Form,
+import { Form,
   Input,
   Button,
   Steps,
@@ -12,8 +11,8 @@ import {
   Radio,
   Checkbox,
   Result,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -57,7 +56,7 @@ const ExamRegistration: NextPage = () => {
   // Traitement final de la soumission
   const onSubmit = () => {
     // Ici, vous pouvez intégrer un appel API ou une logique de paiement.
-    message.success('Registration complete!');
+    antdMessage.success('Registration complete!');
     setRegistrationCompleted(true);
 
   // Rendu conditionnel du contenu selon l'étape courante
@@ -185,3 +184,4 @@ const ExamRegistration: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default ExamRegistration;
+}}}}}

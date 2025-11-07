@@ -24,7 +24,7 @@ const weightByDomain = [
   { domain: 'Technology', weight: '75%' },
 ];
 
-const CurrentVotingWeight: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const CurrentVotingWeight = () => {
   // Poids de vote smart de l'utilisateur (exemple statique)
   const smartVoteWeight = 70; // par exemple en pourcentage
 
@@ -75,7 +75,7 @@ const CurrentVotingWeight: NextPage & { getLayout?: (page: React.ReactElement) =
         <Card className="mb-6">
           <Title level={4}>Highest Weight by Domain</Title>
           <List
-            dataSource={weightByDomain}
+            dataSource={weightByDomain ?? []}
             renderItem={(item) => (
               <List.Item>
                 <strong>{item.domain}:</strong> {item.weight}
@@ -90,3 +90,4 @@ const CurrentVotingWeight: NextPage & { getLayout?: (page: React.ReactElement) =
 
 
 export default CurrentVotingWeight;
+}

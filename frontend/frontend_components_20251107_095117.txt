@@ -245,9 +245,7 @@ const RecentComments: React.FC<RecentCommentsProps> = ({
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: { background: '#ff4d4f', borderColor: '#ff4d4f' },
-      },
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
       onOk: async () => {
         try {
           await api.delete(`/comment/${String(key)}`);
@@ -262,11 +260,7 @@ const RecentComments: React.FC<RecentCommentsProps> = ({
   };
 
   return (
-    <Card
-      title="Recent Comments"
-      bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
-    >
+    <Card title="Recent Comments" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
       <List<RecentCommentItem>
         itemLayout="horizontal"
         dataSource={items}
@@ -310,14 +304,10 @@ const RecentComments: React.FC<RecentCommentsProps> = ({
                     <Link href={`/users/id/${x.user.userId}`}>
                       <Text strong>{name}</Text>
                     </Link>
-                    <Tooltip
-                      title={dayjs(x.createdTime).format(
-                        'D MMMM YYYY, h:mm:ss a',
-                      )}
-                    >
+                    <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
                       <Text type="secondary">{dayjs(x.createdTime).fromNow()} in</Text>
                     </Tooltip>
-                    <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
+                    <Link href={`/sculptures/id/${String(x.sculpture.accessionId)}`}>
                       <Text>{x.sculpture.name}</Text>
                     </Link>
                   </Space>
@@ -383,7 +373,7 @@ const RecentLikes: React.FC<RecentLikesProps> = ({ likes }) => {
     <Card title="Recent Likes" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
       <List
         itemLayout="horizontal"
-        dataSource={sortedLikes}
+        dataSource={sortedLikes ?? []}
         renderItem={(x: RecentLike) => {
           const displayName =
             x.user.userId.includes('auth0')
@@ -530,7 +520,7 @@ const RecentVisits = ({ visits }: RecentVisitsProps) => {
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         renderItem={item => (
           <li key={item.key}>
@@ -564,6 +554,7 @@ import React, { CSSProperties, ForwardedRef } from 'react';
 import styled from 'styled-components';
 import { Card, Col, Form, Typography, Empty, Table } from 'antd';
 import type { SVGProps } from 'react';
+import Icon from '@/components/compat/Icon';
 import {
   LikeOutlined,
   LikeFilled,
@@ -1062,7 +1053,7 @@ const meta: Meta<typeof Button> = {
 type Story = StoryObj<typeof Button>
 
 export const Default: Story = {
-  render: (args) => <Button {...args} />,
+  render: (args, row) => <Button {...args} />,
 }
 
 export default meta
@@ -2792,7 +2783,7 @@ type Props = {
 };
 
 const Map = ({ view, setView, marker, setMarker }: Props) => {
-  const token = process.env.MAPBOX_ACCESS_TOKEN as string | undefined;
+  const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_ACCESS_TOKEN as string | undefined;
   const { markerLat, markerLng } = marker;
 
   return (
@@ -2845,7 +2836,7 @@ const Map = ({ view, setView, marker, setMarker }: Props) => {
       />
 
       {/* Removed undeclared lat/lng props */}
-      <ControlPanel />
+      <ControlPanel lat={markerLat} lng={markerLng} />
     </ReactMapGL>
   );
 };
@@ -3064,7 +3055,8 @@ export default function PageContainer({
  */
 
 import { useState } from 'react'
-import { Input, Icon, Select, Divider } from 'antd'
+import { Input, Select, Divider } from 'antd';
+import Icon from '@/components/compat/Icon';
 const { TextArea } = Input
 import { FormCol, CustomFormItem } from '../style'
 import { validateLatitude, validateLongitude } from '../../shared/utils'
@@ -3202,7 +3194,7 @@ export default ({
           {getFieldDecorator('creditLine')(
             <TextArea
               placeholder="Credit line"
-              autosize={{ minRows: 3, maxRows: 5 }}
+              autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
             />
           )}
@@ -3214,7 +3206,7 @@ export default ({
           {getFieldDecorator('locationNotes')(
             <TextArea
               placeholder="Location details"
-              autosize={{ minRows: 3, maxRows: 5 }}
+              autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
             />
           )}
@@ -3315,8 +3307,7 @@ export default CreateForm
  */
 
 import { useState } from 'react'
-import { Input, Form, Button, Modal, message } from 'antd'
-import { CustomFormItem } from '../style'
+import { Input, Form, Button, Modal, message as antdMessage  } from 'antd';import { CustomFormItem } from '../style'
 import api from '../../../api'
 import { normalizeError } from "../../../shared/errors";
 
@@ -3353,11 +3344,11 @@ const MakerCreate = ({
           setSubmitting(false)
           handleCancel()
           resetFields()
-          message.success('Created new maker succesfully!', 2)
+          antdMessage.success('Created new maker succesfully!', 2)
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })
@@ -3468,8 +3459,7 @@ export default Form.create({
  */
 
 import { useState, useEffect } from 'react'
-import { Row, Button, Form, message } from 'antd'
-import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
+import { Row, Button, Form, message as antdMessage  } from 'antd';import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
 import { FlyToInterpolator } from 'react-map-gl'
 import Map from '../../map-components'
 import TextFields from './CreateFormTextFields'
@@ -3587,7 +3577,7 @@ const SculptureCreate = ({
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })
@@ -3668,13 +3658,14 @@ export default Form.create({
  * Author: Hieu Chu
  */
 
-import { Upload, Button, Icon, message, Row, Modal } from 'antd'
+import { Upload, Button, message as antdMessage, Row, Modal  } from 'antd';
 import { useState } from 'react'
 import { CardStyled, ColStyled } from '../style'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
 import Head from 'next/head'
 import { normalizeError } from "../../../shared/errors";
+import Icon from '@/components/compat/Icon';
 
 const { confirm } = Modal
 
@@ -3703,10 +3694,10 @@ const SculptureUploadImage = ({ sculpture }) => {
             const _result = await api.delete(`/sculpture-images/${file.uid}`)
             resolve(true)
             setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
-            message.success('Deleted image successfully!', 2)
+            antdMessage.success('Deleted image successfully!', 2)
           } catch (error: unknown) {
             const { message, statusCode } = normalizeError(error);
-            message.error(error.response.data.message)
+            antdMessage.error(error.response.data.message)
             resolve(false)
           }
         },
@@ -3734,7 +3725,7 @@ const SculptureUploadImage = ({ sculpture }) => {
     let data = new FormData()
     data.append('images', e.file)
     data.set('accessionId', accessionId)
-    const hide = message.loading('Uploading image...', 0)
+    const hide = antdMessage.loading('Uploading image...', 0)
 
     try {
       const _result = await api.post('/sculpture-images', data, config)
@@ -3748,10 +3739,10 @@ const SculptureUploadImage = ({ sculpture }) => {
 
       e.onSuccess(_result.data[0], e.file)
       hide()
-      message.success('Uploaded image successfully!', 2)
+      antdMessage.success('Uploaded image successfully!', 2)
     } catch (error: unknown) {
       const { message, statusCode } = normalizeError(error);
-      message.error(error.response.data.message)
+      antdMessage.error(error.response.data.message)
       e.onError(error.response.data.message)
     }
   }
@@ -3811,7 +3802,8 @@ export default SculptureUploadImage
  */
 
 import { useState } from 'react'
-import { Input, Icon, Select, Divider } from 'antd'
+import { Input, Select, Divider } from 'antd';
+import Icon from '@/components/compat/Icon';
 const { TextArea } = Input
 import { FormCol, CustomFormItem } from '../style'
 import { validateLatitude, validateLongitude } from '../../shared/utils'
@@ -4010,7 +4002,7 @@ export default ({
           })(
             <TextArea
               placeholder="Credit line"
-              autosize={{ minRows: 3, maxRows: 5 }}
+              autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
             />
           )}
@@ -4024,7 +4016,7 @@ export default ({
           })(
             <TextArea
               placeholder="Location details"
-              autosize={{ minRows: 3, maxRows: 5 }}
+              autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
             />
           )}
@@ -4104,12 +4096,13 @@ export default ({
  * Author: Hieu Chu
  */
 
-import { Upload, Button, Icon, message, Row, Modal } from 'antd'
+import { Upload, Button, message as antdMessage, Row, Modal  } from 'antd';
 import { useState } from 'react'
 import { ColStyled } from '../style'
 import api from '../../../api'
 import { useRouter } from 'next/navigation';
 import { normalizeError } from "../../../shared/errors";
+import Icon from '@/components/compat/Icon';
 
 const { confirm } = Modal
 
@@ -4137,10 +4130,10 @@ const EditImage = ({ accessionId, _name, images }) => {
             const _result = await api.delete(`/sculpture-images/${file.uid}`)
             resolve(true)
             setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
-            message.success('Deleted image successfully!', 2)
+            antdMessage.success('Deleted image successfully!', 2)
           } catch (error: unknown) {
             const { message, statusCode } = normalizeError(error);
-            message.error(error.response.data.message)
+            antdMessage.error(error.response.data.message)
             resolve(false)
           }
           setIsSubmitting(false)
@@ -4169,7 +4162,7 @@ const EditImage = ({ accessionId, _name, images }) => {
     let data = new FormData()
     data.append('images', e.file)
     data.set('accessionId', accessionId)
-    const hide = message.loading('Uploading image...', 0)
+    const hide = antdMessage.loading('Uploading image...', 0)
     setIsSubmitting(true)
 
     try {
@@ -4184,10 +4177,10 @@ const EditImage = ({ accessionId, _name, images }) => {
 
       e.onSuccess(_result.data[0], e.file)
       hide()
-      message.success('Uploaded image successfully!', 2)
+      antdMessage.success('Uploaded image successfully!', 2)
     } catch (error: unknown) {
       const { message, statusCode } = normalizeError(error);
-      message.error(error.response.data.message)
+      antdMessage.error(error.response.data.message)
       e.onError(error.response.data.message)
     }
     setIsSubmitting(false)
@@ -4242,7 +4235,7 @@ export default EditImage
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { Row, Modal, Button, message, notification, Result } from 'antd';
+import { Row, Modal, Button, message as antdMessage, notification, Result  } from 'antd';
 import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { CardStyled, ColStyled } from '../style';
@@ -4320,7 +4313,7 @@ const SculptureEditForm = () => {
         try {
           if (!sculptureId) return;
           await api.delete(`/sculpture/${sculptureId}`);
-          message.success('Deleted sculpture successfully!', 2);
+          antdMessage.success('Deleted sculpture successfully!', 2);
           router.push('/sculptures');
         } catch (e: unknown) {
           const { message: errMsg } = normalizeError(e);
@@ -4443,8 +4436,7 @@ export { SculptureEditForm };
  */
 
 import { useState } from 'react'
-import { Input, Form, Button, Modal, message } from 'antd'
-import { CustomFormItem } from '../style'
+import { Input, Form, Button, Modal, message as antdMessage  } from 'antd';import { CustomFormItem } from '../style'
 import api from '../../../api'
 import { normalizeError } from "../../../shared/errors";
 
@@ -4495,11 +4487,11 @@ const MakerEdit = ({
           editMaker(values)
           handleCancel()
           resetFields()
-          message.success('Updated maker details successfully!', 2)
+          antdMessage.success('Updated maker details successfully!', 2)
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })
@@ -4615,8 +4607,7 @@ export default Form.create({
  */
 
 import { useState } from 'react'
-import { Button, Form, message } from 'antd'
-import { ColStyled, FormCol, CustomFormItem } from '../style'
+import { Button, Form, message as antdMessage  } from 'antd';import { ColStyled, FormCol, CustomFormItem } from '../style'
 import { FlyToInterpolator } from 'react-map-gl'
 import Map from '../../map-components'
 import EditFormTextFields from './EditFormTextFields'
@@ -4698,13 +4689,13 @@ const SculptureEdit = ({
         setSubmitting(true)
         try {
           const _result = (await api.patch('/sculpture', values)).data
-          message.success('Updated sculpture details successfully!', 2)
+          antdMessage.success('Updated sculpture details successfully!', 2)
           setSubmitting(false)
           router.push(`/sculptures/id/${values.accessionId}`)
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })
@@ -4792,8 +4783,7 @@ export default Form.create({
  */
 
 import { useState, useEffect } from 'react'
-import { Row, Divider, Modal, message, notification, Button } from 'antd'
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { Row, Divider, Modal, message as antdMessage, notification, Button  } from 'antd';import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { ColStyled, CardStyled, StyledTable } from './style'
 import MakerEdit from './EditForm/MakerEdit'
 import api from '@/services/_request'
@@ -4893,7 +4883,7 @@ const MakerList = () => {
         try {
           await api.delete(`/maker/${makerId}`)
           deleteMaker(makerId)
-          message.success('Deleted maker successfully!', 2)
+          antdMessage.success('Deleted maker successfully!', 2)
         } catch (error: unknown) {
           const { message, statusCode } = normalizeError(error);
           notification.error({
@@ -4940,7 +4930,7 @@ const MakerList = () => {
     {
       title: 'Action',
       key: 'action',
-      render: (record: any) => (
+      render: (record, row) => (
         <span>
           <a onClick={() => openModal(record.key)}>Edit</a>
           <Divider type="vertical" />
@@ -5287,19 +5277,17 @@ export default SculptureDetail
  */
 
 import dayjs from 'dayjs'
-import {
-  Tooltip,
+import { Tooltip,
   List,
   Comment,
   Card,
   Dropdown,
   Modal,
-  message,
+  message as antdMessage,
   Button,
   Empty,
   Input
-} from 'antd'
-import type { MenuProps } from 'antd'
+ } from 'antd';import type { MenuProps } from 'antd'
 import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
@@ -5336,12 +5324,12 @@ const SculptureComment = ({
       onOk: async () => {
         try {
           await api.delete(`/comment/${e.key}`)
-          message.success('Deleted comment successfully!', 2)
+          antdMessage.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
         } catch (error: unknown) {
           const { message, statusCode } = normalizeError(error);
           // @ts-ignore
-          message.error(error.response.data.message)
+          antdMessage.error(error.response.data.message)
         }
       }
     })
@@ -5424,7 +5412,7 @@ const SculptureComment = ({
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (
@@ -5509,7 +5497,7 @@ const Editor = ({
             const { message, statusCode } = normalizeError(e);
             setSubmitting(false)
             // @ts-ignore
-            message.error(e.response.data.message)
+            antdMessage.error(e.response.data.message)
           }
         }}
         type="primary"
@@ -6079,7 +6067,8 @@ export default SculptureGrid
  */
 
 import styled from 'styled-components'
-import { Card, Col, Icon, Form, Typography, Empty, Table } from 'antd'
+import { Card, Col, Form, Typography, Empty, Table } from 'antd';
+import Icon from '@/components/compat/Icon';
 
 const { Text } = Typography
 
@@ -6612,18 +6601,16 @@ export const StyledTable = styled(Table)`
  */
 
 import dayjs from 'dayjs'
-import {
-  Tooltip,
+import { Tooltip,
   List,
   Comment,
   Card,
   Dropdown,
-  message,
+  message as antdMessage,
   Modal,
   Empty,
   Input
-} from 'antd'
-import type { MenuProps } from 'antd'
+ } from 'antd';import type { MenuProps } from 'antd'
 import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 
 const { confirm } = Modal
@@ -6650,11 +6637,11 @@ const UserComments = ({ comments, deleteComment }) => {
       onOk: async () => {
         try {
           await api.delete(`/comment/${e.key}`)
-          message.success('Deleted comment successfully!', 2)
+          antdMessage.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
         } catch (error: any) {
           const { message, statusCode } = normalizeError(error);
-          message.error(error.response?.data?.message || 'Error')
+          antdMessage.error(error.response?.data?.message || 'Error')
         }
       }
     })
@@ -6741,7 +6728,7 @@ const UserComments = ({ comments, deleteComment }) => {
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (
@@ -6849,7 +6836,7 @@ const UserLikes = ({ likes }) => {
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (
@@ -7118,7 +7105,7 @@ const UserVisit = ({ visits }) => {
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (

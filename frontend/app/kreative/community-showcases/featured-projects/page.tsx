@@ -163,7 +163,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
                   title={project.title}
                   description={
                     <>
-                      {/* fix: remove ellipsis={{ rows: 2 }} which is incompatible in your setup */}
+                      {/* fix: remove ellipsis={{}} which is incompatible in your setup */}
                       <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
                         {project.description}
                       </Paragraph>
@@ -227,3 +227,4 @@ export default function FeaturedProjectsPage(): JSX.Element {
     </PageContainer>
   );
 }
+}}

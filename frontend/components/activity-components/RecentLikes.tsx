@@ -39,7 +39,7 @@ const RecentLikes: React.FC<RecentLikesProps> = ({ likes }) => {
     <Card title="Recent Likes" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
       <List
         itemLayout="horizontal"
-        dataSource={sortedLikes}
+        dataSource={sortedLikes ?? []}
         renderItem={(x: RecentLike) => {
           const displayName =
             x.user.userId.includes('auth0')

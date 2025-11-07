@@ -56,7 +56,7 @@ const sampleWorkspaces: Workspace[] = [
   },
 ];
 
-const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const MyWorkspaces = () => {
   const router = useRouter();
 
   // État pour le filtre par projet
@@ -129,7 +129,7 @@ const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React
         {/* Liste des workspaces */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={filteredWorkspaces}
+          dataSource={filteredWorkspaces ?? []}
           renderItem={(workspace: Workspace) => (
             <List.Item key={workspace.id}>
               <Card
@@ -165,3 +165,4 @@ const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React
 
 
 export default MyWorkspaces;
+}}}

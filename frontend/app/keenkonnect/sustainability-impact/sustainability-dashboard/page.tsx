@@ -1,10 +1,11 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/sustainability-impact/sustainability-dashboard/index.tsx
+// File: app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
 import React, { useMemo } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
 import { Card, Row, Col, Statistic, Table, Select, Divider } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import MainLayout from '@/components/layout-components/MainLayout';
 import {
   PieChart as RePieChart,
@@ -17,22 +18,24 @@ import {
 
 const { Option } = Select;
 
-// -------------------------------
-// Données simulées
-// -------------------------------
+/* -------------------------------
+ * Données simulées
+ * ------------------------------- */
 
 // Statistiques globales
 const globalStats = {
   totalCO2Saved: 50000,       // en kilogrammes
   totalVolunteerHours: 1200,  // en heures
   totalProjects: 45,
+};
 
-// Impact distribution pour le donut chart
+// Répartition d’impact (donut)
 const impactDistribution = [
   { name: 'Environmental', value: 55 },
   { name: 'Social', value: 30 },
   { name: 'Economic', value: 15 },
 ];
+
 const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
 // Données pour le leaderboard (liste de projets par impact)
@@ -52,8 +55,8 @@ const leaderboardData: LeaderboardEntry[] = [
   { key: '5', projectName: 'Project Epsilon', impactScore: 75, co2Saved: 7000, volunteerHours: 170 },
 ];
 
-// Colonnes pour le leaderboard Table
-const columns = [
+// Colonnes pour le leaderboard
+const columns: ColumnsType<LeaderboardEntry> = [
   { title: 'Project Name', dataIndex: 'projectName', key: 'projectName' },
   { title: 'Impact Score', dataIndex: 'impactScore', key: 'impactScore' },
   { title: 'CO2 Saved (kg)', dataIndex: 'co2Saved', key: 'co2Saved' },
@@ -64,14 +67,16 @@ const columns = [
 const regions = ['All', 'North America', 'Europe', 'Asia'];
 const categories = ['All', 'Environmental', 'Social', 'Economic'];
 
-const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
-  // États pour les filtres (pour l’exemple, ils n’influencent pas réellement les données)
+const SustainabilityDashboard: NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+} = () => {
+  // États de filtres (ici décoratifs)
   const [selectedRegion, setSelectedRegion] = React.useState('All');
   const [selectedCategory, setSelectedCategory] = React.useState('All');
 
-  // Simuler un filtrage des données du leaderboard (pour cet exemple, on retourne tout)
+  // Filtrage simulé
   const filteredLeaderboard = useMemo(() => {
-    // Vous pouvez ajouter une logique de filtrage ici selon selectedRegion ou selectedCategory
+    // Ajouter une vraie logique si nécessaire (region / category)
     return leaderboardData;
   }, [selectedRegion, selectedCategory]);
 
@@ -79,8 +84,12 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
     <>
       <Head>
         <title>Sustainability Dashboard</title>
-        <meta name="description" content="High-level dashboard aggregating sustainability impact across projects." />
+        <meta
+          name="description"
+          content="High-level dashboard aggregating sustainability impact across projects."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
         {/* En-tête */}
         <h1 className="text-2xl font-bold mb-4">Sustainability Dashboard</h1>
@@ -88,23 +97,36 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
         {/* Filtres */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={12}>
-            <Select value={selectedRegion} onChange={(value) => setSelectedRegion(value)} style={{ width: '100%' }}>
+            <Select
+              value={selectedRegion}
+              onChange={(value) => setSelectedRegion(value)}
+              style={{ width: '100%' }}
+            >
               {regions.map((region) => (
-                <Option key={region} value={region}>{region}</Option>
+                <Option key={region} value={region}>
+                  {region}
+                </Option>
               ))}
             </Select>
           </Col>
           <Col xs={24} sm={12}>
-            <Select value={selectedCategory} onChange={(value) => setSelectedCategory(value)} style={{ width: '100%' }}>
+            <Select
+              value={selectedCategory}
+              onChange={(value) => setSelectedCategory(value)}
+              style={{ width: '100%' }}
+            >
               {categories.map((cat) => (
-                <Option key={cat} value={cat}>{cat}</Option>
+                <Option key={cat} value={cat}>
+                  {cat}
+                </Option>
               ))}
             </Select>
           </Col>
         </Row>
+
         <Divider />
 
-        {/* Global Impact Statistics */}
+        {/* Statistiques globales */}
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={8}>
             <Card>
@@ -123,7 +145,7 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
           </Col>
         </Row>
 
-        {/* Impact Distribution Chart (Pie Chart) */}
+        {/* Donut: Impact Distribution */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Impact Distribution</h2>
           <div style={{ width: '100%', height: 300 }}>
@@ -131,9 +153,19 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
               <RePieChart>
                 <ReTooltip />
                 <Legend verticalAlign="bottom" height={36} />
-                <Pie data={impactDistribution} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} paddingAngle={5}>
+                <Pie
+                  data={impactDistribution}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                >
                   {impactDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                    />
                   ))}
                 </Pie>
               </RePieChart>
@@ -141,15 +173,23 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
           </div>
         </Card>
 
-        {/* Leaderboard of Projects by Impact */}
+        {/* Leaderboard */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Top Projects by Impact</h2>
-          <Table columns={columns} dataSource={filteredLeaderboard} pagination={{ pageSize: 5 }} />
+          <Table
+            columns={columns}
+            dataSource={filteredLeaderboard}
+            pagination={{ pageSize: 5 }}
+          />
         </Card>
       </div>
     </>
   );
+};
 
-
+// Mise en page (si utilisée dans ton app)
+SustainabilityDashboard.getLayout = (page: React.ReactElement) => (
+  <MainLayout>{page}</MainLayout>
+);
 
 export default SustainabilityDashboard;

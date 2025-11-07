@@ -205,3 +205,4 @@ const CertificationPrograms: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default CertificationPrograms;
+}}}

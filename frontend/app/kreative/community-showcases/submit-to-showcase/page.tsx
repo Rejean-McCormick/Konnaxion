@@ -3,7 +3,7 @@
 // File: /pages/kreative/community-showcases/submit-to-showcase.tsx
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import { Form, Input, Select, Button, Modal, message } from 'antd';
+import { Form, Input, Select, Button, Modal, message as antdMessage  } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -32,7 +32,7 @@ const SubmitToShowcase: NextPage = () => {
 
   // Handle modal confirmation.
   const handleModalOk = () => {
-    message.success('Your project has been submitted for review.');
+    antdMessage.success('Your project has been submitted for review.');
     setModalVisible(false);
     // Redirect to the featured projects page or the user's submissions.
     router.push('/kreative/community-showcases/featured-projects');
@@ -113,3 +113,4 @@ const SubmitToShowcase: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default SubmitToShowcase;
+}}}

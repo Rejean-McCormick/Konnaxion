@@ -93,3 +93,4 @@ const ManageExpertiseAreas: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default ManageExpertiseAreas;
+}}

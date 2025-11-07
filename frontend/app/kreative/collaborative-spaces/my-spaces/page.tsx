@@ -105,7 +105,7 @@ export default function MySpacesPage(): JSX.Element {
 
       <List
         itemLayout="horizontal"
-        dataSource={filteredSpaces}
+        dataSource={filteredSpaces ?? []}
         renderItem={(space: CollaborativeSpace) => (
           <List.Item
             key={space.id}
@@ -140,4 +140,5 @@ export default function MySpacesPage(): JSX.Element {
       />
     </PageContainer>
   );
+}
 }

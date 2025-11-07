@@ -77,7 +77,7 @@ const sampleWorkspaces: Workspace[] = [
   },
 ];
 
-const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseAvailableWorkspaces = () => {
   const router = useRouter();
   // États pour la recherche et les filtres
   const [searchText, setSearchText] = useState('');
@@ -157,7 +157,7 @@ const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElem
         {/* Liste des workspaces */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 3 }}
-          dataSource={paginatedWorkspaces}
+          dataSource={paginatedWorkspaces ?? []}
           renderItem={(workspace: Workspace) => (
             <List.Item key={workspace.id}>
               <Card
@@ -202,3 +202,4 @@ const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElem
 
 
 export default BrowseAvailableWorkspaces;
+}}

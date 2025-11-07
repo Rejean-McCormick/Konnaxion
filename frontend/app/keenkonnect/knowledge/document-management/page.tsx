@@ -1,24 +1,21 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/knowledge/document-management/index.tsx
 import React, { useState } from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Row, Col, Card, Button, Input, Timeline, Divider, List, Avatar, message } from 'antd';
+import { Row, Col, Card, Button, Input, Timeline, Divider, List, Avatar, message as antdMessage } from 'antd';
 import { SaveOutlined, UploadOutlined, EditOutlined } from '@ant-design/icons';
 import { Comment } from '@ant-design/compatible';
-//import '@ant-design/compatible/assets/index.css';
-import MainLayout from '@/components/layout-components/MainLayout';
+// import '@ant-design/compatible/assets/index.css';
 
 const { TextArea } = Input;
 
-const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+export default function DocumentManagement(): JSX.Element {
   // Simulation : l'utilisateur possède les droits d'édition
   const userCanEdit = true;
 
   // État pour le contenu du document (éditeur / vue)
   const [documentContent, setDocumentContent] = useState<string>(
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum pretium, risus at fermentum cursus, purus lacus scelerisque dolor, nec dictum augue mi ut ligula. Sed vitae nisl vel metus tincidunt interdum."
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum pretium, risus at fermentum cursus, purus lacus scelerisque dolor, nec dictum augue mi ut ligula. Sed vitae nisl vel metus tincidunt interdum.'
   );
 
   // Données simulées pour les métadonnées du document
@@ -28,6 +25,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
     lastModified: '2023-09-05',
     version: '2.0',
     language: 'English',
+  };
 
   // Historique des versions (Timeline)
   const versionHistory = [
@@ -56,20 +54,26 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
   const handleSaveChanges = () => {
     // Simuler un appel API pour sauvegarder les modifications
     console.log('Saving changes:', documentContent);
-    message.success('Changes saved successfully.');
+    antdMessage.success('Changes saved successfully.');
+  };
 
   // Gestion de la publication d'une nouvelle version
   const handlePublishNewVersion = () => {
     // Simulation d'une publication
     console.log('Publishing new version...');
-    message.success('New version published successfully.');
+    antdMessage.success('New version published successfully.');
+  };
 
   return (
     <>
       <Head>
         <title>Document Management</title>
-        <meta name="description" content="Manage and edit your knowledge documents, view version history, and collaborate with reviewers." />
+        <meta
+          name="description"
+          content="Manage and edit your knowledge documents, view version history, and collaborate with reviewers."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
         {/* Page Header */}
         <h1 className="text-2xl font-bold mb-4">Document Management</h1>
@@ -78,7 +82,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
           {/* Left Panel: Content Viewer */}
           <Col xs={24} md={14}>
             <Card title="Document Content" style={{ height: '100%', overflowY: 'auto' }}>
-              <div style={{ padding: '20px' }}>
+              <div style={{ padding: 20 }}>
                 <p>{documentContent}</p>
               </div>
             </Card>
@@ -88,7 +92,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
           <Col xs={24} md={10}>
             {/* Editor Panel (if editable) */}
             <Card
-              title={userCanEdit ? "Edit Document" : "Document Details"}
+              title={userCanEdit ? 'Edit Document' : 'Document Details'}
               extra={userCanEdit && <Button icon={<EditOutlined />} onClick={() => {}}>Edit</Button>}
               className="mb-4"
             >
@@ -116,11 +120,21 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
 
             {/* Metadata Sidebar */}
             <Card title="Document Metadata" className="mb-4">
-              <p><strong>Title:</strong> {documentMetadata.title}</p>
-              <p><strong>Created At:</strong> {documentMetadata.createdAt}</p>
-              <p><strong>Last Modified:</strong> {documentMetadata.lastModified}</p>
-              <p><strong>Version:</strong> {documentMetadata.version}</p>
-              <p><strong>Language:</strong> {documentMetadata.language}</p>
+              <p>
+                <strong>Title:</strong> {documentMetadata.title}
+              </p>
+              <p>
+                <strong>Created At:</strong> {documentMetadata.createdAt}
+              </p>
+              <p>
+                <strong>Last Modified:</strong> {documentMetadata.lastModified}
+              </p>
+              <p>
+                <strong>Version:</strong> {documentMetadata.version}
+              </p>
+              <p>
+                <strong>Language:</strong> {documentMetadata.language}
+              </p>
             </Card>
 
             {/* Version History */}
@@ -139,7 +153,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
             <Card title="Comments" className="mb-4">
               <List
                 itemLayout="horizontal"
-                dataSource={commentsData}
+                dataSource={commentsData ?? []}
                 renderItem={(comment) => (
                   <Comment
                     author={comment.author}
@@ -155,7 +169,4 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
       </div>
     </>
   );
-
-
-
-export default DocumentManagement;
+}

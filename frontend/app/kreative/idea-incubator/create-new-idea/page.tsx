@@ -3,7 +3,7 @@
 // File: /pages/kreative/idea-incubator/create-new-idea.tsx
 import React from 'react';
 import { NextPage } from 'next';
-import { Form, Input, Select, Button, message } from 'antd';
+import { Form, Input, Select, Button, message as antdMessage  } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -19,7 +19,7 @@ const CreateNewIdea: NextPage = () => {
   const onFinish = (values: any) => {
     // Log form values; in a real app, you would send this data via an API call.
     console.log('Submitted Idea:', values);
-    message.success('Votre idée a été soumise avec succès !');
+    antdMessage.success('Votre idée a été soumise avec succès !');
     // Redirect to the "My Ideas" page after submitting.
     router.push('/kreative/idea-incubator/my-ideas');
 
@@ -89,3 +89,4 @@ const CreateNewIdea: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default CreateNewIdea;
+}}

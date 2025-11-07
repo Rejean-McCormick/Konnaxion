@@ -6,8 +6,7 @@
  */
 
 import { useState } from 'react'
-import { Input, Form, Button, Modal, message } from 'antd'
-import { CustomFormItem } from '../style'
+import { Input, Form, Button, Modal, message as antdMessage  } from 'antd';import { CustomFormItem } from '../style'
 import api from '../../../api'
 import { normalizeError } from "../../../shared/errors";
 
@@ -44,11 +43,11 @@ const MakerCreate = ({
           setSubmitting(false)
           handleCancel()
           resetFields()
-          message.success('Created new maker succesfully!', 2)
+          antdMessage.success('Created new maker succesfully!', 2)
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })

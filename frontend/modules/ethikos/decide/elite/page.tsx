@@ -19,15 +19,15 @@ export default function EliteBallots() {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-render: (v: string) => (
-  <Statistic.Countdown value={dayjs(v)} format="D[d] HH:mm:ss" />
+render: (v, row) => (
+  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
 ),
     },
     {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (v: number) => <Progress type="circle" percent={v} />,
+      render: (v, row) => <Progress type="circle" percent={v} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
   ];

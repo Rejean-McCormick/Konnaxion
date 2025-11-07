@@ -29,7 +29,7 @@ export default function AuditLogs() {
       title: 'Severity',
       dataIndex: 'severity',
       width: 120,
-      render: (v: LogRow['severity']) => (
+      render: (v, row) => (
         <Tag color={v === 'critical' ? 'red' : v === 'warn' ? 'orange' : 'blue'}>{v}</Tag>
       ),
       filters: [

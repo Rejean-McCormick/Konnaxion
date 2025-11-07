@@ -1,88 +1,93 @@
-'use client'
+'use client';
 
 import React, { useState } from 'react';
-import { NextPage } from 'next';
-import { Row, Col, Card, Button, Typography, Spin, message } from 'antd';
-import { SyncOutlined, CheckCircleOutlined, DownloadOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
+import {
+  Row,
+  Col,
+  Card,
+  Button,
+  Typography,
+  Spin,
+  message as antdMessage,
+} from 'antd';
+import {
+  SyncOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 
 const { Paragraph, Text } = Typography;
 
-interface OfflineContentPackage {
+type OfflineContentPackage = {
   id: string;
   title: string;
   description: string;
   lastUpdated: string;
   downloaded: boolean;
-  size?: string;
   syncing: boolean;
-}
+  size?: string;
+};
 
 const initialPackages: OfflineContentPackage[] = [
   {
-    id: '1',
-    title: 'Package A: Course Material',
-    description: 'Includes video lectures, study guides, and supplemental notes.',
-    lastUpdated: '2025-04-10 14:00',
-    downloaded: true,
-    size: '150 MB',
-    syncing: false,
-  },
-  {
-    id: '2',
-    title: 'Package B: Interactive Quiz',
-    description: 'Contains interactive quizzes and practice tests.',
-    lastUpdated: '2025-04-09 10:30',
+    id: 'foundation-js',
+    title: 'JavaScript Foundations',
+    description: 'Core JS concepts for beginners to intermediate learners.',
+    lastUpdated: 'Never',
     downloaded: false,
     syncing: false,
   },
   {
-    id: '3',
-    title: 'Package C: Supplemental Readings',
-    description: 'A collection of additional readings and research articles.',
-    lastUpdated: '2025-04-08 09:15',
-    downloaded: true,
-    size: '75 MB',
+    id: 'react-advanced',
+    title: 'Advanced React',
+    description: 'Hooks, performance patterns, suspense and more.',
+    lastUpdated: 'Never',
+    downloaded: false,
     syncing: false,
   },
-  // Add more packages as needed...
+  {
+    id: 'data-viz',
+    title: 'Data Visualization Toolkit',
+    description: 'Build charts and dashboards with modern libraries.',
+    lastUpdated: 'Never',
+    downloaded: false,
+    syncing: false,
+  },
 ];
 
-const OfflineContentPage: NextPage = () => {
+export default function OfflineContentPage(): JSX.Element {
   const [packages, setPackages] = useState<OfflineContentPackage[]>(initialPackages);
 
-  // Trigger sync/download for a single package
+  // Sync / download a single package
   const handleSync = (id: string) => {
-    // Mark the package as syncing
+    // mark as syncing
     setPackages(prev =>
-      prev.map(pkg =>
-        pkg.id === id ? { ...pkg, syncing: true } : pkg
-      )
+      prev.map(pkg => (pkg.id === id ? { ...pkg, syncing: true } : pkg)),
     );
-    // Simulate a download/sync delay
+
+    // simulate download
     setTimeout(() => {
       setPackages(prev =>
-        prev.map(pkg => {
-          if (pkg.id === id) {
-            return {
-              ...pkg,
-              syncing: false,
-              downloaded: true,
-              lastUpdated: new Date().toLocaleString(),
-              size: pkg.size || '100 MB',
-          }
-          return pkg;
-        })
+        prev.map(pkg =>
+          pkg.id === id
+            ? {
+                ...pkg,
+                syncing: false,
+                downloaded: true,
+                lastUpdated: new Date().toLocaleString(),
+                size: pkg.size || '100 MB',
+              }
+            : pkg,
+        ),
       );
-      message.success(`Package "${id}" synced successfully!`);
+      antdMessage.success(`Package "${id}" synced successfully!`);
     }, 2000);
+  };
 
-  // Global "Sync All" action for all packages
+  // Sync all packages
   const handleSyncAll = () => {
-    setPackages(prev =>
-      prev.map(pkg => ({ ...pkg, syncing: true }))
-    );
+    setPackages(prev => prev.map(pkg => ({ ...pkg, syncing: true })));
+
     setTimeout(() => {
       setPackages(prev =>
         prev.map(pkg => ({
@@ -91,10 +96,11 @@ const OfflineContentPage: NextPage = () => {
           downloaded: true,
           lastUpdated: new Date().toLocaleString(),
           size: pkg.size || '100 MB',
-        }))
+        })),
       );
-      message.success('All packages synced successfully!');
+      antdMessage.success('All packages synced successfully!');
     }, 2000);
+  };
 
   return (
     <PageContainer title="Offline Content">
@@ -105,15 +111,17 @@ const OfflineContentPage: NextPage = () => {
         </Button>
       </Row>
 
-      {/* Grid display of content packages */}
+      {/* Grid of packages */}
       <Row gutter={[16, 16]}>
-        {packages.map((pkg) => (
+        {packages.map(pkg => (
           <Col xs={24} sm={12} md={8} key={pkg.id}>
             <Card
               title={pkg.title}
               extra={
                 pkg.syncing ? (
-                  <Spin indicator={<SyncOutlined style={{ fontSize: 24 }} spin />} />
+                  <Spin
+                    indicator={<SyncOutlined style={{ fontSize: 24 }} spin />}
+                  />
                 ) : (
                   <Button type="primary" onClick={() => handleSync(pkg.id)}>
                     {pkg.downloaded ? 'Sync Updates' : 'Download'}
@@ -122,7 +130,7 @@ const OfflineContentPage: NextPage = () => {
               }
             >
               <Paragraph>{pkg.description}</Paragraph>
-              <Text strong>Last Updated:</Text> {pkg.lastUpdated}
+              <Text strong>Last Updated:</Text> <span>{pkg.lastUpdated}</span>
               {pkg.downloaded && (
                 <>
                   <br />
@@ -139,9 +147,4 @@ const OfflineContentPage: NextPage = () => {
       </Row>
     </PageContainer>
   );
-
-// Wrap the page with MainLayout
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default OfflineContentPage;
+}

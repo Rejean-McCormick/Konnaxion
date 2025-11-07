@@ -19,7 +19,7 @@ export default function RoleManagement() {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (v: number) => <Tag>{v}</Tag>,
+      render: (v, row) => <Tag>{v}</Tag>,
     },
     {
       title: 'Enabled',

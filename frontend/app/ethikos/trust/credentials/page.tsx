@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { PageContainer } from '@ant-design/pro-components';
 import { Upload, Button, Result } from 'antd';
@@ -24,6 +24,7 @@ export default function Credentials() {
         onError();
       }
     },
+  };
 
   return (
     <PageContainer ghost>
@@ -32,7 +33,11 @@ export default function Credentials() {
           status="success"
           title="Document uploaded!"
           subTitle="Your credential is pending verification."
-          extra={<Button type="primary" onClick={() => setDone(false)}>Upload another</Button>}
+          extra={
+            <Button type="primary" onClick={() => setDone(false)}>
+              Upload another
+            </Button>
+          }
         />
       ) : (
         <Upload.Dragger {...props} accept=".pdf,.jpg,.png">
@@ -40,7 +45,7 @@ export default function Credentials() {
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">Click or drag file to this area to upload</p>
-          <p className="ant-upload-hint">Supported: PDF / JPG / PNG &nbsp;·&nbsp; Max 5 MB</p>
+          <p className="ant-upload-hint">Supported: PDF / JPG / PNG · Max 5 MB</p>
         </Upload.Dragger>
       )}
     </PageContainer>

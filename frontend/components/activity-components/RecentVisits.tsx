@@ -86,7 +86,7 @@ const RecentVisits = ({ visits }: RecentVisitsProps) => {
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         renderItem={item => (
           <li key={item.key}>

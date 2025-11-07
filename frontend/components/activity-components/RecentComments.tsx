@@ -75,9 +75,7 @@ const RecentComments: React.FC<RecentCommentsProps> = ({
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: { background: '#ff4d4f', borderColor: '#ff4d4f' },
-      },
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
       onOk: async () => {
         try {
           await api.delete(`/comment/${String(key)}`);
@@ -92,11 +90,7 @@ const RecentComments: React.FC<RecentCommentsProps> = ({
   };
 
   return (
-    <Card
-      title="Recent Comments"
-      bodyStyle={{ padding: '20px 24px 0px' }}
-      bordered={false}
-    >
+    <Card title="Recent Comments" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
       <List<RecentCommentItem>
         itemLayout="horizontal"
         dataSource={items}
@@ -140,14 +134,10 @@ const RecentComments: React.FC<RecentCommentsProps> = ({
                     <Link href={`/users/id/${x.user.userId}`}>
                       <Text strong>{name}</Text>
                     </Link>
-                    <Tooltip
-                      title={dayjs(x.createdTime).format(
-                        'D MMMM YYYY, h:mm:ss a',
-                      )}
-                    >
+                    <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
                       <Text type="secondary">{dayjs(x.createdTime).fromNow()} in</Text>
                     </Tooltip>
-                    <Link href={`/sculptures/id/${x.sculpture.accessionId}`}>
+                    <Link href={`/sculptures/id/${String(x.sculpture.accessionId)}`}>
                       <Text>{x.sculpture.name}</Text>
                     </Link>
                   </Space>

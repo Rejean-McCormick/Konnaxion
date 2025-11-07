@@ -92,6 +92,7 @@ export default function Page() {
         ))}
       </ul>
     );
+  };
 
   /** Calendar selection uses Dayjs in AntD v5 */
   const handleDateSelect = (value: Dayjs) => {
@@ -99,6 +100,7 @@ export default function Page() {
     // preset only the date; time stays empty until user picks it
     form.setFieldsValue({ eventDate: value } as Partial<ActivityForm>);
     setModalVisible(true);
+  };
 
   /** Submit new event with strongly typed form values */
   const handleAddEvent = (values: ActivityForm) => {
@@ -107,7 +109,12 @@ export default function Page() {
 
     const dateTime = eventDate
       .clone()
-      .set({ hour: eventTime.hour(), minute: eventTime.minute(), second: 0, millisecond: 0 });
+      .set({
+        hour: eventTime.hour(),
+        minute: eventTime.minute(),
+        second: 0,
+        millisecond: 0,
+      });
 
     const newEvent: ActivityEvent = {
       id: `evt${Date.now()}`,
@@ -116,12 +123,14 @@ export default function Page() {
       dateTime,
       owner,
       team,
+    };
 
     setEvents((prev) => [...prev, newEvent]);
     message.success('Activity added');
     form.resetFields();
     setPreSelectedDate(null);
     setModalVisible(false);
+  };
 
   return (
     <PageContainer title="Activity Planner">
@@ -224,7 +233,11 @@ export default function Page() {
             rules={[{ required: true, message: 'Please select a team.' }]}
             initialValue={teamOptions[1]}
           >
-            <Select options={teamOptions.filter((t) => t !== 'All').map((t) => ({ value: t, label: t }))} />
+            <Select
+              options={teamOptions
+                .filter((t) => t !== 'All')
+                .map((t) => ({ value: t, label: t }))}
+            />
           </Form.Item>
 
           <Form.Item

@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Steps, Button, Form, Input, Select, Upload, Result, message } from 'antd';
+import { Steps, Button, Form, Input, Select, Upload, Result, message as antdMessage  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { normalizeError } from "../../../../shared/errors";
@@ -13,7 +13,7 @@ const { Step } = Steps;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const CreateNewProject = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [form] = Form.useForm();
@@ -42,7 +42,7 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       form.resetFields();
     } catch (error: unknown) {
       const { message, statusCode } = normalizeError(error);
-      message.error('Please fill in the required fields.');
+      antdMessage.error('Please fill in the required fields.');
     }
 
   // Retour à l'étape précédente
@@ -59,7 +59,7 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       setSubmitted(true);
     } catch (error: unknown) {
       const { message, statusCode } = normalizeError(error);
-      message.error('Please fill in the required fields.');
+      antdMessage.error('Please fill in the required fields.');
     }
 
   // Rendu du contenu en fonction de l'étape
@@ -212,3 +212,4 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
 
 
 export default CreateNewProject;
+}}}}}

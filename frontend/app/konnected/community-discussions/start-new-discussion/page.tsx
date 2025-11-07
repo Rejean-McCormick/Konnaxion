@@ -3,7 +3,7 @@
 // File: /pages/konnected/community-discussions/start-new-discussion.tsx
 import React from 'react';
 import { NextPage } from 'next';
-import { Form, Input, Select, Switch, Button, message } from 'antd';
+import { Form, Input, Select, Switch, Button, message as antdMessage  } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -17,7 +17,7 @@ const StartNewDiscussion: NextPage = () => {
   // Simulation de la soumission : en production, un appel API sera nécessaire pour créer le thread.
   const onFinish = (values: any) => {
     console.log('New Discussion Data:', values);
-    message.success('Votre discussion a été créée avec succès !');
+    antdMessage.success('Votre discussion a été créée avec succès !');
     // Simuler la redirection vers la page de détail du thread créé, par exemple avec l'ID généré.
     router.push(`/konnected/community-discussions/thread/123`);
 
@@ -78,3 +78,4 @@ const StartNewDiscussion: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default StartNewDiscussion;
+}}

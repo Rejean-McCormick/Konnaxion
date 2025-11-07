@@ -1,9 +1,8 @@
 'use client';
+
 import React from 'react';
-import { NextPage } from 'next';
 import { Card, Statistic, Row, Col, List, Typography, Divider } from 'antd';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout'; // Assurez-vous que ce chemin est correct
 
 const { Title, Text } = Typography;
 
@@ -19,11 +18,11 @@ interface Achievement {
   description: string;
 }
 
-const ViewReputationEkoh: NextPage = () => {
-  // Données simulées pour l'exemple
+export default function ViewReputationEkoh(): JSX.Element {
   const reputation = {
     ekohScore: 1234,
-    smartVoteWeight: 75, // exprimé en pourcentage
+    smartVoteWeight: 75, // percentage
+  };
 
   const expertiseAreas: Expertise[] = [
     { id: '1', name: 'Frontend Development', weight: '30%' },
@@ -48,7 +47,7 @@ const ViewReputationEkoh: NextPage = () => {
 
   return (
     <PageContainer title="View Reputation (Ekoh)">
-      {/* Section récapitulative des scores */}
+      {/* Score summary */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12}>
           <Card>
@@ -64,11 +63,10 @@ const ViewReputationEkoh: NextPage = () => {
 
       <Divider />
 
-      {/* Section Graphique */}
+      {/* Charts placeholders */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12}>
           <Card title="Expertise Contributions">
-            {/* Ici vous intégrerez un pie chart pour visualiser la répartition des contributions */}
             <div
               style={{
                 height: 200,
@@ -83,7 +81,6 @@ const ViewReputationEkoh: NextPage = () => {
         </Col>
         <Col xs={24} sm={12}>
           <Card title="Score Trend">
-            {/* Ici vous intégrerez une courbe de tendance illustrant l’évolution du score dans le temps */}
             <div
               style={{
                 height: 200,
@@ -100,8 +97,8 @@ const ViewReputationEkoh: NextPage = () => {
 
       <Divider />
 
-      {/* Liste d'expertise */}
-      <Title level={4}>Expertise Areas & Weights</Title>
+      {/* Expertise list */}
+      <Title level={4}>Expertise Areas &amp; Weights</Title>
       <List
         itemLayout="horizontal"
         dataSource={expertiseAreas}
@@ -114,8 +111,8 @@ const ViewReputationEkoh: NextPage = () => {
 
       <Divider />
 
-      {/* Achèvements et badges */}
-      <Title level={4}>Achievements & Badges</Title>
+      {/* Achievements */}
+      <Title level={4}>Achievements &amp; Badges</Title>
       <List
         grid={{ gutter: 16, column: 2 }}
         dataSource={achievements}
@@ -129,9 +126,4 @@ const ViewReputationEkoh: NextPage = () => {
       />
     </PageContainer>
   );
-
-// Correction : envelopper la page dans MainLayout
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default ViewReputationEkoh;
+}

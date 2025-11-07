@@ -1,8 +1,8 @@
-'use client'
+'use client';
 
 // File: /pages/kreative/creative-hub/submit-creative-work.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
+import type { NextPage } from 'next';
 import {
   Form,
   Input,
@@ -10,12 +10,11 @@ import {
   Upload,
   Button,
   Alert,
-  message,
+  message as antdMessage,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -23,30 +22,26 @@ const { Option } = Select;
 const SubmitCreativeWork: NextPage = () => {
   const [form] = Form.useForm();
   const router = useRouter();
-  // Local state to manage file uploads if needed.
   const [fileList, setFileList] = useState<any[]>([]);
 
-  // Handler for file changes in the Upload component.
   const handleUploadChange = (info: any) => {
-    // Optionally, manage file upload status and fileList locally.
-    let newFileList = [...info.fileList];
-    // You might add further validations on file type/size here.
-    setFileList(newFileList);
+    setFileList([...info.fileList]);
+  };
 
   const onFinish = (values: any) => {
-    // Combine form values with file upload information.
     const creativeWorkData = {
       ...values,
-      // Here we simply include file info; in practice, the file(s) might need uploading to a server.
       file: fileList,
+    };
     console.log('Submitted Creative Work:', creativeWorkData);
-    message.success('Votre œuvre créative a été soumise avec succès et est en attente d\'approbation!');
-    // After submission, optionally redirect to the newly created work’s detail page or the gallery.
+    antdMessage.success(
+      "Votre œuvre créative a été soumise avec succès et est en attente d'approbation!"
+    );
     router.push('/kreative/creative-hub/inspiration-gallery');
+  };
 
   return (
     <PageContainer title="Submit Creative Work">
-      {/* Guidelines Alert */}
       <Alert
         message="Please Note"
         description="File size limit is 5MB. Accepted formats are JPG, PNG for images, MP4 for videos, and MP3 for audio."
@@ -59,11 +54,8 @@ const SubmitCreativeWork: NextPage = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        initialValues={{
-          category: 'Illustration',
-        }}
+        initialValues={{ category: 'Illustration' }}
       >
-        {/* Title Field */}
         <Form.Item
           label="Title of the Work"
           name="title"
@@ -72,7 +64,6 @@ const SubmitCreativeWork: NextPage = () => {
           <Input placeholder="Entrez le titre de votre œuvre créative" />
         </Form.Item>
 
-        {/* Description Field */}
         <Form.Item
           label="Description or Story Behind the Work"
           name="description"
@@ -81,7 +72,6 @@ const SubmitCreativeWork: NextPage = () => {
           <TextArea rows={5} placeholder="Décrivez votre œuvre et partagez son histoire..." />
         </Form.Item>
 
-        {/* Category / Medium Field */}
         <Form.Item
           label="Category / Medium"
           name="category"
@@ -93,23 +83,16 @@ const SubmitCreativeWork: NextPage = () => {
             <Option value="Music">Music</Option>
             <Option value="Video">Video</Option>
             <Option value="Digital Art">Digital Art</Option>
-            {/* Add more options as needed */}
           </Select>
         </Form.Item>
 
-        {/* File Upload Field */}
         <Form.Item
           label="Upload Creative File"
           name="creativeFile"
-          rules={[
-            {
-              required: true,
-              message: 'Veuillez télécharger un fichier pour votre œuvre.',
-            },
-          ]}
+          rules={[{ required: true, message: 'Veuillez télécharger un fichier pour votre œuvre.' }]}
         >
           <Upload
-            beforeUpload={() => false} // Prevent automatic upload so that the file is handled on form submission.
+            beforeUpload={() => false}
             fileList={fileList}
             onChange={handleUploadChange}
             accept="image/*,video/*,audio/*"
@@ -118,12 +101,10 @@ const SubmitCreativeWork: NextPage = () => {
           </Upload>
         </Form.Item>
 
-        {/* Optional Credits/Tools Used Field */}
         <Form.Item label="Credits / Tools Used (Optional)" name="credits">
           <Input placeholder="Exemple: Adobe Photoshop, Procreate, etc." />
         </Form.Item>
 
-        {/* Submit Button */}
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Submit Work
@@ -132,8 +113,6 @@ const SubmitCreativeWork: NextPage = () => {
       </Form>
     </PageContainer>
   );
-
-
-  return <MainLayout>{page}</MainLayout>;
+};
 
 export default SubmitCreativeWork;

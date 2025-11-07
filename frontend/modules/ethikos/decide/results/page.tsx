@@ -26,7 +26,7 @@ export default function ResultsArchive() {
       title: 'Result',
       dataIndex: 'passed',
       width: 120,
-      render: (v: boolean) => (
+      render: (v, row) => (
         <Tag color={v ? 'green' : 'red'}>{v ? 'PASSED' : 'REJECTED'}</Tag>
       ),
       filters: [

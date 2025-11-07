@@ -9,11 +9,13 @@ import { useRouter } from 'next/navigation';
 type TeamInfo = {
   name: string;
   description?: string;
+};
 
 type Member = {
   id?: string;       // may be undefined when newly added
   email: string;
   role?: string;
+};
 
 export default function TeamBuilderPage() {
   const router = useRouter();
@@ -75,14 +77,16 @@ export default function TeamBuilderPage() {
     } catch {
       // validation errors are shown by antd
     }
+  };
 
   const addMember = async () => {
     try {
       const values = await inviteForm.validateFields();
       // ensure a stable non-undefined key; prefer provided id else generate from email
-      const stableId = values.id && values.id.trim().length > 0
-        ? values.id
-        : `${values.email.toLowerCase()}-${Date.now()}`;
+      const stableId =
+        values.id && values.id.trim().length > 0
+          ? values.id
+          : `${values.email.toLowerCase()}-${Date.now()}`;
 
       setMembers((prev) => {
         // dedupe by email
@@ -96,11 +100,13 @@ export default function TeamBuilderPage() {
     } catch {
       // validation errors are shown by antd
     }
+  };
 
   const finish = async () => {
     // TODO: replace with actual API call
     message.success('Team created');
     router.push('/konnected/teams-collaboration/project-workspaces');
+  };
 
   return (
     <PageContainer title="Team Builder">

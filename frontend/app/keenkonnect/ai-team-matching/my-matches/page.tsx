@@ -93,7 +93,7 @@ const MyMatchesPage: NextPage = () => {
         >
           <List
             itemLayout="horizontal"
-            dataSource={teamMatches}
+            dataSource={teamMatches ?? []}
             renderItem={renderMatchItem}
           />
         </TabPane>
@@ -103,7 +103,7 @@ const MyMatchesPage: NextPage = () => {
         >
           <List
             itemLayout="horizontal"
-            dataSource={partnerMatches}
+            dataSource={partnerMatches ?? []}
             renderItem={renderMatchItem}
           />
         </TabPane>
@@ -120,3 +120,4 @@ const MyMatchesPage: NextPage = () => {
   return page; // Pour l'exemple, on retourne la page directement
 
 export default MyMatchesPage;
+}

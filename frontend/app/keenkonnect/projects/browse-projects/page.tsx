@@ -77,7 +77,7 @@ const sampleProjects: Project[] = [
   },
 ];
 
-const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseProjects = () => {
   const router = useRouter();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -206,7 +206,7 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
         {/* Projects List */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={paginatedProjects}
+          dataSource={paginatedProjects ?? []}
           renderItem={(project: Project) => (
             <List.Item key={project.id}>
               <Card
@@ -273,3 +273,4 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
 
 
 export default BrowseProjects;
+}}}

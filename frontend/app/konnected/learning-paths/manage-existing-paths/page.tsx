@@ -3,16 +3,15 @@
 // File: /pages/konnected/learning-paths/manage-existing-paths.tsx
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import {
-  Table,
+import { Table,
   Button,
   Modal,
   Typography,
   Input,
   Space,
   Empty,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -60,7 +59,7 @@ const ManageExistingPaths: NextPage = () => {
       okType: 'danger',
       onOk: () => {
         setPaths(paths.filter((path) => path.id !== id));
-        message.success('Learning path deleted successfully');
+        antdMessage.success('Learning path deleted successfully');
       },
     });
 
@@ -149,3 +148,4 @@ const ManageExistingPaths: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default ManageExistingPaths;
+}}

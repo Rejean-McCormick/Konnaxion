@@ -76,7 +76,7 @@ const sampleResources: Resource[] = [
   },
 ];
 
-const SearchFilters: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const SearchFilters = () => {
   // États pour les filtres de recherche
   const [keyword, setKeyword] = useState('');
   const [authorFilter, setAuthorFilter] = useState<string>('');
@@ -230,3 +230,4 @@ const SearchFilters: NextPage & { getLayout?: (page: React.ReactElement) => Reac
 
 
 export default SearchFilters;
+}

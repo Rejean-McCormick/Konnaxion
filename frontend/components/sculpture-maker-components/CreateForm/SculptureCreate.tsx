@@ -6,8 +6,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { Row, Button, Form, message } from 'antd'
-import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
+import { Row, Button, Form, message as antdMessage  } from 'antd';import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
 import { FlyToInterpolator } from 'react-map-gl'
 import Map from '../../map-components'
 import TextFields from './CreateFormTextFields'
@@ -125,7 +124,7 @@ const SculptureCreate = ({
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })

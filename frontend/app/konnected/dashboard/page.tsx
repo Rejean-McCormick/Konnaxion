@@ -104,7 +104,7 @@ const KonnectedDashboard: NextPage = () => {
           <Card title="Recent Updates">
             <List
               itemLayout="horizontal"
-              dataSource={recentUpdates}
+              dataSource={recentUpdates ?? []}
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
@@ -130,7 +130,7 @@ const KonnectedDashboard: NextPage = () => {
           <Card title="Active Discussions">
             <List
               itemLayout="horizontal"
-              dataSource={activeDiscussions}
+              dataSource={activeDiscussions ?? []}
               renderItem={(discussion) => (
                 <List.Item>
                   <List.Item.Meta
@@ -186,3 +186,4 @@ const KonnectedDashboard: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default KonnectedDashboard;
+}

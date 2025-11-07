@@ -6,8 +6,7 @@
  */
 
 import { useState, useEffect } from 'react'
-import { Row, Divider, Modal, message, notification, Button } from 'antd'
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { Row, Divider, Modal, message as antdMessage, notification, Button  } from 'antd';import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { ColStyled, CardStyled, StyledTable } from './style'
 import MakerEdit from './EditForm/MakerEdit'
 import api from '@/services/_request'
@@ -107,7 +106,7 @@ const MakerList = () => {
         try {
           await api.delete(`/maker/${makerId}`)
           deleteMaker(makerId)
-          message.success('Deleted maker successfully!', 2)
+          antdMessage.success('Deleted maker successfully!', 2)
         } catch (error: unknown) {
           const { message, statusCode } = normalizeError(error);
           notification.error({
@@ -154,7 +153,7 @@ const MakerList = () => {
     {
       title: 'Action',
       key: 'action',
-      render: (record: any) => (
+      render: (record, row) => (
         <span>
           <a onClick={() => openModal(record.key)}>Edit</a>
           <Divider type="vertical" />

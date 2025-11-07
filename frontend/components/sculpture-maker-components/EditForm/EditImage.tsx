@@ -5,7 +5,7 @@
  * Author: Hieu Chu
  */
 
-import { Upload, Button, message, Row, Modal } from 'antd';
+import { Upload, Button, message as antdMessage, Row, Modal  } from 'antd';
 import { useState } from 'react'
 import { ColStyled } from '../style'
 import api from '../../../api'
@@ -39,10 +39,10 @@ const EditImage = ({ accessionId, _name, images }) => {
             const _result = await api.delete(`/sculpture-images/${file.uid}`)
             resolve(true)
             setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
-            message.success('Deleted image successfully!', 2)
+            antdMessage.success('Deleted image successfully!', 2)
           } catch (error: unknown) {
             const { message, statusCode } = normalizeError(error);
-            message.error(error.response.data.message)
+            antdMessage.error(error.response.data.message)
             resolve(false)
           }
           setIsSubmitting(false)
@@ -71,7 +71,7 @@ const EditImage = ({ accessionId, _name, images }) => {
     let data = new FormData()
     data.append('images', e.file)
     data.set('accessionId', accessionId)
-    const hide = message.loading('Uploading image...', 0)
+    const hide = antdMessage.loading('Uploading image...', 0)
     setIsSubmitting(true)
 
     try {
@@ -86,10 +86,10 @@ const EditImage = ({ accessionId, _name, images }) => {
 
       e.onSuccess(_result.data[0], e.file)
       hide()
-      message.success('Uploaded image successfully!', 2)
+      antdMessage.success('Uploaded image successfully!', 2)
     } catch (error: unknown) {
       const { message, statusCode } = normalizeError(error);
-      message.error(error.response.data.message)
+      antdMessage.error(error.response.data.message)
       e.onError(error.response.data.message)
     }
     setIsSubmitting(false)

@@ -42,7 +42,7 @@ const expertiseData: Expertise[] = [
   },
 ];
 
-const ViewCurrentExpertise: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const ViewCurrentExpertise = () => {
   return (
     <>
       <Head>
@@ -57,7 +57,7 @@ const ViewCurrentExpertise: NextPage & { getLayout?: (page: React.ReactElement) 
         <Card className="mb-6">
           <List
             itemLayout="vertical"
-            dataSource={expertiseData}
+            dataSource={expertiseData ?? []}
             renderItem={(item) => (
               <List.Item key={item.id}>
                 <List.Item.Meta
@@ -85,3 +85,4 @@ const ViewCurrentExpertise: NextPage & { getLayout?: (page: React.ReactElement) 
 
 
 export default ViewCurrentExpertise;
+}

@@ -61,7 +61,7 @@ export default function TopCreatorsPage(): JSX.Element {
       dataIndex: 'contributions',
       key: 'contributions',
       width: 150,
-      render: (value: number) => <Text>{value}</Text>,
+      render: (value, row) => <Text>{value}</Text>,
     },
     {
       title: 'Specialty',

@@ -6,8 +6,7 @@
  */
 
 import { useState } from 'react'
-import { Button, Form, message } from 'antd'
-import { ColStyled, FormCol, CustomFormItem } from '../style'
+import { Button, Form, message as antdMessage  } from 'antd';import { ColStyled, FormCol, CustomFormItem } from '../style'
 import { FlyToInterpolator } from 'react-map-gl'
 import Map from '../../map-components'
 import EditFormTextFields from './EditFormTextFields'
@@ -89,13 +88,13 @@ const SculptureEdit = ({
         setSubmitting(true)
         try {
           const _result = (await api.patch('/sculpture', values)).data
-          message.success('Updated sculpture details successfully!', 2)
+          antdMessage.success('Updated sculpture details successfully!', 2)
           setSubmitting(false)
           router.push(`/sculptures/id/${values.accessionId}`)
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })

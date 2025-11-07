@@ -1,8 +1,7 @@
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Timeline, Typography } from 'antd';
-import { Comment } from '@ant-design/compatible';
+import { Timeline, Typography, Comment } from 'antd';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
@@ -13,18 +12,20 @@ type Statement = {
   author: string;
   body: string;
   createdAt: string;
+};
 
-type TopicDetail = {
+type TopicDetailData = {
   id: string;
   title: string;
   statements: Statement[];
+};
 
 export default function TopicDetail() {
   const { topic } = useParams() as { topic: string };
 
   usePageTitle(`Deliberate · ${topic}`);
 
-  const { data, loading } = useRequest<TopicDetail>(
+  const { data, loading } = useRequest<TopicDetailData>(
     () => fetchTopicDetail(topic),
     { ready: !!topic }
   );

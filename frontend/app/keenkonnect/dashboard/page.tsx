@@ -6,7 +6,7 @@ import { Card, List, Row, Col, Button, Divider } from 'antd';
 import { PlusOutlined, TeamOutlined, FolderAddOutlined, CheckSquareOutlined, BellOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 
-const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const KeenKonnectDashboard = () => {
   // Données simulées pour les widgets
   const recentProjects = [
     { id: 'p1', title: 'Project Alpha', update: 'Updated timeline and task statuses.' },
@@ -52,7 +52,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="Recent Projects" variant="borderless">
               <List
-                dataSource={recentProjects}
+                dataSource={recentProjects ?? []}
                 renderItem={(project) => (
                   <List.Item key={project.id}>
                     <List.Item.Meta title={project.title} description={project.update} />
@@ -66,7 +66,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="Repository Updates" variant="borderless">
               <List
-                dataSource={repositoryUpdates}
+                dataSource={repositoryUpdates ?? []}
                 renderItem={(resource) => (
                   <List.Item key={resource.id}>
                     <List.Item.Meta title={resource.title} description={resource.update} />
@@ -80,7 +80,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="Active Collaboration" variant="borderless">
               <List
-                dataSource={activeWorkspaces}
+                dataSource={activeWorkspaces ?? []}
                 renderItem={(workspace) => (
                   <List.Item key={workspace.id}>
                     <List.Item.Meta title={workspace.title} description={`Status: ${workspace.status}`} />
@@ -94,7 +94,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="My Tasks" variant="borderless">
               <List
-                dataSource={myTasks}
+                dataSource={myTasks ?? []}
                 renderItem={(task) => (
                   <List.Item key={task.id}>
                     <List.Item.Meta title={task.task} description={`Deadline: ${task.deadline}`} />
@@ -135,7 +135,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
         <Card title="Notifications" variant="borderless">
           {notifications.length > 0 ? (
             <List
-              dataSource={notifications}
+              dataSource={notifications ?? []}
               renderItem={(notif) => (
                 <List.Item key={notif.id}>
                   <List.Item.Meta title={notif.message} />
@@ -153,3 +153,4 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
 
 
 export default KeenKonnectDashboard;
+}

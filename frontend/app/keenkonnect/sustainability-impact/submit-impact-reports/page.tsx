@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Form, Input, Select, DatePicker, InputNumber, Upload, Switch, Button, Modal, message } from 'antd';
+import { Form, Input, Select, DatePicker, InputNumber, Upload, Switch, Button, Modal, message as antdMessage  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
@@ -13,7 +13,7 @@ const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const { Option } = Select;
 
-const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const SubmitImpactReports = () => {
   const router = useRouter();
   const [form] = Form.useForm();
   
@@ -149,3 +149,4 @@ const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) =
 
 
 export default SubmitImpactReports;
+}}}

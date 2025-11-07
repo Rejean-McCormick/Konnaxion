@@ -7,7 +7,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { Row, Modal, Button, message, notification, Result } from 'antd';
+import { Row, Modal, Button, message as antdMessage, notification, Result  } from 'antd';
 import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
 import { CardStyled, ColStyled } from '../style';
@@ -85,7 +85,7 @@ const SculptureEditForm = () => {
         try {
           if (!sculptureId) return;
           await api.delete(`/sculpture/${sculptureId}`);
-          message.success('Deleted sculpture successfully!', 2);
+          antdMessage.success('Deleted sculpture successfully!', 2);
           router.push('/sculptures');
         } catch (e: unknown) {
           const { message: errMsg } = normalizeError(e);

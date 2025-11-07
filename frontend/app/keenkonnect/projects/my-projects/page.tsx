@@ -31,7 +31,7 @@ const sampleProjects: Project[] = [
   { key: '5', name: 'Project Epsilon', role: 'Member', status: 'Completed', lastUpdated: '2023-07-30', category: 'Design' },
 ];
 
-const MyProjects: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const MyProjects = () => {
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
@@ -163,3 +163,4 @@ const MyProjects: NextPage & { getLayout?: (page: React.ReactElement) => React.R
 
 
 export default MyProjects;
+}

@@ -71,7 +71,7 @@ const UserLikes = ({ likes }) => {
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (

@@ -1,7 +1,7 @@
-'use client'
+'use client';
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Tag, Select } from 'antd';
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
+import { Select } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchImpactTracker, patchImpactStatus } from '@/services/impact';
@@ -12,6 +12,7 @@ type TrackerRow = {
   owner: string;
   status: 'Planned' | 'In-Progress' | 'Completed' | 'Blocked';
   updatedAt: string;
+};
 
 export default function ImpactTracker() {
   usePageTitle('Impact · Tracker');
@@ -20,31 +21,33 @@ export default function ImpactTracker() {
 
   const onStatusChange = async (id: string, status: TrackerRow['status']) => {
     await patchImpactStatus(id, status);
-    mutate(d => ({
-      items: d!.items.map(r => (r.id === id ? { ...r, status } : r)),
+    mutate((d) => ({
+      items: d!.items.map((r) => (r.id === id ? { ...r, status } : r)),
     }));
+  };
 
-  const columns = [
+  const columns: ProColumns<TrackerRow>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     { title: 'Owner', dataIndex: 'owner', width: 160 },
     {
       title: 'Status',
       dataIndex: 'status',
-      width: 160,
-      render: (v: TrackerRow['status'], row: TrackerRow) => (
+      width: 180,
+      render: (_, row) => (
         <Select
-          value={v}
+          value={row.status}
           options={[
             { value: 'Planned', label: 'Planned' },
             { value: 'In-Progress', label: 'In-Progress' },
             { value: 'Completed', label: 'Completed' },
             { value: 'Blocked', label: 'Blocked' },
           ]}
-          onChange={val => onStatusChange(row.id, val)}
+          onChange={(val) => onStatusChange(row.id, val as TrackerRow['status'])}
+          style={{ width: '100%' }}
         />
       ),
     },
-    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'fromNow', sorter: true },
+    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'dateTime', sorter: true },
   ];
 
   return (
@@ -52,7 +55,7 @@ export default function ImpactTracker() {
       <ProTable<TrackerRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={{ pageSize: 12 }}
         search={false}
       />

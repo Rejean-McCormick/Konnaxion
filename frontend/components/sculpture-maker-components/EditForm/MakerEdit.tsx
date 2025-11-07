@@ -6,8 +6,7 @@
  */
 
 import { useState } from 'react'
-import { Input, Form, Button, Modal, message } from 'antd'
-import { CustomFormItem } from '../style'
+import { Input, Form, Button, Modal, message as antdMessage  } from 'antd';import { CustomFormItem } from '../style'
 import api from '../../../api'
 import { normalizeError } from "../../../shared/errors";
 
@@ -58,11 +57,11 @@ const MakerEdit = ({
           editMaker(values)
           handleCancel()
           resetFields()
-          message.success('Updated maker details successfully!', 2)
+          antdMessage.success('Updated maker details successfully!', 2)
         } catch (e: unknown) {
           const { message, statusCode } = normalizeError(e);
           setSubmitting(false)
-          message.error(e.response.data.message)
+          antdMessage.error(e.response.data.message)
         }
       }
     })

@@ -82,7 +82,7 @@ const ExamPreparationPage: NextPage = () => {
           <Card title="Study Modules Overview">
             <List
               itemLayout="horizontal"
-              dataSource={studyModules}
+              dataSource={studyModules ?? []}
               renderItem={(module: Module) => (
                 <List.Item
                   actions={[
@@ -151,3 +151,4 @@ const ExamPreparationPage: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default ExamPreparationPage;
+}}

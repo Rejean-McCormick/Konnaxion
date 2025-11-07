@@ -3,8 +3,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
-import {
-  Row,
+import { Row,
   Col,
   Card,
   Input,
@@ -14,8 +13,8 @@ import {
   Pagination,
   Space,
   Typography,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import { SearchOutlined, UserAddOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
@@ -128,7 +127,7 @@ const FindSpaces: NextPage = () => {
     const router = useRouter();
     if (space.joinType === 'open') {
       // Direct join.
-      message.success(`You have joined "${space.name}"!`);
+      antdMessage.success(`You have joined "${space.name}"!`);
       // Optionally, redirect to the space's main page.
       router.push(`/kreative/collaborative-spaces/${space.id}`);
     } else {
@@ -140,7 +139,7 @@ const FindSpaces: NextPage = () => {
   // Confirm join request.
   const confirmJoinRequest = () => {
     if (selectedSpace) {
-      message.success(`Your request to join "${selectedSpace.name}" has been sent.`);
+      antdMessage.success(`Your request to join "${selectedSpace.name}" has been sent.`);
       // Here, integrate API call to process join request.
     }
     setJoinModalVisible(false);
@@ -264,3 +263,4 @@ const FindSpaces: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default FindSpaces;
+}}}

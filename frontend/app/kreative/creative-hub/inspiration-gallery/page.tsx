@@ -196,7 +196,7 @@ export default function InspirationGalleryPage(): JSX.Element {
                   <>
                     <Text>{work.creator}</Text>
                     <br />
-                    {/* Replace ellipsis={{ rows: 2 }} with CSS line clamp */}
+                    {/* Replace ellipsis={{}} with CSS line clamp */}
                     <Paragraph type="secondary" className="lineClamp2">
                       {work.description}
                     </Paragraph>
@@ -259,3 +259,4 @@ export default function InspirationGalleryPage(): JSX.Element {
     </PageContainer>
   );
 }
+}}}

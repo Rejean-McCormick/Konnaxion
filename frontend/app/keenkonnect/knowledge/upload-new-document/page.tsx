@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Form, Input, Select, Upload, Switch, Button, message, Progress, Result } from 'antd';
+import { Form, Input, Select, Upload, Switch, Button, message as antdMessage, Progress, Result  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
@@ -12,7 +12,7 @@ import { useRouter } from 'next/navigation';
 const { Option } = Select;
 const { TextArea } = Input;
 
-const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const UploadNewDocument = () => {
   const [form] = Form.useForm();
   const router = useRouter();
   
@@ -34,7 +34,7 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
         if (prev >= 100) {
           clearInterval(interval);
           setUploading(false);
-          message.success('Document uploaded successfully');
+          antdMessage.success('Document uploaded successfully');
           setSubmitted(true);
           return 100;
         }
@@ -165,3 +165,4 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
 
 
 export default UploadNewDocument;
+}}}}

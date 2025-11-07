@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
-import { Table, Tabs, Tag, Button, Space, Modal, message } from 'antd';
+import { Table, Tabs, Tag, Button, Space, Modal, message as antdMessage  } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -72,11 +72,11 @@ const ModerationPage: NextPage = () => {
 
   // Gestion des actions pour une entrée de modération
   const handleApprove = (item: ModerationItem) => {
-    message.success(`Content "${item.contentSnippet.substring(0, 20)}..." approved.`);
+    antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." approved.`);
     // Ici, intégrez un appel API pour approuver l'élément
 
   const handleFlagUser = (item: ModerationItem) => {
-    message.warning(`User ${item.author} has been flagged/warned.`);
+    antdMessage.warning(`User ${item.author} has been flagged/warned.`);
     // Intégrez ici la logique de signalement de l'utilisateur
 
   const handleDelete = (item: ModerationItem) => {
@@ -88,7 +88,7 @@ const ModerationPage: NextPage = () => {
       okType: 'danger',
       cancelText: 'Annuler',
       onOk() {
-        message.success(`Content "${item.contentSnippet.substring(0, 20)}..." deleted.`);
+        antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." deleted.`);
         // Intégrez ici la logique de suppression via API
       },
     });
@@ -99,7 +99,7 @@ const ModerationPage: NextPage = () => {
       title: 'Content Snippet',
       dataIndex: 'contentSnippet',
       key: 'contentSnippet',
-      render: (text: string) => <span>{text}</span>,
+      render: (text, row) => <span>{text}</span>,
     },
     {
       title: 'Author',
@@ -110,7 +110,7 @@ const ModerationPage: NextPage = () => {
       title: activeTab === 'Reported' ? 'Report Reason' : 'Note',
       dataIndex: 'reportReason',
       key: 'reportReason',
-      render: (text: string) =>
+      render: (text, row) =>
         text ? <Tag color="volcano">{text}</Tag> : <Tag color="blue">Pending Approval</Tag>,
     },
     {
@@ -122,7 +122,7 @@ const ModerationPage: NextPage = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) =>
+      render: (status, row) =>
         status === 'Approved' ? (
           <Tag color="green">Approved</Tag>
         ) : (
@@ -177,3 +177,4 @@ const ModerationPage: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default ModerationPage;
+}}}}

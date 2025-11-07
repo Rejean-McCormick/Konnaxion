@@ -113,9 +113,9 @@ const TeamsCollaboration: NextPage = () => {
       title: 'Recent Activity',
       dataIndex: 'recentActivity',
       key: 'recentActivity',
-      render: (activities: string[]) => (
+      render: (activities, row) => (
         <List
-          dataSource={activities.slice(0, 2)} // Afficher les 2 dernières activités en aperçu
+          dataSource={activities.slice(0, 2) ?? []} // Afficher les 2 dernières activités en aperçu
           renderItem={(activity) => (
             <List.Item style={{ padding: 0 }}>
               <Text type="secondary">{activity}</Text>
@@ -148,7 +148,7 @@ const TeamsCollaboration: NextPage = () => {
         <Title level={5}>Team Roster</Title>
         <List
           grid={{ gutter: 16, column: 4 }}
-          dataSource={record.roster}
+          dataSource={record.roster ?? []}
           renderItem={(member: TeamMember) => (
             <List.Item>
               <Space direction="vertical" align="center">
@@ -164,7 +164,7 @@ const TeamsCollaboration: NextPage = () => {
         <br />
         <Title level={5}>Recent Activity Log</Title>
         <List
-          dataSource={record.recentActivity}
+          dataSource={record.recentActivity ?? []}
           renderItem={(activity) => (
             <List.Item>
               <Text>{activity}</Text>
@@ -207,3 +207,4 @@ const TeamsCollaboration: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default TeamsCollaboration;
+}}

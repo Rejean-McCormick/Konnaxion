@@ -23,7 +23,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28']
 
 type Point = { date: string; score: number }
 
-const CurrentEkohScore: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const CurrentEkohScore = () => {
   const [pieData] = useState([
     { name: 'Expertise', value: 40 },
     { name: 'Community Feedback', value: 35 },

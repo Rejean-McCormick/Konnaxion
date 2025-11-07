@@ -1,49 +1,35 @@
-'use client'
+'use client';
 
-// File: /pages/kreative/collaborative-spaces/start-new-space.tsx
+// File: app/kreative/collaborative-spaces/start-new-space/page.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
-import {
-  Form,
-  Input,
-  Select,
-  Radio,
-  Button,
-  Upload,
-  Space as AntdSpace,
-  message,
-} from 'antd';
+import { Form, Input, Select, Radio, Button, Upload, Space as AntdSpace, message as antdMessage } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
-import Icon from '@/components/compat/Icon';
-
+import { PageContainer } from '@ant-design/pro-components';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const StartNewSpace: NextPage = () => {
+export default function StartNewSpacePage() {
   const [form] = Form.useForm();
   const router = useRouter();
-  // State to manage file uploads for the space banner or icon.
   const [fileList, setFileList] = useState<any[]>([]);
 
-  // Handler for file upload changes.
+  // Upload change handler
   const handleFileChange = (info: any) => {
-    // Prevent automatic upload and update fileList locally.
     setFileList([...info.fileList]);
+  };
 
-  // Handler when the form is submitted.
+  // Submit handler
   const onFinish = (values: any) => {
     const spaceData = {
       ...values,
-      // Include the file information from fileList (to be handled by an API).
       banner: fileList,
+    };
     console.log('New Space Data:', spaceData);
-    message.success('Your new space has been created successfully!');
-    // Optionally auto-join the user and then redirect to the space’s detail page.
-    router.push('/kreative/collaborative-spaces/' + 'new-space-id'); // Replace 'new-space-id' with the actual ID.
+    antdMessage.success('Your new space has been created successfully!');
+    router.push('/kreative/collaborative-spaces/new-space-id'); // TODO: replace with created ID
+  };
 
   return (
     <PageContainer title="Start a New Space">
@@ -51,10 +37,7 @@ const StartNewSpace: NextPage = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        initialValues={{
-          privacy: 'Public',
-          category: 'Art Study Group',
-        }}
+        initialValues={{ privacy: 'Public', category: 'Art Study Group' }}
       >
         {/* Space Name */}
         <Form.Item
@@ -69,9 +52,7 @@ const StartNewSpace: NextPage = () => {
         <Form.Item
           label="Description / Purpose"
           name="description"
-          rules={[
-            { required: true, message: 'Please provide a description for your space.' },
-          ]}
+          rules={[{ required: true, message: 'Please provide a description for your space.' }]}
         >
           <TextArea rows={5} placeholder="Describe the purpose and vision of your space" />
         </Form.Item>
@@ -102,8 +83,8 @@ const StartNewSpace: NextPage = () => {
           </Radio.Group>
         </Form.Item>
 
-        {/* Invite Initial Members - Conditional on Private Privacy */}
-        <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.privacy !== curValues.privacy}>
+        {/* Invite Initial Members (only when Private) */}
+        <Form.Item shouldUpdate={(prev, cur) => prev.privacy !== cur.privacy}>
           {({ getFieldValue }) =>
             getFieldValue('privacy') === 'Private' ? (
               <Form.List name="invitedMembers">
@@ -115,7 +96,6 @@ const StartNewSpace: NextPage = () => {
                           <Form.Item
                             {...field}
                             name={[field.name, 'email']}
-                            fieldKey={[field.fieldKey, 'email']}
                             rules={[{ required: true, message: 'Please enter an email address.' }]}
                           >
                             <Input placeholder="Enter member email" />
@@ -141,7 +121,7 @@ const StartNewSpace: NextPage = () => {
         {/* Space Banner or Icon Upload */}
         <Form.Item label="Space Icon / Banner Image" name="banner">
           <Upload
-            beforeUpload={() => false} // Prevent auto-upload.
+            beforeUpload={() => false} // prevent auto-upload
             fileList={fileList}
             onChange={handleFileChange}
             accept="image/*"
@@ -159,8 +139,4 @@ const StartNewSpace: NextPage = () => {
       </Form>
     </PageContainer>
   );
-
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default StartNewSpace;
+}

@@ -25,7 +25,7 @@ const meta: Meta<typeof Button> = {
 type Story = StoryObj<typeof Button>
 
 export const Default: Story = {
-  render: (args) => <Button {...args} />,
+  render: (args, row) => <Button {...args} />,
 }
 
 export default meta

@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Steps, Button, Form, Input, Select, Result, Divider, message } from 'antd';
+import { Steps, Button, Form, Input, Select, Result, Divider, message as antdMessage  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,7 @@ const { Step } = Steps;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const LaunchNewWorkspace = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -45,7 +45,7 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       form.resetFields();
     } catch (err: unknown) {
       const { message, statusCode } = normalizeError(err);
-      message.error('Please complete the required fields.');
+      antdMessage.error('Please complete the required fields.');
     }
 
   const prev = () => {
@@ -60,7 +60,7 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       setSubmitted(true);
     } catch (err: unknown) {
       const { message, statusCode } = normalizeError(err);
-      message.error('Please ensure all fields are correctly filled.');
+      antdMessage.error('Please ensure all fields are correctly filled.');
     }
 
   const renderStepContent = (step: number) => {
@@ -214,3 +214,4 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
 
 
 export default LaunchNewWorkspace;
+}}}}}

@@ -70,7 +70,7 @@ const sampleResources: Resource[] = [
   },
 ];
 
-const BrowseResources: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseResources = () => {
   const router = useRouter();
   const [searchText, setSearchText] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('All');
@@ -124,7 +124,7 @@ const BrowseResources: NextPage & { getLayout?: (page: React.ReactElement) => Re
       title: 'Rating',
       dataIndex: 'rating',
       key: 'rating',
-      render: (rating: number) => `${rating} / 5`,
+      render: (rating, row) => `${rating} / 5`,
     },
     {
       title: 'Action',
@@ -198,3 +198,4 @@ const BrowseResources: NextPage & { getLayout?: (page: React.ReactElement) => Re
 
 
 export default BrowseResources;
+}

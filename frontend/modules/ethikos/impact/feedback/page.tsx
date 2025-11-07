@@ -44,7 +44,7 @@ export default function FeedbackLoops() {
       <ProCard title="Community Feedback" ghost style={{ marginTop: 24 }}>
         {data?.items.length ? (
           <List
-            dataSource={data.items}
+            dataSource={data.items ?? []}
             renderItem={f => (
               <li>
                 <Comment

@@ -4,18 +4,16 @@
  */
 
 import dayjs from 'dayjs'
-import {
-  Tooltip,
+import { Tooltip,
   List,
   Comment,
   Card,
   Dropdown,
-  message,
+  message as antdMessage,
   Modal,
   Empty,
   Input
-} from 'antd'
-import type { MenuProps } from 'antd'
+ } from 'antd';import type { MenuProps } from 'antd'
 import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 
 const { confirm } = Modal
@@ -42,11 +40,11 @@ const UserComments = ({ comments, deleteComment }) => {
       onOk: async () => {
         try {
           await api.delete(`/comment/${e.key}`)
-          message.success('Deleted comment successfully!', 2)
+          antdMessage.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
         } catch (error: any) {
           const { message, statusCode } = normalizeError(error);
-          message.error(error.response?.data?.message || 'Error')
+          antdMessage.error(error.response?.data?.message || 'Error')
         }
       }
     })
@@ -133,7 +131,7 @@ const UserComments = ({ comments, deleteComment }) => {
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (

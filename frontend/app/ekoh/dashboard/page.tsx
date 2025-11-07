@@ -10,7 +10,7 @@ import LineChart from '@/components/dashboard-components/LineChart';
 
 const { TabPane } = Tabs;
 
-const EkohDashboard: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const EkohDashboard = () => {
   // États simulant des données utilisateur
   const [ekohScore, setEkohScore] = useState<number>(80);
   const [smartVoteWeight, setSmartVoteWeight] = useState<number>(70);
@@ -132,3 +132,4 @@ const EkohDashboard: NextPage & { getLayout?: (page: React.ReactElement) => Reac
 
 
 export default EkohDashboard;
+}

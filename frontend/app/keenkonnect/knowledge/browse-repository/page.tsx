@@ -28,7 +28,7 @@ const sampleResources: DocumentResource[] = [
   { key: '4', title: 'Sustainable Energy Report', category: 'Energy', language: 'English', version: '3.0', lastUpdated: '2023-08-20' },
 ];
 
-const BrowseRepository: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseRepository = () => {
   const router = useRouter();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -129,3 +129,4 @@ const BrowseRepository: NextPage & { getLayout?: (page: React.ReactElement) => R
 
 
 export default BrowseRepository;
+}

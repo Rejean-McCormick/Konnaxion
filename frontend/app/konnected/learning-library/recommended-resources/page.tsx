@@ -46,7 +46,7 @@ const initialRecommendedResources: Resource[] = [
   },
 ];
 
-const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const RecommendedResources = () => {
   const router = useRouter();
   const [resources, setResources] = useState<Resource[]>(initialRecommendedResources);
 
@@ -79,7 +79,7 @@ const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) 
         {/* Liste des ressources recommandées */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={resources}
+          dataSource={resources ?? []}
           renderItem={(resource) => (
             <List.Item key={resource.key}>
               <Card
@@ -106,3 +106,4 @@ const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) 
 
 
 export default RecommendedResources;
+}}

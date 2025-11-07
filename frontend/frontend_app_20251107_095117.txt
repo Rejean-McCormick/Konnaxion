@@ -209,85 +209,41 @@ export async function GET(request: NextRequest) {
 
 
 ===== BEGIN app/ekoh/achievements-badges/earned-badges-display/page.tsx =====
-'use client'
+'use client';
 
-// pages/ekoh/achievements-badges/earned-badges-display/index.tsx
 import React, { useState, useMemo } from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
 import { Card, List, Modal, Select, Row, Col, Typography, Empty, Divider } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
 
-// Définition du type pour un badge
 interface Badge {
   id: string;
   name: string;
-  icon: string; // chemin vers l'image
+  icon: string;
   category: string;
-  dateEarned: string; // format ISO ou chaîne lisible
+  dateEarned: string;
   description: string;
 }
 
-// Données simulées pour les badges
 const sampleBadges: Badge[] = [
-  {
-    id: '1',
-    name: 'Top Contributor',
-    icon: '/badges/top-contributor.png',
-    category: 'Expertise',
-    dateEarned: '2023-08-20',
-    description: 'Awarded for exceptional contributions in discussions.',
-  },
-  {
-    id: '2',
-    name: 'Community Champion',
-    icon: '/badges/community-champion.png',
-    category: 'Community',
-    dateEarned: '2023-07-15',
-    description: 'Recognizes outstanding community engagement and support.',
-  },
-  {
-    id: '3',
-    name: 'Innovator',
-    icon: '/badges/innovator.png',
-    category: 'Innovation',
-    dateEarned: '2023-06-10',
-    description: 'Awarded for innovative ideas and solutions.',
-  },
-  {
-    id: '4',
-    name: 'Expert Reviewer',
-    icon: '/badges/expert-reviewer.png',
-    category: 'Expertise',
-    dateEarned: '2023-05-22',
-    description: 'Given to users providing insightful reviews.',
-  },
-  {
-    id: '5',
-    name: 'Active Participant',
-    icon: '/badges/active-participant.png',
-    category: 'Community',
-    dateEarned: '2023-09-01',
-    description: 'Recognizes consistent participation over time.',
-  },
+  { id: '1', name: 'Top Contributor', icon: '/badges/top-contributor.png', category: 'Expertise', dateEarned: '2023-08-20', description: 'Awarded for exceptional contributions in discussions.' },
+  { id: '2', name: 'Community Champion', icon: '/badges/community-champion.png', category: 'Community', dateEarned: '2023-07-15', description: 'Recognizes outstanding community engagement and support.' },
+  { id: '3', name: 'Innovator', icon: '/badges/innovator.png', category: 'Innovation', dateEarned: '2023-06-10', description: 'Awarded for innovative ideas and solutions.' },
+  { id: '4', name: 'Expert Reviewer', icon: '/badges/expert-reviewer.png', category: 'Expertise', dateEarned: '2023-05-22', description: 'Given to users providing insightful reviews.' },
+  { id: '5', name: 'Active Participant', icon: '/badges/active-participant.png', category: 'Community', dateEarned: '2023-09-01', description: 'Recognizes consistent participation over time.' },
 ];
 
-const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
-  // États pour filtre et tri
+export default function EarnedBadgesDisplay() {
   const [filterCategory, setFilterCategory] = useState<string>('All');
   const [sortOrder, setSortOrder] = useState<string>('Newest');
-  // État pour la modal de détail
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  // Calcul du résumé
   const totalBadges = sampleBadges.length;
   const userLevel = totalBadges >= 5 ? 'Gold' : totalBadges >= 3 ? 'Silver' : 'Bronze';
 
-  // Filtre et tri des badges
   const displayedBadges = useMemo(() => {
     let badges = [...sampleBadges];
     if (filterCategory !== 'All') {
@@ -301,7 +257,6 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
     return badges;
   }, [filterCategory, sortOrder]);
 
-  // Ouvrir la modal avec les détails d'un badge
   const showBadgeDetails = (badge: Badge) => {
     setSelectedBadge(badge);
     setModalVisible(true);
@@ -311,13 +266,16 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
     <>
       <Head>
         <title>Achievements & Badges</title>
-        <meta name="description" content="View all your earned badges and achievements with filtering and detailed views." />
+        <meta
+          name="description"
+          content="View all your earned badges and achievements with filtering and detailed views."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
-        {/* En-tête de page */}
         <Title level={2}>Achievements & Badges</Title>
         <Divider />
-        {/* Résumé en haut de page */}
+
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={12}>
             <Text strong>Total Badges:</Text> <Text>{totalBadges}</Text>
@@ -327,15 +285,10 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
           </Col>
         </Row>
 
-        {/* Contrôles de filtre et de tri */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={12}>
             <Text>Filter by Category:</Text>
-            <Select
-              defaultValue="All"
-              style={{ width: '100%' }}
-              onChange={(value) => setFilterCategory(value)}
-            >
+            <Select defaultValue="All" style={{ width: '100%' }} onChange={(v) => setFilterCategory(v)}>
               <Option value="All">All</Option>
               <Option value="Expertise">Expertise</Option>
               <Option value="Community">Community</Option>
@@ -344,22 +297,17 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
           </Col>
           <Col xs={24} sm={12}>
             <Text>Sort by Date Earned:</Text>
-            <Select
-              defaultValue="Newest"
-              style={{ width: '100%' }}
-              onChange={(value) => setSortOrder(value)}
-            >
+            <Select defaultValue="Newest" style={{ width: '100%' }} onChange={(v) => setSortOrder(v)}>
               <Option value="Newest">Newest</Option>
               <Option value="Oldest">Oldest</Option>
             </Select>
           </Col>
         </Row>
 
-        {/* Galerie des badges */}
         {displayedBadges.length > 0 ? (
           <List
             grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }}
-            dataSource={displayedBadges}
+            dataSource={displayedBadges ?? []}
             renderItem={(badge: Badge) => (
               <List.Item>
                 <Card
@@ -382,7 +330,6 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
           <Empty description="No badges earned yet." />
         )}
 
-        {/* Modal pour afficher les détails du badge */}
         <Modal
           title={selectedBadge?.name}
           open={modalVisible}
@@ -397,19 +344,19 @@ const EarnedBadgesDisplay: NextPage & { getLayout?: (page: React.ReactElement) =
                 src={selectedBadge.icon}
                 style={{ width: '100%', maxHeight: 150, objectFit: 'contain', marginBottom: 16 }}
               />
-              <p><strong>Description:</strong> {selectedBadge.description}</p>
-              <p><strong>Date Earned:</strong> {selectedBadge.dateEarned}</p>
+              <p>
+                <strong>Description:</strong> {selectedBadge.description}
+              </p>
+              <p>
+                <strong>Date Earned:</strong> {selectedBadge.dateEarned}
+              </p>
             </div>
           )}
         </Modal>
       </div>
     </>
   );
-};
-
-EarnedBadgesDisplay.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
-
-export default EarnedBadgesDisplay;
+}
 
 ===== END app/ekoh/achievements-badges/earned-badges-display/page.tsx =====
 
@@ -427,7 +374,7 @@ import LineChart from '@/components/dashboard-components/LineChart';
 
 const { TabPane } = Tabs;
 
-const EkohDashboard: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const EkohDashboard = () => {
   // États simulant des données utilisateur
   const [ekohScore, setEkohScore] = useState<number>(80);
   const [smartVoteWeight, setSmartVoteWeight] = useState<number>(70);
@@ -545,11 +492,11 @@ const EkohDashboard: NextPage & { getLayout?: (page: React.ReactElement) => Reac
       </div>
     </>
   );
-};
 
-EkohDashboard.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default EkohDashboard;
+}
 
 ===== END app/ekoh/dashboard/page.tsx =====
 
@@ -599,7 +546,7 @@ const expertiseData: Expertise[] = [
   },
 ];
 
-const ViewCurrentExpertise: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const ViewCurrentExpertise = () => {
   return (
     <>
       <Head>
@@ -614,7 +561,7 @@ const ViewCurrentExpertise: NextPage & { getLayout?: (page: React.ReactElement) 
         <Card className="mb-6">
           <List
             itemLayout="vertical"
-            dataSource={expertiseData}
+            dataSource={expertiseData ?? []}
             renderItem={(item) => (
               <List.Item key={item.id}>
                 <List.Item.Meta
@@ -638,11 +585,11 @@ const ViewCurrentExpertise: NextPage & { getLayout?: (page: React.ReactElement) 
       </div>
     </>
   );
-};
 
-ViewCurrentExpertise.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default ViewCurrentExpertise;
+}
 
 ===== END app/ekoh/expertise-areas/view-current-expertise/page.tsx =====
 
@@ -684,7 +631,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28']
 
 type Point = { date: string; score: number }
 
-const CurrentEkohScore: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const CurrentEkohScore = () => {
   const [pieData] = useState([
     { name: 'Expertise', value: 40 },
     { name: 'Community Feedback', value: 35 },
@@ -812,7 +759,7 @@ const CurrentEkohScore: NextPage & { getLayout?: (page: React.ReactElement) => R
   )
 }
 
-CurrentEkohScore.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>
+
 
 export default CurrentEkohScore
 
@@ -846,7 +793,7 @@ const weightByDomain = [
   { domain: 'Technology', weight: '75%' },
 ];
 
-const CurrentVotingWeight: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const CurrentVotingWeight = () => {
   // Poids de vote smart de l'utilisateur (exemple statique)
   const smartVoteWeight = 70; // par exemple en pourcentage
 
@@ -897,7 +844,7 @@ const CurrentVotingWeight: NextPage & { getLayout?: (page: React.ReactElement) =
         <Card className="mb-6">
           <Title level={4}>Highest Weight by Domain</Title>
           <List
-            dataSource={weightByDomain}
+            dataSource={weightByDomain ?? []}
             renderItem={(item) => (
               <List.Item>
                 <strong>{item.domain}:</strong> {item.weight}
@@ -908,11 +855,11 @@ const CurrentVotingWeight: NextPage & { getLayout?: (page: React.ReactElement) =
       </div>
     </>
   );
-};
 
-CurrentVotingWeight.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default CurrentVotingWeight;
+}
 
 ===== END app/ekoh/voting-influence/current-voting-weight/page.tsx =====
 
@@ -1100,7 +1047,7 @@ export default function RoleManagement() {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (v: number) => <Tag>{v}</Tag>,
+      render: (v, row) => <Tag>{v}</Tag>,
     },
     {
       title: 'Enabled',
@@ -1156,15 +1103,15 @@ export default function EliteBallots() {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-render: (v: string) => (
-  <Statistic.Countdown value={dayjs(v)} format="D[d] HH:mm:ss" />
+render: (v, row) => (
+  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
 ),
     },
     {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (v: number) => <Progress type="circle" percent={v} />,
+      render: (v, row) => <Progress type="circle" percent={v} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
   ];
@@ -1383,7 +1330,7 @@ export default function PublicVotePage() {
     {
       title: 'Turnout',
       dataIndex: 'turnout',
-      render: (v: number) => <Progress percent={v} size="small" />,
+      render: (v, row) => <Progress percent={v} size="small" />,
     },
   ]
 
@@ -1438,7 +1385,7 @@ export default function PublicVotePage() {
 ===== BEGIN app/ethikos/decide/results/page.tsx =====
 'use client';
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
 import { Tag } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
@@ -1458,23 +1405,25 @@ export default function ResultsArchive() {
 
   const { data, loading } = useRequest(fetchDecisionResults);
 
-  const columns = [
+  const columns: ProColumns<ResultRow>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Result',
       dataIndex: 'passed',
       width: 120,
-      render: (v: boolean) => (
-        <Tag color={v ? 'green' : 'red'}>{v ? 'PASSED' : 'REJECTED'}</Tag>
+      render: (_, row) => (
+        <Tag color={row.passed ? 'green' : 'red'}>
+          {row.passed ? 'PASSED' : 'REJECTED'}
+        </Tag>
       ),
       filters: [
         { text: 'Passed', value: 'true' },
         { text: 'Rejected', value: 'false' },
       ],
-      onFilter: (val: any, row: ResultRow) => String(row.passed) === val,
+      onFilter: (val, row) => String(row.passed) === val,
     },
-    { title: 'Scope', dataIndex: 'scope', width: 120, filters: true },
-    { title: 'Region', dataIndex: 'region', width: 140, filters: true },
+    { title: 'Scope', dataIndex: 'scope', width: 120 },
+    { title: 'Region', dataIndex: 'region', width: 140 },
     { title: 'Closed', dataIndex: 'closesAt', valueType: 'date' },
   ];
 
@@ -1483,7 +1432,7 @@ export default function ResultsArchive() {
       <ProTable<ResultRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={{ pageSize: 10 }}
         search={false}
       />
@@ -1498,8 +1447,7 @@ export default function ResultsArchive() {
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Timeline, Typography } from 'antd';
-import { Comment } from '@ant-design/compatible';
+import { Timeline, Typography, Comment } from 'antd';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
@@ -1512,7 +1460,7 @@ type Statement = {
   createdAt: string;
 };
 
-type TopicDetail = {
+type TopicDetailData = {
   id: string;
   title: string;
   statements: Statement[];
@@ -1523,7 +1471,7 @@ export default function TopicDetail() {
 
   usePageTitle(`Deliberate · ${topic}`);
 
-  const { data, loading } = useRequest<TopicDetail>(
+  const { data, loading } = useRequest<TopicDetailData>(
     () => fetchTopicDetail(topic),
     { ready: !!topic }
   );
@@ -1565,16 +1513,15 @@ import {
   ProFormText,
   ProFormSelect,
 } from '@ant-design/pro-components';
-import {
-  Badge,
+import { Badge,
   Button,
   Drawer,
   Empty,
   Space,
   Tag,
   Tooltip,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import { useRequest, useInterval } from 'ahooks';
 import {
   PlusOutlined,
@@ -1624,7 +1571,6 @@ export default function EliteAgora() {
   const openPreview = (row: TopicRow) => {
     setPreviewId(row.id);
     loadPreview(row.id);
-  };
 
   /* ---------- KPI header ---------- */
   const headerStats = [
@@ -1661,7 +1607,7 @@ export default function EliteAgora() {
       title: 'Category',
       dataIndex: 'category',
       filters: true,
-      render: (v: string) => <Tag color="geekblue">{v}</Tag>,
+      render: (v, row) => <Tag color="geekblue">{v}</Tag>,
     },
     {
       title: 'Stances',
@@ -1678,7 +1624,7 @@ export default function EliteAgora() {
       title: '',
       dataIndex: 'hot',
       width: 60,
-      render: (v: boolean) =>
+      render: (v, row) =>
         v ? (
           <Tooltip title="Trending">
             <FireOutlined style={{ color: '#fa541c' }} />
@@ -1781,7 +1727,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   const { runAsync, loading } = useRequest(createEliteTopic, {
     manual: true,
     onSuccess: () => {
-      message.success('Topic created 🎉');
+      antdMessage.success('Topic created 🎉');
       setVisible(false);
       onCreated();
     },
@@ -1824,6 +1770,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
       </ModalForm>
     </>
   );
+}
 }
 
 ===== END app/ethikos/deliberate/elite/page.tsx =====
@@ -2009,10 +1956,10 @@ export default function Outcomes() {
 
 
 ===== BEGIN app/ethikos/impact/tracker/page.tsx =====
-'use client'
+'use client';
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Tag, Select } from 'antd';
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
+import { Select } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchImpactTracker, patchImpactStatus } from '@/services/impact';
@@ -2032,32 +1979,33 @@ export default function ImpactTracker() {
 
   const onStatusChange = async (id: string, status: TrackerRow['status']) => {
     await patchImpactStatus(id, status);
-    mutate(d => ({
-      items: d!.items.map(r => (r.id === id ? { ...r, status } : r)),
+    mutate((d) => ({
+      items: d!.items.map((r) => (r.id === id ? { ...r, status } : r)),
     }));
   };
 
-  const columns = [
+  const columns: ProColumns<TrackerRow>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     { title: 'Owner', dataIndex: 'owner', width: 160 },
     {
       title: 'Status',
       dataIndex: 'status',
-      width: 160,
-      render: (v: TrackerRow['status'], row: TrackerRow) => (
+      width: 180,
+      render: (_, row) => (
         <Select
-          value={v}
+          value={row.status}
           options={[
             { value: 'Planned', label: 'Planned' },
             { value: 'In-Progress', label: 'In-Progress' },
             { value: 'Completed', label: 'Completed' },
             { value: 'Blocked', label: 'Blocked' },
           ]}
-          onChange={val => onStatusChange(row.id, val)}
+          onChange={(val) => onStatusChange(row.id, val as TrackerRow['status'])}
+          style={{ width: '100%' }}
         />
       ),
     },
-    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'fromNow', sorter: true },
+    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'dateTime', sorter: true },
   ];
 
   return (
@@ -2065,7 +2013,7 @@ export default function ImpactTracker() {
       <ProTable<TrackerRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={{ pageSize: 12 }}
         search={false}
       />
@@ -2523,7 +2471,7 @@ export default function Badges() {
 
 
 ===== BEGIN app/ethikos/trust/credentials/page.tsx =====
-'use client'
+'use client';
 
 import { PageContainer } from '@ant-design/pro-components';
 import { Upload, Button, Result } from 'antd';
@@ -2558,7 +2506,11 @@ export default function Credentials() {
           status="success"
           title="Document uploaded!"
           subTitle="Your credential is pending verification."
-          extra={<Button type="primary" onClick={() => setDone(false)}>Upload another</Button>}
+          extra={
+            <Button type="primary" onClick={() => setDone(false)}>
+              Upload another
+            </Button>
+          }
         />
       ) : (
         <Upload.Dragger {...props} accept=".pdf,.jpg,.png">
@@ -2566,7 +2518,7 @@ export default function Credentials() {
             <InboxOutlined />
           </p>
           <p className="ant-upload-text">Click or drag file to this area to upload</p>
-          <p className="ant-upload-hint">Supported: PDF / JPG / PNG &nbsp;·&nbsp; Max 5 MB</p>
+          <p className="ant-upload-hint">Supported: PDF / JPG / PNG · Max 5 MB</p>
         </Upload.Dragger>
       )}
     </PageContainer>
@@ -2679,7 +2631,7 @@ const sampleTeams: Team[] = [
   },
 ];
 
-const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const FindTeams = () => {
   const router = useRouter();
   
   // États pour la recherche et les filtres
@@ -2709,13 +2661,11 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
   const openDrawer = (team: Team) => {
     setSelectedTeam(team);
     setDrawerVisible(true);
-  };
 
   // Fermer le Drawer
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedTeam(null);
-  };
 
   return (
     <>
@@ -2755,7 +2705,7 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
         {/* Liste de suggestions d'équipes */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 3 }}
-          dataSource={filteredTeams}
+          dataSource={filteredTeams ?? []}
           renderItem={(team: Team) => (
             <List.Item key={team.id}>
               <Card
@@ -2807,23 +2757,31 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
       </div>
     </>
   );
-};
 
-FindTeams.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default FindTeams;
+}}}
 
 ===== END app/keenkonnect/ai-team-matching/find-teams/page.tsx =====
 
 
 ===== BEGIN app/keenkonnect/ai-team-matching/match-preferences/page.tsx =====
-'use client'
+'use client';
 
-// File: /pages/keenkonnect/ai-team-matching/match-preferences.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
-import { Form, Select, InputNumber, Radio, Slider, Button, Progress, Typography } from 'antd';
-import PageContainer from '@/components/PageContainer'; // Composant global de page
+import type { NextPage } from 'next';
+import {
+  Form,
+  Select,
+  InputNumber,
+  Radio,
+  Slider,
+  Button,
+  Progress,
+  Typography,
+} from 'antd';
+import PageContainer from '@/components/PageContainer';
 
 const { Option } = Select;
 const { Text } = Typography;
@@ -2833,18 +2791,19 @@ const MatchPreferencesPage: NextPage = () => {
 
   // Valeurs initiales pour le formulaire
   const initialValues = {
-    projectDomains: [],
+    projectDomains: [] as string[],
     preferredTeamSize: 4,
-    rolesOfInterest: [],
-    skillsOffered: [],
-    skillsSought: [],
+    rolesOfInterest: [] as string[],
+    skillsOffered: [] as string[],
+    skillsSought: [] as string[],
     collaborationStyle: 'balanced',
-    innovationExecution: 50, // 0 = Innovation focus, 100 = Execution focus
+    // 0 = Innovation focus, 100 = Execution focus
+    innovationExecution: 50,
   };
 
   // Calcul d'un indicateur de complétude (matching readiness)
   const computeReadiness = (values: any) => {
-    // Pour simplifier, 5 champs clés (on considère que chacun a le même poids)
+    // 5 champs clés, poids équivalent
     const totalFields = 5;
     let completed = 0;
     if (values.projectDomains && values.projectDomains.length > 0) completed++;
@@ -2856,17 +2815,19 @@ const MatchPreferencesPage: NextPage = () => {
   };
 
   // State pour suivre la complétude du profil
-  const [readiness, setReadiness] = useState<number>(computeReadiness(initialValues));
+  const [readiness, setReadiness] = useState<number>(
+    computeReadiness(initialValues)
+  );
 
   // Mise à jour de l'indicateur lors d'un changement dans le formulaire
-  const onValuesChange = (_changedValues: any, allValues: any) => {
+  const onValuesChange = (_changed: any, allValues: any) => {
     setReadiness(computeReadiness(allValues));
   };
 
   // Gestion de la soumission du formulaire
   const onFinish = (values: any) => {
-    console.log('Preferences Saved: ', values);
-    // Ajoutez ici une éventuelle intégration avec une API pour sauvegarder les préférences
+    // Intégration API possible ici
+    // console.log('Preferences Saved: ', values);
   };
 
   return (
@@ -2878,46 +2839,52 @@ const MatchPreferencesPage: NextPage = () => {
         onValuesChange={onValuesChange}
         onFinish={onFinish}
       >
-        {/* Sélection des domaines de projet */}
+        {/* Domaines de projet souhaités */}
         <Form.Item
           label="Desired Project Domains"
           name="projectDomains"
-          rules={[{ required: true, message: 'Veuillez sélectionner au moins un domaine de projet' }]}
+          rules={[{ required: true, message: 'Please select at least one domain.' }]}
         >
-          <Select mode="multiple" placeholder="Sélectionnez des domaines de projet">
-            <Option value="web">Web Development</Option>
-            <Option value="mobile">Mobile Apps</Option>
-            <Option value="data">Data Science</Option>
-            <Option value="ai">Artificial Intelligence</Option>
+          <Select
+            mode="multiple"
+            placeholder="Select domains you want to work on"
+            allowClear
+          >
+            <Option value="ai-ml">AI / Machine Learning</Option>
+            <Option value="sustainability">Sustainability</Option>
+            <Option value="edtech">EdTech</Option>
+            <Option value="fintech">FinTech</Option>
+            <Option value="healthtech">HealthTech</Option>
+            <Option value="open-source">Open Source</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Taille d'équipe souhaitée */}
+        <Form.Item
+          label="Preferred Team Size"
+          name="preferredTeamSize"
+          rules={[{ required: true, message: 'Please set your preferred team size.' }]}
+        >
+          <InputNumber min={2} max={10} />
+        </Form.Item>
+
+        {/* Rôles d'intérêt */}
+        <Form.Item
+          label="Roles of Interest"
+          name="rolesOfInterest"
+          rules={[{ required: true, message: 'Please select at least one role.' }]}
+        >
+          <Select mode="multiple" placeholder="Select roles you want to take">
+            <Option value="frontend">Frontend Developer</Option>
+            <Option value="backend">Backend Developer</Option>
+            <Option value="data">Data Scientist</Option>
+            <Option value="designer">Designer (UI/UX)</Option>
+            <Option value="pm">Product Manager</Option>
             <Option value="devops">DevOps</Option>
           </Select>
         </Form.Item>
 
-        {/* Taille d'équipe préférée */}
-        <Form.Item
-          label="Preferred Team Size"
-          name="preferredTeamSize"
-          rules={[{ required: true, message: 'Veuillez spécifier la taille d’équipe souhaitée' }]}
-        >
-          <InputNumber min={1} max={20} />
-        </Form.Item>
-
-        {/* Sélection des rôles d'intérêt */}
-        <Form.Item
-          label="Roles of Interest"
-          name="rolesOfInterest"
-          rules={[{ required: true, message: 'Veuillez sélectionner au moins un rôle' }]}
-        >
-          <Select mode="multiple" placeholder="Sélectionnez les rôles qui vous intéressent">
-            <Option value="frontend">Frontend Developer</Option>
-            <Option value="backend">Backend Developer</Option>
-            <Option value="designer">Designer</Option>
-            <Option value="qa">QA Engineer</Option>
-            <Option value="pm">Project Manager</Option>
-          </Select>
-        </Form.Item>
-
-        {/* Sélection des compétences offertes */}
+        {/* Compétences offertes */}
         <Form.Item
           label="Skills You Offer"
           name="skillsOffered"
@@ -2932,7 +2899,7 @@ const MatchPreferencesPage: NextPage = () => {
           </Select>
         </Form.Item>
 
-        {/* Sélection des compétences recherchées */}
+        {/* Compétences recherchées */}
         <Form.Item
           label="Skills You Seek in a Team"
           name="skillsSought"
@@ -2947,7 +2914,7 @@ const MatchPreferencesPage: NextPage = () => {
           </Select>
         </Form.Item>
 
-        {/* Sélection du style de collaboration */}
+        {/* Style de collaboration */}
         <Form.Item label="Collaboration Style" name="collaborationStyle">
           <Radio.Group>
             <Radio value="flexible">Flexible</Radio>
@@ -2959,6 +2926,7 @@ const MatchPreferencesPage: NextPage = () => {
         {/* Slider Innovation vs Execution */}
         <Form.Item label="Innovation Focus vs Execution Focus">
           <Form.Item name="innovationExecution" noStyle>
+            {/* Si vous êtes en antd v5+, vous pouvez basculer sur: tooltip={{ open: true }} */}
             <Slider min={0} max={100} tooltipVisible />
           </Form.Item>
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -2969,20 +2937,24 @@ const MatchPreferencesPage: NextPage = () => {
 
         {/* Indicateur de matching readiness */}
         <Form.Item label="Matching Readiness">
-          <Progress percent={readiness} status={readiness === 100 ? 'success' : 'active'} />
+          <Progress
+            percent={readiness}
+            status={readiness === 100 ? 'success' : 'active'}
+          />
           <Text type="secondary">
             Complétez vos préférences pour améliorer la qualité des suggestions de l’IA.
           </Text>
         </Form.Item>
 
-        {/* Texte informatif */}
+        {/* Info */}
         <Form.Item>
           <Text type="secondary">
-            Ces préférences permettent à notre système AI de vous proposer les meilleures correspondances d’équipes.
+            Ces préférences permettent à notre système AI de vous proposer les meilleures
+            correspondances d’équipes.
           </Text>
         </Form.Item>
 
-        {/* Bouton de sauvegarde */}
+        {/* Soumission */}
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Save Preferences
@@ -2993,12 +2965,8 @@ const MatchPreferencesPage: NextPage = () => {
   );
 };
 
-// Si un layout global est utilisé via getLayout (_app.tsx), vous pouvez l'intégrer ainsi :
-MatchPreferencesPage.getLayout = (page: React.ReactNode) => {
-  // Exemple d'enveloppement avec MainLayout :
-  // return <MainLayout>{page}</MainLayout>;
-  return page;
-};
+// Option d’intégration layout (conservée comme dans vos sources)
+MatchPreferencesPage.getLayout = (page: React.ReactNode) => page;
 
 export default MatchPreferencesPage;
 
@@ -3101,7 +3069,7 @@ const MyMatchesPage: NextPage = () => {
         >
           <List
             itemLayout="horizontal"
-            dataSource={teamMatches}
+            dataSource={teamMatches ?? []}
             renderItem={renderMatchItem}
           />
         </TabPane>
@@ -3111,25 +3079,24 @@ const MyMatchesPage: NextPage = () => {
         >
           <List
             itemLayout="horizontal"
-            dataSource={partnerMatches}
+            dataSource={partnerMatches ?? []}
             renderItem={renderMatchItem}
           />
         </TabPane>
       </Tabs>
     </PageContainer>
   );
-};
 
 // Si votre projet utilise une méthode de layout global via getLayout (par exemple dans _app.tsx), vous pouvez l'intégrer ainsi :
-MyMatchesPage.getLayout = function getLayout(page: React.ReactNode) {
+
   // MainLayout est le layout global qui intègre header, sidebar, etc.
   // Assurez-vous de l'importer depuis le dossier correspondant (par ex. '@/layout-components/MainLayout')
   // Exemple :
   // return <MainLayout>{page}</MainLayout>;
   return page; // Pour l'exemple, on retourne la page directement
-};
 
 export default MyMatchesPage;
+}
 
 ===== END app/keenkonnect/ai-team-matching/my-matches/page.tsx =====
 
@@ -3143,7 +3110,7 @@ import { Card, List, Row, Col, Button, Divider } from 'antd';
 import { PlusOutlined, TeamOutlined, FolderAddOutlined, CheckSquareOutlined, BellOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 
-const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const KeenKonnectDashboard = () => {
   // Données simulées pour les widgets
   const recentProjects = [
     { id: 'p1', title: 'Project Alpha', update: 'Updated timeline and task statuses.' },
@@ -3189,7 +3156,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="Recent Projects" variant="borderless">
               <List
-                dataSource={recentProjects}
+                dataSource={recentProjects ?? []}
                 renderItem={(project) => (
                   <List.Item key={project.id}>
                     <List.Item.Meta title={project.title} description={project.update} />
@@ -3203,7 +3170,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="Repository Updates" variant="borderless">
               <List
-                dataSource={repositoryUpdates}
+                dataSource={repositoryUpdates ?? []}
                 renderItem={(resource) => (
                   <List.Item key={resource.id}>
                     <List.Item.Meta title={resource.title} description={resource.update} />
@@ -3217,7 +3184,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="Active Collaboration" variant="borderless">
               <List
-                dataSource={activeWorkspaces}
+                dataSource={activeWorkspaces ?? []}
                 renderItem={(workspace) => (
                   <List.Item key={workspace.id}>
                     <List.Item.Meta title={workspace.title} description={`Status: ${workspace.status}`} />
@@ -3231,7 +3198,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
           <Col xs={24} md={12}>
             <Card title="My Tasks" variant="borderless">
               <List
-                dataSource={myTasks}
+                dataSource={myTasks ?? []}
                 renderItem={(task) => (
                   <List.Item key={task.id}>
                     <List.Item.Meta title={task.task} description={`Deadline: ${task.deadline}`} />
@@ -3272,7 +3239,7 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
         <Card title="Notifications" variant="borderless">
           {notifications.length > 0 ? (
             <List
-              dataSource={notifications}
+              dataSource={notifications ?? []}
               renderItem={(notif) => (
                 <List.Item key={notif.id}>
                   <List.Item.Meta title={notif.message} />
@@ -3286,11 +3253,11 @@ const KeenKonnectDashboard: NextPage & { getLayout?: (page: React.ReactElement) 
       </div>
     </>
   );
-};
 
-KeenKonnectDashboard.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default KeenKonnectDashboard;
+}
 
 ===== END app/keenkonnect/dashboard/page.tsx =====
 
@@ -3326,7 +3293,7 @@ const sampleResources: DocumentResource[] = [
   { key: '4', title: 'Sustainable Energy Report', category: 'Energy', language: 'English', version: '3.0', lastUpdated: '2023-08-20' },
 ];
 
-const BrowseRepository: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseRepository = () => {
   const router = useRouter();
   const [searchText, setSearchText] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -3423,37 +3390,34 @@ const BrowseRepository: NextPage & { getLayout?: (page: React.ReactElement) => R
       </div>
     </>
   );
-};
 
-BrowseRepository.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseRepository;
+}
 
 ===== END app/keenkonnect/knowledge/browse-repository/page.tsx =====
 
 
 ===== BEGIN app/keenkonnect/knowledge/document-management/page.tsx =====
-'use client'
+'use client';
 
-// pages/keenkonnect/knowledge/document-management/index.tsx
 import React, { useState } from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Row, Col, Card, Button, Input, Timeline, Divider, List, Avatar, message } from 'antd';
+import { Row, Col, Card, Button, Input, Timeline, Divider, List, Avatar, message as antdMessage } from 'antd';
 import { SaveOutlined, UploadOutlined, EditOutlined } from '@ant-design/icons';
 import { Comment } from '@ant-design/compatible';
-//import '@ant-design/compatible/assets/index.css';
-import MainLayout from '@/components/layout-components/MainLayout';
+// import '@ant-design/compatible/assets/index.css';
 
 const { TextArea } = Input;
 
-const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+export default function DocumentManagement(): JSX.Element {
   // Simulation : l'utilisateur possède les droits d'édition
   const userCanEdit = true;
 
   // État pour le contenu du document (éditeur / vue)
   const [documentContent, setDocumentContent] = useState<string>(
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum pretium, risus at fermentum cursus, purus lacus scelerisque dolor, nec dictum augue mi ut ligula. Sed vitae nisl vel metus tincidunt interdum."
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum pretium, risus at fermentum cursus, purus lacus scelerisque dolor, nec dictum augue mi ut ligula. Sed vitae nisl vel metus tincidunt interdum.'
   );
 
   // Données simulées pour les métadonnées du document
@@ -3492,22 +3456,26 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
   const handleSaveChanges = () => {
     // Simuler un appel API pour sauvegarder les modifications
     console.log('Saving changes:', documentContent);
-    message.success('Changes saved successfully.');
+    antdMessage.success('Changes saved successfully.');
   };
 
   // Gestion de la publication d'une nouvelle version
   const handlePublishNewVersion = () => {
     // Simulation d'une publication
     console.log('Publishing new version...');
-    message.success('New version published successfully.');
+    antdMessage.success('New version published successfully.');
   };
 
   return (
     <>
       <Head>
         <title>Document Management</title>
-        <meta name="description" content="Manage and edit your knowledge documents, view version history, and collaborate with reviewers." />
+        <meta
+          name="description"
+          content="Manage and edit your knowledge documents, view version history, and collaborate with reviewers."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
         {/* Page Header */}
         <h1 className="text-2xl font-bold mb-4">Document Management</h1>
@@ -3516,7 +3484,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
           {/* Left Panel: Content Viewer */}
           <Col xs={24} md={14}>
             <Card title="Document Content" style={{ height: '100%', overflowY: 'auto' }}>
-              <div style={{ padding: '20px' }}>
+              <div style={{ padding: 20 }}>
                 <p>{documentContent}</p>
               </div>
             </Card>
@@ -3526,7 +3494,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
           <Col xs={24} md={10}>
             {/* Editor Panel (if editable) */}
             <Card
-              title={userCanEdit ? "Edit Document" : "Document Details"}
+              title={userCanEdit ? 'Edit Document' : 'Document Details'}
               extra={userCanEdit && <Button icon={<EditOutlined />} onClick={() => {}}>Edit</Button>}
               className="mb-4"
             >
@@ -3554,11 +3522,21 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
 
             {/* Metadata Sidebar */}
             <Card title="Document Metadata" className="mb-4">
-              <p><strong>Title:</strong> {documentMetadata.title}</p>
-              <p><strong>Created At:</strong> {documentMetadata.createdAt}</p>
-              <p><strong>Last Modified:</strong> {documentMetadata.lastModified}</p>
-              <p><strong>Version:</strong> {documentMetadata.version}</p>
-              <p><strong>Language:</strong> {documentMetadata.language}</p>
+              <p>
+                <strong>Title:</strong> {documentMetadata.title}
+              </p>
+              <p>
+                <strong>Created At:</strong> {documentMetadata.createdAt}
+              </p>
+              <p>
+                <strong>Last Modified:</strong> {documentMetadata.lastModified}
+              </p>
+              <p>
+                <strong>Version:</strong> {documentMetadata.version}
+              </p>
+              <p>
+                <strong>Language:</strong> {documentMetadata.language}
+              </p>
             </Card>
 
             {/* Version History */}
@@ -3577,7 +3555,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
             <Card title="Comments" className="mb-4">
               <List
                 itemLayout="horizontal"
-                dataSource={commentsData}
+                dataSource={commentsData ?? []}
                 renderItem={(comment) => (
                   <Comment
                     author={comment.author}
@@ -3593,11 +3571,7 @@ const DocumentManagement: NextPage & { getLayout?: (page: React.ReactElement) =>
       </div>
     </>
   );
-};
-
-DocumentManagement.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
-
-export default DocumentManagement;
+}
 
 ===== END app/keenkonnect/knowledge/document-management/page.tsx =====
 
@@ -3676,7 +3650,7 @@ const sampleDocuments: DocumentResource[] = [
   },
 ];
 
-const SearchFilterDocuments: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const SearchFilterDocuments = () => {
   const [form] = Form.useForm();
   // États pour les filtres
   const [keyword, setKeyword] = useState('');
@@ -3797,11 +3771,11 @@ const SearchFilterDocuments: NextPage & { getLayout?: (page: React.ReactElement)
       </div>
     </>
   );
-};
 
-SearchFilterDocuments.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default SearchFilterDocuments;
+}
 
 ===== END app/keenkonnect/knowledge/search-filter-documents/page.tsx =====
 
@@ -3813,7 +3787,7 @@ export default SearchFilterDocuments;
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Form, Input, Select, Upload, Switch, Button, message, Progress, Result } from 'antd';
+import { Form, Input, Select, Upload, Switch, Button, message as antdMessage, Progress, Result  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
@@ -3821,7 +3795,7 @@ import { useRouter } from 'next/navigation';
 const { Option } = Select;
 const { TextArea } = Input;
 
-const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const UploadNewDocument = () => {
   const [form] = Form.useForm();
   const router = useRouter();
   
@@ -3832,7 +3806,6 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
   const handleUploadChange = ({ fileList }: any) => {
     // Ce callback se contente de conserver le fileList dans le formulaire via antd.
     return fileList;
-  };
 
   const simulateUpload = () => {
     setUploading(true);
@@ -3844,19 +3817,17 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
         if (prev >= 100) {
           clearInterval(interval);
           setUploading(false);
-          message.success('Document uploaded successfully');
+          antdMessage.success('Document uploaded successfully');
           setSubmitted(true);
           return 100;
         }
         return prev + 20;
       });
     }, 500);
-  };
 
   const onFinish = async (values: any) => {
     console.log('Form values:', values);
     simulateUpload();
-  };
 
   if (submitted) {
     return (
@@ -3973,11 +3944,11 @@ const UploadNewDocument: NextPage & { getLayout?: (page: React.ReactElement) => 
       </div>
     </>
   );
-};
 
-UploadNewDocument.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default UploadNewDocument;
+}}}}
 
 ===== END app/keenkonnect/knowledge/upload-new-document/page.tsx =====
 
@@ -4073,7 +4044,7 @@ const sampleProjects: Project[] = [
   },
 ];
 
-const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseProjects = () => {
   const router = useRouter();
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -4123,12 +4094,10 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
   const openDrawer = (project: Project) => {
     setSelectedProject(project);
     setDrawerVisible(true);
-  };
 
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedProject(null);
-  };
 
   return (
     <>
@@ -4204,7 +4173,7 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
         {/* Projects List */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={paginatedProjects}
+          dataSource={paginatedProjects ?? []}
           renderItem={(project: Project) => (
             <List.Item key={project.id}>
               <Card
@@ -4267,11 +4236,11 @@ const BrowseProjects: NextPage & { getLayout?: (page: React.ReactElement) => Rea
       </div>
     </>
   );
-};
 
-BrowseProjects.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseProjects;
+}}}
 
 ===== END app/keenkonnect/projects/browse-projects/page.tsx =====
 
@@ -4283,7 +4252,7 @@ export default BrowseProjects;
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Steps, Button, Form, Input, Select, Upload, Result, message } from 'antd';
+import { Steps, Button, Form, Input, Select, Upload, Result, message as antdMessage  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { normalizeError } from "../../../../shared/errors";
@@ -4292,7 +4261,7 @@ const { Step } = Steps;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const CreateNewProject = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [form] = Form.useForm();
@@ -4321,14 +4290,12 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       form.resetFields();
     } catch (error: unknown) {
       const { message, statusCode } = normalizeError(error);
-      message.error('Please fill in the required fields.');
+      antdMessage.error('Please fill in the required fields.');
     }
-  };
 
   // Retour à l'étape précédente
   const prev = () => {
     setCurrentStep(currentStep - 1);
-  };
 
   // Soumission finale du formulaire
   const onFinish = async () => {
@@ -4340,9 +4307,8 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       setSubmitted(true);
     } catch (error: unknown) {
       const { message, statusCode } = normalizeError(error);
-      message.error('Please fill in the required fields.');
+      antdMessage.error('Please fill in the required fields.');
     }
-  };
 
   // Rendu du contenu en fonction de l'étape
   const renderStepContent = (step: number) => {
@@ -4436,7 +4402,6 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       default:
         return null;
     }
-  };
 
   if (submitted) {
     return (
@@ -4491,11 +4456,11 @@ const CreateNewProject: NextPage & { getLayout?: (page: React.ReactElement) => R
       </div>
     </>
   );
-};
 
-CreateNewProject.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default CreateNewProject;
+}}}}}
 
 ===== END app/keenkonnect/projects/create-new-project/page.tsx =====
 
@@ -4534,7 +4499,7 @@ const sampleProjects: Project[] = [
   { key: '5', name: 'Project Epsilon', role: 'Member', status: 'Completed', lastUpdated: '2023-07-30', category: 'Design' },
 ];
 
-const MyProjects: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const MyProjects = () => {
   const router = useRouter();
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [categoryFilter, setCategoryFilter] = useState<string>('All');
@@ -4662,201 +4627,248 @@ const MyProjects: NextPage & { getLayout?: (page: React.ReactElement) => React.R
       </div>
     </>
   );
-};
 
-MyProjects.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default MyProjects;
+}
 
 ===== END app/keenkonnect/projects/my-projects/page.tsx =====
 
 
 ===== BEGIN app/keenkonnect/projects/project-workspace/page.tsx =====
-'use client'
+'use client';
 
-// pages/keenkonnect/projects/project-workspace/index.tsx
-import React from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Card, Tabs, Row, Col, Avatar, List, Button, Divider } from 'antd';
-import { EditOutlined } from '@ant-design/icons';
-import MainLayout from '@/components/layout-components/MainLayout';
-import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { Row, Col, Card, List, Avatar, Tag, Space, Button, Progress, Typography, Timeline } from 'antd';
+import PageContainer from '@/components/PageContainer';
 
-const { TabPane } = Tabs;
+const { Title, Text } = Typography;
 
-// Données simulées pour le projet
-const projectInfo = {
-  title: 'Project Alpha',
-  description: 'This project is focused on developing innovative renewable energy solutions.',
-  status: 'Active',
-  startDate: '2023-08-01',
-  recentUpdates: [
-    'Updated project roadmap',
-    'Invited a new team member: Alice',
-    'Milestone reached: Prototype completed'
-  ],
-  // Indication si l’utilisateur est le propriétaire
-  isOwner: true,
+type TaskStatus = 'todo' | 'in-progress' | 'done';
+
+type Task = {
+  id: string;
+  title: string;
+  assignee: string;
+  status: TaskStatus;
+  progress?: number;
 };
 
-// Données simulées pour les tâches
-const tasksData = [
-  { key: '1', task: 'Finalize proposal', assignee: 'Alice', status: 'In Progress', dueDate: '2023-09-15' },
-  { key: '2', task: 'Design prototype', assignee: 'Bob', status: 'Pending', dueDate: '2023-09-20' },
-  { key: '3', task: 'Test prototype', assignee: 'Charlie', status: 'Completed', dueDate: '2023-09-10' },
+type FileItem = {
+  id: string;
+  name: string;
+  uploader: string;
+  size: string;
+};
+
+type Discussion = {
+  id: string;
+  author: string;
+  message: string;
+  time: string;
+};
+
+type Member = {
+  id: string;
+  name: string;
+  role: string;
+  avatar?: string;
+};
+
+const tasksData: Task[] = [
+  { id: 't1', title: 'Define project scope', assignee: 'Alice', status: 'done', progress: 100 },
+  { id: 't2', title: 'Design wireframes', assignee: 'Bob', status: 'in-progress', progress: 60 },
+  { id: 't3', title: 'API contract', assignee: 'Chloé', status: 'todo', progress: 0 },
 ];
 
-// Données simulées pour les fichiers
-const filesData = [
-  { key: '1', name: 'Project Roadmap.pdf', action: 'Download' },
-  { key: '2', name: 'Technical Specs.docx', action: 'Download' },
+const filesData: FileItem[] = [
+  { id: 'f1', name: 'requirements.pdf', uploader: 'Alice', size: '214 KB' },
+  { id: 'f2', name: 'wireframes.fig', uploader: 'Bob', size: '1.2 MB' },
+  { id: 'f3', name: 'api-contract.yaml', uploader: 'Chloé', size: '36 KB' },
 ];
 
-// Données simulées pour la discussion (dummy messages)
-const discussionData = [
-  { id: '1', author: 'Alice', message: 'Let’s schedule a meeting to discuss the prototype.', time: '10:15 AM' },
-  { id: '2', author: 'Bob', message: 'I think we should also consider cost efficiency.', time: '10:20 AM' },
+const discussionData: Discussion[] = [
+  { id: 'd1', author: 'Alice', message: 'I pushed the latest requirements.', time: 'Today 09:42' },
+  { id: 'd2', author: 'Bob', message: 'Wireframes homepage v2 ready.', time: 'Yesterday 18:05' },
+  { id: 'd3', author: 'Chloé', message: 'Starting the API contract draft.', time: 'Yesterday 11:17' },
 ];
 
-// Données simulées pour la timeline / activité du projet
-const timelineData = [
-  { key: '1', time: '2023-08-05', event: 'Project kickoff meeting held.' },
-  { key: '2', time: '2023-08-20', event: 'Concept design approved.' },
-  { key: '3', time: '2023-09-01', event: 'Prototype completed.' },
+const projectMembers: Member[] = [
+  { id: 'm1', name: 'Alice Martin', role: 'PM', avatar: '' },
+  { id: 'm2', name: 'Bob Leroy', role: 'Designer', avatar: '' },
+  { id: 'm3', name: 'Chloé Durand', role: 'Backend', avatar: '' },
+  { id: 'm4', name: 'Diego Ruiz', role: 'Frontend', avatar: '' },
 ];
 
-// Données simulées pour la liste des membres
-const projectMembers = [
-  { key: '1', name: 'Alice', role: 'Owner', avatar: '/avatars/alice.png' },
-  { key: '2', name: 'Bob', role: 'Member', avatar: '/avatars/bob.png' },
-  { key: '3', name: 'Charlie', role: 'Member', avatar: '/avatars/charlie.png' },
-  { key: '4', name: 'Diana', role: 'Member', avatar: '/avatars/diana.png' },
-];
+function statusTag(status: TaskStatus) {
+  switch (status) {
+    case 'done':
+      return <Tag color="green">Done</Tag>;
+    case 'in-progress':
+      return <Tag color="blue">In progress</Tag>;
+    default:
+      return <Tag>To do</Tag>;
+  }
+}
 
-const ProjectWorkspace: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
-  const router = useRouter();
+export default function ProjectWorkspacePage() {
+  const [tasks, setTasks] = useState<Task[]>(tasksData);
 
-  // Pour simuler l'action de modification du projet (si propriétaire)
-  const handleEditProject = () => {
-    // Redirige vers une page d'édition (exemple)
-    router.push('/keenkonnect/projects/manage-project?id=1');
+  const markDone = (id: string) => {
+    setTasks(prev =>
+      prev.map(t => (t.id === id ? { ...t, status: 'done', progress: 100 } : t)),
+    );
   };
 
   return (
-    <>
-      <Head>
-        <title>Project Workspace</title>
-        <meta name="description" content="Collaboration tools for your project workspace." />
-      </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête du Workspace */}
-        <Row justify="space-between" align="middle" className="mb-4">
-          <h1 className="text-2xl font-bold">{projectInfo.title}</h1>
-          {projectInfo.isOwner && (
-            <Button icon={<EditOutlined />} onClick={handleEditProject}>
-              Edit Project
-            </Button>
-          )}
-        </Row>
-        <p>{projectInfo.description}</p>
-        <Divider />
+    <PageContainer title="Project Workspace">
+      <Space direction="vertical" size={16} style={{ width: '100%' }}>
+        {/* Overview */}
+        <Card>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Space direction="vertical" size={8}>
+                <Text type="secondary">Total tasks</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  {tasks.length}
+                </Title>
+              </Space>
+            </Col>
+            <Col xs={24} md={8}>
+              <Space direction="vertical" size={8}>
+                <Text type="secondary">In progress</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  {tasks.filter(t => t.status === 'in-progress').length}
+                </Title>
+              </Space>
+            </Col>
+            <Col xs={24} md={8}>
+              <Space direction="vertical" size={8}>
+                <Text type="secondary">Done</Text>
+                <Title level={3} style={{ margin: 0 }}>
+                  {tasks.filter(t => t.status === 'done').length}
+                </Title>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
 
-        <Row gutter={16}>
-          {/* Contenu principal avec onglets */}
-          <Col xs={24} md={18}>
-            <Card>
-              <Tabs defaultActiveKey="overview">
-                <TabPane tab="Overview" key="overview">
-                  <p><strong>Status:</strong> {projectInfo.status}</p>
-                  <p><strong>Start Date:</strong> {projectInfo.startDate}</p>
-                  <p><strong>Members:</strong> {projectMembers.length}</p>
-                  <p><strong>Recent Updates:</strong></p>
-                  <List
-                    dataSource={projectInfo.recentUpdates}
-                    renderItem={(item) => <List.Item>{item}</List.Item>}
-                  />
-                </TabPane>
-
-                <TabPane tab="Tasks" key="tasks">
-                  <p>Task List:</p>
-                  <List
-                    dataSource={tasksData}
-                    renderItem={(task) => (
-                      <List.Item>
-                        <List.Item.Meta
-                          title={`${task.task} (Assignee: ${task.assignee})`}
-                          description={`Status: ${task.status} | Due Date: ${task.dueDate}`}
-                        />
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-
-                <TabPane tab="Files" key="files">
-                  <List
-                    dataSource={filesData}
-                    renderItem={(file) => (
-                      <List.Item>
-                        <List.Item.Meta
-                          title={file.name}
-                          description={file.action}
-                        />
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-
-                <TabPane tab="Discussion" key="discussion">
-                  <List
-                    dataSource={discussionData}
-                    renderItem={(msg) => (
-                      <List.Item>
-                        <List.Item.Meta
-                          avatar={<Avatar src={`/avatars/${msg.author.toLowerCase()}.png`} />}
-                          title={msg.author}
-                          description={`${msg.message} (${msg.time})`}
-                        />
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-
-                <TabPane tab="Timeline" key="timeline">
-                  <List
-                    dataSource={timelineData}
-                    renderItem={(event) => (
-                      <List.Item>
-                        <strong>{event.time}</strong>: {event.event}
-                      </List.Item>
-                    )}
-                  />
-                </TabPane>
-              </Tabs>
+        <Row gutter={[16, 16]}>
+          {/* Tasks */}
+          <Col xs={24} lg={12}>
+            <Card title="Tasks">
+              <List
+                dataSource={tasks}
+                renderItem={(item) => (
+                  <List.Item
+                    actions={[
+                      item.status !== 'done' ? (
+                        <Button key="done" size="small" onClick={() => markDone(item.id)}>
+                          Mark done
+                        </Button>
+                      ) : null,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      title={
+                        <Space size={8}>
+                          <Text>{item.title}</Text>
+                          {statusTag(item.status)}
+                        </Space>
+                      }
+                      description={<Text type="secondary">Assignee: {item.assignee}</Text>}
+                    />
+                    <div style={{ minWidth: 120 }}>
+                      <Progress percent={item.progress ?? 0} size="small" />
+                    </div>
+                  </List.Item>
+                )}
+              />
             </Card>
           </Col>
 
-          {/* Sidebar : liste des membres */}
-          <Col xs={24} md={6}>
-            <Card title="Project Members">
-              <Avatar.Group>
-                {projectMembers.map(member => (
-                  <Avatar key={member.key} src={member.avatar} title={`${member.name} (${member.role})`} />
-                ))}
-              </Avatar.Group>
-              <Divider />
-              <p><strong>Online:</strong> {/* Vous pouvez ajouter un indicateur ici */}2/4 currently online</p>
+          {/* Files */}
+          <Col xs={24} lg={12}>
+            <Card title="Files">
+              <List
+                dataSource={filesData}
+                renderItem={(file) => (
+                  <List.Item actions={[<Button key="download" type="link">Download</Button>]}>
+                    <List.Item.Meta
+                      avatar={<Avatar>{file.name.slice(0, 1).toUpperCase()}</Avatar>}
+                      title={file.name}
+                      description={
+                        <Text type="secondary">
+                          Uploaded by {file.uploader} • {file.size}
+                        </Text>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
             </Card>
           </Col>
         </Row>
-      </div>
-    </>
+
+        <Row gutter={[16, 16]}>
+          {/* Discussion */}
+          <Col xs={24} lg={12}>
+            <Card title="Discussion">
+              <List
+                dataSource={discussionData}
+                renderItem={(msg) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      avatar={<Avatar>{msg.author.slice(0, 1).toUpperCase()}</Avatar>}
+                      title={
+                        <Space direction="horizontal" size={8}>
+                          <Text strong>{msg.author}</Text>
+                          <Text type="secondary">{msg.time}</Text>
+                        </Space>
+                      }
+                      description={msg.message}
+                    />
+                  </List.Item>
+                )}
+              />
+            </Card>
+          </Col>
+
+          {/* Timeline */}
+          <Col xs={24} lg={12}>
+            <Card title="Timeline">
+              <Timeline
+                items={[
+                  { color: 'green', children: 'Project created' },
+                  { color: 'blue', children: 'Wireframes v2 shared' },
+                  { color: 'gray', children: 'API contract drafting' },
+                ]}
+              />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Team */}
+        <Card title="Team">
+          <List
+            grid={{ gutter: 16, xs: 2, sm: 3, md: 4, lg: 4 }}
+            dataSource={projectMembers}
+            renderItem={(member) => (
+              <List.Item>
+                <Space direction="vertical" align="center" style={{ width: '100%' }}>
+                  <Avatar size={56}>{member.name.slice(0, 1).toUpperCase()}</Avatar>
+                  <Text strong>{member.name}</Text>
+                  <Text type="secondary">{member.role}</Text>
+                </Space>
+              </List.Item>
+            )}
+          />
+        </Card>
+      </Space>
+    </PageContainer>
   );
-};
-
-ProjectWorkspace.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
-
-export default ProjectWorkspace;
+}
 
 ===== END app/keenkonnect/projects/project-workspace/page.tsx =====
 
@@ -4868,7 +4880,7 @@ export default ProjectWorkspace;
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Form, Input, Select, DatePicker, InputNumber, Upload, Switch, Button, Modal, message } from 'antd';
+import { Form, Input, Select, DatePicker, InputNumber, Upload, Switch, Button, Modal, message as antdMessage  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
@@ -4877,7 +4889,7 @@ const { RangePicker } = DatePicker;
 const { TextArea } = Input;
 const { Option } = Select;
 
-const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const SubmitImpactReports = () => {
   const router = useRouter();
   const [form] = Form.useForm();
   
@@ -4896,13 +4908,11 @@ const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) =
       setSubmitting(false);
       setModalVisible(true);
     }, 1500);
-  };
 
   const handleModalOk = () => {
     setModalVisible(false);
     // Rediriger vers la page Track Project Impact après soumission
     router.push('/keenkonnect/sustainability-impact/track-project-impact');
-  };
 
   return (
     <>
@@ -5011,23 +5021,24 @@ const SubmitImpactReports: NextPage & { getLayout?: (page: React.ReactElement) =
       </div>
     </>
   );
-};
 
-SubmitImpactReports.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default SubmitImpactReports;
+}}}
 
 ===== END app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx =====
 
 
 ===== BEGIN app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx =====
-'use client'
+'use client';
 
-// pages/keenkonnect/sustainability-impact/sustainability-dashboard/index.tsx
+// File: app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
 import React, { useMemo } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
 import { Card, Row, Col, Statistic, Table, Select, Divider } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import MainLayout from '@/components/layout-components/MainLayout';
 import {
   PieChart as RePieChart,
@@ -5040,9 +5051,9 @@ import {
 
 const { Option } = Select;
 
-// -------------------------------
-// Données simulées
-// -------------------------------
+/* -------------------------------
+ * Données simulées
+ * ------------------------------- */
 
 // Statistiques globales
 const globalStats = {
@@ -5051,12 +5062,13 @@ const globalStats = {
   totalProjects: 45,
 };
 
-// Impact distribution pour le donut chart
+// Répartition d’impact (donut)
 const impactDistribution = [
   { name: 'Environmental', value: 55 },
   { name: 'Social', value: 30 },
   { name: 'Economic', value: 15 },
 ];
+
 const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
 // Données pour le leaderboard (liste de projets par impact)
@@ -5076,8 +5088,8 @@ const leaderboardData: LeaderboardEntry[] = [
   { key: '5', projectName: 'Project Epsilon', impactScore: 75, co2Saved: 7000, volunteerHours: 170 },
 ];
 
-// Colonnes pour le leaderboard Table
-const columns = [
+// Colonnes pour le leaderboard
+const columns: ColumnsType<LeaderboardEntry> = [
   { title: 'Project Name', dataIndex: 'projectName', key: 'projectName' },
   { title: 'Impact Score', dataIndex: 'impactScore', key: 'impactScore' },
   { title: 'CO2 Saved (kg)', dataIndex: 'co2Saved', key: 'co2Saved' },
@@ -5088,14 +5100,16 @@ const columns = [
 const regions = ['All', 'North America', 'Europe', 'Asia'];
 const categories = ['All', 'Environmental', 'Social', 'Economic'];
 
-const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
-  // États pour les filtres (pour l’exemple, ils n’influencent pas réellement les données)
+const SustainabilityDashboard: NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+} = () => {
+  // États de filtres (ici décoratifs)
   const [selectedRegion, setSelectedRegion] = React.useState('All');
   const [selectedCategory, setSelectedCategory] = React.useState('All');
 
-  // Simuler un filtrage des données du leaderboard (pour cet exemple, on retourne tout)
+  // Filtrage simulé
   const filteredLeaderboard = useMemo(() => {
-    // Vous pouvez ajouter une logique de filtrage ici selon selectedRegion ou selectedCategory
+    // Ajouter une vraie logique si nécessaire (region / category)
     return leaderboardData;
   }, [selectedRegion, selectedCategory]);
 
@@ -5103,8 +5117,12 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
     <>
       <Head>
         <title>Sustainability Dashboard</title>
-        <meta name="description" content="High-level dashboard aggregating sustainability impact across projects." />
+        <meta
+          name="description"
+          content="High-level dashboard aggregating sustainability impact across projects."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
         {/* En-tête */}
         <h1 className="text-2xl font-bold mb-4">Sustainability Dashboard</h1>
@@ -5112,23 +5130,36 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
         {/* Filtres */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={12}>
-            <Select value={selectedRegion} onChange={(value) => setSelectedRegion(value)} style={{ width: '100%' }}>
+            <Select
+              value={selectedRegion}
+              onChange={(value) => setSelectedRegion(value)}
+              style={{ width: '100%' }}
+            >
               {regions.map((region) => (
-                <Option key={region} value={region}>{region}</Option>
+                <Option key={region} value={region}>
+                  {region}
+                </Option>
               ))}
             </Select>
           </Col>
           <Col xs={24} sm={12}>
-            <Select value={selectedCategory} onChange={(value) => setSelectedCategory(value)} style={{ width: '100%' }}>
+            <Select
+              value={selectedCategory}
+              onChange={(value) => setSelectedCategory(value)}
+              style={{ width: '100%' }}
+            >
               {categories.map((cat) => (
-                <Option key={cat} value={cat}>{cat}</Option>
+                <Option key={cat} value={cat}>
+                  {cat}
+                </Option>
               ))}
             </Select>
           </Col>
         </Row>
+
         <Divider />
 
-        {/* Global Impact Statistics */}
+        {/* Statistiques globales */}
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={8}>
             <Card>
@@ -5147,7 +5178,7 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
           </Col>
         </Row>
 
-        {/* Impact Distribution Chart (Pie Chart) */}
+        {/* Donut: Impact Distribution */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Impact Distribution</h2>
           <div style={{ width: '100%', height: 300 }}>
@@ -5155,9 +5186,19 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
               <RePieChart>
                 <ReTooltip />
                 <Legend verticalAlign="bottom" height={36} />
-                <Pie data={impactDistribution} dataKey="value" nameKey="name" innerRadius={60} outerRadius={100} paddingAngle={5}>
+                <Pie
+                  data={impactDistribution}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                >
                   {impactDistribution.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                    />
                   ))}
                 </Pie>
               </RePieChart>
@@ -5165,17 +5206,24 @@ const SustainabilityDashboard: NextPage & { getLayout?: (page: React.ReactElemen
           </div>
         </Card>
 
-        {/* Leaderboard of Projects by Impact */}
+        {/* Leaderboard */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Top Projects by Impact</h2>
-          <Table columns={columns} dataSource={filteredLeaderboard} pagination={{ pageSize: 5 }} />
+          <Table
+            columns={columns}
+            dataSource={filteredLeaderboard}
+            pagination={{ pageSize: 5 }}
+          />
         </Card>
       </div>
     </>
   );
 };
 
-SustainabilityDashboard.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+// Mise en page (si utilisée dans ton app)
+SustainabilityDashboard.getLayout = (page: React.ReactElement) => (
+  <MainLayout>{page}</MainLayout>
+);
 
 export default SustainabilityDashboard;
 
@@ -5188,10 +5236,20 @@ export default SustainabilityDashboard;
 // pages/keenkonnect/sustainability-impact/track-project-impact/index.tsx
 import React, { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Card, Statistic, Row, Col, Select, DatePicker, Divider, Timeline } from 'antd';
+// (Optionnel) type NextPage non requis ici
+import { Card, Statistic, Row, Col, Select, DatePicker, Timeline } from 'antd';
 import MainLayout from '@/components/layout-components/MainLayout';
-import { ResponsiveContainer, LineChart as ReLineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts';
+import {
+  ResponsiveContainer,
+  LineChart as ReLineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  BarChart,
+  Bar,
+} from 'recharts';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -5205,7 +5263,7 @@ const sampleImpactMetrics = {
   carbonReduction: 1200, // in kg CO2 reduced
   peopleReached: 450,
   fundsSaved: 3000, // in dollars
-};
+}; // <-- fermeture manquante ajoutée
 
 // Données simulées pour l'évolution de l'impact dans le temps (line chart)
 const sampleImpactTrend = [
@@ -5232,18 +5290,15 @@ const impactReports = [
   { key: '3', date: '2023-07-10', summary: 'Major milestone achieved in funds saved.' },
 ];
 
-const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+export default function TrackProjectImpact() {
   // États pour le filtre par projet et période
   const [selectedProject, setSelectedProject] = useState<string>(projects[0]);
   const [dateRange, setDateRange] = useState<[any, any] | null>(null);
 
-  // Pour simplifier, on ne change pas les métriques selon le filtre dans ce dummy
-  // Vous pourrez intégrer ici une logique d'API pour actualiser les métriques selon le projet et la plage de dates
-
   // Filtre supplémentaire sur dateRange pour la Timeline (exemple simulé)
   const filteredImpactReports = useMemo(() => {
     if (!dateRange) return impactReports;
-    return impactReports.filter(report => {
+    return impactReports.filter((report) => {
       const reportDate = dayjs(report.date);
       return reportDate.isAfter(dateRange[0]) && reportDate.isBefore(dateRange[1]);
     });
@@ -5255,25 +5310,38 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
   }, []);
 
   return (
-    <>
+    <MainLayout>
       <Head>
         <title>Track Project Impact</title>
-        <meta name="description" content="Dashboard for tracking the impact metrics of your project." />
+        <meta
+          name="description"
+          content="Dashboard for tracking the impact metrics of your project."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
         <h1 className="text-2xl font-bold mb-4">Track Project Impact</h1>
 
         {/* Sélecteur de projet et filtre de période */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={12}>
-            <Select defaultValue={selectedProject} style={{ width: '100%' }} onChange={setSelectedProject}>
+            <Select
+              defaultValue={selectedProject}
+              style={{ width: '100%' }}
+              onChange={setSelectedProject}
+            >
               {projects.map((proj) => (
-                <Option key={proj} value={proj}>{proj}</Option>
+                <Option key={proj} value={proj}>
+                  {proj}
+                </Option>
               ))}
             </Select>
           </Col>
           <Col xs={24} sm={12}>
-            <RangePicker style={{ width: '100%' }} onChange={(dates) => setDateRange(dates as any)} />
+            <RangePicker
+              style={{ width: '100%' }}
+              onChange={(dates) => setDateRange(dates as any)}
+            />
           </Col>
         </Row>
 
@@ -5281,7 +5349,10 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={8}>
             <Card>
-              <Statistic title="Carbon Footprint Reduced (kg)" value={sampleImpactMetrics.carbonReduction} />
+              <Statistic
+                title="Carbon Footprint Reduced (kg)"
+                value={sampleImpactMetrics.carbonReduction}
+              />
             </Card>
           </Col>
           <Col xs={24} sm={8}>
@@ -5306,7 +5377,7 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
                 <XAxis dataKey="period" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                <Line type="monotone" dataKey="value" />
               </ReLineChart>
             </ResponsiveContainer>
           </div>
@@ -5322,7 +5393,7 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
                 <XAxis dataKey="category" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#82ca9d" />
+                <Bar dataKey="value" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -5332,7 +5403,7 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Impact Reports Timeline</h2>
           <Timeline>
-            {filteredImpactReports.map(report => (
+            {filteredImpactReports.map((report) => (
               <Timeline.Item key={report.key}>
                 <strong>{report.date}</strong>: {report.summary}
               </Timeline.Item>
@@ -5340,13 +5411,9 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
           </Timeline>
         </Card>
       </div>
-    </>
+    </MainLayout>
   );
-};
-
-TrackProjectImpact.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
-
-export default TrackProjectImpact;
+}
 
 ===== END app/keenkonnect/sustainability-impact/track-project-impact/page.tsx =====
 
@@ -5357,8 +5424,7 @@ export default TrackProjectImpact;
 // File: /pages/keenkonnect/user-reputation/account-preferences.tsx
 import React, { useState } from "react";
 import { NextPage } from "next";
-import {
-  Tabs,
+import { Tabs,
   Form,
   Input,
   Button,
@@ -5366,8 +5432,8 @@ import {
   Modal,
   Switch,
   Radio,
-  message
-} from "antd";
+  message as antdMessage
+ } from 'antd';
 import { UploadOutlined } from "@ant-design/icons";
 import PageContainer from "@/components/PageContainer";
 // Ajout de l'import de MainLayout pour appliquer le layout global
@@ -5382,36 +5448,29 @@ const AccountPreferencesPage: NextPage = () => {
   // Gestion des événements liés au Modal de suppression
   const showDeleteModal = () => {
     setIsModalVisible(true);
-  };
   const handleDeleteCancel = () => {
     setIsModalVisible(false);
-  };
   const handleDeleteConfirm = () => {
     // Ici, vous appellerez éventuellement une API pour la suppression de compte
-    message.success("Account deletion requested.");
+    antdMessage.success("Account deletion requested.");
     setIsModalVisible(false);
-  };
 
   // Gestion des soumissions de formulaire pour chaque section
   const onFinishProfile = (values: any) => {
     console.log("Profile Info:", values);
-    message.success("Profile info saved.");
-  };
+    antdMessage.success("Profile info saved.");
 
   const onFinishSecurity = (values: any) => {
     console.log("Security Info:", values);
-    message.success("Security info saved.");
-  };
+    antdMessage.success("Security info saved.");
 
   const onFinishNotifications = (values: any) => {
     console.log("Notifications Settings:", values);
-    message.success("Notifications settings saved.");
-  };
+    antdMessage.success("Notifications settings saved.");
 
   const onFinishPrivacy = (values: any) => {
     console.log("Privacy Settings:", values);
-    message.success("Privacy settings saved.");
-  };
+    antdMessage.success("Privacy settings saved.");
 
   return (
     <PageContainer title="Account & Preferences">
@@ -5574,14 +5633,13 @@ const AccountPreferencesPage: NextPage = () => {
       </Tabs>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via la fonction getLayout
-AccountPreferencesPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default AccountPreferencesPage;
+}}}}}}}}
 
 ===== END app/keenkonnect/user-reputation/account-preferences/page.tsx =====
 
@@ -5617,7 +5675,6 @@ const ManageExpertiseAreas: NextPage = () => {
   const onFinish = (values: any) => {
     console.log('Updated Expertise Areas:', values);
     // Traitement complémentaire
-  };
 
   return (
     <PageContainer title="Manage Expertise Areas">
@@ -5677,25 +5734,23 @@ const ManageExpertiseAreas: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout
-ManageExpertiseAreas.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ManageExpertiseAreas;
+}}
 
 ===== END app/keenkonnect/user-reputation/manage-expertise-areas/page.tsx =====
 
 
 ===== BEGIN app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx =====
 'use client';
+
 import React from 'react';
-import { NextPage } from 'next';
 import { Card, Statistic, Row, Col, List, Typography, Divider } from 'antd';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout'; // Assurez-vous que ce chemin est correct
 
 const { Title, Text } = Typography;
 
@@ -5711,11 +5766,10 @@ interface Achievement {
   description: string;
 }
 
-const ViewReputationEkoh: NextPage = () => {
-  // Données simulées pour l'exemple
+export default function ViewReputationEkoh(): JSX.Element {
   const reputation = {
     ekohScore: 1234,
-    smartVoteWeight: 75, // exprimé en pourcentage
+    smartVoteWeight: 75, // percentage
   };
 
   const expertiseAreas: Expertise[] = [
@@ -5741,7 +5795,7 @@ const ViewReputationEkoh: NextPage = () => {
 
   return (
     <PageContainer title="View Reputation (Ekoh)">
-      {/* Section récapitulative des scores */}
+      {/* Score summary */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12}>
           <Card>
@@ -5757,11 +5811,10 @@ const ViewReputationEkoh: NextPage = () => {
 
       <Divider />
 
-      {/* Section Graphique */}
+      {/* Charts placeholders */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12}>
           <Card title="Expertise Contributions">
-            {/* Ici vous intégrerez un pie chart pour visualiser la répartition des contributions */}
             <div
               style={{
                 height: 200,
@@ -5776,7 +5829,6 @@ const ViewReputationEkoh: NextPage = () => {
         </Col>
         <Col xs={24} sm={12}>
           <Card title="Score Trend">
-            {/* Ici vous intégrerez une courbe de tendance illustrant l’évolution du score dans le temps */}
             <div
               style={{
                 height: 200,
@@ -5793,8 +5845,8 @@ const ViewReputationEkoh: NextPage = () => {
 
       <Divider />
 
-      {/* Liste d'expertise */}
-      <Title level={4}>Expertise Areas & Weights</Title>
+      {/* Expertise list */}
+      <Title level={4}>Expertise Areas &amp; Weights</Title>
       <List
         itemLayout="horizontal"
         dataSource={expertiseAreas}
@@ -5807,8 +5859,8 @@ const ViewReputationEkoh: NextPage = () => {
 
       <Divider />
 
-      {/* Achèvements et badges */}
-      <Title level={4}>Achievements & Badges</Title>
+      {/* Achievements */}
+      <Title level={4}>Achievements &amp; Badges</Title>
       <List
         grid={{ gutter: 16, column: 2 }}
         dataSource={achievements}
@@ -5822,14 +5874,7 @@ const ViewReputationEkoh: NextPage = () => {
       />
     </PageContainer>
   );
-};
-
-// Correction : envelopper la page dans MainLayout
-ViewReputationEkoh.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ViewReputationEkoh;
+}
 
 ===== END app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx =====
 
@@ -5914,7 +5959,7 @@ const sampleWorkspaces: Workspace[] = [
   },
 ];
 
-const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseAvailableWorkspaces = () => {
   const router = useRouter();
   // États pour la recherche et les filtres
   const [searchText, setSearchText] = useState('');
@@ -5945,7 +5990,6 @@ const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElem
     } else {
       router.push(`/keenkonnect/workspaces/request-access?id=${workspace.id}`);
     }
-  };
 
   return (
     <>
@@ -5995,7 +6039,7 @@ const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElem
         {/* Liste des workspaces */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 3 }}
-          dataSource={paginatedWorkspaces}
+          dataSource={paginatedWorkspaces ?? []}
           renderItem={(workspace: Workspace) => (
             <List.Item key={workspace.id}>
               <Card
@@ -6036,11 +6080,11 @@ const BrowseAvailableWorkspaces: NextPage & { getLayout?: (page: React.ReactElem
       </div>
     </>
   );
-};
 
-BrowseAvailableWorkspaces.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseAvailableWorkspaces;
+}}
 
 ===== END app/keenkonnect/workspaces/browse-available-workspaces/page.tsx =====
 
@@ -6052,7 +6096,7 @@ export default BrowseAvailableWorkspaces;
 import React, { useState } from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { Steps, Button, Form, Input, Select, Result, Divider, message } from 'antd';
+import { Steps, Button, Form, Input, Select, Result, Divider, message as antdMessage  } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
@@ -6062,7 +6106,7 @@ const { Step } = Steps;
 const { Option } = Select;
 const { TextArea } = Input;
 
-const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const LaunchNewWorkspace = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
@@ -6093,13 +6137,11 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       form.resetFields();
     } catch (err: unknown) {
       const { message, statusCode } = normalizeError(err);
-      message.error('Please complete the required fields.');
+      antdMessage.error('Please complete the required fields.');
     }
-  };
 
   const prev = () => {
     setCurrentStep(currentStep - 1);
-  };
 
   const onFinish = async () => {
     try {
@@ -6110,9 +6152,8 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       setSubmitted(true);
     } catch (err: unknown) {
       const { message, statusCode } = normalizeError(err);
-      message.error('Please ensure all fields are correctly filled.');
+      antdMessage.error('Please ensure all fields are correctly filled.');
     }
-  };
 
   const renderStepContent = (step: number) => {
     switch (step) {
@@ -6207,7 +6248,6 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       default:
         return null;
     }
-  };
 
   if (submitted) {
     return (
@@ -6262,11 +6302,11 @@ const LaunchNewWorkspace: NextPage & { getLayout?: (page: React.ReactElement) =>
       </div>
     </>
   );
-};
 
-LaunchNewWorkspace.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default LaunchNewWorkspace;
+}}}}}
 
 ===== END app/keenkonnect/workspaces/launch-new-workspace/page.tsx =====
 
@@ -6330,7 +6370,7 @@ const sampleWorkspaces: Workspace[] = [
   },
 ];
 
-const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const MyWorkspaces = () => {
   const router = useRouter();
 
   // État pour le filtre par projet
@@ -6361,11 +6401,9 @@ const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React
     } else {
       router.push(`/keenkonnect/workspaces/launch-workspace?id=${ws.id}`);
     }
-  };
 
   const handleManageSettings = (ws: Workspace) => {
     router.push(`/keenkonnect/workspaces/manage-workspace?id=${ws.id}`);
-  };
 
   return (
     <>
@@ -6405,7 +6443,7 @@ const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React
         {/* Liste des workspaces */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={filteredWorkspaces}
+          dataSource={filteredWorkspaces ?? []}
           renderItem={(workspace: Workspace) => (
             <List.Item key={workspace.id}>
               <Card
@@ -6437,11 +6475,11 @@ const MyWorkspaces: NextPage & { getLayout?: (page: React.ReactElement) => React
       </div>
     </>
   );
-};
 
-MyWorkspaces.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default MyWorkspaces;
+}}}
 
 ===== END app/keenkonnect/workspaces/my-workspaces/page.tsx =====
 
@@ -6537,13 +6575,11 @@ const CertificationPrograms: NextPage = () => {
   const openDrawer = (program: CertificationProgram) => {
     setSelectedProgram(program);
     setDrawerVisible(true);
-  };
 
   // Fermeture du Drawer
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedProgram(null);
-  };
 
   return (
     <PageContainer title="Certification Programs">
@@ -6650,14 +6686,13 @@ const CertificationPrograms: NextPage = () => {
       </Drawer>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via getLayout
-CertificationPrograms.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default CertificationPrograms;
+}}}
 
 ===== END app/konnected/certifications/certification-programs/page.tsx =====
 
@@ -6667,7 +6702,8 @@ export default CertificationPrograms;
 
 // File: /pages/konnected/certifications/exam-dashboard-results.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
+// (Optionnel) Si tu veux garder NextPage, tu peux l'importer :
+// import { NextPage } from 'next';
 import {
   Card,
   Statistic,
@@ -6684,7 +6720,7 @@ import { EyeOutlined, FilePdfOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 // Interface pour représenter une tentative d'examen
 interface ExamResult {
@@ -6701,7 +6737,7 @@ const upcomingExam = {
   examName: 'Certification Exam Level 1',
   examDate: '2023-10-10 10:00',
   status: 'Registered',
-};
+}; // <-- fermeture manquante ajoutée
 
 // Historique des examens réalisés
 const examResultsData: ExamResult[] = [
@@ -6711,7 +6747,8 @@ const examResultsData: ExamResult[] = [
     dateTaken: '2023-08-10',
     score: 78,
     result: 'Pass',
-    details: 'Score global de 78%. Excellente performance en théorie, à améliorer en pratique.',
+    details:
+      'Score global de 78%. Excellente performance en théorie, à améliorer en pratique.',
   },
   {
     id: '2',
@@ -6719,7 +6756,8 @@ const examResultsData: ExamResult[] = [
     dateTaken: '2023-07-05',
     score: 65,
     result: 'Fail',
-    details: 'Score global de 65%. Points faibles identifiés en gestion des situations critiques.',
+    details:
+      'Score global de 65%. Points faibles identifiés en gestion des situations critiques.',
   },
 ];
 
@@ -6729,7 +6767,7 @@ const certificationsEarned = [
   { id: 'cert2', title: 'Advanced Certification Exam', pdfLink: '#' },
 ];
 
-const ExamDashboardResults: NextPage = () => {
+export default function ExamDashboardResults() {
   // État pour gérer le Drawer de détail d'une tentative d'examen
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [selectedExam, setSelectedExam] = useState<ExamResult | null>(null);
@@ -6756,7 +6794,7 @@ const ExamDashboardResults: NextPage = () => {
       title: 'Result',
       dataIndex: 'result',
       key: 'result',
-      render: (result: 'Pass' | 'Fail') => (
+      render: (result: ExamResult['result']) => (
         <Text strong style={{ color: result === 'Pass' ? 'green' : 'red' }}>
           {result}
         </Text>
@@ -6781,130 +6819,137 @@ const ExamDashboardResults: NextPage = () => {
   ];
 
   return (
-    <PageContainer title="Exam Dashboard & Results">
-      {/* Section Examen à venir */}
-      {upcomingExam && (
-        <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={8}>
-              <Text strong>Exam:</Text> {upcomingExam.examName}
-            </Col>
-            <Col xs={24} md={8}>
-              <Text strong>Date:</Text> {upcomingExam.examDate}
-            </Col>
-            <Col xs={24} md={8}>
-              <Text strong>Status:</Text> {upcomingExam.status}
-            </Col>
-          </Row>
-        </Card>
-      )}
-      {/* Section Résumé des résultats pour le dernier examen terminé */}
-      {examResultsData.length > 0 && (
-        <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Statistic
-                title="Score Achieved"
-                value={examResultsData[0].score}
-                suffix="%"
-              />
-            </Col>
-            <Col xs={24} md={12}>
-              <Statistic
-                title="Result"
-                value={examResultsData[0].result}
-                valueStyle={{
-                  color:
-                    examResultsData[0].result === 'Pass' ? '#3f8600' : '#cf1322',
-                }}
-              />
-            </Col>
-          </Row>
-        </Card>
-      )}
-      {/* Tableau historique des examens */}
-      <Card title="Exam History" style={{ marginBottom: 24 }}>
-        <Table
-          columns={columns}
-          dataSource={examResultsData}
-          rowKey="id"
-          pagination={{ pageSize: 5 }}
-        />
-      </Card>
-      {/* Liste des certifications obtenues */}
-      <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
-        <List
-          dataSource={certificationsEarned}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Button icon={<FilePdfOutlined />} type="link">
-                  Download
-                </Button>,
-              ]}
-            >
-              <List.Item.Meta
-                title={item.title}
-                description={`Certificate ID: ${item.id}`}
-              />
-            </List.Item>
-          )}
-        />
-      </Card>
-      {/* Section Prochaines Étapes */}
-      <Card>
-        <Alert
-          message="Next Steps: Explore further certification programs to advance your career."
-          type="info"
-          showIcon
-        />
-        <div style={{ marginTop: 16 }}>
-          <Button type="primary" href="/konnected/certifications/programs">
-            Certification Programs
-          </Button>
-        </div>
-      </Card>
-      {/* Drawer pour détailler l'examen sélectionné */}
-      <Drawer
-        title="Exam Details"
-        placement="right"
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
-      >
-        {selectedExam && (
-          <>
-            <p>
-              <strong>Exam Name:</strong> {selectedExam.examName}
-            </p>
-            <p>
-              <strong>Date Taken:</strong> {selectedExam.dateTaken}
-            </p>
-            <p>
-              <strong>Score:</strong> {selectedExam.score}%
-            </p>
-            <p>
-              <strong>Result:</strong>{' '}
-              <Text strong style={{ color: selectedExam.result === 'Pass' ? 'green' : 'red' }}>
-                {selectedExam.result}
-              </Text>
-            </p>
-            <p>
-              <strong>Details:</strong>
-            </p>
-            <p>{selectedExam.details}</p>
-          </>
+    <MainLayout>
+      <PageContainer title="Exam Dashboard & Results">
+        {/* Section Examen à venir */}
+        {upcomingExam && (
+          <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={8}>
+                <Text strong>Exam:</Text> {upcomingExam.examName}
+              </Col>
+              <Col xs={24} md={8}>
+                <Text strong>Date:</Text> {upcomingExam.examDate}
+              </Col>
+              <Col xs={24} md={8}>
+                <Text strong>Status:</Text> {upcomingExam.status}
+              </Col>
+            </Row>
+          </Card>
         )}
-      </Drawer>
-    </PageContainer>
+
+        {/* Section Résumé des résultats pour le dernier examen terminé */}
+        {examResultsData.length > 0 && (
+          <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Statistic
+                  title="Score Achieved"
+                  value={examResultsData[0].score}
+                  suffix="%"
+                />
+              </Col>
+              <Col xs={24} md={12}>
+                <Statistic
+                  title="Result"
+                  value={examResultsData[0].result}
+                  valueStyle={{
+                    color:
+                      examResultsData[0].result === 'Pass'
+                        ? '#3f8600'
+                        : '#cf1322',
+                  }}
+                />
+              </Col>
+            </Row>
+          </Card>
+        )}
+
+        {/* Tableau historique des examens */}
+        <Card title="Exam History" style={{ marginBottom: 24 }}>
+          <Table
+            columns={columns}
+            dataSource={examResultsData}
+            rowKey="id"
+            pagination={{ pageSize: 5 }}
+          />
+        </Card>
+
+        {/* Liste des certifications obtenues */}
+        <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
+          <List
+            dataSource={certificationsEarned ?? []}
+            renderItem={(item) => (
+              <List.Item
+                actions={[
+                  <Button key="dl" icon={<FilePdfOutlined />} type="link">
+                    Download
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={item.title}
+                  description={`Certificate ID: ${item.id}`}
+                />
+              </List.Item>
+            )}
+          />
+        </Card>
+
+        {/* Section Prochaines Étapes */}
+        <Card>
+          <Alert
+            message="Next Steps: Explore further certification programs to advance your career."
+            type="info"
+            showIcon
+          />
+          <div style={{ marginTop: 16 }}>
+            <Button type="primary" href="/konnected/certifications/programs">
+              Certification Programs
+            </Button>
+          </div>
+        </Card>
+
+        {/* Drawer pour détailler l'examen sélectionné */}
+        <Drawer
+          title="Exam Details"
+          placement="right"
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+        >
+          {selectedExam && (
+            <>
+              <p>
+                <strong>Exam Name:</strong> {selectedExam.examName}
+              </p>
+              <p>
+                <strong>Date Taken:</strong> {selectedExam.dateTaken}
+              </p>
+              <p>
+                <strong>Score:</strong> {selectedExam.score}%
+              </p>
+              <p>
+                <strong>Result:</strong>{' '}
+                <Text
+                  strong
+                  style={{
+                    color: selectedExam.result === 'Pass' ? 'green' : 'red',
+                  }}
+                >
+                  {selectedExam.result}
+                </Text>
+              </p>
+              <p>
+                <strong>Details:</strong>
+              </p>
+              <p>{selectedExam.details}</p>
+            </>
+          )}
+        </Drawer>
+      </PageContainer>
+    </MainLayout>
   );
-};
-
-// Correction : envelopper la page dans MainLayout via getLayout
-ExamDashboardResults.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default ExamDashboardResults;
+}
 
 ===== END app/konnected/certifications/exam-dashboard-results/page.tsx =====
 
@@ -6985,7 +7030,6 @@ const ExamPreparationPage: NextPage = () => {
     // Ici, vous pouvez rediriger vers un nouvel écran de quiz ou ouvrir un modal.
     // Pour cet exemple, nous affichons simplement un message de log.
     console.log('Starting practice exam...');
-  };
 
   return (
     <PageContainer title="Exam Preparation">
@@ -6995,7 +7039,7 @@ const ExamPreparationPage: NextPage = () => {
           <Card title="Study Modules Overview">
             <List
               itemLayout="horizontal"
-              dataSource={studyModules}
+              dataSource={studyModules ?? []}
               renderItem={(module: Module) => (
                 <List.Item
                   actions={[
@@ -7058,14 +7102,13 @@ const ExamPreparationPage: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via getLayout
-ExamPreparationPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ExamPreparationPage;
+}}
 
 ===== END app/konnected/certifications/exam-preparation/page.tsx =====
 
@@ -7076,8 +7119,7 @@ export default ExamPreparationPage;
 // File: /pages/konnected/certifications/exam-registration.tsx
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import {
-  Form,
+import { Form,
   Input,
   Button,
   Steps,
@@ -7085,8 +7127,8 @@ import {
   Radio,
   Checkbox,
   Result,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
 
@@ -7122,19 +7164,16 @@ const ExamRegistration: NextPage = () => {
       .catch((info) => {
         console.log('Validation Failed:', info);
       });
-  };
 
   // Retour à l'étape précédente
   const prev = () => {
     setCurrentStep(currentStep - 1);
-  };
 
   // Traitement final de la soumission
   const onSubmit = () => {
     // Ici, vous pouvez intégrer un appel API ou une logique de paiement.
-    message.success('Registration complete!');
+    antdMessage.success('Registration complete!');
     setRegistrationCompleted(true);
-  };
 
   // Rendu conditionnel du contenu selon l'étape courante
   const renderStepContent = () => {
@@ -7207,7 +7246,6 @@ const ExamRegistration: NextPage = () => {
       default:
         return null;
     }
-  };
 
   // Une fois l'inscription terminée, afficher une page de résultat
   if (registrationCompleted) {
@@ -7256,14 +7294,13 @@ const ExamRegistration: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
 // Correction: envelopper la page dans MainLayout via getLayout
-ExamRegistration.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ExamRegistration;
+}}}}}
 
 ===== END app/konnected/certifications/exam-registration/page.tsx =====
 
@@ -7390,7 +7427,6 @@ const ActiveThreadsPage: NextPage = () => {
   const openThread = (thread: Thread) => {
     console.log('Ouvrir le thread:', thread.title);
     // Exemple de redirection : Router.push(`/konnected/community-discussions/thread/${thread.id}`);
-  };
 
   return (
     <PageContainer title="Active Threads">
@@ -7433,7 +7469,7 @@ const ActiveThreadsPage: NextPage = () => {
 
       <List
         grid={{ gutter: 16, column: 1 }}
-        dataSource={paginatedThreads}
+        dataSource={paginatedThreads ?? []}
         renderItem={(thread: Thread) => (
           <List.Item
             onClick={() => openThread(thread)}
@@ -7478,13 +7514,12 @@ const ActiveThreadsPage: NextPage = () => {
       </div>
     </PageContainer>
   );
-};
 
-ActiveThreadsPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ActiveThreadsPage;
+}}
 
 ===== END app/konnected/community-discussions/active-threads/page.tsx =====
 
@@ -7494,7 +7529,7 @@ export default ActiveThreadsPage;
 
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
-import { Table, Tabs, Tag, Button, Space, Modal, message } from 'antd';
+import { Table, Tabs, Tag, Button, Space, Modal, message as antdMessage  } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -7564,14 +7599,12 @@ const ModerationPage: NextPage = () => {
 
   // Gestion des actions pour une entrée de modération
   const handleApprove = (item: ModerationItem) => {
-    message.success(`Content "${item.contentSnippet.substring(0, 20)}..." approved.`);
+    antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." approved.`);
     // Ici, intégrez un appel API pour approuver l'élément
-  };
 
   const handleFlagUser = (item: ModerationItem) => {
-    message.warning(`User ${item.author} has been flagged/warned.`);
+    antdMessage.warning(`User ${item.author} has been flagged/warned.`);
     // Intégrez ici la logique de signalement de l'utilisateur
-  };
 
   const handleDelete = (item: ModerationItem) => {
     confirm({
@@ -7582,11 +7615,10 @@ const ModerationPage: NextPage = () => {
       okType: 'danger',
       cancelText: 'Annuler',
       onOk() {
-        message.success(`Content "${item.contentSnippet.substring(0, 20)}..." deleted.`);
+        antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." deleted.`);
         // Intégrez ici la logique de suppression via API
       },
     });
-  };
 
   // Définition des colonnes du tableau
   const columns = [
@@ -7594,7 +7626,7 @@ const ModerationPage: NextPage = () => {
       title: 'Content Snippet',
       dataIndex: 'contentSnippet',
       key: 'contentSnippet',
-      render: (text: string) => <span>{text}</span>,
+      render: (text, row) => <span>{text}</span>,
     },
     {
       title: 'Author',
@@ -7605,7 +7637,7 @@ const ModerationPage: NextPage = () => {
       title: activeTab === 'Reported' ? 'Report Reason' : 'Note',
       dataIndex: 'reportReason',
       key: 'reportReason',
-      render: (text: string) =>
+      render: (text, row) =>
         text ? <Tag color="volcano">{text}</Tag> : <Tag color="blue">Pending Approval</Tag>,
     },
     {
@@ -7617,7 +7649,7 @@ const ModerationPage: NextPage = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) =>
+      render: (status, row) =>
         status === 'Approved' ? (
           <Tag color="green">Approved</Tag>
         ) : (
@@ -7667,13 +7699,12 @@ const ModerationPage: NextPage = () => {
       />
     </PageContainer>
   );
-};
 
-ModerationPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ModerationPage;
+}}}}
 
 ===== END app/konnected/community-discussions/moderation/page.tsx =====
 
@@ -7684,7 +7715,7 @@ export default ModerationPage;
 // File: /pages/konnected/community-discussions/start-new-discussion.tsx
 import React from 'react';
 import { NextPage } from 'next';
-import { Form, Input, Select, Switch, Button, message } from 'antd';
+import { Form, Input, Select, Switch, Button, message as antdMessage  } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -7698,10 +7729,9 @@ const StartNewDiscussion: NextPage = () => {
   // Simulation de la soumission : en production, un appel API sera nécessaire pour créer le thread.
   const onFinish = (values: any) => {
     console.log('New Discussion Data:', values);
-    message.success('Votre discussion a été créée avec succès !');
+    antdMessage.success('Votre discussion a été créée avec succès !');
     // Simuler la redirection vers la page de détail du thread créé, par exemple avec l'ID généré.
     router.push(`/konnected/community-discussions/thread/123`);
-  };
 
   return (
     <PageContainer title="Start New Discussion">
@@ -7755,13 +7785,12 @@ const StartNewDiscussion: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
-StartNewDiscussion.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default StartNewDiscussion;
+}}
 
 ===== END app/konnected/community-discussions/start-new-discussion/page.tsx =====
 
@@ -7873,7 +7902,7 @@ const KonnectedDashboard: NextPage = () => {
           <Card title="Recent Updates">
             <List
               itemLayout="horizontal"
-              dataSource={recentUpdates}
+              dataSource={recentUpdates ?? []}
               renderItem={(item) => (
                 <List.Item>
                   <List.Item.Meta
@@ -7899,7 +7928,7 @@ const KonnectedDashboard: NextPage = () => {
           <Card title="Active Discussions">
             <List
               itemLayout="horizontal"
-              dataSource={activeDiscussions}
+              dataSource={activeDiscussions ?? []}
               renderItem={(discussion) => (
                 <List.Item>
                   <List.Item.Meta
@@ -7949,14 +7978,13 @@ const KonnectedDashboard: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
 
 // Correction : envelopper la page dans MainLayout via getLayout
-KonnectedDashboard.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default KonnectedDashboard;
+}
 
 ===== END app/konnected/dashboard/page.tsx =====
 
@@ -8045,7 +8073,7 @@ const sampleResources: Resource[] = [
   },
 ];
 
-const BrowseResources: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const BrowseResources = () => {
   const router = useRouter();
   const [searchText, setSearchText] = useState('');
   const [subjectFilter, setSubjectFilter] = useState('All');
@@ -8099,7 +8127,7 @@ const BrowseResources: NextPage & { getLayout?: (page: React.ReactElement) => Re
       title: 'Rating',
       dataIndex: 'rating',
       key: 'rating',
-      render: (rating: number) => `${rating} / 5`,
+      render: (rating, row) => `${rating} / 5`,
     },
     {
       title: 'Action',
@@ -8169,103 +8197,106 @@ const BrowseResources: NextPage & { getLayout?: (page: React.ReactElement) => Re
       </div>
     </>
   );
-};
 
-BrowseResources.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default BrowseResources;
+}
 
 ===== END app/konnected/learning-library/browse-resources/page.tsx =====
 
 
 ===== BEGIN app/konnected/learning-library/offline-content/page.tsx =====
-'use client'
+'use client';
 
 import React, { useState } from 'react';
-import { NextPage } from 'next';
-import { Row, Col, Card, Button, Typography, Spin, message } from 'antd';
-import { SyncOutlined, CheckCircleOutlined, DownloadOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
+import {
+  Row,
+  Col,
+  Card,
+  Button,
+  Typography,
+  Spin,
+  message as antdMessage,
+} from 'antd';
+import {
+  SyncOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
 
 const { Paragraph, Text } = Typography;
 
-interface OfflineContentPackage {
+type OfflineContentPackage = {
   id: string;
   title: string;
   description: string;
   lastUpdated: string;
   downloaded: boolean;
-  size?: string;
   syncing: boolean;
-}
+  size?: string;
+};
 
 const initialPackages: OfflineContentPackage[] = [
   {
-    id: '1',
-    title: 'Package A: Course Material',
-    description: 'Includes video lectures, study guides, and supplemental notes.',
-    lastUpdated: '2025-04-10 14:00',
-    downloaded: true,
-    size: '150 MB',
-    syncing: false,
-  },
-  {
-    id: '2',
-    title: 'Package B: Interactive Quiz',
-    description: 'Contains interactive quizzes and practice tests.',
-    lastUpdated: '2025-04-09 10:30',
+    id: 'foundation-js',
+    title: 'JavaScript Foundations',
+    description: 'Core JS concepts for beginners to intermediate learners.',
+    lastUpdated: 'Never',
     downloaded: false,
     syncing: false,
   },
   {
-    id: '3',
-    title: 'Package C: Supplemental Readings',
-    description: 'A collection of additional readings and research articles.',
-    lastUpdated: '2025-04-08 09:15',
-    downloaded: true,
-    size: '75 MB',
+    id: 'react-advanced',
+    title: 'Advanced React',
+    description: 'Hooks, performance patterns, suspense and more.',
+    lastUpdated: 'Never',
+    downloaded: false,
     syncing: false,
   },
-  // Add more packages as needed...
+  {
+    id: 'data-viz',
+    title: 'Data Visualization Toolkit',
+    description: 'Build charts and dashboards with modern libraries.',
+    lastUpdated: 'Never',
+    downloaded: false,
+    syncing: false,
+  },
 ];
 
-const OfflineContentPage: NextPage = () => {
+export default function OfflineContentPage(): JSX.Element {
   const [packages, setPackages] = useState<OfflineContentPackage[]>(initialPackages);
 
-  // Trigger sync/download for a single package
+  // Sync / download a single package
   const handleSync = (id: string) => {
-    // Mark the package as syncing
+    // mark as syncing
     setPackages(prev =>
-      prev.map(pkg =>
-        pkg.id === id ? { ...pkg, syncing: true } : pkg
-      )
+      prev.map(pkg => (pkg.id === id ? { ...pkg, syncing: true } : pkg)),
     );
-    // Simulate a download/sync delay
+
+    // simulate download
     setTimeout(() => {
       setPackages(prev =>
-        prev.map(pkg => {
-          if (pkg.id === id) {
-            return {
-              ...pkg,
-              syncing: false,
-              downloaded: true,
-              lastUpdated: new Date().toLocaleString(),
-              size: pkg.size || '100 MB',
-            };
-          }
-          return pkg;
-        })
+        prev.map(pkg =>
+          pkg.id === id
+            ? {
+                ...pkg,
+                syncing: false,
+                downloaded: true,
+                lastUpdated: new Date().toLocaleString(),
+                size: pkg.size || '100 MB',
+              }
+            : pkg,
+        ),
       );
-      message.success(`Package "${id}" synced successfully!`);
+      antdMessage.success(`Package "${id}" synced successfully!`);
     }, 2000);
   };
 
-  // Global "Sync All" action for all packages
+  // Sync all packages
   const handleSyncAll = () => {
-    setPackages(prev =>
-      prev.map(pkg => ({ ...pkg, syncing: true }))
-    );
+    setPackages(prev => prev.map(pkg => ({ ...pkg, syncing: true })));
+
     setTimeout(() => {
       setPackages(prev =>
         prev.map(pkg => ({
@@ -8274,9 +8305,9 @@ const OfflineContentPage: NextPage = () => {
           downloaded: true,
           lastUpdated: new Date().toLocaleString(),
           size: pkg.size || '100 MB',
-        }))
+        })),
       );
-      message.success('All packages synced successfully!');
+      antdMessage.success('All packages synced successfully!');
     }, 2000);
   };
 
@@ -8289,15 +8320,17 @@ const OfflineContentPage: NextPage = () => {
         </Button>
       </Row>
 
-      {/* Grid display of content packages */}
+      {/* Grid of packages */}
       <Row gutter={[16, 16]}>
-        {packages.map((pkg) => (
+        {packages.map(pkg => (
           <Col xs={24} sm={12} md={8} key={pkg.id}>
             <Card
               title={pkg.title}
               extra={
                 pkg.syncing ? (
-                  <Spin indicator={<SyncOutlined style={{ fontSize: 24 }} spin />} />
+                  <Spin
+                    indicator={<SyncOutlined style={{ fontSize: 24 }} spin />}
+                  />
                 ) : (
                   <Button type="primary" onClick={() => handleSync(pkg.id)}>
                     {pkg.downloaded ? 'Sync Updates' : 'Download'}
@@ -8306,7 +8339,7 @@ const OfflineContentPage: NextPage = () => {
               }
             >
               <Paragraph>{pkg.description}</Paragraph>
-              <Text strong>Last Updated:</Text> {pkg.lastUpdated}
+              <Text strong>Last Updated:</Text> <span>{pkg.lastUpdated}</span>
               {pkg.downloaded && (
                 <>
                   <br />
@@ -8323,14 +8356,7 @@ const OfflineContentPage: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
-
-// Wrap the page with MainLayout
-OfflineContentPage.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default OfflineContentPage;
+}
 
 ===== END app/konnected/learning-library/offline-content/page.tsx =====
 
@@ -8384,7 +8410,7 @@ const initialRecommendedResources: Resource[] = [
   },
 ];
 
-const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const RecommendedResources = () => {
   const router = useRouter();
   const [resources, setResources] = useState<Resource[]>(initialRecommendedResources);
 
@@ -8394,7 +8420,6 @@ const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) 
     // Pour la simulation, nous changeons l'ordre des ressources aléatoirement
     const shuffled = [...resources].sort(() => Math.random() - 0.5);
     setResources(shuffled);
-  };
 
   return (
     <>
@@ -8418,7 +8443,7 @@ const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) 
         {/* Liste des ressources recommandées */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={resources}
+          dataSource={resources ?? []}
           renderItem={(resource) => (
             <List.Item key={resource.key}>
               <Card
@@ -8441,11 +8466,11 @@ const RecommendedResources: NextPage & { getLayout?: (page: React.ReactElement) 
       </div>
     </>
   );
-};
 
-RecommendedResources.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default RecommendedResources;
+}}
 
 ===== END app/konnected/learning-library/recommended-resources/page.tsx =====
 
@@ -8529,7 +8554,7 @@ const sampleResources: Resource[] = [
   },
 ];
 
-const SearchFilters: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const SearchFilters = () => {
   // États pour les filtres de recherche
   const [keyword, setKeyword] = useState('');
   const [authorFilter, setAuthorFilter] = useState<string>('');
@@ -8679,11 +8704,11 @@ const SearchFilters: NextPage & { getLayout?: (page: React.ReactElement) => Reac
       </div>
     </>
   );
-};
 
-SearchFilters.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+
 
 export default SearchFilters;
+}
 
 ===== END app/konnected/learning-library/search-filters/page.tsx =====
 
@@ -8691,258 +8716,398 @@ export default SearchFilters;
 ===== BEGIN app/konnected/learning-paths/create-learning-path/page.tsx =====
 'use client'
 
-// pages/konnected/learning-paths/create-learning-path/index.tsx
 import React, { useState } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Form, Input, Select, Button, Modal, List, Card, Space, Divider, message, Result } from 'antd';
-import { ArrowUpOutlined, ArrowDownOutlined, EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
-import MainLayout from '@/components/layout-components/MainLayout';
-import { useRouter } from 'next/navigation';
-import { normalizeError } from "../../../../shared/errors";
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  List,
+  Modal,
+  Select,
+  Steps,
+  Table,
+  Typography,
+} from 'antd';
+import PageContainer from '@/components/PageContainer';
 
+const { Title, Paragraph } = Typography;
 const { Option } = Select;
-const { TextArea } = Input;
 
-interface StepItem {
+type Step = {
   id: string;
-  resourceName: string;
-  resourceType: string;
-  note: string;
-}
+  title: string;
+  type: 'lesson' | 'quiz' | 'assignment';
+  content: string;
+  resourceIds: string[];
+};
 
-// Exemples de ressources disponibles (dummy)
-const availableResources = [
-  { id: 'r1', name: 'Introduction to HTML', type: 'Lesson' },
-  { id: 'r2', name: 'CSS Fundamentals', type: 'Lesson' },
-  { id: 'r3', name: 'JavaScript Basics', type: 'Lesson' },
-  { id: 'r4', name: 'Responsive Design Techniques', type: 'Article' },
-  { id: 'r5', name: 'React Overview', type: 'Video' },
+type LearningPath = {
+  id: string;
+  name: string;
+  description: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
+  steps: Step[];
+  tags: string[];
+};
+
+const initialSteps: Step[] = [
+  {
+    id: 'step-1',
+    title: 'Introduction to the Subject',
+    type: 'lesson',
+    content: 'Overview of the key concepts that will be covered in this learning path.',
+    resourceIds: ['res-1', 'res-2'],
+  },
+  {
+    id: 'step-2',
+    title: 'Knowledge Check Quiz',
+    type: 'quiz',
+    content: 'A brief quiz to evaluate understanding of the introduction.',
+    resourceIds: [],
+  },
 ];
 
-const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
-  const router = useRouter();
+const availableResources = [
+  { id: 'res-1', name: 'Intro Article', type: 'Article' },
+  { id: 'res-2', name: 'Intro Video', type: 'Video' },
+  { id: 'res-3', name: 'Cheat Sheet', type: 'Document' },
+  { id: 'res-4', name: 'Practice Repo', type: 'Code' },
+];
+
+const CreateLearningPath = () => {
   const [form] = Form.useForm();
-  
-  // État pour les informations de base
-  const [basicInfo, setBasicInfo] = useState({
-    pathTitle: '',
-    description: '',
-    targetAudience: '',
-  });
-
-  // Liste des étapes du parcours
-  const [steps, setSteps] = useState<StepItem[]>([]);
-
-  // État pour la modal d'ajout/édition de step
-  const [stepModalVisible, setStepModalVisible] = useState(false);
-  // Permet de savoir si l'on édite un step existant (index) ou si on ajoute un nouveau step (null)
-  const [editingStepIndex, setEditingStepIndex] = useState<number | null>(null);
+  const [resourceForm] = Form.useForm();
   const [stepForm] = Form.useForm();
 
-  // État final de soumission du parcours
-  const [submitted, setSubmitted] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
+  const [steps, setSteps] = useState<Step[]>(initialSteps);
+  const [selectedStep, setSelectedStep] = useState<Step | null>(null);
 
-  // Ouvrir la modal pour ajouter un nouveau step
-  const openAddStepModal = () => {
-    setEditingStepIndex(null);
+  const [isStepModalVisible, setStepModalVisible] = useState(false);
+  const [isResourceModalVisible, setResourceModalVisible] = useState(false);
+
+  const stepItems = [
+    { title: 'Basics' },
+    { title: 'Steps' },
+    { title: 'Resources' },
+    { title: 'Review & Create' },
+  ];
+
+  const onNext = () => setCurrentStep((s) => Math.min(s + 1, stepItems.length - 1));
+  const onPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
+
+  const handleAddStep = () => {
+    setSelectedStep(null);
     stepForm.resetFields();
     setStepModalVisible(true);
   };
 
-  // Ouvrir la modal pour éditer un step existant
-  const openEditStepModal = (index: number) => {
-    setEditingStepIndex(index);
-    const step = steps[index];
-    stepForm.setFieldsValue({
-      resourceId: step.id,
-      note: step.note,
-    });
+  const handleEditStep = (step: Step) => {
+    setSelectedStep(step);
+    stepForm.setFieldsValue(step);
     setStepModalVisible(true);
   };
 
-  // Gestion de la soumission du step (ajout ou édition)
-  const handleStepModalOk = async () => {
-    try {
-      const values = await stepForm.validateFields();
-      // Trouver la ressource sélectionnée pour récupérer le nom et type
-      const resource = availableResources.find(r => r.id === values.resourceId);
-      if (!resource) {
-        message.error('Selected resource not found.');
-        return;
-      }
-      const newStep: StepItem = {
-        id: resource.id,
-        resourceName: resource.name,
-        resourceType: resource.type,
-        note: values.note || '',
-      };
-      if (editingStepIndex !== null) {
-        // Edition d'une étape existante
-        const updatedSteps = [...steps];
-        updatedSteps[editingStepIndex] = newStep;
-        setSteps(updatedSteps);
+  const handleDeleteStep = (id: string) => {
+    setSteps((prev) => prev.filter((s) => s.id !== id));
+  };
+
+  const submitStep = () => {
+    stepForm.validateFields().then((values: Omit<Step, 'id'>) => {
+      if (selectedStep) {
+        setSteps((prev) =>
+          prev.map((s) => (s.id === selectedStep.id ? { ...selectedStep, ...values } : s)),
+        );
       } else {
-        // Ajout d'une nouvelle étape
-        setSteps(prev => [...prev, newStep]);
+        const newStep: Step = {
+          id: `step-${Date.now()}`,
+          ...values,
+        };
+        setSteps((prev) => [...prev, newStep]);
       }
       setStepModalVisible(false);
-    } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      message.error('Please complete the step form.');
-    }
+    });
   };
 
-  const handleStepModalCancel = () => {
-    setStepModalVisible(false);
+  const openResourceModal = (step: Step) => {
+    setSelectedStep(step);
+    resourceForm.setFieldsValue({ resourceIds: step.resourceIds });
+    setResourceModalVisible(true);
   };
 
-  // Fonctions pour réordonner les steps
-  const moveStepUp = (index: number) => {
-    if (index === 0) return;
-    const updatedSteps = [...steps];
-    [updatedSteps[index - 1], updatedSteps[index]] = [updatedSteps[index], updatedSteps[index - 1]];
-    setSteps(updatedSteps);
+  const submitResources = () => {
+    resourceForm.validateFields().then(({ resourceIds }: { resourceIds: string[] }) => {
+      if (selectedStep) {
+        setSteps((prev) =>
+          prev.map((s) => (s.id === selectedStep.id ? { ...s, resourceIds } : s)),
+        );
+      }
+      setResourceModalVisible(false);
+    });
   };
 
-  const moveStepDown = (index: number) => {
-    if (index === steps.length - 1) return;
-    const updatedSteps = [...steps];
-    [updatedSteps[index + 1], updatedSteps[index]] = [updatedSteps[index], updatedSteps[index + 1]];
-    setSteps(updatedSteps);
+  const onFinishBasics = (_values: any) => {
+    // Basics are read from `form` during final submit
   };
 
-  // Supprimer une étape
-  const removeStep = (index: number) => {
-    setSteps(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Soumission finale du parcours
   const onSubmitPath = async () => {
-    try {
-      const basicValues = await form.validateFields();
-      setBasicInfo(basicValues);
-      // Ici, simuler un appel API pour sauvegarder le parcours
-      console.log('Learning Path Submitted:', {
-        basicInfo: basicValues,
-        steps,
-      });
-      setSubmitted(true);
-    } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      message.error('Please complete the basic information form.');
-    }
+    const basics = await form.validateFields();
+    const path: LearningPath = {
+      id: `path-${Date.now()}`,
+      name: basics.name,
+      description: basics.description,
+      difficulty: basics.difficulty,
+      steps,
+      tags: basics.tags || [],
+    };
+    // TODO: Send `path` to your backend
+    console.log('New Learning Path:', path);
   };
 
-  if (submitted) {
-    return (
-      <div className="container mx-auto p-5">
-        <Result
-          status="success"
-          title="Learning Path Created Successfully!"
-          subTitle="Your new learning path has been published."
-          extra={[
-            <Button key="view" type="primary" onClick={() => router.push('/konnected/learning-paths/my-learning-path')}>
-              View Learning Path
-            </Button>,
-          ]}
-        />
+  const columns = [
+    { title: 'Title', dataIndex: 'title' as const },
+    {
+      title: 'Type',
+      dataIndex: 'type' as const,
+      render: (t: Step['type']) => t.charAt(0).toUpperCase() + t.slice(1),
+    },
+    { title: 'Content', dataIndex: 'content' as const, ellipsis: true },
+    {
+      title: 'Resources',
+      dataIndex: 'resourceIds' as const,
+      render: (ids: string[]) =>
+        ids.length ? (
+          <List
+            size="small"
+            dataSource={ids}
+            renderItem={(id) => {
+              const res = availableResources.find((r) => r.id === id);
+              return <List.Item>{res ? `${res.name} (${res.type})` : id}</List.Item>;
+            }}
+          />
+        ) : (
+          <em>None</em>
+        ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: Step) => (
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button onClick={() => handleEditStep(record)}>Edit</Button>
+          <Button onClick={() => openResourceModal(record)}>Resources</Button>
+          <Button danger onClick={() => handleDeleteStep(record.id)}>
+            Delete
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
+  const StepBasics = (
+    <Card>
+      <Title level={4}>Learning Path Basics</Title>
+      <Paragraph>Provide the basic information for your learning path.</Paragraph>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinishBasics}
+        initialValues={{ difficulty: 'Beginner', tags: ['Onboarding'] }}
+      >
+        <Form.Item
+          label="Path Name"
+          name="name"
+          rules={[{ required: true, message: 'Please enter a name for the learning path.' }]}
+        >
+          <Input placeholder="e.g., Web Fundamentals for New Team Members" />
+        </Form.Item>
+
+        <Form.Item
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: 'Please enter a brief description.' }]}
+        >
+          <Input.TextArea rows={4} placeholder="Describe the goals and audience for this path..." />
+        </Form.Item>
+
+        <Form.Item label="Difficulty" name="difficulty" rules={[{ required: true }]}>
+          <Select>
+            <Option value="Beginner">Beginner</Option>
+            <Option value="Intermediate">Intermediate</Option>
+            <Option value="Advanced">Advanced</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item label="Tags" name="tags">
+          <Select mode="tags" placeholder="Add tags (optional)" />
+        </Form.Item>
+      </Form>
+    </Card>
+  );
+
+  const StepSteps = (
+    <Card>
+      <Title level={4}>Define Steps</Title>
+      <Paragraph>Create and organize the steps that make up this learning path.</Paragraph>
+
+      <div style={{ marginBottom: 16 }}>
+        <Button type="primary" onClick={handleAddStep}>
+          Add Step
+        </Button>
       </div>
-    );
-  }
+
+      <Table rowKey="id" dataSource={steps} columns={columns} pagination={false} />
+    </Card>
+  );
+
+  const StepResources = (
+    <Card>
+      <Title level={4}>Manage Resources</Title>
+      <Paragraph>
+        Resources are supporting materials linked to steps (articles, videos, documents, code, etc.).
+        Use the “Resources” action on each step to attach relevant items.
+      </Paragraph>
+      <List
+        header="Available Resources"
+        dataSource={availableResources}
+        renderItem={(item) => (
+          <List.Item>
+            <List.Item.Meta title={`${item.name} (${item.type})`} description={`ID: ${item.id}`} />
+          </List.Item>
+        )}
+      />
+    </Card>
+  );
+
+  const StepReview = (
+    <Card>
+      <Title level={4}>Review & Create</Title>
+      <Paragraph>Review all details, then click “Create Path”.</Paragraph>
+
+      <Title level={5} style={{ marginTop: 8 }}>Basics</Title>
+      <List
+        size="small"
+        dataSource={[
+          { label: 'Name', value: form.getFieldValue('name') },
+          { label: 'Description', value: form.getFieldValue('description') },
+          { label: 'Difficulty', value: form.getFieldValue('difficulty') },
+          { label: 'Tags', value: (form.getFieldValue('tags') || []).join(', ') || '—' },
+        ]}
+        renderItem={(i) => (
+          <List.Item>
+            <strong style={{ width: 120, display: 'inline-block' }}>{i.label}:</strong>{' '}
+            {i.value || '—'}
+          </List.Item>
+        )}
+      />
+
+      <Title level={5} style={{ marginTop: 16 }}>Steps</Title>
+      <Table
+        rowKey="id"
+        dataSource={steps}
+        columns={[
+          { title: '#', render: (_: any, __: Step, idx: number) => idx + 1, width: 60 },
+          { title: 'Title', dataIndex: 'title' as const },
+          { title: 'Type', dataIndex: 'type' as const },
+          {
+            title: 'Resources',
+            dataIndex: 'resourceIds' as const,
+            render: (ids: string[]) => (ids?.length ?? 0),
+          },
+        ]}
+        pagination={false}
+      />
+
+      <div style={{ marginTop: 16 }}>
+        <Button type="primary" onClick={onSubmitPath}>
+          Create Path
+        </Button>
+      </div>
+    </Card>
+  );
 
   return (
     <>
-      <Head>
-        <title>Create Learning Path</title>
-        <meta name="description" content="Create a new learning path by ordering and linking educational resources." />
-      </Head>
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Create Learning Path</h1>
-        {/* Formulaire pour les informations de base */}
-        <Card className="mb-6">
-          <Form form={form} layout="vertical">
-            <Form.Item
-              name="pathTitle"
-              label="Path Title"
-              rules={[{ required: true, message: 'Please enter the learning path title.' }]}
-            >
-              <Input placeholder="Enter title" />
-            </Form.Item>
-            <Form.Item
-              name="description"
-              label="Description"
-              rules={[{ required: true, message: 'Please enter a description.' }]}
-            >
-              <TextArea rows={4} placeholder="Enter description" />
-            </Form.Item>
-            <Form.Item
-              name="targetAudience"
-              label="Target Audience"
-              rules={[{ required: true, message: 'Please specify the target audience.' }]}
-            >
-              <Input placeholder="e.g., Beginners, Advanced learners" />
-            </Form.Item>
-          </Form>
-        </Card>
+      <PageContainer title="Create Learning Path">
+        <Steps current={currentStep} items={stepItems} style={{ marginBottom: 24 }} />
 
-        {/* Editeur de steps */}
-        <Card className="mb-6" title="Learning Path Steps">
-          <Button type="dashed" icon={<PlusOutlined />} onClick={openAddStepModal} style={{ marginBottom: 16 }}>
-            Add Step
+        <div>
+          {currentStep === 0 && StepBasics}
+          {currentStep === 1 && StepSteps}
+          {currentStep === 2 && StepResources}
+          {currentStep === 3 && StepReview}
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
+          <Button onClick={onPrev} disabled={currentStep === 0}>
+            Previous
           </Button>
-          {steps.length === 0 ? (
-            <p>No steps added yet. Click "Add Step" to start building your learning path.</p>
-          ) : (
-            <List
-              dataSource={steps}
-              renderItem={(step, index) => (
-                <List.Item
-                  actions={[
-                    <Button icon={<ArrowUpOutlined />} onClick={() => moveStepUp(index)} disabled={index === 0} />,
-                    <Button icon={<ArrowDownOutlined />} onClick={() => moveStepDown(index)} disabled={index === steps.length - 1} />,
-                    <Button icon={<EditOutlined />} onClick={() => openEditStepModal(index)} />,
-                    <Button icon={<DeleteOutlined />} danger onClick={() => removeStep(index)} />,
-                  ]}
-                >
-                  <List.Item.Meta
-                    title={`${index + 1}. ${step.resourceName} (${step.resourceType})`}
-                    description={step.note || 'No additional notes.'}
-                  />
-                </List.Item>
-              )}
-            />
-          )}
-        </Card>
+          <Button type="primary" onClick={onNext} disabled={currentStep === stepItems.length - 1}>
+            Next
+          </Button>
+        </div>
+      </PageContainer>
 
-        <Divider />
-
-        {/* Bouton de soumission du parcours */}
-        <Button type="primary" onClick={onSubmitPath}>
-          Save & Publish Path
-        </Button>
-      </div>
-      {/* Modal pour Ajouter/Éditer une étape */}
+      {/* Step Create/Edit Modal */}
       <Modal
-        title={editingStepIndex !== null ? "Edit Step" : "Add New Step"}
-        open={stepModalVisible}
-        onOk={handleStepModalOk}
-        onCancel={handleStepModalCancel}
+        title={selectedStep ? 'Edit Step' : 'Add Step'}
+        open={isStepModalVisible}
+        onOk={submitStep}
+        onCancel={() => setStepModalVisible(false)}
       >
-        <Form form={stepForm} layout="vertical">
+        <Form form={stepForm} layout="vertical" initialValues={{ type: 'lesson' }}>
           <Form.Item
-            name="resourceId"
-            label="Select Resource"
+            name="title"
+            label="Step Title"
+            rules={[{ required: true, message: 'Please enter a step title.' }]}
+          >
+            <Input placeholder="e.g., Understanding HTML & CSS" />
+          </Form.Item>
+
+          <Form.Item name="type" label="Step Type">
+            <Select>
+              <Option value="lesson">Lesson</Option>
+              <Option value="quiz">Quiz</Option>
+              <Option value="assignment">Assignment</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="content"
+            label="Content / Instructions"
+            rules={[{ required: true, message: 'Please provide content or instructions.' }]}
+          >
+            <Input.TextArea
+              rows={4}
+              placeholder="Write the lesson content, quiz outline, or assignment brief..."
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Resource Selector Modal */}
+      <Modal
+        title="Attach Resources"
+        open={isResourceModalVisible}
+        onOk={submitResources}
+        onCancel={() => setResourceModalVisible(false)}
+      >
+        <Form form={resourceForm} layout="vertical">
+          <Form.Item
+            name="resourceIds"
+            label="Resources"
             rules={[{ required: true, message: 'Please select a resource.' }]}
           >
-            <Select placeholder="Select a resource">
-              {availableResources.map(resource => (
+            <Select placeholder="Select resources" mode="multiple" allowClear>
+              {availableResources.map((resource) => (
                 <Option key={resource.id} value={resource.id}>
                   {resource.name} ({resource.type})
                 </Option>
               ))}
             </Select>
           </Form.Item>
+
           <Form.Item name="note" label="Add a Note (optional)">
             <Input placeholder="Enter any instructions or additional notes" />
           </Form.Item>
@@ -8951,8 +9116,6 @@ const CreateLearningPath: NextPage & { getLayout?: (page: React.ReactElement) =>
     </>
   );
 };
-
-CreateLearningPath.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
 
 export default CreateLearningPath;
 
@@ -8965,16 +9128,15 @@ export default CreateLearningPath;
 // File: /pages/konnected/learning-paths/manage-existing-paths.tsx
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import {
-  Table,
+import { Table,
   Button,
   Modal,
   Typography,
   Input,
   Space,
   Empty,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -9022,10 +9184,9 @@ const ManageExistingPaths: NextPage = () => {
       okType: 'danger',
       onOk: () => {
         setPaths(paths.filter((path) => path.id !== id));
-        message.success('Learning path deleted successfully');
+        antdMessage.success('Learning path deleted successfully');
       },
     });
-  };
 
   // Colonnes du tableau
   const columns = [
@@ -9107,13 +9268,12 @@ const ManageExistingPaths: NextPage = () => {
       )}
     </PageContainer>
   );
-};
 
-ManageExistingPaths.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default ManageExistingPaths;
+}}
 
 ===== END app/konnected/learning-paths/manage-existing-paths/page.tsx =====
 
@@ -9150,8 +9310,9 @@ interface LearningPath {
 const sampleLearningPath: LearningPath = {
   id: '1',
   title: 'Beginner Web Development',
-  description: 'A comprehensive path to learn web development from scratch. You will start with HTML and CSS and move on to JavaScript and modern frameworks.',
-  progress: 40,  // Pourcentage de progression
+  description:
+    'A comprehensive path to learn web development from scratch. You will start with HTML and CSS and move on to JavaScript and modern frameworks.',
+  progress: 40, // Pourcentage de progression
   lessons: [
     { id: '1', name: 'HTML Basics', completed: true },
     { id: '2', name: 'CSS Fundamentals', completed: true },
@@ -9161,7 +9322,9 @@ const sampleLearningPath: LearningPath = {
   ],
 };
 
-const MyLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const MyLearningPath: NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+} = () => {
   const router = useRouter();
   // Dans cet exemple, nous partons du principe que l'utilisateur suit un parcours,
   // sinon, on pourra passer learningPath à null pour afficher un message d'invitation.
@@ -9176,7 +9339,10 @@ const MyLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => Rea
     <>
       <Head>
         <title>My Learning Path</title>
-        <meta name="description" content="View your current learning path and track your progress." />
+        <meta
+          name="description"
+          content="View your current learning path and track your progress."
+        />
       </Head>
       <div className="container mx-auto p-5">
         <Title level={2}>My Learning Path</Title>
@@ -9202,7 +9368,13 @@ const MyLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => Rea
                   <Step
                     key={lesson.id}
                     title={lesson.name}
-                    status={lesson.completed ? 'finish' : (index === learningPath.lessons.findIndex(l => !l.completed) ? 'process' : 'wait')}
+                    status={
+                      lesson.completed
+                        ? 'finish'
+                        : index === learningPath.lessons.findIndex((l) => !l.completed)
+                        ? 'process'
+                        : 'wait'
+                    }
                     description={
                       <Button type="link" onClick={() => goToLesson(lesson.id)}>
                         Go to Lesson
@@ -9221,7 +9393,9 @@ const MyLearningPath: NextPage & { getLayout?: (page: React.ReactElement) => Rea
   );
 };
 
-MyLearningPath.getLayout = (page: React.ReactElement) => <MainLayout>{page}</MainLayout>;
+MyLearningPath.getLayout = (page: React.ReactElement) => (
+  <MainLayout>{page}</MainLayout>
+);
 
 export default MyLearningPath;
 
@@ -9340,7 +9514,12 @@ export default function Page() {
 
     const dateTime = eventDate
       .clone()
-      .set({ hour: eventTime.hour(), minute: eventTime.minute(), second: 0, millisecond: 0 });
+      .set({
+        hour: eventTime.hour(),
+        minute: eventTime.minute(),
+        second: 0,
+        millisecond: 0,
+      });
 
     const newEvent: ActivityEvent = {
       id: `evt${Date.now()}`,
@@ -9459,7 +9638,11 @@ export default function Page() {
             rules={[{ required: true, message: 'Please select a team.' }]}
             initialValue={teamOptions[1]}
           >
-            <Select options={teamOptions.filter((t) => t !== 'All').map((t) => ({ value: t, label: t }))} />
+            <Select
+              options={teamOptions
+                .filter((t) => t !== 'All')
+                .map((t) => ({ value: t, label: t }))}
+            />
           </Form.Item>
 
           <Form.Item
@@ -9600,9 +9783,9 @@ const TeamsCollaboration: NextPage = () => {
       title: 'Recent Activity',
       dataIndex: 'recentActivity',
       key: 'recentActivity',
-      render: (activities: string[]) => (
+      render: (activities, row) => (
         <List
-          dataSource={activities.slice(0, 2)} // Afficher les 2 dernières activités en aperçu
+          dataSource={activities.slice(0, 2) ?? []} // Afficher les 2 dernières activités en aperçu
           renderItem={(activity) => (
             <List.Item style={{ padding: 0 }}>
               <Text type="secondary">{activity}</Text>
@@ -9635,7 +9818,7 @@ const TeamsCollaboration: NextPage = () => {
         <Title level={5}>Team Roster</Title>
         <List
           grid={{ gutter: 16, column: 4 }}
-          dataSource={record.roster}
+          dataSource={record.roster ?? []}
           renderItem={(member: TeamMember) => (
             <List.Item>
               <Space direction="vertical" align="center">
@@ -9651,7 +9834,7 @@ const TeamsCollaboration: NextPage = () => {
         <br />
         <Title level={5}>Recent Activity Log</Title>
         <List
-          dataSource={record.recentActivity}
+          dataSource={record.recentActivity ?? []}
           renderItem={(activity) => (
             <List.Item>
               <Text>{activity}</Text>
@@ -9661,7 +9844,6 @@ const TeamsCollaboration: NextPage = () => {
         />
       </div>
     );
-  };
 
   return (
     <PageContainer title="My Teams">
@@ -9690,13 +9872,12 @@ const TeamsCollaboration: NextPage = () => {
       `}</style>
     </PageContainer>
   );
-};
 
-TeamsCollaboration.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default TeamsCollaboration;
+}}
 
 ===== END app/konnected/teams-collaboration/my-teams/page.tsx =====
 
@@ -9706,7 +9887,7 @@ export default TeamsCollaboration;
 
 // File: app/konnected/teams-collaboration/project-workspaces/page.tsx
 import React from 'react';
-import { Table, Button, Tag, Space, message } from 'antd';
+import { Table, Button, Tag, Space, message as antdMessage  } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
@@ -9760,12 +9941,11 @@ export default function ProjectWorkspacesPage() {
     if (!workspace.isLaunched && workspace.userRole === 'Leader') {
       // Example: launch action
       // TODO: call API then refresh or navigate
-      message.success(`Workspace ${workspace.projectName} launched successfully.`);
+      antdMessage.success(`Workspace ${workspace.projectName} launched successfully.`);
       return;
     }
     // Navigate to workspace
     router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
-  };
 
   const columns: ColumnsType<Workspace> = [
     {
@@ -9782,14 +9962,14 @@ export default function ProjectWorkspacesPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: Workspace['status']) =>
+      render: (status, row) =>
         status === 'Active' ? <Tag color="green">Active</Tag> : <Tag color="volcano">Inactive</Tag>,
     },
     {
       title: 'Online Members',
       dataIndex: 'onlineMembers',
       key: 'onlineMembers',
-      render: (onlineMembers: number) => <span>{onlineMembers} online</span>,
+      render: (onlineMembers, row) => <span>{onlineMembers} online</span>,
     },
     {
       title: 'Action',
@@ -9834,6 +10014,7 @@ Notes:
 - Fixed rule-of-hooks violation by moving useRouter() to the component top level.
 - Removed unused Typography/Title import.
 */
+}
 
 ===== END app/konnected/teams-collaboration/project-workspaces/page.tsx =====
 
@@ -9924,9 +10105,10 @@ export default function TeamBuilderPage() {
     try {
       const values = await inviteForm.validateFields();
       // ensure a stable non-undefined key; prefer provided id else generate from email
-      const stableId = values.id && values.id.trim().length > 0
-        ? values.id
-        : `${values.email.toLowerCase()}-${Date.now()}`;
+      const stableId =
+        values.id && values.id.trim().length > 0
+          ? values.id
+          : `${values.email.toLowerCase()}-${Date.now()}`;
 
       setMembers((prev) => {
         // dedupe by email
@@ -10045,8 +10227,7 @@ export default PollPage;
 
 import React, { useState, useMemo } from 'react';
 import { NextPage } from 'next';
-import {
-  Row,
+import { Row,
   Col,
   Card,
   Input,
@@ -10056,8 +10237,8 @@ import {
   Pagination,
   Space,
   Typography,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import { SearchOutlined, UserAddOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
@@ -10170,7 +10351,7 @@ const FindSpaces: NextPage = () => {
     const router = useRouter();
     if (space.joinType === 'open') {
       // Direct join.
-      message.success(`You have joined "${space.name}"!`);
+      antdMessage.success(`You have joined "${space.name}"!`);
       // Optionally, redirect to the space's main page.
       router.push(`/kreative/collaborative-spaces/${space.id}`);
     } else {
@@ -10178,17 +10359,15 @@ const FindSpaces: NextPage = () => {
       setSelectedSpace(space);
       setJoinModalVisible(true);
     }
-  };
 
   // Confirm join request.
   const confirmJoinRequest = () => {
     if (selectedSpace) {
-      message.success(`Your request to join "${selectedSpace.name}" has been sent.`);
+      antdMessage.success(`Your request to join "${selectedSpace.name}" has been sent.`);
       // Here, integrate API call to process join request.
     }
     setJoinModalVisible(false);
     setSelectedSpace(null);
-  };
 
   return (
     <PageContainer title="Find Spaces">
@@ -10303,13 +10482,12 @@ const FindSpaces: NextPage = () => {
       </Modal>
     </PageContainer>
   );
-};
 
-FindSpaces.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default FindSpaces;
+}}}
 
 ===== END app/kreative/collaborative-spaces/find-spaces/page.tsx =====
 
@@ -10383,7 +10561,6 @@ export default function MySpacesPage(): JSX.Element {
 
   const enterSpace = (id: string) => {
     router.push(`/kreative/collaborative-spaces/${id}`);
-  };
 
   return (
     <PageContainer title="My Spaces">
@@ -10423,7 +10600,7 @@ export default function MySpacesPage(): JSX.Element {
 
       <List
         itemLayout="horizontal"
-        dataSource={filteredSpaces}
+        dataSource={filteredSpaces ?? []}
         renderItem={(space: CollaborativeSpace) => (
           <List.Item
             key={space.id}
@@ -10459,58 +10636,43 @@ export default function MySpacesPage(): JSX.Element {
     </PageContainer>
   );
 }
+}
 
 ===== END app/kreative/collaborative-spaces/my-spaces/page.tsx =====
 
 
 ===== BEGIN app/kreative/collaborative-spaces/start-new-space/page.tsx =====
-'use client'
+'use client';
 
-// File: /pages/kreative/collaborative-spaces/start-new-space.tsx
+// File: app/kreative/collaborative-spaces/start-new-space/page.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
-import {
-  Form,
-  Input,
-  Select,
-  Radio,
-  Button,
-  Upload,
-  Space as AntdSpace,
-  message,
-} from 'antd';
+import { Form, Input, Select, Radio, Button, Upload, Space as AntdSpace, message as antdMessage } from 'antd';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
-
+import { PageContainer } from '@ant-design/pro-components';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const StartNewSpace: NextPage = () => {
+export default function StartNewSpacePage() {
   const [form] = Form.useForm();
   const router = useRouter();
-  // State to manage file uploads for the space banner or icon.
   const [fileList, setFileList] = useState<any[]>([]);
 
-  // Handler for file upload changes.
+  // Upload change handler
   const handleFileChange = (info: any) => {
-    // Prevent automatic upload and update fileList locally.
     setFileList([...info.fileList]);
   };
 
-  // Handler when the form is submitted.
+  // Submit handler
   const onFinish = (values: any) => {
     const spaceData = {
       ...values,
-      // Include the file information from fileList (to be handled by an API).
       banner: fileList,
     };
     console.log('New Space Data:', spaceData);
-    message.success('Your new space has been created successfully!');
-    // Optionally auto-join the user and then redirect to the space’s detail page.
-    router.push('/kreative/collaborative-spaces/' + 'new-space-id'); // Replace 'new-space-id' with the actual ID.
+    antdMessage.success('Your new space has been created successfully!');
+    router.push('/kreative/collaborative-spaces/new-space-id'); // TODO: replace with created ID
   };
 
   return (
@@ -10519,10 +10681,7 @@ const StartNewSpace: NextPage = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        initialValues={{
-          privacy: 'Public',
-          category: 'Art Study Group',
-        }}
+        initialValues={{ privacy: 'Public', category: 'Art Study Group' }}
       >
         {/* Space Name */}
         <Form.Item
@@ -10537,9 +10696,7 @@ const StartNewSpace: NextPage = () => {
         <Form.Item
           label="Description / Purpose"
           name="description"
-          rules={[
-            { required: true, message: 'Please provide a description for your space.' },
-          ]}
+          rules={[{ required: true, message: 'Please provide a description for your space.' }]}
         >
           <TextArea rows={5} placeholder="Describe the purpose and vision of your space" />
         </Form.Item>
@@ -10570,8 +10727,8 @@ const StartNewSpace: NextPage = () => {
           </Radio.Group>
         </Form.Item>
 
-        {/* Invite Initial Members - Conditional on Private Privacy */}
-        <Form.Item shouldUpdate={(prevValues, curValues) => prevValues.privacy !== curValues.privacy}>
+        {/* Invite Initial Members (only when Private) */}
+        <Form.Item shouldUpdate={(prev, cur) => prev.privacy !== cur.privacy}>
           {({ getFieldValue }) =>
             getFieldValue('privacy') === 'Private' ? (
               <Form.List name="invitedMembers">
@@ -10583,7 +10740,6 @@ const StartNewSpace: NextPage = () => {
                           <Form.Item
                             {...field}
                             name={[field.name, 'email']}
-                            fieldKey={[field.fieldKey, 'email']}
                             rules={[{ required: true, message: 'Please enter an email address.' }]}
                           >
                             <Input placeholder="Enter member email" />
@@ -10609,7 +10765,7 @@ const StartNewSpace: NextPage = () => {
         {/* Space Banner or Icon Upload */}
         <Form.Item label="Space Icon / Banner Image" name="banner">
           <Upload
-            beforeUpload={() => false} // Prevent auto-upload.
+            beforeUpload={() => false} // prevent auto-upload
             fileList={fileList}
             onChange={handleFileChange}
             accept="image/*"
@@ -10627,13 +10783,7 @@ const StartNewSpace: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
-
-StartNewSpace.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
-export default StartNewSpace;
+}
 
 ===== END app/kreative/collaborative-spaces/start-new-space/page.tsx =====
 
@@ -10746,12 +10896,10 @@ export default function FeaturedProjectsPage(): JSX.Element {
   const openModal = (project: Project) => {
     setSelectedProject(project);
     setModalVisible(true);
-  };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedProject(null);
-  };
 
   return (
     <PageContainer title="Featured Projects">
@@ -10806,7 +10954,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
                   title={project.title}
                   description={
                     <>
-                      {/* fix: remove ellipsis={{ rows: 2 }} which is incompatible in your setup */}
+                      {/* fix: remove ellipsis={{}} which is incompatible in your setup */}
                       <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
                         {project.description}
                       </Paragraph>
@@ -10870,6 +11018,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
     </PageContainer>
   );
 }
+}}
 
 ===== END app/kreative/community-showcases/featured-projects/page.tsx =====
 
@@ -10880,7 +11029,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
 // File: /pages/kreative/community-showcases/submit-to-showcase.tsx
 import React, { useState } from 'react';
 import { NextPage } from 'next';
-import { Form, Input, Select, Button, Modal, message } from 'antd';
+import { Form, Input, Select, Button, Modal, message as antdMessage  } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -10906,15 +11055,13 @@ const SubmitToShowcase: NextPage = () => {
     console.log('Submitted values:', values);
     // Here you would typically submit values to your API.
     setModalVisible(true);
-  };
 
   // Handle modal confirmation.
   const handleModalOk = () => {
-    message.success('Your project has been submitted for review.');
+    antdMessage.success('Your project has been submitted for review.');
     setModalVisible(false);
     // Redirect to the featured projects page or the user's submissions.
     router.push('/kreative/community-showcases/featured-projects');
-  };
 
   return (
     <PageContainer title="Submit to Showcase">
@@ -10987,13 +11134,12 @@ const SubmitToShowcase: NextPage = () => {
       </Modal>
     </PageContainer>
   );
-};
 
-SubmitToShowcase.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default SubmitToShowcase;
+}}}
 
 ===== END app/kreative/community-showcases/submit-to-showcase/page.tsx =====
 
@@ -11062,7 +11208,7 @@ export default function TopCreatorsPage(): JSX.Element {
       dataIndex: 'contributions',
       key: 'contributions',
       width: 150,
-      render: (value: number) => <Text>{value}</Text>,
+      render: (value, row) => <Text>{value}</Text>,
     },
     {
       title: 'Specialty',
@@ -11214,7 +11360,6 @@ export default function ExploreIdeasPage() {
 
   const handleCardClick = (idea: CreativeIdea) => {
     router.push(`/kreative/creative-hub/idea/${idea.id}`);
-  };
 
   return (
     <PageContainer title="Explore Ideas">
@@ -11315,6 +11460,7 @@ export default function ExploreIdeasPage() {
       `}</style>
     </PageContainer>
   );
+}
 }
 
 ===== END app/kreative/creative-hub/explore-ideas/page.tsx =====
@@ -11456,19 +11602,16 @@ export default function InspirationGalleryPage(): JSX.Element {
         w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w
       )
     );
-  };
 
   // Open Modal for work details.
   const openWorkModal = (work: CreativeWork) => {
     setSelectedWork(work);
     setModalVisible(true);
-  };
 
   // Close the details Modal.
   const closeModal = () => {
     setModalVisible(false);
     setSelectedWork(null);
-  };
 
   return (
     <PageContainer title="Inspiration Gallery">
@@ -11522,7 +11665,7 @@ export default function InspirationGalleryPage(): JSX.Element {
                   <>
                     <Text>{work.creator}</Text>
                     <br />
-                    {/* Replace ellipsis={{ rows: 2 }} with CSS line clamp */}
+                    {/* Replace ellipsis={{}} with CSS line clamp */}
                     <Paragraph type="secondary" className="lineClamp2">
                       {work.description}
                     </Paragraph>
@@ -11585,16 +11728,17 @@ export default function InspirationGalleryPage(): JSX.Element {
     </PageContainer>
   );
 }
+}}}
 
 ===== END app/kreative/creative-hub/inspiration-gallery/page.tsx =====
 
 
 ===== BEGIN app/kreative/creative-hub/submit-creative-work/page.tsx =====
-'use client'
+'use client';
 
 // File: /pages/kreative/creative-hub/submit-creative-work.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
+import type { NextPage } from 'next';
 import {
   Form,
   Input,
@@ -11602,12 +11746,11 @@ import {
   Upload,
   Button,
   Alert,
-  message,
+  message as antdMessage,
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/router';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -11615,33 +11758,26 @@ const { Option } = Select;
 const SubmitCreativeWork: NextPage = () => {
   const [form] = Form.useForm();
   const router = useRouter();
-  // Local state to manage file uploads if needed.
   const [fileList, setFileList] = useState<any[]>([]);
 
-  // Handler for file changes in the Upload component.
   const handleUploadChange = (info: any) => {
-    // Optionally, manage file upload status and fileList locally.
-    let newFileList = [...info.fileList];
-    // You might add further validations on file type/size here.
-    setFileList(newFileList);
+    setFileList([...info.fileList]);
   };
 
   const onFinish = (values: any) => {
-    // Combine form values with file upload information.
     const creativeWorkData = {
       ...values,
-      // Here we simply include file info; in practice, the file(s) might need uploading to a server.
       file: fileList,
     };
     console.log('Submitted Creative Work:', creativeWorkData);
-    message.success('Votre œuvre créative a été soumise avec succès et est en attente d\'approbation!');
-    // After submission, optionally redirect to the newly created work’s detail page or the gallery.
+    antdMessage.success(
+      "Votre œuvre créative a été soumise avec succès et est en attente d'approbation!"
+    );
     router.push('/kreative/creative-hub/inspiration-gallery');
   };
 
   return (
     <PageContainer title="Submit Creative Work">
-      {/* Guidelines Alert */}
       <Alert
         message="Please Note"
         description="File size limit is 5MB. Accepted formats are JPG, PNG for images, MP4 for videos, and MP3 for audio."
@@ -11654,11 +11790,8 @@ const SubmitCreativeWork: NextPage = () => {
         form={form}
         layout="vertical"
         onFinish={onFinish}
-        initialValues={{
-          category: 'Illustration',
-        }}
+        initialValues={{ category: 'Illustration' }}
       >
-        {/* Title Field */}
         <Form.Item
           label="Title of the Work"
           name="title"
@@ -11667,7 +11800,6 @@ const SubmitCreativeWork: NextPage = () => {
           <Input placeholder="Entrez le titre de votre œuvre créative" />
         </Form.Item>
 
-        {/* Description Field */}
         <Form.Item
           label="Description or Story Behind the Work"
           name="description"
@@ -11676,7 +11808,6 @@ const SubmitCreativeWork: NextPage = () => {
           <TextArea rows={5} placeholder="Décrivez votre œuvre et partagez son histoire..." />
         </Form.Item>
 
-        {/* Category / Medium Field */}
         <Form.Item
           label="Category / Medium"
           name="category"
@@ -11688,23 +11819,16 @@ const SubmitCreativeWork: NextPage = () => {
             <Option value="Music">Music</Option>
             <Option value="Video">Video</Option>
             <Option value="Digital Art">Digital Art</Option>
-            {/* Add more options as needed */}
           </Select>
         </Form.Item>
 
-        {/* File Upload Field */}
         <Form.Item
           label="Upload Creative File"
           name="creativeFile"
-          rules={[
-            {
-              required: true,
-              message: 'Veuillez télécharger un fichier pour votre œuvre.',
-            },
-          ]}
+          rules={[{ required: true, message: 'Veuillez télécharger un fichier pour votre œuvre.' }]}
         >
           <Upload
-            beforeUpload={() => false} // Prevent automatic upload so that the file is handled on form submission.
+            beforeUpload={() => false}
             fileList={fileList}
             onChange={handleUploadChange}
             accept="image/*,video/*,audio/*"
@@ -11713,12 +11837,10 @@ const SubmitCreativeWork: NextPage = () => {
           </Upload>
         </Form.Item>
 
-        {/* Optional Credits/Tools Used Field */}
         <Form.Item label="Credits / Tools Used (Optional)" name="credits">
           <Input placeholder="Exemple: Adobe Photoshop, Procreate, etc." />
         </Form.Item>
 
-        {/* Submit Button */}
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Submit Work
@@ -11729,10 +11851,6 @@ const SubmitCreativeWork: NextPage = () => {
   );
 };
 
-SubmitCreativeWork.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
-};
-
 export default SubmitCreativeWork;
 
 ===== END app/kreative/creative-hub/submit-creative-work/page.tsx =====
@@ -11740,22 +11858,36 @@ export default SubmitCreativeWork;
 
 ===== BEGIN app/kreative/dashboard/page.tsx =====
 'use client';
+
 import React from 'react';
 import { NextPage } from 'next';
-import { Card, Avatar, Button, Carousel, List, Row, Col, Typography, Space } from 'antd';
-import { PictureOutlined, BulbOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+  Card,
+  Avatar,
+  Button,
+  Carousel,
+  List,
+  Row,
+  Col,
+  Typography,
+  Space,
+} from 'antd';
+import {
+  PictureOutlined,
+  BulbOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text } = Typography;
 
-// Dummy data for Featured Project
+/** Featured Project */
 const featuredProject = {
   title: 'Dreamscape: A Visual Journey',
   imageUrl: 'https://via.placeholder.com/600x300.png?text=Featured+Project',
 };
 
-// Dummy data for Inspiration Gallery Preview (carousel items)
+/** Inspiration Gallery (carousel) */
 const inspirationGallery = [
   { id: '1', imageUrl: 'https://via.placeholder.com/600x300.png?text=Art+1' },
   { id: '2', imageUrl: 'https://via.placeholder.com/600x300.png?text=Art+2' },
@@ -11763,26 +11895,54 @@ const inspirationGallery = [
   { id: '4', imageUrl: 'https://via.placeholder.com/600x300.png?text=Art+4' },
 ];
 
-// Dummy data for Top Creator Spotlight
+/** Top Creator */
 const topCreator = {
   name: 'Sophia Rivera',
   avatar: 'https://via.placeholder.com/80.png?text=S',
   stats: '48 Projects · 1200 Likes',
 };
 
-// Dummy data for Quick Links
+/** Quick Links */
 const quickLinks = [
-  { title: 'Explore Ideas', icon: <BulbOutlined style={{ fontSize: 24 }} />, link: '/kreative/explore' },
-  { title: 'Submit Work', icon: <UploadOutlined style={{ fontSize: 24 }} />, link: '/kreative/submit' },
-  { title: 'View Gallery', icon: <PictureOutlined style={{ fontSize: 24 }} />, link: '/kreative/gallery' },
+  {
+    title: 'Explore Ideas',
+    icon: <BulbOutlined style={{ fontSize: 24 }} />,
+    link: '/kreative/explore',
+  },
+  {
+    title: 'Submit Work',
+    icon: <UploadOutlined style={{ fontSize: 24 }} />,
+    link: '/kreative/submit',
+  },
+  {
+    title: 'View Gallery',
+    icon: <PictureOutlined style={{ fontSize: 24 }} />,
+    link: '/kreative/gallery',
+  },
 ];
 
-// Dummy data for Recent Activity Feed
+/** Recent Activity */
 const recentActivities = [
-  { id: 'a1', text: 'User John submitted a new Art piece in Photography', time: '2 hours ago' },
-  { id: 'a2', text: 'User Emma started a new idea: “Urban Sketching”', time: '5 hours ago' },
-  { id: 'a3', text: 'User Liam commented on “Dreamscape: A Visual Journey”', time: '1 day ago' },
-  { id: 'a4', text: 'User Olivia liked a work in Digital Art', time: '2 days ago' },
+  {
+    id: 'a1',
+    text: 'User John submitted a new Art piece in Photography',
+    time: '2 hours ago',
+  },
+  {
+    id: 'a2',
+    text: 'User Emma started a new idea: “Urban Sketching”',
+    time: '5 hours ago',
+  },
+  {
+    id: 'a3',
+    text: 'User Liam commented on “Dreamscape: A Visual Journey”',
+    time: '1 day ago',
+  },
+  {
+    id: 'a4',
+    text: 'User Olivia liked a work in Digital Art',
+    time: '2 days ago',
+  },
 ];
 
 const KreativeDashboard: NextPage = () => {
@@ -11791,16 +11951,28 @@ const KreativeDashboard: NextPage = () => {
       <Row gutter={[24, 24]}>
         {/* Featured Project Highlight */}
         <Col xs={24} md={16}>
-          <Card hoverable cover={<img alt="Featured Project" src={featuredProject.imageUrl} />}>
+          <Card
+            hoverable
+            cover={
+              <img
+                alt="Featured Project"
+                src={featuredProject.imageUrl}
+                style={{ objectFit: 'cover' }}
+              />
+            }
+          >
             <Title level={3}>{featuredProject.title}</Title>
           </Card>
         </Col>
+
         {/* Top Creator Spotlight */}
         <Col xs={24} md={8}>
           <Card>
             <Space direction="vertical" align="center" style={{ width: '100%' }}>
               <Avatar size={80} src={topCreator.avatar} />
-              <Title level={4} style={{ margin: 0 }}>{topCreator.name}</Title>
+              <Title level={4} style={{ margin: 0 }}>
+                {topCreator.name}
+              </Title>
               <Text type="secondary">{topCreator.stats}</Text>
             </Space>
           </Card>
@@ -11817,13 +11989,14 @@ const KreativeDashboard: NextPage = () => {
                   <img
                     alt={`Art ${item.id}`}
                     src={item.imageUrl}
-                    style={{ width: '100%', height: '300px', objectFit: 'cover' }}
+                    style={{ width: '100%', height: 300, objectFit: 'cover' }}
                   />
                 </div>
               ))}
             </Carousel>
           </Card>
         </Col>
+
         {/* Quick Links */}
         <Col xs={24} md={8}>
           <Card title="Quick Links">
@@ -11834,7 +12007,9 @@ const KreativeDashboard: NextPage = () => {
                   type="primary"
                   block
                   icon={link.icon}
-                  onClick={() => { window.location.href = link.link; }}
+                  onClick={() => {
+                    window.location.href = link.link;
+                  }}
                 >
                   {link.title}
                 </Button>
@@ -11853,10 +12028,7 @@ const KreativeDashboard: NextPage = () => {
               dataSource={recentActivities}
               renderItem={(item) => (
                 <List.Item>
-                  <List.Item.Meta
-                    title={item.text}
-                    description={item.time}
-                  />
+                  <List.Item.Meta title={item.text} description={item.time} />
                 </List.Item>
               )}
             />
@@ -11865,10 +12037,6 @@ const KreativeDashboard: NextPage = () => {
       </Row>
     </PageContainer>
   );
-};
-
-KreativeDashboard.getLayout = function getLayout(page: React.ReactElement) {
-  return <MainLayout>{page}</MainLayout>;
 };
 
 export default KreativeDashboard;
@@ -11967,7 +12135,7 @@ const MyIdeasPage: NextPage = () => {
       {/* Ideas List */}
       <List
         itemLayout="vertical"
-        dataSource={filteredIdeas}
+        dataSource={filteredIdeas ?? []}
         renderItem={(idea) => (
           <List.Item
             key={idea.id}
@@ -12005,13 +12173,12 @@ const MyIdeasPage: NextPage = () => {
       />
     </PageContainer>
   );
-};
 
-MyIdeasPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default MyIdeasPage;
+}
 
 ===== END app/kreative/idea-incubator/collaborate-on-ideas/page.tsx =====
 
@@ -12022,7 +12189,7 @@ export default MyIdeasPage;
 // File: /pages/kreative/idea-incubator/create-new-idea.tsx
 import React from 'react';
 import { NextPage } from 'next';
-import { Form, Input, Select, Button, message } from 'antd';
+import { Form, Input, Select, Button, message as antdMessage  } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -12038,10 +12205,9 @@ const CreateNewIdea: NextPage = () => {
   const onFinish = (values: any) => {
     // Log form values; in a real app, you would send this data via an API call.
     console.log('Submitted Idea:', values);
-    message.success('Votre idée a été soumise avec succès !');
+    antdMessage.success('Votre idée a été soumise avec succès !');
     // Redirect to the "My Ideas" page after submitting.
     router.push('/kreative/idea-incubator/my-ideas');
-  };
 
   return (
     <PageContainer title="Create New Idea">
@@ -12103,14 +12269,13 @@ const CreateNewIdea: NextPage = () => {
       </Form>
     </PageContainer>
   );
-};
 
 // Integrate with a global layout if required.
-CreateNewIdea.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default CreateNewIdea;
+}}
 
 ===== END app/kreative/idea-incubator/create-new-idea/page.tsx =====
 
@@ -12207,7 +12372,7 @@ const MyIdeasPage: NextPage = () => {
       {/* Ideas List */}
       <List
         itemLayout="vertical"
-        dataSource={filteredIdeas}
+        dataSource={filteredIdeas ?? []}
         renderItem={(idea) => (
           <List.Item
             key={idea.id}
@@ -12247,13 +12412,12 @@ const MyIdeasPage: NextPage = () => {
       />
     </PageContainer>
   );
-};
 
-MyIdeasPage.getLayout = function getLayout(page: React.ReactElement) {
+
   return <MainLayout>{page}</MainLayout>;
-};
 
 export default MyIdeasPage;
+}
 
 ===== END app/kreative/idea-incubator/my-ideas/page.tsx =====
 

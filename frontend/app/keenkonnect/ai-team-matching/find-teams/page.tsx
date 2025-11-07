@@ -56,7 +56,7 @@ const sampleTeams: Team[] = [
   },
 ];
 
-const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const FindTeams = () => {
   const router = useRouter();
   
   // États pour la recherche et les filtres
@@ -130,7 +130,7 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
         {/* Liste de suggestions d'équipes */}
         <List
           grid={{ gutter: 16, xs: 1, sm: 2, md: 3 }}
-          dataSource={filteredTeams}
+          dataSource={filteredTeams ?? []}
           renderItem={(team: Team) => (
             <List.Item key={team.id}>
               <Card
@@ -186,3 +186,4 @@ const FindTeams: NextPage & { getLayout?: (page: React.ReactElement) => React.Re
 
 
 export default FindTeams;
+}}}

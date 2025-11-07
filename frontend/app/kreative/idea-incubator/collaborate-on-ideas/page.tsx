@@ -88,7 +88,7 @@ const MyIdeasPage: NextPage = () => {
       {/* Ideas List */}
       <List
         itemLayout="vertical"
-        dataSource={filteredIdeas}
+        dataSource={filteredIdeas ?? []}
         renderItem={(idea) => (
           <List.Item
             key={idea.id}
@@ -131,3 +131,4 @@ const MyIdeasPage: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default MyIdeasPage;
+}

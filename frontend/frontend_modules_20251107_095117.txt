@@ -675,7 +675,7 @@ export default function AuditLogs() {
       title: 'Severity',
       dataIndex: 'severity',
       width: 120,
-      render: (v: LogRow['severity']) => (
+      render: (v, row) => (
         <Tag color={v === 'critical' ? 'red' : v === 'warn' ? 'orange' : 'blue'}>{v}</Tag>
       ),
       filters: [
@@ -818,7 +818,7 @@ export default function RoleManagement() {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (v: number) => <Tag>{v}</Tag>,
+      render: (v, row) => <Tag>{v}</Tag>,
     },
     {
       title: 'Enabled',
@@ -874,15 +874,15 @@ export default function EliteBallots() {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-render: (v: string) => (
-  <Statistic.Countdown value={dayjs(v)} format="D[d] HH:mm:ss" />
+render: (v, row) => (
+  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
 ),
     },
     {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (v: number) => <Progress type="circle" percent={v} />,
+      render: (v, row) => <Progress type="circle" percent={v} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
   ];
@@ -1101,7 +1101,7 @@ export default function PublicVotePage() {
     {
       title: 'Turnout',
       dataIndex: 'turnout',
-      render: (v: number) => <Progress percent={v} size="small" />,
+      render: (v, row) => <Progress percent={v} size="small" />,
     },
   ]
 
@@ -1182,7 +1182,7 @@ export default function ResultsArchive() {
       title: 'Result',
       dataIndex: 'passed',
       width: 120,
-      render: (v: boolean) => (
+      render: (v, row) => (
         <Tag color={v ? 'green' : 'red'}>{v ? 'PASSED' : 'REJECTED'}</Tag>
       ),
       filters: [
@@ -1274,16 +1274,15 @@ import {
   ProFormText,
   ProFormSelect,
 } from '@ant-design/pro-components';
-import {
-  Badge,
+import { Badge,
   Button,
   Drawer,
   Empty,
   Space,
   Tag,
   Tooltip,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import { useRequest, useInterval } from 'ahooks';
 import {
   PlusOutlined,
@@ -1370,7 +1369,7 @@ export default function EliteAgora() {
       title: 'Category',
       dataIndex: 'category',
       filters: true,
-      render: (v: string) => <Tag color="geekblue">{v}</Tag>,
+      render: (v, row) => <Tag color="geekblue">{v}</Tag>,
     },
     {
       title: 'Stances',
@@ -1387,7 +1386,7 @@ export default function EliteAgora() {
       title: '',
       dataIndex: 'hot',
       width: 60,
-      render: (v: boolean) =>
+      render: (v, row) =>
         v ? (
           <Tooltip title="Trending">
             <FireOutlined style={{ color: '#fa541c' }} />
@@ -1490,7 +1489,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   const { runAsync, loading } = useRequest(createEliteTopic, {
     manual: true,
     onSuccess: () => {
-      message.success('Topic created 🎉');
+      antdMessage.success('Topic created 🎉');
       setVisible(false);
       onCreated();
     },
@@ -1637,7 +1636,7 @@ export default function FeedbackLoops() {
       <ProCard title="Community Feedback" ghost style={{ marginTop: 24 }}>
         {data?.items.length ? (
           <List
-            dataSource={data.items}
+            dataSource={data.items ?? []}
             renderItem={f => (
               <li>
                 <Comment

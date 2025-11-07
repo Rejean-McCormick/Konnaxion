@@ -6,19 +6,17 @@
  */
 
 import dayjs from 'dayjs'
-import {
-  Tooltip,
+import { Tooltip,
   List,
   Comment,
   Card,
   Dropdown,
   Modal,
-  message,
+  message as antdMessage,
   Button,
   Empty,
   Input
-} from 'antd'
-import type { MenuProps } from 'antd'
+ } from 'antd';import type { MenuProps } from 'antd'
 import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
@@ -55,12 +53,12 @@ const SculptureComment = ({
       onOk: async () => {
         try {
           await api.delete(`/comment/${e.key}`)
-          message.success('Deleted comment successfully!', 2)
+          antdMessage.success('Deleted comment successfully!', 2)
           deleteComment(e.key as string)
         } catch (error: unknown) {
           const { message, statusCode } = normalizeError(error);
           // @ts-ignore
-          message.error(error.response.data.message)
+          antdMessage.error(error.response.data.message)
         }
       }
     })
@@ -143,7 +141,7 @@ const SculptureComment = ({
     >
       <List
         itemLayout="horizontal"
-        dataSource={formattedComments}
+        dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (
@@ -228,7 +226,7 @@ const Editor = ({
             const { message, statusCode } = normalizeError(e);
             setSubmitting(false)
             // @ts-ignore
-            message.error(e.response.data.message)
+            antdMessage.error(e.response.data.message)
           }
         }}
         type="primary"

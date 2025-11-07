@@ -161,7 +161,7 @@ const ActiveThreadsPage: NextPage = () => {
 
       <List
         grid={{ gutter: 16, column: 1 }}
-        dataSource={paginatedThreads}
+        dataSource={paginatedThreads ?? []}
         renderItem={(thread: Thread) => (
           <List.Item
             onClick={() => openThread(thread)}
@@ -211,3 +211,4 @@ const ActiveThreadsPage: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default ActiveThreadsPage;
+}}

@@ -3,8 +3,7 @@
 // File: /pages/keenkonnect/user-reputation/account-preferences.tsx
 import React, { useState } from "react";
 import { NextPage } from "next";
-import {
-  Tabs,
+import { Tabs,
   Form,
   Input,
   Button,
@@ -12,8 +11,8 @@ import {
   Modal,
   Switch,
   Radio,
-  message
-} from "antd";
+  message as antdMessage
+ } from 'antd';
 import { UploadOutlined } from "@ant-design/icons";
 import PageContainer from "@/components/PageContainer";
 // Ajout de l'import de MainLayout pour appliquer le layout global
@@ -32,25 +31,25 @@ const AccountPreferencesPage: NextPage = () => {
     setIsModalVisible(false);
   const handleDeleteConfirm = () => {
     // Ici, vous appellerez éventuellement une API pour la suppression de compte
-    message.success("Account deletion requested.");
+    antdMessage.success("Account deletion requested.");
     setIsModalVisible(false);
 
   // Gestion des soumissions de formulaire pour chaque section
   const onFinishProfile = (values: any) => {
     console.log("Profile Info:", values);
-    message.success("Profile info saved.");
+    antdMessage.success("Profile info saved.");
 
   const onFinishSecurity = (values: any) => {
     console.log("Security Info:", values);
-    message.success("Security info saved.");
+    antdMessage.success("Security info saved.");
 
   const onFinishNotifications = (values: any) => {
     console.log("Notifications Settings:", values);
-    message.success("Notifications settings saved.");
+    antdMessage.success("Notifications settings saved.");
 
   const onFinishPrivacy = (values: any) => {
     console.log("Privacy Settings:", values);
-    message.success("Privacy settings saved.");
+    antdMessage.success("Privacy settings saved.");
 
   return (
     <PageContainer title="Account & Preferences">
@@ -219,3 +218,4 @@ const AccountPreferencesPage: NextPage = () => {
   return <MainLayout>{page}</MainLayout>;
 
 export default AccountPreferencesPage;
+}}}}}}}}

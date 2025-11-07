@@ -10,16 +10,15 @@ import {
   ProFormText,
   ProFormSelect,
 } from '@ant-design/pro-components';
-import {
-  Badge,
+import { Badge,
   Button,
   Drawer,
   Empty,
   Space,
   Tag,
   Tooltip,
-  message,
-} from 'antd';
+  message as antdMessage,
+ } from 'antd';
 import { useRequest, useInterval } from 'ahooks';
 import {
   PlusOutlined,
@@ -105,7 +104,7 @@ export default function EliteAgora() {
       title: 'Category',
       dataIndex: 'category',
       filters: true,
-      render: (v: string) => <Tag color="geekblue">{v}</Tag>,
+      render: (v, row) => <Tag color="geekblue">{v}</Tag>,
     },
     {
       title: 'Stances',
@@ -122,7 +121,7 @@ export default function EliteAgora() {
       title: '',
       dataIndex: 'hot',
       width: 60,
-      render: (v: boolean) =>
+      render: (v, row) =>
         v ? (
           <Tooltip title="Trending">
             <FireOutlined style={{ color: '#fa541c' }} />
@@ -225,7 +224,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   const { runAsync, loading } = useRequest(createEliteTopic, {
     manual: true,
     onSuccess: () => {
-      message.success('Topic created 🎉');
+      antdMessage.success('Topic created 🎉');
       setVisible(false);
       onCreated();
     },
@@ -268,4 +267,5 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
       </ModalForm>
     </>
   );
+}
 }

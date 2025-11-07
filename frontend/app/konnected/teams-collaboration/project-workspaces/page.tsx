@@ -2,7 +2,7 @@
 
 // File: app/konnected/teams-collaboration/project-workspaces/page.tsx
 import React from 'react';
-import { Table, Button, Tag, Space, message } from 'antd';
+import { Table, Button, Tag, Space, message as antdMessage  } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
@@ -56,7 +56,7 @@ export default function ProjectWorkspacesPage() {
     if (!workspace.isLaunched && workspace.userRole === 'Leader') {
       // Example: launch action
       // TODO: call API then refresh or navigate
-      message.success(`Workspace ${workspace.projectName} launched successfully.`);
+      antdMessage.success(`Workspace ${workspace.projectName} launched successfully.`);
       return;
     }
     // Navigate to workspace
@@ -77,14 +77,14 @@ export default function ProjectWorkspacesPage() {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status: Workspace['status']) =>
+      render: (status, row) =>
         status === 'Active' ? <Tag color="green">Active</Tag> : <Tag color="volcano">Inactive</Tag>,
     },
     {
       title: 'Online Members',
       dataIndex: 'onlineMembers',
       key: 'onlineMembers',
-      render: (onlineMembers: number) => <span>{onlineMembers} online</span>,
+      render: (onlineMembers, row) => <span>{onlineMembers} online</span>,
     },
     {
       title: 'Action',
@@ -129,3 +129,4 @@ Notes:
 - Fixed rule-of-hooks violation by moving useRouter() to the component top level.
 - Removed unused Typography/Title import.
 */
+}

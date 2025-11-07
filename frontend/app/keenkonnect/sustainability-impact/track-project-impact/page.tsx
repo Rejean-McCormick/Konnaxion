@@ -3,10 +3,20 @@
 // pages/keenkonnect/sustainability-impact/track-project-impact/index.tsx
 import React, { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Card, Statistic, Row, Col, Select, DatePicker, Divider, Timeline } from 'antd';
+// (Optionnel) type NextPage non requis ici
+import { Card, Statistic, Row, Col, Select, DatePicker, Timeline } from 'antd';
 import MainLayout from '@/components/layout-components/MainLayout';
-import { ResponsiveContainer, LineChart as ReLineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, BarChart, Bar } from 'recharts';
+import {
+  ResponsiveContainer,
+  LineChart as ReLineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  BarChart,
+  Bar,
+} from 'recharts';
 import dayjs from 'dayjs';
 
 const { Option } = Select;
@@ -20,6 +30,7 @@ const sampleImpactMetrics = {
   carbonReduction: 1200, // in kg CO2 reduced
   peopleReached: 450,
   fundsSaved: 3000, // in dollars
+}; // <-- fermeture manquante ajoutée
 
 // Données simulées pour l'évolution de l'impact dans le temps (line chart)
 const sampleImpactTrend = [
@@ -46,18 +57,15 @@ const impactReports = [
   { key: '3', date: '2023-07-10', summary: 'Major milestone achieved in funds saved.' },
 ];
 
-const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+export default function TrackProjectImpact() {
   // États pour le filtre par projet et période
   const [selectedProject, setSelectedProject] = useState<string>(projects[0]);
   const [dateRange, setDateRange] = useState<[any, any] | null>(null);
 
-  // Pour simplifier, on ne change pas les métriques selon le filtre dans ce dummy
-  // Vous pourrez intégrer ici une logique d'API pour actualiser les métriques selon le projet et la plage de dates
-
   // Filtre supplémentaire sur dateRange pour la Timeline (exemple simulé)
   const filteredImpactReports = useMemo(() => {
     if (!dateRange) return impactReports;
-    return impactReports.filter(report => {
+    return impactReports.filter((report) => {
       const reportDate = dayjs(report.date);
       return reportDate.isAfter(dateRange[0]) && reportDate.isBefore(dateRange[1]);
     });
@@ -69,25 +77,38 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
   }, []);
 
   return (
-    <>
+    <MainLayout>
       <Head>
         <title>Track Project Impact</title>
-        <meta name="description" content="Dashboard for tracking the impact metrics of your project." />
+        <meta
+          name="description"
+          content="Dashboard for tracking the impact metrics of your project."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
         <h1 className="text-2xl font-bold mb-4">Track Project Impact</h1>
 
         {/* Sélecteur de projet et filtre de période */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={12}>
-            <Select defaultValue={selectedProject} style={{ width: '100%' }} onChange={setSelectedProject}>
+            <Select
+              defaultValue={selectedProject}
+              style={{ width: '100%' }}
+              onChange={setSelectedProject}
+            >
               {projects.map((proj) => (
-                <Option key={proj} value={proj}>{proj}</Option>
+                <Option key={proj} value={proj}>
+                  {proj}
+                </Option>
               ))}
             </Select>
           </Col>
           <Col xs={24} sm={12}>
-            <RangePicker style={{ width: '100%' }} onChange={(dates) => setDateRange(dates as any)} />
+            <RangePicker
+              style={{ width: '100%' }}
+              onChange={(dates) => setDateRange(dates as any)}
+            />
           </Col>
         </Row>
 
@@ -95,7 +116,10 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={8}>
             <Card>
-              <Statistic title="Carbon Footprint Reduced (kg)" value={sampleImpactMetrics.carbonReduction} />
+              <Statistic
+                title="Carbon Footprint Reduced (kg)"
+                value={sampleImpactMetrics.carbonReduction}
+              />
             </Card>
           </Col>
           <Col xs={24} sm={8}>
@@ -120,7 +144,7 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
                 <XAxis dataKey="period" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" />
+                <Line type="monotone" dataKey="value" />
               </ReLineChart>
             </ResponsiveContainer>
           </div>
@@ -136,7 +160,7 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
                 <XAxis dataKey="category" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#82ca9d" />
+                <Bar dataKey="value" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -146,7 +170,7 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Impact Reports Timeline</h2>
           <Timeline>
-            {filteredImpactReports.map(report => (
+            {filteredImpactReports.map((report) => (
               <Timeline.Item key={report.key}>
                 <strong>{report.date}</strong>: {report.summary}
               </Timeline.Item>
@@ -154,9 +178,6 @@ const TrackProjectImpact: NextPage & { getLayout?: (page: React.ReactElement) =>
           </Timeline>
         </Card>
       </div>
-    </>
+    </MainLayout>
   );
-
-
-
-export default TrackProjectImpact;
+}

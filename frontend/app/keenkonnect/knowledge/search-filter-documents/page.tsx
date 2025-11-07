@@ -71,7 +71,7 @@ const sampleDocuments: DocumentResource[] = [
   },
 ];
 
-const SearchFilterDocuments: NextPage & { getLayout?: (page: React.ReactElement) => React.ReactNode } = () => {
+const SearchFilterDocuments = () => {
   const [form] = Form.useForm();
   // États pour les filtres
   const [keyword, setKeyword] = useState('');
@@ -196,3 +196,4 @@ const SearchFilterDocuments: NextPage & { getLayout?: (page: React.ReactElement)
 
 
 export default SearchFilterDocuments;
+}
