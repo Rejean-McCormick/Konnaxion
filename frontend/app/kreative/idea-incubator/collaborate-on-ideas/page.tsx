@@ -1,21 +1,17 @@
 'use client';
 
-// File: /pages/kreative/idea-incubator/my-ideas.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import { List, Button, Badge, Input, Select, Space, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 interface Idea {
   id: string;
   title: string;
   status: 'Seeking Collaboration' | 'In Progress';
-  dateCreated: string; // e.g., YYYY-MM-DD
+  dateCreated: string; // YYYY-MM-DD
   newActivity: boolean;
 }
 
@@ -41,31 +37,30 @@ const dummyIdeas: Idea[] = [
     dateCreated: '2025-11-01',
     newActivity: true,
   },
-  // Add more idea objects as needed...
 ];
 
-const MyIdeasPage: NextPage = () => {
-  // State for search query and status filter.
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('All');
+type StatusFilter = 'All' | Idea['status'];
 
-  // Filter ideas based on search text and selected status.
-  const filteredIdeas = useMemo(() => {
+export default function CollaborateOnIdeasPage(): JSX.Element {
+  const router = useRouter();
+
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('All');
+
+  const filteredIdeas = useMemo<Idea[]>(() => {
     let ideas = dummyIdeas;
     if (selectedStatus !== 'All') {
       ideas = ideas.filter((idea) => idea.status === selectedStatus);
     }
     if (searchQuery.trim() !== '') {
-      ideas = ideas.filter((idea) =>
-        idea.title.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const q = searchQuery.toLowerCase();
+      ideas = ideas.filter((idea) => idea.title.toLowerCase().includes(q));
     }
     return ideas;
   }, [searchQuery, selectedStatus]);
 
   return (
-    <PageContainer title="My Ideas">
-      {/* Filter Section */}
+    <PageContainer title="Collaborate on Ideas">
       <Space direction="vertical" size="middle" style={{ width: '100%', marginBottom: 24 }}>
         <Space>
           <Input
@@ -73,33 +68,39 @@ const MyIdeasPage: NextPage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: 300 }}
+            allowClear
           />
-          <Select
+          <Select<StatusFilter>
             value={selectedStatus}
             onChange={(value) => setSelectedStatus(value)}
-            style={{ width: 200 }}
-          >
-            <Option value="All">All Status</Option>
-            <Option value="Seeking Collaboration">Seeking Collaboration</Option>
-            <Option value="In Progress">In Progress</Option>
-          </Select>
+            style={{ width: 220 }}
+            options={[
+              { value: 'All', label: 'All Status' },
+              { value: 'Seeking Collaboration', label: 'Seeking Collaboration' },
+              { value: 'In Progress', label: 'In Progress' },
+            ]}
+          />
         </Space>
       </Space>
-      {/* Ideas List */}
+
       <List
         itemLayout="vertical"
-        dataSource={filteredIdeas ?? []}
+        dataSource={filteredIdeas}
         renderItem={(idea) => (
           <List.Item
             key={idea.id}
             actions={[
               <Button
+                key="edit"
                 type="primary"
                 onClick={() => router.push(`/kreative/idea-incubator/edit/${idea.id}`)}
               >
                 Edit
               </Button>,
-              <Button onClick={() => router.push(`/kreative/idea-incubator/view/${idea.id}`)}>
+              <Button
+                key="view"
+                onClick={() => router.push(`/kreative/idea-incubator/view/${idea.id}`)}
+              >
                 View
               </Button>,
             ]}
@@ -107,7 +108,9 @@ const MyIdeasPage: NextPage = () => {
             <List.Item.Meta
               title={
                 <Space>
-                  {idea.newActivity && <Badge count="New" style={{ backgroundColor: '#52c41a' }} />}
+                  {idea.newActivity && (
+                    <Badge count="New" style={{ backgroundColor: '#52c41a' }} />
+                  )}
                   <Title level={4} style={{ margin: 0 }}>
                     {idea.title}
                   </Title>
@@ -126,9 +129,4 @@ const MyIdeasPage: NextPage = () => {
       />
     </PageContainer>
   );
-
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default MyIdeasPage;
 }

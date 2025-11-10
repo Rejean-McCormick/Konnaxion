@@ -1,8 +1,7 @@
-import type { ThemeObject } from './types';
-import { theme }             from 'antd';
+import { theme } from 'antd';
 const { defaultAlgorithm } = theme;
 
-const modernTheme: ThemeObject = {
+export default {
   label       : 'Modern',
   icon        : '🖌️',
 
@@ -20,12 +19,10 @@ const modernTheme: ThemeObject = {
   borderRadiusLG : 16,
   controlHeight  : 40,
 
-  /* raw Tailwind vars (R G B) */
-  bgMain    : '249 250 251',
-  bgLight   : '255 255 255',
-  bgDark    : '226 232 240',
-  textMain  : '15 23 42',
-  accent    : '71 85 105',
-};
-
-export default modernTheme;
+  // Custom tokens
+  bgMain  : '#F9FAFB',
+  bgLight : '#FFFFFF',
+  bgDark  : '#E2E8F0',
+  textMain: '#0F172A',
+  accent  : '#475569',
+} as const;

@@ -7,7 +7,6 @@ import React, { CSSProperties, ForwardedRef } from 'react';
 import styled from 'styled-components';
 import { Card, Col, Form, Typography, Empty, Table } from 'antd';
 import type { SVGProps } from 'react';
-import Icon from '@/components/compat/Icon';
 import {
   LikeOutlined,
   LikeFilled,
@@ -49,9 +48,8 @@ import {
 const { Text } = Typography;
 
 /* --------------------------------------------------------------------------------
-   AntD v5 no longer exports a generic <Icon /> from 'antd'.
-   Provide a small shim so existing usages like <DescriptionIcon type="like" />
-   still render an icon. Prefer using concrete icons in new code.
+   AntD v5 does not export a generic <Icon />.
+   Shim to keep usages like <DescriptionIcon type="like" /> working.
 -------------------------------------------------------------------------------- */
 
 type LegacyIconName =
@@ -66,16 +64,10 @@ type LegacyIconName =
   | 'calendar' | 'clock' | 'user' | 'team' | 'bell' | 'search' | 'filter' | 'setting'
   | 'loading';
 
-const ICON_MAP: Record<
-  LegacyIconName,
-  React.ComponentType<{
-    spin?: boolean;
-    rotate?: number;
-    twoToneColor?: string;
-    style?: CSSProperties;
-    className?: string;
-  }>
-> = {
+/** All AntD icons share the same component type. */
+type AnyAntdIcon = typeof LikeOutlined;
+
+const ICON_MAP: Record<LegacyIconName, AnyAntdIcon> = {
   like: LikeOutlined,
   'like-filled': LikeFilled,
   'like-two-tone': LikeTwoTone,
@@ -120,17 +112,18 @@ export type IconProps = {
   component?: React.ComponentType<SVGProps<SVGSVGElement>>;
   rotate?: number;
   spin?: boolean;
-  twoToneColor?: string;
+  /** Matches AntD twoTone type: string or [primary, secondary] */
+  twoToneColor?: string | [string, string];
   className?: string;
   style?: CSSProperties;
   title?: string;
-  onClick?: React.MouseEventHandler<HTMLElement>;
-} & Omit<React.HTMLAttributes<HTMLElement>, 'onClick' | 'title'>;
+  onClick?: React.MouseEventHandler<HTMLSpanElement>;
+} & Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClick' | 'title'>;
 
 /** Local Icon shim */
-export const Icon = React.forwardRef(function LegacyIcon(
-  { type, component: CustomSvg, rotate, spin, twoToneColor, className, style, title, onClick, ...rest }: IconProps,
-  ref: ForwardedRef<HTMLElement>
+export const Icon = React.forwardRef<HTMLSpanElement, IconProps>(function LegacyIcon(
+  { type, component: CustomSvg, rotate, spin, twoToneColor, className, style, title, onClick, ...rest },
+  ref
 ) {
   // Custom SVG support
   if (CustomSvg) {
@@ -153,12 +146,12 @@ export const Icon = React.forwardRef(function LegacyIcon(
   const Mapped = type ? ICON_MAP[type] : undefined;
   const RenderIcon = Mapped ?? QuestionCircleOutlined;
 
-  const needsWrap = !!rotate; // most AntD icons support rotate, but wrap keeps behavior consistent
+  const needsWrap = !!rotate;
   const iconEl = (
     <RenderIcon
       spin={spin}
       rotate={needsWrap ? undefined : rotate}
-      twoToneColor={twoToneColor}
+      twoToneColor={twoToneColor as any}
       style={style}
       className={className}
     />
@@ -166,7 +159,7 @@ export const Icon = React.forwardRef(function LegacyIcon(
 
   if (!needsWrap) {
     return (
-      <span ref={ref as any} onClick={onClick} title={title} {...rest}>
+      <span ref={ref} onClick={onClick} title={title} {...rest}>
         {iconEl}
       </span>
     );
@@ -174,7 +167,7 @@ export const Icon = React.forwardRef(function LegacyIcon(
 
   return (
     <span
-      ref={ref as any}
+      ref={ref}
       onClick={onClick}
       title={title}
       style={{ display: 'inline-flex', lineHeight: 0, verticalAlign: 'middle', transform: `rotate(${rotate}deg)` }}
@@ -183,7 +176,7 @@ export const Icon = React.forwardRef(function LegacyIcon(
       {iconEl}
     </span>
   );
-}) as React.ForwardRefExoticComponent<IconProps & React.RefAttributes<HTMLElement>>;
+});
 
 /* --------------------------------------------------------------------------------
    Styled exports (API preserved)

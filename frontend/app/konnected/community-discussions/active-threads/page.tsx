@@ -1,45 +1,31 @@
 ﻿'use client'
 
-// File: /pages/konnected/community-discussions/active-threads.tsx
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
-import {
-  List,
-  Card,
-  Input,
-  Select,
-  Space,
-  Typography,
-  Pagination,
-} from 'antd';
-import {
-  SearchOutlined,
-  QuestionCircleOutlined,
-  MessageTwoTone,
-} from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
+import React, { useMemo, useState } from 'react'
+import { List, Card, Input, Select, Space, Typography, Pagination } from 'antd'
+import { SearchOutlined, QuestionCircleOutlined, MessageTwoTone } from '@ant-design/icons'
+import { useRouter } from 'next/navigation'
+import PageContainer from '@/components/PageContainer'
+import MainLayout from '@/components/layout-components/MainLayout'
 
-const { Title, Text } = Typography;
-const { Option } = Select;
+const { Title, Text } = Typography
 
 interface Thread {
-  id: string;
-  title: string;
-  snippet: string;
-  author: string;
-  repliesCount: number;
-  lastActivity: string; // date string for simplification
-  category: 'Math' | 'Science' | 'General';
-  threadType: 'question' | 'discussion';
+  id: string
+  title: string
+  snippet: string
+  author: string
+  repliesCount: number
+  lastActivity: string // ISO-like string for simplicity
+  category: 'Math' | 'Science' | 'General'
+  threadType: 'question' | 'discussion'
 }
 
-// DonnÃ©es simulÃ©es pour les threads
+// Dummy data for threads
 const dummyThreads: Thread[] = [
   {
     id: 't1',
     title: 'How to solve quadratic equations?',
-    snippet: 'Iâ€™m struggling with solving quadratic equations. Can anyone explain...',
+    snippet: "I’m struggling with solving quadratic equations. Can anyone explain...",
     author: 'Alice',
     repliesCount: 15,
     lastActivity: '2025-12-01 14:30',
@@ -49,7 +35,7 @@ const dummyThreads: Thread[] = [
   {
     id: 't2',
     title: 'The impact of climate change on ecosystems',
-    snippet: 'Letâ€™s discuss how various ecosystems are being affected by the recent...',
+    snippet: 'Let’s discuss how various ecosystems are being affected by the recent...',
     author: 'Bob',
     repliesCount: 8,
     lastActivity: '2025-12-01 10:15',
@@ -59,7 +45,7 @@ const dummyThreads: Thread[] = [
   {
     id: 't3',
     title: 'Study tips for final exams',
-    snippet: 'Iâ€™d like to share some study tips and ask for suggestions for better...',
+    snippet: 'I’d like to share some study tips and ask for suggestions for better...',
     author: 'Carol',
     repliesCount: 22,
     lastActivity: '2025-11-30 18:45',
@@ -76,139 +62,144 @@ const dummyThreads: Thread[] = [
     category: 'Math',
     threadType: 'question',
   },
-  // ... Ajoutez d'autres threads au besoin
-];
+]
 
-const ActiveThreadsPage: NextPage = () => {
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [sortOption, setSortOption] = useState<'recent' | 'replies'>('recent');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 5;
+type CategoryFilter = 'All' | Thread['category']
 
-  // Filtrage et tri des threads
+const CATEGORY_OPTIONS = [
+  { value: 'All', label: 'All Categories' },
+  { value: 'Math', label: 'Math' },
+  { value: 'Science', label: 'Science' },
+  { value: 'General', label: 'General' },
+] as const
+
+const SORT_OPTIONS = [
+  { value: 'recent', label: 'Sort by Recent Activity' },
+  { value: 'replies', label: 'Sort by Most Replies' },
+] as const
+
+export default function ActiveThreadsPage(): JSX.Element {
+  const router = useRouter()
+
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('All')
+  const [sortOption, setSortOption] = useState<'recent' | 'replies'>('recent')
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const pageSize = 5
+
+  // Filter and sort
   const filteredThreads = useMemo(() => {
-    let threads = [...dummyThreads]; // copie pour Ã©viter la mutation
+    let threads = [...dummyThreads]
+
     if (selectedCategory !== 'All') {
-      threads = threads.filter((t) => t.category === selectedCategory);
+      threads = threads.filter((t) => t.category === selectedCategory)
     }
+
     if (searchQuery) {
-      threads = threads.filter((t) =>
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        t.snippet.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      const q = searchQuery.toLowerCase()
+      threads = threads.filter(
+        (t) => t.title.toLowerCase().includes(q) || t.snippet.toLowerCase().includes(q),
+      )
     }
+
     if (sortOption === 'recent') {
-      threads = threads.slice().sort(
-        (a, b) =>
-          new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime()
-      );
+      threads = threads
+        .slice()
+        .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())
     } else {
-      threads = threads.slice().sort((a, b) => b.repliesCount - a.repliesCount);
+      threads = threads.slice().sort((a, b) => b.repliesCount - a.repliesCount)
     }
-    return threads;
-  }, [searchQuery, selectedCategory, sortOption]);
 
-  // Gestion de la pagination
+    return threads
+  }, [searchQuery, selectedCategory, sortOption])
+
+  // Pagination slice
   const paginatedThreads = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredThreads.slice(startIndex, startIndex + pageSize);
-  }, [filteredThreads, currentPage, pageSize]);
+    const startIndex = (currentPage - 1) * pageSize
+    return filteredThreads.slice(startIndex, startIndex + pageSize)
+  }, [filteredThreads, currentPage])
 
-  // Fonction de clic sur un thread (redirection vers la page de dÃ©tail)
+  // Navigate to thread details
   const openThread = (thread: Thread) => {
-    console.log('Ouvrir le thread:', thread.title);
-    // Exemple de redirection : Router.push(`/konnected/community-discussions/thread/${thread.id}`);
+    router.push(`/konnected/community-discussions/thread/${thread.id}`)
+  }
 
   return (
-    <PageContainer title="Active Threads">
-      <Space style={{ marginBottom: 24 }} size="large" wrap>
-        <Input
-          placeholder="Search threads..."
-          prefix={<SearchOutlined />}
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value);
-            setCurrentPage(1);
-          }}
-          style={{ width: 300 }}
-        />
-        <Select
-          value={selectedCategory}
-          onChange={(value) => {
-            setSelectedCategory(value);
-            setCurrentPage(1);
-          }}
-          style={{ width: 150 }}
-        >
-          <Option value="All">All Categories</Option>
-          <Option value="Math">Math</Option>
-          <Option value="Science">Science</Option>
-          <Option value="General">General</Option>
-        </Select>
-        <Select
-          value={sortOption}
-          onChange={(value) => {
-            setSortOption(value);
-            setCurrentPage(1);
-          }}
-          style={{ width: 180 }}
-        >
-          <Option value="recent">Sort by Recent Activity</Option>
-          <Option value="replies">Sort by Most Replies</Option>
-        </Select>
-      </Space>
+    <MainLayout>
+      <PageContainer title="Active Threads">
+        <Space style={{ marginBottom: 24 }} size="large" wrap>
+          <Input
+            placeholder="Search threads..."
+            prefix={<SearchOutlined />}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setCurrentPage(1)
+            }}
+            style={{ width: 300 }}
+          />
 
-      <List
-        grid={{ gutter: 16, column: 1 }}
-        dataSource={paginatedThreads ?? []}
-        renderItem={(thread: Thread) => (
-          <List.Item
-            onClick={() => openThread(thread)}
-            style={{ cursor: 'pointer' }}
-          >
-            <Card hoverable>
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Space>
-                  {thread.threadType === 'question' ? (
-                    <QuestionCircleOutlined
-                      style={{ fontSize: 18, color: '#1890ff' }}
-                    />
-                  ) : (
-                    <MessageTwoTone
-                      twoToneColor="#52c41a"
-                      style={{ fontSize: 18 }}
-                    />
-                  )}
-                  <Title level={4} style={{ margin: 0 }}>
-                    {thread.title}
-                  </Title>
+          <Select
+            value={selectedCategory}
+            onChange={(value) => {
+              setSelectedCategory(value as CategoryFilter)
+              setCurrentPage(1)
+            }}
+            options={CATEGORY_OPTIONS as any}
+            style={{ width: 180 }}
+          />
+
+          <Select
+            value={sortOption}
+            onChange={(value) => {
+              setSortOption(value as 'recent' | 'replies')
+              setCurrentPage(1)
+            }}
+            options={SORT_OPTIONS as any}
+            style={{ width: 220 }}
+          />
+        </Space>
+
+        <List
+          grid={{ gutter: 16, column: 1 }}
+          dataSource={paginatedThreads}
+          renderItem={(thread: Thread) => (
+            <List.Item onClick={() => openThread(thread)} style={{ cursor: 'pointer' }}>
+              <Card hoverable>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Space>
+                    {thread.threadType === 'question' ? (
+                      <QuestionCircleOutlined style={{ fontSize: 18, color: '#1890ff' }} />
+                    ) : (
+                      <MessageTwoTone twoToneColor="#52c41a" style={{ fontSize: 18 }} />
+                    )}
+                    <Title level={4} style={{ margin: 0 }}>
+                      {thread.title}
+                    </Title>
+                  </Space>
+
+                  <Text>{thread.snippet}</Text>
+
+                  <Space>
+                    <Text strong>Author:</Text> {thread.author}
+                    <Text strong>Replies:</Text> {thread.repliesCount}
+                    <Text strong>Last Activity:</Text> {thread.lastActivity}
+                  </Space>
                 </Space>
-                <Text>{thread.snippet}</Text>
-                <Space>
-                  <Text strong>Author:</Text> {thread.author}
-                  <Text strong>Replies:</Text> {thread.repliesCount}
-                  <Text strong>Last Activity:</Text> {thread.lastActivity}
-                </Space>
-              </Space>
-            </Card>
-          </List.Item>
-        )}
-      />
-
-      <div style={{ textAlign: 'center', marginTop: 24 }}>
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={filteredThreads.length}
-          onChange={(page) => setCurrentPage(page)}
+              </Card>
+            </List.Item>
+          )}
         />
-      </div>
-    </PageContainer>
-  );
 
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default ActiveThreadsPage;
-}}
+        <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={filteredThreads.length}
+            onChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      </PageContainer>
+    </MainLayout>
+  )
+}

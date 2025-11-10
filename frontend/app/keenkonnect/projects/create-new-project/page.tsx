@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import {
   Button,
   Card,
@@ -25,8 +26,13 @@ import {
   CheckCircleOutlined,
 } from '@ant-design/icons';
 
-import MainLayout from '@/components/layout-components/MainLayout';
 import { normalizeError } from '@/shared/errors';
+
+// Load MainLayout on the client to avoid server/client boundary issues
+const MainLayout = dynamic(
+  () => import('@/components/layout-components/MainLayout'),
+  { ssr: false }
+);
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -40,21 +46,21 @@ interface ProjectFormData {
   projectName: string;
   projectDescription: string;
   category?: string;
-  projectImage?: UploadFile[]; // image principale (liste contrôlée)
+  projectImage?: UploadFile[]; // main image (controlled fileList)
   teamMembers: TeamMember[];
-  documents?: UploadFile[]; // pièces jointes
+  documents?: UploadFile[]; // attachments
 }
 
-function CreateNewProjectPage(): JSX.Element {
+export default function CreateNewProjectPage(): JSX.Element {
   const router = useRouter();
   const [form] = Form.useForm<ProjectFormData>();
 
-  // état global minimal pour le récapitulatif / soumission
+  // minimal global UI state
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
 
-  // valeurs initiales (remplace les initialValue éparpillés)
+  // single source of truth for initial values
   const initialValues: ProjectFormData = useMemo(
     () => ({
       projectName: '',
@@ -77,22 +83,21 @@ function CreateNewProjectPage(): JSX.Element {
     []
   );
 
-  // Normalise la valeur d'Upload vers fileList
+  // Normalize Upload value to fileList
   const normFile = (
     e: { fileList?: UploadFile[] } | UploadFile[] | undefined
   ): UploadFile[] => {
     if (!e) return [];
     return Array.isArray(e) ? e : e.fileList ?? [];
-    // Pas d’upload auto : on laisse beforeUpload={() => false}
   };
 
   const goNext = async () => {
-    // On valide les champs visibles (par simplicité on valide tout)
     try {
+      // validate all current fields before moving on
       await form.validateFields();
       setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
     } catch {
-      // erreurs déjà affichées par antd
+      // errors already displayed by antd
     }
   };
 
@@ -101,7 +106,7 @@ function CreateNewProjectPage(): JSX.Element {
   const handleSubmit: FormProps<ProjectFormData>['onFinish'] = async (values) => {
     setSubmitting(true);
     try {
-      // Ici : appel API/Mutation à votre backend si nécessaire
+      // TODO: call your API/mutation here with `values`
       // await api.createProject(values)
 
       setSubmitted(true);
@@ -163,6 +168,7 @@ function CreateNewProjectPage(): JSX.Element {
             </Form.Item>
           </>
         );
+
       case 1:
         return (
           <>
@@ -173,29 +179,27 @@ function CreateNewProjectPage(): JSX.Element {
             <Form.List name="teamMembers">
               {(fields, { add, remove }) => (
                 <>
-                  {fields.map((field) => (
+                  {fields.map(({ key, name, ...restField }) => (
                     <Space
-                      key={field.key}
+                      key={key}
                       align="baseline"
                       style={{ display: 'flex', marginBottom: 8 }}
                     >
                       <Form.Item
-                        {...field}
-                        name={[field.name, 'name']}
-                        fieldKey={[field.fieldKey!, 'name']}
+                        {...restField}
+                        name={[name, 'name']}
                         rules={[{ required: true, message: 'Name is required' }]}
                       >
                         <Input placeholder="Full name" />
                       </Form.Item>
                       <Form.Item
-                        {...field}
-                        name={[field.name, 'role']}
-                        fieldKey={[field.fieldKey!, 'role']}
+                        {...restField}
+                        name={[name, 'role']}
                         rules={[{ required: true, message: 'Role is required' }]}
                       >
                         <Input placeholder="Role (e.g., Lead Researcher)" />
                       </Form.Item>
-                      <Button type="link" danger onClick={() => remove(field.name)}>
+                      <Button type="link" danger onClick={() => remove(name)}>
                         Remove
                       </Button>
                     </Space>
@@ -208,6 +212,7 @@ function CreateNewProjectPage(): JSX.Element {
             </Form.List>
           </>
         );
+
       case 2:
         return (
           <>
@@ -224,6 +229,7 @@ function CreateNewProjectPage(): JSX.Element {
             </Form.Item>
           </>
         );
+
       case 3: {
         const v = form.getFieldsValue(true) as ProjectFormData;
         return (
@@ -245,7 +251,7 @@ function CreateNewProjectPage(): JSX.Element {
                 <Text>
                   {Array.isArray(v.teamMembers) && v.teamMembers.length
                     ? v.teamMembers
-                        .map((m) => [m?.name, m?.role].filter(Boolean).join(' – '))
+                        .map((m) => [m?.name, m?.role].filter(Boolean).join(' – ')) // en dash
                         .join(', ')
                     : '—'}
                 </Text>
@@ -262,6 +268,7 @@ function CreateNewProjectPage(): JSX.Element {
           </div>
         );
       }
+
       default:
         return null;
     }
@@ -280,7 +287,7 @@ function CreateNewProjectPage(): JSX.Element {
           style={{ marginBottom: 24 }}
         />
 
-        {/* Form unique contrôlé sur l’ensemble des étapes */}
+        {/* Single form across all steps */}
         <Form<ProjectFormData>
           form={form}
           layout="vertical"
@@ -303,11 +310,7 @@ function CreateNewProjectPage(): JSX.Element {
               </Button>
 
               {currentStep < steps.length - 1 ? (
-                <Button
-                  type="primary"
-                  onClick={goNext}
-                  icon={<ArrowRightOutlined />}
-                >
+                <Button type="primary" onClick={goNext} icon={<ArrowRightOutlined />}>
                   Next
                 </Button>
               ) : (
@@ -325,7 +328,10 @@ function CreateNewProjectPage(): JSX.Element {
             <Space direction="vertical" size="middle">
               <Text type="success">Project created successfully.</Text>
               <Space>
-                <Button type="primary" onClick={() => router.push('/keenkonnect/projects/my-projects')}>
+                <Button
+                  type="primary"
+                  onClick={() => router.push('/keenkonnect/projects/my-projects')}
+                >
                   Go to My Projects
                 </Button>
                 <Link href="/keenkonnect/projects/create-new-project">
@@ -339,5 +345,3 @@ function CreateNewProjectPage(): JSX.Element {
     </MainLayout>
   );
 }
-
-export default CreateNewProjectPage;

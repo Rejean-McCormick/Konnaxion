@@ -1,29 +1,29 @@
+// C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx
+
 'use client'
 
-// pages/keenkonnect/knowledge/search-filter-documents/index.tsx
-import React, { useState, useMemo } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Form, Input, Select, DatePicker, Button, Table, Row, Col, Card, Divider } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
-import dayjs from 'dayjs';
+import React, { useMemo, useState } from 'react'
+import { Form, Input, Select, DatePicker, Button, Table, Row, Col, Card } from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import dayjs from 'dayjs'
 
-const { RangePicker } = DatePicker;
-const { Option } = Select;
+const { RangePicker } = DatePicker
 
 interface DocumentResource {
-  key: string;
-  title: string;
-  snippet: string;
-  author: string;
-  tags: string[];
-  language: string;
-  version: string;
-  lastUpdated: string;
-  relevanceScore: number;
+  key: string
+  title: string
+  snippet: string
+  author: string
+  tags: string[]
+  language: string
+  version: string
+  lastUpdated: string // ISO date
+  relevanceScore: number
 }
 
-// Données simulées pour les documents
+type DateRange = [dayjs.Dayjs | null, dayjs.Dayjs | null] | null
+
+// Demo data
 const sampleDocuments: DocumentResource[] = [
   {
     key: '1',
@@ -69,52 +69,51 @@ const sampleDocuments: DocumentResource[] = [
     lastUpdated: '2023-08-20',
     relevanceScore: 80,
   },
-];
+]
 
-const SearchFilterDocuments = () => {
-  const [form] = Form.useForm();
-  // États pour les filtres
-  const [keyword, setKeyword] = useState('');
-  const [authorFilter, setAuthorFilter] = useState<string[]>([]);
-  const [tagFilter, setTagFilter] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<[any, any] | null>(null);
-  const [sortCriteria, setSortCriteria] = useState<string>('relevance');
+export default function SearchFilterDocuments() {
+  const [form] = Form.useForm()
 
-  // Filtrage des documents
+  const [keyword, setKeyword] = useState<string>('')
+  const [authorFilter, setAuthorFilter] = useState<string[]>([])
+  const [tagFilter, setTagFilter] = useState<string[]>([])
+  const [dateRange, setDateRange] = useState<DateRange>(null)
+  const [sortCriteria, setSortCriteria] = useState<'relevance' | 'date' | 'popularity'>('relevance')
+
   const filteredDocuments = useMemo(() => {
     return sampleDocuments.filter((doc) => {
       const matchesKeyword =
-        keyword === '' ||
+        !keyword ||
         doc.title.toLowerCase().includes(keyword.toLowerCase()) ||
-        doc.snippet.toLowerCase().includes(keyword.toLowerCase());
-      const matchesAuthor =
-        authorFilter.length === 0 || authorFilter.includes(doc.author);
-      const matchesTags =
-        tagFilter.length === 0 || tagFilter.every(tag => doc.tags.includes(tag));
-      let matchesDate = true;
+        doc.snippet.toLowerCase().includes(keyword.toLowerCase())
+
+      const matchesAuthor = authorFilter.length === 0 || authorFilter.includes(doc.author)
+
+      const matchesTags = tagFilter.length === 0 || tagFilter.every((t) => doc.tags.includes(t))
+
+      let matchesDate = true
       if (dateRange && dateRange[0] && dateRange[1]) {
-        const docDate = dayjs(doc.lastUpdated);
-        matchesDate = docDate.isAfter(dateRange[0]) && docDate.isBefore(dateRange[1]);
+        const docDate = dayjs(doc.lastUpdated)
+        matchesDate = docDate.isAfter(dateRange[0]) && docDate.isBefore(dateRange[1])
       }
-      return matchesKeyword && matchesAuthor && matchesTags && matchesDate;
-    });
-  }, [keyword, authorFilter, tagFilter, dateRange]);
 
-  // Tri des résultats
+      return matchesKeyword && matchesAuthor && matchesTags && matchesDate
+    })
+  }, [keyword, authorFilter, tagFilter, dateRange])
+
   const sortedDocuments = useMemo(() => {
-    const docs = [...filteredDocuments];
+    const docs = [...filteredDocuments]
     if (sortCriteria === 'relevance') {
-      docs.sort((a, b) => b.relevanceScore - a.relevanceScore);
+      docs.sort((a, b) => b.relevanceScore - a.relevanceScore)
     } else if (sortCriteria === 'date') {
-      docs.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+      docs.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())
     } else if (sortCriteria === 'popularity') {
-      // Si la popularité devait être calculée sur un autre critère, l'implémenter ici.
+      // placeholder: implement when a popularity metric exists
     }
-    return docs;
-  }, [filteredDocuments, sortCriteria]);
+    return docs
+  }, [filteredDocuments, sortCriteria])
 
-  // Définition des colonnes pour le tableau (simulant ProTable)
-  const columns = [
+  const columns: ColumnsType<DocumentResource> = [
     { title: 'Title', dataIndex: 'title', key: 'title' },
     { title: 'Snippet', dataIndex: 'snippet', key: 'snippet' },
     { title: 'Author', dataIndex: 'author', key: 'author' },
@@ -122,78 +121,93 @@ const SearchFilterDocuments = () => {
     { title: 'Version', dataIndex: 'version', key: 'version' },
     { title: 'Last Updated', dataIndex: 'lastUpdated', key: 'lastUpdated' },
     { title: 'Relevance', dataIndex: 'relevanceScore', key: 'relevanceScore' },
-  ];
+  ]
 
   return (
-    <>
-      <Head>
-        <title>Search & Filter Documents</title>
-        <meta name="description" content="Advanced search and filter interface for repository documents." />
-      </Head>
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Search & Filter Documents</h1>
-        
-        {/* Panneau de recherche et filtres */}
-        <Card className="mb-6">
-          <Form form={form} layout="vertical">
-            <Row gutter={[16, 16]}>
-              <Col xs={24} sm={12}>
-                <Form.Item label="Keywords">
-                  <Input.Search placeholder="Enter keywords" allowClear onSearch={setKeyword} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12}>
-                <Form.Item label="Authors">
-                  <Select mode="multiple" placeholder="Select authors" onChange={setAuthorFilter}>
-                    {['Alice', 'Bob', 'Charlie', 'Diana'].map(author => (
-                      <Option key={author} value={author}>{author}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12}>
-                <Form.Item label="Tags">
-                  <Select mode="multiple" placeholder="Select tags" onChange={setTagFilter}>
-                    {['Robotics', 'Healthcare', 'Technology', 'Energy', 'Environment'].map(tag => (
-                      <Option key={tag} value={tag}>{tag}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12}>
-                <Form.Item label="Date Range">
-                  <RangePicker onChange={(dates) => setDateRange(dates as any)} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12}>
-                <Form.Item label="Sort By">
-                  <Select defaultValue="relevance" onChange={setSortCriteria}>
-                    <Option value="relevance">Relevance</Option>
-                    <Option value="date">Date</Option>
-                    <Option value="popularity">Popularity</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={12}>
-                <Form.Item>
-                  <Button type="primary" onClick={() => form.submit()}>
-                    Apply Filters
-                  </Button>
-                </Form.Item>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+    <div className="container mx-auto p-5">
+      <h1 className="text-2xl font-bold mb-4">Search &amp; Filter Documents</h1>
 
-        {/* Résultats */}
-        <Card>
-          <Table columns={columns} dataSource={sortedDocuments} pagination={{ pageSize: 5 }} />
-        </Card>
-      </div>
-    </>
-  );
+      <Card className="mb-6">
+        <Form form={form} layout="vertical">
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+              <Form.Item label="Keywords">
+                <Input.Search
+                  placeholder="Enter keywords"
+                  allowClear
+                  onSearch={(v) => setKeyword(v)}
+                />
+              </Form.Item>
+            </Col>
 
+            <Col xs={24} sm={12}>
+              <Form.Item label="Authors">
+                <Select
+                  mode="multiple"
+                  placeholder="Select authors"
+                  value={authorFilter}
+                  onChange={setAuthorFilter}
+                  options={['Alice', 'Bob', 'Charlie', 'Diana'].map((a) => ({
+                    value: a,
+                    label: a,
+                  }))}
+                />
+              </Form.Item>
+            </Col>
 
+            <Col xs={24} sm={12}>
+              <Form.Item label="Tags">
+                <Select
+                  mode="multiple"
+                  placeholder="Select tags"
+                  value={tagFilter}
+                  onChange={setTagFilter}
+                  options={['Robotics', 'Healthcare', 'Technology', 'Energy', 'Environment'].map(
+                    (t) => ({ value: t, label: t }),
+                  )}
+                />
+              </Form.Item>
+            </Col>
 
-export default SearchFilterDocuments;
+            <Col xs={24} sm={12}>
+              <Form.Item label="Date Range">
+                <RangePicker onChange={(dates) => setDateRange(dates)} />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12}>
+              <Form.Item label="Sort By">
+                <Select
+                  value={sortCriteria}
+                  onChange={(v) => setSortCriteria(v)}
+                  options={[
+                    { value: 'relevance', label: 'Relevance' },
+                    { value: 'date', label: 'Date' },
+                    { value: 'popularity', label: 'Popularity' },
+                  ]}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={12}>
+              <Form.Item>
+                <Button type="primary" onClick={() => form.submit()}>
+                  Apply Filters
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+
+      <Card>
+        <Table<DocumentResource>
+          rowKey="key"
+          columns={columns}
+          dataSource={sortedDocuments}
+          pagination={{ pageSize: 5 }}
+        />
+      </Card>
+    </div>
+  )
 }

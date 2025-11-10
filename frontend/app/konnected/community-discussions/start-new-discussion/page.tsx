@@ -1,12 +1,21 @@
 ﻿'use client';
 
 import React from 'react';
-import { Form, Input, Select, Switch, Button, message as antdMessage } from 'antd';
+import {
+  Form,
+  Input,
+  Select,
+  Switch,
+  Button,
+  Typography,
+  message as antdMessage,
+} from 'antd';
 import type { FormProps } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 
 const { TextArea } = Input;
+const { Paragraph } = Typography;
 
 type FormValues = {
   title: string;
@@ -15,25 +24,26 @@ type FormValues = {
   isQuestion?: boolean;
 };
 
-export default function StartNewDiscussionPage() {
+export default function StartNewDiscussionPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
   const router = useRouter();
 
-  const onFinish: FormProps<FormValues>['onFinish'] = (values) => {
-    // TODO: remplacez par l'appel API réel (+ gestion d’erreurs)
+  const onFinish: FormProps<FormValues>['onFinish'] = (_values) => {
+    // TODO: replace with real API call (+ error handling)
     antdMessage.success('Discussion posted');
     router.push('/konnected/community-discussions/active-threads');
   };
 
-  const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = (_errorInfo) => {
+  const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = () => {
     antdMessage.error('Please fix the errors and try again.');
   };
 
   return (
-    <PageContainer
-      title="Start a New Discussion"
-      subtitle="Share a topic with the community"
-    >
+    <PageContainer title="Start a New Discussion">
+      <Paragraph type="secondary" style={{ marginBottom: 24 }}>
+        Share a topic with the community.
+      </Paragraph>
+
       <Form<FormValues>
         form={form}
         layout="vertical"
@@ -60,6 +70,7 @@ export default function StartNewDiscussionPage() {
               { label: 'General', value: 'general' },
               { label: 'Announcements', value: 'announcements' },
             ]}
+            allowClear
           />
         </Form.Item>
 

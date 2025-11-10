@@ -1,0 +1,627 @@
+===== TOC (12 fichiers) =====
+1. C:\MyCode\Konnaxionv14\frontend\src\theme\cyberTheme.ts
+2. C:\MyCode\Konnaxionv14\frontend\src\theme\darkTheme.ts
+3. C:\MyCode\Konnaxionv14\frontend\src\theme\funkyTheme.ts
+4. C:\MyCode\Konnaxionv14\frontend\src\theme\index.ts
+5. C:\MyCode\Konnaxionv14\frontend\src\theme\kktheme.ts
+6. C:\MyCode\Konnaxionv14\frontend\src\theme\lightTheme.ts
+7. C:\MyCode\Konnaxionv14\frontend\src\theme\minimalTheme.ts
+8. C:\MyCode\Konnaxionv14\frontend\src\theme\modernTheme.ts
+9. C:\MyCode\Konnaxionv14\frontend\src\theme\oceanTheme.ts
+10. C:\MyCode\Konnaxionv14\frontend\src\theme\sunsetTheme.ts
+11. C:\MyCode\Konnaxionv14\frontend\src\theme\types.ts
+12. C:\MyCode\Konnaxionv14\frontend\styles\tailwind.css
+===== END TOC =====
+
+
+===== BEGIN src/theme/cyberTheme.ts =====
+import { theme as antdTheme } from 'antd';
+const { darkAlgorithm } = antdTheme;
+
+export default {
+  label : 'Cyber',
+  icon  : '🕶️',
+
+  // Base algorithm (dark)
+  algorithm: darkAlgorithm,
+
+  // Couleurs principales
+  colorPrimary          : '#39FF14',
+  colorLink             : '#00FFB3',
+  colorLinkHover        : '#39FF14',
+  colorSuccess          : '#00FF9C',
+  colorWarning          : '#FFD700',
+  colorError            : '#FF3B3B',
+
+  // Texte global
+  colorText             : '#AEFAFF',
+  colorTextBase         : '#AEFAFF',
+  colorTextSecondary    : '#6EF7B8',
+  colorTextTertiary     : '#3DDAD7',
+
+  // Fonds / Layout
+  colorBgLayout         : '#000C1A',
+  colorBgContainer      : '#001627',
+  colorBgElevated       : '#002033',
+  layoutColorBgSider    : '#000C1A',
+  colorBgMask           : 'rgba(0,255,150,0.1)',
+
+  // Menu / Sidebar
+  colorMenuItemText         : '#AEFAFF',
+  colorMenuItemHoverBg      : '#003B2E',
+  colorMenuItemSelectedBg   : '#004C3A',
+  colorMenuItemSelectedText : '#39FF14',
+
+  // Bordures / séparateurs
+  colorBorder           : '#003B2E',
+  colorSplit            : '#004C3A',
+
+  // Ombres
+  boxShadow             : '0 4px 12px rgba(57,255,20,0.15)',
+  boxShadowSecondary    : '0 2px 8px rgba(0,255,150,0.2)',
+
+  // Tokens personnalisés
+  bgMain                : '#000C1A',
+  bgLight               : '#001627',
+  bgDark                : '#00E0FF1A',
+  textMain              : '#AEFAFF',
+  accent                : '#39FF14',
+  accentSoft            : '#00FF99',
+  accentGlow            : '0 0 8px rgba(57,255,20,0.5)',
+} as const;
+
+===== END src/theme/cyberTheme.ts =====
+
+
+===== BEGIN src/theme/darkTheme.ts =====
+import { theme as antdTheme } from 'antd';
+const { darkAlgorithm } = antdTheme;
+
+export default {
+  label : 'Dark',
+  icon  : '🌌',
+
+  // Base algorithm (dark)
+  algorithm: darkAlgorithm,
+
+  // Couleurs principales
+  colorPrimary          : '#00C4FF',
+  colorLink             : '#1E90FF',
+  colorLinkHover        : '#63C5DA',
+  colorSuccess          : '#00B894',
+  colorWarning          : '#FFA500',
+  colorError            : '#FF4D4F',
+
+  // Texte global
+  colorText             : '#FFFFFF',
+  colorTextBase         : '#F0F0F0',
+  colorTextSecondary    : '#A0A0A0',
+  colorTextTertiary     : '#7A7A7A',
+
+  // Fonds / Layout
+  colorBgLayout         : '#121214',
+  colorBgContainer      : '#1A1A1E',
+  colorBgElevated       : '#24242A',
+  layoutColorBgSider    : '#16161A',
+  colorBgMask           : 'rgba(0,0,0,0.6)',
+
+  // Menu / Sidebar
+  colorMenuItemText         : '#FFFFFF',
+  colorMenuItemHoverBg      : '#002B36',
+  colorMenuItemSelectedBg   : '#003B4C',
+  colorMenuItemSelectedText : '#00C4FF',
+
+  // Bordures / séparateurs
+  colorBorder           : '#2C2C34',
+  colorSplit            : '#303036',
+
+  // Ombres
+  boxShadow             : '0 4px 12px rgba(0,0,0,0.4)',
+  boxShadowSecondary    : '0 2px 8px rgba(0,0,0,0.25)',
+
+  // Tokens personnalisés
+  bgMain                : '#18181C',
+  bgLight               : '#24242A',
+  bgDark                : '#0D0D10',
+  textMain              : '#FFFFFF',
+  accent                : '#00C4FF',
+  accentSoft            : '#007A99',
+  accentGlow            : '0 0 8px rgba(0,196,255,0.5)',
+} as const;
+
+===== END src/theme/darkTheme.ts =====
+
+
+===== BEGIN src/theme/funkyTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Funky Disco',
+  icon          : '🪩',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF69B4',   // Hot Pink
+  colorLink              : '#00FFFF',   // Cyan
+  colorLinkHover         : '#7FFFD4',   // Aquamarine
+
+  // Texte (pour --ant-color-text et --ant-color-text-base)
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+  colorTextTertiary      : '#E0E0E0',
+  colorTextPlaceholder   : '#BBBBBB',
+  colorTextDisabled      : '#777777',
+
+  // Arrondis / typo
+  borderRadius           : 8,
+  fontFamily             : '"Comic Sans MS", cursive, sans-serif',
+
+  // Fonds généraux
+  colorBgLayout          : '#1E1E2F',
+  colorBgContainer       : '#2E1A47',
+  colorBgElevated        : '#41295A',
+  colorBgMask            : 'rgba(0,0,0,0.6)',
+  colorBgSpotlight       : '#FFD700',
+  colorBgSolid           : '#FF4500',
+  colorBgSolidHover      : '#FF6347',
+
+  // Menu / Sidebar (raw keys custom)
+  menuBg                 : '#2E1A47',
+  menuItemHoverBg        : '#584F8E',
+  menuItemSelectedBg     : '#7D5BA6',
+  menuItemTextColor      : '#FFFFFF',
+
+  // Dropdown / Popconfirm
+  dropdownBg             : '#383838',
+  dropdownItemHoverBg    : '#4A4A4A',
+  colorBgPopconfirm      : '#383838',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF69B4',
+  colorSplit             : '#884EA0',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+
+  // Espacements & typo
+  fontSize               : 14,
+  fontSizeLG             : 18,
+  paddingContentHorizontalLG: 24,
+  paddingContentVerticalLG  : 24,
+
+  // Variables perso (si vous les exposez sur <html>)
+  bgMain   : '#1E1E2F',
+  bgLight  : '#2E1A47',
+  bgDark   : '#0F0B20',
+  textMain : '#FFFFFF',
+  accent   : '#00FF00',
+} as const
+
+===== END src/theme/funkyTheme.ts =====
+
+
+===== BEGIN src/theme/index.ts =====
+// src/theme/index.ts
+import light        from './lightTheme';
+import dark         from './darkTheme';
+import funky        from './funkyTheme';
+import cyber        from './cyberTheme';
+import kktheme      from './kktheme';
+import sunsetTheme  from './sunsetTheme';
+import oceanTheme   from './oceanTheme';
+import minimalTheme from './minimalTheme';
+import modernTheme  from './modernTheme';
+
+export const themes = {
+  light,
+  dark,
+  funky,
+  cyber,
+  kktheme,
+  sunsetTheme,
+  oceanTheme,
+  minimalTheme,
+  modernTheme,
+} as const;
+
+export type ThemeType = keyof typeof themes;
+export const themeKeys = Object.keys(themes) as ThemeType[];
+export default themes;
+
+===== END src/theme/index.ts =====
+
+
+===== BEGIN src/theme/kktheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'KK',
+  icon            : '🦄',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#1e6864',
+  colorPrimaryBg  : '#1e68641a',
+  colorBgLayout   : '#f0fefa',
+  colorBgContainer: '#e0f7f5',
+  colorTextBase   : '#05332b',
+
+  bgMain   : '#f0fefa',
+  bgLight  : '#e0f7f5',
+  bgDark   : '#1e6864',
+  textMain : '#05332b',
+  accent   : '#1e6864',
+} as const;
+
+===== END src/theme/kktheme.ts =====
+
+
+===== BEGIN src/theme/lightTheme.ts =====
+import { theme as antdTheme } from 'antd';
+const { defaultAlgorithm } = antdTheme;
+
+export default {
+  label : 'Light',
+  icon  : '☀️',
+
+  // Base algorithm (light)
+  algorithm: defaultAlgorithm,
+
+  // Couleurs principales
+  colorPrimary          : '#D4AF37', // or élégant
+  colorLink             : '#D4AF37',
+  colorLinkHover        : '#E6BE4A',
+  colorSuccess          : '#5DBB63',
+  colorWarning          : '#E1B12C',
+  colorError            : '#D45D5D',
+
+  // Texte global
+  colorText             : '#1A1A1A',
+  colorTextBase         : '#141414',
+  colorTextSecondary    : '#5C5C5C',
+  colorTextTertiary     : '#8C8C8C',
+
+  // Fonds / Layout
+  colorBgLayout         : '#FFFFFF',
+  colorBgContainer      : '#FAFAFA',
+  colorBgElevated       : '#F5F5F5',
+  layoutColorBgSider    : '#FFFFFF',
+  colorBgMask           : 'rgba(212,175,55,0.1)',
+
+  // Menu / Sidebar
+  colorMenuItemText         : '#1A1A1A',
+  colorMenuItemHoverBg      : '#FFF5DA',
+  colorMenuItemSelectedBg   : '#FFF2C2',
+  colorMenuItemSelectedText : '#D4AF37',
+
+  // Bordures / séparateurs
+  colorBorder           : '#E5E5E5',
+  colorSplit            : '#E0E0E0',
+
+  // Ombres
+  boxShadow             : '0 4px 12px rgba(0,0,0,0.05)',
+  boxShadowSecondary    : '0 2px 8px rgba(0,0,0,0.04)',
+
+  // Tokens personnalisés
+  bgMain                : '#FFFFFF',
+  bgLight               : '#F5F5F5',
+  bgDark                : '#E5E5E5',
+  textMain              : '#141414',
+  accent                : '#D4AF37',
+  accentComplementary   : '#2A9DF4', // bleu royal complémentaire du doré
+  accentSoft            : '#E6BE4A',
+  accentGlow            : '0 0 8px rgba(212,175,55,0.4)',
+} as const;
+
+===== END src/theme/lightTheme.ts =====
+
+
+===== BEGIN src/theme/minimalTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label           : 'Minimal',
+  icon            : '⚪️',
+
+  algorithm       : defaultAlgorithm,
+  colorPrimary    : '#888888',
+  colorPrimaryBg  : '#8888881a',
+  colorBgLayout   : '#fafafa',
+  colorBgContainer: '#f5f5f5',
+  colorTextBase   : '#333333',
+
+  bgMain   : '#fafafa',
+  bgLight  : '#f5f5f5',
+  bgDark   : '#888888',
+  textMain : '#333333',
+  accent   : '#888888',
+} as const;
+
+===== END src/theme/minimalTheme.ts =====
+
+
+===== BEGIN src/theme/modernTheme.ts =====
+import { theme } from 'antd';
+const { defaultAlgorithm } = theme;
+
+export default {
+  label       : 'Modern',
+  icon        : '🖌️',
+
+  algorithm   : defaultAlgorithm,
+  colorPrimary: '#475569',
+  colorInfo   : '#2563eb',
+  colorSuccess: '#22c55e',
+  colorWarning: '#facc15',
+  colorError  : '#ef4444',
+
+  colorBgLayout   : '#f9fafb',
+  colorBgContainer: '#ffffff',
+  colorTextBase   : '#0f172a',
+
+  borderRadiusLG : 16,
+  controlHeight  : 40,
+
+  // Custom tokens
+  bgMain  : '#F9FAFB',
+  bgLight : '#FFFFFF',
+  bgDark  : '#E2E8F0',
+  textMain: '#0F172A',
+  accent  : '#475569',
+} as const;
+
+===== END src/theme/modernTheme.ts =====
+
+
+===== BEGIN src/theme/oceanTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Ocean',
+  icon          : '🌊',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#1E90FF',
+  colorLink              : '#00BFFF',
+  colorLinkHover         : '#87CEFA',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#ADD8E6',
+
+  // Fonds
+  colorBgLayout          : '#001F3F',
+  colorBgContainer       : '#002B5C',
+  colorBgElevated        : '#003366',
+  
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#001F3F',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#004080',
+  colorMenuItemSelectedBg: '#00509E',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#1E90FF',
+  colorSplit             : '#004080',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+  
+  // entete tableaux
+  tableHeaderBg : '#24242A',
+} as const
+
+===== END src/theme/oceanTheme.ts =====
+
+
+===== BEGIN src/theme/sunsetTheme.ts =====
+import { theme as antdTheme } from 'antd'
+const { darkAlgorithm } = antdTheme
+
+export default {
+  label         : 'Sunset',
+  icon          : '🌅',
+
+  // Base algorithm (dark)
+  algorithm     : darkAlgorithm,
+
+  // Seed tokens
+  colorPrimary           : '#FF4500',
+  colorLink              : '#FF8C00',
+  colorLinkHover         : '#FFA500',
+
+  // Texte global
+  colorText              : '#FFFFFF',
+  colorTextBase          : '#FFFFFF',
+  colorTextSecondary     : '#FFD700',
+
+  // Fonds
+  colorBgLayout          : '#2E1E1E',
+  colorBgContainer       : '#3C1E1E',
+  colorBgElevated        : '#4A2A2A',
+
+  // **Ajout décisif** pour le sider
+  layoutColorBgSider     : '#2E1E1E',
+
+  // Sidebar / Menu
+  colorMenuItemText      : '#FFFFFF',
+  colorMenuItemHoverBg   : '#662222',
+  colorMenuItemSelectedBg: '#880000',
+  colorMenuItemSelectedText: '#FFFFFF',
+
+  // Bordures / séparateurs
+  colorBorder            : '#FF4500',
+  colorSplit             : '#884A2E',
+
+  // Ombres
+  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
+} as const
+
+===== END src/theme/sunsetTheme.ts =====
+
+
+===== BEGIN src/theme/types.ts =====
+// File: /src/theme/types.ts
+// Permissive typing for Ant Design seeds + a few app-specific keys.
+export interface ThemeObject {
+  /* Labels / UI */
+  label: string;
+  icon?: string;
+
+  /* AntD algorithm (light/dark). Keep `any` to avoid internal API coupling. */
+  algorithm?: any;
+
+  /* Common seed / alias colors */
+  colorPrimary?: string;
+  colorInfo?: string;
+  colorSuccess?: string;
+  colorWarning?: string;
+  colorError?: string;
+
+  colorBgLayout?: string;
+  colorBgContainer?: string;
+  colorBgElevated?: string;
+  colorBgMask?: string;
+  colorBgSpotlight?: string;
+  colorBgSolid?: string;
+  colorBgSolidHover?: string;
+  colorBgPopconfirm?: string;
+
+  colorText?: string;
+  colorTextBase?: string;
+  colorTextSecondary?: string;
+  colorTextTertiary?: string;
+  colorTextPlaceholder?: string;
+  colorTextDisabled?: string;
+
+  colorBorder?: string;
+  colorSplit?: string;
+
+  /* Radius / typography / dimensions */
+  borderRadius?: number;
+  borderRadiusLG?: number;
+  controlHeight?: number;
+  fontFamily?: string;
+  fontSize?: number;
+  fontSizeLG?: number;
+  paddingContentHorizontalLG?: number;
+  paddingContentVerticalLG?: number;
+
+  /* “Raw” keys consumed by ThemeProvider for component remaps */
+  // Layout
+  layoutColorBgSider?: string;
+
+  // Menu
+  menuBg?: string;
+  menuItemHoverBg?: string;
+  menuItemSelectedBg?: string;
+  menuItemTextColor?: string;
+
+  // Dropdown
+  dropdownBg?: string;
+  dropdownItemHoverBg?: string;
+
+  // Table
+  tableHeaderBg?: string;
+
+  /* Custom CSS variables (exported to :root in ThemeContext) */
+  bgMain?: string;
+  bgLight?: string;
+  bgDark?: string;
+  textMain?: string;
+  accent?: string;
+
+  /* Optional extensions */
+  [key: string]: string | number | boolean | undefined;
+}
+
+===== END src/theme/types.ts =====
+
+
+===== BEGIN styles/tailwind.css =====
+/* Ant Design reset d'abord pour éviter les collisions */
+@import "antd/dist/reset.css";
+
+/* Couches Tailwind */
+@tailwind base;
+
+/* Compat v3 : conserver l'ancien défaut de couleur de bordure */
+@layer base {
+  *,
+  ::before,
+  ::after,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
+  }
+}
+
+/* Variables CSS par défaut (utilisées par le thème étendu ci‑dessus) */
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222.2 47.4% 11.2%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 47.4% 11.2%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96.1%;
+  --accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
+}
+
+/* Mode sombre piloté par la classe .dark */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 48%;
+}
+
+@tailwind components;
+@tailwind utilities;
+
+===== END styles/tailwind.css =====
+

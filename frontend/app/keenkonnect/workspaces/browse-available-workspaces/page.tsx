@@ -1,15 +1,10 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/workspaces/browse-available-workspaces/index.tsx
-import React, { useState, useMemo } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import { List, Card, Input, Select, Button, Row, Col, Pagination, Divider, Tag, Typography } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
 
 const { Search } = Input;
-const { Option } = Select;
 const { Text } = Typography;
 
 interface Workspace {
@@ -23,7 +18,6 @@ interface Workspace {
   isJoinable: boolean;
 }
 
-// Exemple de données simulées pour les workspaces
 const sampleWorkspaces: Workspace[] = [
   {
     id: '1',
@@ -77,16 +71,14 @@ const sampleWorkspaces: Workspace[] = [
   },
 ];
 
-const BrowseAvailableWorkspaces = () => {
+export default function BrowseAvailableWorkspaces(): JSX.Element {
   const router = useRouter();
-  // États pour la recherche et les filtres
+
   const [searchText, setSearchText] = useState('');
   const [selectedTool, setSelectedTool] = useState<string>('All');
-  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 4; // ajustable
+  const pageSize = 4;
 
-  // Filtrer les workspaces en fonction des critères
   const filteredWorkspaces = useMemo(() => {
     return sampleWorkspaces.filter((workspace) => {
       const matchesSearch = workspace.name.toLowerCase().includes(searchText.toLowerCase());
@@ -95,111 +87,98 @@ const BrowseAvailableWorkspaces = () => {
     });
   }, [searchText, selectedTool]);
 
-  // Appliquer la pagination
   const paginatedWorkspaces = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return filteredWorkspaces.slice(startIndex, startIndex + pageSize);
-  }, [filteredWorkspaces, currentPage, pageSize]);
+  }, [filteredWorkspaces, currentPage]);
 
-  // Gestion de l'action de rejoindre ou de demander l'accès
   const handleJoinAction = (workspace: Workspace) => {
     if (workspace.isJoinable) {
       router.push(`/keenkonnect/workspaces/join?id=${workspace.id}`);
     } else {
       router.push(`/keenkonnect/workspaces/request-access?id=${workspace.id}`);
     }
+  };
 
   return (
-    <>
-      <Head>
-        <title>Browse Available Workspaces</title>
-        <meta name="description" content="Explore and join public workspaces available for collaboration." />
-      </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de page */}
-        <h1 className="text-2xl font-bold mb-4">Browse Available Workspaces</h1>
-        
-        {/* Contrôles de recherche et de filtre */}
-        <Row gutter={[16, 16]} className="mb-4">
-          <Col xs={24} sm={12}>
-            <Search
-              placeholder="Search workspaces..."
-              allowClear
-              onSearch={(value) => {
-                setSearchText(value);
-                setCurrentPage(1);
-              }}
-            />
-          </Col>
-          <Col xs={24} sm={12}>
-            <Select
-              defaultValue="All"
-              style={{ width: '100%' }}
-              onChange={(value) => {
-                setSelectedTool(value);
-                setCurrentPage(1);
-              }}
-            >
-              <Option value="All">All Tools</Option>
-              <Option value="Data Science Notebook">Data Science Notebook</Option>
-              <Option value="VR">VR</Option>
-              <Option value="Programming">Programming</Option>
-              <Option value="Design Tools">Design Tools</Option>
-              <Option value="3D Modeling">3D Modeling</Option>
-              <Option value="Whiteboard">Whiteboard</Option>
-              <Option value="Brainstorming">Brainstorming</Option>
-              <Option value="Prototyping">Prototyping</Option>
-            </Select>
-          </Col>
-        </Row>
-        <Divider />
+    <div className="container mx-auto p-5">
+      <h1 className="text-2xl font-bold mb-4">Browse Available Workspaces</h1>
 
-        {/* Liste des workspaces */}
-        <List
-          grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 3 }}
-          dataSource={paginatedWorkspaces ?? []}
-          renderItem={(workspace: Workspace) => (
-            <List.Item key={workspace.id}>
-              <Card
-                hoverable
-                title={workspace.name}
-                extra={<Text type="secondary">{workspace.owner}</Text>}
-                actions={[
-                  <Button type="primary" onClick={() => handleJoinAction(workspace)}>
-                    {workspace.isJoinable ? 'Join' : 'Request Access'}
-                  </Button>,
-                ]}
-              >
-                <p>{workspace.purpose}</p>
-                <div style={{ marginBottom: 8 }}>
-                  {workspace.tools.map((tool, index) => (
-                    <Tag key={index}>{tool}</Tag>
-                  ))}
-                </div>
-                <Divider />
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Tag color="blue">{workspace.currentUsers} Users</Tag>
-                  <Tag color="volcano">Last Active: {workspace.lastActive}</Tag>
-                </div>
-              </Card>
-            </List.Item>
-          )}
-        />
-
-        {/* Pagination */}
-        <Row justify="center" className="mt-4">
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={filteredWorkspaces.length}
-            onChange={(page) => setCurrentPage(page)}
+      <Row gutter={[16, 16]} className="mb-4">
+        <Col xs={24} sm={12}>
+          <Search
+            placeholder="Search workspaces..."
+            allowClear
+            onSearch={(value) => {
+              setSearchText(value);
+              setCurrentPage(1);
+            }}
           />
-        </Row>
-      </div>
-    </>
+        </Col>
+        <Col xs={24} sm={12}>
+          <Select
+            value={selectedTool}
+            style={{ width: '100%' }}
+            onChange={(value: string) => {
+              setSelectedTool(value);
+              setCurrentPage(1);
+            }}
+            options={[
+              { value: 'All', label: 'All Tools' },
+              { value: 'Data Science Notebook', label: 'Data Science Notebook' },
+              { value: 'VR', label: 'VR' },
+              { value: 'Programming', label: 'Programming' },
+              { value: 'Design Tools', label: 'Design Tools' },
+              { value: '3D Modeling', label: '3D Modeling' },
+              { value: 'Whiteboard', label: 'Whiteboard' },
+              { value: 'Brainstorming', label: 'Brainstorming' },
+              { value: 'Prototyping', label: 'Prototyping' },
+            ]}
+          />
+        </Col>
+      </Row>
+
+      <Divider />
+
+      <List
+        grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 3 }}
+        dataSource={paginatedWorkspaces}
+        renderItem={(workspace: Workspace) => (
+          <List.Item key={workspace.id}>
+            <Card
+              hoverable
+              title={workspace.name}
+              extra={<Text type="secondary">{workspace.owner}</Text>}
+              actions={[
+                <Button key="join" type="primary" onClick={() => handleJoinAction(workspace)}>
+                  {workspace.isJoinable ? 'Join' : 'Request Access'}
+                </Button>,
+              ]}
+            >
+              <p>{workspace.purpose}</p>
+              <div style={{ marginBottom: 8 }}>
+                {workspace.tools.map((tool) => (
+                  <Tag key={tool}>{tool}</Tag>
+                ))}
+              </div>
+              <Divider />
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Tag color="blue">{workspace.currentUsers} Users</Tag>
+                <Tag color="volcano">Last Active: {workspace.lastActive}</Tag>
+              </div>
+            </Card>
+          </List.Item>
+        )}
+      />
+
+      <Row justify="center" className="mt-4">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={filteredWorkspaces.length}
+          onChange={(page) => setCurrentPage(page)}
+        />
+      </Row>
+    </div>
   );
-
-
-
-export default BrowseAvailableWorkspaces;
-}}
+}

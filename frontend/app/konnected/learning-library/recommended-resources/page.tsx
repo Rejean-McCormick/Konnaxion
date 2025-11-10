@@ -1,109 +1,111 @@
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\recommended-resources\page.tsx
+'use client';
 
-// pages/konnected/learning-library/recommended-resources/index.tsx
 import React, { useState } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
 import { List, Card, Button, Typography, Divider } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
-import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
 
-const { Title, Paragraph } = Typography;
+const { Title, Paragraph, Text } = Typography;
 
-interface Resource {
+type Resource = {
   key: string;
   title: string;
   summary: string;
   recommendationNote: string;
-}
+};
 
-// Exemple de données simulées pour les ressources recommandées
-const initialRecommendedResources: Resource[] = [
+// Simulated recommended resources
+const INITIAL_RESOURCES: Resource[] = [
   {
     key: '1',
     title: 'Advanced AI Techniques',
-    summary: 'Learn about deep learning, neural networks, and advanced AI strategies.',
-    recommendationNote: 'Recommended because you liked "Machine Learning Fundamentals".',
+    summary:
+      'Learn about deep learning, neural networks, and advanced AI strategies.',
+    recommendationNote:
+      'Recommended because you liked "Machine Learning Fundamentals".',
   },
   {
     key: '2',
     title: 'Introduction to Robotics',
-    summary: 'A beginner-friendly introduction covering the basics of robotics.',
+    summary:
+      'A beginner-friendly introduction covering the basics of robotics.',
     recommendationNote: 'Recommended based on your interest in Robotics.',
   },
   {
     key: '3',
     title: 'Innovative Design Trends',
-    summary: 'Discover the latest trends and methodologies in creative design.',
-    recommendationNote: 'Recommended because of your past searches in Design.',
+    summary:
+      'Discover the latest trends and methodologies in creative design.',
+    recommendationNote:
+      'Recommended because of your past searches in Design.',
   },
   {
     key: '4',
     title: 'Effective Data Analysis',
-    summary: 'A comprehensive guide to data analytics using modern tools.',
-    recommendationNote: 'Recommended due to your high rating on data science resources.',
+    summary:
+      'A comprehensive guide to data analytics using modern tools.',
+    recommendationNote:
+      'Recommended due to your high rating on data science resources.',
   },
 ];
 
-const RecommendedResources = () => {
+export default function RecommendedResources() {
   const router = useRouter();
-  const [resources, setResources] = useState<Resource[]>(initialRecommendedResources);
+  const [resources, setResources] = useState<Resource[]>(INITIAL_RESOURCES);
 
-  // Simuler le rafraîchissement des suggestions
+  // Simulate refreshing suggestions
   const refreshSuggestions = () => {
-    // Ici vous pourriez appeler une API de recommandation
-    // Pour la simulation, nous changeons l'ordre des ressources aléatoirement
-    const shuffled = [...resources].sort(() => Math.random() - 0.5);
-    setResources(shuffled);
+    setResources(prev => [...prev].sort(() => Math.random() - 0.5));
+  };
 
   return (
-    <>
-      <Head>
-        <title>Recommended Resources</title>
-        <meta name="description" content="Personalized recommendations based on your profile and past activity in the learning library." />
-      </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de page */}
-        <Title level={2}>Recommended Resources</Title>
-        <Paragraph>
-          Explore a curated list of resources tailored to your interests and learning path.
-        </Paragraph>
-        <Divider />
+    <div className="container" style={{ padding: 16 }}>
+      <Title level={2}>Recommended Resources</Title>
+      <Paragraph>
+        Explore a curated list of resources tailored to your interests and
+        learning path.
+      </Paragraph>
+      <Divider />
 
-        {/* Bouton pour rafraîchir les suggestions */}
-        <Button type="default" icon={<ReloadOutlined />} onClick={refreshSuggestions} className="mb-4">
-          Refresh Suggestions
-        </Button>
+      <Button
+        type="default"
+        icon={<ReloadOutlined />}
+        onClick={refreshSuggestions}
+        style={{ marginBottom: 16 }}
+      >
+        Refresh Suggestions
+      </Button>
 
-        {/* Liste des ressources recommandées */}
-        <List
-          grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={resources ?? []}
-          renderItem={(resource) => (
-            <List.Item key={resource.key}>
-              <Card
-                hoverable
-                title={resource.title}
-                extra={
-                  <Button type="link" onClick={() => router.push(`/konnected/learning-library/resource/${resource.key}`)}>
-                    View Resource
-                  </Button>
-                }
-              >
-                <Paragraph>{resource.summary}</Paragraph>
-                <Paragraph type="secondary" style={{ fontStyle: 'italic', fontSize: 12 }}>
-                  {resource.recommendationNote}
-                </Paragraph>
-              </Card>
-            </List.Item>
-          )}
-        />
-      </div>
-    </>
+      <List<Resource>
+        grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
+        dataSource={resources}
+        renderItem={(resource) => (
+          <List.Item key={resource.key}>
+            <Card
+              hoverable
+              title={resource.title}
+              extra={
+                <Button
+                  type="link"
+                  onClick={() =>
+                    router.push(
+                      `/konnected/learning-library/resource/${resource.key}`,
+                    )
+                  }
+                >
+                  View Resource
+                </Button>
+              }
+            >
+              <Paragraph>{resource.summary}</Paragraph>
+              <Paragraph style={{ fontStyle: 'italic', fontSize: 12, marginBottom: 0 }}>
+                <Text type="secondary">{resource.recommendationNote}</Text>
+              </Paragraph>
+            </Card>
+          </List.Item>
+        )}
+      />
+    </div>
   );
-
-
-
-export default RecommendedResources;
-}}
+}
