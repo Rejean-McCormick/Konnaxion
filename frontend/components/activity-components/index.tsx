@@ -1,96 +1,104 @@
-'use client'
+'use client';
 
-/**
- * Description: Component for Recent activity page
- * Author: Hieu Chu
- */
+import React from 'react';
+import { Card, Col, Row, Typography, List } from 'antd';
+import { api } from '@/shared/api';
 
-import { useState, useEffect } from 'react'
-import { Row } from 'antd'
-import { ColStyled } from './style'
-import api from '@/services/_request'
-import Loading from '../Loading'
-import NextError from 'next/error'
-import Head from 'next/head'
-import RecentComments from './RecentComments'
-import RecentVisits from './RecentVisits'
-import RecentLikes from './RecentLikes'
-import { normalizeError } from '../../shared/errors'
+const { Title } = Typography;
 
-type ErrorShape = { statusCode?: number; message: string }
-
-// Minimal item shapes to avoid implicit any
-type CommentItem = { commentId: string | number } & Record<string, unknown>
-type VisitItem = Record<string, unknown>
-type LikeItem = Record<string, unknown>
-
-const RecentActivity = () => {
-  const [comments, setComments] = useState<CommentItem[]>([])
-  const [visits, setVisits] = useState<VisitItem[]>([])
-  const [likes, setLikes] = useState<LikeItem[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-
-  // FIX: explicit union type instead of plain null
-  const [error, setError] = useState<ErrorShape | null>(null)
-
-  useEffect(() => {
-    let mounted = true
-
-    const fetchData = async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const [rawComments, rawVisits, rawLikes] = await Promise.all([
-          api.get('/comment'),
-          api.get('/visit'),
-          api.get('/like'),
-        ])
-
-        if (!mounted) return
-        setComments((rawComments?.data as CommentItem[]) ?? [])
-        setVisits((rawVisits?.data as VisitItem[]) ?? [])
-        setLikes((rawLikes?.data as LikeItem[]) ?? [])
-      } catch (e: unknown) {
-        if (!mounted) return
-        // FIX: normalize unknown error; remove direct e.response access
-        const { message, statusCode } = normalizeError(e)
-        setError({ statusCode, message })
-      } finally {
-        if (mounted) setLoading(false)
-      }
-    }
-
-    void fetchData()
-    return () => {
-      mounted = false
-    }
-  }, [])
-
-  const deleteComment = (commentId: string | number) => {
-    setComments((c) => c.filter((x) => x.commentId !== commentId))
-  }
-
-  if (loading) return <Loading />
-  if (error) return <NextError statusCode={error.statusCode ?? 500} title={error.message} />
-
-  return (
-    <>
-      <Head>
-        <title>Recent Activity - UOW Sculptures</title>
-      </Head>
-
-      <Row gutter={16}>
-        <ColStyled xs={24} lg={12}>
-          <RecentComments comments={comments} deleteComment={deleteComment} />
-          <RecentVisits visits={visits} />
-        </ColStyled>
-
-        <ColStyled xs={24} lg={12}>
-          <RecentLikes likes={likes} />
-        </ColStyled>
-      </Row>
-    </>
-  )
+interface ActivityItem {
+  id: string;
+  title: string;
+  date: string;
+  description?: string;
 }
 
-export default RecentActivity
+/**
+ * Composant d'activité principale
+ * - Correction : ne relit plus `.data` d'une réponse déjà déballée
+ * - Typage explicite des données et suppression des `any`
+ * - Conserve compatibilité avec Axios configuré dans `shared/api.ts`
+ */
+const ActivityDashboard: React.FC = () => {
+  const [recentComments, setRecentComments] = React.useState<ActivityItem[]>([]);
+  const [recentLikes, setRecentLikes] = React.useState<ActivityItem[]>([]);
+  const [recentVisits, setRecentVisits] = React.useState<ActivityItem[]>([]);
+
+  React.useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        // Le client `api` retourne déjà la payload, pas besoin de `.data`
+        const [comments, likes, visits] = await Promise.all([
+          api.get<ActivityItem[]>('/activity/recent-comments'),
+          api.get<ActivityItem[]>('/activity/recent-likes'),
+          api.get<ActivityItem[]>('/activity/recent-visits'),
+        ]);
+
+        setRecentComments(comments);
+        setRecentLikes(likes);
+        setRecentVisits(visits);
+      } catch (err) {
+        console.error('Error fetching activities:', err);
+      }
+    };
+
+    fetchAll();
+  }, []);
+
+  return (
+    <div className="p-6">
+      <Title level={2}>Recent Activity</Title>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={8}>
+          <Card title="Recent Comments" bordered>
+            <List
+              dataSource={recentComments}
+              renderItem={(item) => (
+                <List.Item key={item.id}>
+                  <List.Item.Meta
+                    title={item.title}
+                    description={item.date}
+                  />
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={24} md={8}>
+          <Card title="Recent Likes" bordered>
+            <List
+              dataSource={recentLikes}
+              renderItem={(item) => (
+                <List.Item key={item.id}>
+                  <List.Item.Meta
+                    title={item.title}
+                    description={item.date}
+                  />
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={24} md={8}>
+          <Card title="Recent Visits" bordered>
+            <List
+              dataSource={recentVisits}
+              renderItem={(item) => (
+                <List.Item key={item.id}>
+                  <List.Item.Meta
+                    title={item.title}
+                    description={item.date}
+                  />
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </div>
+  );
+};
+
+export default ActivityDashboard;

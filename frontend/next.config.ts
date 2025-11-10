@@ -10,7 +10,7 @@ const baseConfig: NextConfig = {
 
   // TEMP : ne bloque pas la build sur les erreurs ESLint
   // (remets à false quand le lint sera corrigé)
-  eslint: { ignoreDuringBuilds: true },
+ // eslint: { ignoreDuringBuilds: true },
 
   // Important : pas d'optimizePackageImports sur "antd"
   // (c'est ce qui déclenchait les erreurs __barrel_optimize__)

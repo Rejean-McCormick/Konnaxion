@@ -1,4 +1,5 @@
-'use client'
+// app/ethikos/deliberate/elite/page.tsx
+'use client';
 
 import React from 'react';
 import {
@@ -9,44 +10,29 @@ import {
   ModalForm,
   ProFormText,
   ProFormSelect,
+  type ProColumns,
 } from '@ant-design/pro-components';
-import { Badge,
-  Button,
-  Drawer,
-  Empty,
-  Space,
-  Tag,
-  Tooltip,
-  message as antdMessage,
- } from 'antd';
+import { Button, Drawer, Empty, Space, Tag, Tooltip, message as antdMessage } from 'antd';
+import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
 import { useRequest, useInterval } from 'ahooks';
-import {
-  PlusOutlined,
-  ReloadOutlined,
-  FireOutlined,
-} from '@ant-design/icons';
 import dayjs from 'dayjs';
 
 import usePageTitle from '@/hooks/usePageTitle';
-import {
-  fetchEliteTopics,
-  createEliteTopic,
-  fetchTopicPreview,
-} from '@/services/deliberate';
+import { fetchEliteTopics, createEliteTopic, fetchTopicPreview } from '@/services/deliberate';
 import type { Topic } from '@/types';
 
 /* ------------------------------------------------------------------ */
-/*  Derived types                                                      */
+/*  Types dérivés                                                      */
 /* ------------------------------------------------------------------ */
 
 interface TopicRow extends Topic {
   createdAt: string;
   lastActivity: string;
-  hot: boolean; // computed server-side: stanceCount increased >= 20% in 24 h
+  hot: boolean; // calculé côté serveur
 }
 
 /* ------------------------------------------------------------------ */
-/*  Main component                                                     */
+/*  Composant principal                                                */
 /* ------------------------------------------------------------------ */
 
 export default function EliteAgora() {
@@ -54,83 +40,90 @@ export default function EliteAgora() {
 
   /* ---------- data ---------- */
   const { data, loading, refresh } = useRequest(fetchEliteTopics);
-  useInterval(refresh, 60_000); // poll every minute
+  useInterval(refresh, 60_000); // polling 1 min
 
   /* ---------- drawer state ---------- */
   const [previewId, setPreviewId] = React.useState<string | null>(null);
-  const {
-    data: preview,
-    loading: previewLoading,
-    run: loadPreview,
-  } = useRequest((id: string) => fetchTopicPreview(id), { manual: true });
+  const { data: preview, loading: previewLoading, run: loadPreview } = useRequest(
+    (id: string) => fetchTopicPreview(id),
+    { manual: true },
+  );
 
   /* ---------- open drawer ---------- */
-  const openPreview = (row: TopicRow) => {
+  const openPreview = React.useCallback((row: TopicRow) => {
     setPreviewId(row.id);
     loadPreview(row.id);
+  }, [loadPreview]);
 
   /* ---------- KPI header ---------- */
-  const headerStats = [
-    {
-      label: 'Open topics',
-      value: data?.list.length ?? 0,
-    },
-    {
-      label: 'Avg stances / topic',
-      value:
-        data && data.list.length
+  const headerStats = React.useMemo(
+    () => [
+      { label: 'Open topics', value: data?.list.length ?? 0 },
+      {
+        label: 'Avg stances / topic',
+        value: data?.list?.length
           ? Math.round(
-              data.list.reduce((sum, t) => sum + t.stanceCount, 0) /
-                data.list.length,
+              (data!.list.reduce((sum: number, t: TopicRow) => sum + t.stanceCount, 0)) /
+                data!.list.length,
             )
           : 0,
-    },
-    {
-      label: 'Hot topics',
-      value: data?.list.filter((t) => t.hot).length ?? 0,
-    },
-  ];
+      },
+      { label: 'Hot topics', value: (data?.list ?? []).filter((t: TopicRow) => t.hot).length },
+    ],
+    [data],
+  );
 
-  /* ---------- columns ---------- */
-  const columns = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      render: (_: any, row: TopicRow) => (
-        <a onClick={() => openPreview(row)}>{row.title}</a>
-      ),
-    },
-    {
-      title: 'Category',
-      dataIndex: 'category',
-      filters: true,
-      render: (v, row) => <Tag color="geekblue">{v}</Tag>,
-    },
-    {
-      title: 'Stances',
-      dataIndex: 'stanceCount',
-      sorter: true,
-      align: 'right' as const,
-    },
-    {
-      title: 'Last activity',
-      dataIndex: 'lastActivity',
-      valueType: 'fromNow',
-    },
-    {
-      title: '',
-      dataIndex: 'hot',
-      width: 60,
-      render: (v, row) =>
-        v ? (
-          <Tooltip title="Trending">
-            <FireOutlined style={{ color: '#fa541c' }} />
-          </Tooltip>
-        ) : null,
-    },
-  ];
+  /* ---------- filtres catégorie ---------- */
+  const categoryFilters = React.useMemo(
+    () =>
+      Array.from(
+        new Set((data?.list ?? []).map((t: TopicRow) => t.category).filter(Boolean)),
+      ).map((c) => ({ text: String(c), value: String(c) })),
+    [data?.list],
+  );
 
-  /* ---------- render ---------- */
+  /* ---------- colonnes ---------- */
+  const columns: ProColumns<TopicRow>[] = React.useMemo(
+    () => [
+      {
+        title: 'Title',
+        dataIndex: 'title',
+        render: (_, row) => <a onClick={() => openPreview(row)}>{row.title}</a>,
+      },
+      {
+        title: 'Category',
+        dataIndex: 'category',
+        filters: categoryFilters,
+        onFilter: (val, row) => String(row.category) === String(val),
+        render: (_, row) => <Tag color="geekblue">{row.category}</Tag>,
+      },
+      {
+        title: 'Stances',
+        dataIndex: 'stanceCount',
+        sorter: true,
+        align: 'right',
+      },
+      {
+        title: 'Last activity',
+        dataIndex: 'lastActivity',
+        valueType: 'fromNow',
+      },
+      {
+        title: '',
+        dataIndex: 'hot',
+        width: 60,
+        render: (_, row) =>
+          row.hot ? (
+            <Tooltip title="Trending">
+              <FireOutlined style={{ color: '#fa541c' }} />
+            </Tooltip>
+          ) : null,
+      },
+    ],
+    [categoryFilters, openPreview],
+  );
+
+  /* ---------- rendu ---------- */
   return (
     <PageContainer
       ghost
@@ -143,7 +136,7 @@ export default function EliteAgora() {
             type="text"
             title="Refresh list"
           />
-          {/* role check goes here */}
+          {/* vérification de rôle/permission si besoin */}
           <NewTopicButton onCreated={refresh} />
         </Space>
       }
@@ -159,15 +152,12 @@ export default function EliteAgora() {
         ))}
       </ProCard>
 
-      {/* list */}
+      {/* liste */}
       <ProTable<TopicRow>
         rowKey="id"
         columns={columns}
         dataSource={data?.list}
-        search={{
-          labelWidth: 90,
-          filterType: 'light',
-        }}
+        search={{ labelWidth: 90, filterType: 'light' }}
         pagination={{ pageSize: 10 }}
       />
 
@@ -186,8 +176,7 @@ export default function EliteAgora() {
               <strong>Category:</strong> {preview.category}
             </p>
             <p>
-              <strong>Opened:</strong>{' '}
-              {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+              <strong>Opened:</strong> {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
             </p>
             <h4>Latest statements</h4>
             <ul>
@@ -199,9 +188,7 @@ export default function EliteAgora() {
             </ul>
             <Button
               type="primary"
-              onClick={() =>
-                window.location.assign(`/ethikos/deliberate/${preview.id}`)
-              }
+              onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
             >
               Go to thread →
             </Button>
@@ -243,7 +230,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
         title="Create new topic"
         open={visible}
         onOpenChange={setVisible}
-        onFinish={async (values) => {
+        onFinish={async (values: Record<string, any>) => {
           await runAsync(values);
           return true;
         }}
@@ -267,5 +254,4 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
       </ModalForm>
     </>
   );
-}
 }

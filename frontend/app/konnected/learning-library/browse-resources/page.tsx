@@ -1,27 +1,51 @@
-'use client'
+'use client';
 
-// pages/konnected/learning-library/browse-resources/index.tsx
-import React, { useState, useMemo } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Table, Input, Select, Row, Col, Card, Divider, Tag, Button } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Row,
+  Col,
+  Card,
+  Typography,
+  Input,
+  Select,
+  Tag,
+  Rate,
+  Space,
+  Table,
+  Pagination,
+  Button,
+} from 'antd';
+import type { TableProps } from 'antd';
+import {
+  SearchOutlined,
+  FilterOutlined,
+  DownloadOutlined,
+  ShareAltOutlined,
+} from '@ant-design/icons';
 
+const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
-const { Option } = Select;
+
+type Level = 'Beginner' | 'Intermediate' | 'Advanced';
+type Language = 'English' | 'French' | 'Spanish';
 
 interface Resource {
   key: string;
   title: string;
   subject: string;
-  level: string; // ex. Beginner, Intermediate, Advanced
-  language: string;
-  resourceType: string; // document, video, quiz, etc.
-  rating: number; // sur 5
+  level: Level;
+  language: Language;
+  resourceType: 'Video' | 'Article' | 'Course' | 'Quiz';
+  rating: number; // 1..5
+  tags?: string[];
 }
 
-// Exemple de données simulées pour les ressources
+const SUBJECTS = ['Robotics', 'Healthcare', 'AI', 'Sustainability', 'Design'];
+const LEVELS: Level[] = ['Beginner', 'Intermediate', 'Advanced'];
+const LANGUAGES: Language[] = ['English', 'French', 'Spanish'];
+
+// NOTE: D’après le code original, c’est du mock. Je le conserve tel quel.
 const sampleResources: Resource[] = [
   {
     key: '1',
@@ -38,22 +62,22 @@ const sampleResources: Resource[] = [
     subject: 'Healthcare',
     level: 'Advanced',
     language: 'French',
-    resourceType: 'Document',
+    resourceType: 'Article',
     rating: 5,
   },
   {
     key: '3',
-    title: 'Machine Learning Fundamentals',
-    subject: 'Technology',
+    title: 'AI Ethics Fundamentals',
+    subject: 'AI',
     level: 'Intermediate',
     language: 'English',
-    resourceType: 'Article',
+    resourceType: 'Course',
     rating: 4,
   },
   {
     key: '4',
-    title: 'Sustainable Energy Solutions',
-    subject: 'Energy',
+    title: 'Sustainable Design Basics',
+    subject: 'Sustainability',
     level: 'Beginner',
     language: 'English',
     resourceType: 'Video',
@@ -70,132 +94,188 @@ const sampleResources: Resource[] = [
   },
 ];
 
-const BrowseResources = () => {
+export default function Page() {
   const router = useRouter();
-  const [searchText, setSearchText] = useState('');
-  const [subjectFilter, setSubjectFilter] = useState('All');
-  const [levelFilter, setLevelFilter] = useState('All');
-  const [languageFilter, setLanguageFilter] = useState('All');
 
-  // Filtrage des ressources selon les critères saisis
+  // State
+  const [searchText, setSearchText] = useState<string>('');
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [selectedLevel, setSelectedLevel] = useState<Level | undefined>();
+  const [selectedLanguage, setSelectedLanguage] = useState<Language | undefined>();
+  const [current, setCurrent] = useState<number>(1);
+  const pageSize = 8;
+
+  // Filtrage
   const filteredResources = useMemo(() => {
-    return sampleResources.filter(resource => {
-      const matchesSearch = searchText === '' || resource.title.toLowerCase().includes(searchText.toLowerCase()) || resource.resourceType.toLowerCase().includes(searchText.toLowerCase());
-      const matchesSubject = subjectFilter === 'All' || resource.subject === subjectFilter;
-      const matchesLevel = levelFilter === 'All' || resource.level === levelFilter;
-      const matchesLanguage = languageFilter === 'All' || resource.language === languageFilter;
+    return sampleResources.filter((r) => {
+      const matchesSearch =
+        !searchText ||
+        r.title.toLowerCase().includes(searchText.toLowerCase()) ||
+        r.subject.toLowerCase().includes(searchText.toLowerCase());
+
+      const matchesSubject =
+        selectedSubjects.length === 0 || selectedSubjects.includes(r.subject);
+
+      const matchesLevel = !selectedLevel || r.level === selectedLevel;
+      const matchesLanguage = !selectedLanguage || r.language === selectedLanguage;
+
       return matchesSearch && matchesSubject && matchesLevel && matchesLanguage;
     });
-  }, [searchText, subjectFilter, levelFilter, languageFilter]);
+  }, [searchText, selectedSubjects, selectedLevel, selectedLanguage]);
 
-  // Définition des colonnes du tableau
-  const columns = [
+  // Pagination manuelle (Table sans pagination intégrée)
+  const pagedResources = useMemo(() => {
+    const start = (current - 1) * pageSize;
+    return filteredResources.slice(start, start + pageSize);
+  }, [filteredResources, current]);
+
+  // Colonnes du tableau
+  const columns: TableProps<Resource>['columns'] = [
     {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      render: (text: string, record: Resource) => (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-          {/* Affichage d'une icône indicative selon le type de ressource */}
-          {record.resourceType === 'Video' && <Tag color="blue">🎥</Tag>}
-          {record.resourceType === 'Document' && <Tag color="green">📄</Tag>}
-          {record.resourceType === 'Quiz' && <Tag color="purple">❓</Tag>}
-          {record.resourceType === 'Article' && <Tag color="orange">📰</Tag>}
-          <span style={{ marginLeft: 8 }}>{text}</span>
-        </div>
+      render: (text: string, record) => (
+        <Space direction="vertical" size={0}>
+          <a
+            onClick={() =>
+              router.push(`/konnected/learning-library/resource/${record.key}`)
+            }
+          >
+            {text}
+          </a>
+          <Text type="secondary">
+            {record.resourceType} · {record.level} · {record.language}
+          </Text>
+          {record.tags && record.tags.length > 0 && (
+            <Space direction="horizontal" size={4} wrap>
+              {record.tags.map((t) => (
+                <Tag key={t}>{t}</Tag>
+              ))}
+            </Space>
+          )}
+        </Space>
       ),
     },
     {
       title: 'Subject',
       dataIndex: 'subject',
       key: 'subject',
-    },
-    {
-      title: 'Level',
-      dataIndex: 'level',
-      key: 'level',
-    },
-    {
-      title: 'Language',
-      dataIndex: 'language',
-      key: 'language',
+      filters: SUBJECTS.map((s) => ({ text: s, value: s })),
+      onFilter: (value, r) => r.subject === value,
     },
     {
       title: 'Rating',
       dataIndex: 'rating',
       key: 'rating',
-      render: (rating, row) => `${rating} / 5`,
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_: any, record: Resource) => (
-        <Button type="link" onClick={() => router.push(`/konnected/learning-library/resource/${record.key}`)}>
-          Open
-        </Button>
-      ),
+      width: 160,
+      render: (v: number) => <Rate disabled allowHalf defaultValue={v} />,
+      sorter: (a, b) => a.rating - b.rating,
     },
   ];
 
   return (
-    <>
-      <Head>
-        <title>Browse Resources</title>
-        <meta name="description" content="Browse and search for educational content in the learning library." />
-      </Head>
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Browse Resources</h1>
-        
-        {/* Barre de recherche et filtres */}
-        <Card className="mb-4">
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12}>
-              <Search placeholder="Search resources" allowClear onSearch={(value) => setSearchText(value)} />
-            </Col>
-            <Col xs={24} sm={4}>
-              <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setSubjectFilter(value)}>
-                <Option value="All">All Subjects</Option>
-                <Option value="Robotics">Robotics</Option>
-                <Option value="Healthcare">Healthcare</Option>
-                <Option value="Technology">Technology</Option>
-                <Option value="Energy">Energy</Option>
-                <Option value="Design">Design</Option>
-              </Select>
-            </Col>
-            <Col xs={24} sm={4}>
-              <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setLevelFilter(value)}>
-                <Option value="All">All Levels</Option>
-                <Option value="Beginner">Beginner</Option>
-                <Option value="Intermediate">Intermediate</Option>
-                <Option value="Advanced">Advanced</Option>
-              </Select>
-            </Col>
-            <Col xs={24} sm={4}>
-              <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setLanguageFilter(value)}>
-                <Option value="All">All Languages</Option>
-                <Option value="English">English</Option>
-                <Option value="French">French</Option>
-                {/* Ajoutez d'autres langues si nécessaire */}
-              </Select>
-            </Col>
-          </Row>
-        </Card>
+    <div style={{ padding: 16 }}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24}>
+          <Title level={2} style={{ marginBottom: 0 }}>
+            Learning Library
+          </Title>
+          <Paragraph type="secondary" style={{ marginTop: 4 }}>
+            Browse curated resources by subject, level and language.
+          </Paragraph>
+        </Col>
 
-        <Divider />
+        <Col xs={24} md={8}>
+          <Card title={<Space><FilterOutlined />Filters</Space>}>
+            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+              <Search
+                placeholder="Search by title or subject"
+                allowClear
+                enterButton={<SearchOutlined />}
+                onSearch={(value: string) => {
+                  setCurrent(1);
+                  setSearchText(value);
+                }}
+              />
 
-        {/* Table des ressources */}
-        <Card>
-          <Table
-            dataSource={filteredResources}
-            columns={columns}
-            pagination={{ pageSize: 5 }}
-          />
-        </Card>
-      </div>
-    </>
+              <div>
+                <Text strong>Subjects</Text>
+                <Select
+                  mode="multiple"
+                  style={{ width: '100%', marginTop: 8 }}
+                  placeholder="Select subjects"
+                  value={selectedSubjects}
+                  onChange={(value: string[]) => {
+                    setCurrent(1);
+                    setSelectedSubjects(value);
+                  }}
+                  options={SUBJECTS.map((s) => ({ label: s, value: s }))}
+                />
+              </div>
+
+              <div>
+                <Text strong>Level</Text>
+                <Select
+                  allowClear
+                  style={{ width: '100%', marginTop: 8 }}
+                  placeholder="Select level"
+                  value={selectedLevel}
+                  onChange={(value: Level | undefined) => {
+                    setCurrent(1);
+                    setSelectedLevel(value);
+                  }}
+                  options={LEVELS.map((l) => ({ label: l, value: l }))}
+                />
+              </div>
+
+              <div>
+                <Text strong>Language</Text>
+                <Select
+                  allowClear
+                  style={{ width: '100%', marginTop: 8 }}
+                  placeholder="Select language"
+                  value={selectedLanguage}
+                  onChange={(value: Language | undefined) => {
+                    setCurrent(1);
+                    setSelectedLanguage(value);
+                  }}
+                  options={LANGUAGES.map((l) => ({ label: l, value: l }))}
+                />
+              </div>
+
+              <Space style={{ marginTop: 8 }}>
+                <Button icon={<DownloadOutlined />}>Export</Button>
+                <Button icon={<ShareAltOutlined />}>Share</Button>
+              </Space>
+            </Space>
+          </Card>
+        </Col>
+
+        <Col xs={24} md={16}>
+          <Card title="Resources">
+            <Table<Resource>
+              rowKey="key"
+              columns={columns}
+              dataSource={pagedResources}
+              pagination={false}
+              onRow={(record: Resource) => ({
+                onClick: () =>
+                  router.push(`/konnected/learning-library/resource/${record.key}`),
+              })}
+            />
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+              <Pagination
+                current={current}
+                pageSize={pageSize}
+                total={filteredResources.length}
+                onChange={(page: number) => setCurrent(page)}
+                showSizeChanger={false}
+              />
+            </div>
+          </Card>
+        </Col>
+      </Row>
+    </div>
   );
-
-
-
-export default BrowseResources;
 }

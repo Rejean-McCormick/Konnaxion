@@ -1,0 +1,4265 @@
+
+===== BEGIN components\sculpture-maker-components\CreateForm\SculptureCreate.tsx =====
+'use client'
+
+/**
+ * Description: Component for Sculpture create page
+ * Author: Hieu Chu
+ */
+
+import { useState, useEffect } from 'react'
+import { Row, Button, Form, message as antdMessage } from 'antd'
+import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
+import { FlyToInterpolator } from 'react-map-gl'
+import Map from '../../map-components'
+import TextFields from './CreateFormTextFields'
+import { api } from '../../../shared/api'
+import Loading from '../../Loading'
+import Error from 'next/error'
+import { normalizeError } from '../../../shared/errors'
+
+type ErrState = { message: string; statusCode?: number } | null
+
+const SculptureCreate = ({
+  form,
+  form: { getFieldDecorator, setFieldsValue },
+  setStep,
+  setSculpture
+}) => {
+  const [view, setView] = useState({
+    latitude: -34.40581053569814,
+    longitude: 150.87842788963476,
+    zoom: 15,
+    pitch: 50
+  })
+
+  const initialData = {
+    markerLat: -34.40581053569814,
+    markerLng: 150.87842788963476
+  }
+
+  const [marker, setMarker] = useState({ ...initialData })
+  const [makerList, setMakerList] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<ErrState>(null)
+
+  const addMaker = (maker: any) => {
+    setMakerList(prev => [...prev, maker])
+    setFieldsValue({ primaryMakerId: maker.id })
+  }
+
+  useEffect(() => {
+    let mounted = true
+    const fetchMakerList = async () => {
+      try {
+        const res = await api.get('/maker/')
+        if (mounted) setMakerList(res.data ?? [])
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e)
+        if (mounted) setError({ statusCode, message })
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    fetchMakerList()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const flyTo = (latitude: number, longitude: number) => {
+    setView(prev => ({
+      ...prev,
+      latitude,
+      longitude,
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionDuration: 1500,
+      zoom: 15
+    }))
+    setMarker({ markerLat: latitude, markerLng: longitude })
+  }
+
+  const showLocationOnMap = () => {
+    form.validateFields(['latitude', 'longitude'], (errors: any, values: any) => {
+      if (!errors) {
+        const { latitude, longitude } = values
+        flyTo(+latitude, +longitude)
+      }
+    })
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    form.validateFields(async (err: any, values: any) => {
+      if (!err) {
+        // nettoie les champs vides
+        Object.keys(values).forEach(k => {
+          if (!values[k]) delete values[k]
+        })
+        if (values.latitude) values.latitude = Number(values.latitude)
+        if (values.longitude) values.longitude = Number(values.longitude)
+
+        setSubmitting(true)
+        try {
+          await api.post('/sculpture', values)
+          setSculpture({ ...values })
+          setStep((s: number) => s + 1)
+        } catch (e: unknown) {
+          const { message } = normalizeError(e)
+          antdMessage.error(message)
+        } finally {
+          setSubmitting(false)
+        }
+      }
+    })
+  }
+
+  if (loading) return <Loading />
+  if (error) return <Error statusCode={error.statusCode ?? 500} title={error.message} />
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled title="Create new sculpture">
+          <Form onSubmit={handleSubmit} autoComplete="off">
+            <ColStyled xs={24} md={12}>
+              <TextFields
+                getFieldDecorator={getFieldDecorator}
+                initialData={initialData}
+                makerList={makerList}
+                addMaker={addMaker}
+              />
+              <FormCol xs={24}>
+                <Button onClick={showLocationOnMap}>Show on map</Button>
+              </FormCol>
+            </ColStyled>
+
+            <ColStyled
+              xs={24}
+              md={12}
+              style={{ height: 500, marginTop: 10 }}
+            >
+              <Map
+                view={view}
+                marker={marker}
+                setView={setView}
+                setMarker={({ markerLat, markerLng }) => {
+                  setMarker({ markerLat, markerLng })
+                  setFieldsValue({
+                    latitude: String(markerLat),
+                    longitude: String(markerLng)
+                  })
+                }}
+              />
+            </ColStyled>
+
+            <ColStyled xs={24}>
+              <FormCol xs={24}>
+                <CustomFormItem style={{ marginBottom: 0, marginTop: 8 }}>
+                  <Button type="primary" htmlType="submit" loading={submitting}>
+                    Submit
+                  </Button>
+                </CustomFormItem>
+              </FormCol>
+            </ColStyled>
+          </Form>
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  )
+}
+
+export default Form.create({
+  name: 'sculpture_create_form'
+})(SculptureCreate)
+
+===== END components\sculpture-maker-components\CreateForm\SculptureCreate.tsx =====
+
+===== BEGIN components\sculpture-maker-components\EditForm\SculptureEdit.tsx =====
+'use client';
+
+/**
+ * Description: Sculpture edit page component
+ * Author: Hieu Chu
+ */
+
+import { useState } from 'react'
+import { Button, Form, message as antdMessage  } from 'antd';import { ColStyled, FormCol, CustomFormItem } from '../style'
+import { FlyToInterpolator } from 'react-map-gl'
+import Map from '../../map-components'
+import EditFormTextFields from './EditFormTextFields'
+import api from '../../../api'
+import { useRouter } from 'next/navigation';
+import { normalizeError } from "../../../shared/errors";
+
+const SculptureEdit = ({
+  form,
+  form: { getFieldDecorator, setFieldsValue, getFieldValue, resetFields },
+  defaultPosition,
+  initialData,
+  initialData: { latitude, longitude },
+  makerList,
+  setMakerList
+}) => {
+  const [view, setView] = useState({
+    latitude: latitude ? latitude : defaultPosition[0],
+    longitude: longitude ? longitude : defaultPosition[1],
+    zoom: 15,
+    pitch: 50
+  })
+
+  const [marker, setMarker] = useState({
+    markerLat: latitude ? latitude : defaultPosition[0],
+    markerLng: longitude ? longitude : defaultPosition[1]
+  })
+
+  const [submitting, setSubmitting] = useState(false)
+
+  const flyTo = (latitude, longitude) => {
+    setView({
+      ...view,
+      latitude,
+      longitude,
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionDuration: 1500,
+      zoom: 15
+    })
+
+    setMarker({
+      markerLat: latitude,
+      markerLng: longitude
+    })
+  }
+
+  const showLocationOnMap = () => {
+    form.validateFields(['latitude', 'longitude'], (errors, values) => {
+      if (!errors) {
+        const { latitude, longitude } = values
+        flyTo(+latitude, +longitude)
+      }
+    })
+  }
+
+  const handleSubmit = e => {
+    e.preventDefault()
+    form.validateFields(async (err, values) => {
+      const router = useRouter();
+      if (!err) {
+        // remember to convert lat and long to numeric type
+        console.log('Received values of form: ', values)
+        for (let key in values) {
+          if (!values[key]) {
+            values[key] = null
+          }
+        }
+
+        if (values.latitude) {
+          values.latitude = Number(values.latitude)
+        }
+
+        if (values.longitude) {
+          values.longitude = Number(values.longitude)
+        }
+
+        console.log('after', values)
+
+        setSubmitting(true)
+        try {
+          const _result = (await api.patch('/sculpture', values)).data
+          antdMessage.success('Updated sculpture details successfully!', 2)
+          setSubmitting(false)
+          router.push(`/sculptures/id/${values.accessionId}`)
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
+          setSubmitting(false)
+          antdMessage.error(e.response.data.message)
+        }
+      }
+    })
+  }
+
+  return (
+    <Form onSubmit={handleSubmit} autoComplete="off">
+      <ColStyled xs={24} md={12}>
+        {/* long repeated list of text fields */}
+        <EditFormTextFields
+          getFieldDecorator={getFieldDecorator}
+          setFieldsValue={setFieldsValue}
+          getFieldValue={getFieldValue}
+          initialData={initialData}
+          makerList={makerList}
+          setMakerList={setMakerList}
+        />
+        <FormCol xs={24}>
+          <Button onClick={showLocationOnMap}>Show on map</Button>
+        </FormCol>
+      </ColStyled>
+
+      <ColStyled
+        xs={24}
+        md={12}
+        style={{
+          height: 500,
+          marginTop: 10
+        }}
+      >
+        <Map
+          view={view}
+          marker={marker}
+          setView={setView}
+          setMarker={({ markerLat, markerLng }) => {
+            setMarker({ markerLat, markerLng })
+            setFieldsValue({
+              latitude: String(markerLat),
+              longitude: String(markerLng)
+            })
+          }}
+        />
+      </ColStyled>
+
+      <ColStyled xs={24}>
+        <FormCol xs={24}>
+          <CustomFormItem style={{ marginBottom: 0, marginTop: 8 }}>
+            <Button type="primary" htmlType="submit" loading={submitting}>
+              Submit
+            </Button>
+            <Button
+              type="default"
+              style={{
+                marginLeft: 5
+              }}
+              onClick={() => {
+                resetFields()
+                const flyLat = latitude ? latitude : defaultPosition[0]
+                const flyLng = longitude ? longitude : defaultPosition[1]
+                flyTo(flyLat, flyLng)
+              }}
+            >
+              Reset
+            </Button>
+          </CustomFormItem>
+        </FormCol>
+      </ColStyled>
+    </Form>
+  )
+}
+
+export default Form.create({
+  name: 'sculpture_edit_form'
+})(SculptureEdit)
+
+===== END components\sculpture-maker-components\EditForm\SculptureEdit.tsx =====
+
+===== BEGIN components\sculpture-maker-components\EditForm\MakerEdit.tsx =====
+'use client'
+
+/**
+ * Description: Primary maker edit page component
+ * Author: Hieu Chu
+ */
+
+import { useState } from 'react'
+import { Input, Form, Button, Modal, message as antdMessage  } from 'antd';import { CustomFormItem } from '../style'
+import api from '../../../api'
+import { normalizeError } from "../../../shared/errors";
+
+const MakerEdit = ({
+  form: { getFieldDecorator, validateFields, resetFields },
+  visible,
+  handleCancel,
+  getCurrentMaker,
+  editMaker
+}) => {
+  const [submitting, setSubmitting] = useState(false)
+
+  const {
+    firstName,
+    lastName,
+    nationality,
+    birthYear,
+    deathYear,
+    wikiUrl,
+    id
+  } = getCurrentMaker()
+
+  const handleOk = e => {
+    e.preventDefault()
+    validateFields(async (err, values) => {
+      if (!err) {
+        console.log('Received values of maker form: ', values)
+        for (let key in values) {
+          if (!values[key]) {
+            values[key] = null
+          }
+        }
+
+        if (values.birthYear) {
+          values.birthYear = Number(values.birthYear)
+        }
+        if (values.deathYear) {
+          values.deathYear = Number(values.deathYear)
+        }
+
+        values.id = id
+        console.log('after maker', values)
+
+        setSubmitting(true)
+        try {
+          const _result = (await api.patch('/maker', values)).data
+          setSubmitting(false)
+          editMaker(values)
+          handleCancel()
+          resetFields()
+          antdMessage.success('Updated maker details successfully!', 2)
+        } catch (e: unknown) {
+          const { message, statusCode } = normalizeError(e);
+          setSubmitting(false)
+          antdMessage.error(e.response.data.message)
+        }
+      }
+    })
+  }
+
+  return (
+    <Modal
+      open={visible}
+      title="Edit maker details"
+      onOk={handleOk}
+      onCancel={handleCancel}
+      maskClosable={false}
+      footer={[
+        <Button key="back" onClick={() => resetFields()}>
+          Reset
+        </Button>,
+        <Button
+          key="submit"
+          type="primary"
+          loading={submitting}
+          onClick={handleOk}
+        >
+          Submit
+        </Button>
+      ]}
+    >
+      <Form autoComplete="off">
+        <CustomFormItem label="First name" hasFeedback>
+          {getFieldDecorator('firstName', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the first name!'
+              }
+            ],
+            initialValue: firstName
+          })(<Input type="text" placeholder="First name" />)}
+        </CustomFormItem>
+
+        <CustomFormItem label="Last name" hasFeedback>
+          {getFieldDecorator('lastName', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the last name!'
+              }
+            ],
+            initialValue: lastName
+          })(<Input type="text" placeholder="Last name" />)}
+        </CustomFormItem>
+
+        <CustomFormItem label="Nationality" hasFeedback>
+          {getFieldDecorator('nationality', {
+            initialValue: nationality
+          })(<Input type="text" placeholder="Nationality" />)}
+        </CustomFormItem>
+
+        <CustomFormItem label="Born" hasFeedback>
+          {getFieldDecorator('birthYear', {
+            rules: [
+              {
+                pattern: '^[0-9]{4}$',
+                message: 'Please fill in a valid year!'
+              }
+            ],
+            initialValue: birthYear ? String(birthYear) : ''
+          })(<Input type="text" placeholder="Born" />)}
+        </CustomFormItem>
+
+        <CustomFormItem label="Passed away" hasFeedback>
+          {getFieldDecorator('deathYear', {
+            rules: [
+              {
+                pattern: '^[0-9]{4}$',
+                message: 'Please fill in a valid year!'
+              }
+            ],
+            initialValue: deathYear ? String(deathYear) : ''
+          })(<Input type="text" placeholder="Passed away" />)}
+        </CustomFormItem>
+
+        <CustomFormItem label="Website" hasFeedback>
+          {getFieldDecorator('wikiUrl', {
+            rules: [
+              {
+                type: 'url',
+                message: 'Please fill in a valid URL!'
+              }
+            ],
+            initialValue: wikiUrl
+          })(<Input type="text" placeholder="Website" />)}
+        </CustomFormItem>
+      </Form>
+    </Modal>
+  );
+}
+
+export default Form.create({
+  name: 'maker_edit_form'
+})(MakerEdit)
+
+===== END components\sculpture-maker-components\EditForm\MakerEdit.tsx =====
+
+===== BEGIN app\keenkonnect\ai-team-matching\match-preferences\page.tsx =====
+'use client';
+
+import React, { useState } from 'react';
+import type { NextPage } from 'next';
+import {
+  Form,
+  Select,
+  InputNumber,
+  Radio,
+  Slider,
+  Button,
+  Progress,
+  Typography,
+} from 'antd';
+import PageContainer from '@/components/PageContainer';
+
+const { Option } = Select;
+const { Text } = Typography;
+
+const MatchPreferencesPage: NextPage = () => {
+  const [form] = Form.useForm();
+
+  // Valeurs initiales pour le formulaire
+  const initialValues = {
+    projectDomains: [] as string[],
+    preferredTeamSize: 4,
+    rolesOfInterest: [] as string[],
+    skillsOffered: [] as string[],
+    skillsSought: [] as string[],
+    collaborationStyle: 'balanced',
+    // 0 = Innovation focus, 100 = Execution focus
+    innovationExecution: 50,
+  };
+
+  // Calcul d'un indicateur de complétude (matching readiness)
+  const computeReadiness = (values: any) => {
+    // 5 champs clés, poids équivalent
+    const totalFields = 5;
+    let completed = 0;
+    if (values.projectDomains && values.projectDomains.length > 0) completed++;
+    if (values.preferredTeamSize) completed++;
+    if (values.rolesOfInterest && values.rolesOfInterest.length > 0) completed++;
+    if (values.skillsOffered && values.skillsOffered.length > 0) completed++;
+    if (values.skillsSought && values.skillsSought.length > 0) completed++;
+    return Math.round((completed / totalFields) * 100);
+  };
+
+  // State pour suivre la complétude du profil
+  const [readiness, setReadiness] = useState<number>(
+    computeReadiness(initialValues)
+  );
+
+  // Mise à jour de l'indicateur lors d'un changement dans le formulaire
+  const onValuesChange = (_changed: any, allValues: any) => {
+    setReadiness(computeReadiness(allValues));
+  };
+
+  // Gestion de la soumission du formulaire
+  const onFinish = (values: any) => {
+    // Intégration API possible ici
+    // console.log('Preferences Saved: ', values);
+  };
+
+  return (
+    <PageContainer title="Match Preferences">
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={initialValues}
+        onValuesChange={onValuesChange}
+        onFinish={onFinish}
+      >
+        {/* Domaines de projet souhaités */}
+        <Form.Item
+          label="Desired Project Domains"
+          name="projectDomains"
+          rules={[{ required: true, message: 'Please select at least one domain.' }]}
+        >
+          <Select
+            mode="multiple"
+            placeholder="Select domains you want to work on"
+            allowClear
+          >
+            <Option value="ai-ml">AI / Machine Learning</Option>
+            <Option value="sustainability">Sustainability</Option>
+            <Option value="edtech">EdTech</Option>
+            <Option value="fintech">FinTech</Option>
+            <Option value="healthtech">HealthTech</Option>
+            <Option value="open-source">Open Source</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Taille d'équipe souhaitée */}
+        <Form.Item
+          label="Preferred Team Size"
+          name="preferredTeamSize"
+          rules={[{ required: true, message: 'Please set your preferred team size.' }]}
+        >
+          <InputNumber min={2} max={10} />
+        </Form.Item>
+
+        {/* Rôles d'intérêt */}
+        <Form.Item
+          label="Roles of Interest"
+          name="rolesOfInterest"
+          rules={[{ required: true, message: 'Please select at least one role.' }]}
+        >
+          <Select mode="multiple" placeholder="Select roles you want to take">
+            <Option value="frontend">Frontend Developer</Option>
+            <Option value="backend">Backend Developer</Option>
+            <Option value="data">Data Scientist</Option>
+            <Option value="designer">Designer (UI/UX)</Option>
+            <Option value="pm">Product Manager</Option>
+            <Option value="devops">DevOps</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Compétences offertes */}
+        <Form.Item
+          label="Skills You Offer"
+          name="skillsOffered"
+          rules={[{ required: true, message: 'Veuillez sélectionner vos compétences' }]}
+        >
+          <Select mode="multiple" placeholder="Sélectionnez vos compétences">
+            <Option value="react">React</Option>
+            <Option value="node">Node.js</Option>
+            <Option value="python">Python</Option>
+            <Option value="design">UI/UX Design</Option>
+            <Option value="ml">Machine Learning</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Compétences recherchées */}
+        <Form.Item
+          label="Skills You Seek in a Team"
+          name="skillsSought"
+          rules={[{ required: true, message: 'Veuillez sélectionner les compétences recherchées' }]}
+        >
+          <Select mode="multiple" placeholder="Sélectionnez les compétences attendues">
+            <Option value="react">React</Option>
+            <Option value="node">Node.js</Option>
+            <Option value="python">Python</Option>
+            <Option value="design">UI/UX Design</Option>
+            <Option value="ml">Machine Learning</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Style de collaboration */}
+        <Form.Item label="Collaboration Style" name="collaborationStyle">
+          <Radio.Group>
+            <Radio value="flexible">Flexible</Radio>
+            <Radio value="structured">Structuré</Radio>
+            <Radio value="balanced">Équilibré</Radio>
+          </Radio.Group>
+        </Form.Item>
+
+        {/* Slider Innovation vs Execution */}
+        <Form.Item label="Innovation Focus vs Execution Focus">
+          <Form.Item name="innovationExecution" noStyle>
+            {/* Si vous êtes en antd v5+, vous pouvez basculer sur: tooltip={{ open: true }} */}
+            <Slider min={0} max={100} tooltipVisible />
+          </Form.Item>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <Text>Innovation Focus</Text>
+            <Text>Execution Focus</Text>
+          </div>
+        </Form.Item>
+
+        {/* Indicateur de matching readiness */}
+        <Form.Item label="Matching Readiness">
+          <Progress
+            percent={readiness}
+            status={readiness === 100 ? 'success' : 'active'}
+          />
+          <Text type="secondary">
+            Complétez vos préférences pour améliorer la qualité des suggestions de l’IA.
+          </Text>
+        </Form.Item>
+
+        {/* Info */}
+        <Form.Item>
+          <Text type="secondary">
+            Ces préférences permettent à notre système AI de vous proposer les meilleures
+            correspondances d’équipes.
+          </Text>
+        </Form.Item>
+
+        {/* Soumission */}
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Save Preferences
+          </Button>
+        </Form.Item>
+      </Form>
+    </PageContainer>
+  );
+};
+
+// Option d’intégration layout (conservée comme dans vos sources)
+MatchPreferencesPage.getLayout = (page: React.ReactNode) => page;
+
+export default MatchPreferencesPage;
+
+===== END app\keenkonnect\ai-team-matching\match-preferences\page.tsx =====
+
+===== BEGIN app\konnected\teams-collaboration\project-workspaces\page.tsx =====
+'use client';
+
+// File: app/konnected/teams-collaboration/project-workspaces/page.tsx
+import React from 'react';
+import { Table, Button, Tag, Space, message as antdMessage  } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import { useRouter } from 'next/navigation';
+import PageContainer from '@/components/PageContainer';
+
+// Workspace data shape
+interface Workspace {
+  id: string;
+  projectName: string;
+  teamName: string;
+  status: 'Active' | 'Inactive';
+  isLaunched: boolean;
+  onlineMembers: number;
+  userRole: 'Leader' | 'Member';
+}
+
+// Example data
+const workspaceData: Workspace[] = [
+  {
+    id: '1',
+    projectName: 'Project Alpha',
+    teamName: 'Alpha Innovators',
+    status: 'Active',
+    isLaunched: true,
+    onlineMembers: 4,
+    userRole: 'Leader',
+  },
+  {
+    id: '2',
+    projectName: 'Project Beta',
+    teamName: 'Beta Coders',
+    status: 'Inactive',
+    isLaunched: false,
+    onlineMembers: 0,
+    userRole: 'Member',
+  },
+  {
+    id: '3',
+    projectName: 'Project Gamma',
+    teamName: 'Gamma Team',
+    status: 'Active',
+    isLaunched: true,
+    onlineMembers: 2,
+    userRole: 'Member',
+  },
+];
+
+export default function ProjectWorkspacesPage() {
+  const router = useRouter(); // fixed: create router once at top level (rules of hooks)
+
+  const handleWorkspaceAction = (workspace: Workspace) => {
+    if (!workspace.isLaunched && workspace.userRole === 'Leader') {
+      // Example: launch action
+      // TODO: call API then refresh or navigate
+      antdMessage.success(`Workspace ${workspace.projectName} launched successfully.`);
+      return;
+    }
+    // Navigate to workspace
+    router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
+
+  const columns: ColumnsType<Workspace> = [
+    {
+      title: 'Workspace/Project Name',
+      dataIndex: 'projectName',
+      key: 'projectName',
+    },
+    {
+      title: 'Team Name',
+      dataIndex: 'teamName',
+      key: 'teamName',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status, row) =>
+        status === 'Active' ? <Tag color="green">Active</Tag> : <Tag color="volcano">Inactive</Tag>,
+    },
+    {
+      title: 'Online Members',
+      dataIndex: 'onlineMembers',
+      key: 'onlineMembers',
+      render: (onlineMembers, row) => <span>{onlineMembers} online</span>,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_: unknown, record: Workspace) => {
+        let buttonLabel = '';
+        if (!record.isLaunched && record.userRole === 'Leader') {
+          buttonLabel = 'Launch Workspace';
+        } else if (record.isLaunched) {
+          buttonLabel = record.userRole === 'Leader' ? 'Open Workspace' : 'Join Workspace';
+        } else {
+          buttonLabel = 'Join Workspace';
+        }
+        return (
+          <Button type="primary" onClick={() => handleWorkspaceAction(record)}>
+            {buttonLabel}
+          </Button>
+        );
+      },
+    },
+  ];
+
+  return (
+    <PageContainer title="Project Workspaces">
+      <Space style={{ marginBottom: 16 }}>
+        <Button
+          type="primary"
+          onClick={() => router.push('/konnected/teams-collaboration/launch-new-workspace')}
+        >
+          Launch New Workspace
+        </Button>
+      </Space>
+      <Table columns={columns} dataSource={workspaceData} rowKey="id" pagination={{ pageSize: 5 }} />
+    </PageContainer>
+  );
+}
+
+/*
+Notes:
+- Removed NextPage type and legacy static getLayout. In the App Router, use a layout.tsx file
+  in this route segment if you need a layout wrapper.
+- Fixed rule-of-hooks violation by moving useRouter() to the component top level.
+- Removed unused Typography/Title import.
+*/
+}
+
+===== END app\konnected\teams-collaboration\project-workspaces\page.tsx =====
+
+===== BEGIN app\ethikos\decide\public\page.tsx =====
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import { Select, Space, Input, Popconfirm, Progress, Radio, Slider } from 'antd'
+import axios from 'axios'
+import usePageTitle from '@/hooks/usePageTitle'
+
+interface Category { id: number; name: string }
+interface Format   { id: number; name: string }
+interface PublicTopic {
+  id: number
+  question: string
+  description?: string
+  debatecategory_id: number
+  responseformat_id: number
+  turnout: number
+  options?: string[]
+  scaleLabels?: string[]
+}
+
+export default function PublicVotePage() {
+  usePageTitle('Decide · Public Voting')
+
+  const [categories, setCategories] = useState<Category[]>([])
+  const [formats, setFormats]       = useState<Format[]>([])
+  const [topicsData, setTopicsData] = useState<{ results: PublicTopic[]; count: number }>({ results: [], count: 0 })
+  const [activeCat, setActiveCat]   = useState<number | 'all'>('all')
+  const [activeFormats, setActiveFormats] = useState<number[]>([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [page, setPage]             = useState<number>(1)
+  const pageSize = 20
+
+  // 1. Load categories & formats
+  useEffect(() => {
+    axios
+      .get<Category[]>('/api/home/debatecategory/', { params: { is_deleted: false } })
+      .then(r => setCategories(r.data))
+    axios
+      .get<Format[]>('/api/home/responseformat/', { params: { is_deleted: false } })
+      .then(r => setFormats(r.data))
+  }, [])
+
+  // 2. Load topics with filters & pagination
+  useEffect(() => {
+    axios
+      .get<{ results: PublicTopic[]; count: number }>('/api/home/debatetopic/', {
+        params: {
+          is_active: true,
+          is_deleted: false,
+          debatecategory_id: activeCat === 'all' ? undefined : activeCat,
+          responseformat_id: activeFormats,
+          search: searchTerm,
+          page,
+          page_size: pageSize,
+          ordering: '-created_at',
+        },
+      })
+      .then(r => setTopicsData(r.data))
+  }, [activeCat, activeFormats, searchTerm, page])
+
+  // 3. Submit a vote and refresh
+  const vote = async (row: PublicTopic, value: any) => {
+    await axios.post('/api/home/publicvote/', { topic_id: row.id, value })
+    // refresh current page
+    axios
+      .get<{ results: PublicTopic[]; count: number }>('/api/home/debatetopic/', {
+        params: {
+          is_active: true,
+          is_deleted: false,
+          debatecategory_id: activeCat === 'all' ? undefined : activeCat,
+          responseformat_id: activeFormats,
+          search: searchTerm,
+          page,
+          page_size: pageSize,
+          ordering: '-created_at',
+        },
+      })
+      .then(r => setTopicsData(r.data))
+  }
+
+  // 4. Render vote input based on format
+  const renderVoteInput = (row: PublicTopic) => {
+    const handleChange = (e: any) => {
+      const val = e?.target?.value ?? e
+      vote(row, val)
+    }
+
+    switch (row.responseformat_id) {
+      case 1: // binary (Yes/No)
+        return (
+          <Radio.Group
+            options={(row.options ?? ['Yes', 'No']).map(v => ({ label: v, value: v }))}
+            onChange={handleChange}
+          />
+        )
+      case 2: // multiple choice
+        return (
+          <Radio.Group
+            options={(row.options ?? []).map(v => ({ label: v, value: v }))}
+            onChange={handleChange}
+          />
+        )
+      case 3: // scale
+        const labels = row.scaleLabels ?? ['1', '2', '3', '4', '5']
+        return (
+          <Space direction="vertical" size={4}>
+            <Slider
+              min={0}
+              max={labels.length - 1}
+              step={1}
+              tooltip={{ formatter: idx => labels[idx] }}
+              onAfterChange={handleChange}
+            />
+          </Space>
+        )
+      default:
+        return null
+    }
+  }
+
+  const columns = [
+    { title: 'Question', dataIndex: 'question', width: 360 },
+    {
+      title: 'Vote',
+      dataIndex: 'vote',
+      render: (_: any, row: PublicTopic) => (
+        <Popconfirm title="Confirm your vote?" onConfirm={() => {}}>
+          {renderVoteInput(row)}
+        </Popconfirm>
+      ),
+    },
+    {
+      title: 'Turnout',
+      dataIndex: 'turnout',
+      render: (v, row) => <Progress percent={v} size="small" />,
+    },
+  ]
+
+  return (
+    <PageContainer ghost>
+      <Space wrap style={{ marginBottom: 16 }}>
+        <Select
+          placeholder="Catégorie"
+          allowClear
+          value={activeCat}
+          onChange={val => { setActiveCat(val); setPage(1) }}
+          style={{ width: 200 }}
+          options={[
+            { label: 'All', value: 'all' },
+            ...categories.map(c => ({ label: c.name, value: c.id })),
+          ]}
+        />
+        <Select
+          mode="multiple"
+          placeholder="Formats"
+          value={activeFormats}
+          onChange={val => { setActiveFormats(val); setPage(1) }}
+          style={{ width: 200 }}
+          options={formats.map(f => ({ label: f.name, value: f.id }))}
+        />
+        <Input.Search
+          placeholder="Rechercher…"
+          onSearch={val => { setSearchTerm(val); setPage(1) }}
+          style={{ width: 260 }}
+        />
+      </Space>
+
+      <ProTable<PublicTopic>
+        rowKey="id"
+        columns={columns as any}
+        dataSource={topicsData.results}
+        pagination={{
+          total: topicsData.count,
+          current: page,
+          pageSize,
+          onChange: setPage,
+        }}
+        search={false}
+      />
+    </PageContainer>
+  )
+}
+
+===== END app\ethikos\decide\public\page.tsx =====
+
+===== BEGIN app\ethikos\deliberate\elite\page.tsx =====
+'use client'
+
+import React from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  ModalForm,
+  ProFormText,
+  ProFormSelect,
+} from '@ant-design/pro-components';
+import { Badge,
+  Button,
+  Drawer,
+  Empty,
+  Space,
+  Tag,
+  Tooltip,
+  message as antdMessage,
+ } from 'antd';
+import { useRequest, useInterval } from 'ahooks';
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  FireOutlined,
+} from '@ant-design/icons';
+import dayjs from 'dayjs';
+
+import usePageTitle from '@/hooks/usePageTitle';
+import {
+  fetchEliteTopics,
+  createEliteTopic,
+  fetchTopicPreview,
+} from '@/services/deliberate';
+import type { Topic } from '@/types';
+
+/* ------------------------------------------------------------------ */
+/*  Derived types                                                      */
+/* ------------------------------------------------------------------ */
+
+interface TopicRow extends Topic {
+  createdAt: string;
+  lastActivity: string;
+  hot: boolean; // computed server-side: stanceCount increased >= 20% in 24 h
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
+
+export default function EliteAgora() {
+  usePageTitle('Deliberate · Elite Agora');
+
+  /* ---------- data ---------- */
+  const { data, loading, refresh } = useRequest(fetchEliteTopics);
+  useInterval(refresh, 60_000); // poll every minute
+
+  /* ---------- drawer state ---------- */
+  const [previewId, setPreviewId] = React.useState<string | null>(null);
+  const {
+    data: preview,
+    loading: previewLoading,
+    run: loadPreview,
+  } = useRequest((id: string) => fetchTopicPreview(id), { manual: true });
+
+  /* ---------- open drawer ---------- */
+  const openPreview = (row: TopicRow) => {
+    setPreviewId(row.id);
+    loadPreview(row.id);
+
+  /* ---------- KPI header ---------- */
+  const headerStats = [
+    {
+      label: 'Open topics',
+      value: data?.list.length ?? 0,
+    },
+    {
+      label: 'Avg stances / topic',
+      value:
+        data && data.list.length
+          ? Math.round(
+              data.list.reduce((sum, t) => sum + t.stanceCount, 0) /
+                data.list.length,
+            )
+          : 0,
+    },
+    {
+      label: 'Hot topics',
+      value: data?.list.filter((t) => t.hot).length ?? 0,
+    },
+  ];
+
+  /* ---------- columns ---------- */
+  const columns = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      render: (_: any, row: TopicRow) => (
+        <a onClick={() => openPreview(row)}>{row.title}</a>
+      ),
+    },
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      filters: true,
+      render: (v, row) => <Tag color="geekblue">{v}</Tag>,
+    },
+    {
+      title: 'Stances',
+      dataIndex: 'stanceCount',
+      sorter: true,
+      align: 'right' as const,
+    },
+    {
+      title: 'Last activity',
+      dataIndex: 'lastActivity',
+      valueType: 'fromNow',
+    },
+    {
+      title: '',
+      dataIndex: 'hot',
+      width: 60,
+      render: (v, row) =>
+        v ? (
+          <Tooltip title="Trending">
+            <FireOutlined style={{ color: '#fa541c' }} />
+          </Tooltip>
+        ) : null,
+    },
+  ];
+
+  /* ---------- render ---------- */
+  return (
+    <PageContainer
+      ghost
+      loading={loading}
+      extra={
+        <Space>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={refresh}
+            type="text"
+            title="Refresh list"
+          />
+          {/* role check goes here */}
+          <NewTopicButton onCreated={refresh} />
+        </Space>
+      }
+    >
+      {/* KPI summary */}
+      <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+        {headerStats.map((k) => (
+          <StatisticCard
+            key={k.label}
+            colSpan={{ xs: 24, sm: 8 }}
+            statistic={{ title: k.label, value: k.value }}
+          />
+        ))}
+      </ProCard>
+
+      {/* list */}
+      <ProTable<TopicRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.list}
+        search={{
+          labelWidth: 90,
+          filterType: 'light',
+        }}
+        pagination={{ pageSize: 10 }}
+      />
+
+      {/* preview drawer */}
+      <Drawer
+        width={520}
+        open={!!previewId}
+        onClose={() => setPreviewId(null)}
+        title={preview?.title || 'Preview'}
+      >
+        {previewLoading ? (
+          <Empty description="Loading…" />
+        ) : preview ? (
+          <>
+            <p>
+              <strong>Category:</strong> {preview.category}
+            </p>
+            <p>
+              <strong>Opened:</strong>{' '}
+              {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+            </p>
+            <h4>Latest statements</h4>
+            <ul>
+              {preview.latest.map((s) => (
+                <li key={s.id}>
+                  <em>{s.author}</em> — {s.body}
+                </li>
+              ))}
+            </ul>
+            <Button
+              type="primary"
+              onClick={() =>
+                window.location.assign(`/ethikos/deliberate/${preview.id}`)
+              }
+            >
+              Go to thread →
+            </Button>
+          </>
+        ) : (
+          <Empty />
+        )}
+      </Drawer>
+    </PageContainer>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  New Topic modal                                                    */
+/* ------------------------------------------------------------------ */
+
+function NewTopicButton({ onCreated }: { onCreated: () => void }) {
+  const [visible, setVisible] = React.useState(false);
+
+  const { runAsync, loading } = useRequest(createEliteTopic, {
+    manual: true,
+    onSuccess: () => {
+      antdMessage.success('Topic created 🎉');
+      setVisible(false);
+      onCreated();
+    },
+  });
+
+  return (
+    <>
+      <Button
+        icon={<PlusOutlined />}
+        type="primary"
+        onClick={() => setVisible(true)}
+      >
+        New Topic
+      </Button>
+      <ModalForm
+        title="Create new topic"
+        open={visible}
+        onOpenChange={setVisible}
+        onFinish={async (values) => {
+          await runAsync(values);
+          return true;
+        }}
+        submitter={{ submitButtonProps: { loading } }}
+      >
+        <ProFormText
+          name="title"
+          label="Title"
+          rules={[{ required: true, min: 10 }]}
+        />
+        <ProFormSelect
+          name="category"
+          label="Category"
+          options={[
+            { label: 'AI Policy', value: 'AI Policy' },
+            { label: 'Biotech', value: 'Biotech' },
+            { label: 'Ethics', value: 'Ethics' },
+          ]}
+          rules={[{ required: true }]}
+        />
+      </ModalForm>
+    </>
+  );
+}
+}
+
+===== END app\ethikos\deliberate\elite\page.tsx =====
+
+===== BEGIN app\keenkonnect\ai-team-matching\my-matches\page.tsx =====
+'use client';
+
+import React, { useState } from 'react';
+import { NextPage } from 'next';
+import { Tabs, List, Button, Badge } from 'antd';
+import PageContainer from '@/components/PageContainer'; // Composant contenant le header et le layout global
+
+// Définition d'un type pour représenter un match
+interface Match {
+  id: string;
+  name: string;
+  matchScore: number; // Pourcentage de match par exemple
+  commonInterests: string; // Chaîne résumant les intérêts ou points communs
+  new?: boolean; // Flag indiquant un nouveau match pour ajouter un badge
+}
+
+// Exemple de données en local pour les "Team Matches"
+const teamMatches: Match[] = [
+  {
+    id: 'team1',
+    name: 'Alpha Team',
+    matchScore: 92,
+    commonInterests: 'UI/UX, Backend, DevOps',
+    new: true,
+  },
+  {
+    id: 'team2',
+    name: 'Beta Squad',
+    matchScore: 85,
+    commonInterests: 'Mobile, Frontend',
+  },
+  // Ajoutez d'autres données selon les besoins
+];
+
+// Exemple de données en local pour les "Partner Matches" (collaborateurs individuels)
+const partnerMatches: Match[] = [
+  {
+    id: 'partner1',
+    name: 'Jean Dupont',
+    matchScore: 88,
+    commonInterests: 'Data Science, Machine Learning',
+    new: true,
+  },
+  {
+    id: 'partner2',
+    name: 'Marie Curie',
+    matchScore: 90,
+    commonInterests: 'Research, AI Innovation',
+  },
+  // Ajoutez d'autres données si nécessaire
+];
+
+const { TabPane } = Tabs;
+
+const MyMatchesPage: NextPage = () => {
+  // On peut utiliser un state pour gérer l'onglet actif si des traitements spécifiques doivent être appliqués
+  const [activeTab, setActiveTab] = useState<string>('team');
+
+  // Fonction de rendu générique pour un élément de la liste
+  const renderMatchItem = (item: Match) => (
+    <List.Item
+      key={item.id}
+      actions={[
+        // Action « Connect » pour démarrer une interaction
+        <Button type="primary" key="connect">Connect</Button>,
+        // Action pour consulter le profil ou l'équipe
+        <Button key="view">View Profile/Team</Button>,
+      ]}
+    >
+      <List.Item.Meta
+        // Le titre inclut éventuellement un Badge si le match est récent
+        title={
+          <span>
+            {item.name}
+            {item.new && (
+              <Badge count={'new'} style={{ backgroundColor: '#52c41a', marginLeft: 8 }} />
+            )}
+          </span>
+        }
+        description={`${item.matchScore}% de match - ${item.commonInterests}`}
+      />
+    </List.Item>
+  );
+
+  return (
+    // Le PageContainer gère la structure globale et le header de la page
+    <PageContainer title="My Matches">
+      <Tabs defaultActiveKey="team" onChange={setActiveTab}>
+        <TabPane
+          // Intitulé de l'onglet Team Matches avec possibilité d'y intégrer un badge de notification si besoin
+          tab="Team Matches"
+          key="team"
+        >
+          <List
+            itemLayout="horizontal"
+            dataSource={teamMatches ?? []}
+            renderItem={renderMatchItem}
+          />
+        </TabPane>
+        <TabPane
+          tab="Partner Matches"
+          key="partner"
+        >
+          <List
+            itemLayout="horizontal"
+            dataSource={partnerMatches ?? []}
+            renderItem={renderMatchItem}
+          />
+        </TabPane>
+      </Tabs>
+    </PageContainer>
+  );
+
+// Si votre projet utilise une méthode de layout global via getLayout (par exemple dans _app.tsx), vous pouvez l'intégrer ainsi :
+
+  // MainLayout est le layout global qui intègre header, sidebar, etc.
+  // Assurez-vous de l'importer depuis le dossier correspondant (par ex. '@/layout-components/MainLayout')
+  // Exemple :
+  // return <MainLayout>{page}</MainLayout>;
+  return page; // Pour l'exemple, on retourne la page directement
+
+export default MyMatchesPage;
+}
+
+===== END app\keenkonnect\ai-team-matching\my-matches\page.tsx =====
+
+===== BEGIN app\keenkonnect\knowledge\browse-repository\page.tsx =====
+'use client'
+
+// pages/keenkonnect/knowledge/browse-repository/index.tsx
+import React, { useState, useMemo } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Table, Input, Select, Button, Row, Col, Card, Divider } from 'antd';
+import MainLayout from '@/components/layout-components/MainLayout';
+import { useRouter } from 'next/navigation';
+
+const { Search } = Input;
+const { Option } = Select;
+
+interface DocumentResource {
+  key: string;
+  title: string;
+  category: string;
+  language: string;
+  version: string;
+  lastUpdated: string;
+}
+
+// Données simulées pour les ressources
+const sampleResources: DocumentResource[] = [
+  { key: '1', title: 'Robotics Blueprint', category: 'Robotics', language: 'English', version: '1.0', lastUpdated: '2023-09-01' },
+  { key: '2', title: 'Healthcare Protocols', category: 'Healthcare', language: 'French', version: '2.1', lastUpdated: '2023-08-28' },
+  { key: '3', title: 'AI Research Paper', category: 'Technology', language: 'English', version: '1.2', lastUpdated: '2023-09-03' },
+  { key: '4', title: 'Sustainable Energy Report', category: 'Energy', language: 'English', version: '3.0', lastUpdated: '2023-08-20' },
+];
+
+const BrowseRepository = () => {
+  const router = useRouter();
+  const [searchText, setSearchText] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('All');
+
+  // Filtrage des ressources selon les filtres
+  const filteredResources = useMemo(() => {
+    return sampleResources.filter((resource) => {
+      const matchesSearch = resource.title.toLowerCase().includes(searchText.toLowerCase());
+      const matchesCategory = selectedCategory === 'All' || resource.category === selectedCategory;
+      const matchesLanguage = selectedLanguage === 'All' || resource.language === selectedLanguage;
+      return matchesSearch && matchesCategory && matchesLanguage;
+    });
+  }, [searchText, selectedCategory, selectedLanguage]);
+
+  // Colonnes pour la table
+  const columns = [
+    { title: 'Title', dataIndex: 'title', key: 'title' },
+    { title: 'Category', dataIndex: 'category', key: 'category' },
+    { title: 'Language', dataIndex: 'language', key: 'language' },
+    { title: 'Version', dataIndex: 'version', key: 'version' },
+    { title: 'Last Updated', dataIndex: 'lastUpdated', key: 'lastUpdated' },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: DocumentResource) => (
+        <>
+          <Button type="link" onClick={() => router.push(`/keenkonnect/knowledge/view/${record.key}`)}>
+            View
+          </Button>
+          <Button type="link" onClick={() => router.push(`/keenkonnect/knowledge/edit/${record.key}`)}>
+            Edit
+          </Button>
+        </>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <Head>
+        <title>Browse Repository</title>
+        <meta name="description" content="Browse technical documents and blueprints in your repository." />
+      </Head>
+      <div className="container mx-auto p-5">
+        {/* En-tête */}
+        <h1 className="text-2xl font-bold mb-4">Browse Repository</h1>
+        
+        {/* Barre de recherche et filtres */}
+        <Row gutter={[16, 16]} className="mb-4">
+          <Col xs={24} sm={8}>
+            <Search
+              placeholder="Search documents..."
+              allowClear
+              onSearch={value => setSearchText(value)}
+            />
+          </Col>
+          <Col xs={24} sm={8}>
+            <Select
+              defaultValue="All"
+              style={{ width: '100%' }}
+              onChange={(value) => setSelectedCategory(value)}
+            >
+              <Option value="All">All Categories</Option>
+              <Option value="Robotics">Robotics</Option>
+              <Option value="Healthcare">Healthcare</Option>
+              <Option value="Technology">Technology</Option>
+              <Option value="Energy">Energy</Option>
+            </Select>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Select
+              defaultValue="All"
+              style={{ width: '100%' }}
+              onChange={(value) => setSelectedLanguage(value)}
+            >
+              <Option value="All">All Languages</Option>
+              <Option value="English">English</Option>
+              <Option value="French">French</Option>
+            </Select>
+          </Col>
+        </Row>
+
+        {/* Bouton pour uploader un nouveau document */}
+        <Row justify="end" className="mb-4">
+          <Button type="primary" onClick={() => router.push('/keenkonnect/knowledge/upload-new-document')}>
+            Upload New Document
+          </Button>
+        </Row>
+
+        <Card>
+          <Table columns={columns} dataSource={filteredResources} pagination={{ pageSize: 5 }} />
+        </Card>
+      </div>
+    </>
+  );
+
+
+
+export default BrowseRepository;
+}
+
+===== END app\keenkonnect\knowledge\browse-repository\page.tsx =====
+
+===== BEGIN app\keenkonnect\knowledge\upload-new-document\page.tsx =====
+'use client'
+
+// pages/keenkonnect/knowledge/upload-new-document/index.tsx
+import React, { useState } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Form, Input, Select, Upload, Switch, Button, message as antdMessage, Progress, Result  } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import MainLayout from '@/components/layout-components/MainLayout';
+import { useRouter } from 'next/navigation';
+
+const { Option } = Select;
+const { TextArea } = Input;
+
+const UploadNewDocument = () => {
+  const [form] = Form.useForm();
+  const router = useRouter();
+  
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploading, setUploading] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  const handleUploadChange = ({ fileList }: any) => {
+    // Ce callback se contente de conserver le fileList dans le formulaire via antd.
+    return fileList;
+
+  const simulateUpload = () => {
+    setUploading(true);
+    setUploadProgress(0);
+    
+    // Simuler une progression d'upload
+    const interval = setInterval(() => {
+      setUploadProgress(prev => {
+        if (prev >= 100) {
+          clearInterval(interval);
+          setUploading(false);
+          antdMessage.success('Document uploaded successfully');
+          setSubmitted(true);
+          return 100;
+        }
+        return prev + 20;
+      });
+    }, 500);
+
+  const onFinish = async (values: any) => {
+    console.log('Form values:', values);
+    simulateUpload();
+
+  if (submitted) {
+    return (
+      <div className="container mx-auto p-5">
+        <Result
+          status="success"
+          title="Document Uploaded Successfully!"
+          subTitle="Your document has been successfully submitted."
+          extra={[
+            <Button type="primary" key="manage" onClick={() => router.push('/keenkonnect/knowledge/document-management')}>
+              Go to Document Management
+            </Button>,
+          ]}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Upload New Document</title>
+        <meta name="description" content="Submit a new document to the knowledge repository." />
+      </Head>
+      <div className="container mx-auto p-5">
+        <h1 className="text-2xl font-bold mb-4">Upload New Document</h1>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
+          {/* Title */}
+          <Form.Item
+            name="title"
+            label="Document Title"
+            rules={[{ required: true, message: 'Please enter a document title' }]}
+          >
+            <Input placeholder="Enter document title" />
+          </Form.Item>
+
+          {/* Description */}
+          <Form.Item
+            name="description"
+            label="Description/Abstract"
+            rules={[{ required: true, message: 'Please provide a description' }]}
+          >
+            <TextArea rows={4} placeholder="Enter document description" />
+          </Form.Item>
+
+          {/* Category/Topic */}
+          <Form.Item
+            name="category"
+            label="Category/Topic"
+            rules={[{ required: true, message: 'Please select a category' }]}
+          >
+            <Select placeholder="Select category">
+              <Option value="Robotics">Robotics</Option>
+              <Option value="Healthcare">Healthcare</Option>
+              <Option value="Technology">Technology</Option>
+              <Option value="Energy">Energy</Option>
+              <Option value="Education">Education</Option>
+            </Select>
+          </Form.Item>
+
+          {/* Version */}
+          <Form.Item
+            name="version"
+            label="Version"
+            rules={[{ required: true, message: 'Please enter the document version' }]}
+          >
+            <Input placeholder="e.g. 1.0" />
+          </Form.Item>
+
+          {/* Language */}
+          <Form.Item
+            name="language"
+            label="Language"
+            rules={[{ required: true, message: 'Please select a language' }]}
+          >
+            <Select placeholder="Select language">
+              <Option value="English">English</Option>
+              <Option value="French">French</Option>
+            </Select>
+          </Form.Item>
+
+          {/* File Upload */}
+          <Form.Item
+            name="documentFile"
+            label="Document File"
+            rules={[{ required: true, message: 'Please upload the document file' }]}
+            valuePropName="fileList"
+            getValueFromEvent={handleUploadChange}
+          >
+            <Upload beforeUpload={() => false} listType="picture">
+              <Button icon={<UploadOutlined />}>Upload File</Button>
+            </Upload>
+          </Form.Item>
+
+          {/* Publish Toggle */}
+          <Form.Item name="publishNow" label="Publish Status" initialValue={true} valuePropName="checked">
+            <Switch checkedChildren="Publish Now" unCheckedChildren="Save as Draft" />
+          </Form.Item>
+
+          {/* Bouton de soumission */}
+          <Form.Item>
+            <Button type="primary" htmlType="submit" disabled={uploading}>
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
+
+        {/* Indicateur de progression lors de l'upload */}
+        {uploading && (
+          <div className="mt-4">
+            <Progress percent={uploadProgress} status="active" />
+          </div>
+        )}
+      </div>
+    </>
+  );
+
+
+
+export default UploadNewDocument;
+}}}}
+
+===== END app\keenkonnect\knowledge\upload-new-document\page.tsx =====
+
+===== BEGIN app\keenkonnect\projects\create-new-project\page.tsx =====
+'use client'
+
+// pages/keenkonnect/projects/create-new-project/index.tsx
+import React, { useState } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Steps, Button, Form, Input, Select, Upload, Result, message as antdMessage  } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import MainLayout from '@/components/layout-components/MainLayout';
+import { normalizeError } from "../../../../shared/errors";
+
+const { Step } = Steps;
+const { Option } = Select;
+const { TextArea } = Input;
+
+const CreateNewProject = () => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
+  const [form] = Form.useForm();
+
+  // Stockage des données saisies durant le wizard
+  const [formData, setFormData] = useState({
+    projectName: '',
+    projectDescription: '',
+    category: '',
+    projectImage: null as any,
+    teamMembers: [] as string[],
+  });
+
+  const steps = [
+    { title: 'Project Info' },
+    { title: 'Team Setup' },
+    { title: 'Review' },
+  ];
+
+  // Passage à l'étape suivante après validation
+  const next = async () => {
+    try {
+      const values = await form.validateFields();
+      setFormData((prev) => ({ ...prev, ...values }));
+      setCurrentStep(currentStep + 1);
+      form.resetFields();
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
+      antdMessage.error('Please fill in the required fields.');
+    }
+
+  // Retour à l'étape précédente
+  const prev = () => {
+    setCurrentStep(currentStep - 1);
+
+  // Soumission finale du formulaire
+  const onFinish = async () => {
+    try {
+      const values = await form.validateFields();
+      setFormData((prev) => ({ ...prev, ...values }));
+      // Simulation d'enregistrement du projet.
+      console.log('Project created with values:', { ...formData, ...values });
+      setSubmitted(true);
+    } catch (error: unknown) {
+      const { message, statusCode } = normalizeError(error);
+      antdMessage.error('Please fill in the required fields.');
+    }
+
+  // Rendu du contenu en fonction de l'étape
+  const renderStepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return (
+          <>
+            <Form.Item
+              name="projectName"
+              label="Project Name"
+              rules={[{ required: true, message: 'Please enter project name' }]}
+              initialValue={formData.projectName}
+            >
+              <Input placeholder="Enter project name" />
+            </Form.Item>
+            <Form.Item
+              name="projectDescription"
+              label="Project Description"
+              rules={[{ required: true, message: 'Please enter project description' }]}
+              initialValue={formData.projectDescription}
+            >
+              <TextArea rows={4} placeholder="Enter project description" />
+            </Form.Item>
+            <Form.Item
+              name="category"
+              label="Category/Domain"
+              rules={[{ required: true, message: 'Please select a category' }]}
+              initialValue={formData.category}
+            >
+              <Select placeholder="Select category">
+                <Option value="Innovation">Innovation</Option>
+                <Option value="Research">Research</Option>
+                <Option value="Development">Development</Option>
+                <Option value="Marketing">Marketing</Option>
+                <Option value="Design">Design</Option>
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name="projectImage"
+              label="Project Image/Icon"
+              valuePropName="fileList"
+              getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+            >
+              <Upload beforeUpload={() => false} listType="picture">
+                <Button icon={<UploadOutlined />}>Upload Image</Button>
+              </Upload>
+            </Form.Item>
+          </>
+        );
+      case 1:
+        return (
+          <>
+            <Form.Item
+              name="teamMembers"
+              label="Invite Team Members"
+              initialValue={formData.teamMembers}
+            >
+              <Select mode="multiple" placeholder="Select team members">
+                <Option value="Alice">Alice</Option>
+                <Option value="Bob">Bob</Option>
+                <Option value="Charlie">Charlie</Option>
+                <Option value="Diana">Diana</Option>
+              </Select>
+            </Form.Item>
+          </>
+        );
+      case 2:
+        return (
+          <div>
+            <h3>Review Your Project Details:</h3>
+            <p>
+              <strong>Project Name:</strong> {formData.projectName || 'N/A'}
+            </p>
+            <p>
+              <strong>Description:</strong> {formData.projectDescription || 'N/A'}
+            </p>
+            <p>
+              <strong>Category:</strong> {formData.category || 'N/A'}
+            </p>
+            <p>
+              <strong>Team Members:</strong>{' '}
+              {formData.teamMembers.length > 0 ? formData.teamMembers.join(', ') : 'None'}
+            </p>
+            {formData.projectImage && (
+              <p>
+                <strong>Project Image:</strong> {JSON.stringify(formData.projectImage)}
+              </p>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+
+  if (submitted) {
+    return (
+      <div className="container mx-auto p-5">
+        <Result
+          status="success"
+          title="Project Created Successfully!"
+          subTitle="Your new project has been created. You can now manage it or invite additional team members."
+          extra={[
+            <Button type="primary" key="dashboard" onClick={() => window.location.href = '/keenkonnect/dashboard'}>
+              Go to Dashboard
+            </Button>,
+          ]}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Create New Project</title>
+        <meta name="description" content="Create a new project using our guided project creation wizard." />
+      </Head>
+      <div className="container mx-auto p-5">
+        <h1 className="text-2xl font-bold mb-4">Create New Project</h1>
+        <Steps current={currentStep} className="mb-6">
+          {steps.map((item, index) => (
+            <Step key={index} title={item.title} />
+          ))}
+        </Steps>
+        <Form form={form} layout="vertical" initialValues={formData} onFinish={onFinish}>
+          {renderStepContent(currentStep)}
+          <div style={{ marginTop: 24 }}>
+            {currentStep > 0 && (
+              <Button style={{ marginRight: 8 }} onClick={prev}>
+                Back
+              </Button>
+            )}
+            {currentStep < steps.length - 1 && (
+              <Button type="primary" onClick={next}>
+                Next
+              </Button>
+            )}
+            {currentStep === steps.length - 1 && (
+              <Button type="primary" htmlType="submit">
+                Submit
+              </Button>
+            )}
+          </div>
+        </Form>
+      </div>
+    </>
+  );
+
+
+
+export default CreateNewProject;
+}}}}}
+
+===== END app\keenkonnect\projects\create-new-project\page.tsx =====
+
+===== BEGIN app\keenkonnect\projects\my-projects\page.tsx =====
+'use client'
+
+// pages/keenkonnect/projects/my-projects/index.tsx
+import React, { useState, useMemo } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Table, Card, Button, Row, Col, Select, Typography, Divider, Space } from 'antd';
+import { EyeOutlined, EditOutlined, RocketOutlined, PlusOutlined } from '@ant-design/icons';
+import MainLayout from '@/components/layout-components/MainLayout';
+import { useRouter } from 'next/navigation';
+
+const { Title, Text } = Typography;
+const { Option } = Select;
+
+// Définition du type d'un projet
+interface Project {
+  key: string;
+  name: string;
+  role: 'Owner' | 'Member';
+  status: 'Active' | 'Completed';
+  lastUpdated: string; // date formatée
+  category?: string;
+}
+
+// Données simulées pour les projets
+const sampleProjects: Project[] = [
+  { key: '1', name: 'Project Alpha', role: 'Owner', status: 'Active', lastUpdated: '2023-09-01', category: 'Innovation' },
+  { key: '2', name: 'Project Beta', role: 'Member', status: 'Completed', lastUpdated: '2023-08-15', category: 'Research' },
+  { key: '3', name: 'Project Gamma', role: 'Owner', status: 'Active', lastUpdated: '2023-09-03', category: 'Development' },
+  { key: '4', name: 'Project Delta', role: 'Member', status: 'Active', lastUpdated: '2023-08-28', category: 'Marketing' },
+  { key: '5', name: 'Project Epsilon', role: 'Member', status: 'Completed', lastUpdated: '2023-07-30', category: 'Design' },
+];
+
+const MyProjects = () => {
+  const router = useRouter();
+  const [statusFilter, setStatusFilter] = useState<string>('All');
+  const [categoryFilter, setCategoryFilter] = useState<string>('All');
+
+  // Filtrage des projets selon le statut et la catégorie
+  const filteredProjects = useMemo(() => {
+    return sampleProjects.filter((project) => {
+      const statusMatch = statusFilter === 'All' || project.status === statusFilter;
+      const categoryMatch = categoryFilter === 'All' || project.category === categoryFilter;
+      return statusMatch && categoryMatch;
+    });
+  }, [statusFilter, categoryFilter]);
+
+  // Définition des colonnes du tableau
+  const columns = [
+    {
+      title: 'Project Name',
+      dataIndex: 'name',
+      key: 'name',
+      render: (name: string, record: Project) => (
+        <Text strong style={{ cursor: 'pointer' }} onClick={() => router.push(`/keenkonnect/projects/project-workspace?id=${record.key}`)}>
+          {name}
+        </Text>
+      ),
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: 'Last Updated',
+      dataIndex: 'lastUpdated',
+      key: 'lastUpdated',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: Project) => (
+        <Space>
+          <Button icon={<EyeOutlined />} size="small" onClick={() => router.push(`/keenkonnect/projects/project-workspace?id=${record.key}`)}>View</Button>
+          <Button icon={<EditOutlined />} size="small" onClick={() => router.push(`/keenkonnect/projects/manage-project?id=${record.key}`)}>Manage</Button>
+          <Button icon={<RocketOutlined />} size="small" onClick={() => router.push(`/keenkonnect/projects/project-workspace?id=${record.key}`)}>Go to Workspace</Button>
+        </Space>
+      ),
+    },
+  ];
+
+  // Calcul du résumé des projets
+  const totalProjects = sampleProjects.length;
+  const activeCount = sampleProjects.filter(proj => proj.status === 'Active').length;
+  const completedCount = sampleProjects.filter(proj => proj.status === 'Completed').length;
+
+  return (
+    <>
+      <Head>
+        <title>My Projects</title>
+        <meta name="description" content="View and manage your projects within KeenKonnect." />
+      </Head>
+      <div className="container mx-auto p-5">
+        {/* En-tête de la page */}
+        <Title level={2}>My Projects</Title>
+        <Divider />
+
+        {/* Résumé des projets */}
+        <Row gutter={16} className="mb-4">
+          <Col xs={24} sm={8}>
+            <Card>
+              <Text strong>Total Projects:</Text> <Text>{totalProjects}</Text>
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card>
+              <Text strong>Active:</Text> <Text>{activeCount}</Text>
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card>
+              <Text strong>Completed:</Text> <Text>{completedCount}</Text>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Filtres */}
+        <Row gutter={[16, 16]} className="mb-4">
+          <Col xs={24} sm={12}>
+            <Text>Status:</Text>
+            <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setStatusFilter(value)}>
+              <Option value="All">All</Option>
+              <Option value="Active">Active</Option>
+              <Option value="Completed">Completed</Option>
+            </Select>
+          </Col>
+          <Col xs={24} sm={12}>
+            <Text>Category:</Text>
+            <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setCategoryFilter(value)}>
+              <Option value="All">All</Option>
+              <Option value="Innovation">Innovation</Option>
+              <Option value="Research">Research</Option>
+              <Option value="Development">Development</Option>
+              <Option value="Marketing">Marketing</Option>
+              <Option value="Design">Design</Option>
+            </Select>
+          </Col>
+        </Row>
+
+        <Divider />
+
+        {/* Tableau de projets */}
+        <Card className="mb-4">
+          <Table columns={columns} dataSource={filteredProjects} pagination={false} />
+        </Card>
+
+        {/* Bouton pour créer un nouveau projet */}
+        <Row justify="end">
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push('/keenkonnect/projects/create-new-project')}>
+            Create New Project
+          </Button>
+        </Row>
+      </div>
+    </>
+  );
+
+
+
+export default MyProjects;
+}
+
+===== END app\keenkonnect\projects\my-projects\page.tsx =====
+
+===== BEGIN app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx =====
+'use client'
+
+// pages/keenkonnect/sustainability-impact/submit-impact-reports/index.tsx
+import React, { useState } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Form, Input, Select, DatePicker, InputNumber, Upload, Switch, Button, Modal, message as antdMessage  } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import MainLayout from '@/components/layout-components/MainLayout';
+import { useRouter } from 'next/navigation';
+
+const { RangePicker } = DatePicker;
+const { TextArea } = Input;
+const { Option } = Select;
+
+const SubmitImpactReports = () => {
+  const router = useRouter();
+  const [form] = Form.useForm();
+  
+  // États pour gérer l'upload, la soumission, et la modal de confirmation
+  const [submitting, setSubmitting] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  // Flag pour déterminer si le rapport doit être sauvegardé en brouillon (true) ou soumis final (false)
+  const [saveAsDraft, setSaveAsDraft] = useState(true);
+
+  // Fonction simulant l'upload et la soumission
+  const onFinish = async (values: any) => {
+    setSubmitting(true);
+    console.log('Submitted values:', values);
+    // Simuler un appel API d'une durée de 1,5 seconde
+    setTimeout(() => {
+      setSubmitting(false);
+      setModalVisible(true);
+    }, 1500);
+
+  const handleModalOk = () => {
+    setModalVisible(false);
+    // Rediriger vers la page Track Project Impact après soumission
+    router.push('/keenkonnect/sustainability-impact/track-project-impact');
+
+  return (
+    <>
+      <Head>
+        <title>Submit Impact Reports</title>
+        <meta name="description" content="Submit a new impact report for your project." />
+      </Head>
+      <div className="container mx-auto p-5">
+        <h1 className="text-2xl font-bold mb-4">Submit Impact Reports</h1>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
+          {/* Sélecteur du projet */}
+          <Form.Item
+            name="project"
+            label="Select Project"
+            rules={[{ required: true, message: 'Please select a project' }]}
+          >
+            <Select placeholder="Select project">
+              <Option value="Project Alpha">Project Alpha</Option>
+              <Option value="Project Beta">Project Beta</Option>
+              <Option value="Project Gamma">Project Gamma</Option>
+            </Select>
+          </Form.Item>
+
+          {/* Période de rapport */}
+          <Form.Item
+            name="reportingPeriod"
+            label="Reporting Period"
+            rules={[{ required: true, message: 'Please select the reporting period' }]}
+          >
+            <RangePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          {/* Impact metrics */}
+          <Form.Item
+            name="peopleAffected"
+            label="Number of People Affected"
+            rules={[{ required: true, message: 'Please enter the number of people affected' }]}
+          >
+            <InputNumber style={{ width: '100%' }} min={0} placeholder="Enter number" />
+          </Form.Item>
+
+          <Form.Item
+            name="co2Reduction"
+            label="CO2 Reduction (tons)"
+            rules={[{ required: true, message: 'Please enter the CO2 reduction in tons' }]}
+          >
+            <InputNumber style={{ width: '100%' }} min={0} placeholder="Enter value" />
+          </Form.Item>
+
+          {/* Description narrative */}
+          <Form.Item
+            name="narrative"
+            label="Impact Description"
+            rules={[{ required: true, message: 'Please provide a description of the impact achieved' }]}
+          >
+            <TextArea rows={4} placeholder="Provide a narrative description..." />
+          </Form.Item>
+
+          {/* Upload des preuves */}
+          <Form.Item
+            name="evidence"
+            label="Attach Evidence or Data Files"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+          >
+            <Upload beforeUpload={() => false} listType="text">
+              <Button icon={<UploadOutlined />}>Upload File</Button>
+            </Upload>
+          </Form.Item>
+
+          {/* Option de sauvegarde en brouillon */}
+          <Form.Item
+            name="saveDraft"
+            label="Save as Draft"
+            valuePropName="checked"
+            initialValue={true}
+          >
+            <Switch
+              checkedChildren="Draft"
+              unCheckedChildren="Submit Final"
+              onChange={(checked) => setSaveAsDraft(checked)}
+            />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={submitting}>
+              Submit Report
+            </Button>
+          </Form.Item>
+        </Form>
+
+        {/* Modal de confirmation */}
+        <Modal
+          title="Report Submitted"
+          open={modalVisible}
+          onOk={handleModalOk}
+          onCancel={handleModalOk}
+          footer={[
+            <Button key="ok" type="primary" onClick={handleModalOk}>
+              OK
+            </Button>,
+          ]}
+        >
+          <p>Your impact report has been successfully submitted.</p>
+        </Modal>
+      </div>
+    </>
+  );
+
+
+
+export default SubmitImpactReports;
+}}}
+
+===== END app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx =====
+
+===== BEGIN app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx =====
+'use client';
+
+// File: app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
+import React, { useMemo } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Card, Row, Col, Statistic, Table, Select, Divider } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import MainLayout from '@/components/layout-components/MainLayout';
+import {
+  PieChart as RePieChart,
+  Pie,
+  Cell,
+  Legend,
+  ResponsiveContainer,
+  Tooltip as ReTooltip,
+} from 'recharts';
+
+const { Option } = Select;
+
+/* -------------------------------
+ * Données simulées
+ * ------------------------------- */
+
+// Statistiques globales
+const globalStats = {
+  totalCO2Saved: 50000,       // en kilogrammes
+  totalVolunteerHours: 1200,  // en heures
+  totalProjects: 45,
+};
+
+// Répartition d’impact (donut)
+const impactDistribution = [
+  { name: 'Environmental', value: 55 },
+  { name: 'Social', value: 30 },
+  { name: 'Economic', value: 15 },
+];
+
+const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+
+// Données pour le leaderboard (liste de projets par impact)
+interface LeaderboardEntry {
+  key: string;
+  projectName: string;
+  impactScore: number;
+  co2Saved: number;
+  volunteerHours: number;
+}
+
+const leaderboardData: LeaderboardEntry[] = [
+  { key: '1', projectName: 'Project Alpha', impactScore: 95, co2Saved: 15000, volunteerHours: 300 },
+  { key: '2', projectName: 'Project Beta', impactScore: 88, co2Saved: 12000, volunteerHours: 250 },
+  { key: '3', projectName: 'Project Gamma', impactScore: 82, co2Saved: 10000, volunteerHours: 200 },
+  { key: '4', projectName: 'Project Delta', impactScore: 78, co2Saved: 8000, volunteerHours: 180 },
+  { key: '5', projectName: 'Project Epsilon', impactScore: 75, co2Saved: 7000, volunteerHours: 170 },
+];
+
+// Colonnes pour le leaderboard
+const columns: ColumnsType<LeaderboardEntry> = [
+  { title: 'Project Name', dataIndex: 'projectName', key: 'projectName' },
+  { title: 'Impact Score', dataIndex: 'impactScore', key: 'impactScore' },
+  { title: 'CO2 Saved (kg)', dataIndex: 'co2Saved', key: 'co2Saved' },
+  { title: 'Volunteer Hours', dataIndex: 'volunteerHours', key: 'volunteerHours' },
+];
+
+// Filtres supplémentaires (simulés)
+const regions = ['All', 'North America', 'Europe', 'Asia'];
+const categories = ['All', 'Environmental', 'Social', 'Economic'];
+
+const SustainabilityDashboard: NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+} = () => {
+  // États de filtres (ici décoratifs)
+  const [selectedRegion, setSelectedRegion] = React.useState('All');
+  const [selectedCategory, setSelectedCategory] = React.useState('All');
+
+  // Filtrage simulé
+  const filteredLeaderboard = useMemo(() => {
+    // Ajouter une vraie logique si nécessaire (region / category)
+    return leaderboardData;
+  }, [selectedRegion, selectedCategory]);
+
+  return (
+    <>
+      <Head>
+        <title>Sustainability Dashboard</title>
+        <meta
+          name="description"
+          content="High-level dashboard aggregating sustainability impact across projects."
+        />
+      </Head>
+
+      <div className="container mx-auto p-5">
+        {/* En-tête */}
+        <h1 className="text-2xl font-bold mb-4">Sustainability Dashboard</h1>
+
+        {/* Filtres */}
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col xs={24} sm={12}>
+            <Select
+              value={selectedRegion}
+              onChange={(value) => setSelectedRegion(value)}
+              style={{ width: '100%' }}
+            >
+              {regions.map((region) => (
+                <Option key={region} value={region}>
+                  {region}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+          <Col xs={24} sm={12}>
+            <Select
+              value={selectedCategory}
+              onChange={(value) => setSelectedCategory(value)}
+              style={{ width: '100%' }}
+            >
+              {categories.map((cat) => (
+                <Option key={cat} value={cat}>
+                  {cat}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+        </Row>
+
+        <Divider />
+
+        {/* Statistiques globales */}
+        <Row gutter={16} className="mb-6">
+          <Col xs={24} sm={8}>
+            <Card>
+              <Statistic title="Total CO2 Saved (kg)" value={globalStats.totalCO2Saved} />
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card>
+              <Statistic title="Total Volunteer Hours" value={globalStats.totalVolunteerHours} />
+            </Card>
+          </Col>
+          <Col xs={24} sm={8}>
+            <Card>
+              <Statistic title="Total Projects" value={globalStats.totalProjects} />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Donut: Impact Distribution */}
+        <Card className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Impact Distribution</h2>
+          <div style={{ width: '100%', height: 300 }}>
+            <ResponsiveContainer>
+              <RePieChart>
+                <ReTooltip />
+                <Legend verticalAlign="bottom" height={36} />
+                <Pie
+                  data={impactDistribution}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                >
+                  {impactDistribution.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={PIE_COLORS[index % PIE_COLORS.length]}
+                    />
+                  ))}
+                </Pie>
+              </RePieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        {/* Leaderboard */}
+        <Card className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Top Projects by Impact</h2>
+          <Table
+            columns={columns}
+            dataSource={filteredLeaderboard}
+            pagination={{ pageSize: 5 }}
+          />
+        </Card>
+      </div>
+    </>
+  );
+};
+
+// Mise en page (si utilisée dans ton app)
+SustainabilityDashboard.getLayout = (page: React.ReactElement) => (
+  <MainLayout>{page}</MainLayout>
+);
+
+export default SustainabilityDashboard;
+
+===== END app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx =====
+
+===== BEGIN app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx =====
+﻿import React from 'react';
+import { NextPage } from 'next';
+import { Form, Checkbox, Select, Button, Alert, Divider } from 'antd';
+import PageContainer from '@/components/PageContainer';
+// MainLayout retiré car non utilisé
+
+const { Option } = Select;
+
+const ManageExpertiseAreas: NextPage = () => {
+  const [form] = Form.useForm();
+
+  // Données initiales : expertises déjà sélectionnées par l'utilisateur
+  const currentExpertiseInitial: string[] = ['Frontend Development', 'UI/UX Design'];
+
+  // Liste complète des domaines d'expertise disponibles
+  const expertiseOptions: string[] = [
+    'Frontend Development',
+    'Backend Development',
+    'UI/UX Design',
+    'Data Science',
+    'DevOps',
+    'Mobile Development',
+    'QA',
+    'Project Management',
+  ];
+
+  // Gestion de la soumission : intégration d'une API ou logique de mise à jour
+  const onFinish = (values: any) => {
+    console.log('Updated Expertise Areas:', values);
+    // Traitement complémentaire
+  };
+
+  return (
+    <PageContainer title="Manage Expertise Areas">
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          currentExpertise: currentExpertiseInitial,
+          newExpertise: [],
+        }}
+        onFinish={onFinish}
+      >
+        {/* Liste des expertises actuelles */}
+        <Form.Item label="Current Expertise Areas" name="currentExpertise">
+          <Checkbox.Group>
+            {expertiseOptions.map((option) => (
+              <Checkbox key={option} value={option}>
+                {option}
+              </Checkbox>
+            ))}
+          </Checkbox.Group>
+        </Form.Item>
+
+        <Divider />
+
+        {/* Sélecteur pour ajouter de nouvelles expertises */}
+        <Form.Item
+          label="Add New Expertise Area"
+          name="newExpertise"
+          tooltip="Adding an expertise area will require validation through contributions."
+        >
+          <Select mode="multiple" placeholder="Select new expertise areas to add" allowClear>
+            {expertiseOptions
+              .filter((opt) => !currentExpertiseInitial.includes(opt))
+              .map((option) => (
+                <Option key={option} value={option}>
+                  {option}
+                </Option>
+              ))}
+          </Select>
+        </Form.Item>
+
+        {/* Message informatif */}
+        <Alert
+          message="Note: Adding an expertise will require validation through contributions."
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+
+        {/* Bouton pour sauvegarder */}
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Save Changes
+          </Button>
+        </Form.Item>
+      </Form>
+    </PageContainer>
+  );
+};
+
+export default ManageExpertiseAreas;
+
+===== END app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx =====
+
+===== BEGIN app\konnected\certifications\exam-dashboard-results\page.tsx =====
+'use client'
+
+// File: /pages/konnected/certifications/exam-dashboard-results.tsx
+import React, { useState } from 'react';
+// (Optionnel) Si tu veux garder NextPage, tu peux l'importer :
+// import { NextPage } from 'next';
+import {
+  Card,
+  Statistic,
+  Table,
+  Drawer,
+  Button,
+  Typography,
+  Row,
+  Col,
+  List,
+  Alert,
+} from 'antd';
+import { EyeOutlined, FilePdfOutlined } from '@ant-design/icons';
+import PageContainer from '@/components/PageContainer';
+import MainLayout from '@/components/layout-components/MainLayout';
+
+const { Text } = Typography;
+
+// Interface pour représenter une tentative d'examen
+interface ExamResult {
+  id: string;
+  examName: string;
+  dateTaken: string;
+  score: number;
+  result: 'Pass' | 'Fail';
+  details: string; // Description détaillée ou récapitulatif
+}
+
+// Examen à venir (si l'utilisateur est inscrit)
+const upcomingExam = {
+  examName: 'Certification Exam Level 1',
+  examDate: '2023-10-10 10:00',
+  status: 'Registered',
+}; // <-- fermeture manquante ajoutée
+
+// Historique des examens réalisés
+const examResultsData: ExamResult[] = [
+  {
+    id: '1',
+    examName: 'Certification Exam Level 1',
+    dateTaken: '2023-08-10',
+    score: 78,
+    result: 'Pass',
+    details:
+      'Score global de 78%. Excellente performance en théorie, à améliorer en pratique.',
+  },
+  {
+    id: '2',
+    examName: 'Certification Exam Level 1',
+    dateTaken: '2023-07-05',
+    score: 65,
+    result: 'Fail',
+    details:
+      'Score global de 65%. Points faibles identifiés en gestion des situations critiques.',
+  },
+];
+
+// Exemples de certificats obtenus
+const certificationsEarned = [
+  { id: 'cert1', title: 'Certification Exam Level 1', pdfLink: '#' },
+  { id: 'cert2', title: 'Advanced Certification Exam', pdfLink: '#' },
+];
+
+export default function ExamDashboardResults() {
+  // État pour gérer le Drawer de détail d'une tentative d'examen
+  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
+  const [selectedExam, setSelectedExam] = useState<ExamResult | null>(null);
+
+  // Définition des colonnes du tableau
+  const columns = [
+    {
+      title: 'Exam Name',
+      dataIndex: 'examName',
+      key: 'examName',
+    },
+    {
+      title: 'Date Taken',
+      dataIndex: 'dateTaken',
+      key: 'dateTaken',
+    },
+    {
+      title: 'Score',
+      dataIndex: 'score',
+      key: 'score',
+      render: (score: number) => `${score}%`,
+    },
+    {
+      title: 'Result',
+      dataIndex: 'result',
+      key: 'result',
+      render: (result: ExamResult['result']) => (
+        <Text strong style={{ color: result === 'Pass' ? 'green' : 'red' }}>
+          {result}
+        </Text>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_: any, record: ExamResult) => (
+        <Button
+          type="link"
+          icon={<EyeOutlined />}
+          onClick={() => {
+            setSelectedExam(record);
+            setDrawerVisible(true);
+          }}
+        >
+          View Details
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <MainLayout>
+      <PageContainer title="Exam Dashboard & Results">
+        {/* Section Examen à venir */}
+        {upcomingExam && (
+          <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={8}>
+                <Text strong>Exam:</Text> {upcomingExam.examName}
+              </Col>
+              <Col xs={24} md={8}>
+                <Text strong>Date:</Text> {upcomingExam.examDate}
+              </Col>
+              <Col xs={24} md={8}>
+                <Text strong>Status:</Text> {upcomingExam.status}
+              </Col>
+            </Row>
+          </Card>
+        )}
+
+        {/* Section Résumé des résultats pour le dernier examen terminé */}
+        {examResultsData.length > 0 && (
+          <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
+            <Row gutter={16}>
+              <Col xs={24} md={12}>
+                <Statistic
+                  title="Score Achieved"
+                  value={examResultsData[0].score}
+                  suffix="%"
+                />
+              </Col>
+              <Col xs={24} md={12}>
+                <Statistic
+                  title="Result"
+                  value={examResultsData[0].result}
+                  valueStyle={{
+                    color:
+                      examResultsData[0].result === 'Pass'
+                        ? '#3f8600'
+                        : '#cf1322',
+                  }}
+                />
+              </Col>
+            </Row>
+          </Card>
+        )}
+
+        {/* Tableau historique des examens */}
+        <Card title="Exam History" style={{ marginBottom: 24 }}>
+          <Table
+            columns={columns}
+            dataSource={examResultsData}
+            rowKey="id"
+            pagination={{ pageSize: 5 }}
+          />
+        </Card>
+
+        {/* Liste des certifications obtenues */}
+        <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
+          <List
+            dataSource={certificationsEarned ?? []}
+            renderItem={(item) => (
+              <List.Item
+                actions={[
+                  <Button key="dl" icon={<FilePdfOutlined />} type="link">
+                    Download
+                  </Button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={item.title}
+                  description={`Certificate ID: ${item.id}`}
+                />
+              </List.Item>
+            )}
+          />
+        </Card>
+
+        {/* Section Prochaines Étapes */}
+        <Card>
+          <Alert
+            message="Next Steps: Explore further certification programs to advance your career."
+            type="info"
+            showIcon
+          />
+          <div style={{ marginTop: 16 }}>
+            <Button type="primary" href="/konnected/certifications/programs">
+              Certification Programs
+            </Button>
+          </div>
+        </Card>
+
+        {/* Drawer pour détailler l'examen sélectionné */}
+        <Drawer
+          title="Exam Details"
+          placement="right"
+          onClose={() => setDrawerVisible(false)}
+          open={drawerVisible}
+        >
+          {selectedExam && (
+            <>
+              <p>
+                <strong>Exam Name:</strong> {selectedExam.examName}
+              </p>
+              <p>
+                <strong>Date Taken:</strong> {selectedExam.dateTaken}
+              </p>
+              <p>
+                <strong>Score:</strong> {selectedExam.score}%
+              </p>
+              <p>
+                <strong>Result:</strong>{' '}
+                <Text
+                  strong
+                  style={{
+                    color: selectedExam.result === 'Pass' ? 'green' : 'red',
+                  }}
+                >
+                  {selectedExam.result}
+                </Text>
+              </p>
+              <p>
+                <strong>Details:</strong>
+              </p>
+              <p>{selectedExam.details}</p>
+            </>
+          )}
+        </Drawer>
+      </PageContainer>
+    </MainLayout>
+  );
+}
+
+===== END app\konnected\certifications\exam-dashboard-results\page.tsx =====
+
+===== BEGIN app\konnected\community-discussions\moderation\page.tsx =====
+﻿'use client';
+
+import React, { useState, useMemo } from 'react';
+import { NextPage } from 'next';
+import { Table, Tabs, Tag, Button, Space, Modal, message as antdMessage } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import PageContainer from '@/components/PageContainer';
+
+const { TabPane } = Tabs;
+const { confirm } = Modal;
+
+interface ModerationItem {
+  id: string;
+  contentSnippet: string;
+  author: string;
+  reportReason: string;
+  date: string;
+  status: 'Pending' | 'Approved' | 'Flagged';
+  queue: 'Reported' | 'PendingApproval';
+}
+
+const dummyModerationItems: ModerationItem[] = [
+  {
+    id: '1',
+    contentSnippet: 'Ce post contient des propos inappropriés sur…',
+    author: 'John Doe',
+    reportReason: 'Propos inappropriés',
+    date: '2025-12-01 15:30',
+    status: 'Pending',
+    queue: 'Reported',
+  },
+  {
+    id: '2',
+    contentSnippet: "Nouvelle discussion sur les méthodes d'enseignement…",
+    author: 'Alice Smith',
+    reportReason: '',
+    date: '2025-12-01 14:00',
+    status: 'Pending',
+    queue: 'PendingApproval',
+  },
+  {
+    id: '3',
+    contentSnippet: 'Ce thread a été signalé pour spam ou contenu indésirable.',
+    author: 'Bob Johnson',
+    reportReason: 'Spam',
+    date: '2025-11-30 18:45',
+    status: 'Pending',
+    queue: 'Reported',
+  },
+  {
+    id: '4',
+    contentSnippet: 'Discussion ouverte sur la nouvelle réforme éducative…',
+    author: 'Carol Lee',
+    reportReason: '',
+    date: '2025-12-01 16:20',
+    status: 'Pending',
+    queue: 'PendingApproval',
+  },
+];
+
+const ModerationPage: NextPage = () => {
+  // Onglet actif : "Reported" ou "PendingApproval"
+  const [activeTab, setActiveTab] = useState<'Reported' | 'PendingApproval'>('Reported');
+
+  // Filtrage selon l’onglet actif
+  const filteredItems = useMemo(
+    () => dummyModerationItems.filter((item) => item.queue === activeTab),
+    [activeTab],
+  );
+
+  // Actions modération
+  const handleApprove = (item: ModerationItem) => {
+    antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." approved.`);
+    // TODO: appel API d’approbation
+  };
+
+  const handleFlagUser = (item: ModerationItem) => {
+    antdMessage.warning(`User ${item.author} has been flagged/warned.`);
+    // TODO: appel API de signalement
+  };
+
+  const handleDelete = (item: ModerationItem) => {
+    confirm({
+      title: 'Confirmer la suppression',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.',
+      okText: 'Supprimer',
+      okType: 'danger',
+      cancelText: 'Annuler',
+      onOk() {
+        antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." deleted.`);
+        // TODO: appel API de suppression
+      },
+    });
+  };
+
+  // Colonnes du tableau
+  const columns = [
+    {
+      title: 'Content Snippet',
+      dataIndex: 'contentSnippet',
+      key: 'contentSnippet',
+      render: (text: string) => <span>{text}</span>,
+    },
+    { title: 'Author', dataIndex: 'author', key: 'author' },
+    {
+      title: activeTab === 'Reported' ? 'Report Reason' : 'Note',
+      dataIndex: 'reportReason',
+      key: 'reportReason',
+      render: (text: string) =>
+        text ? <Tag color="volcano">{text}</Tag> : <Tag color="blue">Pending Approval</Tag>,
+    },
+    { title: 'Date', dataIndex: 'date', key: 'date' },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: ModerationItem['status']) =>
+        status === 'Approved' ? <Tag color="green">Approved</Tag> : <Tag color="orange">Pending</Tag>,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: ModerationItem) => (
+        <Space>
+          {record.status === 'Pending' && (
+            <Button size="small" type="primary" onClick={() => handleApprove(record)}>
+              Approve
+            </Button>
+          )}
+          <Button size="small" danger onClick={() => handleDelete(record)}>
+            Delete
+          </Button>
+          {record.queue === 'Reported' && (
+            <Button size="small" onClick={() => handleFlagUser(record)}>
+              Flag User
+            </Button>
+          )}
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <PageContainer title="Moderation">
+      <Tabs
+        defaultActiveKey="Reported"
+        activeKey={activeTab}
+        onChange={(key) => setActiveTab(key as 'Reported' | 'PendingApproval')}
+        type="card"
+        style={{ marginBottom: 24 }}
+      >
+        <TabPane tab="Reported Content" key="Reported" />
+        <TabPane tab="Pending Approval" key="PendingApproval" />
+      </Tabs>
+      <Table columns={columns} dataSource={filteredItems} rowKey="id" pagination={{ pageSize: 5 }} />
+    </PageContainer>
+  );
+};
+
+export default ModerationPage;
+
+===== END app\konnected\community-discussions\moderation\page.tsx =====
+
+===== BEGIN app\konnected\community-discussions\start-new-discussion\page.tsx =====
+﻿'use client'
+
+// File: /pages/konnected/community-discussions/start-new-discussion.tsx
+import React from 'react';
+import { NextPage } from 'next';
+import { Form, Input, Select, Switch, Button, message as antdMessage  } from 'antd';
+import { useRouter } from 'next/navigation';
+import PageContainer from '@/components/PageContainer';
+import MainLayout from '@/components/layout-components/MainLayout';
+
+const { Option } = Select;
+
+const StartNewDiscussion: NextPage = () => {
+  const [form] = Form.useForm();
+  const router = useRouter();
+
+  // Simulation de la soumission : en production, un appel API sera nÃ©cessaire pour crÃ©er le thread.
+  const onFinish = (values: any) => {
+    console.log('New Discussion Data:', values);
+    antdMessage.success('Votre discussion a Ã©tÃ© crÃ©Ã©e avec succÃ¨s !');
+    // Simuler la redirection vers la page de dÃ©tail du thread crÃ©Ã©, par exemple avec l'ID gÃ©nÃ©rÃ©.
+    router.push(`/konnected/community-discussions/thread/123`);
+
+  return (
+    <PageContainer title="Start New Discussion">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          isQuestion: false,
+        }}
+      >
+        <Form.Item
+          label="Title"
+          name="title"
+          rules={[{ required: true, message: 'Veuillez saisir le titre de la discussion.' }]}
+        >
+          <Input placeholder="Entrez le titre de votre discussion" />
+        </Form.Item>
+        
+        <Form.Item
+          label="Content"
+          name="content"
+          rules={[{ required: true, message: 'Veuillez saisir le contenu de la discussion.' }]}
+        >
+          <Input.TextArea rows={6} placeholder="RÃ©digez le contenu de votre discussion ici..." />
+          {/* Vous pouvez intÃ©grer ici un Ã©diteur riche (ex: React Quill) pour un contenu formatÃ© */}
+        </Form.Item>
+        
+        <Form.Item
+          label="Category"
+          name="category"
+          rules={[{ required: true, message: 'Veuillez sÃ©lectionner une catÃ©gorie.' }]}
+        >
+          <Select placeholder="Choisissez une catÃ©gorie">
+            <Option value="Math">Math</Option>
+            <Option value="Science">Science</Option>
+            <Option value="General">General</Option>
+            {/* Ajoutez d'autres catÃ©gories selon vos besoins */}
+          </Select>
+        </Form.Item>
+        
+        <Form.Item label="Is this a question?" name="isQuestion" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+        
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Post Discussion
+          </Button>
+        </Form.Item>
+      </Form>
+    </PageContainer>
+  );
+
+
+  return <MainLayout>{page}</MainLayout>;
+
+export default StartNewDiscussion;
+}}
+
+===== END app\konnected\community-discussions\start-new-discussion\page.tsx =====
+
+===== BEGIN app\konnected\learning-library\browse-resources\page.tsx =====
+'use client'
+
+// pages/konnected/learning-library/browse-resources/index.tsx
+import React, { useState, useMemo } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Table, Input, Select, Row, Col, Card, Divider, Tag, Button } from 'antd';
+import MainLayout from '@/components/layout-components/MainLayout';
+import { useRouter } from 'next/navigation';
+
+const { Search } = Input;
+const { Option } = Select;
+
+interface Resource {
+  key: string;
+  title: string;
+  subject: string;
+  level: string; // ex. Beginner, Intermediate, Advanced
+  language: string;
+  resourceType: string; // document, video, quiz, etc.
+  rating: number; // sur 5
+}
+
+// Exemple de données simulées pour les ressources
+const sampleResources: Resource[] = [
+  {
+    key: '1',
+    title: 'Introduction to Robotics',
+    subject: 'Robotics',
+    level: 'Beginner',
+    language: 'English',
+    resourceType: 'Video',
+    rating: 4,
+  },
+  {
+    key: '2',
+    title: 'Advanced Healthcare Protocols',
+    subject: 'Healthcare',
+    level: 'Advanced',
+    language: 'French',
+    resourceType: 'Document',
+    rating: 5,
+  },
+  {
+    key: '3',
+    title: 'Machine Learning Fundamentals',
+    subject: 'Technology',
+    level: 'Intermediate',
+    language: 'English',
+    resourceType: 'Article',
+    rating: 4,
+  },
+  {
+    key: '4',
+    title: 'Sustainable Energy Solutions',
+    subject: 'Energy',
+    level: 'Beginner',
+    language: 'English',
+    resourceType: 'Video',
+    rating: 3,
+  },
+  {
+    key: '5',
+    title: 'Design Thinking Essentials',
+    subject: 'Design',
+    level: 'Intermediate',
+    language: 'English',
+    resourceType: 'Quiz',
+    rating: 4,
+  },
+];
+
+const BrowseResources = () => {
+  const router = useRouter();
+  const [searchText, setSearchText] = useState('');
+  const [subjectFilter, setSubjectFilter] = useState('All');
+  const [levelFilter, setLevelFilter] = useState('All');
+  const [languageFilter, setLanguageFilter] = useState('All');
+
+  // Filtrage des ressources selon les critères saisis
+  const filteredResources = useMemo(() => {
+    return sampleResources.filter(resource => {
+      const matchesSearch = searchText === '' || resource.title.toLowerCase().includes(searchText.toLowerCase()) || resource.resourceType.toLowerCase().includes(searchText.toLowerCase());
+      const matchesSubject = subjectFilter === 'All' || resource.subject === subjectFilter;
+      const matchesLevel = levelFilter === 'All' || resource.level === levelFilter;
+      const matchesLanguage = languageFilter === 'All' || resource.language === languageFilter;
+      return matchesSearch && matchesSubject && matchesLevel && matchesLanguage;
+    });
+  }, [searchText, subjectFilter, levelFilter, languageFilter]);
+
+  // Définition des colonnes du tableau
+  const columns = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+      render: (text: string, record: Resource) => (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          {/* Affichage d'une icône indicative selon le type de ressource */}
+          {record.resourceType === 'Video' && <Tag color="blue">🎥</Tag>}
+          {record.resourceType === 'Document' && <Tag color="green">📄</Tag>}
+          {record.resourceType === 'Quiz' && <Tag color="purple">❓</Tag>}
+          {record.resourceType === 'Article' && <Tag color="orange">📰</Tag>}
+          <span style={{ marginLeft: 8 }}>{text}</span>
+        </div>
+      ),
+    },
+    {
+      title: 'Subject',
+      dataIndex: 'subject',
+      key: 'subject',
+    },
+    {
+      title: 'Level',
+      dataIndex: 'level',
+      key: 'level',
+    },
+    {
+      title: 'Language',
+      dataIndex: 'language',
+      key: 'language',
+    },
+    {
+      title: 'Rating',
+      dataIndex: 'rating',
+      key: 'rating',
+      render: (rating, row) => `${rating} / 5`,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_: any, record: Resource) => (
+        <Button type="link" onClick={() => router.push(`/konnected/learning-library/resource/${record.key}`)}>
+          Open
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <Head>
+        <title>Browse Resources</title>
+        <meta name="description" content="Browse and search for educational content in the learning library." />
+      </Head>
+      <div className="container mx-auto p-5">
+        <h1 className="text-2xl font-bold mb-4">Browse Resources</h1>
+        
+        {/* Barre de recherche et filtres */}
+        <Card className="mb-4">
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+              <Search placeholder="Search resources" allowClear onSearch={(value) => setSearchText(value)} />
+            </Col>
+            <Col xs={24} sm={4}>
+              <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setSubjectFilter(value)}>
+                <Option value="All">All Subjects</Option>
+                <Option value="Robotics">Robotics</Option>
+                <Option value="Healthcare">Healthcare</Option>
+                <Option value="Technology">Technology</Option>
+                <Option value="Energy">Energy</Option>
+                <Option value="Design">Design</Option>
+              </Select>
+            </Col>
+            <Col xs={24} sm={4}>
+              <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setLevelFilter(value)}>
+                <Option value="All">All Levels</Option>
+                <Option value="Beginner">Beginner</Option>
+                <Option value="Intermediate">Intermediate</Option>
+                <Option value="Advanced">Advanced</Option>
+              </Select>
+            </Col>
+            <Col xs={24} sm={4}>
+              <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setLanguageFilter(value)}>
+                <Option value="All">All Languages</Option>
+                <Option value="English">English</Option>
+                <Option value="French">French</Option>
+                {/* Ajoutez d'autres langues si nécessaire */}
+              </Select>
+            </Col>
+          </Row>
+        </Card>
+
+        <Divider />
+
+        {/* Table des ressources */}
+        <Card>
+          <Table
+            dataSource={filteredResources}
+            columns={columns}
+            pagination={{ pageSize: 5 }}
+          />
+        </Card>
+      </div>
+    </>
+  );
+
+
+
+export default BrowseResources;
+}
+
+===== END app\konnected\learning-library\browse-resources\page.tsx =====
+
+===== BEGIN app\konnected\learning-library\search-filters\page.tsx =====
+'use client'
+
+// pages/konnected/learning-library/search-filters/index.tsx
+import React, { useState, useMemo } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Form, Input, DatePicker, Select, Slider, Button, Table, Row, Col, Card, Divider } from 'antd';
+import MainLayout from '@/components/layout-components/MainLayout';
+import dayjs from 'dayjs';
+
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+
+interface Resource {
+  key: string;
+  title: string;
+  author: string;
+  subject: string;
+  resourceType: string; // Document, Video, Quiz, etc.
+  difficulty: number;   // Niveau de difficulté (1 à 5)
+  createdAt: string;    // Date de publication
+  rating: number;       // sur 5
+}
+
+// Exemple de données simulées pour les ressources
+const sampleResources: Resource[] = [
+  {
+    key: '1',
+    title: 'Introduction to Robotics',
+    author: 'Alice',
+    subject: 'Robotics',
+    resourceType: 'Video',
+    difficulty: 2,
+    createdAt: '2023-09-01',
+    rating: 4,
+  },
+  {
+    key: '2',
+    title: 'Advanced Healthcare Protocols',
+    author: 'Bob',
+    subject: 'Healthcare',
+    resourceType: 'Document',
+    difficulty: 5,
+    createdAt: '2023-08-28',
+    rating: 5,
+  },
+  {
+    key: '3',
+    title: 'Machine Learning Fundamentals',
+    author: 'Charlie',
+    subject: 'Technology',
+    resourceType: 'Article',
+    difficulty: 3,
+    createdAt: '2023-09-03',
+    rating: 4,
+  },
+  {
+    key: '4',
+    title: 'Sustainable Energy Solutions',
+    author: 'Diana',
+    subject: 'Energy',
+    resourceType: 'Video',
+    difficulty: 1,
+    createdAt: '2023-08-20',
+    rating: 3,
+  },
+  {
+    key: '5',
+    title: 'Design Thinking Essentials',
+    author: 'Edward',
+    subject: 'Design',
+    resourceType: 'Quiz',
+    difficulty: 4,
+    createdAt: '2023-08-25',
+    rating: 4,
+  },
+];
+
+const SearchFilters = () => {
+  // États pour les filtres de recherche
+  const [keyword, setKeyword] = useState('');
+  const [authorFilter, setAuthorFilter] = useState<string>('');
+  const [dateRange, setDateRange] = useState<[any, any] | null>(null);
+  const [subjectFilter, setSubjectFilter] = useState<string[]>([]);
+  const [resourceTypeFilter, setResourceTypeFilter] = useState<string[]>([]);
+  const [difficultyRange, setDifficultyRange] = useState<[number, number]>([1, 5]);
+  const [sortCriteria, setSortCriteria] = useState<string>('relevance');
+
+  // Filtrage des ressources selon les valeurs des filtres
+  const filteredResources = useMemo(() => {
+    return sampleResources.filter(resource => {
+      // Filtre de recherche par titre et auteur
+      const matchesKeyword =
+        keyword === '' ||
+        resource.title.toLowerCase().includes(keyword.toLowerCase()) ||
+        resource.author.toLowerCase().includes(keyword.toLowerCase());
+      // Filtre auteur (si renseigné séparément)
+      const matchesAuthor = authorFilter === '' || resource.author.toLowerCase().includes(authorFilter.toLowerCase());
+      // Filtre date
+      let matchesDate = true;
+      if (dateRange && dateRange[0] && dateRange[1]) {
+        const resourceDate = dayjs(resource.createdAt);
+        matchesDate = resourceDate.isAfter(dateRange[0]) && resourceDate.isBefore(dateRange[1]);
+      }
+      // Filtre par sujet
+      const matchesSubject = subjectFilter.length === 0 || subjectFilter.includes(resource.subject);
+      // Filtre par type de ressource
+      const matchesResourceType = resourceTypeFilter.length === 0 || resourceTypeFilter.includes(resource.resourceType);
+      // Filtre par niveau de difficulté
+      const matchesDifficulty = resource.difficulty >= difficultyRange[0] && resource.difficulty <= difficultyRange[1];
+
+      return matchesKeyword && matchesAuthor && matchesDate && matchesSubject && matchesResourceType && matchesDifficulty;
+    });
+  }, [keyword, authorFilter, dateRange, subjectFilter, resourceTypeFilter, difficultyRange]);
+
+  // Définition des colonnes pour le tableau des résultats
+  const columns = [
+    { title: 'Title', dataIndex: 'title', key: 'title' },
+    { title: 'Author', dataIndex: 'author', key: 'author' },
+    { title: 'Subject', dataIndex: 'subject', key: 'subject' },
+    { title: 'Type', dataIndex: 'resourceType', key: 'resourceType' },
+    { title: 'Difficulty', dataIndex: 'difficulty', key: 'difficulty' },
+    { title: 'Created At', dataIndex: 'createdAt', key: 'createdAt' },
+    { title: 'Rating', dataIndex: 'rating', key: 'rating' },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (_: any, record: Resource) => (
+        <Button type="link" onClick={() => window.location.href = `/konnected/learning-library/resource/${record.key}`}>
+          Open
+        </Button>
+      ),
+    },
+  ];
+
+  return (
+    <>
+      <Head>
+        <title>Search & Filters</title>
+        <meta name="description" content="Advanced search interface with detailed filters for learning resources." />
+      </Head>
+      <div className="container mx-auto p-5">
+        <h1 className="text-2xl font-bold mb-4">Search & Filters</h1>
+        
+        {/* Formulaire de recherche avancée */}
+        <Card className="mb-6">
+          <Form layout="vertical">
+            <Row gutter={[16, 16]}>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Keywords">
+                  <Input
+                    placeholder="Search by title or author"
+                    allowClear
+                    onChange={(e) => setKeyword(e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Author">
+                  <Input
+                    placeholder="Filter by author"
+                    allowClear
+                    onChange={(e) => setAuthorFilter(e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Date Range">
+                  <RangePicker onChange={(dates) => setDateRange(dates as any)} style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Subjects">
+                  <Select mode="multiple" placeholder="Select subjects" allowClear onChange={(value) => setSubjectFilter(value)}>
+                    <Option value="Robotics">Robotics</Option>
+                    <Option value="Healthcare">Healthcare</Option>
+                    <Option value="Technology">Technology</Option>
+                    <Option value="Energy">Energy</Option>
+                    <Option value="Design">Design</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Resource Type">
+                  <Select mode="multiple" placeholder="Select type(s)" allowClear onChange={(value) => setResourceTypeFilter(value)}>
+                    <Option value="Document">Document</Option>
+                    <Option value="Video">Video</Option>
+                    <Option value="Article">Article</Option>
+                    <Option value="Quiz">Quiz</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Difficulty">
+                  <Slider
+                    range
+                    min={1}
+                    max={5}
+                    defaultValue={[1, 5]}
+                    onChange={(value: [number, number]) => setDifficultyRange(value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item label="Sort By">
+                  <Select defaultValue="relevance" onChange={(value) => setSortCriteria(value)}>
+                    <Option value="relevance">Relevance</Option>
+                    <Option value="date">Newest</Option>
+                    <Option value="rating">Highest Rated</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
+            <Button type="primary" onClick={() => { /* les filtres s'appliquent en temps réel grâce aux hooks */ }}>
+              Apply Filters
+            </Button>
+          </Form>
+        </Card>
+
+        <Divider />
+
+        {/* Résultats de la recherche */}
+        <Card>
+          <Table dataSource={filteredResources} columns={columns} pagination={{ pageSize: 5 }} />
+        </Card>
+      </div>
+    </>
+  );
+
+
+
+export default SearchFilters;
+}
+
+===== END app\konnected\learning-library\search-filters\page.tsx =====
+
+===== BEGIN app\konnected\learning-paths\manage-existing-paths\page.tsx =====
+﻿'use client'
+
+// File: /pages/konnected/learning-paths/manage-existing-paths.tsx
+import React, { useState } from 'react';
+import { NextPage } from 'next';
+import {
+  Table,
+  Button,
+  Modal,
+  Typography,
+  Input,
+  Space,
+  Empty,
+  message as antdMessage,
+} from 'antd';
+import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import PageContainer from '@/components/PageContainer';
+
+const { Title } = Typography;
+const { Search } = Input;
+
+interface LearningPath {
+  id: string;
+  title: string;
+  lastUpdated: string;
+  status: 'Published' | 'Draft';
+}
+
+const initialPaths: LearningPath[] = [
+  {
+    id: '1',
+    title: 'Introduction to Programming',
+    lastUpdated: '2023-09-15',
+    status: 'Published',
+  },
+  {
+    id: '2',
+    title: 'Advanced Web Development',
+    lastUpdated: '2023-08-10',
+    status: 'Draft',
+  },
+  // Ajoutez d'autres parcours selon les besoins
+];
+
+const ManageExistingPaths: NextPage = () => {
+  const [paths, setPaths] = useState<LearningPath[]>(initialPaths);
+  const [searchText, setSearchText] = useState<string>('');
+
+  // Filtrage des parcours selon le texte de recherche
+  const filteredPaths = paths.filter((path) =>
+    path.title.toLowerCase().includes(searchText.toLowerCase())
+  );
+
+  // Gestion de la suppression d'un parcours
+  const handleDelete = (id: string) => {
+    Modal.confirm({
+      title: 'Confirm Deletion',
+      content: 'Are you sure you want to delete this learning path?',
+      okType: 'danger',
+      onOk: () => {
+        setPaths(paths.filter((path) => path.id !== id));
+        antdMessage.success('Learning path deleted successfully');
+      },
+    });
+  };
+
+  // Colonnes du tableau
+  const columns = [
+    {
+      title: 'Path Title',
+      dataIndex: 'title',
+      key: 'title',
+    },
+    {
+      title: 'Last Updated',
+      dataIndex: 'lastUpdated',
+      key: 'lastUpdated',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: LearningPath) => (
+        <Space>
+          <Button
+            icon={<EditOutlined />}
+            type="link"
+            onClick={() => {
+              // Redirection vers la page d’édition (ex: /learning-paths/edit/[id])
+              window.location.href = `/learning-paths/edit/${record.id}`;
+            }}
+          >
+            Edit
+          </Button>
+          <Button
+            icon={<DeleteOutlined />}
+            type="link"
+            danger
+            onClick={() => handleDelete(record.id)}
+          >
+            Delete
+          </Button>
+        </Space>
+      ),
+    },
+  ];
+
+  return (
+    <PageContainer title="Manage Existing Paths">
+      {/* Titre affiché en plus si tu veux conserver Typography */}
+      <Title level={4} style={{ marginBottom: 16 }}>Manage Existing Paths</Title>
+
+      <div
+        style={{
+          marginBottom: 24,
+          display: 'flex',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Search
+          placeholder="Search by path name"
+          onChange={(e) => setSearchText(e.target.value)}
+          style={{ width: 300 }}
+        />
+        <Button type="primary" icon={<PlusOutlined />} href="/learning-paths/create">
+          Create New Path
+        </Button>
+      </div>
+
+      {filteredPaths.length > 0 ? (
+        <Table
+          dataSource={filteredPaths}
+          columns={columns}
+          rowKey="id"
+          pagination={{ pageSize: 5 }}
+        />
+      ) : (
+        <Empty description="No learning paths found.">
+          <Button type="primary" href="/learning-paths/create">
+            Create New Path
+          </Button>
+        </Empty>
+      )}
+    </PageContainer>
+  );
+};
+
+export default ManageExistingPaths;
+
+===== END app\konnected\learning-paths\manage-existing-paths\page.tsx =====
+
+===== BEGIN app\konnected\learning-paths\my-learning-path\page.tsx =====
+'use client'
+
+// pages/konnected/learning-paths/my-learning-path/index.tsx
+import React, { useState } from 'react';
+import Head from 'next/head';
+import type { NextPage } from 'next';
+import { Card, Steps, Progress, Button, Typography, Empty } from 'antd';
+import { useRouter } from 'next/navigation';
+import MainLayout from '@/components/layout-components/MainLayout';
+
+const { Title, Paragraph } = Typography;
+const { Step } = Steps;
+
+interface Lesson {
+  id: string;
+  name: string;
+  completed: boolean;
+}
+
+interface LearningPath {
+  id: string;
+  title: string;
+  description: string;
+  progress: number;
+  lessons: Lesson[];
+}
+
+// Exemple de données simulées pour un parcours d'apprentissage
+const sampleLearningPath: LearningPath = {
+  id: '1',
+  title: 'Beginner Web Development',
+  description:
+    'A comprehensive path to learn web development from scratch. You will start with HTML and CSS and move on to JavaScript and modern frameworks.',
+  progress: 40, // Pourcentage de progression
+  lessons: [
+    { id: '1', name: 'HTML Basics', completed: true },
+    { id: '2', name: 'CSS Fundamentals', completed: true },
+    { id: '3', name: 'Introduction to JavaScript', completed: false },
+    { id: '4', name: 'Responsive Design', completed: false },
+    { id: '5', name: 'Basic React', completed: false },
+  ],
+};
+
+const MyLearningPath: NextPage & {
+  getLayout?: (page: React.ReactElement) => React.ReactNode;
+} = () => {
+  const router = useRouter();
+  // Dans cet exemple, nous partons du principe que l'utilisateur suit un parcours,
+  // sinon, on pourra passer learningPath à null pour afficher un message d'invitation.
+  const [learningPath] = useState<LearningPath | null>(sampleLearningPath);
+
+  // Fonction pour naviguer vers la leçon sélectionnée
+  const goToLesson = (lessonId: string) => {
+    router.push(`/konnected/learning-library/lesson/${lessonId}`);
+  };
+
+  return (
+    <>
+      <Head>
+        <title>My Learning Path</title>
+        <meta
+          name="description"
+          content="View your current learning path and track your progress."
+        />
+      </Head>
+      <div className="container mx-auto p-5">
+        <Title level={2}>My Learning Path</Title>
+        {learningPath ? (
+          <>
+            {/* Informations générales sur le parcours */}
+            <Card className="mb-4">
+              <Title level={4}>{learningPath.title}</Title>
+              <Paragraph>{learningPath.description}</Paragraph>
+            </Card>
+
+            {/* Progression globale */}
+            <Card className="mb-4">
+              <Title level={5}>Overall Progress</Title>
+              <Progress percent={learningPath.progress} status="active" />
+            </Card>
+
+            {/* Liste des modules/leçons du parcours */}
+            <Card>
+              <Title level={5}>Your Lessons</Title>
+              <Steps direction="vertical">
+                {learningPath.lessons.map((lesson, index) => (
+                  <Step
+                    key={lesson.id}
+                    title={lesson.name}
+                    status={
+                      lesson.completed
+                        ? 'finish'
+                        : index === learningPath.lessons.findIndex((l) => !l.completed)
+                        ? 'process'
+                        : 'wait'
+                    }
+                    description={
+                      <Button type="link" onClick={() => goToLesson(lesson.id)}>
+                        Go to Lesson
+                      </Button>
+                    }
+                  />
+                ))}
+              </Steps>
+            </Card>
+          </>
+        ) : (
+          <Empty description="You are not enrolled in any learning path yet. Explore our available learning paths to get started." />
+        )}
+      </div>
+    </>
+  );
+};
+
+MyLearningPath.getLayout = (page: React.ReactElement) => (
+  <MainLayout>{page}</MainLayout>
+);
+
+export default MyLearningPath;
+
+===== END app\konnected\learning-paths\my-learning-path\page.tsx =====
+
+===== BEGIN app\konnected\teams-collaboration\my-teams\page.tsx =====
+﻿'use client';
+import React from 'react';
+import type { NextPage } from 'next';
+import { Table, Button, Avatar, List, Menu, Dropdown, Typography, Space } from 'antd';
+import { SettingOutlined, DownOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import PageContainer from '@/components/PageContainer';
+
+const { Text, Title } = Typography;
+
+interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  avatar: string;
+}
+
+interface Team {
+  id: string;
+  teamName: string;
+  role: 'Leader' | 'Member';
+  membersCount: number;
+  recentActivity: string[];
+  roster: TeamMember[];
+}
+
+const teamsData: Team[] = [
+  {
+    id: 'team1',
+    teamName: 'Alpha Innovators',
+    role: 'Leader',
+    membersCount: 5,
+    recentActivity: [
+      'John joined the team',
+      'Meeting scheduled for 14:00',
+      'Project milestone completed',
+    ],
+    roster: [
+      { id: 'm1', name: 'John Doe', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
+      { id: 'm2', name: 'Alice Smith', role: 'Member', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
+      { id: 'm3', name: 'Bob Johnson', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
+      { id: 'm4', name: 'Eve Davis', role: 'Member', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' },
+      { id: 'm5', name: 'Charlie Brown', role: 'Leader', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' },
+    ],
+  },
+  {
+    id: 'team2',
+    teamName: 'Beta Coders',
+    role: 'Member',
+    membersCount: 8,
+    recentActivity: ['New repository added', 'Bug fixes deployed', 'Code review completed'],
+    roster: [
+      { id: 'm6', name: 'Diana Prince', role: 'Leader', avatar: 'https://randomuser.me/api/portraits/women/6.jpg' },
+      { id: 'm7', name: 'Bruce Wayne', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/7.jpg' },
+      { id: 'm8', name: 'Clark Kent', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/8.jpg' },
+      // ... autres membres si besoin
+    ],
+  },
+];
+
+const TeamsCollaboration: NextPage = () => {
+  const teamActionsMenu = (
+    <Menu>
+      <Menu.Item key="settings">
+        <a href="#">Manage Team Settings</a>
+      </Menu.Item>
+      <Menu.Item key="invite">
+        <a href="#">Invite New Member</a>
+      </Menu.Item>
+    </Menu>
+  );
+
+  const columns = [
+    {
+      title: 'Team Name',
+      dataIndex: 'teamName',
+      key: 'teamName',
+      render: (text: string, record: Team) => (
+        <Space>
+          <span>{text}</span>
+          {record.role === 'Leader' && (
+            <Text type="success" strong>
+              (Leader)
+            </Text>
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      key: 'role',
+    },
+    {
+      title: 'Members',
+      dataIndex: 'membersCount',
+      key: 'membersCount',
+    },
+    {
+      title: 'Recent Activity',
+      dataIndex: 'recentActivity',
+      key: 'recentActivity',
+      render: (activities: string[]) => (
+        <List
+          dataSource={activities.slice(0, 2) ?? []}
+          renderItem={(activity) => (
+            <List.Item style={{ padding: 0 }}>
+              <Text type="secondary">{activity}</Text>
+            </List.Item>
+          )}
+          size="small"
+        />
+      ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_: any, record: Team) =>
+        record.role === 'Leader' ? (
+          <Dropdown overlay={teamActionsMenu}>
+            <a onClick={(e) => e.preventDefault()}>
+              <Space>
+                Actions <DownOutlined />
+              </Space>
+            </a>
+          </Dropdown>
+        ) : null,
+    },
+  ];
+
+  const expandedRowRender = (record: Team) => (
+    <div style={{ padding: '16px 24px', background: '#fafafa' }}>
+      <Title level={5}>Team Roster</Title>
+      <List
+        grid={{ gutter: 16, column: 4 }}
+        dataSource={record.roster ?? []}
+        renderItem={(member: TeamMember) => (
+          <List.Item>
+            <Space direction="vertical" align="center">
+              <Avatar src={member.avatar} size={48} />
+              <Text>{member.name}</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {member.role}
+              </Text>
+            </Space>
+          </List.Item>
+        )}
+      />
+      <br />
+      <Title level={5}>Recent Activity Log</Title>
+      <List
+        dataSource={record.recentActivity ?? []}
+        renderItem={(activity) => (
+          <List.Item>
+            <Text>{activity}</Text>
+          </List.Item>
+        )}
+        size="small"
+      />
+    </div>
+  );
+
+  return (
+    <PageContainer title="My Teams">
+      <div style={{ marginBottom: 24, textAlign: 'right' }}>
+        <Button
+          type="primary"
+          icon={<UsergroupAddOutlined />}
+          href="/konnected/teams-collaboration/team-builder"
+        >
+          Team Builder
+        </Button>
+      </div>
+      <Table
+        columns={columns}
+        dataSource={teamsData}
+        rowKey="id"
+        expandable={{ expandedRowRender }}
+        pagination={{ pageSize: 5 }}
+        rowClassName={(record: Team) => (record.role === 'Leader' ? 'team-leader-row' : '')}
+      />
+      <style jsx>{`
+        .team-leader-row {
+          background-color: #f6ffed;
+        }
+      `}</style>
+    </PageContainer>
+  );
+};
+
+export default TeamsCollaboration;
+
+===== END app\konnected\teams-collaboration\my-teams\page.tsx =====
+
+===== BEGIN app\kreative\community-showcases\submit-to-showcase\page.tsx =====
+'use client'
+
+// File: /pages/kreative/community-showcases/submit-to-showcase.tsx
+import React, { useState } from 'react';
+import { NextPage } from 'next';
+import { Form, Input, Select, Button, Modal, message as antdMessage  } from 'antd';
+import { useRouter } from 'next/navigation';
+import PageContainer from '@/components/PageContainer';
+import MainLayout from '@/components/layout-components/MainLayout';
+
+
+const { TextArea } = Input;
+const { Option } = Select;
+
+const SubmitToShowcase: NextPage = () => {
+  const [form] = Form.useForm();
+  const router = useRouter();
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Dummy data representing the user's existing projects.
+  const projectOptions = [
+    { id: 'p1', name: 'Project Sunrise' },
+    { id: 'p2', name: 'Digital Dreamscape' },
+    { id: 'p3', name: 'Urban Poetry' },
+  ];
+
+  // Handle form submission.
+  const onFinish = (values: any) => {
+    console.log('Submitted values:', values);
+    // Here you would typically submit values to your API.
+    setModalVisible(true);
+
+  // Handle modal confirmation.
+  const handleModalOk = () => {
+    antdMessage.success('Your project has been submitted for review.');
+    setModalVisible(false);
+    // Redirect to the featured projects page or the user's submissions.
+    router.push('/kreative/community-showcases/featured-projects');
+
+  return (
+    <PageContainer title="Submit to Showcase">
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{
+          showcaseCategory: 'General',
+        }}
+      >
+        {/* Project Selection */}
+        <Form.Item
+          label="Select Project"
+          name="projectId"
+          rules={[{ required: true, message: 'Please select a project to submit.' }]}
+        >
+          <Select placeholder="Choose a project">
+            {projectOptions.map((project) => (
+              <Option key={project.id} value={project.id}>
+                {project.name}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        {/* Showcase Category (Optional) */}
+        <Form.Item
+          label="Showcase Category"
+          name="showcaseCategory"
+          rules={[{ required: true, message: 'Please select a showcase category.' }]}
+        >
+          <Select placeholder="Select a category">
+            <Option value="General">General</Option>
+            <Option value="Art">Art</Option>
+            <Option value="Music">Music</Option>
+            <Option value="Digital">Digital</Option>
+          </Select>
+        </Form.Item>
+
+        {/* Justification Field */}
+        <Form.Item
+          label="Justification / Description"
+          name="justification"
+          rules={[{ required: true, message: 'Please provide a justification for your submission.' }]}
+        >
+          <TextArea
+            rows={5}
+            placeholder="Explain why your project is showcase-worthy and provide context for our curators."
+          />
+        </Form.Item>
+
+        {/* Submit Button */}
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Submit Nomination
+          </Button>
+        </Form.Item>
+      </Form>
+      {/* Confirmation Modal */}
+      <Modal
+        title="Submission Received"
+        open={modalVisible}
+        onOk={handleModalOk}
+        onCancel={() => setModalVisible(false)}
+        okText="Ok"
+        cancelButtonProps={{ style: { display: 'none' } }}
+      >
+        <p>Your project has been submitted for review. Moderators will evaluate your submission shortly.</p>
+      </Modal>
+    </PageContainer>
+  );
+
+
+  return <MainLayout>{page}</MainLayout>;
+
+export default SubmitToShowcase;
+}}}
+
+===== END app\kreative\community-showcases\submit-to-showcase\page.tsx =====
+
+===== BEGIN app\kreative\creative-hub\submit-creative-work\page.tsx =====
+'use client';
+
+// File: /pages/kreative/creative-hub/submit-creative-work.tsx
+import React, { useState } from 'react';
+import type { NextPage } from 'next';
+import {
+  Form,
+  Input,
+  Select,
+  Upload,
+  Button,
+  Alert,
+  message as antdMessage,
+} from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/router';
+import PageContainer from '@/components/PageContainer';
+
+const { TextArea } = Input;
+const { Option } = Select;
+
+const SubmitCreativeWork: NextPage = () => {
+  const [form] = Form.useForm();
+  const router = useRouter();
+  const [fileList, setFileList] = useState<any[]>([]);
+
+  const handleUploadChange = (info: any) => {
+    setFileList([...info.fileList]);
+  };
+
+  const onFinish = (values: any) => {
+    const creativeWorkData = {
+      ...values,
+      file: fileList,
+    };
+    console.log('Submitted Creative Work:', creativeWorkData);
+    antdMessage.success(
+      "Votre œuvre créative a été soumise avec succès et est en attente d'approbation!"
+    );
+    router.push('/kreative/creative-hub/inspiration-gallery');
+  };
+
+  return (
+    <PageContainer title="Submit Creative Work">
+      <Alert
+        message="Please Note"
+        description="File size limit is 5MB. Accepted formats are JPG, PNG for images, MP4 for videos, and MP3 for audio."
+        type="info"
+        showIcon
+        style={{ marginBottom: 24 }}
+      />
+
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        initialValues={{ category: 'Illustration' }}
+      >
+        <Form.Item
+          label="Title of the Work"
+          name="title"
+          rules={[{ required: true, message: 'Veuillez saisir le titre de votre œuvre.' }]}
+        >
+          <Input placeholder="Entrez le titre de votre œuvre créative" />
+        </Form.Item>
+
+        <Form.Item
+          label="Description or Story Behind the Work"
+          name="description"
+          rules={[{ required: true, message: 'Veuillez fournir une description ou une histoire.' }]}
+        >
+          <TextArea rows={5} placeholder="Décrivez votre œuvre et partagez son histoire..." />
+        </Form.Item>
+
+        <Form.Item
+          label="Category / Medium"
+          name="category"
+          rules={[{ required: true, message: 'Veuillez sélectionner une catégorie.' }]}
+        >
+          <Select placeholder="Sélectionnez le type de contenu">
+            <Option value="Illustration">Illustration</Option>
+            <Option value="Photography">Photography</Option>
+            <Option value="Music">Music</Option>
+            <Option value="Video">Video</Option>
+            <Option value="Digital Art">Digital Art</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          label="Upload Creative File"
+          name="creativeFile"
+          rules={[{ required: true, message: 'Veuillez télécharger un fichier pour votre œuvre.' }]}
+        >
+          <Upload
+            beforeUpload={() => false}
+            fileList={fileList}
+            onChange={handleUploadChange}
+            accept="image/*,video/*,audio/*"
+          >
+            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+          </Upload>
+        </Form.Item>
+
+        <Form.Item label="Credits / Tools Used (Optional)" name="credits">
+          <Input placeholder="Exemple: Adobe Photoshop, Procreate, etc." />
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit">
+            Submit Work
+          </Button>
+        </Form.Item>
+      </Form>
+    </PageContainer>
+  );
+};
+
+export default SubmitCreativeWork;
+
+===== END app\kreative\creative-hub\submit-creative-work\page.tsx =====

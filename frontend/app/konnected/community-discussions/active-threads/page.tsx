@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 // File: /pages/konnected/community-discussions/active-threads.tsx
 import React, { useState, useMemo } from 'react';
@@ -34,12 +34,12 @@ interface Thread {
   threadType: 'question' | 'discussion';
 }
 
-// Données simulées pour les threads
+// DonnÃ©es simulÃ©es pour les threads
 const dummyThreads: Thread[] = [
   {
     id: 't1',
     title: 'How to solve quadratic equations?',
-    snippet: 'I’m struggling with solving quadratic equations. Can anyone explain...',
+    snippet: 'Iâ€™m struggling with solving quadratic equations. Can anyone explain...',
     author: 'Alice',
     repliesCount: 15,
     lastActivity: '2025-12-01 14:30',
@@ -49,7 +49,7 @@ const dummyThreads: Thread[] = [
   {
     id: 't2',
     title: 'The impact of climate change on ecosystems',
-    snippet: 'Let’s discuss how various ecosystems are being affected by the recent...',
+    snippet: 'Letâ€™s discuss how various ecosystems are being affected by the recent...',
     author: 'Bob',
     repliesCount: 8,
     lastActivity: '2025-12-01 10:15',
@@ -59,7 +59,7 @@ const dummyThreads: Thread[] = [
   {
     id: 't3',
     title: 'Study tips for final exams',
-    snippet: 'I’d like to share some study tips and ask for suggestions for better...',
+    snippet: 'Iâ€™d like to share some study tips and ask for suggestions for better...',
     author: 'Carol',
     repliesCount: 22,
     lastActivity: '2025-11-30 18:45',
@@ -88,7 +88,7 @@ const ActiveThreadsPage: NextPage = () => {
 
   // Filtrage et tri des threads
   const filteredThreads = useMemo(() => {
-    let threads = [...dummyThreads]; // copie pour éviter la mutation
+    let threads = [...dummyThreads]; // copie pour Ã©viter la mutation
     if (selectedCategory !== 'All') {
       threads = threads.filter((t) => t.category === selectedCategory);
     }
@@ -115,7 +115,7 @@ const ActiveThreadsPage: NextPage = () => {
     return filteredThreads.slice(startIndex, startIndex + pageSize);
   }, [filteredThreads, currentPage, pageSize]);
 
-  // Fonction de clic sur un thread (redirection vers la page de détail)
+  // Fonction de clic sur un thread (redirection vers la page de dÃ©tail)
   const openThread = (thread: Thread) => {
     console.log('Ouvrir le thread:', thread.title);
     // Exemple de redirection : Router.push(`/konnected/community-discussions/thread/${thread.id}`);

@@ -1,15 +1,10 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/workspaces/my-workspaces/index.tsx
-import React, { useState, useMemo } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
+import React, { useMemo, useState } from 'react';
 import { Card, List, Button, Badge, Row, Col, Select, Divider, Typography } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
 import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
 interface Workspace {
   id: string;
@@ -17,10 +12,9 @@ interface Workspace {
   project: string;
   status: 'active' | 'inactive';
   description: string;
-  environment: string; // Ex: "Python environment", "Design whiteboard"
+  environment: string; // e.g. "Python environment", "Design whiteboard"
 }
 
-// Données simulées pour les workspaces
 const sampleWorkspaces: Workspace[] = [
   {
     id: '1',
@@ -56,113 +50,97 @@ const sampleWorkspaces: Workspace[] = [
   },
 ];
 
-const MyWorkspaces = () => {
+export default function MyWorkspaces() {
   const router = useRouter();
 
-  // État pour le filtre par projet
+  // Filter by project
   const [selectedProject, setSelectedProject] = useState<string>('All');
 
-  // Filtrage des workspaces selon le projet sélectionné
   const filteredWorkspaces = useMemo(() => {
     if (selectedProject === 'All') return sampleWorkspaces;
-    return sampleWorkspaces.filter(ws => ws.project === selectedProject);
+    return sampleWorkspaces.filter((ws) => ws.project === selectedProject);
   }, [selectedProject]);
 
-  // Calcul du nombre de workspaces actifs
-  const activeCount = useMemo(() => {
-    return sampleWorkspaces.filter(ws => ws.status === 'active').length;
-  }, []);
+  const activeCount = useMemo(
+    () => sampleWorkspaces.filter((ws) => ws.status === 'active').length,
+    []
+  );
 
-  // Liste des projets disponibles (unique)
   const projectOptions = useMemo(() => {
-    const projects = Array.from(new Set(sampleWorkspaces.map(ws => ws.project)));
+    const projects = Array.from(new Set(sampleWorkspaces.map((ws) => ws.project)));
     return ['All', ...projects];
   }, []);
 
-  // Gestion des actions sur un workspace
   const handleWorkspaceAction = (ws: Workspace) => {
-    // Selon le statut, redirigez ou lancez une action
-    if (ws.status === 'active') {
-      router.push(`/keenkonnect/workspaces/launch-workspace?id=${ws.id}`);
-    } else {
-      router.push(`/keenkonnect/workspaces/launch-workspace?id=${ws.id}`);
-    }
+    // Use the real route that exists in your app
+    router.push(`/keenkonnect/workspaces/launch-new-workspace?id=${ws.id}`);
+  };
 
   const handleManageSettings = (ws: Workspace) => {
-    router.push(`/keenkonnect/workspaces/manage-workspace?id=${ws.id}`);
+    // Reuse the same page and flag "manage" to avoid 404s until a settings page exists
+    router.push(`/keenkonnect/workspaces/launch-new-workspace?id=${ws.id}&manage=1`);
+  };
 
   return (
-    <>
-      <Head>
-        <title>My Workspaces</title>
-        <meta name="description" content="View and manage your interactive workspaces on KeenKonnect." />
-      </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de page */}
-        <Title level={2}>My Workspaces</Title>
-        <Divider />
+    <div className="container mx-auto p-5">
+      <Title level={2}>My Workspaces</Title>
+      <Divider />
 
-        {/* Résumé des workspaces actifs */}
-        <Row gutter={[16, 16]} className="mb-4">
-          <Col>
-            <Text strong>Total Active Workspaces: {activeCount}</Text>
-          </Col>
-        </Row>
+      <Row gutter={[16, 16]} className="mb-4">
+        <Col>
+          <Text strong>Total Active Workspaces: {activeCount}</Text>
+        </Col>
+      </Row>
 
-        {/* Filtres */}
-        <Row gutter={[16, 16]} className="mb-4">
-          <Col xs={24} sm={12}>
-            <Text>Filter by Project:</Text>
-            <Select
-              value={selectedProject}
-              onChange={(value) => setSelectedProject(value)}
-              style={{ width: '100%' }}
+      <Row gutter={[16, 16]} className="mb-4">
+        <Col xs={24} sm={12}>
+          <Text>Filter by Project:</Text>
+          <Select
+            value={selectedProject}
+            onChange={(value) => setSelectedProject(value)}
+            style={{ width: '100%' }}
+            options={projectOptions.map((p) => ({ label: p, value: p }))}
+          />
+        </Col>
+      </Row>
+
+      <Divider />
+
+      <List
+        grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
+        dataSource={filteredWorkspaces}
+        renderItem={(workspace: Workspace) => (
+          <List.Item key={workspace.id}>
+            <Card
+              hoverable
+              title={workspace.name}
+              extra={
+                workspace.status === 'active' ? (
+                  <Badge status="success" text="Active" />
+                ) : (
+                  <Badge status="default" text="Inactive" />
+                )
+              }
             >
-              {projectOptions.map((project) => (
-                <Option key={project} value={project}>{project}</Option>
-              ))}
-            </Select>
-          </Col>
-        </Row>
-        <Divider />
-
-        {/* Liste des workspaces */}
-        <List
-          grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-          dataSource={filteredWorkspaces ?? []}
-          renderItem={(workspace: Workspace) => (
-            <List.Item key={workspace.id}>
-              <Card
-                hoverable
-                title={workspace.name}
-                extra={
-                  workspace.status === 'active' ? (
-                    <Badge status="success" text="Active" />
-                  ) : (
-                    <Badge status="default" text="Inactive" />
-                  )
-                }
-              >
-                <p><strong>Project:</strong> {workspace.project}</p>
-                <p><strong>Description:</strong> {workspace.description}</p>
-                <p><strong>Environment:</strong> {workspace.environment}</p>
-                <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between' }}>
-                  <Button type="primary" onClick={() => handleWorkspaceAction(workspace)}>
-                    {workspace.status === 'active' ? 'Join Now' : 'Launch'}
-                  </Button>
-                  <Button onClick={() => handleManageSettings(workspace)}>
-                    Manage Settings
-                  </Button>
-                </div>
-              </Card>
-            </List.Item>
-          )}
-        />
-      </div>
-    </>
+              <p>
+                <strong>Project:</strong> {workspace.project}
+              </p>
+              <p>
+                <strong>Description:</strong> {workspace.description}
+              </p>
+              <p>
+                <strong>Environment:</strong> {workspace.environment}
+              </p>
+              <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between' }}>
+                <Button type="primary" onClick={() => handleWorkspaceAction(workspace)}>
+                  {workspace.status === 'active' ? 'Join Now' : 'Launch'}
+                </Button>
+                <Button onClick={() => handleManageSettings(workspace)}>Manage Settings</Button>
+              </div>
+            </Card>
+          </List.Item>
+        )}
+      />
+    </div>
   );
-
-
-
-export default MyWorkspaces;
-}}}
+}

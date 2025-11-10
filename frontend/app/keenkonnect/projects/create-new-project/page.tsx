@@ -1,111 +1,164 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/projects/create-new-project/index.tsx
-import React, { useState } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Steps, Button, Form, Input, Select, Upload, Result, message as antdMessage  } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import {
+  Button,
+  Card,
+  Form,
+  Input,
+  Select,
+  Steps,
+  Upload,
+  message as antdMessage,
+  Typography,
+  Space,
+  Divider,
+} from 'antd';
+import type { FormProps } from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
+import {
+  UploadOutlined,
+  ArrowRightOutlined,
+  ArrowLeftOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
+
 import MainLayout from '@/components/layout-components/MainLayout';
-import { normalizeError } from "../../../../shared/errors";
+import { normalizeError } from '@/shared/errors';
 
-const { Step } = Steps;
-const { Option } = Select;
+const { Title, Text } = Typography;
 const { TextArea } = Input;
 
-const CreateNewProject = () => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
-  const [form] = Form.useForm();
+type TeamMember = {
+  name: string;
+  role: string;
+};
 
-  // Stockage des données saisies durant le wizard
-  const [formData, setFormData] = useState({
-    projectName: '',
-    projectDescription: '',
-    category: '',
-    projectImage: null as any,
-    teamMembers: [] as string[],
-  });
+interface ProjectFormData {
+  projectName: string;
+  projectDescription: string;
+  category?: string;
+  projectImage?: UploadFile[]; // image principale (liste contrôlée)
+  teamMembers: TeamMember[];
+  documents?: UploadFile[]; // pièces jointes
+}
 
-  const steps = [
-    { title: 'Project Info' },
-    { title: 'Team Setup' },
-    { title: 'Review' },
-  ];
+function CreateNewProjectPage(): JSX.Element {
+  const router = useRouter();
+  const [form] = Form.useForm<ProjectFormData>();
 
-  // Passage à l'étape suivante après validation
-  const next = async () => {
+  // état global minimal pour le récapitulatif / soumission
+  const [currentStep, setCurrentStep] = useState<number>(0);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  // valeurs initiales (remplace les initialValue éparpillés)
+  const initialValues: ProjectFormData = useMemo(
+    () => ({
+      projectName: '',
+      projectDescription: '',
+      category: undefined,
+      projectImage: [],
+      teamMembers: [{ name: '', role: '' }],
+      documents: [],
+    }),
+    []
+  );
+
+  const steps = useMemo(
+    () => [
+      { key: 'info', title: 'Project Info' },
+      { key: 'team', title: 'Team & Roles' },
+      { key: 'docs', title: 'Documents & Media' },
+      { key: 'summary', title: 'Summary' },
+    ],
+    []
+  );
+
+  // Normalise la valeur d'Upload vers fileList
+  const normFile = (
+    e: { fileList?: UploadFile[] } | UploadFile[] | undefined
+  ): UploadFile[] => {
+    if (!e) return [];
+    return Array.isArray(e) ? e : e.fileList ?? [];
+    // Pas d’upload auto : on laisse beforeUpload={() => false}
+  };
+
+  const goNext = async () => {
+    // On valide les champs visibles (par simplicité on valide tout)
     try {
-      const values = await form.validateFields();
-      setFormData((prev) => ({ ...prev, ...values }));
-      setCurrentStep(currentStep + 1);
-      form.resetFields();
-    } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      antdMessage.error('Please fill in the required fields.');
+      await form.validateFields();
+      setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
+    } catch {
+      // erreurs déjà affichées par antd
     }
+  };
 
-  // Retour à l'étape précédente
-  const prev = () => {
-    setCurrentStep(currentStep - 1);
+  const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
 
-  // Soumission finale du formulaire
-  const onFinish = async () => {
+  const handleSubmit: FormProps<ProjectFormData>['onFinish'] = async (values) => {
+    setSubmitting(true);
     try {
-      const values = await form.validateFields();
-      setFormData((prev) => ({ ...prev, ...values }));
-      // Simulation d'enregistrement du projet.
-      console.log('Project created with values:', { ...formData, ...values });
+      // Ici : appel API/Mutation à votre backend si nécessaire
+      // await api.createProject(values)
+
       setSubmitted(true);
-    } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      antdMessage.error('Please fill in the required fields.');
+      antdMessage.success('Project created successfully');
+    } catch (err) {
+      const { message } = normalizeError(err);
+      antdMessage.error(message ?? 'An unexpected error occurred');
+    } finally {
+      setSubmitting(false);
     }
+  };
 
-  // Rendu du contenu en fonction de l'étape
-  const renderStepContent = (step: number) => {
-    switch (step) {
+  const renderStepFields = (stepIndex: number) => {
+    switch (stepIndex) {
       case 0:
         return (
           <>
             <Form.Item
-              name="projectName"
               label="Project Name"
+              name="projectName"
               rules={[{ required: true, message: 'Please enter project name' }]}
-              initialValue={formData.projectName}
             >
-              <Input placeholder="Enter project name" />
+              <Input placeholder="e.g., Open Carbon Capture Initiative" />
             </Form.Item>
+
             <Form.Item
-              name="projectDescription"
               label="Project Description"
-              rules={[{ required: true, message: 'Please enter project description' }]}
-              initialValue={formData.projectDescription}
+              name="projectDescription"
+              rules={[
+                { required: true, message: 'Please enter a description' },
+                { min: 10, message: 'Please write at least 10 characters' },
+              ]}
             >
-              <TextArea rows={4} placeholder="Enter project description" />
+              <TextArea rows={5} placeholder="What is this project about?" />
             </Form.Item>
-            <Form.Item
-              name="category"
-              label="Category/Domain"
-              rules={[{ required: true, message: 'Please select a category' }]}
-              initialValue={formData.category}
-            >
-              <Select placeholder="Select category">
-                <Option value="Innovation">Innovation</Option>
-                <Option value="Research">Research</Option>
-                <Option value="Development">Development</Option>
-                <Option value="Marketing">Marketing</Option>
-                <Option value="Design">Design</Option>
-              </Select>
+
+            <Form.Item label="Category" name="category">
+              <Select
+                placeholder="Select a category"
+                options={[
+                  { value: 'sustainability', label: 'Sustainability' },
+                  { value: 'education', label: 'Education' },
+                  { value: 'health', label: 'Health' },
+                  { value: 'civic-tech', label: 'Civic Tech' },
+                ]}
+              />
             </Form.Item>
+
             <Form.Item
+              label="Project Image"
               name="projectImage"
-              label="Project Image/Icon"
               valuePropName="fileList"
-              getValueFromEvent={(e) => (Array.isArray(e) ? e : e && e.fileList)}
+              getValueFromEvent={normFile}
+              extra="Upload a representative image for your project"
             >
-              <Upload beforeUpload={() => false} listType="picture">
-                <Button icon={<UploadOutlined />}>Upload Image</Button>
+              <Upload listType="picture" multiple={false} beforeUpload={() => false}>
+                <Button icon={<UploadOutlined />}>Select Image</Button>
               </Upload>
             </Form.Item>
           </>
@@ -113,103 +166,178 @@ const CreateNewProject = () => {
       case 1:
         return (
           <>
-            <Form.Item
-              name="teamMembers"
-              label="Invite Team Members"
-              initialValue={formData.teamMembers}
-            >
-              <Select mode="multiple" placeholder="Select team members">
-                <Option value="Alice">Alice</Option>
-                <Option value="Bob">Bob</Option>
-                <Option value="Charlie">Charlie</Option>
-                <Option value="Diana">Diana</Option>
-              </Select>
-            </Form.Item>
+            <Text type="secondary">
+              Add core team members and define their roles.
+            </Text>
+            <Divider />
+            <Form.List name="teamMembers">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map((field) => (
+                    <Space
+                      key={field.key}
+                      align="baseline"
+                      style={{ display: 'flex', marginBottom: 8 }}
+                    >
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'name']}
+                        fieldKey={[field.fieldKey!, 'name']}
+                        rules={[{ required: true, message: 'Name is required' }]}
+                      >
+                        <Input placeholder="Full name" />
+                      </Form.Item>
+                      <Form.Item
+                        {...field}
+                        name={[field.name, 'role']}
+                        fieldKey={[field.fieldKey!, 'role']}
+                        rules={[{ required: true, message: 'Role is required' }]}
+                      >
+                        <Input placeholder="Role (e.g., Lead Researcher)" />
+                      </Form.Item>
+                      <Button type="link" danger onClick={() => remove(field.name)}>
+                        Remove
+                      </Button>
+                    </Space>
+                  ))}
+                  <Button onClick={() => add()} type="dashed">
+                    Add member
+                  </Button>
+                </>
+              )}
+            </Form.List>
           </>
         );
       case 2:
         return (
+          <>
+            <Form.Item
+              label="Documents & Media"
+              name="documents"
+              valuePropName="fileList"
+              getValueFromEvent={normFile}
+              extra="Attach any relevant documents, briefs, or media files"
+            >
+              <Upload multiple beforeUpload={() => false}>
+                <Button icon={<UploadOutlined />}>Add files</Button>
+              </Upload>
+            </Form.Item>
+          </>
+        );
+      case 3: {
+        const v = form.getFieldsValue(true) as ProjectFormData;
+        return (
           <div>
-            <h3>Review Your Project Details:</h3>
-            <p>
-              <strong>Project Name:</strong> {formData.projectName || 'N/A'}
-            </p>
-            <p>
-              <strong>Description:</strong> {formData.projectDescription || 'N/A'}
-            </p>
-            <p>
-              <strong>Category:</strong> {formData.category || 'N/A'}
-            </p>
-            <p>
-              <strong>Team Members:</strong>{' '}
-              {formData.teamMembers.length > 0 ? formData.teamMembers.join(', ') : 'None'}
-            </p>
-            {formData.projectImage && (
-              <p>
-                <strong>Project Image:</strong> {JSON.stringify(formData.projectImage)}
-              </p>
-            )}
+            <Title level={4}>Summary</Title>
+            <Space direction="vertical" size="small">
+              <div>
+                <Text strong>Name:</Text> <Text>{v.projectName || '—'}</Text>
+              </div>
+              <div>
+                <Text strong>Description:</Text>{' '}
+                <Text>{v.projectDescription || '—'}</Text>
+              </div>
+              <div>
+                <Text strong>Category:</Text> <Text>{v.category || '—'}</Text>
+              </div>
+              <div>
+                <Text strong>Team members:</Text>{' '}
+                <Text>
+                  {Array.isArray(v.teamMembers) && v.teamMembers.length
+                    ? v.teamMembers
+                        .map((m) => [m?.name, m?.role].filter(Boolean).join(' – '))
+                        .join(', ')
+                    : '—'}
+                </Text>
+              </div>
+              <div>
+                <Text strong>Documents:</Text>{' '}
+                <Text>
+                  {Array.isArray(v.documents) && v.documents.length
+                    ? `${v.documents.length} file(s)`
+                    : '—'}
+                </Text>
+              </div>
+            </Space>
           </div>
         );
+      }
       default:
         return null;
     }
-
-  if (submitted) {
-    return (
-      <div className="container mx-auto p-5">
-        <Result
-          status="success"
-          title="Project Created Successfully!"
-          subTitle="Your new project has been created. You can now manage it or invite additional team members."
-          extra={[
-            <Button type="primary" key="dashboard" onClick={() => window.location.href = '/keenkonnect/dashboard'}>
-              Go to Dashboard
-            </Button>,
-          ]}
-        />
-      </div>
-    );
-  }
+  };
 
   return (
-    <>
-      <Head>
-        <title>Create New Project</title>
-        <meta name="description" content="Create a new project using our guided project creation wizard." />
-      </Head>
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Create New Project</h1>
-        <Steps current={currentStep} className="mb-6">
-          {steps.map((item, index) => (
-            <Step key={index} title={item.title} />
-          ))}
-        </Steps>
-        <Form form={form} layout="vertical" initialValues={formData} onFinish={onFinish}>
-          {renderStepContent(currentStep)}
-          <div style={{ marginTop: 24 }}>
-            {currentStep > 0 && (
-              <Button style={{ marginRight: 8 }} onClick={prev}>
-                Back
+    <MainLayout>
+      <Card>
+        <Title level={3} style={{ marginBottom: 16 }}>
+          Create New Project
+        </Title>
+
+        <Steps
+          current={currentStep}
+          items={steps.map((s) => ({ key: s.key, title: s.title }))}
+          style={{ marginBottom: 24 }}
+        />
+
+        {/* Form unique contrôlé sur l’ensemble des étapes */}
+        <Form<ProjectFormData>
+          form={form}
+          layout="vertical"
+          initialValues={initialValues}
+          onFinish={handleSubmit}
+          autoComplete="off"
+        >
+          {renderStepFields(currentStep)}
+
+          <Divider />
+
+          {!submitted ? (
+            <Space>
+              <Button
+                onClick={goPrev}
+                disabled={currentStep === 0}
+                icon={<ArrowLeftOutlined />}
+              >
+                Previous
               </Button>
-            )}
-            {currentStep < steps.length - 1 && (
-              <Button type="primary" onClick={next}>
-                Next
-              </Button>
-            )}
-            {currentStep === steps.length - 1 && (
-              <Button type="primary" htmlType="submit">
-                Submit
-              </Button>
-            )}
-          </div>
+
+              {currentStep < steps.length - 1 ? (
+                <Button
+                  type="primary"
+                  onClick={goNext}
+                  icon={<ArrowRightOutlined />}
+                >
+                  Next
+                </Button>
+              ) : (
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={submitting}
+                  icon={<CheckCircleOutlined />}
+                >
+                  Create Project
+                </Button>
+              )}
+            </Space>
+          ) : (
+            <Space direction="vertical" size="middle">
+              <Text type="success">Project created successfully.</Text>
+              <Space>
+                <Button type="primary" onClick={() => router.push('/keenkonnect/projects/my-projects')}>
+                  Go to My Projects
+                </Button>
+                <Link href="/keenkonnect/projects/create-new-project">
+                  <Button>Create another</Button>
+                </Link>
+              </Space>
+            </Space>
+          )}
         </Form>
-      </div>
-    </>
+      </Card>
+    </MainLayout>
   );
+}
 
-
-
-export default CreateNewProject;
-}}}}}
+export default CreateNewProjectPage;

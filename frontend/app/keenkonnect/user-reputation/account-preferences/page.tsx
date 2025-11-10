@@ -1,9 +1,8 @@
-'use client'
+﻿'use client'
 
-// File: /pages/keenkonnect/user-reputation/account-preferences.tsx
 import React, { useState } from "react";
-import { NextPage } from "next";
-import { Tabs,
+import {
+  Tabs,
   Form,
   Input,
   Button,
@@ -11,58 +10,61 @@ import { Tabs,
   Modal,
   Switch,
   Radio,
-  message as antdMessage
- } from 'antd';
+  message as antdMessage,
+} from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import PageContainer from "@/components/PageContainer";
-// Ajout de l'import de MainLayout pour appliquer le layout global
-import MainLayout from "@/components/layout-components/MainLayout";
 
 const { TabPane } = Tabs;
 
-const AccountPreferencesPage: NextPage = () => {
-  // État pour gérer la visibilité du Modal de suppression de compte
+export default function AccountPreferencesPage() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
-  // Gestion des événements liés au Modal de suppression
+  // Modal handlers
   const showDeleteModal = () => {
     setIsModalVisible(true);
+  };
+
   const handleDeleteCancel = () => {
     setIsModalVisible(false);
+  };
+
   const handleDeleteConfirm = () => {
-    // Ici, vous appellerez éventuellement une API pour la suppression de compte
+    // Appel API éventuel pour suppression de compte
     antdMessage.success("Account deletion requested.");
     setIsModalVisible(false);
+  };
 
-  // Gestion des soumissions de formulaire pour chaque section
+  // Form handlers
   const onFinishProfile = (values: any) => {
     console.log("Profile Info:", values);
     antdMessage.success("Profile info saved.");
+  };
 
   const onFinishSecurity = (values: any) => {
     console.log("Security Info:", values);
     antdMessage.success("Security info saved.");
+  };
 
   const onFinishNotifications = (values: any) => {
     console.log("Notifications Settings:", values);
     antdMessage.success("Notifications settings saved.");
+  };
 
   const onFinishPrivacy = (values: any) => {
     console.log("Privacy Settings:", values);
     antdMessage.success("Privacy settings saved.");
+  };
 
   return (
     <PageContainer title="Account & Preferences">
       <Tabs defaultActiveKey="profile">
-        {/* ===== Section Profile Info ===== */}
+        {/* ===== Profile Info ===== */}
         <TabPane tab="Profile Info" key="profile">
           <Form
             layout="vertical"
             onFinish={onFinishProfile}
-            initialValues={{
-              name: "John Doe",
-              email: "john.doe@example.com",
-            }}
+            initialValues={{ name: "John Doe", email: "john.doe@example.com" }}
           >
             <Form.Item
               label="Name"
@@ -87,7 +89,7 @@ const AccountPreferencesPage: NextPage = () => {
           </Form>
         </TabPane>
 
-        {/* ===== Section Security ===== */}
+        {/* ===== Security ===== */}
         <TabPane tab="Security" key="security">
           <Form layout="vertical" onFinish={onFinishSecurity}>
             <Form.Item
@@ -115,14 +117,13 @@ const AccountPreferencesPage: NextPage = () => {
                     if (!value || getFieldValue("newPassword") === value) {
                       return Promise.resolve();
                     }
-                    return Promise.reject("The two passwords do not match!");
+                    return Promise.reject(new Error("The two passwords do not match!"));
                   },
                 }),
               ]}
             >
               <Input.Password />
             </Form.Item>
-            {/* Vous pouvez ajouter ici des paramètres 2FA si nécessaire */}
             <Form.Item>
               <Button type="primary" htmlType="submit">
                 Save Security Settings
@@ -131,25 +132,17 @@ const AccountPreferencesPage: NextPage = () => {
           </Form>
         </TabPane>
 
-        {/* ===== Section Notifications ===== */}
+        {/* ===== Notifications ===== */}
         <TabPane tab="Notifications" key="notifications">
           <Form
             layout="vertical"
             onFinish={onFinishNotifications}
             initialValues={{ teamInvites: true, emailUpdates: false }}
           >
-            <Form.Item
-              label="Team Invites"
-              name="teamInvites"
-              valuePropName="checked"
-            >
+            <Form.Item label="Team Invites" name="teamInvites" valuePropName="checked">
               <Switch />
             </Form.Item>
-            <Form.Item
-              label="Email Updates"
-              name="emailUpdates"
-              valuePropName="checked"
-            >
+            <Form.Item label="Email Updates" name="emailUpdates" valuePropName="checked">
               <Switch />
             </Form.Item>
             <Form.Item>
@@ -160,7 +153,7 @@ const AccountPreferencesPage: NextPage = () => {
           </Form>
         </TabPane>
 
-        {/* ===== Section Privacy ===== */}
+        {/* ===== Privacy ===== */}
         <TabPane tab="Privacy" key="privacy">
           <Form
             layout="vertical"
@@ -181,7 +174,7 @@ const AccountPreferencesPage: NextPage = () => {
           </Form>
         </TabPane>
 
-        {/* ===== Section Danger Zone ===== */}
+        {/* ===== Danger Zone ===== */}
         <TabPane tab="Danger Zone" key="danger">
           <div
             style={{
@@ -212,10 +205,4 @@ const AccountPreferencesPage: NextPage = () => {
       </Tabs>
     </PageContainer>
   );
-
-// Correction : envelopper la page dans MainLayout via la fonction getLayout
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default AccountPreferencesPage;
-}}}}}}}}
+}

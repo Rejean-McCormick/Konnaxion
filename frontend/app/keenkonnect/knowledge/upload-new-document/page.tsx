@@ -1,168 +1,200 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/knowledge/upload-new-document/index.tsx
 import React, { useState } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Form, Input, Select, Upload, Switch, Button, message as antdMessage, Progress, Result  } from 'antd';
+import { Form, Input, Select, Upload, Switch, Button, message as antdMessage, Progress, Result } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import MainLayout from '@/components/layout-components/MainLayout';
+import type { UploadFile, UploadProps, FormProps } from 'antd';
 import { useRouter } from 'next/navigation';
 
-const { Option } = Select;
 const { TextArea } = Input;
 
-const UploadNewDocument = () => {
-  const [form] = Form.useForm();
+type FormValues = {
+  title: string;
+  description?: string;
+  category?: string;
+  version?: string;
+  language?: string;
+  documentFile?: UploadFile<unknown>[];
+  publishNow?: boolean;
+};
+
+export default function UploadNewDocumentPage() {
+  const [form] = Form.useForm<FormValues>();
   const router = useRouter();
-  
-  const [uploadProgress, setUploadProgress] = useState<number>(0);
-  const [uploading, setUploading] = useState<boolean>(false);
-  const [submitted, setSubmitted] = useState<boolean>(false);
 
-  const handleUploadChange = ({ fileList }: any) => {
-    // Ce callback se contente de conserver le fileList dans le formulaire via antd.
-    return fileList;
+  const [uploadedFileList, setUploadedFileList] = useState<UploadFile<unknown>[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [submitted, setSubmitted] = useState(false);
 
+  // Normalise l’événement Upload -> fileList pour AntD Form
+  const normFile: UploadProps['getValueFromEvent'] = (e) => {
+    if (Array.isArray(e)) return e;
+    return e?.fileList ?? [];
+  };
+
+  const handleUploadChange: UploadProps['onChange'] = ({ fileList }) => {
+    // On garde la liste côté état (affichage) et côté Form (via getValueFromEvent)
+    setUploadedFileList(fileList as UploadFile<unknown>[]);
+  };
+
+  // Simulation d’upload avec progression (remplacer par ton appel API)
   const simulateUpload = () => {
     setUploading(true);
     setUploadProgress(0);
-    
-    // Simuler une progression d'upload
+
     const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
+      setUploadProgress((prev) => {
+        const next = prev + 10;
+        if (next >= 100) {
           clearInterval(interval);
           setUploading(false);
-          antdMessage.success('Document uploaded successfully');
           setSubmitted(true);
+          antdMessage.success('Document uploaded successfully');
           return 100;
         }
-        return prev + 20;
+        return next;
       });
-    }, 500);
+    }, 300);
+  };
 
-  const onFinish = async (values: any) => {
-    console.log('Form values:', values);
-    simulateUpload();
+  const onFinish: FormProps<FormValues>['onFinish'] = async () => {
+    try {
+      simulateUpload();
+      // Exemple : ici tu ferais l'appel à ton backend avec `form.getFieldsValue()`
+      // const payload = form.getFieldsValue();
+      // await api.uploadDocument(payload);
+    } catch {
+      setUploading(false);
+      antdMessage.error('Upload failed');
+    }
+  };
+
+  const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = ({ errorFields }) => {
+    antdMessage.error('Please fix the errors before submitting.');
+    if (errorFields?.[0]?.name) {
+      form.scrollToField(errorFields[0].name);
+    }
+  };
 
   if (submitted) {
     return (
-      <div className="container mx-auto p-5">
-        <Result
-          status="success"
-          title="Document Uploaded Successfully!"
-          subTitle="Your document has been successfully submitted."
-          extra={[
-            <Button type="primary" key="manage" onClick={() => router.push('/keenkonnect/knowledge/document-management')}>
-              Go to Document Management
-            </Button>,
-          ]}
-        />
-      </div>
+      <Result
+        status="success"
+        title="Your document has been uploaded"
+        extra={[
+          <Button
+            key="back"
+            type="primary"
+            onClick={() => router.push('/keenkonnect/knowledge/browse-repository')}
+          >
+            Go to repository
+          </Button>,
+        ]}
+      />
     );
   }
 
   return (
-    <>
-      <Head>
-        <title>Upload New Document</title>
-        <meta name="description" content="Submit a new document to the knowledge repository." />
-      </Head>
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Upload New Document</h1>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
-          {/* Title */}
-          <Form.Item
-            name="title"
-            label="Document Title"
-            rules={[{ required: true, message: 'Please enter a document title' }]}
+    <div style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
+      <h1 style={{ marginBottom: 16 }}>Upload a new document</h1>
+
+      {uploading && (
+        <div style={{ marginBottom: 16 }}>
+          <Progress percent={uploadProgress} status="active" />
+        </div>
+      )}
+
+      <Form<FormValues>
+        form={form}
+        layout="vertical"
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
+        <Form.Item
+          name="title"
+          label="Title"
+          rules={[{ required: true, message: 'Please enter a title' }]}
+        >
+          <Input placeholder="e.g. Sustainable AI Guidelines" />
+        </Form.Item>
+
+        <Form.Item name="description" label="Description">
+          <TextArea rows={4} placeholder="Short description of the document" />
+        </Form.Item>
+
+        <Form.Item name="category" label="Category/Topic">
+          <Select
+            placeholder="Select a category"
+            showSearch
+            optionFilterProp="label"
+            options={[
+              { value: 'Robotics', label: 'Robotics' },
+              { value: 'AI & ML', label: 'AI & ML' },
+              { value: 'Environment', label: 'Environment' },
+              { value: 'Finance', label: 'Finance' },
+            ]}
+          />
+        </Form.Item>
+
+        <Form.Item name="version" label="Version">
+          <Input placeholder="v1.0.0" />
+        </Form.Item>
+
+        <Form.Item name="language" label="Language">
+          <Select
+            placeholder="Select language"
+            showSearch
+            optionFilterProp="label"
+            options={[
+              { value: 'en', label: 'English' },
+              { value: 'fr', label: 'French' },
+              { value: 'es', label: 'Spanish' },
+              { value: 'de', label: 'German' },
+            ]}
+          />
+        </Form.Item>
+
+        <Form.Item
+          name="documentFile"
+          label="Document file"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          rules={[{ required: true, message: 'Please select a file to upload' }]}
+        >
+          <Upload
+            accept=".pdf,.doc,.docx,.txt,.md"
+            beforeUpload={() => false} // on laisse AntD gérer, pas d’upload auto
+            onChange={handleUploadChange}
+            fileList={uploadedFileList as UploadFile[]}
+            maxCount={1}
           >
-            <Input placeholder="Enter document title" />
-          </Form.Item>
+            <Button icon={<UploadOutlined />}>Select file</Button>
+          </Upload>
+        </Form.Item>
 
-          {/* Description */}
-          <Form.Item
-            name="description"
-            label="Description/Abstract"
-            rules={[{ required: true, message: 'Please provide a description' }]}
+        <Form.Item
+          name="publishNow"
+          label="Publish now"
+          valuePropName="checked"
+          initialValue
+        >
+          <Switch />
+        </Form.Item>
+
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={uploading} disabled={uploading}>
+            Upload
+          </Button>
+          <Button
+            style={{ marginLeft: 8 }}
+            onClick={() => router.push('/keenkonnect/knowledge/browse-repository')}
+            disabled={uploading}
           >
-            <TextArea rows={4} placeholder="Enter document description" />
-          </Form.Item>
-
-          {/* Category/Topic */}
-          <Form.Item
-            name="category"
-            label="Category/Topic"
-            rules={[{ required: true, message: 'Please select a category' }]}
-          >
-            <Select placeholder="Select category">
-              <Option value="Robotics">Robotics</Option>
-              <Option value="Healthcare">Healthcare</Option>
-              <Option value="Technology">Technology</Option>
-              <Option value="Energy">Energy</Option>
-              <Option value="Education">Education</Option>
-            </Select>
-          </Form.Item>
-
-          {/* Version */}
-          <Form.Item
-            name="version"
-            label="Version"
-            rules={[{ required: true, message: 'Please enter the document version' }]}
-          >
-            <Input placeholder="e.g. 1.0" />
-          </Form.Item>
-
-          {/* Language */}
-          <Form.Item
-            name="language"
-            label="Language"
-            rules={[{ required: true, message: 'Please select a language' }]}
-          >
-            <Select placeholder="Select language">
-              <Option value="English">English</Option>
-              <Option value="French">French</Option>
-            </Select>
-          </Form.Item>
-
-          {/* File Upload */}
-          <Form.Item
-            name="documentFile"
-            label="Document File"
-            rules={[{ required: true, message: 'Please upload the document file' }]}
-            valuePropName="fileList"
-            getValueFromEvent={handleUploadChange}
-          >
-            <Upload beforeUpload={() => false} listType="picture">
-              <Button icon={<UploadOutlined />}>Upload File</Button>
-            </Upload>
-          </Form.Item>
-
-          {/* Publish Toggle */}
-          <Form.Item name="publishNow" label="Publish Status" initialValue={true} valuePropName="checked">
-            <Switch checkedChildren="Publish Now" unCheckedChildren="Save as Draft" />
-          </Form.Item>
-
-          {/* Bouton de soumission */}
-          <Form.Item>
-            <Button type="primary" htmlType="submit" disabled={uploading}>
-              Submit
-            </Button>
-          </Form.Item>
-        </Form>
-
-        {/* Indicateur de progression lors de l'upload */}
-        {uploading && (
-          <div className="mt-4">
-            <Progress percent={uploadProgress} status="active" />
-          </div>
-        )}
-      </div>
-    </>
+            Cancel
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
-
-
-
-export default UploadNewDocument;
-}}}}
+}

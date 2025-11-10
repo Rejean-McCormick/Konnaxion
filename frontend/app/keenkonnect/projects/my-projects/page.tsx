@@ -1,166 +1,145 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/projects/my-projects/index.tsx
-import React, { useState, useMemo } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Table, Card, Button, Row, Col, Select, Typography, Divider, Space } from 'antd';
+import React, { useMemo, useState } from 'react';
+import { Table, Card, Button, Row, Col, Select, Typography, Divider, Space, Tag } from 'antd';
 import { EyeOutlined, EditOutlined, RocketOutlined, PlusOutlined } from '@ant-design/icons';
-import MainLayout from '@/components/layout-components/MainLayout';
+import type { ColumnsType } from 'antd/es/table';
 import { useRouter } from 'next/navigation';
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 
-// Définition du type d'un projet
+type ProjectStatus = 'draft' | 'active' | 'archived';
+
 interface Project {
-  key: string;
+  id: string;
   name: string;
-  role: 'Owner' | 'Member';
-  status: 'Active' | 'Completed';
-  lastUpdated: string; // date formatée
-  category?: string;
+  owner: string;
+  members: number;
+  status: ProjectStatus;
+  createdAt: string; // ISO date string
 }
 
-// Données simulées pour les projets
-const sampleProjects: Project[] = [
-  { key: '1', name: 'Project Alpha', role: 'Owner', status: 'Active', lastUpdated: '2023-09-01', category: 'Innovation' },
-  { key: '2', name: 'Project Beta', role: 'Member', status: 'Completed', lastUpdated: '2023-08-15', category: 'Research' },
-  { key: '3', name: 'Project Gamma', role: 'Owner', status: 'Active', lastUpdated: '2023-09-03', category: 'Development' },
-  { key: '4', name: 'Project Delta', role: 'Member', status: 'Active', lastUpdated: '2023-08-28', category: 'Marketing' },
-  { key: '5', name: 'Project Epsilon', role: 'Member', status: 'Completed', lastUpdated: '2023-07-30', category: 'Design' },
-];
-
-const MyProjects = () => {
+export default function MyProjectsPage(): JSX.Element {
   const router = useRouter();
-  const [statusFilter, setStatusFilter] = useState<string>('All');
-  const [categoryFilter, setCategoryFilter] = useState<string>('All');
 
-  // Filtrage des projets selon le statut et la catégorie
-  const filteredProjects = useMemo(() => {
-    return sampleProjects.filter((project) => {
-      const statusMatch = statusFilter === 'All' || project.status === statusFilter;
-      const categoryMatch = categoryFilter === 'All' || project.category === categoryFilter;
-      return statusMatch && categoryMatch;
-    });
-  }, [statusFilter, categoryFilter]);
+  // TODO: remplacez par vos données réelles (fetch/SWR, etc.)
+  const [projects] = useState<Project[]>([
+    { id: 'p-1', name: 'Sustainable Plastics', owner: 'Alice', members: 8, status: 'active', createdAt: '2025-08-01' },
+    { id: 'p-2', name: 'AI Team Matching', owner: 'Bob', members: 5, status: 'draft', createdAt: '2025-09-15' },
+    { id: 'p-3', name: 'Energy Dashboard', owner: 'Clara', members: 12, status: 'archived', createdAt: '2025-02-10' },
+  ]);
 
-  // Définition des colonnes du tableau
-  const columns = [
+  const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
+
+  const filtered: Project[] = useMemo(() => {
+    if (statusFilter === 'all') return projects;
+    return projects.filter((p) => p.status === statusFilter);
+  }, [projects, statusFilter]);
+
+  const handleView = (id: string): void => {
+    router.push(`/keenkonnect/projects/${id}`);
+  };
+
+  const handleEdit = (id: string): void => {
+    router.push(`/keenkonnect/projects/${id}/edit`);
+  };
+
+  const handleLaunch = (id: string): void => {
+    router.push(`/keenkonnect/projects/${id}/launch`);
+  };
+
+  const columns: ColumnsType<Project> = [
     {
-      title: 'Project Name',
+      title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (name: string, record: Project) => (
-        <Text strong style={{ cursor: 'pointer' }} onClick={() => router.push(`/keenkonnect/projects/project-workspace?id=${record.key}`)}>
-          {name}
-        </Text>
+      render: (value: string, record: Project): React.ReactNode => (
+        <Space>
+          <Text strong>{value}</Text>
+          <Tag>{record.members} members</Tag>
+        </Space>
       ),
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
+      title: 'Owner',
+      dataIndex: 'owner',
+      key: 'owner',
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (value: ProjectStatus): React.ReactNode => <Tag>{value}</Tag>,
     },
     {
-      title: 'Last Updated',
-      dataIndex: 'lastUpdated',
-      key: 'lastUpdated',
+      title: 'Created',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: any, record: Project) => (
+      render: (_: unknown, record: Project): React.ReactNode => (
         <Space>
-          <Button icon={<EyeOutlined />} size="small" onClick={() => router.push(`/keenkonnect/projects/project-workspace?id=${record.key}`)}>View</Button>
-          <Button icon={<EditOutlined />} size="small" onClick={() => router.push(`/keenkonnect/projects/manage-project?id=${record.key}`)}>Manage</Button>
-          <Button icon={<RocketOutlined />} size="small" onClick={() => router.push(`/keenkonnect/projects/project-workspace?id=${record.key}`)}>Go to Workspace</Button>
+          <Button icon={<EyeOutlined />} onClick={() => handleView(record.id)}>
+            View
+          </Button>
+          <Button icon={<EditOutlined />} onClick={() => handleEdit(record.id)}>
+            Edit
+          </Button>
+          <Button type="primary" icon={<RocketOutlined />} onClick={() => handleLaunch(record.id)}>
+            Launch
+          </Button>
         </Space>
       ),
     },
   ];
 
-  // Calcul du résumé des projets
-  const totalProjects = sampleProjects.length;
-  const activeCount = sampleProjects.filter(proj => proj.status === 'Active').length;
-  const completedCount = sampleProjects.filter(proj => proj.status === 'Completed').length;
-
   return (
-    <>
-      <Head>
-        <title>My Projects</title>
-        <meta name="description" content="View and manage your projects within KeenKonnect." />
-      </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de la page */}
-        <Title level={2}>My Projects</Title>
-        <Divider />
-
-        {/* Résumé des projets */}
-        <Row gutter={16} className="mb-4">
-          <Col xs={24} sm={8}>
-            <Card>
-              <Text strong>Total Projects:</Text> <Text>{totalProjects}</Text>
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Text strong>Active:</Text> <Text>{activeCount}</Text>
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Text strong>Completed:</Text> <Text>{completedCount}</Text>
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Filtres */}
-        <Row gutter={[16, 16]} className="mb-4">
-          <Col xs={24} sm={12}>
-            <Text>Status:</Text>
-            <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setStatusFilter(value)}>
-              <Option value="All">All</Option>
-              <Option value="Active">Active</Option>
-              <Option value="Completed">Completed</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={12}>
-            <Text>Category:</Text>
-            <Select defaultValue="All" style={{ width: '100%' }} onChange={(value) => setCategoryFilter(value)}>
-              <Option value="All">All</Option>
-              <Option value="Innovation">Innovation</Option>
-              <Option value="Research">Research</Option>
-              <Option value="Development">Development</Option>
-              <Option value="Marketing">Marketing</Option>
-              <Option value="Design">Design</Option>
-            </Select>
-          </Col>
-        </Row>
-
-        <Divider />
-
-        {/* Tableau de projets */}
-        <Card className="mb-4">
-          <Table columns={columns} dataSource={filteredProjects} pagination={false} />
-        </Card>
-
-        {/* Bouton pour créer un nouveau projet */}
-        <Row justify="end">
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => router.push('/keenkonnect/projects/create-new-project')}>
+    <div>
+      <Row justify="space-between" align="middle">
+        <Col>
+          <Title level={2}>My Projects</Title>
+        </Col>
+        <Col>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => router.push('/keenkonnect/projects/create-new-project')}
+          >
             Create New Project
           </Button>
+        </Col>
+      </Row>
+
+      <Divider />
+
+      <Card bordered={false}>
+        <Row gutter={[16, 16]} align="middle" style={{ marginBottom: 16 }}>
+          <Col>
+            <Text>Status:</Text>
+          </Col>
+          <Col>
+            <Select<ProjectStatus | 'all'>
+              value={statusFilter}
+              onChange={(v: ProjectStatus | 'all') => setStatusFilter(v)}
+              style={{ width: 180 }}
+            >
+              <Select.Option value="all">All</Select.Option>
+              <Select.Option value="draft">Draft</Select.Option>
+              <Select.Option value="active">Active</Select.Option>
+              <Select.Option value="archived">Archived</Select.Option>
+            </Select>
+          </Col>
         </Row>
-      </div>
-    </>
+
+        <Table<Project>
+          rowKey={(record: Project) => record.id}
+          dataSource={filtered}
+          columns={columns}
+          pagination={{ pageSize: 10 }}
+        />
+      </Card>
+    </div>
   );
-
-
-
-export default MyProjects;
 }

@@ -1,42 +1,53 @@
 /**
- * Description: Shared utility functions
- * Author: Hieu Chu
+ * Shared utility functions
+ * - AntD v5 validators: return Promise<void>, no callback
+ * - No implicit any
  */
 
-export const validateLatitude = (rule, value, callback) => {
-  if (!value || !value.trim()) return callback()
-  if (isNaN(value)) {
-    return callback('Please fill in a valid latitude value!')
-  } else {
-    if (parseFloat(value) <= -90 || parseFloat(value) >= 90) {
-      return callback('Please fill in a valid latitude value!')
-    }
-  }
-  return callback()
-}
+type FieldValidator = (_rule: unknown, value: unknown) => Promise<void>;
 
-export const validateLongitude = (rule, value, callback) => {
-  if (!value || !value.trim()) return callback()
-  if (isNaN(value)) {
-    return callback('Please fill in a valid longitude value!')
-  } else {
-    if (parseFloat(value) <= -180 || parseFloat(value) >= 180) {
-      return callback('Please fill in a valid longitude value!')
-    }
+/** Latitude valide strictement dans l'intervalle (-90, 90). */
+export const validateLatitude: FieldValidator = async (_rule, value) => {
+  // Champ non requis: ne pas invalider si vide
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return;
   }
-  return callback()
-}
 
-export const convertNonAccent = str => {
-  str = str.toLowerCase()
-  str = str.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
-  str = str.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
-  str = str.replace(/ì|í|ị|ỉ|ĩ/g, 'i')
-  str = str.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
-  str = str.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
-  str = str.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
-  str = str.replace(/đ/g, 'd')
-  str = str.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, '')
-  str = str.replace(/\u02C6|\u0306|\u031B/g, '')
-  return str
-}
+  const num = typeof value === 'number' ? value : Number(String(value).trim());
+  if (Number.isNaN(num)) {
+    throw new Error('Please fill in a valid latitude value!');
+  }
+  // Reproduit la logique d’origine: bornes -90 et 90 sont considérées invalides
+  if (num <= -90 || num >= 90) {
+    throw new Error('Please fill in a valid latitude value!');
+  }
+};
+
+/** Longitude valide strictement dans l'intervalle (-180, 180). */
+export const validateLongitude: FieldValidator = async (_rule, value) => {
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return;
+  }
+
+  const num = typeof value === 'number' ? value : Number(String(value).trim());
+  if (Number.isNaN(num)) {
+    throw new Error('Please fill in a valid longitude value!');
+  }
+  // Reproduit la logique d’origine: bornes -180 et 180 sont considérées invalides
+  if (num <= -180 || num >= 180) {
+    throw new Error('Please fill in a valid longitude value!');
+  }
+};
+
+/**
+ * Supprime les accents pour faciliter les recherches "accent-insensitive".
+ * Conserve le comportement original (mise en minuscule).
+ */
+export const convertNonAccent = (str: string): string => {
+  if (str == null) return '';
+  // Normalisation unicode + suppression des diacritiques
+  let s = String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // Spécifiques vietnamien (compat avec ancien code)
+  s = s.replace(/đ/g, 'd').replace(/Đ/g, 'd');
+  return s;
+};

@@ -1,171 +1,189 @@
 'use client';
 
-/**
- * Description: Sculpture edit page component
- * Author: Hieu Chu
- */
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Form, Input, Button, Upload, message } from 'antd';
+import type { UploadChangeParam, UploadFile } from 'antd/es/upload/interface';
+import type { RcFile } from 'antd/es/upload';
+import Map, { Marker, MapRef, ViewState, MapLayerMouseEvent } from 'react-map-gl';
 
-import { useState } from 'react'
-import { Button, Form, message as antdMessage  } from 'antd';import { ColStyled, FormCol, CustomFormItem } from '../style'
-import { FlyToInterpolator } from 'react-map-gl'
-import Map from '../../map-components'
-import EditFormTextFields from './EditFormTextFields'
-import api from '../../../api'
-import { useRouter } from 'next/navigation';
-import { normalizeError } from "../../../shared/errors";
+const { TextArea } = Input;
 
-const SculptureEdit = ({
-  form,
-  form: { getFieldDecorator, setFieldsValue, getFieldValue, resetFields },
-  defaultPosition,
-  initialData,
-  initialData: { latitude, longitude },
-  makerList,
-  setMakerList
-}) => {
-  const [view, setView] = useState({
-    latitude: latitude ? latitude : defaultPosition[0],
-    longitude: longitude ? longitude : defaultPosition[1],
-    zoom: 15,
-    pitch: 50
-  })
-
-  const [marker, setMarker] = useState({
-    markerLat: latitude ? latitude : defaultPosition[0],
-    markerLng: longitude ? longitude : defaultPosition[1]
-  })
-
-  const [submitting, setSubmitting] = useState(false)
-
-  const flyTo = (latitude, longitude) => {
-    setView({
-      ...view,
-      latitude,
-      longitude,
-      transitionInterpolator: new FlyToInterpolator(),
-      transitionDuration: 1500,
-      zoom: 15
-    })
-
-    setMarker({
-      markerLat: latitude,
-      markerLng: longitude
-    })
-  }
-
-  const showLocationOnMap = () => {
-    form.validateFields(['latitude', 'longitude'], (errors, values) => {
-      if (!errors) {
-        const { latitude, longitude } = values
-        flyTo(+latitude, +longitude)
-      }
-    })
-  }
-
-  const handleSubmit = e => {
-    e.preventDefault()
-    form.validateFields(async (err, values) => {
-      const router = useRouter();
-      if (!err) {
-        // remember to convert lat and long to numeric type
-        console.log('Received values of form: ', values)
-        for (let key in values) {
-          if (!values[key]) {
-            values[key] = null
-          }
-        }
-
-        if (values.latitude) {
-          values.latitude = Number(values.latitude)
-        }
-
-        if (values.longitude) {
-          values.longitude = Number(values.longitude)
-        }
-
-        console.log('after', values)
-
-        setSubmitting(true)
-        try {
-          const _result = (await api.patch('/sculpture', values)).data
-          antdMessage.success('Updated sculpture details successfully!', 2)
-          setSubmitting(false)
-          router.push(`/sculptures/id/${values.accessionId}`)
-        } catch (e: unknown) {
-          const { message, statusCode } = normalizeError(e);
-          setSubmitting(false)
-          antdMessage.error(e.response.data.message)
-        }
-      }
-    })
-  }
-
-  return (
-    <Form onSubmit={handleSubmit} autoComplete="off">
-      <ColStyled xs={24} md={12}>
-        {/* long repeated list of text fields */}
-        <EditFormTextFields
-          getFieldDecorator={getFieldDecorator}
-          setFieldsValue={setFieldsValue}
-          getFieldValue={getFieldValue}
-          initialData={initialData}
-          makerList={makerList}
-          setMakerList={setMakerList}
-        />
-        <FormCol xs={24}>
-          <Button onClick={showLocationOnMap}>Show on map</Button>
-        </FormCol>
-      </ColStyled>
-
-      <ColStyled
-        xs={24}
-        md={12}
-        style={{
-          height: 500,
-          marginTop: 10
-        }}
-      >
-        <Map
-          view={view}
-          marker={marker}
-          setView={setView}
-          setMarker={({ markerLat, markerLng }) => {
-            setMarker({ markerLat, markerLng })
-            setFieldsValue({
-              latitude: String(markerLat),
-              longitude: String(markerLng)
-            })
-          }}
-        />
-      </ColStyled>
-
-      <ColStyled xs={24}>
-        <FormCol xs={24}>
-          <CustomFormItem style={{ marginBottom: 0, marginTop: 8 }}>
-            <Button type="primary" htmlType="submit" loading={submitting}>
-              Submit
-            </Button>
-            <Button
-              type="default"
-              style={{
-                marginLeft: 5
-              }}
-              onClick={() => {
-                resetFields()
-                const flyLat = latitude ? latitude : defaultPosition[0]
-                const flyLng = longitude ? longitude : defaultPosition[1]
-                flyTo(flyLat, flyLng)
-              }}
-            >
-              Reset
-            </Button>
-          </CustomFormItem>
-        </FormCol>
-      </ColStyled>
-    </Form>
-  )
+export interface Sculpture {
+  id: string;
+  title: string;
+  description: string;
+  location: { lat: number; lng: number };
+  imageUrl?: string;
 }
 
-export default Form.create({
-  name: 'sculpture_edit_form'
-})(SculptureEdit)
+export interface SculptureEditProps {
+  sculpture: Sculpture;
+  /** Soumission des données modifiées. Branche ici ta persistance. */
+  onSubmit: (updated: Sculpture) => Promise<void>;
+}
+
+/** Normalise l’événement Upload → fileList (AntD v4). */
+function normFile(e: UploadChangeParam<UploadFile>): UploadFile[] {
+  return e?.fileList ?? [];
+}
+
+/** Transforme un UploadFile → File (si présent). */
+function toFile(uploadFile?: UploadFile): File | undefined {
+  const f = uploadFile?.originFileObj as RcFile | undefined;
+  return f as unknown as File | undefined;
+}
+
+export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProps) {
+  const [form] = Form.useForm();
+  const mapRef = useRef<MapRef | null>(null);
+
+  const initialViewState = useMemo<ViewState>(() => ({
+    longitude: sculpture.location?.lng ?? 0,
+    latitude: sculpture.location?.lat ?? 0,
+    zoom: 12,
+  }), [sculpture.location?.lat, sculpture.location?.lng]);
+
+  const [viewState, setViewState] = useState<ViewState>(initialViewState);
+
+  const flyTo = useCallback((lat: number, lng: number) => {
+    mapRef.current?.flyTo({ center: [lng, lat], zoom: 12, duration: 1200 });
+  }, []);
+
+  const onMapClick = useCallback((e: MapLayerMouseEvent) => {
+    const { lat, lng } = e.lngLat;
+    form.setFieldsValue({ location: { lat, lng } });
+    setViewState((vs) => ({ ...vs, latitude: lat, longitude: lng }));
+  }, [form]);
+
+  const onFinish = useCallback(async (values: any) => {
+    try {
+      // NOTE: values a la forme { title, description, location: {lat,lng}, image?: UploadFile[] }
+      const file = toFile(values.image?.[0]);
+      let imageUrl = sculpture.imageUrl;
+
+      // TODO: uploader le fichier si présent et récupérer un URL
+      // if (file) {
+      //   const uploadedUrl = await uploadImageToYourAPI(file);
+      //   imageUrl = uploadedUrl;
+      // }
+
+      const updated: Sculpture = {
+        ...sculpture,
+        title: values.title,
+        description: values.description,
+        location: { lat: values.location?.lat, lng: values.location?.lng },
+        imageUrl,
+      };
+
+      await onSubmit(updated);
+      message.success('Sculpture mise à jour');
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      message.error("Échec de l'enregistrement");
+    }
+  }, [onSubmit, sculpture]);
+
+  const onFinishFailed = useCallback(() => {
+    message.warning('Merci de corriger les champs requis.');
+  }, []);
+
+  return (
+    <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr', maxWidth: 900 }}>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          title: sculpture.title,
+          description: sculpture.description,
+          location: {
+            lat: sculpture.location?.lat,
+            lng: sculpture.location?.lng,
+          },
+          image: [] as UploadFile[],
+        }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
+        <Form.Item
+          label="Titre"
+          name="title"
+          rules={[{ required: true, message: 'Veuillez saisir un titre.' }]}
+        >
+          <Input placeholder="Titre de la sculpture" />
+        </Form.Item>
+
+        <Form.Item
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: 'Veuillez saisir une description.' }]}
+        >
+          <TextArea rows={4} placeholder="Décrivez la sculpture…" />
+        </Form.Item>
+
+        {/* Coordonnées (lat/lng) synchronisées avec la carte */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <Form.Item
+            label="Latitude"
+            name={['location', 'lat']}
+            rules={[{ required: true, message: 'Latitude requise.' }]}
+          >
+            <Input type="number" step="0.000001" onBlur={() => {
+              const { location } = form.getFieldsValue();
+              if (location?.lat != null && location?.lng != null) {
+                flyTo(Number(location.lat), Number(location.lng));
+              }
+            }} />
+          </Form.Item>
+          <Form.Item
+            label="Longitude"
+            name={['location', 'lng']}
+            rules={[{ required: true, message: 'Longitude requise.' }]}
+          >
+            <Input type="number" step="0.000001" onBlur={() => {
+              const { location } = form.getFieldsValue();
+              if (location?.lat != null && location?.lng != null) {
+                flyTo(Number(location.lat), Number(location.lng));
+              }
+            }} />
+          </Form.Item>
+        </div>
+
+        {/* Upload de l’image (optionnel). Laisse la TODO pour brancher ton backend. */}
+        <Form.Item label="Image" name="image" valuePropName="fileList" getValueFromEvent={normFile}>
+          <Upload beforeUpload={() => false} listType="picture-card" maxCount={1}>
+            <div>Choisir une image</div>
+          </Upload>
+        </Form.Item>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button type="primary" htmlType="submit">Enregistrer</Button>
+          <Button
+            onClick={() => flyTo(
+              form.getFieldValue(['location', 'lat']),
+              form.getFieldValue(['location', 'lng']),
+            )}
+          >
+            Recentrer la carte
+          </Button>
+        </div>
+      </Form>
+
+      {/* Carte : React Map GL (v7/8). Si tu es sur MapLibre, change l’import à `react-map-gl/maplibre`. */}
+      <div style={{ height: 360 }}>
+        <Map
+          ref={mapRef}
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+          mapStyle="mapbox://styles/mapbox/streets-v11"
+          initialViewState={initialViewState}
+          {...viewState}
+          onMove={(evt) => setViewState(evt.viewState)}
+          onClick={onMapClick}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Marker latitude={viewState.latitude} longitude={viewState.longitude} />
+        </Map>
+      </div>
+    </div>
+  );
+}

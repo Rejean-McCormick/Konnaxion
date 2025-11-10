@@ -17,16 +17,46 @@ import { MoreOutlined } from '@ant-design/icons'
 
 const { RangePicker } = DatePicker
 
-import dayjs from 'dayjs'
-import { useState, useEffect, useRef } from 'react'
+import dayjs, { Dayjs } from 'dayjs'
+import React, { useState, useEffect, useRef } from 'react'
 import Loading from '../../Loading'
 import Error from 'next/error'
+import type { AxiosError } from 'axios'
 import api from '../../../api'
 import { CardStyled, ShadowCard } from '../../dashboard-components/style'
-import { normalizeError } from "../../../shared/errors";
+import { normalizeError } from '../../../shared/errors'
 
-const formatDailyData = rawData => {
-  const result = []
+type DailyPoint = { x: string; y: number }
+
+interface TrendState {
+  TOTAL_VISITS: number
+  DAILY_VISITS: number
+  DAILY_VISITS_CHANGE: number
+  TOTAL_LIKES: number
+  DAILY_LIKES: number
+  DAILY_LIKES_CHANGE: number
+  TOTAL_COMMENTS: number
+  DAILY_COMMENTS: number
+  DAILY_COMMENTS_CHANGE: number
+  VISIT_DATA: DailyPoint[]
+  LIKE_DATA: DailyPoint[]
+  COMMENT_DATA: DailyPoint[]
+}
+
+interface SculptureTrendProps {
+  totalLikes: number
+  totalComments: number
+  totalVisits: number
+  sculptureId: string
+}
+
+interface RequestError {
+  statusCode: number
+  message: string
+}
+
+const formatDailyData = (rawData: Record<string, number>): DailyPoint[] => {
+  const result: DailyPoint[] = []
   for (const date of Object.keys(rawData)) {
     result.push({
       x: dayjs(date).format('MMM D YYYY'),
@@ -38,22 +68,34 @@ const formatDailyData = rawData => {
   return result
 }
 
-const SculptureTrend = ({
+const SculptureTrend: React.FC<SculptureTrendProps> = ({
   totalLikes,
   totalComments,
   totalVisits,
   sculptureId
 }) => {
-  const [state, setState] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [state, setState] = useState<TrendState>({
+    TOTAL_VISITS: 0,
+    DAILY_VISITS: 0,
+    DAILY_VISITS_CHANGE: 0,
+    TOTAL_LIKES: 0,
+    DAILY_LIKES: 0,
+    DAILY_LIKES_CHANGE: 0,
+    TOTAL_COMMENTS: 0,
+    DAILY_COMMENTS: 0,
+    DAILY_COMMENTS_CHANGE: 0,
+    VISIT_DATA: [],
+    LIKE_DATA: [],
+    COMMENT_DATA: []
+  })
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<RequestError | null>(null)
 
-  const defaultEndDate = useRef(dayjs(new Date())).current
-  const defaultStartDate = useRef(dayjs(defaultEndDate).subtract(7, 'days'))
-    .current
+  const defaultEndDate = useRef<Dayjs>(dayjs(new Date())).current
+  const defaultStartDate = useRef<Dayjs>(dayjs(defaultEndDate).subtract(7, 'days')).current
 
-  const [startDate, setStartDate] = useState(defaultStartDate)
-  const [endDate, setEndDate] = useState(defaultEndDate)
+  const [startDate, setStartDate] = useState<Dayjs>(defaultStartDate)
+  const [endDate, setEndDate] = useState<Dayjs>(defaultEndDate)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,23 +104,23 @@ const SculptureTrend = ({
         const today = endDate.format('YYYY-MM-DD')
         const defaultToday = defaultEndDate.format('YYYY-MM-DD')
 
-        const likesPromise = api.get(
+        const likesPromise = api.get<Record<string, number>>(
           `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
         )
-        const commentsPromise = api.get(
+        const commentsPromise = api.get<Record<string, number>>(
           `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
         )
-        const visitPromise = api.get(
+        const visitPromise = api.get<Record<string, number>>(
           `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
         )
 
-        const defaultLikesPromise = api.get(
+        const defaultLikesPromise = api.get<Record<string, number>>(
           `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
         )
-        const defaultCommentsPromise = api.get(
+        const defaultCommentsPromise = api.get<Record<string, number>>(
           `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
         )
-        const defaultVisitsPromise = api.get(
+        const defaultVisitsPromise = api.get<Record<string, number>>(
           `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
         )
 
@@ -107,22 +149,23 @@ const SculptureTrend = ({
         const DEFAULT_COMMENT_DATA = formatDailyData(rawDefaultComments)
         const DEFAULT_VISIT_DATA = formatDailyData(rawDefaultVisits)
 
-        const DAILY_VISITS = DEFAULT_VISIT_DATA[DEFAULT_VISIT_DATA.length - 1].y
-        const DAILY_VISITS_CHANGE =
-          DAILY_VISITS - DEFAULT_VISIT_DATA[DEFAULT_VISIT_DATA.length - 2].y
+        const lastVisit = DEFAULT_VISIT_DATA.at(-1)?.y ?? 0
+        const prevVisit = DEFAULT_VISIT_DATA.at(-2)?.y ?? 0
+        const DAILY_VISITS = lastVisit
+        const DAILY_VISITS_CHANGE = lastVisit - prevVisit
 
-        const DAILY_LIKES = DEFAULT_LIKE_DATA[DEFAULT_LIKE_DATA.length - 1].y
-        const DAILY_LIKES_CHANGE =
-          DAILY_LIKES - DEFAULT_LIKE_DATA[DEFAULT_LIKE_DATA.length - 2].y
+        const lastLike = DEFAULT_LIKE_DATA.at(-1)?.y ?? 0
+        const prevLike = DEFAULT_LIKE_DATA.at(-2)?.y ?? 0
+        const DAILY_LIKES = lastLike
+        const DAILY_LIKES_CHANGE = lastLike - prevLike
 
-        const DAILY_COMMENTS =
-          DEFAULT_COMMENT_DATA[DEFAULT_COMMENT_DATA.length - 1].y
-        const DAILY_COMMENTS_CHANGE =
-          DAILY_COMMENTS -
-          DEFAULT_COMMENT_DATA[DEFAULT_COMMENT_DATA.length - 2].y
+        const lastComment = DEFAULT_COMMENT_DATA.at(-1)?.y ?? 0
+        const prevComment = DEFAULT_COMMENT_DATA.at(-2)?.y ?? 0
+        const DAILY_COMMENTS = lastComment
+        const DAILY_COMMENTS_CHANGE = lastComment - prevComment
 
-        setState(state => ({
-          ...state,
+        setState(s => ({
+          ...s,
           TOTAL_VISITS: totalVisits,
           DAILY_VISITS,
           DAILY_VISITS_CHANGE,
@@ -137,11 +180,11 @@ const SculptureTrend = ({
           COMMENT_DATA
         }))
       } catch (e: unknown) {
-        const { message, statusCode } = normalizeError(e);
-        const { statusCode, message } = e.response.data
-        setError({ statusCode, message })
+        const n = normalizeError(e as AxiosError<any>)
+        setError({ statusCode: n.statusCode, message: n.message })
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     fetchData()
   }, [
@@ -157,12 +200,12 @@ const SculptureTrend = ({
   const dateFormat = 'MMM D YYYY'
   const staticToday = dayjs(new Date())
 
-  const renderPicker = (startDate, endDate) => {
-    const disabledDate = current => current.valueOf() > staticToday.valueOf()
+  const renderPicker = (start: Dayjs, end: Dayjs) => {
+    const disabledDate = (current: Dayjs) => current.valueOf() > staticToday.valueOf()
     return (
       <RangePicker
-        defaultValue={[startDate, endDate]}
-        value={[startDate, endDate]}
+        defaultValue={[start, end]}
+        value={[start, end]}
         format={dateFormat}
         size="large"
         allowClear={false}
@@ -170,19 +213,14 @@ const SculptureTrend = ({
         disabledDate={disabledDate}
         ranges={{
           'Past week': [dayjs(staticToday).subtract(7, 'days'), dayjs(staticToday)],
-          'Past 2 weeks': [
-            dayjs(staticToday).subtract(14, 'days'),
-            dayjs(staticToday)
-          ],
-          'Past month': [
-            dayjs(staticToday).subtract(30, 'days'),
-            dayjs(staticToday)
-          ]
+          'Past 2 weeks': [dayjs(staticToday).subtract(14, 'days'), dayjs(staticToday)],
+          'Past month': [dayjs(staticToday).subtract(30, 'days'), dayjs(staticToday)]
         }}
-        onChange={date => {
-          if (date[0].valueOf() !== date[1].valueOf()) {
-            setStartDate(date[0])
-            setEndDate(date[1])
+        onChange={(dates) => {
+          if (!dates || !dates[0] || !dates[1]) return
+          if (dates[0].valueOf() !== dates[1].valueOf()) {
+            setStartDate(dates[0])
+            setEndDate(dates[1])
           }
         }}
       />

@@ -1,118 +1,136 @@
-'use client';
+"use client";
 
-// File: /pages/kreative/creative-hub/submit-creative-work.tsx
-import React, { useState } from 'react';
-import type { NextPage } from 'next';
+import React, { useState } from "react";
 import {
   Form,
   Input,
-  Select,
-  Upload,
   Button,
-  Alert,
+  Upload,
+  Select,
   message as antdMessage,
-} from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/router';
-import PageContainer from '@/components/PageContainer';
+  Alert,
+} from "antd";
+import type { UploadFile } from "antd/es/upload/interface";
+import { UploadOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
+import PageContainer from "@/components/PageContainer";
 
-const { TextArea } = Input;
-const { Option } = Select;
+type CreativeWorkFormValues = {
+  title: string;
+  description: string;
+  category: string;
+  credits?: string;
+  creativeFile: UploadFile[];
+};
 
-const SubmitCreativeWork: NextPage = () => {
-  const [form] = Form.useForm();
+// Type minimal utile pour le onChange d'Upload (évite implicit any)
+type UploadChangeParamLite = {
+  fileList: UploadFile[];
+};
+
+export default function SubmitCreativeWorkPage() {
+  const [form] = Form.useForm<CreativeWorkFormValues>();
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const router = useRouter();
-  const [fileList, setFileList] = useState<any[]>([]);
 
-  const handleUploadChange = (info: any) => {
-    setFileList([...info.fileList]);
+  const handleUploadChange = (info: UploadChangeParamLite) => {
+    setFileList(info.fileList);
   };
 
-  const onFinish = (values: any) => {
-    const creativeWorkData = {
-      ...values,
-      file: fileList,
-    };
-    console.log('Submitted Creative Work:', creativeWorkData);
-    antdMessage.success(
-      "Votre œuvre créative a été soumise avec succès et est en attente d'approbation!"
-    );
-    router.push('/kreative/creative-hub/inspiration-gallery');
+  // Normalise l'évènement Upload pour AntD Form
+  const normFile = (e: UploadChangeParamLite | UploadFile[]) => {
+    if (Array.isArray(e)) return e;
+    return e?.fileList ?? [];
+  };
+
+  const onFinish = async (values: CreativeWorkFormValues) => {
+    if (!fileList.length) {
+      antdMessage.error("Veuillez joindre au moins un fichier.");
+      return;
+    }
+    try {
+      // TODO: remplacer par l'appel API réel d’envoi
+      // await api.submitCreativeWork(values, fileList)
+      antdMessage.success("Création envoyée avec succès !");
+      router.push("/kreative/creative-hub");
+    } catch {
+      antdMessage.error("Erreur lors de l'envoi. Réessayez.");
+    }
   };
 
   return (
     <PageContainer title="Submit Creative Work">
       <Alert
-        message="Please Note"
-        description="File size limit is 5MB. Accepted formats are JPG, PNG for images, MP4 for videos, and MP3 for audio."
         type="info"
         showIcon
-        style={{ marginBottom: 24 }}
+        style={{ marginBottom: 16 }}
+        message="Partagez votre travail créatif avec la communauté."
       />
 
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        initialValues={{ category: 'Illustration' }}
-      >
+      <Form<CreativeWorkFormValues> layout="vertical" form={form} onFinish={onFinish}>
         <Form.Item
-          label="Title of the Work"
+          label="Title"
           name="title"
-          rules={[{ required: true, message: 'Veuillez saisir le titre de votre œuvre.' }]}
+          rules={[{ required: true, message: "Please enter a title" }]}
         >
-          <Input placeholder="Entrez le titre de votre œuvre créative" />
+          <Input placeholder="e.g., Generative sculpture series" />
         </Form.Item>
 
         <Form.Item
-          label="Description or Story Behind the Work"
+          label="Description"
           name="description"
-          rules={[{ required: true, message: 'Veuillez fournir une description ou une histoire.' }]}
+          rules={[{ required: true, message: "Please add a description" }]}
         >
-          <TextArea rows={5} placeholder="Décrivez votre œuvre et partagez son histoire..." />
+          <Input.TextArea rows={4} placeholder="What did you make? How? Why?" />
         </Form.Item>
 
         <Form.Item
-          label="Category / Medium"
+          label="Category"
           name="category"
-          rules={[{ required: true, message: 'Veuillez sélectionner une catégorie.' }]}
+          rules={[{ required: true, message: "Please pick a category" }]}
         >
-          <Select placeholder="Sélectionnez le type de contenu">
-            <Option value="Illustration">Illustration</Option>
-            <Option value="Photography">Photography</Option>
-            <Option value="Music">Music</Option>
-            <Option value="Video">Video</Option>
-            <Option value="Digital Art">Digital Art</Option>
+          <Select placeholder="Choose one">
+            <Select.Option value="art">Art</Select.Option>
+            <Select.Option value="design">Design</Select.Option>
+            <Select.Option value="music">Music</Select.Option>
+            <Select.Option value="other">Other</Select.Option>
           </Select>
         </Form.Item>
 
         <Form.Item
-          label="Upload Creative File"
+          label="Upload"
           name="creativeFile"
-          rules={[{ required: true, message: 'Veuillez télécharger un fichier pour votre œuvre.' }]}
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
+          rules={[
+            {
+              validator: (_, value: UploadFile[]) =>
+                value && value.length
+                  ? Promise.resolve()
+                  : Promise.reject(new Error("Please attach at least one file")),
+            },
+          ]}
         >
           <Upload
-            beforeUpload={() => false}
-            fileList={fileList}
+            beforeUpload={() => false} // empêche l’upload auto, on laisse le form gérer
+            multiple
             onChange={handleUploadChange}
-            accept="image/*,video/*,audio/*"
+            fileList={fileList}
           >
-            <Button icon={<UploadOutlined />}>Click to Upload</Button>
+            <Button icon={<UploadOutlined />}>Select file(s)</Button>
           </Upload>
         </Form.Item>
 
-        <Form.Item label="Credits / Tools Used (Optional)" name="credits">
-          <Input placeholder="Exemple: Adobe Photoshop, Procreate, etc." />
+        <Form.Item label="Credits" name="credits">
+          <Input placeholder="Collaborators, references, tools…" />
         </Form.Item>
 
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            Submit Work
+            Submit
           </Button>
         </Form.Item>
       </Form>
     </PageContainer>
   );
-};
-
-export default SubmitCreativeWork;
+}

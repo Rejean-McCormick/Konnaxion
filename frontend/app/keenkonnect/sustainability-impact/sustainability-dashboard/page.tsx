@@ -1,9 +1,7 @@
 'use client';
 
 // File: app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
-import React, { useMemo } from 'react';
-import Head from 'next/head';
-import type { NextPage } from 'next';
+import React, { useMemo, useEffect } from 'react';
 import { Card, Row, Col, Statistic, Table, Select, Divider } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import MainLayout from '@/components/layout-components/MainLayout';
@@ -67,12 +65,15 @@ const columns: ColumnsType<LeaderboardEntry> = [
 const regions = ['All', 'North America', 'Europe', 'Asia'];
 const categories = ['All', 'Environmental', 'Social', 'Economic'];
 
-const SustainabilityDashboard: NextPage & {
-  getLayout?: (page: React.ReactElement) => React.ReactNode;
-} = () => {
+const SustainabilityDashboard: React.FC = () => {
   // États de filtres (ici décoratifs)
   const [selectedRegion, setSelectedRegion] = React.useState('All');
   const [selectedCategory, setSelectedCategory] = React.useState('All');
+
+  // Dans l'App Router, éviter next/head côté client : on peut fixer le titre ainsi
+  useEffect(() => {
+    document.title = 'Sustainability Dashboard';
+  }, []);
 
   // Filtrage simulé
   const filteredLeaderboard = useMemo(() => {
@@ -81,15 +82,7 @@ const SustainabilityDashboard: NextPage & {
   }, [selectedRegion, selectedCategory]);
 
   return (
-    <>
-      <Head>
-        <title>Sustainability Dashboard</title>
-        <meta
-          name="description"
-          content="High-level dashboard aggregating sustainability impact across projects."
-        />
-      </Head>
-
+    <MainLayout>
       <div className="container mx-auto p-5">
         {/* En-tête */}
         <h1 className="text-2xl font-bold mb-4">Sustainability Dashboard</h1>
@@ -183,13 +176,8 @@ const SustainabilityDashboard: NextPage & {
           />
         </Card>
       </div>
-    </>
+    </MainLayout>
   );
 };
-
-// Mise en page (si utilisée dans ton app)
-SustainabilityDashboard.getLayout = (page: React.ReactElement) => (
-  <MainLayout>{page}</MainLayout>
-);
 
 export default SustainabilityDashboard;

@@ -1,84 +1,109 @@
+﻿'use client';
+
 import React from 'react';
-import { NextPage } from 'next';
 import { Form, Checkbox, Select, Button, Alert, Divider } from 'antd';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Option } = Select;
+// --- Données (échantillon minimal) -----------------------------------------
+// TODO: Remplacer par la liste complète (le fichier concat avait des "..." tronquant la liste)
+const expertiseOptions: string[] = [
+  'Frontend Development',
+  'UI/UX Design',
+  'Data Science',
+  'DevOps',
+  'Mobile Development',
+  'QA',
+  'Project Management',
+];
 
-const ManageExpertiseAreas: NextPage = () => {
-  const [form] = Form.useForm();
+const currentExpertiseInitial: string[] = ['Frontend Development', 'UI/UX Design'];
 
-  // Données initiales : expertises déjà sélectionnées par l'utilisateur
-  const currentExpertiseInitial: string[] = ['Frontend Development', 'UI/UX Design'];
+// Champs que l’utilisateur peut ajouter (échantillon)
+const selectableFields: string[] = ['React', 'TypeScript', 'Figma', 'GraphQL', 'Node.js'];
 
-  // Liste complète des domaines d'expertise disponibles
-  const expertiseOptions: string[] = [
-    'Frontend Development',
-    'Backend Development',
-    'UI/UX Design',
-    'Data Science',
-    'DevOps',
-    'Mobile Development',
-    'QA',
-    'Project Management',
-  ];
+// Niveaux de visibilité
+const visibilityLevels = [
+  { label: 'Public', value: 'public' as const },
+  { label: 'Team only', value: 'team-only' as const },
+  { label: 'Private', value: 'private' as const },
+];
 
-  // Gestion de la soumission : intégration d'une API ou logique de mise à jour
-  const onFinish = (values: any) => {
-    console.log('Updated Expertise Areas:', values);
-    // Traitement complémentaire
+// Types du formulaire
+type FormValues = {
+  currentExpertise: string[];
+  newExpertise?: string[];        // si vous avez un groupe/Select pour "nouvelles expertises"
+  newFields?: string[];           // champs complémentaires (Select multiple)
+  visibility: 'public' | 'team-only' | 'private';
+};
+
+export default function Page(): JSX.Element {
+  const [form] = Form.useForm<FormValues>();
+
+  const onFinish = (values: FormValues) => {
+    // TODO: branchement API / action serveur si nécessaire
+    console.log('Manage Expertise Areas - submit:', values);
+  };
 
   return (
     <PageContainer title="Manage Expertise Areas">
-      <Form
+      <Divider orientation="left">Your current expertise</Divider>
+
+      <Form<FormValues>
         form={form}
         layout="vertical"
         initialValues={{
           currentExpertise: currentExpertiseInitial,
-          newExpertise: [],
+          visibility: 'team-only',
+          newFields: [],
         }}
         onFinish={onFinish}
       >
-        {/* Liste des expertises actuelles */}
-        <Form.Item label="Current Expertise Areas" name="currentExpertise">
-          <Checkbox.Group>
-            {expertiseOptions.map((option) => (
-              <Checkbox key={option} value={option}>
-                {option}
-              </Checkbox>
-            ))}
-          </Checkbox.Group>
-        </Form.Item>
-
-        <Divider />
-
-        {/* Sélecteur pour ajouter de nouvelles expertises */}
+        {/* Expertise actuelles */}
         <Form.Item
-          label="Add New Expertise Area"
-          name="newExpertise"
-          tooltip="Adding an expertise area will require validation through contributions."
+          name="currentExpertise"
+          label="Current expertise"
+          rules={[{ required: true, message: 'Please select at least one expertise.' }]}
         >
-          <Select mode="multiple" placeholder="Select new expertise areas to add" allowClear>
-            {expertiseOptions
-              .filter((opt) => !currentExpertiseInitial.includes(opt))
-              .map((option) => (
-                <Option key={option} value={option}>
-                  {option}
-                </Option>
-              ))}
-          </Select>
+          <Checkbox.Group options={expertiseOptions} />
         </Form.Item>
 
-        {/* Message informatif */}
+        {/* Nouvelles expertises (si applicable) */}
+        {/* 
+        <Form.Item name="newExpertise" label="Add new expertise (optional)">
+          <Checkbox.Group options={expertiseOptions} />
+        </Form.Item>
+        */}
+
+        {/* Champs complémentaires à ajouter */}
+        <Form.Item name="newFields" label="Select new fields (optional)">
+          <Select
+            mode="multiple"
+            allowClear
+            placeholder="Select fields…"
+            options={selectableFields.map(f => ({ label: f, value: f }))}
+          />
+        </Form.Item>
+
+        {/* Visibilité du profil / des expertises */}
+        <Form.Item
+          name="visibility"
+          label="Visibility"
+          rules={[{ required: true, message: 'Please choose a visibility level.' }]}
+        >
+          <Select
+            placeholder="Choose visibility…"
+            options={visibilityLevels}
+          />
+        </Form.Item>
+
+        {/* Info */}
         <Alert
-          message="Note: Adding an expertise will require validation through contributions."
+          message="Note: Adding an expertise may require validation through contributions."
           type="info"
           showIcon
           style={{ marginBottom: 16 }}
         />
 
-        {/* Bouton pour sauvegarder */}
         <Form.Item>
           <Button type="primary" htmlType="submit">
             Save Changes
@@ -87,10 +112,4 @@ const ManageExpertiseAreas: NextPage = () => {
       </Form>
     </PageContainer>
   );
-
-// Correction : envelopper la page dans MainLayout
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default ManageExpertiseAreas;
-}}
+}

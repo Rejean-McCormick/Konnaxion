@@ -128,8 +128,6 @@ const EkohDashboard = () => {
       </div>
     </>
   );
-
-
+}
 
 export default EkohDashboard;
-}

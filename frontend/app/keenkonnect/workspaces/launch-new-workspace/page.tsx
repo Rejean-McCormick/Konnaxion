@@ -1,161 +1,87 @@
-'use client'
+'use client';
 
-// pages/keenkonnect/workspaces/launch-new-workspace/index.tsx
+// app/keenkonnect/workspaces/launch-new-workspace/page.tsx (rename to page.tsx if using App Router)
 import React, { useState } from 'react';
+// If you're in App Router, prefer Metadata API or head.tsx instead of next/head.
 import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Steps, Button, Form, Input, Select, Result, Divider, message as antdMessage  } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import MainLayout from '@/components/layout-components/MainLayout';
+import { Steps, Button, Form, Input, Select, Result, Divider, message as antdMessage } from 'antd';
 import { useRouter } from 'next/navigation';
-import { normalizeError } from "../../../../shared/errors";
+import { normalizeError } from '../../../../shared/errors';
 
-const { Step } = Steps;
-const { Option } = Select;
 const { TextArea } = Input;
 
-const LaunchNewWorkspace = () => {
+type Accessibility = 'Private' | 'Team' | 'Public';
+
+type WorkspaceFormValues = {
+  workspaceName: string;
+  workspaceDescription: string;
+  linkedProject?: string;
+  environmentTemplate: string;
+  accessibility: Accessibility;
+  resourceParams?: string;
+};
+
+const STEP_META = [
+  { title: 'Basic Info' },
+  { title: 'Environment Settings' },
+  { title: 'Confirmation' },
+];
+
+// Fields to validate per step
+const STEP_FIELDS: Record<number, (keyof WorkspaceFormValues)[]> = {
+  0: ['workspaceName', 'workspaceDescription', 'linkedProject'],
+  1: ['environmentTemplate', 'accessibility', 'resourceParams'],
+  2: [], // review step
+};
+
+const LaunchNewWorkspace: React.FC = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<WorkspaceFormValues>();
 
-  // Stockage des données recueillies par le wizard
-  const [workspaceData, setWorkspaceData] = useState({
+  // Persist wizard data across steps
+  const [workspaceData, setWorkspaceData] = useState<WorkspaceFormValues>({
     workspaceName: '',
     workspaceDescription: '',
-    linkedProject: '', // optionnel
+    linkedProject: undefined,
     environmentTemplate: '',
-    accessibility: 'Private', // Private | Team | Public
-    resourceParams: '', // Ex: "4 vCPUs, 8GB RAM"
+    accessibility: 'Private',
+    resourceParams: '',
   });
 
-  const steps = [
-    { title: 'Basic Info' },
-    { title: 'Environment Settings' },
-    { title: 'Confirmation' },
-  ];
-
-  // Passage à l'étape suivante, après validation des champs de l'étape courante
-  const next = async () => {
+  const handleNext = async () => {
     try {
-      const values = await form.validateFields();
-      setWorkspaceData(prev => ({ ...prev, ...values }));
-      setCurrentStep(currentStep + 1);
-      form.resetFields();
+      await form.validateFields(STEP_FIELDS[currentStep] as any);
+      setCurrentStep((s) => s + 1);
     } catch (err: unknown) {
-      const { message, statusCode } = normalizeError(err);
-      antdMessage.error('Please complete the required fields.');
+      const { message } = normalizeError(err);
+      antdMessage.error(message || 'Please complete the required fields.');
     }
+  };
 
-  const prev = () => {
-    setCurrentStep(currentStep - 1);
+  const handlePrev = () => setCurrentStep((s) => s - 1);
 
   const onFinish = async () => {
     try {
+      // Validate everything before submit
       const values = await form.validateFields();
-      setWorkspaceData(prev => ({ ...prev, ...values }));
-      // Simuler la création du workspace (appel API à intégrer ici)
-      console.log('Workspace created with data:', { ...workspaceData, ...values });
-      setSubmitted(true);
-    } catch (err: unknown) {
-      const { message, statusCode } = normalizeError(err);
-      antdMessage.error('Please ensure all fields are correctly filled.');
-    }
+      const payload = { ...workspaceData, ...values };
 
-  const renderStepContent = (step: number) => {
-    switch (step) {
-      case 0:
-        return (
-          <>
-            <Form.Item
-              name="workspaceName"
-              label="Workspace Name"
-              rules={[{ required: true, message: 'Please enter a workspace name' }]}
-              initialValue={workspaceData.workspaceName}
-            >
-              <Input placeholder="Enter workspace name" />
-            </Form.Item>
-            <Form.Item
-              name="workspaceDescription"
-              label="Workspace Description"
-              rules={[{ required: true, message: 'Please enter a workspace description' }]}
-              initialValue={workspaceData.workspaceDescription}
-            >
-              <TextArea rows={4} placeholder="Describe your workspace purpose" />
-            </Form.Item>
-            <Form.Item name="linkedProject" label="Link to Existing Project (optional)" initialValue={workspaceData.linkedProject}>
-              <Select placeholder="Select a project or leave blank">
-                <Option value="">None</Option>
-                <Option value="Project Alpha">Project Alpha</Option>
-                <Option value="Project Beta">Project Beta</Option>
-              </Select>
-            </Form.Item>
-          </>
-        );
-      case 1:
-        return (
-          <>
-            <Form.Item
-              name="environmentTemplate"
-              label="Environment Template"
-              rules={[{ required: true, message: 'Please select an environment template' }]}
-              initialValue={workspaceData.environmentTemplate}
-            >
-              <Select placeholder="Select template">
-                <Option value="Coding Notebook">Coding Notebook</Option>
-                <Option value="Design Canvas">Design Canvas</Option>
-                <Option value="AR/VR Room">AR/VR Room</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="accessibility"
-              label="Accessibility"
-              rules={[{ required: true, message: 'Please choose the accessibility' }]}
-              initialValue={workspaceData.accessibility}
-            >
-              <Select>
-                <Option value="Private">Private</Option>
-                <Option value="Team">Team</Option>
-                <Option value="Public">Public</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name="resourceParams"
-              label="Resource Parameters"
-              initialValue={workspaceData.resourceParams}
-            >
-              <Input placeholder="e.g. 4 vCPUs, 8GB RAM" />
-            </Form.Item>
-          </>
-        );
-      case 2:
-        return (
-          <div>
-            <h3>Review Your Workspace Configuration:</h3>
-            <p>
-              <strong>Name:</strong> {workspaceData.workspaceName || 'N/A'}
-            </p>
-            <p>
-              <strong>Description:</strong> {workspaceData.workspaceDescription || 'N/A'}
-            </p>
-            <p>
-              <strong>Linked Project:</strong> {workspaceData.linkedProject || 'None'}
-            </p>
-            <p>
-              <strong>Environment Template:</strong> {workspaceData.environmentTemplate || 'N/A'}
-            </p>
-            <p>
-              <strong>Accessibility:</strong> {workspaceData.accessibility || 'N/A'}
-            </p>
-            <p>
-              <strong>Resource Parameters:</strong> {workspaceData.resourceParams || 'N/A'}
-            </p>
-          </div>
-        );
-      default:
-        return null;
+      // TODO: Replace with your API call to create the workspace
+      // e.g. await api.workspaces.create(payload)
+      // Simulate
+      // console.log('Workspace created with data:', payload);
+      setSubmitted(true);
+      antdMessage.success('Workspace launched successfully!');
+    } catch (err: unknown) {
+      const { message } = normalizeError(err);
+      antdMessage.error(message || 'Please ensure all fields are correctly filled.');
     }
+  };
+
+  // Values to show on confirmation (live merge of state + current form)
+  const review = { ...workspaceData, ...form.getFieldsValue() };
 
   if (submitted) {
     return (
@@ -164,11 +90,16 @@ const LaunchNewWorkspace = () => {
           status="success"
           title="Workspace Launched Successfully!"
           subTitle="Your new workspace has been created. Click the button below to enter your workspace."
-          extra={[
-            <Button type="primary" key="launch" onClick={() => router.push(`/keenkonnect/workspaces/launch-workspace?id=123`)}>
+          extra={
+            <Button
+              type="primary"
+              onClick={() =>
+                router.push(`/keenkonnect/workspaces/launch-workspace?id=123`)
+              }
+            >
               Open Workspace
-            </Button>,
-          ]}
+            </Button>
+          }
         />
       </div>
     );
@@ -176,31 +107,147 @@ const LaunchNewWorkspace = () => {
 
   return (
     <>
+      {/* If using App Router, move this metadata to layout.tsx or head.tsx */}
       <Head>
         <title>Launch New Workspace</title>
-        <meta name="description" content="Configure and launch a new workspace for collaboration." />
+        <meta
+          name="description"
+          content="Configure and launch a new workspace for collaboration."
+        />
       </Head>
+
       <div className="container mx-auto p-5">
         <h1 className="text-2xl font-bold mb-4">Launch New Workspace</h1>
-        <Steps current={currentStep} className="mb-6">
-          {steps.map((item, index) => (
-            <Step key={index} title={item.title} />
-          ))}
-        </Steps>
-        <Form form={form} layout="vertical" onFinish={onFinish}>
-          {renderStepContent(currentStep)}
+
+        <Steps
+          current={currentStep}
+          className="mb-6"
+          items={STEP_META.map((s) => ({ title: s.title }))}
+        />
+
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={workspaceData}
+          onValuesChange={(_, allValues) =>
+            setWorkspaceData((prev) => ({ ...prev, ...allValues }))
+          }
+          onFinish={onFinish}
+        >
+          {currentStep === 0 && (
+            <>
+              <Form.Item
+                name="workspaceName"
+                label="Workspace Name"
+                rules={[{ required: true, message: 'Please enter a workspace name' }]}
+              >
+                <Input placeholder="Enter workspace name" />
+              </Form.Item>
+
+              <Form.Item
+                name="workspaceDescription"
+                label="Workspace Description"
+                rules={[
+                  { required: true, message: 'Please enter a workspace description' },
+                ]}
+              >
+                <TextArea rows={4} placeholder="Describe your workspace purpose" />
+              </Form.Item>
+
+              <Form.Item
+                name="linkedProject"
+                label="Link to Existing Project (optional)"
+              >
+                <Select
+                  placeholder="Select a project or leave blank"
+                  allowClear
+                  options={[
+                    { label: 'Project Alpha', value: 'Project Alpha' },
+                    { label: 'Project Beta', value: 'Project Beta' },
+                  ]}
+                />
+              </Form.Item>
+            </>
+          )}
+
+          {currentStep === 1 && (
+            <>
+              <Form.Item
+                name="environmentTemplate"
+                label="Environment Template"
+                rules={[
+                  { required: true, message: 'Please select an environment template' },
+                ]}
+              >
+                <Select
+                  placeholder="Select template"
+                  options={[
+                    { label: 'Coding Notebook', value: 'Coding Notebook' },
+                    { label: 'Design Canvas', value: 'Design Canvas' },
+                    { label: 'AR/VR Room', value: 'AR/VR Room' },
+                  ]}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="accessibility"
+                label="Accessibility"
+                rules={[
+                  { required: true, message: 'Please choose the accessibility' },
+                ]}
+              >
+                <Select
+                  options={[
+                    { label: 'Private', value: 'Private' },
+                    { label: 'Team', value: 'Team' },
+                    { label: 'Public', value: 'Public' },
+                  ]}
+                />
+              </Form.Item>
+
+              <Form.Item name="resourceParams" label="Resource Parameters">
+                <Input placeholder="e.g. 4 vCPUs, 8GB RAM" />
+              </Form.Item>
+            </>
+          )}
+
+          {currentStep === 2 && (
+            <div>
+              <h3 className="font-semibold mb-2">Review Your Workspace Configuration</h3>
+              <Divider className="my-3" />
+              <p>
+                <strong>Name:</strong> {review.workspaceName || 'N/A'}
+              </p>
+              <p>
+                <strong>Description:</strong> {review.workspaceDescription || 'N/A'}
+              </p>
+              <p>
+                <strong>Linked Project:</strong> {review.linkedProject || 'None'}
+              </p>
+              <p>
+                <strong>Environment Template:</strong> {review.environmentTemplate || 'N/A'}
+              </p>
+              <p>
+                <strong>Accessibility:</strong> {review.accessibility || 'N/A'}
+              </p>
+              <p>
+                <strong>Resource Parameters:</strong> {review.resourceParams || 'N/A'}
+              </p>
+            </div>
+          )}
+
           <div style={{ marginTop: 24 }}>
             {currentStep > 0 && (
-              <Button style={{ marginRight: 8 }} onClick={prev}>
+              <Button style={{ marginRight: 8 }} onClick={handlePrev}>
                 Back
               </Button>
             )}
-            {currentStep < steps.length - 1 && (
-              <Button type="primary" onClick={next}>
+            {currentStep < STEP_META.length - 1 && (
+              <Button type="primary" onClick={handleNext}>
                 Next
               </Button>
             )}
-            {currentStep === steps.length - 1 && (
+            {currentStep === STEP_META.length - 1 && (
               <Button type="primary" htmlType="submit">
                 Launch Workspace
               </Button>
@@ -210,8 +257,6 @@ const LaunchNewWorkspace = () => {
       </div>
     </>
   );
-
-
+};
 
 export default LaunchNewWorkspace;
-}}}}}

@@ -1,180 +1,188 @@
-'use client';
+﻿'use client';
 
-import React, { useState, useMemo } from 'react';
-import { NextPage } from 'next';
-import { Table, Tabs, Tag, Button, Space, Modal, message as antdMessage  } from 'antd';
-import { ExclamationCircleOutlined } from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
+import { Button, Table, Tabs, Tag, Space, Modal, message as antdMessage } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import {
+  DeleteOutlined,
+  FlagOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+} from '@ant-design/icons';
 
 const { TabPane } = Tabs;
 const { confirm } = Modal;
 
-// Interface pour une entrée de modération
+type ModerationStatus = 'Pending' | 'Approved' | 'Flagged';
+type ModerationQueue = 'Reported' | 'PendingApproval';
+
 interface ModerationItem {
   id: string;
   contentSnippet: string;
   author: string;
-  reportReason: string; // pour les posts signalés
+  reportReason: string;
   date: string;
-  status: 'Pending' | 'Approved' | 'Flagged';
-  queue: 'Reported' | 'PendingApproval';
+  status: ModerationStatus;
+  queue: ModerationQueue;
 }
 
-// Données fictives pour l'exemple
-const dummyModerationItems: ModerationItem[] = [
+const MOCK_ITEMS: ModerationItem[] = [
   {
     id: '1',
-    contentSnippet: 'Ce post contient des propos inappropriés sur...',
-    author: 'John Doe',
-    reportReason: 'Propos inappropriés',
-    date: '2025-12-01 15:30',
+    contentSnippet: 'This is a reported post content...',
+    author: 'User123',
+    reportReason: 'Inappropriate language',
+    date: '3h ago',
     status: 'Pending',
     queue: 'Reported',
   },
   {
     id: '2',
-    contentSnippet: "Nouvelle discussion sur les méthodes d'enseignement...",
-    author: 'Alice Smith',
-    reportReason: '',
-    date: '2025-12-01 14:00',
-    status: 'Pending',
-    queue: 'PendingApproval',
-  },
-  {
-    id: '3',
-    contentSnippet: 'Ce thread a été signalé pour spam ou contenu indésirable.',
-    author: 'Bob Johnson',
+    contentSnippet: 'Another reported content snippet...',
+    author: 'Member456',
     reportReason: 'Spam',
-    date: '2025-11-30 18:45',
+    date: '1 day ago',
     status: 'Pending',
     queue: 'Reported',
   },
   {
-    id: '4',
-    contentSnippet: 'Discussion ouverte sur la nouvelle réforme éducative...',
-    author: 'Carol Lee',
+    id: '3',
+    contentSnippet: 'Awaiting approval content...',
+    author: 'Contributor789',
     reportReason: '',
-    date: '2025-12-01 16:20',
+    date: '2 days ago',
     status: 'Pending',
     queue: 'PendingApproval',
   },
 ];
 
-const ModerationPage: NextPage = () => {
-  // Onglet actif : "Reported" ou "PendingApproval"
-  const [activeTab, setActiveTab] = useState<'Reported' | 'PendingApproval'>('Reported');
+export default function ModerationPage(): JSX.Element {
+  const [activeTab, setActiveTab] = useState<ModerationQueue>('Reported');
+  const [data, setData] = useState<ModerationItem[]>(MOCK_ITEMS);
 
-  // Filtrage des éléments selon l'onglet actif
-  const filteredItems = useMemo(() => {
-    return dummyModerationItems.filter(item => item.queue === activeTab);
-  }, [activeTab]);
+  const filteredItems = useMemo<ModerationItem[]>(
+    () => data.filter((item) => item.queue === activeTab),
+    [activeTab, data],
+  );
 
-  // Gestion des actions pour une entrée de modération
-  const handleApprove = (item: ModerationItem) => {
-    antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." approved.`);
-    // Ici, intégrez un appel API pour approuver l'élément
+  const handleApprove = (record: ModerationItem) => {
+    setData((prev) =>
+      prev.map((item) =>
+        item.id === record.id ? { ...item, status: 'Approved', queue: 'PendingApproval' } : item,
+      ),
+    );
+    antdMessage.success('Content approved successfully');
+  };
 
-  const handleFlagUser = (item: ModerationItem) => {
-    antdMessage.warning(`User ${item.author} has been flagged/warned.`);
-    // Intégrez ici la logique de signalement de l'utilisateur
+  const handleFlagUser = (record: ModerationItem) => {
+    antdMessage.warning(`User ${record.author} has been flagged for review`);
+  };
 
-  const handleDelete = (item: ModerationItem) => {
+  const handleDelete = (record: ModerationItem) => {
     confirm({
-      title: 'Confirmer la suppression',
+      title: 'Delete this content?',
       icon: <ExclamationCircleOutlined />,
-      content: 'Êtes-vous sûr de vouloir supprimer ce contenu ? Cette action est irréversible.',
-      okText: 'Supprimer',
+      content: 'This action cannot be undone.',
+      okText: 'Delete',
       okType: 'danger',
-      cancelText: 'Annuler',
-      onOk() {
-        antdMessage.success(`Content "${item.contentSnippet.substring(0, 20)}..." deleted.`);
-        // Intégrez ici la logique de suppression via API
+      cancelText: 'Cancel',
+      onOk: () => {
+        setData((prev) => prev.filter((item) => item.id !== record.id));
+        antdMessage.success('Content deleted successfully');
       },
     });
+  };
 
-  // Définition des colonnes du tableau
-  const columns = [
+  const columns: ColumnsType<ModerationItem> = [
     {
       title: 'Content Snippet',
       dataIndex: 'contentSnippet',
       key: 'contentSnippet',
-      render: (text, row) => <span>{text}</span>,
+      render: (text: string) => (
+        <span
+          style={{
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            display: 'inline-block',
+            maxWidth: 480,
+          }}
+          title={text}
+        >
+          {text}
+        </span>
+      ),
     },
     {
       title: 'Author',
       dataIndex: 'author',
       key: 'author',
+      render: (text: string) => <strong>{text}</strong>,
+      width: 160,
     },
     {
+      // Dans le code d’origine, le titre dépendait de `activeTab`.
+      // On garde la logique tout en restant sûr côté types.
       title: activeTab === 'Reported' ? 'Report Reason' : 'Note',
-      dataIndex: 'reportReason',
-      key: 'reportReason',
-      render: (text, row) =>
-        text ? <Tag color="volcano">{text}</Tag> : <Tag color="blue">Pending Approval</Tag>,
+      key: 'reasonOrNote',
+      render: (_: unknown, record: ModerationItem) =>
+        activeTab === 'Reported' ? (
+          <Tag icon={<ExclamationCircleOutlined />} color="error">
+            {record.reportReason || '—'}
+          </Tag>
+        ) : (
+          <Tag color="blue">Pending Approval</Tag>
+        ),
+      width: 220,
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status, row) =>
-        status === 'Approved' ? (
-          <Tag color="green">Approved</Tag>
-        ) : (
-          <Tag color="orange">Pending</Tag>
-        ),
+      width: 140,
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: any, record: ModerationItem) => (
+      render: (_: unknown, record: ModerationItem) => (
         <Space>
           {record.status === 'Pending' && (
-            <Button size="small" type="primary" onClick={() => handleApprove(record)}>
+            <Button
+              type="primary"
+              icon={<CheckCircleOutlined />}
+              onClick={() => handleApprove(record)}
+            >
               Approve
             </Button>
           )}
-          <Button size="small" danger onClick={() => handleDelete(record)}>
+          <Button danger icon={<DeleteOutlined />} onClick={() => handleDelete(record)}>
             Delete
           </Button>
           {record.queue === 'Reported' && (
-            <Button size="small" onClick={() => handleFlagUser(record)}>
+            <Button icon={<FlagOutlined />} onClick={() => handleFlagUser(record)}>
               Flag User
             </Button>
           )}
         </Space>
       ),
+      width: 300,
     },
   ];
 
   return (
-    <PageContainer title="Moderation">
-      <Tabs
-        defaultActiveKey="Reported"
-        activeKey={activeTab}
-        onChange={(key) => setActiveTab(key as 'Reported' | 'PendingApproval')}
-        type="card"
-        style={{ marginBottom: 24 }}
-      >
-        <TabPane tab="Reported Content" key="Reported" />
+    <PageContainer title="Community Moderation">
+      <Tabs activeKey={activeTab} onChange={(k) => setActiveTab(k as ModerationQueue)}>
+        <TabPane tab="Reported" key="Reported" />
         <TabPane tab="Pending Approval" key="PendingApproval" />
       </Tabs>
-      <Table
+
+      <Table<ModerationItem>
+        rowKey="id"
         columns={columns}
         dataSource={filteredItems}
-        rowKey="id"
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
       />
     </PageContainer>
   );
-
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default ModerationPage;
-}}}}
+}

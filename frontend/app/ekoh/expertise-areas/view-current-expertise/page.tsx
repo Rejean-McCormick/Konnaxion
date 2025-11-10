@@ -47,7 +47,10 @@ const ViewCurrentExpertise = () => {
     <>
       <Head>
         <title>Expertise Areas</title>
-        <meta name="description" content="View your recognized expertise areas along with proficiency levels and contribution details." />
+        <meta
+          name="description"
+          content="View your recognized expertise areas along with proficiency levels and contribution details."
+        />
       </Head>
       <div className="container mx-auto p-5">
         {/* En-tête de la page */}
@@ -63,7 +66,7 @@ const ViewCurrentExpertise = () => {
                 <List.Item.Meta
                   title={
                     <span>
-                      {item.domain}{" "}
+                      {item.domain}{' '}
                       <Tag color="blue">Proficiency: {item.proficiency}%</Tag>
                     </span>
                   }
@@ -81,8 +84,6 @@ const ViewCurrentExpertise = () => {
       </div>
     </>
   );
-
-
+}
 
 export default ViewCurrentExpertise;
-}

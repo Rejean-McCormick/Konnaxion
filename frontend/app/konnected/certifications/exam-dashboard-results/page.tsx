@@ -1,9 +1,8 @@
-'use client'
+// app/konnected/certifications/exam-dashboard-results/page.tsx
+'use client';
 
-// File: /pages/konnected/certifications/exam-dashboard-results.tsx
 import React, { useState } from 'react';
-// (Optionnel) Si tu veux garder NextPage, tu peux l'importer :
-// import { NextPage } from 'next';
+import type { TableProps } from 'antd';
 import {
   Card,
   Statistic,
@@ -17,29 +16,32 @@ import {
   Alert,
 } from 'antd';
 import { EyeOutlined, FilePdfOutlined } from '@ant-design/icons';
+import Link from 'next/link';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Text } = Typography;
 
-// Interface pour représenter une tentative d'examen
+// --- Types ---
+type ExamOutcome = 'Pass' | 'Fail';
+
 interface ExamResult {
   id: string;
   examName: string;
-  dateTaken: string;
-  score: number;
-  result: 'Pass' | 'Fail';
-  details: string; // Description détaillée ou récapitulatif
+  dateTaken: string; // ISO ou lisible
+  score: number;     // 0..100
+  result: ExamOutcome;
+  details: string;
 }
 
-// Examen à venir (si l'utilisateur est inscrit)
-const upcomingExam = {
+// --- Données démo (à brancher sur API plus tard) ---
+const upcomingExam:
+  | { examName: string; examDate: string; status: string }
+  | null = {
   examName: 'Certification Exam Level 1',
   examDate: '2023-10-10 10:00',
   status: 'Registered',
-}; // <-- fermeture manquante ajoutée
+};
 
-// Historique des examens réalisés
 const examResultsData: ExamResult[] = [
   {
     id: '1',
@@ -61,29 +63,19 @@ const examResultsData: ExamResult[] = [
   },
 ];
 
-// Exemples de certificats obtenus
-const certificationsEarned = [
+const certificationsEarned: { id: string; title: string; pdfLink: string }[] = [
   { id: 'cert1', title: 'Certification Exam Level 1', pdfLink: '#' },
   { id: 'cert2', title: 'Advanced Certification Exam', pdfLink: '#' },
 ];
 
-export default function ExamDashboardResults() {
-  // État pour gérer le Drawer de détail d'une tentative d'examen
-  const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
+export default function ExamDashboardResultsPage() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState<ExamResult | null>(null);
 
-  // Définition des colonnes du tableau
-  const columns = [
-    {
-      title: 'Exam Name',
-      dataIndex: 'examName',
-      key: 'examName',
-    },
-    {
-      title: 'Date Taken',
-      dataIndex: 'dateTaken',
-      key: 'dateTaken',
-    },
+  // Colonnes (typage strict pour éviter implicit any)
+  const columns: TableProps<ExamResult>['columns'] = [
+    { title: 'Exam Name', dataIndex: 'examName', key: 'examName' },
+    { title: 'Date Taken', dataIndex: 'dateTaken', key: 'dateTaken' },
     {
       title: 'Score',
       dataIndex: 'score',
@@ -94,7 +86,7 @@ export default function ExamDashboardResults() {
       title: 'Result',
       dataIndex: 'result',
       key: 'result',
-      render: (result: ExamResult['result']) => (
+      render: (result: ExamOutcome) => (
         <Text strong style={{ color: result === 'Pass' ? 'green' : 'red' }}>
           {result}
         </Text>
@@ -103,13 +95,13 @@ export default function ExamDashboardResults() {
     {
       title: 'Action',
       key: 'action',
-      render: (_: any, record: ExamResult) => (
+      render: (_: unknown, record: ExamResult) => (
         <Button
           type="link"
           icon={<EyeOutlined />}
           onClick={() => {
             setSelectedExam(record);
-            setDrawerVisible(true);
+            setDrawerOpen(true);
           }}
         >
           View Details
@@ -119,134 +111,136 @@ export default function ExamDashboardResults() {
   ];
 
   return (
-    <MainLayout>
-      <PageContainer title="Exam Dashboard & Results">
-        {/* Section Examen à venir */}
-        {upcomingExam && (
-          <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
-            <Row gutter={[16, 16]}>
-              <Col xs={24} md={8}>
-                <Text strong>Exam:</Text> {upcomingExam.examName}
-              </Col>
-              <Col xs={24} md={8}>
-                <Text strong>Date:</Text> {upcomingExam.examDate}
-              </Col>
-              <Col xs={24} md={8}>
-                <Text strong>Status:</Text> {upcomingExam.status}
-              </Col>
-            </Row>
-          </Card>
-        )}
-
-        {/* Section Résumé des résultats pour le dernier examen terminé */}
-        {examResultsData.length > 0 && (
-          <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Statistic
-                  title="Score Achieved"
-                  value={examResultsData[0].score}
-                  suffix="%"
-                />
-              </Col>
-              <Col xs={24} md={12}>
-                <Statistic
-                  title="Result"
-                  value={examResultsData[0].result}
-                  valueStyle={{
-                    color:
-                      examResultsData[0].result === 'Pass'
-                        ? '#3f8600'
-                        : '#cf1322',
-                  }}
-                />
-              </Col>
-            </Row>
-          </Card>
-        )}
-
-        {/* Tableau historique des examens */}
-        <Card title="Exam History" style={{ marginBottom: 24 }}>
-          <Table
-            columns={columns}
-            dataSource={examResultsData}
-            rowKey="id"
-            pagination={{ pageSize: 5 }}
-          />
+    <PageContainer title="Exam Dashboard & Results">
+      {/* Examen à venir */}
+      {upcomingExam && (
+        <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Text strong>Exam:</Text> {upcomingExam.examName}
+            </Col>
+            <Col xs={24} md={8}>
+              <Text strong>Date:</Text> {upcomingExam.examDate}
+            </Col>
+            <Col xs={24} md={8}>
+              <Text strong>Status:</Text> {upcomingExam.status}
+            </Col>
+          </Row>
         </Card>
+      )}
 
-        {/* Liste des certifications obtenues */}
-        <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
-          <List
-            dataSource={certificationsEarned ?? []}
-            renderItem={(item) => (
-              <List.Item
-                actions={[
-                  <Button key="dl" icon={<FilePdfOutlined />} type="link">
-                    Download
-                  </Button>,
-                ]}
-              >
-                <List.Item.Meta
-                  title={item.title}
-                  description={`Certificate ID: ${item.id}`}
-                />
-              </List.Item>
-            )}
-          />
+      {/* Résumé du dernier examen */}
+      {examResultsData.length > 0 && (
+        <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
+          <Row gutter={16}>
+            <Col xs={24} md={12}>
+              <Statistic
+                title="Score Achieved"
+                value={examResultsData[0].score}
+                suffix="%"
+              />
+            </Col>
+            <Col xs={24} md={12}>
+              <Statistic
+                title="Result"
+                value={examResultsData[0].result}
+                valueStyle={{
+                  color:
+                    examResultsData[0].result === 'Pass' ? '#3f8600' : '#cf1322',
+                }}
+              />
+            </Col>
+          </Row>
         </Card>
+      )}
 
-        {/* Section Prochaines Étapes */}
-        <Card>
-          <Alert
-            message="Next Steps: Explore further certification programs to advance your career."
-            type="info"
-            showIcon
-          />
-          <div style={{ marginTop: 16 }}>
-            <Button type="primary" href="/konnected/certifications/programs">
-              Certification Programs
-            </Button>
-          </div>
-        </Card>
+      {/* Historique */}
+      <Card title="Exam History" style={{ marginBottom: 24 }}>
+        <Table<ExamResult>
+          columns={columns}
+          dataSource={examResultsData}
+          rowKey="id"
+          pagination={{ pageSize: 5 }}
+        />
+      </Card>
 
-        {/* Drawer pour détailler l'examen sélectionné */}
-        <Drawer
-          title="Exam Details"
-          placement="right"
-          onClose={() => setDrawerVisible(false)}
-          open={drawerVisible}
-        >
-          {selectedExam && (
-            <>
-              <p>
-                <strong>Exam Name:</strong> {selectedExam.examName}
-              </p>
-              <p>
-                <strong>Date Taken:</strong> {selectedExam.dateTaken}
-              </p>
-              <p>
-                <strong>Score:</strong> {selectedExam.score}%
-              </p>
-              <p>
-                <strong>Result:</strong>{' '}
-                <Text
-                  strong
-                  style={{
-                    color: selectedExam.result === 'Pass' ? 'green' : 'red',
-                  }}
+      {/* Certificats */}
+      <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
+        <List
+          dataSource={certificationsEarned}
+          renderItem={(item) => (
+            <List.Item
+              actions={[
+                <Button
+                  key="dl"
+                  icon={<FilePdfOutlined />}
+                  type="link"
+                  href={item.pdfLink}
                 >
-                  {selectedExam.result}
-                </Text>
-              </p>
-              <p>
-                <strong>Details:</strong>
-              </p>
-              <p>{selectedExam.details}</p>
-            </>
+                  Download
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta
+                title={item.title}
+                description={`Certificate ID: ${item.id}`}
+              />
+            </List.Item>
           )}
-        </Drawer>
-      </PageContainer>
-    </MainLayout>
+        />
+      </Card>
+
+      {/* Prochaines étapes */}
+      <Card>
+        <Alert
+          message="Next Steps: Explore further certification programs to advance your career."
+          type="info"
+          showIcon
+        />
+        <div style={{ marginTop: 16 }}>
+          {/* Chemin existant */}
+          <Link href="/konnected/certifications/certification-programs">
+            <Button type="primary">Certification Programs</Button>
+          </Link>
+        </div>
+      </Card>
+
+      {/* Détails d’un examen */}
+      <Drawer
+        title="Exam Details"
+        placement="right"
+        onClose={() => setDrawerOpen(false)}
+        open={drawerOpen}
+      >
+        {selectedExam && (
+          <>
+            <p>
+              <strong>Exam Name:</strong> {selectedExam.examName}
+            </p>
+            <p>
+              <strong>Date Taken:</strong> {selectedExam.dateTaken}
+            </p>
+            <p>
+              <strong>Score:</strong> {selectedExam.score}%
+            </p>
+            <p>
+              <strong>Result:</strong>{' '}
+              <Text
+                strong
+                style={{
+                  color: selectedExam.result === 'Pass' ? 'green' : 'red',
+                }}
+              >
+                {selectedExam.result}
+              </Text>
+            </p>
+            <p>
+              <strong>Details:</strong>
+            </p>
+            <p>{selectedExam.details}</p>
+          </>
+        )}
+      </Drawer>
+    </PageContainer>
   );
 }

@@ -1,6 +1,5 @@
-'use client'
+﻿'use client';
 
-// File: /pages/konnected/certifications/certification-programs.tsx
 import React, { useState } from 'react';
 import { NextPage } from 'next';
 import {
@@ -12,13 +11,12 @@ import {
   Button,
   Drawer,
   Typography,
-  Pagination
+  Pagination,
 } from 'antd';
 import { FileSearchOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 interface CertificationProgram {
@@ -28,7 +26,6 @@ interface CertificationProgram {
   category: string;
   levels: number;
   upcomingExamDates: string;
-  // Vous pouvez ajouter d’autres propriétés comme l’URL d’une image/icone
 }
 
 const dummyPrograms: CertificationProgram[] = [
@@ -56,7 +53,6 @@ const dummyPrograms: CertificationProgram[] = [
     levels: 4,
     upcomingExamDates: '2023-11-15, 2023-12-20',
   },
-  // Ajoutez d’autres programmes selon vos besoins...
 ];
 
 const CertificationPrograms: NextPage = () => {
@@ -64,35 +60,35 @@ const CertificationPrograms: NextPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [drawerVisible, setDrawerVisible] = useState<boolean>(false);
   const [selectedProgram, setSelectedProgram] = useState<CertificationProgram | null>(null);
-  // Pour la pagination (si nécessaire)
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 6;
 
-  // Filtrage des programmes selon le mot-clé et la catégorie
+  // Filtrage
   const filteredPrograms = dummyPrograms.filter((program) => {
     const matchesKeyword =
       program.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
       program.description.toLowerCase().includes(searchKeyword.toLowerCase());
-    const matchesCategory =
-      selectedCategory === 'All' || program.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'All' || program.category === selectedCategory;
     return matchesKeyword && matchesCategory;
   });
 
-  // Gestion de la pagination
+  // Pagination
   const paginatedPrograms = filteredPrograms.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
-  // Ouverture du Drawer de détails
+  // Ouverture du Drawer
   const openDrawer = (program: CertificationProgram) => {
     setSelectedProgram(program);
     setDrawerVisible(true);
+  };
 
   // Fermeture du Drawer
   const closeDrawer = () => {
     setDrawerVisible(false);
     setSelectedProgram(null);
+  };
 
   return (
     <PageContainer title="Certification Programs">
@@ -121,10 +117,10 @@ const CertificationPrograms: NextPage = () => {
             <Option value="All">All</Option>
             <Option value="Technical">Technical</Option>
             <Option value="Vocational">Vocational</Option>
-            {/* Ajoutez d’autres catégories si nécessaire */}
           </Select>
         </Col>
       </Row>
+
       <Row gutter={[16, 16]}>
         {paginatedPrograms.map((program) => (
           <Col xs={24} sm={12} md={8} key={program.id}>
@@ -149,6 +145,7 @@ const CertificationPrograms: NextPage = () => {
           </Col>
         ))}
       </Row>
+
       {filteredPrograms.length > pageSize && (
         <Row justify="center" style={{ marginTop: 24 }}>
           <Pagination
@@ -159,7 +156,7 @@ const CertificationPrograms: NextPage = () => {
           />
         </Row>
       )}
-      {/* Drawer de détails du programme */}
+
       <Drawer
         title={selectedProgram?.title}
         placement="right"
@@ -184,13 +181,6 @@ const CertificationPrograms: NextPage = () => {
               <strong>Upcoming Exam Dates: </strong>
               {selectedProgram.upcomingExamDates}
             </p>
-            <p>
-              <strong>Syllabus:</strong>
-              <br />
-              {/* Cette section pourra inclure le détail du programme */}
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod
-              libero nec nulla facilisis.
-            </p>
             <Button type="primary" style={{ marginTop: 16 }}>
               Register Now
             </Button>
@@ -199,10 +189,6 @@ const CertificationPrograms: NextPage = () => {
       </Drawer>
     </PageContainer>
   );
-
-// Correction : envelopper la page dans MainLayout via getLayout
-
-  return <MainLayout>{page}</MainLayout>;
+};
 
 export default CertificationPrograms;
-}}}

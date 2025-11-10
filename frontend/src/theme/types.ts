@@ -1,14 +1,14 @@
-// src/theme/types.ts
-// Typage permissif mais utile pour nos thèmes Ant Design + quelques clés custom.
+// File: /src/theme/types.ts
+// Permissive typing for Ant Design seeds + a few app-specific keys.
 export interface ThemeObject {
-  /* Libellés / UI */
+  /* Labels / UI */
   label: string;
   icon?: string;
 
-  /* Algorithme AntD (light/dark). On laisse `any` pour éviter de dépendre d'APIs internes */
+  /* AntD algorithm (light/dark). Keep `any` to avoid internal API coupling. */
   algorithm?: any;
 
-  /* Couleurs seed / alias fréquentes */
+  /* Common seed / alias colors */
   colorPrimary?: string;
   colorInfo?: string;
   colorSuccess?: string;
@@ -34,7 +34,7 @@ export interface ThemeObject {
   colorBorder?: string;
   colorSplit?: string;
 
-  /* Rayon / typo / dimensions */
+  /* Radius / typography / dimensions */
   borderRadius?: number;
   borderRadiusLG?: number;
   controlHeight?: number;
@@ -44,21 +44,30 @@ export interface ThemeObject {
   paddingContentHorizontalLG?: number;
   paddingContentVerticalLG?: number;
 
-  /* Clés "raw" utilisées dans ThemeProvider (menu, dropdown…) */
+  /* “Raw” keys consumed by ThemeProvider for component remaps */
+  // Layout
+  layoutColorBgSider?: string;
+
+  // Menu
   menuBg?: string;
   menuItemHoverBg?: string;
   menuItemSelectedBg?: string;
   menuItemTextColor?: string;
+
+  // Dropdown
   dropdownBg?: string;
   dropdownItemHoverBg?: string;
 
-  /* Variables perso exposées en CSS (voir ThemeContext) */
+  // Table
+  tableHeaderBg?: string;
+
+  /* Custom CSS variables (exported to :root in ThemeContext) */
   bgMain?: string;
   bgLight?: string;
   bgDark?: string;
   textMain?: string;
   accent?: string;
 
-  /* Éventuelles extensions */
+  /* Optional extensions */
   [key: string]: string | number | boolean | undefined;
 }

@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
-// File: /pages/konnected/certifications/exam-registration.tsx
+// File: /app/konnected/certifications/exam-registration/page.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
-import { Form,
+import type { NextPage } from 'next';
+import {
+  Form,
   Input,
   Button,
   Steps,
@@ -12,54 +13,49 @@ import { Form,
   Checkbox,
   Result,
   message as antdMessage,
- } from 'antd';
+} from 'antd';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Step } = Steps;
 const { Option } = Select;
 
 const ExamRegistration: NextPage = () => {
-  // State pour gérer l'étape courante de l'inscription
   const [currentStep, setCurrentStep] = useState<number>(0);
-  // Instance du formulaire
   const [form] = Form.useForm();
-  // State pour stocker les données saisies
   const [registrationData, setRegistrationData] = useState<any>({});
-  // State pour indiquer que l'inscription est terminée
   const [registrationCompleted, setRegistrationCompleted] = useState<boolean>(false);
 
-  // Définition des titres d'étape
   const steps = [
     { title: 'Choose Exam' },
     { title: 'Schedule Details' },
     { title: 'Confirmation' },
   ];
 
-  // Passage à l'étape suivante après validation des champs
+  // Étape suivante
   const next = () => {
     form
       .validateFields()
       .then((values) => {
-        // Enregistrer les valeurs dans le state global d'inscription
         setRegistrationData({ ...registrationData, ...values });
-        setCurrentStep(currentStep + 1);
+        setCurrentStep((s) => s + 1);
       })
       .catch((info) => {
         console.log('Validation Failed:', info);
       });
+  };
 
-  // Retour à l'étape précédente
+  // Étape précédente
   const prev = () => {
-    setCurrentStep(currentStep - 1);
+    setCurrentStep((s) => s - 1);
+  };
 
-  // Traitement final de la soumission
+  // Soumission finale
   const onSubmit = () => {
-    // Ici, vous pouvez intégrer un appel API ou une logique de paiement.
     antdMessage.success('Registration complete!');
     setRegistrationCompleted(true);
+  };
 
-  // Rendu conditionnel du contenu selon l'étape courante
+  // Contenu par étape
   const renderStepContent = () => {
     switch (currentStep) {
       case 0:
@@ -130,8 +126,9 @@ const ExamRegistration: NextPage = () => {
       default:
         return null;
     }
+  };
 
-  // Une fois l'inscription terminée, afficher une page de résultat
+  // Résultat post-soumission
   if (registrationCompleted) {
     return (
       <PageContainer title="Exam Registration">
@@ -149,6 +146,7 @@ const ExamRegistration: NextPage = () => {
     );
   }
 
+  // Rendu principal
   return (
     <PageContainer title="Exam Registration">
       <Steps current={currentStep} style={{ marginBottom: 24 }}>
@@ -156,6 +154,7 @@ const ExamRegistration: NextPage = () => {
           <Step key={item.title} title={item.title} />
         ))}
       </Steps>
+
       <Form form={form} layout="vertical">
         {renderStepContent()}
         <div style={{ marginTop: 24 }}>
@@ -178,10 +177,6 @@ const ExamRegistration: NextPage = () => {
       </Form>
     </PageContainer>
   );
-
-// Correction: envelopper la page dans MainLayout via getLayout
-
-  return <MainLayout>{page}</MainLayout>;
+};
 
 export default ExamRegistration;
-}}}}}

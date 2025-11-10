@@ -1,100 +1,101 @@
-'use client'
+﻿'use client';
 
-// File: /pages/konnected/learning-paths/manage-existing-paths.tsx
 import React, { useState } from 'react';
-import { NextPage } from 'next';
-import { Table,
-  Button,
-  Modal,
-  Typography,
-  Input,
-  Space,
-  Empty,
-  message as antdMessage,
- } from 'antd';
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import Link from 'next/link';
+import { Button, Empty, Modal, Space, Table, Tag, Typography, message } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Title } = Typography;
-const { Search } = Input;
+const { Title, Paragraph, Text } = Typography;
 
-interface LearningPath {
+type LearningPathStatus = 'Draft' | 'Published' | 'Archived';
+
+export interface LearningPath {
   id: string;
   title: string;
-  lastUpdated: string;
-  status: 'Published' | 'Draft';
+  description?: string;
+  createdAt: string; // ISO string
+  modulesCount: number;
+  learnersCount: number;
+  status: LearningPathStatus;
 }
 
-const initialPaths: LearningPath[] = [
-  {
-    id: '1',
-    title: 'Introduction to Programming',
-    lastUpdated: '2023-09-15',
-    status: 'Published',
-  },
-  {
-    id: '2',
-    title: 'Advanced Web Development',
-    lastUpdated: '2023-08-10',
-    status: 'Draft',
-  },
-  // Ajoutez d'autres parcours selon les besoins
-];
+export default function Page() {
+  // NOTE: branchement API à faire ici si nécessaire
+  const [paths, setPaths] = useState<LearningPath[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-const ManageExistingPaths: NextPage = () => {
-  const [paths, setPaths] = useState<LearningPath[]>(initialPaths);
-  const [searchText, setSearchText] = useState<string>('');
-  
-  // Filtrage des parcours selon le texte de recherche
-  const filteredPaths = paths.filter((path) =>
-    path.title.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  // Gestion de la suppression d'un parcours
   const handleDelete = (id: string) => {
     Modal.confirm({
-      title: 'Confirm Deletion',
-      content: 'Are you sure you want to delete this learning path?',
-      okType: 'danger',
-      onOk: () => {
-        setPaths(paths.filter((path) => path.id !== id));
-        antdMessage.success('Learning path deleted successfully');
+      title: 'Delete this learning path?',
+      content:
+        'This action cannot be undone. If this path is assigned to learners, consider archiving instead.',
+      okText: 'Delete',
+      okButtonProps: { danger: true },
+      onOk: async () => {
+        // TODO: appelez votre API ici (DELETE /api/konnected/learning-paths/:id)
+        setPaths(prev => prev.filter(p => p.id !== id));
+        message.success('Learning path deleted');
       },
     });
+  };
 
-  // Colonnes du tableau
-  const columns = [
+  const columns: ColumnsType<LearningPath> = [
     {
-      title: 'Path Title',
+      title: 'Title',
       dataIndex: 'title',
       key: 'title',
+      render: (text, record) => (
+        <Link href={`/konnected/learning-paths/manage-existing-paths/${record.id}`}>
+          {text}
+        </Link>
+      ),
     },
     {
-      title: 'Last Updated',
-      dataIndex: 'lastUpdated',
-      key: 'lastUpdated',
+      title: 'Modules',
+      dataIndex: 'modulesCount',
+      key: 'modulesCount',
+      width: 110,
+      align: 'right',
+    },
+    {
+      title: 'Learners',
+      dataIndex: 'learnersCount',
+      key: 'learnersCount',
+      width: 120,
+      align: 'right',
+    },
+    {
+      title: 'Created',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (iso) => new Date(iso).toLocaleDateString(),
+      width: 140,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (status: LearningPathStatus) => {
+        const color =
+          status === 'Published' ? 'green' : status === 'Draft' ? 'gold' : 'default';
+        return <Tag color={color}>{status}</Tag>;
+      },
+      width: 120,
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (_: any, record: LearningPath) => (
+      fixed: 'right',
+      width: 170,
+      render: (_: unknown, record) => (
         <Space>
-          <Button
-            icon={<EditOutlined />}
-            type="link"
-            onClick={() => {
-              // Redirection vers la page d'édition (ex: /learning-paths/edit/[id])
-              window.location.href = `/learning-paths/edit/${record.id}`;
-            }}
-          >
-            Edit
-          </Button>
+          <Link href={`/konnected/learning-paths/manage-existing-paths/${record.id}/edit`}>
+            <Button icon={<EditOutlined />} type="link">
+              Edit
+            </Button>
+          </Link>
           <Button
             icon={<DeleteOutlined />}
             type="link"
@@ -109,43 +110,39 @@ const ManageExistingPaths: NextPage = () => {
   ];
 
   return (
-    <PageContainer title="Manage Existing Paths">
-      <div
-        style={{
-          marginBottom: 24,
-          display: 'flex',
-          justifyContent: 'space-between',
-        }}
-      >
-        <Search
-          placeholder="Search by path name"
-          onChange={(e) => setSearchText(e.target.value)}
-          style={{ width: 300 }}
-        />
-        <Button type="primary" icon={<PlusOutlined />} href="/learning-paths/create">
-          Create New Path
-        </Button>
-      </div>
+    <PageContainer
+      title="Manage Existing Paths"
+      extra={[
+        <Link key="create" href="/konnected/learning-paths/create-learning-path">
+          <Button type="primary" icon={<PlusOutlined />}>
+            Create Path
+          </Button>
+        </Link>,
+      ]}
+    >
+      {/* Sous-titre optionnel pour contexte */}
+      <Title level={4} style={{ marginBottom: 8 }}>Manage Existing Paths</Title>
+      <Paragraph type="secondary" style={{ marginBottom: 24 }}>
+        Review, edit, archive or delete learning paths. Published paths affect learners currently
+        enrolled.
+      </Paragraph>
 
-      {filteredPaths.length > 0 ? (
-        <Table
-          dataSource={filteredPaths}
-          columns={columns}
+      {paths.length > 0 ? (
+        <Table<LearningPath>
           rowKey="id"
-          pagination={{ pageSize: 5 }}
+          columns={columns}
+          dataSource={paths}
+          loading={loading}
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: 900 }}
         />
       ) : (
         <Empty description="No learning paths found.">
-          <Button type="primary" href="/learning-paths/create">
-            Create New Path
-          </Button>
+          <Link href="/konnected/learning-paths/create-learning-path">
+            <Button type="primary">Create New Path</Button>
+          </Link>
         </Empty>
       )}
     </PageContainer>
   );
-
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default ManageExistingPaths;
-}}
+}

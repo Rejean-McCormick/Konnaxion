@@ -1,4 +1,4 @@
-// theme/index.ts
+// src/theme/index.ts
 import light        from './lightTheme';
 import dark         from './darkTheme';
 import funky        from './funkyTheme';
@@ -22,8 +22,5 @@ export const themes = {
 } as const;
 
 export type ThemeType = keyof typeof themes;
-
-/* --- NOUVEAU : liste prête à l’emploi pour les consommateurs ------ */
 export const themeKeys = Object.keys(themes) as ThemeType[];
-
 export default themes;

@@ -1,210 +1,215 @@
-// File: /pages/konnected/teams-collaboration/my-teams.tsx
+﻿/* eslint-disable react/jsx-key */
 'use client';
-import React from 'react';
-import { NextPage } from 'next';
-import { Table, Button, Avatar, List, Menu, Dropdown, Typography, Space } from 'antd';
-import { SettingOutlined, DownOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Text, Title } = Typography;
+import React, { useMemo, useState } from 'react';
+import { Button, Dropdown, List, Space, Table, Typography, Avatar } from 'antd';
+import type { ColumnsType, TableProps } from 'antd/es/table';
+import type { MenuProps } from 'antd';
+import { DownOutlined, UsergroupAddOutlined, PlusOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
 
-// Interface pour définir la structure d'un membre d'équipe
+const { Text } = Typography;
+
 interface TeamMember {
   id: string;
   name: string;
   role: string;
-  avatar: string;
+  avatar?: string;
 }
 
-// Interface pour définir la structure d'une équipe
 interface Team {
   id: string;
-  teamName: string;
-  role: 'Leader' | 'Member';
-  membersCount: number;
-  // Quelques dernières activités à afficher en aperçu
+  name: string;
+  project: string;
+  members: TeamMember[];
   recentActivity: string[];
-  // Liste détaillée des membres de l'équipe
-  roster: TeamMember[];
 }
 
-// Exemple de données simulées pour les équipes de l'utilisateur
+type TeamRow = {
+  key: string;
+  teamId: string;
+  teamName: string;
+  projectName: string;
+  membersCount: number;
+  roster: TeamMember[];
+  recentActivity: string[];
+};
+
 const teamsData: Team[] = [
   {
-    id: 'team1',
-    teamName: 'Alpha Innovators',
-    role: 'Leader',
-    membersCount: 5,
+    id: 't-1',
+    name: 'Frontend Guild',
+    project: 'Design System',
+    members: [
+      { id: 'u-1', name: 'John Doe', role: 'Lead' },
+      { id: 'u-2', name: 'Alice Smith', role: 'Developer' },
+      { id: 'u-3', name: 'Bob Johnson', role: 'Developer' },
+      { id: 'u-4', name: 'Eve Davis', role: 'QA' },
+      { id: 'u-5', name: 'Charlie Brown', role: 'Designer' },
+    ],
     recentActivity: [
       'John joined the team',
-      'Meeting scheduled for 14:00',
-      'Project milestone completed'
-    ],
-    roster: [
-      { id: 'm1', name: 'John Doe', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-      { id: 'm2', name: 'Alice Smith', role: 'Member', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
-      { id: 'm3', name: 'Bob Johnson', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/3.jpg' },
-      { id: 'm4', name: 'Eve Davis', role: 'Member', avatar: 'https://randomuser.me/api/portraits/women/4.jpg' },
-      { id: 'm5', name: 'Charlie Brown', role: 'Leader', avatar: 'https://randomuser.me/api/portraits/men/5.jpg' },
+      'Alice commented on PR #42',
+      'Bob merged branch feature/layout'
     ],
   },
   {
-    id: 'team2',
-    teamName: 'Beta Coders',
-    role: 'Member',
-    membersCount: 8,
-    recentActivity: [
-      'New repository added',
-      'Bug fixes deployed',
-      'Code review completed'
+    id: 't-2',
+    name: 'Backend Core',
+    project: 'API Platform',
+    members: [
+      { id: 'u-6', name: 'Diana Prince', role: 'Lead' },
+      { id: 'u-7', name: 'Bruce Wayne', role: 'SRE' },
+      { id: 'u-8', name: 'Clark Kent', role: 'Developer' },
     ],
-    roster: [
-      { id: 'm6', name: 'Diana Prince', role: 'Leader', avatar: 'https://randomuser.me/api/portraits/women/6.jpg' },
-      { id: 'm7', name: 'Bruce Wayne', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/7.jpg' },
-      { id: 'm8', name: 'Clark Kent', role: 'Member', avatar: 'https://randomuser.me/api/portraits/men/8.jpg' },
-      // ... autres membres
+    recentActivity: [
+      'Diana created issue API-120',
+      'Bruce deployed v2.3.1',
+      'Clark fixed failing tests'
     ],
   },
-  // Ajoutez d'autres équipes si besoin...
 ];
 
-const TeamsCollaboration: NextPage = () => {
-  // Définition du menu d'actions pour une équipe, disponible uniquement si l'utilisateur est leader
-  const teamActionsMenu = (
-    <Menu>
-      <Menu.Item key="settings">
-        <a href="#">Manage Team Settings</a>
-      </Menu.Item>
-      <Menu.Item key="invite">
-        <a href="#">Invite New Member</a>
-      </Menu.Item>
-    </Menu>
-  );
+const toRows = (input: Team[]): TeamRow[] =>
+  input.map((t) => ({
+    key: t.id,
+    teamId: t.id,
+    teamName: t.name,
+    projectName: t.project,
+    membersCount: t.members.length,
+    roster: t.members,
+    recentActivity: t.recentActivity,
+  }));
 
-  // Colonnes du tableau de liste des équipes
-  const columns = [
+export default function Page() {
+  const [selectedTeamKeys, setSelectedTeamKeys] = useState<React.Key[]>([]);
+  const [data, setData] = useState<TeamRow[]>(() => toRows(teamsData));
+
+  const columns: ColumnsType<TeamRow> = [
     {
-      title: 'Team Name',
+      title: 'Équipe',
       dataIndex: 'teamName',
       key: 'teamName',
-      render: (text: string, record: Team) => (
-        <Space>
-          <span>{text}</span>
-          {record.role === 'Leader' && (
-            <Text type="success" strong>
-              (Leader)
-            </Text>
-          )}
+      render: (value: string, record) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{value}</Text>
+          <Text type="secondary">ID&nbsp;: {record.teamId}</Text>
         </Space>
       ),
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
+      title: 'Projet',
+      dataIndex: 'projectName',
+      key: 'projectName',
+      ellipsis: true,
+      render: (value: string) => <Text>{value}</Text>,
     },
     {
-      title: 'Members',
-      dataIndex: 'membersCount',
-      key: 'membersCount',
-    },
-    {
-      title: 'Recent Activity',
-      dataIndex: 'recentActivity',
-      key: 'recentActivity',
-      render: (activities, row) => (
+      title: 'Membres',
+      dataIndex: 'roster',
+      key: 'roster',
+      render: (_: TeamMember[], record) => (
         <List
-          dataSource={activities.slice(0, 2) ?? []} // Afficher les 2 dernières activités en aperçu
-          renderItem={(activity) => (
-            <List.Item style={{ padding: 0 }}>
-              <Text type="secondary">{activity}</Text>
+          dataSource={record.roster.slice(0, 3)}
+          renderItem={(m: TeamMember) => (
+            <List.Item style={{ paddingInline: 0 }} key={m.id}>
+              <List.Item.Meta
+                avatar={<Avatar>{m.name.charAt(0)}</Avatar>}
+                title={<Text>{m.name}</Text>}
+                description={<Text type="secondary">{m.role}</Text>}
+              />
             </List.Item>
           )}
-          size="small"
         />
       ),
     },
     {
+      title: 'Activité récente',
+      dataIndex: 'recentActivity',
+      key: 'recentActivity',
+      render: (activities: string[]) => (
+        <List
+          size="small"
+          dataSource={activities.slice(0, 3)}
+          renderItem={(msg) => <List.Item style={{ paddingInline: 0 }}>{msg}</List.Item>}
+        />
+      ),
+      responsive: ['lg'],
+    },
+    {
       title: 'Actions',
       key: 'actions',
-      render: (_: any, record: Team) =>
-        record.role === 'Leader' ? (
-          <Dropdown overlay={teamActionsMenu}>
-            <a onClick={(e) => e.preventDefault()}>
-              <Space>
-                Actions <DownOutlined />
-              </Space>
-            </a>
+      fixed: 'right',
+      width: 140,
+      render: (_: unknown, record) => {
+        const onMenuClick: MenuProps['onClick'] = ({ key }) => {
+          switch (key) {
+            case 'view':
+              // TODO: router.push(`/konnected/teams-collaboration/my-teams/${record.teamId}`);
+              break;
+            case 'invite':
+              // TODO: ouvrir un modal d’invitation
+              break;
+            case 'archive':
+              setData((prev) => prev.filter((r) => r.key !== record.key));
+              break;
+            default:
+              break;
+          }
+        };
+
+        const items: MenuProps['items'] = [
+          { key: 'view', label: 'Voir l’équipe' },
+          { key: 'invite', label: 'Inviter des membres' },
+          { type: 'divider' },
+          { key: 'archive', danger: true, label: 'Archiver' },
+        ];
+
+        return (
+          <Dropdown menu={{ items, onClick: onMenuClick }} trigger={['click']}>
+            <Button>
+              Actions <DownOutlined />
+            </Button>
           </Dropdown>
-        ) : null,
+        );
+      },
     },
   ];
 
-  // Fonction de rendu pour la zone détaillée (row expansion)
-  const expandedRowRender = (record: Team) => {
-    return (
-      <div style={{ padding: '16px 24px', background: '#fafafa' }}>
-        <Title level={5}>Team Roster</Title>
-        <List
-          grid={{ gutter: 16, column: 4 }}
-          dataSource={record.roster ?? []}
-          renderItem={(member: TeamMember) => (
-            <List.Item>
-              <Space direction="vertical" align="center">
-                <Avatar src={member.avatar} size={48} />
-                <Text>{member.name}</Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  {member.role}
-                </Text>
-              </Space>
-            </List.Item>
-          )}
-        />
-        <br />
-        <Title level={5}>Recent Activity Log</Title>
-        <List
-          dataSource={record.recentActivity ?? []}
-          renderItem={(activity) => (
-            <List.Item>
-              <Text>{activity}</Text>
-            </List.Item>
-          )}
-          size="small"
-        />
-      </div>
-    );
+  const rowSelection: TableProps<TeamRow>['rowSelection'] = {
+    selectedRowKeys: selectedTeamKeys,
+    onChange: (keys) => setSelectedTeamKeys(keys),
+  };
 
-  return (
-    <PageContainer title="My Teams">
-      <div style={{ marginBottom: 24, textAlign: 'right' }}>
-        <Button
-          type="primary"
-          icon={<UsergroupAddOutlined />}
-          href="/konnected/teams-collaboration/team-builder"
-        >
-          Team Builder
-        </Button>
-      </div>
-      <Table
-        columns={columns}
-        dataSource={teamsData}
-        rowKey="id"
-        expandable={{ expandedRowRender }}
-        pagination={{ pageSize: 5 }}
-        // Mise en évidence des équipes où l'utilisateur est Leader
-        rowClassName={(record: Team) => (record.role === 'Leader' ? 'team-leader-row' : '')}
-      />
-      <style jsx>{`
-        .team-leader-row {
-          background-color: #f6ffed;
-        }
-      `}</style>
-    </PageContainer>
+  const sortedData = useMemo(
+    () => [...data].sort((a, b) => a.teamName.localeCompare(b.teamName)),
+    [data]
   );
 
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default TeamsCollaboration;
-}}
+  return (
+    <PageContainer
+      header={{
+        title: 'Mes équipes',
+        extra: [
+          <Button key="new" type="primary" icon={<PlusOutlined />}>
+            Nouvelle équipe
+          </Button>,
+          <Button key="invite" icon={<UsergroupAddOutlined />}>
+            Inviter
+          </Button>,
+        ],
+      }}
+    >
+      <Table<TeamRow>
+        rowKey="key"
+        size="middle"
+        bordered
+        columns={columns}
+        dataSource={sortedData}
+        rowSelection={rowSelection}
+        pagination={{ pageSize: 8, showSizeChanger: false }}
+        scroll={{ x: 900 }}
+      />
+    </PageContainer>
+  );
+}

@@ -1,27 +1,25 @@
-'use client'
+'use client';
 
-// File: /pages/kreative/idea-incubator/create-new-idea.tsx
 import React from 'react';
-import { NextPage } from 'next';
-import { Form, Input, Select, Button, message as antdMessage  } from 'antd';
+import { Form, Input, Select, Button, message as antdMessage } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
+// Note: MainLayout import removed because the /kreative layout handles the layout wrapper.
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const CreateNewIdea: NextPage = () => {
+const CreateNewIdea: React.FC = () => {
   const [form] = Form.useForm();
   const router = useRouter();
 
   // Handler for form submission.
   const onFinish = (values: any) => {
-    // Log form values; in a real app, you would send this data via an API call.
     console.log('Submitted Idea:', values);
     antdMessage.success('Votre idée a été soumise avec succès !');
     // Redirect to the "My Ideas" page after submitting.
     router.push('/kreative/idea-incubator/my-ideas');
+  };
 
   return (
     <PageContainer title="Create New Idea">
@@ -62,17 +60,7 @@ const CreateNewIdea: NextPage = () => {
           </Select>
         </Form.Item>
 
-        {/*
-        // Optionally, add a multi-select for "Resources Needed" or "Skills Required" 
-        <Form.Item label="Resources Needed / Skills Required" name="resources">
-          <Select mode="multiple" placeholder="Select resources or skills">
-            <Option value="Design">Design</Option>
-            <Option value="Development">Development</Option>
-            <Option value="Marketing">Marketing</Option>
-            <Option value="Research">Research</Option>
-          </Select>
-        </Form.Item>
-        */}
+        {/* (Optional) Resources Needed / Skills Required - omitted for now */}
 
         {/* Submit Button */}
         <Form.Item>
@@ -83,10 +71,6 @@ const CreateNewIdea: NextPage = () => {
       </Form>
     </PageContainer>
   );
-
-// Integrate with a global layout if required.
-
-  return <MainLayout>{page}</MainLayout>;
+};
 
 export default CreateNewIdea;
-}}

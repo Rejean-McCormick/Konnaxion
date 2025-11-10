@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import React from 'react';
 import { NextPage } from 'next';
@@ -19,8 +19,6 @@ import {
   DownloadOutlined
 } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
-// Ajout de l'import de MainLayout pour appliquer le layout global
-import MainLayout from '@/components/layout-components/MainLayout';
 
 const { Title, Text } = Typography;
 
@@ -180,10 +178,6 @@ const KonnectedDashboard: NextPage = () => {
       </Row>
     </PageContainer>
   );
-
-// Correction : envelopper la page dans MainLayout via getLayout
-
-  return <MainLayout>{page}</MainLayout>;
+};
 
 export default KonnectedDashboard;
-}
