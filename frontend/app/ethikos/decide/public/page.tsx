@@ -6,7 +6,7 @@ import axios from 'axios';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import { Select, Space, Input, Progress, Radio, Slider, message } from 'antd';
-import type { RadioChangeEvent } from 'antd/es/radio';
+import type { RadioChangeEvent } from 'antd';
 import usePageTitle from '@/hooks/usePageTitle';
 
 type Format = 'SINGLE' | 'MULTIPLE' | 'SCALE';
@@ -15,7 +15,7 @@ export interface PublicTopic {
   id: string | number;
   question: string;
   category: string;
-  responseformat_id: number; // 1 = binaire, 2 = multiple, 3 = échelle
+  responseformat_id: number; // 1 = binary, 2 = multiple, 3 = scale
   options?: string[];        // SINGLE/MULTIPLE
   labels?: string[];         // SCALE
   turnout?: number;          // 0..100
@@ -26,7 +26,7 @@ interface PagedResult<T> {
   count: number;
 }
 
-export default function PublicVotePage() {
+export default function PublicVotePage(): JSX.Element {
   usePageTitle('Décider — Public');
 
   // --- UI state ---
@@ -36,24 +36,19 @@ export default function PublicVotePage() {
 
   // --- data ---
   const [categories, setCategories] = useState<string[]>([]);
-  const [formats, setFormats] = useState<Format[]>([]);
   const [topicsData, setTopicsData] = useState<PagedResult<PublicTopic> | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Filtres (catégories/formats)
+  // Load category filter values
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const [catsRes, fmtRes] = await Promise.all([
-          axios.get<string[]>('/api/home/categories/'),
-          axios.get<Format[]>('/api/home/responseformat/'),
-        ]);
+        const catsRes = await axios.get<string[]>('/api/home/categories/');
         if (!mounted) return;
-        setCategories(catsRes.data ?? []);
-        setFormats(fmtRes.data ?? []);
+        setCategories(Array.isArray(catsRes.data) ? catsRes.data : []);
       } catch (e) {
-        console.warn('Failed to load filters', e);
+        console.warn('Failed to load categories', e);
       }
     })();
     return () => {
@@ -61,7 +56,7 @@ export default function PublicVotePage() {
     };
   }, []);
 
-  // Sujets
+  // Fetch topics list
   const fetchTopics = useCallback(async () => {
     setLoading(true);
     try {
@@ -84,13 +79,13 @@ export default function PublicVotePage() {
     fetchTopics();
   }, [fetchTopics]);
 
-  // Soumission d'un vote (adapter l'endpoint si besoin)
+  // Submit a vote (adapt the endpoint as needed)
   const submitVote = useCallback(
     async (topic: PublicTopic, value: string | string[] | number) => {
       try {
         await axios.post(`/api/home/debatetopic/${topic.id}/vote`, { value });
         message.success('Vote enregistré');
-        fetchTopics(); // refresh
+        fetchTopics(); // refresh after voting
       } catch {
         message.error("Impossible d'enregistrer le vote");
       }
@@ -98,9 +93,15 @@ export default function PublicVotePage() {
     [fetchTopics]
   );
 
+  /**
+   * Per-topic vote UI:
+   * - SCALE: Slider with labeled marks (no unsafe array indexing)
+   * - MULTIPLE: Select[multiple]
+   * - SINGLE / default: Radio group
+   */
   const renderVoteInput = useCallback(
     (topic: PublicTopic) => {
-      // 3: échelle (Slider)
+      // 3: scale
       if (topic.responseformat_id === 3) {
         const labels = topic.labels ?? topic.options ?? [];
         const marks = labels.reduce<Record<number, React.ReactNode>>((acc, label, i) => {
@@ -123,7 +124,7 @@ export default function PublicVotePage() {
         );
       }
 
-      // 2: multiple (Select multiple)
+      // 2: multiple
       if (topic.responseformat_id === 2) {
         const opts = topic.options ?? topic.labels ?? [];
         const onChange = (value: string[]) => submitVote(topic, value);
@@ -138,10 +139,9 @@ export default function PublicVotePage() {
         );
       }
 
-      // 1 (default): binaire / single (Radio)
+      // 1: binary / single (default)
       const opts = topic.options ?? ['Oui', 'Non'];
-      const onRadio: (e: RadioChangeEvent) => void = (e) =>
-        submitVote(topic, e.target.value as string);
+      const onRadio: (e: RadioChangeEvent) => void = (e) => submitVote(topic, e.target.value as string);
       return (
         <Radio.Group onChange={onRadio}>
           {opts.map((o) => (
@@ -155,7 +155,7 @@ export default function PublicVotePage() {
     [submitVote]
   );
 
-  // Colonnes
+  // Table columns (typed; ProTable v3 render signature respected)
   const columns: ProColumns<PublicTopic>[] = useMemo(
     () => [
       {
@@ -176,7 +176,6 @@ export default function PublicVotePage() {
         dataIndex: 'turnout',
         align: 'center',
         width: 160,
-        // FIX (#8): nouvelle signature de ProTable — on lit depuis "row"
         render: (_dom, row) => <Progress percent={row.turnout ?? 0} size="small" />,
       },
     ],

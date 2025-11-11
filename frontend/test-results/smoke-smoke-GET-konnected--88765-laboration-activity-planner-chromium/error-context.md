@@ -1,0 +1,271 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6] [cursor=pointer]:
+        - img "Konnaxion logo" [ref=e7]
+        - generic [ref=e8]: EkoH
+      - menu [ref=e9]
+  - generic [ref=e10]:
+    - banner [ref=e11]:
+      - generic [ref=e12]:
+        - img "menu-fold" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+        - navigation [ref=e17]:
+          - list [ref=e18]:
+            - listitem [ref=e19]:
+              - link "Ekoh" [ref=e21] [cursor=pointer]:
+                - /url: /ekoh?sidebar=ekoh
+        - generic [ref=e22]:
+          - button "🪩 Funky Disco" [ref=e23] [cursor=pointer]
+          - generic [ref=e24] [cursor=pointer]:
+            - img "user" [ref=e25]:
+              - img [ref=e26]
+            - text: Admin
+    - main [ref=e28]:
+      - generic [ref=e29]:
+        - heading "Activity Planner" [level=1] [ref=e31]
+        - main [ref=e32]:
+          - generic [ref=e33]:
+            - generic [ref=e35]:
+              - generic [ref=e36]:
+                - generic [ref=e37]:
+                  - generic [ref=e39]:
+                    - combobox [ref=e41]
+                    - text: "2025"
+                  - img [ref=e43]:
+                    - img [ref=e44]
+                - generic [ref=e46]:
+                  - generic [ref=e48]:
+                    - combobox [ref=e50]
+                    - text: Nov
+                  - img [ref=e52]:
+                    - img [ref=e53]
+                - generic [ref=e55]:
+                  - generic [ref=e56]:
+                    - radio "Month" [checked] [ref=e58]
+                    - text: Month
+                  - generic [ref=e59]:
+                    - radio "Year" [ref=e61]
+                    - text: Year
+              - table [ref=e65]:
+                - rowgroup [ref=e66]:
+                  - row "Su Mo Tu We Th Fr Sa" [ref=e67]:
+                    - cell "Su" [ref=e68]
+                    - cell "Mo" [ref=e69]
+                    - cell "Tu" [ref=e70]
+                    - cell "We" [ref=e71]
+                    - cell "Th" [ref=e72]
+                    - cell "Fr" [ref=e73]
+                    - cell "Sa" [ref=e74]
+                - rowgroup [ref=e75]:
+                  - row "26 26 27 27 28 28 29 29 30 30 31 31 01 1" [ref=e76]:
+                    - cell "26 26" [ref=e77]:
+                      - generic [ref=e78]:
+                        - generic [ref=e79]: "26"
+                        - generic [ref=e81]: "26"
+                    - cell "27 27" [ref=e82]:
+                      - generic [ref=e83]:
+                        - generic [ref=e84]: "27"
+                        - generic [ref=e86]: "27"
+                    - cell "28 28" [ref=e87]:
+                      - generic [ref=e88]:
+                        - generic [ref=e89]: "28"
+                        - generic [ref=e91]: "28"
+                    - cell "29 29" [ref=e92]:
+                      - generic [ref=e93]:
+                        - generic [ref=e94]: "29"
+                        - generic [ref=e96]: "29"
+                    - cell "30 30" [ref=e97]:
+                      - generic [ref=e98]:
+                        - generic [ref=e99]: "30"
+                        - generic [ref=e101]: "30"
+                    - cell "31 31" [ref=e102]:
+                      - generic [ref=e103]:
+                        - generic [ref=e104]: "31"
+                        - generic [ref=e106]: "31"
+                    - cell "01 1" [ref=e107]:
+                      - generic [ref=e108]:
+                        - generic [ref=e109]: "01"
+                        - generic [ref=e111]: "1"
+                  - row "02 2 03 3 04 4 05 5 06 6 07 7 08 8" [ref=e112]:
+                    - cell "02 2" [ref=e113]:
+                      - generic [ref=e114]:
+                        - generic [ref=e115]: "02"
+                        - generic [ref=e117]: "2"
+                    - cell "03 3" [ref=e118]:
+                      - generic [ref=e119]:
+                        - generic [ref=e120]: "03"
+                        - generic [ref=e122]: "3"
+                    - cell "04 4" [ref=e123]:
+                      - generic [ref=e124]:
+                        - generic [ref=e125]: "04"
+                        - generic [ref=e127]: "4"
+                    - cell "05 5" [ref=e128]:
+                      - generic [ref=e129]:
+                        - generic [ref=e130]: "05"
+                        - generic [ref=e132]: "5"
+                    - cell "06 6" [ref=e133]:
+                      - generic [ref=e134]:
+                        - generic [ref=e135]: "06"
+                        - generic [ref=e137]: "6"
+                    - cell "07 7" [ref=e138]:
+                      - generic [ref=e139]:
+                        - generic [ref=e140]: "07"
+                        - generic [ref=e142]: "7"
+                    - cell "08 8" [ref=e143]:
+                      - generic [ref=e144]:
+                        - generic [ref=e145]: "08"
+                        - generic [ref=e147]: "8"
+                  - row "09 9 10 10 11 11 12 Team Meeting 13 13 14 Sprint Planning 15 15" [ref=e148]:
+                    - cell "09 9" [ref=e149]:
+                      - generic [ref=e150]:
+                        - generic [ref=e151]: "09"
+                        - generic [ref=e153]: "9"
+                    - cell "10 10" [ref=e154]:
+                      - generic [ref=e155]:
+                        - generic [ref=e156]: "10"
+                        - generic [ref=e158]: "10"
+                    - cell "11 11" [ref=e159]:
+                      - generic [ref=e160]:
+                        - generic [ref=e161]: "11"
+                        - generic [ref=e163]: "11"
+                    - cell "12 Team Meeting" [ref=e164]:
+                      - generic [ref=e165]:
+                        - generic [ref=e166]: "12"
+                        - list [ref=e168]:
+                          - listitem [ref=e169]: Team Meeting
+                    - cell "13 13" [ref=e170]:
+                      - generic [ref=e171]:
+                        - generic [ref=e172]: "13"
+                        - generic [ref=e174]: "13"
+                    - cell "14 Sprint Planning" [ref=e175]:
+                      - generic [ref=e176]:
+                        - generic [ref=e177]: "14"
+                        - list [ref=e179]:
+                          - listitem [ref=e180]: Sprint Planning
+                    - cell "15 15" [ref=e181]:
+                      - generic [ref=e182]:
+                        - generic [ref=e183]: "15"
+                        - generic [ref=e185]: "15"
+                  - row "16 16 17 17 18 18 19 19 20 20 21 21 22 22" [ref=e186]:
+                    - cell "16 16" [ref=e187]:
+                      - generic [ref=e188]:
+                        - generic [ref=e189]: "16"
+                        - generic [ref=e191]: "16"
+                    - cell "17 17" [ref=e192]:
+                      - generic [ref=e193]:
+                        - generic [ref=e194]: "17"
+                        - generic [ref=e196]: "17"
+                    - cell "18 18" [ref=e197]:
+                      - generic [ref=e198]:
+                        - generic [ref=e199]: "18"
+                        - generic [ref=e201]: "18"
+                    - cell "19 19" [ref=e202]:
+                      - generic [ref=e203]:
+                        - generic [ref=e204]: "19"
+                        - generic [ref=e206]: "19"
+                    - cell "20 20" [ref=e207]:
+                      - generic [ref=e208]:
+                        - generic [ref=e209]: "20"
+                        - generic [ref=e211]: "20"
+                    - cell "21 21" [ref=e212]:
+                      - generic [ref=e213]:
+                        - generic [ref=e214]: "21"
+                        - generic [ref=e216]: "21"
+                    - cell "22 22" [ref=e217]:
+                      - generic [ref=e218]:
+                        - generic [ref=e219]: "22"
+                        - generic [ref=e221]: "22"
+                  - row "23 23 24 24 25 25 26 26 27 27 28 28 29 29" [ref=e222]:
+                    - cell "23 23" [ref=e223]:
+                      - generic [ref=e224]:
+                        - generic [ref=e225]: "23"
+                        - generic [ref=e227]: "23"
+                    - cell "24 24" [ref=e228]:
+                      - generic [ref=e229]:
+                        - generic [ref=e230]: "24"
+                        - generic [ref=e232]: "24"
+                    - cell "25 25" [ref=e233]:
+                      - generic [ref=e234]:
+                        - generic [ref=e235]: "25"
+                        - generic [ref=e237]: "25"
+                    - cell "26 26" [ref=e238]:
+                      - generic [ref=e239]:
+                        - generic [ref=e240]: "26"
+                        - generic [ref=e242]: "26"
+                    - cell "27 27" [ref=e243]:
+                      - generic [ref=e244]:
+                        - generic [ref=e245]: "27"
+                        - generic [ref=e247]: "27"
+                    - cell "28 28" [ref=e248]:
+                      - generic [ref=e249]:
+                        - generic [ref=e250]: "28"
+                        - generic [ref=e252]: "28"
+                    - cell "29 29" [ref=e253]:
+                      - generic [ref=e254]:
+                        - generic [ref=e255]: "29"
+                        - generic [ref=e257]: "29"
+                  - row "30 30 01 1 02 2 03 3 04 4 05 5 06 6" [ref=e258]:
+                    - cell "30 30" [ref=e259]:
+                      - generic [ref=e260]:
+                        - generic [ref=e261]: "30"
+                        - generic [ref=e263]: "30"
+                    - cell "01 1" [ref=e264]:
+                      - generic [ref=e265]:
+                        - generic [ref=e266]: "01"
+                        - generic [ref=e268]: "1"
+                    - cell "02 2" [ref=e269]:
+                      - generic [ref=e270]:
+                        - generic [ref=e271]: "02"
+                        - generic [ref=e273]: "2"
+                    - cell "03 3" [ref=e274]:
+                      - generic [ref=e275]:
+                        - generic [ref=e276]: "03"
+                        - generic [ref=e278]: "3"
+                    - cell "04 4" [ref=e279]:
+                      - generic [ref=e280]:
+                        - generic [ref=e281]: "04"
+                        - generic [ref=e283]: "4"
+                    - cell "05 5" [ref=e284]:
+                      - generic [ref=e285]:
+                        - generic [ref=e286]: "05"
+                        - generic [ref=e288]: "5"
+                    - cell "06 6" [ref=e289]:
+                      - generic [ref=e290]:
+                        - generic [ref=e291]: "06"
+                        - generic [ref=e293]: "6"
+            - generic [ref=e294]:
+              - heading "Upcoming Activities" [level=4] [ref=e295]
+              - generic [ref=e296]:
+                - generic [ref=e298]:
+                  - combobox [ref=e300]
+                  - text: All
+                - img [ref=e302]:
+                  - img [ref=e303]
+              - list [ref=e308]:
+                - listitem [ref=e309]:
+                  - generic [ref=e311]:
+                    - heading "Team Meeting" [level=4] [ref=e312]
+                    - generic [ref=e313]:
+                      - text: Nov 12, 2025, 10:00
+                      - strong [ref=e315]: "Owner:"
+                      - text: Alice
+                      - strong [ref=e317]: "Team:"
+                      - text: Alpha Innovators
+                - listitem [ref=e318]:
+                  - generic [ref=e320]:
+                    - heading "Sprint Planning" [level=4] [ref=e321]
+                    - generic [ref=e322]:
+                      - text: Nov 14, 2025, 09:30
+                      - strong [ref=e324]: "Owner:"
+                      - text: Bob
+                      - strong [ref=e326]: "Team:"
+                      - text: Beta Coders
+              - button "plusAdd Activity" [ref=e327] [cursor=pointer]:
+                - img "plus" [ref=e329]:
+                  - img [ref=e330]
+                - text: Add Activity
+```

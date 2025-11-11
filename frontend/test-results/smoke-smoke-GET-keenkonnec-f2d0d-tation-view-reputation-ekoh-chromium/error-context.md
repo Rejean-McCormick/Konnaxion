@@ -1,0 +1,80 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e6] [cursor=pointer]:
+        - img "Konnaxion logo" [ref=e7]
+        - generic [ref=e8]: EkoH
+      - menu [ref=e9]
+  - generic [ref=e10]:
+    - banner [ref=e11]:
+      - generic [ref=e12]:
+        - img "menu-fold" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+        - navigation [ref=e17]:
+          - list [ref=e18]:
+            - listitem [ref=e19]:
+              - link "Ekoh" [ref=e21] [cursor=pointer]:
+                - /url: /ekoh?sidebar=ekoh
+        - generic [ref=e22]:
+          - button "🪩 Funky Disco" [ref=e23] [cursor=pointer]
+          - generic [ref=e24] [cursor=pointer]:
+            - img "user" [ref=e25]:
+              - img [ref=e26]
+            - text: Admin
+    - main [ref=e28]:
+      - generic [ref=e29]:
+        - heading "View Reputation (Ekoh)" [level=1] [ref=e31]
+        - main [ref=e32]:
+          - generic [ref=e33]:
+            - generic [ref=e37]:
+              - generic [ref=e38]: Ekoh Score
+              - generic [ref=e40]: 1,234
+            - generic [ref=e44]:
+              - generic [ref=e45]: Smart Vote Weight
+              - generic [ref=e46]:
+                - generic [ref=e47]: "75"
+                - text: "%"
+          - separator
+          - generic [ref=e48]:
+            - generic [ref=e50]:
+              - generic [ref=e53]: Expertise Contributions
+              - generic [ref=e55]: Pie Chart Placeholder
+            - generic [ref=e57]:
+              - generic [ref=e60]: Score Trend
+              - generic [ref=e62]: Trend Line Chart Placeholder
+          - separator
+          - heading "Expertise Areas & Weights" [level=4] [ref=e63]
+          - list [ref=e67]:
+            - listitem [ref=e68]:
+              - generic [ref=e70]:
+                - heading "Frontend Development" [level=4] [ref=e71]
+                - generic [ref=e72]: "Weight: 30%"
+            - listitem [ref=e73]:
+              - generic [ref=e75]:
+                - heading "Backend Development" [level=4] [ref=e76]
+                - generic [ref=e77]: "Weight: 25%"
+            - listitem [ref=e78]:
+              - generic [ref=e80]:
+                - heading "UI/UX Design" [level=4] [ref=e81]
+                - generic [ref=e82]: "Weight: 20%"
+            - listitem [ref=e83]:
+              - generic [ref=e85]:
+                - heading "Data Science" [level=4] [ref=e86]
+                - generic [ref=e87]: "Weight: 15%"
+            - listitem [ref=e88]:
+              - generic [ref=e90]:
+                - heading "DevOps" [level=4] [ref=e91]
+                - generic [ref=e92]: "Weight: 10%"
+          - separator
+          - heading "Achievements & Badges" [level=4] [ref=e93]
+          - generic [ref=e97]:
+            - generic [ref=e101]:
+              - generic [ref=e104]: Top Contributor
+              - generic [ref=e105]: Awarded for significant expertise contributions to the community.
+            - generic [ref=e109]:
+              - generic [ref=e112]: Innovation Leader
+              - generic [ref=e113]: Recognized for innovative solutions and creative problem-solving.
+```

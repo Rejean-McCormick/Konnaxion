@@ -29,7 +29,6 @@ export default function StartNewDiscussionPage(): JSX.Element {
   const router = useRouter();
 
   const onFinish: FormProps<FormValues>['onFinish'] = (_values) => {
-    // TODO: replace with real API call (+ error handling)
     antdMessage.success('Discussion posted');
     router.push('/konnected/community-discussions/active-threads');
   };

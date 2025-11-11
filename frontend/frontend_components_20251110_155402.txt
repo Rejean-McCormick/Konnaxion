@@ -83,10 +83,8 @@ interface ActivityItem {
 }
 
 /**
- * Composant d'activité principale
- * - Correction : ne relit plus `.data` d'une réponse déjà déballée
- * - Typage explicite des données et suppression des `any`
- * - Conserve compatibilité avec Axios configuré dans `shared/api.ts`
+ * Tableau de bord d'activité
+ * Correction : lire `.data` car `shared/api` ne déballe pas la réponse Axios.
  */
 const ActivityDashboard: React.FC = () => {
   const [recentComments, setRecentComments] = React.useState<ActivityItem[]>([]);
@@ -96,16 +94,15 @@ const ActivityDashboard: React.FC = () => {
   React.useEffect(() => {
     const fetchAll = async () => {
       try {
-        // Le client `api` retourne déjà la payload, pas besoin de `.data`
-        const [comments, likes, visits] = await Promise.all([
+        const [commentsRes, likesRes, visitsRes] = await Promise.all([
           api.get<ActivityItem[]>('/activity/recent-comments'),
           api.get<ActivityItem[]>('/activity/recent-likes'),
           api.get<ActivityItem[]>('/activity/recent-visits'),
         ]);
 
-        setRecentComments(comments);
-        setRecentLikes(likes);
-        setRecentVisits(visits);
+        setRecentComments(commentsRes.data);
+        setRecentLikes(likesRes.data);
+        setRecentVisits(visitsRes.data);
       } catch (err) {
         console.error('Error fetching activities:', err);
       }
@@ -124,10 +121,7 @@ const ActivityDashboard: React.FC = () => {
               dataSource={recentComments}
               renderItem={(item) => (
                 <List.Item key={item.id}>
-                  <List.Item.Meta
-                    title={item.title}
-                    description={item.date}
-                  />
+                  <List.Item.Meta title={item.title} description={item.date} />
                 </List.Item>
               )}
             />
@@ -140,10 +134,7 @@ const ActivityDashboard: React.FC = () => {
               dataSource={recentLikes}
               renderItem={(item) => (
                 <List.Item key={item.id}>
-                  <List.Item.Meta
-                    title={item.title}
-                    description={item.date}
-                  />
+                  <List.Item.Meta title={item.title} description={item.date} />
                 </List.Item>
               )}
             />
@@ -156,10 +147,7 @@ const ActivityDashboard: React.FC = () => {
               dataSource={recentVisits}
               renderItem={(item) => (
                 <List.Item key={item.id}>
-                  <List.Item.Meta
-                    title={item.title}
-                    description={item.date}
-                  />
+                  <List.Item.Meta title={item.title} description={item.date} />
                 </List.Item>
               )}
             />
@@ -820,18 +808,7 @@ import React, {
   useCallback,
   type ReactNode,
 } from 'react';
-import createAuth0Client, {
-  Auth0Client,
-  type Auth0ClientOptions,
-  type RedirectLoginOptions,
-  type PopupLoginOptions,
-  type GetTokenSilentlyOptions,
-  type GetTokenWithPopupOptions,
-  type GetIdTokenClaimsOptions,
-  type LogoutOptions,
-  type User,
-  type IdToken,
-} from '@auth0/auth0-spa-js';
+import * as Auth0 from '@auth0/auth0-spa-js';
 import { normalizeError } from '../../shared/errors';
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
@@ -841,19 +818,20 @@ type Nullable<T> = T | null;
 
 interface Auth0ContextValue {
   isAuthenticated: boolean;
-  user: Nullable<User>;
+  user: Nullable<Auth0.User>;
   loading: boolean;
   popupOpen: boolean;
-  loginWithPopup: (params?: PopupLoginOptions) => Promise<void>;
+  loginWithPopup: (params?: Auth0.PopupLoginOptions) => Promise<void>;
   handleRedirectCallback: () => Promise<void>;
-  getIdTokenClaims: (p?: GetIdTokenClaimsOptions) => Promise<IdToken>;
-  loginWithRedirect: (p?: RedirectLoginOptions) => Promise<void>;
-  getTokenSilently: (p?: GetTokenSilentlyOptions) => Promise<string>;
-  getTokenWithPopup: (p?: GetTokenWithPopupOptions) => Promise<string>;
-  logout: (p?: LogoutOptions) => void;
+  getIdTokenClaims: () => Promise<Auth0.IdToken | undefined>;
+  loginWithRedirect: (p?: Auth0.RedirectLoginOptions) => Promise<void>;
+  getTokenSilently: (p?: Auth0.GetTokenSilentlyOptions) => Promise<string>;
+  getTokenWithPopup: (p?: Auth0.GetTokenWithPopupOptions) => Promise<string | undefined>;
+  logout: (p?: Auth0.LogoutOptions) => void;
 }
 
 const Auth0Context = createContext<Auth0ContextValue | undefined>(undefined);
+
 export const useAuth0 = (): Auth0ContextValue => {
   const ctx = useContext(Auth0Context);
   if (!ctx) throw new Error('useAuth0 must be used within <Auth0Provider>');
@@ -863,16 +841,16 @@ export const useAuth0 = (): Auth0ContextValue => {
 type Auth0ProviderProps = {
   children: ReactNode;
   onRedirectCallback?: (appState?: unknown) => void;
-} & Auth0ClientOptions;
+} & Auth0.Auth0ClientOptions;
 
 export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   children,
   onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
   ...initOptions
 }) => {
-  const [auth0Client, setAuth0Client] = useState<Auth0Client | null>(null);
+  const [auth0Client, setAuth0Client] = useState<Auth0.Auth0Client | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Auth0.User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
 
@@ -881,7 +859,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
 
     const initAuth0 = async () => {
       try {
-        const client = await createAuth0Client({
+        const client = await Auth0.createAuth0Client({
           ...initOptions,
           // Ensure redirect_uri exists unless explicitly provided
           authorizationParams: {
@@ -928,7 +906,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   }, []);
 
   const loginWithPopup = useCallback(
-    async (params?: PopupLoginOptions) => {
+    async (params?: Auth0.PopupLoginOptions) => {
       if (!auth0Client) return;
       setPopupOpen(true);
       try {
@@ -960,16 +938,13 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
     }
   }, [auth0Client]);
 
-  const getIdTokenClaims = useCallback(
-    async (p?: GetIdTokenClaimsOptions) => {
-      if (!auth0Client) throw new Error('Auth0 client not initialized');
-      return auth0Client.getIdTokenClaims(p);
-    },
-    [auth0Client]
-  );
+  const getIdTokenClaims = useCallback(async () => {
+    if (!auth0Client) throw new Error('Auth0 client not initialized');
+    return auth0Client.getIdTokenClaims();
+  }, [auth0Client]);
 
   const loginWithRedirect = useCallback(
-    async (p?: RedirectLoginOptions) => {
+    async (p?: Auth0.RedirectLoginOptions) => {
       if (!auth0Client) throw new Error('Auth0 client not initialized');
       await auth0Client.loginWithRedirect(p);
     },
@@ -977,7 +952,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   );
 
   const getTokenSilently = useCallback(
-    async (p?: GetTokenSilentlyOptions) => {
+    async (p?: Auth0.GetTokenSilentlyOptions) => {
       if (!auth0Client) throw new Error('Auth0 client not initialized');
       return auth0Client.getTokenSilently(p);
     },
@@ -985,7 +960,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   );
 
   const getTokenWithPopup = useCallback(
-    async (p?: GetTokenWithPopupOptions) => {
+    async (p?: Auth0.GetTokenWithPopupOptions) => {
       if (!auth0Client) throw new Error('Auth0 client not initialized');
       return auth0Client.getTokenWithPopup(p);
     },
@@ -993,7 +968,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   );
 
   const logout = useCallback(
-    (p?: LogoutOptions) => {
+    (p?: Auth0.LogoutOptions) => {
       if (!auth0Client) return;
       auth0Client.logout({
         logoutParams: {
@@ -1117,38 +1092,60 @@ export function Button({ className, intent, size, underline, ...props }: ButtonP
 ===== BEGIN components/charts/ChartCard.tsx =====
 // components/charts/ChartCard.tsx
 'use client';
+
 import React from 'react';
 import { Line, Area } from '@ant-design/plots';
 
-interface ChartCardProps {
+type ChartType = 'line' | 'area' | 'tinyLine';
+type Datum = Record<string, unknown>;
+
+export interface ChartCardProps {
   /** choose a compact chart variant */
-  type: 'line' | 'area';
-  /** [{ x: …, y: … }] or any fields you map with xField / yField */
-  data: { x?: string | number; y: number }[];
+  type: ChartType;
+  /** accepts any record array; map fields with xField/yField or let it auto-detect */
+  data: Datum[];
   height?: number;
-  /* forward any extra Ant Design Plot options */
+  /** optional explicit field names (e.g. xField="ts", yField="value") */
+  xField?: string;
+  yField?: string;
+  /** forward any extra Ant Design Plot options */
   [key: string]: any;
+}
+
+function pickField(data: Datum[], candidates: string[], fallback: string) {
+  if (!data?.length) return fallback;
+  const sample = data[0] as Record<string, unknown>;
+  for (const k of candidates) if (k in sample) return k;
+  return fallback;
 }
 
 export default function ChartCard({
   type,
   data,
   height = 60,
+  xField,
+  yField,
   ...rest
 }: ChartCardProps) {
-  const commonCfg = {
+  // Auto-map common shapes: {x,y}, {ts,value}, {date,count}, etc.
+  const xf = xField ?? pickField(data, ['x', 'ts', 'date', 'label'], 'x');
+  const yf = yField ?? pickField(data, ['y', 'value', 'count'], 'y');
+
+  const common = {
     data,
+    xField: xf,
+    yField: yf,
     height,
     autoFit: true,
-    smooth: true,
-    xField: 'x',
-    yField: 'y',
-    ...rest,               // allow overrides
-  };
+    ...rest, // allow overrides
+  } as any;
 
-  return type === 'area'
-    ? <Area {...commonCfg} />
-    : <Line {...commonCfg} />;
+  if (type === 'area') return <Area {...common} />;
+
+  // "tinyLine" = line with compact defaults; still uses <Line/>
+  const tinyOverrides = type === 'tinyLine' ? { legend: false } : undefined;
+
+  return <Line {...{ ...common, ...tinyOverrides }} />;
 }
 
 ===== END components/charts/ChartCard.tsx =====
@@ -1656,67 +1653,86 @@ export default LineChart;
  * Author: Hieu Chu
  */
 
-import { Table } from 'antd'
-import { CardStyled } from './style'
-import styled from 'styled-components'
+import React from 'react';
+import { Table } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
+import { CardStyled } from './style';
 
-const StyledTable = styled(Table)`
+type Maker = {
+  firstName: string;
+  lastName: string;
+};
+
+export type SculptureRow = {
+  accessionId: string;
+  name: string;
+  primaryMaker: Maker;
+  totalLikes: number;
+  totalComments: number;
+  totalVisits: number;
+};
+
+type Props = {
+  sculptures: SculptureRow[];
+};
+
+// Typage assoupli pour le wrapper styled afin d'éviter les erreurs de génériques
+const StyledTable = styled(Table as unknown as React.ComponentType<any>)`
   .ant-table table {
     border-left: 1px solid #e8e8e8;
     border-top: 1px solid #e8e8e8;
     border-right: 1px solid #e8e8e8;
   }
-`
+`;
 
-export default ({ sculptures }) => {
-  const columns = [
+export default function SculptureTable({ sculptures }: Props): JSX.Element {
+  const router = useRouter();
+
+  const columns: ColumnsType<SculptureRow> = [
     {
       title: 'Sculpture Name',
-      dataIndex: 'name'
+      dataIndex: 'name',
     },
     {
       title: 'Author',
       key: 'author',
-      render: (_, { primaryMaker: { firstName, lastName } }) => (
-        <span>{`${firstName} ${lastName}`}</span>
-      )
+      render: (_: unknown, { primaryMaker }) => (
+        <span>{`${primaryMaker.firstName} ${primaryMaker.lastName}`}</span>
+      ),
     },
     {
       title: 'Likes',
       dataIndex: 'totalLikes',
       sorter: (a, b) => a.totalLikes - b.totalLikes,
-      sortDirections: ['descend', 'ascend']
+      sortDirections: ['descend', 'ascend'],
     },
     {
       title: 'Comments',
       dataIndex: 'totalComments',
       sorter: (a, b) => a.totalComments - b.totalComments,
-      sortDirections: ['descend', 'ascend']
+      sortDirections: ['descend', 'ascend'],
     },
     {
       title: 'Visits',
       dataIndex: 'totalVisits',
       sorter: (a, b) => a.totalVisits - b.totalVisits,
-      sortDirections: ['descend', 'ascend']
-    }
-  ]
+      sortDirections: ['descend', 'ascend'],
+    },
+  ];
 
   return (
     <CardStyled title="Sculpture Rankings">
       <StyledTable
+        rowKey="accessionId"
         dataSource={sculptures}
         columns={columns}
         pagination={{ pageSize: 10 }}
         className="sculpture-table"
-        onRow={(record, _) => {
-          return {
-            onClick: () => {
-              const router = useRouter();
-              router.push(`/sculptures/id/${record.key}`)
-            }
-          };
-        }}
+        onRow={(record: SculptureRow) => ({
+          onClick: () => router.push(`/sculptures/id/${record.accessionId}`),
+        })}
       />
     </CardStyled>
   );
@@ -3439,226 +3455,208 @@ export default function MakerCreate({
 
 
 ===== BEGIN components/sculpture-maker-components/CreateForm/SculptureCreate.tsx =====
-'use client';
+'use client'
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, Button, Col, Form, Row, message as antdMessage } from 'antd';
-import type { FormInstance } from 'antd/es/form';
-import { Map } from '../../map-components'; // wrapper local; on ne dépend plus de FlyToInterpolator ici
-import Loading from '../../Loading';
-import api from '../../../shared/api';
-import { normalizeError } from '../../../shared/errors';
-import {
-  ColStyled,
-  Container,
-  FormCol,
-  MapCol,
-  MapWrapper,
-  Title,
-  Wrapper,
-} from '../style';
-import TextFields from './CreateFormTextFields';
+/**
+ * Description: Component for Sculpture create page
+ * Author: Hieu Chu
+ */
 
-type ErrState = { message: string; statusCode?: number } | null;
+import React, { useState, useEffect } from 'react'
+import { Row, Button, Form, message as antdMessage } from 'antd'
+import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
+import { FlyToInterpolator } from 'react-map-gl'
+import Map from '../../map-components'
+import TextFields from './CreateFormTextFields'
+import { api } from '../../../shared/api'
+import Loading from '../../Loading'
+import Error from 'next/error'
+import { normalizeError } from '../../../shared/errors'
+
+type ErrState = { message: string; statusCode?: number } | null
+
+// Typages minimaux pour l’API legacy d’antd v3 afin d’éviter 'any' non contrôlés.
+type LegacyForm = {
+  getFieldDecorator: (name: string, options?: any) => (node: React.ReactNode) => React.ReactNode
+  setFieldsValue: (values: Record<string, any>) => void
+  validateFields: (...args: any[]) => any
+}
+
+type Maker = {
+  id: string | number
+  firstName?: string
+  lastName?: string
+}
 
 type ViewState = {
-  longitude: number;
-  latitude: number;
-  zoom: number;
-  pitch: number;
-};
+  latitude: number
+  longitude: number
+  zoom: number
+  pitch: number
+  transitionInterpolator?: any
+  transitionDuration?: number
+}
 
 type MarkerState = {
-  longitude?: number;
-  latitude?: number;
-};
+  markerLat: number
+  markerLng: number
+}
 
 type SculptureCreateProps = {
-  setStep: (updater: number | ((n: number) => number)) => void;
-  setSculpture: (data: any) => void;
-  initialData?: Record<string, unknown>;
-};
-
-const DEFAULT_VIEW: ViewState = {
-  longitude: -73.5673,
-  latitude: 45.5017,
-  zoom: 1,
-  pitch: 0,
-};
+  form: LegacyForm
+  setStep: React.Dispatch<React.SetStateAction<number>>
+  setSculpture: React.Dispatch<React.SetStateAction<Record<string, any>>>
+}
 
 const SculptureCreate: React.FC<SculptureCreateProps> = ({
+  form,
+  form: { getFieldDecorator, setFieldsValue },
   setStep,
-  setSculpture,
-  initialData,
+  setSculpture
 }) => {
-  const [form] = Form.useForm();
-  const [view, setView] = useState<ViewState>(DEFAULT_VIEW);
-  const [marker, setMarker] = useState<MarkerState>({});
-  const [makerList, setMakerList] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [error, setError] = useState<ErrState>(null);
+  const [view, setView] = useState<ViewState>({
+    latitude: -34.40581053569814,
+    longitude: 150.87842788963476,
+    zoom: 15,
+    pitch: 50
+  })
 
-  // Exemple de chargement (si présent dans l’original)
+  const initialData: MarkerState = {
+    markerLat: -34.40581053569814,
+    markerLng: 150.87842788963476
+  }
+
+  const [marker, setMarker] = useState<MarkerState>({ ...initialData })
+  const [makerList, setMakerList] = useState<Maker[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [error, setError] = useState<ErrState>(null)
+
+  const addMaker = (maker: Maker) => {
+    setMakerList((prev) => [...prev, maker])
+    setFieldsValue({ primaryMakerId: maker.id })
+  }
+
   useEffect(() => {
-    let mounted = true;
-    const run = async () => {
+    let mounted = true
+    const fetchMakerList = async () => {
       try {
-        setLoading(true);
-        // ... éventuels chargements (makers, catégories, etc.)
-        // const { data } = await api.get('/makers');
-        // if (mounted) setMakerList(data);
-      } catch (e: any) {
-        const { message, statusCode } = normalizeError(e);
-        if (mounted) setError({ message, statusCode });
+        const res = await api.get('/maker/')
+        if (mounted) setMakerList((res as any)?.data ?? [])
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e)
+        if (mounted) setError({ statusCode, message })
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) setLoading(false)
       }
-    };
-    run();
+    }
+    fetchMakerList()
     return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const addMaker = useCallback((m: any) => {
-    setMakerList((prev) => [...prev, m]);
-  }, []);
-
-  const updateMapTo = useCallback(
-    (lng: number, lat: number, zoom = 14) => {
-      // Remplace l’ancien FlyToInterpolator : on se contente de mettre à jour l’état
-      setMarker({ longitude: lng, latitude: lat });
-      setView((v) => ({
-        ...v,
-        longitude: lng,
-        latitude: lat,
-        zoom: Math.max(v.zoom, zoom),
-      }));
-      form.setFieldsValue({ longitude: lng, latitude: lat });
-    },
-    [form]
-  );
-
-  const handleMapClick = useCallback(
-    (lng: number, lat: number) => updateMapTo(lng, lat),
-    [updateMapTo]
-  );
-
-  const handleShowOnMap = useCallback(() => {
-    const { longitude, latitude } = form.getFieldsValue([
-      'longitude',
-      'latitude',
-    ]) as { longitude?: number; latitude?: number };
-
-    if (
-      typeof longitude === 'number' &&
-      !Number.isNaN(longitude) &&
-      typeof latitude === 'number' &&
-      !Number.isNaN(latitude)
-    ) {
-      updateMapTo(longitude, latitude);
-    } else {
-      antdMessage.info('Veuillez saisir une longitude et une latitude valides.');
+      mounted = false
     }
-  }, [form, updateMapTo]);
+  }, [])
 
-  const coerceNumbersIn = (vals: Record<string, any>) => {
-    // Aligne avec l’intention de l’original (conversion lat/lng notamment)
-    ['longitude', 'latitude', 'height', 'width', 'depth'].forEach((k) => {
-      if (vals[k] !== undefined && vals[k] !== null && vals[k] !== '') {
-        const n = Number(vals[k]);
-        if (!Number.isNaN(n)) vals[k] = n;
+  const flyTo = (latitude: number, longitude: number) => {
+    setView((prev) => ({
+      ...prev,
+      latitude,
+      longitude,
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionDuration: 1500,
+      zoom: 15
+    }))
+    setMarker({ markerLat: latitude, markerLng: longitude })
+  }
+
+  const showLocationOnMap = () => {
+    form.validateFields(['latitude', 'longitude'], (errors: any, values: any) => {
+      if (!errors) {
+        const { latitude, longitude } = values as { latitude: string | number; longitude: string | number }
+        flyTo(+latitude, +longitude)
       }
-    });
-  };
+    })
+  }
 
-  const handleFinish = async (values: any) => {
-    coerceNumbersIn(values);
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    form.validateFields(async (err: any, values: Record<string, any>) => {
+      if (!err) {
+        // nettoie les champs vides
+        Object.keys(values).forEach((k) => {
+          if (!values[k]) delete values[k]
+        })
+        if (values.latitude) values.latitude = Number(values.latitude)
+        if (values.longitude) values.longitude = Number(values.longitude)
 
-    setSubmitting(true);
-    setError(null);
+        setSubmitting(true)
+        try {
+          await api.post('/sculpture', values)
+          setSculpture({ ...values })
+          setStep((s) => s + 1)
+        } catch (e: unknown) {
+          const { message } = normalizeError(e)
+          antdMessage.error(message)
+        } finally {
+          setSubmitting(false)
+        }
+      }
+    })
+  }
 
-    try {
-      // L’original postait sur /sculpture avec les valeurs du formulaire
-      const { data } = await api.post('/sculpture', values);
-      setSculpture(data);
-      setStep((n) => n + 1);
-      antdMessage.success('Sculpture enregistrée.');
-    } catch (e: any) {
-      const { message, statusCode } = normalizeError(e);
-      setError({ message, statusCode });
-      antdMessage.error(message || "Échec de l'enregistrement.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  if (loading) return <Loading />;
+  if (loading) return <Loading />
+  if (error) return <Error statusCode={error.statusCode ?? 500} title={error.message} />
 
   return (
-    <Wrapper>
-      <Title>Créer une sculpture</Title>
-
-      {error && (
-        <Alert
-          type="error"
-          showIcon
-          message={error.message}
-          style={{ marginBottom: 16 }}
-        />
-      )}
-
-      <Container>
-        <Form
-          form={form}
-          layout="vertical"
-          autoComplete="off"
-          initialValues={initialData}
-          onFinish={handleFinish}
-        >
-          <Row gutter={24}>
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled title="Create new sculpture">
+          <Form onSubmit={handleSubmit} autoComplete="off">
             <ColStyled xs={24} md={12}>
-              {/* ⚠️ TextFields doit être migré pour utiliser <Form.Item name="...">.
-                  On lui passe désormais "form" au lieu de getFieldDecorator. */}
               <TextFields
-                form={form as FormInstance}
+                getFieldDecorator={getFieldDecorator}
                 initialData={initialData}
                 makerList={makerList}
                 addMaker={addMaker}
               />
-
               <FormCol xs={24}>
-                <Button onClick={handleShowOnMap}>Afficher sur la carte</Button>
+                <Button onClick={showLocationOnMap}>Show on map</Button>
               </FormCol>
             </ColStyled>
 
-            <MapCol xs={24} md={12}>
-              <MapWrapper>
-                <Map
-                  view={view}
-                  marker={marker}
-                  onViewChange={setView}
-                  onClick={(lng: number, lat: number) => handleMapClick(lng, lat)}
-                />
-              </MapWrapper>
-            </MapCol>
-          </Row>
+            <ColStyled xs={24} md={12} style={{ height: 500, marginTop: 10 }}>
+              <Map
+                view={view}
+                marker={marker}
+                setView={setView}
+                setMarker={({ markerLat, markerLng }: { markerLat: number; markerLng: number }) => {
+                  setMarker({ markerLat, markerLng })
+                  setFieldsValue({
+                    latitude: String(markerLat),
+                    longitude: String(markerLng)
+                  })
+                }}
+              />
+            </ColStyled>
 
-          <Row>
-            <Col xs={24}>
-              <Button type="primary" htmlType="submit" loading={submitting}>
-                Enregistrer et continuer
-              </Button>
-            </Col>
-          </Row>
-        </Form>
-      </Container>
-    </Wrapper>
-  );
-};
+            <ColStyled xs={24}>
+              <FormCol xs={24}>
+                <CustomFormItem style={{ marginBottom: 0, marginTop: 8 }}>
+                  <Button type="primary" htmlType="submit" loading={submitting}>
+                    Submit
+                  </Button>
+                </CustomFormItem>
+              </FormCol>
+            </ColStyled>
+          </Form>
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  )
+}
 
-export default SculptureCreate;
+export default Form.create({
+  name: 'sculpture_create_form'
+})(SculptureCreate)
 
 ===== END components/sculpture-maker-components/CreateForm/SculptureCreate.tsx =====
 
@@ -3671,101 +3669,102 @@ export default SculptureCreate;
  * Author: Hieu Chu
  */
 
-import { Upload, Button, message as antdMessage, Row, Modal  } from 'antd';
-import { useState } from 'react'
-import { CardStyled, ColStyled } from '../style'
-import api from '../../../api'
+import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
+import type { UploadProps, UploadFile } from 'antd';
+import type { AxiosProgressEvent } from 'axios';
+import { useState } from 'react';
+import { CardStyled, ColStyled } from '../style';
+import api from '../../../api';
 import { useRouter } from 'next/navigation';
-import Head from 'next/head'
-import { normalizeError } from "../../../shared/errors";
+import Head from 'next/head';
+import { normalizeError } from '../../../shared/errors';
 import Icon from '@/components/compat/Icon';
 
-const { confirm } = Modal
+const { confirm } = Modal;
 
-const defaultFileList = []
+type SculptureUploadImageProps = {
+  sculpture: { accessionId: string; name: string };
+};
 
-const SculptureUploadImage = ({ sculpture }) => {
-  const [fileList, setFileList] = useState([...defaultFileList])
-  const { accessionId, name } = sculpture
+const defaultFileList: UploadFile[] = [];
 
-  const handleRemove = file => {
-    return new Promise((resolve, _reject) => {
+export default function SculptureUploadImage({ sculpture }: SculptureUploadImageProps) {
+  const router = useRouter();
+  const [fileList, setFileList] = useState<UploadFile[]>([...defaultFileList]);
+  const { accessionId, name } = sculpture;
+
+  const handleRemove: UploadProps['onRemove'] = (file) =>
+    new Promise<boolean>((resolve) => {
       confirm({
         title: 'Do you want to remove this image?',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
         style: { top: 110 },
         maskClosable: true,
         okText: 'Confirm',
-        okButtonProps: {
-          style: {
-            background: '#ff4d4f',
-            borderColor: '#ff4d4f'
-          }
-        },
+        okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
         onOk: async () => {
           try {
-            const _result = await api.delete(`/sculpture-images/${file.uid}`)
-            resolve(true)
-            setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
-            antdMessage.success('Deleted image successfully!', 2)
-          } catch (error: unknown) {
-            const { message, statusCode } = normalizeError(error);
-            antdMessage.error(error.response.data.message)
-            resolve(false)
+            await api.delete(`/sculpture-images/${file.uid}`);
+            setFileList((prev) => prev.filter((x) => x.uid !== file.uid));
+            antdMessage.success('Deleted image successfully!', 2);
+            resolve(true);
+          } catch (e) {
+            const { message } = normalizeError(e);
+            antdMessage.error(message || 'Failed to delete image');
+            resolve(false);
           }
         },
-        onCancel: () => {
-          resolve(false)
-        }
-      })
-    })
-  }
+        onCancel: () => resolve(false),
+      });
+    });
 
-  const customRequest = async e => {
+  const customRequest: UploadProps['customRequest'] = async (options) => {
+    const { file, onProgress, onError, onSuccess } = options;
+
     const config = {
-      headers: {
-        'content-type':
-          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s'
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress: (ev: AxiosProgressEvent) => {
+        const total = ev.total ?? 0;
+        const percent = total ? Math.round((ev.loaded / total) * 100) : 0;
+        onProgress?.({ percent });
       },
-      onUploadProgress: function(progressEvent) {
-        var percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        )
-        e.onProgress(percentCompleted)
-      }
-    }
+    };
 
-    let data = new FormData()
-    data.append('images', e.file)
-    data.set('accessionId', accessionId)
-    const hide = antdMessage.loading('Uploading image...', 0)
+    const form = new FormData();
+    form.append('images', file as any);
+    form.set('accessionId', accessionId);
 
+    const hide = antdMessage.loading('Uploading image...', 0);
     try {
-      const _result = await api.post('/sculpture-images', data, config)
-      const file = { ...e.file }
-      const { id, url } = _result.data[0]
-      file.uid = id
-      file.url = url
-      file.thumbUrl = url
-      file.preview = url
-      setFileList(fileList => [...fileList, file])
+      const result = await api.post('/sculpture-images', form, config);
+      const { id, url } = result.data[0];
 
-      e.onSuccess(_result.data[0], e.file)
-      hide()
-      antdMessage.success('Uploaded image successfully!', 2)
-    } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      antdMessage.error(error.response.data.message)
-      e.onError(error.response.data.message)
+      const uploaded: UploadFile = {
+        uid: String(id),
+        name: (file as any)?.name ?? String(id),
+        status: 'done',
+        url,
+        thumbUrl: url,
+      };
+
+      setFileList((prev) => [...prev, uploaded]);
+      onSuccess?.(result.data[0], file as any);
+      antdMessage.success('Uploaded image successfully!', 2);
+    } catch (e) {
+      const { message } = normalizeError(e);
+      antdMessage.error(message || 'Upload failed');
+      onError?.(new Error(message || 'Upload failed') as any);
+    } finally {
+      hide();
     }
-  }
+  };
 
   const uploadButton = (
     <div>
       <Icon type="plus" />
       <div className="ant-upload-text">Upload</div>
     </div>
-  )
+  );
 
   return (
     <>
@@ -3786,12 +3785,7 @@ const SculptureUploadImage = ({ sculpture }) => {
               {uploadButton}
             </Upload>
 
-            <Button
-              type="primary"
-              onClick={() =>
-                router.push(`/sculptures/id/${accessionId}`)
-              }
-            >
+            <Button type="primary" onClick={() => router.push(`/sculptures/id/${accessionId}`)}>
               Finish
             </Button>
           </CardStyled>
@@ -3800,8 +3794,6 @@ const SculptureUploadImage = ({ sculpture }) => {
     </>
   );
 }
-
-export default SculptureUploadImage
 
 ===== END components/sculpture-maker-components/CreateForm/SculptureUploadImage.tsx =====
 
@@ -4109,22 +4101,34 @@ export default ({
  * Author: Hieu Chu
  */
 
-import { Upload, Button, message as antdMessage, Row, Modal  } from 'antd';
-import { useState } from 'react'
-import { ColStyled } from '../style'
-import api from '../../../api'
+import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
+import type { UploadFile } from 'antd';
+import { useState } from 'react';
+import { ColStyled } from '../style';
+import api from '../../../api';
 import { useRouter } from 'next/navigation';
-import { normalizeError } from "../../../shared/errors";
+import { normalizeError } from '../../../shared/errors';
 import Icon from '@/components/compat/Icon';
+import type { UploadRequestOption as RcUploadRequestOption } from 'rc-upload/lib/interface';
+import type { AxiosProgressEvent } from 'axios';
 
-const { confirm } = Modal
+const { confirm } = Modal;
 
-const EditImage = ({ accessionId, _name, images }) => {
-  const [fileList, setFileList] = useState([...images])
-  const [isSubmitting, setIsSubmitting] = useState(false)
+type EditImageProps = {
+  accessionId: string;
+  _name: string;
+  // Les images reçues sont déjà façonnées côté parent pour l'Upload (uid/url/preview/status)
+  images: UploadFile[];
+};
 
-  const handleRemove = file => {
-    return new Promise((resolve, _reject) => {
+const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
+  const router = useRouter();
+
+  const [fileList, setFileList] = useState<UploadFile[]>([...(images as UploadFile[])]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRemove = (file: UploadFile): Promise<boolean> => {
+    return new Promise((resolve) => {
       confirm({
         title: 'Do you want to remove this image?',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
@@ -4134,77 +4138,81 @@ const EditImage = ({ accessionId, _name, images }) => {
         okButtonProps: {
           style: {
             background: '#ff4d4f',
-            borderColor: '#ff4d4f'
-          }
+            borderColor: '#ff4d4f',
+          },
         },
         onOk: async () => {
-          setIsSubmitting(true)
+          setIsSubmitting(true);
           try {
-            const _result = await api.delete(`/sculpture-images/${file.uid}`)
-            resolve(true)
-            setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
-            antdMessage.success('Deleted image successfully!', 2)
+            await api.delete(`/sculpture-images/${(file as any).uid}`);
+            resolve(true);
+            setFileList((curr) => curr.filter((x: any) => x.uid !== (file as any).uid));
+            antdMessage.success('Deleted image successfully!', 2);
           } catch (error: unknown) {
-            const { message, statusCode } = normalizeError(error);
-            antdMessage.error(error.response.data.message)
-            resolve(false)
+            const { message } = normalizeError(error);
+            antdMessage.error(message);
+            resolve(false);
           }
-          setIsSubmitting(false)
+          setIsSubmitting(false);
         },
         onCancel: () => {
-          resolve(false)
-        }
-      })
-    })
-  }
+          resolve(false);
+        },
+      });
+    });
+  };
 
-  const customRequest = async e => {
+  const customRequest = async (e: RcUploadRequestOption) => {
     const config = {
       headers: {
         'content-type':
-          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s'
+          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s',
       },
-      onUploadProgress: function(progressEvent) {
-        var percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        )
-        e.onProgress(percentCompleted)
-      }
-    }
+      onUploadProgress: function (progressEvent: AxiosProgressEvent) {
+        const loaded = progressEvent.loaded ?? 0;
+        const total = progressEvent.total ?? 1;
+        const percentCompleted = Math.round((loaded * 100) / total);
+        // rc-upload attend un objet { percent }
+        e.onProgress?.({ percent: percentCompleted } as any, e.file as any);
+      },
+    };
 
-    let data = new FormData()
-    data.append('images', e.file)
-    data.set('accessionId', accessionId)
-    const hide = antdMessage.loading('Uploading image...', 0)
-    setIsSubmitting(true)
+    const data = new FormData();
+    data.append('images', e.file as Blob);
+    data.set('accessionId', accessionId);
+
+    const hide = antdMessage.loading('Uploading image...', 0);
+    setIsSubmitting(true);
 
     try {
-      const _result = await api.post('/sculpture-images', data, config)
-      const file = { ...e.file }
-      const { id, url } = _result.data[0]
-      file.uid = id
-      file.url = url
-      file.thumbUrl = url
-      file.preview = url
-      setFileList(fileList => [...fileList, file])
+      const _result = await api.post('/sculpture-images', data, config);
+      const file: any = { ...(e.file as any) };
+      const { id, url } = _result.data[0];
+      file.uid = id;
+      file.url = url;
+      file.thumbUrl = url;
+      file.preview = url;
 
-      e.onSuccess(_result.data[0], e.file)
-      hide()
-      antdMessage.success('Uploaded image successfully!', 2)
+      setFileList((curr) => [...curr, file]);
+
+      e.onSuccess?.(_result.data[0], e.file as any);
+      hide();
+      antdMessage.success('Uploaded image successfully!', 2);
     } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      antdMessage.error(error.response.data.message)
-      e.onError(error.response.data.message)
+      const { message } = normalizeError(error);
+      antdMessage.error(message);
+      e.onError?.(message as any);
     }
-    setIsSubmitting(false)
-  }
+
+    setIsSubmitting(false);
+  };
 
   const uploadButton = (
     <div>
       <Icon type="plus" />
       <div className="ant-upload-text">Upload</div>
     </div>
-  )
+  );
 
   return (
     <Row gutter={16}>
@@ -4214,7 +4222,7 @@ const EditImage = ({ accessionId, _name, images }) => {
           listType="picture-card"
           customRequest={customRequest}
           onRemove={handleRemove}
-          fileList={fileList}
+          fileList={fileList as any}
         >
           {uploadButton}
         </Upload>
@@ -4222,18 +4230,16 @@ const EditImage = ({ accessionId, _name, images }) => {
         <Button
           type="primary"
           loading={isSubmitting}
-          onClick={() =>
-            router.push(`/sculptures/id/${accessionId}`)
-          }
+          onClick={() => router.push(`/sculptures/id/${accessionId}`)}
         >
           Finish
         </Button>
       </ColStyled>
     </Row>
   );
-}
+};
 
-export default EditImage
+export default EditImage;
 
 ===== END components/sculpture-maker-components/EditForm/EditImage.tsx =====
 
@@ -5034,7 +5040,7 @@ export default MakerList
  */
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useParams } from 'next/navigation'
 import { Row, Carousel, Typography, List, Empty, Button } from 'antd'
 import { ColStyled, CardStyled } from '../style'
 import { SculptureCardDescription } from '../SculptureGrid'
@@ -5046,17 +5052,24 @@ import Link from 'next/link'
 import Head from 'next/head'
 import SculptureComment from './SculptureComment'
 import SculptureTrend from './SculptureTrend'
-import { normalizeError } from "../../../shared/errors";
+import { normalizeError } from '../../../shared/errors'
 
 const { Title } = Typography
 
+type HttpError = { statusCode: number; message: string }
+type CommentItem = { commentId: string | number; [key: string]: any }
+
 const SculptureDetail = () => {
-  const [sculpture, setSculpture] = useState({})
-  const [comments, setComments] = useState([])
+  const params = useParams<{ id?: string; sculptureId?: string }>()
+  const id = (params?.id ?? params?.sculptureId) as string | undefined
+
+  const [sculpture, setSculpture] = useState<any>({})
+  const [comments, setComments] = useState<CommentItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<HttpError | null>(null)
 
   useEffect(() => {
+    if (!id) return
     const fetchData = async () => {
       try {
         const sculpturePromise = api.get(`/sculpture/${id}`)
@@ -5064,74 +5077,67 @@ const SculptureDetail = () => {
 
         const [rawSculpture, rawComments] = await Promise.all([
           sculpturePromise,
-          commentPromise
+          commentPromise,
         ])
 
         setComments(rawComments.data)
-        console.log('hhhh', rawComments.data)
         setSculpture(rawSculpture.data)
       } catch (e: unknown) {
-        const { message, statusCode } = normalizeError(e);
-        const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        const { message, statusCode } = normalizeError(e)
+        setError({ statusCode, message })
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
 
     fetchData()
   }, [id])
 
-  const deleteComment = commentId => {
-    setComments(c => c.filter(x => x.commentId !== commentId))
-    setSculpture(x => ({
+  const deleteComment = (commentId: string | number) => {
+    setComments((c) => c.filter((x) => x.commentId !== commentId))
+    setSculpture((x: any) => ({
       ...x,
-      totalComments: +x.totalComments - 1
+      totalComments: +x.totalComments - 1,
     }))
   }
 
-  const addComment = comment => {
-    setComments(c => [comment, ...c])
-    setSculpture(x => ({
+  const addComment = (comment: CommentItem) => {
+    setComments((c) => [comment, ...c])
+    setSculpture((x: any) => ({
       ...x,
-      totalComments: +x.totalComments + 1
+      totalComments: +x.totalComments + 1,
     }))
   }
-
-  const router = useRouter()
-  const id = router.query.id
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
 
   const {
-    images,
-    name,
-    primaryMaker,
-    accessionId,
-    longitude,
-    latitude,
-    productionDate,
-    material,
-    creditLine,
-    locationNotes,
-    totalLikes,
-    totalComments,
-    totalVisits
-  } = sculpture
+    images = [],
+    name = '',
+    primaryMaker = {},
+    accessionId = '',
+    longitude = 0,
+    latitude = 0,
+    productionDate = '',
+    material = '',
+    creditLine = '',
+    locationNotes = '',
+    totalLikes = 0,
+    totalComments = 0,
+    totalVisits = 0,
+  } = (sculpture ?? {}) as any
 
-  const { birthYear, deathYear, nationality, wikiUrl } = primaryMaker
+  const { birthYear, deathYear, nationality, wikiUrl } = (primaryMaker ?? {}) as any
 
   const markerLat = Number(latitude)
   const markerLng = Number(longitude)
 
   images.sort(
-    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+    (a: any, b: any) =>
+      new Date(a.created).getTime() - new Date(b.created).getTime(),
   )
-  const imageList = images.map((image, idx) => (
+  const imageList = images.map((image: any, idx: number) => (
     <div key={idx}>
       <img src={image.url} />
     </div>
@@ -5157,7 +5163,7 @@ const SculptureDetail = () => {
             <Carousel
               draggable
               style={{
-                width: '100%'
+                width: '100%',
               }}
             >
               {images.length ? (
@@ -5173,7 +5179,7 @@ const SculptureDetail = () => {
             </Carousel>
             <div
               style={{
-                marginTop: 15
+                marginTop: 15,
               }}
             >
               <Title level={4} style={{ marginBottom: 0 }}>
@@ -5183,7 +5189,7 @@ const SculptureDetail = () => {
                 totalLikes={totalLikes}
                 totalComments={totalComments}
                 totalVisits={totalVisits}
-                makerName={primaryMaker.firstName + ' ' + primaryMaker.lastName}
+                makerName={`${primaryMaker?.firstName ?? ''} ${primaryMaker?.lastName ?? ''}`}
               />
 
               <List itemLayout="horizontal">
@@ -5191,21 +5197,20 @@ const SculptureDetail = () => {
                   <List.Item.Meta
                     title="Accession ID"
                     description={
-                      !accessionId.includes('unknown') ? accessionId : 'N/A'
+                      accessionId && !accessionId.includes('unknown')
+                        ? accessionId
+                        : 'N/A'
                     }
                   />
                 </List.Item>
                 <List.Item>
                   <List.Item.Meta
                     title="Production Date"
-                    description={productionDate ? productionDate : 'N/A'}
+                    description={productionDate || 'N/A'}
                   />
                 </List.Item>
                 <List.Item>
-                  <List.Item.Meta
-                    title="Material"
-                    description={material ? material : 'N/A'}
-                  />
+                  <List.Item.Meta title="Material" description={material || 'N/A'} />
                 </List.Item>
                 <List.Item>
                   <List.Item.Meta
@@ -5241,51 +5246,34 @@ const SculptureDetail = () => {
             totalLikes={totalLikes}
             totalComments={totalComments}
             totalVisits={totalVisits}
-            sculptureId={id}
+            sculptureId={id as string}
           />
         </ColStyled>
+
         {/* Maker detail */}
         <ColStyled xs={24} lg={9}>
           <MyStaticMap markerLat={markerLat} markerLng={markerLng} />
           <CardStyled title="Primary maker details" style={{ marginTop: 10 }}>
-            <List
-              itemLayout="horizontal"
-              style={{
-                marginTop: -20
-              }}
-            >
+            <List itemLayout="horizontal" style={{ marginTop: -20 }}>
               <List.Item>
                 <List.Item.Meta
                   title="Full Name"
-                  description={
-                    primaryMaker.firstName + ' ' + primaryMaker.lastName
-                  }
+                  description={`${primaryMaker?.firstName ?? ''} ${primaryMaker?.lastName ?? ''}`}
                 />
               </List.Item>
               <List.Item>
-                <List.Item.Meta
-                  title="Nationality"
-                  description={nationality ? nationality : 'N/A'}
-                />
+                <List.Item.Meta title="Nationality" description={nationality || 'N/A'} />
               </List.Item>
               <List.Item>
-                <List.Item.Meta
-                  title="Born"
-                  description={birthYear ? birthYear : 'N/A'}
-                />
+                <List.Item.Meta title="Born" description={birthYear ?? 'N/A'} />
               </List.Item>
               <List.Item>
-                <List.Item.Meta
-                  title="Passed away"
-                  description={deathYear ? deathYear : 'N/A'}
-                />
+                <List.Item.Meta title="Passed away" description={deathYear ?? 'N/A'} />
               </List.Item>
               <List.Item>
                 <List.Item.Meta
                   title="Website"
-                  description={
-                    wikiUrl ? <a href={`${wikiUrl}`}>{wikiUrl}</a> : 'N/A'
-                  }
+                  description={wikiUrl ? <a href={`${wikiUrl}`}>{wikiUrl}</a> : 'N/A'}
                 />
               </List.Item>
             </List>
@@ -5295,12 +5283,12 @@ const SculptureDetail = () => {
             comments={comments}
             deleteComment={deleteComment}
             addComment={addComment}
-            sculptureId={id}
+            sculptureId={id as string}
           />
         </ColStyled>
       </Row>
     </>
-  );
+  )
 }
 
 export default SculptureDetail
@@ -5868,7 +5856,8 @@ export default SculptureTrend
  * Author: Hieu Chu
  */
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
 import {
   Row,
   Card,
@@ -5877,7 +5866,7 @@ import {
   Input,
   Empty,
   Button,
-  Dropdown
+  Dropdown,
 } from 'antd'
 import type { MenuProps } from 'antd'
 import {
@@ -5886,47 +5875,68 @@ import {
   DownOutlined,
   HeartTwoTone,
   MessageTwoTone,
-  EnvironmentOutlined
+  EnvironmentOutlined,
 } from '@ant-design/icons'
 const { Text } = Typography
 const { Meta } = Card
 const { Search } = Input
 import Link from 'next/link'
-import { ColStyled, CardStyled, ShadowCard, Subtitle, EmptyImage } from './style'
+import {
+  ColStyled,
+  CardStyled,
+  ShadowCard,
+  Subtitle,
+  EmptyImage,
+} from './style'
 import Loading from '../Loading'
 import Error from 'next/error'
 import api from '@/services/_request'
-import { normalizeError } from "../../shared/errors";
+import { normalizeError } from '../../shared/errors'
 
-const SculptureCard = ({
-  info: {
-    accessionId,
-    name,
-    totalVisits,
-    totalLikes,
-    totalComments,
-    primaryMaker,
-    images
-  }
-}) => {
-  const makerName = primaryMaker.firstName + ' ' + primaryMaker.lastName
-  images.sort(
-    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+// --- Types locaux ---
+type SortCriterion = 'Default' | 'Likes' | 'Comments' | 'Visits'
+
+interface Maker {
+  firstName: string
+  lastName: string
+}
+interface ImageItem {
+  url: string
+  created: string | number | Date
+}
+interface Sculpture {
+  accessionId: string
+  name: string
+  totalVisits: number
+  totalLikes: number
+  totalComments: number
+  primaryMaker: Maker
+  images: ImageItem[]
+}
+interface ErrorState {
+  statusCode: number
+  message: string
+}
+
+// --- Composants ---
+const SculptureCard = ({ info }: { info: Sculpture }) => {
+  const { accessionId, name, totalVisits, totalLikes, totalComments, primaryMaker, images } = info
+  const makerName = `${primaryMaker.firstName} ${primaryMaker.lastName}`
+  const sortedImages = [...images].sort(
+    (a: ImageItem, b: ImageItem) =>
+      new Date(a.created).getTime() - new Date(b.created).getTime(),
   )
+
   return (
     <Link href={`/sculptures/id/${accessionId}`}>
       <a style={{ display: 'inline-block', width: '100%' }}>
         <ShadowCard
           cover={
-            images.length ? (
+            sortedImages.length ? (
               <div style={{ height: 450 }}>
                 <img
-                  src={images[0].url}
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                    objectFit: 'cover'
-                  }}
+                  src={sortedImages[0].url}
+                  style={{ height: '100%', width: '100%', objectFit: 'cover' }}
                 />
               </div>
             ) : (
@@ -5959,7 +5969,12 @@ export const SculptureCardDescription = ({
   totalLikes,
   totalComments,
   totalVisits,
-  makerName
+  makerName,
+}: {
+  totalLikes: number
+  totalComments: number
+  totalVisits: number
+  makerName: string
 }) => {
   return (
     <>
@@ -5992,39 +6007,38 @@ export const SculptureCardDescription = ({
   )
 }
 
-// custom sort function
-const sortBy = (list, criterion) => {
+// Tri local
+const sortBy = (list: Sculpture[], criterion: SortCriterion): Sculpture[] => {
   switch (criterion) {
     case 'Likes':
-      return list.slice().sort((a, b) => +b.totalLikes - +a.totalLikes)
+      return list.slice().sort((a, b) => b.totalLikes - a.totalLikes)
     case 'Comments':
-      return list.slice().sort((a, b) => +b.totalComments - +a.totalComments)
+      return list.slice().sort((a, b) => b.totalComments - a.totalComments)
     case 'Visits':
-      return list.slice().sort((a, b) => +b.totalVisits - +a.totalVisits)
+      return list.slice().sort((a, b) => b.totalVisits - a.totalVisits)
     case 'Default':
+    default:
       return list.slice().sort((a, b) => a.name.localeCompare(b.name))
   }
 }
 
 const SculptureGrid = () => {
-  const [originalList, setOriginalList] = useState([])
-  const [filteredList, setFilteredList] = useState(originalList.slice())
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-
-  const [currentSort, setSort] = useState('Default')
+  const [originalList, setOriginalList] = useState<Sculpture[]>([])
+  const [filteredList, setFilteredList] = useState<Sculpture[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<ErrorState | null>(null)
+  const [currentSort, setSort] = useState<SortCriterion>('Default')
 
   useEffect(() => {
     const fetchSculpture = async () => {
       try {
-        const { data } = await api.get('/sculpture')
-        data.sort((a, b) => a.name.localeCompare(b.name))
-        setOriginalList(data)
-        setFilteredList(data)
+        const { data } = await api.get<Sculpture[]>('/sculpture')
+        const sorted = data.slice().sort((a, b) => a.name.localeCompare(b.name))
+        setOriginalList(sorted)
+        setFilteredList(sorted)
       } catch (e: unknown) {
-        const { message, statusCode } = normalizeError(e);
-        const { statusCode, message } = e.response.data
-        setError({ statusCode, message })
+        const n = normalizeError(e)
+        setError({ statusCode: n.statusCode, message: n.message })
       }
       setLoading(false)
     }
@@ -6032,37 +6046,36 @@ const SculptureGrid = () => {
     fetchSculpture()
   }, [])
 
-  const handleMenuClick: MenuProps['onClick'] = e => {
-    setSort(e.key)
-    setFilteredList(filtered => sortBy(filtered, e.key))
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    const k = e.key as SortCriterion
+    setSort(k)
+    setFilteredList((prev) => sortBy(prev, k))
   }
 
   const menuItems: MenuProps['items'] = [
     { key: 'Default', label: 'Default' },
     { key: 'Likes', label: 'Likes' },
     { key: 'Comments', label: 'Comments' },
-    { key: 'Visits', label: 'Visits' }
+    { key: 'Visits', label: 'Visits' },
   ]
 
-  const handleChange = e => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value
     if (input.length >= 3) {
-      const newList = originalList.filter(sculpture => {
+      const lower = input.toLowerCase()
+      const newList = originalList.filter((sculpture) => {
         const makerName =
           sculpture.primaryMaker.firstName +
           ' ' +
           sculpture.primaryMaker.lastName
-
         return (
-          sculpture.name.toLowerCase().includes(input.toLowerCase()) ||
-          makerName.toLowerCase().includes(input.toLowerCase())
+          sculpture.name.toLowerCase().includes(lower) ||
+          makerName.toLowerCase().includes(lower)
         )
       })
       setFilteredList(sortBy(newList, currentSort))
-    } else {
-      if (filteredList.length !== originalList.length) {
-        setFilteredList(sortBy(originalList.slice(), currentSort))
-      }
+    } else if (filteredList.length !== originalList.length) {
+      setFilteredList(sortBy(originalList.slice(), currentSort))
     }
   }
 
@@ -6089,7 +6102,7 @@ const SculptureGrid = () => {
               marginLeft: 8,
               marginRight: 8,
               marginBottom: 16,
-              display: 'flex'
+              display: 'flex',
             }}
           >
             <Search
@@ -6118,13 +6131,16 @@ const SculptureGrid = () => {
                 style={{ marginTop: 60 }}
               />
             ) : (
-              filteredList.map(sculpture => {
-                return (
-                  <ColStyled xs={24} sm={12} md={8} key={sculpture.accessionId}>
-                    <SculptureCard info={sculpture} />
-                  </ColStyled>
-                )
-              })
+              filteredList.map((sculpture) => (
+                <ColStyled
+                  xs={24}
+                  sm={12}
+                  md={8}
+                  key={sculpture.accessionId}
+                >
+                  <SculptureCard info={sculpture} />
+                </ColStyled>
+              ))
             )}
           </>
         </CardStyled>
@@ -7216,22 +7232,49 @@ export default UserProfile;
  * Author: Hieu Chu
  */
 
-import dayjs from 'dayjs'
-import { Tooltip, List, Card, Empty } from 'antd'
-import { Comment } from '@ant-design/compatible'
-import Link from 'next/link'
+import type React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Tooltip, List, Card, Empty } from 'antd';
+import { Comment } from '@ant-design/compatible';
+import Link from 'next/link';
 
-const UserVisit = ({ visits }) => {
-  visits.sort(
-    (a, b) => new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
-  )
-  visits.forEach(x => {
+dayjs.extend(relativeTime);
+
+/** Types minimaux utilisés par ce composant */
+type ImageItem = { url: string; created: string | Date };
+
+export interface Visit {
+  visitTime: string | Date;
+  sculptureId: string | number;
+  sculpture: {
+    name: string;
+    images: ImageItem[];
+  };
+}
+
+type FormattedComment = {
+  author: React.ReactNode;
+  avatar: React.ReactNode;
+  content: React.ReactNode;
+};
+
+const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
+  // Ne pas muter la prop: on clone avant de trier
+  const sorted: Visit[] = [...visits].sort(
+    (a: Visit, b: Visit) =>
+      new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
+  );
+
+  // Trie les images de chaque sculpture par date de création ascendante
+  sorted.forEach((x: Visit) => {
     x.sculpture.images.sort(
-      (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
-    )
-  })
+      (a: ImageItem, b: ImageItem) =>
+        new Date(a.created).getTime() - new Date(b.created).getTime()
+    );
+  });
 
-  const formattedComments = visits.map(x => ({
+  const formattedComments: FormattedComment[] = sorted.map((x: Visit) => ({
     author: (
       <span>
         <Link href={`/sculptures/id/${x.sculptureId}`}>
@@ -7239,7 +7282,7 @@ const UserVisit = ({ visits }) => {
             style={{
               fontSize: 14,
               fontWeight: 500,
-              color: 'rgba(0, 0, 0, 0.65)'
+              color: 'rgba(0, 0, 0, 0.65)',
             }}
           >
             {x.sculpture.name}
@@ -7259,7 +7302,7 @@ const UserVisit = ({ visits }) => {
             width: 42,
             height: 42,
             objectFit: 'cover',
-            borderRadius: 4
+            borderRadius: 4,
           }}
         />
       </div>
@@ -7272,8 +7315,8 @@ const UserVisit = ({ visits }) => {
           </span>
         </Tooltip>
       </div>
-    )
-  }))
+    ),
+  }));
 
   return (
     <Card
@@ -7282,27 +7325,35 @@ const UserVisit = ({ visits }) => {
       variant="borderless"
       style={{ marginTop: 12 }}
     >
-      <List
+      <List<FormattedComment>
         itemLayout="horizontal"
         dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
-          )
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No Visits"
+            />
+          ),
         }}
-        renderItem={item => (
+        renderItem={(item: FormattedComment) => (
           <li>
-            <Comment author={item.author} avatar={item.avatar} content={item.content} className="comment" />
+            <Comment
+              author={item.author}
+              avatar={item.avatar}
+              content={item.content}
+              className="comment"
+            />
           </li>
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
       />
     </Card>
-  )
-}
+  );
+};
 
-export default UserVisit
+export default UserVisit;
 
 ===== END components/user-components/UserVisit.tsx =====
 

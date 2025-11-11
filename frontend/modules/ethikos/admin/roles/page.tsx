@@ -1,51 +1,50 @@
 'use client'
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Switch, Tag } from 'antd';
-import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchRoles, toggleRole } from '@/services/admin';
-
-type RoleRow = { id: string; name: string; userCount: number; enabled: boolean };
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { Switch, Tag } from 'antd'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/services/admin'
 
 export default function RoleManagement() {
-  usePageTitle('Admin · Role Management');
+  usePageTitle('Admin · Role Management')
 
-  const { data, loading, mutate } = useRequest(fetchRoles);
+  const { data, loading, refresh } = useRequest<RolePayload>(() => fetchRoles())
 
-  const columns = [
+  const columns: ProColumns<RoleRow>[] = [
     { title: 'Role', dataIndex: 'name', width: 200 },
     {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (v, row) => <Tag>{v}</Tag>,
+      render: (dom) => <Tag>{dom}</Tag>,
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       width: 120,
-      render: (v: boolean, row: RoleRow) => (
+      render: (_, row) => (
         <Switch
-          checked={v}
-          onChange={async () => {
-            await toggleRole(row.id, !v);
-            mutate();
+          checked={row.enabled}
+          onChange={async (checked) => {
+            await toggleRole(row.id, checked)
+            refresh()
           }}
         />
       ),
     },
-  ];
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
       <ProTable<RoleRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={false}
         search={false}
       />
     </PageContainer>
-  );
+  )
 }

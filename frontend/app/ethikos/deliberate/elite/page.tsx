@@ -16,10 +16,13 @@ import { Button, Drawer, Empty, Space, Tag, Tooltip, message as antdMessage } fr
 import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
 import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchEliteTopics, createEliteTopic, fetchTopicPreview } from '@/services/deliberate';
 import type { Topic } from '@/types';
+
+dayjs.extend(relativeTime);
 
 /* ------------------------------------------------------------------ */
 /*  Types dérivés                                                      */
@@ -28,7 +31,8 @@ import type { Topic } from '@/types';
 interface TopicRow extends Topic {
   createdAt: string;
   lastActivity: string;
-  hot: boolean; // calculé côté serveur
+  hot: boolean;         // calculé côté serveur
+  stanceCount: number;  // <-- ajouté : utilisé par KPI et la colonne
 }
 
 /* ------------------------------------------------------------------ */
@@ -39,7 +43,8 @@ export default function EliteAgora() {
   usePageTitle('Deliberate · Elite Agora');
 
   /* ---------- data ---------- */
-  const { data, loading, refresh } = useRequest(fetchEliteTopics);
+  // Déclare explicitement la forme de data pour inclure stanceCount
+  const { data, loading, refresh } = useRequest<{ list: TopicRow[] }>(fetchEliteTopics);
   useInterval(refresh, 60_000); // polling 1 min
 
   /* ---------- drawer state ---------- */
@@ -50,10 +55,13 @@ export default function EliteAgora() {
   );
 
   /* ---------- open drawer ---------- */
-  const openPreview = React.useCallback((row: TopicRow) => {
-    setPreviewId(row.id);
-    loadPreview(row.id);
-  }, [loadPreview]);
+  const openPreview = React.useCallback(
+    (row: TopicRow) => {
+      setPreviewId(row.id);
+      loadPreview(row.id);
+    },
+    [loadPreview],
+  );
 
   /* ---------- KPI header ---------- */
   const headerStats = React.useMemo(
@@ -63,7 +71,7 @@ export default function EliteAgora() {
         label: 'Avg stances / topic',
         value: data?.list?.length
           ? Math.round(
-              (data!.list.reduce((sum: number, t: TopicRow) => sum + t.stanceCount, 0)) /
+              data!.list.reduce((sum: number, t: TopicRow) => sum + (t.stanceCount ?? 0), 0) /
                 data!.list.length,
             )
           : 0,
@@ -88,13 +96,17 @@ export default function EliteAgora() {
       {
         title: 'Title',
         dataIndex: 'title',
-        render: (_, row) => <a onClick={() => openPreview(row)}>{row.title}</a>,
+        render: (_, row) => (
+          <a onClick={() => openPreview(row)} style={{ cursor: 'pointer' }}>
+            {row.title}
+          </a>
+        ),
       },
       {
         title: 'Category',
         dataIndex: 'category',
         filters: categoryFilters,
-        onFilter: (val, row) => String(row.category) === String(val),
+        onFilter: (val: string | number | boolean, row) => String(row.category) === String(val),
         render: (_, row) => <Tag color="geekblue">{row.category}</Tag>,
       },
       {
@@ -106,7 +118,8 @@ export default function EliteAgora() {
       {
         title: 'Last activity',
         dataIndex: 'lastActivity',
-        valueType: 'fromNow',
+        // Utiliser dayjs.fromNow() pour éviter les frictions de typings de `valueType`
+        render: (_, row) => dayjs(row.lastActivity).fromNow(),
       },
       {
         title: '',
@@ -130,12 +143,7 @@ export default function EliteAgora() {
       loading={loading}
       extra={
         <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={refresh}
-            type="text"
-            title="Refresh list"
-          />
+          <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title="Refresh list" />
           {/* vérification de rôle/permission si besoin */}
           <NewTopicButton onCreated={refresh} />
         </Space>
@@ -219,28 +227,20 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
 
   return (
     <>
-      <Button
-        icon={<PlusOutlined />}
-        type="primary"
-        onClick={() => setVisible(true)}
-      >
+      <Button icon={<PlusOutlined />} type="primary" onClick={() => setVisible(true)}>
         New Topic
       </Button>
       <ModalForm
         title="Create new topic"
         open={visible}
         onOpenChange={setVisible}
-        onFinish={async (values: Record<string, any>) => {
-          await runAsync(values);
+        onFinish={async (values: { title: string; category: string }) => {
+          await runAsync(values); // <-- typé correctement
           return true;
         }}
         submitter={{ submitButtonProps: { loading } }}
       >
-        <ProFormText
-          name="title"
-          label="Title"
-          rules={[{ required: true, min: 10 }]}
-        />
+        <ProFormText name="title" label="Title" rules={[{ required: true, min: 10 }]} />
         <ProFormSelect
           name="category"
           label="Category"

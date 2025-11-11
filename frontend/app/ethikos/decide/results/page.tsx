@@ -20,31 +20,37 @@ export default function ResultsArchive() {
 
   const { data, loading } = useRequest(fetchDecisionResults);
 
-  const columns: ProColumns<ResultRow>[] = [
+  // Note the second generic argument (`any`) so valueType isn't restricted to "text"
+  const columns: ProColumns<ResultRow, any>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Result',
       dataIndex: 'passed',
       width: 120,
-      render: (_, row) => (
-        <Tag color={row.passed ? 'green' : 'red'}>
-          {row.passed ? 'PASSED' : 'REJECTED'}
-        </Tag>
+      // Avoid implicit-any by annotating both params
+      render: (_: any, row: ResultRow) => (
+        <Tag color={row.passed ? 'green' : 'red'}>{row.passed ? 'PASSED' : 'REJECTED'}</Tag>
       ),
+      // Use boolean filter values to match the Table's onFilter type
       filters: [
-        { text: 'Passed', value: 'true' },
-        { text: 'Rejected', value: 'false' },
+        { text: 'Passed', value: true },
+        { text: 'Rejected', value: false },
       ],
-      onFilter: (val, row) => String(row.passed) === val,
+      // Keep the wider param type that AntD expects to avoid typing conflicts
+      onFilter: (value: React.Key | boolean, row: ResultRow) => {
+        const v = typeof value === 'boolean' ? value : String(value) === 'true';
+        return row.passed === v;
+      },
     },
     { title: 'Scope', dataIndex: 'scope', width: 120 },
     { title: 'Region', dataIndex: 'region', width: 140 },
-    { title: 'Closed', dataIndex: 'closesAt', valueType: 'date' },
+    { title: 'Closed', dataIndex: 'closesAt', valueType: 'dateTime' },
   ];
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProTable<ResultRow>
+      {/* Match ProTable's generics with the columns declaration */}
+      <ProTable<ResultRow, any>
         rowKey="id"
         columns={columns}
         dataSource={data?.items ?? []}

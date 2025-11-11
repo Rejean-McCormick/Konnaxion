@@ -14,10 +14,8 @@ interface ActivityItem {
 }
 
 /**
- * Composant d'activité principale
- * - Correction : ne relit plus `.data` d'une réponse déjà déballée
- * - Typage explicite des données et suppression des `any`
- * - Conserve compatibilité avec Axios configuré dans `shared/api.ts`
+ * Tableau de bord d'activité
+ * Correction : lire `.data` car `shared/api` ne déballe pas la réponse Axios.
  */
 const ActivityDashboard: React.FC = () => {
   const [recentComments, setRecentComments] = React.useState<ActivityItem[]>([]);
@@ -27,16 +25,15 @@ const ActivityDashboard: React.FC = () => {
   React.useEffect(() => {
     const fetchAll = async () => {
       try {
-        // Le client `api` retourne déjà la payload, pas besoin de `.data`
-        const [comments, likes, visits] = await Promise.all([
+        const [commentsRes, likesRes, visitsRes] = await Promise.all([
           api.get<ActivityItem[]>('/activity/recent-comments'),
           api.get<ActivityItem[]>('/activity/recent-likes'),
           api.get<ActivityItem[]>('/activity/recent-visits'),
         ]);
 
-        setRecentComments(comments);
-        setRecentLikes(likes);
-        setRecentVisits(visits);
+        setRecentComments(commentsRes.data);
+        setRecentLikes(likesRes.data);
+        setRecentVisits(visitsRes.data);
       } catch (err) {
         console.error('Error fetching activities:', err);
       }
@@ -55,10 +52,7 @@ const ActivityDashboard: React.FC = () => {
               dataSource={recentComments}
               renderItem={(item) => (
                 <List.Item key={item.id}>
-                  <List.Item.Meta
-                    title={item.title}
-                    description={item.date}
-                  />
+                  <List.Item.Meta title={item.title} description={item.date} />
                 </List.Item>
               )}
             />
@@ -71,10 +65,7 @@ const ActivityDashboard: React.FC = () => {
               dataSource={recentLikes}
               renderItem={(item) => (
                 <List.Item key={item.id}>
-                  <List.Item.Meta
-                    title={item.title}
-                    description={item.date}
-                  />
+                  <List.Item.Meta title={item.title} description={item.date} />
                 </List.Item>
               )}
             />
@@ -87,10 +78,7 @@ const ActivityDashboard: React.FC = () => {
               dataSource={recentVisits}
               renderItem={(item) => (
                 <List.Item key={item.id}>
-                  <List.Item.Meta
-                    title={item.title}
-                    description={item.date}
-                  />
+                  <List.Item.Meta title={item.title} description={item.date} />
                 </List.Item>
               )}
             />

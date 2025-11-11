@@ -1,0 +1,118 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6] [cursor=pointer]:
+          - img "Konnaxion logo" [ref=e7]
+          - generic [ref=e8]: EkoH
+        - menu [ref=e9]
+    - generic [ref=e10]:
+      - banner [ref=e11]:
+        - generic [ref=e12]:
+          - img "menu-fold" [ref=e14] [cursor=pointer]:
+            - img [ref=e15]
+          - navigation [ref=e17]:
+            - list [ref=e18]:
+              - listitem [ref=e19]:
+                - link "Ekoh" [ref=e21] [cursor=pointer]:
+                  - /url: /ekoh?sidebar=ekoh
+          - generic [ref=e22]:
+            - button "🪩 Funky Disco" [ref=e23] [cursor=pointer]:
+              - generic [ref=e24]: 🪩 Funky Disco
+            - generic [ref=e25] [cursor=pointer]:
+              - img "user" [ref=e26]:
+                - img [ref=e27]
+              - text: Admin
+      - main [ref=e29]:
+        - generic [ref=e30]:
+          - heading "KonnectED Dashboard" [level=1] [ref=e32]
+          - main [ref=e33]:
+            - generic [ref=e34]:
+              - generic [ref=e36]:
+                - generic [ref=e39]: Recent Updates
+                - list [ref=e44]:
+                  - listitem [ref=e45]:
+                    - generic [ref=e47]:
+                      - heading "New Lesson on React Hooks" [level=4] [ref=e48]
+                      - generic [ref=e49]:
+                        - text: Learn about the latest features in React 17.
+                        - text: 2023-09-20 14:30
+                  - listitem [ref=e50]:
+                    - generic [ref=e52]:
+                      - 'heading "Updated Knowledge Unit: TypeScript Basics" [level=4] [ref=e53]'
+                      - generic [ref=e54]:
+                        - text: Refreshed content with new examples.
+                        - text: 2023-09-19 09:15
+                  - listitem [ref=e55]:
+                    - generic [ref=e57]:
+                      - heading "New Resource on Ant Design" [level=4] [ref=e58]
+                      - generic [ref=e59]:
+                        - text: Tips and tricks for building UIs faster.
+                        - text: 2023-09-18 11:00
+              - generic [ref=e61]:
+                - generic [ref=e64]: Active Discussions
+                - list [ref=e69]:
+                  - listitem [ref=e70]:
+                    - generic [ref=e71]:
+                      - img [ref=e74]
+                      - generic [ref=e75]:
+                        - heading "Best practices for state management in Next.js" [level=4] [ref=e76]
+                        - generic [ref=e77]: By Alice • 12 Replies
+                  - listitem [ref=e78]:
+                    - generic [ref=e79]:
+                      - img [ref=e82]
+                      - generic [ref=e83]:
+                        - heading "How to optimize performance in React apps?" [level=4] [ref=e84]
+                        - generic [ref=e85]: By Bob • 8 Replies
+                  - listitem [ref=e86]:
+                    - generic [ref=e87]:
+                      - img [ref=e90]
+                      - generic [ref=e91]:
+                        - heading "Sharing my experience with TypeScript in production" [level=4] [ref=e92]
+                        - generic [ref=e93]: By Carol • 5 Replies
+                  - listitem [ref=e94]:
+                    - generic [ref=e95]:
+                      - img [ref=e98]
+                      - generic [ref=e99]:
+                        - 'heading "Discussion: Design Systems vs Component Libraries" [level=4] [ref=e100]'
+                        - generic [ref=e101]: By Dave • 3 Replies
+                  - listitem [ref=e102]:
+                    - generic [ref=e103]:
+                      - img [ref=e106]
+                      - generic [ref=e107]:
+                        - heading "Future of AI in Education" [level=4] [ref=e108]
+                        - generic [ref=e109]: By Eve • 15 Replies
+              - generic [ref=e111]:
+                - generic [ref=e114]: Learning Progress
+                - generic [ref=e115]:
+                  - generic [ref=e116]: Your current learning path is 60% complete
+                  - progressbar [ref=e117]:
+                    - generic "60%" [ref=e121]
+              - generic [ref=e123]:
+                - generic [ref=e126]: Quick Access
+                - generic [ref=e128]:
+                  - generic [ref=e129]:
+                    - button "read" [ref=e130] [cursor=pointer]:
+                      - img "read" [ref=e132]:
+                        - img [ref=e133]
+                    - generic [ref=e135]: Knowledge
+                  - generic [ref=e136]:
+                    - button "comment" [ref=e137] [cursor=pointer]:
+                      - img "comment" [ref=e139]:
+                        - img [ref=e140]
+                    - generic [ref=e144]: Community
+                  - generic [ref=e145]:
+                    - button "book" [ref=e146] [cursor=pointer]:
+                      - img "book" [ref=e148]:
+                        - img [ref=e149]
+                    - generic [ref=e151]: Learning
+                  - generic [ref=e152]:
+                    - button "download" [ref=e153] [cursor=pointer]:
+                      - img "download" [ref=e155]:
+                        - img [ref=e156]
+                    - generic [ref=e158]: Offline
+  - alert [ref=e159]
+```

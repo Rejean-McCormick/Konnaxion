@@ -799,54 +799,53 @@ export default function Moderation() {
 ===== BEGIN modules/ethikos/admin/roles/page.tsx =====
 'use client'
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Switch, Tag } from 'antd';
-import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchRoles, toggleRole } from '@/services/admin';
-
-type RoleRow = { id: string; name: string; userCount: number; enabled: boolean };
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { Switch, Tag } from 'antd'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/services/admin'
 
 export default function RoleManagement() {
-  usePageTitle('Admin · Role Management');
+  usePageTitle('Admin · Role Management')
 
-  const { data, loading, mutate } = useRequest(fetchRoles);
+  const { data, loading, refresh } = useRequest<RolePayload>(() => fetchRoles())
 
-  const columns = [
+  const columns: ProColumns<RoleRow>[] = [
     { title: 'Role', dataIndex: 'name', width: 200 },
     {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (v, row) => <Tag>{v}</Tag>,
+      render: (dom) => <Tag>{dom}</Tag>,
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       width: 120,
-      render: (v: boolean, row: RoleRow) => (
+      render: (_, row) => (
         <Switch
-          checked={v}
-          onChange={async () => {
-            await toggleRole(row.id, !v);
-            mutate();
+          checked={row.enabled}
+          onChange={async (checked) => {
+            await toggleRole(row.id, checked)
+            refresh()
           }}
         />
       ),
     },
-  ];
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
       <ProTable<RoleRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={false}
         search={false}
       />
     </PageContainer>
-  );
+  )
 }
 
 ===== END modules/ethikos/admin/roles/page.tsx =====
@@ -1216,45 +1215,62 @@ export default function ResultsArchive() {
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Comment, Timeline, Typography } from 'antd';
+import { Timeline, Typography } from 'antd';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchTopicDetail } from '@/services/deliberate';
-import type { TopicDetail as TopicDetailType } from '@/services/deliberate';
 
-export default function TopicDetail() {
+// Derive the exact return type from the service
+type TopicDetail = Awaited<ReturnType<typeof fetchTopicDetail>>;
+type Statement = TopicDetail['statements'][number];
+
+export default function TopicDetailPage() {
   const params = useParams<{ topic: string }>();
-  const topicId = params?.topic;
+  const topicParam = params?.topic;
+  const topicId =
+    typeof topicParam === 'string'
+      ? topicParam
+      : Array.isArray(topicParam)
+      ? topicParam[0]
+      : undefined;
 
   usePageTitle(`Deliberate · ${topicId ?? ''}`);
 
-  const { data, loading } = useRequest<TopicDetailType, []>(
-    async () => fetchTopicDetail(topicId!),
-    {
-      ready: !!topicId,
-      refreshDeps: [topicId],
-    },
+  const { data, loading } = useRequest<TopicDetail>(
+    () => fetchTopicDetail(topicId!),
+    { ready: !!topicId, refreshDeps: [topicId] },
   );
 
   return (
     <PageContainer ghost loading={loading}>
-      <Typography.Title level={3}>{data?.title}</Typography.Title>
+      <Typography.Title level={3}>{data?.title ?? 'Topic'}</Typography.Title>
 
       <ProCard title="Statements Thread" ghost>
-        <Timeline>
-          {data?.statements?.map((s) => (
-            <Timeline.Item key={s.id}>
-              <Comment
-                author={s.author}
-                datetime={s.createdAt}
-                content={<Typography.Paragraph>{s.body}</Typography.Paragraph>}
-              />
-            </Timeline.Item>
-          ))}
-        </Timeline>
+        <Timeline
+          items={(data?.statements ?? []).map((s) => ({
+            key: s.id,
+            children: <StatementItem s={s} />,
+          }))}
+        />
       </ProCard>
     </PageContainer>
+  );
+}
+
+function StatementItem({ s }: { s: Statement }) {
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
+        <Typography.Text strong>{s.author}</Typography.Text>
+        <Typography.Text type="secondary">
+          {new Date(s.createdAt).toLocaleString()}
+        </Typography.Text>
+      </div>
+      <Typography.Paragraph style={{ marginTop: 4, marginBottom: 0 }}>
+        {s.body}
+      </Typography.Paragraph>
+    </div>
   );
 }
 
@@ -1946,7 +1962,7 @@ import { Badge, Space } from 'antd';
 import { useInterval, useRequest } from 'ahooks';
 import ChartCard from '@/components/charts/ChartCard';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchPulseLiveData } from '@/services/pulse';   // ← correct import
+import { fetchPulseLiveData } from '@/services/pulse';   // correct import
 
 export default function PulseLive() {
   usePageTitle('Pulse · Live Metrics');
@@ -1960,7 +1976,7 @@ export default function PulseLive() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.counters.map(c => (
+        {data?.counters.map((c) => (
           <StatisticCard
             key={c.label}
             statistic={{
@@ -1973,7 +1989,13 @@ export default function PulseLive() {
               value: c.value,
               precision: 0,
             }}
-            chart={<ChartCard type="tinyLine" data={c.history} height={50} />}
+            chart={
+              <ChartCard
+                type="line"
+                data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
+                height={50}
+              />
+            }
           />
         ))}
       </ProCard>

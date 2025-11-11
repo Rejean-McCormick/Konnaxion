@@ -13,18 +13,7 @@ import React, {
   useCallback,
   type ReactNode,
 } from 'react';
-import createAuth0Client, {
-  Auth0Client,
-  type Auth0ClientOptions,
-  type RedirectLoginOptions,
-  type PopupLoginOptions,
-  type GetTokenSilentlyOptions,
-  type GetTokenWithPopupOptions,
-  type GetIdTokenClaimsOptions,
-  type LogoutOptions,
-  type User,
-  type IdToken,
-} from '@auth0/auth0-spa-js';
+import * as Auth0 from '@auth0/auth0-spa-js';
 import { normalizeError } from '../../shared/errors';
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
@@ -34,19 +23,20 @@ type Nullable<T> = T | null;
 
 interface Auth0ContextValue {
   isAuthenticated: boolean;
-  user: Nullable<User>;
+  user: Nullable<Auth0.User>;
   loading: boolean;
   popupOpen: boolean;
-  loginWithPopup: (params?: PopupLoginOptions) => Promise<void>;
+  loginWithPopup: (params?: Auth0.PopupLoginOptions) => Promise<void>;
   handleRedirectCallback: () => Promise<void>;
-  getIdTokenClaims: (p?: GetIdTokenClaimsOptions) => Promise<IdToken>;
-  loginWithRedirect: (p?: RedirectLoginOptions) => Promise<void>;
-  getTokenSilently: (p?: GetTokenSilentlyOptions) => Promise<string>;
-  getTokenWithPopup: (p?: GetTokenWithPopupOptions) => Promise<string>;
-  logout: (p?: LogoutOptions) => void;
+  getIdTokenClaims: () => Promise<Auth0.IdToken | undefined>;
+  loginWithRedirect: (p?: Auth0.RedirectLoginOptions) => Promise<void>;
+  getTokenSilently: (p?: Auth0.GetTokenSilentlyOptions) => Promise<string>;
+  getTokenWithPopup: (p?: Auth0.GetTokenWithPopupOptions) => Promise<string | undefined>;
+  logout: (p?: Auth0.LogoutOptions) => void;
 }
 
 const Auth0Context = createContext<Auth0ContextValue | undefined>(undefined);
+
 export const useAuth0 = (): Auth0ContextValue => {
   const ctx = useContext(Auth0Context);
   if (!ctx) throw new Error('useAuth0 must be used within <Auth0Provider>');
@@ -56,16 +46,16 @@ export const useAuth0 = (): Auth0ContextValue => {
 type Auth0ProviderProps = {
   children: ReactNode;
   onRedirectCallback?: (appState?: unknown) => void;
-} & Auth0ClientOptions;
+} & Auth0.Auth0ClientOptions;
 
 export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   children,
   onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
   ...initOptions
 }) => {
-  const [auth0Client, setAuth0Client] = useState<Auth0Client | null>(null);
+  const [auth0Client, setAuth0Client] = useState<Auth0.Auth0Client | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<Auth0.User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [popupOpen, setPopupOpen] = useState<boolean>(false);
 
@@ -74,7 +64,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
 
     const initAuth0 = async () => {
       try {
-        const client = await createAuth0Client({
+        const client = await Auth0.createAuth0Client({
           ...initOptions,
           // Ensure redirect_uri exists unless explicitly provided
           authorizationParams: {
@@ -121,7 +111,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   }, []);
 
   const loginWithPopup = useCallback(
-    async (params?: PopupLoginOptions) => {
+    async (params?: Auth0.PopupLoginOptions) => {
       if (!auth0Client) return;
       setPopupOpen(true);
       try {
@@ -153,16 +143,13 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
     }
   }, [auth0Client]);
 
-  const getIdTokenClaims = useCallback(
-    async (p?: GetIdTokenClaimsOptions) => {
-      if (!auth0Client) throw new Error('Auth0 client not initialized');
-      return auth0Client.getIdTokenClaims(p);
-    },
-    [auth0Client]
-  );
+  const getIdTokenClaims = useCallback(async () => {
+    if (!auth0Client) throw new Error('Auth0 client not initialized');
+    return auth0Client.getIdTokenClaims();
+  }, [auth0Client]);
 
   const loginWithRedirect = useCallback(
-    async (p?: RedirectLoginOptions) => {
+    async (p?: Auth0.RedirectLoginOptions) => {
       if (!auth0Client) throw new Error('Auth0 client not initialized');
       await auth0Client.loginWithRedirect(p);
     },
@@ -170,7 +157,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   );
 
   const getTokenSilently = useCallback(
-    async (p?: GetTokenSilentlyOptions) => {
+    async (p?: Auth0.GetTokenSilentlyOptions) => {
       if (!auth0Client) throw new Error('Auth0 client not initialized');
       return auth0Client.getTokenSilently(p);
     },
@@ -178,7 +165,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   );
 
   const getTokenWithPopup = useCallback(
-    async (p?: GetTokenWithPopupOptions) => {
+    async (p?: Auth0.GetTokenWithPopupOptions) => {
       if (!auth0Client) throw new Error('Auth0 client not initialized');
       return auth0Client.getTokenWithPopup(p);
     },
@@ -186,7 +173,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
   );
 
   const logout = useCallback(
-    (p?: LogoutOptions) => {
+    (p?: Auth0.LogoutOptions) => {
       if (!auth0Client) return;
       auth0Client.logout({
         logoutParams: {

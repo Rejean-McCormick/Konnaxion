@@ -16,7 +16,7 @@ import {
   Pagination,
   Button,
 } from 'antd';
-import type { TableProps } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import {
   SearchOutlined,
   FilterOutlined,
@@ -45,7 +45,7 @@ const SUBJECTS = ['Robotics', 'Healthcare', 'AI', 'Sustainability', 'Design'];
 const LEVELS: Level[] = ['Beginner', 'Intermediate', 'Advanced'];
 const LANGUAGES: Language[] = ['English', 'French', 'Spanish'];
 
-// NOTE: D’après le code original, c’est du mock. Je le conserve tel quel.
+// Données de démonstration
 const sampleResources: Resource[] = [
   {
     key: '1',
@@ -108,10 +108,11 @@ export default function Page() {
   // Filtrage
   const filteredResources = useMemo(() => {
     return sampleResources.filter((r) => {
+      const q = searchText.toLowerCase();
       const matchesSearch =
-        !searchText ||
-        r.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        r.subject.toLowerCase().includes(searchText.toLowerCase());
+        !q ||
+        r.title.toLowerCase().includes(q) ||
+        r.subject.toLowerCase().includes(q);
 
       const matchesSubject =
         selectedSubjects.length === 0 || selectedSubjects.includes(r.subject);
@@ -130,12 +131,12 @@ export default function Page() {
   }, [filteredResources, current]);
 
   // Colonnes du tableau
-  const columns: TableProps<Resource>['columns'] = [
+  const columns: ColumnsType<Resource> = [
     {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      render: (text: string, record) => (
+      render: (text: string, record: Resource) => (
         <Space direction="vertical" size={0}>
           <a
             onClick={() =>
@@ -162,7 +163,8 @@ export default function Page() {
       dataIndex: 'subject',
       key: 'subject',
       filters: SUBJECTS.map((s) => ({ text: s, value: s })),
-      onFilter: (value, r) => r.subject === value,
+      // AntD v5 expects: (value: React.Key | boolean, record: Resource) => boolean
+      onFilter: (value: boolean | React.Key, r: Resource) => r.subject === String(value),
     },
     {
       title: 'Rating',
@@ -170,7 +172,7 @@ export default function Page() {
       key: 'rating',
       width: 160,
       render: (v: number) => <Rate disabled allowHalf defaultValue={v} />,
-      sorter: (a, b) => a.rating - b.rating,
+      sorter: (a: Resource, b: Resource) => a.rating - b.rating,
     },
   ];
 
@@ -206,9 +208,9 @@ export default function Page() {
                   style={{ width: '100%', marginTop: 8 }}
                   placeholder="Select subjects"
                   value={selectedSubjects}
-                  onChange={(value: string[]) => {
+                  onChange={(value) => {
                     setCurrent(1);
-                    setSelectedSubjects(value);
+                    setSelectedSubjects(value as string[]);
                   }}
                   options={SUBJECTS.map((s) => ({ label: s, value: s }))}
                 />
@@ -221,9 +223,9 @@ export default function Page() {
                   style={{ width: '100%', marginTop: 8 }}
                   placeholder="Select level"
                   value={selectedLevel}
-                  onChange={(value: Level | undefined) => {
+                  onChange={(value) => {
                     setCurrent(1);
-                    setSelectedLevel(value);
+                    setSelectedLevel(value as Level | undefined);
                   }}
                   options={LEVELS.map((l) => ({ label: l, value: l }))}
                 />
@@ -236,9 +238,9 @@ export default function Page() {
                   style={{ width: '100%', marginTop: 8 }}
                   placeholder="Select language"
                   value={selectedLanguage}
-                  onChange={(value: Language | undefined) => {
+                  onChange={(value) => {
                     setCurrent(1);
-                    setSelectedLanguage(value);
+                    setSelectedLanguage(value as Language | undefined);
                   }}
                   options={LANGUAGES.map((l) => ({ label: l, value: l }))}
                 />

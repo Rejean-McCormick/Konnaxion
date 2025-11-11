@@ -4,67 +4,86 @@
  * Author: Hieu Chu
  */
 
-import { Table } from 'antd'
-import { CardStyled } from './style'
-import styled from 'styled-components'
+import React from 'react';
+import { Table } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import styled from 'styled-components';
 import { useRouter } from 'next/navigation';
+import { CardStyled } from './style';
 
-const StyledTable = styled(Table)`
+type Maker = {
+  firstName: string;
+  lastName: string;
+};
+
+export type SculptureRow = {
+  accessionId: string;
+  name: string;
+  primaryMaker: Maker;
+  totalLikes: number;
+  totalComments: number;
+  totalVisits: number;
+};
+
+type Props = {
+  sculptures: SculptureRow[];
+};
+
+// Typage assoupli pour le wrapper styled afin d'éviter les erreurs de génériques
+const StyledTable = styled(Table as unknown as React.ComponentType<any>)`
   .ant-table table {
     border-left: 1px solid #e8e8e8;
     border-top: 1px solid #e8e8e8;
     border-right: 1px solid #e8e8e8;
   }
-`
+`;
 
-export default ({ sculptures }) => {
-  const columns = [
+export default function SculptureTable({ sculptures }: Props): JSX.Element {
+  const router = useRouter();
+
+  const columns: ColumnsType<SculptureRow> = [
     {
       title: 'Sculpture Name',
-      dataIndex: 'name'
+      dataIndex: 'name',
     },
     {
       title: 'Author',
       key: 'author',
-      render: (_, { primaryMaker: { firstName, lastName } }) => (
-        <span>{`${firstName} ${lastName}`}</span>
-      )
+      render: (_: unknown, { primaryMaker }) => (
+        <span>{`${primaryMaker.firstName} ${primaryMaker.lastName}`}</span>
+      ),
     },
     {
       title: 'Likes',
       dataIndex: 'totalLikes',
       sorter: (a, b) => a.totalLikes - b.totalLikes,
-      sortDirections: ['descend', 'ascend']
+      sortDirections: ['descend', 'ascend'],
     },
     {
       title: 'Comments',
       dataIndex: 'totalComments',
       sorter: (a, b) => a.totalComments - b.totalComments,
-      sortDirections: ['descend', 'ascend']
+      sortDirections: ['descend', 'ascend'],
     },
     {
       title: 'Visits',
       dataIndex: 'totalVisits',
       sorter: (a, b) => a.totalVisits - b.totalVisits,
-      sortDirections: ['descend', 'ascend']
-    }
-  ]
+      sortDirections: ['descend', 'ascend'],
+    },
+  ];
 
   return (
     <CardStyled title="Sculpture Rankings">
       <StyledTable
+        rowKey="accessionId"
         dataSource={sculptures}
         columns={columns}
         pagination={{ pageSize: 10 }}
         className="sculpture-table"
-        onRow={(record, _) => {
-          return {
-            onClick: () => {
-              const router = useRouter();
-              router.push(`/sculptures/id/${record.key}`)
-            }
-          };
-        }}
+        onRow={(record: SculptureRow) => ({
+          onClick: () => router.push(`/sculptures/id/${record.accessionId}`),
+        })}
       />
     </CardStyled>
   );

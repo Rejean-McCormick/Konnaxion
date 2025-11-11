@@ -1,7 +1,8 @@
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Timeline, Typography, Comment } from 'antd';
+import { Timeline, Typography } from 'antd';
+import Comment from 'antd/es/comment';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
@@ -25,7 +26,7 @@ export default function TopicDetail() {
 
   usePageTitle(`Deliberate · ${topic}`);
 
-  const { data, loading } = useRequest<TopicDetailData>(
+  const { data, loading } = useRequest<TopicDetailData, []>(
     () => fetchTopicDetail(topic),
     { ready: !!topic }
   );

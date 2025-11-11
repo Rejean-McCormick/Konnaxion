@@ -20,13 +20,13 @@ type ModerationPayload = { items: Report[] }
 export default function Moderation() {
   usePageTitle('Admin · Moderation')
 
-  const { data, loading, mutate } = useRequest<ModerationPayload, []>(
-    async () => await fetchModerationQueue()
+  const { data, loading, refresh } = useRequest<ModerationPayload, []>(
+    () => fetchModerationQueue() as Promise<ModerationPayload>
   )
 
   const handleModeration = async (id: string, approve: boolean) => {
     await actOnReport(id, approve)
-    await mutate()
+    refresh()
   }
 
   const columns: ProColumns<Report>[] = [

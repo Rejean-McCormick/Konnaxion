@@ -1,0 +1,232 @@
+[
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/admin/hooks/useModeration.ts",
+    "method": "GET",
+    "url": "/admin/moderation"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/admin/hooks/useModeration.ts",
+    "method": "GET",
+    "url": "/admin/moderation"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/admin/hooks/useStats.ts",
+    "method": "GET",
+    "url": "/api/admin/stats"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/admin/hooks/useStats.ts",
+    "method": "GET",
+    "url": "/api/admin/stats"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/ethikos/decide/public/page.tsx",
+    "method": "GET",
+    "url": "/api/home/debatecategory/"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/ethikos/decide/public/page.tsx",
+    "method": "GET",
+    "url": "/api/home/debatetopic/"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/ethikos/decide/public/page.tsx",
+    "method": "GET",
+    "url": "/api/home/debatetopic/"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/ethikos/decide/public/page.tsx",
+    "method": "POST",
+    "url": "/api/home/publicvote/"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/ethikos/decide/public/page.tsx",
+    "method": "GET",
+    "url": "/api/home/responseformat/"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/konsensus/hooks/usePoll.ts",
+    "method": "GET",
+    "url": "/api/polls/${id}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/konsensus/hooks/usePoll.ts",
+    "method": "GET",
+    "url": "/api/polls/${id}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/insights/hooks/useReport.ts",
+    "method": "GET",
+    "url": "/reports/${endpoint}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/insights/hooks/useReport.ts",
+    "method": "GET",
+    "url": "/reports/${endpoint}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/global/hooks/useGlobalSearch.ts",
+    "method": "GET",
+    "url": "/search"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/global/hooks/useGlobalSearch.ts",
+    "method": "GET",
+    "url": "/search"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/admin.ts",
+    "method": "GET",
+    "url": "admin/audit"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/audit.ts",
+    "method": "GET",
+    "url": "admin/audit/logs"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/admin.ts",
+    "method": "GET",
+    "url": "admin/moderation"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/admin.ts",
+    "method": "POST",
+    "url": "admin/moderation/${id}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/admin.ts",
+    "method": "GET",
+    "url": "admin/roles"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/admin.ts",
+    "method": "PATCH",
+    "url": "admin/roles/${id}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/decide.ts",
+    "method": "GET",
+    "url": "decide/elite/ballots"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/decide.ts",
+    "method": "GET",
+    "url": "decide/public/ballots"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/decide.ts",
+    "method": "POST",
+    "url": "decide/public/ballots/${id}/vote"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/decide.ts",
+    "method": "GET",
+    "url": "decide/results"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/deliberate.ts",
+    "method": "GET",
+    "url": "deliberate/elite/topics"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/deliberate.ts",
+    "method": "POST",
+    "url": "deliberate/elite/topics"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/deliberate.ts",
+    "method": "GET",
+    "url": "deliberate/topics/${id}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/deliberate.ts",
+    "method": "GET",
+    "url": "deliberate/topics/${id}/preview"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/impact.ts",
+    "method": "GET",
+    "url": "impact/feedback"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/impact.ts",
+    "method": "POST",
+    "url": "impact/feedback"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/impact.ts",
+    "method": "GET",
+    "url": "impact/outcomes"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/impact.ts",
+    "method": "GET",
+    "url": "impact/tracker"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/impact.ts",
+    "method": "PATCH",
+    "url": "impact/tracker/${id}"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/learn.ts",
+    "method": "GET",
+    "url": "learn/changelog"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/learn.ts",
+    "method": "GET",
+    "url": "learn/glossary"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/learn.ts",
+    "method": "GET",
+    "url": "learn/guides"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/pulse.ts",
+    "method": "GET",
+    "url": "pulse/health"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/pulse.ts",
+    "method": "GET",
+    "url": "pulse/live"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/pulse.ts",
+    "method": "GET",
+    "url": "pulse/overview"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/pulse.ts",
+    "method": "GET",
+    "url": "pulse/trends"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/global/components/GlobalSearchBar.tsx",
+    "method": "GET",
+    "url": "q"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/modules/global/pages/Search.tsx",
+    "method": "GET",
+    "url": "q"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/trust.ts",
+    "method": "GET",
+    "url": "trust/badges"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/trust.ts",
+    "method": "POST",
+    "url": "trust/credentials"
+  },
+  {
+    "file": "C:/MyCode/Konnaxionv14/frontend/services/trust.ts",
+    "method": "GET",
+    "url": "trust/profile"
+  }
+]

@@ -5,22 +5,34 @@
  * Author: Hieu Chu
  */
 
-import { Upload, Button, message as antdMessage, Row, Modal  } from 'antd';
-import { useState } from 'react'
-import { ColStyled } from '../style'
-import api from '../../../api'
+import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
+import type { UploadFile } from 'antd';
+import { useState } from 'react';
+import { ColStyled } from '../style';
+import api from '../../../api';
 import { useRouter } from 'next/navigation';
-import { normalizeError } from "../../../shared/errors";
+import { normalizeError } from '../../../shared/errors';
 import Icon from '@/components/compat/Icon';
+import type { UploadRequestOption as RcUploadRequestOption } from 'rc-upload/lib/interface';
+import type { AxiosProgressEvent } from 'axios';
 
-const { confirm } = Modal
+const { confirm } = Modal;
 
-const EditImage = ({ accessionId, _name, images }) => {
-  const [fileList, setFileList] = useState([...images])
-  const [isSubmitting, setIsSubmitting] = useState(false)
+type EditImageProps = {
+  accessionId: string;
+  _name: string;
+  // Les images reçues sont déjà façonnées côté parent pour l'Upload (uid/url/preview/status)
+  images: UploadFile[];
+};
 
-  const handleRemove = file => {
-    return new Promise((resolve, _reject) => {
+const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
+  const router = useRouter();
+
+  const [fileList, setFileList] = useState<UploadFile[]>([...(images as UploadFile[])]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRemove = (file: UploadFile): Promise<boolean> => {
+    return new Promise((resolve) => {
       confirm({
         title: 'Do you want to remove this image?',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
@@ -30,77 +42,81 @@ const EditImage = ({ accessionId, _name, images }) => {
         okButtonProps: {
           style: {
             background: '#ff4d4f',
-            borderColor: '#ff4d4f'
-          }
+            borderColor: '#ff4d4f',
+          },
         },
         onOk: async () => {
-          setIsSubmitting(true)
+          setIsSubmitting(true);
           try {
-            const _result = await api.delete(`/sculpture-images/${file.uid}`)
-            resolve(true)
-            setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
-            antdMessage.success('Deleted image successfully!', 2)
+            await api.delete(`/sculpture-images/${(file as any).uid}`);
+            resolve(true);
+            setFileList((curr) => curr.filter((x: any) => x.uid !== (file as any).uid));
+            antdMessage.success('Deleted image successfully!', 2);
           } catch (error: unknown) {
-            const { message, statusCode } = normalizeError(error);
-            antdMessage.error(error.response.data.message)
-            resolve(false)
+            const { message } = normalizeError(error);
+            antdMessage.error(message);
+            resolve(false);
           }
-          setIsSubmitting(false)
+          setIsSubmitting(false);
         },
         onCancel: () => {
-          resolve(false)
-        }
-      })
-    })
-  }
+          resolve(false);
+        },
+      });
+    });
+  };
 
-  const customRequest = async e => {
+  const customRequest = async (e: RcUploadRequestOption) => {
     const config = {
       headers: {
         'content-type':
-          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s'
+          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s',
       },
-      onUploadProgress: function(progressEvent) {
-        var percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        )
-        e.onProgress(percentCompleted)
-      }
-    }
+      onUploadProgress: function (progressEvent: AxiosProgressEvent) {
+        const loaded = progressEvent.loaded ?? 0;
+        const total = progressEvent.total ?? 1;
+        const percentCompleted = Math.round((loaded * 100) / total);
+        // rc-upload attend un objet { percent }
+        e.onProgress?.({ percent: percentCompleted } as any, e.file as any);
+      },
+    };
 
-    let data = new FormData()
-    data.append('images', e.file)
-    data.set('accessionId', accessionId)
-    const hide = antdMessage.loading('Uploading image...', 0)
-    setIsSubmitting(true)
+    const data = new FormData();
+    data.append('images', e.file as Blob);
+    data.set('accessionId', accessionId);
+
+    const hide = antdMessage.loading('Uploading image...', 0);
+    setIsSubmitting(true);
 
     try {
-      const _result = await api.post('/sculpture-images', data, config)
-      const file = { ...e.file }
-      const { id, url } = _result.data[0]
-      file.uid = id
-      file.url = url
-      file.thumbUrl = url
-      file.preview = url
-      setFileList(fileList => [...fileList, file])
+      const _result = await api.post('/sculpture-images', data, config);
+      const file: any = { ...(e.file as any) };
+      const { id, url } = _result.data[0];
+      file.uid = id;
+      file.url = url;
+      file.thumbUrl = url;
+      file.preview = url;
 
-      e.onSuccess(_result.data[0], e.file)
-      hide()
-      antdMessage.success('Uploaded image successfully!', 2)
+      setFileList((curr) => [...curr, file]);
+
+      e.onSuccess?.(_result.data[0], e.file as any);
+      hide();
+      antdMessage.success('Uploaded image successfully!', 2);
     } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      antdMessage.error(error.response.data.message)
-      e.onError(error.response.data.message)
+      const { message } = normalizeError(error);
+      antdMessage.error(message);
+      e.onError?.(message as any);
     }
-    setIsSubmitting(false)
-  }
+
+    setIsSubmitting(false);
+  };
 
   const uploadButton = (
     <div>
       <Icon type="plus" />
       <div className="ant-upload-text">Upload</div>
     </div>
-  )
+  );
 
   return (
     <Row gutter={16}>
@@ -110,7 +126,7 @@ const EditImage = ({ accessionId, _name, images }) => {
           listType="picture-card"
           customRequest={customRequest}
           onRemove={handleRemove}
-          fileList={fileList}
+          fileList={fileList as any}
         >
           {uploadButton}
         </Upload>
@@ -118,15 +134,13 @@ const EditImage = ({ accessionId, _name, images }) => {
         <Button
           type="primary"
           loading={isSubmitting}
-          onClick={() =>
-            router.push(`/sculptures/id/${accessionId}`)
-          }
+          onClick={() => router.push(`/sculptures/id/${accessionId}`)}
         >
           Finish
         </Button>
       </ColStyled>
     </Row>
   );
-}
+};
 
-export default EditImage
+export default EditImage;

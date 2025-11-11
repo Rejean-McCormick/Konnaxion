@@ -5,101 +5,102 @@
  * Author: Hieu Chu
  */
 
-import { Upload, Button, message as antdMessage, Row, Modal  } from 'antd';
-import { useState } from 'react'
-import { CardStyled, ColStyled } from '../style'
-import api from '../../../api'
+import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
+import type { UploadProps, UploadFile } from 'antd';
+import type { AxiosProgressEvent } from 'axios';
+import { useState } from 'react';
+import { CardStyled, ColStyled } from '../style';
+import api from '../../../api';
 import { useRouter } from 'next/navigation';
-import Head from 'next/head'
-import { normalizeError } from "../../../shared/errors";
+import Head from 'next/head';
+import { normalizeError } from '../../../shared/errors';
 import Icon from '@/components/compat/Icon';
 
-const { confirm } = Modal
+const { confirm } = Modal;
 
-const defaultFileList = []
+type SculptureUploadImageProps = {
+  sculpture: { accessionId: string; name: string };
+};
 
-const SculptureUploadImage = ({ sculpture }) => {
-  const [fileList, setFileList] = useState([...defaultFileList])
-  const { accessionId, name } = sculpture
+const defaultFileList: UploadFile[] = [];
 
-  const handleRemove = file => {
-    return new Promise((resolve, _reject) => {
+export default function SculptureUploadImage({ sculpture }: SculptureUploadImageProps) {
+  const router = useRouter();
+  const [fileList, setFileList] = useState<UploadFile[]>([...defaultFileList]);
+  const { accessionId, name } = sculpture;
+
+  const handleRemove: UploadProps['onRemove'] = (file) =>
+    new Promise<boolean>((resolve) => {
       confirm({
         title: 'Do you want to remove this image?',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
         style: { top: 110 },
         maskClosable: true,
         okText: 'Confirm',
-        okButtonProps: {
-          style: {
-            background: '#ff4d4f',
-            borderColor: '#ff4d4f'
-          }
-        },
+        okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
         onOk: async () => {
           try {
-            const _result = await api.delete(`/sculpture-images/${file.uid}`)
-            resolve(true)
-            setFileList(fileList => fileList.filter(x => x.uid !== file.uid))
-            antdMessage.success('Deleted image successfully!', 2)
-          } catch (error: unknown) {
-            const { message, statusCode } = normalizeError(error);
-            antdMessage.error(error.response.data.message)
-            resolve(false)
+            await api.delete(`/sculpture-images/${file.uid}`);
+            setFileList((prev) => prev.filter((x) => x.uid !== file.uid));
+            antdMessage.success('Deleted image successfully!', 2);
+            resolve(true);
+          } catch (e) {
+            const { message } = normalizeError(e);
+            antdMessage.error(message || 'Failed to delete image');
+            resolve(false);
           }
         },
-        onCancel: () => {
-          resolve(false)
-        }
-      })
-    })
-  }
+        onCancel: () => resolve(false),
+      });
+    });
 
-  const customRequest = async e => {
+  const customRequest: UploadProps['customRequest'] = async (options) => {
+    const { file, onProgress, onError, onSuccess } = options;
+
     const config = {
-      headers: {
-        'content-type':
-          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s'
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress: (ev: AxiosProgressEvent) => {
+        const total = ev.total ?? 0;
+        const percent = total ? Math.round((ev.loaded / total) * 100) : 0;
+        onProgress?.({ percent });
       },
-      onUploadProgress: function(progressEvent) {
-        var percentCompleted = Math.round(
-          (progressEvent.loaded * 100) / progressEvent.total
-        )
-        e.onProgress(percentCompleted)
-      }
-    }
+    };
 
-    let data = new FormData()
-    data.append('images', e.file)
-    data.set('accessionId', accessionId)
-    const hide = antdMessage.loading('Uploading image...', 0)
+    const form = new FormData();
+    form.append('images', file as any);
+    form.set('accessionId', accessionId);
 
+    const hide = antdMessage.loading('Uploading image...', 0);
     try {
-      const _result = await api.post('/sculpture-images', data, config)
-      const file = { ...e.file }
-      const { id, url } = _result.data[0]
-      file.uid = id
-      file.url = url
-      file.thumbUrl = url
-      file.preview = url
-      setFileList(fileList => [...fileList, file])
+      const result = await api.post('/sculpture-images', form, config);
+      const { id, url } = result.data[0];
 
-      e.onSuccess(_result.data[0], e.file)
-      hide()
-      antdMessage.success('Uploaded image successfully!', 2)
-    } catch (error: unknown) {
-      const { message, statusCode } = normalizeError(error);
-      antdMessage.error(error.response.data.message)
-      e.onError(error.response.data.message)
+      const uploaded: UploadFile = {
+        uid: String(id),
+        name: (file as any)?.name ?? String(id),
+        status: 'done',
+        url,
+        thumbUrl: url,
+      };
+
+      setFileList((prev) => [...prev, uploaded]);
+      onSuccess?.(result.data[0], file as any);
+      antdMessage.success('Uploaded image successfully!', 2);
+    } catch (e) {
+      const { message } = normalizeError(e);
+      antdMessage.error(message || 'Upload failed');
+      onError?.(new Error(message || 'Upload failed') as any);
+    } finally {
+      hide();
     }
-  }
+  };
 
   const uploadButton = (
     <div>
       <Icon type="plus" />
       <div className="ant-upload-text">Upload</div>
     </div>
-  )
+  );
 
   return (
     <>
@@ -120,12 +121,7 @@ const SculptureUploadImage = ({ sculpture }) => {
               {uploadButton}
             </Upload>
 
-            <Button
-              type="primary"
-              onClick={() =>
-                router.push(`/sculptures/id/${accessionId}`)
-              }
-            >
+            <Button type="primary" onClick={() => router.push(`/sculptures/id/${accessionId}`)}>
               Finish
             </Button>
           </CardStyled>
@@ -134,5 +130,3 @@ const SculptureUploadImage = ({ sculpture }) => {
     </>
   );
 }
-
-export default SculptureUploadImage

@@ -1,40 +1,43 @@
 'use client'
 
-import { PageContainer, ProTable, StatisticCard } from '@ant-design/pro-components';
-import { Progress, Statistic } from 'antd';
-import { useRequest } from 'ahooks';
-import dayjs from 'dayjs';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchEliteBallots } from '@/services/decide';
-import type { Ballot } from '@/types';
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { Progress, Statistic } from 'antd'
+import { useRequest } from 'ahooks'
+import dayjs from 'dayjs'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchEliteBallots } from '@/services/decide'
+import type { Ballot } from '@/types'
+
+type Row = Ballot & { turnout: number }
 
 export default function EliteBallots() {
-  usePageTitle('Decide · Elite Ballots');
+  usePageTitle('Decide · Elite Ballots')
 
-  const { data, loading } = useRequest(fetchEliteBallots);
+  const { data, loading } = useRequest<{ ballots: Row[] }>(fetchEliteBallots)
 
-  const columns = [
+  const columns: ProColumns<Row>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-render: (v, row) => (
-  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
-),
+      render: (_: React.ReactNode, row) => (
+        <Statistic.Countdown value={dayjs(row.closesAt).valueOf()} format="D[d] HH:mm:ss" />
+      ),
     },
     {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (v, row) => <Progress type="circle" percent={v} />,
+      render: (_: React.ReactNode, row) => <Progress type="circle" percent={row.turnout} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
-  ];
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProTable<Ballot & { turnout: number }>
+      <ProTable<Row>
         rowKey="id"
         columns={columns}
         dataSource={data?.ballots}
@@ -42,5 +45,5 @@ render: (v, row) => (
         search={false}
       />
     </PageContainer>
-  );
+  )
 }

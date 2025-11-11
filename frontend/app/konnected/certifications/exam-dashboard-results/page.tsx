@@ -16,24 +16,21 @@ import {
   Alert,
 } from 'antd';
 import { EyeOutlined, FilePdfOutlined } from '@ant-design/icons';
-import Link from 'next/link';
 import PageContainer from '@/components/PageContainer';
 
 const { Text } = Typography;
 
-// --- Types ---
 type ExamOutcome = 'Pass' | 'Fail';
 
 interface ExamResult {
   id: string;
   examName: string;
-  dateTaken: string; // ISO ou lisible
-  score: number;     // 0..100
+  dateTaken: string;
+  score: number;
   result: ExamOutcome;
   details: string;
 }
 
-// --- Données démo (à brancher sur API plus tard) ---
 const upcomingExam:
   | { examName: string; examDate: string; status: string }
   | null = {
@@ -72,7 +69,6 @@ export default function ExamDashboardResultsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState<ExamResult | null>(null);
 
-  // Colonnes (typage strict pour éviter implicit any)
   const columns: TableProps<ExamResult>['columns'] = [
     { title: 'Exam Name', dataIndex: 'examName', key: 'examName' },
     { title: 'Date Taken', dataIndex: 'dateTaken', key: 'dateTaken' },
@@ -110,9 +106,10 @@ export default function ExamDashboardResultsPage() {
     },
   ];
 
+  const latest = examResultsData[0];
+
   return (
     <PageContainer title="Exam Dashboard & Results">
-      {/* Examen à venir */}
       {upcomingExam && (
         <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
           <Row gutter={[16, 16]}>
@@ -129,24 +126,18 @@ export default function ExamDashboardResultsPage() {
         </Card>
       )}
 
-      {/* Résumé du dernier examen */}
-      {examResultsData.length > 0 && (
+      {latest && (
         <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
           <Row gutter={16}>
             <Col xs={24} md={12}>
-              <Statistic
-                title="Score Achieved"
-                value={examResultsData[0].score}
-                suffix="%"
-              />
+              <Statistic title="Score Achieved" value={latest.score} suffix="%" />
             </Col>
             <Col xs={24} md={12}>
               <Statistic
                 title="Result"
-                value={examResultsData[0].result}
+                value={latest.result}
                 valueStyle={{
-                  color:
-                    examResultsData[0].result === 'Pass' ? '#3f8600' : '#cf1322',
+                  color: latest.result === 'Pass' ? '#3f8600' : '#cf1322',
                 }}
               />
             </Col>
@@ -154,7 +145,6 @@ export default function ExamDashboardResultsPage() {
         </Card>
       )}
 
-      {/* Historique */}
       <Card title="Exam History" style={{ marginBottom: 24 }}>
         <Table<ExamResult>
           columns={columns}
@@ -164,19 +154,13 @@ export default function ExamDashboardResultsPage() {
         />
       </Card>
 
-      {/* Certificats */}
       <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
         <List
           dataSource={certificationsEarned}
           renderItem={(item) => (
             <List.Item
               actions={[
-                <Button
-                  key="dl"
-                  icon={<FilePdfOutlined />}
-                  type="link"
-                  href={item.pdfLink}
-                >
+                <Button key="dl" icon={<FilePdfOutlined />} type="link" href={item.pdfLink}>
                   Download
                 </Button>,
               ]}
@@ -190,7 +174,6 @@ export default function ExamDashboardResultsPage() {
         />
       </Card>
 
-      {/* Prochaines étapes */}
       <Card>
         <Alert
           message="Next Steps: Explore further certification programs to advance your career."
@@ -198,14 +181,12 @@ export default function ExamDashboardResultsPage() {
           showIcon
         />
         <div style={{ marginTop: 16 }}>
-          {/* Chemin existant */}
-          <Link href="/konnected/certifications/certification-programs">
-            <Button type="primary">Certification Programs</Button>
-          </Link>
+          <Button type="primary" href="/konnected/certifications/certification-programs">
+            Certification Programs
+          </Button>
         </div>
       </Card>
 
-      {/* Détails d’un examen */}
       <Drawer
         title="Exam Details"
         placement="right"
@@ -227,9 +208,7 @@ export default function ExamDashboardResultsPage() {
               <strong>Result:</strong>{' '}
               <Text
                 strong
-                style={{
-                  color: selectedExam.result === 'Pass' ? 'green' : 'red',
-                }}
+                style={{ color: selectedExam.result === 'Pass' ? 'green' : 'red' }}
               >
                 {selectedExam.result}
               </Text>

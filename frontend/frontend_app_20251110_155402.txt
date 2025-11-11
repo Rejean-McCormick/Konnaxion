@@ -1,4 +1,4 @@
-===== TOC (104 fichiers) =====
+===== TOC (103 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\app\_api\admin\moderation\route.ts
 2. C:\MyCode\Konnaxionv14\frontend\app\_api\admin\stats\route.ts
 3. C:\MyCode\Konnaxionv14\frontend\app\_api\health\route.ts
@@ -52,57 +52,56 @@
 51. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
 52. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx.bak
 53. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx
-54. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx.bak
-55. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\view-reputation-ekoh\page.tsx
-56. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\browse-available-workspaces\page.tsx
-57. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx
-58. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
-59. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx
-60. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx.bak
-61. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
-62. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx
-63. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx.bak
-64. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx
-65. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx.bak
-66. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
-67. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx
-68. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx.bak
-69. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
-70. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx
-71. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx.bak
-72. C:\MyCode\Konnaxionv14\frontend\app\konnected\layout.tsx
-73. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\browse-resources\page.tsx
-74. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\offline-content\page.tsx
-75. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\recommended-resources\page.tsx
-76. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\search-filters\page.tsx
-77. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\create-learning-path\page.tsx
-78. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx
-79. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx.bak
-80. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\my-learning-path\page.tsx
-81. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\activity-planner\page.tsx
-82. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
-83. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx.bak
-84. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx
-85. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\team-builder\page.tsx
-86. C:\MyCode\Konnaxionv14\frontend\app\konsensus\page.tsx
-87. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
-88. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
-89. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx
-90. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
-91. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx
-92. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
-93. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
-94. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
-95. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
-96. C:\MyCode\Konnaxionv14\frontend\app\kreative\dashboard\page.tsx
-97. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\collaborate-on-ideas\page.tsx
-98. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
-99. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
-100. C:\MyCode\Konnaxionv14\frontend\app\kreative\layout.tsx
-101. C:\MyCode\Konnaxionv14\frontend\app\layout.tsx
-102. C:\MyCode\Konnaxionv14\frontend\app\page.tsx
-103. C:\MyCode\Konnaxionv14\frontend\app\problem_files_concat.txt
-104. C:\MyCode\Konnaxionv14\frontend\app\providers\AuthProvider.tsx
+54. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\view-reputation-ekoh\page.tsx
+55. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\browse-available-workspaces\page.tsx
+56. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx
+57. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
+58. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx
+59. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx.bak
+60. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
+61. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx
+62. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx.bak
+63. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx
+64. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx.bak
+65. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
+66. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx
+67. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx.bak
+68. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
+69. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx
+70. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx.bak
+71. C:\MyCode\Konnaxionv14\frontend\app\konnected\layout.tsx
+72. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\browse-resources\page.tsx
+73. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\offline-content\page.tsx
+74. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\recommended-resources\page.tsx
+75. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\search-filters\page.tsx
+76. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\create-learning-path\page.tsx
+77. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx
+78. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx.bak
+79. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\my-learning-path\page.tsx
+80. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\activity-planner\page.tsx
+81. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
+82. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx.bak
+83. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx
+84. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\team-builder\page.tsx
+85. C:\MyCode\Konnaxionv14\frontend\app\konsensus\page.tsx
+86. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
+87. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
+88. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx
+89. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
+90. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx
+91. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
+92. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
+93. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
+94. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
+95. C:\MyCode\Konnaxionv14\frontend\app\kreative\dashboard\page.tsx
+96. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\collaborate-on-ideas\page.tsx
+97. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
+98. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
+99. C:\MyCode\Konnaxionv14\frontend\app\kreative\layout.tsx
+100. C:\MyCode\Konnaxionv14\frontend\app\layout.tsx
+101. C:\MyCode\Konnaxionv14\frontend\app\page.tsx
+102. C:\MyCode\Konnaxionv14\frontend\app\problem_files_concat.txt
+103. C:\MyCode\Konnaxionv14\frontend\app\providers\AuthProvider.tsx
 ===== END TOC =====
 
 
@@ -892,10 +891,12 @@ type AuditPayload = { items: LogRow[] }
 export default function AuditLogs() {
   usePageTitle('Admin · Audit Logs')
 
-  const { data, loading } = useRequest<AuditPayload, []>(async () => {
+  const service = async (): Promise<AuditPayload> => {
     const res = await fetchAuditLogs()
-    return res                     // ← was `res.data`
-  })
+    return res as AuditPayload
+  }
+
+  const { data, loading } = useRequest<AuditPayload, []>(service)
 
   const columns: ProColumns<LogRow>[] = [
     { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
@@ -959,13 +960,13 @@ type ModerationPayload = { items: Report[] }
 export default function Moderation() {
   usePageTitle('Admin · Moderation')
 
-  const { data, loading, mutate } = useRequest<ModerationPayload, []>(
-    async () => await fetchModerationQueue()
+  const { data, loading, refresh } = useRequest<ModerationPayload, []>(
+    () => fetchModerationQueue() as Promise<ModerationPayload>
   )
 
   const handleModeration = async (id: string, approve: boolean) => {
     await actOnReport(id, approve)
-    await mutate()
+    refresh()
   }
 
   const columns: ProColumns<Report>[] = [
@@ -1032,54 +1033,56 @@ export default function Moderation() {
 ===== BEGIN app/ethikos/admin/roles/page.tsx =====
 'use client'
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Switch, Tag } from 'antd';
-import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchRoles, toggleRole } from '@/services/admin';
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { Switch, Tag } from 'antd'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchRoles, toggleRole } from '@/services/admin'
 
-type RoleRow = { id: string; name: string; userCount: number; enabled: boolean };
+type RoleRow = { id: string; name: string; userCount: number; enabled: boolean }
+type RolePayload = { items: RoleRow[] }
 
 export default function RoleManagement() {
-  usePageTitle('Admin · Role Management');
+  usePageTitle('Admin · Role Management')
 
-  const { data, loading, mutate } = useRequest(fetchRoles);
+  const { data, loading, refresh } = useRequest<RolePayload, []>(async () => await fetchRoles())
 
-  const columns = [
+  const columns: ProColumns<RoleRow>[] = [
     { title: 'Role', dataIndex: 'name', width: 200 },
     {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (v, row) => <Tag>{v}</Tag>,
+      render: (dom) => <Tag>{dom}</Tag>,
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       width: 120,
-      render: (v: boolean, row: RoleRow) => (
+      render: (_, row) => (
         <Switch
-          checked={v}
-          onChange={async () => {
-            await toggleRole(row.id, !v);
-            mutate();
+          checked={row.enabled}
+          onChange={async (checked) => {
+            await toggleRole(row.id, checked)
+            refresh()
           }}
         />
       ),
     },
-  ];
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
       <ProTable<RoleRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={data?.items ?? []}
         pagination={false}
         search={false}
       />
     </PageContainer>
-  );
+  )
 }
 
 ===== END app/ethikos/admin/roles/page.tsx =====
@@ -1497,7 +1500,8 @@ export default function ResultsArchive() {
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Timeline, Typography, Comment } from 'antd';
+import { Timeline, Typography } from 'antd';
+import Comment from 'antd/es/comment';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
@@ -1521,7 +1525,7 @@ export default function TopicDetail() {
 
   usePageTitle(`Deliberate · ${topic}`);
 
-  const { data, loading } = useRequest<TopicDetailData>(
+  const { data, loading } = useRequest<TopicDetailData, []>(
     () => fetchTopicDetail(topic),
     { ready: !!topic }
   );
@@ -2239,7 +2243,7 @@ import { Badge, Space } from 'antd';
 import { useInterval, useRequest } from 'ahooks';
 import ChartCard from '@/components/charts/ChartCard';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchPulseLiveData } from '@/services/pulse';   // ← correct import
+import { fetchPulseLiveData } from '@/services/pulse';   // ← import correct
 
 export default function PulseLive() {
   usePageTitle('Pulse · Live Metrics');
@@ -2253,7 +2257,7 @@ export default function PulseLive() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.counters.map(c => (
+        {data?.counters.map((c) => (
           <StatisticCard
             key={c.label}
             statistic={{
@@ -2266,7 +2270,13 @@ export default function PulseLive() {
               value: c.value,
               precision: 0,
             }}
-            chart={<ChartCard type="tinyLine" data={c.history} height={50} />}
+            chart={
+              <ChartCard
+                type="line"
+                data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
+                height={50}
+              />
+            }
           />
         ))}
       </ProCard>
@@ -3927,9 +3937,19 @@ export default function SearchFilterDocuments() {
 'use client';
 
 import React, { useState } from 'react';
-import { Form, Input, Select, Upload, Switch, Button, message as antdMessage, Progress, Result } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import {
+  Form,
+  Input,
+  Select,
+  Upload,
+  Switch,
+  Button,
+  message as antdMessage,
+  Progress,
+  Result,
+} from 'antd';
 import type { UploadFile, UploadProps, FormProps } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 
 const { TextArea } = Input;
@@ -3940,31 +3960,30 @@ type FormValues = {
   category?: string;
   version?: string;
   language?: string;
-  documentFile?: UploadFile<unknown>[];
+  documentFile?: UploadFile[];
   publishNow?: boolean;
 };
 
-export default function UploadNewDocumentPage() {
+export default function UploadNewDocumentPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
   const router = useRouter();
 
-  const [uploadedFileList, setUploadedFileList] = useState<UploadFile<unknown>[]>([]);
+  const [uploadedFileList, setUploadedFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
-  // Normalise l’événement Upload -> fileList pour AntD Form
-  const normFile: UploadProps['getValueFromEvent'] = (e) => {
+  type UploadChangeParam = Parameters<NonNullable<UploadProps['onChange']>>[0];
+
+  const normFile = (e: UploadChangeParam | UploadFile[]): UploadFile[] => {
     if (Array.isArray(e)) return e;
     return e?.fileList ?? [];
   };
 
   const handleUploadChange: UploadProps['onChange'] = ({ fileList }) => {
-    // On garde la liste côté état (affichage) et côté Form (via getValueFromEvent)
-    setUploadedFileList(fileList as UploadFile<unknown>[]);
+    setUploadedFileList(fileList as UploadFile[]);
   };
 
-  // Simulation d’upload avec progression (remplacer par ton appel API)
   const simulateUpload = () => {
     setUploading(true);
     setUploadProgress(0);
@@ -3987,9 +4006,6 @@ export default function UploadNewDocumentPage() {
   const onFinish: FormProps<FormValues>['onFinish'] = async () => {
     try {
       simulateUpload();
-      // Exemple : ici tu ferais l'appel à ton backend avec `form.getFieldsValue()`
-      // const payload = form.getFieldsValue();
-      // await api.uploadDocument(payload);
     } catch {
       setUploading(false);
       antdMessage.error('Upload failed');
@@ -4090,21 +4106,16 @@ export default function UploadNewDocumentPage() {
         >
           <Upload
             accept=".pdf,.doc,.docx,.txt,.md"
-            beforeUpload={() => false} // on laisse AntD gérer, pas d’upload auto
+            beforeUpload={() => false}
             onChange={handleUploadChange}
-            fileList={uploadedFileList as UploadFile[]}
+            fileList={uploadedFileList}
             maxCount={1}
           >
             <Button icon={<UploadOutlined />}>Select file</Button>
           </Upload>
         </Form.Item>
 
-        <Form.Item
-          name="publishNow"
-          label="Publish now"
-          valuePropName="checked"
-          initialValue
-        >
+        <Form.Item name="publishNow" label="Publish now" valuePropName="checked" initialValue>
           <Switch />
         </Form.Item>
 
@@ -5227,14 +5238,9 @@ export default function SubmitImpactReports(): JSX.Element {
   const onFinish = async (values: ImpactReportFormValues) => {
     try {
       setSubmitting(true);
-
-      // TODO: branchez ici votre appel API si nécessaire
-      // await fetch('/api/impact-reports', { method: 'POST', body: JSON.stringify(values) });
-
       message.success('Votre rapport a bien été soumis.');
       setOpen(true);
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(e);
       message.error("Échec de l'envoi du rapport.");
     } finally {
@@ -5251,11 +5257,7 @@ export default function SubmitImpactReports(): JSX.Element {
     <div style={{ padding: 24 }}>
       <h1>Soumettre un rapport d’impact</h1>
 
-      <Form<ImpactReportFormValues>
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-      >
+      <Form<ImpactReportFormValues> form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Titre"
           name="title"
@@ -5301,7 +5303,12 @@ export default function SubmitImpactReports(): JSX.Element {
           </Upload>
         </Form.Item>
 
-        <Form.Item label="Rendre public" name="isPublic" valuePropName="checked" initialValue={false}>
+        <Form.Item
+          label="Rendre public"
+          name="isPublic"
+          valuePropName="checked"
+          initialValue={false}
+        >
           <Switch />
         </Form.Item>
 
@@ -5347,8 +5354,6 @@ import {
   ResponsiveContainer,
   Tooltip as ReTooltip,
 } from 'recharts';
-
-const { Option } = Select;
 
 /* -------------------------------
  * Données simulées
@@ -5428,26 +5433,16 @@ const SustainabilityDashboard: React.FC = () => {
               value={selectedRegion}
               onChange={(value) => setSelectedRegion(value)}
               style={{ width: '100%' }}
-            >
-              {regions.map((region) => (
-                <Option key={region} value={region}>
-                  {region}
-                </Option>
-              ))}
-            </Select>
+              options={regions.map((r) => ({ label: r, value: r }))}
+            />
           </Col>
           <Col xs={24} sm={12}>
             <Select
               value={selectedCategory}
               onChange={(value) => setSelectedCategory(value)}
               style={{ width: '100%' }}
-            >
-              {categories.map((cat) => (
-                <Option key={cat} value={cat}>
-                  {cat}
-                </Option>
-              ))}
-            </Select>
+              options={categories.map((c) => ({ label: c, value: c }))}
+            />
           </Col>
         </Row>
 
@@ -6153,8 +6148,13 @@ import React from 'react';
 import { Form, Checkbox, Select, Button, Alert, Divider } from 'antd';
 import PageContainer from '@/components/PageContainer';
 
-// --- Données (échantillon minimal) -----------------------------------------
-// TODO: Remplacer par la liste complète (le fichier concat avait des "..." tronquant la liste)
+type FormValues = {
+  currentExpertise: string[];
+  newExpertise?: string[];
+  newFields?: string[];
+  visibility: 'public' | 'team-only' | 'private';
+};
+
 const expertiseOptions: string[] = [
   'Frontend Development',
   'UI/UX Design',
@@ -6167,29 +6167,18 @@ const expertiseOptions: string[] = [
 
 const currentExpertiseInitial: string[] = ['Frontend Development', 'UI/UX Design'];
 
-// Champs que l’utilisateur peut ajouter (échantillon)
 const selectableFields: string[] = ['React', 'TypeScript', 'Figma', 'GraphQL', 'Node.js'];
 
-// Niveaux de visibilité
 const visibilityLevels = [
   { label: 'Public', value: 'public' as const },
   { label: 'Team only', value: 'team-only' as const },
   { label: 'Private', value: 'private' as const },
 ];
 
-// Types du formulaire
-type FormValues = {
-  currentExpertise: string[];
-  newExpertise?: string[];        // si vous avez un groupe/Select pour "nouvelles expertises"
-  newFields?: string[];           // champs complémentaires (Select multiple)
-  visibility: 'public' | 'team-only' | 'private';
-};
-
 export default function Page(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
 
   const onFinish = (values: FormValues) => {
-    // TODO: branchement API / action serveur si nécessaire
     console.log('Manage Expertise Areas - submit:', values);
   };
 
@@ -6197,7 +6186,7 @@ export default function Page(): JSX.Element {
     <PageContainer title="Manage Expertise Areas">
       <Divider orientation="left">Your current expertise</Divider>
 
-      <Form<FormValues>
+      <Form
         form={form}
         layout="vertical"
         initialValues={{
@@ -6207,7 +6196,6 @@ export default function Page(): JSX.Element {
         }}
         onFinish={onFinish}
       >
-        {/* Expertise actuelles */}
         <Form.Item
           name="currentExpertise"
           label="Current expertise"
@@ -6216,36 +6204,23 @@ export default function Page(): JSX.Element {
           <Checkbox.Group options={expertiseOptions} />
         </Form.Item>
 
-        {/* Nouvelles expertises (si applicable) */}
-        {/* 
-        <Form.Item name="newExpertise" label="Add new expertise (optional)">
-          <Checkbox.Group options={expertiseOptions} />
-        </Form.Item>
-        */}
-
-        {/* Champs complémentaires à ajouter */}
         <Form.Item name="newFields" label="Select new fields (optional)">
           <Select
             mode="multiple"
             allowClear
             placeholder="Select fields…"
-            options={selectableFields.map(f => ({ label: f, value: f }))}
+            options={selectableFields.map((f) => ({ label: f, value: f }))}
           />
         </Form.Item>
 
-        {/* Visibilité du profil / des expertises */}
         <Form.Item
           name="visibility"
           label="Visibility"
           rules={[{ required: true, message: 'Please choose a visibility level.' }]}
         >
-          <Select
-            placeholder="Choose visibility…"
-            options={visibilityLevels}
-          />
+          <Select placeholder="Choose visibility…" options={visibilityLevels} />
         </Form.Item>
 
-        {/* Info */}
         <Alert
           message="Note: Adding an expertise may require validation through contributions."
           type="info"
@@ -6264,107 +6239,6 @@ export default function Page(): JSX.Element {
 }
 
 ===== END app/keenkonnect/user-reputation/manage-expertise-areas/page.tsx =====
-
-
-===== BEGIN app/keenkonnect/user-reputation/manage-expertise-areas/page.tsx.bak =====
-import React from 'react';
-import { NextPage } from 'next';
-import { Form, Checkbox, Select, Button, Alert, Divider } from 'antd';
-import PageContainer from '@/components/PageContainer';
-import MainLayout from '@/components/layout-components/MainLayout';
-
-const { Option } = Select;
-
-const ManageExpertiseAreas: NextPage = () => {
-  const [form] = Form.useForm();
-
-  // Données initiales : expertises déjà sélectionnées par l'utilisateur
-  const currentExpertiseInitial: string[] = ['Frontend Development', 'UI/UX Design'];
-
-  // Liste complète des domaines d'expertise disponibles
-  const expertiseOptions: string[] = [
-    'Frontend Development',
-    'Backend Development',
-    'UI/UX Design',
-    'Data Science',
-    'DevOps',
-    'Mobile Development',
-    'QA',
-    'Project Management',
-  ];
-
-  // Gestion de la soumission : intégration d'une API ou logique de mise à jour
-  const onFinish = (values: any) => {
-    console.log('Updated Expertise Areas:', values);
-    // Traitement complémentaire
-
-  return (
-    <PageContainer title="Manage Expertise Areas">
-      <Form
-        form={form}
-        layout="vertical"
-        initialValues={{
-          currentExpertise: currentExpertiseInitial,
-          newExpertise: [],
-        }}
-        onFinish={onFinish}
-      >
-        {/* Liste des expertises actuelles */}
-        <Form.Item label="Current Expertise Areas" name="currentExpertise">
-          <Checkbox.Group>
-            {expertiseOptions.map((option) => (
-              <Checkbox key={option} value={option}>
-                {option}
-              </Checkbox>
-            ))}
-          </Checkbox.Group>
-        </Form.Item>
-
-        <Divider />
-
-        {/* Sélecteur pour ajouter de nouvelles expertises */}
-        <Form.Item
-          label="Add New Expertise Area"
-          name="newExpertise"
-          tooltip="Adding an expertise area will require validation through contributions."
-        >
-          <Select mode="multiple" placeholder="Select new expertise areas to add" allowClear>
-            {expertiseOptions
-              .filter((opt) => !currentExpertiseInitial.includes(opt))
-              .map((option) => (
-                <Option key={option} value={option}>
-                  {option}
-                </Option>
-              ))}
-          </Select>
-        </Form.Item>
-
-        {/* Message informatif */}
-        <Alert
-          message="Note: Adding an expertise will require validation through contributions."
-          type="info"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
-
-        {/* Bouton pour sauvegarder */}
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Save Changes
-          </Button>
-        </Form.Item>
-      </Form>
-    </PageContainer>
-  );
-
-// Correction : envelopper la page dans MainLayout
-
-  return <MainLayout>{page}</MainLayout>;
-
-export default ManageExpertiseAreas;
-}}
-
-===== END app/keenkonnect/user-reputation/manage-expertise-areas/page.tsx.bak =====
 
 
 ===== BEGIN app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx =====
@@ -7539,24 +7413,21 @@ import {
   Alert,
 } from 'antd';
 import { EyeOutlined, FilePdfOutlined } from '@ant-design/icons';
-import Link from 'next/link';
 import PageContainer from '@/components/PageContainer';
 
 const { Text } = Typography;
 
-// --- Types ---
 type ExamOutcome = 'Pass' | 'Fail';
 
 interface ExamResult {
   id: string;
   examName: string;
-  dateTaken: string; // ISO ou lisible
-  score: number;     // 0..100
+  dateTaken: string;
+  score: number;
   result: ExamOutcome;
   details: string;
 }
 
-// --- Données démo (à brancher sur API plus tard) ---
 const upcomingExam:
   | { examName: string; examDate: string; status: string }
   | null = {
@@ -7595,7 +7466,6 @@ export default function ExamDashboardResultsPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState<ExamResult | null>(null);
 
-  // Colonnes (typage strict pour éviter implicit any)
   const columns: TableProps<ExamResult>['columns'] = [
     { title: 'Exam Name', dataIndex: 'examName', key: 'examName' },
     { title: 'Date Taken', dataIndex: 'dateTaken', key: 'dateTaken' },
@@ -7633,9 +7503,10 @@ export default function ExamDashboardResultsPage() {
     },
   ];
 
+  const latest = examResultsData[0];
+
   return (
     <PageContainer title="Exam Dashboard & Results">
-      {/* Examen à venir */}
       {upcomingExam && (
         <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
           <Row gutter={[16, 16]}>
@@ -7652,24 +7523,18 @@ export default function ExamDashboardResultsPage() {
         </Card>
       )}
 
-      {/* Résumé du dernier examen */}
-      {examResultsData.length > 0 && (
+      {latest && (
         <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
           <Row gutter={16}>
             <Col xs={24} md={12}>
-              <Statistic
-                title="Score Achieved"
-                value={examResultsData[0].score}
-                suffix="%"
-              />
+              <Statistic title="Score Achieved" value={latest.score} suffix="%" />
             </Col>
             <Col xs={24} md={12}>
               <Statistic
                 title="Result"
-                value={examResultsData[0].result}
+                value={latest.result}
                 valueStyle={{
-                  color:
-                    examResultsData[0].result === 'Pass' ? '#3f8600' : '#cf1322',
+                  color: latest.result === 'Pass' ? '#3f8600' : '#cf1322',
                 }}
               />
             </Col>
@@ -7677,7 +7542,6 @@ export default function ExamDashboardResultsPage() {
         </Card>
       )}
 
-      {/* Historique */}
       <Card title="Exam History" style={{ marginBottom: 24 }}>
         <Table<ExamResult>
           columns={columns}
@@ -7687,19 +7551,13 @@ export default function ExamDashboardResultsPage() {
         />
       </Card>
 
-      {/* Certificats */}
       <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
         <List
           dataSource={certificationsEarned}
           renderItem={(item) => (
             <List.Item
               actions={[
-                <Button
-                  key="dl"
-                  icon={<FilePdfOutlined />}
-                  type="link"
-                  href={item.pdfLink}
-                >
+                <Button key="dl" icon={<FilePdfOutlined />} type="link" href={item.pdfLink}>
                   Download
                 </Button>,
               ]}
@@ -7713,7 +7571,6 @@ export default function ExamDashboardResultsPage() {
         />
       </Card>
 
-      {/* Prochaines étapes */}
       <Card>
         <Alert
           message="Next Steps: Explore further certification programs to advance your career."
@@ -7721,14 +7578,12 @@ export default function ExamDashboardResultsPage() {
           showIcon
         />
         <div style={{ marginTop: 16 }}>
-          {/* Chemin existant */}
-          <Link href="/konnected/certifications/certification-programs">
-            <Button type="primary">Certification Programs</Button>
-          </Link>
+          <Button type="primary" href="/konnected/certifications/certification-programs">
+            Certification Programs
+          </Button>
         </div>
       </Card>
 
-      {/* Détails d’un examen */}
       <Drawer
         title="Exam Details"
         placement="right"
@@ -7750,9 +7605,7 @@ export default function ExamDashboardResultsPage() {
               <strong>Result:</strong>{' '}
               <Text
                 strong
-                style={{
-                  color: selectedExam.result === 'Pass' ? 'green' : 'red',
-                }}
+                style={{ color: selectedExam.result === 'Pass' ? 'green' : 'red' }}
               >
                 {selectedExam.result}
               </Text>
@@ -8656,9 +8509,6 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
-const { TabPane } = Tabs;
-const { confirm } = Modal;
-
 type ModerationStatus = 'Pending' | 'Approved' | 'Flagged';
 type ModerationQueue = 'Reported' | 'PendingApproval';
 
@@ -8671,6 +8521,8 @@ interface ModerationItem {
   status: ModerationStatus;
   queue: ModerationQueue;
 }
+
+const { confirm } = Modal;
 
 const MOCK_ITEMS: ModerationItem[] = [
   {
@@ -8706,7 +8558,7 @@ export default function ModerationPage(): JSX.Element {
   const [activeTab, setActiveTab] = useState<ModerationQueue>('Reported');
   const [data, setData] = useState<ModerationItem[]>(MOCK_ITEMS);
 
-  const filteredItems = useMemo<ModerationItem[]>(
+  const filteredItems = useMemo(
     () => data.filter((item) => item.queue === activeTab),
     [activeTab, data],
   );
@@ -8714,7 +8566,7 @@ export default function ModerationPage(): JSX.Element {
   const handleApprove = (record: ModerationItem) => {
     setData((prev) =>
       prev.map((item) =>
-        item.id === record.id ? { ...item, status: 'Approved', queue: 'PendingApproval' } : item,
+        item.id === record.id ? { ...item, status: 'Approved' } : item,
       ),
     );
     antdMessage.success('Content approved successfully');
@@ -8767,8 +8619,6 @@ export default function ModerationPage(): JSX.Element {
       width: 160,
     },
     {
-      // Dans le code d’origine, le titre dépendait de `activeTab`.
-      // On garde la logique tout en restant sûr côté types.
       title: activeTab === 'Reported' ? 'Report Reason' : 'Note',
       key: 'reasonOrNote',
       render: (_: unknown, record: ModerationItem) =>
@@ -8815,13 +8665,18 @@ export default function ModerationPage(): JSX.Element {
     },
   ];
 
+  const tabItems = [
+    { key: 'Reported', label: 'Reported' },
+    { key: 'PendingApproval', label: 'Pending Approval' },
+  ];
+
   return (
     <PageContainer title="Community Moderation">
-      <Tabs activeKey={activeTab} onChange={(k) => setActiveTab(k as ModerationQueue)}>
-        <TabPane tab="Reported" key="Reported" />
-        <TabPane tab="Pending Approval" key="PendingApproval" />
-      </Tabs>
-
+      <Tabs
+        items={tabItems}
+        activeKey={activeTab}
+        onChange={(k) => setActiveTab(k as ModerationQueue)}
+      />
       <Table<ModerationItem>
         rowKey="id"
         columns={columns}
@@ -9052,7 +8907,6 @@ export default function StartNewDiscussionPage(): JSX.Element {
   const router = useRouter();
 
   const onFinish: FormProps<FormValues>['onFinish'] = (_values) => {
-    // TODO: replace with real API call (+ error handling)
     antdMessage.success('Discussion posted');
     router.push('/konnected/community-discussions/active-threads');
   };
@@ -9530,7 +9384,7 @@ import {
   Pagination,
   Button,
 } from 'antd';
-import type { TableProps } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 import {
   SearchOutlined,
   FilterOutlined,
@@ -9559,7 +9413,7 @@ const SUBJECTS = ['Robotics', 'Healthcare', 'AI', 'Sustainability', 'Design'];
 const LEVELS: Level[] = ['Beginner', 'Intermediate', 'Advanced'];
 const LANGUAGES: Language[] = ['English', 'French', 'Spanish'];
 
-// NOTE: D’après le code original, c’est du mock. Je le conserve tel quel.
+// Données de démonstration
 const sampleResources: Resource[] = [
   {
     key: '1',
@@ -9622,10 +9476,11 @@ export default function Page() {
   // Filtrage
   const filteredResources = useMemo(() => {
     return sampleResources.filter((r) => {
+      const q = searchText.toLowerCase();
       const matchesSearch =
-        !searchText ||
-        r.title.toLowerCase().includes(searchText.toLowerCase()) ||
-        r.subject.toLowerCase().includes(searchText.toLowerCase());
+        !q ||
+        r.title.toLowerCase().includes(q) ||
+        r.subject.toLowerCase().includes(q);
 
       const matchesSubject =
         selectedSubjects.length === 0 || selectedSubjects.includes(r.subject);
@@ -9644,12 +9499,12 @@ export default function Page() {
   }, [filteredResources, current]);
 
   // Colonnes du tableau
-  const columns: TableProps<Resource>['columns'] = [
+  const columns: ColumnsType<Resource> = [
     {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      render: (text: string, record) => (
+      render: (text: string, record: Resource) => (
         <Space direction="vertical" size={0}>
           <a
             onClick={() =>
@@ -9676,7 +9531,8 @@ export default function Page() {
       dataIndex: 'subject',
       key: 'subject',
       filters: SUBJECTS.map((s) => ({ text: s, value: s })),
-      onFilter: (value, r) => r.subject === value,
+      onFilter: (value: string | number | boolean, r: Resource) =>
+        r.subject === String(value),
     },
     {
       title: 'Rating',
@@ -9684,7 +9540,7 @@ export default function Page() {
       key: 'rating',
       width: 160,
       render: (v: number) => <Rate disabled allowHalf defaultValue={v} />,
-      sorter: (a, b) => a.rating - b.rating,
+      sorter: (a: Resource, b: Resource) => a.rating - b.rating,
     },
   ];
 
@@ -9720,9 +9576,9 @@ export default function Page() {
                   style={{ width: '100%', marginTop: 8 }}
                   placeholder="Select subjects"
                   value={selectedSubjects}
-                  onChange={(value: string[]) => {
+                  onChange={(value) => {
                     setCurrent(1);
-                    setSelectedSubjects(value);
+                    setSelectedSubjects(value as string[]);
                   }}
                   options={SUBJECTS.map((s) => ({ label: s, value: s }))}
                 />
@@ -9735,9 +9591,9 @@ export default function Page() {
                   style={{ width: '100%', marginTop: 8 }}
                   placeholder="Select level"
                   value={selectedLevel}
-                  onChange={(value: Level | undefined) => {
+                  onChange={(value) => {
                     setCurrent(1);
-                    setSelectedLevel(value);
+                    setSelectedLevel(value as Level | undefined);
                   }}
                   options={LEVELS.map((l) => ({ label: l, value: l }))}
                 />
@@ -9750,9 +9606,9 @@ export default function Page() {
                   style={{ width: '100%', marginTop: 8 }}
                   placeholder="Select language"
                   value={selectedLanguage}
-                  onChange={(value: Language | undefined) => {
+                  onChange={(value) => {
                     setCurrent(1);
-                    setSelectedLanguage(value);
+                    setSelectedLanguage(value as Language | undefined);
                   }}
                   options={LANGUAGES.map((l) => ({ label: l, value: l }))}
                 />
@@ -10106,7 +9962,7 @@ type Resource = {
   subject: string;
   type: 'Article' | 'Video' | 'Course' | 'Book' | 'Podcast';
   difficulty: number; // 1-5
-  createdAt: string;  // ISO
+  createdAt: string; // ISO
   tags: string[];
 };
 
@@ -10266,8 +10122,9 @@ const SearchFiltersPage = () => {
     },
   ];
 
-  const handleDifficultyChange = (value: number | [number, number]) => {
-    if (Array.isArray(value) && value.length === 2) {
+  // ✅ Correction: onChange doit accepter number[] en mode range
+  const handleDifficultyChange = (value: number[]) => {
+    if (value.length === 2) {
       setDifficultyRange([value[0], value[1]]);
     }
   };
@@ -10828,7 +10685,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 type LearningPathStatus = 'Draft' | 'Published' | 'Archived';
 
@@ -10843,9 +10700,8 @@ export interface LearningPath {
 }
 
 export default function Page() {
-  // NOTE: branchement API à faire ici si nécessaire
   const [paths, setPaths] = useState<LearningPath[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading] = useState<boolean>(false);
 
   const handleDelete = (id: string) => {
     Modal.confirm({
@@ -10855,7 +10711,6 @@ export default function Page() {
       okText: 'Delete',
       okButtonProps: { danger: true },
       onOk: async () => {
-        // TODO: appelez votre API ici (DELETE /api/konnected/learning-paths/:id)
         setPaths(prev => prev.filter(p => p.id !== id));
         message.success('Learning path deleted');
       },
@@ -10867,7 +10722,7 @@ export default function Page() {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      render: (text, record) => (
+      render: (text: string, record: LearningPath) => (
         <Link href={`/konnected/learning-paths/manage-existing-paths/${record.id}`}>
           {text}
         </Link>
@@ -10891,7 +10746,7 @@ export default function Page() {
       title: 'Created',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (iso) => new Date(iso).toLocaleDateString(),
+      render: (iso: string) => new Date(iso).toLocaleDateString(),
       width: 140,
     },
     {
@@ -10910,7 +10765,7 @@ export default function Page() {
       key: 'actions',
       fixed: 'right',
       width: 170,
-      render: (_: unknown, record) => (
+      render: (_: unknown, record: LearningPath) => (
         <Space>
           <Link href={`/konnected/learning-paths/manage-existing-paths/${record.id}/edit`}>
             <Button icon={<EditOutlined />} type="link">
@@ -10931,17 +10786,16 @@ export default function Page() {
   ];
 
   return (
-    <PageContainer
-      title="Manage Existing Paths"
-      extra={[
-        <Link key="create" href="/konnected/learning-paths/create-learning-path">
+    <PageContainer title="Manage Existing Paths">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div />
+        <Link href="/konnected/learning-paths/create-learning-path">
           <Button type="primary" icon={<PlusOutlined />}>
             Create Path
           </Button>
-        </Link>,
-      ]}
-    >
-      {/* Sous-titre optionnel pour contexte */}
+        </Link>
+      </div>
+
       <Title level={4} style={{ marginBottom: 8 }}>Manage Existing Paths</Title>
       <Paragraph type="secondary" style={{ marginBottom: 24 }}>
         Review, edit, archive or delete learning paths. Published paths affect learners currently
@@ -11137,12 +10991,6 @@ import { useRouter } from 'next/navigation';
 const { Title, Paragraph } = Typography;
 const { Step } = Steps;
 
-// App Router: remplace <Head> par du metadata exporté
-export const metadata = {
-  title: 'My Learning Path - Konnected',
-  description: 'View your current learning path and track your progress.',
-};
-
 type Lesson = { id: string; name: string; completed: boolean; href?: string };
 type LearningPath = {
   id: string;
@@ -11151,7 +10999,6 @@ type LearningPath = {
   lessons: Lesson[];
 };
 
-// Exemple réaliste (reprend l’esprit du contenu original)
 const initialLearningPath: LearningPath = {
   id: '1',
   title: 'Beginner Web Development',
@@ -11170,7 +11017,6 @@ export default function Page() {
   const router = useRouter();
   const [learningPath] = useState<LearningPath | null>(initialLearningPath);
 
-  // Calcul du pourcentage de progression à partir des leçons
   const progress = useMemo(() => {
     if (!learningPath) return 0;
     const total = learningPath.lessons.length || 1;
@@ -11183,9 +11029,13 @@ export default function Page() {
     return learningPath.lessons.findIndex((l) => !l.completed);
   }, [learningPath]);
 
+  const nextLesson = useMemo<Lesson | null>(() => {
+    if (!learningPath) return null;
+    if (firstIncompleteIndex < 0) return null;
+    return learningPath.lessons[firstIncompleteIndex] ?? null;
+  }, [learningPath, firstIncompleteIndex]);
+
   const goToLesson = (lessonId: string, href?: string) => {
-    // Conserve la navigation utilisée dans l’original
-    // (l’original poussait vers /konnected/learning-library/lesson/[id]) :contentReference[oaicite:3]{index=3}
     router.push(href ?? `/konnected/learning-library/lesson/${lessonId}`);
   };
 
@@ -11210,13 +11060,13 @@ export default function Page() {
       <Card className="mb-4">
         <Title level={5}>Overall Progress</Title>
         <Progress percent={progress} status="active" />
-        {firstIncompleteIndex >= 0 && (
+        {nextLesson && (
           <div style={{ marginTop: 12 }}>
             <Button
               type="primary"
               onClick={() => {
-                const next = learningPath.lessons[firstIncompleteIndex];
-                goToLesson(next.id, next.href);
+                if (!nextLesson) return;
+                goToLesson(nextLesson.id, nextLesson.href);
               }}
             >
               Continue where you left off
@@ -11975,7 +11825,6 @@ interface Workspace {
   userRole: 'Leader' | 'Member';
 }
 
-// Exemple de données
 const workspaceData: Workspace[] = [
   {
     id: '1',
@@ -12011,14 +11860,11 @@ export default function ProjectWorkspacesPage() {
 
   const handleWorkspaceAction = (workspace: Workspace) => {
     if (!workspace.isLaunched && workspace.userRole === 'Leader') {
-      // Exemple : action de “launch”
-      // TODO: appeler l’API puis rafraîchir ou naviguer
       antdMessage.success(`Workspace ${workspace.projectName} launched successfully.`);
       return;
     }
-    // Naviguer vers le workspace
     router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
-  }; // <-- FIX: fermeture de la fonction manquante dans la version d’origine (voir concat) :contentReference[oaicite:2]{index=2}
+  };
 
   const columns: ColumnsType<Workspace> = [
     {
@@ -12048,10 +11894,13 @@ export default function ProjectWorkspacesPage() {
       title: 'Action',
       key: 'action',
       render: (_: unknown, record: Workspace) => {
-        const buttonLabel = !record.isLaunched && record.userRole === 'Leader'
-          ? 'Launch Workspace'
-          : record.isLaunched
-            ? (record.userRole === 'Leader' ? 'Open Workspace' : 'Join Workspace')
+        const buttonLabel =
+          !record.isLaunched && record.userRole === 'Leader'
+            ? 'Launch Workspace'
+            : record.isLaunched
+            ? record.userRole === 'Leader'
+              ? 'Open Workspace'
+              : 'Join Workspace'
             : 'Join Workspace';
         return (
           <Button type="primary" onClick={() => handleWorkspaceAction(record)}>
@@ -13693,22 +13542,25 @@ export default function InspirationGalleryPage(): JSX.Element {
   }, [filteredWorks, currentPage]);
 
   // Handle like toggle.
-  const toggleLike = (id: string) => {
+  const toggleLike = (id: string): void => {
     setWorks((prev) =>
       prev.map((w) =>
         w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w
       )
     );
+  };
 
   // Open Modal for work details.
-  const openWorkModal = (work: CreativeWork) => {
+  const openWorkModal = (work: CreativeWork): void => {
     setSelectedWork(work);
     setModalVisible(true);
+  };
 
   // Close the details Modal.
-  const closeModal = () => {
+  const closeModal = (): void => {
     setModalVisible(false);
     setSelectedWork(null);
+  };
 
   return (
     <PageContainer title="Inspiration Gallery">
@@ -13825,7 +13677,6 @@ export default function InspirationGalleryPage(): JSX.Element {
     </PageContainer>
   );
 }
-}}}
 
 ===== END app/kreative/creative-hub/inspiration-gallery/page.tsx =====
 

@@ -1,0 +1,44 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e4]:
+        - generic [ref=e6] [cursor=pointer]:
+          - img "Konnaxion logo" [ref=e7]
+          - generic [ref=e8]: EkoH
+        - menu [ref=e9]:
+          - menuitem "dashboard Dashboard" [ref=e10] [cursor=pointer]:
+            - img "dashboard" [ref=e11]:
+              - img [ref=e12]
+            - link "Dashboard" [ref=e15]:
+              - /url: /ekoh/dashboard?sidebar=ekoh
+          - menuitem "Achievements Badges" [ref=e16] [cursor=pointer]:
+            - generic [ref=e17]: Achievements Badges
+          - menuitem "Expertise Areas" [ref=e18] [cursor=pointer]:
+            - generic [ref=e19]: Expertise Areas
+          - menuitem "Overview Analytics" [ref=e20] [cursor=pointer]:
+            - generic [ref=e21]: Overview Analytics
+          - menuitem "Voting Influence" [ref=e22] [cursor=pointer]:
+            - generic [ref=e23]: Voting Influence
+    - generic [ref=e24]:
+      - banner [ref=e25]:
+        - generic [ref=e26]:
+          - img "menu-fold" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+          - navigation [ref=e31]:
+            - list [ref=e32]:
+              - listitem [ref=e33]:
+                - link "Ekoh" [ref=e35] [cursor=pointer]:
+                  - /url: /ekoh?sidebar=ekoh
+          - generic [ref=e36]:
+            - button "🪩 Funky Disco" [ref=e37] [cursor=pointer]:
+              - generic [ref=e38]: 🪩 Funky Disco
+            - generic [ref=e39] [cursor=pointer]:
+              - img "user" [ref=e40]:
+                - img [ref=e41]
+              - text: Admin
+      - main [ref=e43]
+  - alert [ref=e55]
+```

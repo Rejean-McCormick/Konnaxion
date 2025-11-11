@@ -1,9 +1,19 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Form, Input, Select, Upload, Switch, Button, message as antdMessage, Progress, Result } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import {
+  Form,
+  Input,
+  Select,
+  Upload,
+  Switch,
+  Button,
+  message as antdMessage,
+  Progress,
+  Result,
+} from 'antd';
 import type { UploadFile, UploadProps, FormProps } from 'antd';
+import { UploadOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 
 const { TextArea } = Input;
@@ -14,31 +24,30 @@ type FormValues = {
   category?: string;
   version?: string;
   language?: string;
-  documentFile?: UploadFile<unknown>[];
+  documentFile?: UploadFile[];
   publishNow?: boolean;
 };
 
-export default function UploadNewDocumentPage() {
+export default function UploadNewDocumentPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
   const router = useRouter();
 
-  const [uploadedFileList, setUploadedFileList] = useState<UploadFile<unknown>[]>([]);
+  const [uploadedFileList, setUploadedFileList] = useState<UploadFile[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [submitted, setSubmitted] = useState(false);
 
-  // Normalise l’événement Upload -> fileList pour AntD Form
-  const normFile: UploadProps['getValueFromEvent'] = (e) => {
+  type UploadChangeParam = Parameters<NonNullable<UploadProps['onChange']>>[0];
+
+  const normFile = (e: UploadChangeParam | UploadFile[]): UploadFile[] => {
     if (Array.isArray(e)) return e;
     return e?.fileList ?? [];
   };
 
   const handleUploadChange: UploadProps['onChange'] = ({ fileList }) => {
-    // On garde la liste côté état (affichage) et côté Form (via getValueFromEvent)
-    setUploadedFileList(fileList as UploadFile<unknown>[]);
+    setUploadedFileList(fileList as UploadFile[]);
   };
 
-  // Simulation d’upload avec progression (remplacer par ton appel API)
   const simulateUpload = () => {
     setUploading(true);
     setUploadProgress(0);
@@ -61,9 +70,6 @@ export default function UploadNewDocumentPage() {
   const onFinish: FormProps<FormValues>['onFinish'] = async () => {
     try {
       simulateUpload();
-      // Exemple : ici tu ferais l'appel à ton backend avec `form.getFieldsValue()`
-      // const payload = form.getFieldsValue();
-      // await api.uploadDocument(payload);
     } catch {
       setUploading(false);
       antdMessage.error('Upload failed');
@@ -164,21 +170,16 @@ export default function UploadNewDocumentPage() {
         >
           <Upload
             accept=".pdf,.doc,.docx,.txt,.md"
-            beforeUpload={() => false} // on laisse AntD gérer, pas d’upload auto
+            beforeUpload={() => false}
             onChange={handleUploadChange}
-            fileList={uploadedFileList as UploadFile[]}
+            fileList={uploadedFileList}
             maxCount={1}
           >
             <Button icon={<UploadOutlined />}>Select file</Button>
           </Upload>
         </Form.Item>
 
-        <Form.Item
-          name="publishNow"
-          label="Publish now"
-          valuePropName="checked"
-          initialValue
-        >
+        <Form.Item name="publishNow" label="Publish now" valuePropName="checked" initialValue>
           <Switch />
         </Form.Item>
 

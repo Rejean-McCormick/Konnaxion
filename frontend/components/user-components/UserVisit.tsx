@@ -3,22 +3,49 @@
  * Author: Hieu Chu
  */
 
-import dayjs from 'dayjs'
-import { Tooltip, List, Card, Empty } from 'antd'
-import { Comment } from '@ant-design/compatible'
-import Link from 'next/link'
+import type React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Tooltip, List, Card, Empty } from 'antd';
+import { Comment } from '@ant-design/compatible';
+import Link from 'next/link';
 
-const UserVisit = ({ visits }) => {
-  visits.sort(
-    (a, b) => new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
-  )
-  visits.forEach(x => {
+dayjs.extend(relativeTime);
+
+/** Types minimaux utilisés par ce composant */
+type ImageItem = { url: string; created: string | Date };
+
+export interface Visit {
+  visitTime: string | Date;
+  sculptureId: string | number;
+  sculpture: {
+    name: string;
+    images: ImageItem[];
+  };
+}
+
+type FormattedComment = {
+  author: React.ReactNode;
+  avatar: React.ReactNode;
+  content: React.ReactNode;
+};
+
+const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
+  // Ne pas muter la prop: on clone avant de trier
+  const sorted: Visit[] = [...visits].sort(
+    (a: Visit, b: Visit) =>
+      new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
+  );
+
+  // Trie les images de chaque sculpture par date de création ascendante
+  sorted.forEach((x: Visit) => {
     x.sculpture.images.sort(
-      (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
-    )
-  })
+      (a: ImageItem, b: ImageItem) =>
+        new Date(a.created).getTime() - new Date(b.created).getTime()
+    );
+  });
 
-  const formattedComments = visits.map(x => ({
+  const formattedComments: FormattedComment[] = sorted.map((x: Visit) => ({
     author: (
       <span>
         <Link href={`/sculptures/id/${x.sculptureId}`}>
@@ -26,7 +53,7 @@ const UserVisit = ({ visits }) => {
             style={{
               fontSize: 14,
               fontWeight: 500,
-              color: 'rgba(0, 0, 0, 0.65)'
+              color: 'rgba(0, 0, 0, 0.65)',
             }}
           >
             {x.sculpture.name}
@@ -46,7 +73,7 @@ const UserVisit = ({ visits }) => {
             width: 42,
             height: 42,
             objectFit: 'cover',
-            borderRadius: 4
+            borderRadius: 4,
           }}
         />
       </div>
@@ -59,8 +86,8 @@ const UserVisit = ({ visits }) => {
           </span>
         </Tooltip>
       </div>
-    )
-  }))
+    ),
+  }));
 
   return (
     <Card
@@ -69,24 +96,32 @@ const UserVisit = ({ visits }) => {
       variant="borderless"
       style={{ marginTop: 12 }}
     >
-      <List
+      <List<FormattedComment>
         itemLayout="horizontal"
         dataSource={formattedComments ?? []}
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
-          )
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No Visits"
+            />
+          ),
         }}
-        renderItem={item => (
+        renderItem={(item: FormattedComment) => (
           <li>
-            <Comment author={item.author} avatar={item.avatar} content={item.content} className="comment" />
+            <Comment
+              author={item.author}
+              avatar={item.avatar}
+              content={item.content}
+              className="comment"
+            />
           </li>
         )}
         pagination={{ pageSize: 15, hideOnSinglePage: true }}
       />
     </Card>
-  )
-}
+  );
+};
 
-export default UserVisit
+export default UserVisit;

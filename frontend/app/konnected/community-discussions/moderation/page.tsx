@@ -11,9 +11,6 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 
-const { TabPane } = Tabs;
-const { confirm } = Modal;
-
 type ModerationStatus = 'Pending' | 'Approved' | 'Flagged';
 type ModerationQueue = 'Reported' | 'PendingApproval';
 
@@ -26,6 +23,8 @@ interface ModerationItem {
   status: ModerationStatus;
   queue: ModerationQueue;
 }
+
+const { confirm } = Modal;
 
 const MOCK_ITEMS: ModerationItem[] = [
   {
@@ -61,7 +60,7 @@ export default function ModerationPage(): JSX.Element {
   const [activeTab, setActiveTab] = useState<ModerationQueue>('Reported');
   const [data, setData] = useState<ModerationItem[]>(MOCK_ITEMS);
 
-  const filteredItems = useMemo<ModerationItem[]>(
+  const filteredItems = useMemo(
     () => data.filter((item) => item.queue === activeTab),
     [activeTab, data],
   );
@@ -69,7 +68,7 @@ export default function ModerationPage(): JSX.Element {
   const handleApprove = (record: ModerationItem) => {
     setData((prev) =>
       prev.map((item) =>
-        item.id === record.id ? { ...item, status: 'Approved', queue: 'PendingApproval' } : item,
+        item.id === record.id ? { ...item, status: 'Approved' } : item,
       ),
     );
     antdMessage.success('Content approved successfully');
@@ -122,8 +121,6 @@ export default function ModerationPage(): JSX.Element {
       width: 160,
     },
     {
-      // Dans le code d’origine, le titre dépendait de `activeTab`.
-      // On garde la logique tout en restant sûr côté types.
       title: activeTab === 'Reported' ? 'Report Reason' : 'Note',
       key: 'reasonOrNote',
       render: (_: unknown, record: ModerationItem) =>
@@ -170,13 +167,18 @@ export default function ModerationPage(): JSX.Element {
     },
   ];
 
+  const tabItems = [
+    { key: 'Reported', label: 'Reported' },
+    { key: 'PendingApproval', label: 'Pending Approval' },
+  ];
+
   return (
     <PageContainer title="Community Moderation">
-      <Tabs activeKey={activeTab} onChange={(k) => setActiveTab(k as ModerationQueue)}>
-        <TabPane tab="Reported" key="Reported" />
-        <TabPane tab="Pending Approval" key="PendingApproval" />
-      </Tabs>
-
+      <Tabs
+        items={tabItems}
+        activeKey={activeTab}
+        onChange={(k) => setActiveTab(k as ModerationQueue)}
+      />
       <Table<ModerationItem>
         rowKey="id"
         columns={columns}

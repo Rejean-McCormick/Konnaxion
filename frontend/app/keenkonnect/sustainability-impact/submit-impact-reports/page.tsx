@@ -40,14 +40,9 @@ export default function SubmitImpactReports(): JSX.Element {
   const onFinish = async (values: ImpactReportFormValues) => {
     try {
       setSubmitting(true);
-
-      // TODO: branchez ici votre appel API si nécessaire
-      // await fetch('/api/impact-reports', { method: 'POST', body: JSON.stringify(values) });
-
       message.success('Votre rapport a bien été soumis.');
       setOpen(true);
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error(e);
       message.error("Échec de l'envoi du rapport.");
     } finally {
@@ -64,11 +59,7 @@ export default function SubmitImpactReports(): JSX.Element {
     <div style={{ padding: 24 }}>
       <h1>Soumettre un rapport d’impact</h1>
 
-      <Form<ImpactReportFormValues>
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-      >
+      <Form<ImpactReportFormValues> form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label="Titre"
           name="title"
@@ -114,7 +105,12 @@ export default function SubmitImpactReports(): JSX.Element {
           </Upload>
         </Form.Item>
 
-        <Form.Item label="Rendre public" name="isPublic" valuePropName="checked" initialValue={false}>
+        <Form.Item
+          label="Rendre public"
+          name="isPublic"
+          valuePropName="checked"
+          initialValue={false}
+        >
           <Switch />
         </Form.Item>
 

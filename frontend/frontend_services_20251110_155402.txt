@@ -82,27 +82,51 @@ export default apiRequest
 
 ===== BEGIN services/admin.ts =====
 // services/admin.ts
-import { get, post, put, patch, del } from './_request';
+import { get, post, patch } from './_request'
 
-// Moderation
-export async function fetchModerationQueue() {
-  return get('admin/moderation');
+// ----- Shared Admin types -----
+export type RoleRow = { id: string; name: string; userCount: number; enabled: boolean }
+export type RolePayload = { items: RoleRow[] }
+
+export type Report = {
+  id: string
+  content: string
+  reporter: string
+  type: 'Spam' | 'Harassment' | 'Misinformation'
+  status: 'Pending' | 'Resolved'
 }
-export async function actOnReport(id: string, remove: boolean) {
-  return post(`admin/moderation/${id}`, { remove });
+export type ModerationPayload = { items: Report[] }
+
+// Narrow log shape used by admin pages
+export type LogRow = {
+  id: string
+  actor: string
+  action: string
+  target: string
+  severity: 'info' | 'warn' | 'critical'
+  ts: string
+}
+export type AuditPayload = { items: LogRow[] }
+
+// ----- API calls with explicit return types -----
+export async function fetchModerationQueue(): Promise<ModerationPayload> {
+  return get<ModerationPayload>('admin/moderation')
 }
 
-// Roles
-export async function fetchRoles() {
-  return get('admin/roles');
-}
-export async function toggleRole(id: string, enabled: boolean) {
-  return patch(`admin/roles/${id}`, { enabled });
+export async function actOnReport(id: string, remove: boolean): Promise<void> {
+  return post<void>(`admin/moderation/${id}`, { remove })
 }
 
-// Audit
-export async function fetchAuditLogs() {
-  return get('admin/audit');
+export async function fetchRoles(): Promise<RolePayload> {
+  return get<RolePayload>('admin/roles')
+}
+
+export async function toggleRole(id: string, enabled: boolean): Promise<void> {
+  return patch<void>(`admin/roles/${id}`, { enabled })
+}
+
+export async function fetchAuditLogs(): Promise<AuditPayload> {
+  return get<AuditPayload>('admin/audit')
 }
 
 ===== END services/admin.ts =====

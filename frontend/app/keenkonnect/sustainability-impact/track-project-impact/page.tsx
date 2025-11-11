@@ -1,9 +1,8 @@
 'use client'
 
-// pages/keenkonnect/sustainability-impact/track-project-impact/index.tsx
+// app/keenkonnect/sustainability-impact/track-project-impact/index.tsx
 import React, { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
-// (Optionnel) type NextPage non requis ici
 import { Card, Statistic, Row, Col, Select, DatePicker, Timeline } from 'antd';
 import MainLayout from '@/components/layout-components/MainLayout';
 import {
@@ -17,22 +16,28 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
-const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-// Exemple de projets disponibles
-const projects = ['Project Alpha', 'Project Beta', 'Project Gamma'];
+// ---- Types ----
+type DateRange = [Dayjs, Dayjs] | null;
 
-// Impact metrics simulés pour un projet
+interface ImpactReport {
+  key: string;
+  date: string;     // ISO string (YYYY-MM-DD) for simplicity
+  summary: string;
+}
+
+// ---- Demo data ----
+const projects = ['Project Alpha', 'Project Beta', 'Project Gamma'] as const;
+
 const sampleImpactMetrics = {
   carbonReduction: 1200, // in kg CO2 reduced
   peopleReached: 450,
   fundsSaved: 3000, // in dollars
-}; // <-- fermeture manquante ajoutée
+};
 
-// Données simulées pour l'évolution de l'impact dans le temps (line chart)
 const sampleImpactTrend = [
   { period: 'Jan', value: 500 },
   { period: 'Feb', value: 600 },
@@ -43,37 +48,37 @@ const sampleImpactTrend = [
   { period: 'Jul', value: 1200 },
 ];
 
-// Données simulées pour le breakdown par catégories (bar chart)
 const sampleImpactBreakdown = [
   { category: 'Environmental', value: 1200 },
   { category: 'Social', value: 450 },
   { category: 'Economic', value: 3000 },
 ];
 
-// Simulé: liste d'impact reports (Timeline)
-const impactReports = [
+const impactReports: ImpactReport[] = [
   { key: '1', date: '2023-01-15', summary: 'Initial report - baseline established.' },
   { key: '2', date: '2023-04-20', summary: 'Significant improvement in carbon reduction.' },
   { key: '3', date: '2023-07-10', summary: 'Major milestone achieved in funds saved.' },
 ];
 
 export default function TrackProjectImpact() {
-  // États pour le filtre par projet et période
-  const [selectedProject, setSelectedProject] = useState<string>(projects[0]);
-  const [dateRange, setDateRange] = useState<[any, any] | null>(null);
+  // Project & period filters
+  // Safe fallback avoids TS2345 under noUncheckedIndexedAccess
+  const [selectedProject, setSelectedProject] = useState<string>(projects[0] ?? 'Project Alpha');
+  const [dateRange, setDateRange] = useState<DateRange>(null);
 
-  // Filtre supplémentaire sur dateRange pour la Timeline (exemple simulé)
+  // Filter timeline by dateRange
   const filteredImpactReports = useMemo(() => {
     if (!dateRange) return impactReports;
+    const [start, end] = dateRange;
     return impactReports.filter((report) => {
       const reportDate = dayjs(report.date);
-      return reportDate.isAfter(dateRange[0]) && reportDate.isBefore(dateRange[1]);
+      return reportDate.isAfter(start) && reportDate.isBefore(end);
     });
   }, [dateRange]);
 
-  // Mise à jour automatique de la tendance (optionnel)
+  // Example: background refresh hook (kept for future plug-in)
   useEffect(() => {
-    // Ici vous pourriez intégrer un setInterval pour actualiser sampleImpactTrend en temps réel
+    // setInterval(...) if you want to refresh charts periodically
   }, []);
 
   return (
@@ -89,25 +94,26 @@ export default function TrackProjectImpact() {
       <div className="container mx-auto p-5">
         <h1 className="text-2xl font-bold mb-4">Track Project Impact</h1>
 
-        {/* Sélecteur de projet et filtre de période */}
+        {/* Project selector & date filter */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={12}>
             <Select
-              defaultValue={selectedProject}
+              value={selectedProject}
               style={{ width: '100%' }}
               onChange={setSelectedProject}
-            >
-              {projects.map((proj) => (
-                <Option key={proj} value={proj}>
-                  {proj}
-                </Option>
-              ))}
-            </Select>
+              options={projects.map((p) => ({ value: p, label: p }))}
+            />
           </Col>
           <Col xs={24} sm={12}>
             <RangePicker
               style={{ width: '100%' }}
-              onChange={(dates) => setDateRange(dates as any)}
+              onChange={(dates) => {
+                if (!dates || !dates[0] || !dates[1]) {
+                  setDateRange(null);
+                } else {
+                  setDateRange([dates[0], dates[1]]);
+                }
+              }}
             />
           </Col>
         </Row>
@@ -134,7 +140,7 @@ export default function TrackProjectImpact() {
           </Col>
         </Row>
 
-        {/* Impact Trend Chart (Line Chart) */}
+        {/* Impact Trend (Line) */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Impact Trend Over Time</h2>
           <div style={{ width: '100%', height: 300 }}>
@@ -150,7 +156,7 @@ export default function TrackProjectImpact() {
           </div>
         </Card>
 
-        {/* Impact Breakdown (Bar Chart) */}
+        {/* Category Breakdown (Bar) */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Category-wise Impact Breakdown</h2>
           <div style={{ width: '100%', height: 300 }}>
@@ -166,7 +172,7 @@ export default function TrackProjectImpact() {
           </div>
         </Card>
 
-        {/* Timeline of Impact Reports */}
+        {/* Timeline */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Impact Reports Timeline</h2>
           <Timeline>

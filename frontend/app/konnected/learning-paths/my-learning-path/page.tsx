@@ -7,12 +7,6 @@ import { useRouter } from 'next/navigation';
 const { Title, Paragraph } = Typography;
 const { Step } = Steps;
 
-// App Router: remplace <Head> par du metadata exporté
-export const metadata = {
-  title: 'My Learning Path - Konnected',
-  description: 'View your current learning path and track your progress.',
-};
-
 type Lesson = { id: string; name: string; completed: boolean; href?: string };
 type LearningPath = {
   id: string;
@@ -21,7 +15,6 @@ type LearningPath = {
   lessons: Lesson[];
 };
 
-// Exemple réaliste (reprend l’esprit du contenu original)
 const initialLearningPath: LearningPath = {
   id: '1',
   title: 'Beginner Web Development',
@@ -40,7 +33,6 @@ export default function Page() {
   const router = useRouter();
   const [learningPath] = useState<LearningPath | null>(initialLearningPath);
 
-  // Calcul du pourcentage de progression à partir des leçons
   const progress = useMemo(() => {
     if (!learningPath) return 0;
     const total = learningPath.lessons.length || 1;
@@ -53,9 +45,13 @@ export default function Page() {
     return learningPath.lessons.findIndex((l) => !l.completed);
   }, [learningPath]);
 
+  const nextLesson = useMemo<Lesson | null>(() => {
+    if (!learningPath) return null;
+    if (firstIncompleteIndex < 0) return null;
+    return learningPath.lessons[firstIncompleteIndex] ?? null;
+  }, [learningPath, firstIncompleteIndex]);
+
   const goToLesson = (lessonId: string, href?: string) => {
-    // Conserve la navigation utilisée dans l’original
-    // (l’original poussait vers /konnected/learning-library/lesson/[id]) :contentReference[oaicite:3]{index=3}
     router.push(href ?? `/konnected/learning-library/lesson/${lessonId}`);
   };
 
@@ -80,13 +76,13 @@ export default function Page() {
       <Card className="mb-4">
         <Title level={5}>Overall Progress</Title>
         <Progress percent={progress} status="active" />
-        {firstIncompleteIndex >= 0 && (
+        {nextLesson && (
           <div style={{ marginTop: 12 }}>
             <Button
               type="primary"
               onClick={() => {
-                const next = learningPath.lessons[firstIncompleteIndex];
-                goToLesson(next.id, next.href);
+                if (!nextLesson) return;
+                goToLesson(nextLesson.id, nextLesson.href);
               }}
             >
               Continue where you left off

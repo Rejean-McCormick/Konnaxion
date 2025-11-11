@@ -1,0 +1,6495 @@
+
+# ==== app/ethikos/decide/elite/page.tsx ====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { Progress, Statistic } from 'antd'
+import { useRequest } from 'ahooks'
+import dayjs from 'dayjs'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchEliteBallots } from '@/services/decide'
+import type { Ballot } from '@/types'
+
+type Row = Ballot & { turnout: number }
+
+export default function EliteBallots() {
+  usePageTitle('Decide · Elite Ballots')
+
+  const { data, loading } = useRequest<{ ballots: Row[] }>(fetchEliteBallots)
+
+  const columns: ProColumns<Row>[] = [
+    { title: 'Title', dataIndex: 'title', width: 260 },
+    {
+      title: 'Closes In',
+      dataIndex: 'closesAt',
+      width: 180,
+      render: (_: React.ReactNode, row) => (
+        <Statistic.Countdown value={dayjs(row.closesAt).valueOf()} format="D[d] HH:mm:ss" />
+      ),
+    },
+    {
+      title: 'Turnout',
+      dataIndex: 'turnout',
+      width: 160,
+      render: (_: React.ReactNode, row) => <Progress type="circle" percent={row.turnout} />,
+    },
+    { title: 'Scope', dataIndex: 'scope', width: 100 },
+  ]
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<Row>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.ballots}
+        pagination={{ pageSize: 8 }}
+        search={false}
+      />
+    </PageContainer>
+  )
+}
+
+# ==== app/ethikos/deliberate/[topic]/page.tsx ====
+'use client';
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Timeline, Typography } from 'antd';
+import Comment from 'antd/es/comment';
+import { useParams } from 'next/navigation';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchTopicDetail } from '@/services/deliberate';
+
+type Statement = {
+  id: string;
+  author: string;
+  body: string;
+  createdAt: string;
+};
+
+type TopicDetailData = {
+  id: string;
+  title: string;
+  statements: Statement[];
+};
+
+export default function TopicDetail() {
+  const { topic } = useParams() as { topic: string };
+
+  usePageTitle(`Deliberate · ${topic}`);
+
+  const { data, loading } = useRequest<TopicDetailData, []>(
+    () => fetchTopicDetail(topic),
+    { ready: !!topic }
+  );
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Typography.Title level={3}>{data?.title}</Typography.Title>
+
+      <ProCard title="Statements Thread" ghost>
+        <Timeline>
+          {data?.statements?.map((s) => (
+            <Timeline.Item key={s.id}>
+              <Comment
+                author={s.author}
+                datetime={s.createdAt}
+                content={<Typography.Paragraph>{s.body}</Typography.Paragraph>}
+              />
+            </Timeline.Item>
+          ))}
+        </Timeline>
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+# ==== app/ethikos/deliberate/elite/page.tsx ====
+// app/ethikos/deliberate/elite/page.tsx
+'use client';
+
+import React from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  ModalForm,
+  ProFormText,
+  ProFormSelect,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import { Button, Drawer, Empty, Space, Tag, Tooltip, message as antdMessage } from 'antd';
+import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
+import { useRequest, useInterval } from 'ahooks';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchEliteTopics, createEliteTopic, fetchTopicPreview } from '@/services/deliberate';
+import type { Topic } from '@/types';
+
+dayjs.extend(relativeTime);
+
+/* ------------------------------------------------------------------ */
+/*  Types dérivés                                                      */
+/* ------------------------------------------------------------------ */
+
+interface TopicRow extends Topic {
+  createdAt: string;
+  lastActivity: string;
+  hot: boolean;         // calculé côté serveur
+  stanceCount: number;  // <-- ajouté : utilisé par KPI et la colonne
+}
+
+/* ------------------------------------------------------------------ */
+/*  Composant principal                                                */
+/* ------------------------------------------------------------------ */
+
+export default function EliteAgora() {
+  usePageTitle('Deliberate · Elite Agora');
+
+  /* ---------- data ---------- */
+  // Déclare explicitement la forme de data pour inclure stanceCount
+  const { data, loading, refresh } = useRequest<{ list: TopicRow[] }>(fetchEliteTopics);
+  useInterval(refresh, 60_000); // polling 1 min
+
+  /* ---------- drawer state ---------- */
+  const [previewId, setPreviewId] = React.useState<string | null>(null);
+  const { data: preview, loading: previewLoading, run: loadPreview } = useRequest(
+    (id: string) => fetchTopicPreview(id),
+    { manual: true },
+  );
+
+  /* ---------- open drawer ---------- */
+  const openPreview = React.useCallback(
+    (row: TopicRow) => {
+      setPreviewId(row.id);
+      loadPreview(row.id);
+    },
+    [loadPreview],
+  );
+
+  /* ---------- KPI header ---------- */
+  const headerStats = React.useMemo(
+    () => [
+      { label: 'Open topics', value: data?.list.length ?? 0 },
+      {
+        label: 'Avg stances / topic',
+        value: data?.list?.length
+          ? Math.round(
+              data!.list.reduce((sum: number, t: TopicRow) => sum + (t.stanceCount ?? 0), 0) /
+                data!.list.length,
+            )
+          : 0,
+      },
+      { label: 'Hot topics', value: (data?.list ?? []).filter((t: TopicRow) => t.hot).length },
+    ],
+    [data],
+  );
+
+  /* ---------- filtres catégorie ---------- */
+  const categoryFilters = React.useMemo(
+    () =>
+      Array.from(
+        new Set((data?.list ?? []).map((t: TopicRow) => t.category).filter(Boolean)),
+      ).map((c) => ({ text: String(c), value: String(c) })),
+    [data?.list],
+  );
+
+  /* ---------- colonnes ---------- */
+  const columns: ProColumns<TopicRow>[] = React.useMemo(
+    () => [
+      {
+        title: 'Title',
+        dataIndex: 'title',
+        render: (_, row) => (
+          <a onClick={() => openPreview(row)} style={{ cursor: 'pointer' }}>
+            {row.title}
+          </a>
+        ),
+      },
+      {
+        title: 'Category',
+        dataIndex: 'category',
+        filters: categoryFilters,
+        onFilter: (val: string | number | boolean, row) => String(row.category) === String(val),
+        render: (_, row) => <Tag color="geekblue">{row.category}</Tag>,
+      },
+      {
+        title: 'Stances',
+        dataIndex: 'stanceCount',
+        sorter: true,
+        align: 'right',
+      },
+      {
+        title: 'Last activity',
+        dataIndex: 'lastActivity',
+        // Utiliser dayjs.fromNow() pour éviter les frictions de typings de `valueType`
+        render: (_, row) => dayjs(row.lastActivity).fromNow(),
+      },
+      {
+        title: '',
+        dataIndex: 'hot',
+        width: 60,
+        render: (_, row) =>
+          row.hot ? (
+            <Tooltip title="Trending">
+              <FireOutlined style={{ color: '#fa541c' }} />
+            </Tooltip>
+          ) : null,
+      },
+    ],
+    [categoryFilters, openPreview],
+  );
+
+  /* ---------- rendu ---------- */
+  return (
+    <PageContainer
+      ghost
+      loading={loading}
+      extra={
+        <Space>
+          <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title="Refresh list" />
+          {/* vérification de rôle/permission si besoin */}
+          <NewTopicButton onCreated={refresh} />
+        </Space>
+      }
+    >
+      {/* KPI summary */}
+      <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+        {headerStats.map((k) => (
+          <StatisticCard
+            key={k.label}
+            colSpan={{ xs: 24, sm: 8 }}
+            statistic={{ title: k.label, value: k.value }}
+          />
+        ))}
+      </ProCard>
+
+      {/* liste */}
+      <ProTable<TopicRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.list}
+        search={{ labelWidth: 90, filterType: 'light' }}
+        pagination={{ pageSize: 10 }}
+      />
+
+      {/* preview drawer */}
+      <Drawer
+        width={520}
+        open={!!previewId}
+        onClose={() => setPreviewId(null)}
+        title={preview?.title || 'Preview'}
+      >
+        {previewLoading ? (
+          <Empty description="Loading…" />
+        ) : preview ? (
+          <>
+            <p>
+              <strong>Category:</strong> {preview.category}
+            </p>
+            <p>
+              <strong>Opened:</strong> {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+            </p>
+            <h4>Latest statements</h4>
+            <ul>
+              {preview.latest.map((s) => (
+                <li key={s.id}>
+                  <em>{s.author}</em> — {s.body}
+                </li>
+              ))}
+            </ul>
+            <Button
+              type="primary"
+              onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
+            >
+              Go to thread →
+            </Button>
+          </>
+        ) : (
+          <Empty />
+        )}
+      </Drawer>
+    </PageContainer>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  New Topic modal                                                    */
+/* ------------------------------------------------------------------ */
+
+function NewTopicButton({ onCreated }: { onCreated: () => void }) {
+  const [visible, setVisible] = React.useState(false);
+
+  const { runAsync, loading } = useRequest(createEliteTopic, {
+    manual: true,
+    onSuccess: () => {
+      antdMessage.success('Topic created 🎉');
+      setVisible(false);
+      onCreated();
+    },
+  });
+
+  return (
+    <>
+      <Button icon={<PlusOutlined />} type="primary" onClick={() => setVisible(true)}>
+        New Topic
+      </Button>
+      <ModalForm
+        title="Create new topic"
+        open={visible}
+        onOpenChange={setVisible}
+        onFinish={async (values: { title: string; category: string }) => {
+          await runAsync(values); // <-- typé correctement
+          return true;
+        }}
+        submitter={{ submitButtonProps: { loading } }}
+      >
+        <ProFormText name="title" label="Title" rules={[{ required: true, min: 10 }]} />
+        <ProFormSelect
+          name="category"
+          label="Category"
+          options={[
+            { label: 'AI Policy', value: 'AI Policy' },
+            { label: 'Biotech', value: 'Biotech' },
+            { label: 'Ethics', value: 'Ethics' },
+          ]}
+          rules={[{ required: true }]}
+        />
+      </ModalForm>
+    </>
+  );
+}
+
+# ==== app/konnected/learning-library/search-filters/page.tsx ====
+'use client';
+
+import React, { useMemo, useState } from 'react';
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Divider,
+  Form,
+  Input,
+  Modal,
+  Row,
+  Select,
+  Slider,
+  Space,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
+import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
+
+// ✅ Use the MainLayout that actually exists in the repo
+import MainLayout from '@/shared/layout/MainLayout'; // was: '@/components/layout-components/MainLayout'
+import type { ColumnsType } from 'antd/es/table';
+
+const { Title, Paragraph, Text } = Typography;
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+
+type Resource = {
+  id: string;
+  title: string;
+  subject: string;
+  type: 'Article' | 'Video' | 'Course' | 'Book' | 'Podcast';
+  difficulty: number; // 1-5
+  createdAt: string; // ISO
+  tags: string[];
+};
+
+const MOCK_RESOURCES: Resource[] = [
+  {
+    id: '1',
+    title: 'Sustainable Design Principles',
+    subject: 'Sustainability',
+    type: 'Article',
+    difficulty: 2,
+    createdAt: '2025-01-02',
+    tags: ['eco', 'design'],
+  },
+  {
+    id: '2',
+    title: 'Advanced TypeScript Patterns',
+    subject: 'Engineering',
+    type: 'Course',
+    difficulty: 4,
+    createdAt: '2025-03-12',
+    tags: ['typescript', 'patterns'],
+  },
+  {
+    id: '3',
+    title: 'Community Moderation 101',
+    subject: 'Community',
+    type: 'Video',
+    difficulty: 1,
+    createdAt: '2024-11-14',
+    tags: ['moderation', 'basics'],
+  },
+  {
+    id: '4',
+    title: 'Ethical AI in Decision Making',
+    subject: 'Ethics',
+    type: 'Podcast',
+    difficulty: 3,
+    createdAt: '2025-07-09',
+    tags: ['ai', 'ethics'],
+  },
+];
+
+const ALL_SUBJECTS = ['Sustainability', 'Engineering', 'Community', 'Ethics', 'Leadership'];
+const ALL_TYPES: Resource['type'][] = ['Article', 'Video', 'Course', 'Book', 'Podcast'];
+
+const SearchFiltersPage: React.FC = () => {
+  // Recherche simple
+  const [query, setQuery] = useState<string>('');
+
+  // Filtres
+  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
+  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
+  const [difficultyRange, setDifficultyRange] = useState<[number, number]>([1, 5]);
+  const [resourceTypes, setResourceTypes] = useState<Resource['type'][]>([]);
+  const [category, setCategory] = useState<string>('All');
+
+  const [advancedOpen, setAdvancedOpen] = useState(false);
+
+  const resetFilters = () => {
+    setQuery('');
+    setSelectedSubjects([]);
+    setDateRange(null);
+    setDifficultyRange([1, 5]);
+    setResourceTypes([]);
+    setCategory('All');
+  };
+
+  const filteredData = useMemo(() => {
+    return MOCK_RESOURCES.filter((res) => {
+      // Query
+      if (query.trim()) {
+        const q = query.trim().toLowerCase();
+        const hay = `${res.title} ${res.subject} ${res.tags.join(' ')}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+
+      // Subjects
+      if (selectedSubjects.length > 0 && !selectedSubjects.includes(res.subject)) {
+        return false;
+      }
+
+      // Types
+      if (resourceTypes.length > 0 && !resourceTypes.includes(res.type)) {
+        return false;
+      }
+
+      // Difficulty
+      if (res.difficulty < difficultyRange[0] || res.difficulty > difficultyRange[1]) {
+        return false;
+      }
+
+      // Date range
+      if (dateRange) {
+        const [start, end] = dateRange;
+        const resDate = dayjs(res.createdAt);
+        if (resDate.isBefore(start, 'day') || resDate.isAfter(end, 'day')) {
+          return false;
+        }
+      }
+
+      // Category (démo)
+      if (category !== 'All') {
+        // exemple de mapping fictif
+        if (category === 'Featured' && res.id !== '1') return false;
+        if (category === 'New' && dayjs().diff(dayjs(res.createdAt), 'day') > 60) return false;
+      }
+
+      return true;
+    });
+  }, [query, selectedSubjects, resourceTypes, difficultyRange, dateRange, category]);
+
+  const columns: ColumnsType<Resource> = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+      render: (_: unknown, record: Resource) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{record.title}</Text>
+          <Text type="secondary">{record.subject}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Type',
+      dataIndex: 'type',
+      key: 'type',
+      // avoid implicit-any on value
+      render: (t: Resource['type']) => <Tag>{t}</Tag>,
+    },
+    {
+      title: 'Difficulty',
+      dataIndex: 'difficulty',
+      key: 'difficulty',
+      render: (d: number) => (
+        <Space>
+          <Text>{d}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Created',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (d: string) => dayjs(d).format('YYYY-MM-DD'),
+    },
+    {
+      title: 'Tags',
+      dataIndex: 'tags',
+      key: 'tags',
+      render: (tags: string[]) => (
+        <Space wrap>
+          {tags.map((t) => (
+            <Tag key={t}>{t}</Tag>
+          ))}
+        </Space>
+      ),
+    },
+  ];
+
+  /** ✅ Difficulty handler accepts union & narrows to tuple so indices are never undefined */
+  const handleDifficultyChange = (value: number | [number, number]) => {
+    if (Array.isArray(value) && value.length === 2) {
+      setDifficultyRange([value[0], value[1]]);
+    }
+  };
+
+  /** ✅ Date range handler copes with nulls from RangePicker */
+  const handleDateRangeChange = (dates: null | [Dayjs | null, Dayjs | null]) => {
+    if (dates && dates[0] && dates[1]) setDateRange([dates[0], dates[1]]);
+    else setDateRange(null);
+  };
+
+  return (
+    <MainLayout>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Title level={2}>Learning Library — Search &amp; Filters</Title>
+          <Paragraph type="secondary">
+            Recherchez dans les ressources avec des filtres combinables (matière, type, difficulté, plage de dates, etc.).
+          </Paragraph>
+        </Col>
+
+        {/* Barre de recherche + actions */}
+        <Col span={24}>
+          <Card>
+            <Row gutter={[12, 12]} align="middle">
+              <Col xs={24} md={12}>
+                <Input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Rechercher par titre / sujet / tag…"
+                  allowClear
+                  prefix={<SearchOutlined />}
+                />
+              </Col>
+              <Col xs={24} md={12}>
+                <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+                  <Button icon={<FilterOutlined />} onClick={() => setAdvancedOpen(true)}>
+                    Filtres avancés
+                  </Button>
+                  <Button icon={<ReloadOutlined />} onClick={resetFilters}>
+                    Réinitialiser
+                  </Button>
+                </Space>
+              </Col>
+            </Row>
+
+            <Divider />
+
+            {/* Filtres rapides */}
+            <Row gutter={[12, 12]}>
+              <Col xs={24} md={8}>
+                <Text strong>Matières</Text>
+                <Select
+                  mode="multiple"
+                  style={{ width: '100%' }}
+                  placeholder="Sélectionner des matières"
+                  value={selectedSubjects}
+                  onChange={setSelectedSubjects}
+                >
+                  {ALL_SUBJECTS.map((s) => (
+                    <Option key={s} value={s}>
+                      {s}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+
+              <Col xs={24} md={8}>
+                <Text strong>Types</Text>
+                <Select
+                  mode="multiple"
+                  style={{ width: '100%' }}
+                  placeholder="Sélectionner des types"
+                  value={resourceTypes}
+                  onChange={(vals) => setResourceTypes(vals as Resource['type'][])}
+                >
+                  {ALL_TYPES.map((t) => (
+                    <Option key={t} value={t}>
+                      {t}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+
+              <Col xs={24} md={8}>
+                <Text strong>Difficulté</Text>
+                <Slider
+                  range={{ draggableTrack: true }}
+                  min={1}
+                  max={5}
+                  step={1}
+                  value={difficultyRange}
+                  onChange={handleDifficultyChange}
+                />
+              </Col>
+            </Row>
+          </Card>
+        </Col>
+
+        {/* Résultats */}
+        <Col span={24}>
+          <Card>
+            <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 12 }}>
+              <Text type="secondary">Résultats: {filteredData.length}</Text>
+              <Select value={category} onChange={setCategory} style={{ width: 180 }}>
+                <Option value="All">Toutes les catégories</Option>
+                <Option value="Featured">Mises en avant</Option>
+                <Option value="New">Nouveautés</Option>
+              </Select>
+            </Space>
+
+            <Table<Resource>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 8 }}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Filtres avancés */}
+      <Modal
+        open={advancedOpen}
+        title="Filtres avancés"
+        onOk={() => setAdvancedOpen(false)}
+        onCancel={() => setAdvancedOpen(false)}
+        okText="Appliquer"
+      >
+        <Form layout="vertical">
+          <Form.Item label="Plage de dates">
+            <RangePicker
+              onChange={handleDateRangeChange}
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
+
+          <Form.Item label="Mots-clés">
+            <Input
+              placeholder="Mots-clés additionnels…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              allowClear
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
+    </MainLayout>
+  );
+};
+
+export default SearchFiltersPage;
+
+# ==== app/konnected/teams-collaboration/activity-planner/page.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import type { CalendarProps } from 'antd';
+import {
+  Calendar,
+  Modal,
+  Form,
+  DatePicker,
+  TimePicker,
+  Input,
+  Button,
+  List,
+  Select,
+  Typography,
+  Row,
+  Col,
+  message,
+} from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import PageContainer from '@/components/PageContainer';
+import dayjs, { Dayjs } from 'dayjs';
+
+const { Title, Text } = Typography;
+
+/** Domain types */
+interface ActivityEvent {
+  id: string;
+  title: string;
+  description: string;
+  /** Stored as Dayjs (AntD v5 default) */
+  dateTime: Dayjs;
+  owner: string;
+  team: string;
+}
+
+interface ActivityForm {
+  eventTitle: string;
+  eventDescription?: string;
+  eventDate: Dayjs;
+  eventTime: Dayjs;
+  team: string;
+  owner: string;
+}
+
+/** Team list for filter and form */
+const teamOptions = ['All', 'Alpha Innovators', 'Beta Coders', 'Gamma Team'];
+
+export default function Page() {
+  const [events, setEvents] = useState<ActivityEvent[]>([
+    {
+      id: 'evt1',
+      title: 'Team Meeting',
+      description: 'Réunion d’équipe pour définir les prochaines étapes.',
+      dateTime: dayjs().add(2, 'day').hour(10).minute(0),
+      owner: 'Alice',
+      team: 'Alpha Innovators',
+    },
+    {
+      id: 'evt2',
+      title: 'Sprint Planning',
+      description: 'Planification du sprint avec présentation du backlog.',
+      dateTime: dayjs().add(4, 'day').hour(9).minute(30),
+      owner: 'Bob',
+      team: 'Beta Coders',
+    },
+  ]);
+
+  const [selectedTeam, setSelectedTeam] = useState<string>('All');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [preSelectedDate, setPreSelectedDate] = useState<Dayjs | null>(null);
+
+  const [form] = Form.useForm<ActivityForm>();
+
+  const filteredEvents =
+    selectedTeam === 'All'
+      ? events
+      : events.filter((evt) => evt.team === selectedTeam);
+
+  /** AntD v5: use `cellRender` for date cells */
+  const cellRender: CalendarProps<Dayjs>['cellRender'] = (value, info) => {
+    if (info.type !== 'date') return info.originNode;
+    const listData = events.filter((evt) => evt.dateTime.isSame(value, 'day'));
+    if (!listData.length) return info.originNode;
+
+    return (
+      <ul style={{ padding: 0, margin: 0, listStyle: 'none' }}>
+        {listData.map((item) => (
+          <li key={item.id}>
+            <Text style={{ fontSize: 10 }}>{item.title}</Text>
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
+  /** Calendar selection uses Dayjs in AntD v5 */
+  const handleDateSelect = (value: Dayjs) => {
+    setPreSelectedDate(value);
+    // preset only the date; time stays empty until user picks it
+    form.setFieldsValue({ eventDate: value } as Partial<ActivityForm>);
+    setModalVisible(true);
+  };
+
+  /** Submit new event with strongly typed form values */
+  const handleAddEvent = (values: ActivityForm) => {
+    const { eventTitle, eventDescription, eventDate, eventTime, team, owner } =
+      values;
+
+    const dateTime = eventDate
+      .clone()
+      .set({
+        hour: eventTime.hour(),
+        minute: eventTime.minute(),
+        second: 0,
+        millisecond: 0,
+      });
+
+    const newEvent: ActivityEvent = {
+      id: `evt${Date.now()}`,
+      title: eventTitle,
+      description: eventDescription ?? '',
+      dateTime,
+      owner,
+      team,
+    };
+
+    setEvents((prev) => [...prev, newEvent]);
+    message.success('Activity added');
+    form.resetFields();
+    setPreSelectedDate(null);
+    setModalVisible(false);
+  };
+
+  return (
+    <PageContainer title="Activity Planner">
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={16}>
+          <Calendar cellRender={cellRender} onSelect={handleDateSelect} />
+        </Col>
+
+        <Col xs={24} md={8}>
+          <Title level={4}>Upcoming Activities</Title>
+
+          <Select
+            style={{ width: '100%', marginBottom: 16 }}
+            value={selectedTeam}
+            onChange={(value: string) => setSelectedTeam(value)}
+            options={teamOptions.map((t) => ({ value: t, label: t }))}
+          />
+
+          <List
+            dataSource={[...filteredEvents].sort((a, b) =>
+              a.dateTime.diff(b.dateTime),
+            )}
+            renderItem={(item: ActivityEvent) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={item.title}
+                  description={
+                    <>
+                      <Text type="secondary">
+                        {item.dateTime.format('MMM D, YYYY, HH:mm')}
+                      </Text>
+                      <br />
+                      <Text strong>Owner:</Text> {item.owner}
+                      <br />
+                      <Text strong>Team:</Text> {item.team}
+                    </>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            style={{ marginTop: 16 }}
+            onClick={() => {
+              setPreSelectedDate(null);
+              form.resetFields();
+              setModalVisible(true);
+            }}
+          >
+            Add Activity
+          </Button>
+        </Col>
+      </Row>
+
+      <Modal
+        title="Add New Activity"
+        open={modalVisible}
+        onCancel={() => {
+          setModalVisible(false);
+          form.resetFields();
+          setPreSelectedDate(null);
+        }}
+        footer={null}
+      >
+        <Form<ActivityForm> form={form} layout="vertical" onFinish={handleAddEvent}>
+          <Form.Item
+            label="Event Title"
+            name="eventTitle"
+            rules={[{ required: true, message: 'Please enter the event title.' }]}
+          >
+            <Input placeholder="Event title" />
+          </Form.Item>
+
+          <Form.Item label="Description" name="eventDescription">
+            <Input.TextArea rows={3} placeholder="Event description" />
+          </Form.Item>
+
+          <Form.Item
+            label="Date"
+            name="eventDate"
+            rules={[{ required: true, message: 'Please select a date.' }]}
+          >
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item
+            label="Time"
+            name="eventTime"
+            rules={[{ required: true, message: 'Please select a time.' }]}
+          >
+            <TimePicker style={{ width: '100%' }} format="HH:mm" />
+          </Form.Item>
+
+          <Form.Item
+            label="Team"
+            name="team"
+            rules={[{ required: true, message: 'Please select a team.' }]}
+            initialValue={teamOptions[1]}
+          >
+            <Select
+              options={teamOptions
+                .filter((t) => t !== 'All')
+                .map((t) => ({ value: t, label: t }))}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Owner"
+            name="owner"
+            rules={[{ required: true, message: 'Please enter the owner.' }]}
+          >
+            <Input placeholder="Owner name" />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" block>
+              Add Activity
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
+    </PageContainer>
+  );
+}
+
+# ==== app/kreative/collaborative-spaces/my-spaces/page.tsx ====
+'use client';
+
+import React, { useMemo, useState } from 'react';
+import { List, Button, Input, Select, Badge, Avatar, Space, Row, Col, Typography } from 'antd';
+import { TeamOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import PageContainer from '@/components/PageContainer';
+
+const { Title, Text } = Typography;
+
+// Collaborative space model
+interface CollaborativeSpace {
+  id: string;
+  name: string;
+  topic: string;
+  membersCount: number;
+  category: 'Studio' | 'Club' | 'Community';
+  unreadCount: number;
+}
+
+// Demo data
+const dummySpaces: CollaborativeSpace[] = [
+  {
+    id: '1',
+    name: 'Creative Studio Alpha',
+    topic: 'Graphic Design & Illustration',
+    membersCount: 12,
+    category: 'Studio',
+    unreadCount: 3,
+  },
+  {
+    id: '2',
+    name: 'Music Club Beta',
+    topic: 'Indie & Electronic Music',
+    membersCount: 20,
+    category: 'Club',
+    unreadCount: 0,
+  },
+  {
+    id: '3',
+    name: 'Writers Community Gamma',
+    topic: 'Creative Writing & Storytelling',
+    membersCount: 15,
+    category: 'Community',
+    unreadCount: 5,
+  },
+];
+
+export default function MySpacesPage(): JSX.Element {
+  const router = useRouter();
+
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const filteredSpaces = useMemo(() => {
+    let spaces = dummySpaces;
+    if (selectedCategory !== 'All') {
+      spaces = spaces.filter((s) => s.category === selectedCategory);
+    }
+    if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase();
+      spaces = spaces.filter((s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q));
+    }
+    return spaces;
+  }, [selectedCategory, searchQuery]);
+
+  const enterSpace = (id: string) => {
+    router.push(`/kreative/collaborative-spaces/${id}`);
+
+  return (
+    <PageContainer title="My Spaces">
+      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+        <Col>
+          <Space>
+            <Input
+              placeholder="Search spaces..."
+              prefix={<SearchOutlined />}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: 300 }}
+            />
+            <Select
+              value={selectedCategory}
+              onChange={setSelectedCategory}
+              style={{ width: 200 }}
+              options={[
+                { value: 'All', label: 'All Categories' },
+                { value: 'Studio', label: 'Studio' },
+                { value: 'Club', label: 'Club' },
+                { value: 'Community', label: 'Community' },
+              ]}
+            />
+          </Space>
+        </Col>
+        <Col>
+          <Button
+            type="primary"
+            icon={<PlusOutlined />}
+            onClick={() => router.push('/kreative/collaborative-spaces/create')}
+          >
+            Start a New Space
+          </Button>
+        </Col>
+      </Row>
+
+      <List
+        itemLayout="horizontal"
+        dataSource={filteredSpaces ?? []}
+        renderItem={(space: CollaborativeSpace) => (
+          <List.Item
+            key={space.id}
+            actions={[
+              <Button key="enter" type="primary" onClick={() => enterSpace(space.id)}>
+                Enter Space
+              </Button>,
+            ]}
+          >
+            <List.Item.Meta
+              avatar={
+                space.unreadCount > 0 ? (
+                  <Badge count={space.unreadCount} offset={[-5, 5]}>
+                    <Avatar size="large" icon={<TeamOutlined />} />
+                  </Badge>
+                ) : (
+                  <Avatar size="large" icon={<TeamOutlined />} />
+                )
+              }
+              title={<Title level={4} style={{ margin: 0 }}>{space.name}</Title>}
+              description={
+                <Space direction="vertical" size={0}>
+                  <Text strong>Topic:</Text>
+                  <Text>{space.topic}</Text>
+                  <Text strong>Members:</Text>
+                  <Text>{space.membersCount}</Text>
+                </Space>
+              }
+            />
+          </List.Item>
+        )}
+      />
+    </PageContainer>
+  );
+}
+}
+
+# ==== app/kreative/community-showcases/featured-projects/page.tsx ====
+'use client';
+
+// File: app/kreative/community-showcases/featured-projects/page.tsx
+import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Card,
+  Row,
+  Col,
+  Input,
+  Select,
+  Modal,
+  Pagination,
+  Typography,
+  Badge,
+  Space,
+  Button, // fixed: ensure Button is imported
+} from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
+import PageContainer from '@/components/PageContainer';
+
+const { Title, Text, Paragraph } = Typography;
+
+interface Project {
+  id: string;
+  title: string;
+  description: string;
+  creator: string;
+  coverImage: string;
+  category: string;
+}
+
+const dummyProjects: Project[] = [
+  {
+    id: '1',
+    title: 'Project Sunrise',
+    description:
+      'An inspiring project that captures the beauty of dawn with innovative photo techniques and a vivid color palette.',
+    creator: 'Alice Johnson',
+    coverImage: 'https://via.placeholder.com/400x300.png?text=Project+Sunrise',
+    category: 'Photography',
+  },
+  {
+    id: '2',
+    title: 'Digital Dreamscape',
+    description:
+      'A surreal digital art piece combining abstract concepts with vibrant colors to evoke emotion.',
+    creator: 'Bob Smith',
+    coverImage: 'https://via.placeholder.com/400x300.png?text=Digital+Dreamscape',
+    category: 'Digital Art',
+  },
+  {
+    id: '3',
+    title: 'Urban Poetry',
+    description:
+      'A mixed-media project blending urban photography with spoken word performance, reimagining cityscapes in a poetic light.',
+    creator: 'Carol Lee',
+    coverImage: 'https://via.placeholder.com/400x300.png?text=Urban+Poetry',
+    category: 'Mixed Media',
+  },
+  {
+    id: '4',
+    title: 'Vintage Revival',
+    description:
+      'A creative reinterpretation of vintage art styles merged with modern design sensibilities.',
+    creator: 'David Kim',
+    coverImage: 'https://via.placeholder.com/400x300.png?text=Vintage+Revival',
+    category: 'Painting',
+  },
+];
+
+export default function FeaturedProjectsPage(): JSX.Element {
+  const router = useRouter(); // fixed: useRouter from next/navigation
+
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  // Pagination state.
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 4;
+
+  // Filter projects based on search and category.
+  const filteredProjects = useMemo(() => {
+    let projects = dummyProjects;
+    if (selectedCategory !== 'All') {
+      projects = projects.filter((project) => project.category === selectedCategory);
+    }
+    if (searchQuery.trim() !== '') {
+      projects = projects.filter(
+        (project) =>
+          project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          project.description.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+    }
+    return projects;
+  }, [searchQuery, selectedCategory]);
+
+  const paginatedProjects = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredProjects.slice(start, start + pageSize);
+  }, [filteredProjects, currentPage]);
+
+  const openModal = (project: Project) => {
+    setSelectedProject(project);
+    setModalVisible(true);
+
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedProject(null);
+
+  return (
+    <PageContainer title="Featured Projects">
+      {/* Filter Section */}
+      <Space wrap style={{ marginBottom: 24 }}>
+        <Input
+          placeholder="Search projects."
+          prefix={<SearchOutlined />}
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value);
+            setCurrentPage(1);
+          }}
+          style={{ width: 300 }}
+        />
+
+        {/* refactor: avoid deprecated Select.Option, use options prop */}
+        <Select
+          value={selectedCategory}
+          onChange={(value) => {
+            setSelectedCategory(value);
+            setCurrentPage(1);
+          }}
+          style={{ width: 220 }}
+          options={[
+            { value: 'All', label: 'All Categories' },
+            { value: 'Photography', label: 'Photography' },
+            { value: 'Digital Art', label: 'Digital Art' },
+            { value: 'Mixed Media', label: 'Mixed Media' },
+            { value: 'Painting', label: 'Painting' },
+          ]}
+        />
+      </Space>
+
+      {/* Projects Grid */}
+      <Row gutter={[24, 24]}>
+        {paginatedProjects.map((project) => (
+          <Col key={project.id} xs={24} sm={12} md={8} lg={6}>
+            <Badge.Ribbon text="Featured" color="red">
+              <Card
+                hoverable
+                cover={
+                  <img
+                    alt={project.title}
+                    src={project.coverImage}
+                    style={{ height: 200, objectFit: 'cover' }}
+                  />
+                }
+                onClick={() => openModal(project)}
+              >
+                <Card.Meta
+                  title={project.title}
+                  description={
+                    <>
+                      {/* fix: remove ellipsis={{}} which is incompatible in your setup */}
+                      <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
+                        {project.description}
+                      </Paragraph>
+                      <Text type="secondary">By {project.creator}</Text>
+                    </>
+                  }
+                />
+              </Card>
+            </Badge.Ribbon>
+          </Col>
+        ))}
+      </Row>
+
+      {/* Pagination */}
+      <div style={{ textAlign: 'center', marginTop: 24 }}>
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={filteredProjects.length}
+          onChange={(page) => setCurrentPage(page)}
+        />
+      </div>
+
+      {/* Modal for Project Details */}
+      <Modal open={modalVisible} onCancel={closeModal} footer={null} width={800}>
+        {selectedProject && (
+          <div>
+            <img
+              alt={selectedProject.title}
+              src={selectedProject.coverImage}
+              style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }}
+            />
+            <div style={{ marginTop: 16 }}>
+              <Title level={3}>{selectedProject.title}</Title>
+              <Text type="secondary">By {selectedProject.creator}</Text>
+              <p style={{ marginTop: 12 }}>{selectedProject.description}</p>
+              <Button
+                type="primary"
+                onClick={() =>
+                  router.push(
+                    `/kreative/community-showcases/featured-projects/${selectedProject.id}`,
+                  )
+                }
+              >
+                View Details
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      {/* multi-line clamp replacement for deprecated Typography ellipsis rows */}
+      <style jsx>{`
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      `}</style>
+    </PageContainer>
+  );
+}
+}}
+
+# ==== components/dashboard-components/CommentCard.tsx ====
+'use client'
+
+/**
+ * Description: Comment statistics card, including total comments and trend graph
+ * Author: Hieu Chu
+ */
+
+import React from 'react'
+import dynamic from 'next/dynamic'
+import type { AreaConfig } from '@ant-design/plots'
+import {
+  MainIcon,
+  CardDivider,
+  NumberInfoStyled,
+  CardFooter,
+  BarContainer,
+} from './style'
+
+type Point = { x: string | number; y: number }
+
+interface Props {
+  TOTAL_COMMENTS: number
+  DAILY_COMMENTS: number
+  DAILY_COMMENTS_CHANGE: number
+  COMMENT_DATA: Point[]
+}
+
+// SSR-safe dynamic import of the Area chart
+const Area = dynamic(() => import('@ant-design/plots').then(m => m.Area), {
+  ssr: false,
+})
+
+export default function CommentCard({
+  TOTAL_COMMENTS,
+  DAILY_COMMENTS,
+  DAILY_COMMENTS_CHANGE,
+  COMMENT_DATA,
+}: Props) {
+  const areaConfig: AreaConfig = {
+    data: COMMENT_DATA,
+    xField: 'x',
+    yField: 'y',
+    smooth: true,
+    height: 90,
+    autoFit: true,
+    padding: 0,
+    xAxis: false,
+    yAxis: false,
+    tooltip: {},
+    areaStyle: { fillOpacity: 0.2 },
+  }
+
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <MainIcon type="message" twoToneColor="rgb(205, 34, 255)" />
+        <NumberInfoStyled subTitle="Comments" total={TOTAL_COMMENTS} />
+      </div>
+
+      <BarContainer>
+        <Area {...areaConfig} />
+      </BarContainer>
+
+      <CardDivider />
+
+      <CardFooter
+        title="Daily comments"
+        value={DAILY_COMMENTS}
+        change={DAILY_COMMENTS_CHANGE}
+      />
+    </>
+  )
+}
+
+# ==== components/dashboard-components/LikeCard.tsx ====
+'use client';
+
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { TinyLineConfig } from '@ant-design/plots';
+
+// SSR-safe dynamic import of TinyLine
+const TinyLine = dynamic(
+  () => import('@ant-design/plots').then((m) => m.TinyLine),
+  { ssr: false }
+);
+
+export interface LikeCardProps {
+  title?: string;            // Default: 'Likes'
+  total: number;             // Total likes
+  trend?: number[];          // Sparkline series
+  loading?: boolean;
+}
+
+const LikeCard: React.FC<LikeCardProps> = ({
+  title = 'Likes',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const data: number[] = Array.isArray(trend) ? trend : [];
+
+  const config: TinyLineConfig = {
+    data,
+    autoFit: true,
+    smooth: true,
+    height: 56,
+    padding: 0,
+    tooltip: {},
+  };
+
+  return (
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <TinyLine {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
+
+export default LikeCard;
+
+# ==== components/dashboard-components/style.tsx ====
+/**
+ * Description: Stylesheet for dashboard components
+ * Author: Hieu Chu
+ */
+
+import React from 'react'
+import { Card, Tooltip, Divider, Col } from 'antd'
+import { NumberInfo } from 'ant-design-pro'
+import styled from 'styled-components'
+import {
+  InfoCircleOutlined,
+  CaretDownOutlined,
+  CaretUpOutlined,
+} from '@ant-design/icons'
+import * as AntIcons from '@ant-design/icons'
+
+/** helper: map legacy Icon `type` strings (e.g. "shopping-cart") to v4 components */
+const legacyTypeToIcon = (type?: string) => {
+  if (!type) return null
+  const pascal =
+    type
+      .split('-')
+      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+      .join('') + 'Outlined'
+  // @ts-ignore dynamic lookup
+  return (AntIcons as any)[pascal] || null
+}
+
+export const CardStyled = (props: any) => {
+  const bodyStyle: React.CSSProperties = {
+    padding: '20px 24px 8px',
+  }
+  if (props.type === 'stats') {
+    bodyStyle.padding = '20px 16px 16px'
+  }
+  return <Card bodyStyle={bodyStyle} variant="borderless" {...props} />
+}
+
+export const NumberInfoStyled = (props: any) => (
+  <NumberInfo
+    {...props}
+    total={<span style={{ fontSize: 30 }}>{props.total.toLocaleString()}</span>}
+    style={{ display: 'inline-block' }}
+  />
+)
+
+export const HelperIcon = (props: any) => (
+  <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
+    <Tooltip {...props} placement="topLeft" arrowPointAtCenter={true}>
+      <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
+    </Tooltip>
+  </div>
+)
+
+/**
+ * Backward compatible MainIcon.
+ * Preferred: <MainIcon icon={<YourIcon />} />
+ * Legacy support: <MainIcon type="shopping-cart" />
+ */
+export const MainIcon = (props: any) => {
+  const { icon, type, style, ...rest } = props
+  const Resolved = icon
+    ? icon
+    : (() => {
+        const Comp = legacyTypeToIcon(type)
+        return Comp ? <Comp /> : null
+      })()
+
+  return (
+    <div style={{ marginRight: 16 }} {...rest}>
+      {React.isValidElement(Resolved)
+        ? React.cloneElement(Resolved as React.ReactElement, {
+            style: { ...(Resolved.props?.style || {}), ...(style || {}), fontSize: 54 },
+          })
+        : null}
+    </div>
+  )
+}
+
+export const CardFooter = (props: any) => {
+  return (
+    <div style={{ position: 'relative', zIndex: 99 }}>
+      <span>{props.title}:</span>
+      <span style={{ marginLeft: 8, color: 'rgba(0,0,0,.85)' }}>
+        {props.value.toLocaleString()}
+      </span>
+      <Tooltip title="Change compared to yesterday">
+        <span style={{ marginLeft: 16 }}>
+          <span style={{ color: 'rgba(0,0,0,.55)', marginRight: 2 }}>
+            {props.change.toLocaleString()}
+          </span>
+
+          {/* Up/down icon */}
+          {props.change < 0 ? (
+            <CaretDownOutlined style={{ color: '#f5222d', verticalAlign: 'text-bottom' }} />
+          ) : (
+            <CaretUpOutlined style={{ color: '#52c41a', verticalAlign: 'middle' }} />
+          )}
+        </span>
+      </Tooltip>
+    </div>
+  )
+}
+
+export const ColStyled = styled(Col)`
+  padding-bottom: 12px;
+`
+
+export const CardDivider = styled(Divider)`
+  margin-top: 12px;
+  margin-bottom: 9px;
+`
+
+export const BarContainer = styled.div`
+  height: 90px;
+  margin-top: 10px;
+  margin-bottom: -10px;
+`
+
+export const ShadowCard = styled(CardStyled)`
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(242, 242, 242);
+  border-radius: 3px;
+  transition: all 150ms ease-in-out 0s;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 9px 24px;
+    cursor: pointer;
+    transition: all 150ms ease-in-out 0s;
+  }
+`
+
+# ==== components/dashboard-components/UserCard.tsx ====
+'use client';
+
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { TinyColumnConfig } from '@ant-design/plots';
+
+// SSR-safe dynamic import of TinyColumn
+const TinyColumn = dynamic(
+  () => import('@ant-design/plots').then((m) => m.TinyColumn),
+  { ssr: false }
+);
+
+export interface UserCardProps {
+  title?: string;                       // Default: 'New Users'
+  total: number;                        // Total users (or new users)
+  trend?: number[];                     // Tiny column series (e.g., daily counts)
+  loading?: boolean;
+}
+
+const UserCard: React.FC<UserCardProps> = ({
+  title = 'New Users',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const data: number[] = Array.isArray(trend) ? trend : [];
+
+  const config: TinyColumnConfig = {
+    data,
+    autoFit: true,
+    height: 56,
+    padding: 0,
+    tooltip: {},
+  };
+
+  return (
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <TinyColumn {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
+
+export default UserCard;
+
+# ==== components/dashboard-components/UserPieChart.tsx ====
+'use client'
+import React from 'react'
+import {
+  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
+} from 'recharts'
+import { CardStyled } from './style'
+
+type User = { userId: string }
+export default function UserPieChart({ users }: { users: User[] }) {
+  const data = [
+    { name: 'Email', value: 0 },
+    { name: 'Google', value: 0 },
+    { name: 'Facebook', value: 0 },
+  ]
+  for (const u of users) {
+    if (u.userId.includes('auth0')) data[0].value++
+    else if (u.userId.includes('google')) data[1].value++
+    else data[2].value++
+  }
+
+  const COLORS = ['#A97BE9', '#EA4335', '#1890FF']
+
+  return (
+    <CardStyled title="Proportion of Users">
+      <div style={{ width: '100%', height: 294 }}>
+        <ResponsiveContainer>
+          <PieChart>
+            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
+              {data.map((entry, i) => <Cell key={entry.name} fill={COLORS[i % COLORS.length]} />)}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </CardStyled>
+  )
+}
+
+# ==== components/layout-components/Header.tsx ====
+'use client'
+
+import { Layout, Dropdown, Breadcrumb } from 'antd'
+import {
+  UserOutlined,
+  LogoutOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+} from '@ant-design/icons'
+import styled from 'styled-components'
+import Link from 'next/link'
+import nookies from 'nookies'
+import { useRouter, usePathname } from 'next/navigation'
+import { useMemo } from 'react'
+import ThemeSwitcher from '@/components/ThemeSwitcher'
+
+const { Header } = Layout
+
+/* -------- styled -------- */
+const NavBar = styled.div`
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 16px;
+`
+
+const Crumb = styled(Breadcrumb)`
+  margin-left: 20px; /* espace après le toggle */
+  color: var(--ant-color-text);
+  .ant-breadcrumb-separator {
+    color: var(--ant-color-text-secondary);
+  }
+`
+
+const HeaderBlock = styled.div`
+  padding: 0 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  &:hover {
+    background: var(--ant-color-fill-secondary);
+  }
+`
+
+/* -------- helpers -------- */
+const accountItems = [
+  { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+  { type: 'divider' as const },
+  { key: 'logout', icon: <LogoutOutlined />, label: 'Logout' },
+]
+
+interface Route {
+  path?: string
+  name: string
+  views?: Route[]
+}
+
+const trail = (rs: Route[], cur: string): Route[] => {
+  for (const r of rs) {
+    if (r.views?.length) {
+      const sub = trail(r.views, cur)
+      if (sub.length) return [r, ...sub]
+    }
+    if (r.path && (cur === r.path || cur.startsWith(r.path))) return [r]
+  }
+  return []
+}
+
+/* -------- component -------- */
+interface Props {
+  collapsed: boolean
+  handleToggle: () => void
+  routes?: Route[]
+  selectedSidebar?: string
+}
+
+export default function HeaderBar({
+  collapsed,
+  handleToggle,
+  routes = [],
+  selectedSidebar = '',
+}: Props) {
+  const router = useRouter()
+  const pathname = usePathname() ?? '/'
+  const cur = pathname
+
+  const breadcrumbItems = useMemo(() => {
+    const br = trail(routes, cur)
+    const root = {
+      name: selectedSidebar
+        ? selectedSidebar[0].toUpperCase() + selectedSidebar.slice(1)
+        : '',
+      path: `/${selectedSidebar}`,
+    }
+    const crumbs = br.length ? [root, ...br] : [root]
+    return crumbs.map(c => ({
+      key: c.path ?? c.name,
+      title: c.path ? (
+        <Link
+          href={{ pathname: c.path, query: { sidebar: selectedSidebar } }}
+          style={{ color: 'var(--ant-color-text)' }}
+        >
+          {c.name}
+        </Link>
+      ) : (
+        <span style={{ color: 'var(--ant-color-text)' }}>{c.name}</span>
+      ),
+    }))
+  }, [routes, cur, selectedSidebar])
+
+  return (
+    <Header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        background: 'var(--ant-color-bg-container)',
+        padding: 0,
+        boxShadow: 'var(--ant-box-shadow-secondary)',
+      }}
+    >
+      <NavBar>
+        {/* Toggle sidebar */}
+        <div
+          onClick={handleToggle}
+          style={{ cursor: 'pointer', marginRight: 20 }}
+        >
+          {collapsed ? (
+            <MenuUnfoldOutlined style={{ fontSize: 20, color: 'var(--ant-color-text)' }} />
+          ) : (
+            <MenuFoldOutlined style={{ fontSize: 20, color: 'var(--ant-color-text)' }} />
+          )}
+        </div>
+
+        {/* Fil d’Ariane */}
+        <Crumb items={breadcrumbItems} />
+
+        {/* Zone droite : thème + compte */}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+          <ThemeSwitcher />
+
+          <Dropdown
+            placement="bottomRight"
+            menu={{
+              items: accountItems,
+              onClick: ({ key }) => {
+                if (key === 'logout') {
+                  nookies.destroy({}, 'auth0.is.authenticated')
+                  nookies.destroy({}, 'accessToken')
+                  router.push('/')
+                } else if (key === 'profile') {
+                  router.push('/users/id/123')
+                }
+              },
+            }}
+          >
+            <HeaderBlock>
+              <UserOutlined style={{ marginRight: 8, color: 'var(--ant-color-text)' }} /> Admin
+            </HeaderBlock>
+          </Dropdown>
+        </div>
+      </NavBar>
+    </Header>
+  )
+}
+
+# ==== components/layout-components/Main.tsx ====
+'use client'
+
+import { Layout } from 'antd'
+import styled, { css } from 'styled-components'
+
+const StyledMain = styled(
+  ({ collapsed: _c, ...rest }) => <Layout {...rest} />,
+)<{ collapsed: boolean }>`
+  transition: 0.2s all;
+
+  /* décalage = largeur réelle du sider (ouvert) */
+  margin-left: 256px;
+
+  background: var(--ant-color-bg-layout);
+
+  /* décalage quand le sider est réduit */
+  ${({ collapsed }) =>
+    collapsed &&
+    css`
+      margin-left: 80px;
+    `}
+
+  @media (max-width: 575.98px) {
+    margin-left: 0;
+  }
+`
+
+export default function Main({
+  children,
+  collapsed,
+}: {
+  children: React.ReactNode
+  collapsed: boolean
+}) {
+  return <StyledMain collapsed={collapsed}>{children}</StyledMain>
+}
+
+# ==== components/map-components/Map.tsx ====
+'use client';
+/**
+ * Description: Dynamic map view with support for geolocation control and draggable marker
+ * Author: Hieu Chu
+ */
+
+import type { CSSProperties } from 'react';
+import {
+  Map as ReactMapGL,
+  Marker,
+  NavigationControl,
+  FullscreenControl,
+  GeolocateControl,
+} from 'react-map-gl';
+
+import 'mapbox-gl/dist/mapbox-gl.css';
+import MapMarker from './MapMarker';
+import ControlPanel from './ControlPanel';
+
+const fullscreenControlStyle: CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  padding: '10px',
+};
+
+const navStyle: CSSProperties = {
+  position: 'absolute',
+  top: 36,
+  left: 0,
+  padding: '10px',
+};
+
+const geolocateStyle: CSSProperties = {
+  position: 'absolute',
+  bottom: 30,
+  right: 0,
+  margin: 10,
+};
+
+type ViewState = {
+  latitude: number;
+  longitude: number;
+  zoom: number;
+  pitch?: number;
+  bearing?: number;
+};
+
+type MarkerState = { markerLat: number; markerLng: number };
+
+type Props = {
+  view: ViewState;
+  setView: (v: ViewState) => void;
+  marker: MarkerState;
+  setMarker: (m: MarkerState) => void;
+};
+
+const Map = ({ view, setView, marker, setMarker }: Props) => {
+  const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_ACCESS_TOKEN as string | undefined;
+  const { markerLat, markerLng } = marker;
+
+  return (
+    <ReactMapGL
+      initialViewState={view}
+      viewState={view}
+      onMove={(evt) => {
+        const vs = evt.viewState;
+        setView({
+          ...view,
+          latitude: vs.latitude,
+          longitude: vs.longitude,
+          zoom: vs.zoom,
+          pitch: vs.pitch,
+          bearing: vs.bearing,
+        });
+      }}
+      mapboxAccessToken={token}
+      mapStyle="mapbox://styles/mapbox/streets-v11"
+      style={{ width: '100%', height: '100%' }}
+    >
+      <Marker
+        longitude={markerLng}
+        latitude={markerLat}
+        draggable
+        onDragEnd={(e) => {
+          const { lng, lat } = e.lngLat;
+          setMarker({ markerLat: lat, markerLng: lng });
+        }}
+      >
+        {/* Removed undeclared `size` prop */}
+        <MapMarker />
+      </Marker>
+
+      <div className="fullscreen" style={fullscreenControlStyle}>
+        <FullscreenControl />
+      </div>
+
+      <div className="nav" style={navStyle}>
+        <NavigationControl />
+      </div>
+
+      <GeolocateControl
+        style={geolocateStyle}
+        positionOptions={{ enableHighAccuracy: true }}
+        trackUserLocation
+        showUserLocation
+        // Zoom d’accompagnement après géolocalisation
+        onGeolocate={() => setView({ ...view, zoom: 13 })}
+      />
+
+      {/* Removed undeclared lat/lng props */}
+      <ControlPanel lat={markerLat} lng={markerLng} />
+    </ReactMapGL>
+  );
+};
+
+export default Map;
+
+# ==== components/map-components/StaticMap.tsx ====
+'use client'
+
+/**
+ * Description: Static map view
+ * Author: Hieu Chu
+ */
+
+import type { CSSProperties } from 'react'
+import {
+  Map as ReactMapGL,
+  Marker,
+  FullscreenControl,
+  Popup,
+  GeolocateControl
+} from 'react-map-gl'
+
+import { useState } from 'react'
+import 'mapbox-gl/dist/mapbox-gl.css'
+import MapMarker from './MapMarker'
+
+const fullscreenControlStyle: CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  padding: '10px'
+}
+
+const geolocateStyle: CSSProperties = {
+  position: 'absolute',
+  bottom: 30,
+  right: 0,
+  margin: 10
+}
+
+const defaultLocation = {
+  latitude: -34.40581053569814,
+  longitude: 150.87842788963476
+}
+
+type StaticMapProps = {
+  markerLat?: number
+  markerLng?: number
+}
+
+const MyStaticMap = ({ markerLat, markerLng }: StaticMapProps) => {
+  const token = process.env.MAPBOX_ACCESS_TOKEN as string | undefined
+
+  const [vp, setVp] = useState({
+    latitude: markerLat ?? defaultLocation.latitude,
+    longitude: markerLng ?? defaultLocation.longitude,
+    zoom: 15,
+    pitch: 50
+  })
+
+  return (
+    <ReactMapGL
+      initialViewState={vp}
+      viewState={vp}
+      onMove={evt => {
+        const vs = evt.viewState
+        setVp(v => ({
+          ...v,
+          latitude: vs.latitude,
+          longitude: vs.longitude,
+          zoom: vs.zoom,
+          pitch: vs.pitch,
+          bearing: vs.bearing
+        }))
+      }}
+      mapboxAccessToken={token}
+      mapStyle="mapbox://styles/mapbox/streets-v11"
+      style={{ width: '100%', height: '640px' }}
+    >
+      <div>
+        {markerLat != null && markerLng != null && (
+          <>
+            <Marker longitude={markerLng} latitude={markerLat}>
+              <MapMarker size={22} />
+            </Marker>
+
+            <Popup
+              anchor="bottom"
+              latitude={markerLat}
+              longitude={markerLng}
+              closeOnClick={false}
+              closeButton={false}
+              offset={[0, -20]}
+            >
+              <div style={{ marginLeft: 5, marginRight: 5 }}>
+                <div>Latitude: {markerLat}</div>
+                <div>Longitude: {markerLng}</div>
+              </div>
+            </Popup>
+          </>
+        )}
+
+        <div className="fullscreen" style={fullscreenControlStyle}>
+          <FullscreenControl />
+        </div>
+
+        <GeolocateControl
+          style={geolocateStyle}
+          positionOptions={{ enableHighAccuracy: true }}
+          trackUserLocation
+          showUserLocation
+          onGeolocate={() =>
+            setVp(v => ({ ...v, zoom: 14 }))
+          }
+        />
+      </div>
+    </ReactMapGL>
+  )
+}
+
+export default MyStaticMap
+
+# ==== components/sculpture-maker-components/CreateForm/CreateFormTextFields.tsx ====
+'use client'
+
+/**
+ * Description: Sculpture create text fields component
+ * Author: Hieu Chu
+ */
+
+import { useState } from 'react'
+import { Input, Select, Divider } from 'antd';
+import Icon from '@/components/compat/Icon';
+const { TextArea } = Input
+import { FormCol, CustomFormItem } from '../style'
+import { validateLatitude, validateLongitude } from '../../shared/utils'
+import MakerCreate from './MakerCreate'
+
+const { Option } = Select
+
+export default ({
+  getFieldDecorator,
+  initialData: { markerLat, markerLng },
+  makerList,
+  addMaker
+}) => {
+  const [showModal, setShowModal] = useState(false)
+
+  const openModal = () => setShowModal(true)
+  const handleCancel = () => setShowModal(false)
+
+  return (
+    <>
+      <FormCol>
+        <CustomFormItem label="Sculpture name" hasFeedback>
+          {getFieldDecorator('name', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the sculpture name!'
+              }
+            ]
+          })(
+            <Input
+              prefix={
+                <Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Sculpture name"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Accession ID" hasFeedback>
+          {getFieldDecorator('accessionId', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the unique accession ID!'
+              }
+            ]
+          })(
+            <Input
+              prefix={
+                <Icon type="number" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Accession ID"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Primary maker" hasFeedback>
+          {getFieldDecorator('primaryMakerId', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the primary maker!'
+              }
+            ]
+          })(
+            <Select
+              placeholder="Primary maker"
+              dropdownRender={menu => (
+                <div>
+                  {menu}
+                  <Divider style={{ margin: '4px 0' }} />
+                  <div
+                    style={{ padding: '8px', cursor: 'pointer' }}
+                    onMouseDown={e => e.preventDefault()} // fix
+                    onClick={openModal}
+                  >
+                    <Icon type="plus" /> Add new maker
+                  </div>
+                </div>
+              )}
+            >
+              {makerList.map(maker => (
+                <Option key={maker.id} value={maker.id}>
+                  {maker.firstName + ' ' + maker.lastName}
+                </Option>
+              ))}
+            </Select>
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Production date" hasFeedback>
+          {getFieldDecorator('productionDate')(
+            <Input
+              prefix={
+                <Icon type="calendar" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Production date"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Material" hasFeedback>
+          {getFieldDecorator('material')(
+            <Input
+              prefix={
+                <Icon
+                  type="code-sandbox"
+                  style={{ color: 'rgba(0,0,0,.25)' }}
+                />
+              }
+              type="text"
+              placeholder="Material"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Credit line" hasFeedback>
+          {getFieldDecorator('creditLine')(
+            <TextArea
+              placeholder="Credit line"
+              autoSize={{ minRows: 3, maxRows: 5 }}
+              style={{ marginTop: 5 }}
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Location details" hasFeedback>
+          {getFieldDecorator('locationNotes')(
+            <TextArea
+              placeholder="Location details"
+              autoSize={{ minRows: 3, maxRows: 5 }}
+              style={{ marginTop: 5 }}
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol xs={24} sm={12}>
+        <CustomFormItem label="Latitude" hasFeedback className="latitude-input">
+          {getFieldDecorator('latitude', {
+            rules: [
+              {
+                validator: validateLatitude
+              }
+            ],
+            initialValue: String(markerLat)
+          })(
+            <Input
+              prefix={
+                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Latitude"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol xs={24} sm={12}>
+        <CustomFormItem
+          label="Longitude"
+          hasFeedback
+          className="longitude-input"
+        >
+          {getFieldDecorator('longitude', {
+            rules: [
+              {
+                validator: validateLongitude
+              }
+            ],
+            initialValue: String(markerLng)
+          })(
+            <Input
+              prefix={
+                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Longitude"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <MakerCreate
+        visible={showModal}
+        handleCancel={handleCancel}
+        addMaker={addMaker}
+      />
+    </>
+  )
+}
+
+# ==== components/sculpture-maker-components/CreateForm/index.tsx ====
+'use client'
+
+/**
+ * Description: Sculpture create page component
+ * Author: Hieu Chu
+ */
+
+import { useState } from 'react'
+import SculptureCreate from './SculptureCreate'
+import SculptureUploadImage from './SculptureUploadImage'
+const CreateForm = () => {
+  const [step, setStep] = useState(1)
+  const [sculpture, setSculpture] = useState({})
+
+  if (step === 1) {
+    return <SculptureCreate setStep={setStep} setSculpture={setSculpture} />
+  } else if (step === 2) {
+    return <SculptureUploadImage sculpture={sculpture} />
+  }
+}
+
+export default CreateForm
+
+# ==== components/sculpture-maker-components/CreateForm/MakerCreate.tsx ====
+'use client'
+
+/**
+ * Description: Component for primary maker create page
+ * Author: Hieu Chu
+ */
+
+import { useState } from 'react'
+import { Form, Input, Button, Modal, message as antdMessage } from 'antd'
+import { CustomFormItem } from '../style'
+import api from '../../../api'
+import { normalizeError } from '../../../shared/errors'
+
+type Maker = {
+  id: string | number
+  firstName: string
+  lastName: string
+  nationality?: string
+  birthYear?: number | null
+  deathYear?: number | null
+  wikiUrl?: string
+}
+
+type MakerCreateProps = {
+  visible: boolean
+  handleCancel: () => void
+  addMaker: (m: Maker) => void
+}
+
+export default function MakerCreate({
+  visible,
+  handleCancel,
+  addMaker,
+}: MakerCreateProps) {
+  const [form] = Form.useForm()
+  const [submitting, setSubmitting] = useState(false)
+
+  const handleOk = async () => {
+    try {
+      const raw = await form.validateFields()
+
+      // prune empty values
+      const values: Record<string, any> = {}
+      Object.keys(raw).forEach((k) => {
+        const v = raw[k]
+        if (v !== undefined && v !== null && String(v).trim() !== '') values[k] = v
+      })
+      if (values.birthYear) values.birthYear = Number(values.birthYear)
+      if (values.deathYear) values.deathYear = Number(values.deathYear)
+
+      setSubmitting(true)
+      // axios instance already returns raw data (no `.data`)
+      const result = await api.post<Maker>('/maker', values)
+      addMaker(result)
+      antdMessage.success('Created new maker successfully!', 2)
+      form.resetFields()
+      handleCancel()
+    } catch (e) {
+      const { message } = normalizeError(e)
+      if (message) antdMessage.error(message)
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <Modal
+      open={visible}
+      title="Add new maker"
+      onOk={handleOk}
+      onCancel={handleCancel}
+      maskClosable={false}
+      footer={[
+        <Button key="back" onClick={handleCancel}>
+          Cancel
+        </Button>,
+        <Button key="submit" type="primary" loading={submitting} onClick={handleOk}>
+          Submit
+        </Button>,
+      ]}
+    >
+      <Form form={form} autoComplete="off" layout="vertical">
+        <CustomFormItem
+          label="First name"
+          name="firstName"
+          hasFeedback
+          rules={[{ required: true, whitespace: true, message: 'Please fill in the first name!' }]}
+        >
+          <Input type="text" placeholder="First name" />
+        </CustomFormItem>
+
+        <CustomFormItem
+          label="Last name"
+          name="lastName"
+          hasFeedback
+          rules={[{ required: true, whitespace: true, message: 'Please fill in the last name!' }]}
+        >
+          <Input type="text" placeholder="Last name" />
+        </CustomFormItem>
+
+        <CustomFormItem label="Nationality" name="nationality" hasFeedback>
+          <Input type="text" placeholder="Nationality" />
+        </CustomFormItem>
+
+        <CustomFormItem
+          label="Born"
+          name="birthYear"
+          hasFeedback
+          rules={[{ pattern: /^\d{4}$/, message: 'Please fill in a valid year!' }]}
+        >
+          <Input type="text" placeholder="Born" inputMode="numeric" />
+        </CustomFormItem>
+
+        <CustomFormItem
+          label="Passed away"
+          name="deathYear"
+          hasFeedback
+          rules={[{ pattern: /^\d{4}$/, message: 'Please fill in a valid year!' }]}
+        >
+          <Input type="text" placeholder="Passed away" inputMode="numeric" />
+        </CustomFormItem>
+
+        <CustomFormItem
+          label="Website"
+          name="wikiUrl"
+          hasFeedback
+          rules={[{ type: 'url', message: 'Please fill in a valid URL!' }]}
+        >
+          <Input type="text" placeholder="Website" />
+        </CustomFormItem>
+      </Form>
+    </Modal>
+  )
+}
+
+# ==== components/sculpture-maker-components/CreateForm/SculptureCreate.tsx ====
+'use client'
+
+/**
+ * Description: Component for Sculpture create page
+ * Author: Hieu Chu
+ */
+
+import React, { useState, useEffect } from 'react'
+import { Row, Button, Form, message as antdMessage } from 'antd'
+import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
+import { FlyToInterpolator } from 'react-map-gl'
+import Map from '../../map-components'
+import TextFields from './CreateFormTextFields'
+import { api } from '../../../shared/api'
+import Loading from '../../Loading'
+import Error from 'next/error'
+import { normalizeError } from '../../../shared/errors'
+
+type ErrState = { message: string; statusCode?: number } | null
+
+// Typages minimaux pour l’API legacy d’antd v3 afin d’éviter 'any' non contrôlés.
+type LegacyForm = {
+  getFieldDecorator: (name: string, options?: any) => (node: React.ReactNode) => React.ReactNode
+  setFieldsValue: (values: Record<string, any>) => void
+  validateFields: (...args: any[]) => any
+}
+
+type Maker = {
+  id: string | number
+  firstName?: string
+  lastName?: string
+}
+
+type ViewState = {
+  latitude: number
+  longitude: number
+  zoom: number
+  pitch: number
+  transitionInterpolator?: any
+  transitionDuration?: number
+}
+
+type MarkerState = {
+  markerLat: number
+  markerLng: number
+}
+
+type SculptureCreateProps = {
+  form: LegacyForm
+  setStep: React.Dispatch<React.SetStateAction<number>>
+  setSculpture: React.Dispatch<React.SetStateAction<Record<string, any>>>
+}
+
+const SculptureCreate: React.FC<SculptureCreateProps> = ({
+  form,
+  form: { getFieldDecorator, setFieldsValue },
+  setStep,
+  setSculpture
+}) => {
+  const [view, setView] = useState<ViewState>({
+    latitude: -34.40581053569814,
+    longitude: 150.87842788963476,
+    zoom: 15,
+    pitch: 50
+  })
+
+  const initialData: MarkerState = {
+    markerLat: -34.40581053569814,
+    markerLng: 150.87842788963476
+  }
+
+  const [marker, setMarker] = useState<MarkerState>({ ...initialData })
+  const [makerList, setMakerList] = useState<Maker[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [error, setError] = useState<ErrState>(null)
+
+  const addMaker = (maker: Maker) => {
+    setMakerList((prev) => [...prev, maker])
+    setFieldsValue({ primaryMakerId: maker.id })
+  }
+
+  useEffect(() => {
+    let mounted = true
+    const fetchMakerList = async () => {
+      try {
+        const res = await api.get('/maker/')
+        if (mounted) setMakerList((res as any)?.data ?? [])
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e)
+        if (mounted) setError({ statusCode, message })
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    fetchMakerList()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const flyTo = (latitude: number, longitude: number) => {
+    setView((prev) => ({
+      ...prev,
+      latitude,
+      longitude,
+      transitionInterpolator: new FlyToInterpolator(),
+      transitionDuration: 1500,
+      zoom: 15
+    }))
+    setMarker({ markerLat: latitude, markerLng: longitude })
+  }
+
+  const showLocationOnMap = () => {
+    form.validateFields(['latitude', 'longitude'], (errors: any, values: any) => {
+      if (!errors) {
+        const { latitude, longitude } = values as { latitude: string | number; longitude: string | number }
+        flyTo(+latitude, +longitude)
+      }
+    })
+  }
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    form.validateFields(async (err: any, values: Record<string, any>) => {
+      if (!err) {
+        // nettoie les champs vides
+        Object.keys(values).forEach((k) => {
+          if (!values[k]) delete values[k]
+        })
+        if (values.latitude) values.latitude = Number(values.latitude)
+        if (values.longitude) values.longitude = Number(values.longitude)
+
+        setSubmitting(true)
+        try {
+          await api.post('/sculpture', values)
+          setSculpture({ ...values })
+          setStep((s) => s + 1)
+        } catch (e: unknown) {
+          const { message } = normalizeError(e)
+          antdMessage.error(message)
+        } finally {
+          setSubmitting(false)
+        }
+      }
+    })
+  }
+
+  if (loading) return <Loading />
+  if (error) return <Error statusCode={error.statusCode ?? 500} title={error.message} />
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled title="Create new sculpture">
+          <Form onSubmit={handleSubmit} autoComplete="off">
+            <ColStyled xs={24} md={12}>
+              <TextFields
+                getFieldDecorator={getFieldDecorator}
+                initialData={initialData}
+                makerList={makerList}
+                addMaker={addMaker}
+              />
+              <FormCol xs={24}>
+                <Button onClick={showLocationOnMap}>Show on map</Button>
+              </FormCol>
+            </ColStyled>
+
+            <ColStyled xs={24} md={12} style={{ height: 500, marginTop: 10 }}>
+              <Map
+                view={view}
+                marker={marker}
+                setView={setView}
+                setMarker={({ markerLat, markerLng }: { markerLat: number; markerLng: number }) => {
+                  setMarker({ markerLat, markerLng })
+                  setFieldsValue({
+                    latitude: String(markerLat),
+                    longitude: String(markerLng)
+                  })
+                }}
+              />
+            </ColStyled>
+
+            <ColStyled xs={24}>
+              <FormCol xs={24}>
+                <CustomFormItem style={{ marginBottom: 0, marginTop: 8 }}>
+                  <Button type="primary" htmlType="submit" loading={submitting}>
+                    Submit
+                  </Button>
+                </CustomFormItem>
+              </FormCol>
+            </ColStyled>
+          </Form>
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  )
+}
+
+export default Form.create({
+  name: 'sculpture_create_form'
+})(SculptureCreate)
+
+# ==== components/sculpture-maker-components/EditForm/EditFormTextFields.tsx ====
+'use client'
+
+/**
+ * Description: Text details edit component for sculpture
+ * Author: Hieu Chu
+ */
+
+import { useState } from 'react'
+import { Input, Select, Divider } from 'antd';
+import Icon from '@/components/compat/Icon';
+const { TextArea } = Input
+import { FormCol, CustomFormItem } from '../style'
+import { validateLatitude, validateLongitude } from '../../shared/utils'
+import MakerEdit from './MakerEdit'
+import MakerCreate from '../CreateForm/MakerCreate'
+
+const { Option } = Select
+
+export default ({
+  getFieldDecorator,
+  setFieldsValue,
+  getFieldValue,
+  initialData: {
+    latitude,
+    longitude,
+    accessionId,
+    creditLine,
+    locationNotes,
+    material,
+    name,
+    productionDate,
+    primaryMakerId
+  },
+  makerList,
+  setMakerList
+}) => {
+  const [showModal, setShowModal] = useState(false)
+  const [showModalCreate, setShowModalCreate] = useState(false)
+
+  const openModal = () => setShowModal(true)
+  const handleCancel = () => setShowModal(false)
+
+  const openModalCreate = () => setShowModalCreate(true)
+  const handleCancelCreate = () => setShowModalCreate(false)
+
+  const getCurrentMaker = () => {
+    return makerList.find(x => x.id === getFieldValue('primaryMakerId'))
+  }
+
+  const addMaker = maker => {
+    setMakerList(c => [...c, maker])
+    setFieldsValue({
+      primaryMakerId: maker.id
+    })
+  }
+
+  const editMaker = maker => {
+    setMakerList(c =>
+      c.map(m => {
+        if (m.id !== maker.id) {
+          return m
+        }
+
+        return { ...maker }
+      })
+    )
+    setFieldsValue({
+      primaryMakerId: maker.id
+    })
+  }
+
+  return (
+    <>
+      <FormCol>
+        <CustomFormItem label="Sculpture name" hasFeedback>
+          {getFieldDecorator('name', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the sculpture name!'
+              }
+            ],
+            initialValue: name
+          })(
+            <Input
+              prefix={
+                <Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Sculpture name"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Accession ID" hasFeedback>
+          {getFieldDecorator('accessionId', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the unique accession ID!'
+              }
+            ],
+            initialValue: accessionId
+          })(
+            <Input
+              prefix={
+                <Icon type="number" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Accession ID"
+              // disabled
+              readOnly
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Primary maker" hasFeedback>
+          {getFieldDecorator('primaryMakerId', {
+            rules: [
+              {
+                required: true,
+                whitespace: true,
+                message: 'Please fill in the primary maker!'
+              }
+            ],
+            initialValue: primaryMakerId
+          })(
+            <Select
+              placeholder="Primary maker"
+              dropdownRender={menu => (
+                <div>
+                  {menu}
+                  <Divider style={{ margin: '4px 0' }} />
+                  <div
+                    style={{ padding: '8px', cursor: 'pointer' }}
+                    onMouseDown={e => e.preventDefault()} // fix
+                    onClick={openModal}
+                  >
+                    <Icon type="edit" /> Edit current maker
+                  </div>
+                  <div
+                    style={{ padding: '8px', cursor: 'pointer' }}
+                    onMouseDown={e => e.preventDefault()} // fix
+                    onClick={openModalCreate}
+                  >
+                    <Icon type="plus" /> Add new maker
+                  </div>
+                </div>
+              )}
+            >
+              {makerList.map(maker => (
+                <Option key={maker.id} value={maker.id}>
+                  {maker.firstName + ' ' + maker.lastName}
+                </Option>
+              ))}
+            </Select>
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Production date" hasFeedback>
+          {getFieldDecorator('productionDate', {
+            initialValue: productionDate
+          })(
+            <Input
+              prefix={
+                <Icon type="calendar" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Production date"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Material" hasFeedback>
+          {getFieldDecorator('material', {
+            initialValue: material
+          })(
+            <Input
+              prefix={
+                <Icon
+                  type="code-sandbox"
+                  style={{ color: 'rgba(0,0,0,.25)' }}
+                />
+              }
+              type="text"
+              placeholder="Material"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Credit line" hasFeedback>
+          {getFieldDecorator('creditLine', {
+            initialValue: creditLine
+          })(
+            <TextArea
+              placeholder="Credit line"
+              autoSize={{ minRows: 3, maxRows: 5 }}
+              style={{ marginTop: 5 }}
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol>
+        <CustomFormItem label="Location details" hasFeedback>
+          {getFieldDecorator('locationNotes', {
+            initialValue: locationNotes
+          })(
+            <TextArea
+              placeholder="Location details"
+              autoSize={{ minRows: 3, maxRows: 5 }}
+              style={{ marginTop: 5 }}
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol xs={24} sm={12}>
+        <CustomFormItem label="Latitude" hasFeedback className="latitude-input">
+          {getFieldDecorator('latitude', {
+            rules: [
+              {
+                validator: validateLatitude
+              }
+            ],
+            initialValue: latitude ? String(latitude) : ''
+          })(
+            <Input
+              prefix={
+                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Latitude"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <FormCol xs={24} sm={12}>
+        <CustomFormItem
+          label="Longitude"
+          hasFeedback
+          className="longitude-input"
+        >
+          {getFieldDecorator('longitude', {
+            rules: [
+              {
+                validator: validateLongitude
+              }
+            ],
+            initialValue: longitude ? String(longitude) : ''
+          })(
+            <Input
+              prefix={
+                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
+              }
+              type="text"
+              placeholder="Longitude"
+            />
+          )}
+        </CustomFormItem>
+      </FormCol>
+
+      <MakerEdit
+        visible={showModal}
+        handleCancel={handleCancel}
+        getCurrentMaker={getCurrentMaker}
+        editMaker={editMaker}
+      />
+
+      <MakerCreate
+        visible={showModalCreate}
+        handleCancel={handleCancelCreate}
+        addMaker={addMaker}
+      />
+    </>
+  )
+}
+
+# ==== components/sculpture-maker-components/EditForm/EditImage.tsx ====
+'use client';
+
+/**
+ * Description: Image edit component for sculpture
+ * Author: Hieu Chu
+ */
+
+import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
+import type { UploadFile } from 'antd';
+import { useState } from 'react';
+import { ColStyled } from '../style';
+import api from '../../../api';
+import { useRouter } from 'next/navigation';
+import { normalizeError } from '../../../shared/errors';
+import Icon from '@/components/compat/Icon';
+import type { UploadRequestOption as RcUploadRequestOption } from 'rc-upload/lib/interface';
+import type { AxiosProgressEvent } from 'axios';
+
+const { confirm } = Modal;
+
+type EditImageProps = {
+  accessionId: string;
+  _name: string;
+  // Les images reçues sont déjà façonnées côté parent pour l'Upload (uid/url/preview/status)
+  images: UploadFile[];
+};
+
+const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
+  const router = useRouter();
+
+  const [fileList, setFileList] = useState<UploadFile[]>([...(images as UploadFile[])]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleRemove = (file: UploadFile): Promise<boolean> => {
+    return new Promise((resolve) => {
+      confirm({
+        title: 'Do you want to remove this image?',
+        icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
+        style: { top: 110 },
+        maskClosable: true,
+        okText: 'Confirm',
+        okButtonProps: {
+          style: {
+            background: '#ff4d4f',
+            borderColor: '#ff4d4f',
+          },
+        },
+        onOk: async () => {
+          setIsSubmitting(true);
+          try {
+            await api.delete(`/sculpture-images/${(file as any).uid}`);
+            resolve(true);
+            setFileList((curr) => curr.filter((x: any) => x.uid !== (file as any).uid));
+            antdMessage.success('Deleted image successfully!', 2);
+          } catch (error: unknown) {
+            const { message } = normalizeError(error);
+            antdMessage.error(message);
+            resolve(false);
+          }
+          setIsSubmitting(false);
+        },
+        onCancel: () => {
+          resolve(false);
+        },
+      });
+    });
+  };
+
+  const customRequest = async (e: RcUploadRequestOption) => {
+    const config = {
+      headers: {
+        'content-type':
+          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s',
+      },
+      onUploadProgress: function (progressEvent: AxiosProgressEvent) {
+        const loaded = progressEvent.loaded ?? 0;
+        const total = progressEvent.total ?? 1;
+        const percentCompleted = Math.round((loaded * 100) / total);
+        // rc-upload attend un objet { percent }
+        e.onProgress?.({ percent: percentCompleted } as any, e.file as any);
+      },
+    };
+
+    const data = new FormData();
+    data.append('images', e.file as Blob);
+    data.set('accessionId', accessionId);
+
+    const hide = antdMessage.loading('Uploading image...', 0);
+    setIsSubmitting(true);
+
+    try {
+      const _result = await api.post('/sculpture-images', data, config);
+      const file: any = { ...(e.file as any) };
+      const { id, url } = _result.data[0];
+      file.uid = id;
+      file.url = url;
+      file.thumbUrl = url;
+      file.preview = url;
+
+      setFileList((curr) => [...curr, file]);
+
+      e.onSuccess?.(_result.data[0], e.file as any);
+      hide();
+      antdMessage.success('Uploaded image successfully!', 2);
+    } catch (error: unknown) {
+      const { message } = normalizeError(error);
+      antdMessage.error(message);
+      e.onError?.(message as any);
+    }
+
+    setIsSubmitting(false);
+  };
+
+  const uploadButton = (
+    <div>
+      <Icon type="plus" />
+      <div className="ant-upload-text">Upload</div>
+    </div>
+  );
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <Upload
+          accept="image/*"
+          listType="picture-card"
+          customRequest={customRequest}
+          onRemove={handleRemove}
+          fileList={fileList as any}
+        >
+          {uploadButton}
+        </Upload>
+
+        <Button
+          type="primary"
+          loading={isSubmitting}
+          onClick={() => router.push(`/sculptures/id/${accessionId}`)}
+        >
+          Finish
+        </Button>
+      </ColStyled>
+    </Row>
+  );
+};
+
+export default EditImage;
+
+# ==== components/sculpture-maker-components/EditForm/index.tsx ====
+'use client';
+
+/**
+ * Description: Sculpture Edit Page component
+ * Author: Hieu Chu
+ */
+
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { Row, Modal, Button, message as antdMessage, notification, Result  } from 'antd';
+import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
+
+import { CardStyled, ColStyled } from '../style';
+import SculptureEdit from './SculptureEdit';
+import EditImage from './EditImage';
+
+// NOTE: API legacy import conservé tel que dans la base
+import api from '../../../api';
+import { normalizeError } from '../../../shared/errors';
+
+const defaultPosition: [number, number] = [-34.40581053569814, 150.87842788963476];
+const { confirm } = Modal;
+
+const tabList = [
+  { key: 'tab1', tab: 'Edit text details' },
+  { key: 'tab2', tab: 'Edit images' },
+] as const;
+
+type TabKey = (typeof tabList)[number]['key'];
+
+type Maker = {
+  firstName?: string;
+  lastName?: string;
+  wikiUrl?: string;
+  birthYear?: number | null;
+  deathYear?: number | null;
+  nationality?: string | null;
+};
+
+type ImageItem = {
+  id: string | number;
+  url: string;
+  created: string;
+};
+
+type InitialData = {
+  accessionId: string;
+  name: string;
+  images: ImageItem[];
+  latitude?: number | null;
+  longitude?: number | null;
+  primaryMaker?: Maker;
+};
+
+type HttpError = { statusCode: number; message: string };
+
+const SculptureEditForm = () => {
+  const router = useRouter();
+  const params = useParams<{ id?: string; sculptureId?: string }>();
+  const searchParams = useSearchParams();
+
+  // Prefer dynamic segment names, then fallback to query ?id=
+  const sculptureId = useMemo(
+    () => params?.sculptureId ?? params?.id ?? searchParams.get('id') ?? undefined,
+    [params, searchParams]
+  );
+
+  const [initialData, setInitialData] = useState<InitialData | null>(null);
+  const [makerList, setMakerList] = useState<Maker[]>([]);
+  const [tabKey, setTabKey] = useState<TabKey>('tab1');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<HttpError | null>(null);
+
+  const handleTabChange = (key: TabKey) => setTabKey(key);
+
+  const handleDelete = () => {
+    confirm({
+      title: 'Do you want to remove this sculpture?',
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
+      style: { top: 110 },
+      maskClosable: true,
+      okText: 'Confirm',
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
+      onOk: async () => {
+        try {
+          if (!sculptureId) return;
+          await api.delete(`/sculpture/${sculptureId}`);
+          antdMessage.success('Deleted sculpture successfully!', 2);
+          router.push('/sculptures');
+        } catch (e: unknown) {
+          const { message: errMsg } = normalizeError(e);
+          notification.error({
+            message: 'Delete failed',
+            description: errMsg || 'Unexpected error while deleting the sculpture.',
+          });
+        }
+      },
+    });
+  };
+
+  useEffect(() => {
+    const fetchInitialForm = async () => {
+      if (!sculptureId) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const { data } = await api.get<InitialData>(`/sculpture/${sculptureId}`);
+        const next: InitialData = {
+          ...data,
+          latitude: data.latitude != null ? Number(data.latitude) : data.latitude ?? null,
+          longitude: data.longitude != null ? Number(data.longitude) : data.longitude ?? null,
+          images: Array.isArray(data.images) ? data.images : [],
+        };
+        setInitialData(next);
+
+        const makersRes = await api.get<Maker[]>('/maker/');
+        setMakerList(Array.isArray(makersRes.data) ? makersRes.data : []);
+      } catch (e: unknown) {
+        const { statusCode = 500, message: errMsg = 'Unknown error' } = normalizeError(e);
+        setError({ statusCode, message: errMsg });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialForm();
+  }, [sculptureId]);
+
+  if (loading) return null;
+
+  if (error) {
+    const status = (['404', '403', '500'] as const).includes(String(error.statusCode) as any)
+      ? (String(error.statusCode) as '404' | '403' | '500')
+      : 'error';
+    return (
+      <Result
+        status={status}
+        title={error.message}
+        subTitle={`Error ${error.statusCode}`}
+        extra={
+          <Button type="primary" onClick={() => router.back()}>
+            Go Back
+          </Button>
+        }
+      />
+    );
+  }
+
+  if (!initialData) return null;
+
+  const sortedImages: ImageItem[] = [...(initialData.images ?? [])].sort(
+    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+  );
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled
+          title={`Edit details for ${initialData.name}`}
+          tabList={tabList as unknown as { key: string; tab: string }[]}
+          activeTabKey={tabKey}
+          onTabChange={handleTabChange as (key: string) => void}
+          extra={
+            <Button danger icon={<DeleteOutlined />} onClick={handleDelete}>
+              Delete
+            </Button>
+          }
+        >
+          <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
+            <SculptureEdit
+              defaultPosition={defaultPosition}
+              initialData={{ ...initialData, images: sortedImages }}
+              makerList={makerList}
+              setMakerList={setMakerList}
+            />
+          </div>
+
+          <div style={{ display: tabKey === 'tab2' ? 'block' : 'none' }}>
+            <EditImage
+              accessionId={initialData.accessionId}
+              _name={initialData.name} // NOTE: the component expects `_name`
+              images={sortedImages.map((img) => ({
+                ...img,
+                uid: img.id,
+                thumbUrl: img.url,
+                preview: img.url,
+                status: 'done',
+              }))}
+            />
+          </div>
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  );
+};
+
+export { SculptureEditForm };
+
+# ==== components/sculpture-maker-components/EditForm/SculptureEdit.tsx ====
+'use client';
+
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Form, Input, Button, Upload, message } from 'antd';
+import type { UploadChangeParam, UploadFile } from 'antd/es/upload/interface';
+import type { RcFile } from 'antd/es/upload';
+import Map, { Marker, MapRef, ViewState, MapLayerMouseEvent } from 'react-map-gl';
+
+const { TextArea } = Input;
+
+export interface Sculpture {
+  id: string;
+  title: string;
+  description: string;
+  location: { lat: number; lng: number };
+  imageUrl?: string;
+}
+
+export interface SculptureEditProps {
+  sculpture: Sculpture;
+  /** Soumission des données modifiées. Branche ici ta persistance. */
+  onSubmit: (updated: Sculpture) => Promise<void>;
+}
+
+/** Normalise l’événement Upload → fileList (AntD v4). */
+function normFile(e: UploadChangeParam<UploadFile>): UploadFile[] {
+  return e?.fileList ?? [];
+}
+
+/** Transforme un UploadFile → File (si présent). */
+function toFile(uploadFile?: UploadFile): File | undefined {
+  const f = uploadFile?.originFileObj as RcFile | undefined;
+  return f as unknown as File | undefined;
+}
+
+export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProps) {
+  const [form] = Form.useForm();
+  const mapRef = useRef<MapRef | null>(null);
+
+  const initialViewState = useMemo<ViewState>(() => ({
+    longitude: sculpture.location?.lng ?? 0,
+    latitude: sculpture.location?.lat ?? 0,
+    zoom: 12,
+  }), [sculpture.location?.lat, sculpture.location?.lng]);
+
+  const [viewState, setViewState] = useState<ViewState>(initialViewState);
+
+  const flyTo = useCallback((lat: number, lng: number) => {
+    mapRef.current?.flyTo({ center: [lng, lat], zoom: 12, duration: 1200 });
+  }, []);
+
+  const onMapClick = useCallback((e: MapLayerMouseEvent) => {
+    const { lat, lng } = e.lngLat;
+    form.setFieldsValue({ location: { lat, lng } });
+    setViewState((vs) => ({ ...vs, latitude: lat, longitude: lng }));
+  }, [form]);
+
+  const onFinish = useCallback(async (values: any) => {
+    try {
+      // NOTE: values a la forme { title, description, location: {lat,lng}, image?: UploadFile[] }
+      const file = toFile(values.image?.[0]);
+      let imageUrl = sculpture.imageUrl;
+
+      // TODO: uploader le fichier si présent et récupérer un URL
+      // if (file) {
+      //   const uploadedUrl = await uploadImageToYourAPI(file);
+      //   imageUrl = uploadedUrl;
+      // }
+
+      const updated: Sculpture = {
+        ...sculpture,
+        title: values.title,
+        description: values.description,
+        location: { lat: values.location?.lat, lng: values.location?.lng },
+        imageUrl,
+      };
+
+      await onSubmit(updated);
+      message.success('Sculpture mise à jour');
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error(err);
+      message.error("Échec de l'enregistrement");
+    }
+  }, [onSubmit, sculpture]);
+
+  const onFinishFailed = useCallback(() => {
+    message.warning('Merci de corriger les champs requis.');
+  }, []);
+
+  return (
+    <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr', maxWidth: 900 }}>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{
+          title: sculpture.title,
+          description: sculpture.description,
+          location: {
+            lat: sculpture.location?.lat,
+            lng: sculpture.location?.lng,
+          },
+          image: [] as UploadFile[],
+        }}
+        onFinish={onFinish}
+        onFinishFailed={onFinishFailed}
+      >
+        <Form.Item
+          label="Titre"
+          name="title"
+          rules={[{ required: true, message: 'Veuillez saisir un titre.' }]}
+        >
+          <Input placeholder="Titre de la sculpture" />
+        </Form.Item>
+
+        <Form.Item
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: 'Veuillez saisir une description.' }]}
+        >
+          <TextArea rows={4} placeholder="Décrivez la sculpture…" />
+        </Form.Item>
+
+        {/* Coordonnées (lat/lng) synchronisées avec la carte */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <Form.Item
+            label="Latitude"
+            name={['location', 'lat']}
+            rules={[{ required: true, message: 'Latitude requise.' }]}
+          >
+            <Input type="number" step="0.000001" onBlur={() => {
+              const { location } = form.getFieldsValue();
+              if (location?.lat != null && location?.lng != null) {
+                flyTo(Number(location.lat), Number(location.lng));
+              }
+            }} />
+          </Form.Item>
+          <Form.Item
+            label="Longitude"
+            name={['location', 'lng']}
+            rules={[{ required: true, message: 'Longitude requise.' }]}
+          >
+            <Input type="number" step="0.000001" onBlur={() => {
+              const { location } = form.getFieldsValue();
+              if (location?.lat != null && location?.lng != null) {
+                flyTo(Number(location.lat), Number(location.lng));
+              }
+            }} />
+          </Form.Item>
+        </div>
+
+        {/* Upload de l’image (optionnel). Laisse la TODO pour brancher ton backend. */}
+        <Form.Item label="Image" name="image" valuePropName="fileList" getValueFromEvent={normFile}>
+          <Upload beforeUpload={() => false} listType="picture-card" maxCount={1}>
+            <div>Choisir une image</div>
+          </Upload>
+        </Form.Item>
+
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button type="primary" htmlType="submit">Enregistrer</Button>
+          <Button
+            onClick={() => flyTo(
+              form.getFieldValue(['location', 'lat']),
+              form.getFieldValue(['location', 'lng']),
+            )}
+          >
+            Recentrer la carte
+          </Button>
+        </div>
+      </Form>
+
+      {/* Carte : React Map GL (v7/8). Si tu es sur MapLibre, change l’import à `react-map-gl/maplibre`. */}
+      <div style={{ height: 360 }}>
+        <Map
+          ref={mapRef}
+          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+          mapStyle="mapbox://styles/mapbox/streets-v11"
+          initialViewState={initialViewState}
+          {...viewState}
+          onMove={(evt) => setViewState(evt.viewState)}
+          onClick={onMapClick}
+          style={{ width: '100%', height: '100%' }}
+        >
+          <Marker latitude={viewState.latitude} longitude={viewState.longitude} />
+        </Map>
+      </div>
+    </div>
+  );
+}
+
+# ==== components/sculpture-maker-components/MakerList.tsx ====
+'use client'
+
+/**
+ * Description: Primary maker list component
+ * Author: Hieu Chu
+ */
+
+import { useState, useEffect } from 'react'
+import { Row, Divider, Modal, message as antdMessage, notification, Button  } from 'antd';import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import { ColStyled, CardStyled, StyledTable } from './style'
+import MakerEdit from './EditForm/MakerEdit'
+import api from '@/services/_request'
+import Loading from '../Loading'
+import Error from 'next/error'
+import MakerCreate from './CreateForm/MakerCreate'
+import { normalizeError } from "../../shared/errors";
+
+const { confirm } = Modal
+
+const MakerList = () => {
+  useEffect(() => {
+    const fetchMakerList = async () => {
+      try {
+        const data = (await api.get('/maker/')).data
+
+        let formattedData = data.map((maker: any) => {
+          let formattedMaker = { ...maker }
+          formattedMaker.key = maker.id
+          return formattedMaker
+        })
+
+        formattedData.sort((a: any, b: any) => a.firstName.localeCompare(b.firstName))
+
+        console.log(formattedData)
+        setMakerList(formattedData)
+      } catch (e: any) {
+        const { message, statusCode } = normalizeError(e);
+        const { statusCode, message } = e.response.data
+        setError({
+          statusCode,
+          message
+        })
+      }
+      setLoading(false)
+    }
+    fetchMakerList()
+  }, [])
+
+  const [makerList, setMakerList] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<any>(null)
+
+  const [showModal, setShowModal] = useState(false)
+  const [showModalCreate, setShowModalCreate] = useState(false)
+
+  const [currentMakerId, setCurrentMakerId] = useState('')
+  const openModal = (makerId: string) => {
+    setCurrentMakerId(makerId)
+    setShowModal(true)
+  }
+
+  const openModalCreate = () => {
+    setShowModalCreate(true)
+  }
+
+  const handleCancel = () => setShowModal(false)
+  const handleCancelCreate = () => setShowModalCreate(false)
+
+  const getCurrentMaker = () =>
+    makerList.find(x => x.id === currentMakerId) || {}
+
+  const editMaker = (maker: any) => {
+    setMakerList(list =>
+      list.map(x => {
+        if (x.id === maker.id) {
+          return { ...maker, key: maker.id }
+        }
+        return x
+      })
+    )
+  }
+
+  const deleteMaker = (makerId: string) => {
+    setMakerList(list => list.filter(x => x.id !== makerId))
+  }
+
+  const addMaker = (maker: any) => {
+    maker.key = maker.id
+    setMakerList(list => [...list, maker])
+  }
+
+  const handleDelete = (makerId: string) => {
+    confirm({
+      title: 'Do you want to remove this maker?',
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
+      style: { top: 110 },
+      maskClosable: true,
+      okText: 'Confirm',
+      okButtonProps: {
+        style: {
+          background: '#ff4d4f',
+          borderColor: '#ff4d4f'
+        }
+      },
+      onOk: async () => {
+        try {
+          await api.delete(`/maker/${makerId}`)
+          deleteMaker(makerId)
+          antdMessage.success('Deleted maker successfully!', 2)
+        } catch (error: unknown) {
+          const { message, statusCode } = normalizeError(error);
+          notification.error({
+            message: 'Error',
+            description:
+              "There has been internal server error or the maker you're trying to delete is currently associated with a sculpture."
+          })
+        }
+      }
+    })
+  }
+
+  const columns = [
+    {
+      title: 'Maker name',
+      key: 'makerName',
+      width: '22%',
+      render: (_: any, record: any) => {
+        const { firstName, lastName, wikiUrl } = record
+        const makerName = firstName + ' ' + lastName
+        if (!wikiUrl) {
+          return <span>{makerName}</span>
+        }
+        return <a href={wikiUrl}>{makerName}</a>
+      }
+    },
+
+    {
+      title: 'Nationality',
+      dataIndex: 'nationality',
+      width: '22%'
+    },
+    {
+      title: 'Born - Passed away',
+      key: 'year',
+      width: '28%',
+      render: (_: any, record: any) => {
+        let { birthYear, deathYear } = record
+        if (!birthYear) birthYear = 'N/A'
+        if (!deathYear) deathYear = 'N/A'
+        return <span>{birthYear + ' - ' + deathYear}</span>
+      }
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (record, row) => (
+        <span>
+          <a onClick={() => openModal(record.key)}>Edit</a>
+          <Divider type="vertical" />
+          <a onClick={() => handleDelete(record.key)}>Delete</a>
+        </span>
+      )
+    }
+  ]
+
+  if (loading) return <Loading />
+  if (error)
+    return <Error statusCode={error.statusCode} title={error.message} />
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled
+          title="Maker List"
+          extra={
+            <Button type="primary" icon={<PlusOutlined />} onClick={openModalCreate}>
+              Add new maker
+            </Button>
+          }
+        >
+          <StyledTable
+            dataSource={makerList}
+            columns={columns}
+            pagination={{ pageSize: 25, hideOnSinglePage: true }}
+            style={{ maxWidth: 750 }}
+          />
+        </CardStyled>
+      </ColStyled>
+
+      <MakerEdit
+        visible={showModal}
+        handleCancel={handleCancel}
+        getCurrentMaker={getCurrentMaker}
+        editMaker={editMaker}
+      />
+
+      <MakerCreate
+        visible={showModalCreate}
+        handleCancel={handleCancelCreate}
+        addMaker={addMaker}
+      />
+    </Row>
+  )
+}
+
+export default MakerList
+
+# ==== components/sculpture-maker-components/SculptureDetail/index.tsx ====
+'use client'
+
+/**
+ * Description: Sculpture Detail page component
+ * Author: Hieu Chu
+ */
+
+import { useState, useEffect } from 'react'
+import { useParams } from 'next/navigation'
+import { Row, Carousel, Typography, List, Empty, Button } from 'antd'
+import { ColStyled, CardStyled } from '../style'
+import { SculptureCardDescription } from '../SculptureGrid'
+import api from '../../../api'
+import Loading from '../../Loading'
+import Error from 'next/error'
+import MyStaticMap from '../../map-components/StaticMap'
+import Link from 'next/link'
+import Head from 'next/head'
+import SculptureComment from './SculptureComment'
+import SculptureTrend from './SculptureTrend'
+import { normalizeError } from '../../../shared/errors'
+
+const { Title } = Typography
+
+type HttpError = { statusCode: number; message: string }
+type CommentItem = { commentId: string | number; [key: string]: any }
+
+const SculptureDetail = () => {
+  const params = useParams<{ id?: string; sculptureId?: string }>()
+  const id = (params?.id ?? params?.sculptureId) as string | undefined
+
+  const [sculpture, setSculpture] = useState<any>({})
+  const [comments, setComments] = useState<CommentItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<HttpError | null>(null)
+
+  useEffect(() => {
+    if (!id) return
+    const fetchData = async () => {
+      try {
+        const sculpturePromise = api.get(`/sculpture/${id}`)
+        const commentPromise = api.get(`/comment/sculpture-id/${id}`)
+
+        const [rawSculpture, rawComments] = await Promise.all([
+          sculpturePromise,
+          commentPromise,
+        ])
+
+        setComments(rawComments.data)
+        setSculpture(rawSculpture.data)
+      } catch (e: unknown) {
+        const { message, statusCode } = normalizeError(e)
+        setError({ statusCode, message })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [id])
+
+  const deleteComment = (commentId: string | number) => {
+    setComments((c) => c.filter((x) => x.commentId !== commentId))
+    setSculpture((x: any) => ({
+      ...x,
+      totalComments: +x.totalComments - 1,
+    }))
+  }
+
+  const addComment = (comment: CommentItem) => {
+    setComments((c) => [comment, ...c])
+    setSculpture((x: any) => ({
+      ...x,
+      totalComments: +x.totalComments + 1,
+    }))
+  }
+
+  if (loading) return <Loading />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
+
+  const {
+    images = [],
+    name = '',
+    primaryMaker = {},
+    accessionId = '',
+    longitude = 0,
+    latitude = 0,
+    productionDate = '',
+    material = '',
+    creditLine = '',
+    locationNotes = '',
+    totalLikes = 0,
+    totalComments = 0,
+    totalVisits = 0,
+  } = (sculpture ?? {}) as any
+
+  const { birthYear, deathYear, nationality, wikiUrl } = (primaryMaker ?? {}) as any
+
+  const markerLat = Number(latitude)
+  const markerLng = Number(longitude)
+
+  images.sort(
+    (a: any, b: any) =>
+      new Date(a.created).getTime() - new Date(b.created).getTime(),
+  )
+  const imageList = images.map((image: any, idx: number) => (
+    <div key={idx}>
+      <img src={image.url} />
+    </div>
+  ))
+
+  return (
+    <>
+      <Head>
+        <title>{name} - UOW Sculptures</title>
+      </Head>
+      <Row gutter={16}>
+        <ColStyled xs={24} lg={15}>
+          <CardStyled
+            title="Sculpture Details"
+            extra={
+              <Link href={`/sculptures/id/${id}/edit`}>
+                <a>
+                  <Button icon="edit">Edit details</Button>
+                </a>
+              </Link>
+            }
+          >
+            <Carousel
+              draggable
+              style={{
+                width: '100%',
+              }}
+            >
+              {images.length ? (
+                imageList
+              ) : (
+                <div>
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    style={{ height: 100, marginTop: 100 }}
+                  />
+                </div>
+              )}
+            </Carousel>
+            <div
+              style={{
+                marginTop: 15,
+              }}
+            >
+              <Title level={4} style={{ marginBottom: 0 }}>
+                {name}
+              </Title>
+              <SculptureCardDescription
+                totalLikes={totalLikes}
+                totalComments={totalComments}
+                totalVisits={totalVisits}
+                makerName={`${primaryMaker?.firstName ?? ''} ${primaryMaker?.lastName ?? ''}`}
+              />
+
+              <List itemLayout="horizontal">
+                <List.Item>
+                  <List.Item.Meta
+                    title="Accession ID"
+                    description={
+                      accessionId && !accessionId.includes('unknown')
+                        ? accessionId
+                        : 'N/A'
+                    }
+                  />
+                </List.Item>
+                <List.Item>
+                  <List.Item.Meta
+                    title="Production Date"
+                    description={productionDate || 'N/A'}
+                  />
+                </List.Item>
+                <List.Item>
+                  <List.Item.Meta title="Material" description={material || 'N/A'} />
+                </List.Item>
+                <List.Item>
+                  <List.Item.Meta
+                    title="Credit Line"
+                    description={
+                      creditLine
+                        ? creditLine
+                            .trim()
+                            .split('\n')
+                            .map((line, idx) => <div key={idx}>{line}</div>)
+                        : 'N/A'
+                    }
+                  />
+                </List.Item>
+                <List.Item>
+                  <List.Item.Meta
+                    title="Location Details"
+                    description={
+                      locationNotes
+                        ? locationNotes
+                            .trim()
+                            .split('\n')
+                            .map((line, idx) => <div key={idx}>{line}</div>)
+                        : 'N/A'
+                    }
+                  />
+                </List.Item>
+              </List>
+            </div>
+          </CardStyled>
+
+          <SculptureTrend
+            totalLikes={totalLikes}
+            totalComments={totalComments}
+            totalVisits={totalVisits}
+            sculptureId={id as string}
+          />
+        </ColStyled>
+
+        {/* Maker detail */}
+        <ColStyled xs={24} lg={9}>
+          <MyStaticMap markerLat={markerLat} markerLng={markerLng} />
+          <CardStyled title="Primary maker details" style={{ marginTop: 10 }}>
+            <List itemLayout="horizontal" style={{ marginTop: -20 }}>
+              <List.Item>
+                <List.Item.Meta
+                  title="Full Name"
+                  description={`${primaryMaker?.firstName ?? ''} ${primaryMaker?.lastName ?? ''}`}
+                />
+              </List.Item>
+              <List.Item>
+                <List.Item.Meta title="Nationality" description={nationality || 'N/A'} />
+              </List.Item>
+              <List.Item>
+                <List.Item.Meta title="Born" description={birthYear ?? 'N/A'} />
+              </List.Item>
+              <List.Item>
+                <List.Item.Meta title="Passed away" description={deathYear ?? 'N/A'} />
+              </List.Item>
+              <List.Item>
+                <List.Item.Meta
+                  title="Website"
+                  description={wikiUrl ? <a href={`${wikiUrl}`}>{wikiUrl}</a> : 'N/A'}
+                />
+              </List.Item>
+            </List>
+          </CardStyled>
+
+          <SculptureComment
+            comments={comments}
+            deleteComment={deleteComment}
+            addComment={addComment}
+            sculptureId={id as string}
+          />
+        </ColStyled>
+      </Row>
+    </>
+  )
+}
+
+export default SculptureDetail
+
+# ==== components/sculpture-maker-components/SculptureDetail/SculptureComment.tsx ====
+'use client'
+
+/**
+ * Description: Sculpture's comment list component
+ * Author: Hieu Chu
+ */
+
+import dayjs from 'dayjs'
+import { Tooltip,
+  List,
+  Comment,
+  Card,
+  Dropdown,
+  Modal,
+  message as antdMessage,
+  Button,
+  Empty,
+  Input
+ } from 'antd';import type { MenuProps } from 'antd'
+import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
+import Link from 'next/link'
+import api from '../../../api'
+import { useState } from 'react'
+import { normalizeError } from "../../../shared/errors";
+
+const { confirm } = Modal
+const { TextArea } = Input
+
+const SculptureComment = ({
+  comments,
+  deleteComment,
+  addComment,
+  sculptureId
+}) => {
+  comments.sort(
+    (a, b) =>
+      new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
+  )
+
+  const handleDelete: MenuProps['onClick'] = e => {
+    confirm({
+      title: 'Delete this comment permanently?',
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
+      style: { top: 110 },
+      maskClosable: true,
+      okText: 'Confirm',
+      okButtonProps: {
+        style: {
+          background: '#ff4d4f',
+          borderColor: '#ff4d4f'
+        }
+      },
+      onOk: async () => {
+        try {
+          await api.delete(`/comment/${e.key}`)
+          antdMessage.success('Deleted comment successfully!', 2)
+          deleteComment(e.key as string)
+        } catch (error: unknown) {
+          const { message, statusCode } = normalizeError(error);
+          // @ts-ignore
+          antdMessage.error(error.response.data.message)
+        }
+      }
+    })
+  }
+
+  const [submitting, setSubmitting] = useState(false)
+  const [value, setValue] = useState('')
+
+  const getMenuItems = (commentId: string): MenuProps['items'] => [
+    { key: commentId, label: 'Delete comment' }
+  ]
+
+  const formattedComments = comments.map(x => ({
+    commentId: x.commentId,
+    author: (
+      <Link href={`/users/id/${x.user.userId}`}>
+        <a
+          style={{
+            fontSize: 14,
+            fontWeight: 500,
+            color: 'rgba(0, 0, 0, 0.65)'
+          }}
+        >
+          {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
+        </a>
+      </Link>
+    ),
+    avatar: (
+      <img
+        src={x.user.picture}
+        style={{
+          width: 42,
+          height: 42,
+          borderRadius: '50%',
+          objectFit: 'cover'
+        }}
+      />
+    ),
+    content: (
+      <div style={{ fontSize: 14 }}>
+        {x.content
+          .trim()
+          .split('\n')
+          .map((line, idx) => (
+            <div key={idx}>{line}</div>
+          ))}
+      </div>
+    ),
+    datetime: (
+      <div style={{ display: 'flex' }}>
+        <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+          <div style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
+            {dayjs(x.createdTime).fromNow()}
+          </div>
+        </Tooltip>
+        <div
+          style={{
+            fontSize: 14,
+            color: 'rgba(0, 0, 0, 0.45)',
+            marginLeft: 'auto'
+          }}
+        >
+          <Dropdown
+            menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
+            trigger={['click']}
+          >
+            <MoreOutlined />
+          </Dropdown>
+        </div>
+      </div>
+    )
+  }))
+
+  return (
+    <Card
+      title="Comments"
+      bodyStyle={{ padding: '20px 24px 0px' }}
+      variant="borderless"
+      style={{ marginTop: 12 }}
+    >
+      <List
+        itemLayout="horizontal"
+        dataSource={formattedComments ?? []}
+        className="comment-list"
+        locale={{
+          emptyText: (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
+          )
+        }}
+        renderItem={item => (
+          <li>
+            <Comment
+              author={item.author}
+              avatar={item.avatar}
+              content={item.content}
+              datetime={item.datetime}
+              className="comment"
+            />
+          </li>
+        )}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+      />
+      <Comment
+        className="admin-comment"
+        avatar={
+          <img
+            src={'../../../static/avatar.png'}
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: '50%',
+              objectFit: 'cover'
+            }}
+          />
+        }
+        content={
+          <Editor
+            value={value}
+            setValue={setValue}
+            submitting={submitting}
+            setSubmitting={setSubmitting}
+            sculptureId={sculptureId}
+            addComment={addComment}
+          />
+        }
+      />
+    </Card>
+  )
+}
+
+const Editor = ({
+  value,
+  setValue,
+  setSubmitting,
+  submitting,
+  sculptureId,
+  addComment
+}) => (
+  <>
+    <div style={{ marginBottom: 12 }}>
+      <TextArea
+        autoSize={{ minRows: 2 }}
+        onChange={e => setValue(e.target.value)}
+        value={value}
+      />
+    </div>
+    <div style={{ marginBottom: 16 }}>
+      <Button
+        htmlType="submit"
+        disabled={value.trim() === ''}
+        loading={submitting}
+        onClick={async () => {
+          setSubmitting(true)
+          try {
+            const result = (
+              await api.post('/comment', {
+                sculptureId,
+                content: value
+              })
+            ).data
+            setSubmitting(false)
+            setValue('')
+            addComment(result)
+          } catch (e: unknown) {
+            const { message, statusCode } = normalizeError(e);
+            setSubmitting(false)
+            // @ts-ignore
+            antdMessage.error(e.response.data.message)
+          }
+        }}
+        type="primary"
+      >
+        Post
+      </Button>
+    </div>
+  </>
+)
+
+export default SculptureComment
+
+# ==== components/sculpture-maker-components/SculptureDetail/SculptureTrend.tsx ====
+'use client'
+
+/**
+ * Description: Sculpture's trends graph component
+ * Author: Hieu Chu
+ */
+
+import 'ant-design-pro/lib/Charts/style/index.less'
+import {
+  ColStyled,
+  VisitCard,
+  LikeCard,
+  CommentCard
+} from '../../dashboard-components/'
+import { Popover, DatePicker, Button } from 'antd'
+import { MoreOutlined } from '@ant-design/icons'
+
+const { RangePicker } = DatePicker
+
+import dayjs, { Dayjs } from 'dayjs'
+import React, { useState, useEffect, useRef } from 'react'
+import Loading from '../../Loading'
+import Error from 'next/error'
+import type { AxiosError } from 'axios'
+import api from '../../../api'
+import { CardStyled, ShadowCard } from '../../dashboard-components/style'
+import { normalizeError } from '../../../shared/errors'
+
+type DailyPoint = { x: string; y: number }
+
+interface TrendState {
+  TOTAL_VISITS: number
+  DAILY_VISITS: number
+  DAILY_VISITS_CHANGE: number
+  TOTAL_LIKES: number
+  DAILY_LIKES: number
+  DAILY_LIKES_CHANGE: number
+  TOTAL_COMMENTS: number
+  DAILY_COMMENTS: number
+  DAILY_COMMENTS_CHANGE: number
+  VISIT_DATA: DailyPoint[]
+  LIKE_DATA: DailyPoint[]
+  COMMENT_DATA: DailyPoint[]
+}
+
+interface SculptureTrendProps {
+  totalLikes: number
+  totalComments: number
+  totalVisits: number
+  sculptureId: string
+}
+
+interface RequestError {
+  statusCode: number
+  message: string
+}
+
+const formatDailyData = (rawData: Record<string, number>): DailyPoint[] => {
+  const result: DailyPoint[] = []
+  for (const date of Object.keys(rawData)) {
+    result.push({
+      x: dayjs(date).format('MMM D YYYY'),
+      y: rawData[date]
+    })
+  }
+  // sort in correct order
+  result.sort((a, b) => dayjs(a.x).valueOf() - dayjs(b.x).valueOf())
+  return result
+}
+
+const SculptureTrend: React.FC<SculptureTrendProps> = ({
+  totalLikes,
+  totalComments,
+  totalVisits,
+  sculptureId
+}) => {
+  const [state, setState] = useState<TrendState>({
+    TOTAL_VISITS: 0,
+    DAILY_VISITS: 0,
+    DAILY_VISITS_CHANGE: 0,
+    TOTAL_LIKES: 0,
+    DAILY_LIKES: 0,
+    DAILY_LIKES_CHANGE: 0,
+    TOTAL_COMMENTS: 0,
+    DAILY_COMMENTS: 0,
+    DAILY_COMMENTS_CHANGE: 0,
+    VISIT_DATA: [],
+    LIKE_DATA: [],
+    COMMENT_DATA: []
+  })
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<RequestError | null>(null)
+
+  const defaultEndDate = useRef<Dayjs>(dayjs(new Date())).current
+  const defaultStartDate = useRef<Dayjs>(dayjs(defaultEndDate).subtract(7, 'days')).current
+
+  const [startDate, setStartDate] = useState<Dayjs>(defaultStartDate)
+  const [endDate, setEndDate] = useState<Dayjs>(defaultEndDate)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const past = startDate.format('YYYY-MM-DD')
+        const today = endDate.format('YYYY-MM-DD')
+        const defaultToday = defaultEndDate.format('YYYY-MM-DD')
+
+        const likesPromise = api.get<Record<string, number>>(
+          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+        )
+        const commentsPromise = api.get<Record<string, number>>(
+          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+        )
+        const visitPromise = api.get<Record<string, number>>(
+          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+        )
+
+        const defaultLikesPromise = api.get<Record<string, number>>(
+          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+        )
+        const defaultCommentsPromise = api.get<Record<string, number>>(
+          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+        )
+        const defaultVisitsPromise = api.get<Record<string, number>>(
+          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+        )
+
+        const [
+          { data: rawLikes },
+          { data: rawComments },
+          { data: rawVisits },
+          { data: rawDefaultLikes },
+          { data: rawDefaultComments },
+          { data: rawDefaultVisits }
+        ] = await Promise.all([
+          likesPromise,
+          commentsPromise,
+          visitPromise,
+          defaultLikesPromise,
+          defaultCommentsPromise,
+          defaultVisitsPromise
+        ])
+
+        // format daily data statistics
+        const LIKE_DATA = formatDailyData(rawLikes)
+        const COMMENT_DATA = formatDailyData(rawComments)
+        const VISIT_DATA = formatDailyData(rawVisits)
+
+        const DEFAULT_LIKE_DATA = formatDailyData(rawDefaultLikes)
+        const DEFAULT_COMMENT_DATA = formatDailyData(rawDefaultComments)
+        const DEFAULT_VISIT_DATA = formatDailyData(rawDefaultVisits)
+
+        const lastVisit = DEFAULT_VISIT_DATA.at(-1)?.y ?? 0
+        const prevVisit = DEFAULT_VISIT_DATA.at(-2)?.y ?? 0
+        const DAILY_VISITS = lastVisit
+        const DAILY_VISITS_CHANGE = lastVisit - prevVisit
+
+        const lastLike = DEFAULT_LIKE_DATA.at(-1)?.y ?? 0
+        const prevLike = DEFAULT_LIKE_DATA.at(-2)?.y ?? 0
+        const DAILY_LIKES = lastLike
+        const DAILY_LIKES_CHANGE = lastLike - prevLike
+
+        const lastComment = DEFAULT_COMMENT_DATA.at(-1)?.y ?? 0
+        const prevComment = DEFAULT_COMMENT_DATA.at(-2)?.y ?? 0
+        const DAILY_COMMENTS = lastComment
+        const DAILY_COMMENTS_CHANGE = lastComment - prevComment
+
+        setState(s => ({
+          ...s,
+          TOTAL_VISITS: totalVisits,
+          DAILY_VISITS,
+          DAILY_VISITS_CHANGE,
+          TOTAL_LIKES: totalLikes,
+          DAILY_LIKES,
+          DAILY_LIKES_CHANGE,
+          TOTAL_COMMENTS: totalComments,
+          DAILY_COMMENTS,
+          DAILY_COMMENTS_CHANGE,
+          VISIT_DATA,
+          LIKE_DATA,
+          COMMENT_DATA
+        }))
+      } catch (e: unknown) {
+        const n = normalizeError(e as AxiosError<any>)
+        setError({ statusCode: n.statusCode, message: n.message })
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [
+    defaultEndDate,
+    endDate,
+    sculptureId,
+    startDate,
+    totalComments,
+    totalLikes,
+    totalVisits
+  ])
+
+  const dateFormat = 'MMM D YYYY'
+  const staticToday = dayjs(new Date())
+
+  const renderPicker = (start: Dayjs, end: Dayjs) => {
+    const disabledDate = (current: Dayjs) => current.valueOf() > staticToday.valueOf()
+    return (
+      <RangePicker
+        defaultValue={[start, end]}
+        value={[start, end]}
+        format={dateFormat}
+        size="large"
+        allowClear={false}
+        separator="-"
+        disabledDate={disabledDate}
+        ranges={{
+          'Past week': [dayjs(staticToday).subtract(7, 'days'), dayjs(staticToday)],
+          'Past 2 weeks': [dayjs(staticToday).subtract(14, 'days'), dayjs(staticToday)],
+          'Past month': [dayjs(staticToday).subtract(30, 'days'), dayjs(staticToday)]
+        }}
+        onChange={(dates) => {
+          if (!dates || !dates[0] || !dates[1]) return
+          if (dates[0].valueOf() !== dates[1].valueOf()) {
+            setStartDate(dates[0])
+            setEndDate(dates[1])
+          }
+        }}
+      />
+    )
+  }
+
+  const {
+    TOTAL_VISITS,
+    DAILY_VISITS,
+    DAILY_VISITS_CHANGE,
+    TOTAL_LIKES,
+    DAILY_LIKES,
+    DAILY_LIKES_CHANGE,
+    TOTAL_COMMENTS,
+    DAILY_COMMENTS,
+    DAILY_COMMENTS_CHANGE,
+    VISIT_DATA,
+    LIKE_DATA,
+    COMMENT_DATA
+  } = state
+
+  if (loading) return <Loading />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
+
+  return (
+    <CardStyled
+      title="Trends"
+      extra={
+        <Popover content={renderPicker(startDate, endDate)} trigger="click" placement="bottomRight">
+          <Button type="text" icon={<MoreOutlined />} />
+        </Popover>
+      }
+      type="stats"
+      style={{ marginTop: 12 }}
+    >
+      <ColStyled xs={24}>
+        <ShadowCard>
+          <LikeCard
+            TOTAL_LIKES={TOTAL_LIKES}
+            DAILY_LIKES={DAILY_LIKES}
+            DAILY_LIKES_CHANGE={DAILY_LIKES_CHANGE}
+            LIKE_DATA={LIKE_DATA}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        </ShadowCard>
+      </ColStyled>
+
+      <ColStyled xs={24}>
+        <ShadowCard>
+          <CommentCard
+            TOTAL_COMMENTS={TOTAL_COMMENTS}
+            DAILY_COMMENTS={DAILY_COMMENTS}
+            DAILY_COMMENTS_CHANGE={DAILY_COMMENTS_CHANGE}
+            COMMENT_DATA={COMMENT_DATA}
+            startDate={startDate}
+            endDate={endDate}
+          />
+        </ShadowCard>
+      </ColStyled>
+
+      <ColStyled xs={24}>
+        <ShadowCard>
+          <VisitCard
+            TOTAL_VISITS={TOTAL_VISITS}
+            DAILY_VISITS={DAILY_VISITS}
+            DAILY_VISITS_CHANGE={DAILY_VISITS_CHANGE}
+            VISIT_DATA={VISIT_DATA}
+            startDate={startDate}
+            endDate={endDate}
+            SINGLE_SCULPTURE
+          />
+        </ShadowCard>
+      </ColStyled>
+    </CardStyled>
+  )
+}
+
+export default SculptureTrend
+
+# ==== components/sculpture-maker-components/SculptureGrid.tsx ====
+'use client'
+
+/**
+ * Description: Sculpture list component
+ * Author: Hieu Chu
+ */
+
+import { useEffect, useState } from 'react'
+import type { ChangeEvent } from 'react'
+import {
+  Row,
+  Card,
+  Typography,
+  Tooltip,
+  Input,
+  Empty,
+  Button,
+  Dropdown,
+} from 'antd'
+import type { MenuProps } from 'antd'
+import {
+  PlusOutlined,
+  SortAscendingOutlined,
+  DownOutlined,
+  HeartTwoTone,
+  MessageTwoTone,
+  EnvironmentOutlined,
+} from '@ant-design/icons'
+const { Text } = Typography
+const { Meta } = Card
+const { Search } = Input
+import Link from 'next/link'
+import {
+  ColStyled,
+  CardStyled,
+  ShadowCard,
+  Subtitle,
+  EmptyImage,
+} from './style'
+import Loading from '../Loading'
+import Error from 'next/error'
+import api from '@/services/_request'
+import { normalizeError } from '../../shared/errors'
+
+// --- Types locaux ---
+type SortCriterion = 'Default' | 'Likes' | 'Comments' | 'Visits'
+
+interface Maker {
+  firstName: string
+  lastName: string
+}
+interface ImageItem {
+  url: string
+  created: string | number | Date
+}
+interface Sculpture {
+  accessionId: string
+  name: string
+  totalVisits: number
+  totalLikes: number
+  totalComments: number
+  primaryMaker: Maker
+  images: ImageItem[]
+}
+interface ErrorState {
+  statusCode: number
+  message: string
+}
+
+// --- Composants ---
+const SculptureCard = ({ info }: { info: Sculpture }) => {
+  const { accessionId, name, totalVisits, totalLikes, totalComments, primaryMaker, images } = info
+  const makerName = `${primaryMaker.firstName} ${primaryMaker.lastName}`
+  const sortedImages = [...images].sort(
+    (a: ImageItem, b: ImageItem) =>
+      new Date(a.created).getTime() - new Date(b.created).getTime(),
+  )
+
+  return (
+    <Link href={`/sculptures/id/${accessionId}`}>
+      <a style={{ display: 'inline-block', width: '100%' }}>
+        <ShadowCard
+          cover={
+            sortedImages.length ? (
+              <div style={{ height: 450 }}>
+                <img
+                  src={sortedImages[0].url}
+                  style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+                />
+              </div>
+            ) : (
+              <EmptyImage
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No Images"
+              />
+            )
+          }
+          bordered
+        >
+          <Meta
+            title={name}
+            description={
+              <SculptureCardDescription
+                totalLikes={totalLikes}
+                totalComments={totalComments}
+                totalVisits={totalVisits}
+                makerName={makerName}
+              />
+            }
+          />
+        </ShadowCard>
+      </a>
+    </Link>
+  )
+}
+
+export const SculptureCardDescription = ({
+  totalLikes,
+  totalComments,
+  totalVisits,
+  makerName,
+}: {
+  totalLikes: number
+  totalComments: number
+  totalVisits: number
+  makerName: string
+}) => {
+  return (
+    <>
+      <Subtitle type="secondary">{makerName}</Subtitle>
+
+      <Tooltip placement="top" title="Likes">
+        <HeartTwoTone twoToneColor="#eb2f96" style={{ marginRight: 4 }} />
+        <Text type="secondary" style={{ marginRight: 8 }}>
+          {totalLikes}
+        </Text>
+      </Tooltip>
+
+      <Tooltip placement="top" title="Comments">
+        <MessageTwoTone
+          twoToneColor="rgb(205, 34, 255)"
+          style={{ marginRight: 4 }}
+        />
+        <Text type="secondary" style={{ marginRight: 5 }}>
+          {totalComments}
+        </Text>
+      </Tooltip>
+
+      <Tooltip placement="top" title="Visits">
+        <EnvironmentOutlined style={{ color: '#F73F3F', marginRight: 3 }} />
+        <Text type="secondary" style={{ marginRight: 4 }}>
+          {totalVisits}
+        </Text>
+      </Tooltip>
+    </>
+  )
+}
+
+// Tri local
+const sortBy = (list: Sculpture[], criterion: SortCriterion): Sculpture[] => {
+  switch (criterion) {
+    case 'Likes':
+      return list.slice().sort((a, b) => b.totalLikes - a.totalLikes)
+    case 'Comments':
+      return list.slice().sort((a, b) => b.totalComments - a.totalComments)
+    case 'Visits':
+      return list.slice().sort((a, b) => b.totalVisits - a.totalVisits)
+    case 'Default':
+    default:
+      return list.slice().sort((a, b) => a.name.localeCompare(b.name))
+  }
+}
+
+const SculptureGrid = () => {
+  const [originalList, setOriginalList] = useState<Sculpture[]>([])
+  const [filteredList, setFilteredList] = useState<Sculpture[]>([])
+  const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<ErrorState | null>(null)
+  const [currentSort, setSort] = useState<SortCriterion>('Default')
+
+  useEffect(() => {
+    const fetchSculpture = async () => {
+      try {
+        const { data } = await api.get<Sculpture[]>('/sculpture')
+        const sorted = data.slice().sort((a, b) => a.name.localeCompare(b.name))
+        setOriginalList(sorted)
+        setFilteredList(sorted)
+      } catch (e: unknown) {
+        const n = normalizeError(e)
+        setError({ statusCode: n.statusCode, message: n.message })
+      }
+      setLoading(false)
+    }
+
+    fetchSculpture()
+  }, [])
+
+  const handleMenuClick: MenuProps['onClick'] = (e) => {
+    const k = e.key as SortCriterion
+    setSort(k)
+    setFilteredList((prev) => sortBy(prev, k))
+  }
+
+  const menuItems: MenuProps['items'] = [
+    { key: 'Default', label: 'Default' },
+    { key: 'Likes', label: 'Likes' },
+    { key: 'Comments', label: 'Comments' },
+    { key: 'Visits', label: 'Visits' },
+  ]
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value
+    if (input.length >= 3) {
+      const lower = input.toLowerCase()
+      const newList = originalList.filter((sculpture) => {
+        const makerName =
+          sculpture.primaryMaker.firstName +
+          ' ' +
+          sculpture.primaryMaker.lastName
+        return (
+          sculpture.name.toLowerCase().includes(lower) ||
+          makerName.toLowerCase().includes(lower)
+        )
+      })
+      setFilteredList(sortBy(newList, currentSort))
+    } else if (filteredList.length !== originalList.length) {
+      setFilteredList(sortBy(originalList.slice(), currentSort))
+    }
+  }
+
+  if (loading) return <Loading />
+  if (error) return <Error statusCode={error.statusCode} title={error.message} />
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled
+          title="Sculpture Collection"
+          extra={
+            <Link href="/sculptures/create">
+              <a>
+                <Button type="primary" icon={<PlusOutlined />}>
+                  Add new sculpture
+                </Button>
+              </a>
+            </Link>
+          }
+        >
+          <div
+            style={{
+              marginLeft: 8,
+              marginRight: 8,
+              marginBottom: 16,
+              display: 'flex',
+            }}
+          >
+            <Search
+              allowClear
+              placeholder="Enter search term"
+              onChange={handleChange}
+              size="large"
+              style={{ marginRight: 8 }}
+            />
+
+            <Dropdown
+              menu={{ items: menuItems, onClick: handleMenuClick }}
+              trigger={['click']}
+            >
+              <Button size="large">
+                <SortAscendingOutlined /> {currentSort} <DownOutlined />
+              </Button>
+            </Dropdown>
+          </div>
+
+          <>
+            {!filteredList.length ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No Data :("
+                style={{ marginTop: 60 }}
+              />
+            ) : (
+              filteredList.map((sculpture) => (
+                <ColStyled
+                  xs={24}
+                  sm={12}
+                  md={8}
+                  key={sculpture.accessionId}
+                >
+                  <SculptureCard info={sculpture} />
+                </ColStyled>
+              ))
+            )}
+          </>
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  )
+}
+
+export default SculptureGrid
+
+# ==== components/sculpture-maker-components/style.tsx ====
+/**
+ * Description: Stylesheet for sculpture-maker components
+ * Author: Hieu Chu
+ */
+
+import styled from 'styled-components'
+import { Card, Col, Form, Typography, Empty, Table } from 'antd';
+import Icon from '@/components/compat/Icon';
+
+const { Text } = Typography
+
+export const CardStyled = props => (
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
+)
+
+export const ColStyled = styled(Col)`
+  padding-bottom: 12px;
+`
+
+export const DescriptionIcon = styled(Icon)`
+  font-size: 20px;
+`
+
+export const ShadowCard = styled(CardStyled)`
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(242, 242, 242);
+  border-radius: 3px;
+  transition: all 150ms ease-in-out 0s;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 9px 24px;
+    cursor: pointer;
+    transition: all 150ms ease-in-out 0s;
+  }
+`
+
+export const CustomFormItem = styled(Form.Item)`
+  margin-bottom: 8px;
+
+  &.ant-form-item-with-help {
+    margin-bottom: 5px;
+  }
+`
+
+export const FormCol = styled(Col)`
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+`
+
+export const Subtitle = styled(Text)`
+  display: block;
+  margin-bottom: 12px;
+`
+
+export const EmptyImage = styled(Empty)`
+  height: 230px;
+  margin: 0;
+  border-bottom: 0.3px solid rgba(0, 0, 0, 0.25);
+
+  & .ant-empty-image {
+    margin-top: 220px;
+  }
+`
+
+export const StyledTable = styled(Table)`
+  .ant-table table {
+    border-left: 1px solid #e8e8e8;
+    border-top: 1px solid #e8e8e8;
+    border-right: 1px solid #e8e8e8;
+  }
+`
+
+# ==== components/user-components/index.tsx ====
+'use client'
+
+/**
+ * Description: User management components
+ * Author: Hieu Chu
+ */
+
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import dayjs from 'dayjs'
+
+import { Row, Input, Button } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
+import { Comment } from '@ant-design/compatible'
+
+import { ColStyled, CardStyled, StyledTable } from './style'
+import api from '@/services/_request'
+import Loading from '../Loading'
+import NextError from 'next/error'
+import { convertNonAccent } from '../shared/utils'
+import { normalizeError } from "../../shared/errors";
+
+const UserList = () => {
+  const router = useRouter()
+
+  const [userList, setUserList] = useState<any[]>([])
+  const searchInput = useRef<Input | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<{ statusCode: number; message: string } | null>(null)
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        let users = (await api.get('/user')).data
+        users = users
+          .filter((x: any) => !x.role)
+          .map((x: any) => ({
+            ...x,
+            key: x.userId,
+            totalLikes: +x.totalLikes,
+            totalComments: +x.totalComments,
+            totalVisits: +x.totalVisits,
+          }))
+
+        users.sort(
+          (a: any, b: any) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime(),
+        )
+
+        setUserList(users)
+      } catch (e: any) {
+        const { message, statusCode } = normalizeError(e);
+        const statusCode = e?.response?.data?.statusCode ?? 500
+        const message = e?.response?.data?.message ?? 'Failed to load users'
+        setError({ statusCode, message })
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchUsers()
+  }, [])
+
+  const getUserSearchProps = () => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }: {
+      setSelectedKeys: (keys: React.Key[]) => void
+      selectedKeys: React.Key[]
+      confirm: () => void
+      clearFilters: () => void
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput as any}
+          placeholder="Search user"
+          value={(selectedKeys[0] as string) ?? ''}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Button type="primary" onClick={() => handleSearch(selectedKeys, confirm)} style={{ width: 90, marginRight: 8 }}>
+          Search
+        </Button>
+        <Button onClick={() => handleReset(clearFilters)} style={{ width: 90 }}>
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => (
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : '#7E7E7E' }} />
+    ),
+    onFilter: (value: string, record: any) => {
+      const { email, name, nickname, userId } = record
+      let author = name
+      if (userId.includes('auth0')) author = nickname
+
+      return (
+        convertNonAccent(author.toLowerCase()).includes(value.toLowerCase()) ||
+        convertNonAccent(email.toLowerCase()).includes(value.toLowerCase())
+      )
+    },
+    // AntD v5: "open" naming
+    onFilterDropdownOpenChange: (open: boolean) => {
+      if (open) {
+        setTimeout(() => searchInput.current?.select?.(), 0)
+      }
+    },
+  })
+
+  const handleSearch = (_selectedKeys: React.Key[], confirm: () => void) => {
+    confirm()
+  }
+
+  const handleReset = (clearFilters: () => void) => {
+    clearFilters()
+  }
+
+  const columns: any[] = [
+    {
+      title: 'User',
+      key: 'user',
+      render: (_: any, record: any) => {
+        const { email, name, nickname, picture, userId } = record
+        let author = name
+        if (userId.includes('auth0')) author = nickname
+
+        return (
+          <Comment
+            author={
+              <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(0, 0, 0, 0.65)' }}>
+                {author}
+              </span>
+            }
+            avatar={
+              <img
+                src={picture}
+                style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover' }}
+                alt={author}
+              />
+            }
+            content={<div style={{ fontSize: 14 }}>{email}</div>}
+          />
+        )
+      },
+      width: '30%',
+      ...getUserSearchProps(),
+    },
+    {
+      title: 'Connection type',
+      key: 'connection',
+      render: (_: any, record: any) => {
+        let connection = ''
+        if (record.userId.includes('google')) connection = 'Google'
+        else if (record.userId.includes('facebook')) connection = 'Facebook'
+        else connection = 'Email'
+        return <span>{connection}</span>
+      },
+      filters: [
+        { text: 'Email', value: 'auth0' },
+        { text: 'Google', value: 'google' },
+        { text: 'Facebook', value: 'facebook' },
+      ],
+      onFilter: (value: string, record: any) => record.userId.includes(value),
+      width: '15%',
+    },
+    {
+      title: 'Join date',
+      key: 'joinDate',
+      render: (_: any, record: any) => <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>,
+      sorter: (a: any, b: any) => new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
+      sortDirections: ['ascend', 'descend'],
+      width: '15%',
+    },
+    {
+      title: 'Likes',
+      dataIndex: 'totalLikes',
+      sorter: (a: any, b: any) => a.totalLikes - b.totalLikes,
+      sortDirections: ['descend', 'ascend'],
+      width: '13.33%',
+    },
+    {
+      title: 'Comments',
+      dataIndex: 'totalComments',
+      sorter: (a: any, b: any) => a.totalComments - b.totalComments,
+      sortDirections: ['descend', 'ascend'],
+      width: '13.33%',
+    },
+    {
+      title: 'Visits',
+      dataIndex: 'totalVisits',
+      sorter: (a: any, b: any) => a.totalVisits - b.totalVisits,
+      sortDirections: ['descend', 'ascend'],
+      width: '13.33%',
+    },
+  ]
+
+  if (loading) return <Loading />
+  if (error) return <NextError statusCode={error.statusCode} title={error.message} />
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled title="User Management">
+          <StyledTable
+            dataSource={userList}
+            columns={columns}
+            pagination={{ pageSize: 25, hideOnSinglePage: true }}
+            className="user-table"
+            onRow={(record: any) => ({
+              onClick: () => router.push(`/users/id/${record.key}`),
+            })}
+            style={{ maxWidth: 1100 }}
+          />
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  )
+}
+
+export default UserList
+
+# ==== components/user-components/style.tsx ====
+/**
+ * Description: Stylesheet for user components
+ * Author: Hieu Chu
+ */
+
+import styled from 'styled-components'
+import { Card, Col, Form, Typography, Empty, Table } from 'antd'
+import Icon from '../compat/Icon' // wrapper compat
+
+const { Text } = Typography
+
+export const CardStyled = props => (
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
+)
+
+export const ColStyled = styled(Col)`
+  padding-bottom: 12px;
+`
+
+export const DescriptionIcon = styled(Icon)`
+  font-size: 20px;
+`
+
+export const ShadowCard = styled(CardStyled)`
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(242, 242, 242);
+  border-radius: 3px;
+  transition: all 150ms ease-in-out 0s;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 9px 24px;
+    cursor: pointer;
+    transition: all 150ms ease-in-out 0s;
+  }
+`
+
+export const CustomFormItem = styled(Form.Item)`
+  margin-bottom: 8px;
+
+  &.ant-form-item-with-help {
+    margin-bottom: 5px;
+  }
+`
+
+export const FormCol = styled(Col)`
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+`
+
+export const Subtitle = styled(Text)`
+  display: block;
+  margin-bottom: 12px;
+`
+
+export const EmptyImage = styled(Empty)`
+  height: 230px;
+  margin: 0;
+  border-bottom: 0.3px solid rgba(0, 0, 0, 0.25);
+
+  & .ant-empty-image {
+    margin-top: 220px;
+  }
+`
+
+export const StyledTable = styled(Table)`
+  .ant-table table {
+    border-left: 1px solid #e8e8e8;
+    border-top: 1px solid #e8e8e8;
+    border-right: 1px solid #e8e8e8;
+  }
+`
+
+# ==== components/user-components/UserLikes.tsx ====
+'use client';
+
+/**
+ * Description: User likes list component
+ * Author: Hieu Chu
+ */
+
+import React, { useMemo } from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Card, List, Tooltip, Empty, Avatar, Typography } from 'antd';
+import Link from 'next/link';
+
+dayjs.extend(relativeTime);
+
+type LikeImage = { url: string; created?: string | Date };
+type Sculpture = {
+  name: string;
+  images?: LikeImage[];
+  accessionId?: string | number;
+};
+
+type UserLikeItem = {
+  likedTime: string | Date;
+  sculptureId?: string | number;
+  sculpture: Sculpture;
+};
+
+interface UserLikesProps {
+  likes: UserLikeItem[];
+}
+
+const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
+  // ne pas muter les props; tri sur des copies
+  const items = useMemo<UserLikeItem[]>(
+    () =>
+      [...(likes ?? [])]
+        .sort(
+          (a, b) =>
+            new Date(b.likedTime).getTime() -
+            new Date(a.likedTime).getTime(),
+        )
+        .map((x) => {
+          const sortedImages = [...(x.sculpture.images ?? [])].sort(
+            (a, b) =>
+              new Date(a.created ?? 0).getTime() -
+              new Date(b.created ?? 0).getTime(),
+          );
+          return {
+            ...x,
+            sculpture: { ...x.sculpture, images: sortedImages },
+          };
+        }),
+    [likes],
+  );
+
+  return (
+    <Card
+      title="Likes"
+      bodyStyle={{ padding: '20px 24px 0px' }}
+      variant="borderless"
+      style={{ marginTop: 12 }}
+    >
+      <List<UserLikeItem>
+        itemLayout="horizontal"
+        dataSource={items}
+        className="comment-list"
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No Likes"
+            />
+          ),
+        }}
+        renderItem={(x) => {
+          const firstImageUrl =
+            x.sculpture.images && x.sculpture.images.length > 0
+              ? x.sculpture.images[0].url
+              : '/static/no-image.png';
+          const targetId = x.sculptureId ?? x.sculpture.accessionId;
+          const when = dayjs(x.likedTime);
+
+          return (
+            <List.Item key={`${String(targetId)}-${String(x.likedTime)}`}>
+              <List.Item.Meta
+                avatar={
+                  <Avatar
+                    shape="square"
+                    size={42}
+                    src={firstImageUrl}
+                    alt={x.sculpture.name}
+                    style={{ objectFit: 'cover', borderRadius: 4 }}
+                  />
+                }
+                title={
+                  <Link href={`/sculptures/id/${String(targetId)}`}>
+                    <Typography.Text
+                      style={{
+                        fontSize: 14,
+                        fontWeight: 500,
+                        color: 'rgba(0, 0, 0, 0.65)',
+                      }}
+                    >
+                      {x.sculpture.name}
+                    </Typography.Text>
+                  </Link>
+                }
+                description={
+                  <Tooltip
+                    title={when.format('D MMMM YYYY, h:mm:ss a')}
+                  >
+                    <Typography.Text
+                      style={{
+                        fontSize: 14,
+                        color: 'rgba(0, 0, 0, 0.35)',
+                      }}
+                    >
+                      {when.fromNow()}
+                    </Typography.Text>
+                  </Tooltip>
+                }
+              />
+            </List.Item>
+          );
+        }}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+      />
+    </Card>
+  );
+};
+
+export default UserLikes;
+
+# ==== components/user-components/UserProfile.tsx ====
+'use client';
+
+import React from 'react';
+import { useSearchParams } from 'next/navigation';
+import type { AxiosError } from 'axios';
+import { Card, Typography, List, Empty, Alert } from 'antd';
+import { api } from '@/shared/api';
+
+const { Title, Text } = Typography;
+
+/** Types sûrs et minimaux pour ce composant */
+interface ProfileSummary {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  bio?: string;
+}
+
+interface CommentItem {
+  commentId: string;
+  author: string;
+  content: string;
+  createdAt: string; // ISO string
+}
+
+interface RequestError {
+  statusCode: number;
+  message: string;
+}
+
+const UserProfile: React.FC = () => {
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('id') ?? '';
+
+  const [profile, setProfile] = React.useState<ProfileSummary | null>(null);
+  const [comments, setComments] = React.useState<CommentItem[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<RequestError | null>(null);
+
+  /** Supprime un commentaire localement avec typage strict */
+  const deleteComment = (commentId: string) => {
+    setComments((prev) => prev.filter((x) => x.commentId !== commentId));
+  };
+
+  React.useEffect(() => {
+    // Si pas d'id dans l'URL, on ne déclenche pas de requête
+    if (!userId) return;
+
+    let cancelled = false;
+    const run = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // NOTE: le client `api` retourne la payload (pas besoin de `.data`)
+        const [p, c] = await Promise.all([
+          api.get<ProfileSummary>(`/users/${userId}`),
+          api.get<CommentItem[]>(`/users/${userId}/comments`),
+        ]);
+
+        if (cancelled) return;
+        setProfile(p);
+        setComments(c);
+      } catch (e: unknown) {
+        // Typage défensif d'une erreur axios
+        const ax = e as AxiosError<{ statusCode?: number; message?: string }>;
+        const statusCode = ax.response?.data?.statusCode ?? ax.status ?? 500;
+        const message =
+          ax.response?.data?.message ??
+          ax.message ??
+          'Request failed';
+        if (!cancelled) setError({ statusCode: Number(statusCode), message: String(message) });
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  return (
+    <div className="p-6">
+      <Title level={2}>User Profile</Title>
+
+      {!userId && (
+        <Alert
+          type="warning"
+          message="Missing user id"
+          description="Ajoutez ?id=<USER_ID> à l’URL pour charger le profil."
+          className="mb-4"
+        />
+      )}
+
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          className="mb-4"
+          message={`Erreur ${error.statusCode}`}
+          description={error.message}
+        />
+      )}
+
+      <Card loading={loading} className="mb-6">
+        {profile ? (
+          <>
+            <Title level={4} className="mb-1">
+              {profile.name}
+            </Title>
+            {profile.bio ? <Text type="secondary">{profile.bio}</Text> : <Text type="secondary">No bio</Text>}
+          </>
+        ) : (
+          <Empty description="No profile loaded" />
+        )}
+      </Card>
+
+      <Card title="Recent comments" loading={loading}>
+        {comments.length === 0 ? (
+          <Empty description="No comments" />
+        ) : (
+          <List
+            dataSource={comments}
+            renderItem={(item) => (
+              <List.Item
+                key={item.commentId}
+                actions={[
+                  <button
+                    key="delete"
+                    onClick={() => deleteComment(item.commentId)}
+                    className="text-red-600"
+                    aria-label={`Delete comment ${item.commentId}`}
+                  >
+                    Delete
+                  </button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <div className="flex items-center gap-2">
+                      <Text strong>{item.author}</Text>
+                      <Text type="secondary">{new Date(item.createdAt).toLocaleString()}</Text>
+                    </div>
+                  }
+                  description={item.content}
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Card>
+    </div>
+  );
+};
+
+export default UserProfile;
+
+# ==== components/user-components/UserVisit.tsx ====
+/**
+ * Description: User visit list component
+ * Author: Hieu Chu
+ */
+
+import type React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Tooltip, List, Card, Empty } from 'antd';
+import { Comment } from '@ant-design/compatible';
+import Link from 'next/link';
+
+dayjs.extend(relativeTime);
+
+/** Types minimaux utilisés par ce composant */
+type ImageItem = { url: string; created: string | Date };
+
+export interface Visit {
+  visitTime: string | Date;
+  sculptureId: string | number;
+  sculpture: {
+    name: string;
+    images: ImageItem[];
+  };
+}
+
+type FormattedComment = {
+  author: React.ReactNode;
+  avatar: React.ReactNode;
+  content: React.ReactNode;
+};
+
+const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
+  // Ne pas muter la prop: on clone avant de trier
+  const sorted: Visit[] = [...visits].sort(
+    (a: Visit, b: Visit) =>
+      new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
+  );
+
+  // Trie les images de chaque sculpture par date de création ascendante
+  sorted.forEach((x: Visit) => {
+    x.sculpture.images.sort(
+      (a: ImageItem, b: ImageItem) =>
+        new Date(a.created).getTime() - new Date(b.created).getTime()
+    );
+  });
+
+  const formattedComments: FormattedComment[] = sorted.map((x: Visit) => ({
+    author: (
+      <span>
+        <Link href={`/sculptures/id/${x.sculptureId}`}>
+          <a
+            style={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: 'rgba(0, 0, 0, 0.65)',
+            }}
+          >
+            {x.sculpture.name}
+          </a>
+        </Link>
+      </span>
+    ),
+    avatar: (
+      <div>
+        <img
+          src={
+            x.sculpture.images.length
+              ? x.sculpture.images[0].url
+              : '../../static/no-image.png'
+          }
+          style={{
+            width: 42,
+            height: 42,
+            objectFit: 'cover',
+            borderRadius: 4,
+          }}
+        />
+      </div>
+    ),
+    content: (
+      <div style={{ fontSize: 14 }}>
+        <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
+          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
+            {dayjs(x.visitTime).fromNow()}
+          </span>
+        </Tooltip>
+      </div>
+    ),
+  }));
+
+  return (
+    <Card
+      title="Visits"
+      bodyStyle={{ padding: '20px 24px 0px' }}
+      variant="borderless"
+      style={{ marginTop: 12 }}
+    >
+      <List<FormattedComment>
+        itemLayout="horizontal"
+        dataSource={formattedComments ?? []}
+        className="comment-list"
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No Visits"
+            />
+          ),
+        }}
+        renderItem={(item: FormattedComment) => (
+          <li>
+            <Comment
+              author={item.author}
+              avatar={item.avatar}
+              content={item.content}
+              className="comment"
+            />
+          </li>
+        )}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+      />
+    </Card>
+  );
+};
+
+export default UserVisit;
+
+# ==== modules/ethikos/admin/audit/page.tsx ====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Tag } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchAuditLogs } from '@/services/admin';
+
+type LogRow = {
+  id: string;
+  actor: string;
+  action: string;
+  target: string;
+  severity: 'info' | 'warn' | 'critical';
+  ts: string;
+};
+
+export default function AuditLogs() {
+  usePageTitle('Admin · Audit Logs');
+
+  const { data, loading } = useRequest(fetchAuditLogs);
+
+  const columns = [
+    { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
+    { title: 'Actor', dataIndex: 'actor', width: 120 },
+    { title: 'Action', dataIndex: 'action', width: 200 },
+    { title: 'Target', dataIndex: 'target', ellipsis: true },
+    {
+      title: 'Severity',
+      dataIndex: 'severity',
+      width: 120,
+      render: (v, row) => (
+        <Tag color={v === 'critical' ? 'red' : v === 'warn' ? 'orange' : 'blue'}>{v}</Tag>
+      ),
+      filters: [
+        { text: 'Info', value: 'info' },
+        { text: 'Warn', value: 'warn' },
+        { text: 'Critical', value: 'critical' },
+      ],
+      onFilter: (val: any, row: LogRow) => row.severity === val,
+    },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<LogRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={{ pageSize: 15 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+# ==== modules/ethikos/admin/roles/page.tsx ====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { Switch, Tag } from 'antd'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/services/admin'
+
+export default function RoleManagement() {
+  usePageTitle('Admin · Role Management')
+
+  const { data, loading, refresh } = useRequest<RolePayload>(() => fetchRoles())
+
+  const columns: ProColumns<RoleRow>[] = [
+    { title: 'Role', dataIndex: 'name', width: 200 },
+    {
+      title: 'Users',
+      dataIndex: 'userCount',
+      width: 100,
+      render: (dom) => <Tag>{dom}</Tag>,
+    },
+    {
+      title: 'Enabled',
+      dataIndex: 'enabled',
+      width: 120,
+      render: (_, row) => (
+        <Switch
+          checked={row.enabled}
+          onChange={async (checked) => {
+            await toggleRole(row.id, checked)
+            refresh()
+          }}
+        />
+      ),
+    },
+  ]
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<RoleRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items ?? []}
+        pagination={false}
+        search={false}
+      />
+    </PageContainer>
+  )
+}
+
+# ==== modules/ethikos/decide/elite/page.tsx ====
+'use client'
+
+import { PageContainer, ProTable, StatisticCard } from '@ant-design/pro-components';
+import { Progress, Statistic } from 'antd';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchEliteBallots } from '@/services/decide';
+import type { Ballot } from '@/types';
+
+export default function EliteBallots() {
+  usePageTitle('Decide · Elite Ballots');
+
+  const { data, loading } = useRequest(fetchEliteBallots);
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', width: 260 },
+    {
+      title: 'Closes In',
+      dataIndex: 'closesAt',
+      width: 180,
+render: (v, row) => (
+  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
+),
+    },
+    {
+      title: 'Turnout',
+      dataIndex: 'turnout',
+      width: 160,
+      render: (v, row) => <Progress type="circle" percent={v} />,
+    },
+    { title: 'Scope', dataIndex: 'scope', width: 100 },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<Ballot & { turnout: number }>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.ballots}
+        pagination={{ pageSize: 8 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+# ==== modules/ethikos/decide/public/page.tsx ====
+'use client'
+
+import React, { useEffect, useState } from 'react'
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import { Select, Space, Input, Popconfirm, Progress, Radio, Slider } from 'antd'
+import axios from 'axios'
+import usePageTitle from '@/hooks/usePageTitle'
+
+interface Category { id: number; name: string }
+interface Format   { id: number; name: string }
+interface PublicTopic {
+  id: number
+  question: string
+  description?: string
+  debatecategory_id: number
+  responseformat_id: number
+  turnout: number
+  options?: string[]
+  scaleLabels?: string[]
+}
+
+export default function PublicVotePage() {
+  usePageTitle('Decide · Public Voting')
+
+  const [categories, setCategories] = useState<Category[]>([])
+  const [formats, setFormats]       = useState<Format[]>([])
+  const [topicsData, setTopicsData] = useState<{ results: PublicTopic[]; count: number }>({ results: [], count: 0 })
+  const [activeCat, setActiveCat]   = useState<number | 'all'>('all')
+  const [activeFormats, setActiveFormats] = useState<number[]>([])
+  const [searchTerm, setSearchTerm] = useState<string>('')
+  const [page, setPage]             = useState<number>(1)
+  const pageSize = 20
+
+  // 1. Load categories & formats
+  useEffect(() => {
+    axios
+      .get<Category[]>('/api/home/debatecategory/', { params: { is_deleted: false } })
+      .then(r => setCategories(r.data))
+    axios
+      .get<Format[]>('/api/home/responseformat/', { params: { is_deleted: false } })
+      .then(r => setFormats(r.data))
+  }, [])
+
+  // 2. Load topics with filters & pagination
+  useEffect(() => {
+    axios
+      .get<{ results: PublicTopic[]; count: number }>('/api/home/debatetopic/', {
+        params: {
+          is_active: true,
+          is_deleted: false,
+          debatecategory_id: activeCat === 'all' ? undefined : activeCat,
+          responseformat_id: activeFormats,
+          search: searchTerm,
+          page,
+          page_size: pageSize,
+          ordering: '-created_at',
+        },
+      })
+      .then(r => setTopicsData(r.data))
+  }, [activeCat, activeFormats, searchTerm, page])
+
+  // 3. Submit a vote and refresh
+  const vote = async (row: PublicTopic, value: any) => {
+    await axios.post('/api/home/publicvote/', { topic_id: row.id, value })
+    // refresh current page
+    axios
+      .get<{ results: PublicTopic[]; count: number }>('/api/home/debatetopic/', {
+        params: {
+          is_active: true,
+          is_deleted: false,
+          debatecategory_id: activeCat === 'all' ? undefined : activeCat,
+          responseformat_id: activeFormats,
+          search: searchTerm,
+          page,
+          page_size: pageSize,
+          ordering: '-created_at',
+        },
+      })
+      .then(r => setTopicsData(r.data))
+  }
+
+  // 4. Render vote input based on format
+  const renderVoteInput = (row: PublicTopic) => {
+    const handleChange = (e: any) => {
+      const val = e?.target?.value ?? e
+      vote(row, val)
+    }
+
+    switch (row.responseformat_id) {
+      case 1: // binary (Yes/No)
+        return (
+          <Radio.Group
+            options={(row.options ?? ['Yes', 'No']).map(v => ({ label: v, value: v }))}
+            onChange={handleChange}
+          />
+        )
+      case 2: // multiple choice
+        return (
+          <Radio.Group
+            options={(row.options ?? []).map(v => ({ label: v, value: v }))}
+            onChange={handleChange}
+          />
+        )
+      case 3: // scale
+        const labels = row.scaleLabels ?? ['1', '2', '3', '4', '5']
+        return (
+          <Space direction="vertical" size={4}>
+            <Slider
+              min={0}
+              max={labels.length - 1}
+              step={1}
+              tooltip={{ formatter: idx => labels[idx] }}
+              onAfterChange={handleChange}
+            />
+          </Space>
+        )
+      default:
+        return null
+    }
+  }
+
+  const columns = [
+    { title: 'Question', dataIndex: 'question', width: 360 },
+    {
+      title: 'Vote',
+      dataIndex: 'vote',
+      render: (_: any, row: PublicTopic) => (
+        <Popconfirm title="Confirm your vote?" onConfirm={() => {}}>
+          {renderVoteInput(row)}
+        </Popconfirm>
+      ),
+    },
+    {
+      title: 'Turnout',
+      dataIndex: 'turnout',
+      render: (v, row) => <Progress percent={v} size="small" />,
+    },
+  ]
+
+  return (
+    <PageContainer ghost>
+      <Space wrap style={{ marginBottom: 16 }}>
+        <Select
+          placeholder="Catégorie"
+          allowClear
+          value={activeCat}
+          onChange={val => { setActiveCat(val); setPage(1) }}
+          style={{ width: 200 }}
+          options={[
+            { label: 'All', value: 'all' },
+            ...categories.map(c => ({ label: c.name, value: c.id })),
+          ]}
+        />
+        <Select
+          mode="multiple"
+          placeholder="Formats"
+          value={activeFormats}
+          onChange={val => { setActiveFormats(val); setPage(1) }}
+          style={{ width: 200 }}
+          options={formats.map(f => ({ label: f.name, value: f.id }))}
+        />
+        <Input.Search
+          placeholder="Rechercher…"
+          onSearch={val => { setSearchTerm(val); setPage(1) }}
+          style={{ width: 260 }}
+        />
+      </Space>
+
+      <ProTable<PublicTopic>
+        rowKey="id"
+        columns={columns as any}
+        dataSource={topicsData.results}
+        pagination={{
+          total: topicsData.count,
+          current: page,
+          pageSize,
+          onChange: setPage,
+        }}
+        search={false}
+      />
+    </PageContainer>
+  )
+}
+
+# ==== modules/ethikos/decide/results/page.tsx ====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Tag } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchDecisionResults } from '@/services/decide';
+
+type ResultRow = {
+  id: string;
+  title: string;
+  scope: 'Elite' | 'Public';
+  passed: boolean;
+  closesAt: string;
+  region: string;
+};
+
+export default function ResultsArchive() {
+  usePageTitle('Decide · Results Archive');
+
+  const { data, loading } = useRequest(fetchDecisionResults);
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', width: 260 },
+    {
+      title: 'Result',
+      dataIndex: 'passed',
+      width: 120,
+      render: (v, row) => (
+        <Tag color={v ? 'green' : 'red'}>{v ? 'PASSED' : 'REJECTED'}</Tag>
+      ),
+      filters: [
+        { text: 'Passed', value: 'true' },
+        { text: 'Rejected', value: 'false' },
+      ],
+      onFilter: (val: any, row: ResultRow) => String(row.passed) === val,
+    },
+    { title: 'Scope', dataIndex: 'scope', width: 120, filters: true },
+    { title: 'Region', dataIndex: 'region', width: 140, filters: true },
+    { title: 'Closed', dataIndex: 'closesAt', valueType: 'date' },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<ResultRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={{ pageSize: 10 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+# ==== modules/ethikos/deliberate/[topic]/page.tsx ====
+'use client';
+
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Timeline, Typography } from 'antd';
+import { useParams } from 'next/navigation';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchTopicDetail } from '@/services/deliberate';
+
+// Derive the exact return type from the service
+type TopicDetail = Awaited<ReturnType<typeof fetchTopicDetail>>;
+type Statement = TopicDetail['statements'][number];
+
+export default function TopicDetailPage() {
+  const params = useParams<{ topic: string }>();
+  const topicParam = params?.topic;
+  const topicId =
+    typeof topicParam === 'string'
+      ? topicParam
+      : Array.isArray(topicParam)
+      ? topicParam[0]
+      : undefined;
+
+  usePageTitle(`Deliberate · ${topicId ?? ''}`);
+
+  const { data, loading } = useRequest<TopicDetail>(
+    () => fetchTopicDetail(topicId!),
+    { ready: !!topicId, refreshDeps: [topicId] },
+  );
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Typography.Title level={3}>{data?.title ?? 'Topic'}</Typography.Title>
+
+      <ProCard title="Statements Thread" ghost>
+        <Timeline
+          items={(data?.statements ?? []).map((s) => ({
+            key: s.id,
+            children: <StatementItem s={s} />,
+          }))}
+        />
+      </ProCard>
+    </PageContainer>
+  );
+}
+
+function StatementItem({ s }: { s: Statement }) {
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'baseline' }}>
+        <Typography.Text strong>{s.author}</Typography.Text>
+        <Typography.Text type="secondary">
+          {new Date(s.createdAt).toLocaleString()}
+        </Typography.Text>
+      </div>
+      <Typography.Paragraph style={{ marginTop: 4, marginBottom: 0 }}>
+        {s.body}
+      </Typography.Paragraph>
+    </div>
+  );
+}
+
+# ==== modules/ethikos/deliberate/elite/page.tsx ====
+'use client'
+
+import React from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  ModalForm,
+  ProFormText,
+  ProFormSelect,
+} from '@ant-design/pro-components';
+import { Badge,
+  Button,
+  Drawer,
+  Empty,
+  Space,
+  Tag,
+  Tooltip,
+  message as antdMessage,
+ } from 'antd';
+import { useRequest, useInterval } from 'ahooks';
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  FireOutlined,
+} from '@ant-design/icons';
+import dayjs from 'dayjs';
+
+import usePageTitle from '@/hooks/usePageTitle';
+import {
+  fetchEliteTopics,
+  createEliteTopic,
+  fetchTopicPreview,
+} from '@/services/deliberate';
+import type { Topic } from '@/types';
+
+/* ------------------------------------------------------------------ */
+/*  Derived types                                                      */
+/* ------------------------------------------------------------------ */
+
+interface TopicRow extends Topic {
+  createdAt: string;
+  lastActivity: string;
+  hot: boolean; // computed server-side: stanceCount increased >= 20% in 24 h
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
+
+export default function EliteAgora() {
+  usePageTitle('Deliberate · Elite Agora');
+
+  /* ---------- data ---------- */
+  const { data, loading, refresh } = useRequest(fetchEliteTopics);
+  useInterval(refresh, 60_000); // poll every minute
+
+  /* ---------- drawer state ---------- */
+  const [previewId, setPreviewId] = React.useState<string | null>(null);
+  const {
+    data: preview,
+    loading: previewLoading,
+    run: loadPreview,
+  } = useRequest((id: string) => fetchTopicPreview(id), { manual: true });
+
+  /* ---------- open drawer ---------- */
+  const openPreview = (row: TopicRow) => {
+    setPreviewId(row.id);
+    loadPreview(row.id);
+  };
+
+  /* ---------- KPI header ---------- */
+  const headerStats = [
+    {
+      label: 'Open topics',
+      value: data?.list.length ?? 0,
+    },
+    {
+      label: 'Avg stances / topic',
+      value:
+        data && data.list.length
+          ? Math.round(
+              data.list.reduce((sum, t) => sum + t.stanceCount, 0) /
+                data.list.length,
+            )
+          : 0,
+    },
+    {
+      label: 'Hot topics',
+      value: data?.list.filter((t) => t.hot).length ?? 0,
+    },
+  ];
+
+  /* ---------- columns ---------- */
+  const columns = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      render: (_: any, row: TopicRow) => (
+        <a onClick={() => openPreview(row)}>{row.title}</a>
+      ),
+    },
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      filters: true,
+      render: (v, row) => <Tag color="geekblue">{v}</Tag>,
+    },
+    {
+      title: 'Stances',
+      dataIndex: 'stanceCount',
+      sorter: true,
+      align: 'right' as const,
+    },
+    {
+      title: 'Last activity',
+      dataIndex: 'lastActivity',
+      valueType: 'fromNow',
+    },
+    {
+      title: '',
+      dataIndex: 'hot',
+      width: 60,
+      render: (v, row) =>
+        v ? (
+          <Tooltip title="Trending">
+            <FireOutlined style={{ color: '#fa541c' }} />
+          </Tooltip>
+        ) : null,
+    },
+  ];
+
+  /* ---------- render ---------- */
+  return (
+    <PageContainer
+      ghost
+      loading={loading}
+      extra={
+        <Space>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={refresh}
+            type="text"
+            title="Refresh list"
+          />
+          {/* role check goes here */}
+          <NewTopicButton onCreated={refresh} />
+        </Space>
+      }
+    >
+      {/* KPI summary */}
+      <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+        {headerStats.map((k) => (
+          <StatisticCard
+            key={k.label}
+            colSpan={{ xs: 24, sm: 8 }}
+            statistic={{ title: k.label, value: k.value }}
+          />
+        ))}
+      </ProCard>
+
+      {/* list */}
+      <ProTable<TopicRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.list}
+        search={{
+          labelWidth: 90,
+          filterType: 'light',
+        }}
+        pagination={{ pageSize: 10 }}
+      />
+
+      {/* preview drawer */}
+      <Drawer
+        width={520}
+        open={!!previewId}
+        onClose={() => setPreviewId(null)}
+        title={preview?.title || 'Preview'}
+      >
+        {previewLoading ? (
+          <Empty description="Loading…" />
+        ) : preview ? (
+          <>
+            <p>
+              <strong>Category:</strong> {preview.category}
+            </p>
+            <p>
+              <strong>Opened:</strong>{' '}
+              {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+            </p>
+            <h4>Latest statements</h4>
+            <ul>
+              {preview.latest.map((s) => (
+                <li key={s.id}>
+                  <em>{s.author}</em> — {s.body}
+                </li>
+              ))}
+            </ul>
+            <Button
+              type="primary"
+              onClick={() =>
+                window.location.assign(`/ethikos/deliberate/${preview.id}`)
+              }
+            >
+              Go to thread →
+            </Button>
+          </>
+        ) : (
+          <Empty />
+        )}
+      </Drawer>
+    </PageContainer>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  New Topic modal                                                    */
+/* ------------------------------------------------------------------ */
+
+function NewTopicButton({ onCreated }: { onCreated: () => void }) {
+  const [visible, setVisible] = React.useState(false);
+
+  const { runAsync, loading } = useRequest(createEliteTopic, {
+    manual: true,
+    onSuccess: () => {
+      antdMessage.success('Topic created 🎉');
+      setVisible(false);
+      onCreated();
+    },
+  });
+
+  return (
+    <>
+      <Button
+        icon={<PlusOutlined />}
+        type="primary"
+        onClick={() => setVisible(true)}
+      >
+        New Topic
+      </Button>
+      <ModalForm
+        title="Create new topic"
+        open={visible}
+        onOpenChange={setVisible}
+        onFinish={async (values) => {
+          await runAsync(values);
+          return true;
+        }}
+        submitter={{ submitButtonProps: { loading } }}
+      >
+        <ProFormText
+          name="title"
+          label="Title"
+          rules={[{ required: true, min: 10 }]}
+        />
+        <ProFormSelect
+          name="category"
+          label="Category"
+          options={[
+            { label: 'AI Policy', value: 'AI Policy' },
+            { label: 'Biotech', value: 'Biotech' },
+            { label: 'Ethics', value: 'Ethics' },
+          ]}
+          rules={[{ required: true }]}
+        />
+      </ModalForm>
+    </>
+  );
+}
+
+# ==== modules/ethikos/impact/tracker/page.tsx ====
+'use client'
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { Tag, Select } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchImpactTracker, patchImpactStatus } from '@/services/impact';
+
+type TrackerRow = {
+  id: string;
+  title: string;
+  owner: string;
+  status: 'Planned' | 'In-Progress' | 'Completed' | 'Blocked';
+  updatedAt: string;
+};
+
+export default function ImpactTracker() {
+  usePageTitle('Impact · Tracker');
+
+  const { data, loading, mutate } = useRequest(fetchImpactTracker);
+
+  const onStatusChange = async (id: string, status: TrackerRow['status']) => {
+    await patchImpactStatus(id, status);
+    mutate(d => ({
+      items: d!.items.map(r => (r.id === id ? { ...r, status } : r)),
+    }));
+  };
+
+  const columns = [
+    { title: 'Title', dataIndex: 'title', width: 260 },
+    { title: 'Owner', dataIndex: 'owner', width: 160 },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      width: 160,
+      render: (v: TrackerRow['status'], row: TrackerRow) => (
+        <Select
+          value={v}
+          options={[
+            { value: 'Planned', label: 'Planned' },
+            { value: 'In-Progress', label: 'In-Progress' },
+            { value: 'Completed', label: 'Completed' },
+            { value: 'Blocked', label: 'Blocked' },
+          ]}
+          onChange={val => onStatusChange(row.id, val)}
+        />
+      ),
+    },
+    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'fromNow', sorter: true },
+  ];
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <ProTable<TrackerRow>
+        rowKey="id"
+        columns={columns}
+        dataSource={data?.items}
+        pagination={{ pageSize: 12 }}
+        search={false}
+      />
+    </PageContainer>
+  );
+}
+
+# ==== modules/insights/hooks/index.ts ====
+﻿export { default as useReport }       from './useReport';
+export { default as useReportStream } from './useReportStream';
+
+# ==== modules/konsensus/components/index.ts ====
+﻿export { VoteButtons } from './VoteButtons';

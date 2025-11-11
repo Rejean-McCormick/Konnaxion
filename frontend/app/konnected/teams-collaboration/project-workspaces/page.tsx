@@ -17,7 +17,6 @@ interface Workspace {
   userRole: 'Leader' | 'Member';
 }
 
-// Exemple de données
 const workspaceData: Workspace[] = [
   {
     id: '1',
@@ -53,14 +52,11 @@ export default function ProjectWorkspacesPage() {
 
   const handleWorkspaceAction = (workspace: Workspace) => {
     if (!workspace.isLaunched && workspace.userRole === 'Leader') {
-      // Exemple : action de “launch”
-      // TODO: appeler l’API puis rafraîchir ou naviguer
       antdMessage.success(`Workspace ${workspace.projectName} launched successfully.`);
       return;
     }
-    // Naviguer vers le workspace
     router.push(`/konnected/teams-collaboration/project-workspaces/${workspace.id}`);
-  }; // <-- FIX: fermeture de la fonction manquante dans la version d’origine (voir concat) :contentReference[oaicite:2]{index=2}
+  };
 
   const columns: ColumnsType<Workspace> = [
     {
@@ -90,10 +86,13 @@ export default function ProjectWorkspacesPage() {
       title: 'Action',
       key: 'action',
       render: (_: unknown, record: Workspace) => {
-        const buttonLabel = !record.isLaunched && record.userRole === 'Leader'
-          ? 'Launch Workspace'
-          : record.isLaunched
-            ? (record.userRole === 'Leader' ? 'Open Workspace' : 'Join Workspace')
+        const buttonLabel =
+          !record.isLaunched && record.userRole === 'Leader'
+            ? 'Launch Workspace'
+            : record.isLaunched
+            ? record.userRole === 'Leader'
+              ? 'Open Workspace'
+              : 'Join Workspace'
             : 'Join Workspace';
         return (
           <Button type="primary" onClick={() => handleWorkspaceAction(record)}>

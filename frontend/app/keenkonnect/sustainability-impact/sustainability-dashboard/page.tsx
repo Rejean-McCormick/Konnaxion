@@ -14,8 +14,6 @@ import {
   Tooltip as ReTooltip,
 } from 'recharts';
 
-const { Option } = Select;
-
 /* -------------------------------
  * Données simulées
  * ------------------------------- */
@@ -94,26 +92,16 @@ const SustainabilityDashboard: React.FC = () => {
               value={selectedRegion}
               onChange={(value) => setSelectedRegion(value)}
               style={{ width: '100%' }}
-            >
-              {regions.map((region) => (
-                <Option key={region} value={region}>
-                  {region}
-                </Option>
-              ))}
-            </Select>
+              options={regions.map((r) => ({ label: r, value: r }))}
+            />
           </Col>
           <Col xs={24} sm={12}>
             <Select
               value={selectedCategory}
               onChange={(value) => setSelectedCategory(value)}
               style={{ width: '100%' }}
-            >
-              {categories.map((cat) => (
-                <Option key={cat} value={cat}>
-                  {cat}
-                </Option>
-              ))}
-            </Select>
+              options={categories.map((c) => ({ label: c, value: c }))}
+            />
           </Col>
         </Row>
 

@@ -7,7 +7,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 
 type LearningPathStatus = 'Draft' | 'Published' | 'Archived';
 
@@ -22,9 +22,8 @@ export interface LearningPath {
 }
 
 export default function Page() {
-  // NOTE: branchement API à faire ici si nécessaire
   const [paths, setPaths] = useState<LearningPath[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading] = useState<boolean>(false);
 
   const handleDelete = (id: string) => {
     Modal.confirm({
@@ -34,7 +33,6 @@ export default function Page() {
       okText: 'Delete',
       okButtonProps: { danger: true },
       onOk: async () => {
-        // TODO: appelez votre API ici (DELETE /api/konnected/learning-paths/:id)
         setPaths(prev => prev.filter(p => p.id !== id));
         message.success('Learning path deleted');
       },
@@ -46,7 +44,7 @@ export default function Page() {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
-      render: (text, record) => (
+      render: (text: string, record: LearningPath) => (
         <Link href={`/konnected/learning-paths/manage-existing-paths/${record.id}`}>
           {text}
         </Link>
@@ -70,7 +68,7 @@ export default function Page() {
       title: 'Created',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (iso) => new Date(iso).toLocaleDateString(),
+      render: (iso: string) => new Date(iso).toLocaleDateString(),
       width: 140,
     },
     {
@@ -89,7 +87,7 @@ export default function Page() {
       key: 'actions',
       fixed: 'right',
       width: 170,
-      render: (_: unknown, record) => (
+      render: (_: unknown, record: LearningPath) => (
         <Space>
           <Link href={`/konnected/learning-paths/manage-existing-paths/${record.id}/edit`}>
             <Button icon={<EditOutlined />} type="link">
@@ -110,17 +108,16 @@ export default function Page() {
   ];
 
   return (
-    <PageContainer
-      title="Manage Existing Paths"
-      extra={[
-        <Link key="create" href="/konnected/learning-paths/create-learning-path">
+    <PageContainer title="Manage Existing Paths">
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>
+        <div />
+        <Link href="/konnected/learning-paths/create-learning-path">
           <Button type="primary" icon={<PlusOutlined />}>
             Create Path
           </Button>
-        </Link>,
-      ]}
-    >
-      {/* Sous-titre optionnel pour contexte */}
+        </Link>
+      </div>
+
       <Title level={4} style={{ marginBottom: 8 }}>Manage Existing Paths</Title>
       <Paragraph type="secondary" style={{ marginBottom: 24 }}>
         Review, edit, archive or delete learning paths. Published paths affect learners currently

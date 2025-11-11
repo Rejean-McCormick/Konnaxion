@@ -22,7 +22,8 @@ import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icon
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 
-import MainLayout from '@/components/layout-components/MainLayout';
+// ✅ Use the MainLayout that actually exists in the repo
+import MainLayout from '@/shared/layout/MainLayout'; // was: '@/components/layout-components/MainLayout'
 import type { ColumnsType } from 'antd/es/table';
 
 const { Title, Paragraph, Text } = Typography;
@@ -35,7 +36,7 @@ type Resource = {
   subject: string;
   type: 'Article' | 'Video' | 'Course' | 'Book' | 'Podcast';
   difficulty: number; // 1-5
-  createdAt: string;  // ISO
+  createdAt: string; // ISO
   tags: string[];
 };
 
@@ -81,7 +82,7 @@ const MOCK_RESOURCES: Resource[] = [
 const ALL_SUBJECTS = ['Sustainability', 'Engineering', 'Community', 'Ethics', 'Leadership'];
 const ALL_TYPES: Resource['type'][] = ['Article', 'Video', 'Course', 'Book', 'Podcast'];
 
-const SearchFiltersPage = () => {
+const SearchFiltersPage: React.FC = () => {
   // Recherche simple
   const [query, setQuery] = useState<string>('');
 
@@ -163,13 +164,14 @@ const SearchFiltersPage = () => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      render: (t) => <Tag>{t}</Tag>,
+      // avoid implicit-any on value
+      render: (t: Resource['type']) => <Tag>{t}</Tag>,
     },
     {
       title: 'Difficulty',
       dataIndex: 'difficulty',
       key: 'difficulty',
-      render: (d) => (
+      render: (d: number) => (
         <Space>
           <Text>{d}</Text>
         </Space>
@@ -179,7 +181,7 @@ const SearchFiltersPage = () => {
       title: 'Created',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (d) => dayjs(d).format('YYYY-MM-DD'),
+      render: (d: string) => dayjs(d).format('YYYY-MM-DD'),
     },
     {
       title: 'Tags',
@@ -195,10 +197,17 @@ const SearchFiltersPage = () => {
     },
   ];
 
+  /** ✅ Difficulty handler accepts union & narrows to tuple so indices are never undefined */
   const handleDifficultyChange = (value: number | [number, number]) => {
     if (Array.isArray(value) && value.length === 2) {
       setDifficultyRange([value[0], value[1]]);
     }
+  };
+
+  /** ✅ Date range handler copes with nulls from RangePicker */
+  const handleDateRangeChange = (dates: null | [Dayjs | null, Dayjs | null]) => {
+    if (dates && dates[0] && dates[1]) setDateRange([dates[0], dates[1]]);
+    else setDateRange(null);
   };
 
   return (
@@ -301,7 +310,12 @@ const SearchFiltersPage = () => {
               </Select>
             </Space>
 
-            <Table<Resource> rowKey="id" columns={columns} dataSource={filteredData} pagination={{ pageSize: 8 }} />
+            <Table<Resource>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 8 }}
+            />
           </Card>
         </Col>
       </Row>
@@ -316,7 +330,10 @@ const SearchFiltersPage = () => {
       >
         <Form layout="vertical">
           <Form.Item label="Plage de dates">
-            <RangePicker onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs] | null)} style={{ width: '100%' }} />
+            <RangePicker
+              onChange={handleDateRangeChange}
+              style={{ width: '100%' }}
+            />
           </Form.Item>
 
           <Form.Item label="Mots-clés">

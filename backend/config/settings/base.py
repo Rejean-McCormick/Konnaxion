@@ -354,7 +354,6 @@ SPECTACULAR_SETTINGS = {
 }
 # Your stuff...
 # ------------------------------------------------------------------------------
-ACCOUNT_EMAIL_REQUIRED     = True
 
 # --- EkoH & Smart-Vote additions ---
 from .settings_addons import *

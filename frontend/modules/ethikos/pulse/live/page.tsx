@@ -5,7 +5,7 @@ import { Badge, Space } from 'antd';
 import { useInterval, useRequest } from 'ahooks';
 import ChartCard from '@/components/charts/ChartCard';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchPulseLiveData } from '@/services/pulse';   // ← correct import
+import { fetchPulseLiveData } from '@/services/pulse';   // correct import
 
 export default function PulseLive() {
   usePageTitle('Pulse · Live Metrics');
@@ -19,7 +19,7 @@ export default function PulseLive() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.counters.map(c => (
+        {data?.counters.map((c) => (
           <StatisticCard
             key={c.label}
             statistic={{
@@ -32,7 +32,13 @@ export default function PulseLive() {
               value: c.value,
               precision: 0,
             }}
-            chart={<ChartCard type="tinyLine" data={c.history} height={50} />}
+            chart={
+              <ChartCard
+                type="line"
+                data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
+                height={50}
+              />
+            }
           />
         ))}
       </ProCard>
