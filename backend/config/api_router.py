@@ -8,14 +8,16 @@ from django.conf import settings
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 # ── Core / Users ──────────────────────────────────────────
-from konnaxion.users.api.views import UserViewSet
+from konnaxion.users.api.views import UserViewSet  # /api/users/...
 
 # ── ethiKos ───────────────────────────────────────────────
-from konnaxion.ethikos.api_views import (
-    TopicViewSet,
-    StanceViewSet,
-    ArgumentViewSet,
-)
+from konnaxion.ethikos import api_views as ethikos_api  # module import, safer
+# Required
+TopicViewSet = ethikos_api.TopicViewSet
+StanceViewSet = ethikos_api.StanceViewSet
+ArgumentViewSet = ethikos_api.ArgumentViewSet
+# Optional (will be None if not implemented yet)
+EthikosCategoryViewSet = getattr(ethikos_api, "EthikosCategoryViewSet", None)
 
 # ── keenKonnect ───────────────────────────────────────────
 from konnaxion.keenkonnect.api_views import ProjectViewSet
@@ -27,10 +29,7 @@ from konnaxion.kollective_intelligence.api_views import VoteViewSet
 from konnaxion.konnected.api_views import KnowledgeResourceViewSet
 
 # ── Kreative ──────────────────────────────────────────────
-from konnaxion.kreative.api_views import (
-    KreativeArtworkViewSet,
-    GalleryViewSet,
-)
+from konnaxion.kreative.api_views import KreativeArtworkViewSet, GalleryViewSet
 
 # ---------------------------------------------------------------------------
 
@@ -43,6 +42,9 @@ router.register("users", UserViewSet, basename="user")
 router.register("ethikos/topics",    TopicViewSet,    basename="ethikos-topic")
 router.register("ethikos/stances",   StanceViewSet,   basename="ethikos-stance")
 router.register("ethikos/arguments", ArgumentViewSet, basename="ethikos-argument")
+# Register categories only if the ViewSet exists in the codebase
+if EthikosCategoryViewSet is not None:
+    router.register("ethikos/categories", EthikosCategoryViewSet, basename="ethikos-category")
 
 # keenKonnect
 router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-project")
@@ -50,24 +52,12 @@ router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-pr
 # Kollective Intelligence
 router.register("kollective/votes", VoteViewSet, basename="kollective-vote")
 
-# KonnectED (knowledge resources)
-router.register(
-    "konnected/resources",
-    KnowledgeResourceViewSet,
-    basename="konnected-resource",
-)
+# KonnectED
+router.register("konnected/resources", KnowledgeResourceViewSet, basename="konnected-resource")
 
 # Kreative
-router.register(
-    "kreative/artworks",      # REST path
-    KreativeArtworkViewSet,
-    basename="kreative-artwork",
-)
-router.register(
-    "kreative/galleries",
-    GalleryViewSet,
-    basename="kreative-gallery",
-)
+router.register("kreative/artworks",  KreativeArtworkViewSet, basename="kreative-artwork")
+router.register("kreative/galleries", GalleryViewSet,        basename="kreative-gallery")
 
 # ---------------------------------------------------------------------------
 

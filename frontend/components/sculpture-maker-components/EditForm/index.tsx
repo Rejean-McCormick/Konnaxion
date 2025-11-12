@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\index.tsx
 'use client';
 
 /**
@@ -7,18 +8,19 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { Row, Modal, Button, message as antdMessage, notification, Result  } from 'antd';
+import { Row, Modal, Button, message as antdMessage, notification, Result } from 'antd';
 import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
+// FIX: style.tsx est au niveau parent de EditForm
 import { CardStyled, ColStyled } from '../style';
+
 import SculptureEdit from './SculptureEdit';
 import EditImage from './EditImage';
 
-// NOTE: API legacy import conservé tel que dans la base
-import api from '../../../api';
-import { normalizeError } from '../../../shared/errors';
+// data-first axios wrapper (retourne T, pas AxiosResponse<T>)
+import api from '@/api';
+import { normalizeError } from '@/shared/errors';
 
-const defaultPosition: [number, number] = [-34.40581053569814, 150.87842788963476];
 const { confirm } = Modal;
 
 const tabList = [
@@ -62,7 +64,7 @@ const SculptureEditForm = () => {
   // Prefer dynamic segment names, then fallback to query ?id=
   const sculptureId = useMemo(
     () => params?.sculptureId ?? params?.id ?? searchParams.get('id') ?? undefined,
-    [params, searchParams]
+    [params, searchParams],
   );
 
   const [initialData, setInitialData] = useState<InitialData | null>(null);
@@ -105,7 +107,8 @@ const SculptureEditForm = () => {
         return;
       }
       try {
-        const { data } = await api.get<InitialData>(`/sculpture/${sculptureId}`);
+        // data-first wrapper: no `.data`
+        const data = await api.get<InitialData>(`/sculpture/${sculptureId}`);
         const next: InitialData = {
           ...data,
           latitude: data.latitude != null ? Number(data.latitude) : data.latitude ?? null,
@@ -114,8 +117,8 @@ const SculptureEditForm = () => {
         };
         setInitialData(next);
 
-        const makersRes = await api.get<Maker[]>('/maker/');
-        setMakerList(Array.isArray(makersRes.data) ? makersRes.data : []);
+        const makers = await api.get<Maker[]>('/maker/');
+        setMakerList(Array.isArray(makers) ? makers : []);
       } catch (e: unknown) {
         const { statusCode = 500, message: errMsg = 'Unknown error' } = normalizeError(e);
         setError({ statusCode, message: errMsg });
@@ -149,8 +152,20 @@ const SculptureEditForm = () => {
   if (!initialData) return null;
 
   const sortedImages: ImageItem[] = [...(initialData.images ?? [])].sort(
-    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
   );
+
+  /** Mapping vers la forme attendue par <SculptureEdit /> */
+  const sculptureProp = {
+    id: initialData.accessionId,
+    title: initialData.name,
+    description: '', // adapte si ton API renvoie une description
+    location: {
+      lat: Number(initialData.latitude ?? 0),
+      lng: Number(initialData.longitude ?? 0),
+    },
+    imageUrl: sortedImages[0]?.url,
+  };
 
   return (
     <Row gutter={16}>
@@ -166,22 +181,48 @@ const SculptureEditForm = () => {
             </Button>
           }
         >
+          {/* Tab 1: édition des champs texte + position */}
           <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
             <SculptureEdit
-              defaultPosition={defaultPosition}
-              initialData={{ ...initialData, images: sortedImages }}
-              makerList={makerList}
-              setMakerList={setMakerList}
+              sculpture={sculptureProp}
+              onSubmit={async (updated) => {
+                try {
+                  await api.patch(`/sculpture/${updated.id}`, {
+                    name: updated.title,
+                    latitude: updated.location.lat,
+                    longitude: updated.location.lng,
+                    // ajoutez description/imageUrl si l'API les accepte
+                  });
+                  antdMessage.success('Updated sculpture details successfully!', 2);
+                  // Optionnel: recharger les données locales
+                  setInitialData((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          name: updated.title,
+                          latitude: updated.location.lat,
+                          longitude: updated.location.lng,
+                        }
+                      : prev,
+                  );
+                } catch (e) {
+                  const { message } = normalizeError(e);
+                  antdMessage.error(message || 'Update failed');
+                }
+              }}
             />
           </div>
 
+          {/* Tab 2: édition d’images */}
           <div style={{ display: tabKey === 'tab2' ? 'block' : 'none' }}>
             <EditImage
               accessionId={initialData.accessionId}
-              _name={initialData.name} // NOTE: the component expects `_name`
+              _name={initialData.name} // NOTE: le composant attend `_name`
               images={sortedImages.map((img) => ({
                 ...img,
-                uid: img.id,
+                uid: String(img.id),
+                name: String(img.id),        // ensure required UploadFile.name
+                url: img.url,                // explicit url
                 thumbUrl: img.url,
                 preview: img.url,
                 status: 'done',

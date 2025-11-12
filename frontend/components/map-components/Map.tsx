@@ -1,9 +1,10 @@
 'use client';
+
 /**
- * Description: Dynamic map view with support for geolocation control and draggable marker
- * Author: Hieu Chu
+ * Dynamic map view with geolocation control and draggable marker
  */
 
+import { useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import {
   Map as ReactMapGL,
@@ -11,26 +12,27 @@ import {
   NavigationControl,
   FullscreenControl,
   GeolocateControl,
+  type ViewState as MapViewState,
+  type ViewStateChangeEvent,
 } from 'react-map-gl';
-
 import 'mapbox-gl/dist/mapbox-gl.css';
+
 import MapMarker from './MapMarker';
 import ControlPanel from './ControlPanel';
 
+/** Controls styling */
 const fullscreenControlStyle: CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
   padding: '10px',
 };
-
 const navStyle: CSSProperties = {
   position: 'absolute',
   top: 36,
   left: 0,
   padding: '10px',
 };
-
 const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
@@ -38,64 +40,96 @@ const geolocateStyle: CSSProperties = {
   margin: 10,
 };
 
-type ViewState = {
+/** Public shape expected by parent (keeps prop contract minimal) */
+type ViewInput = {
   latitude: number;
   longitude: number;
   zoom: number;
   pitch?: number;
   bearing?: number;
+  /** Optional on input to avoid breaking callers; we’ll default it */
+  padding?: { top: number; bottom: number; left: number; right: number };
 };
 
 type MarkerState = { markerLat: number; markerLng: number };
 
 type Props = {
-  view: ViewState;
-  setView: (v: ViewState) => void;
+  view: ViewInput;
+  setView: (v: ViewInput) => void;
   marker: MarkerState;
   setMarker: (m: MarkerState) => void;
 };
 
-const Map = ({ view, setView, marker, setMarker }: Props) => {
-  const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_ACCESS_TOKEN as string | undefined;
-  const { markerLat, markerLng } = marker;
+const DEFAULT_PADDING: MapViewState['padding'] = {
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+};
+
+export default function Map({ view, setView, marker, setMarker }: Props) {
+  const token =
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
+    process.env.MAPBOX_ACCESS_TOKEN;
+
+  // Internal view that satisfies react-map-gl’s stricter ViewState typing
+  const controlledView: MapViewState = useMemo(
+    () => ({
+      latitude: view.latitude,
+      longitude: view.longitude,
+      zoom: view.zoom,
+      pitch: view.pitch ?? 0,
+      bearing: view.bearing ?? 0,
+      padding: view.padding ?? DEFAULT_PADDING,
+    }),
+    [view],
+  );
+
+  const handleMove = (evt: ViewStateChangeEvent) => {
+    const vs = evt.viewState;
+    // Feed a relaxed shape back to parent while preserving optional fields
+    setView({
+      latitude: vs.latitude,
+      longitude: vs.longitude,
+      zoom: vs.zoom,
+      pitch: vs.pitch,
+      bearing: vs.bearing,
+      padding: vs.padding,
+    });
+  };
 
   return (
     <ReactMapGL
-      initialViewState={view}
-      viewState={view}
-      onMove={(evt) => {
-        const vs = evt.viewState;
-        setView({
-          ...view,
-          latitude: vs.latitude,
-          longitude: vs.longitude,
-          zoom: vs.zoom,
-          pitch: vs.pitch,
-          bearing: vs.bearing,
-        });
-      }}
+      /** Uncontrolled startup values for first render */
+      initialViewState={controlledView}
+      /**
+       * Keep it controlled. Cast only at the boundary to avoid
+       * polluting the rest of your code with map-specific width/height typing.
+       */
+      viewState={controlledView as unknown as MapViewState & { width: number; height: number }}
+      onMove={handleMove}
       mapboxAccessToken={token}
       mapStyle="mapbox://styles/mapbox/streets-v11"
       style={{ width: '100%', height: '100%' }}
     >
       <Marker
-        longitude={markerLng}
-        latitude={markerLat}
+        longitude={marker.markerLng}
+        latitude={marker.markerLat}
         draggable
         onDragEnd={(e) => {
           const { lng, lat } = e.lngLat;
           setMarker({ markerLat: lat, markerLng: lng });
         }}
       >
-        {/* Removed undeclared `size` prop */}
         <MapMarker />
       </Marker>
 
-      <div className="fullscreen" style={fullscreenControlStyle}>
+      <div style={fullscreenControlStyle}>
         <FullscreenControl />
       </div>
 
-      <div className="nav" style={navStyle}>
+      <div style={navStyle}>
         <NavigationControl />
       </div>
 
@@ -104,14 +138,16 @@ const Map = ({ view, setView, marker, setMarker }: Props) => {
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation
         showUserLocation
-        // Zoom d’accompagnement après géolocalisation
-        onGeolocate={() => setView({ ...view, zoom: 13 })}
+        onGeolocate={() =>
+          setView({
+            ...view,
+            // keep or increase zoom to a sensible level
+            zoom: Math.max(view.zoom ?? 0, 13),
+          })
+        }
       />
 
-      {/* Removed undeclared lat/lng props */}
-      <ControlPanel lat={markerLat} lng={markerLng} />
+      <ControlPanel lat={marker.markerLat} lng={marker.markerLng} />
     </ReactMapGL>
   );
-};
-
-export default Map;
+}

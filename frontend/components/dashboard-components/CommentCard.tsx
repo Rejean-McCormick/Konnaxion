@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\CommentCard.tsx
 'use client'
 
 /**
@@ -40,14 +41,14 @@ export default function CommentCard({
     data: COMMENT_DATA,
     xField: 'x',
     yField: 'y',
-    smooth: true,
     height: 90,
     autoFit: true,
     padding: 0,
-    xAxis: false,
-    yAxis: false,
+    // v2: axis unifié (remplace xAxis/yAxis)
+    axis: { x: false, y: false },
     tooltip: {},
-    areaStyle: { fillOpacity: 0.2 },
+    // v2: style au niveau du mark (remplace areaStyle)
+    style: { fillOpacity: 0.2 },
   }
 
   return (

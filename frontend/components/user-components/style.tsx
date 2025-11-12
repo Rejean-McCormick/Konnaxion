@@ -1,15 +1,19 @@
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx  :contentReference[oaicite:0]{index=0}
 /**
  * Description: Stylesheet for user components
  * Author: Hieu Chu
  */
 
+import type { ComponentProps } from 'react'
 import styled from 'styled-components'
 import { Card, Col, Form, Typography, Empty, Table } from 'antd'
-import Icon from '../compat/Icon' // wrapper compat
+import Icon from '@/components/compat/Icon'
 
 const { Text } = Typography
 
-export const CardStyled = props => (
+type CardStyledProps = ComponentProps<typeof Card>
+
+export const CardStyled = (props: CardStyledProps) => (
   <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
 )
 

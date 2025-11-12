@@ -1,6 +1,6 @@
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
 'use client';
 
-// File: app/kreative/community-showcases/featured-projects/page.tsx
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -14,7 +14,7 @@ import {
   Typography,
   Badge,
   Space,
-  Button, // fixed: ensure Button is imported
+  Button,
 } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
@@ -70,28 +70,29 @@ const dummyProjects: Project[] = [
 ];
 
 export default function FeaturedProjectsPage(): JSX.Element {
-  const router = useRouter(); // fixed: useRouter from next/navigation
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  // Pagination state.
+  // Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 4;
 
-  // Filter projects based on search and category.
+  // Filters
   const filteredProjects = useMemo(() => {
     let projects = dummyProjects;
     if (selectedCategory !== 'All') {
       projects = projects.filter((project) => project.category === selectedCategory);
     }
     if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase();
       projects = projects.filter(
         (project) =>
-          project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          project.description.toLowerCase().includes(searchQuery.toLowerCase()),
+          project.title.toLowerCase().includes(q) ||
+          project.description.toLowerCase().includes(q),
       );
     }
     return projects;
@@ -105,14 +106,16 @@ export default function FeaturedProjectsPage(): JSX.Element {
   const openModal = (project: Project) => {
     setSelectedProject(project);
     setModalVisible(true);
+  };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedProject(null);
+  };
 
   return (
     <PageContainer title="Featured Projects">
-      {/* Filter Section */}
+      {/* Filters */}
       <Space wrap style={{ marginBottom: 24 }}>
         <Input
           placeholder="Search projects."
@@ -125,7 +128,6 @@ export default function FeaturedProjectsPage(): JSX.Element {
           style={{ width: 300 }}
         />
 
-        {/* refactor: avoid deprecated Select.Option, use options prop */}
         <Select
           value={selectedCategory}
           onChange={(value) => {
@@ -143,7 +145,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
         />
       </Space>
 
-      {/* Projects Grid */}
+      {/* Grid */}
       <Row gutter={[24, 24]}>
         {paginatedProjects.map((project) => (
           <Col key={project.id} xs={24} sm={12} md={8} lg={6}>
@@ -163,7 +165,6 @@ export default function FeaturedProjectsPage(): JSX.Element {
                   title={project.title}
                   description={
                     <>
-                      {/* fix: remove ellipsis={{}} which is incompatible in your setup */}
                       <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
                         {project.description}
                       </Paragraph>
@@ -187,7 +188,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
         />
       </div>
 
-      {/* Modal for Project Details */}
+      {/* Modal */}
       <Modal open={modalVisible} onCancel={closeModal} footer={null} width={800}>
         {selectedProject && (
           <div>
@@ -215,7 +216,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
         )}
       </Modal>
 
-      {/* multi-line clamp replacement for deprecated Typography ellipsis rows */}
+      {/* simple 2-line clamp */}
       <style jsx>{`
         .line-clamp-2 {
           display: -webkit-box;
@@ -227,4 +228,3 @@ export default function FeaturedProjectsPage(): JSX.Element {
     </PageContainer>
   );
 }
-}}

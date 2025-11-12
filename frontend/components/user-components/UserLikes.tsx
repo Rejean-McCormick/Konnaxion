@@ -1,3 +1,5 @@
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
+// Source: dump original (UserLikes.tsx) 
 'use client';
 
 /**
@@ -30,29 +32,32 @@ interface UserLikesProps {
   likes: UserLikeItem[];
 }
 
+const FALLBACK_IMG = '/static/no-image.png';
+
 const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
-  // ne pas muter les props; tri sur des copies
-  const items = useMemo<UserLikeItem[]>(
-    () =>
-      [...(likes ?? [])]
-        .sort(
-          (a, b) =>
-            new Date(b.likedTime).getTime() -
-            new Date(a.likedTime).getTime(),
-        )
-        .map((x) => {
-          const sortedImages = [...(x.sculpture.images ?? [])].sort(
+  // Tri sans muter la prop et tri interne des images sans mutation
+  const items = useMemo<UserLikeItem[]>(() => {
+    const safeLikes = Array.isArray(likes) ? likes : [];
+    return safeLikes
+      .slice() // clone props
+      .sort(
+        (a, b) =>
+          new Date(b.likedTime).getTime() - new Date(a.likedTime).getTime(),
+      )
+      .map((x) => {
+        const sortedImages = (x.sculpture?.images ?? [])
+          .slice() // clone images
+          .sort(
             (a, b) =>
               new Date(a.created ?? 0).getTime() -
               new Date(b.created ?? 0).getTime(),
           );
-          return {
-            ...x,
-            sculpture: { ...x.sculpture, images: sortedImages },
-          };
-        }),
-    [likes],
-  );
+        return {
+          ...x,
+          sculpture: { ...x.sculpture, images: sortedImages },
+        };
+      });
+  }, [likes]);
 
   return (
     <Card
@@ -74,42 +79,51 @@ const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
           ),
         }}
         renderItem={(x) => {
+          const images = x.sculpture?.images ?? [];
           const firstImageUrl =
-            x.sculpture.images && x.sculpture.images.length > 0
-              ? x.sculpture.images[0].url
-              : '/static/no-image.png';
-          const targetId = x.sculptureId ?? x.sculpture.accessionId;
+            images.length > 0 && images[0]?.url ? images[0].url : FALLBACK_IMG;
+          const targetId = x.sculptureId ?? x.sculpture?.accessionId;
           const when = dayjs(x.likedTime);
 
+          const titleNode = (
+            <Typography.Text
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: 'rgba(0, 0, 0, 0.65)',
+              }}
+            >
+              {x.sculpture?.name ?? 'Unknown sculpture'}
+            </Typography.Text>
+          );
+
           return (
-            <List.Item key={`${String(targetId)}-${String(x.likedTime)}`}>
+            <List.Item
+              key={`${String(targetId ?? x.sculpture?.name ?? 'unknown')}-${new Date(
+                x.likedTime,
+              ).getTime()}`}
+            >
               <List.Item.Meta
                 avatar={
                   <Avatar
                     shape="square"
                     size={42}
                     src={firstImageUrl}
-                    alt={x.sculpture.name}
+                    alt={x.sculpture?.name ?? 'sculpture'}
                     style={{ objectFit: 'cover', borderRadius: 4 }}
                   />
                 }
                 title={
-                  <Link href={`/sculptures/id/${String(targetId)}`}>
-                    <Typography.Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 500,
-                        color: 'rgba(0, 0, 0, 0.65)',
-                      }}
-                    >
-                      {x.sculpture.name}
-                    </Typography.Text>
-                  </Link>
+                  targetId != null ? (
+                    <Link href={`/sculptures/id/${encodeURIComponent(String(targetId))}`}>
+                      {titleNode}
+                    </Link>
+                  ) : (
+                    titleNode
+                  )
                 }
                 description={
-                  <Tooltip
-                    title={when.format('D MMMM YYYY, h:mm:ss a')}
-                  >
+                  <Tooltip title={when.format('D MMMM YYYY, h:mm:ss a')}>
                     <Typography.Text
                       style={{
                         fontSize: 14,

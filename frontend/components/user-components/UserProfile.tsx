@@ -1,10 +1,14 @@
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
+// Référence dump: :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
+
 'use client';
 
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import type { AxiosError } from 'axios';
 import { Card, Typography, List, Empty, Alert } from 'antd';
-import { api } from '@/shared/api';
+import api from '@/api';
+import type { AxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 
 const { Title, Text } = Typography;
 
@@ -43,7 +47,6 @@ const UserProfile: React.FC = () => {
   };
 
   React.useEffect(() => {
-    // Si pas d'id dans l'URL, on ne déclenche pas de requête
     if (!userId) return;
 
     let cancelled = false;
@@ -51,7 +54,7 @@ const UserProfile: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        // NOTE: le client `api` retourne la payload (pas besoin de `.data`)
+        // Client "payload-first": renvoie directement T, pas AxiosResponse<T>
         const [p, c] = await Promise.all([
           api.get<ProfileSummary>(`/users/${userId}`),
           api.get<CommentItem[]>(`/users/${userId}/comments`),
@@ -61,14 +64,15 @@ const UserProfile: React.FC = () => {
         setProfile(p);
         setComments(c);
       } catch (e: unknown) {
-        // Typage défensif d'une erreur axios
-        const ax = e as AxiosError<{ statusCode?: number; message?: string }>;
-        const statusCode = ax.response?.data?.statusCode ?? ax.status ?? 500;
-        const message =
-          ax.response?.data?.message ??
-          ax.message ??
-          'Request failed';
-        if (!cancelled) setError({ statusCode: Number(statusCode), message: String(message) });
+        let statusCode = 500;
+        let message = 'Request failed';
+        if (isAxiosError<{ statusCode?: number; message?: string }>(e)) {
+          statusCode = e.response?.data?.statusCode ?? e.response?.status ?? 500;
+          message = e.response?.data?.message ?? e.message ?? 'Request failed';
+        } else if (e instanceof Error) {
+          message = e.message;
+        }
+        if (!cancelled) setError({ statusCode, message });
       } finally {
         if (!cancelled) setLoading(false);
       }

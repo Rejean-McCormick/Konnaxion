@@ -1,2 +1,3 @@
-﻿export { default as useReport }       from './useReport';
+﻿// modules/insights/hooks/index.ts
+export { useReport } from './useReport';
 export { default as useReportStream } from './useReportStream';

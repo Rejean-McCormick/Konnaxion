@@ -21,10 +21,10 @@ import {
 import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
-
-// ✅ Use the MainLayout that actually exists in the repo
-import MainLayout from '@/shared/layout/MainLayout'; // was: '@/components/layout-components/MainLayout'
 import type { ColumnsType } from 'antd/es/table';
+import type { SliderRangeProps } from 'antd/es/slider'; // <-- added
+
+import MainLayout from '@/shared/layout/MainLayout';
 
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -83,10 +83,8 @@ const ALL_SUBJECTS = ['Sustainability', 'Engineering', 'Community', 'Ethics', 'L
 const ALL_TYPES: Resource['type'][] = ['Article', 'Video', 'Course', 'Book', 'Podcast'];
 
 const SearchFiltersPage: React.FC = () => {
-  // Recherche simple
   const [query, setQuery] = useState<string>('');
 
-  // Filtres
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
   const [difficultyRange, setDifficultyRange] = useState<[number, number]>([1, 5]);
@@ -106,29 +104,24 @@ const SearchFiltersPage: React.FC = () => {
 
   const filteredData = useMemo(() => {
     return MOCK_RESOURCES.filter((res) => {
-      // Query
       if (query.trim()) {
         const q = query.trim().toLowerCase();
         const hay = `${res.title} ${res.subject} ${res.tags.join(' ')}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
 
-      // Subjects
       if (selectedSubjects.length > 0 && !selectedSubjects.includes(res.subject)) {
         return false;
       }
 
-      // Types
       if (resourceTypes.length > 0 && !resourceTypes.includes(res.type)) {
         return false;
       }
 
-      // Difficulty
       if (res.difficulty < difficultyRange[0] || res.difficulty > difficultyRange[1]) {
         return false;
       }
 
-      // Date range
       if (dateRange) {
         const [start, end] = dateRange;
         const resDate = dayjs(res.createdAt);
@@ -137,9 +130,7 @@ const SearchFiltersPage: React.FC = () => {
         }
       }
 
-      // Category (démo)
       if (category !== 'All') {
-        // exemple de mapping fictif
         if (category === 'Featured' && res.id !== '1') return false;
         if (category === 'New' && dayjs().diff(dayjs(res.createdAt), 'day') > 60) return false;
       }
@@ -164,7 +155,6 @@ const SearchFiltersPage: React.FC = () => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      // avoid implicit-any on value
       render: (t: Resource['type']) => <Tag>{t}</Tag>,
     },
     {
@@ -197,14 +187,12 @@ const SearchFiltersPage: React.FC = () => {
     },
   ];
 
-  /** ✅ Difficulty handler accepts union & narrows to tuple so indices are never undefined */
-  const handleDifficultyChange = (value: number | [number, number]) => {
-    if (Array.isArray(value) && value.length === 2) {
-      setDifficultyRange([value[0], value[1]]);
-    }
+  // FIX: onChange must be (value: number[]) when range is enabled
+  const handleDifficultyChange: SliderRangeProps['onChange'] = (value) => {
+    const [min, max] = value as [number, number];
+    setDifficultyRange([min, max]);
   };
 
-  /** ✅ Date range handler copes with nulls from RangePicker */
   const handleDateRangeChange = (dates: null | [Dayjs | null, Dayjs | null]) => {
     if (dates && dates[0] && dates[1]) setDateRange([dates[0], dates[1]]);
     else setDateRange(null);
@@ -290,8 +278,8 @@ const SearchFiltersPage: React.FC = () => {
                   min={1}
                   max={5}
                   step={1}
-                  value={difficultyRange}
-                  onChange={handleDifficultyChange}
+                  value={difficultyRange}        // [number, number] is fine for value
+                  onChange={handleDifficultyChange} // now typed as (value: number[]) => void
                 />
               </Col>
             </Row>
@@ -330,10 +318,7 @@ const SearchFiltersPage: React.FC = () => {
       >
         <Form layout="vertical">
           <Form.Item label="Plage de dates">
-            <RangePicker
-              onChange={handleDateRangeChange}
-              style={{ width: '100%' }}
-            />
+            <RangePicker onChange={handleDateRangeChange} style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item label="Mots-clés">

@@ -4,8 +4,7 @@
  */
 
 import React from 'react'
-import { Card, Tooltip, Divider, Col } from 'antd'
-import { NumberInfo } from 'ant-design-pro'
+import { Card, Tooltip, Divider, Col, Statistic } from 'antd'
 import styled from 'styled-components'
 import {
   InfoCircleOutlined,
@@ -33,20 +32,40 @@ export const CardStyled = (props: any) => {
   if (props.type === 'stats') {
     bodyStyle.padding = '20px 16px 16px'
   }
-  return <Card bodyStyle={bodyStyle} variant="borderless" {...props} />
+  return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
 }
 
-export const NumberInfoStyled = (props: any) => (
-  <NumberInfo
-    {...props}
-    total={<span style={{ fontSize: 30 }}>{props.total.toLocaleString()}</span>}
-    style={{ display: 'inline-block' }}
-  />
-)
+/**
+ * Replacement for `NumberInfo` from ant-design-pro.
+ * Keeps the same call sites: <NumberInfoStyled subTitle="..." total={123} />
+ */
+export const NumberInfoStyled = (props: {
+  subTitle?: React.ReactNode
+  total: number
+  precision?: number
+  prefix?: React.ReactNode
+  suffix?: React.ReactNode
+  style?: React.CSSProperties
+}) => {
+  const { subTitle, total, precision, prefix, suffix, style } = props
+  return (
+    <div style={{ display: 'inline-block', ...(style || {}) }}>
+      <Statistic
+        title={subTitle}
+        value={total}
+        precision={precision}
+        prefix={prefix}
+        suffix={suffix}
+        formatter={(v) => Number(v).toLocaleString()}
+        valueStyle={{ fontSize: 30 }}
+      />
+    </div>
+  )
+}
 
 export const HelperIcon = (props: any) => (
   <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
-    <Tooltip {...props} placement="topLeft" arrowPointAtCenter={true}>
+    <Tooltip {...props} placement="topLeft" arrowPointAtCenter>
       <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
     </Tooltip>
   </div>
@@ -57,20 +76,28 @@ export const HelperIcon = (props: any) => (
  * Preferred: <MainIcon icon={<YourIcon />} />
  * Legacy support: <MainIcon type="shopping-cart" />
  */
-export const MainIcon = (props: any) => {
-  const { icon, type, style, ...rest } = props
-  const Resolved = icon
-    ? icon
-    : (() => {
-        const Comp = legacyTypeToIcon(type)
-        return Comp ? <Comp /> : null
-      })()
+type MainIconProps = {
+  icon?: React.ReactElement
+  type?: string
+  style?: React.CSSProperties
+  twoToneColor?: string
+} & React.HTMLAttributes<HTMLDivElement>
+
+export const MainIcon: React.FC<MainIconProps> = ({ icon, type, style, twoToneColor, ...rest }) => {
+  const Comp = !icon && type ? legacyTypeToIcon(type) : null
+  const element: React.ReactElement | null =
+    icon && React.isValidElement(icon)
+      ? icon
+      : Comp
+      ? React.createElement(Comp as React.ComponentType<any>)
+      : null
 
   return (
     <div style={{ marginRight: 16 }} {...rest}>
-      {React.isValidElement(Resolved)
-        ? React.cloneElement(Resolved as React.ReactElement, {
-            style: { ...(Resolved.props?.style || {}), ...(style || {}), fontSize: 54 },
+      {element
+        ? React.cloneElement(element, {
+            style: { ...(element.props as any)?.style, ...(style || {}), fontSize: 54 },
+            twoToneColor,
           })
         : null}
     </div>

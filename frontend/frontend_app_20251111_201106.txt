@@ -868,38 +868,45 @@ export default function CurrentVotingWeightPage() {
 
 
 ===== BEGIN app/ethikos/admin/audit/page.tsx =====
-// app/ethikos/admin/audit/page.tsx
-'use client'
+'use client';
 
-import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components'
-import { Tag } from 'antd'
-import { useRequest } from 'ahooks'
-import usePageTitle from '@/hooks/usePageTitle'
-import { fetchAuditLogs } from '@/services/admin'
+import React from 'react';
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
+import { Tag } from 'antd';
+import { useRequest } from 'ahooks';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchAuditLogs } from '@/services/admin';
 
 type LogRow = {
-  id: string
-  actor: string
-  action: string
-  target: string
-  severity: 'info' | 'warn' | 'critical'
-  ts: string
-}
+  id: string;
+  actor: string;
+  action: string;
+  target: string;
+  severity: 'info' | 'warn' | 'critical';
+  ts: string; // ISO
+};
 
-type AuditPayload = { items: LogRow[] }
+type AuditPayload = { items: LogRow[] };
 
-export default function AuditLogs() {
-  usePageTitle('Admin · Audit Logs')
+export default function AuditLogs(): JSX.Element {
+  usePageTitle('Admin · Audit Logs');
 
   const service = async (): Promise<AuditPayload> => {
-    const res = await fetchAuditLogs()
-    return res as AuditPayload
-  }
+    const res = await fetchAuditLogs();
+    return res as AuditPayload;
+  };
 
-  const { data, loading } = useRequest<AuditPayload, []>(service)
+  // Note: ahooks' useRequest generics are <Data, Params>
+  const { data, loading } = useRequest<AuditPayload, []>(service);
 
   const columns: ProColumns<LogRow>[] = [
-    { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
+    {
+      title: 'Time',
+      dataIndex: 'ts',
+      valueType: 'dateTime' as const, // keep literal, avoid widening to string
+      width: 180,
+      sorter: true,
+    },
     { title: 'Actor', dataIndex: 'actor', width: 120 },
     { title: 'Action', dataIndex: 'action', width: 200 },
     { title: 'Target', dataIndex: 'target', ellipsis: true },
@@ -912,14 +919,23 @@ export default function AuditLogs() {
         { text: 'Warn', value: 'warn' },
         { text: 'Critical', value: 'critical' },
       ],
-      onFilter: (val, row) => row.severity === (val as LogRow['severity']),
-      render: (_, row) => (
-        <Tag color={row.severity === 'critical' ? 'red' : row.severity === 'warn' ? 'orange' : 'blue'}>
-          {row.severity}
+      onFilter: (value, record) =>
+        record.severity === (String(value) as LogRow['severity']),
+      render: (_: React.ReactNode, record: LogRow) => (
+        <Tag
+          color={
+            record.severity === 'critical'
+              ? 'red'
+              : record.severity === 'warn'
+              ? 'orange'
+              : 'blue'
+          }
+        >
+          {record.severity}
         </Tag>
       ),
     },
-  ]
+  ];
 
   return (
     <PageContainer ghost loading={loading}>
@@ -931,7 +947,7 @@ export default function AuditLogs() {
         search={false}
       />
     </PageContainer>
-  )
+  );
 }
 
 ===== END app/ethikos/admin/audit/page.tsx =====
@@ -1033,6 +1049,7 @@ export default function Moderation() {
 ===== BEGIN app/ethikos/admin/roles/page.tsx =====
 'use client'
 
+import type { ReactNode } from 'react'
 import { PageContainer, ProTable } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { Switch, Tag } from 'antd'
@@ -1044,9 +1061,10 @@ type RoleRow = { id: string; name: string; userCount: number; enabled: boolean }
 type RolePayload = { items: RoleRow[] }
 
 export default function RoleManagement() {
-  usePageTitle('Admin · Role Management')
+  usePageTitle('Admin · Role Management') // sets <title> on the client :contentReference[oaicite:3]{index=3}
 
-  const { data, loading, refresh } = useRequest<RolePayload, []>(async () => await fetchRoles())
+  // useRequest: data shape is { items: RoleRow[] }; no params → params tuple is []
+  const { data, loading, refresh } = useRequest<RolePayload, []>(fetchRoles) // :contentReference[oaicite:4]{index=4}
 
   const columns: ProColumns<RoleRow>[] = [
     { title: 'Role', dataIndex: 'name', width: 200 },
@@ -1054,17 +1072,17 @@ export default function RoleManagement() {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (dom) => <Tag>{dom}</Tag>,
+      render: (dom: ReactNode) => <Tag>{dom}</Tag>, // avoid implicit any
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       width: 120,
-      render: (_, row) => (
+      render: (_: ReactNode, row: RoleRow) => (
         <Switch
           checked={row.enabled}
           onChange={async (checked) => {
-            await toggleRole(row.id, checked)
+            await toggleRole(row.id, checked) // PATCH /admin/roles/:id { enabled } :contentReference[oaicite:5]{index=5}
             refresh()
           }}
         />
@@ -1089,51 +1107,57 @@ export default function RoleManagement() {
 
 
 ===== BEGIN app/ethikos/decide/elite/page.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\elite\page.tsx
 'use client'
 
-import { PageContainer, ProTable, StatisticCard } from '@ant-design/pro-components';
-import { Progress, Statistic } from 'antd';
-import { useRequest } from 'ahooks';
-import dayjs from 'dayjs';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchEliteBallots } from '@/services/decide';
-import type { Ballot } from '@/types';
+import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import type { ReactNode } from 'react'
+import { Progress, Statistic } from 'antd'
+import { useRequest } from 'ahooks'
+import dayjs from 'dayjs'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchEliteBallots } from '@/services/decide'
+import type { Ballot } from '@/types'
+
+type Row = Ballot & { turnout: number }
 
 export default function EliteBallots() {
-  usePageTitle('Decide · Elite Ballots');
+  usePageTitle('Decide · Elite Ballots')
 
-  const { data, loading } = useRequest(fetchEliteBallots);
+  // ahooks v3 expects two generics: <TData, TParams>. No params → [].
+  const { data, loading } = useRequest<{ ballots: Row[] }, []>(fetchEliteBallots)
 
-  const columns = [
+  const columns: ProColumns<Row>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-render: (v, row) => (
-  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
-),
+      render: (_dom: ReactNode, row: Row) => (
+        <Statistic.Countdown value={dayjs(row.closesAt).valueOf()} format="D[d] HH:mm:ss" />
+      ),
     },
     {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (v, row) => <Progress type="circle" percent={v} />,
+      render: (_dom: ReactNode, row: Row) => <Progress type="circle" percent={row.turnout} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
-  ];
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProTable<Ballot & { turnout: number }>
+      <ProTable<Row>
         rowKey="id"
         columns={columns}
-        dataSource={data?.ballots}
+        dataSource={data?.ballots ?? []}
         pagination={{ pageSize: 8 }}
         search={false}
       />
     </PageContainer>
-  );
+  )
 }
 
 ===== END app/ethikos/decide/elite/page.tsx =====
@@ -1210,7 +1234,7 @@ import axios from 'axios';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import { Select, Space, Input, Progress, Radio, Slider, message } from 'antd';
-import type { RadioChangeEvent } from 'antd/es/radio';
+import type { RadioChangeEvent } from 'antd';
 import usePageTitle from '@/hooks/usePageTitle';
 
 type Format = 'SINGLE' | 'MULTIPLE' | 'SCALE';
@@ -1219,7 +1243,7 @@ export interface PublicTopic {
   id: string | number;
   question: string;
   category: string;
-  responseformat_id: number; // 1 = binaire, 2 = multiple, 3 = échelle
+  responseformat_id: number; // 1 = binary, 2 = multiple, 3 = scale
   options?: string[];        // SINGLE/MULTIPLE
   labels?: string[];         // SCALE
   turnout?: number;          // 0..100
@@ -1230,7 +1254,7 @@ interface PagedResult<T> {
   count: number;
 }
 
-export default function PublicVotePage() {
+export default function PublicVotePage(): JSX.Element {
   usePageTitle('Décider — Public');
 
   // --- UI state ---
@@ -1240,24 +1264,19 @@ export default function PublicVotePage() {
 
   // --- data ---
   const [categories, setCategories] = useState<string[]>([]);
-  const [formats, setFormats] = useState<Format[]>([]);
   const [topicsData, setTopicsData] = useState<PagedResult<PublicTopic> | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  // Filtres (catégories/formats)
+  // Load category filter values
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const [catsRes, fmtRes] = await Promise.all([
-          axios.get<string[]>('/api/home/categories/'),
-          axios.get<Format[]>('/api/home/responseformat/'),
-        ]);
+        const catsRes = await axios.get<string[]>('/api/home/categories/');
         if (!mounted) return;
-        setCategories(catsRes.data ?? []);
-        setFormats(fmtRes.data ?? []);
+        setCategories(Array.isArray(catsRes.data) ? catsRes.data : []);
       } catch (e) {
-        console.warn('Failed to load filters', e);
+        console.warn('Failed to load categories', e);
       }
     })();
     return () => {
@@ -1265,7 +1284,7 @@ export default function PublicVotePage() {
     };
   }, []);
 
-  // Sujets
+  // Fetch topics list
   const fetchTopics = useCallback(async () => {
     setLoading(true);
     try {
@@ -1288,13 +1307,13 @@ export default function PublicVotePage() {
     fetchTopics();
   }, [fetchTopics]);
 
-  // Soumission d'un vote (adapter l'endpoint si besoin)
+  // Submit a vote (adapt the endpoint as needed)
   const submitVote = useCallback(
     async (topic: PublicTopic, value: string | string[] | number) => {
       try {
         await axios.post(`/api/home/debatetopic/${topic.id}/vote`, { value });
         message.success('Vote enregistré');
-        fetchTopics(); // refresh
+        fetchTopics(); // refresh after voting
       } catch {
         message.error("Impossible d'enregistrer le vote");
       }
@@ -1302,9 +1321,15 @@ export default function PublicVotePage() {
     [fetchTopics]
   );
 
+  /**
+   * Per-topic vote UI:
+   * - SCALE: Slider with labeled marks (no unsafe array indexing)
+   * - MULTIPLE: Select[multiple]
+   * - SINGLE / default: Radio group
+   */
   const renderVoteInput = useCallback(
     (topic: PublicTopic) => {
-      // 3: échelle (Slider)
+      // 3: scale
       if (topic.responseformat_id === 3) {
         const labels = topic.labels ?? topic.options ?? [];
         const marks = labels.reduce<Record<number, React.ReactNode>>((acc, label, i) => {
@@ -1327,7 +1352,7 @@ export default function PublicVotePage() {
         );
       }
 
-      // 2: multiple (Select multiple)
+      // 2: multiple
       if (topic.responseformat_id === 2) {
         const opts = topic.options ?? topic.labels ?? [];
         const onChange = (value: string[]) => submitVote(topic, value);
@@ -1342,10 +1367,9 @@ export default function PublicVotePage() {
         );
       }
 
-      // 1 (default): binaire / single (Radio)
+      // 1: binary / single (default)
       const opts = topic.options ?? ['Oui', 'Non'];
-      const onRadio: (e: RadioChangeEvent) => void = (e) =>
-        submitVote(topic, e.target.value as string);
+      const onRadio: (e: RadioChangeEvent) => void = (e) => submitVote(topic, e.target.value as string);
       return (
         <Radio.Group onChange={onRadio}>
           {opts.map((o) => (
@@ -1359,7 +1383,7 @@ export default function PublicVotePage() {
     [submitVote]
   );
 
-  // Colonnes
+  // Table columns (typed; ProTable v3 render signature respected)
   const columns: ProColumns<PublicTopic>[] = useMemo(
     () => [
       {
@@ -1380,7 +1404,6 @@ export default function PublicVotePage() {
         dataIndex: 'turnout',
         align: 'center',
         width: 160,
-        // FIX (#8): nouvelle signature de ProTable — on lit depuis "row"
         render: (_dom, row) => <Progress percent={row.turnout ?? 0} size="small" />,
       },
     ],
@@ -1458,31 +1481,37 @@ export default function ResultsArchive() {
 
   const { data, loading } = useRequest(fetchDecisionResults);
 
-  const columns: ProColumns<ResultRow>[] = [
+  // Note the second generic argument (`any`) so valueType isn't restricted to "text"
+  const columns: ProColumns<ResultRow, any>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Result',
       dataIndex: 'passed',
       width: 120,
-      render: (_, row) => (
-        <Tag color={row.passed ? 'green' : 'red'}>
-          {row.passed ? 'PASSED' : 'REJECTED'}
-        </Tag>
+      // Avoid implicit-any by annotating both params
+      render: (_: any, row: ResultRow) => (
+        <Tag color={row.passed ? 'green' : 'red'}>{row.passed ? 'PASSED' : 'REJECTED'}</Tag>
       ),
+      // Use boolean filter values to match the Table's onFilter type
       filters: [
-        { text: 'Passed', value: 'true' },
-        { text: 'Rejected', value: 'false' },
+        { text: 'Passed', value: true },
+        { text: 'Rejected', value: false },
       ],
-      onFilter: (val, row) => String(row.passed) === val,
+      // Keep the wider param type that AntD expects to avoid typing conflicts
+      onFilter: (value: React.Key | boolean, row: ResultRow) => {
+        const v = typeof value === 'boolean' ? value : String(value) === 'true';
+        return row.passed === v;
+      },
     },
     { title: 'Scope', dataIndex: 'scope', width: 120 },
     { title: 'Region', dataIndex: 'region', width: 140 },
-    { title: 'Closed', dataIndex: 'closesAt', valueType: 'date' },
+    { title: 'Closed', dataIndex: 'closesAt', valueType: 'dateTime' },
   ];
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProTable<ResultRow>
+      {/* Match ProTable's generics with the columns declaration */}
+      <ProTable<ResultRow, any>
         rowKey="id"
         columns={columns}
         dataSource={data?.items ?? []}
@@ -1497,56 +1526,78 @@ export default function ResultsArchive() {
 
 
 ===== BEGIN app/ethikos/deliberate/[topic]/page.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\[topic]\page.tsx
 'use client';
 
-import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Timeline, Typography } from 'antd';
-import Comment from 'antd/es/comment';
-import { useParams } from 'next/navigation';
+import React from 'react';
+import { PageContainer } from '@ant-design/pro-components';
+import { Card, Empty, List, Typography } from 'antd';
+import { Comment } from '@ant-design/compatible';
 import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchTopicDetail } from '@/services/deliberate';
+import { fetchTopicPreview } from '@/services/deliberate';
 
-type Statement = {
-  id: string;
-  author: string;
-  body: string;
-  createdAt: string;
-};
+dayjs.extend(relativeTime);
 
-type TopicDetailData = {
+type Statement = { id: string; author: string; body: string; createdAt?: string };
+type Preview = {
   id: string;
   title: string;
-  statements: Statement[];
+  category?: string;
+  createdAt?: string;
+  latest: Statement[];
 };
 
-export default function TopicDetail() {
-  const { topic } = useParams() as { topic: string };
+export default function TopicThreadPage({
+  params,
+}: {
+  params: { topic: string };
+}) {
+  usePageTitle('Deliberate · Thread');
 
-  usePageTitle(`Deliberate · ${topic}`);
-
-  const { data, loading } = useRequest<TopicDetailData, []>(
-    () => fetchTopicDetail(topic),
-    { ready: !!topic }
+  // Pas de génériques → évite l’erreur "Expected 2 type arguments"
+  const { data, loading } = useRequest(
+    () => fetchTopicPreview(params.topic),
+    { refreshDeps: [params.topic] },
   );
+
+  const preview = data as unknown as Preview | undefined;
 
   return (
     <PageContainer ghost loading={loading}>
-      <Typography.Title level={3}>{data?.title}</Typography.Title>
+      {preview ? (
+        <>
+          <Typography.Title level={3} style={{ marginTop: 0 }}>
+            {preview.title}
+          </Typography.Title>
+          <Typography.Paragraph type="secondary" style={{ marginBottom: 16 }}>
+            {preview.category ? `${preview.category} · ` : ''}
+            {preview.createdAt ? dayjs(preview.createdAt).fromNow() : null}
+          </Typography.Paragraph>
 
-      <ProCard title="Statements Thread" ghost>
-        <Timeline>
-          {data?.statements?.map((s) => (
-            <Timeline.Item key={s.id}>
-              <Comment
-                author={s.author}
-                datetime={s.createdAt}
-                content={<Typography.Paragraph>{s.body}</Typography.Paragraph>}
-              />
-            </Timeline.Item>
-          ))}
-        </Timeline>
-      </ProCard>
+          <Card title="Latest statements" bordered={false} bodyStyle={{ padding: 0 }}>
+            <List<Statement>
+              itemLayout="horizontal"
+              dataSource={preview.latest ?? []}
+              locale={{ emptyText: <Empty description="No statements" /> }}
+              renderItem={(s) => (
+                <li key={s.id}>
+                  <Comment
+                    author={s.author}
+                    content={<div style={{ whiteSpace: 'pre-wrap' }}>{s.body}</div>}
+                  />
+                </li>
+              )}
+              pagination={{ pageSize: 15, hideOnSinglePage: true }}
+            />
+          </Card>
+        </>
+      ) : (
+        <Empty />
+      )}
     </PageContainer>
   );
 }
@@ -1555,7 +1606,7 @@ export default function TopicDetail() {
 
 
 ===== BEGIN app/ethikos/deliberate/elite/page.tsx =====
-// app/ethikos/deliberate/elite/page.tsx
+// C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\elite\page.tsx
 'use client';
 
 import React from 'react';
@@ -1573,20 +1624,48 @@ import { Button, Drawer, Empty, Space, Tag, Tooltip, message as antdMessage } fr
 import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
 import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchEliteTopics, createEliteTopic, fetchTopicPreview } from '@/services/deliberate';
 import type { Topic } from '@/types';
 
+dayjs.extend(relativeTime);
+
 /* ------------------------------------------------------------------ */
-/*  Types dérivés                                                      */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 interface TopicRow extends Topic {
   createdAt: string;
   lastActivity: string;
-  hot: boolean; // calculé côté serveur
+  hot: boolean;         // calculé côté serveur
+  stanceCount: number;  // utilisé par KPI et la colonne
 }
+
+type TopicPreview = {
+  id: string;
+  title: string;
+  category: string;
+  createdAt: string;
+  latest: Array<{ id: string; author: string; body: string }>;
+};
+
+/* ------------------------------------------------------------------ */
+/*  Service wrapper (type-safe)                                        */
+/* ------------------------------------------------------------------ */
+
+// Le service natif ne garantit pas `stanceCount`. On normalise ici pour
+// faire correspondre exactement <{ list: TopicRow[] }, []>.
+const useEliteService = () =>
+  React.useCallback(async (): Promise<{ list: TopicRow[] }> => {
+    const res = await fetchEliteTopics();
+    const list = (res?.list ?? []).map((t: any) => ({
+      ...t,
+      stanceCount: typeof t.stanceCount === 'number' ? t.stanceCount : 0,
+    })) as TopicRow[];
+    return { list };
+  }, []);
 
 /* ------------------------------------------------------------------ */
 /*  Composant principal                                                */
@@ -1596,21 +1675,27 @@ export default function EliteAgora() {
   usePageTitle('Deliberate · Elite Agora');
 
   /* ---------- data ---------- */
-  const { data, loading, refresh } = useRequest(fetchEliteTopics);
+  const eliteService = useEliteService();
+  // useRequest attend 2 génériques <TData, TParams>. Le service n’a pas de params -> [].
+  const { data, loading, refresh } = useRequest<{ list: TopicRow[] }, []>(eliteService);
   useInterval(refresh, 60_000); // polling 1 min
 
   /* ---------- drawer state ---------- */
   const [previewId, setPreviewId] = React.useState<string | null>(null);
-  const { data: preview, loading: previewLoading, run: loadPreview } = useRequest(
-    (id: string) => fetchTopicPreview(id),
-    { manual: true },
-  );
+  const {
+    data: preview,
+    loading: previewLoading,
+    run: loadPreview,
+  } = useRequest<TopicPreview, [string]>(fetchTopicPreview, { manual: true });
 
   /* ---------- open drawer ---------- */
-  const openPreview = React.useCallback((row: TopicRow) => {
-    setPreviewId(row.id);
-    loadPreview(row.id);
-  }, [loadPreview]);
+  const openPreview = React.useCallback(
+    (row: TopicRow) => {
+      setPreviewId(row.id);
+      loadPreview(row.id);
+    },
+    [loadPreview],
+  );
 
   /* ---------- KPI header ---------- */
   const headerStats = React.useMemo(
@@ -1620,7 +1705,7 @@ export default function EliteAgora() {
         label: 'Avg stances / topic',
         value: data?.list?.length
           ? Math.round(
-              (data!.list.reduce((sum: number, t: TopicRow) => sum + t.stanceCount, 0)) /
+              data!.list.reduce((sum: number, t: TopicRow) => sum + (t.stanceCount ?? 0), 0) /
                 data!.list.length,
             )
           : 0,
@@ -1645,14 +1730,19 @@ export default function EliteAgora() {
       {
         title: 'Title',
         dataIndex: 'title',
-        render: (_, row) => <a onClick={() => openPreview(row)}>{row.title}</a>,
+        render: (_: any, row: TopicRow) => (
+          <a onClick={() => openPreview(row)} style={{ cursor: 'pointer' }}>
+            {row.title}
+          </a>
+        ),
       },
       {
         title: 'Category',
         dataIndex: 'category',
         filters: categoryFilters,
-        onFilter: (val, row) => String(row.category) === String(val),
-        render: (_, row) => <Tag color="geekblue">{row.category}</Tag>,
+        onFilter: (value: React.Key | boolean, record: TopicRow) =>
+          String(record.category) === String(value),
+        render: (_: any, row: TopicRow) => <Tag color="geekblue">{row.category}</Tag>,
       },
       {
         title: 'Stances',
@@ -1663,13 +1753,14 @@ export default function EliteAgora() {
       {
         title: 'Last activity',
         dataIndex: 'lastActivity',
-        valueType: 'fromNow',
+        // Pas de valueType non standard. On rend “fromNow” explicitement.
+        render: (_: any, row: TopicRow) => dayjs(row.lastActivity).fromNow(),
       },
       {
         title: '',
         dataIndex: 'hot',
         width: 60,
-        render: (_, row) =>
+        render: (_: any, row: TopicRow) =>
           row.hot ? (
             <Tooltip title="Trending">
               <FireOutlined style={{ color: '#fa541c' }} />
@@ -1687,13 +1778,7 @@ export default function EliteAgora() {
       loading={loading}
       extra={
         <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={refresh}
-            type="text"
-            title="Refresh list"
-          />
-          {/* vérification de rôle/permission si besoin */}
+          <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title="Refresh list" />
           <NewTopicButton onCreated={refresh} />
         </Space>
       }
@@ -1776,28 +1861,20 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
 
   return (
     <>
-      <Button
-        icon={<PlusOutlined />}
-        type="primary"
-        onClick={() => setVisible(true)}
-      >
+      <Button icon={<PlusOutlined />} type="primary" onClick={() => setVisible(true)}>
         New Topic
       </Button>
       <ModalForm
         title="Create new topic"
         open={visible}
         onOpenChange={setVisible}
-        onFinish={async (values: Record<string, any>) => {
+        onFinish={async (values: { title: string; category: string }) => {
           await runAsync(values);
           return true;
         }}
         submitter={{ submitButtonProps: { loading } }}
       >
-        <ProFormText
-          name="title"
-          label="Title"
-          rules={[{ required: true, min: 10 }]}
-        />
+        <ProFormText name="title" label="Title" rules={[{ required: true, min: 10 }]} />
         <ProFormSelect
           name="category"
           label="Category"
@@ -5517,10 +5594,9 @@ export default SustainabilityDashboard;
 ===== BEGIN app/keenkonnect/sustainability-impact/track-project-impact/page.tsx =====
 'use client'
 
-// pages/keenkonnect/sustainability-impact/track-project-impact/index.tsx
+// app/keenkonnect/sustainability-impact/track-project-impact/index.tsx
 import React, { useState, useMemo, useEffect } from 'react';
 import Head from 'next/head';
-// (Optionnel) type NextPage non requis ici
 import { Card, Statistic, Row, Col, Select, DatePicker, Timeline } from 'antd';
 import MainLayout from '@/components/layout-components/MainLayout';
 import {
@@ -5534,22 +5610,28 @@ import {
   BarChart,
   Bar,
 } from 'recharts';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
-const { Option } = Select;
 const { RangePicker } = DatePicker;
 
-// Exemple de projets disponibles
-const projects = ['Project Alpha', 'Project Beta', 'Project Gamma'];
+// ---- Types ----
+type DateRange = [Dayjs, Dayjs] | null;
 
-// Impact metrics simulés pour un projet
+interface ImpactReport {
+  key: string;
+  date: string;     // ISO string (YYYY-MM-DD) for simplicity
+  summary: string;
+}
+
+// ---- Demo data ----
+const projects = ['Project Alpha', 'Project Beta', 'Project Gamma'] as const;
+
 const sampleImpactMetrics = {
   carbonReduction: 1200, // in kg CO2 reduced
   peopleReached: 450,
   fundsSaved: 3000, // in dollars
-}; // <-- fermeture manquante ajoutée
+};
 
-// Données simulées pour l'évolution de l'impact dans le temps (line chart)
 const sampleImpactTrend = [
   { period: 'Jan', value: 500 },
   { period: 'Feb', value: 600 },
@@ -5560,37 +5642,37 @@ const sampleImpactTrend = [
   { period: 'Jul', value: 1200 },
 ];
 
-// Données simulées pour le breakdown par catégories (bar chart)
 const sampleImpactBreakdown = [
   { category: 'Environmental', value: 1200 },
   { category: 'Social', value: 450 },
   { category: 'Economic', value: 3000 },
 ];
 
-// Simulé: liste d'impact reports (Timeline)
-const impactReports = [
+const impactReports: ImpactReport[] = [
   { key: '1', date: '2023-01-15', summary: 'Initial report - baseline established.' },
   { key: '2', date: '2023-04-20', summary: 'Significant improvement in carbon reduction.' },
   { key: '3', date: '2023-07-10', summary: 'Major milestone achieved in funds saved.' },
 ];
 
 export default function TrackProjectImpact() {
-  // États pour le filtre par projet et période
-  const [selectedProject, setSelectedProject] = useState<string>(projects[0]);
-  const [dateRange, setDateRange] = useState<[any, any] | null>(null);
+  // Project & period filters
+  // Safe fallback avoids TS2345 under noUncheckedIndexedAccess
+  const [selectedProject, setSelectedProject] = useState<string>(projects[0] ?? 'Project Alpha');
+  const [dateRange, setDateRange] = useState<DateRange>(null);
 
-  // Filtre supplémentaire sur dateRange pour la Timeline (exemple simulé)
+  // Filter timeline by dateRange
   const filteredImpactReports = useMemo(() => {
     if (!dateRange) return impactReports;
+    const [start, end] = dateRange;
     return impactReports.filter((report) => {
       const reportDate = dayjs(report.date);
-      return reportDate.isAfter(dateRange[0]) && reportDate.isBefore(dateRange[1]);
+      return reportDate.isAfter(start) && reportDate.isBefore(end);
     });
   }, [dateRange]);
 
-  // Mise à jour automatique de la tendance (optionnel)
+  // Example: background refresh hook (kept for future plug-in)
   useEffect(() => {
-    // Ici vous pourriez intégrer un setInterval pour actualiser sampleImpactTrend en temps réel
+    // setInterval(...) if you want to refresh charts periodically
   }, []);
 
   return (
@@ -5606,25 +5688,26 @@ export default function TrackProjectImpact() {
       <div className="container mx-auto p-5">
         <h1 className="text-2xl font-bold mb-4">Track Project Impact</h1>
 
-        {/* Sélecteur de projet et filtre de période */}
+        {/* Project selector & date filter */}
         <Row gutter={[16, 16]} className="mb-6">
           <Col xs={24} sm={12}>
             <Select
-              defaultValue={selectedProject}
+              value={selectedProject}
               style={{ width: '100%' }}
               onChange={setSelectedProject}
-            >
-              {projects.map((proj) => (
-                <Option key={proj} value={proj}>
-                  {proj}
-                </Option>
-              ))}
-            </Select>
+              options={projects.map((p) => ({ value: p, label: p }))}
+            />
           </Col>
           <Col xs={24} sm={12}>
             <RangePicker
               style={{ width: '100%' }}
-              onChange={(dates) => setDateRange(dates as any)}
+              onChange={(dates) => {
+                if (!dates || !dates[0] || !dates[1]) {
+                  setDateRange(null);
+                } else {
+                  setDateRange([dates[0], dates[1]]);
+                }
+              }}
             />
           </Col>
         </Row>
@@ -5651,7 +5734,7 @@ export default function TrackProjectImpact() {
           </Col>
         </Row>
 
-        {/* Impact Trend Chart (Line Chart) */}
+        {/* Impact Trend (Line) */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Impact Trend Over Time</h2>
           <div style={{ width: '100%', height: 300 }}>
@@ -5667,7 +5750,7 @@ export default function TrackProjectImpact() {
           </div>
         </Card>
 
-        {/* Impact Breakdown (Bar Chart) */}
+        {/* Category Breakdown (Bar) */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Category-wise Impact Breakdown</h2>
           <div style={{ width: '100%', height: 300 }}>
@@ -5683,7 +5766,7 @@ export default function TrackProjectImpact() {
           </div>
         </Card>
 
-        {/* Timeline of Impact Reports */}
+        {/* Timeline */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Impact Reports Timeline</h2>
           <Timeline>
@@ -9531,8 +9614,8 @@ export default function Page() {
       dataIndex: 'subject',
       key: 'subject',
       filters: SUBJECTS.map((s) => ({ text: s, value: s })),
-      onFilter: (value: string | number | boolean, r: Resource) =>
-        r.subject === String(value),
+      // AntD v5 expects: (value: React.Key | boolean, record: Resource) => boolean
+      onFilter: (value: boolean | React.Key, r: Resource) => r.subject === String(value),
     },
     {
       title: 'Rating',
@@ -9948,9 +10031,10 @@ import {
 import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
-
-import MainLayout from '@/components/layout-components/MainLayout';
 import type { ColumnsType } from 'antd/es/table';
+import type { SliderRangeProps } from 'antd/es/slider'; // <-- added
+
+import MainLayout from '@/shared/layout/MainLayout';
 
 const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -10008,11 +10092,9 @@ const MOCK_RESOURCES: Resource[] = [
 const ALL_SUBJECTS = ['Sustainability', 'Engineering', 'Community', 'Ethics', 'Leadership'];
 const ALL_TYPES: Resource['type'][] = ['Article', 'Video', 'Course', 'Book', 'Podcast'];
 
-const SearchFiltersPage = () => {
-  // Recherche simple
+const SearchFiltersPage: React.FC = () => {
   const [query, setQuery] = useState<string>('');
 
-  // Filtres
   const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
   const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
   const [difficultyRange, setDifficultyRange] = useState<[number, number]>([1, 5]);
@@ -10032,29 +10114,24 @@ const SearchFiltersPage = () => {
 
   const filteredData = useMemo(() => {
     return MOCK_RESOURCES.filter((res) => {
-      // Query
       if (query.trim()) {
         const q = query.trim().toLowerCase();
         const hay = `${res.title} ${res.subject} ${res.tags.join(' ')}`.toLowerCase();
         if (!hay.includes(q)) return false;
       }
 
-      // Subjects
       if (selectedSubjects.length > 0 && !selectedSubjects.includes(res.subject)) {
         return false;
       }
 
-      // Types
       if (resourceTypes.length > 0 && !resourceTypes.includes(res.type)) {
         return false;
       }
 
-      // Difficulty
       if (res.difficulty < difficultyRange[0] || res.difficulty > difficultyRange[1]) {
         return false;
       }
 
-      // Date range
       if (dateRange) {
         const [start, end] = dateRange;
         const resDate = dayjs(res.createdAt);
@@ -10063,9 +10140,7 @@ const SearchFiltersPage = () => {
         }
       }
 
-      // Category (démo)
       if (category !== 'All') {
-        // exemple de mapping fictif
         if (category === 'Featured' && res.id !== '1') return false;
         if (category === 'New' && dayjs().diff(dayjs(res.createdAt), 'day') > 60) return false;
       }
@@ -10090,13 +10165,13 @@ const SearchFiltersPage = () => {
       title: 'Type',
       dataIndex: 'type',
       key: 'type',
-      render: (t) => <Tag>{t}</Tag>,
+      render: (t: Resource['type']) => <Tag>{t}</Tag>,
     },
     {
       title: 'Difficulty',
       dataIndex: 'difficulty',
       key: 'difficulty',
-      render: (d) => (
+      render: (d: number) => (
         <Space>
           <Text>{d}</Text>
         </Space>
@@ -10106,7 +10181,7 @@ const SearchFiltersPage = () => {
       title: 'Created',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (d) => dayjs(d).format('YYYY-MM-DD'),
+      render: (d: string) => dayjs(d).format('YYYY-MM-DD'),
     },
     {
       title: 'Tags',
@@ -10122,11 +10197,15 @@ const SearchFiltersPage = () => {
     },
   ];
 
-  // ✅ Correction: onChange doit accepter number[] en mode range
-  const handleDifficultyChange = (value: number[]) => {
-    if (value.length === 2) {
-      setDifficultyRange([value[0], value[1]]);
-    }
+  // FIX: onChange must be (value: number[]) when range is enabled
+  const handleDifficultyChange: SliderRangeProps['onChange'] = (value) => {
+    const [min, max] = value as [number, number];
+    setDifficultyRange([min, max]);
+  };
+
+  const handleDateRangeChange = (dates: null | [Dayjs | null, Dayjs | null]) => {
+    if (dates && dates[0] && dates[1]) setDateRange([dates[0], dates[1]]);
+    else setDateRange(null);
   };
 
   return (
@@ -10209,8 +10288,8 @@ const SearchFiltersPage = () => {
                   min={1}
                   max={5}
                   step={1}
-                  value={difficultyRange}
-                  onChange={handleDifficultyChange}
+                  value={difficultyRange}        // [number, number] is fine for value
+                  onChange={handleDifficultyChange} // now typed as (value: number[]) => void
                 />
               </Col>
             </Row>
@@ -10229,7 +10308,12 @@ const SearchFiltersPage = () => {
               </Select>
             </Space>
 
-            <Table<Resource> rowKey="id" columns={columns} dataSource={filteredData} pagination={{ pageSize: 8 }} />
+            <Table<Resource>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredData}
+              pagination={{ pageSize: 8 }}
+            />
           </Card>
         </Col>
       </Row>
@@ -10244,7 +10328,7 @@ const SearchFiltersPage = () => {
       >
         <Form layout="vertical">
           <Form.Item label="Plage de dates">
-            <RangePicker onChange={(dates) => setDateRange(dates as [Dayjs, Dayjs] | null)} style={{ width: '100%' }} />
+            <RangePicker onChange={handleDateRangeChange} style={{ width: '100%' }} />
           </Form.Item>
 
           <Form.Item label="Mots-clés">
@@ -11217,12 +11301,10 @@ export default function Page() {
 
     const dateTime = eventDate
       .clone()
-      .set({
-        hour: eventTime.hour(),
-        minute: eventTime.minute(),
-        second: 0,
-        millisecond: 0,
-      });
+      .hour(eventTime.hour())
+      .minute(eventTime.minute())
+      .second(0)
+      .millisecond(0);
 
     const newEvent: ActivityEvent = {
       id: `evt${Date.now()}`,
@@ -12420,6 +12502,7 @@ export default function FindSpacesPage(): JSX.Element {
 
 
 ===== BEGIN app/kreative/collaborative-spaces/my-spaces/page.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -12481,13 +12564,16 @@ export default function MySpacesPage(): JSX.Element {
     }
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
-      spaces = spaces.filter((s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q));
+      spaces = spaces.filter(
+        (s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q),
+      );
     }
     return spaces;
   }, [selectedCategory, searchQuery]);
 
   const enterSpace = (id: string) => {
     router.push(`/kreative/collaborative-spaces/${id}`);
+  };
 
   return (
     <PageContainer title="My Spaces">
@@ -12495,7 +12581,7 @@ export default function MySpacesPage(): JSX.Element {
         <Col>
           <Space>
             <Input
-              placeholder="Search spaces..."
+              placeholder="Search spaces."
               prefix={<SearchOutlined />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -12503,7 +12589,7 @@ export default function MySpacesPage(): JSX.Element {
             />
             <Select
               value={selectedCategory}
-              onChange={setSelectedCategory}
+              onChange={(value: string) => setSelectedCategory(value)}
               style={{ width: 200 }}
               options={[
                 { value: 'All', label: 'All Categories' },
@@ -12525,7 +12611,7 @@ export default function MySpacesPage(): JSX.Element {
         </Col>
       </Row>
 
-      <List
+      <List<CollaborativeSpace>
         itemLayout="horizontal"
         dataSource={filteredSpaces ?? []}
         renderItem={(space: CollaborativeSpace) => (
@@ -12547,7 +12633,11 @@ export default function MySpacesPage(): JSX.Element {
                   <Avatar size="large" icon={<TeamOutlined />} />
                 )
               }
-              title={<Title level={4} style={{ margin: 0 }}>{space.name}</Title>}
+              title={
+                <Title level={4} style={{ margin: 0 }}>
+                  {space.name}
+                </Title>
+              }
               description={
                 <Space direction="vertical" size={0}>
                   <Text strong>Topic:</Text>
@@ -12562,7 +12652,6 @@ export default function MySpacesPage(): JSX.Element {
       />
     </PageContainer>
   );
-}
 }
 
 ===== END app/kreative/collaborative-spaces/my-spaces/page.tsx =====
@@ -12716,9 +12805,9 @@ export default function StartNewSpacePage() {
 
 
 ===== BEGIN app/kreative/community-showcases/featured-projects/page.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
 'use client';
 
-// File: app/kreative/community-showcases/featured-projects/page.tsx
 import React, { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -12732,7 +12821,7 @@ import {
   Typography,
   Badge,
   Space,
-  Button, // fixed: ensure Button is imported
+  Button,
 } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import PageContainer from '@/components/PageContainer';
@@ -12788,28 +12877,29 @@ const dummyProjects: Project[] = [
 ];
 
 export default function FeaturedProjectsPage(): JSX.Element {
-  const router = useRouter(); // fixed: useRouter from next/navigation
+  const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  // Pagination state.
+  // Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 4;
 
-  // Filter projects based on search and category.
+  // Filters
   const filteredProjects = useMemo(() => {
     let projects = dummyProjects;
     if (selectedCategory !== 'All') {
       projects = projects.filter((project) => project.category === selectedCategory);
     }
     if (searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase();
       projects = projects.filter(
         (project) =>
-          project.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          project.description.toLowerCase().includes(searchQuery.toLowerCase()),
+          project.title.toLowerCase().includes(q) ||
+          project.description.toLowerCase().includes(q),
       );
     }
     return projects;
@@ -12823,14 +12913,16 @@ export default function FeaturedProjectsPage(): JSX.Element {
   const openModal = (project: Project) => {
     setSelectedProject(project);
     setModalVisible(true);
+  };
 
   const closeModal = () => {
     setModalVisible(false);
     setSelectedProject(null);
+  };
 
   return (
     <PageContainer title="Featured Projects">
-      {/* Filter Section */}
+      {/* Filters */}
       <Space wrap style={{ marginBottom: 24 }}>
         <Input
           placeholder="Search projects."
@@ -12843,7 +12935,6 @@ export default function FeaturedProjectsPage(): JSX.Element {
           style={{ width: 300 }}
         />
 
-        {/* refactor: avoid deprecated Select.Option, use options prop */}
         <Select
           value={selectedCategory}
           onChange={(value) => {
@@ -12861,7 +12952,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
         />
       </Space>
 
-      {/* Projects Grid */}
+      {/* Grid */}
       <Row gutter={[24, 24]}>
         {paginatedProjects.map((project) => (
           <Col key={project.id} xs={24} sm={12} md={8} lg={6}>
@@ -12881,7 +12972,6 @@ export default function FeaturedProjectsPage(): JSX.Element {
                   title={project.title}
                   description={
                     <>
-                      {/* fix: remove ellipsis={{}} which is incompatible in your setup */}
                       <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
                         {project.description}
                       </Paragraph>
@@ -12905,7 +12995,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
         />
       </div>
 
-      {/* Modal for Project Details */}
+      {/* Modal */}
       <Modal open={modalVisible} onCancel={closeModal} footer={null} width={800}>
         {selectedProject && (
           <div>
@@ -12933,7 +13023,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
         )}
       </Modal>
 
-      {/* multi-line clamp replacement for deprecated Typography ellipsis rows */}
+      {/* simple 2-line clamp */}
       <style jsx>{`
         .line-clamp-2 {
           display: -webkit-box;
@@ -12945,7 +13035,6 @@ export default function FeaturedProjectsPage(): JSX.Element {
     </PageContainer>
   );
 }
-}}
 
 ===== END app/kreative/community-showcases/featured-projects/page.tsx =====
 

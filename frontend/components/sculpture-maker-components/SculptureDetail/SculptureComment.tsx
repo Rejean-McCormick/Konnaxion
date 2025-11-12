@@ -1,180 +1,173 @@
 'use client'
 
 /**
- * Description: Sculpture's comment list component
- * Author: Hieu Chu
+ * Sculpture comments list and editor
+ * Refactor: remove antd Comment, stop using .data on API calls
  */
 
+import React, { useMemo, useState, useCallback } from 'react'
 import dayjs from 'dayjs'
-import { Tooltip,
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
+
+import {
+  Tooltip,
   List,
-  Comment,
   Card,
   Dropdown,
   Modal,
   message as antdMessage,
   Button,
   Empty,
-  Input
- } from 'antd';import type { MenuProps } from 'antd'
+  Input,
+  Avatar,
+  Typography,
+} from 'antd'
+import type { MenuProps } from 'antd'
 import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
-import { useState } from 'react'
-import { normalizeError } from "../../../shared/errors";
+import { normalizeError } from '../../../shared/errors'
 
 const { confirm } = Modal
 const { TextArea } = Input
+const { Text } = Typography
 
-const SculptureComment = ({
-  comments,
+type User = {
+  userId: string
+  name?: string
+  nickname?: string
+  picture?: string
+}
+
+export type SculptureCommentItem = {
+  commentId: string
+  user: User
+  content: string
+  createdTime: string | Date
+}
+
+type Props = {
+  comments?: SculptureCommentItem[]
+  deleteComment: (commentId: string) => void
+  addComment: (comment: SculptureCommentItem) => void
+  sculptureId: string
+}
+
+const displayName = (u: User) =>
+  u.userId?.includes('auth0')
+    ? u.nickname ?? u.name ?? 'Unknown user'
+    : u.name ?? u.nickname ?? 'Unknown user'
+
+const SculptureComment: React.FC<Props> = ({
+  comments = [],
   deleteComment,
   addComment,
-  sculptureId
+  sculptureId,
 }) => {
-  comments.sort(
-    (a, b) =>
-      new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
+  const [submitting, setSubmitting] = useState(false)
+  const [value, setValue] = useState('')
+
+  const sortedComments = useMemo(
+    () =>
+      [...comments].sort(
+        (a, b) =>
+          new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime(),
+      ),
+    [comments],
   )
 
-  const handleDelete: MenuProps['onClick'] = e => {
+  const getMenuItems = useCallback(
+    (commentId: string): MenuProps['items'] => [{ key: commentId, label: 'Delete comment' }],
+    [],
+  )
+
+  const handleDelete: MenuProps['onClick'] = ({ key }) => {
     confirm({
       title: 'Delete this comment permanently?',
       icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: {
-          background: '#ff4d4f',
-          borderColor: '#ff4d4f'
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
+      async onOk() {
+        try {
+          await api.delete(`/comment/${String(key)}`)
+          antdMessage.success('Deleted comment successfully!')
+          deleteComment(String(key))
+        } catch (error: unknown) {
+          const { message } = normalizeError(error)
+          antdMessage.error(message || 'Failed to delete the comment.')
         }
       },
-      onOk: async () => {
-        try {
-          await api.delete(`/comment/${e.key}`)
-          antdMessage.success('Deleted comment successfully!', 2)
-          deleteComment(e.key as string)
-        } catch (error: unknown) {
-          const { message, statusCode } = normalizeError(error);
-          // @ts-ignore
-          antdMessage.error(error.response.data.message)
-        }
-      }
     })
   }
 
-  const [submitting, setSubmitting] = useState(false)
-  const [value, setValue] = useState('')
-
-  const getMenuItems = (commentId: string): MenuProps['items'] => [
-    { key: commentId, label: 'Delete comment' }
-  ]
-
-  const formattedComments = comments.map(x => ({
-    commentId: x.commentId,
-    author: (
-      <Link href={`/users/id/${x.user.userId}`}>
-        <a
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: 'rgba(0, 0, 0, 0.65)'
-          }}
-        >
-          {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
-        </a>
-      </Link>
-    ),
-    avatar: (
-      <img
-        src={x.user.picture}
-        style={{
-          width: 42,
-          height: 42,
-          borderRadius: '50%',
-          objectFit: 'cover'
-        }}
-      />
-    ),
-    content: (
-      <div style={{ fontSize: 14 }}>
-        {x.content
-          .trim()
-          .split('\n')
-          .map((line, idx) => (
-            <div key={idx}>{line}</div>
-          ))}
-      </div>
-    ),
-    datetime: (
-      <div style={{ display: 'flex' }}>
-        <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <div style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {dayjs(x.createdTime).fromNow()}
-          </div>
-        </Tooltip>
-        <div
-          style={{
-            fontSize: 14,
-            color: 'rgba(0, 0, 0, 0.45)',
-            marginLeft: 'auto'
-          }}
-        >
-          <Dropdown
-            menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
-            trigger={['click']}
-          >
-            <MoreOutlined />
-          </Dropdown>
-        </div>
-      </div>
-    )
-  }))
-
   return (
-    <Card
-      title="Comments"
-      bodyStyle={{ padding: '20px 24px 0px' }}
-      variant="borderless"
-      style={{ marginTop: 12 }}
-    >
-      <List
+    <Card title="Comments" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false} style={{ marginTop: 12 }}>
+      <List<SculptureCommentItem>
         itemLayout="horizontal"
-        dataSource={formattedComments ?? []}
+        dataSource={sortedComments}
         className="comment-list"
         locale={{
-          emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
+          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />,
+        }}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+        renderItem={(x) => {
+          const created = dayjs(x.createdTime)
+          const name = displayName(x.user)
+          return (
+            <List.Item
+              key={x.commentId}
+              actions={[
+                <Tooltip
+                  key="time"
+                  title={created.isValid() ? created.format('D MMMM YYYY, h:mm:ss a') : 'Invalid date'}
+                >
+                  <Text type="secondary">{created.isValid() ? created.fromNow() : '—'}</Text>
+                </Tooltip>,
+                <Dropdown
+                  key="menu"
+                  menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
+                  trigger={['click']}
+                >
+                  <Button type="text" size="small" aria-label="More actions" icon={<MoreOutlined />} />
+                </Dropdown>,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar
+                    size={42}
+                    src={x.user.picture || '/static/avatar.png'}
+                    alt={`${name} avatar`}
+                  />
+                }
+                title={
+                  <Link href={`/users/id/${x.user.userId}`} style={{ fontSize: 14, fontWeight: 500 }}>
+                    {name}
+                  </Link>
+                }
+                description={
+                  <div style={{ fontSize: 14 }}>
+                    {(x.content || '')
+                      .trim()
+                      .split('\n')
+                      .map((line, idx) => (
+                        <div key={`${x.commentId}-${idx}`}>{line}</div>
+                      ))}
+                  </div>
+                }
+              />
+            </List.Item>
           )
         }}
-        renderItem={item => (
-          <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              datetime={item.datetime}
-              className="comment"
-            />
-          </li>
-        )}
-        pagination={{ pageSize: 15, hideOnSinglePage: true }}
       />
-      <Comment
-        className="admin-comment"
-        avatar={
-          <img
-            src={'../../../static/avatar.png'}
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: '50%',
-              objectFit: 'cover'
-            }}
-          />
-        }
-        content={
+
+      {/* Editor */}
+      <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+        <Avatar size={42} src="/static/avatar.png" alt="Your avatar" />
+        <div style={{ flex: 1 }}>
           <Editor
             value={value}
             setValue={setValue}
@@ -183,58 +176,70 @@ const SculptureComment = ({
             sculptureId={sculptureId}
             addComment={addComment}
           />
-        }
-      />
+        </div>
+      </div>
     </Card>
   )
 }
 
-const Editor = ({
+type EditorProps = {
+  value: string
+  setValue: React.Dispatch<React.SetStateAction<string>>
+  setSubmitting: React.Dispatch<React.SetStateAction<boolean>>
+  submitting: boolean
+  sculptureId: string
+  addComment: (comment: SculptureCommentItem) => void
+}
+
+const Editor: React.FC<EditorProps> = ({
   value,
   setValue,
   setSubmitting,
   submitting,
   sculptureId,
-  addComment
-}) => (
-  <>
-    <div style={{ marginBottom: 12 }}>
-      <TextArea
-        autoSize={{ minRows: 2 }}
-        onChange={e => setValue(e.target.value)}
-        value={value}
-      />
-    </div>
-    <div style={{ marginBottom: 16 }}>
-      <Button
-        htmlType="submit"
-        disabled={value.trim() === ''}
-        loading={submitting}
-        onClick={async () => {
-          setSubmitting(true)
-          try {
-            const result = (
-              await api.post('/comment', {
-                sculptureId,
-                content: value
-              })
-            ).data
-            setSubmitting(false)
-            setValue('')
-            addComment(result)
-          } catch (e: unknown) {
-            const { message, statusCode } = normalizeError(e);
-            setSubmitting(false)
-            // @ts-ignore
-            antdMessage.error(e.response.data.message)
-          }
-        }}
-        type="primary"
-      >
-        Post
-      </Button>
-    </div>
-  </>
-)
+  addComment,
+}) => {
+  const post = async () => {
+    if (value.trim() === '') return
+    setSubmitting(true)
+    try {
+      const result = await api.post<SculptureCommentItem>('/comment', {
+        sculptureId,
+        content: value.trim(),
+      })
+      setValue('')
+      addComment(result)
+      antdMessage.success('Comment posted!')
+    } catch (error: unknown) {
+      const { message } = normalizeError(error)
+      antdMessage.error(message || 'Failed to post comment.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <div style={{ marginBottom: 12 }}>
+        <TextArea
+          autoSize={{ minRows: 2 }}
+          onChange={(e) => setValue(e.target.value)}
+          value={value}
+          onPressEnter={(e) => {
+            if (e.metaKey || e.ctrlKey) {
+              e.preventDefault()
+              void post()
+            }
+          }}
+        />
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <Button type="primary" htmlType="button" disabled={value.trim() === ''} loading={submitting} onClick={post}>
+          Post
+        </Button>
+      </div>
+    </>
+  )
+}
 
 export default SculptureComment

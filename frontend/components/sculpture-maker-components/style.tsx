@@ -1,25 +1,27 @@
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\style.tsx
 /**
  * Description: Stylesheet for sculpture-maker components
  * Author: Hieu Chu
  */
 
-import styled from 'styled-components'
+import styled from 'styled-components';
 import { Card, Col, Form, Typography, Empty, Table } from 'antd';
+import type { ComponentProps } from 'react';
 import Icon from '@/components/compat/Icon';
 
-const { Text } = Typography
+const { Text } = Typography;
 
-export const CardStyled = props => (
+export const CardStyled = (props: ComponentProps<typeof Card>) => (
   <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
-)
+);
 
 export const ColStyled = styled(Col)`
   padding-bottom: 12px;
-`
+`;
 
 export const DescriptionIcon = styled(Icon)`
   font-size: 20px;
-`
+`;
 
 export const ShadowCard = styled(CardStyled)`
   box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
@@ -34,7 +36,7 @@ export const ShadowCard = styled(CardStyled)`
     cursor: pointer;
     transition: all 150ms ease-in-out 0s;
   }
-`
+`;
 
 export const CustomFormItem = styled(Form.Item)`
   margin-bottom: 8px;
@@ -42,17 +44,17 @@ export const CustomFormItem = styled(Form.Item)`
   &.ant-form-item-with-help {
     margin-bottom: 5px;
   }
-`
+`;
 
 export const FormCol = styled(Col)`
   padding-left: 0px !important;
   padding-right: 0px !important;
-`
+`;
 
 export const Subtitle = styled(Text)`
   display: block;
   margin-bottom: 12px;
-`
+`;
 
 export const EmptyImage = styled(Empty)`
   height: 230px;
@@ -62,7 +64,7 @@ export const EmptyImage = styled(Empty)`
   & .ant-empty-image {
     margin-top: 220px;
   }
-`
+`;
 
 export const StyledTable = styled(Table)`
   .ant-table table {
@@ -70,4 +72,4 @@ export const StyledTable = styled(Table)`
     border-top: 1px solid #e8e8e8;
     border-right: 1px solid #e8e8e8;
   }
-`
+`;

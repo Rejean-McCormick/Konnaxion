@@ -384,7 +384,7 @@ class EthikosStance(models.Model):
         constraints = [
             models.CheckConstraint(
                 name="stance_value_between_-3_and_3",
-                check=models.Q(value__gte=STANCE_MIN, value__lte=STANCE_MAX),
+                condition=models.Q(value__gte=STANCE_MIN, value__lte=STANCE_MAX),
             ),
         ]
 

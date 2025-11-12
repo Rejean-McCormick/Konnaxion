@@ -60,7 +60,7 @@ const formatDailyData = (rawData: Record<string, number>): DailyPoint[] => {
   for (const date of Object.keys(rawData)) {
     result.push({
       x: dayjs(date).format('MMM D YYYY'),
-      y: rawData[date]
+      y: Number(rawData[date] ?? 0),
     })
   }
   // sort in correct order
@@ -125,12 +125,12 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         )
 
         const [
-          { data: rawLikes },
-          { data: rawComments },
-          { data: rawVisits },
-          { data: rawDefaultLikes },
-          { data: rawDefaultComments },
-          { data: rawDefaultVisits }
+          rawLikes,
+          rawComments,
+          rawVisits,
+          rawDefaultLikes,
+          rawDefaultComments,
+          rawDefaultVisits
         ] = await Promise.all([
           likesPromise,
           commentsPromise,
@@ -181,7 +181,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         }))
       } catch (e: unknown) {
         const n = normalizeError(e as AxiosError<any>)
-        setError({ statusCode: n.statusCode, message: n.message })
+        setError({ statusCode: n.statusCode ?? 500, message: n.message || 'Unknown error' })
       } finally {
         setLoading(false)
       }
@@ -259,12 +259,8 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
       <ColStyled xs={24}>
         <ShadowCard>
           <LikeCard
-            TOTAL_LIKES={TOTAL_LIKES}
-            DAILY_LIKES={DAILY_LIKES}
-            DAILY_LIKES_CHANGE={DAILY_LIKES_CHANGE}
-            LIKE_DATA={LIKE_DATA}
-            startDate={startDate}
-            endDate={endDate}
+            total={TOTAL_LIKES}
+            trend={LIKE_DATA.map(p => p.y)}
           />
         </ShadowCard>
       </ColStyled>
@@ -276,8 +272,6 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
             DAILY_COMMENTS={DAILY_COMMENTS}
             DAILY_COMMENTS_CHANGE={DAILY_COMMENTS_CHANGE}
             COMMENT_DATA={COMMENT_DATA}
-            startDate={startDate}
-            endDate={endDate}
           />
         </ShadowCard>
       </ColStyled>
@@ -289,8 +283,6 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
             DAILY_VISITS={DAILY_VISITS}
             DAILY_VISITS_CHANGE={DAILY_VISITS_CHANGE}
             VISIT_DATA={VISIT_DATA}
-            startDate={startDate}
-            endDate={endDate}
             SINGLE_SCULPTURE
           />
         </ShadowCard>

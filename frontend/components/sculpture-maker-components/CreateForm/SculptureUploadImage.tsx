@@ -1,19 +1,16 @@
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\SculptureUploadImage.tsx
 'use client';
-
-/**
- * Description: Upload image component when creating new sculpture
- * Author: Hieu Chu
- */
 
 import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 import type { AxiosProgressEvent } from 'axios';
 import { useState } from 'react';
+// FIX: style.tsx is one level up from CreateForm
 import { CardStyled, ColStyled } from '../style';
-import api from '../../../api';
+import api from '@/api';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
-import { normalizeError } from '../../../shared/errors';
+import { normalizeError } from '@/shared/errors';
 import Icon from '@/components/compat/Icon';
 
 const { confirm } = Modal;
@@ -22,11 +19,16 @@ type SculptureUploadImageProps = {
   sculpture: { accessionId: string; name: string };
 };
 
+type UploadedImage = {
+  id: string | number;
+  url: string;
+};
+
 const defaultFileList: UploadFile[] = [];
 
 export default function SculptureUploadImage({ sculpture }: SculptureUploadImageProps) {
   const router = useRouter();
-  const [fileList, setFileList] = useState<UploadFile[]>([...defaultFileList]);
+  const [fileList, setFileList] = useState<UploadFile[]>(defaultFileList);
   const { accessionId, name } = sculpture;
 
   const handleRemove: UploadProps['onRemove'] = (file) =>
@@ -72,19 +74,21 @@ export default function SculptureUploadImage({ sculpture }: SculptureUploadImage
 
     const hide = antdMessage.loading('Uploading image...', 0);
     try {
-      const result = await api.post('/sculpture-images', form, config);
-      const { id, url } = result.data[0];
+      // data-first wrapper returns T directly
+      const uploaded = await api.post<UploadedImage[]>('/sculpture-images', form, config);
+      const first = uploaded?.[0];
+      if (!first) throw new Error('Upload response empty');
 
-      const uploaded: UploadFile = {
-        uid: String(id),
-        name: (file as any)?.name ?? String(id),
+      const next: UploadFile = {
+        uid: String(first.id),
+        name: (file as any)?.name ?? String(first.id),
         status: 'done',
-        url,
-        thumbUrl: url,
+        url: first.url,
+        thumbUrl: first.url,
       };
 
-      setFileList((prev) => [...prev, uploaded]);
-      onSuccess?.(result.data[0], file as any);
+      setFileList((prev) => [...prev, next]);
+      onSuccess?.(first as any, file as any);
       antdMessage.success('Uploaded image successfully!', 2);
     } catch (e) {
       const { message } = normalizeError(e);
@@ -111,12 +115,12 @@ export default function SculptureUploadImage({ sculpture }: SculptureUploadImage
         <ColStyled xs={24}>
           <CardStyled title={`Upload sculpture image for ${name}`}>
             <Upload
-              defaultFileList={[...defaultFileList]}
               accept="image/*"
               listType="picture-card"
               customRequest={customRequest}
               onRemove={handleRemove}
               fileList={fileList}
+              maxCount={20}
             >
               {uploadButton}
             </Upload>

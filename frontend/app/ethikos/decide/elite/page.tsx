@@ -1,7 +1,9 @@
+// C:\MyCode\Konnaxionv14\frontend\app\ethikos\decide\elite\page.tsx
 'use client'
 
 import { PageContainer, ProTable } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
+import type { ReactNode } from 'react'
 import { Progress, Statistic } from 'antd'
 import { useRequest } from 'ahooks'
 import dayjs from 'dayjs'
@@ -14,7 +16,8 @@ type Row = Ballot & { turnout: number }
 export default function EliteBallots() {
   usePageTitle('Decide · Elite Ballots')
 
-  const { data, loading } = useRequest<{ ballots: Row[] }>(fetchEliteBallots)
+  // ahooks v3 expects two generics: <TData, TParams>. No params → [].
+  const { data, loading } = useRequest<{ ballots: Row[] }, []>(fetchEliteBallots)
 
   const columns: ProColumns<Row>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
@@ -22,7 +25,7 @@ export default function EliteBallots() {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-      render: (_: React.ReactNode, row) => (
+      render: (_dom: ReactNode, row: Row) => (
         <Statistic.Countdown value={dayjs(row.closesAt).valueOf()} format="D[d] HH:mm:ss" />
       ),
     },
@@ -30,7 +33,7 @@ export default function EliteBallots() {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (_: React.ReactNode, row) => <Progress type="circle" percent={row.turnout} />,
+      render: (_dom: ReactNode, row: Row) => <Progress type="circle" percent={row.turnout} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
   ]
@@ -40,7 +43,7 @@ export default function EliteBallots() {
       <ProTable<Row>
         rowKey="id"
         columns={columns}
-        dataSource={data?.ballots}
+        dataSource={data?.ballots ?? []}
         pagination={{ pageSize: 8 }}
         search={false}
       />

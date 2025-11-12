@@ -1449,6 +1449,7 @@ export default function CustomComment({
 
 
 ===== BEGIN components/dashboard-components/CommentCard.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\CommentCard.tsx
 'use client'
 
 /**
@@ -1491,14 +1492,14 @@ export default function CommentCard({
     data: COMMENT_DATA,
     xField: 'x',
     yField: 'y',
-    smooth: true,
     height: 90,
     autoFit: true,
     padding: 0,
-    xAxis: false,
-    yAxis: false,
+    // v2: axis unifié (remplace xAxis/yAxis)
+    axis: { x: false, y: false },
     tooltip: {},
-    areaStyle: { fillOpacity: 0.2 },
+    // v2: style au niveau du mark (remplace areaStyle)
+    style: { fillOpacity: 0.2 },
   }
 
   return (
@@ -1554,18 +1555,17 @@ export {
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Card, Statistic, Skeleton } from 'antd';
-import type { TinyLineConfig } from '@ant-design/plots';
+import type { LineConfig } from '@ant-design/plots';
 
-// SSR-safe dynamic import of TinyLine
-const TinyLine = dynamic(
-  () => import('@ant-design/plots').then((m) => m.TinyLine),
-  { ssr: false }
-);
+// Use Line instead of TinyLine (works across versions)
+const Line = dynamic(() => import('@ant-design/plots').then(m => m.Line), {
+  ssr: false,
+});
 
 export interface LikeCardProps {
-  title?: string;            // Default: 'Likes'
-  total: number;             // Total likes
-  trend?: number[];          // Sparkline series
+  title?: string;        // Default: 'Likes'
+  total: number;         // Total likes
+  trend?: number[];      // Sparkline series
   loading?: boolean;
 }
 
@@ -1575,14 +1575,19 @@ const LikeCard: React.FC<LikeCardProps> = ({
   trend = [],
   loading = false,
 }) => {
-  const data: number[] = Array.isArray(trend) ? trend : [];
+  const series = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ x: i, y }));
 
-  const config: TinyLineConfig = {
+  const config: LineConfig = {
     data,
-    autoFit: true,
+    xField: 'x',
+    yField: 'y',
     smooth: true,
+    autoFit: true,
     height: 56,
     padding: 0,
+    xAxis: false,
+    yAxis: false,
     tooltip: {},
   };
 
@@ -1593,7 +1598,7 @@ const LikeCard: React.FC<LikeCardProps> = ({
         <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
       ) : (
         <div style={{ marginTop: 8 }}>
-          <TinyLine {...config} />
+          <Line {...config} />
         </div>
       )}
     </Card>
@@ -1770,8 +1775,7 @@ export default StatisticCard;
  */
 
 import React from 'react'
-import { Card, Tooltip, Divider, Col } from 'antd'
-import { NumberInfo } from 'ant-design-pro'
+import { Card, Tooltip, Divider, Col, Statistic } from 'antd'
 import styled from 'styled-components'
 import {
   InfoCircleOutlined,
@@ -1799,20 +1803,40 @@ export const CardStyled = (props: any) => {
   if (props.type === 'stats') {
     bodyStyle.padding = '20px 16px 16px'
   }
-  return <Card bodyStyle={bodyStyle} variant="borderless" {...props} />
+  return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
 }
 
-export const NumberInfoStyled = (props: any) => (
-  <NumberInfo
-    {...props}
-    total={<span style={{ fontSize: 30 }}>{props.total.toLocaleString()}</span>}
-    style={{ display: 'inline-block' }}
-  />
-)
+/**
+ * Replacement for `NumberInfo` from ant-design-pro.
+ * Keeps the same call sites: <NumberInfoStyled subTitle="..." total={123} />
+ */
+export const NumberInfoStyled = (props: {
+  subTitle?: React.ReactNode
+  total: number
+  precision?: number
+  prefix?: React.ReactNode
+  suffix?: React.ReactNode
+  style?: React.CSSProperties
+}) => {
+  const { subTitle, total, precision, prefix, suffix, style } = props
+  return (
+    <div style={{ display: 'inline-block', ...(style || {}) }}>
+      <Statistic
+        title={subTitle}
+        value={total}
+        precision={precision}
+        prefix={prefix}
+        suffix={suffix}
+        formatter={(v) => Number(v).toLocaleString()}
+        valueStyle={{ fontSize: 30 }}
+      />
+    </div>
+  )
+}
 
 export const HelperIcon = (props: any) => (
   <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
-    <Tooltip {...props} placement="topLeft" arrowPointAtCenter={true}>
+    <Tooltip {...props} placement="topLeft" arrowPointAtCenter>
       <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
     </Tooltip>
   </div>
@@ -1823,20 +1847,28 @@ export const HelperIcon = (props: any) => (
  * Preferred: <MainIcon icon={<YourIcon />} />
  * Legacy support: <MainIcon type="shopping-cart" />
  */
-export const MainIcon = (props: any) => {
-  const { icon, type, style, ...rest } = props
-  const Resolved = icon
-    ? icon
-    : (() => {
-        const Comp = legacyTypeToIcon(type)
-        return Comp ? <Comp /> : null
-      })()
+type MainIconProps = {
+  icon?: React.ReactElement
+  type?: string
+  style?: React.CSSProperties
+  twoToneColor?: string
+} & React.HTMLAttributes<HTMLDivElement>
+
+export const MainIcon: React.FC<MainIconProps> = ({ icon, type, style, twoToneColor, ...rest }) => {
+  const Comp = !icon && type ? legacyTypeToIcon(type) : null
+  const element: React.ReactElement | null =
+    icon && React.isValidElement(icon)
+      ? icon
+      : Comp
+      ? React.createElement(Comp as React.ComponentType<any>)
+      : null
 
   return (
     <div style={{ marginRight: 16 }} {...rest}>
-      {React.isValidElement(Resolved)
-        ? React.cloneElement(Resolved as React.ReactElement, {
-            style: { ...(Resolved.props?.style || {}), ...(style || {}), fontSize: 54 },
+      {element
+        ? React.cloneElement(element, {
+            style: { ...(element.props as any)?.style, ...(style || {}), fontSize: 54 },
+            twoToneColor,
           })
         : null}
     </div>
@@ -1907,18 +1939,18 @@ export const ShadowCard = styled(CardStyled)`
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Card, Statistic, Skeleton } from 'antd';
-import type { TinyColumnConfig } from '@ant-design/plots';
+import type { ColumnConfig } from '@ant-design/plots';
 
-// SSR-safe dynamic import of TinyColumn
-const TinyColumn = dynamic(
-  () => import('@ant-design/plots').then((m) => m.TinyColumn),
+// SSR-safe dynamic import of Column
+const Column = dynamic(
+  () => import('@ant-design/plots').then((m) => m.Column),
   { ssr: false }
 );
 
 export interface UserCardProps {
-  title?: string;                       // Default: 'New Users'
-  total: number;                        // Total users (or new users)
-  trend?: number[];                     // Tiny column series (e.g., daily counts)
+  title?: string;        // Default: 'New Users'
+  total: number;         // Total users (or new users)
+  trend?: number[];      // Time series values
   loading?: boolean;
 }
 
@@ -1928,14 +1960,22 @@ const UserCard: React.FC<UserCardProps> = ({
   trend = [],
   loading = false,
 }) => {
-  const data: number[] = Array.isArray(trend) ? trend : [];
+  const series: number[] = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ idx: String(i + 1), value: Number(y ?? 0) }));
 
-  const config: TinyColumnConfig = {
+  const config: ColumnConfig = {
     data,
-    autoFit: true,
+    xField: 'idx',
+    yField: 'value',
     height: 56,
+    autoFit: true,
     padding: 0,
-    tooltip: {},
+    legend: false,
+    xAxis: false,
+    yAxis: false,
+    label: false,
+    tooltip: false,
+    columnWidthRatio: 1,
   };
 
   return (
@@ -1945,7 +1985,7 @@ const UserCard: React.FC<UserCardProps> = ({
         <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
       ) : (
         <div style={{ marginTop: 8 }}>
-          <TinyColumn {...config} />
+          <Column {...config} />
         </div>
       )}
     </Card>
@@ -1958,35 +1998,67 @@ export default UserCard;
 
 
 ===== BEGIN components/dashboard-components/UserPieChart.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserPieChart.tsx
+// Version corrigée basée sur le dump fourni. :contentReference[oaicite:0]{index=0}
 'use client'
+
 import React from 'react'
 import {
-  PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend,
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from 'recharts'
 import { CardStyled } from './style'
 
 type User = { userId: string }
-export default function UserPieChart({ users }: { users: User[] }) {
-  const data = [
-    { name: 'Email', value: 0 },
-    { name: 'Google', value: 0 },
-    { name: 'Facebook', value: 0 },
-  ]
+type Props = { users: User[] }
+type PieDatum = { name: string; value: number }
+
+export default function UserPieChart({ users }: Props) {
+  // Comptage sans indexation de tableau
+  let email = 0
+  let google = 0
+  let facebook = 0
+
   for (const u of users) {
-    if (u.userId.includes('auth0')) data[0].value++
-    else if (u.userId.includes('google')) data[1].value++
-    else data[2].value++
+    const id = u.userId
+    if (id.includes('auth0')) email += 1
+    else if (id.includes('google')) google += 1
+    else facebook += 1
   }
 
-  const COLORS = ['#A97BE9', '#EA4335', '#1890FF']
+  const data: PieDatum[] = [
+    { name: 'Email', value: email },
+    { name: 'Google', value: google },
+    { name: 'Facebook', value: facebook },
+  ]
+
+  const COLORS = ['#A97BE9', '#EA4335', '#1890FF'] as const
 
   return (
     <CardStyled title="Proportion of Users">
       <div style={{ width: '100%', height: 294 }}>
         <ResponsiveContainer>
           <PieChart>
-            <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={90} label>
-              {data.map((entry, i) => <Cell key={entry.name} fill={COLORS[i % COLORS.length]} />)}
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={90}
+              label
+            >
+              {data.map((entry, i) => (
+                <Cell
+                  key={entry.name}
+                  // Évite l'indexation non sûre avec une couleur de repli
+                  fill={COLORS[i % COLORS.length] ?? '#8884d8'}
+                />
+              ))}
             </Pie>
             <Tooltip />
             <Legend />
@@ -2207,9 +2279,9 @@ export default function HeaderBar({
   const breadcrumbItems = useMemo(() => {
     const br = trail(routes, cur)
     const root = {
-      name: selectedSidebar
-        ? selectedSidebar[0].toUpperCase() + selectedSidebar.slice(1)
-        : '',
+      name:
+        (selectedSidebar?.[0]?.toUpperCase() ?? '') +
+        (selectedSidebar?.slice(1) ?? ''),
       path: `/${selectedSidebar}`,
     }
     const crumbs = br.length ? [root, ...br] : [root]
@@ -2381,13 +2453,17 @@ export default function LogoTitle({
 
 
 ===== BEGIN components/layout-components/Main.tsx =====
+// components/layout-components/Main.tsx
 'use client'
 
+import type { ComponentProps, ReactNode } from 'react'
 import { Layout } from 'antd'
 import styled, { css } from 'styled-components'
 
 const StyledMain = styled(
-  ({ collapsed: _c, ...rest }) => <Layout {...rest} />,
+  ({ collapsed: _c, ...rest }: { collapsed?: boolean } & ComponentProps<typeof Layout>) => (
+    <Layout {...rest} />
+  ),
 )<{ collapsed: boolean }>`
   transition: 0.2s all;
 
@@ -2412,7 +2488,7 @@ export default function Main({
   children,
   collapsed,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   collapsed: boolean
 }) {
   return <StyledMain collapsed={collapsed}>{children}</StyledMain>
@@ -2743,11 +2819,12 @@ export default Map
 
 ===== BEGIN components/map-components/Map.tsx =====
 'use client';
+
 /**
- * Description: Dynamic map view with support for geolocation control and draggable marker
- * Author: Hieu Chu
+ * Dynamic map view with geolocation control and draggable marker
  */
 
+import { useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import {
   Map as ReactMapGL,
@@ -2755,26 +2832,27 @@ import {
   NavigationControl,
   FullscreenControl,
   GeolocateControl,
+  type ViewState as MapViewState,
+  type ViewStateChangeEvent,
 } from 'react-map-gl';
-
 import 'mapbox-gl/dist/mapbox-gl.css';
+
 import MapMarker from './MapMarker';
 import ControlPanel from './ControlPanel';
 
+/** Controls styling */
 const fullscreenControlStyle: CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
   padding: '10px',
 };
-
 const navStyle: CSSProperties = {
   position: 'absolute',
   top: 36,
   left: 0,
   padding: '10px',
 };
-
 const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
@@ -2782,64 +2860,96 @@ const geolocateStyle: CSSProperties = {
   margin: 10,
 };
 
-type ViewState = {
+/** Public shape expected by parent (keeps prop contract minimal) */
+type ViewInput = {
   latitude: number;
   longitude: number;
   zoom: number;
   pitch?: number;
   bearing?: number;
+  /** Optional on input to avoid breaking callers; we’ll default it */
+  padding?: { top: number; bottom: number; left: number; right: number };
 };
 
 type MarkerState = { markerLat: number; markerLng: number };
 
 type Props = {
-  view: ViewState;
-  setView: (v: ViewState) => void;
+  view: ViewInput;
+  setView: (v: ViewInput) => void;
   marker: MarkerState;
   setMarker: (m: MarkerState) => void;
 };
 
-const Map = ({ view, setView, marker, setMarker }: Props) => {
-  const token = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || process.env.MAPBOX_ACCESS_TOKEN as string | undefined;
-  const { markerLat, markerLng } = marker;
+const DEFAULT_PADDING: MapViewState['padding'] = {
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+};
+
+export default function Map({ view, setView, marker, setMarker }: Props) {
+  const token =
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
+    process.env.MAPBOX_ACCESS_TOKEN;
+
+  // Internal view that satisfies react-map-gl’s stricter ViewState typing
+  const controlledView: MapViewState = useMemo(
+    () => ({
+      latitude: view.latitude,
+      longitude: view.longitude,
+      zoom: view.zoom,
+      pitch: view.pitch ?? 0,
+      bearing: view.bearing ?? 0,
+      padding: view.padding ?? DEFAULT_PADDING,
+    }),
+    [view],
+  );
+
+  const handleMove = (evt: ViewStateChangeEvent) => {
+    const vs = evt.viewState;
+    // Feed a relaxed shape back to parent while preserving optional fields
+    setView({
+      latitude: vs.latitude,
+      longitude: vs.longitude,
+      zoom: vs.zoom,
+      pitch: vs.pitch,
+      bearing: vs.bearing,
+      padding: vs.padding,
+    });
+  };
 
   return (
     <ReactMapGL
-      initialViewState={view}
-      viewState={view}
-      onMove={(evt) => {
-        const vs = evt.viewState;
-        setView({
-          ...view,
-          latitude: vs.latitude,
-          longitude: vs.longitude,
-          zoom: vs.zoom,
-          pitch: vs.pitch,
-          bearing: vs.bearing,
-        });
-      }}
+      /** Uncontrolled startup values for first render */
+      initialViewState={controlledView}
+      /**
+       * Keep it controlled. Cast only at the boundary to avoid
+       * polluting the rest of your code with map-specific width/height typing.
+       */
+      viewState={controlledView as unknown as MapViewState & { width: number; height: number }}
+      onMove={handleMove}
       mapboxAccessToken={token}
       mapStyle="mapbox://styles/mapbox/streets-v11"
       style={{ width: '100%', height: '100%' }}
     >
       <Marker
-        longitude={markerLng}
-        latitude={markerLat}
+        longitude={marker.markerLng}
+        latitude={marker.markerLat}
         draggable
         onDragEnd={(e) => {
           const { lng, lat } = e.lngLat;
           setMarker({ markerLat: lat, markerLng: lng });
         }}
       >
-        {/* Removed undeclared `size` prop */}
         <MapMarker />
       </Marker>
 
-      <div className="fullscreen" style={fullscreenControlStyle}>
+      <div style={fullscreenControlStyle}>
         <FullscreenControl />
       </div>
 
-      <div className="nav" style={navStyle}>
+      <div style={navStyle}>
         <NavigationControl />
       </div>
 
@@ -2848,17 +2958,19 @@ const Map = ({ view, setView, marker, setMarker }: Props) => {
         positionOptions={{ enableHighAccuracy: true }}
         trackUserLocation
         showUserLocation
-        // Zoom d’accompagnement après géolocalisation
-        onGeolocate={() => setView({ ...view, zoom: 13 })}
+        onGeolocate={() =>
+          setView({
+            ...view,
+            // keep or increase zoom to a sensible level
+            zoom: Math.max(view.zoom ?? 0, 13),
+          })
+        }
       />
 
-      {/* Removed undeclared lat/lng props */}
-      <ControlPanel lat={markerLat} lng={markerLng} />
+      <ControlPanel lat={marker.markerLat} lng={marker.markerLng} />
     </ReactMapGL>
   );
-};
-
-export default Map;
+}
 
 ===== END components/map-components/Map.tsx =====
 
@@ -2900,121 +3012,131 @@ export default class MapMarker extends PureComponent<MapMarkerProps> {
 
 
 ===== BEGIN components/map-components/StaticMap.tsx =====
-'use client'
+'use client';
 
 /**
- * Description: Static map view
- * Author: Hieu Chu
+ * Static map view
  */
 
-import type { CSSProperties } from 'react'
+import { useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
 import {
   Map as ReactMapGL,
   Marker,
   FullscreenControl,
   Popup,
-  GeolocateControl
-} from 'react-map-gl'
+  GeolocateControl,
+  type ViewState as MapViewState,
+  type ViewStateChangeEvent,
+} from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
-import { useState } from 'react'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import MapMarker from './MapMarker'
+import MapMarker from './MapMarker';
 
 const fullscreenControlStyle: CSSProperties = {
   position: 'absolute',
   top: 0,
   left: 0,
-  padding: '10px'
-}
+  padding: '10px',
+};
 
 const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
   right: 0,
-  margin: 10
-}
+  margin: 10,
+};
 
-const defaultLocation = {
-  latitude: -34.40581053569814,
-  longitude: 150.87842788963476
-}
+const DEFAULT_LOCATION = { latitude: -34.40581053569814, longitude: 150.87842788963476 };
+const DEFAULT_PADDING: MapViewState['padding'] = { top: 0, right: 0, bottom: 0, left: 0 };
 
-type StaticMapProps = {
-  markerLat?: number
-  markerLng?: number
-}
+type Props = {
+  markerLat?: number;
+  markerLng?: number;
+};
 
-const MyStaticMap = ({ markerLat, markerLng }: StaticMapProps) => {
-  const token = process.env.MAPBOX_ACCESS_TOKEN as string | undefined
+export default function MyStaticMap({ markerLat, markerLng }: Props) {
+  const token =
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
+    process.env.MAPBOX_ACCESS_TOKEN;
 
-  const [vp, setVp] = useState({
-    latitude: markerLat ?? defaultLocation.latitude,
-    longitude: markerLng ?? defaultLocation.longitude,
+  // Keep a local controlled view so geolocate/drag gestures remain in sync
+  const [vp, setVp] = useState<MapViewState>({
+    latitude: markerLat ?? DEFAULT_LOCATION.latitude,
+    longitude: markerLng ?? DEFAULT_LOCATION.longitude,
     zoom: 15,
-    pitch: 50
-  })
+    pitch: 50,
+    bearing: 0,
+    padding: DEFAULT_PADDING,
+  });
+
+  const initialView = useMemo(() => vp, []); // only for first paint
+
+  const onMove = (evt: ViewStateChangeEvent) => {
+    const vs = evt.viewState;
+    setVp((prev) => ({
+      ...prev,
+      latitude: vs.latitude,
+      longitude: vs.longitude,
+      zoom: vs.zoom,
+      pitch: vs.pitch,
+      bearing: vs.bearing,
+      padding: vs.padding ?? prev.padding,
+    }));
+  };
 
   return (
     <ReactMapGL
-      initialViewState={vp}
-      viewState={vp}
-      onMove={evt => {
-        const vs = evt.viewState
-        setVp(v => ({
-          ...v,
-          latitude: vs.latitude,
-          longitude: vs.longitude,
-          zoom: vs.zoom,
-          pitch: vs.pitch,
-          bearing: vs.bearing
-        }))
-      }}
+      initialViewState={initialView}
+      // Keep controlled. Cast at the boundary to satisfy the library’s extra width/height typing.
+      viewState={vp as unknown as MapViewState & { width: number; height: number }}
+      onMove={onMove}
       mapboxAccessToken={token}
       mapStyle="mapbox://styles/mapbox/streets-v11"
       style={{ width: '100%', height: '640px' }}
     >
-      <div>
-        {markerLat != null && markerLng != null && (
-          <>
-            <Marker longitude={markerLng} latitude={markerLat}>
-              <MapMarker size={22} />
-            </Marker>
+      {markerLat != null && markerLng != null && (
+        <>
+          <Marker longitude={markerLng} latitude={markerLat}>
+            <MapMarker />
+          </Marker>
 
-            <Popup
-              anchor="bottom"
-              latitude={markerLat}
-              longitude={markerLng}
-              closeOnClick={false}
-              closeButton={false}
-              offset={[0, -20]}
-            >
-              <div style={{ marginLeft: 5, marginRight: 5 }}>
-                <div>Latitude: {markerLat}</div>
-                <div>Longitude: {markerLng}</div>
-              </div>
-            </Popup>
-          </>
-        )}
+          <Popup
+            anchor="bottom"
+            latitude={markerLat}
+            longitude={markerLng}
+            closeOnClick={false}
+            closeButton={false}
+            offset={[0, -20]}
+          >
+            <div style={{ marginLeft: 5, marginRight: 5 }}>
+              <div>Latitude: {markerLat}</div>
+              <div>Longitude: {markerLng}</div>
+            </div>
+          </Popup>
+        </>
+      )}
 
-        <div className="fullscreen" style={fullscreenControlStyle}>
-          <FullscreenControl />
-        </div>
-
-        <GeolocateControl
-          style={geolocateStyle}
-          positionOptions={{ enableHighAccuracy: true }}
-          trackUserLocation
-          showUserLocation
-          onGeolocate={() =>
-            setVp(v => ({ ...v, zoom: 14 }))
-          }
-        />
+      <div style={fullscreenControlStyle}>
+        <FullscreenControl />
       </div>
-    </ReactMapGL>
-  )
-}
 
-export default MyStaticMap
+      <GeolocateControl
+        style={geolocateStyle}
+        positionOptions={{ enableHighAccuracy: true }}
+        trackUserLocation
+        showUserLocation
+        onGeolocate={() =>
+          setVp((v) => ({
+            ...v,
+            zoom: Math.max(v.zoom ?? 0, 14),
+          }))
+        }
+      />
+    </ReactMapGL>
+  );
+}
 
 ===== END components/map-components/StaticMap.tsx =====
 
@@ -3064,6 +3186,8 @@ export default function PageContainer({
 
 
 ===== BEGIN components/sculpture-maker-components/CreateForm/CreateFormTextFields.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\CreateFormTextFields.tsx
+
 'use client'
 
 /**
@@ -3071,23 +3195,93 @@ export default function PageContainer({
  * Author: Hieu Chu
  */
 
+import type React from 'react'
 import { useState } from 'react'
-import { Input, Select, Divider } from 'antd';
-import Icon from '@/components/compat/Icon';
+import { Input, Select, Divider } from 'antd'
+import Icon from '@/components/compat/Icon'
 const { TextArea } = Input
+// fix import path (file is in ../style)
 import { FormCol, CustomFormItem } from '../style'
-import { validateLatitude, validateLongitude } from '../../shared/utils'
+// remove broken import of '././shared/utils' and define local validators
 import MakerCreate from './MakerCreate'
 
 const { Option } = Select
 
-export default ({
+/* ----------------------------- Types ----------------------------- */
+
+type Maker = {
+  id: string | number
+  firstName: string
+  lastName: string
+}
+
+type GetFieldDecorator = (
+  id: string,
+  options?: {
+    rules?: Array<
+      | {
+          required?: boolean
+          whitespace?: boolean
+          message?: string
+        }
+      | {
+          validator: (
+            rule: unknown,
+            value: unknown,
+            callback: (message?: string) => void
+          ) => void
+        }
+    >
+    initialValue?: unknown
+  }
+) => (node: React.ReactElement) => React.ReactNode
+
+type Props = {
+  getFieldDecorator: GetFieldDecorator
+  initialData: { markerLat?: number | string | null; markerLng?: number | string | null }
+  makerList: Maker[]
+  addMaker: (maker: Maker) => void
+}
+
+/* ------------------------ Local validators ----------------------- */
+
+const validateLatitude: (
+  rule: unknown,
+  value: unknown,
+  callback: (message?: string) => void
+) => void = (_rule, value, callback) => {
+  if (value === undefined || value === null || value === '') return callback()
+  const n = Number(value)
+  if (!Number.isFinite(n) || n < -90 || n > 90) {
+    callback('Latitude must be between -90 and 90')
+  } else {
+    callback()
+  }
+}
+
+const validateLongitude: (
+  rule: unknown,
+  value: unknown,
+  callback: (message?: string) => void
+) => void = (_rule, value, callback) => {
+  if (value === undefined || value === null || value === '') return callback()
+  const n = Number(value)
+  if (!Number.isFinite(n) || n < -180 || n > 180) {
+    callback('Longitude must be between -180 and 180')
+  } else {
+    callback()
+  }
+}
+
+/* ----------------------------- UI ------------------------------- */
+
+export default function CreateFormTextFields({
   getFieldDecorator,
   initialData: { markerLat, markerLng },
   makerList,
-  addMaker
-}) => {
-  const [showModal, setShowModal] = useState(false)
+  addMaker,
+}: Props) {
+  const [showModal, setShowModal] = useState<boolean>(false)
 
   const openModal = () => setShowModal(true)
   const handleCancel = () => setShowModal(false)
@@ -3101,17 +3295,15 @@ export default ({
               {
                 required: true,
                 whitespace: true,
-                message: 'Please fill in the sculpture name!'
-              }
-            ]
+                message: 'Please fill in the sculpture name!',
+              },
+            ],
           })(
             <Input
-              prefix={
-                <Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Sculpture name"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -3123,17 +3315,15 @@ export default ({
               {
                 required: true,
                 whitespace: true,
-                message: 'Please fill in the unique accession ID!'
-              }
-            ]
+                message: 'Please fill in the unique accession ID!',
+              },
+            ],
           })(
             <Input
-              prefix={
-                <Icon type="number" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="number" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Accession ID"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -3145,19 +3335,19 @@ export default ({
               {
                 required: true,
                 whitespace: true,
-                message: 'Please fill in the primary maker!'
-              }
-            ]
+                message: 'Please fill in the primary maker!',
+              },
+            ],
           })(
             <Select
               placeholder="Primary maker"
-              dropdownRender={menu => (
+              dropdownRender={(menu) => (
                 <div>
                   {menu}
                   <Divider style={{ margin: '4px 0' }} />
                   <div
                     style={{ padding: '8px', cursor: 'pointer' }}
-                    onMouseDown={e => e.preventDefault()} // fix
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={openModal}
                   >
                     <Icon type="plus" /> Add new maker
@@ -3165,12 +3355,12 @@ export default ({
                 </div>
               )}
             >
-              {makerList.map(maker => (
+              {makerList.map((maker) => (
                 <Option key={maker.id} value={maker.id}>
-                  {maker.firstName + ' ' + maker.lastName}
+                  {`${maker.firstName} ${maker.lastName}`}
                 </Option>
               ))}
-            </Select>
+            </Select>,
           )}
         </CustomFormItem>
       </FormCol>
@@ -3179,12 +3369,10 @@ export default ({
         <CustomFormItem label="Production date" hasFeedback>
           {getFieldDecorator('productionDate')(
             <Input
-              prefix={
-                <Icon type="calendar" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="calendar" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Production date"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -3193,15 +3381,10 @@ export default ({
         <CustomFormItem label="Material" hasFeedback>
           {getFieldDecorator('material')(
             <Input
-              prefix={
-                <Icon
-                  type="code-sandbox"
-                  style={{ color: 'rgba(0,0,0,.25)' }}
-                />
-              }
+              prefix={<Icon type="code-sandbox" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Material"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -3209,11 +3392,7 @@ export default ({
       <FormCol>
         <CustomFormItem label="Credit line" hasFeedback>
           {getFieldDecorator('creditLine')(
-            <TextArea
-              placeholder="Credit line"
-              autoSize={{ minRows: 3, maxRows: 5 }}
-              style={{ marginTop: 5 }}
-            />
+            <TextArea placeholder="Credit line" autoSize={{ minRows: 3, maxRows: 5 }} style={{ marginTop: 5 }} />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -3225,7 +3404,7 @@ export default ({
               placeholder="Location details"
               autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -3233,54 +3412,34 @@ export default ({
       <FormCol xs={24} sm={12}>
         <CustomFormItem label="Latitude" hasFeedback className="latitude-input">
           {getFieldDecorator('latitude', {
-            rules: [
-              {
-                validator: validateLatitude
-              }
-            ],
-            initialValue: String(markerLat)
+            rules: [{ validator: validateLatitude }],
+            initialValue: markerLat != null ? String(markerLat) : undefined,
           })(
             <Input
-              prefix={
-                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Latitude"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
 
       <FormCol xs={24} sm={12}>
-        <CustomFormItem
-          label="Longitude"
-          hasFeedback
-          className="longitude-input"
-        >
+        <CustomFormItem label="Longitude" hasFeedback className="longitude-input">
           {getFieldDecorator('longitude', {
-            rules: [
-              {
-                validator: validateLongitude
-              }
-            ],
-            initialValue: String(markerLng)
+            rules: [{ validator: validateLongitude }],
+            initialValue: markerLng != null ? String(markerLng) : undefined,
           })(
             <Input
-              prefix={
-                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Longitude"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
 
-      <MakerCreate
-        visible={showModal}
-        handleCancel={handleCancel}
-        addMaker={addMaker}
-      />
+      <MakerCreate visible={showModal} handleCancel={handleCancel} addMaker={addMaker} />
     </>
   )
 }
@@ -3289,6 +3448,7 @@ export default ({
 
 
 ===== BEGIN components/sculpture-maker-components/CreateForm/index.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\index.tsx
 'use client'
 
 /**
@@ -3297,17 +3457,52 @@ export default ({
  */
 
 import { useState } from 'react'
+import type { Dispatch, SetStateAction } from 'react'
 import SculptureCreate from './SculptureCreate'
 import SculptureUploadImage from './SculptureUploadImage'
+
+type MinimalSculpture = { accessionId: string; name: string }
+
 const CreateForm = () => {
-  const [step, setStep] = useState(1)
-  const [sculpture, setSculpture] = useState({})
+  // 1) Aligne la signature attendue par SculptureCreate: number
+  const [step, setStep] = useState<number>(1)
+
+  // 2) État local typé au plus juste pour l’upload
+  const [sculpture, setSculptureState] = useState<MinimalSculpture | null>(null)
+
+  // 3) Setter proxy pour coller à la prop attendue par SculptureCreate:
+  //    Dispatch<SetStateAction<Record<string, any>>>
+  const setSculpture: Dispatch<SetStateAction<Record<string, any>>> = (update) => {
+    setSculptureState((prev) => {
+      const base: Record<string, any> = prev ?? { accessionId: '', name: '' }
+      const nextObj =
+        typeof update === 'function'
+          ? (update as (p: Record<string, any>) => Record<string, any>)(base)
+          : update
+
+      if (nextObj && typeof nextObj === 'object') {
+        const accessionId = String(nextObj.accessionId ?? base.accessionId ?? '')
+        const name = String(nextObj.name ?? base.name ?? '')
+        if (accessionId && name) {
+          return { accessionId, name }
+        }
+      }
+      // Ignore une mise à jour invalide pour conserver l’état précédent
+      return prev
+    })
+  }
 
   if (step === 1) {
     return <SculptureCreate setStep={setStep} setSculpture={setSculpture} />
-  } else if (step === 2) {
+  }
+
+  if (step === 2) {
+    // Sécurité: si `sculpture` est encore null, on n’affiche pas l’upload.
+    if (!sculpture) return null
     return <SculptureUploadImage sculpture={sculpture} />
   }
+
+  return null
 }
 
 export default CreateForm
@@ -3458,14 +3653,17 @@ export default function MakerCreate({
 'use client'
 
 /**
- * Description: Component for Sculpture create page
- * Author: Hieu Chu
+ * Description: Component for Sculpture create page (migrated to AntD v5 form API)
+ * Changes:
+ *  - Drop Form.create/getFieldDecorator at the page level
+ *  - Use Form.useForm() + onFinish
+ *  - Provide a minimal getFieldDecorator-compat shim for TextFields
+ *  - Remove FlyToInterpolator dependency
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Row, Button, Form, message as antdMessage } from 'antd'
 import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
-import { FlyToInterpolator } from 'react-map-gl'
 import Map from '../../map-components'
 import TextFields from './CreateFormTextFields'
 import { api } from '../../../shared/api'
@@ -3475,74 +3673,59 @@ import { normalizeError } from '../../../shared/errors'
 
 type ErrState = { message: string; statusCode?: number } | null
 
-// Typages minimaux pour l’API legacy d’antd v3 afin d’éviter 'any' non contrôlés.
-type LegacyForm = {
-  getFieldDecorator: (name: string, options?: any) => (node: React.ReactNode) => React.ReactNode
-  setFieldsValue: (values: Record<string, any>) => void
-  validateFields: (...args: any[]) => any
-}
-
-type Maker = {
-  id: string | number
-  firstName?: string
-  lastName?: string
-}
-
-type ViewState = {
+type ViewShape = {
   latitude: number
   longitude: number
   zoom: number
-  pitch: number
-  transitionInterpolator?: any
-  transitionDuration?: number
+  pitch?: number
+  bearing?: number
+  padding?: { top: number; bottom: number; left: number; right: number }
 }
 
-type MarkerState = {
-  markerLat: number
-  markerLng: number
-}
+type MarkerState = { markerLat: number; markerLng: number }
 
-type SculptureCreateProps = {
-  form: LegacyForm
+export default function SculptureCreate({
+  setStep,
+  setSculpture,
+}: {
   setStep: React.Dispatch<React.SetStateAction<number>>
   setSculpture: React.Dispatch<React.SetStateAction<Record<string, any>>>
-}
+}) {
+  const [form] = Form.useForm()
 
-const SculptureCreate: React.FC<SculptureCreateProps> = ({
-  form,
-  form: { getFieldDecorator, setFieldsValue },
-  setStep,
-  setSculpture
-}) => {
-  const [view, setView] = useState<ViewState>({
+  // map state
+  const [view, setView] = useState<ViewShape>({
     latitude: -34.40581053569814,
     longitude: 150.87842788963476,
     zoom: 15,
-    pitch: 50
+    pitch: 50,
+    bearing: 0,
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
   })
 
-  const initialData: MarkerState = {
+  const initialData = useMemo<MarkerState>(() => ({
     markerLat: -34.40581053569814,
-    markerLng: 150.87842788963476
-  }
+    markerLng: 150.87842788963476,
+  }), [])
 
-  const [marker, setMarker] = useState<MarkerState>({ ...initialData })
-  const [makerList, setMakerList] = useState<Maker[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [marker, setMarker] = useState<MarkerState>(initialData)
+  const [makerList, setMakerList] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<ErrState>(null)
 
-  const addMaker = (maker: Maker) => {
-    setMakerList((prev) => [...prev, maker])
-    setFieldsValue({ primaryMakerId: maker.id })
+  const addMaker = (maker: any) => {
+    setMakerList(prev => [...prev, maker])
+    form.setFieldsValue({ primaryMakerId: maker.id })
   }
 
   useEffect(() => {
     let mounted = true
     const fetchMakerList = async () => {
       try {
-        const res = await api.get('/maker/')
-        if (mounted) setMakerList((res as any)?.data ?? [])
+        // axios helper in your codebase typically returns raw data (no `.data`)
+        const res: any = await api.get('/maker/')
+        if (mounted) setMakerList(Array.isArray(res) ? res : (res?.data ?? []))
       } catch (e: unknown) {
         const { message, statusCode } = normalizeError(e)
         if (mounted) setError({ statusCode, message })
@@ -3551,57 +3734,74 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
       }
     }
     fetchMakerList()
-    return () => {
-      mounted = false
-    }
+    return () => { mounted = false }
   }, [])
 
+  // remove FlyToInterpolator usage; simple state update is enough
   const flyTo = (latitude: number, longitude: number) => {
-    setView((prev) => ({
+    setView(prev => ({
       ...prev,
       latitude,
       longitude,
-      transitionInterpolator: new FlyToInterpolator(),
-      transitionDuration: 1500,
-      zoom: 15
+      zoom: 15,
     }))
     setMarker({ markerLat: latitude, markerLng: longitude })
   }
 
-  const showLocationOnMap = () => {
-    form.validateFields(['latitude', 'longitude'], (errors: any, values: any) => {
-      if (!errors) {
-        const { latitude, longitude } = values as { latitude: string | number; longitude: string | number }
-        flyTo(+latitude, +longitude)
-      }
-    })
+  const showLocationOnMap = async () => {
+    try {
+      const { latitude, longitude } = await form.validateFields(['latitude', 'longitude']) as any
+      flyTo(Number(latitude), Number(longitude))
+    } catch {
+      // validation errors are shown by antd
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    form.validateFields(async (err: any, values: Record<string, any>) => {
-      if (!err) {
-        // nettoie les champs vides
-        Object.keys(values).forEach((k) => {
-          if (!values[k]) delete values[k]
-        })
-        if (values.latitude) values.latitude = Number(values.latitude)
-        if (values.longitude) values.longitude = Number(values.longitude)
-
-        setSubmitting(true)
-        try {
-          await api.post('/sculpture', values)
-          setSculpture({ ...values })
-          setStep((s) => s + 1)
-        } catch (e: unknown) {
-          const { message } = normalizeError(e)
-          antdMessage.error(message)
-        } finally {
-          setSubmitting(false)
-        }
-      }
+  const onFinish = async (raw: Record<string, any>) => {
+    // prune empties and convert coordinates
+    const values: Record<string, any> = {}
+    Object.keys(raw).forEach(k => {
+      const v = raw[k]
+      if (v !== undefined && v !== null && String(v).trim() !== '') values[k] = v
     })
+    if (values.latitude) values.latitude = Number(values.latitude)
+    if (values.longitude) values.longitude = Number(values.longitude)
+
+    setSubmitting(true)
+    try {
+      await api.post('/sculpture', values)
+      setSculpture({ ...values })
+      setStep(s => s + 1)
+    } catch (e: unknown) {
+      const { message } = normalizeError(e)
+      antdMessage.error(message)
+    } finally {
+      setSubmitting(false)
+    }
   }
+
+  // Map component expects: setView: (v: ViewInput) => void
+  const applyViewFromMap = useCallback((v: ViewShape) => {
+    setView(prev => ({ ...prev, ...v }))
+  }, [])
+
+  // getFieldDecorator compatibility shim for TextFields:
+  // wraps child control in a noStyle Form.Item to register it without nesting layout
+  const getFieldDecorator = useCallback(
+    (name: string, options?: { rules?: any[]; initialValue?: any; valuePropName?: string }) =>
+      (node: React.ReactNode) => (
+        <Form.Item
+          noStyle
+          name={name}
+          rules={options?.rules}
+          initialValue={options?.initialValue}
+          valuePropName={options?.valuePropName}
+        >
+          {node}
+        </Form.Item>
+      ),
+    [],
+  )
 
   if (loading) return <Loading />
   if (error) return <Error statusCode={error.statusCode ?? 500} title={error.message} />
@@ -3610,7 +3810,7 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
     <Row gutter={16}>
       <ColStyled xs={24}>
         <CardStyled title="Create new sculpture">
-          <Form onSubmit={handleSubmit} autoComplete="off">
+          <Form form={form} autoComplete="off" onFinish={onFinish}>
             <ColStyled xs={24} md={12}>
               <TextFields
                 getFieldDecorator={getFieldDecorator}
@@ -3627,12 +3827,12 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
               <Map
                 view={view}
                 marker={marker}
-                setView={setView}
-                setMarker={({ markerLat, markerLng }: { markerLat: number; markerLng: number }) => {
+                setView={applyViewFromMap}
+                setMarker={({ markerLat, markerLng }) => {
                   setMarker({ markerLat, markerLng })
-                  setFieldsValue({
+                  form.setFieldsValue({
                     latitude: String(markerLat),
-                    longitude: String(markerLng)
+                    longitude: String(markerLng),
                   })
                 }}
               />
@@ -3654,30 +3854,22 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
   )
 }
 
-export default Form.create({
-  name: 'sculpture_create_form'
-})(SculptureCreate)
-
 ===== END components/sculpture-maker-components/CreateForm/SculptureCreate.tsx =====
 
 
 ===== BEGIN components/sculpture-maker-components/CreateForm/SculptureUploadImage.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\CreateForm\SculptureUploadImage.tsx
 'use client';
-
-/**
- * Description: Upload image component when creating new sculpture
- * Author: Hieu Chu
- */
 
 import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 import type { AxiosProgressEvent } from 'axios';
 import { useState } from 'react';
-import { CardStyled, ColStyled } from '../style';
-import api from '../../../api';
+import { CardStyled, ColStyled } from './style';
+import api from '@/api';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
-import { normalizeError } from '../../../shared/errors';
+import { normalizeError } from '@/shared/errors';
 import Icon from '@/components/compat/Icon';
 
 const { confirm } = Modal;
@@ -3686,11 +3878,16 @@ type SculptureUploadImageProps = {
   sculpture: { accessionId: string; name: string };
 };
 
+type UploadedImage = {
+  id: string | number;
+  url: string;
+};
+
 const defaultFileList: UploadFile[] = [];
 
 export default function SculptureUploadImage({ sculpture }: SculptureUploadImageProps) {
   const router = useRouter();
-  const [fileList, setFileList] = useState<UploadFile[]>([...defaultFileList]);
+  const [fileList, setFileList] = useState<UploadFile[]>(defaultFileList);
   const { accessionId, name } = sculpture;
 
   const handleRemove: UploadProps['onRemove'] = (file) =>
@@ -3736,19 +3933,21 @@ export default function SculptureUploadImage({ sculpture }: SculptureUploadImage
 
     const hide = antdMessage.loading('Uploading image...', 0);
     try {
-      const result = await api.post('/sculpture-images', form, config);
-      const { id, url } = result.data[0];
+      // axios wrapper retourne directement T, pas AxiosResponse<T>
+      const uploaded = await api.post<UploadedImage[]>('/sculpture-images', form, config);
+      const first = uploaded?.[0];
+      if (!first) throw new Error('Upload response empty');
 
-      const uploaded: UploadFile = {
-        uid: String(id),
-        name: (file as any)?.name ?? String(id),
+      const next: UploadFile = {
+        uid: String(first.id),
+        name: (file as any)?.name ?? String(first.id),
         status: 'done',
-        url,
-        thumbUrl: url,
+        url: first.url,
+        thumbUrl: first.url,
       };
 
-      setFileList((prev) => [...prev, uploaded]);
-      onSuccess?.(result.data[0], file as any);
+      setFileList((prev) => [...prev, next]);
+      onSuccess?.(first as any, file as any);
       antdMessage.success('Uploaded image successfully!', 2);
     } catch (e) {
       const { message } = normalizeError(e);
@@ -3775,12 +3974,12 @@ export default function SculptureUploadImage({ sculpture }: SculptureUploadImage
         <ColStyled xs={24}>
           <CardStyled title={`Upload sculpture image for ${name}`}>
             <Upload
-              defaultFileList={[...defaultFileList]}
               accept="image/*"
               listType="picture-card"
               customRequest={customRequest}
               onRemove={handleRemove}
               fileList={fileList}
+              maxCount={20}
             >
               {uploadButton}
             </Upload>
@@ -3806,9 +4005,9 @@ export default function SculptureUploadImage({ sculpture }: SculptureUploadImage
  * Author: Hieu Chu
  */
 
-import { useState } from 'react'
-import { Input, Select, Divider } from 'antd';
-import Icon from '@/components/compat/Icon';
+import React, { useState } from 'react'
+import { Input, Select, Divider } from 'antd'
+import Icon from '@/components/compat/Icon'
 const { TextArea } = Input
 import { FormCol, CustomFormItem } from '../style'
 import { validateLatitude, validateLongitude } from '../../shared/utils'
@@ -3817,7 +4016,40 @@ import MakerCreate from '../CreateForm/MakerCreate'
 
 const { Option } = Select
 
-export default ({
+type Maker = {
+  id: string | number
+  firstName: string
+  lastName: string
+  nationality?: string | null
+}
+
+type InitialData = {
+  latitude?: number | null
+  longitude?: number | null
+  accessionId: string
+  creditLine?: string
+  locationNotes?: string
+  material?: string
+  name: string
+  productionDate?: string
+  primaryMakerId?: string | number
+}
+
+type GetFieldDecorator = (
+  name: string,
+  options?: any
+) => (node: React.ReactElement) => React.ReactElement
+
+type Props = {
+  getFieldDecorator: GetFieldDecorator
+  setFieldsValue: (values: Record<string, any>) => void
+  getFieldValue: (name: string) => any
+  initialData: InitialData
+  makerList: Maker[]
+  setMakerList: React.Dispatch<React.SetStateAction<Maker[]>>
+}
+
+export default function EditFormTextFields({
   getFieldDecorator,
   setFieldsValue,
   getFieldValue,
@@ -3834,40 +4066,44 @@ export default ({
   },
   makerList,
   setMakerList
-}) => {
-  const [showModal, setShowModal] = useState(false)
-  const [showModalCreate, setShowModalCreate] = useState(false)
+}: Props): JSX.Element {
+  const [showModal, setShowModal] = useState<boolean>(false)
+  const [showModalCreate, setShowModalCreate] = useState<boolean>(false)
 
-  const openModal = () => setShowModal(true)
-  const handleCancel = () => setShowModal(false)
+  const openModal = (): void => setShowModal(true)
+  const handleCancel = (): void => setShowModal(false)
 
-  const openModalCreate = () => setShowModalCreate(true)
-  const handleCancelCreate = () => setShowModalCreate(false)
+  const openModalCreate = (): void => setShowModalCreate(true)
+  const handleCancelCreate = (): void => setShowModalCreate(false)
 
-  const getCurrentMaker = () => {
-    return makerList.find(x => x.id === getFieldValue('primaryMakerId'))
+  const getCurrentMaker = (): Maker => {
+    const current = makerList.find(
+      (x) => x.id === getFieldValue('primaryMakerId')
+    )
+    // Fallback to first or an empty shell to satisfy MakerEdit typing
+    return (
+      current ??
+      makerList[0] ?? {
+        id: '',
+        firstName: '',
+        lastName: ''
+      }
+    )
   }
 
-  const addMaker = maker => {
-    setMakerList(c => [...c, maker])
-    setFieldsValue({
-      primaryMakerId: maker.id
-    })
+  const addMaker = (maker: Maker): void => {
+    setMakerList((c) => [...c, maker])
+    setFieldsValue({ primaryMakerId: maker.id })
   }
 
-  const editMaker = maker => {
-    setMakerList(c =>
-      c.map(m => {
-        if (m.id !== maker.id) {
-          return m
-        }
-
+  const editMaker = (maker: Maker): void => {
+    setMakerList((c) =>
+      c.map((m) => {
+        if (m.id !== maker.id) return m
         return { ...maker }
       })
     )
-    setFieldsValue({
-      primaryMakerId: maker.id
-    })
+    setFieldsValue({ primaryMakerId: maker.id })
   }
 
   return (
@@ -3885,9 +4121,7 @@ export default ({
             initialValue: name
           })(
             <Input
-              prefix={
-                <Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Sculpture name"
             />
@@ -3908,12 +4142,9 @@ export default ({
             initialValue: accessionId
           })(
             <Input
-              prefix={
-                <Icon type="number" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="number" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Accession ID"
-              // disabled
               readOnly
             />
           )}
@@ -3934,20 +4165,20 @@ export default ({
           })(
             <Select
               placeholder="Primary maker"
-              dropdownRender={menu => (
+              dropdownRender={(menu: React.ReactNode) => (
                 <div>
                   {menu}
                   <Divider style={{ margin: '4px 0' }} />
                   <div
                     style={{ padding: '8px', cursor: 'pointer' }}
-                    onMouseDown={e => e.preventDefault()} // fix
+                    onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.preventDefault()}
                     onClick={openModal}
                   >
                     <Icon type="edit" /> Edit current maker
                   </div>
                   <div
                     style={{ padding: '8px', cursor: 'pointer' }}
-                    onMouseDown={e => e.preventDefault()} // fix
+                    onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.preventDefault()}
                     onClick={openModalCreate}
                   >
                     <Icon type="plus" /> Add new maker
@@ -3955,7 +4186,7 @@ export default ({
                 </div>
               )}
             >
-              {makerList.map(maker => (
+              {makerList.map((maker: Maker) => (
                 <Option key={maker.id} value={maker.id}>
                   {maker.firstName + ' ' + maker.lastName}
                 </Option>
@@ -3971,9 +4202,7 @@ export default ({
             initialValue: productionDate
           })(
             <Input
-              prefix={
-                <Icon type="calendar" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="calendar" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Production date"
             />
@@ -3987,12 +4216,7 @@ export default ({
             initialValue: material
           })(
             <Input
-              prefix={
-                <Icon
-                  type="code-sandbox"
-                  style={{ color: 'rgba(0,0,0,.25)' }}
-                />
-              }
+              prefix={<Icon type="code-sandbox" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Material"
             />
@@ -4031,17 +4255,11 @@ export default ({
       <FormCol xs={24} sm={12}>
         <CustomFormItem label="Latitude" hasFeedback className="latitude-input">
           {getFieldDecorator('latitude', {
-            rules: [
-              {
-                validator: validateLatitude
-              }
-            ],
-            initialValue: latitude ? String(latitude) : ''
+            rules: [{ validator: validateLatitude }],
+            initialValue: latitude != null ? String(latitude) : ''
           })(
             <Input
-              prefix={
-                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Latitude"
             />
@@ -4050,23 +4268,13 @@ export default ({
       </FormCol>
 
       <FormCol xs={24} sm={12}>
-        <CustomFormItem
-          label="Longitude"
-          hasFeedback
-          className="longitude-input"
-        >
+        <CustomFormItem label="Longitude" hasFeedback className="longitude-input">
           {getFieldDecorator('longitude', {
-            rules: [
-              {
-                validator: validateLongitude
-              }
-            ],
-            initialValue: longitude ? String(longitude) : ''
+            rules: [{ validator: validateLongitude }],
+            initialValue: longitude != null ? String(longitude) : ''
           })(
             <Input
-              prefix={
-                <Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />
-              }
+              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Longitude"
             />
@@ -4094,125 +4302,129 @@ export default ({
 
 
 ===== BEGIN components/sculpture-maker-components/EditForm/EditImage.tsx =====
-'use client';
+// Path: components/sculpture-maker-components/EditForm/EditImage.tsx
+'use client'
 
 /**
  * Description: Image edit component for sculpture
  * Author: Hieu Chu
  */
 
-import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
-import type { UploadFile } from 'antd';
-import { useState } from 'react';
-import { ColStyled } from '../style';
-import api from '../../../api';
-import { useRouter } from 'next/navigation';
-import { normalizeError } from '../../../shared/errors';
-import Icon from '@/components/compat/Icon';
-import type { UploadRequestOption as RcUploadRequestOption } from 'rc-upload/lib/interface';
-import type { AxiosProgressEvent } from 'axios';
+import { Upload, Button, message as antdMessage, Row, Modal } from 'antd'
+import type { UploadProps, UploadFile } from 'antd'
+import { useState } from 'react'
+import { ColStyled } from '../style' // FIX: le style est au niveau parent
+import api from '@/api'
+import { useRouter } from 'next/navigation'
+import { normalizeError } from '@/shared/errors'
+import Icon from '@/components/compat/Icon'
+import type { AxiosProgressEvent } from 'axios'
 
-const { confirm } = Modal;
+const { confirm } = Modal
+
+type UploadedImage = { id: string | number; url: string }
 
 type EditImageProps = {
-  accessionId: string;
-  _name: string;
-  // Les images reçues sont déjà façonnées côté parent pour l'Upload (uid/url/preview/status)
-  images: UploadFile[];
-};
+  accessionId: string
+  _name: string
+  /** Images déjà normalisées par le parent au format UploadFile AntD. */
+  images: UploadFile[]
+}
+
+/** Typage robuste du paramètre customRequest sans dépendre de rc-upload. */
+type CustomRequestOptions = Parameters<NonNullable<UploadProps['customRequest']>>[0]
 
 const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const [fileList, setFileList] = useState<UploadFile[]>([...(images as UploadFile[])]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([...images])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleRemove = (file: UploadFile): Promise<boolean> => {
-    return new Promise((resolve) => {
+  const handleRemove: UploadProps['onRemove'] = (file) =>
+    new Promise<boolean>((resolve) => {
       confirm({
         title: 'Do you want to remove this image?',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
         style: { top: 110 },
         maskClosable: true,
         okText: 'Confirm',
-        okButtonProps: {
-          style: {
-            background: '#ff4d4f',
-            borderColor: '#ff4d4f',
-          },
-        },
+        okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
         onOk: async () => {
-          setIsSubmitting(true);
+          setIsSubmitting(true)
           try {
-            await api.delete(`/sculpture-images/${(file as any).uid}`);
-            resolve(true);
-            setFileList((curr) => curr.filter((x: any) => x.uid !== (file as any).uid));
-            antdMessage.success('Deleted image successfully!', 2);
+            await api.delete(`/sculpture-images/${file.uid}`)
+            resolve(true)
+            setFileList((curr) => curr.filter((x) => x.uid !== file.uid))
+            antdMessage.success('Deleted image successfully!', 2)
           } catch (error: unknown) {
-            const { message } = normalizeError(error);
-            antdMessage.error(message);
-            resolve(false);
+            const { message } = normalizeError(error)
+            antdMessage.error(message || 'Failed to delete image')
+            resolve(false)
+          } finally {
+            setIsSubmitting(false)
           }
-          setIsSubmitting(false);
         },
-        onCancel: () => {
-          resolve(false);
-        },
-      });
-    });
-  };
+        onCancel: () => resolve(false),
+      })
+    })
 
-  const customRequest = async (e: RcUploadRequestOption) => {
+  // AntD v5: customRequest(options) => void, faire l'async à l'intérieur.
+  const customRequest: UploadProps['customRequest'] = (options) => {
+    const e = options as CustomRequestOptions
+
     const config = {
-      headers: {
-        'content-type':
-          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s',
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress(progressEvent: AxiosProgressEvent) {
+        const loaded = progressEvent.loaded ?? 0
+        const total = progressEvent.total ?? 1
+        const percent = total ? Math.round((loaded * 100) / total) : 0
+        // AntD attend { percent } et accepte le fichier en 2e arg
+        e.onProgress?.({ percent }, e.file as any)
       },
-      onUploadProgress: function (progressEvent: AxiosProgressEvent) {
-        const loaded = progressEvent.loaded ?? 0;
-        const total = progressEvent.total ?? 1;
-        const percentCompleted = Math.round((loaded * 100) / total);
-        // rc-upload attend un objet { percent }
-        e.onProgress?.({ percent: percentCompleted } as any, e.file as any);
-      },
-    };
-
-    const data = new FormData();
-    data.append('images', e.file as Blob);
-    data.set('accessionId', accessionId);
-
-    const hide = antdMessage.loading('Uploading image...', 0);
-    setIsSubmitting(true);
-
-    try {
-      const _result = await api.post('/sculpture-images', data, config);
-      const file: any = { ...(e.file as any) };
-      const { id, url } = _result.data[0];
-      file.uid = id;
-      file.url = url;
-      file.thumbUrl = url;
-      file.preview = url;
-
-      setFileList((curr) => [...curr, file]);
-
-      e.onSuccess?.(_result.data[0], e.file as any);
-      hide();
-      antdMessage.success('Uploaded image successfully!', 2);
-    } catch (error: unknown) {
-      const { message } = normalizeError(error);
-      antdMessage.error(message);
-      e.onError?.(message as any);
     }
 
-    setIsSubmitting(false);
-  };
+    const data = new FormData()
+    data.append('images', e.file as any)
+    data.set('accessionId', accessionId)
+
+    const hide = antdMessage.loading('Uploading image...', 0)
+    setIsSubmitting(true)
+
+    ;(async () => {
+      try {
+        // Wrapper axios "data-first" : retourne T directement
+        const uploaded = await api.post<UploadedImage[]>('/sculpture-images', data, config)
+        const first = uploaded?.[0]
+        if (!first) throw new Error('Upload response empty')
+
+        const next: UploadFile = {
+          uid: String(first.id),
+          name: (e.file as any)?.name ?? String(first.id),
+          status: 'done',
+          url: first.url,
+          thumbUrl: first.url,
+        }
+
+        setFileList((prev) => [...prev, next])
+        e.onSuccess?.(first as any, e.file as any)
+        antdMessage.success('Uploaded image successfully!', 2)
+      } catch (error: unknown) {
+        const { message } = normalizeError(error)
+        antdMessage.error(message || 'Upload failed')
+        e.onError?.(new Error(message || 'Upload failed') as any)
+      } finally {
+        hide()
+        setIsSubmitting(false)
+      }
+    })()
+  }
 
   const uploadButton = (
     <div>
       <Icon type="plus" />
       <div className="ant-upload-text">Upload</div>
     </div>
-  );
+  )
 
   return (
     <Row gutter={16}>
@@ -4222,7 +4434,7 @@ const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
           listType="picture-card"
           customRequest={customRequest}
           onRemove={handleRemove}
-          fileList={fileList as any}
+          fileList={fileList}
         >
           {uploadButton}
         </Upload>
@@ -4236,15 +4448,16 @@ const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
         </Button>
       </ColStyled>
     </Row>
-  );
-};
+  )
+}
 
-export default EditImage;
+export default EditImage
 
 ===== END components/sculpture-maker-components/EditForm/EditImage.tsx =====
 
 
 ===== BEGIN components/sculpture-maker-components/EditForm/index.tsx =====
+// components/sculpture-maker-components/EditForm/index.tsx
 'use client';
 
 /**
@@ -4254,18 +4467,19 @@ export default EditImage;
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import { Row, Modal, Button, message as antdMessage, notification, Result  } from 'antd';
+import { Row, Modal, Button, message as antdMessage, notification, Result } from 'antd';
 import { ExclamationCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 
+// FIX: style.tsx est au niveau parent de EditForm
 import { CardStyled, ColStyled } from '../style';
+
 import SculptureEdit from './SculptureEdit';
 import EditImage from './EditImage';
 
-// NOTE: API legacy import conservé tel que dans la base
-import api from '../../../api';
-import { normalizeError } from '../../../shared/errors';
+// data-first axios wrapper (retourne T, pas AxiosResponse<T>)
+import api from '@/api';
+import { normalizeError } from '@/shared/errors';
 
-const defaultPosition: [number, number] = [-34.40581053569814, 150.87842788963476];
 const { confirm } = Modal;
 
 const tabList = [
@@ -4309,7 +4523,7 @@ const SculptureEditForm = () => {
   // Prefer dynamic segment names, then fallback to query ?id=
   const sculptureId = useMemo(
     () => params?.sculptureId ?? params?.id ?? searchParams.get('id') ?? undefined,
-    [params, searchParams]
+    [params, searchParams],
   );
 
   const [initialData, setInitialData] = useState<InitialData | null>(null);
@@ -4352,7 +4566,8 @@ const SculptureEditForm = () => {
         return;
       }
       try {
-        const { data } = await api.get<InitialData>(`/sculpture/${sculptureId}`);
+        // data-first wrapper: no `.data`
+        const data = await api.get<InitialData>(`/sculpture/${sculptureId}`);
         const next: InitialData = {
           ...data,
           latitude: data.latitude != null ? Number(data.latitude) : data.latitude ?? null,
@@ -4361,8 +4576,8 @@ const SculptureEditForm = () => {
         };
         setInitialData(next);
 
-        const makersRes = await api.get<Maker[]>('/maker/');
-        setMakerList(Array.isArray(makersRes.data) ? makersRes.data : []);
+        const makers = await api.get<Maker[]>('/maker/');
+        setMakerList(Array.isArray(makers) ? makers : []);
       } catch (e: unknown) {
         const { statusCode = 500, message: errMsg = 'Unknown error' } = normalizeError(e);
         setError({ statusCode, message: errMsg });
@@ -4396,7 +4611,7 @@ const SculptureEditForm = () => {
   if (!initialData) return null;
 
   const sortedImages: ImageItem[] = [...(initialData.images ?? [])].sort(
-    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime()
+    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
   );
 
   return (
@@ -4415,7 +4630,6 @@ const SculptureEditForm = () => {
         >
           <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
             <SculptureEdit
-              defaultPosition={defaultPosition}
               initialData={{ ...initialData, images: sortedImages }}
               makerList={makerList}
               setMakerList={setMakerList}
@@ -4428,7 +4642,9 @@ const SculptureEditForm = () => {
               _name={initialData.name} // NOTE: the component expects `_name`
               images={sortedImages.map((img) => ({
                 ...img,
-                uid: img.id,
+                uid: String(img.id),
+                name: String(img.id),
+                url: img.url,
                 thumbUrl: img.url,
                 preview: img.url,
                 status: 'done',
@@ -4627,13 +4843,14 @@ export default function MakerEdit({
 
 
 ===== BEGIN components/sculpture-maker-components/EditForm/SculptureEdit.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\SculptureEdit.tsx
 'use client';
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Form, Input, Button, Upload, message } from 'antd';
-import type { UploadChangeParam, UploadFile } from 'antd/es/upload/interface';
-import type { RcFile } from 'antd/es/upload';
-import Map, { Marker, MapRef, ViewState, MapLayerMouseEvent } from 'react-map-gl';
+import type { RcFile, UploadChangeParam, UploadFile } from 'antd/es/upload/interface';
+import Map, { Marker, MapRef, MapLayerMouseEvent } from 'react-map-gl';
+import type { ViewState } from 'react-map-gl';
 
 const { TextArea } = Input;
 
@@ -4651,7 +4868,7 @@ export interface SculptureEditProps {
   onSubmit: (updated: Sculpture) => Promise<void>;
 }
 
-/** Normalise l’événement Upload → fileList (AntD v4). */
+/** Normalise l’événement Upload → fileList (AntD v4/5). */
 function normFile(e: UploadChangeParam<UploadFile>): UploadFile[] {
   return e?.fileList ?? [];
 }
@@ -4662,56 +4879,79 @@ function toFile(uploadFile?: UploadFile): File | undefined {
   return f as unknown as File | undefined;
 }
 
+type FormValues = {
+  title: string;
+  description: string;
+  location?: { lat: number; lng: number };
+  image?: UploadFile[];
+};
+
 export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProps) {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<FormValues>();
   const mapRef = useRef<MapRef | null>(null);
 
-  const initialViewState = useMemo<ViewState>(() => ({
+  // Ne pas typer initialViewState en ViewState (PaddingOptions, etc.) → Partial<ViewState>.
+  const initialViewState = useMemo<Partial<ViewState>>(
+    () => ({
+      longitude: sculpture.location?.lng ?? 0,
+      latitude: sculpture.location?.lat ?? 0,
+      zoom: 12,
+    }),
+    [sculpture.location?.lat, sculpture.location?.lng],
+  );
+
+  // État contrôlé complet. padding doit être un objet PaddingOptions.
+  const [viewState, setViewState] = useState<ViewState>(() => ({
     longitude: sculpture.location?.lng ?? 0,
     latitude: sculpture.location?.lat ?? 0,
     zoom: 12,
-  }), [sculpture.location?.lat, sculpture.location?.lng]);
-
-  const [viewState, setViewState] = useState<ViewState>(initialViewState);
+    bearing: 0,
+    pitch: 0,
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
+  }));
 
   const flyTo = useCallback((lat: number, lng: number) => {
     mapRef.current?.flyTo({ center: [lng, lat], zoom: 12, duration: 1200 });
   }, []);
 
-  const onMapClick = useCallback((e: MapLayerMouseEvent) => {
-    const { lat, lng } = e.lngLat;
-    form.setFieldsValue({ location: { lat, lng } });
-    setViewState((vs) => ({ ...vs, latitude: lat, longitude: lng }));
-  }, [form]);
+  const onMapClick = useCallback(
+    (e: MapLayerMouseEvent) => {
+      const { lat, lng } = e.lngLat;
+      form.setFieldsValue({ location: { lat, lng } });
+      setViewState((vs) => ({ ...vs, latitude: lat, longitude: lng }));
+    },
+    [form],
+  );
 
-  const onFinish = useCallback(async (values: any) => {
-    try {
-      // NOTE: values a la forme { title, description, location: {lat,lng}, image?: UploadFile[] }
-      const file = toFile(values.image?.[0]);
-      let imageUrl = sculpture.imageUrl;
+  const onFinish = useCallback(
+    async (values: FormValues) => {
+      try {
+        const file = toFile(values.image?.[0]);
+        let imageUrl = sculpture.imageUrl;
 
-      // TODO: uploader le fichier si présent et récupérer un URL
-      // if (file) {
-      //   const uploadedUrl = await uploadImageToYourAPI(file);
-      //   imageUrl = uploadedUrl;
-      // }
+        // TODO: uploader `file` vers votre backend si présent, puis affecter imageUrl.
 
-      const updated: Sculpture = {
-        ...sculpture,
-        title: values.title,
-        description: values.description,
-        location: { lat: values.location?.lat, lng: values.location?.lng },
-        imageUrl,
-      };
+        const updated: Sculpture = {
+          ...sculpture, // correction de l’ancienne faute de frappe
+          title: values.title,
+          description: values.description,
+          location: {
+            lat: Number(values.location?.lat),
+            lng: Number(values.location?.lng),
+          },
+          imageUrl,
+        };
 
-      await onSubmit(updated);
-      message.success('Sculpture mise à jour');
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err);
-      message.error("Échec de l'enregistrement");
-    }
-  }, [onSubmit, sculpture]);
+        await onSubmit(updated);
+        message.success('Sculpture mise à jour');
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+        message.error("Échec de l'enregistrement");
+      }
+    },
+    [onSubmit, sculpture],
+  );
 
   const onFinishFailed = useCallback(() => {
     message.warning('Merci de corriger les champs requis.');
@@ -4719,7 +4959,7 @@ export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProp
 
   return (
     <div style={{ display: 'grid', gap: 16, gridTemplateColumns: '1fr', maxWidth: 900 }}>
-      <Form
+      <Form<FormValues>
         form={form}
         layout="vertical"
         initialValues={{
@@ -4750,35 +4990,43 @@ export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProp
           <TextArea rows={4} placeholder="Décrivez la sculpture…" />
         </Form.Item>
 
-        {/* Coordonnées (lat/lng) synchronisées avec la carte */}
+        {/* Coordonnées synchronisées avec la carte */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
           <Form.Item
             label="Latitude"
             name={['location', 'lat']}
             rules={[{ required: true, message: 'Latitude requise.' }]}
           >
-            <Input type="number" step="0.000001" onBlur={() => {
-              const { location } = form.getFieldsValue();
-              if (location?.lat != null && location?.lng != null) {
-                flyTo(Number(location.lat), Number(location.lng));
-              }
-            }} />
+            <Input
+              type="number"
+              step="0.000001"
+              onBlur={() => {
+                const { location } = form.getFieldsValue();
+                if (location?.lat != null && location?.lng != null) {
+                  flyTo(Number(location.lat), Number(location.lng));
+                }
+              }}
+            />
           </Form.Item>
           <Form.Item
             label="Longitude"
             name={['location', 'lng']}
             rules={[{ required: true, message: 'Longitude requise.' }]}
           >
-            <Input type="number" step="0.000001" onBlur={() => {
-              const { location } = form.getFieldsValue();
-              if (location?.lat != null && location?.lng != null) {
-                flyTo(Number(location.lat), Number(location.lng));
-              }
-            }} />
+            <Input
+              type="number"
+              step="0.000001"
+              onBlur={() => {
+                const { location } = form.getFieldsValue();
+                if (location?.lat != null && location?.lng != null) {
+                  flyTo(Number(location.lat), Number(location.lng));
+                }
+              }}
+            />
           </Form.Item>
         </div>
 
-        {/* Upload de l’image (optionnel). Laisse la TODO pour brancher ton backend. */}
+        {/* Upload image (optionnel) */}
         <Form.Item label="Image" name="image" valuePropName="fileList" getValueFromEvent={normFile}>
           <Upload beforeUpload={() => false} listType="picture-card" maxCount={1}>
             <div>Choisir une image</div>
@@ -4786,19 +5034,23 @@ export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProp
         </Form.Item>
 
         <div style={{ display: 'flex', gap: 8 }}>
-          <Button type="primary" htmlType="submit">Enregistrer</Button>
+          <Button type="primary" htmlType="submit">
+            Enregistrer
+          </Button>
           <Button
-            onClick={() => flyTo(
-              form.getFieldValue(['location', 'lat']),
-              form.getFieldValue(['location', 'lng']),
-            )}
+            onClick={() =>
+              flyTo(
+                Number(form.getFieldValue(['location', 'lat'])),
+                Number(form.getFieldValue(['location', 'lng'])),
+              )
+            }
           >
             Recentrer la carte
           </Button>
         </div>
       </Form>
 
-      {/* Carte : React Map GL (v7/8). Si tu es sur MapLibre, change l’import à `react-map-gl/maplibre`. */}
+      {/* Carte */}
       <div style={{ height: 360 }}>
         <Map
           ref={mapRef}
@@ -4821,175 +5073,200 @@ export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProp
 
 
 ===== BEGIN components/sculpture-maker-components/MakerList.tsx =====
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\MakerList.tsx
+'use client';
+
+import React, { useEffect, useState } from 'react';
+import { Row, Divider, Modal, message as antdMessage, notification, Button, Spin } from 'antd';
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
+import { ColStyled, CardStyled, StyledTable } from './style';
+import MakerEdit from './EditForm/MakerEdit';
+import MakerCreate from './CreateForm/MakerCreate';
+import NextError from 'next/error';
+import { get, del } from '@/services/_request';
+import { normalizeError } from '@/shared/errors';
+
+const { confirm } = Modal;
 
 /**
- * Description: Primary maker list component
- * Author: Hieu Chu
+ * Type unifié avec le formulaire d’édition :
+ * - nationality peut être null
+ * - wikiUrl ne doit PAS être null (string | undefined)
  */
+export type Maker = {
+  id: string | number;
+  firstName?: string;
+  lastName?: string;
+  nationality?: string | null;
+  birthYear?: number | null;
+  deathYear?: number | null;
+  wikiUrl?: string;
+  key?: React.Key;
+};
 
-import { useState, useEffect } from 'react'
-import { Row, Divider, Modal, message as antdMessage, notification, Button  } from 'antd';import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
-import { ColStyled, CardStyled, StyledTable } from './style'
-import MakerEdit from './EditForm/MakerEdit'
-import api from '@/services/_request'
-import Loading from '../Loading'
-import Error from 'next/error'
-import MakerCreate from './CreateForm/MakerCreate'
-import { normalizeError } from "../../shared/errors";
+type HttpError = { statusCode: number; message: string };
 
-const { confirm } = Modal
+const Loading = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
+    <Spin size="large" />
+  </div>
+);
 
-const MakerList = () => {
+const EMPTY_MAKER: Maker = {
+  id: '',
+  firstName: '',
+  lastName: '',
+  nationality: null,
+  birthYear: null,
+  deathYear: null,
+  wikiUrl: undefined,
+};
+
+const MakerList: React.FC = () => {
+  const [makerList, setMakerList] = useState<Maker[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<HttpError | null>(null);
+
+  const [showModal, setShowModal] = useState(false);
+  const [showModalCreate, setShowModalCreate] = useState(false);
+  const [currentMakerId, setCurrentMakerId] = useState<string | number>('');
+
   useEffect(() => {
     const fetchMakerList = async () => {
       try {
-        const data = (await api.get('/maker/')).data
-
-        let formattedData = data.map((maker: any) => {
-          let formattedMaker = { ...maker }
-          formattedMaker.key = maker.id
-          return formattedMaker
-        })
-
-        formattedData.sort((a: any, b: any) => a.firstName.localeCompare(b.firstName))
-
-        console.log(formattedData)
-        setMakerList(formattedData)
-      } catch (e: any) {
-        const { message, statusCode } = normalizeError(e);
-        const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        // le helper retourne déjà la payload
+        const data = await get<Maker[]>('/maker/');
+        const formatted = (data ?? [])
+          .map((maker) => ({
+            ...maker,
+            // normalisation douce pour éviter les "undefined"
+            firstName: maker.firstName ?? '',
+            lastName: maker.lastName ?? '',
+            // important: garder null pour nationality si backend l’envoie
+            nationality: maker.nationality ?? null,
+            // important: NE PAS introduire null côté wikiUrl
+            wikiUrl: maker.wikiUrl ?? undefined,
+            key: maker.id,
+          }))
+          .sort(
+            (a, b) =>
+              (a.firstName ?? '').localeCompare(b.firstName ?? '') ||
+              (a.lastName ?? '').localeCompare(b.lastName ?? ''),
+          );
+        setMakerList(formatted);
+      } catch (e) {
+        const { message, statusCode = 500 } = normalizeError(e);
+        setError({ statusCode, message });
+      } finally {
+        setLoading(false);
       }
-      setLoading(false)
-    }
-    fetchMakerList()
-  }, [])
+    };
+    fetchMakerList();
+  }, []);
 
-  const [makerList, setMakerList] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<any>(null)
+  const openModal = (makerId: string | number) => {
+    setCurrentMakerId(makerId);
+    setShowModal(true);
+  };
+  const openModalCreate = () => setShowModalCreate(true);
+  const handleCancel = () => setShowModal(false);
+  const handleCancelCreate = () => setShowModalCreate(false);
 
-  const [showModal, setShowModal] = useState(false)
-  const [showModalCreate, setShowModalCreate] = useState(false)
+  // Retourne toujours un Maker conforme au type unifié
+  const getCurrentMaker = (): Maker =>
+    makerList.find((x) => x.id === currentMakerId) ?? EMPTY_MAKER;
 
-  const [currentMakerId, setCurrentMakerId] = useState('')
-  const openModal = (makerId: string) => {
-    setCurrentMakerId(makerId)
-    setShowModal(true)
-  }
+  // Signature strictement identique à celle attendue par MakerEdit
+  const editMaker = (maker: Maker) => {
+    setMakerList((list) => list.map((x) => (x.id === maker.id ? { ...maker, key: maker.id } : x)));
+  };
 
-  const openModalCreate = () => {
-    setShowModalCreate(true)
-  }
+  const deleteMakerLocal = (makerId: string | number) => {
+    setMakerList((list) => list.filter((x) => x.id !== makerId));
+  };
 
-  const handleCancel = () => setShowModal(false)
-  const handleCancelCreate = () => setShowModalCreate(false)
+  const addMaker = (maker: Maker) => {
+    setMakerList((list) => [{ ...maker, key: maker.id }, ...list]);
+  };
 
-  const getCurrentMaker = () =>
-    makerList.find(x => x.id === currentMakerId) || {}
-
-  const editMaker = (maker: any) => {
-    setMakerList(list =>
-      list.map(x => {
-        if (x.id === maker.id) {
-          return { ...maker, key: maker.id }
-        }
-        return x
-      })
-    )
-  }
-
-  const deleteMaker = (makerId: string) => {
-    setMakerList(list => list.filter(x => x.id !== makerId))
-  }
-
-  const addMaker = (maker: any) => {
-    maker.key = maker.id
-    setMakerList(list => [...list, maker])
-  }
-
-  const handleDelete = (makerId: string) => {
+  const handleDelete = (makerId: string | number) => {
     confirm({
       title: 'Do you want to remove this maker?',
       icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: {
-          background: '#ff4d4f',
-          borderColor: '#ff4d4f'
-        }
-      },
-      onOk: async () => {
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
+      async onOk() {
         try {
-          await api.delete(`/maker/${makerId}`)
-          deleteMaker(makerId)
-          antdMessage.success('Deleted maker successfully!', 2)
-        } catch (error: unknown) {
-          const { message, statusCode } = normalizeError(error);
+          await del<void>(`/maker/${makerId}`);
+          deleteMakerLocal(makerId);
+          antdMessage.success('Deleted maker successfully!', 2);
+        } catch (err) {
+          const { message } = normalizeError(err);
           notification.error({
             message: 'Error',
             description:
-              "There has been internal server error or the maker you're trying to delete is currently associated with a sculpture."
-          })
+              message ||
+              "There has been an internal server error or the maker you're trying to delete is currently associated with a sculpture.",
+          });
         }
-      }
-    })
-  }
+      },
+    });
+  };
 
-  const columns = [
+  const columns: ColumnsType<Maker> = [
     {
       title: 'Maker name',
       key: 'makerName',
       width: '22%',
-      render: (_: any, record: any) => {
-        const { firstName, lastName, wikiUrl } = record
-        const makerName = firstName + ' ' + lastName
-        if (!wikiUrl) {
-          return <span>{makerName}</span>
-        }
-        return <a href={wikiUrl}>{makerName}</a>
-      }
+      render: (_, record) => {
+        const makerName = `${record.firstName ?? ''} ${record.lastName ?? ''}`.trim();
+        return record.wikiUrl ? (
+          <a href={record.wikiUrl}>{makerName || '—'}</a>
+        ) : (
+          <span>{makerName || '—'}</span>
+        );
+      },
     },
-
     {
       title: 'Nationality',
       dataIndex: 'nationality',
-      width: '22%'
+      width: '22%',
+      render: (v: Maker['nationality']) => v ?? '—',
     },
     {
       title: 'Born - Passed away',
       key: 'year',
       width: '28%',
-      render: (_: any, record: any) => {
-        let { birthYear, deathYear } = record
-        if (!birthYear) birthYear = 'N/A'
-        if (!deathYear) deathYear = 'N/A'
-        return <span>{birthYear + ' - ' + deathYear}</span>
-      }
+      render: (_, record) => {
+        const birth = record.birthYear ?? 'N/A';
+        const death = record.deathYear ?? 'N/A';
+        return <span>{`${birth} - ${death}`}</span>;
+      },
     },
     {
       title: 'Action',
       key: 'action',
-      render: (record, row) => (
+      render: (_, record) => (
         <span>
-          <a onClick={() => openModal(record.key)}>Edit</a>
+          <Button type="link" onClick={() => openModal(record.id)}>
+            Edit
+          </Button>
           <Divider type="vertical" />
-          <a onClick={() => handleDelete(record.key)}>Delete</a>
+          <Button type="link" danger onClick={() => handleDelete(record.id)}>
+            Delete
+          </Button>
         </span>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
-  if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (loading) return <Loading />;
+  if (error) return <NextError statusCode={error.statusCode} title={error.message} />;
 
+  // StyledTable perd les génériques via styled-components → cast columns/dataSource
   return (
     <Row gutter={16}>
       <ColStyled xs={24}>
@@ -5002,8 +5279,9 @@ const MakerList = () => {
           }
         >
           <StyledTable
-            dataSource={makerList}
-            columns={columns}
+            rowKey="id"
+            dataSource={makerList as any}
+            columns={columns as any}
             pagination={{ pageSize: 25, hideOnSinglePage: true }}
             style={{ maxWidth: 750 }}
           />
@@ -5016,17 +5294,12 @@ const MakerList = () => {
         getCurrentMaker={getCurrentMaker}
         editMaker={editMaker}
       />
-
-      <MakerCreate
-        visible={showModalCreate}
-        handleCancel={handleCancelCreate}
-        addMaker={addMaker}
-      />
+      <MakerCreate visible={showModalCreate} handleCancel={handleCancelCreate} addMaker={addMaker} />
     </Row>
-  )
-}
+  );
+};
 
-export default MakerList
+export default MakerList;
 
 ===== END components/sculpture-maker-components/MakerList.tsx =====
 
@@ -5041,30 +5314,59 @@ export default MakerList
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { Row, Carousel, Typography, List, Empty, Button } from 'antd'
+import { Row, Carousel, Typography, List, Empty, Spin } from 'antd'
 import { ColStyled, CardStyled } from '../style'
 import { SculptureCardDescription } from '../SculptureGrid'
-import api from '../../../api'
-import Loading from '../../Loading'
+import api from '@/services/_request'
 import Error from 'next/error'
 import MyStaticMap from '../../map-components/StaticMap'
-import Link from 'next/link'
 import Head from 'next/head'
 import SculptureComment from './SculptureComment'
+import type { SculptureCommentItem } from './SculptureComment'
 import SculptureTrend from './SculptureTrend'
-import { normalizeError } from '../../../shared/errors'
+import { normalizeError } from '@/shared/errors'
 
 const { Title } = Typography
 
+// --- Types ---
 type HttpError = { statusCode: number; message: string }
-type CommentItem = { commentId: string | number; [key: string]: any }
+
+type Maker = {
+  firstName?: string
+  lastName?: string
+  nationality?: string | null
+  birthYear?: number | null
+  deathYear?: number | null
+  wikiUrl?: string | null
+}
+
+type ImageItem = {
+  url: string
+  created: string | number | Date
+}
+
+type Sculpture = {
+  accessionId: string
+  name: string
+  images: ImageItem[]
+  latitude?: number | null
+  longitude?: number | null
+  productionDate?: string | null
+  material?: string | null
+  creditLine?: string | null
+  locationNotes?: string | null
+  totalLikes?: number
+  totalComments?: number
+  totalVisits?: number
+  primaryMaker?: Maker
+}
 
 const SculptureDetail = () => {
   const params = useParams<{ id?: string; sculptureId?: string }>()
   const id = (params?.id ?? params?.sculptureId) as string | undefined
 
-  const [sculpture, setSculpture] = useState<any>({})
-  const [comments, setComments] = useState<CommentItem[]>([])
+  const [sculpture, setSculpture] = useState<Sculpture | null>(null)
+  const [comments, setComments] = useState<SculptureCommentItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<HttpError | null>(null)
 
@@ -5072,19 +5374,16 @@ const SculptureDetail = () => {
     if (!id) return
     const fetchData = async () => {
       try {
-        const sculpturePromise = api.get(`/sculpture/${id}`)
-        const commentPromise = api.get(`/comment/sculpture-id/${id}`)
+        const sculpturePromise = api.get<Sculpture>(`/sculpture/${id}`)
+        const commentPromise = api.get<SculptureCommentItem[]>(`/comment/sculpture-id/${id}`)
+        const [sculptureRes, commentsRes] = await Promise.all([sculpturePromise, commentPromise])
 
-        const [rawSculpture, rawComments] = await Promise.all([
-          sculpturePromise,
-          commentPromise,
-        ])
-
-        setComments(rawComments.data)
-        setSculpture(rawSculpture.data)
+        setSculpture(sculptureRes)
+        // Ensure commentId is a string to match SculptureCommentItem
+        setComments(Array.isArray(commentsRes) ? commentsRes.map((c) => ({ ...c, commentId: String(c.commentId) })) : [])
       } catch (e: unknown) {
         const { message, statusCode } = normalizeError(e)
-        setError({ statusCode, message })
+        setError({ statusCode: Number(statusCode ?? 500), message })
       } finally {
         setLoading(false)
       }
@@ -5094,22 +5393,35 @@ const SculptureDetail = () => {
   }, [id])
 
   const deleteComment = (commentId: string | number) => {
-    setComments((c) => c.filter((x) => x.commentId !== commentId))
-    setSculpture((x: any) => ({
-      ...x,
-      totalComments: +x.totalComments - 1,
-    }))
+    setComments((c) => c.filter((x) => x.commentId !== String(commentId)))
+    setSculpture((x) =>
+      x
+        ? {
+            ...x,
+            totalComments: Math.max(0, Number(x.totalComments ?? 0) - 1),
+          }
+        : x,
+    )
   }
 
-  const addComment = (comment: CommentItem) => {
+  const addComment = (comment: SculptureCommentItem) => {
     setComments((c) => [comment, ...c])
-    setSculpture((x: any) => ({
-      ...x,
-      totalComments: +x.totalComments + 1,
-    }))
+    setSculpture((x) =>
+      x
+        ? {
+            ...x,
+            totalComments: Number(x.totalComments ?? 0) + 1,
+          }
+        : x,
+    )
   }
 
-  if (loading) return <Loading />
+  if (loading)
+    return (
+      <div style={{ padding: 24, textAlign: 'center' }}>
+        <Spin />
+      </div>
+    )
   if (error) return <Error statusCode={error.statusCode} title={error.message} />
 
   const {
@@ -5126,65 +5438,49 @@ const SculptureDetail = () => {
     totalLikes = 0,
     totalComments = 0,
     totalVisits = 0,
-  } = (sculpture ?? {}) as any
+  } = (sculpture ?? {}) as Sculpture
 
-  const { birthYear, deathYear, nationality, wikiUrl } = (primaryMaker ?? {}) as any
+  const { birthYear, deathYear, nationality, wikiUrl } = (primaryMaker ?? {}) as Maker
 
-  const markerLat = Number(latitude)
-  const markerLng = Number(longitude)
+  const markerLat = Number(latitude ?? 0)
+  const markerLng = Number(longitude ?? 0)
 
-  images.sort(
-    (a: any, b: any) =>
-      new Date(a.created).getTime() - new Date(b.created).getTime(),
+  const sortedImages = [...images].sort(
+    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
   )
-  const imageList = images.map((image: any, idx: number) => (
-    <div key={idx}>
-      <img src={image.url} />
-    </div>
-  ))
+  const imageList = sortedImages.length
+    ? sortedImages.map((image, idx) => (
+        <div key={idx}>
+          <img
+            src={image.url}
+            style={{ height: 450, width: '100%', objectFit: 'cover' }}
+            alt={`sculpture-${idx}`}
+          />
+        </div>
+      ))
+    : [
+        <div key="empty">
+          <Empty description="No Image" />
+        </div>,
+      ]
 
   return (
     <>
       <Head>
-        <title>{name} - UOW Sculptures</title>
+        <title>{name ? `${name} • Sculpture` : 'Sculpture Detail'}</title>
       </Head>
+
       <Row gutter={16}>
+        {/* Sculpture detail */}
         <ColStyled xs={24} lg={15}>
-          <CardStyled
-            title="Sculpture Details"
-            extra={
-              <Link href={`/sculptures/id/${id}/edit`}>
-                <a>
-                  <Button icon="edit">Edit details</Button>
-                </a>
-              </Link>
-            }
-          >
-            <Carousel
-              draggable
-              style={{
-                width: '100%',
-              }}
-            >
-              {images.length ? (
-                imageList
-              ) : (
-                <div>
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    style={{ height: 100, marginTop: 100 }}
-                  />
-                </div>
-              )}
-            </Carousel>
-            <div
-              style={{
-                marginTop: 15,
-              }}
-            >
-              <Title level={4} style={{ marginBottom: 0 }}>
-                {name}
-              </Title>
+          <CardStyled>
+            <Title level={3} style={{ marginBottom: 8 }}>
+              {name}
+            </Title>
+
+            <Carousel autoplay>{imageList}</Carousel>
+
+            <div style={{ marginTop: 12 }}>
               <SculptureCardDescription
                 totalLikes={totalLikes}
                 totalComments={totalComments}
@@ -5196,18 +5492,11 @@ const SculptureDetail = () => {
                 <List.Item>
                   <List.Item.Meta
                     title="Accession ID"
-                    description={
-                      accessionId && !accessionId.includes('unknown')
-                        ? accessionId
-                        : 'N/A'
-                    }
+                    description={accessionId && !accessionId.includes('unknown') ? accessionId : 'N/A'}
                   />
                 </List.Item>
                 <List.Item>
-                  <List.Item.Meta
-                    title="Production Date"
-                    description={productionDate || 'N/A'}
-                  />
+                  <List.Item.Meta title="Production Date" description={productionDate || 'N/A'} />
                 </List.Item>
                 <List.Item>
                   <List.Item.Meta title="Material" description={material || 'N/A'} />
@@ -5300,180 +5589,173 @@ export default SculptureDetail
 'use client'
 
 /**
- * Description: Sculpture's comment list component
- * Author: Hieu Chu
+ * Sculpture comments list and editor
+ * Refactor: remove antd Comment, stop using .data on API calls
  */
 
+import React, { useMemo, useState, useCallback } from 'react'
 import dayjs from 'dayjs'
-import { Tooltip,
+import relativeTime from 'dayjs/plugin/relativeTime'
+dayjs.extend(relativeTime)
+
+import {
+  Tooltip,
   List,
-  Comment,
   Card,
   Dropdown,
   Modal,
   message as antdMessage,
   Button,
   Empty,
-  Input
- } from 'antd';import type { MenuProps } from 'antd'
+  Input,
+  Avatar,
+  Typography,
+} from 'antd'
+import type { MenuProps } from 'antd'
 import { MoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons'
 import Link from 'next/link'
 import api from '../../../api'
-import { useState } from 'react'
-import { normalizeError } from "../../../shared/errors";
+import { normalizeError } from '../../../shared/errors'
 
 const { confirm } = Modal
 const { TextArea } = Input
+const { Text } = Typography
 
-const SculptureComment = ({
-  comments,
+type User = {
+  userId: string
+  name?: string
+  nickname?: string
+  picture?: string
+}
+
+export type SculptureCommentItem = {
+  commentId: string
+  user: User
+  content: string
+  createdTime: string | Date
+}
+
+type Props = {
+  comments?: SculptureCommentItem[]
+  deleteComment: (commentId: string) => void
+  addComment: (comment: SculptureCommentItem) => void
+  sculptureId: string
+}
+
+const displayName = (u: User) =>
+  u.userId?.includes('auth0')
+    ? u.nickname ?? u.name ?? 'Unknown user'
+    : u.name ?? u.nickname ?? 'Unknown user'
+
+const SculptureComment: React.FC<Props> = ({
+  comments = [],
   deleteComment,
   addComment,
-  sculptureId
+  sculptureId,
 }) => {
-  comments.sort(
-    (a, b) =>
-      new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime()
+  const [submitting, setSubmitting] = useState(false)
+  const [value, setValue] = useState('')
+
+  const sortedComments = useMemo(
+    () =>
+      [...comments].sort(
+        (a, b) =>
+          new Date(b.createdTime).getTime() - new Date(a.createdTime).getTime(),
+      ),
+    [comments],
   )
 
-  const handleDelete: MenuProps['onClick'] = e => {
+  const getMenuItems = useCallback(
+    (commentId: string): MenuProps['items'] => [{ key: commentId, label: 'Delete comment' }],
+    [],
+  )
+
+  const handleDelete: MenuProps['onClick'] = ({ key }) => {
     confirm({
       title: 'Delete this comment permanently?',
       icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: {
-          background: '#ff4d4f',
-          borderColor: '#ff4d4f'
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
+      async onOk() {
+        try {
+          await api.delete(`/comment/${String(key)}`)
+          antdMessage.success('Deleted comment successfully!')
+          deleteComment(String(key))
+        } catch (error: unknown) {
+          const { message } = normalizeError(error)
+          antdMessage.error(message || 'Failed to delete the comment.')
         }
       },
-      onOk: async () => {
-        try {
-          await api.delete(`/comment/${e.key}`)
-          antdMessage.success('Deleted comment successfully!', 2)
-          deleteComment(e.key as string)
-        } catch (error: unknown) {
-          const { message, statusCode } = normalizeError(error);
-          // @ts-ignore
-          antdMessage.error(error.response.data.message)
-        }
-      }
     })
   }
 
-  const [submitting, setSubmitting] = useState(false)
-  const [value, setValue] = useState('')
-
-  const getMenuItems = (commentId: string): MenuProps['items'] => [
-    { key: commentId, label: 'Delete comment' }
-  ]
-
-  const formattedComments = comments.map(x => ({
-    commentId: x.commentId,
-    author: (
-      <Link href={`/users/id/${x.user.userId}`}>
-        <a
-          style={{
-            fontSize: 14,
-            fontWeight: 500,
-            color: 'rgba(0, 0, 0, 0.65)'
-          }}
-        >
-          {x.user.userId.includes('auth0') ? x.user.nickname : x.user.name}
-        </a>
-      </Link>
-    ),
-    avatar: (
-      <img
-        src={x.user.picture}
-        style={{
-          width: 42,
-          height: 42,
-          borderRadius: '50%',
-          objectFit: 'cover'
-        }}
-      />
-    ),
-    content: (
-      <div style={{ fontSize: 14 }}>
-        {x.content
-          .trim()
-          .split('\n')
-          .map((line, idx) => (
-            <div key={idx}>{line}</div>
-          ))}
-      </div>
-    ),
-    datetime: (
-      <div style={{ display: 'flex' }}>
-        <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <div style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {dayjs(x.createdTime).fromNow()}
-          </div>
-        </Tooltip>
-        <div
-          style={{
-            fontSize: 14,
-            color: 'rgba(0, 0, 0, 0.45)',
-            marginLeft: 'auto'
-          }}
-        >
-          <Dropdown
-            menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
-            trigger={['click']}
-          >
-            <MoreOutlined />
-          </Dropdown>
-        </div>
-      </div>
-    )
-  }))
-
   return (
-    <Card
-      title="Comments"
-      bodyStyle={{ padding: '20px 24px 0px' }}
-      variant="borderless"
-      style={{ marginTop: 12 }}
-    >
-      <List
+    <Card title="Comments" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false} style={{ marginTop: 12 }}>
+      <List<SculptureCommentItem>
         itemLayout="horizontal"
-        dataSource={formattedComments ?? []}
+        dataSource={sortedComments}
         className="comment-list"
         locale={{
-          emptyText: (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
+          emptyText: <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />,
+        }}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+        renderItem={(x) => {
+          const created = dayjs(x.createdTime)
+          const name = displayName(x.user)
+          return (
+            <List.Item
+              key={x.commentId}
+              actions={[
+                <Tooltip
+                  key="time"
+                  title={created.isValid() ? created.format('D MMMM YYYY, h:mm:ss a') : 'Invalid date'}
+                >
+                  <Text type="secondary">{created.isValid() ? created.fromNow() : '—'}</Text>
+                </Tooltip>,
+                <Dropdown
+                  key="menu"
+                  menu={{ items: getMenuItems(x.commentId), onClick: handleDelete }}
+                  trigger={['click']}
+                >
+                  <Button type="text" size="small" aria-label="More actions" icon={<MoreOutlined />} />
+                </Dropdown>,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar
+                    size={42}
+                    src={x.user.picture || '/static/avatar.png'}
+                    alt={`${name} avatar`}
+                  />
+                }
+                title={
+                  <Link href={`/users/id/${x.user.userId}`} style={{ fontSize: 14, fontWeight: 500 }}>
+                    {name}
+                  </Link>
+                }
+                description={
+                  <div style={{ fontSize: 14 }}>
+                    {(x.content || '')
+                      .trim()
+                      .split('\n')
+                      .map((line, idx) => (
+                        <div key={`${x.commentId}-${idx}`}>{line}</div>
+                      ))}
+                  </div>
+                }
+              />
+            </List.Item>
           )
         }}
-        renderItem={item => (
-          <li>
-            <Comment
-              author={item.author}
-              avatar={item.avatar}
-              content={item.content}
-              datetime={item.datetime}
-              className="comment"
-            />
-          </li>
-        )}
-        pagination={{ pageSize: 15, hideOnSinglePage: true }}
       />
-      <Comment
-        className="admin-comment"
-        avatar={
-          <img
-            src={'../../../static/avatar.png'}
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: '50%',
-              objectFit: 'cover'
-            }}
-          />
-        }
-        content={
+
+      {/* Editor */}
+      <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
+        <Avatar size={42} src="/static/avatar.png" alt="Your avatar" />
+        <div style={{ flex: 1 }}>
           <Editor
             value={value}
             setValue={setValue}
@@ -5482,59 +5764,71 @@ const SculptureComment = ({
             sculptureId={sculptureId}
             addComment={addComment}
           />
-        }
-      />
+        </div>
+      </div>
     </Card>
   )
 }
 
-const Editor = ({
+type EditorProps = {
+  value: string
+  setValue: React.Dispatch<React.SetStateAction<string>>
+  setSubmitting: React.Dispatch<React.SetStateAction<boolean>>
+  submitting: boolean
+  sculptureId: string
+  addComment: (comment: SculptureCommentItem) => void
+}
+
+const Editor: React.FC<EditorProps> = ({
   value,
   setValue,
   setSubmitting,
   submitting,
   sculptureId,
-  addComment
-}) => (
-  <>
-    <div style={{ marginBottom: 12 }}>
-      <TextArea
-        autoSize={{ minRows: 2 }}
-        onChange={e => setValue(e.target.value)}
-        value={value}
-      />
-    </div>
-    <div style={{ marginBottom: 16 }}>
-      <Button
-        htmlType="submit"
-        disabled={value.trim() === ''}
-        loading={submitting}
-        onClick={async () => {
-          setSubmitting(true)
-          try {
-            const result = (
-              await api.post('/comment', {
-                sculptureId,
-                content: value
-              })
-            ).data
-            setSubmitting(false)
-            setValue('')
-            addComment(result)
-          } catch (e: unknown) {
-            const { message, statusCode } = normalizeError(e);
-            setSubmitting(false)
-            // @ts-ignore
-            antdMessage.error(e.response.data.message)
-          }
-        }}
-        type="primary"
-      >
-        Post
-      </Button>
-    </div>
-  </>
-)
+  addComment,
+}) => {
+  const post = async () => {
+    if (value.trim() === '') return
+    setSubmitting(true)
+    try {
+      const result = await api.post<SculptureCommentItem>('/comment', {
+        sculptureId,
+        content: value.trim(),
+      })
+      setValue('')
+      addComment(result)
+      antdMessage.success('Comment posted!')
+    } catch (error: unknown) {
+      const { message } = normalizeError(error)
+      antdMessage.error(message || 'Failed to post comment.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <>
+      <div style={{ marginBottom: 12 }}>
+        <TextArea
+          autoSize={{ minRows: 2 }}
+          onChange={(e) => setValue(e.target.value)}
+          value={value}
+          onPressEnter={(e) => {
+            if (e.metaKey || e.ctrlKey) {
+              e.preventDefault()
+              void post()
+            }
+          }}
+        />
+      </div>
+      <div style={{ marginBottom: 16 }}>
+        <Button type="primary" htmlType="button" disabled={value.trim() === ''} loading={submitting} onClick={post}>
+          Post
+        </Button>
+      </div>
+    </>
+  )
+}
 
 export default SculptureComment
 
@@ -5604,7 +5898,7 @@ const formatDailyData = (rawData: Record<string, number>): DailyPoint[] => {
   for (const date of Object.keys(rawData)) {
     result.push({
       x: dayjs(date).format('MMM D YYYY'),
-      y: rawData[date]
+      y: Number(rawData[date] ?? 0),
     })
   }
   // sort in correct order
@@ -5669,12 +5963,12 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         )
 
         const [
-          { data: rawLikes },
-          { data: rawComments },
-          { data: rawVisits },
-          { data: rawDefaultLikes },
-          { data: rawDefaultComments },
-          { data: rawDefaultVisits }
+          rawLikes,
+          rawComments,
+          rawVisits,
+          rawDefaultLikes,
+          rawDefaultComments,
+          rawDefaultVisits
         ] = await Promise.all([
           likesPromise,
           commentsPromise,
@@ -5725,7 +6019,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         }))
       } catch (e: unknown) {
         const n = normalizeError(e as AxiosError<any>)
-        setError({ statusCode: n.statusCode, message: n.message })
+        setError({ statusCode: n.statusCode ?? 500, message: n.message || 'Unknown error' })
       } finally {
         setLoading(false)
       }
@@ -5803,12 +6097,8 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
       <ColStyled xs={24}>
         <ShadowCard>
           <LikeCard
-            TOTAL_LIKES={TOTAL_LIKES}
-            DAILY_LIKES={DAILY_LIKES}
-            DAILY_LIKES_CHANGE={DAILY_LIKES_CHANGE}
-            LIKE_DATA={LIKE_DATA}
-            startDate={startDate}
-            endDate={endDate}
+            total={TOTAL_LIKES}
+            trend={LIKE_DATA.map(p => p.y)}
           />
         </ShadowCard>
       </ColStyled>
@@ -5820,8 +6110,6 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
             DAILY_COMMENTS={DAILY_COMMENTS}
             DAILY_COMMENTS_CHANGE={DAILY_COMMENTS_CHANGE}
             COMMENT_DATA={COMMENT_DATA}
-            startDate={startDate}
-            endDate={endDate}
           />
         </ShadowCard>
       </ColStyled>
@@ -5833,8 +6121,6 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
             DAILY_VISITS={DAILY_VISITS}
             DAILY_VISITS_CHANGE={DAILY_VISITS_CHANGE}
             VISIT_DATA={VISIT_DATA}
-            startDate={startDate}
-            endDate={endDate}
             SINGLE_SCULPTURE
           />
         </ShadowCard>
@@ -5849,25 +6135,16 @@ export default SculptureTrend
 
 
 ===== BEGIN components/sculpture-maker-components/SculptureGrid.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\SculptureGrid.tsx
 'use client'
 
 /**
- * Description: Sculpture list component
- * Author: Hieu Chu
+ * Sculpture list
  */
 
 import { useEffect, useState } from 'react'
 import type { ChangeEvent } from 'react'
-import {
-  Row,
-  Card,
-  Typography,
-  Tooltip,
-  Input,
-  Empty,
-  Button,
-  Dropdown,
-} from 'antd'
+import { Row, Card, Typography, Tooltip, Input, Empty, Button, Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
 import {
   PlusOutlined,
@@ -5877,34 +6154,22 @@ import {
   MessageTwoTone,
   EnvironmentOutlined,
 } from '@ant-design/icons'
+import Link from 'next/link'
+import { ColStyled, CardStyled, ShadowCard, Subtitle, EmptyImage } from './style'
+import Loading from '@/components/Loading' // corrigé: anciennement './Loading'
+import NextError from 'next/error'
+import { get } from '@/services/_request'
+import { normalizeError } from '@/shared/errors'
+
 const { Text } = Typography
 const { Meta } = Card
 const { Search } = Input
-import Link from 'next/link'
-import {
-  ColStyled,
-  CardStyled,
-  ShadowCard,
-  Subtitle,
-  EmptyImage,
-} from './style'
-import Loading from '../Loading'
-import Error from 'next/error'
-import api from '@/services/_request'
-import { normalizeError } from '../../shared/errors'
 
-// --- Types locaux ---
 type SortCriterion = 'Default' | 'Likes' | 'Comments' | 'Visits'
 
-interface Maker {
-  firstName: string
-  lastName: string
-}
-interface ImageItem {
-  url: string
-  created: string | number | Date
-}
-interface Sculpture {
+type Maker = { firstName: string; lastName: string }
+type ImageItem = { url: string; created: string | number | Date }
+type Sculpture = {
   accessionId: string
   name: string
   totalVisits: number
@@ -5913,41 +6178,67 @@ interface Sculpture {
   primaryMaker: Maker
   images: ImageItem[]
 }
-interface ErrorState {
-  statusCode: number
-  message: string
+type ErrorState = { statusCode: number; message: string }
+
+const NO_IMAGE_PLACEHOLDER = '/static/no-image.png'
+
+/**
+ * Sanitize d’URL d’image:
+ * - autorise http/https et les chemins relatifs (ex: /static/…)
+ * - optionnel: allowlist d’hôtes via NEXT_PUBLIC_IMG_HOSTS=host1,host2
+ * - fallback vers NO_IMAGE_PLACEHOLDER pour tout le reste
+ */
+function safeImageUrl(raw?: string): string {
+  try {
+    if (!raw) return NO_IMAGE_PLACEHOLDER
+    if (raw.startsWith('/')) return raw
+    const u = new URL(raw)
+    if (!['http:', 'https:'].includes(u.protocol)) return NO_IMAGE_PLACEHOLDER
+
+    const allow = (process.env.NEXT_PUBLIC_IMG_HOSTS ?? '')
+      .split(',')
+      .map((h) => h.trim())
+      .filter(Boolean)
+
+    if (allow.length && !allow.includes(u.hostname)) return NO_IMAGE_PLACEHOLDER
+    return u.toString()
+  } catch {
+    return NO_IMAGE_PLACEHOLDER
+  }
 }
 
-// --- Composants ---
 const SculptureCard = ({ info }: { info: Sculpture }) => {
   const { accessionId, name, totalVisits, totalLikes, totalComments, primaryMaker, images } = info
   const makerName = `${primaryMaker.firstName} ${primaryMaker.lastName}`
-  const sortedImages = [...images].sort(
-    (a: ImageItem, b: ImageItem) =>
-      new Date(a.created).getTime() - new Date(b.created).getTime(),
+
+  // Tri ancien → récent et sélection robuste de la première image
+  const sortedImages: ImageItem[] = [...(images ?? [])].sort(
+    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
+  )
+
+  const firstImage = sortedImages[0]
+  const cover = firstImage ? (
+    <div style={{ height: 450 }}>
+      <img
+        src={safeImageUrl(firstImage.url)}
+        style={{ height: '100%', width: '100%', objectFit: 'cover' }}
+        alt={name}
+        loading="lazy"
+        onError={(e) => {
+          const img = e.currentTarget
+          if (img.src !== NO_IMAGE_PLACEHOLDER) img.src = NO_IMAGE_PLACEHOLDER
+        }}
+      />
+    </div>
+  ) : (
+    // Pas d’image: UI claire + pas d’accès non sûr à images[0]
+    <EmptyImage image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Images" />
   )
 
   return (
     <Link href={`/sculptures/id/${accessionId}`}>
       <a style={{ display: 'inline-block', width: '100%' }}>
-        <ShadowCard
-          cover={
-            sortedImages.length ? (
-              <div style={{ height: 450 }}>
-                <img
-                  src={sortedImages[0].url}
-                  style={{ height: '100%', width: '100%', objectFit: 'cover' }}
-                />
-              </div>
-            ) : (
-              <EmptyImage
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No Images"
-              />
-            )
-          }
-          bordered
-        >
+        <ShadowCard cover={cover} bordered>
           <Meta
             title={name}
             description={
@@ -5988,10 +6279,7 @@ export const SculptureCardDescription = ({
       </Tooltip>
 
       <Tooltip placement="top" title="Comments">
-        <MessageTwoTone
-          twoToneColor="rgb(205, 34, 255)"
-          style={{ marginRight: 4 }}
-        />
+        <MessageTwoTone twoToneColor="rgb(205, 34, 255)" style={{ marginRight: 4 }} />
         <Text type="secondary" style={{ marginRight: 5 }}>
           {totalComments}
         </Text>
@@ -6007,49 +6295,47 @@ export const SculptureCardDescription = ({
   )
 }
 
-// Tri local
-const sortBy = (list: Sculpture[], criterion: SortCriterion): Sculpture[] => {
+const sortBy = (list: Sculpture[], criterion: SortCriterion) => {
+  const copy = list.slice()
   switch (criterion) {
     case 'Likes':
-      return list.slice().sort((a, b) => b.totalLikes - a.totalLikes)
+      return copy.sort((a, b) => +b.totalLikes - +a.totalLikes)
     case 'Comments':
-      return list.slice().sort((a, b) => b.totalComments - a.totalComments)
+      return copy.sort((a, b) => +b.totalComments - +a.totalComments)
     case 'Visits':
-      return list.slice().sort((a, b) => b.totalVisits - a.totalVisits)
-    case 'Default':
+      return copy.sort((a, b) => +b.totalVisits - +a.totalVisits)
     default:
-      return list.slice().sort((a, b) => a.name.localeCompare(b.name))
+      return copy.sort((a, b) => a.name.localeCompare(b.name))
   }
 }
 
 const SculptureGrid = () => {
   const [originalList, setOriginalList] = useState<Sculpture[]>([])
   const [filteredList, setFilteredList] = useState<Sculpture[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
+  const [currentSort, setCurrentSort] = useState<SortCriterion>('Default')
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<ErrorState | null>(null)
-  const [currentSort, setSort] = useState<SortCriterion>('Default')
 
   useEffect(() => {
-    const fetchSculpture = async () => {
+    const fetchList = async () => {
       try {
-        const { data } = await api.get<Sculpture[]>('/sculpture')
-        const sorted = data.slice().sort((a, b) => a.name.localeCompare(b.name))
-        setOriginalList(sorted)
-        setFilteredList(sorted)
-      } catch (e: unknown) {
-        const n = normalizeError(e)
-        setError({ statusCode: n.statusCode, message: n.message })
+        const data = await get<Sculpture[]>('/sculpture')
+        setOriginalList(data)
+        setFilteredList(sortBy(data, 'Default'))
+      } catch (e) {
+        const { message, statusCode = 500 } = normalizeError(e)
+        setError({ statusCode, message })
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
-
-    fetchSculpture()
+    fetchList()
   }, [])
 
   const handleMenuClick: MenuProps['onClick'] = (e) => {
-    const k = e.key as SortCriterion
-    setSort(k)
-    setFilteredList((prev) => sortBy(prev, k))
+    const key = e.key as SortCriterion
+    setCurrentSort(key)
+    setFilteredList(sortBy(filteredList, key))
   }
 
   const menuItems: MenuProps['items'] = [
@@ -6063,15 +6349,9 @@ const SculptureGrid = () => {
     const input = e.target.value
     if (input.length >= 3) {
       const lower = input.toLowerCase()
-      const newList = originalList.filter((sculpture) => {
-        const makerName =
-          sculpture.primaryMaker.firstName +
-          ' ' +
-          sculpture.primaryMaker.lastName
-        return (
-          sculpture.name.toLowerCase().includes(lower) ||
-          makerName.toLowerCase().includes(lower)
-        )
+      const newList = originalList.filter((s) => {
+        const makerName = `${s.primaryMaker.firstName} ${s.primaryMaker.lastName}`
+        return s.name.toLowerCase().includes(lower) || makerName.toLowerCase().includes(lower)
       })
       setFilteredList(sortBy(newList, currentSort))
     } else if (filteredList.length !== originalList.length) {
@@ -6080,7 +6360,7 @@ const SculptureGrid = () => {
   }
 
   if (loading) return <Loading />
-  if (error) return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <NextError statusCode={error.statusCode} title={error.message} />
 
   return (
     <Row gutter={16}>
@@ -6097,14 +6377,7 @@ const SculptureGrid = () => {
             </Link>
           }
         >
-          <div
-            style={{
-              marginLeft: 8,
-              marginRight: 8,
-              marginBottom: 16,
-              display: 'flex',
-            }}
-          >
+          <div style={{ marginLeft: 8, marginRight: 8, marginBottom: 16, display: 'flex' }}>
             <Search
               allowClear
               placeholder="Enter search term"
@@ -6112,37 +6385,22 @@ const SculptureGrid = () => {
               size="large"
               style={{ marginRight: 8 }}
             />
-
-            <Dropdown
-              menu={{ items: menuItems, onClick: handleMenuClick }}
-              trigger={['click']}
-            >
+            <Dropdown menu={{ items: menuItems, onClick: handleMenuClick }} trigger={['click']}>
               <Button size="large">
                 <SortAscendingOutlined /> {currentSort} <DownOutlined />
               </Button>
             </Dropdown>
           </div>
 
-          <>
-            {!filteredList.length ? (
-              <Empty
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
-                description="No Data :("
-                style={{ marginTop: 60 }}
-              />
-            ) : (
-              filteredList.map((sculpture) => (
-                <ColStyled
-                  xs={24}
-                  sm={12}
-                  md={8}
-                  key={sculpture.accessionId}
-                >
-                  <SculptureCard info={sculpture} />
-                </ColStyled>
-              ))
-            )}
-          </>
+          {!filteredList.length ? (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Data :(" style={{ marginTop: 60 }} />
+          ) : (
+            filteredList.map((sculpture) => (
+              <ColStyled xs={24} sm={12} md={8} key={sculpture.accessionId}>
+                <SculptureCard info={sculpture} />
+              </ColStyled>
+            ))
+          )}
         </CardStyled>
       </ColStyled>
     </Row>
@@ -6155,28 +6413,30 @@ export default SculptureGrid
 
 
 ===== BEGIN components/sculpture-maker-components/style.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\style.tsx
 /**
  * Description: Stylesheet for sculpture-maker components
  * Author: Hieu Chu
  */
 
-import styled from 'styled-components'
+import styled from 'styled-components';
 import { Card, Col, Form, Typography, Empty, Table } from 'antd';
+import type { ComponentProps } from 'react';
 import Icon from '@/components/compat/Icon';
 
-const { Text } = Typography
+const { Text } = Typography;
 
-export const CardStyled = props => (
+export const CardStyled = (props: ComponentProps<typeof Card>) => (
   <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
-)
+);
 
 export const ColStyled = styled(Col)`
   padding-bottom: 12px;
-`
+`;
 
 export const DescriptionIcon = styled(Icon)`
   font-size: 20px;
-`
+`;
 
 export const ShadowCard = styled(CardStyled)`
   box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
@@ -6191,7 +6451,7 @@ export const ShadowCard = styled(CardStyled)`
     cursor: pointer;
     transition: all 150ms ease-in-out 0s;
   }
-`
+`;
 
 export const CustomFormItem = styled(Form.Item)`
   margin-bottom: 8px;
@@ -6199,17 +6459,17 @@ export const CustomFormItem = styled(Form.Item)`
   &.ant-form-item-with-help {
     margin-bottom: 5px;
   }
-`
+`;
 
 export const FormCol = styled(Col)`
   padding-left: 0px !important;
   padding-right: 0px !important;
-`
+`;
 
 export const Subtitle = styled(Text)`
   display: block;
   margin-bottom: 12px;
-`
+`;
 
 export const EmptyImage = styled(Empty)`
   height: 230px;
@@ -6219,7 +6479,7 @@ export const EmptyImage = styled(Empty)`
   & .ant-empty-image {
     margin-top: 220px;
   }
-`
+`;
 
 export const StyledTable = styled(Table)`
   .ant-table table {
@@ -6227,7 +6487,7 @@ export const StyledTable = styled(Table)`
     border-top: 1px solid #e8e8e8;
     border-right: 1px solid #e8e8e8;
   }
-`
+`;
 
 ===== END components/sculpture-maker-components/style.tsx =====
 
@@ -6443,6 +6703,7 @@ export function Tooltip({
 
 
 ===== BEGIN components/user-components/index.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
 'use client'
 
 /**
@@ -6450,59 +6711,103 @@ export function Tooltip({
  * Author: Hieu Chu
  */
 
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dayjs from 'dayjs'
 
-import { Row, Input, Button } from 'antd'
+import { Row, Input, Button, Spin } from 'antd'
+import type { InputRef } from 'antd/es/input'
 import { SearchOutlined } from '@ant-design/icons'
 import { Comment } from '@ant-design/compatible'
 
 import { ColStyled, CardStyled, StyledTable } from './style'
-import api from '@/services/_request'
-import Loading from '../Loading'
+import { get as apiGet } from '@/services/_request'
 import NextError from 'next/error'
-import { convertNonAccent } from '../shared/utils'
-import { normalizeError } from "../../shared/errors";
+import { convertNonAccent } from '@/components/shared/utils'
+import { normalizeError } from '@/shared/errors'
 
-const UserList = () => {
+type RawUser = {
+  userId: string
+  email: string
+  name: string
+  nickname?: string
+  picture: string
+  joinDate: string | Date
+  totalLikes?: number | string
+  totalComments?: number | string
+  totalVisits?: number | string
+  role?: string | null
+}
+
+type UserRow = {
+  key: string
+  userId: string
+  email: string
+  name: string
+  nickname?: string
+  picture: string
+  joinDate: string
+  totalLikes: number
+  totalComments: number
+  totalVisits: number
+}
+
+/** Remplacement de l'ancien import './Loading' introuvable */
+const Loading: React.FC = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
+    <Spin size="large" />
+  </div>
+)
+
+const UserList: React.FC = () => {
   const router = useRouter()
 
-  const [userList, setUserList] = useState<any[]>([])
-  const searchInput = useRef<Input | null>(null)
+  const [userList, setUserList] = useState<UserRow[]>([])
+  const searchInput = useRef<InputRef>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<{ statusCode: number; message: string } | null>(null)
 
   useEffect(() => {
+    let mounted = true
     const fetchUsers = async () => {
       try {
-        let users = (await api.get('/user')).data
-        users = users
-          .filter((x: any) => !x.role)
-          .map((x: any) => ({
-            ...x,
+        // le helper retourne la payload directement
+        const users = await apiGet<RawUser[]>('/user')
+
+        const rows: UserRow[] = (users ?? [])
+          .filter((x) => !x.role)
+          .map((x) => ({
             key: x.userId,
-            totalLikes: +x.totalLikes,
-            totalComments: +x.totalComments,
-            totalVisits: +x.totalVisits,
+            userId: x.userId,
+            email: x.email,
+            name: x.name,
+            nickname: x.nickname,
+            picture: x.picture,
+            joinDate: new Date(x.joinDate as any).toISOString(),
+            totalLikes: Number(x.totalLikes ?? 0),
+            totalComments: Number(x.totalComments ?? 0),
+            totalVisits: Number(x.totalVisits ?? 0),
           }))
+          .sort((a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime())
 
-        users.sort(
-          (a: any, b: any) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime(),
-        )
-
-        setUserList(users)
+        if (mounted) setUserList(rows)
       } catch (e: any) {
-        const { message, statusCode } = normalizeError(e);
-        const statusCode = e?.response?.data?.statusCode ?? 500
-        const message = e?.response?.data?.message ?? 'Failed to load users'
-        setError({ statusCode, message })
+        const err = (normalizeError?.(e) ?? {}) as { statusCode?: number; message?: string }
+        const statusCode = Number(err.statusCode ?? e?.response?.data?.statusCode ?? 500)
+        const message = String(err.message ?? 'Failed to load users')
+        if (mounted) setError({ statusCode, message })
       } finally {
-        setLoading(false)
+        if (mounted) setLoading(false)
       }
     }
     fetchUsers()
+    return () => {
+      mounted = false
+    }
   }, [])
+
+  const handleSearch = (_selectedKeys: React.Key[], confirm: () => void) => confirm()
+  const handleReset = (clearFilters: () => void) => clearFilters()
 
   const getUserSearchProps = () => ({
     filterDropdown: ({
@@ -6518,14 +6823,18 @@ const UserList = () => {
     }) => (
       <div style={{ padding: 8 }}>
         <Input
-          ref={searchInput as any}
+          ref={searchInput}
           placeholder="Search user"
           value={(selectedKeys[0] as string) ?? ''}
           onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => handleSearch(selectedKeys, confirm)}
           style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
-        <Button type="primary" onClick={() => handleSearch(selectedKeys, confirm)} style={{ width: 90, marginRight: 8 }}>
+        <Button
+          type="primary"
+          onClick={() => handleSearch(selectedKeys, confirm)}
+          style={{ width: 90, marginRight: 8 }}
+        >
           Search
         </Button>
         <Button onClick={() => handleReset(clearFilters)} style={{ width: 90 }}>
@@ -6536,41 +6845,27 @@ const UserList = () => {
     filterIcon: (filtered: boolean) => (
       <SearchOutlined style={{ color: filtered ? '#1890ff' : '#7E7E7E' }} />
     ),
-    onFilter: (value: string, record: any) => {
+    onFilter: (value: string | number | boolean, record: UserRow) => {
       const { email, name, nickname, userId } = record
-      let author = name
-      if (userId.includes('auth0')) author = nickname
-
+      const author = userId.includes('auth0') ? (nickname ?? name) : name
+      const v = String(value ?? '').toLowerCase()
       return (
-        convertNonAccent(author.toLowerCase()).includes(value.toLowerCase()) ||
-        convertNonAccent(email.toLowerCase()).includes(value.toLowerCase())
+        convertNonAccent(author.toLowerCase()).includes(v) ||
+        convertNonAccent(email.toLowerCase()).includes(v)
       )
     },
-    // AntD v5: "open" naming
     onFilterDropdownOpenChange: (open: boolean) => {
-      if (open) {
-        setTimeout(() => searchInput.current?.select?.(), 0)
-      }
+      if (open) setTimeout(() => searchInput.current?.select?.(), 0)
     },
   })
 
-  const handleSearch = (_selectedKeys: React.Key[], confirm: () => void) => {
-    confirm()
-  }
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters()
-  }
-
-  const columns: any[] = [
+  const columns = [
     {
       title: 'User',
       key: 'user',
-      render: (_: any, record: any) => {
+      render: (_: any, record: UserRow) => {
         const { email, name, nickname, picture, userId } = record
-        let author = name
-        if (userId.includes('auth0')) author = nickname
-
+        const author = userId.includes('auth0') ? (nickname ?? name) : name
         return (
           <Comment
             author={
@@ -6595,11 +6890,13 @@ const UserList = () => {
     {
       title: 'Connection type',
       key: 'connection',
-      render: (_: any, record: any) => {
-        let connection = ''
-        if (record.userId.includes('google')) connection = 'Google'
-        else if (record.userId.includes('facebook')) connection = 'Facebook'
-        else connection = 'Email'
+      render: (_: any, record: UserRow) => {
+        const id = record.userId
+        const connection = id.includes('google')
+          ? 'Google'
+          : id.includes('facebook')
+          ? 'Facebook'
+          : 'Email'
         return <span>{connection}</span>
       },
       filters: [
@@ -6607,36 +6904,40 @@ const UserList = () => {
         { text: 'Google', value: 'google' },
         { text: 'Facebook', value: 'facebook' },
       ],
-      onFilter: (value: string, record: any) => record.userId.includes(value),
+      onFilter: (value: string | number | boolean, record: UserRow) =>
+        record.userId.includes(String(value)),
       width: '15%',
     },
     {
       title: 'Join date',
       key: 'joinDate',
-      render: (_: any, record: any) => <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>,
-      sorter: (a: any, b: any) => new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
-      sortDirections: ['ascend', 'descend'],
+      render: (_: any, record: UserRow) => (
+        <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>
+      ),
+      sorter: (a: UserRow, b: UserRow) =>
+        new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
+      sortDirections: ['ascend', 'descend'] as const,
       width: '15%',
     },
     {
       title: 'Likes',
       dataIndex: 'totalLikes',
-      sorter: (a: any, b: any) => a.totalLikes - b.totalLikes,
-      sortDirections: ['descend', 'ascend'],
+      sorter: (a: UserRow, b: UserRow) => a.totalLikes - b.totalLikes,
+      sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
     {
       title: 'Comments',
       dataIndex: 'totalComments',
-      sorter: (a: any, b: any) => a.totalComments - b.totalComments,
-      sortDirections: ['descend', 'ascend'],
+      sorter: (a: UserRow, b: UserRow) => a.totalComments - b.totalComments,
+      sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
     {
       title: 'Visits',
       dataIndex: 'totalVisits',
-      sorter: (a: any, b: any) => a.totalVisits - b.totalVisits,
-      sortDirections: ['descend', 'ascend'],
+      sorter: (a: UserRow, b: UserRow) => a.totalVisits - b.totalVisits,
+      sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
   ]
@@ -6650,7 +6951,7 @@ const UserList = () => {
         <CardStyled title="User Management">
           <StyledTable
             dataSource={userList}
-            columns={columns}
+            columns={columns as any}
             pagination={{ pageSize: 25, hideOnSinglePage: true }}
             className="user-table"
             onRow={(record: any) => ({
@@ -6670,18 +6971,22 @@ export default UserList
 
 
 ===== BEGIN components/user-components/style.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx  :contentReference[oaicite:0]{index=0}
 /**
  * Description: Stylesheet for user components
  * Author: Hieu Chu
  */
 
+import type { ComponentProps } from 'react'
 import styled from 'styled-components'
 import { Card, Col, Form, Typography, Empty, Table } from 'antd'
-import Icon from '../compat/Icon' // wrapper compat
+import Icon from '@/components/compat/Icon'
 
 const { Text } = Typography
 
-export const CardStyled = props => (
+type CardStyledProps = ComponentProps<typeof Card>
+
+export const CardStyled = (props: CardStyledProps) => (
   <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
 )
 
@@ -6927,6 +7232,8 @@ export default UserComments;
 
 
 ===== BEGIN components/user-components/UserLikes.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
+// Source: dump original (UserLikes.tsx) 
 'use client';
 
 /**
@@ -6959,29 +7266,32 @@ interface UserLikesProps {
   likes: UserLikeItem[];
 }
 
+const FALLBACK_IMG = '/static/no-image.png';
+
 const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
-  // ne pas muter les props; tri sur des copies
-  const items = useMemo<UserLikeItem[]>(
-    () =>
-      [...(likes ?? [])]
-        .sort(
-          (a, b) =>
-            new Date(b.likedTime).getTime() -
-            new Date(a.likedTime).getTime(),
-        )
-        .map((x) => {
-          const sortedImages = [...(x.sculpture.images ?? [])].sort(
+  // Tri sans muter la prop et tri interne des images sans mutation
+  const items = useMemo<UserLikeItem[]>(() => {
+    const safeLikes = Array.isArray(likes) ? likes : [];
+    return safeLikes
+      .slice() // clone props
+      .sort(
+        (a, b) =>
+          new Date(b.likedTime).getTime() - new Date(a.likedTime).getTime(),
+      )
+      .map((x) => {
+        const sortedImages = (x.sculpture?.images ?? [])
+          .slice() // clone images
+          .sort(
             (a, b) =>
               new Date(a.created ?? 0).getTime() -
               new Date(b.created ?? 0).getTime(),
           );
-          return {
-            ...x,
-            sculpture: { ...x.sculpture, images: sortedImages },
-          };
-        }),
-    [likes],
-  );
+        return {
+          ...x,
+          sculpture: { ...x.sculpture, images: sortedImages },
+        };
+      });
+  }, [likes]);
 
   return (
     <Card
@@ -7003,42 +7313,51 @@ const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
           ),
         }}
         renderItem={(x) => {
+          const images = x.sculpture?.images ?? [];
           const firstImageUrl =
-            x.sculpture.images && x.sculpture.images.length > 0
-              ? x.sculpture.images[0].url
-              : '/static/no-image.png';
-          const targetId = x.sculptureId ?? x.sculpture.accessionId;
+            images.length > 0 && images[0]?.url ? images[0].url : FALLBACK_IMG;
+          const targetId = x.sculptureId ?? x.sculpture?.accessionId;
           const when = dayjs(x.likedTime);
 
+          const titleNode = (
+            <Typography.Text
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: 'rgba(0, 0, 0, 0.65)',
+              }}
+            >
+              {x.sculpture?.name ?? 'Unknown sculpture'}
+            </Typography.Text>
+          );
+
           return (
-            <List.Item key={`${String(targetId)}-${String(x.likedTime)}`}>
+            <List.Item
+              key={`${String(targetId ?? x.sculpture?.name ?? 'unknown')}-${new Date(
+                x.likedTime,
+              ).getTime()}`}
+            >
               <List.Item.Meta
                 avatar={
                   <Avatar
                     shape="square"
                     size={42}
                     src={firstImageUrl}
-                    alt={x.sculpture.name}
+                    alt={x.sculpture?.name ?? 'sculpture'}
                     style={{ objectFit: 'cover', borderRadius: 4 }}
                   />
                 }
                 title={
-                  <Link href={`/sculptures/id/${String(targetId)}`}>
-                    <Typography.Text
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 500,
-                        color: 'rgba(0, 0, 0, 0.65)',
-                      }}
-                    >
-                      {x.sculpture.name}
-                    </Typography.Text>
-                  </Link>
+                  targetId != null ? (
+                    <Link href={`/sculptures/id/${encodeURIComponent(String(targetId))}`}>
+                      {titleNode}
+                    </Link>
+                  ) : (
+                    titleNode
+                  )
                 }
                 description={
-                  <Tooltip
-                    title={when.format('D MMMM YYYY, h:mm:ss a')}
-                  >
+                  <Tooltip title={when.format('D MMMM YYYY, h:mm:ss a')}>
                     <Typography.Text
                       style={{
                         fontSize: 14,
@@ -7065,13 +7384,17 @@ export default UserLikes;
 
 
 ===== BEGIN components/user-components/UserProfile.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
+// Référence dump: :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
+
 'use client';
 
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import type { AxiosError } from 'axios';
 import { Card, Typography, List, Empty, Alert } from 'antd';
-import { api } from '@/shared/api';
+import api from '@/api';
+import type { AxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 
 const { Title, Text } = Typography;
 
@@ -7110,7 +7433,6 @@ const UserProfile: React.FC = () => {
   };
 
   React.useEffect(() => {
-    // Si pas d'id dans l'URL, on ne déclenche pas de requête
     if (!userId) return;
 
     let cancelled = false;
@@ -7118,7 +7440,7 @@ const UserProfile: React.FC = () => {
       setLoading(true);
       setError(null);
       try {
-        // NOTE: le client `api` retourne la payload (pas besoin de `.data`)
+        // Client "payload-first": renvoie directement T, pas AxiosResponse<T>
         const [p, c] = await Promise.all([
           api.get<ProfileSummary>(`/users/${userId}`),
           api.get<CommentItem[]>(`/users/${userId}/comments`),
@@ -7128,14 +7450,15 @@ const UserProfile: React.FC = () => {
         setProfile(p);
         setComments(c);
       } catch (e: unknown) {
-        // Typage défensif d'une erreur axios
-        const ax = e as AxiosError<{ statusCode?: number; message?: string }>;
-        const statusCode = ax.response?.data?.statusCode ?? ax.status ?? 500;
-        const message =
-          ax.response?.data?.message ??
-          ax.message ??
-          'Request failed';
-        if (!cancelled) setError({ statusCode: Number(statusCode), message: String(message) });
+        let statusCode = 500;
+        let message = 'Request failed';
+        if (isAxiosError<{ statusCode?: number; message?: string }>(e)) {
+          statusCode = e.response?.data?.statusCode ?? e.response?.status ?? 500;
+          message = e.response?.data?.message ?? e.message ?? 'Request failed';
+        } else if (e instanceof Error) {
+          message = e.message;
+        }
+        if (!cancelled) setError({ statusCode, message });
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -7227,6 +7550,9 @@ export default UserProfile;
 
 
 ===== BEGIN components/user-components/UserVisit.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
+'use client';
+
 /**
  * Description: User visit list component
  * Author: Hieu Chu
@@ -7259,45 +7585,53 @@ type FormattedComment = {
   content: React.ReactNode;
 };
 
+const FALLBACK_IMG = '/static/no-image.png';
+
 const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
-  // Ne pas muter la prop: on clone avant de trier
-  const sorted: Visit[] = [...visits].sort(
-    (a: Visit, b: Visit) =>
-      new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
-  );
+  // Ne pas muter la prop
+  // Clone + tri inverse par date de visite
+  const items: Visit[] = [...(visits ?? [])]
+    .sort(
+      (a, b) =>
+        new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime(),
+    )
+    .map((v) => {
+      // Tri des images par date croissante
+      const images = [...(v.sculpture?.images ?? [])].sort(
+        (a, b) =>
+          new Date(a.created).getTime() - new Date(b.created).getTime(),
+      );
+      return { ...v, sculpture: { ...v.sculpture, images } };
+    });
 
-  // Trie les images de chaque sculpture par date de création ascendante
-  sorted.forEach((x: Visit) => {
-    x.sculpture.images.sort(
-      (a: ImageItem, b: ImageItem) =>
-        new Date(a.created).getTime() - new Date(b.created).getTime()
-    );
-  });
+  const formattedComments: FormattedComment[] = items.map((x: Visit) => {
+    // Accès sûr à l’URL de la première image
+    const firstImageUrl = x.sculpture?.images?.[0]?.url ?? FALLBACK_IMG;
 
-  const formattedComments: FormattedComment[] = sorted.map((x: Visit) => ({
-    author: (
-      <span>
-        <Link href={`/sculptures/id/${x.sculptureId}`}>
-          <a
+    return {
+      author: (
+        <Link href={`/sculptures/id/${String(x.sculptureId)}`}>
+          <span
             style={{
               fontSize: 14,
               fontWeight: 500,
               color: 'rgba(0, 0, 0, 0.65)',
             }}
           >
-            {x.sculpture.name}
-          </a>
+            {x.sculpture?.name ?? 'Untitled sculpture'}
+          </span>
         </Link>
-      </span>
-    ),
-    avatar: (
-      <div>
+      ),
+      avatar: (
         <img
-          src={
-            x.sculpture.images.length
-              ? x.sculpture.images[0].url
-              : '../../static/no-image.png'
-          }
+          src={firstImageUrl}
+          alt={x.sculpture?.name ?? 'Sculpture'}
+          // Fallback d'image robuste
+          onError={(e) => {
+            // évite une boucle si le fallback est manquant
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = FALLBACK_IMG;
+          }}
           style={{
             width: 42,
             height: 42,
@@ -7305,18 +7639,18 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
             borderRadius: 4,
           }}
         />
-      </div>
-    ),
-    content: (
-      <div style={{ fontSize: 14 }}>
-        <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {dayjs(x.visitTime).fromNow()}
-          </span>
-        </Tooltip>
-      </div>
-    ),
-  }));
+      ),
+      content: (
+        <div style={{ fontSize: 14 }}>
+          <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
+            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
+              {dayjs(x.visitTime).fromNow()}
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    };
+  });
 
   return (
     <Card
@@ -7327,14 +7661,11 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
     >
       <List<FormattedComment>
         itemLayout="horizontal"
-        dataSource={formattedComments ?? []}
+        dataSource={formattedComments}
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Visits"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
           ),
         }}
         renderItem={(item: FormattedComment) => (

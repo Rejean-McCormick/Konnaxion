@@ -1,23 +1,22 @@
 'use client'
 
 /**
- * Description: Primary maker edit page component (migrated to AntD v4/v5)
- * Notes:
- *  - Replaces Form.create/getFieldDecorator with Form.useForm + Form.Item
- *  - Replaces validateFields(cb) with await form.validateFields()
- *  - Keeps props API: visible, handleCancel, getCurrentMaker, editMaker
+ * Primary maker edit modal (AntD v5)
+ * - Form.useForm
+ * - Props contract: visible, handleCancel, getCurrentMaker, editMaker
  */
 
 import { useEffect, useState } from 'react'
 import { Form, Input, Button, Modal, message as antdMessage } from 'antd'
 import { CustomFormItem } from '../style'
-import api from '../../../api'
-import { normalizeError } from '../../../shared/errors'
+import api from '@/api'
+import { normalizeError } from '@/shared/errors'
 
-type Maker = {
+/** Type unifié avec MakerList */
+export type Maker = {
   id: string | number
-  firstName: string
-  lastName: string
+  firstName?: string
+  lastName?: string
   nationality?: string | null
   birthYear?: number | null
   deathYear?: number | null
@@ -25,13 +24,9 @@ type Maker = {
 }
 
 type MakerEditProps = {
-  /** Modal state controlled by parent */
   visible: boolean
-  /** Close handler (parent hides the modal) */
   handleCancel: () => void
-  /** Returns the currently selected maker from the parent list */
   getCurrentMaker: () => Maker
-  /** Parent updater after a successful save */
   editMaker: (m: Maker) => void
 }
 
@@ -44,7 +39,7 @@ export default function MakerEdit({
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
 
-  // Pre-fill form when modal opens or selection changes
+  // Pré-remplissage
   useEffect(() => {
     if (!visible) {
       form.resetFields()
@@ -67,12 +62,11 @@ export default function MakerEdit({
     try {
       const raw = await form.validateFields()
 
-      // prune + convert
+      // prune + cast
       const values: Record<string, any> = {}
       Object.keys(raw).forEach((k) => {
         const v = raw[k]
-        if (v !== undefined && v !== null && String(v).trim() !== '') values[k] = v
-        else values[k] = null
+        values[k] = v !== undefined && v !== null && String(v).trim() !== '' ? v : null
       })
       if (values.birthYear) values.birthYear = Number(values.birthYear)
       if (values.deathYear) values.deathYear = Number(values.deathYear)
@@ -85,20 +79,15 @@ export default function MakerEdit({
       values.id = current.id
 
       setSubmitting(true)
-      // NB: dans le code récent de MakerCreate vous consommez directement la data (pas .data)
-      await api.patch('/maker', values)
-
-      // Sync liste côté parent
+      await api.patch('/maker', values) // wrapper data-first
       editMaker({ ...current, ...values })
       antdMessage.success('Updated maker details successfully!', 2)
-
       form.resetFields()
       handleCancel()
     } catch (e: any) {
-      // validateFields peut lever une exception de validation -> ne pas traiter comme erreur API
-      if (e?.errorFields) return
-      const { message: msg } = normalizeError(e)
-      antdMessage.error(msg || 'Update failed')
+      if (e?.errorFields) return // erreurs de validation
+      const { message } = normalizeError(e)
+      antdMessage.error(message || 'Update failed')
     } finally {
       setSubmitting(false)
     }
@@ -106,7 +95,7 @@ export default function MakerEdit({
 
   return (
     <Modal
-      open={visible}                // AntD v5: prop "open" (remplace "visible")
+      open={visible}
       title="Edit maker details"
       onOk={handleOk}
       onCancel={handleCancel}

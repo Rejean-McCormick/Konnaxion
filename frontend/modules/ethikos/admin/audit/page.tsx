@@ -1,6 +1,7 @@
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\modules\ethikos\admin\audit\page.tsx
+'use client';
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
 import { Tag } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
@@ -20,7 +21,7 @@ export default function AuditLogs() {
 
   const { data, loading } = useRequest(fetchAuditLogs);
 
-  const columns = [
+  const columns: ProColumns<LogRow>[] = [
     { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
     { title: 'Actor', dataIndex: 'actor', width: 120 },
     { title: 'Action', dataIndex: 'action', width: 200 },
@@ -29,15 +30,17 @@ export default function AuditLogs() {
       title: 'Severity',
       dataIndex: 'severity',
       width: 120,
-      render: (v, row) => (
-        <Tag color={v === 'critical' ? 'red' : v === 'warn' ? 'orange' : 'blue'}>{v}</Tag>
+      render: (_, row) => (
+        <Tag color={row.severity === 'critical' ? 'red' : row.severity === 'warn' ? 'orange' : 'blue'}>
+          {row.severity}
+        </Tag>
       ),
       filters: [
         { text: 'Info', value: 'info' },
         { text: 'Warn', value: 'warn' },
         { text: 'Critical', value: 'critical' },
       ],
-      onFilter: (val: any, row: LogRow) => row.severity === val,
+      onFilter: (value, record) => record.severity === value,
     },
   ];
 

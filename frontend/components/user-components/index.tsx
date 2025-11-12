@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
 'use client'
 
 /**
@@ -5,59 +6,103 @@
  * Author: Hieu Chu
  */
 
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import dayjs from 'dayjs'
 
-import { Row, Input, Button } from 'antd'
+import { Row, Input, Button, Spin } from 'antd'
+import type { InputRef } from 'antd/es/input'
 import { SearchOutlined } from '@ant-design/icons'
 import { Comment } from '@ant-design/compatible'
 
 import { ColStyled, CardStyled, StyledTable } from './style'
-import api from '@/services/_request'
-import Loading from '../Loading'
+import { get as apiGet } from '@/services/_request'
 import NextError from 'next/error'
-import { convertNonAccent } from '../shared/utils'
-import { normalizeError } from "../../shared/errors";
+import { convertNonAccent } from '@/components/shared/utils'
+import { normalizeError } from '@/shared/errors'
 
-const UserList = () => {
+type RawUser = {
+  userId: string
+  email: string
+  name: string
+  nickname?: string
+  picture: string
+  joinDate: string | Date
+  totalLikes?: number | string
+  totalComments?: number | string
+  totalVisits?: number | string
+  role?: string | null
+}
+
+type UserRow = {
+  key: string
+  userId: string
+  email: string
+  name: string
+  nickname?: string
+  picture: string
+  joinDate: string
+  totalLikes: number
+  totalComments: number
+  totalVisits: number
+}
+
+/** Remplacement de l'ancien import './Loading' introuvable */
+const Loading: React.FC = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
+    <Spin size="large" />
+  </div>
+)
+
+const UserList: React.FC = () => {
   const router = useRouter()
 
-  const [userList, setUserList] = useState<any[]>([])
-  const searchInput = useRef<Input | null>(null)
+  const [userList, setUserList] = useState<UserRow[]>([])
+  const searchInput = useRef<InputRef>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<{ statusCode: number; message: string } | null>(null)
 
   useEffect(() => {
+    let mounted = true
     const fetchUsers = async () => {
       try {
-        let users = (await api.get('/user')).data
-        users = users
-          .filter((x: any) => !x.role)
-          .map((x: any) => ({
-            ...x,
+        // le helper retourne la payload directement
+        const users = await apiGet<RawUser[]>('/user')
+
+        const rows: UserRow[] = (users ?? [])
+          .filter((x) => !x.role)
+          .map((x) => ({
             key: x.userId,
-            totalLikes: +x.totalLikes,
-            totalComments: +x.totalComments,
-            totalVisits: +x.totalVisits,
+            userId: x.userId,
+            email: x.email,
+            name: x.name,
+            nickname: x.nickname,
+            picture: x.picture,
+            joinDate: new Date(x.joinDate as any).toISOString(),
+            totalLikes: Number(x.totalLikes ?? 0),
+            totalComments: Number(x.totalComments ?? 0),
+            totalVisits: Number(x.totalVisits ?? 0),
           }))
+          .sort((a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime())
 
-        users.sort(
-          (a: any, b: any) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime(),
-        )
-
-        setUserList(users)
+        if (mounted) setUserList(rows)
       } catch (e: any) {
-        const { message, statusCode } = normalizeError(e);
-        const statusCode = e?.response?.data?.statusCode ?? 500
-        const message = e?.response?.data?.message ?? 'Failed to load users'
-        setError({ statusCode, message })
+        const err = (normalizeError?.(e) ?? {}) as { statusCode?: number; message?: string }
+        const statusCode = Number(err.statusCode ?? e?.response?.data?.statusCode ?? 500)
+        const message = String(err.message ?? 'Failed to load users')
+        if (mounted) setError({ statusCode, message })
       } finally {
-        setLoading(false)
+        if (mounted) setLoading(false)
       }
     }
     fetchUsers()
+    return () => {
+      mounted = false
+    }
   }, [])
+
+  const handleSearch = (_selectedKeys: React.Key[], confirm: () => void) => confirm()
+  const handleReset = (clearFilters: () => void) => clearFilters()
 
   const getUserSearchProps = () => ({
     filterDropdown: ({
@@ -73,14 +118,18 @@ const UserList = () => {
     }) => (
       <div style={{ padding: 8 }}>
         <Input
-          ref={searchInput as any}
+          ref={searchInput}
           placeholder="Search user"
           value={(selectedKeys[0] as string) ?? ''}
           onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
           onPressEnter={() => handleSearch(selectedKeys, confirm)}
           style={{ width: 188, marginBottom: 8, display: 'block' }}
         />
-        <Button type="primary" onClick={() => handleSearch(selectedKeys, confirm)} style={{ width: 90, marginRight: 8 }}>
+        <Button
+          type="primary"
+          onClick={() => handleSearch(selectedKeys, confirm)}
+          style={{ width: 90, marginRight: 8 }}
+        >
           Search
         </Button>
         <Button onClick={() => handleReset(clearFilters)} style={{ width: 90 }}>
@@ -91,41 +140,27 @@ const UserList = () => {
     filterIcon: (filtered: boolean) => (
       <SearchOutlined style={{ color: filtered ? '#1890ff' : '#7E7E7E' }} />
     ),
-    onFilter: (value: string, record: any) => {
+    onFilter: (value: string | number | boolean, record: UserRow) => {
       const { email, name, nickname, userId } = record
-      let author = name
-      if (userId.includes('auth0')) author = nickname
-
+      const author = userId.includes('auth0') ? (nickname ?? name) : name
+      const v = String(value ?? '').toLowerCase()
       return (
-        convertNonAccent(author.toLowerCase()).includes(value.toLowerCase()) ||
-        convertNonAccent(email.toLowerCase()).includes(value.toLowerCase())
+        convertNonAccent(author.toLowerCase()).includes(v) ||
+        convertNonAccent(email.toLowerCase()).includes(v)
       )
     },
-    // AntD v5: "open" naming
     onFilterDropdownOpenChange: (open: boolean) => {
-      if (open) {
-        setTimeout(() => searchInput.current?.select?.(), 0)
-      }
+      if (open) setTimeout(() => searchInput.current?.select?.(), 0)
     },
   })
 
-  const handleSearch = (_selectedKeys: React.Key[], confirm: () => void) => {
-    confirm()
-  }
-
-  const handleReset = (clearFilters: () => void) => {
-    clearFilters()
-  }
-
-  const columns: any[] = [
+  const columns = [
     {
       title: 'User',
       key: 'user',
-      render: (_: any, record: any) => {
+      render: (_: any, record: UserRow) => {
         const { email, name, nickname, picture, userId } = record
-        let author = name
-        if (userId.includes('auth0')) author = nickname
-
+        const author = userId.includes('auth0') ? (nickname ?? name) : name
         return (
           <Comment
             author={
@@ -150,11 +185,13 @@ const UserList = () => {
     {
       title: 'Connection type',
       key: 'connection',
-      render: (_: any, record: any) => {
-        let connection = ''
-        if (record.userId.includes('google')) connection = 'Google'
-        else if (record.userId.includes('facebook')) connection = 'Facebook'
-        else connection = 'Email'
+      render: (_: any, record: UserRow) => {
+        const id = record.userId
+        const connection = id.includes('google')
+          ? 'Google'
+          : id.includes('facebook')
+          ? 'Facebook'
+          : 'Email'
         return <span>{connection}</span>
       },
       filters: [
@@ -162,36 +199,40 @@ const UserList = () => {
         { text: 'Google', value: 'google' },
         { text: 'Facebook', value: 'facebook' },
       ],
-      onFilter: (value: string, record: any) => record.userId.includes(value),
+      onFilter: (value: string | number | boolean, record: UserRow) =>
+        record.userId.includes(String(value)),
       width: '15%',
     },
     {
       title: 'Join date',
       key: 'joinDate',
-      render: (_: any, record: any) => <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>,
-      sorter: (a: any, b: any) => new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
-      sortDirections: ['ascend', 'descend'],
+      render: (_: any, record: UserRow) => (
+        <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>
+      ),
+      sorter: (a: UserRow, b: UserRow) =>
+        new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
+      sortDirections: ['ascend', 'descend'] as const,
       width: '15%',
     },
     {
       title: 'Likes',
       dataIndex: 'totalLikes',
-      sorter: (a: any, b: any) => a.totalLikes - b.totalLikes,
-      sortDirections: ['descend', 'ascend'],
+      sorter: (a: UserRow, b: UserRow) => a.totalLikes - b.totalLikes,
+      sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
     {
       title: 'Comments',
       dataIndex: 'totalComments',
-      sorter: (a: any, b: any) => a.totalComments - b.totalComments,
-      sortDirections: ['descend', 'ascend'],
+      sorter: (a: UserRow, b: UserRow) => a.totalComments - b.totalComments,
+      sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
     {
       title: 'Visits',
       dataIndex: 'totalVisits',
-      sorter: (a: any, b: any) => a.totalVisits - b.totalVisits,
-      sortDirections: ['descend', 'ascend'],
+      sorter: (a: UserRow, b: UserRow) => a.totalVisits - b.totalVisits,
+      sortDirections: ['descend', 'ascend'] as const,
       width: '13.33%',
     },
   ]
@@ -205,7 +246,7 @@ const UserList = () => {
         <CardStyled title="User Management">
           <StyledTable
             dataSource={userList}
-            columns={columns}
+            columns={columns as any}
             pagination={{ pageSize: 25, hideOnSinglePage: true }}
             className="user-table"
             onRow={(record: any) => ({

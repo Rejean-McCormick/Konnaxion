@@ -109,12 +109,10 @@ export default function Page() {
 
     const dateTime = eventDate
       .clone()
-      .set({
-        hour: eventTime.hour(),
-        minute: eventTime.minute(),
-        second: 0,
-        millisecond: 0,
-      });
+      .hour(eventTime.hour())
+      .minute(eventTime.minute())
+      .second(0)
+      .millisecond(0);
 
     const newEvent: ActivityEvent = {
       id: `evt${Date.now()}`,

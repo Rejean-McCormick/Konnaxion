@@ -1,6 +1,10 @@
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\elite\page.tsx
+// Code d’origine récupéré depuis le dump (File #22). :contentReference[oaicite:0]{index=0}
 
-import { PageContainer, ProTable, StatisticCard } from '@ant-design/pro-components';
+'use client';
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import type { ProColumns } from '@ant-design/pro-components';
 import { Progress, Statistic } from 'antd';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
@@ -8,36 +12,43 @@ import usePageTitle from '@/hooks/usePageTitle';
 import { fetchEliteBallots } from '@/services/decide';
 import type { Ballot } from '@/types';
 
-export default function EliteBallots() {
+type BallotRow = Ballot & { turnout: number };
+
+export default function EliteBallots(): JSX.Element {
   usePageTitle('Decide · Elite Ballots');
 
   const { data, loading } = useRequest(fetchEliteBallots);
 
-  const columns = [
+  const columns: ProColumns<BallotRow>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-render: (v, row) => (
-  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
-),
+      // ProTable render signature: (dom, entity, index, action, schema)
+      render: (_dom, record) => (
+        <Statistic.Countdown
+          value={dayjs(record.closesAt).valueOf()}
+          format="D[d] HH:mm:ss"
+        />
+      ),
     },
     {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (v, row) => <Progress type="circle" percent={v} />,
+      // ProTable render signature: (dom, entity, index, action, schema)
+      render: (_dom, record) => <Progress type="circle" percent={record.turnout} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
   ];
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProTable<Ballot & { turnout: number }>
+      <ProTable<BallotRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.ballots}
+        dataSource={data?.ballots as BallotRow[] | undefined}
         pagination={{ pageSize: 8 }}
         search={false}
       />

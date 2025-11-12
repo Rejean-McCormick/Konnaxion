@@ -1,3 +1,6 @@
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
+'use client';
+
 /**
  * Description: User visit list component
  * Author: Hieu Chu
@@ -30,45 +33,53 @@ type FormattedComment = {
   content: React.ReactNode;
 };
 
+const FALLBACK_IMG = '/static/no-image.png';
+
 const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
-  // Ne pas muter la prop: on clone avant de trier
-  const sorted: Visit[] = [...visits].sort(
-    (a: Visit, b: Visit) =>
-      new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime()
-  );
+  // Ne pas muter la prop
+  // Clone + tri inverse par date de visite
+  const items: Visit[] = [...(visits ?? [])]
+    .sort(
+      (a, b) =>
+        new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime(),
+    )
+    .map((v) => {
+      // Tri des images par date croissante
+      const images = [...(v.sculpture?.images ?? [])].sort(
+        (a, b) =>
+          new Date(a.created).getTime() - new Date(b.created).getTime(),
+      );
+      return { ...v, sculpture: { ...v.sculpture, images } };
+    });
 
-  // Trie les images de chaque sculpture par date de création ascendante
-  sorted.forEach((x: Visit) => {
-    x.sculpture.images.sort(
-      (a: ImageItem, b: ImageItem) =>
-        new Date(a.created).getTime() - new Date(b.created).getTime()
-    );
-  });
+  const formattedComments: FormattedComment[] = items.map((x: Visit) => {
+    // Accès sûr à l’URL de la première image
+    const firstImageUrl = x.sculpture?.images?.[0]?.url ?? FALLBACK_IMG;
 
-  const formattedComments: FormattedComment[] = sorted.map((x: Visit) => ({
-    author: (
-      <span>
-        <Link href={`/sculptures/id/${x.sculptureId}`}>
-          <a
+    return {
+      author: (
+        <Link href={`/sculptures/id/${String(x.sculptureId)}`}>
+          <span
             style={{
               fontSize: 14,
               fontWeight: 500,
               color: 'rgba(0, 0, 0, 0.65)',
             }}
           >
-            {x.sculpture.name}
-          </a>
+            {x.sculpture?.name ?? 'Untitled sculpture'}
+          </span>
         </Link>
-      </span>
-    ),
-    avatar: (
-      <div>
+      ),
+      avatar: (
         <img
-          src={
-            x.sculpture.images.length
-              ? x.sculpture.images[0].url
-              : '../../static/no-image.png'
-          }
+          src={firstImageUrl}
+          alt={x.sculpture?.name ?? 'Sculpture'}
+          // Fallback d'image robuste
+          onError={(e) => {
+            // évite une boucle si le fallback est manquant
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = FALLBACK_IMG;
+          }}
           style={{
             width: 42,
             height: 42,
@@ -76,18 +87,18 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
             borderRadius: 4,
           }}
         />
-      </div>
-    ),
-    content: (
-      <div style={{ fontSize: 14 }}>
-        <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
-          <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
-            {dayjs(x.visitTime).fromNow()}
-          </span>
-        </Tooltip>
-      </div>
-    ),
-  }));
+      ),
+      content: (
+        <div style={{ fontSize: 14 }}>
+          <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
+            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
+              {dayjs(x.visitTime).fromNow()}
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    };
+  });
 
   return (
     <Card
@@ -98,14 +109,11 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
     >
       <List<FormattedComment>
         itemLayout="horizontal"
-        dataSource={formattedComments ?? []}
+        dataSource={formattedComments}
         className="comment-list"
         locale={{
           emptyText: (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No Visits"
-            />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
           ),
         }}
         renderItem={(item: FormattedComment) => (

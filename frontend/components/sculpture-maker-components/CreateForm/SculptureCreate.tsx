@@ -1,14 +1,17 @@
 'use client'
 
 /**
- * Description: Component for Sculpture create page
- * Author: Hieu Chu
+ * Description: Component for Sculpture create page (migrated to AntD v5 form API)
+ * Changes:
+ *  - Drop Form.create/getFieldDecorator at the page level
+ *  - Use Form.useForm() + onFinish
+ *  - Provide a minimal getFieldDecorator-compat shim for TextFields
+ *  - Remove FlyToInterpolator dependency
  */
 
-import React, { useState, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Row, Button, Form, message as antdMessage } from 'antd'
 import { ColStyled, CardStyled, FormCol, CustomFormItem } from '../style'
-import { FlyToInterpolator } from 'react-map-gl'
 import Map from '../../map-components'
 import TextFields from './CreateFormTextFields'
 import { api } from '../../../shared/api'
@@ -18,74 +21,59 @@ import { normalizeError } from '../../../shared/errors'
 
 type ErrState = { message: string; statusCode?: number } | null
 
-// Typages minimaux pour l’API legacy d’antd v3 afin d’éviter 'any' non contrôlés.
-type LegacyForm = {
-  getFieldDecorator: (name: string, options?: any) => (node: React.ReactNode) => React.ReactNode
-  setFieldsValue: (values: Record<string, any>) => void
-  validateFields: (...args: any[]) => any
-}
-
-type Maker = {
-  id: string | number
-  firstName?: string
-  lastName?: string
-}
-
-type ViewState = {
+type ViewShape = {
   latitude: number
   longitude: number
   zoom: number
-  pitch: number
-  transitionInterpolator?: any
-  transitionDuration?: number
+  pitch?: number
+  bearing?: number
+  padding?: { top: number; bottom: number; left: number; right: number }
 }
 
-type MarkerState = {
-  markerLat: number
-  markerLng: number
-}
+type MarkerState = { markerLat: number; markerLng: number }
 
-type SculptureCreateProps = {
-  form: LegacyForm
+export default function SculptureCreate({
+  setStep,
+  setSculpture,
+}: {
   setStep: React.Dispatch<React.SetStateAction<number>>
   setSculpture: React.Dispatch<React.SetStateAction<Record<string, any>>>
-}
+}) {
+  const [form] = Form.useForm()
 
-const SculptureCreate: React.FC<SculptureCreateProps> = ({
-  form,
-  form: { getFieldDecorator, setFieldsValue },
-  setStep,
-  setSculpture
-}) => {
-  const [view, setView] = useState<ViewState>({
+  // map state
+  const [view, setView] = useState<ViewShape>({
     latitude: -34.40581053569814,
     longitude: 150.87842788963476,
     zoom: 15,
-    pitch: 50
+    pitch: 50,
+    bearing: 0,
+    padding: { top: 0, right: 0, bottom: 0, left: 0 },
   })
 
-  const initialData: MarkerState = {
+  const initialData = useMemo<MarkerState>(() => ({
     markerLat: -34.40581053569814,
-    markerLng: 150.87842788963476
-  }
+    markerLng: 150.87842788963476,
+  }), [])
 
-  const [marker, setMarker] = useState<MarkerState>({ ...initialData })
-  const [makerList, setMakerList] = useState<Maker[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [submitting, setSubmitting] = useState<boolean>(false)
+  const [marker, setMarker] = useState<MarkerState>(initialData)
+  const [makerList, setMakerList] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<ErrState>(null)
 
-  const addMaker = (maker: Maker) => {
-    setMakerList((prev) => [...prev, maker])
-    setFieldsValue({ primaryMakerId: maker.id })
+  const addMaker = (maker: any) => {
+    setMakerList(prev => [...prev, maker])
+    form.setFieldsValue({ primaryMakerId: maker.id })
   }
 
   useEffect(() => {
     let mounted = true
     const fetchMakerList = async () => {
       try {
-        const res = await api.get('/maker/')
-        if (mounted) setMakerList((res as any)?.data ?? [])
+        // axios helper in your codebase typically returns raw data (no `.data`)
+        const res: any = await api.get('/maker/')
+        if (mounted) setMakerList(Array.isArray(res) ? res : (res?.data ?? []))
       } catch (e: unknown) {
         const { message, statusCode } = normalizeError(e)
         if (mounted) setError({ statusCode, message })
@@ -94,57 +82,74 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
       }
     }
     fetchMakerList()
-    return () => {
-      mounted = false
-    }
+    return () => { mounted = false }
   }, [])
 
+  // remove FlyToInterpolator usage; simple state update is enough
   const flyTo = (latitude: number, longitude: number) => {
-    setView((prev) => ({
+    setView(prev => ({
       ...prev,
       latitude,
       longitude,
-      transitionInterpolator: new FlyToInterpolator(),
-      transitionDuration: 1500,
-      zoom: 15
+      zoom: 15,
     }))
     setMarker({ markerLat: latitude, markerLng: longitude })
   }
 
-  const showLocationOnMap = () => {
-    form.validateFields(['latitude', 'longitude'], (errors: any, values: any) => {
-      if (!errors) {
-        const { latitude, longitude } = values as { latitude: string | number; longitude: string | number }
-        flyTo(+latitude, +longitude)
-      }
-    })
+  const showLocationOnMap = async () => {
+    try {
+      const { latitude, longitude } = await form.validateFields(['latitude', 'longitude']) as any
+      flyTo(Number(latitude), Number(longitude))
+    } catch {
+      // validation errors are shown by antd
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    form.validateFields(async (err: any, values: Record<string, any>) => {
-      if (!err) {
-        // nettoie les champs vides
-        Object.keys(values).forEach((k) => {
-          if (!values[k]) delete values[k]
-        })
-        if (values.latitude) values.latitude = Number(values.latitude)
-        if (values.longitude) values.longitude = Number(values.longitude)
-
-        setSubmitting(true)
-        try {
-          await api.post('/sculpture', values)
-          setSculpture({ ...values })
-          setStep((s) => s + 1)
-        } catch (e: unknown) {
-          const { message } = normalizeError(e)
-          antdMessage.error(message)
-        } finally {
-          setSubmitting(false)
-        }
-      }
+  const onFinish = async (raw: Record<string, any>) => {
+    // prune empties and convert coordinates
+    const values: Record<string, any> = {}
+    Object.keys(raw).forEach(k => {
+      const v = raw[k]
+      if (v !== undefined && v !== null && String(v).trim() !== '') values[k] = v
     })
+    if (values.latitude) values.latitude = Number(values.latitude)
+    if (values.longitude) values.longitude = Number(values.longitude)
+
+    setSubmitting(true)
+    try {
+      await api.post('/sculpture', values)
+      setSculpture({ ...values })
+      setStep(s => s + 1)
+    } catch (e: unknown) {
+      const { message } = normalizeError(e)
+      antdMessage.error(message)
+    } finally {
+      setSubmitting(false)
+    }
   }
+
+  // Map component expects: setView: (v: ViewInput) => void
+  const applyViewFromMap = useCallback((v: ViewShape) => {
+    setView(prev => ({ ...prev, ...v }))
+  }, [])
+
+  // getFieldDecorator compatibility shim for TextFields:
+  // wraps child control in a noStyle Form.Item to register it without nesting layout
+  const getFieldDecorator = useCallback(
+    (name: string, options?: { rules?: any[]; initialValue?: any; valuePropName?: string }) =>
+      (node: React.ReactNode) => (
+        <Form.Item
+          noStyle
+          name={name}
+          rules={options?.rules}
+          initialValue={options?.initialValue}
+          valuePropName={options?.valuePropName}
+        >
+          {node}
+        </Form.Item>
+      ),
+    [],
+  )
 
   if (loading) return <Loading />
   if (error) return <Error statusCode={error.statusCode ?? 500} title={error.message} />
@@ -153,7 +158,7 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
     <Row gutter={16}>
       <ColStyled xs={24}>
         <CardStyled title="Create new sculpture">
-          <Form onSubmit={handleSubmit} autoComplete="off">
+          <Form form={form} autoComplete="off" onFinish={onFinish}>
             <ColStyled xs={24} md={12}>
               <TextFields
                 getFieldDecorator={getFieldDecorator}
@@ -170,12 +175,12 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
               <Map
                 view={view}
                 marker={marker}
-                setView={setView}
-                setMarker={({ markerLat, markerLng }: { markerLat: number; markerLng: number }) => {
+                setView={applyViewFromMap}
+                setMarker={({ markerLat, markerLng }) => {
                   setMarker({ markerLat, markerLng })
-                  setFieldsValue({
+                  form.setFieldsValue({
                     latitude: String(markerLat),
-                    longitude: String(markerLng)
+                    longitude: String(markerLng),
                   })
                 }}
               />
@@ -196,7 +201,3 @@ const SculptureCreate: React.FC<SculptureCreateProps> = ({
     </Row>
   )
 }
-
-export default Form.create({
-  name: 'sculpture_create_form'
-})(SculptureCreate)

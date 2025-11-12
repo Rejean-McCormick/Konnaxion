@@ -1,122 +1,126 @@
-'use client';
+// Path: components/sculpture-maker-components/EditForm/EditImage.tsx
+'use client'
 
 /**
  * Description: Image edit component for sculpture
  * Author: Hieu Chu
  */
 
-import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
-import type { UploadFile } from 'antd';
-import { useState } from 'react';
-import { ColStyled } from '../style';
-import api from '../../../api';
-import { useRouter } from 'next/navigation';
-import { normalizeError } from '../../../shared/errors';
-import Icon from '@/components/compat/Icon';
-import type { UploadRequestOption as RcUploadRequestOption } from 'rc-upload/lib/interface';
-import type { AxiosProgressEvent } from 'axios';
+import { Upload, Button, message as antdMessage, Row, Modal } from 'antd'
+import type { UploadProps, UploadFile } from 'antd'
+import { useState } from 'react'
+import { ColStyled } from '../style' // FIX: le style est au niveau parent
+import api from '@/api'
+import { useRouter } from 'next/navigation'
+import { normalizeError } from '@/shared/errors'
+import Icon from '@/components/compat/Icon'
+import type { AxiosProgressEvent } from 'axios'
 
-const { confirm } = Modal;
+const { confirm } = Modal
+
+type UploadedImage = { id: string | number; url: string }
 
 type EditImageProps = {
-  accessionId: string;
-  _name: string;
-  // Les images reçues sont déjà façonnées côté parent pour l'Upload (uid/url/preview/status)
-  images: UploadFile[];
-};
+  accessionId: string
+  _name: string
+  /** Images déjà normalisées par le parent au format UploadFile AntD. */
+  images: UploadFile[]
+}
+
+/** Typage robuste du paramètre customRequest sans dépendre de rc-upload. */
+type CustomRequestOptions = Parameters<NonNullable<UploadProps['customRequest']>>[0]
 
 const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
-  const router = useRouter();
+  const router = useRouter()
 
-  const [fileList, setFileList] = useState<UploadFile[]>([...(images as UploadFile[])]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fileList, setFileList] = useState<UploadFile[]>([...images])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleRemove = (file: UploadFile): Promise<boolean> => {
-    return new Promise((resolve) => {
+  const handleRemove: UploadProps['onRemove'] = (file) =>
+    new Promise<boolean>((resolve) => {
       confirm({
         title: 'Do you want to remove this image?',
         icon: <Icon type="exclamation-circle" style={{ color: '#ff4d4f' }} />,
         style: { top: 110 },
         maskClosable: true,
         okText: 'Confirm',
-        okButtonProps: {
-          style: {
-            background: '#ff4d4f',
-            borderColor: '#ff4d4f',
-          },
-        },
+        okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
         onOk: async () => {
-          setIsSubmitting(true);
+          setIsSubmitting(true)
           try {
-            await api.delete(`/sculpture-images/${(file as any).uid}`);
-            resolve(true);
-            setFileList((curr) => curr.filter((x: any) => x.uid !== (file as any).uid));
-            antdMessage.success('Deleted image successfully!', 2);
+            await api.delete(`/sculpture-images/${file.uid}`)
+            resolve(true)
+            setFileList((curr) => curr.filter((x) => x.uid !== file.uid))
+            antdMessage.success('Deleted image successfully!', 2)
           } catch (error: unknown) {
-            const { message } = normalizeError(error);
-            antdMessage.error(message);
-            resolve(false);
+            const { message } = normalizeError(error)
+            antdMessage.error(message || 'Failed to delete image')
+            resolve(false)
+          } finally {
+            setIsSubmitting(false)
           }
-          setIsSubmitting(false);
         },
-        onCancel: () => {
-          resolve(false);
-        },
-      });
-    });
-  };
+        onCancel: () => resolve(false),
+      })
+    })
 
-  const customRequest = async (e: RcUploadRequestOption) => {
+  // AntD v5: customRequest(options) => void, faire l'async à l'intérieur.
+  const customRequest: UploadProps['customRequest'] = (options) => {
+    const e = options as CustomRequestOptions
+
     const config = {
-      headers: {
-        'content-type':
-          'multipart/form-data; boundary=----WebKitFormBoundaryqTqJIxvkWFYqvP5s',
+      headers: { 'content-type': 'multipart/form-data' },
+      onUploadProgress(progressEvent: AxiosProgressEvent) {
+        const loaded = progressEvent.loaded ?? 0
+        const total = progressEvent.total ?? 1
+        const percent = total ? Math.round((loaded * 100) / total) : 0
+        // AntD attend { percent } et accepte le fichier en 2e arg
+        e.onProgress?.({ percent }, e.file as any)
       },
-      onUploadProgress: function (progressEvent: AxiosProgressEvent) {
-        const loaded = progressEvent.loaded ?? 0;
-        const total = progressEvent.total ?? 1;
-        const percentCompleted = Math.round((loaded * 100) / total);
-        // rc-upload attend un objet { percent }
-        e.onProgress?.({ percent: percentCompleted } as any, e.file as any);
-      },
-    };
-
-    const data = new FormData();
-    data.append('images', e.file as Blob);
-    data.set('accessionId', accessionId);
-
-    const hide = antdMessage.loading('Uploading image...', 0);
-    setIsSubmitting(true);
-
-    try {
-      const _result = await api.post('/sculpture-images', data, config);
-      const file: any = { ...(e.file as any) };
-      const { id, url } = _result.data[0];
-      file.uid = id;
-      file.url = url;
-      file.thumbUrl = url;
-      file.preview = url;
-
-      setFileList((curr) => [...curr, file]);
-
-      e.onSuccess?.(_result.data[0], e.file as any);
-      hide();
-      antdMessage.success('Uploaded image successfully!', 2);
-    } catch (error: unknown) {
-      const { message } = normalizeError(error);
-      antdMessage.error(message);
-      e.onError?.(message as any);
     }
 
-    setIsSubmitting(false);
-  };
+    const data = new FormData()
+    data.append('images', e.file as any)
+    data.set('accessionId', accessionId)
+
+    const hide = antdMessage.loading('Uploading image...', 0)
+    setIsSubmitting(true)
+
+    ;(async () => {
+      try {
+        // Wrapper axios "data-first" : retourne T directement
+        const uploaded = await api.post<UploadedImage[]>('/sculpture-images', data, config)
+        const first = uploaded?.[0]
+        if (!first) throw new Error('Upload response empty')
+
+        const next: UploadFile = {
+          uid: String(first.id),
+          name: (e.file as any)?.name ?? String(first.id),
+          status: 'done',
+          url: first.url,
+          thumbUrl: first.url,
+        }
+
+        setFileList((prev) => [...prev, next])
+        e.onSuccess?.(first as any, e.file as any)
+        antdMessage.success('Uploaded image successfully!', 2)
+      } catch (error: unknown) {
+        const { message } = normalizeError(error)
+        antdMessage.error(message || 'Upload failed')
+        e.onError?.(new Error(message || 'Upload failed') as any)
+      } finally {
+        hide()
+        setIsSubmitting(false)
+      }
+    })()
+  }
 
   const uploadButton = (
     <div>
       <Icon type="plus" />
       <div className="ant-upload-text">Upload</div>
     </div>
-  );
+  )
 
   return (
     <Row gutter={16}>
@@ -126,7 +130,7 @@ const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
           listType="picture-card"
           customRequest={customRequest}
           onRemove={handleRemove}
-          fileList={fileList as any}
+          fileList={fileList}
         >
           {uploadButton}
         </Upload>
@@ -140,7 +144,7 @@ const EditImage = ({ accessionId, _name, images }: EditImageProps) => {
         </Button>
       </ColStyled>
     </Row>
-  );
-};
+  )
+}
 
-export default EditImage;
+export default EditImage

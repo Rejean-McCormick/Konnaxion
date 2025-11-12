@@ -3,18 +3,17 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Card, Statistic, Skeleton } from 'antd';
-import type { TinyLineConfig } from '@ant-design/plots';
+import type { LineConfig } from '@ant-design/plots';
 
-// SSR-safe dynamic import of TinyLine
-const TinyLine = dynamic(
-  () => import('@ant-design/plots').then((m) => m.TinyLine),
-  { ssr: false }
-);
+// Use Line instead of TinyLine (works across versions)
+const Line = dynamic(() => import('@ant-design/plots').then(m => m.Line), {
+  ssr: false,
+});
 
 export interface LikeCardProps {
-  title?: string;            // Default: 'Likes'
-  total: number;             // Total likes
-  trend?: number[];          // Sparkline series
+  title?: string;        // Default: 'Likes'
+  total: number;         // Total likes
+  trend?: number[];      // Sparkline series
   loading?: boolean;
 }
 
@@ -24,14 +23,19 @@ const LikeCard: React.FC<LikeCardProps> = ({
   trend = [],
   loading = false,
 }) => {
-  const data: number[] = Array.isArray(trend) ? trend : [];
+  const series = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ x: i, y }));
 
-  const config: TinyLineConfig = {
+  const config: LineConfig = {
     data,
-    autoFit: true,
+    xField: 'x',
+    yField: 'y',
     smooth: true,
+    autoFit: true,
     height: 56,
     padding: 0,
+    xAxis: false,
+    yAxis: false,
     tooltip: {},
   };
 
@@ -42,7 +46,7 @@ const LikeCard: React.FC<LikeCardProps> = ({
         <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
       ) : (
         <div style={{ marginTop: 8 }}>
-          <TinyLine {...config} />
+          <Line {...config} />
         </div>
       )}
     </Card>

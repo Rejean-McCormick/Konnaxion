@@ -7,30 +7,59 @@
 
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
-import { Row, Carousel, Typography, List, Empty, Button } from 'antd'
+import { Row, Carousel, Typography, List, Empty, Spin } from 'antd'
 import { ColStyled, CardStyled } from '../style'
 import { SculptureCardDescription } from '../SculptureGrid'
-import api from '../../../api'
-import Loading from '../../Loading'
+import api from '@/services/_request'
 import Error from 'next/error'
 import MyStaticMap from '../../map-components/StaticMap'
-import Link from 'next/link'
 import Head from 'next/head'
 import SculptureComment from './SculptureComment'
+import type { SculptureCommentItem } from './SculptureComment'
 import SculptureTrend from './SculptureTrend'
-import { normalizeError } from '../../../shared/errors'
+import { normalizeError } from '@/shared/errors'
 
 const { Title } = Typography
 
+// --- Types ---
 type HttpError = { statusCode: number; message: string }
-type CommentItem = { commentId: string | number; [key: string]: any }
+
+type Maker = {
+  firstName?: string
+  lastName?: string
+  nationality?: string | null
+  birthYear?: number | null
+  deathYear?: number | null
+  wikiUrl?: string | null
+}
+
+type ImageItem = {
+  url: string
+  created: string | number | Date
+}
+
+type Sculpture = {
+  accessionId: string
+  name: string
+  images: ImageItem[]
+  latitude?: number | null
+  longitude?: number | null
+  productionDate?: string | null
+  material?: string | null
+  creditLine?: string | null
+  locationNotes?: string | null
+  totalLikes?: number
+  totalComments?: number
+  totalVisits?: number
+  primaryMaker?: Maker
+}
 
 const SculptureDetail = () => {
   const params = useParams<{ id?: string; sculptureId?: string }>()
   const id = (params?.id ?? params?.sculptureId) as string | undefined
 
-  const [sculpture, setSculpture] = useState<any>({})
-  const [comments, setComments] = useState<CommentItem[]>([])
+  const [sculpture, setSculpture] = useState<Sculpture | null>(null)
+  const [comments, setComments] = useState<SculptureCommentItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<HttpError | null>(null)
 
@@ -38,19 +67,16 @@ const SculptureDetail = () => {
     if (!id) return
     const fetchData = async () => {
       try {
-        const sculpturePromise = api.get(`/sculpture/${id}`)
-        const commentPromise = api.get(`/comment/sculpture-id/${id}`)
+        const sculpturePromise = api.get<Sculpture>(`/sculpture/${id}`)
+        const commentPromise = api.get<SculptureCommentItem[]>(`/comment/sculpture-id/${id}`)
+        const [sculptureRes, commentsRes] = await Promise.all([sculpturePromise, commentPromise])
 
-        const [rawSculpture, rawComments] = await Promise.all([
-          sculpturePromise,
-          commentPromise,
-        ])
-
-        setComments(rawComments.data)
-        setSculpture(rawSculpture.data)
+        setSculpture(sculptureRes)
+        // Ensure commentId is a string to match SculptureCommentItem
+        setComments(Array.isArray(commentsRes) ? commentsRes.map((c) => ({ ...c, commentId: String(c.commentId) })) : [])
       } catch (e: unknown) {
         const { message, statusCode } = normalizeError(e)
-        setError({ statusCode, message })
+        setError({ statusCode: Number(statusCode ?? 500), message })
       } finally {
         setLoading(false)
       }
@@ -60,22 +86,35 @@ const SculptureDetail = () => {
   }, [id])
 
   const deleteComment = (commentId: string | number) => {
-    setComments((c) => c.filter((x) => x.commentId !== commentId))
-    setSculpture((x: any) => ({
-      ...x,
-      totalComments: +x.totalComments - 1,
-    }))
+    setComments((c) => c.filter((x) => x.commentId !== String(commentId)))
+    setSculpture((x) =>
+      x
+        ? {
+            ...x,
+            totalComments: Math.max(0, Number(x.totalComments ?? 0) - 1),
+          }
+        : x,
+    )
   }
 
-  const addComment = (comment: CommentItem) => {
+  const addComment = (comment: SculptureCommentItem) => {
     setComments((c) => [comment, ...c])
-    setSculpture((x: any) => ({
-      ...x,
-      totalComments: +x.totalComments + 1,
-    }))
+    setSculpture((x) =>
+      x
+        ? {
+            ...x,
+            totalComments: Number(x.totalComments ?? 0) + 1,
+          }
+        : x,
+    )
   }
 
-  if (loading) return <Loading />
+  if (loading)
+    return (
+      <div style={{ padding: 24, textAlign: 'center' }}>
+        <Spin />
+      </div>
+    )
   if (error) return <Error statusCode={error.statusCode} title={error.message} />
 
   const {
@@ -92,65 +131,49 @@ const SculptureDetail = () => {
     totalLikes = 0,
     totalComments = 0,
     totalVisits = 0,
-  } = (sculpture ?? {}) as any
+  } = (sculpture ?? {}) as Sculpture
 
-  const { birthYear, deathYear, nationality, wikiUrl } = (primaryMaker ?? {}) as any
+  const { birthYear, deathYear, nationality, wikiUrl } = (primaryMaker ?? {}) as Maker
 
-  const markerLat = Number(latitude)
-  const markerLng = Number(longitude)
+  const markerLat = Number(latitude ?? 0)
+  const markerLng = Number(longitude ?? 0)
 
-  images.sort(
-    (a: any, b: any) =>
-      new Date(a.created).getTime() - new Date(b.created).getTime(),
+  const sortedImages = [...images].sort(
+    (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
   )
-  const imageList = images.map((image: any, idx: number) => (
-    <div key={idx}>
-      <img src={image.url} />
-    </div>
-  ))
+  const imageList = sortedImages.length
+    ? sortedImages.map((image, idx) => (
+        <div key={idx}>
+          <img
+            src={image.url}
+            style={{ height: 450, width: '100%', objectFit: 'cover' }}
+            alt={`sculpture-${idx}`}
+          />
+        </div>
+      ))
+    : [
+        <div key="empty">
+          <Empty description="No Image" />
+        </div>,
+      ]
 
   return (
     <>
       <Head>
-        <title>{name} - UOW Sculptures</title>
+        <title>{name ? `${name} • Sculpture` : 'Sculpture Detail'}</title>
       </Head>
+
       <Row gutter={16}>
+        {/* Sculpture detail */}
         <ColStyled xs={24} lg={15}>
-          <CardStyled
-            title="Sculpture Details"
-            extra={
-              <Link href={`/sculptures/id/${id}/edit`}>
-                <a>
-                  <Button icon="edit">Edit details</Button>
-                </a>
-              </Link>
-            }
-          >
-            <Carousel
-              draggable
-              style={{
-                width: '100%',
-              }}
-            >
-              {images.length ? (
-                imageList
-              ) : (
-                <div>
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    style={{ height: 100, marginTop: 100 }}
-                  />
-                </div>
-              )}
-            </Carousel>
-            <div
-              style={{
-                marginTop: 15,
-              }}
-            >
-              <Title level={4} style={{ marginBottom: 0 }}>
-                {name}
-              </Title>
+          <CardStyled>
+            <Title level={3} style={{ marginBottom: 8 }}>
+              {name}
+            </Title>
+
+            <Carousel autoplay>{imageList}</Carousel>
+
+            <div style={{ marginTop: 12 }}>
               <SculptureCardDescription
                 totalLikes={totalLikes}
                 totalComments={totalComments}
@@ -162,18 +185,11 @@ const SculptureDetail = () => {
                 <List.Item>
                   <List.Item.Meta
                     title="Accession ID"
-                    description={
-                      accessionId && !accessionId.includes('unknown')
-                        ? accessionId
-                        : 'N/A'
-                    }
+                    description={accessionId && !accessionId.includes('unknown') ? accessionId : 'N/A'}
                   />
                 </List.Item>
                 <List.Item>
-                  <List.Item.Meta
-                    title="Production Date"
-                    description={productionDate || 'N/A'}
-                  />
+                  <List.Item.Meta title="Production Date" description={productionDate || 'N/A'} />
                 </List.Item>
                 <List.Item>
                   <List.Item.Meta title="Material" description={material || 'N/A'} />

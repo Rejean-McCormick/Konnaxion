@@ -644,9 +644,10 @@ export default CommonWidget;
 
 
 ===== BEGIN modules/ethikos/admin/audit/page.tsx =====
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\modules\ethikos\admin\audit\page.tsx
+'use client';
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
 import { Tag } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
@@ -666,7 +667,7 @@ export default function AuditLogs() {
 
   const { data, loading } = useRequest(fetchAuditLogs);
 
-  const columns = [
+  const columns: ProColumns<LogRow>[] = [
     { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
     { title: 'Actor', dataIndex: 'actor', width: 120 },
     { title: 'Action', dataIndex: 'action', width: 200 },
@@ -675,15 +676,17 @@ export default function AuditLogs() {
       title: 'Severity',
       dataIndex: 'severity',
       width: 120,
-      render: (v, row) => (
-        <Tag color={v === 'critical' ? 'red' : v === 'warn' ? 'orange' : 'blue'}>{v}</Tag>
+      render: (_, row) => (
+        <Tag color={row.severity === 'critical' ? 'red' : row.severity === 'warn' ? 'orange' : 'blue'}>
+          {row.severity}
+        </Tag>
       ),
       filters: [
         { text: 'Info', value: 'info' },
         { text: 'Warn', value: 'warn' },
         { text: 'Critical', value: 'critical' },
       ],
-      onFilter: (val: any, row: LogRow) => row.severity === val,
+      onFilter: (value, record) => record.severity === value,
     },
   ];
 
@@ -799,6 +802,7 @@ export default function Moderation() {
 ===== BEGIN modules/ethikos/admin/roles/page.tsx =====
 'use client'
 
+import type { ReactNode } from 'react'
 import { PageContainer, ProTable } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { Switch, Tag } from 'antd'
@@ -809,7 +813,9 @@ import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/servic
 export default function RoleManagement() {
   usePageTitle('Admin · Role Management')
 
-  const { data, loading, refresh } = useRequest<RolePayload>(() => fetchRoles())
+  // Fix TS2558: ahooks v3 expects 2 generics: <Data, ParamsTuple>
+  // No params → params tuple is []
+  const { data, loading, refresh } = useRequest<RolePayload, []>(fetchRoles)
 
   const columns: ProColumns<RoleRow>[] = [
     { title: 'Role', dataIndex: 'name', width: 200 },
@@ -817,18 +823,18 @@ export default function RoleManagement() {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (dom) => <Tag>{dom}</Tag>,
+      render: (dom: ReactNode) => <Tag>{dom}</Tag>,
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       width: 120,
-      render: (_, row) => (
+      render: (_: ReactNode, row: RoleRow) => (
         <Switch
           checked={row.enabled}
-          onChange={async (checked) => {
+          onChange={async (checked: boolean) => {
             await toggleRole(row.id, checked)
-            refresh()
+            refresh() // typed as () => void by ahooks
           }}
         />
       ),
@@ -852,9 +858,13 @@ export default function RoleManagement() {
 
 
 ===== BEGIN modules/ethikos/decide/elite/page.tsx =====
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\elite\page.tsx
+// Code d’origine récupéré depuis le dump (File #22). :contentReference[oaicite:0]{index=0}
 
-import { PageContainer, ProTable, StatisticCard } from '@ant-design/pro-components';
+'use client';
+
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import type { ProColumns } from '@ant-design/pro-components';
 import { Progress, Statistic } from 'antd';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
@@ -862,36 +872,43 @@ import usePageTitle from '@/hooks/usePageTitle';
 import { fetchEliteBallots } from '@/services/decide';
 import type { Ballot } from '@/types';
 
-export default function EliteBallots() {
+type BallotRow = Ballot & { turnout: number };
+
+export default function EliteBallots(): JSX.Element {
   usePageTitle('Decide · Elite Ballots');
 
   const { data, loading } = useRequest(fetchEliteBallots);
 
-  const columns = [
+  const columns: ProColumns<BallotRow>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Closes In',
       dataIndex: 'closesAt',
       width: 180,
-render: (v, row) => (
-  <Statistic.Countdown value={dayjs(v).valueOf()} format="D[d] HH:mm:ss" />
-),
+      // ProTable render signature: (dom, entity, index, action, schema)
+      render: (_dom, record) => (
+        <Statistic.Countdown
+          value={dayjs(record.closesAt).valueOf()}
+          format="D[d] HH:mm:ss"
+        />
+      ),
     },
     {
       title: 'Turnout',
       dataIndex: 'turnout',
       width: 160,
-      render: (v, row) => <Progress type="circle" percent={v} />,
+      // ProTable render signature: (dom, entity, index, action, schema)
+      render: (_dom, record) => <Progress type="circle" percent={record.turnout} />,
     },
     { title: 'Scope', dataIndex: 'scope', width: 100 },
   ];
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProTable<Ballot & { turnout: number }>
+      <ProTable<BallotRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.ballots}
+        dataSource={data?.ballots as BallotRow[] | undefined}
         pagination={{ pageSize: 8 }}
         search={false}
       />
@@ -969,6 +986,7 @@ export default function Methodology() {
 
 import React, { useEffect, useState } from 'react'
 import { PageContainer, ProTable } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
 import { Select, Space, Input, Popconfirm, Progress, Radio, Slider } from 'antd'
 import axios from 'axios'
 import usePageTitle from '@/hooks/usePageTitle'
@@ -981,24 +999,24 @@ interface PublicTopic {
   description?: string
   debatecategory_id: number
   responseformat_id: number
-  turnout: number
+  turnout?: number
   options?: string[]
   scaleLabels?: string[]
 }
 
-export default function PublicVotePage() {
+export default function PublicVotePage(): JSX.Element {
   usePageTitle('Decide · Public Voting')
 
   const [categories, setCategories] = useState<Category[]>([])
   const [formats, setFormats]       = useState<Format[]>([])
-  const [topicsData, setTopicsData] = useState<{ results: PublicTopic[]; count: number }>({ results: [], count: 0 })
+  const [topicsData, setTopicsData] = useState<{ results: PublicTopic[]; count: number } | null>(null)
   const [activeCat, setActiveCat]   = useState<number | 'all'>('all')
   const [activeFormats, setActiveFormats] = useState<number[]>([])
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [page, setPage]             = useState<number>(1)
   const pageSize = 20
 
-  // 1. Load categories & formats
+  // 1) Load categories & formats
   useEffect(() => {
     axios
       .get<Category[]>('/api/home/debatecategory/', { params: { is_deleted: false } })
@@ -1008,7 +1026,7 @@ export default function PublicVotePage() {
       .then(r => setFormats(r.data))
   }, [])
 
-  // 2. Load topics with filters & pagination
+  // 2) Load topics with filters & pagination
   useEffect(() => {
     axios
       .get<{ results: PublicTopic[]; count: number }>('/api/home/debatetopic/', {
@@ -1026,7 +1044,7 @@ export default function PublicVotePage() {
       .then(r => setTopicsData(r.data))
   }, [activeCat, activeFormats, searchTerm, page])
 
-  // 3. Submit a vote and refresh
+  // 3) Submit a vote and refresh
   const vote = async (row: PublicTopic, value: any) => {
     await axios.post('/api/home/publicvote/', { topic_id: row.id, value })
     // refresh current page
@@ -1046,8 +1064,8 @@ export default function PublicVotePage() {
       .then(r => setTopicsData(r.data))
   }
 
-  // 4. Render vote input based on format
-  const renderVoteInput = (row: PublicTopic) => {
+  // 4) Render vote input based on format
+  const renderVoteInput = (row: PublicTopic): React.ReactNode => {
     const handleChange = (e: any) => {
       const val = e?.target?.value ?? e
       vote(row, val)
@@ -1061,37 +1079,48 @@ export default function PublicVotePage() {
             onChange={handleChange}
           />
         )
-      case 2: // multiple choice
+
+      case 2: // multiple choice (single-pick UI here; adapt if you support multi-pick)
         return (
           <Radio.Group
             options={(row.options ?? []).map(v => ({ label: v, value: v }))}
             onChange={handleChange}
           />
         )
-      case 3: // scale
+
+      case 3: { // scale
         const labels = row.scaleLabels ?? ['1', '2', '3', '4', '5']
+        const formatter: (v?: number) => React.ReactNode = (v) => {
+          const i = Math.max(0, Math.min(labels.length - 1, Number(v ?? 0)))
+          return labels[i]
+        }
         return (
           <Space direction="vertical" size={4}>
             <Slider
               min={0}
               max={labels.length - 1}
               step={1}
-              tooltip={{ formatter: idx => labels[idx] }}
+              tooltip={{ formatter }}
               onAfterChange={handleChange}
             />
           </Space>
         )
+      }
+
       default:
         return null
     }
   }
 
-  const columns = [
-    { title: 'Question', dataIndex: 'question', width: 360 },
+  // 5) Columns (typed; ProTable render signature respected)
+  const columns: ProColumns<PublicTopic>[] = [
+    { title: 'Question', dataIndex: 'question', width: 360, ellipsis: true },
     {
       title: 'Vote',
-      dataIndex: 'vote',
-      render: (_: any, row: PublicTopic) => (
+      key: 'vote',
+      width: 360,
+      search: false,
+      render: (_dom, row) => (
         <Popconfirm title="Confirm your vote?" onConfirm={() => {}}>
           {renderVoteInput(row)}
         </Popconfirm>
@@ -1100,7 +1129,9 @@ export default function PublicVotePage() {
     {
       title: 'Turnout',
       dataIndex: 'turnout',
-      render: (v, row) => <Progress percent={v} size="small" />,
+      align: 'center',
+      width: 160,
+      render: (_dom, row) => <Progress percent={row.turnout ?? 0} size="small" />,
     },
   ]
 
@@ -1111,10 +1142,10 @@ export default function PublicVotePage() {
           placeholder="Catégorie"
           allowClear
           value={activeCat}
-          onChange={val => { setActiveCat(val); setPage(1) }}
+          onChange={(val) => { setActiveCat((val ?? 'all') as any); setPage(1) }}
           style={{ width: 200 }}
           options={[
-            { label: 'All', value: 'all' },
+            { label: 'All', value: 'all' as const },
             ...categories.map(c => ({ label: c.name, value: c.id })),
           ]}
         />
@@ -1122,7 +1153,7 @@ export default function PublicVotePage() {
           mode="multiple"
           placeholder="Formats"
           value={activeFormats}
-          onChange={val => { setActiveFormats(val); setPage(1) }}
+          onChange={(val: number[]) => { setActiveFormats(val); setPage(1) }}
           style={{ width: 200 }}
           options={formats.map(f => ({ label: f.name, value: f.id }))}
         />
@@ -1130,20 +1161,24 @@ export default function PublicVotePage() {
           placeholder="Rechercher…"
           onSearch={val => { setSearchTerm(val); setPage(1) }}
           style={{ width: 260 }}
+          allowClear
         />
       </Space>
 
       <ProTable<PublicTopic>
         rowKey="id"
-        columns={columns as any}
-        dataSource={topicsData.results}
+        columns={columns}
+        dataSource={topicsData?.results ?? []}
         pagination={{
-          total: topicsData.count,
+          total: topicsData?.count ?? 0,
           current: page,
           pageSize,
           onChange: setPage,
+          showSizeChanger: false,
         }}
         search={false}
+        options={false}
+        toolBarRender={false}
       />
     </PageContainer>
   )
@@ -1153,59 +1188,97 @@ export default function PublicVotePage() {
 
 
 ===== BEGIN modules/ethikos/decide/results/page.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\results\page.tsx
 'use client'
 
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Tag } from 'antd';
-import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchDecisionResults } from '@/services/decide';
+import React from 'react'
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components'
+import { Tag } from 'antd'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchDecisionResults } from '@/services/decide'
 
 type ResultRow = {
-  id: string;
-  title: string;
-  scope: 'Elite' | 'Public';
-  passed: boolean;
-  closesAt: string;
-  region: string;
-};
+  id: string
+  title: string
+  scope: 'Elite' | 'Public'
+  passed: boolean
+  closesAt: string
+  region: string
+}
 
 export default function ResultsArchive() {
-  usePageTitle('Decide · Results Archive');
+  usePageTitle('Decide · Results Archive')
 
-  const { data, loading } = useRequest(fetchDecisionResults);
+  const { data, loading } = useRequest(fetchDecisionResults)
 
-  const columns = [
+  // Build dynamic region filters from payload
+  const regionFilters = React.useMemo(
+    () =>
+      Array.from(
+        new Set(((data?.items as ResultRow[] | undefined) ?? []).map((r) => r.region).filter(Boolean)),
+      ).map((r) => ({ text: String(r), value: String(r) })),
+    [data?.items],
+  )
+
+  const scopeFilters = React.useMemo(
+    () => [
+      { text: 'Elite', value: 'Elite' },
+      { text: 'Public', value: 'Public' },
+    ],
+    [],
+  )
+
+  const columns: ProColumns<ResultRow>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     {
       title: 'Result',
       dataIndex: 'passed',
       width: 120,
-      render: (v, row) => (
-        <Tag color={v ? 'green' : 'red'}>{v ? 'PASSED' : 'REJECTED'}</Tag>
+      render: (_, row) => (
+        <Tag color={row.passed ? 'green' : 'red'}>{row.passed ? 'PASSED' : 'REJECTED'}</Tag>
       ),
+      // replace invalid `filters: true` with proper options
       filters: [
-        { text: 'Passed', value: 'true' },
-        { text: 'Rejected', value: 'false' },
+        { text: 'Passed', value: true },
+        { text: 'Rejected', value: false },
       ],
-      onFilter: (val: any, row: ResultRow) => String(row.passed) === val,
+      // onFilter receives React.Key | boolean; compare strictly to row.passed
+      onFilter: (value, row) => row.passed === (value === true || value === 'true'),
     },
-    { title: 'Scope', dataIndex: 'scope', width: 120, filters: true },
-    { title: 'Region', dataIndex: 'region', width: 140, filters: true },
-    { title: 'Closed', dataIndex: 'closesAt', valueType: 'date' },
-  ];
+    {
+      title: 'Scope',
+      dataIndex: 'scope',
+      width: 120,
+      filters: scopeFilters,
+      onFilter: (value, row) => row.scope === String(value),
+      valueEnum: {
+        Elite: { text: 'Elite' },
+        Public: { text: 'Public' },
+      },
+    },
+    {
+      title: 'Region',
+      dataIndex: 'region',
+      width: 140,
+      filters: regionFilters,
+      onFilter: (value, row) => row.region === String(value),
+    },
+    // use a valid ProComponents valueType
+    { title: 'Closed', dataIndex: 'closesAt', valueType: 'dateTime' },
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
       <ProTable<ResultRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items}
+        dataSource={(data?.items as ResultRow[] | undefined) ?? []}
         pagination={{ pageSize: 10 }}
         search={false}
       />
     </PageContainer>
-  );
+  )
 }
 
 ===== END modules/ethikos/decide/results/page.tsx =====
@@ -1221,7 +1294,7 @@ import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchTopicDetail } from '@/services/deliberate';
 
-// Derive the exact return type from the service
+// Typage dérivé du service pour rester aligné sur la source.
 type TopicDetail = Awaited<ReturnType<typeof fetchTopicDetail>>;
 type Statement = TopicDetail['statements'][number];
 
@@ -1237,7 +1310,8 @@ export default function TopicDetailPage() {
 
   usePageTitle(`Deliberate · ${topicId ?? ''}`);
 
-  const { data, loading } = useRequest<TopicDetail>(
+  // FIX: useRequest attend 2 génériques <TData, TParams>. Le service n'a pas de paramètres => [].
+  const { data, loading } = useRequest<TopicDetail, []>(
     () => fetchTopicDetail(topicId!),
     { ready: !!topicId, refreshDeps: [topicId] },
   );
@@ -1278,7 +1352,7 @@ function StatementItem({ s }: { s: Statement }) {
 
 
 ===== BEGIN modules/ethikos/deliberate/elite/page.tsx =====
-'use client'
+'use client';
 
 import React from 'react';
 import {
@@ -1289,147 +1363,163 @@ import {
   ModalForm,
   ProFormText,
   ProFormSelect,
+  type ProColumns,
 } from '@ant-design/pro-components';
-import { Badge,
-  Button,
-  Drawer,
-  Empty,
-  Space,
-  Tag,
-  Tooltip,
-  message as antdMessage,
- } from 'antd';
+import { Button, Drawer, Empty, Space, Tag, Tooltip, message as antdMessage } from 'antd';
+import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
 import { useRequest, useInterval } from 'ahooks';
-import {
-  PlusOutlined,
-  ReloadOutlined,
-  FireOutlined,
-} from '@ant-design/icons';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 import usePageTitle from '@/hooks/usePageTitle';
-import {
-  fetchEliteTopics,
-  createEliteTopic,
-  fetchTopicPreview,
-} from '@/services/deliberate';
+import { fetchEliteTopics, createEliteTopic, fetchTopicPreview } from '@/services/deliberate';
 import type { Topic } from '@/types';
 
+dayjs.extend(relativeTime);
+
 /* ------------------------------------------------------------------ */
-/*  Derived types                                                      */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 interface TopicRow extends Topic {
   createdAt: string;
   lastActivity: string;
-  hot: boolean; // computed server-side: stanceCount increased >= 20% in 24 h
+  hot: boolean;
+  stanceCount: number;
 }
 
+type TopicPreview = {
+  id: string;
+  title: string;
+  category: string;
+  createdAt: string;
+  latest: Array<{ id: string; author: string; body: string }>;
+};
+
 /* ------------------------------------------------------------------ */
-/*  Main component                                                     */
+/*  Composant principal                                                */
 /* ------------------------------------------------------------------ */
 
 export default function EliteAgora() {
   usePageTitle('Deliberate · Elite Agora');
 
-  /* ---------- data ---------- */
-  const { data, loading, refresh } = useRequest(fetchEliteTopics);
-  useInterval(refresh, 60_000); // poll every minute
+  // Service wrapper pour garantir { list: TopicRow[] } au typage de useRequest
+  const eliteTopicsService = React.useCallback(async (): Promise<{ list: TopicRow[] }> => {
+    const res = await fetchEliteTopics();
+    return {
+      list: (res?.list ?? []).map((t: any) => ({
+        ...t,
+        stanceCount: typeof t?.stanceCount === 'number' ? t.stanceCount : 0,
+      })) as TopicRow[],
+    };
+  }, []);
 
-  /* ---------- drawer state ---------- */
+  // useRequest<TData, TParams>. Pas de params -> [].
+  const { data, loading, refresh } = useRequest<{ list: TopicRow[] }, []>(eliteTopicsService);
+  useInterval(refresh, 60_000);
+
+  /* ---------- drawer preview ---------- */
   const [previewId, setPreviewId] = React.useState<string | null>(null);
   const {
     data: preview,
     loading: previewLoading,
     run: loadPreview,
-  } = useRequest((id: string) => fetchTopicPreview(id), { manual: true });
+  } = useRequest<TopicPreview, [string]>(fetchTopicPreview, { manual: true });
 
-  /* ---------- open drawer ---------- */
-  const openPreview = (row: TopicRow) => {
-    setPreviewId(row.id);
-    loadPreview(row.id);
-  };
+  const openPreview = React.useCallback(
+    (row: TopicRow) => {
+      setPreviewId(row.id);
+      loadPreview(row.id);
+    },
+    [loadPreview],
+  );
 
   /* ---------- KPI header ---------- */
-  const headerStats = [
-    {
-      label: 'Open topics',
-      value: data?.list.length ?? 0,
-    },
-    {
-      label: 'Avg stances / topic',
-      value:
-        data && data.list.length
+  const headerStats = React.useMemo(
+    () => [
+      { label: 'Open topics', value: data?.list.length ?? 0 },
+      {
+        label: 'Avg stances / topic',
+        value: data?.list?.length
           ? Math.round(
-              data.list.reduce((sum, t) => sum + t.stanceCount, 0) /
-                data.list.length,
+              data!.list.reduce((sum: number, t: TopicRow) => sum + (t.stanceCount ?? 0), 0) /
+                data!.list.length,
             )
           : 0,
-    },
-    {
-      label: 'Hot topics',
-      value: data?.list.filter((t) => t.hot).length ?? 0,
-    },
-  ];
+      },
+      { label: 'Hot topics', value: (data?.list ?? []).filter((t: TopicRow) => t.hot).length },
+    ],
+    [data],
+  );
 
-  /* ---------- columns ---------- */
-  const columns = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      render: (_: any, row: TopicRow) => (
-        <a onClick={() => openPreview(row)}>{row.title}</a>
-      ),
-    },
-    {
-      title: 'Category',
-      dataIndex: 'category',
-      filters: true,
-      render: (v, row) => <Tag color="geekblue">{v}</Tag>,
-    },
-    {
-      title: 'Stances',
-      dataIndex: 'stanceCount',
-      sorter: true,
-      align: 'right' as const,
-    },
-    {
-      title: 'Last activity',
-      dataIndex: 'lastActivity',
-      valueType: 'fromNow',
-    },
-    {
-      title: '',
-      dataIndex: 'hot',
-      width: 60,
-      render: (v, row) =>
-        v ? (
-          <Tooltip title="Trending">
-            <FireOutlined style={{ color: '#fa541c' }} />
-          </Tooltip>
-        ) : null,
-    },
-  ];
+  /* ---------- filtres de catégorie ---------- */
+  const categoryFilters = React.useMemo(
+    () =>
+      Array.from(
+        new Set((data?.list ?? []).map((t: TopicRow) => t.category).filter(Boolean)),
+      ).map((c) => ({ text: String(c), value: String(c) })),
+    [data?.list],
+  );
 
-  /* ---------- render ---------- */
+  /* ---------- colonnes ---------- */
+  const columns: ProColumns<TopicRow>[] = React.useMemo(
+    () => [
+      {
+        title: 'Title',
+        dataIndex: 'title',
+        render: (_, row) => (
+          <a onClick={() => openPreview(row)} style={{ cursor: 'pointer' }}>
+            {row.title}
+          </a>
+        ),
+      },
+      {
+        title: 'Category',
+        dataIndex: 'category',
+        filters: categoryFilters,
+        onFilter: (value, record) => String(record.category) === String(value),
+        render: (_, row) => <Tag color="geekblue">{row.category}</Tag>,
+      },
+      {
+        title: 'Stances',
+        dataIndex: 'stanceCount',
+        sorter: true,
+        align: 'right',
+      },
+      {
+        title: 'Last activity',
+        dataIndex: 'lastActivity',
+        // Pas de valueType "fromNow" (non standard). On formate via dayjs.
+        render: (_, row) => dayjs(row.lastActivity).fromNow(),
+      },
+      {
+        title: '',
+        dataIndex: 'hot',
+        width: 60,
+        render: (_, row) =>
+          row.hot ? (
+            <Tooltip title="Trending">
+              <FireOutlined style={{ color: '#fa541c' }} />
+            </Tooltip>
+          ) : null,
+      },
+    ],
+    [categoryFilters, openPreview],
+  );
+
+  /* ---------- rendu ---------- */
   return (
     <PageContainer
       ghost
       loading={loading}
       extra={
         <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={refresh}
-            type="text"
-            title="Refresh list"
-          />
-          {/* role check goes here */}
+          <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title="Refresh list" />
           <NewTopicButton onCreated={refresh} />
         </Space>
       }
     >
-      {/* KPI summary */}
+      {/* KPI */}
       <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
         {headerStats.map((k) => (
           <StatisticCard
@@ -1440,19 +1530,16 @@ export default function EliteAgora() {
         ))}
       </ProCard>
 
-      {/* list */}
+      {/* Liste */}
       <ProTable<TopicRow>
         rowKey="id"
         columns={columns}
         dataSource={data?.list}
-        search={{
-          labelWidth: 90,
-          filterType: 'light',
-        }}
+        search={{ labelWidth: 90, filterType: 'light' }}
         pagination={{ pageSize: 10 }}
       />
 
-      {/* preview drawer */}
+      {/* Preview drawer */}
       <Drawer
         width={520}
         open={!!previewId}
@@ -1467,8 +1554,7 @@ export default function EliteAgora() {
               <strong>Category:</strong> {preview.category}
             </p>
             <p>
-              <strong>Opened:</strong>{' '}
-              {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+              <strong>Opened:</strong> {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
             </p>
             <h4>Latest statements</h4>
             <ul>
@@ -1480,9 +1566,7 @@ export default function EliteAgora() {
             </ul>
             <Button
               type="primary"
-              onClick={() =>
-                window.location.assign(`/ethikos/deliberate/${preview.id}`)
-              }
+              onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
             >
               Go to thread →
             </Button>
@@ -1502,25 +1586,25 @@ export default function EliteAgora() {
 function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   const [visible, setVisible] = React.useState(false);
 
-  const { runAsync, loading } = useRequest(createEliteTopic, {
-    manual: true,
-    onSuccess: () => {
-      antdMessage.success('Topic created 🎉');
-      setVisible(false);
-      onCreated();
+  // On fige les Params pour typer runAsync correctement
+  const { runAsync, loading } = useRequest<unknown, [{ title: string; category: string }]>(
+    createEliteTopic,
+    {
+      manual: true,
+      onSuccess: () => {
+        antdMessage.success('Topic created 🎉');
+        setVisible(false);
+        onCreated();
+      },
     },
-  });
+  );
 
   return (
     <>
-      <Button
-        icon={<PlusOutlined />}
-        type="primary"
-        onClick={() => setVisible(true)}
-      >
+      <Button icon={<PlusOutlined />} type="primary" onClick={() => setVisible(true)}>
         New Topic
       </Button>
-      <ModalForm
+      <ModalForm<{ title: string; category: string }>
         title="Create new topic"
         open={visible}
         onOpenChange={setVisible}
@@ -1530,11 +1614,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
         }}
         submitter={{ submitButtonProps: { loading } }}
       >
-        <ProFormText
-          name="title"
-          label="Title"
-          rules={[{ required: true, min: 10 }]}
-        />
+        <ProFormText name="title" label="Title" rules={[{ required: true, min: 10 }]} />
         <ProFormSelect
           name="category"
           label="Category"
@@ -1725,13 +1805,19 @@ export default function Outcomes() {
 
 
 ===== BEGIN modules/ethikos/impact/tracker/page.tsx =====
-'use client'
+'use client';
 
+import React from 'react';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
-import { Tag, Select } from 'antd';
+import type { ProColumns } from '@ant-design/pro-components';
+import { Select } from 'antd';
 import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchImpactTracker, patchImpactStatus } from '@/services/impact';
+
+dayjs.extend(relativeTime);
 
 type TrackerRow = {
   id: string;
@@ -1741,39 +1827,53 @@ type TrackerRow = {
   updatedAt: string;
 };
 
+type TrackerResponse = {
+  items: TrackerRow[];
+};
+
 export default function ImpactTracker() {
   usePageTitle('Impact · Tracker');
 
-  const { data, loading, mutate } = useRequest(fetchImpactTracker);
+  const { data, loading, mutate } = useRequest<TrackerResponse>(fetchImpactTracker);
 
   const onStatusChange = async (id: string, status: TrackerRow['status']) => {
     await patchImpactStatus(id, status);
-    mutate(d => ({
-      items: d!.items.map(r => (r.id === id ? { ...r, status } : r)),
-    }));
+    if (data) {
+      mutate({
+        ...data,
+        items: data.items.map((r) => (r.id === id ? { ...r, status } : r)),
+      });
+    }
   };
 
-  const columns = [
+  const columns: ProColumns<TrackerRow>[] = [
     { title: 'Title', dataIndex: 'title', width: 260 },
     { title: 'Owner', dataIndex: 'owner', width: 160 },
     {
       title: 'Status',
       dataIndex: 'status',
-      width: 160,
-      render: (v: TrackerRow['status'], row: TrackerRow) => (
-        <Select
-          value={v}
+      width: 180,
+      render: (_, row) => (
+        <Select<TrackerRow['status']>
+          value={row.status}
           options={[
             { value: 'Planned', label: 'Planned' },
             { value: 'In-Progress', label: 'In-Progress' },
             { value: 'Completed', label: 'Completed' },
             { value: 'Blocked', label: 'Blocked' },
           ]}
-          onChange={val => onStatusChange(row.id, val)}
+          onChange={(val) => onStatusChange(row.id, val)}
+          style={{ width: '100%' }}
         />
       ),
     },
-    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'fromNow', sorter: true },
+    {
+      title: 'Updated',
+      dataIndex: 'updatedAt',
+      sorter: (a, b) => dayjs(a.updatedAt).valueOf() - dayjs(b.updatedAt).valueOf(),
+      render: (_, row) => dayjs(row.updatedAt).fromNow(),
+      width: 160,
+    },
   ];
 
   return (
@@ -2793,7 +2893,8 @@ test('returns mocked report data', async () => {
 
 
 ===== BEGIN modules/insights/hooks/index.ts =====
-﻿export { default as useReport }       from './useReport';
+﻿// modules/insights/hooks/index.ts
+export { useReport } from './useReport';
 export { default as useReportStream } from './useReportStream';
 
 ===== END modules/insights/hooks/index.ts =====
@@ -3978,7 +4079,8 @@ export default CommonWidget;
 
 
 ===== BEGIN modules/konsensus/components/index.ts =====
-﻿export { VoteButtons } from './VoteButtons';
+﻿// C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\index.ts
+export { default as VoteButtons } from './VoteButtons';
 
 ===== END modules/konsensus/components/index.ts =====
 

@@ -1,5 +1,6 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { PageContainer, ProTable } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { Switch, Tag } from 'antd'
@@ -10,7 +11,9 @@ import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/servic
 export default function RoleManagement() {
   usePageTitle('Admin · Role Management')
 
-  const { data, loading, refresh } = useRequest<RolePayload>(() => fetchRoles())
+  // Fix TS2558: ahooks v3 expects 2 generics: <Data, ParamsTuple>
+  // No params → params tuple is []
+  const { data, loading, refresh } = useRequest<RolePayload, []>(fetchRoles)
 
   const columns: ProColumns<RoleRow>[] = [
     { title: 'Role', dataIndex: 'name', width: 200 },
@@ -18,18 +21,18 @@ export default function RoleManagement() {
       title: 'Users',
       dataIndex: 'userCount',
       width: 100,
-      render: (dom) => <Tag>{dom}</Tag>,
+      render: (dom: ReactNode) => <Tag>{dom}</Tag>,
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       width: 120,
-      render: (_, row) => (
+      render: (_: ReactNode, row: RoleRow) => (
         <Switch
           checked={row.enabled}
-          onChange={async (checked) => {
+          onChange={async (checked: boolean) => {
             await toggleRole(row.id, checked)
-            refresh()
+            refresh() // typed as () => void by ahooks
           }}
         />
       ),

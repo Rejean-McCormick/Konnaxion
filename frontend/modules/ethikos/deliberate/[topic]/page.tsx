@@ -7,7 +7,7 @@ import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchTopicDetail } from '@/services/deliberate';
 
-// Derive the exact return type from the service
+// Typage dérivé du service pour rester aligné sur la source.
 type TopicDetail = Awaited<ReturnType<typeof fetchTopicDetail>>;
 type Statement = TopicDetail['statements'][number];
 
@@ -23,7 +23,8 @@ export default function TopicDetailPage() {
 
   usePageTitle(`Deliberate · ${topicId ?? ''}`);
 
-  const { data, loading } = useRequest<TopicDetail>(
+  // FIX: useRequest attend 2 génériques <TData, TParams>. Le service n'a pas de paramètres => [].
+  const { data, loading } = useRequest<TopicDetail, []>(
     () => fetchTopicDetail(topicId!),
     { ready: !!topicId, refreshDeps: [topicId] },
   );

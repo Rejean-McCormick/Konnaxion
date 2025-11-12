@@ -86,9 +86,9 @@ export default function HeaderBar({
   const breadcrumbItems = useMemo(() => {
     const br = trail(routes, cur)
     const root = {
-      name: selectedSidebar
-        ? selectedSidebar[0].toUpperCase() + selectedSidebar.slice(1)
-        : '',
+      name:
+        (selectedSidebar?.[0]?.toUpperCase() ?? '') +
+        (selectedSidebar?.slice(1) ?? ''),
       path: `/${selectedSidebar}`,
     }
     const crumbs = br.length ? [root, ...br] : [root]

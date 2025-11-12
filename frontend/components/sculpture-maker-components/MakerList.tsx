@@ -1,172 +1,185 @@
 'use client'
 
-/**
- * Description: Primary maker list component
- * Author: Hieu Chu
- */
-
-import { useState, useEffect } from 'react'
-import { Row, Divider, Modal, message as antdMessage, notification, Button  } from 'antd';import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import React, { useEffect, useState } from 'react'
+import { Row, Divider, Modal, message as antdMessage, notification, Button, Spin } from 'antd'
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
 import { ColStyled, CardStyled, StyledTable } from './style'
 import MakerEdit from './EditForm/MakerEdit'
-import api from '@/services/_request'
-import Loading from '../Loading'
-import Error from 'next/error'
 import MakerCreate from './CreateForm/MakerCreate'
-import { normalizeError } from "../../shared/errors";
+import NextError from 'next/error'
+import { get, del } from '@/services/_request'
+import { normalizeError } from '@/shared/errors'
 
 const { confirm } = Modal
 
-const MakerList = () => {
+/** Type unifié avec MakerEdit (notamment wikiUrl: string | null) */
+export type Maker = {
+  id: string | number
+  firstName?: string
+  lastName?: string
+  nationality?: string | null
+  birthYear?: number | null
+  deathYear?: number | null
+  wikiUrl?: string | null
+  key?: React.Key
+}
+
+type HttpError = { statusCode: number; message: string }
+
+const Loading = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
+    <Spin size="large" />
+  </div>
+)
+
+const EMPTY_MAKER: Maker = {
+  id: '',
+  firstName: '',
+  lastName: '',
+  nationality: null,
+  birthYear: null,
+  deathYear: null,
+  wikiUrl: null,
+}
+
+const MakerList: React.FC = () => {
+  const [makerList, setMakerList] = useState<Maker[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<HttpError | null>(null)
+
+  const [showModal, setShowModal] = useState(false)
+  const [showModalCreate, setShowModalCreate] = useState(false)
+  const [currentMakerId, setCurrentMakerId] = useState<string | number>('')
+
   useEffect(() => {
     const fetchMakerList = async () => {
       try {
-        const data = (await api.get('/maker/')).data
-
-        let formattedData = data.map((maker: any) => {
-          let formattedMaker = { ...maker }
-          formattedMaker.key = maker.id
-          return formattedMaker
-        })
-
-        formattedData.sort((a: any, b: any) => a.firstName.localeCompare(b.firstName))
-
-        console.log(formattedData)
-        setMakerList(formattedData)
-      } catch (e: any) {
-        const { message, statusCode } = normalizeError(e);
-        const { statusCode, message } = e.response.data
-        setError({
-          statusCode,
-          message
-        })
+        // helper data-first → retourne directement la payload
+        const data = await get<Maker[]>('/maker/')
+        const formatted = (data ?? [])
+          .map((maker) => ({
+            ...maker,
+            // normalisation douce
+            firstName: maker.firstName ?? '',
+            lastName: maker.lastName ?? '',
+            nationality: maker.nationality ?? null,
+            wikiUrl: maker.wikiUrl ?? null,
+            key: maker.id,
+          }))
+          .sort(
+            (a, b) =>
+              (a.firstName ?? '').localeCompare(b.firstName ?? '') ||
+              (a.lastName ?? '').localeCompare(b.lastName ?? ''),
+          )
+        setMakerList(formatted)
+      } catch (e) {
+        const { message, statusCode = 500 } = normalizeError(e)
+        setError({ statusCode, message })
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
     }
     fetchMakerList()
   }, [])
 
-  const [makerList, setMakerList] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<any>(null)
-
-  const [showModal, setShowModal] = useState(false)
-  const [showModalCreate, setShowModalCreate] = useState(false)
-
-  const [currentMakerId, setCurrentMakerId] = useState('')
-  const openModal = (makerId: string) => {
+  const openModal = (makerId: string | number) => {
     setCurrentMakerId(makerId)
     setShowModal(true)
   }
-
-  const openModalCreate = () => {
-    setShowModalCreate(true)
-  }
-
+  const openModalCreate = () => setShowModalCreate(true)
   const handleCancel = () => setShowModal(false)
   const handleCancelCreate = () => setShowModalCreate(false)
 
-  const getCurrentMaker = () =>
-    makerList.find(x => x.id === currentMakerId) || {}
+  /** Toujours retourner un Maker conforme */
+  const getCurrentMaker = (): Maker => makerList.find((x) => x.id === currentMakerId) ?? EMPTY_MAKER
 
-  const editMaker = (maker: any) => {
-    setMakerList(list =>
-      list.map(x => {
-        if (x.id === maker.id) {
-          return { ...maker, key: maker.id }
-        }
-        return x
-      })
-    )
+  /** Signature compatible avec MakerEdit: (m: Maker) => void */
+  const editMaker = (maker: Maker) => {
+    setMakerList((list) => list.map((x) => (x.id === maker.id ? { ...maker, key: maker.id } : x)))
   }
 
-  const deleteMaker = (makerId: string) => {
-    setMakerList(list => list.filter(x => x.id !== makerId))
+  const deleteMakerLocal = (makerId: string | number) => {
+    setMakerList((list) => list.filter((x) => x.id !== makerId))
   }
 
-  const addMaker = (maker: any) => {
-    maker.key = maker.id
-    setMakerList(list => [...list, maker])
+  const addMaker = (maker: Maker) => {
+    setMakerList((list) => [{ ...maker, key: maker.id }, ...list])
   }
 
-  const handleDelete = (makerId: string) => {
+  const handleDelete = (makerId: string | number) => {
     confirm({
       title: 'Do you want to remove this maker?',
       icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
       style: { top: 110 },
       maskClosable: true,
       okText: 'Confirm',
-      okButtonProps: {
-        style: {
-          background: '#ff4d4f',
-          borderColor: '#ff4d4f'
-        }
-      },
-      onOk: async () => {
+      okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
+      async onOk() {
         try {
-          await api.delete(`/maker/${makerId}`)
-          deleteMaker(makerId)
+          await del<void>(`/maker/${makerId}`)
+          deleteMakerLocal(makerId)
           antdMessage.success('Deleted maker successfully!', 2)
-        } catch (error: unknown) {
-          const { message, statusCode } = normalizeError(error);
+        } catch (err) {
+          const { message } = normalizeError(err)
           notification.error({
             message: 'Error',
             description:
-              "There has been internal server error or the maker you're trying to delete is currently associated with a sculpture."
+              message ||
+              "There has been an internal server error or the maker you're trying to delete is currently associated with a sculpture.",
           })
         }
-      }
+      },
     })
   }
 
-  const columns = [
+  const columns: ColumnsType<Maker> = [
     {
       title: 'Maker name',
       key: 'makerName',
       width: '22%',
-      render: (_: any, record: any) => {
-        const { firstName, lastName, wikiUrl } = record
-        const makerName = firstName + ' ' + lastName
-        if (!wikiUrl) {
-          return <span>{makerName}</span>
-        }
-        return <a href={wikiUrl}>{makerName}</a>
-      }
+      render: (_, record) => {
+        const makerName = `${record.firstName ?? ''} ${record.lastName ?? ''}`.trim()
+        return record.wikiUrl ? <a href={record.wikiUrl}>{makerName || '—'}</a> : <span>{makerName || '—'}</span>
+      },
     },
-
     {
       title: 'Nationality',
       dataIndex: 'nationality',
-      width: '22%'
+      width: '22%',
+      render: (v: Maker['nationality']) => v ?? '—',
     },
     {
       title: 'Born - Passed away',
       key: 'year',
       width: '28%',
-      render: (_: any, record: any) => {
-        let { birthYear, deathYear } = record
-        if (!birthYear) birthYear = 'N/A'
-        if (!deathYear) deathYear = 'N/A'
-        return <span>{birthYear + ' - ' + deathYear}</span>
-      }
+      render: (_, record) => {
+        const birth = record.birthYear ?? 'N/A'
+        const death = record.deathYear ?? 'N/A'
+        return <span>{`${birth} - ${death}`}</span>
+      },
     },
     {
       title: 'Action',
       key: 'action',
-      render: (record, row) => (
+      render: (_, record) => (
         <span>
-          <a onClick={() => openModal(record.key)}>Edit</a>
+          <Button type="link" onClick={() => openModal(record.id)}>
+            Edit
+          </Button>
           <Divider type="vertical" />
-          <a onClick={() => handleDelete(record.key)}>Delete</a>
+          <Button type="link" danger onClick={() => handleDelete(record.id)}>
+            Delete
+          </Button>
         </span>
-      )
-    }
+      ),
+    },
   ]
 
   if (loading) return <Loading />
-  if (error)
-    return <Error statusCode={error.statusCode} title={error.message} />
+  if (error) return <NextError statusCode={error.statusCode} title={error.message} />
 
+  // StyledTable via styled-components perd les génériques → cast columns/dataSource
   return (
     <Row gutter={16}>
       <ColStyled xs={24}>
@@ -179,8 +192,9 @@ const MakerList = () => {
           }
         >
           <StyledTable
-            dataSource={makerList}
-            columns={columns}
+            rowKey="id"
+            dataSource={makerList as any}
+            columns={columns as any}
             pagination={{ pageSize: 25, hideOnSinglePage: true }}
             style={{ maxWidth: 750 }}
           />
@@ -193,12 +207,7 @@ const MakerList = () => {
         getCurrentMaker={getCurrentMaker}
         editMaker={editMaker}
       />
-
-      <MakerCreate
-        visible={showModalCreate}
-        handleCancel={handleCancelCreate}
-        addMaker={addMaker}
-      />
+      <MakerCreate visible={showModalCreate} handleCancel={handleCancelCreate} addMaker={addMaker} />
     </Row>
   )
 }

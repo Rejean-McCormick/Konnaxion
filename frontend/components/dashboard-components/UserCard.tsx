@@ -3,18 +3,18 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Card, Statistic, Skeleton } from 'antd';
-import type { TinyColumnConfig } from '@ant-design/plots';
+import type { ColumnConfig } from '@ant-design/plots';
 
-// SSR-safe dynamic import of TinyColumn
-const TinyColumn = dynamic(
-  () => import('@ant-design/plots').then((m) => m.TinyColumn),
+// SSR-safe dynamic import of Column
+const Column = dynamic(
+  () => import('@ant-design/plots').then((m) => m.Column),
   { ssr: false }
 );
 
 export interface UserCardProps {
-  title?: string;                       // Default: 'New Users'
-  total: number;                        // Total users (or new users)
-  trend?: number[];                     // Tiny column series (e.g., daily counts)
+  title?: string;        // Default: 'New Users'
+  total: number;         // Total users (or new users)
+  trend?: number[];      // Time series values
   loading?: boolean;
 }
 
@@ -24,14 +24,22 @@ const UserCard: React.FC<UserCardProps> = ({
   trend = [],
   loading = false,
 }) => {
-  const data: number[] = Array.isArray(trend) ? trend : [];
+  const series: number[] = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ idx: String(i + 1), value: Number(y ?? 0) }));
 
-  const config: TinyColumnConfig = {
+  const config: ColumnConfig = {
     data,
-    autoFit: true,
+    xField: 'idx',
+    yField: 'value',
     height: 56,
+    autoFit: true,
     padding: 0,
-    tooltip: {},
+    legend: false,
+    xAxis: false,
+    yAxis: false,
+    label: false,
+    tooltip: false,
+    columnWidthRatio: 1,
   };
 
   return (
@@ -41,7 +49,7 @@ const UserCard: React.FC<UserCardProps> = ({
         <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
       ) : (
         <div style={{ marginTop: 8 }}>
-          <TinyColumn {...config} />
+          <Column {...config} />
         </div>
       )}
     </Card>

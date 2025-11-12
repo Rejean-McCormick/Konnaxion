@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -59,13 +60,16 @@ export default function MySpacesPage(): JSX.Element {
     }
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
-      spaces = spaces.filter((s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q));
+      spaces = spaces.filter(
+        (s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q),
+      );
     }
     return spaces;
   }, [selectedCategory, searchQuery]);
 
   const enterSpace = (id: string) => {
     router.push(`/kreative/collaborative-spaces/${id}`);
+  };
 
   return (
     <PageContainer title="My Spaces">
@@ -73,7 +77,7 @@ export default function MySpacesPage(): JSX.Element {
         <Col>
           <Space>
             <Input
-              placeholder="Search spaces..."
+              placeholder="Search spaces."
               prefix={<SearchOutlined />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -81,7 +85,7 @@ export default function MySpacesPage(): JSX.Element {
             />
             <Select
               value={selectedCategory}
-              onChange={setSelectedCategory}
+              onChange={(value: string) => setSelectedCategory(value)}
               style={{ width: 200 }}
               options={[
                 { value: 'All', label: 'All Categories' },
@@ -103,7 +107,7 @@ export default function MySpacesPage(): JSX.Element {
         </Col>
       </Row>
 
-      <List
+      <List<CollaborativeSpace>
         itemLayout="horizontal"
         dataSource={filteredSpaces ?? []}
         renderItem={(space: CollaborativeSpace) => (
@@ -125,7 +129,11 @@ export default function MySpacesPage(): JSX.Element {
                   <Avatar size="large" icon={<TeamOutlined />} />
                 )
               }
-              title={<Title level={4} style={{ margin: 0 }}>{space.name}</Title>}
+              title={
+                <Title level={4} style={{ margin: 0 }}>
+                  {space.name}
+                </Title>
+              }
               description={
                 <Space direction="vertical" size={0}>
                   <Text strong>Topic:</Text>
@@ -140,5 +148,4 @@ export default function MySpacesPage(): JSX.Element {
       />
     </PageContainer>
   );
-}
 }

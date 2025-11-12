@@ -7,56 +7,109 @@ import axios, {
 } from 'axios'
 
 /**
- * Single axios instance for the app.
- * Response interceptor unwraps to raw data, so helpers must NOT read `.data` again.
+ * One axios instance.
+ * Do NOT unwrap in interceptors; wrappers below return `data` as T.
  */
-const apiRequest: AxiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE || '/api',
+const client: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_BASE ?? '/api',
   withCredentials: true,
   xsrfCookieName: 'csrftoken',
   xsrfHeaderName: 'X-CSRFToken',
   timeout: 15000,
 })
 
-apiRequest.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
-  // Auth example:
+client.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
+  // Example:
   // const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null
   // if (t) cfg.headers.Authorization = `Bearer ${t}`
   return cfg
 })
 
-// Keep unwrap here: all callers receive raw data (T), not AxiosResponse<T>.
-apiRequest.interceptors.response.use(
-  (res) => (res.data ?? res),
+client.interceptors.response.use(
+  (res) => res,
   (err) => Promise.reject(err),
 )
 
-type Cfg = AxiosRequestConfig
+type Cfg<D = any> = AxiosRequestConfig<D>
 
-// Helpers: DO NOT re-read `.data` after the interceptor.
-export async function get<T>(url: string, config?: Cfg): Promise<T> {
-  const data = await apiRequest.get<T>(url, config)
-  return data as unknown as T
+/** Typed helpers: always return raw data `T` */
+export async function get<T, D = any>(url: string, config?: Cfg<D>): Promise<T> {
+  const res = await client.get<T>(url, config)
+  return res.data as T
 }
 
-export async function post<T>(url: string, body?: unknown, config?: Cfg): Promise<T> {
-  const data = await apiRequest.post<T>(url, body, config)
-  return data as unknown as T
+export async function post<T, D = any>(
+  url: string,
+  body?: D,
+  config?: Cfg<D>,
+): Promise<T> {
+  const res = await client.post<T>(url, body, config)
+  return res.data as T
 }
 
-export async function put<T>(url: string, body?: unknown, config?: Cfg): Promise<T> {
-  const data = await apiRequest.put<T>(url, body, config)
-  return data as unknown as T
+export async function put<T, D = any>(
+  url: string,
+  body?: D,
+  config?: Cfg<D>,
+): Promise<T> {
+  const res = await client.put<T>(url, body, config)
+  return res.data as T
 }
 
-export async function patch<T>(url: string, body?: unknown, config?: Cfg): Promise<T> {
-  const data = await apiRequest.patch<T>(url, body, config)
-  return data as unknown as T
+export async function patch<T, D = any>(
+  url: string,
+  body?: D,
+  config?: Cfg<D>,
+): Promise<T> {
+  const res = await client.patch<T>(url, body, config)
+  return res.data as T
 }
 
-export async function del<T>(url: string, config?: Cfg): Promise<T> {
-  const data = await apiRequest.delete<T>(url, config)
-  return data as unknown as T
+export async function del<T, D = any>(url: string, config?: Cfg<D>): Promise<T> {
+  const res = await client.delete<T>(url, config)
+  return res.data as T
 }
 
-export default apiRequest
+/**
+ * Default export: axios instance augmented with data-returning methods.
+ * Allows `api.post<T>(...)` to yield `T` (not AxiosResponse<T>).
+ */
+type DataMethods = {
+  get<T, D = any>(url: string, config?: Cfg<D>): Promise<T>
+  post<T, D = any>(url: string, body?: D, config?: Cfg<D>): Promise<T>
+  put<T, D = any>(url: string, body?: D, config?: Cfg<D>): Promise<T>
+  patch<T, D = any>(url: string, body?: D, config?: Cfg<D>): Promise<T>
+  delete<T, D = any>(url: string, config?: Cfg<D>): Promise<T>
+  del<T, D = any>(url: string, config?: Cfg<D>): Promise<T>
+}
+
+type API = Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> & DataMethods
+
+const api = Object.assign(client, {
+  async get<T, D = any>(url: string, config?: Cfg<D>) {
+    const res = await client.get<T>(url, config)
+    return res.data as T
+  },
+  async post<T, D = any>(url: string, body?: D, config?: Cfg<D>) {
+    const res = await client.post<T>(url, body, config)
+    return res.data as T
+  },
+  async put<T, D = any>(url: string, body?: D, config?: Cfg<D>) {
+    const res = await client.put<T>(url, body, config)
+    return res.data as T
+  },
+  async patch<T, D = any>(url: string, body?: D, config?: Cfg<D>) {
+    const res = await client.patch<T>(url, body, config)
+    return res.data as T
+  },
+  async delete<T, D = any>(url: string, config?: Cfg<D>) {
+    const res = await client.delete<T>(url, config)
+    return res.data as T
+  },
+  async del<T, D = any>(url: string, config?: Cfg<D>) {
+    const res = await client.delete<T>(url, config)
+    return res.data as T
+  },
+}) as API
+
+export default api

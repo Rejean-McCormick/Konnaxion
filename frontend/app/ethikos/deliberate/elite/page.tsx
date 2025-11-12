@@ -1,4 +1,4 @@
-// app/ethikos/deliberate/elite/page.tsx
+// C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\elite\page.tsx
 'use client';
 
 import React from 'react';
@@ -25,15 +25,39 @@ import type { Topic } from '@/types';
 dayjs.extend(relativeTime);
 
 /* ------------------------------------------------------------------ */
-/*  Types dérivés                                                      */
+/*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 interface TopicRow extends Topic {
   createdAt: string;
   lastActivity: string;
   hot: boolean;         // calculé côté serveur
-  stanceCount: number;  // <-- ajouté : utilisé par KPI et la colonne
+  stanceCount: number;  // utilisé par KPI et la colonne
 }
+
+type TopicPreview = {
+  id: string;
+  title: string;
+  category: string;
+  createdAt: string;
+  latest: Array<{ id: string; author: string; body: string }>;
+};
+
+/* ------------------------------------------------------------------ */
+/*  Service wrapper (type-safe)                                        */
+/* ------------------------------------------------------------------ */
+
+// Le service natif ne garantit pas `stanceCount`. On normalise ici pour
+// faire correspondre exactement <{ list: TopicRow[] }, []>.
+const useEliteService = () =>
+  React.useCallback(async (): Promise<{ list: TopicRow[] }> => {
+    const res = await fetchEliteTopics();
+    const list = (res?.list ?? []).map((t: any) => ({
+      ...t,
+      stanceCount: typeof t.stanceCount === 'number' ? t.stanceCount : 0,
+    })) as TopicRow[];
+    return { list };
+  }, []);
 
 /* ------------------------------------------------------------------ */
 /*  Composant principal                                                */
@@ -43,16 +67,18 @@ export default function EliteAgora() {
   usePageTitle('Deliberate · Elite Agora');
 
   /* ---------- data ---------- */
-  // Déclare explicitement la forme de data pour inclure stanceCount
-  const { data, loading, refresh } = useRequest<{ list: TopicRow[] }>(fetchEliteTopics);
+  const eliteService = useEliteService();
+  // useRequest attend 2 génériques <TData, TParams>. Le service n’a pas de params -> [].
+  const { data, loading, refresh } = useRequest<{ list: TopicRow[] }, []>(eliteService);
   useInterval(refresh, 60_000); // polling 1 min
 
   /* ---------- drawer state ---------- */
   const [previewId, setPreviewId] = React.useState<string | null>(null);
-  const { data: preview, loading: previewLoading, run: loadPreview } = useRequest(
-    (id: string) => fetchTopicPreview(id),
-    { manual: true },
-  );
+  const {
+    data: preview,
+    loading: previewLoading,
+    run: loadPreview,
+  } = useRequest<TopicPreview, [string]>(fetchTopicPreview, { manual: true });
 
   /* ---------- open drawer ---------- */
   const openPreview = React.useCallback(
@@ -96,7 +122,7 @@ export default function EliteAgora() {
       {
         title: 'Title',
         dataIndex: 'title',
-        render: (_, row) => (
+        render: (_: any, row: TopicRow) => (
           <a onClick={() => openPreview(row)} style={{ cursor: 'pointer' }}>
             {row.title}
           </a>
@@ -106,8 +132,9 @@ export default function EliteAgora() {
         title: 'Category',
         dataIndex: 'category',
         filters: categoryFilters,
-        onFilter: (val: string | number | boolean, row) => String(row.category) === String(val),
-        render: (_, row) => <Tag color="geekblue">{row.category}</Tag>,
+        onFilter: (value: React.Key | boolean, record: TopicRow) =>
+          String(record.category) === String(value),
+        render: (_: any, row: TopicRow) => <Tag color="geekblue">{row.category}</Tag>,
       },
       {
         title: 'Stances',
@@ -118,14 +145,14 @@ export default function EliteAgora() {
       {
         title: 'Last activity',
         dataIndex: 'lastActivity',
-        // Utiliser dayjs.fromNow() pour éviter les frictions de typings de `valueType`
-        render: (_, row) => dayjs(row.lastActivity).fromNow(),
+        // Pas de valueType non standard. On rend “fromNow” explicitement.
+        render: (_: any, row: TopicRow) => dayjs(row.lastActivity).fromNow(),
       },
       {
         title: '',
         dataIndex: 'hot',
         width: 60,
-        render: (_, row) =>
+        render: (_: any, row: TopicRow) =>
           row.hot ? (
             <Tooltip title="Trending">
               <FireOutlined style={{ color: '#fa541c' }} />
@@ -144,7 +171,6 @@ export default function EliteAgora() {
       extra={
         <Space>
           <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title="Refresh list" />
-          {/* vérification de rôle/permission si besoin */}
           <NewTopicButton onCreated={refresh} />
         </Space>
       }
@@ -235,7 +261,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
         open={visible}
         onOpenChange={setVisible}
         onFinish={async (values: { title: string; category: string }) => {
-          await runAsync(values); // <-- typé correctement
+          await runAsync(values);
           return true;
         }}
         submitter={{ submitButtonProps: { loading } }}

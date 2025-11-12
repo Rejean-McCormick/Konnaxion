@@ -1,10 +1,14 @@
+// components/layout-components/Main.tsx
 'use client'
 
+import type { ComponentProps, ReactNode } from 'react'
 import { Layout } from 'antd'
 import styled, { css } from 'styled-components'
 
 const StyledMain = styled(
-  ({ collapsed: _c, ...rest }) => <Layout {...rest} />,
+  ({ collapsed: _c, ...rest }: { collapsed?: boolean } & ComponentProps<typeof Layout>) => (
+    <Layout {...rest} />
+  ),
 )<{ collapsed: boolean }>`
   transition: 0.2s all;
 
@@ -29,7 +33,7 @@ export default function Main({
   children,
   collapsed,
 }: {
-  children: React.ReactNode
+  children: ReactNode
   collapsed: boolean
 }) {
   return <StyledMain collapsed={collapsed}>{children}</StyledMain>
