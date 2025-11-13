@@ -16,21 +16,22 @@ import * as AntIcons from '@ant-design/icons'
 /** helper: map legacy Icon `type` strings (e.g. "shopping-cart") to v4 components */
 const legacyTypeToIcon = (type?: string) => {
   if (!type) return null
+
   const pascal =
     type
       .split('-')
-      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
       .join('') + 'Outlined'
-  // @ts-ignore dynamic lookup
-  return (AntIcons as any)[pascal] || null
+
+  const key = pascal as keyof typeof AntIcons
+  const Comp = AntIcons[key]
+
+  return (Comp as React.ComponentType | undefined) ?? null
 }
 
-export const CardStyled = (props: any) => {
+export const CardStyled = (props: React.ComponentProps<typeof Card>) => {
   const bodyStyle: React.CSSProperties = {
     padding: '20px 24px 8px',
-  }
-  if (props.type === 'stats') {
-    bodyStyle.padding = '20px 16px 16px'
   }
   return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
 }
@@ -63,7 +64,7 @@ export const NumberInfoStyled = (props: {
   )
 }
 
-export const HelperIcon = (props: any) => (
+export const HelperIcon = (props: React.ComponentProps<typeof Tooltip>) => (
   <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
     <Tooltip {...props} placement="topLeft" arrowPointAtCenter>
       <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
@@ -76,27 +77,35 @@ export const HelperIcon = (props: any) => (
  * Preferred: <MainIcon icon={<YourIcon />} />
  * Legacy support: <MainIcon type="shopping-cart" />
  */
-type MainIconProps = {
+export const MainIcon: React.FC<{
   icon?: React.ReactElement
   type?: string
   style?: React.CSSProperties
   twoToneColor?: string
-} & React.HTMLAttributes<HTMLDivElement>
-
-export const MainIcon: React.FC<MainIconProps> = ({ icon, type, style, twoToneColor, ...rest }) => {
+}> = ({ icon, type, style, twoToneColor, ...rest }) => {
   const Comp = !icon && type ? legacyTypeToIcon(type) : null
-  const element: React.ReactElement | null =
+
+  // Loosen the element type so we can pass twoToneColor safely
+  const element: React.ReactElement<any> | null =
     icon && React.isValidElement(icon)
-      ? icon
+      ? (icon as React.ReactElement<any>)
       : Comp
-      ? React.createElement(Comp as React.ComponentType<any>)
+      ? React.createElement(Comp)
       : null
+
+  const mergedStyle: React.CSSProperties | undefined = element
+    ? {
+        ...(element.props.style ?? {}),
+        ...(style ?? {}),
+        fontSize: 54,
+      }
+    : undefined
 
   return (
     <div style={{ marginRight: 16 }} {...rest}>
       {element
         ? React.cloneElement(element, {
-            style: { ...(element.props as any)?.style, ...(style || {}), fontSize: 54 },
+            style: mergedStyle,
             twoToneColor,
           })
         : null}
@@ -104,24 +113,32 @@ export const MainIcon: React.FC<MainIconProps> = ({ icon, type, style, twoToneCo
   )
 }
 
-export const CardFooter = (props: any) => {
+export const CardFooter: React.FC<{
+  title: React.ReactNode
+  value: number
+  change: number
+}> = ({ title, value, change }) => {
   return (
     <div style={{ position: 'relative', zIndex: 99 }}>
-      <span>{props.title}:</span>
+      <span>{title}:</span>
       <span style={{ marginLeft: 8, color: 'rgba(0,0,0,.85)' }}>
-        {props.value.toLocaleString()}
+        {value.toLocaleString()}
       </span>
       <Tooltip title="Change compared to yesterday">
         <span style={{ marginLeft: 16 }}>
           <span style={{ color: 'rgba(0,0,0,.55)', marginRight: 2 }}>
-            {props.change.toLocaleString()}
+            {change.toLocaleString()}
           </span>
 
           {/* Up/down icon */}
-          {props.change < 0 ? (
-            <CaretDownOutlined style={{ color: '#f5222d', verticalAlign: 'text-bottom' }} />
+          {change < 0 ? (
+            <CaretDownOutlined
+              style={{ color: '#f5222d', verticalAlign: 'text-bottom' }}
+            />
           ) : (
-            <CaretUpOutlined style={{ color: '#52c41a', verticalAlign: 'middle' }} />
+            <CaretUpOutlined
+              style={{ color: '#52c41a', verticalAlign: 'middle' }}
+            />
           )}
         </span>
       </Tooltip>
@@ -158,3 +175,4 @@ export const ShadowCard = styled(CardStyled)`
     transition: all 150ms ease-in-out 0s;
   }
 `
+

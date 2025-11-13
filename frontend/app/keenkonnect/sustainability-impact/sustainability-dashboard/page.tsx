@@ -1,171 +1,96 @@
-'use client';
+'use client'
 
-// File: app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
-import React, { useMemo, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Table, Select, Divider } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import MainLayout from '@/components/layout-components/MainLayout';
+import React, { Suspense, useEffect, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Row, Col, Card, Spin } from 'antd'
 import {
-  PieChart as RePieChart,
+  PieChart,
   Pie,
   Cell,
-  Legend,
-  ResponsiveContainer,
   Tooltip as ReTooltip,
-} from 'recharts';
+  ResponsiveContainer,
+} from 'recharts'
+import api from '@/api'
 
-/* -------------------------------
- * Données simulées
- * ------------------------------- */
-
-// Statistiques globales
-const globalStats = {
-  totalCO2Saved: 50000,       // en kilogrammes
-  totalVolunteerHours: 1200,  // en heures
-  totalProjects: 45,
-};
-
-// Répartition d’impact (donut)
-const impactDistribution = [
-  { name: 'Environmental', value: 55 },
-  { name: 'Social', value: 30 },
-  { name: 'Economic', value: 15 },
-];
-
-const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
-
-// Données pour le leaderboard (liste de projets par impact)
-interface LeaderboardEntry {
-  key: string;
-  projectName: string;
-  impactScore: number;
-  co2Saved: number;
-  volunteerHours: number;
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
 }
 
-const leaderboardData: LeaderboardEntry[] = [
-  { key: '1', projectName: 'Project Alpha', impactScore: 95, co2Saved: 15000, volunteerHours: 300 },
-  { key: '2', projectName: 'Project Beta', impactScore: 88, co2Saved: 12000, volunteerHours: 250 },
-  { key: '3', projectName: 'Project Gamma', impactScore: 82, co2Saved: 10000, volunteerHours: 200 },
-  { key: '4', projectName: 'Project Delta', impactScore: 78, co2Saved: 8000, volunteerHours: 180 },
-  { key: '5', projectName: 'Project Epsilon', impactScore: 75, co2Saved: 7000, volunteerHours: 170 },
-];
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState<any>(null)
 
-// Colonnes pour le leaderboard
-const columns: ColumnsType<LeaderboardEntry> = [
-  { title: 'Project Name', dataIndex: 'projectName', key: 'projectName' },
-  { title: 'Impact Score', dataIndex: 'impactScore', key: 'impactScore' },
-  { title: 'CO2 Saved (kg)', dataIndex: 'co2Saved', key: 'co2Saved' },
-  { title: 'Volunteer Hours', dataIndex: 'volunteerHours', key: 'volunteerHours' },
-];
-
-// Filtres supplémentaires (simulés)
-const regions = ['All', 'North America', 'Europe', 'Asia'];
-const categories = ['All', 'Environmental', 'Social', 'Economic'];
-
-const SustainabilityDashboard: React.FC = () => {
-  // États de filtres (ici décoratifs)
-  const [selectedRegion, setSelectedRegion] = React.useState('All');
-  const [selectedCategory, setSelectedCategory] = React.useState('All');
-
-  // Dans l'App Router, éviter next/head côté client : on peut fixer le titre ainsi
   useEffect(() => {
-    document.title = 'Sustainability Dashboard';
-  }, []);
+    const load = async () => {
+      try {
+        const res = await api.get('/impact/sustainability/dashboard')
+        setStats(res ?? {})
+      } catch (err) {
+        console.error('Sustainability dashboard load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  // Filtrage simulé
-  const filteredLeaderboard = useMemo(() => {
-    // Ajouter une vraie logique si nécessaire (region / category)
-    return leaderboardData;
-  }, [selectedRegion, selectedCategory]);
+    load()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ padding: 50, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
+  const COLORS = ['#4e91ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de']
 
   return (
-    <MainLayout>
-      <div className="container mx-auto p-5">
-        {/* En-tête */}
-        <h1 className="text-2xl font-bold mb-4">Sustainability Dashboard</h1>
+    <>
+      <Head>
+        <title>KeenKonnect – Sustainability Dashboard</title>
+      </Head>
 
-        {/* Filtres */}
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24} sm={12}>
-            <Select
-              value={selectedRegion}
-              onChange={(value) => setSelectedRegion(value)}
-              style={{ width: '100%' }}
-              options={regions.map((r) => ({ label: r, value: r }))}
-            />
-          </Col>
-          <Col xs={24} sm={12}>
-            <Select
-              value={selectedCategory}
-              onChange={(value) => setSelectedCategory(value)}
-              style={{ width: '100%' }}
-              options={categories.map((c) => ({ label: c, value: c }))}
-            />
-          </Col>
-        </Row>
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Sustainability Dashboard
+      </h1>
 
-        <Divider />
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={12}>
+          <Card title="Total Impact Reports">
+            <div style={{ fontSize: 32, fontWeight: 700 }}>
+              {stats?.total_reports ?? 0}
+            </div>
+          </Card>
+        </Col>
 
-        {/* Statistiques globales */}
-        <Row gutter={16} className="mb-6">
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="Total CO2 Saved (kg)" value={globalStats.totalCO2Saved} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="Total Volunteer Hours" value={globalStats.totalVolunteerHours} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="Total Projects" value={globalStats.totalProjects} />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Donut: Impact Distribution */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Impact Distribution</h2>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer>
-              <RePieChart>
-                <ReTooltip />
-                <Legend verticalAlign="bottom" height={36} />
+        <Col xs={24} md={12}>
+          <Card title="Impact Category Distribution">
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
                 <Pie
-                  data={impactDistribution}
+                  data={stats?.distribution ?? []}
                   dataKey="value"
                   nameKey="name"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
+                  outerRadius={110}
                 >
-                  {impactDistribution.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={PIE_COLORS[index % PIE_COLORS.length]}
-                    />
+                  {(stats?.distribution ?? []).map((_: any, i: number) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-              </RePieChart>
+                <ReTooltip />
+              </PieChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* Leaderboard */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Top Projects by Impact</h2>
-          <Table
-            columns={columns}
-            dataSource={filteredLeaderboard}
-            pagination={{ pageSize: 5 }}
-          />
-        </Card>
-      </div>
-    </MainLayout>
-  );
-};
-
-export default SustainabilityDashboard;
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
+}

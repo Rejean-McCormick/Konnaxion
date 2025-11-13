@@ -1,0 +1,9 @@
+bundle	count	file
+Code_config	13	Code_config_20251113_160607.txt
+Code_core	11	Code_core_20251113_160607.txt
+Code_apps	76	Code_apps_20251113_160607.txt
+Code_migrations	19	Code_migrations_20251113_160607.txt
+Code_tests	20	Code_tests_20251113_160607.txt
+Code_templates	19	Code_templates_20251113_160607.txt
+Code_celery	2	Code_celery_20251113_160607.txt
+Code_deploy	5	Code_deploy_20251113_160607.txt

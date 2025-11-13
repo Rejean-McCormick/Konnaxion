@@ -1,9 +1,10 @@
 // playwright.ct.config.ts
-import { defineConfig, devices } from '@playwright/experimental-ct-react'
+import { defineConfig, devices } from '@playwright/experimental-ct-react';
 
 export default defineConfig({
   testDir: './ct',
-  /* Nom explicite et config du navigateur */
+
+  /* Component testing projects */
   projects: [
     {
       name: 'chromium',
@@ -11,20 +12,21 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         headless: !!process.env.CI,
         trace: 'retain-on-failure',
-        screenshot: 'only-on-failure'
-      }
-    }
+        screenshot: 'only-on-failure',
+      },
+    },
   ],
 
-  /* Rapports et tolérances */
+  /* Reporters */
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'artifacts/playwright-ct', open: 'never' }]
+    ['html', { outputFolder: 'artifacts/playwright-ct', open: 'never' }],
   ],
+
   retries: process.env.CI ? 1 : 0,
   timeout: 60_000,
   expect: { timeout: 5_000 },
 
-  /* Répertoires de sortie */
-  outputDir: 'artifacts/playwright-ct/output'
-})
+  /* Output */
+  outputDir: 'artifacts/playwright-ct/output',
+});

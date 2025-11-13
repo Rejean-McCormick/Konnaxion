@@ -1,138 +1,106 @@
-'use client';
+'use client'
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import type { UploadFile } from 'antd/es/upload/interface';
-import type { Dayjs } from 'dayjs';
-import {
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  InputNumber,
-  Upload,
-  Switch,
-  Button,
-  Modal,
-  message,
-} from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import React, { Suspense } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Form, Input, DatePicker, Select, Upload, Button, Card, message } from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import api from '@/api'
+import dayjs from 'dayjs'
+import { UploadOutlined } from '@ant-design/icons'
 
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
-
-interface ImpactReportFormValues {
-  title: string;
-  category?: string;
-  period?: [Dayjs, Dayjs];
-  amount?: number;
-  description?: string;
-  attachments?: UploadFile[];
-  isPublic?: boolean;
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
 }
 
-export default function SubmitImpactReports(): JSX.Element {
-  const [form] = Form.useForm<ImpactReportFormValues>();
-  const router = useRouter();
-  const [submitting, setSubmitting] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
+function Content() {
+  const [form] = Form.useForm()
 
-  const onFinish = async (values: ImpactReportFormValues) => {
+  const submitReport = async (values: any) => {
     try {
-      setSubmitting(true);
-      message.success('Votre rapport a bien été soumis.');
-      setOpen(true);
-    } catch (e) {
-      console.error(e);
-      message.error("Échec de l'envoi du rapport.");
-    } finally {
-      setSubmitting(false);
+      await api.post('/impact/sustainability/report', {
+        ...values,
+        date: values.date.format('YYYY-MM-DD'),
+      })
+      message.success('Impact report submitted successfully!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Submit impact report error:', err)
+      message.error('Failed to submit report')
     }
-  };
-
-  const normFile = (e: any): UploadFile[] => {
-    if (Array.isArray(e)) return e as UploadFile[];
-    return (e?.fileList ?? []) as UploadFile[];
-  };
+  }
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Soumettre un rapport d’impact</h1>
+    <>
+      <Head>
+        <title>KeenKonnect – Submit Impact Report</title>
+      </Head>
 
-      <Form<ImpactReportFormValues> form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item
-          label="Titre"
-          name="title"
-          rules={[{ required: true, message: 'Veuillez saisir un titre.' }]}
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Submit Impact Report
+      </h1>
+
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={submitReport}
+          initialValues={{
+            date: dayjs(),
+          }}
         >
-          <Input placeholder="Ex. Réduction des émissions Q3" />
-        </Form.Item>
+          <Form.Item label="Project" name="project" rules={[{ required: true }]}>
+            <Select
+              placeholder="Select the project"
+              options={[
+                { label: 'Project A', value: 'project-a' },
+                { label: 'Project B', value: 'project-b' },
+              ]}
+            />
+          </Form.Item>
 
-        <Form.Item label="Catégorie" name="category">
-          <Select
-            placeholder="Sélectionner une catégorie"
-            options={[
-              { label: 'Énergie', value: 'energy' },
-              { label: 'Déchets', value: 'waste' },
-              { label: 'Eau', value: 'water' },
-              { label: 'Communauté', value: 'community' },
-            ]}
-            allowClear
-          />
-        </Form.Item>
+          <Form.Item label="Date" name="date" rules={[{ required: true }]}>
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
 
-        <Form.Item label="Période" name="period">
-          <RangePicker />
-        </Form.Item>
+          <Form.Item label="Category" name="category" rules={[{ required: true }]}>
+            <Select
+              placeholder="Impact category"
+              options={[
+                { label: 'Environment', value: 'environment' },
+                { label: 'Social', value: 'social' },
+                { label: 'Governance', value: 'governance' },
+              ]}
+            />
+          </Form.Item>
 
-        <Form.Item label="Quantité / Score" name="amount">
-          <InputNumber style={{ width: '100%' }} placeholder="Ex. 42" />
-        </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={4} placeholder="Describe the impact..." />
+          </Form.Item>
 
-        <Form.Item label="Description" name="description">
-          <TextArea rows={4} placeholder="Détails, méthodologie, notes…" />
-        </Form.Item>
+          <Form.Item label="Attachments" name="attachments">
+            <Upload multiple beforeUpload={() => false}>
+              <Button icon={<UploadOutlined />}>Upload Files</Button>
+            </Upload>
+          </Form.Item>
 
-        <Form.Item
-          label="Pièces jointes"
-          name="attachments"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-          extra="Les fichiers ne sont pas téléversés automatiquement."
-        >
-          <Upload beforeUpload={() => false} multiple>
-            <Button icon={<UploadOutlined />}>Choisir des fichiers</Button>
-          </Upload>
-        </Form.Item>
-
-        <Form.Item
-          label="Rendre public"
-          name="isPublic"
-          valuePropName="checked"
-          initialValue={false}
-        >
-          <Switch />
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={submitting}>
-            Soumettre
-          </Button>
-        </Form.Item>
-      </Form>
-
-      <Modal
-        open={open}
-        title="Rapport soumis"
-        onOk={() => {
-          setOpen(false);
-          router.push('/keenkonnect/sustainability-impact/sustainability-dashboard');
-        }}
-        onCancel={() => setOpen(false)}
-        okText="OK"
-      >
-        <p>Votre rapport d’impact a été soumis avec succès.</p>
-      </Modal>
-    </div>
-  );
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
+              Submit Report
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
+  )
 }

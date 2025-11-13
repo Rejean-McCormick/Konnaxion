@@ -9,7 +9,7 @@ import {
   ColStyled,
   VisitCard,
   LikeCard,
-  CommentCard
+  CommentCard,
 } from '../../dashboard-components/'
 import { Popover, DatePicker, Button } from 'antd'
 import { MoreOutlined } from '@ant-design/icons'
@@ -71,7 +71,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
   totalLikes,
   totalComments,
   totalVisits,
-  sculptureId
+  sculptureId,
 }) => {
   const [state, setState] = useState<TrendState>({
     TOTAL_VISITS: 0,
@@ -85,13 +85,15 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     DAILY_COMMENTS_CHANGE: 0,
     VISIT_DATA: [],
     LIKE_DATA: [],
-    COMMENT_DATA: []
+    COMMENT_DATA: [],
   })
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<RequestError | null>(null)
 
   const defaultEndDate = useRef<Dayjs>(dayjs(new Date())).current
-  const defaultStartDate = useRef<Dayjs>(dayjs(defaultEndDate).subtract(7, 'days')).current
+  const defaultStartDate = useRef<Dayjs>(
+    dayjs(defaultEndDate).subtract(7, 'days'),
+  ).current
 
   const [startDate, setStartDate] = useState<Dayjs>(defaultStartDate)
   const [endDate, setEndDate] = useState<Dayjs>(defaultEndDate)
@@ -104,23 +106,23 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         const defaultToday = defaultEndDate.format('YYYY-MM-DD')
 
         const likesPromise = api.get<Record<string, number>>(
-          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`,
         )
         const commentsPromise = api.get<Record<string, number>>(
-          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`,
         )
         const visitPromise = api.get<Record<string, number>>(
-          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`,
         )
 
         const defaultLikesPromise = api.get<Record<string, number>>(
-          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`,
         )
         const defaultCommentsPromise = api.get<Record<string, number>>(
-          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`,
         )
         const defaultVisitsPromise = api.get<Record<string, number>>(
-          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`,
         )
 
         const [
@@ -129,14 +131,14 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
           rawVisits,
           rawDefaultLikes,
           rawDefaultComments,
-          rawDefaultVisits
+          rawDefaultVisits,
         ] = await Promise.all([
           likesPromise,
           commentsPromise,
           visitPromise,
           defaultLikesPromise,
           defaultCommentsPromise,
-          defaultVisitsPromise
+          defaultVisitsPromise,
         ])
 
         // format daily data statistics
@@ -163,7 +165,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         const DAILY_COMMENTS = lastComment
         const DAILY_COMMENTS_CHANGE = lastComment - prevComment
 
-        setState(s => ({
+        setState((s) => ({
           ...s,
           TOTAL_VISITS: totalVisits,
           DAILY_VISITS,
@@ -176,11 +178,14 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
           DAILY_COMMENTS_CHANGE,
           VISIT_DATA,
           LIKE_DATA,
-          COMMENT_DATA
+          COMMENT_DATA,
         }))
       } catch (e: unknown) {
-        const n = normalizeError(e as AxiosError<any>)
-        setError({ statusCode: n.statusCode ?? 500, message: n.message || 'Unknown error' })
+        const n = normalizeError(e as AxiosError<unknown>)
+        setError({
+          statusCode: n.statusCode ?? 500,
+          message: n.message || 'Unknown error',
+        })
       } finally {
         setLoading(false)
       }
@@ -193,14 +198,16 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     startDate,
     totalComments,
     totalLikes,
-    totalVisits
+    totalVisits,
   ])
 
   const dateFormat = 'MMM D YYYY'
   const staticToday = dayjs(new Date())
 
   const renderPicker = (start: Dayjs, end: Dayjs) => {
-    const disabledDate = (current: Dayjs) => current.valueOf() > staticToday.valueOf()
+    const disabledDate = (current: Dayjs) =>
+      current.valueOf() > staticToday.valueOf()
+
     return (
       <RangePicker
         defaultValue={[start, end]}
@@ -211,9 +218,18 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         separator="-"
         disabledDate={disabledDate}
         ranges={{
-          'Past week': [dayjs(staticToday).subtract(7, 'days'), dayjs(staticToday)],
-          'Past 2 weeks': [dayjs(staticToday).subtract(14, 'days'), dayjs(staticToday)],
-          'Past month': [dayjs(staticToday).subtract(30, 'days'), dayjs(staticToday)]
+          'Past week': [
+            dayjs(staticToday).subtract(7, 'days'),
+            dayjs(staticToday),
+          ],
+          'Past 2 weeks': [
+            dayjs(staticToday).subtract(14, 'days'),
+            dayjs(staticToday),
+          ],
+          'Past month': [
+            dayjs(staticToday).subtract(30, 'days'),
+            dayjs(staticToday),
+          ],
         }}
         onChange={(dates) => {
           if (!dates || !dates[0] || !dates[1]) return
@@ -238,7 +254,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     DAILY_COMMENTS_CHANGE,
     VISIT_DATA,
     LIKE_DATA,
-    COMMENT_DATA
+    COMMENT_DATA,
   } = state
 
   if (loading) return <Loading />
@@ -248,19 +264,19 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     <CardStyled
       title="Trends"
       extra={
-        <Popover content={renderPicker(startDate, endDate)} trigger="click" placement="bottomRight">
+        <Popover
+          content={renderPicker(startDate, endDate)}
+          trigger="click"
+          placement="bottomRight"
+        >
           <Button type="text" icon={<MoreOutlined />} />
         </Popover>
       }
-      type="stats"
       style={{ marginTop: 12 }}
     >
       <ColStyled xs={24}>
         <ShadowCard>
-          <LikeCard
-            total={TOTAL_LIKES}
-            trend={LIKE_DATA.map(p => p.y)}
-          />
+          <LikeCard total={TOTAL_LIKES} trend={LIKE_DATA.map((p) => p.y)} />
         </ShadowCard>
       </ColStyled>
 

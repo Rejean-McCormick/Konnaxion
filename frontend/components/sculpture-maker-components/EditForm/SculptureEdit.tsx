@@ -1,4 +1,3 @@
-// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\SculptureEdit.tsx
 'use client';
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -82,12 +81,12 @@ export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProp
     async (values: FormValues) => {
       try {
         const file = toFile(values.image?.[0]);
-        let imageUrl = sculpture.imageUrl;
+        const imageUrl = sculpture.imageUrl;
 
         // TODO: uploader `file` vers votre backend si présent, puis affecter imageUrl.
 
         const updated: Sculpture = {
-          ...sculpture, // correction de l’ancienne faute de frappe
+          ...sculpture,
           title: values.title,
           description: values.description,
           location: {
