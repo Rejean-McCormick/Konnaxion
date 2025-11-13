@@ -1,0 +1,72 @@
+fe_file,fe_function,http_method,fe_endpoint,fe_domain,be_route,be_viewset,be_model,link_type
+frontend/modules/admin/hooks/useModeration.ts,,GET,/admin/moderation,admin,,,,unmapped
+frontend/services/admin.ts,,GET,/admin/audit,admin,,,,unmapped
+frontend/services/admin.ts,,GET,/admin/moderation,admin,,,,unmapped
+frontend/services/admin.ts,,GET,/admin/roles,admin,,,,unmapped
+frontend/services/admin.ts,,PATCH,/admin/roles/${id},admin,,,,unmapped
+frontend/services/admin.ts,,POST,/admin/moderation/${id},admin,,,,unmapped
+frontend/services/admin.ts,actOnReport,POST,/admin/moderation/:id,admin,,,,unmapped
+frontend/services/admin.ts,fetchAuditLogs,GET,/admin/audit,admin,,,,unmapped
+frontend/services/admin.ts,fetchModerationQueue,GET,/admin/moderation,admin,,,,unmapped
+frontend/services/admin.ts,fetchRoles,GET,/admin/roles,admin,,,,unmapped
+frontend/services/admin.ts,toggleRole,PATCH,/admin/roles/:id,admin,,,,unmapped
+frontend/services/audit.ts,,GET,/admin/audit/logs,admin,,,,unmapped
+frontend/app/ethikos/decide/public/page.tsx,,GET,/api/home/categories/,api,GET api/home/categories/,,,api-direct
+frontend/app/ethikos/decide/public/page.tsx,,POST,/api/home/debatetopic/${topic.id}/vote,api,POST api/home/debatetopic/${topic.id}/vote,,,api-direct
+frontend/app/kreative/community-showcases/submit-to-showcase/page.tsx,,FETCH,/api/showcases,api,FETCH api/showcases,,,api-direct
+frontend/modules/admin/hooks/useStats.ts,,GET,/api/admin/stats,api,GET api/admin/stats,,,api-direct
+frontend/modules/ethikos/decide/public/page.tsx,,GET,/api/home/debatecategory/,api,GET api/home/debatecategory/,,,api-direct
+frontend/modules/ethikos/decide/public/page.tsx,,GET,/api/home/debatetopic/,api,GET api/home/debatetopic/,,,api-direct
+frontend/modules/ethikos/decide/public/page.tsx,,GET,/api/home/responseformat/,api,GET api/home/responseformat/,,,api-direct
+frontend/modules/ethikos/decide/public/page.tsx,,POST,/api/home/publicvote/,api,POST api/home/publicvote/,,,api-direct
+frontend/modules/konsensus/hooks/usePoll.ts,,GET,/api/polls/${id},api,GET api/polls/${id},,,api-direct
+frontend/services/decide.ts,,GET,/decide/elite/ballots,decide,GET api/kollective/votes,VoteViewSet,Vote,loose
+frontend/services/decide.ts,,GET,/decide/public/ballots,decide,GET api/kollective/votes,VoteViewSet,Vote,loose
+frontend/services/decide.ts,,GET,/decide/results,decide,GET api/kollective/votes,VoteViewSet,Vote,loose
+frontend/services/decide.ts,,POST,/decide/public/ballots/${id}/vote,decide,GET api/kollective/votes,VoteViewSet,Vote,loose
+frontend/services/decide.ts,fetchEliteBallots,GET,/decide/elite/ballots,decide,GET api/kollective/votes,VoteViewSet,Vote,loose
+frontend/services/decide.ts,fetchPublicBallots,GET,/decide/public/ballots,decide,GET api/kollective/votes,VoteViewSet,Vote,loose
+frontend/services/decide.ts,submitPublicVote,POST,/decide/public/ballots/:id/vote,decide,GET api/kollective/votes,VoteViewSet,Vote,loose
+frontend/services/deliberate.ts,,GET,/deliberate/elite/topics,deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/deliberate.ts,,GET,/deliberate/topics/${id},deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/deliberate.ts,,GET,/deliberate/topics/${id}/preview,deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/deliberate.ts,,POST,/deliberate/elite/topics,deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/deliberate.ts,createEliteTopic,POST,/deliberate/elite/topics,deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/deliberate.ts,fetchEliteTopics,GET,/deliberate/elite/topics,deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/deliberate.ts,fetchTopicDetail,GET,/deliberate/topics/:id,deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/deliberate.ts,fetchTopicPreview,GET,/deliberate/topics/:id/preview,deliberate,GET api/ethikos/topics,TopicViewSet,EthikosTopic,loose
+frontend/services/impact.ts,,GET,/impact/feedback,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,,GET,/impact/outcomes,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,,GET,/impact/tracker,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,,PATCH,/impact/tracker/${id},impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,,POST,/impact/feedback,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,fetchFeedback,GET,/impact/feedback,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,fetchImpactOutcomes,GET,/impact/outcomes,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,fetchImpactTracker,GET,/impact/tracker,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,patchImpactStatus,PATCH,/impact/tracker/:id,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/impact.ts,submitFeedback,POST,/impact/feedback,impact,GET api/keenkonnect/projects,ProjectViewSet,Project,loose
+frontend/services/learn.ts,,GET,/learn/changelog,learn,GET api/konnected/resources,KnowledgeResourceViewSet,KnowledgeResource,loose
+frontend/services/learn.ts,,GET,/learn/glossary,learn,GET api/konnected/resources,KnowledgeResourceViewSet,KnowledgeResource,loose
+frontend/services/learn.ts,,GET,/learn/guides,learn,GET api/konnected/resources,KnowledgeResourceViewSet,KnowledgeResource,loose
+frontend/services/learn.ts,fetchChangelog,GET,/learn/changelog,learn,GET api/konnected/resources,KnowledgeResourceViewSet,KnowledgeResource,loose
+frontend/services/learn.ts,fetchGlossary,GET,/learn/glossary,learn,GET api/konnected/resources,KnowledgeResourceViewSet,KnowledgeResource,loose
+frontend/services/learn.ts,fetchGuides,GET,/learn/guides,learn,GET api/konnected/resources,KnowledgeResourceViewSet,KnowledgeResource,loose
+frontend/services/pulse.ts,,GET,/pulse/health,pulse,,,,unmapped
+frontend/services/pulse.ts,,GET,/pulse/live,pulse,,,,unmapped
+frontend/services/pulse.ts,,GET,/pulse/overview,pulse,,,,unmapped
+frontend/services/pulse.ts,,GET,/pulse/trends,pulse,,,,unmapped
+frontend/services/pulse.ts,fetchPulseHealth,GET,/pulse/health,pulse,,,,unmapped
+frontend/services/pulse.ts,fetchPulseLiveData,GET,/pulse/live,pulse,,,,unmapped
+frontend/services/pulse.ts,fetchPulseOverview,GET,/pulse/overview,pulse,,,,unmapped
+frontend/services/pulse.ts,fetchPulseTrends,GET,/pulse/trends,pulse,,,,unmapped
+frontend/app/_api/search/route.ts,,GET,/q,q,,,,unmapped
+frontend/modules/global/components/GlobalSearchBar.tsx,,GET,/q,q,,,,unmapped
+frontend/modules/global/pages/Search.tsx,,GET,/q,q,,,,unmapped
+frontend/modules/insights/hooks/useReport.ts,,GET,/reports/${endpoint},reports,,,,unmapped
+frontend/modules/global/hooks/useGlobalSearch.ts,,GET,/search,search,,,,unmapped
+frontend/services/trust.ts,,GET,/trust/badges,trust,GET api/users,UserViewSet,AUTH_USER_MODEL,loose
+frontend/services/trust.ts,,GET,/trust/profile,trust,GET api/users,UserViewSet,AUTH_USER_MODEL,loose
+frontend/services/trust.ts,,POST,/trust/credentials,trust,GET api/users,UserViewSet,AUTH_USER_MODEL,loose
+frontend/services/trust.ts,fetchUserBadges,GET,/trust/badges,trust,GET api/users,UserViewSet,AUTH_USER_MODEL,loose
+frontend/services/trust.ts,fetchUserProfile,GET,/trust/profile,trust,GET api/users,UserViewSet,AUTH_USER_MODEL,loose
+frontend/services/trust.ts,uploadCredential,POST,/trust/credentials,trust,GET api/users,UserViewSet,AUTH_USER_MODEL,loose

@@ -1,3 +1,8 @@
+
+>>
+Generated token 704b81214562b7faaf91f59047d60e3f58e20b7c for user KingKlown
+
+
 Use the same dev stack, then hit the schema endpoint with auth.
 
 **1) Start the backend**

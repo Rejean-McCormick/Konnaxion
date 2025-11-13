@@ -18,10 +18,12 @@ mkdir "%BACKUP_DIR%" >nul 2>&1
 echo Source: "%SRC%"
 echo Target: "%BACKUP_DIR%"
 
-rem ==== Copy (exclude caches and reports you can regenerate) ====
-robocopy "%SRC%" "%BACKUP_DIR%" /E /R:1 /W:1 /NFL /NDL /NP ^
-  /XD node_modules .next .swc artifacts "scripts\artifacts" playwright-report ^
-  /XF tsconfig.tsbuildinfo *.log *.tmp .last-run.json use_client_report.csv use_client_report.json
+rem ==== Excludes (no stray quotes) ====
+set "EXCLUDE_DIRS=/XD node_modules .next .swc artifacts scripts\artifacts playwright-report"
+set "EXCLUDE_FILES=/XF tsconfig.tsbuildinfo *.log *.tmp .last-run.json use_client_report.csv use_client_report.json"
+
+rem ==== Copy (append '.' to avoid quoted trailing-backslash issue) ====
+robocopy "%SRC%." "%BACKUP_DIR%." /E /R:1 /W:1 /NFL /NDL /NP %EXCLUDE_DIRS% %EXCLUDE_FILES%
 
 set "RC=%ERRORLEVEL%"
 echo Robocopy exit code: %RC%
