@@ -1,11 +1,11 @@
 // services/learn.ts
-import { get, post, put, patch, del } from './_request';
+import { get } from './_request';
 
 /* ---------- Changelog ---------- */
 
 export interface ChangelogEntry {
   version: string;
-  date: string;                      // ISO-8601 string (e.g. "2025-04-25")
+  date: string; // ISO-8601 (e.g. "2025-04-25")
   tags: ('NEW' | 'FIX' | 'IMPROVE')[];
   notes: string[];
 }
@@ -21,7 +21,7 @@ export async function fetchChangelog(): Promise<{
 export interface GuideSection {
   id: string;
   title: string;
-  content: string;                  // Markdown / HTML-ready text
+  content: string; // Markdown / HTML-ready text
 }
 
 export async function fetchGuides(): Promise<{

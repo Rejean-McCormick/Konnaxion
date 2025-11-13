@@ -1,4 +1,5 @@
-import { get, post, put, patch, del } from './_request'
+// services/pulse.ts
+import { get } from './_request'
 import type { KPI } from '@/types'
 
 export interface KPIWithHistory extends KPI {

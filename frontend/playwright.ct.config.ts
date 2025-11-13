@@ -9,7 +9,6 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        ctPort: 3100,
         headless: !!process.env.CI,
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure'

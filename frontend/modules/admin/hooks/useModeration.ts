@@ -14,7 +14,7 @@ export default function useModeration() {
   return useQuery<ModerationItem[], Error>({
     queryKey: ["admin-moderation"],
     queryFn: async () =>
-      (await api.get<ModerationItem[]>("/admin/moderation")).data,
+      (await api.get<ModerationItem[]>("/api/admin/moderation")).data,
     staleTime: 2 * 60_000,
     retry: 1,
   });

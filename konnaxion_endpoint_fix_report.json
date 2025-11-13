@@ -1,0 +1,155 @@
+{
+  "root": "C:\\MyCode\\Konnaxionv14",
+  "mapping": "C:\\MyCode\\Konnaxionv14\\scriptFixEndPoints\\konnaxion_endpoint_alignment_resolved.csv",
+  "rules": [
+    {
+      "from": "/decide/public/ballots/${id}/vote",
+      "to": "/api/kollective/votes/${id}/vote",
+      "type": "exact"
+    },
+    {
+      "from": "/deliberate/topics/${id}/preview",
+      "to": "/api/ethikos/topics/${id}",
+      "type": "exact"
+    },
+    {
+      "from": "/deliberate/elite/topics",
+      "to": "/api/ethikos/topics",
+      "type": "exact"
+    },
+    {
+      "from": "/deliberate/topics/${id}",
+      "to": "/api/ethikos/topics/${id}",
+      "type": "exact"
+    },
+    {
+      "from": "/admin/moderation/${id}",
+      "to": "/api/admin/moderation/${id}",
+      "type": "prefix"
+    },
+    {
+      "from": "/decide/public/ballots",
+      "to": "/api/kollective/votes",
+      "type": "exact"
+    },
+    {
+      "from": "/decide/elite/ballots",
+      "to": "/api/kollective/votes",
+      "type": "exact"
+    },
+    {
+      "from": "/admin/roles/${id}",
+      "to": "/api/admin/roles/${id}",
+      "type": "prefix"
+    },
+    {
+      "from": "/trust/credentials",
+      "to": "/api/konnected/certifications",
+      "type": "exact"
+    },
+    {
+      "from": "/admin/moderation",
+      "to": "/api/admin/moderation",
+      "type": "prefix"
+    },
+    {
+      "from": "/admin/audit/logs",
+      "to": "/api/admin/audit/logs",
+      "type": "prefix"
+    },
+    {
+      "from": "/learn/changelog",
+      "to": "/api/konnected/resources?slug=changelog",
+      "type": "exact"
+    },
+    {
+      "from": "/decide/results",
+      "to": "/api/kollective/voteresults",
+      "type": "exact"
+    },
+    {
+      "from": "/learn/glossary",
+      "to": "/api/konnected/resources?slug=glossary",
+      "type": "exact"
+    },
+    {
+      "from": "/pulse/overview",
+      "to": "/reports/usage",
+      "type": "exact"
+    },
+    {
+      "from": "/trust/profile",
+      "to": "/api/users/me",
+      "type": "exact"
+    },
+    {
+      "from": "/learn/guides",
+      "to": "/api/konnected/resources?category=guide",
+      "type": "exact"
+    },
+    {
+      "from": "/pulse/health",
+      "to": "/reports/smart-vote",
+      "type": "exact"
+    },
+    {
+      "from": "/pulse/trends",
+      "to": "/reports/usage",
+      "type": "exact"
+    },
+    {
+      "from": "/trust/badges",
+      "to": "/api/users/me?include=badges",
+      "type": "exact"
+    },
+    {
+      "from": "/admin/audit",
+      "to": "/api/admin/audit",
+      "type": "prefix"
+    },
+    {
+      "from": "/admin/audit",
+      "to": "/admin/audit/logs",
+      "type": "exact"
+    },
+    {
+      "from": "/admin/roles",
+      "to": "/api/admin/roles",
+      "type": "prefix"
+    },
+    {
+      "from": "/pulse/live",
+      "to": "/reports/perf",
+      "type": "exact"
+    },
+    {
+      "from": "/q",
+      "to": "/api/search",
+      "type": "exact"
+    }
+  ],
+  "changed_files": [
+    "C:\\MyCode\\Konnaxionv14\\frontend\\routes\\routesEthikos.tsx",
+    "C:\\MyCode\\Konnaxionv14\\frontend\\smoke\\smoke.spec.ts"
+  ],
+  "counts": [
+    {
+      "from": "/admin/moderation",
+      "to": "/api/admin/moderation",
+      "type": "prefix",
+      "replacements": 2
+    },
+    {
+      "from": "/admin/audit",
+      "to": "/api/admin/audit",
+      "type": "prefix",
+      "replacements": 1
+    },
+    {
+      "from": "/admin/roles",
+      "to": "/api/admin/roles",
+      "type": "prefix",
+      "replacements": 1
+    }
+  ]
+}

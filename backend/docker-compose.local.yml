@@ -1,6 +1,6 @@
+version: "3.9"
+
 volumes:
-  konnaxion_local_postgres_data: {}
-  konnaxion_local_postgres_data_backups: {}
   konnaxion_local_redis_data: {}
 
 services:
@@ -11,29 +11,20 @@ services:
     image: konnaxion_local_django
     container_name: konnaxion_local_django
     depends_on:
-      - postgres
       - redis
       - mailpit
     volumes:
       - .:/app:z
     env_file:
       - ./.envs/.local/.django
-      - ./.envs/.local/.postgres
+      - ./.envs/.local/.postgres   # contains only DATABASE_URL for Neon
     ports:
-      - '8000:8000'
+      - "8000:8000"
     command: /start
 
-  postgres:
-    build:
-      context: .
-      dockerfile: ./compose/production/postgres/Dockerfile
-    image: konnaxion_production_postgres
-    container_name: konnaxion_local_postgres
-    volumes:
-      - konnaxion_local_postgres_data:/var/lib/postgresql/data
-      - konnaxion_local_postgres_data_backups:/backups
-    env_file:
-      - ./.envs/.local/.postgres
+  # ❌ REMOVED local postgres — you now use NEON
+  # postgres:
+  #   ...
 
   mailpit:
     image: docker.io/axllent/mailpit:latest
@@ -53,7 +44,6 @@ services:
     container_name: konnaxion_local_celeryworker
     depends_on:
       - redis
-      - postgres
       - mailpit
     ports: []
     command: /start-celeryworker
@@ -64,19 +54,18 @@ services:
     container_name: konnaxion_local_celerybeat
     depends_on:
       - redis
-      - postgres
       - mailpit
     ports: []
     command: /start-celerybeat
 
   flower:
-    <<: *django          # héritage commun
+    <<: *django
     image: konnaxion_local_flower
     container_name: konnaxion_local_flower
     ports:
       - "5555:5555"
     environment:
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_FLOWER_USER=admin        # choisissez des valeurs
-      - CELERY_FLOWER_PASSWORD=admin123 # plus sûres en prod
+      REDIS_URL: "redis://redis:6379/0"
+      CELERY_FLOWER_USER: "admin"
+      CELERY_FLOWER_PASSWORD: "admin123"
     command: /start-flower

@@ -17,9 +17,9 @@ const learnGroup: Route = {
 const adminGroup: Route = {
   name: 'Admin',
   views: [
-    { path: '/ethikos/admin/audit', name: 'Audit' },
-    { path: '/ethikos/admin/roles', name: 'Roles' },
-    { path: '/ethikos/admin/moderation', name: 'Moderation' }
+    { path: '/ethikos/api/admin/audit', name: 'Audit' },
+    { path: '/ethikos/api/admin/roles', name: 'Roles' },
+    { path: '/ethikos/api/admin/moderation', name: 'Moderation' }
   ]
 }
 

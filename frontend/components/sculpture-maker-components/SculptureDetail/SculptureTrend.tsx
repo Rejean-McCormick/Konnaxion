@@ -5,7 +5,6 @@
  * Author: Hieu Chu
  */
 
-import 'ant-design-pro/lib/Charts/style/index.less'
 import {
   ColStyled,
   VisitCard,

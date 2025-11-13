@@ -5,38 +5,40 @@ import React from 'react';
 import { PageContainer } from '@ant-design/pro-components';
 import { Card, Empty, List, Typography } from 'antd';
 import { Comment } from '@ant-design/compatible';
+import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchTopicPreview } from '@/services/deliberate';
+import { fetchTopicPreview, type TopicPreviewResponse } from '@/services/deliberate';
 
 dayjs.extend(relativeTime);
 
-type Statement = { id: string; author: string; body: string; createdAt?: string };
-type Preview = {
-  id: string;
-  title: string;
-  category?: string;
-  createdAt?: string;
-  latest: Statement[];
-};
+type Preview = TopicPreviewResponse;
+type Statement = Preview['latest'][number];
 
-export default function TopicThreadPage({
-  params,
-}: {
-  params: { topic: string };
-}) {
+export default function TopicThreadPage() {
+  const params = useParams<{ topic: string }>();
+  const topicParam = params?.topic;
+  const topicId =
+    typeof topicParam === 'string'
+      ? topicParam
+      : Array.isArray(topicParam)
+      ? topicParam[0]
+      : undefined;
+
   usePageTitle('Deliberate · Thread');
 
-  // Pas de génériques → évite l’erreur "Expected 2 type arguments"
-  const { data, loading } = useRequest(
-    () => fetchTopicPreview(params.topic),
-    { refreshDeps: [params.topic] },
+  const { data, loading } = useRequest<Preview, []>(
+    () => fetchTopicPreview(topicId!),
+    {
+      ready: !!topicId,
+      refreshDeps: [topicId],
+    },
   );
 
-  const preview = data as unknown as Preview | undefined;
+  const preview = data;
 
   return (
     <PageContainer ghost loading={loading}>

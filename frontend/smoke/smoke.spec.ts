@@ -2,7 +2,7 @@
 import { test, expect } from '@playwright/test';
 
 const paths = [
-  '/ethikos/admin/moderation',
+  '/ethikos/api/admin/moderation',
   // …the rest
 ];
 

@@ -36,14 +36,16 @@ from django.conf import settings
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
 # ── Core / Users ──────────────────────────────────────────
-from konnaxion.users.api.views import UserViewSet
+from konnaxion.users.api.views import UserViewSet  # /api/users/...
 
 # ── ethiKos ───────────────────────────────────────────────
-from konnaxion.ethikos.api_views import (
-    TopicViewSet,
-    StanceViewSet,
-    ArgumentViewSet,
-)
+from konnaxion.ethikos import api_views as ethikos_api  # module import, safer
+# Required
+TopicViewSet = ethikos_api.TopicViewSet
+StanceViewSet = ethikos_api.StanceViewSet
+ArgumentViewSet = ethikos_api.ArgumentViewSet
+# Optional (will be None if not implemented yet)
+EthikosCategoryViewSet = getattr(ethikos_api, "EthikosCategoryViewSet", None)
 
 # ── keenKonnect ───────────────────────────────────────────
 from konnaxion.keenkonnect.api_views import ProjectViewSet
@@ -55,10 +57,7 @@ from konnaxion.kollective_intelligence.api_views import VoteViewSet
 from konnaxion.konnected.api_views import KnowledgeResourceViewSet
 
 # ── Kreative ──────────────────────────────────────────────
-from konnaxion.kreative.api_views import (
-    KreativeArtworkViewSet,
-    GalleryViewSet,
-)
+from konnaxion.kreative.api_views import KreativeArtworkViewSet, GalleryViewSet
 
 # ---------------------------------------------------------------------------
 
@@ -71,6 +70,9 @@ router.register("users", UserViewSet, basename="user")
 router.register("ethikos/topics",    TopicViewSet,    basename="ethikos-topic")
 router.register("ethikos/stances",   StanceViewSet,   basename="ethikos-stance")
 router.register("ethikos/arguments", ArgumentViewSet, basename="ethikos-argument")
+# Register categories only if the ViewSet exists in the codebase
+if EthikosCategoryViewSet is not None:
+    router.register("ethikos/categories", EthikosCategoryViewSet, basename="ethikos-category")
 
 # keenKonnect
 router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-project")
@@ -78,24 +80,12 @@ router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-pr
 # Kollective Intelligence
 router.register("kollective/votes", VoteViewSet, basename="kollective-vote")
 
-# KonnectED (knowledge resources)
-router.register(
-    "konnected/resources",
-    KnowledgeResourceViewSet,
-    basename="konnected-resource",
-)
+# KonnectED
+router.register("konnected/resources", KnowledgeResourceViewSet, basename="konnected-resource")
 
 # Kreative
-router.register(
-    "kreative/artworks",      # REST path
-    KreativeArtworkViewSet,
-    basename="kreative-artwork",
-)
-router.register(
-    "kreative/galleries",
-    GalleryViewSet,
-    basename="kreative-gallery",
-)
+router.register("kreative/artworks",  KreativeArtworkViewSet, basename="kreative-artwork")
+router.register("kreative/galleries", GalleryViewSet,        basename="kreative-gallery")
 
 # ---------------------------------------------------------------------------
 
@@ -883,77 +873,67 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.urls import include
-from django.urls import path
+from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
-from drf_spectacular.views import SpectacularAPIView
-from drf_spectacular.views import SpectacularSwaggerView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
-    path(
-        "about/",
-        TemplateView.as_view(template_name="pages/about.html"),
-        name="about",
-    ),
-    # Django Admin, use {% url 'admin:index' %}
+    path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
+    # Django Admin
     path(settings.ADMIN_URL, admin.site.urls),
-    # User management
-    path("users/", include("konnaxion.users.urls", namespace="users")),
+    # User management (non-API)
+    path("users/", include(("konnaxion.users.urls", "users"), namespace="users")),
     path("accounts/", include("allauth.urls")),
-    # Your stuff: custom urls includes go here
-    # ...
-    # Media files
+    # Media
     *static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 ]
+
 if settings.DEBUG:
-    # Static file serving when using Gunicorn + Uvicorn for local web socket development
+    # Static file serving in dev when using Gunicorn + Uvicorn
     urlpatterns += staticfiles_urlpatterns()
 
 # API URLS
 urlpatterns += [
-    # API base url
+    # Base API (DRF routers)
     path("api/", include("config.api_router")),
-    # DRF auth token
+
+    # Auth token (DRF)
     path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
+
+    # OpenAPI schema & docs
     path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
+
+    # ------------------------------------------------------------------
+    # Compat FE aliases: map "deliberate" to existing Ethikos endpoints.
+    # Gives /api/deliberate/topics|stances|arguments and
+    #      /api/deliberate/elite/topics|stances|arguments
+    # ------------------------------------------------------------------
     path(
-        "api/docs/",
-        SpectacularSwaggerView.as_view(url_name="api-schema"),
-        name="api-docs",
+        "api/deliberate/",
+        include(("konnaxion.ethikos.urls", "deliberate"), namespace="deliberate"),
+    ),
+    path(
+        "api/deliberate/elite/",
+        include(("konnaxion.ethikos.urls", "deliberate_elite"), namespace="deliberate_elite"),
     ),
 ]
 
 if settings.DEBUG:
-    # This allows the error pages to be debugged during development, just visit
-    # these url in browser to see how these error pages look like.
+    # Debug error pages
     urlpatterns += [
-        path(
-            "400/",
-            default_views.bad_request,
-            kwargs={"exception": Exception("Bad Request!")},
-        ),
-        path(
-            "403/",
-            default_views.permission_denied,
-            kwargs={"exception": Exception("Permission Denied")},
-        ),
-        path(
-            "404/",
-            default_views.page_not_found,
-            kwargs={"exception": Exception("Page not Found")},
-        ),
+        path("400/", default_views.bad_request, kwargs={"exception": Exception("Bad Request!")}),
+        path("403/", default_views.permission_denied, kwargs={"exception": Exception("Permission Denied")}),
+        path("404/", default_views.page_not_found, kwargs={"exception": Exception("Page not Found")}),
         path("500/", default_views.server_error),
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns = [
-            path("__debug__/", include(debug_toolbar.urls)),
-            *urlpatterns,
-        ]
+        urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]
 
 ===== END config/urls.py =====
 

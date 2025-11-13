@@ -3865,7 +3865,8 @@ import { Upload, Button, message as antdMessage, Row, Modal } from 'antd';
 import type { UploadProps, UploadFile } from 'antd';
 import type { AxiosProgressEvent } from 'axios';
 import { useState } from 'react';
-import { CardStyled, ColStyled } from './style';
+// FIX: style.tsx is one level up from CreateForm
+import { CardStyled, ColStyled } from '../style';
 import api from '@/api';
 import { useRouter } from 'next/navigation';
 import Head from 'next/head';
@@ -3933,7 +3934,7 @@ export default function SculptureUploadImage({ sculpture }: SculptureUploadImage
 
     const hide = antdMessage.loading('Uploading image...', 0);
     try {
-      // axios wrapper retourne directement T, pas AxiosResponse<T>
+      // data-first wrapper returns T directly
       const uploaded = await api.post<UploadedImage[]>('/sculpture-images', form, config);
       const first = uploaded?.[0];
       if (!first) throw new Error('Upload response empty');
@@ -3998,29 +3999,37 @@ export default function SculptureUploadImage({ sculpture }: SculptureUploadImage
 
 
 ===== BEGIN components/sculpture-maker-components/EditForm/EditFormTextFields.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\EditFormTextFields.tsx
 'use client'
 
 /**
- * Description: Text details edit component for sculpture
- * Author: Hieu Chu
+ * Text details edit for Sculpture.
+ * getCurrentMaker now always returns a Maker (no undefined).
+ * editMaker accepts MakerEdit.Maker and normalizes to local Maker.
  */
 
 import React, { useState } from 'react'
-import { Input, Select, Divider } from 'antd'
+import { Input, Select, Divider, Button } from 'antd'
 import Icon from '@/components/compat/Icon'
 const { TextArea } = Input
 import { FormCol, CustomFormItem } from '../style'
 import { validateLatitude, validateLongitude } from '../../shared/utils'
 import MakerEdit from './MakerEdit'
+import type { Maker as MakerFromMakerEdit } from './MakerEdit'
 import MakerCreate from '../CreateForm/MakerCreate'
 
 const { Option } = Select
+
+/* ----------------------------- Types ----------------------------- */
 
 type Maker = {
   id: string | number
   firstName: string
   lastName: string
   nationality?: string | null
+  birthYear?: number | null
+  deathYear?: number | null
+  wikiUrl?: string | null
 }
 
 type InitialData = {
@@ -4049,6 +4058,8 @@ type Props = {
   setMakerList: React.Dispatch<React.SetStateAction<Maker[]>>
 }
 
+/* ----------------------------- Component ----------------------------- */
+
 export default function EditFormTextFields({
   getFieldDecorator,
   setFieldsValue,
@@ -4062,33 +4073,33 @@ export default function EditFormTextFields({
     material,
     name,
     productionDate,
-    primaryMakerId
+    primaryMakerId,
   },
   makerList,
-  setMakerList
+  setMakerList,
 }: Props): JSX.Element {
-  const [showModal, setShowModal] = useState<boolean>(false)
-  const [showModalCreate, setShowModalCreate] = useState<boolean>(false)
+  const [showCreateModal, setShowCreateModal] = useState<boolean>(false)
+  const [showEditModal, setShowEditModal] = useState<boolean>(false)
 
-  const openModal = (): void => setShowModal(true)
-  const handleCancel = (): void => setShowModal(false)
+  const openCreateModal = (): void => setShowCreateModal(true)
+  const closeCreateModal = (): void => setShowCreateModal(false)
 
-  const openModalCreate = (): void => setShowModalCreate(true)
-  const handleCancelCreate = (): void => setShowModalCreate(false)
+  const openEditModal = (): void => setShowEditModal(true)
+  const closeEditModal = (): void => setShowEditModal(false)
 
-  const getCurrentMaker = (): Maker => {
-    const current = makerList.find(
-      (x) => x.id === getFieldValue('primaryMakerId')
-    )
-    // Fallback to first or an empty shell to satisfy MakerEdit typing
-    return (
-      current ??
-      makerList[0] ?? {
-        id: '',
-        firstName: '',
-        lastName: ''
-      }
-    )
+  // Always return a Maker (no undefined) to satisfy MakerEdit prop type
+  const getCurrentMaker = (): MakerFromMakerEdit => {
+    const currentId = getFieldValue('primaryMakerId')
+    const m = makerList.find((x) => x.id === currentId)
+    return {
+      id: m?.id ?? '',
+      firstName: m?.firstName ?? '',
+      lastName: m?.lastName ?? '',
+      nationality: m?.nationality ?? null,
+      birthYear: m?.birthYear ?? null,
+      deathYear: m?.deathYear ?? null,
+      wikiUrl: m?.wikiUrl ?? null,
+    }
   }
 
   const addMaker = (maker: Maker): void => {
@@ -4096,14 +4107,19 @@ export default function EditFormTextFields({
     setFieldsValue({ primaryMakerId: maker.id })
   }
 
-  const editMaker = (maker: Maker): void => {
-    setMakerList((c) =>
-      c.map((m) => {
-        if (m.id !== maker.id) return m
-        return { ...maker }
-      })
-    )
-    setFieldsValue({ primaryMakerId: maker.id })
+  // Accept wider Maker from MakerEdit, normalize to local Maker
+  const editMakerFromModal = (m: MakerFromMakerEdit): void => {
+    const normalized: Maker = {
+      id: m.id,
+      firstName: m.firstName ?? '',
+      lastName: m.lastName ?? '',
+      nationality: m.nationality ?? null,
+      birthYear: m.birthYear ?? null,
+      deathYear: m.deathYear ?? null,
+      wikiUrl: m.wikiUrl ?? null,
+    }
+    setMakerList((c) => c.map((x) => (x.id === normalized.id ? { ...x, ...normalized } : x)))
+    setFieldsValue({ primaryMakerId: normalized.id })
   }
 
   return (
@@ -4112,19 +4128,15 @@ export default function EditFormTextFields({
         <CustomFormItem label="Sculpture name" hasFeedback>
           {getFieldDecorator('name', {
             rules: [
-              {
-                required: true,
-                whitespace: true,
-                message: 'Please fill in the sculpture name!'
-              }
+              { required: true, whitespace: true, message: 'Please fill in the sculpture name!' },
             ],
-            initialValue: name
+            initialValue: name,
           })(
             <Input
               prefix={<Icon type="trophy" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Sculpture name"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -4133,20 +4145,16 @@ export default function EditFormTextFields({
         <CustomFormItem label="Accession ID" hasFeedback>
           {getFieldDecorator('accessionId', {
             rules: [
-              {
-                required: true,
-                whitespace: true,
-                message: 'Please fill in the unique accession ID!'
-              }
+              { required: true, whitespace: true, message: 'Please fill in the unique accession ID!' },
             ],
-            initialValue: accessionId
+            initialValue: accessionId,
           })(
             <Input
               prefix={<Icon type="number" style={{ color: 'rgba(0,0,0,.25)' }} />}
               type="text"
               placeholder="Accession ID"
               readOnly
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -4154,100 +4162,84 @@ export default function EditFormTextFields({
       <FormCol>
         <CustomFormItem label="Primary maker" hasFeedback>
           {getFieldDecorator('primaryMakerId', {
-            rules: [
-              {
-                required: true,
-                whitespace: true,
-                message: 'Please fill in the primary maker!'
-              }
-            ],
-            initialValue: primaryMakerId
+            rules: [{ required: true, whitespace: true, message: 'Please fill in the primary maker!' }],
+            initialValue: primaryMakerId,
           })(
-            <Select
-              placeholder="Primary maker"
-              dropdownRender={(menu: React.ReactNode) => (
-                <div>
-                  {menu}
-                  <Divider style={{ margin: '4px 0' }} />
-                  <div
-                    style={{ padding: '8px', cursor: 'pointer' }}
-                    onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.preventDefault()}
-                    onClick={openModal}
-                  >
-                    <Icon type="edit" /> Edit current maker
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Select
+                style={{ flex: 1 }}
+                placeholder="Primary maker"
+                dropdownRender={(menu) => (
+                  <div>
+                    {menu}
+                    <Divider style={{ margin: '4px 0' }} />
+                    <div
+                      style={{ padding: '8px', cursor: 'pointer' }}
+                      onMouseDown={(e) => e.preventDefault()}
+                      onClick={openCreateModal}
+                    >
+                      <Icon type="plus" /> Add new maker
+                    </div>
                   </div>
-                  <div
-                    style={{ padding: '8px', cursor: 'pointer' }}
-                    onMouseDown={(e: React.MouseEvent<HTMLDivElement>) => e.preventDefault()}
-                    onClick={openModalCreate}
-                  >
-                    <Icon type="plus" /> Add new maker
-                  </div>
-                </div>
-              )}
-            >
-              {makerList.map((maker: Maker) => (
-                <Option key={maker.id} value={maker.id}>
-                  {maker.firstName + ' ' + maker.lastName}
-                </Option>
-              ))}
-            </Select>
+                )}
+              >
+                {makerList.map((maker) => (
+                  <Option key={maker.id} value={maker.id}>
+                    {`${maker.firstName} ${maker.lastName}`}
+                  </Option>
+                ))}
+              </Select>
+
+              <Button onClick={openEditModal}>Edit</Button>
+            </div>,
           )}
         </CustomFormItem>
       </FormCol>
 
       <FormCol>
         <CustomFormItem label="Production date" hasFeedback>
-          {getFieldDecorator('productionDate', {
-            initialValue: productionDate
-          })(
+          {getFieldDecorator('productionDate', { initialValue: productionDate })(
             <Input
-              prefix={<Icon type="calendar" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              prefix={<Icon type="calendar" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Production date"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
 
       <FormCol>
         <CustomFormItem label="Material" hasFeedback>
-          {getFieldDecorator('material', {
-            initialValue: material
-          })(
+          {getFieldDecorator('material', { initialValue: material })(
             <Input
-              prefix={<Icon type="code-sandbox" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              prefix={<Icon type="code-sandbox" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Material"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
 
       <FormCol>
         <CustomFormItem label="Credit line" hasFeedback>
-          {getFieldDecorator('creditLine', {
-            initialValue: creditLine
-          })(
+          {getFieldDecorator('creditLine', { initialValue: creditLine })(
             <TextArea
               placeholder="Credit line"
               autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
 
       <FormCol>
         <CustomFormItem label="Location details" hasFeedback>
-          {getFieldDecorator('locationNotes', {
-            initialValue: locationNotes
-          })(
+          {getFieldDecorator('locationNotes', { initialValue: locationNotes })(
             <TextArea
               placeholder="Location details"
               autoSize={{ minRows: 3, maxRows: 5 }}
               style={{ marginTop: 5 }}
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -4256,13 +4248,13 @@ export default function EditFormTextFields({
         <CustomFormItem label="Latitude" hasFeedback className="latitude-input">
           {getFieldDecorator('latitude', {
             rules: [{ validator: validateLatitude }],
-            initialValue: latitude != null ? String(latitude) : ''
+            initialValue: latitude != null ? String(latitude) : undefined,
           })(
             <Input
-              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Latitude"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
@@ -4271,28 +4263,24 @@ export default function EditFormTextFields({
         <CustomFormItem label="Longitude" hasFeedback className="longitude-input">
           {getFieldDecorator('longitude', {
             rules: [{ validator: validateLongitude }],
-            initialValue: longitude != null ? String(longitude) : ''
+            initialValue: longitude != null ? String(longitude) : undefined,
           })(
             <Input
-              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,.25)' }} />}
+              prefix={<Icon type="compass" style={{ color: 'rgba(0,0,0,25)' }} />}
               type="text"
               placeholder="Longitude"
-            />
+            />,
           )}
         </CustomFormItem>
       </FormCol>
 
+      {/* Modals */}
+      <MakerCreate visible={showCreateModal} handleCancel={closeCreateModal} addMaker={addMaker} />
       <MakerEdit
-        visible={showModal}
-        handleCancel={handleCancel}
+        visible={showEditModal}
+        handleCancel={closeEditModal}
         getCurrentMaker={getCurrentMaker}
-        editMaker={editMaker}
-      />
-
-      <MakerCreate
-        visible={showModalCreate}
-        handleCancel={handleCancelCreate}
-        addMaker={addMaker}
+        editMaker={editMakerFromModal}
       />
     </>
   )
@@ -4457,7 +4445,7 @@ export default EditImage
 
 
 ===== BEGIN components/sculpture-maker-components/EditForm/index.tsx =====
-// components/sculpture-maker-components/EditForm/index.tsx
+// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\index.tsx
 'use client';
 
 /**
@@ -4614,6 +4602,18 @@ const SculptureEditForm = () => {
     (a, b) => new Date(a.created).getTime() - new Date(b.created).getTime(),
   );
 
+  /** Mapping vers la forme attendue par <SculptureEdit /> */
+  const sculptureProp = {
+    id: initialData.accessionId,
+    title: initialData.name,
+    description: '', // adapte si ton API renvoie une description
+    location: {
+      lat: Number(initialData.latitude ?? 0),
+      lng: Number(initialData.longitude ?? 0),
+    },
+    imageUrl: sortedImages[0]?.url,
+  };
+
   return (
     <Row gutter={16}>
       <ColStyled xs={24}>
@@ -4628,23 +4628,48 @@ const SculptureEditForm = () => {
             </Button>
           }
         >
+          {/* Tab 1: édition des champs texte + position */}
           <div style={{ display: tabKey === 'tab1' ? 'block' : 'none' }}>
             <SculptureEdit
-              initialData={{ ...initialData, images: sortedImages }}
-              makerList={makerList}
-              setMakerList={setMakerList}
+              sculpture={sculptureProp}
+              onSubmit={async (updated) => {
+                try {
+                  await api.patch(`/sculpture/${updated.id}`, {
+                    name: updated.title,
+                    latitude: updated.location.lat,
+                    longitude: updated.location.lng,
+                    // ajoutez description/imageUrl si l'API les accepte
+                  });
+                  antdMessage.success('Updated sculpture details successfully!', 2);
+                  // Optionnel: recharger les données locales
+                  setInitialData((prev) =>
+                    prev
+                      ? {
+                          ...prev,
+                          name: updated.title,
+                          latitude: updated.location.lat,
+                          longitude: updated.location.lng,
+                        }
+                      : prev,
+                  );
+                } catch (e) {
+                  const { message } = normalizeError(e);
+                  antdMessage.error(message || 'Update failed');
+                }
+              }}
             />
           </div>
 
+          {/* Tab 2: édition d’images */}
           <div style={{ display: tabKey === 'tab2' ? 'block' : 'none' }}>
             <EditImage
               accessionId={initialData.accessionId}
-              _name={initialData.name} // NOTE: the component expects `_name`
+              _name={initialData.name} // NOTE: le composant attend `_name`
               images={sortedImages.map((img) => ({
                 ...img,
                 uid: String(img.id),
-                name: String(img.id),
-                url: img.url,
+                name: String(img.id),        // ensure required UploadFile.name
+                url: img.url,                // explicit url
                 thumbUrl: img.url,
                 preview: img.url,
                 status: 'done',
@@ -4666,23 +4691,22 @@ export { SculptureEditForm };
 'use client'
 
 /**
- * Description: Primary maker edit page component (migrated to AntD v4/v5)
- * Notes:
- *  - Replaces Form.create/getFieldDecorator with Form.useForm + Form.Item
- *  - Replaces validateFields(cb) with await form.validateFields()
- *  - Keeps props API: visible, handleCancel, getCurrentMaker, editMaker
+ * Primary maker edit modal (AntD v5)
+ * - Form.useForm
+ * - Props contract: visible, handleCancel, getCurrentMaker, editMaker
  */
 
 import { useEffect, useState } from 'react'
 import { Form, Input, Button, Modal, message as antdMessage } from 'antd'
 import { CustomFormItem } from '../style'
-import api from '../../../api'
-import { normalizeError } from '../../../shared/errors'
+import api from '@/api'
+import { normalizeError } from '@/shared/errors'
 
-type Maker = {
+/** Type unifié avec MakerList */
+export type Maker = {
   id: string | number
-  firstName: string
-  lastName: string
+  firstName?: string
+  lastName?: string
   nationality?: string | null
   birthYear?: number | null
   deathYear?: number | null
@@ -4690,13 +4714,9 @@ type Maker = {
 }
 
 type MakerEditProps = {
-  /** Modal state controlled by parent */
   visible: boolean
-  /** Close handler (parent hides the modal) */
   handleCancel: () => void
-  /** Returns the currently selected maker from the parent list */
   getCurrentMaker: () => Maker
-  /** Parent updater after a successful save */
   editMaker: (m: Maker) => void
 }
 
@@ -4709,7 +4729,7 @@ export default function MakerEdit({
   const [form] = Form.useForm()
   const [submitting, setSubmitting] = useState(false)
 
-  // Pre-fill form when modal opens or selection changes
+  // Pré-remplissage
   useEffect(() => {
     if (!visible) {
       form.resetFields()
@@ -4732,12 +4752,11 @@ export default function MakerEdit({
     try {
       const raw = await form.validateFields()
 
-      // prune + convert
+      // prune + cast
       const values: Record<string, any> = {}
       Object.keys(raw).forEach((k) => {
         const v = raw[k]
-        if (v !== undefined && v !== null && String(v).trim() !== '') values[k] = v
-        else values[k] = null
+        values[k] = v !== undefined && v !== null && String(v).trim() !== '' ? v : null
       })
       if (values.birthYear) values.birthYear = Number(values.birthYear)
       if (values.deathYear) values.deathYear = Number(values.deathYear)
@@ -4750,20 +4769,15 @@ export default function MakerEdit({
       values.id = current.id
 
       setSubmitting(true)
-      // NB: dans le code récent de MakerCreate vous consommez directement la data (pas .data)
-      await api.patch('/maker', values)
-
-      // Sync liste côté parent
+      await api.patch('/maker', values) // wrapper data-first
       editMaker({ ...current, ...values })
       antdMessage.success('Updated maker details successfully!', 2)
-
       form.resetFields()
       handleCancel()
     } catch (e: any) {
-      // validateFields peut lever une exception de validation -> ne pas traiter comme erreur API
-      if (e?.errorFields) return
-      const { message: msg } = normalizeError(e)
-      antdMessage.error(msg || 'Update failed')
+      if (e?.errorFields) return // erreurs de validation
+      const { message } = normalizeError(e)
+      antdMessage.error(message || 'Update failed')
     } finally {
       setSubmitting(false)
     }
@@ -4771,7 +4785,7 @@ export default function MakerEdit({
 
   return (
     <Modal
-      open={visible}                // AntD v5: prop "open" (remplace "visible")
+      open={visible}
       title="Edit maker details"
       onOk={handleOk}
       onCancel={handleCancel}
@@ -5073,45 +5087,40 @@ export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProp
 
 
 ===== BEGIN components/sculpture-maker-components/MakerList.tsx =====
-// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\MakerList.tsx
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
-import { Row, Divider, Modal, message as antdMessage, notification, Button, Spin } from 'antd';
-import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import { ColStyled, CardStyled, StyledTable } from './style';
-import MakerEdit from './EditForm/MakerEdit';
-import MakerCreate from './CreateForm/MakerCreate';
-import NextError from 'next/error';
-import { get, del } from '@/services/_request';
-import { normalizeError } from '@/shared/errors';
+import React, { useEffect, useState } from 'react'
+import { Row, Divider, Modal, message as antdMessage, notification, Button, Spin } from 'antd'
+import { ExclamationCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import type { ColumnsType } from 'antd/es/table'
+import { ColStyled, CardStyled, StyledTable } from './style'
+import MakerEdit from './EditForm/MakerEdit'
+import MakerCreate from './CreateForm/MakerCreate'
+import NextError from 'next/error'
+import { get, del } from '@/services/_request'
+import { normalizeError } from '@/shared/errors'
 
-const { confirm } = Modal;
+const { confirm } = Modal
 
-/**
- * Type unifié avec le formulaire d’édition :
- * - nationality peut être null
- * - wikiUrl ne doit PAS être null (string | undefined)
- */
+/** Type unifié avec MakerEdit (notamment wikiUrl: string | null) */
 export type Maker = {
-  id: string | number;
-  firstName?: string;
-  lastName?: string;
-  nationality?: string | null;
-  birthYear?: number | null;
-  deathYear?: number | null;
-  wikiUrl?: string;
-  key?: React.Key;
-};
+  id: string | number
+  firstName?: string
+  lastName?: string
+  nationality?: string | null
+  birthYear?: number | null
+  deathYear?: number | null
+  wikiUrl?: string | null
+  key?: React.Key
+}
 
-type HttpError = { statusCode: number; message: string };
+type HttpError = { statusCode: number; message: string }
 
 const Loading = () => (
   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
     <Spin size="large" />
   </div>
-);
+)
 
 const EMPTY_MAKER: Maker = {
   id: '',
@@ -5120,75 +5129,72 @@ const EMPTY_MAKER: Maker = {
   nationality: null,
   birthYear: null,
   deathYear: null,
-  wikiUrl: undefined,
-};
+  wikiUrl: null,
+}
 
 const MakerList: React.FC = () => {
-  const [makerList, setMakerList] = useState<Maker[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<HttpError | null>(null);
+  const [makerList, setMakerList] = useState<Maker[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<HttpError | null>(null)
 
-  const [showModal, setShowModal] = useState(false);
-  const [showModalCreate, setShowModalCreate] = useState(false);
-  const [currentMakerId, setCurrentMakerId] = useState<string | number>('');
+  const [showModal, setShowModal] = useState(false)
+  const [showModalCreate, setShowModalCreate] = useState(false)
+  const [currentMakerId, setCurrentMakerId] = useState<string | number>('')
 
   useEffect(() => {
     const fetchMakerList = async () => {
       try {
-        // le helper retourne déjà la payload
-        const data = await get<Maker[]>('/maker/');
+        // helper data-first → retourne directement la payload
+        const data = await get<Maker[]>('/maker/')
         const formatted = (data ?? [])
           .map((maker) => ({
             ...maker,
-            // normalisation douce pour éviter les "undefined"
+            // normalisation douce
             firstName: maker.firstName ?? '',
             lastName: maker.lastName ?? '',
-            // important: garder null pour nationality si backend l’envoie
             nationality: maker.nationality ?? null,
-            // important: NE PAS introduire null côté wikiUrl
-            wikiUrl: maker.wikiUrl ?? undefined,
+            wikiUrl: maker.wikiUrl ?? null,
             key: maker.id,
           }))
           .sort(
             (a, b) =>
               (a.firstName ?? '').localeCompare(b.firstName ?? '') ||
               (a.lastName ?? '').localeCompare(b.lastName ?? ''),
-          );
-        setMakerList(formatted);
+          )
+        setMakerList(formatted)
       } catch (e) {
-        const { message, statusCode = 500 } = normalizeError(e);
-        setError({ statusCode, message });
+        const { message, statusCode = 500 } = normalizeError(e)
+        setError({ statusCode, message })
       } finally {
-        setLoading(false);
+        setLoading(false)
       }
-    };
-    fetchMakerList();
-  }, []);
+    }
+    fetchMakerList()
+  }, [])
 
   const openModal = (makerId: string | number) => {
-    setCurrentMakerId(makerId);
-    setShowModal(true);
-  };
-  const openModalCreate = () => setShowModalCreate(true);
-  const handleCancel = () => setShowModal(false);
-  const handleCancelCreate = () => setShowModalCreate(false);
+    setCurrentMakerId(makerId)
+    setShowModal(true)
+  }
+  const openModalCreate = () => setShowModalCreate(true)
+  const handleCancel = () => setShowModal(false)
+  const handleCancelCreate = () => setShowModalCreate(false)
 
-  // Retourne toujours un Maker conforme au type unifié
-  const getCurrentMaker = (): Maker =>
-    makerList.find((x) => x.id === currentMakerId) ?? EMPTY_MAKER;
+  /** Toujours retourner un Maker conforme */
+  const getCurrentMaker = (): Maker => makerList.find((x) => x.id === currentMakerId) ?? EMPTY_MAKER
 
-  // Signature strictement identique à celle attendue par MakerEdit
+  /** Signature compatible avec MakerEdit: (m: Maker) => void */
   const editMaker = (maker: Maker) => {
-    setMakerList((list) => list.map((x) => (x.id === maker.id ? { ...maker, key: maker.id } : x)));
-  };
+    setMakerList((list) => list.map((x) => (x.id === maker.id ? { ...maker, key: maker.id } : x)))
+  }
 
   const deleteMakerLocal = (makerId: string | number) => {
-    setMakerList((list) => list.filter((x) => x.id !== makerId));
-  };
+    setMakerList((list) => list.filter((x) => x.id !== makerId))
+  }
 
   const addMaker = (maker: Maker) => {
-    setMakerList((list) => [{ ...maker, key: maker.id }, ...list]);
-  };
+    setMakerList((list) => [{ ...maker, key: maker.id }, ...list])
+  }
 
   const handleDelete = (makerId: string | number) => {
     confirm({
@@ -5200,21 +5206,21 @@ const MakerList: React.FC = () => {
       okButtonProps: { style: { background: '#ff4d4f', borderColor: '#ff4d4f' } },
       async onOk() {
         try {
-          await del<void>(`/maker/${makerId}`);
-          deleteMakerLocal(makerId);
-          antdMessage.success('Deleted maker successfully!', 2);
+          await del<void>(`/maker/${makerId}`)
+          deleteMakerLocal(makerId)
+          antdMessage.success('Deleted maker successfully!', 2)
         } catch (err) {
-          const { message } = normalizeError(err);
+          const { message } = normalizeError(err)
           notification.error({
             message: 'Error',
             description:
               message ||
               "There has been an internal server error or the maker you're trying to delete is currently associated with a sculpture.",
-          });
+          })
         }
       },
-    });
-  };
+    })
+  }
 
   const columns: ColumnsType<Maker> = [
     {
@@ -5222,12 +5228,8 @@ const MakerList: React.FC = () => {
       key: 'makerName',
       width: '22%',
       render: (_, record) => {
-        const makerName = `${record.firstName ?? ''} ${record.lastName ?? ''}`.trim();
-        return record.wikiUrl ? (
-          <a href={record.wikiUrl}>{makerName || '—'}</a>
-        ) : (
-          <span>{makerName || '—'}</span>
-        );
+        const makerName = `${record.firstName ?? ''} ${record.lastName ?? ''}`.trim()
+        return record.wikiUrl ? <a href={record.wikiUrl}>{makerName || '—'}</a> : <span>{makerName || '—'}</span>
       },
     },
     {
@@ -5241,9 +5243,9 @@ const MakerList: React.FC = () => {
       key: 'year',
       width: '28%',
       render: (_, record) => {
-        const birth = record.birthYear ?? 'N/A';
-        const death = record.deathYear ?? 'N/A';
-        return <span>{`${birth} - ${death}`}</span>;
+        const birth = record.birthYear ?? 'N/A'
+        const death = record.deathYear ?? 'N/A'
+        return <span>{`${birth} - ${death}`}</span>
       },
     },
     {
@@ -5261,12 +5263,12 @@ const MakerList: React.FC = () => {
         </span>
       ),
     },
-  ];
+  ]
 
-  if (loading) return <Loading />;
-  if (error) return <NextError statusCode={error.statusCode} title={error.message} />;
+  if (loading) return <Loading />
+  if (error) return <NextError statusCode={error.statusCode} title={error.message} />
 
-  // StyledTable perd les génériques via styled-components → cast columns/dataSource
+  // StyledTable via styled-components perd les génériques → cast columns/dataSource
   return (
     <Row gutter={16}>
       <ColStyled xs={24}>
@@ -5296,10 +5298,10 @@ const MakerList: React.FC = () => {
       />
       <MakerCreate visible={showModalCreate} handleCancel={handleCancelCreate} addMaker={addMaker} />
     </Row>
-  );
-};
+  )
+}
 
-export default MakerList;
+export default MakerList
 
 ===== END components/sculpture-maker-components/MakerList.tsx =====
 
@@ -5843,7 +5845,6 @@ export default SculptureComment
  * Author: Hieu Chu
  */
 
-import 'ant-design-pro/lib/Charts/style/index.less'
 import {
   ColStyled,
   VisitCard,

@@ -24,7 +24,7 @@ export default function useGlobalSearch(query: string) {
     staleTime: 60_000,
     retry: 1,
     queryFn: async () => {
-      const res = await api.get<GlobalSearchResult[]>("/search", { params: { q } });
+      const res = await api.get<GlobalSearchResult[]>("/api/search", { params: { q } });
       return res.data;
     },
   });

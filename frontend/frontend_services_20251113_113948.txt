@@ -186,35 +186,40 @@ export async function fetchAuditLogs(): Promise<AuditPayload> {
 
 
 ===== BEGIN services/audit.ts =====
-import { get, post, put, patch, del } from './_request'
+// services/audit.ts
+import { get } from "./_request";
 
 export interface LogRow {
-  id: string
-  ts: string                  // ISO timestamp
-  actor: string               // utilisateur / service
-  action: string              // ex: "UPDATE_TOPIC"
-  entity?: string             // ex: "topic"
-  entityId?: string
-  ip?: string
-  status?: 'ok' | 'warn' | 'error'
-  meta?: Record<string, any>  // détails JSON
+  id: string;
+  ts: string; // ISO timestamp
+  actor: string; // utilisateur / service
+  action: string; // ex: "UPDATE_TOPIC"
+  entity?: string; // ex: "topic"
+  entityId?: string;
+  ip?: string;
+  status?: "ok" | "warn" | "error";
+  meta?: Record<string, any>; // détails JSON
 }
 
 export interface AuditPayload {
-  items: LogRow[]
-  page: number
-  pageSize: number
-  total: number
+  items: LogRow[];
+  page: number;
+  pageSize: number;
+  total: number;
 }
 
-/** GET /admin/audit/logs */
+/**
+ * GET /admin/audit/logs
+ * Paginated, filterable audit log stream.
+ * Aligned with backend path "admin/audit/logs" and the global services/_request baseURL.
+ */
 export async function fetchAuditLogs(params?: {
-  page?: number
-  pageSize?: number
-  q?: string
-  sort?: string
+  page?: number;
+  pageSize?: number;
+  q?: string;
+  sort?: string;
 }): Promise<AuditPayload> {
-  return get('admin/audit/logs', { params })
+  return get<AuditPayload>("admin/audit/logs", { params });
 }
 
 ===== END services/audit.ts =====
@@ -312,72 +317,115 @@ export async function submitPublicVote(topicId: string, value: string | number) 
 
 
 ===== BEGIN services/decide.ts =====
-import { get, post, put, patch, del } from './_request'
+// C:\MyCode\Konnaxionv14\frontend\services\decide.ts
+import { get, post } from './_request'
 import type { Ballot } from '@/types'
 
-/** GET /decide/elite/ballots */
-export async function fetchEliteBallots(): Promise<{
-  ballots: (Ballot & { turnout: number })[]
-}> {
-  return get('decide/elite/ballots')
+export type EliteBallot = Ballot & { turnout: number }
+
+export type PublicBallot = Ballot & {
+  options: string[]
+  turnout: number
 }
 
-/** GET /decide/public/ballots */
-export async function fetchPublicBallots(): Promise<{
-  ballots: (Ballot & { options: string[]; turnout: number })[]
-}> {
-  return get('decide/public/ballots')
+/** Response payload for elite ballots */
+export interface EliteBallotResponse {
+  ballots: EliteBallot[]
 }
 
-/** POST /decide/public/ballots/:id/vote */
+/** Response payload for public ballots */
+export interface PublicBallotResponse {
+  ballots: PublicBallot[]
+}
+
+export type DecisionScope = 'Elite' | 'Public'
+
+export interface DecisionResult {
+  id: string
+  title: string
+  scope: DecisionScope
+  passed: boolean
+  closesAt: string
+  region: string
+}
+
+export interface DecisionResultsResponse {
+  items: DecisionResult[]
+}
+
+/** GET /decide/elite/ballots → /api/decide/elite/ballots */
+export async function fetchEliteBallots(): Promise<EliteBallotResponse> {
+  return get<EliteBallotResponse>('decide/elite/ballots')
+}
+
+/** GET /decide/public/ballots → /api/decide/public/ballots */
+export async function fetchPublicBallots(): Promise<PublicBallotResponse> {
+  return get<PublicBallotResponse>('decide/public/ballots')
+}
+
+/** POST /decide/public/ballots/:id/vote → /api/decide/public/ballots/:id/vote */
 export async function submitPublicVote(
   id: string,
   option: string,
 ): Promise<{ ok: true }> {
-  return post(`decide/public/ballots/${id}/vote`, { option })
+  return post<{ ok: true }>(`decide/public/ballots/${id}/vote`, { option })
 }
 
-/** GET /decide/results */
-export async function fetchDecisionResults(): Promise<{
-  items: {
-    id: string
-    title: string
-    scope: 'Elite' | 'Public'
-    passed: boolean
-    closesAt: string
-    region: string
-  }[]
-}> {
-  return get('decide/results')
+/** GET /decide/results → /api/decide/results */
+export async function fetchDecisionResults(): Promise<DecisionResultsResponse> {
+  return get<DecisionResultsResponse>('decide/results')
 }
 
 ===== END services/decide.ts =====
 
 
 ===== BEGIN services/deliberate.ts =====
-import { get, post, put, patch, del } from './_request'
+// services/deliberate.ts
+import { get, post } from './_request'
 import type { Topic } from '@/types'
 
-/** GET /deliberate/elite/topics */
-export async function fetchEliteTopics(): Promise<{
-  list: (Topic & {
-    createdAt: string
-    lastActivity: string
-    hot: boolean
-  })[]
-}> {
-  return get('deliberate/elite/topics')
+/* ------------------------------------------------------------------ */
+/*  Exported types (reused by pages/modules)                           */
+/* ------------------------------------------------------------------ */
+
+export type EliteTopic = Topic & {
+  createdAt: string
+  lastActivity: string
+  hot: boolean
+  /** May or may not be present in the payload; normalized in the UI */
+  stanceCount?: number
 }
 
-/** GET /deliberate/topics/:id/preview */
-export async function fetchTopicPreview(id: string): Promise<{
+export type EliteTopicsResponse = {
+  list: EliteTopic[]
+}
+
+export type TopicPreviewResponse = {
   id: string
   title: string
   category: string
   createdAt: string
   latest: { id: string; author: string; body: string }[]
-}> {
-  return get(`deliberate/topics/${id}/preview`)
+}
+
+export type TopicDetailResponse = {
+  id: string
+  title: string
+  statements: { id: string; author: string; body: string; createdAt: string }[]
+}
+
+/* ------------------------------------------------------------------ */
+/*  API calls                                                          */
+/* ------------------------------------------------------------------ */
+
+/** GET /deliberate/elite/topics */
+export async function fetchEliteTopics(): Promise<EliteTopicsResponse> {
+  return get<EliteTopicsResponse>('deliberate/elite/topics')
+}
+
+/** GET /deliberate/topics/:id/preview */
+export async function fetchTopicPreview(id: string): Promise<TopicPreviewResponse> {
+  return get<TopicPreviewResponse>(`deliberate/topics/${id}/preview`)
 }
 
 /** POST /deliberate/elite/topics */
@@ -385,16 +433,12 @@ export async function createEliteTopic(payload: {
   title: string
   category: string
 }): Promise<{ id: string }> {
-  return post('deliberate/elite/topics', payload)
+  return post<{ id: string }>('deliberate/elite/topics', payload)
 }
 
 /** GET /deliberate/topics/:id */
-export async function fetchTopicDetail(id: string): Promise<{
-  id: string
-  title: string
-  statements: { id: string; author: string; body: string; createdAt: string }[]
-}> {
-  return get(`deliberate/topics/${id}`)
+export async function fetchTopicDetail(id: string): Promise<TopicDetailResponse> {
+  return get<TopicDetailResponse>(`deliberate/topics/${id}`)
 }
 
 ===== END services/deliberate.ts =====
@@ -499,13 +543,13 @@ export * from './pulse'
 
 ===== BEGIN services/learn.ts =====
 // services/learn.ts
-import { get, post, put, patch, del } from './_request';
+import { get } from './_request';
 
 /* ---------- Changelog ---------- */
 
 export interface ChangelogEntry {
   version: string;
-  date: string;                      // ISO-8601 string (e.g. "2025-04-25")
+  date: string; // ISO-8601 (e.g. "2025-04-25")
   tags: ('NEW' | 'FIX' | 'IMPROVE')[];
   notes: string[];
 }
@@ -521,7 +565,7 @@ export async function fetchChangelog(): Promise<{
 export interface GuideSection {
   id: string;
   title: string;
-  content: string;                  // Markdown / HTML-ready text
+  content: string; // Markdown / HTML-ready text
 }
 
 export async function fetchGuides(): Promise<{
@@ -548,7 +592,8 @@ export async function fetchGlossary(): Promise<{
 
 
 ===== BEGIN services/pulse.ts =====
-import { get, post, put, patch, del } from './_request'
+// services/pulse.ts
+import { get } from './_request'
 import type { KPI } from '@/types'
 
 export interface KPIWithHistory extends KPI {
