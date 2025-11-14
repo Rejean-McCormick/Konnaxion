@@ -10,17 +10,17 @@ const learnGroup: Route = {
   views: [
     { path: '/ethikos/learn/changelog', name: 'Changelog' },
     { path: '/ethikos/learn/glossary', name: 'Glossary' },
-    { path: '/ethikos/learn/guides', name: 'Guides' }
-  ]
+    { path: '/ethikos/learn/guides', name: 'Guides' },
+  ],
 }
 
 const adminGroup: Route = {
   name: 'Admin',
   views: [
-    { path: '/ethikos/api/admin/audit', name: 'Audit' },
-    { path: '/ethikos/api/admin/roles', name: 'Roles' },
-    { path: '/ethikos/api/admin/moderation', name: 'Moderation' }
-  ]
+    { path: '/ethikos/admin/audit', name: 'Audit' },
+    { path: '/ethikos/admin/roles', name: 'Roles' },
+    { path: '/ethikos/admin/moderation', name: 'Moderation' },
+  ],
 }
 
 const decideGroup: Route = {
@@ -29,8 +29,8 @@ const decideGroup: Route = {
     { path: '/ethikos/decide/elite', name: 'Elite' },
     { path: '/ethikos/decide/public', name: 'Public' },
     { path: '/ethikos/decide/methodology', name: 'Methodology' },
-    { path: '/ethikos/decide/results', name: 'Results' }
-  ]
+    { path: '/ethikos/decide/results', name: 'Results' },
+  ],
 }
 
 const impactGroup: Route = {
@@ -38,8 +38,8 @@ const impactGroup: Route = {
   views: [
     { path: '/ethikos/impact/feedback', name: 'Feedback' },
     { path: '/ethikos/impact/outcomes', name: 'Outcomes' },
-    { path: '/ethikos/impact/tracker', name: 'Tracker' }
-  ]
+    { path: '/ethikos/impact/tracker', name: 'Tracker' },
+  ],
 }
 
 const deliberateGroup: Route = {
@@ -47,8 +47,8 @@ const deliberateGroup: Route = {
   views: [
     { path: '/ethikos/deliberate/elite', name: 'Elite' },
     { path: '/ethikos/deliberate/guidelines', name: 'Guidelines' },
-    { path: '/ethikos/deliberate/[topic]', name: 'Topic' }
-  ]
+    { path: '/ethikos/deliberate/[topic]', name: 'Topic' },
+  ],
 }
 
 const pulseGroup: Route = {
@@ -57,8 +57,8 @@ const pulseGroup: Route = {
     { path: '/ethikos/pulse/live', name: 'Live' },
     { path: '/ethikos/pulse/health', name: 'Health' },
     { path: '/ethikos/pulse/overview', name: 'Overview' },
-    { path: '/ethikos/pulse/trends', name: 'Trends' }
-  ]
+    { path: '/ethikos/pulse/trends', name: 'Trends' },
+  ],
 }
 
 const trustGroup: Route = {
@@ -66,10 +66,18 @@ const trustGroup: Route = {
   views: [
     { path: '/ethikos/trust/badges', name: 'Badges' },
     { path: '/ethikos/trust/profile', name: 'Profile' },
-    { path: '/ethikos/trust/credentials', name: 'Credentials' }
-  ]
+    { path: '/ethikos/trust/credentials', name: 'Credentials' },
+  ],
 }
 
-const routes: Route[] = [adminGroup, decideGroup, deliberateGroup, impactGroup, learnGroup, pulseGroup, trustGroup]
+const routes: Route[] = [
+  adminGroup,
+  decideGroup,
+  deliberateGroup,
+  impactGroup,
+  learnGroup,
+  pulseGroup,
+  trustGroup,
+]
 
 export default routes

@@ -12,9 +12,9 @@ const { Step } = Steps
 export default function PageWrapper() {
   return (
     <Suspense fallback={null}>
-      <MainLayout>
+      <>
         <Content />
-      </MainLayout>
+      </>
     </Suspense>
   )
 }

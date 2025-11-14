@@ -16,9 +16,9 @@ import api from '@/api'
 export default function PageWrapper() {
   return (
     <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
-      <MainLayout>
+      <>
         <Content />
-      </MainLayout>
+      </>
     </Suspense>
   )
 }

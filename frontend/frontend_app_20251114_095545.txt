@@ -1,4 +1,4 @@
-===== TOC (103 fichiers) =====
+===== TOC (112 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\app\_api\admin\moderation\route.ts
 2. C:\MyCode\Konnaxionv14\frontend\app\_api\admin\stats\route.ts
 3. C:\MyCode\Konnaxionv14\frontend\app\_api\health\route.ts
@@ -39,69 +39,78 @@
 38. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\dashboard\page.tsx
 39. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\browse-repository\page.tsx
 40. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx
-41. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx
-42. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx
-43. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\layout.tsx
-44. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\browse-projects\page.tsx
-45. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\create-new-project\page.tsx
-46. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\my-projects\page.tsx
-47. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\project-workspace\page.tsx
-48. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx
-49. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx
-50. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\track-project-impact\page.tsx
-51. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
-52. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx.bak
-53. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx
-54. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\view-reputation-ekoh\page.tsx
-55. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\browse-available-workspaces\page.tsx
-56. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx
-57. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
-58. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx
-59. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx.bak
-60. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
-61. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx
-62. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx.bak
-63. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx
-64. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx.bak
-65. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
-66. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx
-67. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx.bak
-68. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
-69. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx
-70. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx.bak
-71. C:\MyCode\Konnaxionv14\frontend\app\konnected\layout.tsx
-72. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\browse-resources\page.tsx
-73. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\offline-content\page.tsx
-74. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\recommended-resources\page.tsx
-75. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\search-filters\page.tsx
-76. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\create-learning-path\page.tsx
-77. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx
-78. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx.bak
-79. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\my-learning-path\page.tsx
-80. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\activity-planner\page.tsx
-81. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
-82. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx.bak
-83. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx
-84. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\team-builder\page.tsx
-85. C:\MyCode\Konnaxionv14\frontend\app\konsensus\page.tsx
-86. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
-87. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
-88. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx
-89. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
-90. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx
-91. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
-92. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
-93. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
-94. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
-95. C:\MyCode\Konnaxionv14\frontend\app\kreative\dashboard\page.tsx
-96. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\collaborate-on-ideas\page.tsx
-97. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
-98. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
-99. C:\MyCode\Konnaxionv14\frontend\app\kreative\layout.tsx
-100. C:\MyCode\Konnaxionv14\frontend\app\layout.tsx
-101. C:\MyCode\Konnaxionv14\frontend\app\page.tsx
-102. C:\MyCode\Konnaxionv14\frontend\app\problem_files_concat.txt
-103. C:\MyCode\Konnaxionv14\frontend\app\providers\AuthProvider.tsx
+41. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx.bak
+42. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx
+43. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx
+44. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx.bak
+45. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\layout.tsx
+46. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\browse-projects\page.tsx
+47. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\create-new-project\page.tsx
+48. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\create-new-project\page.tsx.bak
+49. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\my-projects\page.tsx
+50. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\project-workspace\page.tsx
+51. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\projects\project-workspace\page.tsx.bak
+52. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx
+53. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx.bak
+54. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx
+55. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\sustainability-dashboard\page.tsx.bak
+56. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\track-project-impact\page.tsx
+57. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\sustainability-impact\track-project-impact\page.tsx.bak
+58. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
+59. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx.bak
+60. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx
+61. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\user-reputation\view-reputation-ekoh\page.tsx
+62. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\browse-available-workspaces\page.tsx
+63. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx
+64. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx.bak
+65. C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
+66. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx
+67. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\certification-programs\page.tsx.bak
+68. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
+69. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx
+70. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-preparation\page.tsx.bak
+71. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx
+72. C:\MyCode\Konnaxionv14\frontend\app\konnected\certifications\exam-registration\page.tsx.bak
+73. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
+74. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx.bak
+75. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx
+76. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\moderation\page.tsx.bak
+77. C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
+78. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx
+79. C:\MyCode\Konnaxionv14\frontend\app\konnected\dashboard\page.tsx.bak
+80. C:\MyCode\Konnaxionv14\frontend\app\konnected\layout.tsx
+81. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\browse-resources\page.tsx
+82. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\offline-content\page.tsx
+83. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\recommended-resources\page.tsx
+84. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-library\search-filters\page.tsx
+85. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\create-learning-path\page.tsx
+86. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx
+87. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx.bak
+88. C:\MyCode\Konnaxionv14\frontend\app\konnected\learning-paths\my-learning-path\page.tsx
+89. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\activity-planner\page.tsx
+90. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
+91. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx.bak
+92. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx
+93. C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\team-builder\page.tsx
+94. C:\MyCode\Konnaxionv14\frontend\app\konsensus\page.tsx
+95. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
+96. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
+97. C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx
+98. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
+99. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx
+100. C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
+101. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
+102. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
+103. C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
+104. C:\MyCode\Konnaxionv14\frontend\app\kreative\dashboard\page.tsx
+105. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\collaborate-on-ideas\page.tsx
+106. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
+107. C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
+108. C:\MyCode\Konnaxionv14\frontend\app\kreative\layout.tsx
+109. C:\MyCode\Konnaxionv14\frontend\app\layout.tsx
+110. C:\MyCode\Konnaxionv14\frontend\app\page.tsx
+111. C:\MyCode\Konnaxionv14\frontend\app\problem_files_concat.txt
+112. C:\MyCode\Konnaxionv14\frontend\app\providers\AuthProvider.tsx
 ===== END TOC =====
 
 
@@ -603,13 +612,16 @@ export default ViewCurrentExpertise;
 
 
 ===== BEGIN app/ekoh/layout.tsx =====
-import React from 'react'
+import React, { Suspense } from 'react'
 import MainLayout from '@/components/layout-components/MainLayout'
 
 export default function SegmentLayout({ children }: { children: React.ReactNode }) {
-  return <MainLayout>{children}</MainLayout>
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>{children}</MainLayout>
+    </Suspense>
+  )
 }
-
 ===== END app/ekoh/layout.tsx =====
 
 
@@ -2144,13 +2156,16 @@ export default function ImpactTracker() {
 
 
 ===== BEGIN app/ethikos/layout.tsx =====
-import React from 'react'
+import React, { Suspense } from 'react'
 import MainLayout from '@/components/layout-components/MainLayout'
 
 export default function SegmentLayout({ children }: { children: React.ReactNode }) {
-  return <MainLayout>{children}</MainLayout>
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>{children}</MainLayout>
+    </Suspense>
+  )
 }
-
 ===== END app/ethikos/layout.tsx =====
 
 
@@ -3618,71 +3633,105 @@ export default function BrowseRepositoryPage(): JSX.Element {
 
 
 ===== BEGIN app/keenkonnect/knowledge/document-management/page.tsx =====
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import Head from 'next/head';
-import { Row, Col, Card, Button, Input, Timeline, Divider, List, Avatar, message as antdMessage } from 'antd';
-import { SaveOutlined, UploadOutlined, EditOutlined } from '@ant-design/icons';
-import { Comment } from '@ant-design/compatible';
-// import '@ant-design/compatible/assets/index.css';
+/**
+ * KeenKonnect · Knowledge · Document Management
+ *
+ * Static, typed demo page showing:
+ * - document content
+ * - editable panel
+ * - metadata
+ * - version history
+ * - comments thread
+ *
+ * Layout is handled by app/keenkonnect/layout.tsx (MainLayout),
+ * so this page only renders its own content.
+ */
 
-const { TextArea } = Input;
+import React, { useState } from 'react'
+import Head from 'next/head'
+import {
+  Row,
+  Col,
+  Card,
+  Button,
+  Input,
+  Timeline,
+  Divider,
+  List,
+  Avatar,
+  message as antdMessage,
+} from 'antd'
+import { SaveOutlined, UploadOutlined, EditOutlined } from '@ant-design/icons'
+import { Comment } from '@ant-design/compatible'
 
-export default function DocumentManagement(): JSX.Element {
-  // Simulation : l'utilisateur possède les droits d'édition
-  const userCanEdit = true;
+const { TextArea } = Input
 
-  // État pour le contenu du document (éditeur / vue)
+type VersionItem = {
+  key: string
+  time: string
+  event: string
+}
+
+type CommentItem = {
+  author: string
+  avatar: string
+  content: React.ReactNode
+  datetime: string
+}
+
+const documentMetadata = {
+  title: 'Innovative Research Document',
+  createdAt: '2023-08-01',
+  lastModified: '2023-09-05',
+  version: '2.0',
+  language: 'English',
+}
+
+const versionHistory: VersionItem[] = [
+  { key: '1', time: '2023-08-05', event: 'Version 1.0 created by Alice' },
+  { key: '2', time: '2023-08-20', event: 'Version 1.5 updated by Bob' },
+  { key: '3', time: '2023-09-05', event: 'Version 2.0 published by Alice' },
+]
+
+const commentsData: CommentItem[] = [
+  {
+    author: 'John',
+    avatar: '/avatars/john.png',
+    content: <p>Great improvements in this version!</p>,
+    datetime: '2023-09-06 09:15',
+  },
+  {
+    author: 'Emma',
+    avatar: '/avatars/emma.png',
+    content: <p>I suggest adding more details in the methodology section.</p>,
+    datetime: '2023-09-06 10:20',
+  },
+]
+
+export default function DocumentManagementPage(): JSX.Element {
+  const userCanEdit = true
+
   const [documentContent, setDocumentContent] = useState<string>(
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum pretium, risus at fermentum cursus, purus lacus scelerisque dolor, nec dictum augue mi ut ligula. Sed vitae nisl vel metus tincidunt interdum.'
-  );
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum pretium, risus at fermentum cursus, purus lacus scelerisque dolor, nec dictum augue mi ut ligula. Sed vitae nisl vel metus tincidunt interdum.',
+  )
 
-  // Données simulées pour les métadonnées du document
-  const documentMetadata = {
-    title: 'Innovative Research Document',
-    createdAt: '2023-08-01',
-    lastModified: '2023-09-05',
-    version: '2.0',
-    language: 'English',
-  };
-
-  // Historique des versions (Timeline)
-  const versionHistory = [
-    { key: '1', time: '2023-08-05', event: 'Version 1.0 created by Alice' },
-    { key: '2', time: '2023-08-20', event: 'Version 1.5 updated by Bob' },
-    { key: '3', time: '2023-09-05', event: 'Version 2.0 published by Alice' },
-  ];
-
-  // Données simulées pour les commentaires
-  const commentsData = [
-    {
-      author: 'John',
-      avatar: '/avatars/john.png',
-      content: <p>Great improvements in this version!</p>,
-      datetime: '2023-09-06 09:15',
-    },
-    {
-      author: 'Emma',
-      avatar: '/avatars/emma.png',
-      content: <p>I suggest adding more details in the methodology section.</p>,
-      datetime: '2023-09-06 10:20',
-    },
-  ];
-
-  // Gestion de la sauvegarde
   const handleSaveChanges = () => {
-    // Simuler un appel API pour sauvegarder les modifications
-    console.log('Saving changes:', documentContent);
-    antdMessage.success('Changes saved successfully.');
-  };
+    // Simulate an API call
+    // In real usage, replace with your mutation:
+    // await api.patch('/knowledge/documents/:id', { content: documentContent })
+    // eslint-disable-next-line no-console
+    console.log('Saving changes:', documentContent)
+    antdMessage.success('Changes saved successfully.')
+  }
 
-  // Gestion de la publication d'une nouvelle version
   const handlePublishNewVersion = () => {
-    // Simulation d'une publication
-    console.log('Publishing new version...');
-    antdMessage.success('New version published successfully.');
-  };
+    // Simulate publish
+    // eslint-disable-next-line no-console
+    console.log('Publishing new version…')
+    antdMessage.success('New version published successfully.')
+  }
 
   return (
     <>
@@ -3713,7 +3762,13 @@ export default function DocumentManagement(): JSX.Element {
             {/* Editor Panel (if editable) */}
             <Card
               title={userCanEdit ? 'Edit Document' : 'Document Details'}
-              extra={userCanEdit && <Button icon={<EditOutlined />} onClick={() => {}}>Edit</Button>}
+              extra={
+                userCanEdit ? (
+                  <Button icon={<EditOutlined />} onClick={() => {}}>
+                    Edit
+                  </Button>
+                ) : null
+              }
               className="mb-4"
             >
               {userCanEdit ? (
@@ -3725,10 +3780,18 @@ export default function DocumentManagement(): JSX.Element {
                   />
                   <Divider />
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button type="primary" icon={<SaveOutlined />} onClick={handleSaveChanges}>
+                    <Button
+                      type="primary"
+                      icon={<SaveOutlined />}
+                      onClick={handleSaveChanges}
+                    >
                       Save Changes
                     </Button>
-                    <Button type="default" icon={<UploadOutlined />} onClick={handlePublishNewVersion}>
+                    <Button
+                      type="default"
+                      icon={<UploadOutlined />}
+                      onClick={handlePublishNewVersion}
+                    >
                       Publish New Version
                     </Button>
                   </div>
@@ -3773,7 +3836,7 @@ export default function DocumentManagement(): JSX.Element {
             <Card title="Comments" className="mb-4">
               <List
                 itemLayout="horizontal"
-                dataSource={commentsData ?? []}
+                dataSource={commentsData}
                 renderItem={(comment) => (
                   <Comment
                     author={comment.author}
@@ -3788,10 +3851,91 @@ export default function DocumentManagement(): JSX.Element {
         </Row>
       </div>
     </>
-  );
+  )
 }
 
 ===== END app/keenkonnect/knowledge/document-management/page.tsx =====
+
+
+===== BEGIN app/keenkonnect/knowledge/document-management/page.tsx.bak =====
+'use client'
+
+import React, { Suspense, useEffect, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Card, Row, Col, List, Spin, Button } from 'antd'
+import { EditOutlined } from '@ant-design/icons'
+import api from '@/api'
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [docs, setDocs] = useState<any[]>([])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/knowledge/documents')
+        setDocs(res ?? [])
+      } catch (err) {
+        console.error('Document management load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <Head>
+        <title>KeenKonnect – Document Management</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Document Management
+      </h1>
+
+      <Row gutter={[24, 24]}>
+        {docs.map((doc) => (
+          <Col xs={24} md={12} key={doc.id}>
+            <Card
+              title={doc.title}
+              extra={<Button icon={<EditOutlined />}>Edit</Button>}
+            >
+              <p>{doc.description}</p>
+              <p style={{ color: '#888' }}>
+                Category: {doc.category || 'N/A'}
+              </p>
+              <p style={{ color: '#888' }}>
+                Updated: {doc.updatedAt || 'N/A'}
+              </p>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </>
+  )
+}
+
+===== END app/keenkonnect/knowledge/document-management/page.tsx.bak =====
 
 
 ===== BEGIN app/keenkonnect/knowledge/search-filter-documents/page.tsx =====
@@ -4013,217 +4157,242 @@ export default function SearchFilterDocuments() {
 
 
 ===== BEGIN app/keenkonnect/knowledge/upload-new-document/page.tsx =====
-'use client';
+'use client'
 
-import React, { useState } from 'react';
+import React, { Suspense } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
 import {
   Form,
   Input,
-  Select,
   Upload,
-  Switch,
   Button,
-  message as antdMessage,
-  Progress,
-  Result,
-} from 'antd';
-import type { UploadFile, UploadProps, FormProps } from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
+  Select,
+  DatePicker,
+  Card,
+  message,
+} from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import api from '@/api'
+import { UploadOutlined } from '@ant-design/icons'
 
-const { TextArea } = Input;
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <>
+        <Content />
+      </>
+    </Suspense>
+  )
+}
 
-type FormValues = {
-  title: string;
-  description?: string;
-  category?: string;
-  version?: string;
-  language?: string;
-  documentFile?: UploadFile[];
-  publishNow?: boolean;
-};
+function Content() {
+  const [form] = Form.useForm()
 
-export default function UploadNewDocumentPage(): JSX.Element {
-  const [form] = Form.useForm<FormValues>();
-  const router = useRouter();
-
-  const [uploadedFileList, setUploadedFileList] = useState<UploadFile[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
-
-  type UploadChangeParam = Parameters<NonNullable<UploadProps['onChange']>>[0];
-
-  const normFile = (e: UploadChangeParam | UploadFile[]): UploadFile[] => {
-    if (Array.isArray(e)) return e;
-    return e?.fileList ?? [];
-  };
-
-  const handleUploadChange: UploadProps['onChange'] = ({ fileList }) => {
-    setUploadedFileList(fileList as UploadFile[]);
-  };
-
-  const simulateUpload = () => {
-    setUploading(true);
-    setUploadProgress(0);
-
-    const interval = setInterval(() => {
-      setUploadProgress((prev) => {
-        const next = prev + 10;
-        if (next >= 100) {
-          clearInterval(interval);
-          setUploading(false);
-          setSubmitted(true);
-          antdMessage.success('Document uploaded successfully');
-          return 100;
-        }
-        return next;
-      });
-    }, 300);
-  };
-
-  const onFinish: FormProps<FormValues>['onFinish'] = async () => {
+  const submitDoc = async (values: any) => {
     try {
-      simulateUpload();
-    } catch {
-      setUploading(false);
-      antdMessage.error('Upload failed');
+      await api.post('/knowledge/documents/upload', values)
+      message.success('Document uploaded!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Document upload error:', err)
+      message.error('Failed to upload document.')
     }
-  };
-
-  const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = ({ errorFields }) => {
-    antdMessage.error('Please fix the errors before submitting.');
-    if (errorFields?.[0]?.name) {
-      form.scrollToField(errorFields[0].name);
-    }
-  };
-
-  if (submitted) {
-    return (
-      <Result
-        status="success"
-        title="Your document has been uploaded"
-        extra={[
-          <Button
-            key="back"
-            type="primary"
-            onClick={() => router.push('/keenkonnect/knowledge/browse-repository')}
-          >
-            Go to repository
-          </Button>,
-        ]}
-      />
-    );
   }
 
   return (
-    <div style={{ padding: 24, maxWidth: 720, margin: '0 auto' }}>
-      <h1 style={{ marginBottom: 16 }}>Upload a new document</h1>
+    <>
+      <Head>
+        <title>KeenKonnect – Upload New Document</title>
+      </Head>
 
-      {uploading && (
-        <div style={{ marginBottom: 16 }}>
-          <Progress percent={uploadProgress} status="active" />
-        </div>
-      )}
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Upload New Document
+      </h1>
 
-      <Form<FormValues>
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-      >
-        <Form.Item
-          name="title"
-          label="Title"
-          rules={[{ required: true, message: 'Please enter a title' }]}
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={submitDoc}
+          initialValues={{ visibility: 'public' }}
         >
-          <Input placeholder="e.g. Sustainable AI Guidelines" />
-        </Form.Item>
-
-        <Form.Item name="description" label="Description">
-          <TextArea rows={4} placeholder="Short description of the document" />
-        </Form.Item>
-
-        <Form.Item name="category" label="Category/Topic">
-          <Select
-            placeholder="Select a category"
-            showSearch
-            optionFilterProp="label"
-            options={[
-              { value: 'Robotics', label: 'Robotics' },
-              { value: 'AI & ML', label: 'AI & ML' },
-              { value: 'Environment', label: 'Environment' },
-              { value: 'Finance', label: 'Finance' },
-            ]}
-          />
-        </Form.Item>
-
-        <Form.Item name="version" label="Version">
-          <Input placeholder="v1.0.0" />
-        </Form.Item>
-
-        <Form.Item name="language" label="Language">
-          <Select
-            placeholder="Select language"
-            showSearch
-            optionFilterProp="label"
-            options={[
-              { value: 'en', label: 'English' },
-              { value: 'fr', label: 'French' },
-              { value: 'es', label: 'Spanish' },
-              { value: 'de', label: 'German' },
-            ]}
-          />
-        </Form.Item>
-
-        <Form.Item
-          name="documentFile"
-          label="Document file"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-          rules={[{ required: true, message: 'Please select a file to upload' }]}
-        >
-          <Upload
-            accept=".pdf,.doc,.docx,.txt,.md"
-            beforeUpload={() => false}
-            onChange={handleUploadChange}
-            fileList={uploadedFileList}
-            maxCount={1}
+          <Form.Item
+            label="Title"
+            name="title"
+            rules={[{ required: true }]}
           >
-            <Button icon={<UploadOutlined />}>Select file</Button>
-          </Upload>
-        </Form.Item>
+            <Input placeholder="Document title" />
+          </Form.Item>
 
-        <Form.Item name="publishNow" label="Publish now" valuePropName="checked" initialValue>
-          <Switch />
-        </Form.Item>
+          <Form.Item label="Category" name="category">
+            <Select
+              placeholder="Select category"
+              options={[
+                { label: 'Reports', value: 'reports' },
+                { label: 'Guides', value: 'guides' },
+                { label: 'Research', value: 'research' },
+              ]}
+            />
+          </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={uploading} disabled={uploading}>
-            Upload
-          </Button>
-          <Button
-            style={{ marginLeft: 8 }}
-            onClick={() => router.push('/keenkonnect/knowledge/browse-repository')}
-            disabled={uploading}
-          >
-            Cancel
-          </Button>
-        </Form.Item>
-      </Form>
-    </div>
-  );
+          <Form.Item label="Effective Date" name="effectiveDate">
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item label="Visibility" name="visibility">
+            <Select
+              options={[
+                { label: 'Public', value: 'public' },
+                { label: 'Team Only', value: 'team' },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item label="Document File" name="file">
+            <Upload beforeUpload={() => false}>
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
+              Upload Document
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
+  )
 }
 
 ===== END app/keenkonnect/knowledge/upload-new-document/page.tsx =====
 
 
+===== BEGIN app/keenkonnect/knowledge/upload-new-document/page.tsx.bak =====
+'use client'
+
+import React, { Suspense } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import {
+  Form,
+  Input,
+  Upload,
+  Button,
+  Select,
+  DatePicker,
+  Card,
+  message,
+} from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import api from '@/api'
+import { UploadOutlined } from '@ant-design/icons'
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [form] = Form.useForm()
+
+  const submitDoc = async (values: any) => {
+    try {
+      await api.post('/knowledge/documents/upload', values)
+      message.success('Document uploaded!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Document upload error:', err)
+      message.error('Failed to upload document.')
+    }
+  }
+
+  return (
+    <>
+      <Head>
+        <title>KeenKonnect – Upload New Document</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Upload New Document
+      </h1>
+
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={submitDoc}
+          initialValues={{ visibility: 'public' }}
+        >
+          <Form.Item
+            label="Title"
+            name="title"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="Document title" />
+          </Form.Item>
+
+          <Form.Item label="Category" name="category">
+            <Select
+              placeholder="Select category"
+              options={[
+                { label: 'Reports', value: 'reports' },
+                { label: 'Guides', value: 'guides' },
+                { label: 'Research', value: 'research' },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item label="Effective Date" name="effectiveDate">
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item label="Visibility" name="visibility">
+            <Select
+              options={[
+                { label: 'Public', value: 'public' },
+                { label: 'Team Only', value: 'team' },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item label="Document File" name="file">
+            <Upload beforeUpload={() => false}>
+              <Button icon={<UploadOutlined />}>Select File</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
+              Upload Document
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
+  )
+}
+
+===== END app/keenkonnect/knowledge/upload-new-document/page.tsx.bak =====
+
+
 ===== BEGIN app/keenkonnect/layout.tsx =====
-import React from 'react'
+// app/keenkonnect/layout.tsx
+import React, { Suspense } from 'react'
 import MainLayout from '@/components/layout-components/MainLayout'
 
 export default function SegmentLayout({ children }: { children: React.ReactNode }) {
-  return <MainLayout>{children}</MainLayout>
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>{children}</MainLayout>
+    </Suspense>
+  )
 }
 
 ===== END app/keenkonnect/layout.tsx =====
@@ -4536,355 +4705,283 @@ export default function BrowseProjectsPage() {
 
 
 ===== BEGIN app/keenkonnect/projects/create-new-project/page.tsx =====
-'use client';
+'use client'
 
-import React, { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import dynamic from 'next/dynamic';
-import {
-  Button,
-  Card,
-  Form,
-  Input,
-  Select,
-  Steps,
-  Upload,
-  message as antdMessage,
-  Typography,
-  Space,
-  Divider,
-} from 'antd';
-import type { FormProps } from 'antd';
-import type { UploadFile } from 'antd/es/upload/interface';
-import {
-  UploadOutlined,
-  ArrowRightOutlined,
-  ArrowLeftOutlined,
-  CheckCircleOutlined,
-} from '@ant-design/icons';
+import React, { Suspense, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Form, Input, Steps, Button, message, Upload, Select } from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import api from '@/api'
 
-import { normalizeError } from '@/shared/errors';
+const { Step } = Steps
 
-// Load MainLayout on the client to avoid server/client boundary issues
-const MainLayout = dynamic(
-  () => import('@/components/layout-components/MainLayout'),
-  { ssr: false }
-);
-
-const { Title, Text } = Typography;
-const { TextArea } = Input;
-
-type TeamMember = {
-  name: string;
-  role: string;
-};
-
-interface ProjectFormData {
-  projectName: string;
-  projectDescription: string;
-  category?: string;
-  projectImage?: UploadFile[]; // main image (controlled fileList)
-  teamMembers: TeamMember[];
-  documents?: UploadFile[]; // attachments
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <>
+        <Content />
+      </>
+    </Suspense>
+  )
 }
 
-export default function CreateNewProjectPage(): JSX.Element {
-  const router = useRouter();
-  const [form] = Form.useForm<ProjectFormData>();
+function Content() {
+  const [form] = Form.useForm()
+  const [currentStep, setCurrentStep] = useState(0)
 
-  // minimal global UI state
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [submitting, setSubmitting] = useState<boolean>(false);
-  const [submitted, setSubmitted] = useState<boolean>(false);
+  const steps = [
+    { title: 'Basic Info' },
+    { title: 'Team & Settings' },
+    { title: 'Attachments' },
+  ]
 
-  // single source of truth for initial values
-  const initialValues: ProjectFormData = useMemo(
-    () => ({
-      projectName: '',
-      projectDescription: '',
-      category: undefined,
-      projectImage: [],
-      teamMembers: [{ name: '', role: '' }],
-      documents: [],
-    }),
-    []
-  );
+  const next = () => setCurrentStep((c) => c + 1)
+  const prev = () => setCurrentStep((c) => c - 1)
 
-  const steps = useMemo(
-    () => [
-      { key: 'info', title: 'Project Info' },
-      { key: 'team', title: 'Team & Roles' },
-      { key: 'docs', title: 'Documents & Media' },
-      { key: 'summary', title: 'Summary' },
-    ],
-    []
-  );
-
-  // Normalize Upload value to fileList
-  const normFile = (
-    e: { fileList?: UploadFile[] } | UploadFile[] | undefined
-  ): UploadFile[] => {
-    if (!e) return [];
-    return Array.isArray(e) ? e : e.fileList ?? [];
-  };
-
-  const goNext = async () => {
-    try {
-      // validate all current fields before moving on
-      await form.validateFields();
-      setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
-    } catch {
-      // errors already displayed by antd
-    }
-  };
-
-  const goPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
-
-  const handleSubmit: FormProps<ProjectFormData>['onFinish'] = async (values) => {
-    setSubmitting(true);
-    try {
-      // TODO: call your API/mutation here with `values`
-      // await api.createProject(values)
-
-      setSubmitted(true);
-      antdMessage.success('Project created successfully');
-    } catch (err) {
-      const { message } = normalizeError(err);
-      antdMessage.error(message ?? 'An unexpected error occurred');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const renderStepFields = (stepIndex: number) => {
-    switch (stepIndex) {
+  const renderStepContent = (step: number) => {
+    switch (step) {
       case 0:
         return (
           <>
             <Form.Item
               label="Project Name"
-              name="projectName"
-              rules={[{ required: true, message: 'Please enter project name' }]}
+              name="name"
+              rules={[{ required: true }]}
             >
-              <Input placeholder="e.g., Open Carbon Capture Initiative" />
+              <Input placeholder="Enter project name" />
             </Form.Item>
 
-            <Form.Item
-              label="Project Description"
-              name="projectDescription"
-              rules={[
-                { required: true, message: 'Please enter a description' },
-                { min: 10, message: 'Please write at least 10 characters' },
-              ]}
-            >
-              <TextArea rows={5} placeholder="What is this project about?" />
-            </Form.Item>
-
-            <Form.Item label="Category" name="category">
-              <Select
-                placeholder="Select a category"
-                options={[
-                  { value: 'sustainability', label: 'Sustainability' },
-                  { value: 'education', label: 'Education' },
-                  { value: 'health', label: 'Health' },
-                  { value: 'civic-tech', label: 'Civic Tech' },
-                ]}
-              />
-            </Form.Item>
-
-            <Form.Item
-              label="Project Image"
-              name="projectImage"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-              extra="Upload a representative image for your project"
-            >
-              <Upload listType="picture" multiple={false} beforeUpload={() => false}>
-                <Button icon={<UploadOutlined />}>Select Image</Button>
-              </Upload>
+            <Form.Item label="Description" name="description">
+              <Input.TextArea rows={4} />
             </Form.Item>
           </>
-        );
-
+        )
       case 1:
         return (
           <>
-            <Text type="secondary">
-              Add core team members and define their roles.
-            </Text>
-            <Divider />
-            <Form.List name="teamMembers">
-              {(fields, { add, remove }) => (
-                <>
-                  {fields.map(({ key, name, ...restField }) => (
-                    <Space
-                      key={key}
-                      align="baseline"
-                      style={{ display: 'flex', marginBottom: 8 }}
-                    >
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'name']}
-                        rules={[{ required: true, message: 'Name is required' }]}
-                      >
-                        <Input placeholder="Full name" />
-                      </Form.Item>
-                      <Form.Item
-                        {...restField}
-                        name={[name, 'role']}
-                        rules={[{ required: true, message: 'Role is required' }]}
-                      >
-                        <Input placeholder="Role (e.g., Lead Researcher)" />
-                      </Form.Item>
-                      <Button type="link" danger onClick={() => remove(name)}>
-                        Remove
-                      </Button>
-                    </Space>
-                  ))}
-                  <Button onClick={() => add()} type="dashed">
-                    Add member
-                  </Button>
-                </>
-              )}
-            </Form.List>
+            <Form.Item
+              label="Team"
+              name="team"
+              rules={[{ required: true }]}
+            >
+              <Select
+                placeholder="Select team"
+                options={[
+                  { label: 'Team Alpha', value: 'alpha' },
+                  { label: 'Team Beta', value: 'beta' },
+                ]}
+              />
+            </Form.Item>
           </>
-        );
-
+        )
       case 2:
         return (
           <>
-            <Form.Item
-              label="Documents & Media"
-              name="documents"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-              extra="Attach any relevant documents, briefs, or media files"
-            >
-              <Upload multiple beforeUpload={() => false}>
-                <Button icon={<UploadOutlined />}>Add files</Button>
+            <Form.Item label="Attachments" name="attachments">
+              <Upload beforeUpload={() => false} multiple>
+                <Button>Select Files</Button>
               </Upload>
             </Form.Item>
           </>
-        );
-
-      case 3: {
-        const v = form.getFieldsValue(true) as ProjectFormData;
-        return (
-          <div>
-            <Title level={4}>Summary</Title>
-            <Space direction="vertical" size="small">
-              <div>
-                <Text strong>Name:</Text> <Text>{v.projectName || '—'}</Text>
-              </div>
-              <div>
-                <Text strong>Description:</Text>{' '}
-                <Text>{v.projectDescription || '—'}</Text>
-              </div>
-              <div>
-                <Text strong>Category:</Text> <Text>{v.category || '—'}</Text>
-              </div>
-              <div>
-                <Text strong>Team members:</Text>{' '}
-                <Text>
-                  {Array.isArray(v.teamMembers) && v.teamMembers.length
-                    ? v.teamMembers
-                        .map((m) => [m?.name, m?.role].filter(Boolean).join(' – ')) // en dash
-                        .join(', ')
-                    : '—'}
-                </Text>
-              </div>
-              <div>
-                <Text strong>Documents:</Text>{' '}
-                <Text>
-                  {Array.isArray(v.documents) && v.documents.length
-                    ? `${v.documents.length} file(s)`
-                    : '—'}
-                </Text>
-              </div>
-            </Space>
-          </div>
-        );
-      }
-
-      default:
-        return null;
+        )
     }
-  };
+  }
+
+  const onFinish = async (values: any) => {
+    try {
+      await api.post('/projects/create', values)
+      message.success('Project created successfully!')
+      form.resetFields()
+      setCurrentStep(0)
+    } catch (err) {
+      console.error('Create project error:', err)
+      message.error('Failed to create project.')
+    }
+  }
 
   return (
-    <MainLayout>
-      <Card>
-        <Title level={3} style={{ marginBottom: 16 }}>
-          Create New Project
-        </Title>
+    <>
+      <Head>
+        <title>Create New Project – KeenKonnect</title>
+      </Head>
 
-        <Steps
-          current={currentStep}
-          items={steps.map((s) => ({ key: s.key, title: s.title }))}
-          style={{ marginBottom: 24 }}
-        />
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Create New Project
+      </h1>
 
-        {/* Single form across all steps */}
-        <Form<ProjectFormData>
-          form={form}
-          layout="vertical"
-          initialValues={initialValues}
-          onFinish={handleSubmit}
-          autoComplete="off"
-        >
-          {renderStepFields(currentStep)}
+      <Steps current={currentStep} style={{ marginBottom: 24 }}>
+        {steps.map((step, i) => (
+          <Step key={i} title={step.title} />
+        ))}
+      </Steps>
 
-          <Divider />
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        {renderStepContent(currentStep)}
 
-          {!submitted ? (
-            <Space>
-              <Button
-                onClick={goPrev}
-                disabled={currentStep === 0}
-                icon={<ArrowLeftOutlined />}
-              >
-                Previous
-              </Button>
-
-              {currentStep < steps.length - 1 ? (
-                <Button type="primary" onClick={goNext} icon={<ArrowRightOutlined />}>
-                  Next
-                </Button>
-              ) : (
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={submitting}
-                  icon={<CheckCircleOutlined />}
-                >
-                  Create Project
-                </Button>
-              )}
-            </Space>
-          ) : (
-            <Space direction="vertical" size="middle">
-              <Text type="success">Project created successfully.</Text>
-              <Space>
-                <Button
-                  type="primary"
-                  onClick={() => router.push('/keenkonnect/projects/my-projects')}
-                >
-                  Go to My Projects
-                </Button>
-                <Link href="/keenkonnect/projects/create-new-project">
-                  <Button>Create another</Button>
-                </Link>
-              </Space>
-            </Space>
+        <div style={{ marginTop: 24 }}>
+          {currentStep > 0 && (
+            <Button style={{ marginRight: 8 }} onClick={prev}>
+              Back
+            </Button>
           )}
-        </Form>
-      </Card>
-    </MainLayout>
-  );
+
+          {currentStep < steps.length - 1 ? (
+            <Button type="primary" onClick={next}>
+              Next
+            </Button>
+          ) : (
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          )}
+        </div>
+      </Form>
+    </>
+  )
 }
 
 ===== END app/keenkonnect/projects/create-new-project/page.tsx =====
+
+
+===== BEGIN app/keenkonnect/projects/create-new-project/page.tsx.bak =====
+'use client'
+
+import React, { Suspense, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Form, Input, Steps, Button, message, Upload, Select } from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import api from '@/api'
+
+const { Step } = Steps
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [form] = Form.useForm()
+  const [currentStep, setCurrentStep] = useState(0)
+
+  const steps = [
+    { title: 'Basic Info' },
+    { title: 'Team & Settings' },
+    { title: 'Attachments' },
+  ]
+
+  const next = () => setCurrentStep((c) => c + 1)
+  const prev = () => setCurrentStep((c) => c - 1)
+
+  const renderStepContent = (step: number) => {
+    switch (step) {
+      case 0:
+        return (
+          <>
+            <Form.Item
+              label="Project Name"
+              name="name"
+              rules={[{ required: true }]}
+            >
+              <Input placeholder="Enter project name" />
+            </Form.Item>
+
+            <Form.Item label="Description" name="description">
+              <Input.TextArea rows={4} />
+            </Form.Item>
+          </>
+        )
+      case 1:
+        return (
+          <>
+            <Form.Item
+              label="Team"
+              name="team"
+              rules={[{ required: true }]}
+            >
+              <Select
+                placeholder="Select team"
+                options={[
+                  { label: 'Team Alpha', value: 'alpha' },
+                  { label: 'Team Beta', value: 'beta' },
+                ]}
+              />
+            </Form.Item>
+          </>
+        )
+      case 2:
+        return (
+          <>
+            <Form.Item label="Attachments" name="attachments">
+              <Upload beforeUpload={() => false} multiple>
+                <Button>Select Files</Button>
+              </Upload>
+            </Form.Item>
+          </>
+        )
+    }
+  }
+
+  const onFinish = async (values: any) => {
+    try {
+      await api.post('/projects/create', values)
+      message.success('Project created successfully!')
+      form.resetFields()
+      setCurrentStep(0)
+    } catch (err) {
+      console.error('Create project error:', err)
+      message.error('Failed to create project.')
+    }
+  }
+
+  return (
+    <>
+      <Head>
+        <title>Create New Project – KeenKonnect</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Create New Project
+      </h1>
+
+      <Steps current={currentStep} style={{ marginBottom: 24 }}>
+        {steps.map((step, i) => (
+          <Step key={i} title={step.title} />
+        ))}
+      </Steps>
+
+      <Form form={form} layout="vertical" onFinish={onFinish}>
+        {renderStepContent(currentStep)}
+
+        <div style={{ marginTop: 24 }}>
+          {currentStep > 0 && (
+            <Button style={{ marginRight: 8 }} onClick={prev}>
+              Back
+            </Button>
+          )}
+
+          {currentStep < steps.length - 1 ? (
+            <Button type="primary" onClick={next}>
+              Next
+            </Button>
+          ) : (
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          )}
+        </div>
+      </Form>
+    </>
+  )
+}
+
+===== END app/keenkonnect/projects/create-new-project/page.tsx.bak =====
 
 
 ===== BEGIN app/keenkonnect/projects/my-projects/page.tsx =====
@@ -5038,753 +5135,887 @@ export default function MyProjectsPage(): JSX.Element {
 
 
 ===== BEGIN app/keenkonnect/projects/project-workspace/page.tsx =====
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { Row, Col, Card, List, Avatar, Tag, Space, Button, Progress, Typography, Timeline } from 'antd';
-import PageContainer from '@/components/PageContainer';
+import React, { Suspense, useEffect, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Card, Row, Col, Spin, List } from 'antd'
+import api from '@/api'
 
-const { Title, Text } = Typography;
-
-type TaskStatus = 'todo' | 'in-progress' | 'done';
-
-type Task = {
-  id: string;
-  title: string;
-  assignee: string;
-  status: TaskStatus;
-  progress?: number;
-};
-
-type FileItem = {
-  id: string;
-  name: string;
-  uploader: string;
-  size: string;
-};
-
-type Discussion = {
-  id: string;
-  author: string;
-  message: string;
-  time: string;
-};
-
-type Member = {
-  id: string;
-  name: string;
-  role: string;
-  avatar?: string;
-};
-
-const tasksData: Task[] = [
-  { id: 't1', title: 'Define project scope', assignee: 'Alice', status: 'done', progress: 100 },
-  { id: 't2', title: 'Design wireframes', assignee: 'Bob', status: 'in-progress', progress: 60 },
-  { id: 't3', title: 'API contract', assignee: 'Chloé', status: 'todo', progress: 0 },
-];
-
-const filesData: FileItem[] = [
-  { id: 'f1', name: 'requirements.pdf', uploader: 'Alice', size: '214 KB' },
-  { id: 'f2', name: 'wireframes.fig', uploader: 'Bob', size: '1.2 MB' },
-  { id: 'f3', name: 'api-contract.yaml', uploader: 'Chloé', size: '36 KB' },
-];
-
-const discussionData: Discussion[] = [
-  { id: 'd1', author: 'Alice', message: 'I pushed the latest requirements.', time: 'Today 09:42' },
-  { id: 'd2', author: 'Bob', message: 'Wireframes homepage v2 ready.', time: 'Yesterday 18:05' },
-  { id: 'd3', author: 'Chloé', message: 'Starting the API contract draft.', time: 'Yesterday 11:17' },
-];
-
-const projectMembers: Member[] = [
-  { id: 'm1', name: 'Alice Martin', role: 'PM', avatar: '' },
-  { id: 'm2', name: 'Bob Leroy', role: 'Designer', avatar: '' },
-  { id: 'm3', name: 'Chloé Durand', role: 'Backend', avatar: '' },
-  { id: 'm4', name: 'Diego Ruiz', role: 'Frontend', avatar: '' },
-];
-
-function statusTag(status: TaskStatus) {
-  switch (status) {
-    case 'done':
-      return <Tag color="green">Done</Tag>;
-    case 'in-progress':
-      return <Tag color="blue">In progress</Tag>;
-    default:
-      return <Tag>To do</Tag>;
-  }
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <>
+        <Content />
+      </>
+    </Suspense>
+  )
 }
 
-export default function ProjectWorkspacePage() {
-  const [tasks, setTasks] = useState<Task[]>(tasksData);
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [workspace, setWorkspace] = useState<any>(null)
 
-  const markDone = (id: string) => {
-    setTasks(prev =>
-      prev.map(t => (t.id === id ? { ...t, status: 'done', progress: 100 } : t)),
-    );
-  };
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/projects/workspace')
+        setWorkspace(res)
+      } catch (err) {
+        console.error('Workspace load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    load()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
 
   return (
-    <PageContainer title="Project Workspace">
-      <Space direction="vertical" size={16} style={{ width: '100%' }}>
-        {/* Overview */}
-        <Card>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={8}>
-              <Space direction="vertical" size={8}>
-                <Text type="secondary">Total tasks</Text>
-                <Title level={3} style={{ margin: 0 }}>
-                  {tasks.length}
-                </Title>
-              </Space>
-            </Col>
-            <Col xs={24} md={8}>
-              <Space direction="vertical" size={8}>
-                <Text type="secondary">In progress</Text>
-                <Title level={3} style={{ margin: 0 }}>
-                  {tasks.filter(t => t.status === 'in-progress').length}
-                </Title>
-              </Space>
-            </Col>
-            <Col xs={24} md={8}>
-              <Space direction="vertical" size={8}>
-                <Text type="secondary">Done</Text>
-                <Title level={3} style={{ margin: 0 }}>
-                  {tasks.filter(t => t.status === 'done').length}
-                </Title>
-              </Space>
-            </Col>
-          </Row>
-        </Card>
+    <>
+      <Head>
+        <title>KeenKonnect – Project Workspace</title>
+      </Head>
 
-        <Row gutter={[16, 16]}>
-          {/* Tasks */}
-          <Col xs={24} lg={12}>
-            <Card title="Tasks">
-              <List
-                dataSource={tasks}
-                renderItem={(item) => (
-                  <List.Item
-                    actions={[
-                      item.status !== 'done' ? (
-                        <Button key="done" size="small" onClick={() => markDone(item.id)}>
-                          Mark done
-                        </Button>
-                      ) : null,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      title={
-                        <Space size={8}>
-                          <Text>{item.title}</Text>
-                          {statusTag(item.status)}
-                        </Space>
-                      }
-                      description={<Text type="secondary">Assignee: {item.assignee}</Text>}
-                    />
-                    <div style={{ minWidth: 120 }}>
-                      <Progress percent={item.progress ?? 0} size="small" />
-                    </div>
-                  </List.Item>
-                )}
-              />
-            </Card>
-          </Col>
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Project Workspace
+      </h1>
 
-          {/* Files */}
-          <Col xs={24} lg={12}>
-            <Card title="Files">
-              <List
-                dataSource={filesData}
-                renderItem={(file) => (
-                  <List.Item actions={[<Button key="download" type="link">Download</Button>]}>
-                    <List.Item.Meta
-                      avatar={<Avatar>{file.name.slice(0, 1).toUpperCase()}</Avatar>}
-                      title={file.name}
-                      description={
-                        <Text type="secondary">
-                          Uploaded by {file.uploader} • {file.size}
-                        </Text>
-                      }
-                    />
-                  </List.Item>
-                )}
-              />
-            </Card>
-          </Col>
-        </Row>
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={16}>
+          <Card title="Tasks">
+            <List
+              dataSource={workspace?.tasks ?? []}
+              renderItem={(item: any) => (
+                <List.Item>
+                  <div>{item.title}</div>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
 
-        <Row gutter={[16, 16]}>
-          {/* Discussion */}
-          <Col xs={24} lg={12}>
-            <Card title="Discussion">
-              <List
-                dataSource={discussionData}
-                renderItem={(msg) => (
-                  <List.Item>
-                    <List.Item.Meta
-                      avatar={<Avatar>{msg.author.slice(0, 1).toUpperCase()}</Avatar>}
-                      title={
-                        <Space direction="horizontal" size={8}>
-                          <Text strong>{msg.author}</Text>
-                          <Text type="secondary">{msg.time}</Text>
-                        </Space>
-                      }
-                      description={msg.message}
-                    />
-                  </List.Item>
-                )}
-              />
-            </Card>
-          </Col>
-
-          {/* Timeline */}
-          <Col xs={24} lg={12}>
-            <Card title="Timeline">
-              <Timeline
-                items={[
-                  { color: 'green', children: 'Project created' },
-                  { color: 'blue', children: 'Wireframes v2 shared' },
-                  { color: 'gray', children: 'API contract drafting' },
-                ]}
-              />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Team */}
-        <Card title="Team">
-          <List
-            grid={{ gutter: 16, xs: 2, sm: 3, md: 4, lg: 4 }}
-            dataSource={projectMembers}
-            renderItem={(member) => (
-              <List.Item>
-                <Space direction="vertical" align="center" style={{ width: '100%' }}>
-                  <Avatar size={56}>{member.name.slice(0, 1).toUpperCase()}</Avatar>
-                  <Text strong>{member.name}</Text>
-                  <Text type="secondary">{member.role}</Text>
-                </Space>
-              </List.Item>
-            )}
-          />
-        </Card>
-      </Space>
-    </PageContainer>
-  );
+        <Col xs={24} md={8}>
+          <Card title="Team Members">
+            <List
+              dataSource={workspace?.members ?? []}
+              renderItem={(item: any) => (
+                <List.Item>
+                  <div>{item.name}</div>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
 }
 
 ===== END app/keenkonnect/projects/project-workspace/page.tsx =====
 
 
-===== BEGIN app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx =====
-'use client';
+===== BEGIN app/keenkonnect/projects/project-workspace/page.tsx.bak =====
+'use client'
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import type { UploadFile } from 'antd/es/upload/interface';
-import type { Dayjs } from 'dayjs';
-import {
-  Form,
-  Input,
-  Select,
-  DatePicker,
-  InputNumber,
-  Upload,
-  Switch,
-  Button,
-  Modal,
-  message,
-} from 'antd';
-import { UploadOutlined } from '@ant-design/icons';
+import React, { Suspense, useEffect, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Card, Row, Col, Spin, List } from 'antd'
+import api from '@/api'
 
-const { RangePicker } = DatePicker;
-const { TextArea } = Input;
-
-interface ImpactReportFormValues {
-  title: string;
-  category?: string;
-  period?: [Dayjs, Dayjs];
-  amount?: number;
-  description?: string;
-  attachments?: UploadFile[];
-  isPublic?: boolean;
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
 }
 
-export default function SubmitImpactReports(): JSX.Element {
-  const [form] = Form.useForm<ImpactReportFormValues>();
-  const router = useRouter();
-  const [submitting, setSubmitting] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [workspace, setWorkspace] = useState<any>(null)
 
-  const onFinish = async (values: ImpactReportFormValues) => {
-    try {
-      setSubmitting(true);
-      message.success('Votre rapport a bien été soumis.');
-      setOpen(true);
-    } catch (e) {
-      console.error(e);
-      message.error("Échec de l'envoi du rapport.");
-    } finally {
-      setSubmitting(false);
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/projects/workspace')
+        setWorkspace(res)
+      } catch (err) {
+        console.error('Workspace load error:', err)
+      } finally {
+        setLoading(false)
+      }
     }
-  };
+    load()
+  }, [])
 
-  const normFile = (e: any): UploadFile[] => {
-    if (Array.isArray(e)) return e as UploadFile[];
-    return (e?.fileList ?? []) as UploadFile[];
-  };
+  if (loading) {
+    return (
+      <div style={{ padding: 40, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>Soumettre un rapport d’impact</h1>
+    <>
+      <Head>
+        <title>KeenKonnect – Project Workspace</title>
+      </Head>
 
-      <Form<ImpactReportFormValues> form={form} layout="vertical" onFinish={onFinish}>
-        <Form.Item
-          label="Titre"
-          name="title"
-          rules={[{ required: true, message: 'Veuillez saisir un titre.' }]}
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Project Workspace
+      </h1>
+
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={16}>
+          <Card title="Tasks">
+            <List
+              dataSource={workspace?.tasks ?? []}
+              renderItem={(item: any) => (
+                <List.Item>
+                  <div>{item.title}</div>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+
+        <Col xs={24} md={8}>
+          <Card title="Team Members">
+            <List
+              dataSource={workspace?.members ?? []}
+              renderItem={(item: any) => (
+                <List.Item>
+                  <div>{item.name}</div>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
+}
+
+===== END app/keenkonnect/projects/project-workspace/page.tsx.bak =====
+
+
+===== BEGIN app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx =====
+'use client'
+
+import React, { Suspense } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Form, Input, DatePicker, Select, Upload, Button, Card, message } from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import api from '@/api'
+import dayjs from 'dayjs'
+import { UploadOutlined } from '@ant-design/icons'
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <>
+        <Content />
+      </>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [form] = Form.useForm()
+
+  const submitReport = async (values: any) => {
+    try {
+      await api.post('/impact/sustainability/report', {
+        ...values,
+        date: values.date.format('YYYY-MM-DD'),
+      })
+      message.success('Impact report submitted successfully!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Submit impact report error:', err)
+      message.error('Failed to submit report')
+    }
+  }
+
+  return (
+    <>
+      <Head>
+        <title>KeenKonnect – Submit Impact Report</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Submit Impact Report
+      </h1>
+
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={submitReport}
+          initialValues={{
+            date: dayjs(),
+          }}
         >
-          <Input placeholder="Ex. Réduction des émissions Q3" />
-        </Form.Item>
+          <Form.Item label="Project" name="project" rules={[{ required: true }]}>
+            <Select
+              placeholder="Select the project"
+              options={[
+                { label: 'Project A', value: 'project-a' },
+                { label: 'Project B', value: 'project-b' },
+              ]}
+            />
+          </Form.Item>
 
-        <Form.Item label="Catégorie" name="category">
-          <Select
-            placeholder="Sélectionner une catégorie"
-            options={[
-              { label: 'Énergie', value: 'energy' },
-              { label: 'Déchets', value: 'waste' },
-              { label: 'Eau', value: 'water' },
-              { label: 'Communauté', value: 'community' },
-            ]}
-            allowClear
-          />
-        </Form.Item>
+          <Form.Item label="Date" name="date" rules={[{ required: true }]}>
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
 
-        <Form.Item label="Période" name="period">
-          <RangePicker />
-        </Form.Item>
+          <Form.Item label="Category" name="category" rules={[{ required: true }]}>
+            <Select
+              placeholder="Impact category"
+              options={[
+                { label: 'Environment', value: 'environment' },
+                { label: 'Social', value: 'social' },
+                { label: 'Governance', value: 'governance' },
+              ]}
+            />
+          </Form.Item>
 
-        <Form.Item label="Quantité / Score" name="amount">
-          <InputNumber style={{ width: '100%' }} placeholder="Ex. 42" />
-        </Form.Item>
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={4} placeholder="Describe the impact..." />
+          </Form.Item>
 
-        <Form.Item label="Description" name="description">
-          <TextArea rows={4} placeholder="Détails, méthodologie, notes…" />
-        </Form.Item>
+          <Form.Item label="Attachments" name="attachments">
+            <Upload multiple beforeUpload={() => false}>
+              <Button icon={<UploadOutlined />}>Upload Files</Button>
+            </Upload>
+          </Form.Item>
 
-        <Form.Item
-          label="Pièces jointes"
-          name="attachments"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-          extra="Les fichiers ne sont pas téléversés automatiquement."
-        >
-          <Upload beforeUpload={() => false} multiple>
-            <Button icon={<UploadOutlined />}>Choisir des fichiers</Button>
-          </Upload>
-        </Form.Item>
-
-        <Form.Item
-          label="Rendre public"
-          name="isPublic"
-          valuePropName="checked"
-          initialValue={false}
-        >
-          <Switch />
-        </Form.Item>
-
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={submitting}>
-            Soumettre
-          </Button>
-        </Form.Item>
-      </Form>
-
-      <Modal
-        open={open}
-        title="Rapport soumis"
-        onOk={() => {
-          setOpen(false);
-          router.push('/keenkonnect/sustainability-impact/sustainability-dashboard');
-        }}
-        onCancel={() => setOpen(false)}
-        okText="OK"
-      >
-        <p>Votre rapport d’impact a été soumis avec succès.</p>
-      </Modal>
-    </div>
-  );
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
+              Submit Report
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
+  )
 }
 
 ===== END app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx =====
 
 
-===== BEGIN app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx =====
-'use client';
+===== BEGIN app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx.bak =====
+'use client'
 
-// File: app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
-import React, { useMemo, useEffect } from 'react';
-import { Card, Row, Col, Statistic, Table, Select, Divider } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import MainLayout from '@/components/layout-components/MainLayout';
-import {
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  Legend,
-  ResponsiveContainer,
-  Tooltip as ReTooltip,
-} from 'recharts';
+import React, { Suspense } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Form, Input, DatePicker, Select, Upload, Button, Card, message } from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import api from '@/api'
+import dayjs from 'dayjs'
+import { UploadOutlined } from '@ant-design/icons'
 
-/* -------------------------------
- * Données simulées
- * ------------------------------- */
-
-// Statistiques globales
-const globalStats = {
-  totalCO2Saved: 50000,       // en kilogrammes
-  totalVolunteerHours: 1200,  // en heures
-  totalProjects: 45,
-};
-
-// Répartition d’impact (donut)
-const impactDistribution = [
-  { name: 'Environmental', value: 55 },
-  { name: 'Social', value: 30 },
-  { name: 'Economic', value: 15 },
-];
-
-const PIE_COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
-
-// Données pour le leaderboard (liste de projets par impact)
-interface LeaderboardEntry {
-  key: string;
-  projectName: string;
-  impactScore: number;
-  co2Saved: number;
-  volunteerHours: number;
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
 }
 
-const leaderboardData: LeaderboardEntry[] = [
-  { key: '1', projectName: 'Project Alpha', impactScore: 95, co2Saved: 15000, volunteerHours: 300 },
-  { key: '2', projectName: 'Project Beta', impactScore: 88, co2Saved: 12000, volunteerHours: 250 },
-  { key: '3', projectName: 'Project Gamma', impactScore: 82, co2Saved: 10000, volunteerHours: 200 },
-  { key: '4', projectName: 'Project Delta', impactScore: 78, co2Saved: 8000, volunteerHours: 180 },
-  { key: '5', projectName: 'Project Epsilon', impactScore: 75, co2Saved: 7000, volunteerHours: 170 },
-];
+function Content() {
+  const [form] = Form.useForm()
 
-// Colonnes pour le leaderboard
-const columns: ColumnsType<LeaderboardEntry> = [
-  { title: 'Project Name', dataIndex: 'projectName', key: 'projectName' },
-  { title: 'Impact Score', dataIndex: 'impactScore', key: 'impactScore' },
-  { title: 'CO2 Saved (kg)', dataIndex: 'co2Saved', key: 'co2Saved' },
-  { title: 'Volunteer Hours', dataIndex: 'volunteerHours', key: 'volunteerHours' },
-];
-
-// Filtres supplémentaires (simulés)
-const regions = ['All', 'North America', 'Europe', 'Asia'];
-const categories = ['All', 'Environmental', 'Social', 'Economic'];
-
-const SustainabilityDashboard: React.FC = () => {
-  // États de filtres (ici décoratifs)
-  const [selectedRegion, setSelectedRegion] = React.useState('All');
-  const [selectedCategory, setSelectedCategory] = React.useState('All');
-
-  // Dans l'App Router, éviter next/head côté client : on peut fixer le titre ainsi
-  useEffect(() => {
-    document.title = 'Sustainability Dashboard';
-  }, []);
-
-  // Filtrage simulé
-  const filteredLeaderboard = useMemo(() => {
-    // Ajouter une vraie logique si nécessaire (region / category)
-    return leaderboardData;
-  }, [selectedRegion, selectedCategory]);
+  const submitReport = async (values: any) => {
+    try {
+      await api.post('/impact/sustainability/report', {
+        ...values,
+        date: values.date.format('YYYY-MM-DD'),
+      })
+      message.success('Impact report submitted successfully!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Submit impact report error:', err)
+      message.error('Failed to submit report')
+    }
+  }
 
   return (
-    <MainLayout>
-      <div className="container mx-auto p-5">
-        {/* En-tête */}
-        <h1 className="text-2xl font-bold mb-4">Sustainability Dashboard</h1>
+    <>
+      <Head>
+        <title>KeenKonnect – Submit Impact Report</title>
+      </Head>
 
-        {/* Filtres */}
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24} sm={12}>
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Submit Impact Report
+      </h1>
+
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={submitReport}
+          initialValues={{
+            date: dayjs(),
+          }}
+        >
+          <Form.Item label="Project" name="project" rules={[{ required: true }]}>
             <Select
-              value={selectedRegion}
-              onChange={(value) => setSelectedRegion(value)}
-              style={{ width: '100%' }}
-              options={regions.map((r) => ({ label: r, value: r }))}
+              placeholder="Select the project"
+              options={[
+                { label: 'Project A', value: 'project-a' },
+                { label: 'Project B', value: 'project-b' },
+              ]}
             />
-          </Col>
-          <Col xs={24} sm={12}>
+          </Form.Item>
+
+          <Form.Item label="Date" name="date" rules={[{ required: true }]}>
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item label="Category" name="category" rules={[{ required: true }]}>
             <Select
-              value={selectedCategory}
-              onChange={(value) => setSelectedCategory(value)}
-              style={{ width: '100%' }}
-              options={categories.map((c) => ({ label: c, value: c }))}
+              placeholder="Impact category"
+              options={[
+                { label: 'Environment', value: 'environment' },
+                { label: 'Social', value: 'social' },
+                { label: 'Governance', value: 'governance' },
+              ]}
             />
-          </Col>
-        </Row>
+          </Form.Item>
 
-        <Divider />
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={4} placeholder="Describe the impact..." />
+          </Form.Item>
 
-        {/* Statistiques globales */}
-        <Row gutter={16} className="mb-6">
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="Total CO2 Saved (kg)" value={globalStats.totalCO2Saved} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="Total Volunteer Hours" value={globalStats.totalVolunteerHours} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="Total Projects" value={globalStats.totalProjects} />
-            </Card>
-          </Col>
-        </Row>
+          <Form.Item label="Attachments" name="attachments">
+            <Upload multiple beforeUpload={() => false}>
+              <Button icon={<UploadOutlined />}>Upload Files</Button>
+            </Upload>
+          </Form.Item>
 
-        {/* Donut: Impact Distribution */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Impact Distribution</h2>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer>
-              <RePieChart>
-                <ReTooltip />
-                <Legend verticalAlign="bottom" height={36} />
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
+              Submit Report
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
+  )
+}
+
+===== END app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx.bak =====
+
+
+===== BEGIN app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx =====
+'use client'
+
+import React, { Suspense, useEffect, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Row, Col, Card, Spin } from 'antd'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip as ReTooltip,
+  ResponsiveContainer,
+} from 'recharts'
+import api from '@/api'
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <>
+        <Content />
+      </>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/impact/sustainability/dashboard')
+        setStats(res ?? {})
+      } catch (err) {
+        console.error('Sustainability dashboard load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ padding: 50, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
+  const COLORS = ['#4e91ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de']
+
+  return (
+    <>
+      <Head>
+        <title>KeenKonnect – Sustainability Dashboard</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Sustainability Dashboard
+      </h1>
+
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={12}>
+          <Card title="Total Impact Reports">
+            <div style={{ fontSize: 32, fontWeight: 700 }}>
+              {stats?.total_reports ?? 0}
+            </div>
+          </Card>
+        </Col>
+
+        <Col xs={24} md={12}>
+          <Card title="Impact Category Distribution">
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
                 <Pie
-                  data={impactDistribution}
+                  data={stats?.distribution ?? []}
                   dataKey="value"
                   nameKey="name"
-                  innerRadius={60}
-                  outerRadius={100}
-                  paddingAngle={5}
+                  outerRadius={110}
                 >
-                  {impactDistribution.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={PIE_COLORS[index % PIE_COLORS.length]}
-                    />
+                  {(stats?.distribution ?? []).map((_: any, i: number) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-              </RePieChart>
+                <ReTooltip />
+              </PieChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* Leaderboard */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Top Projects by Impact</h2>
-          <Table
-            columns={columns}
-            dataSource={filteredLeaderboard}
-            pagination={{ pageSize: 5 }}
-          />
-        </Card>
-      </div>
-    </MainLayout>
-  );
-};
-
-export default SustainabilityDashboard;
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
+}
 
 ===== END app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx =====
+
+
+===== BEGIN app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx.bak =====
+'use client'
+
+import React, { Suspense, useEffect, useState } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Row, Col, Card, Spin } from 'antd'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip as ReTooltip,
+  ResponsiveContainer,
+} from 'recharts'
+import api from '@/api'
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [stats, setStats] = useState<any>(null)
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/impact/sustainability/dashboard')
+        setStats(res ?? {})
+      } catch (err) {
+        console.error('Sustainability dashboard load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ padding: 50, textAlign: 'center' }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
+  const COLORS = ['#4e91ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de']
+
+  return (
+    <>
+      <Head>
+        <title>KeenKonnect – Sustainability Dashboard</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Sustainability Dashboard
+      </h1>
+
+      <Row gutter={[24, 24]}>
+        <Col xs={24} md={12}>
+          <Card title="Total Impact Reports">
+            <div style={{ fontSize: 32, fontWeight: 700 }}>
+              {stats?.total_reports ?? 0}
+            </div>
+          </Card>
+        </Col>
+
+        <Col xs={24} md={12}>
+          <Card title="Impact Category Distribution">
+            <ResponsiveContainer width="100%" height={280}>
+              <PieChart>
+                <Pie
+                  data={stats?.distribution ?? []}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={110}
+                >
+                  {(stats?.distribution ?? []).map((_: any, i: number) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <ReTooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </Card>
+        </Col>
+      </Row>
+    </>
+  )
+}
+
+===== END app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx.bak =====
 
 
 ===== BEGIN app/keenkonnect/sustainability-impact/track-project-impact/page.tsx =====
 'use client'
 
-// app/keenkonnect/sustainability-impact/track-project-impact/index.tsx
-import React, { useState, useMemo, useEffect } from 'react';
-import Head from 'next/head';
-import { Card, Statistic, Row, Col, Select, DatePicker, Timeline } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
-import {
-  ResponsiveContainer,
-  LineChart as ReLineChart,
-  Line,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  BarChart,
-  Bar,
-} from 'recharts';
-import dayjs, { Dayjs } from 'dayjs';
+import React, { Suspense, useState, useEffect, useMemo } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Row, Col, Card, DatePicker, Select, Spin } from 'antd'
+import { PieChart, Pie, Cell, Tooltip as ReTooltip, ResponsiveContainer } from 'recharts'
+import api from '@/api'
+import dayjs from 'dayjs'
 
-const { RangePicker } = DatePicker;
+const { RangePicker } = DatePicker
 
-// ---- Types ----
-type DateRange = [Dayjs, Dayjs] | null;
-
-interface ImpactReport {
-  key: string;
-  date: string;     // ISO string (YYYY-MM-DD) for simplicity
-  summary: string;
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <>
+        <Content />
+      </>
+    </Suspense>
+  )
 }
 
-// ---- Demo data ----
-const projects = ['Project Alpha', 'Project Beta', 'Project Gamma'] as const;
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [filters, setFilters] = useState({
+    from: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
+    to: dayjs().format('YYYY-MM-DD'),
+    team: undefined as string | undefined,
+  })
 
-const sampleImpactMetrics = {
-  carbonReduction: 1200, // in kg CO2 reduced
-  peopleReached: 450,
-  fundsSaved: 3000, // in dollars
-};
+  const [impactData, setImpactData] = useState<any[]>([])
 
-const sampleImpactTrend = [
-  { period: 'Jan', value: 500 },
-  { period: 'Feb', value: 600 },
-  { period: 'Mar', value: 700 },
-  { period: 'Apr', value: 800 },
-  { period: 'May', value: 900 },
-  { period: 'Jun', value: 1000 },
-  { period: 'Jul', value: 1200 },
-];
-
-const sampleImpactBreakdown = [
-  { category: 'Environmental', value: 1200 },
-  { category: 'Social', value: 450 },
-  { category: 'Economic', value: 3000 },
-];
-
-const impactReports: ImpactReport[] = [
-  { key: '1', date: '2023-01-15', summary: 'Initial report - baseline established.' },
-  { key: '2', date: '2023-04-20', summary: 'Significant improvement in carbon reduction.' },
-  { key: '3', date: '2023-07-10', summary: 'Major milestone achieved in funds saved.' },
-];
-
-export default function TrackProjectImpact() {
-  // Project & period filters
-  // Safe fallback avoids TS2345 under noUncheckedIndexedAccess
-  const [selectedProject, setSelectedProject] = useState<string>(projects[0] ?? 'Project Alpha');
-  const [dateRange, setDateRange] = useState<DateRange>(null);
-
-  // Filter timeline by dateRange
-  const filteredImpactReports = useMemo(() => {
-    if (!dateRange) return impactReports;
-    const [start, end] = dateRange;
-    return impactReports.filter((report) => {
-      const reportDate = dayjs(report.date);
-      return reportDate.isAfter(start) && reportDate.isBefore(end);
-    });
-  }, [dateRange]);
-
-  // Example: background refresh hook (kept for future plug-in)
   useEffect(() => {
-    // setInterval(...) if you want to refresh charts periodically
-  }, []);
+    const load = async () => {
+      try {
+        const res = await api.get('/impact/sustainability/track', {
+          params: {
+            fromDate: filters.from,
+            toDate: filters.to,
+            team: filters.team,
+          },
+        })
+        setImpactData(res || [])
+      } catch (err) {
+        console.error('Track impact load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [filters])
+
+  const COLORS = ['#3f87ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de']
+
+  const chartData = useMemo(() => {
+    if (!impactData || !impactData.length) return []
+    return impactData.map((item: any) => ({
+      name: item.category,
+      value: item.value,
+    }))
+  }, [impactData])
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: 40 }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
 
   return (
-    <MainLayout>
+    <>
       <Head>
-        <title>Track Project Impact</title>
-        <meta
-          name="description"
-          content="Dashboard for tracking the impact metrics of your project."
-        />
+        <title>KeenKonnect – Track Project Impact</title>
       </Head>
 
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Track Project Impact</h1>
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Track Project Impact
+      </h1>
 
-        {/* Project selector & date filter */}
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24} sm={12}>
-            <Select
-              value={selectedProject}
-              style={{ width: '100%' }}
-              onChange={setSelectedProject}
-              options={projects.map((p) => ({ value: p, label: p }))}
-            />
-          </Col>
-          <Col xs={24} sm={12}>
+      <Card style={{ marginBottom: 24 }}>
+        <Row gutter={24}>
+          <Col xs={24} md={12}>
             <RangePicker
+              defaultValue={[dayjs(filters.from), dayjs(filters.to)]}
               style={{ width: '100%' }}
-              onChange={(dates) => {
-                if (!dates || !dates[0] || !dates[1]) {
-                  setDateRange(null);
-                } else {
-                  setDateRange([dates[0], dates[1]]);
-                }
+              onChange={(range) => {
+                if (!range) return
+                setFilters((f) => ({
+                  ...f,
+                  from: range[0].format('YYYY-MM-DD'),
+                  to: range[1].format('YYYY-MM-DD'),
+                }))
               }}
             />
           </Col>
-        </Row>
 
-        {/* Impact Metrics Overview */}
-        <Row gutter={16} className="mb-6">
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic
-                title="Carbon Footprint Reduced (kg)"
-                value={sampleImpactMetrics.carbonReduction}
-              />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="People Reached" value={sampleImpactMetrics.peopleReached} />
-            </Card>
-          </Col>
-          <Col xs={24} sm={8}>
-            <Card>
-              <Statistic title="Funds Saved ($)" value={sampleImpactMetrics.fundsSaved} />
-            </Card>
+          <Col xs={24} md={12}>
+            <Select
+              placeholder="Filter by team"
+              style={{ width: '100%' }}
+              allowClear
+              onChange={(v) => setFilters((f) => ({ ...f, team: v || undefined }))}
+              options={[
+                { label: 'Team A', value: 'team-a' },
+                { label: 'Team B', value: 'team-b' },
+                { label: 'Team C', value: 'team-c' },
+              ]}
+            />
           </Col>
         </Row>
+      </Card>
 
-        {/* Impact Trend (Line) */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Impact Trend Over Time</h2>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer>
-              <ReLineChart data={sampleImpactTrend}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="period" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" />
-              </ReLineChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* Category Breakdown (Bar) */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Category-wise Impact Breakdown</h2>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer>
-              <BarChart data={sampleImpactBreakdown}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="category" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-
-        {/* Timeline */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Impact Reports Timeline</h2>
-          <Timeline>
-            {filteredImpactReports.map((report) => (
-              <Timeline.Item key={report.key}>
-                <strong>{report.date}</strong>: {report.summary}
-              </Timeline.Item>
-            ))}
-          </Timeline>
-        </Card>
-      </div>
-    </MainLayout>
-  );
+      <Card>
+        <ResponsiveContainer width="100%" height={340}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={110}
+            >
+              {chartData.map((_: any, i: number) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Pie>
+            <ReTooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </Card>
+    </>
+  )
 }
 
 ===== END app/keenkonnect/sustainability-impact/track-project-impact/page.tsx =====
+
+
+===== BEGIN app/keenkonnect/sustainability-impact/track-project-impact/page.tsx.bak =====
+'use client'
+
+import React, { Suspense, useState, useEffect, useMemo } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import { Row, Col, Card, DatePicker, Select, Spin } from 'antd'
+import { PieChart, Pie, Cell, Tooltip as ReTooltip, ResponsiveContainer } from 'recharts'
+import api from '@/api'
+import dayjs from 'dayjs'
+
+const { RangePicker } = DatePicker
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [loading, setLoading] = useState(true)
+  const [filters, setFilters] = useState({
+    from: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
+    to: dayjs().format('YYYY-MM-DD'),
+    team: undefined as string | undefined,
+  })
+
+  const [impactData, setImpactData] = useState<any[]>([])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await api.get('/impact/sustainability/track', {
+          params: {
+            fromDate: filters.from,
+            toDate: filters.to,
+            team: filters.team,
+          },
+        })
+        setImpactData(res || [])
+      } catch (err) {
+        console.error('Track impact load error:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    load()
+  }, [filters])
+
+  const COLORS = ['#3f87ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de']
+
+  const chartData = useMemo(() => {
+    if (!impactData || !impactData.length) return []
+    return impactData.map((item: any) => ({
+      name: item.category,
+      value: item.value,
+    }))
+  }, [impactData])
+
+  if (loading) {
+    return (
+      <div style={{ textAlign: 'center', padding: 40 }}>
+        <Spin size="large" />
+      </div>
+    )
+  }
+
+  return (
+    <>
+      <Head>
+        <title>KeenKonnect – Track Project Impact</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Track Project Impact
+      </h1>
+
+      <Card style={{ marginBottom: 24 }}>
+        <Row gutter={24}>
+          <Col xs={24} md={12}>
+            <RangePicker
+              defaultValue={[dayjs(filters.from), dayjs(filters.to)]}
+              style={{ width: '100%' }}
+              onChange={(range) => {
+                if (!range) return
+                setFilters((f) => ({
+                  ...f,
+                  from: range[0].format('YYYY-MM-DD'),
+                  to: range[1].format('YYYY-MM-DD'),
+                }))
+              }}
+            />
+          </Col>
+
+          <Col xs={24} md={12}>
+            <Select
+              placeholder="Filter by team"
+              style={{ width: '100%' }}
+              allowClear
+              onChange={(v) => setFilters((f) => ({ ...f, team: v || undefined }))}
+              options={[
+                { label: 'Team A', value: 'team-a' },
+                { label: 'Team B', value: 'team-b' },
+                { label: 'Team C', value: 'team-c' },
+              ]}
+            />
+          </Col>
+        </Row>
+      </Card>
+
+      <Card>
+        <ResponsiveContainer width="100%" height={340}>
+          <PieChart>
+            <Pie
+              data={chartData}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={110}
+            >
+              {chartData.map((_: any, i: number) => (
+                <Cell key={i} fill={COLORS[i % COLORS.length]} />
+              ))}
+            </Pie>
+            <ReTooltip />
+          </PieChart>
+        </ResponsiveContainer>
+      </Card>
+    </>
+  )
+}
+
+===== END app/keenkonnect/sustainability-impact/track-project-impact/page.tsx.bak =====
 
 
 ===== BEGIN app/keenkonnect/user-reputation/account-preferences/page.tsx =====
@@ -6650,270 +6881,215 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
 
 
 ===== BEGIN app/keenkonnect/workspaces/launch-new-workspace/page.tsx =====
-'use client';
+'use client'
 
-// app/keenkonnect/workspaces/launch-new-workspace/page.tsx (rename to page.tsx if using App Router)
-import React, { useState } from 'react';
-// If you're in App Router, prefer Metadata API or head.tsx instead of next/head.
-import Head from 'next/head';
-import { Steps, Button, Form, Input, Select, Result, Divider, message as antdMessage } from 'antd';
-import { useRouter } from 'next/navigation';
-import { normalizeError } from '../../../../shared/errors';
+import React, { Suspense } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  DatePicker,
+  Card,
+  message,
+} from 'antd'
+import api from '@/api'
+import dayjs from 'dayjs'
 
-const { TextArea } = Input;
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <>
+        <Content />
+      </>
+    </Suspense>
+  )
+}
 
-type Accessibility = 'Private' | 'Team' | 'Public';
+function Content() {
+  const [form] = Form.useForm()
 
-type WorkspaceFormValues = {
-  workspaceName: string;
-  workspaceDescription: string;
-  linkedProject?: string;
-  environmentTemplate: string;
-  accessibility: Accessibility;
-  resourceParams?: string;
-};
-
-const STEP_META = [
-  { title: 'Basic Info' },
-  { title: 'Environment Settings' },
-  { title: 'Confirmation' },
-];
-
-// Fields to validate per step
-const STEP_FIELDS: Record<number, (keyof WorkspaceFormValues)[]> = {
-  0: ['workspaceName', 'workspaceDescription', 'linkedProject'],
-  1: ['environmentTemplate', 'accessibility', 'resourceParams'],
-  2: [], // review step
-};
-
-const LaunchNewWorkspace: React.FC = () => {
-  const router = useRouter();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [submitted, setSubmitted] = useState(false);
-  const [form] = Form.useForm<WorkspaceFormValues>();
-
-  // Persist wizard data across steps
-  const [workspaceData, setWorkspaceData] = useState<WorkspaceFormValues>({
-    workspaceName: '',
-    workspaceDescription: '',
-    linkedProject: undefined,
-    environmentTemplate: '',
-    accessibility: 'Private',
-    resourceParams: '',
-  });
-
-  const handleNext = async () => {
+  const launchWorkspace = async (values: any) => {
     try {
-      await form.validateFields(STEP_FIELDS[currentStep] as any);
-      setCurrentStep((s) => s + 1);
-    } catch (err: unknown) {
-      const { message } = normalizeError(err);
-      antdMessage.error(message || 'Please complete the required fields.');
+      await api.post('/workspaces/launch', {
+        ...values,
+        startDate: values.startDate?.format('YYYY-MM-DD'),
+      })
+      message.success('Workspace launched successfully!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Launch workspace error:', err)
+      message.error('Failed to launch workspace.')
     }
-  };
-
-  const handlePrev = () => setCurrentStep((s) => s - 1);
-
-  const onFinish = async () => {
-    try {
-      // Validate everything before submit
-      const values = await form.validateFields();
-      const payload = { ...workspaceData, ...values };
-
-      // TODO: Replace with your API call to create the workspace
-      // e.g. await api.workspaces.create(payload)
-      // Simulate
-      // console.log('Workspace created with data:', payload);
-      setSubmitted(true);
-      antdMessage.success('Workspace launched successfully!');
-    } catch (err: unknown) {
-      const { message } = normalizeError(err);
-      antdMessage.error(message || 'Please ensure all fields are correctly filled.');
-    }
-  };
-
-  // Values to show on confirmation (live merge of state + current form)
-  const review = { ...workspaceData, ...form.getFieldsValue() };
-
-  if (submitted) {
-    return (
-      <div className="container mx-auto p-5">
-        <Result
-          status="success"
-          title="Workspace Launched Successfully!"
-          subTitle="Your new workspace has been created. Click the button below to enter your workspace."
-          extra={
-            <Button
-              type="primary"
-              onClick={() =>
-                router.push(`/keenkonnect/workspaces/launch-workspace?id=123`)
-              }
-            >
-              Open Workspace
-            </Button>
-          }
-        />
-      </div>
-    );
   }
 
   return (
     <>
-      {/* If using App Router, move this metadata to layout.tsx or head.tsx */}
       <Head>
-        <title>Launch New Workspace</title>
-        <meta
-          name="description"
-          content="Configure and launch a new workspace for collaboration."
-        />
+        <title>KeenKonnect – Launch New Workspace</title>
       </Head>
 
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Launch New Workspace</h1>
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Launch New Workspace
+      </h1>
 
-        <Steps
-          current={currentStep}
-          className="mb-6"
-          items={STEP_META.map((s) => ({ title: s.title }))}
-        />
-
+      <Card>
         <Form
           form={form}
           layout="vertical"
-          initialValues={workspaceData}
-          onValuesChange={(_, allValues) =>
-            setWorkspaceData((prev) => ({ ...prev, ...allValues }))
-          }
-          onFinish={onFinish}
+          onFinish={launchWorkspace}
+          initialValues={{ startDate: dayjs() }}
         >
-          {currentStep === 0 && (
-            <>
-              <Form.Item
-                name="workspaceName"
-                label="Workspace Name"
-                rules={[{ required: true, message: 'Please enter a workspace name' }]}
-              >
-                <Input placeholder="Enter workspace name" />
-              </Form.Item>
+          <Form.Item
+            label="Workspace Name"
+            name="name"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="Enter workspace name" />
+          </Form.Item>
 
-              <Form.Item
-                name="workspaceDescription"
-                label="Workspace Description"
-                rules={[
-                  { required: true, message: 'Please enter a workspace description' },
-                ]}
-              >
-                <TextArea rows={4} placeholder="Describe your workspace purpose" />
-              </Form.Item>
+          <Form.Item
+            label="Team"
+            name="team"
+            rules={[{ required: true }]}
+          >
+            <Select
+              placeholder="Select team"
+              options={[
+                { label: 'Team Alpha', value: 'alpha' },
+                { label: 'Team Beta', value: 'beta' },
+              ]}
+            />
+          </Form.Item>
 
-              <Form.Item
-                name="linkedProject"
-                label="Link to Existing Project (optional)"
-              >
-                <Select
-                  placeholder="Select a project or leave blank"
-                  allowClear
-                  options={[
-                    { label: 'Project Alpha', value: 'Project Alpha' },
-                    { label: 'Project Beta', value: 'Project Beta' },
-                  ]}
-                />
-              </Form.Item>
-            </>
-          )}
+          <Form.Item label="Start Date" name="startDate">
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
 
-          {currentStep === 1 && (
-            <>
-              <Form.Item
-                name="environmentTemplate"
-                label="Environment Template"
-                rules={[
-                  { required: true, message: 'Please select an environment template' },
-                ]}
-              >
-                <Select
-                  placeholder="Select template"
-                  options={[
-                    { label: 'Coding Notebook', value: 'Coding Notebook' },
-                    { label: 'Design Canvas', value: 'Design Canvas' },
-                    { label: 'AR/VR Room', value: 'AR/VR Room' },
-                  ]}
-                />
-              </Form.Item>
+          <Form.Item label="Description" name="description">
+            <Input.TextArea rows={4} />
+          </Form.Item>
 
-              <Form.Item
-                name="accessibility"
-                label="Accessibility"
-                rules={[
-                  { required: true, message: 'Please choose the accessibility' },
-                ]}
-              >
-                <Select
-                  options={[
-                    { label: 'Private', value: 'Private' },
-                    { label: 'Team', value: 'Team' },
-                    { label: 'Public', value: 'Public' },
-                  ]}
-                />
-              </Form.Item>
-
-              <Form.Item name="resourceParams" label="Resource Parameters">
-                <Input placeholder="e.g. 4 vCPUs, 8GB RAM" />
-              </Form.Item>
-            </>
-          )}
-
-          {currentStep === 2 && (
-            <div>
-              <h3 className="font-semibold mb-2">Review Your Workspace Configuration</h3>
-              <Divider className="my-3" />
-              <p>
-                <strong>Name:</strong> {review.workspaceName || 'N/A'}
-              </p>
-              <p>
-                <strong>Description:</strong> {review.workspaceDescription || 'N/A'}
-              </p>
-              <p>
-                <strong>Linked Project:</strong> {review.linkedProject || 'None'}
-              </p>
-              <p>
-                <strong>Environment Template:</strong> {review.environmentTemplate || 'N/A'}
-              </p>
-              <p>
-                <strong>Accessibility:</strong> {review.accessibility || 'N/A'}
-              </p>
-              <p>
-                <strong>Resource Parameters:</strong> {review.resourceParams || 'N/A'}
-              </p>
-            </div>
-          )}
-
-          <div style={{ marginTop: 24 }}>
-            {currentStep > 0 && (
-              <Button style={{ marginRight: 8 }} onClick={handlePrev}>
-                Back
-              </Button>
-            )}
-            {currentStep < STEP_META.length - 1 && (
-              <Button type="primary" onClick={handleNext}>
-                Next
-              </Button>
-            )}
-            {currentStep === STEP_META.length - 1 && (
-              <Button type="primary" htmlType="submit">
-                Launch Workspace
-              </Button>
-            )}
-          </div>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
+              Launch Workspace
+            </Button>
+          </Form.Item>
         </Form>
-      </div>
+      </Card>
     </>
-  );
-};
-
-export default LaunchNewWorkspace;
+  )
+}
 
 ===== END app/keenkonnect/workspaces/launch-new-workspace/page.tsx =====
+
+
+===== BEGIN app/keenkonnect/workspaces/launch-new-workspace/page.tsx.bak =====
+'use client'
+
+import React, { Suspense } from 'react'
+import MainLayout from '@/components/layout-components/MainLayout'
+import Head from 'next/head'
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  DatePicker,
+  Card,
+  message,
+} from 'antd'
+import api from '@/api'
+import dayjs from 'dayjs'
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>
+        <Content />
+      </MainLayout>
+    </Suspense>
+  )
+}
+
+function Content() {
+  const [form] = Form.useForm()
+
+  const launchWorkspace = async (values: any) => {
+    try {
+      await api.post('/workspaces/launch', {
+        ...values,
+        startDate: values.startDate?.format('YYYY-MM-DD'),
+      })
+      message.success('Workspace launched successfully!')
+      form.resetFields()
+    } catch (err) {
+      console.error('Launch workspace error:', err)
+      message.error('Failed to launch workspace.')
+    }
+  }
+
+  return (
+    <>
+      <Head>
+        <title>KeenKonnect – Launch New Workspace</title>
+      </Head>
+
+      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
+        Launch New Workspace
+      </h1>
+
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={launchWorkspace}
+          initialValues={{ startDate: dayjs() }}
+        >
+          <Form.Item
+            label="Workspace Name"
+            name="name"
+            rules={[{ required: true }]}
+          >
+            <Input placeholder="Enter workspace name" />
+          </Form.Item>
+
+          <Form.Item
+            label="Team"
+            name="team"
+            rules={[{ required: true }]}
+          >
+            <Select
+              placeholder="Select team"
+              options={[
+                { label: 'Team Alpha', value: 'alpha' },
+                { label: 'Team Beta', value: 'beta' },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item label="Start Date" name="startDate">
+            <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item label="Description" name="description">
+            <Input.TextArea rows={4} />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
+              Launch Workspace
+            </Button>
+          </Form.Item>
+        </Form>
+      </Card>
+    </>
+  )
+}
+
+===== END app/keenkonnect/workspaces/launch-new-workspace/page.tsx.bak =====
 
 
 ===== BEGIN app/keenkonnect/workspaces/my-workspaces/page.tsx =====
@@ -8498,6 +8674,216 @@ export default function ActiveThreadsPage(): JSX.Element {
   }
 
   return (
+    <>
+      <PageContainer title="Active Threads">
+        <Space style={{ marginBottom: 24 }} size="large" wrap>
+          <Input
+            placeholder="Search threads..."
+            prefix={<SearchOutlined />}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setCurrentPage(1)
+            }}
+            style={{ width: 300 }}
+          />
+
+          <Select
+            value={selectedCategory}
+            onChange={(value) => {
+              setSelectedCategory(value as CategoryFilter)
+              setCurrentPage(1)
+            }}
+            options={CATEGORY_OPTIONS as any}
+            style={{ width: 180 }}
+          />
+
+          <Select
+            value={sortOption}
+            onChange={(value) => {
+              setSortOption(value as 'recent' | 'replies')
+              setCurrentPage(1)
+            }}
+            options={SORT_OPTIONS as any}
+            style={{ width: 220 }}
+          />
+        </Space>
+
+        <List
+          grid={{ gutter: 16, column: 1 }}
+          dataSource={paginatedThreads}
+          renderItem={(thread: Thread) => (
+            <List.Item onClick={() => openThread(thread)} style={{ cursor: 'pointer' }}>
+              <Card hoverable>
+                <Space direction="vertical" style={{ width: '100%' }}>
+                  <Space>
+                    {thread.threadType === 'question' ? (
+                      <QuestionCircleOutlined style={{ fontSize: 18, color: '#1890ff' }} />
+                    ) : (
+                      <MessageTwoTone twoToneColor="#52c41a" style={{ fontSize: 18 }} />
+                    )}
+                    <Title level={4} style={{ margin: 0 }}>
+                      {thread.title}
+                    </Title>
+                  </Space>
+
+                  <Text>{thread.snippet}</Text>
+
+                  <Space>
+                    <Text strong>Author:</Text> {thread.author}
+                    <Text strong>Replies:</Text> {thread.repliesCount}
+                    <Text strong>Last Activity:</Text> {thread.lastActivity}
+                  </Space>
+                </Space>
+              </Card>
+            </List.Item>
+          )}
+        />
+
+        <div style={{ textAlign: 'center', marginTop: 24 }}>
+          <Pagination
+            current={currentPage}
+            pageSize={pageSize}
+            total={filteredThreads.length}
+            onChange={(page) => setCurrentPage(page)}
+          />
+        </div>
+      </PageContainer>
+    </>
+  )
+}
+
+===== END app/konnected/community-discussions/active-threads/page.tsx =====
+
+
+===== BEGIN app/konnected/community-discussions/active-threads/page.tsx.bak =====
+﻿'use client'
+
+import React, { useMemo, useState } from 'react'
+import { List, Card, Input, Select, Space, Typography, Pagination } from 'antd'
+import { SearchOutlined, QuestionCircleOutlined, MessageTwoTone } from '@ant-design/icons'
+import { useRouter } from 'next/navigation'
+import PageContainer from '@/components/PageContainer'
+import MainLayout from '@/components/layout-components/MainLayout'
+
+const { Title, Text } = Typography
+
+interface Thread {
+  id: string
+  title: string
+  snippet: string
+  author: string
+  repliesCount: number
+  lastActivity: string // ISO-like string for simplicity
+  category: 'Math' | 'Science' | 'General'
+  threadType: 'question' | 'discussion'
+}
+
+// Dummy data for threads
+const dummyThreads: Thread[] = [
+  {
+    id: 't1',
+    title: 'How to solve quadratic equations?',
+    snippet: "I’m struggling with solving quadratic equations. Can anyone explain...",
+    author: 'Alice',
+    repliesCount: 15,
+    lastActivity: '2025-12-01 14:30',
+    category: 'Math',
+    threadType: 'question',
+  },
+  {
+    id: 't2',
+    title: 'The impact of climate change on ecosystems',
+    snippet: 'Let’s discuss how various ecosystems are being affected by the recent...',
+    author: 'Bob',
+    repliesCount: 8,
+    lastActivity: '2025-12-01 10:15',
+    category: 'Science',
+    threadType: 'discussion',
+  },
+  {
+    id: 't3',
+    title: 'Study tips for final exams',
+    snippet: 'I’d like to share some study tips and ask for suggestions for better...',
+    author: 'Carol',
+    repliesCount: 22,
+    lastActivity: '2025-11-30 18:45',
+    category: 'General',
+    threadType: 'discussion',
+  },
+  {
+    id: 't4',
+    title: 'What is the derivative of sin(x)?',
+    snippet: 'I know the derivative is cos(x), but how can I remember this easily?',
+    author: 'David',
+    repliesCount: 10,
+    lastActivity: '2025-12-01 16:00',
+    category: 'Math',
+    threadType: 'question',
+  },
+]
+
+type CategoryFilter = 'All' | Thread['category']
+
+const CATEGORY_OPTIONS = [
+  { value: 'All', label: 'All Categories' },
+  { value: 'Math', label: 'Math' },
+  { value: 'Science', label: 'Science' },
+  { value: 'General', label: 'General' },
+] as const
+
+const SORT_OPTIONS = [
+  { value: 'recent', label: 'Sort by Recent Activity' },
+  { value: 'replies', label: 'Sort by Most Replies' },
+] as const
+
+export default function ActiveThreadsPage(): JSX.Element {
+  const router = useRouter()
+
+  const [searchQuery, setSearchQuery] = useState<string>('')
+  const [selectedCategory, setSelectedCategory] = useState<CategoryFilter>('All')
+  const [sortOption, setSortOption] = useState<'recent' | 'replies'>('recent')
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const pageSize = 5
+
+  // Filter and sort
+  const filteredThreads = useMemo(() => {
+    let threads = [...dummyThreads]
+
+    if (selectedCategory !== 'All') {
+      threads = threads.filter((t) => t.category === selectedCategory)
+    }
+
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase()
+      threads = threads.filter(
+        (t) => t.title.toLowerCase().includes(q) || t.snippet.toLowerCase().includes(q),
+      )
+    }
+
+    if (sortOption === 'recent') {
+      threads = threads
+        .slice()
+        .sort((a, b) => new Date(b.lastActivity).getTime() - new Date(a.lastActivity).getTime())
+    } else {
+      threads = threads.slice().sort((a, b) => b.repliesCount - a.repliesCount)
+    }
+
+    return threads
+  }, [searchQuery, selectedCategory, sortOption])
+
+  // Pagination slice
+  const paginatedThreads = useMemo(() => {
+    const startIndex = (currentPage - 1) * pageSize
+    return filteredThreads.slice(startIndex, startIndex + pageSize)
+  }, [filteredThreads, currentPage])
+
+  // Navigate to thread details
+  const openThread = (thread: Thread) => {
+    router.push(`/konnected/community-discussions/thread/${thread.id}`)
+  }
+
+  return (
     <MainLayout>
       <PageContainer title="Active Threads">
         <Space style={{ marginBottom: 24 }} size="large" wrap>
@@ -8577,7 +8963,7 @@ export default function ActiveThreadsPage(): JSX.Element {
   )
 }
 
-===== END app/konnected/community-discussions/active-threads/page.tsx =====
+===== END app/konnected/community-discussions/active-threads/page.tsx.bak =====
 
 
 ===== BEGIN app/konnected/community-discussions/moderation/page.tsx =====
@@ -9440,13 +9826,16 @@ export default KonnectedDashboard;
 
 
 ===== BEGIN app/konnected/layout.tsx =====
-import React from 'react'
+import React, { Suspense } from 'react'
 import MainLayout from '@/components/layout-components/MainLayout'
 
 export default function SegmentLayout({ children }: { children: React.ReactNode }) {
-  return <MainLayout>{children}</MainLayout>
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>{children}</MainLayout>
+    </Suspense>
+  )
 }
-
 ===== END app/konnected/layout.tsx =====
 
 
@@ -14457,13 +14846,16 @@ export default function MyIdeasPage() {
 
 
 ===== BEGIN app/kreative/layout.tsx =====
-import React from 'react'
+import React, { Suspense } from 'react'
 import MainLayout from '@/components/layout-components/MainLayout'
 
 export default function SegmentLayout({ children }: { children: React.ReactNode }) {
-  return <MainLayout>{children}</MainLayout>
+  return (
+    <Suspense fallback={null}>
+      <MainLayout>{children}</MainLayout>
+    </Suspense>
+  )
 }
-
 ===== END app/kreative/layout.tsx =====
 
 

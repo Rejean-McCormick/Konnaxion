@@ -18,9 +18,9 @@ import dayjs from 'dayjs'
 export default function PageWrapper() {
   return (
     <Suspense fallback={null}>
-      <MainLayout>
+      <>
         <Content />
-      </MainLayout>
+      </>
     </Suspense>
   )
 }

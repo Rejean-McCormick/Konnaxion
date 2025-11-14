@@ -20,9 +20,9 @@ import { UploadOutlined } from '@ant-design/icons'
 export default function PageWrapper() {
   return (
     <Suspense fallback={null}>
-      <MainLayout>
+      <>
         <Content />
-      </MainLayout>
+      </>
     </Suspense>
   )
 }

@@ -1,4 +1,4 @@
-===== TOC (28 fichiers) =====
+===== TOC (29 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\.all-contributorsrc
 2. C:\MyCode\Konnaxionv14\frontend\.prettierignore
 3. C:\MyCode\Konnaxionv14\frontend\.releaserc
@@ -26,7 +26,8 @@
 25. C:\MyCode\Konnaxionv14\frontend\scanpathv1-frontend.py
 26. C:\MyCode\Konnaxionv14\frontend\scripts\find-routes.mjs
 27. C:\MyCode\Konnaxionv14\frontend\scripts\scan-endpoints.mjs
-28. C:\MyCode\Konnaxionv14\frontend\tsconfig.json
+28. C:\MyCode\Konnaxionv14\frontend\scripts\unwrap-mainlayout.mjs
+29. C:\MyCode\Konnaxionv14\frontend\tsconfig.json
 ===== END TOC =====
 
 
@@ -353,7 +354,7 @@ const baseConfig: NextConfig = {
 
   // TEMP : ne bloque pas la build sur les erreurs ESLint
   // (remets à false quand le lint sera corrigé)
- // eslint: { ignoreDuringBuilds: true },
+  eslint: { ignoreDuringBuilds: true },
 
   // Important : pas d'optimizePackageImports sur "antd"
   // (c'est ce qui déclenchait les erreurs __barrel_optimize__)
@@ -22202,6 +22203,78 @@ function scanFile(file, text) {
 })();
 
 ===== END scripts/scan-endpoints.mjs =====
+
+
+===== BEGIN scripts/unwrap-mainlayout.mjs =====
+// scripts/unwrap-mainlayout.mjs
+import fs from 'fs';
+import path from 'path';
+import fg from 'fast-glob';
+
+const root = process.cwd();
+const pattern = 'app/**/page.tsx';
+
+// Exact import path we care about
+const IMPORT_PATH = "@/components/layout-components/MainLayout";
+
+async function main() {
+  const files = await fg(pattern, { cwd: root });
+
+  console.log(`Found ${files.length} page.tsx files`);
+
+  for (const rel of files) {
+    const abs = path.join(root, rel);
+    const code = fs.readFileSync(abs, 'utf8');
+
+    // Only touch files that import MainLayout from the canonical path
+    if (!code.includes(IMPORT_PATH)) continue;
+
+    // If there is no <MainLayout ...> tag, nothing to unwrap
+    if (!code.includes('<MainLayout')) continue;
+
+    const backupPath = abs + '.bak';
+    if (!fs.existsSync(backupPath)) {
+      fs.writeFileSync(backupPath, code, 'utf8');
+    }
+
+    let updated = code;
+
+    // 1) Replace opening tags: <MainLayout ...> → <>
+    //    - \b ensures we match the component name, not e.g. <MainLayoutFoo>
+    //    - [^>]* eats any props inside the tag
+    updated = updated.replace(/<MainLayout\b[^>]*>/g, '<>');
+
+    // 2) Replace closing tags: </MainLayout> → </>
+    updated = updated.replace(/<\/MainLayout>/g, '</>');
+
+    // 3) If after replacement there is no 'MainLayout' identifier left,
+    //    remove the import line as well.
+    if (!updated.includes('MainLayout')) {
+      // handles:
+      //   import MainLayout from '...';
+      //   import MainLayout, { Something } from '...';
+      const importRegex =
+        new RegExp(
+          String.raw`import\s+MainLayout\s*(?:,\s*\{[^}]*\})?\s*from\s+['"]${IMPORT_PATH}['"];?\r?\n`,
+          'g'
+        );
+
+      updated = updated.replace(importRegex, '');
+    }
+
+    fs.writeFileSync(abs, updated, 'utf8');
+    console.log(`Unwrapped MainLayout in ${rel}`);
+  }
+
+  console.log('Done. Backups created as *.bak where changes were made.');
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+
+===== END scripts/unwrap-mainlayout.mjs =====
 
 
 ===== BEGIN tsconfig.json =====

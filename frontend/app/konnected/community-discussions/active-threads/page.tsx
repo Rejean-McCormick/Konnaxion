@@ -125,7 +125,7 @@ export default function ActiveThreadsPage(): JSX.Element {
   }
 
   return (
-    <MainLayout>
+    <>
       <PageContainer title="Active Threads">
         <Space style={{ marginBottom: 24 }} size="large" wrap>
           <Input
@@ -200,6 +200,6 @@ export default function ActiveThreadsPage(): JSX.Element {
           />
         </div>
       </PageContainer>
-    </MainLayout>
+    </>
   )
 }

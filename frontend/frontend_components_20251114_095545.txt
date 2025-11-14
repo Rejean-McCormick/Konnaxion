@@ -1787,21 +1787,22 @@ import * as AntIcons from '@ant-design/icons'
 /** helper: map legacy Icon `type` strings (e.g. "shopping-cart") to v4 components */
 const legacyTypeToIcon = (type?: string) => {
   if (!type) return null
+
   const pascal =
     type
       .split('-')
-      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
       .join('') + 'Outlined'
-  // @ts-ignore dynamic lookup
-  return (AntIcons as any)[pascal] || null
+
+  const key = pascal as keyof typeof AntIcons
+  const Comp = AntIcons[key]
+
+  return (Comp as React.ComponentType | undefined) ?? null
 }
 
-export const CardStyled = (props: any) => {
+export const CardStyled = (props: React.ComponentProps<typeof Card>) => {
   const bodyStyle: React.CSSProperties = {
     padding: '20px 24px 8px',
-  }
-  if (props.type === 'stats') {
-    bodyStyle.padding = '20px 16px 16px'
   }
   return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
 }
@@ -1834,7 +1835,7 @@ export const NumberInfoStyled = (props: {
   )
 }
 
-export const HelperIcon = (props: any) => (
+export const HelperIcon = (props: React.ComponentProps<typeof Tooltip>) => (
   <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
     <Tooltip {...props} placement="topLeft" arrowPointAtCenter>
       <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
@@ -1847,27 +1848,35 @@ export const HelperIcon = (props: any) => (
  * Preferred: <MainIcon icon={<YourIcon />} />
  * Legacy support: <MainIcon type="shopping-cart" />
  */
-type MainIconProps = {
+export const MainIcon: React.FC<{
   icon?: React.ReactElement
   type?: string
   style?: React.CSSProperties
   twoToneColor?: string
-} & React.HTMLAttributes<HTMLDivElement>
-
-export const MainIcon: React.FC<MainIconProps> = ({ icon, type, style, twoToneColor, ...rest }) => {
+}> = ({ icon, type, style, twoToneColor, ...rest }) => {
   const Comp = !icon && type ? legacyTypeToIcon(type) : null
-  const element: React.ReactElement | null =
+
+  // Loosen the element type so we can pass twoToneColor safely
+  const element: React.ReactElement<any> | null =
     icon && React.isValidElement(icon)
-      ? icon
+      ? (icon as React.ReactElement<any>)
       : Comp
-      ? React.createElement(Comp as React.ComponentType<any>)
+      ? React.createElement(Comp)
       : null
+
+  const mergedStyle: React.CSSProperties | undefined = element
+    ? {
+        ...(element.props.style ?? {}),
+        ...(style ?? {}),
+        fontSize: 54,
+      }
+    : undefined
 
   return (
     <div style={{ marginRight: 16 }} {...rest}>
       {element
         ? React.cloneElement(element, {
-            style: { ...(element.props as any)?.style, ...(style || {}), fontSize: 54 },
+            style: mergedStyle,
             twoToneColor,
           })
         : null}
@@ -1875,24 +1884,32 @@ export const MainIcon: React.FC<MainIconProps> = ({ icon, type, style, twoToneCo
   )
 }
 
-export const CardFooter = (props: any) => {
+export const CardFooter: React.FC<{
+  title: React.ReactNode
+  value: number
+  change: number
+}> = ({ title, value, change }) => {
   return (
     <div style={{ position: 'relative', zIndex: 99 }}>
-      <span>{props.title}:</span>
+      <span>{title}:</span>
       <span style={{ marginLeft: 8, color: 'rgba(0,0,0,.85)' }}>
-        {props.value.toLocaleString()}
+        {value.toLocaleString()}
       </span>
       <Tooltip title="Change compared to yesterday">
         <span style={{ marginLeft: 16 }}>
           <span style={{ color: 'rgba(0,0,0,.55)', marginRight: 2 }}>
-            {props.change.toLocaleString()}
+            {change.toLocaleString()}
           </span>
 
           {/* Up/down icon */}
-          {props.change < 0 ? (
-            <CaretDownOutlined style={{ color: '#f5222d', verticalAlign: 'text-bottom' }} />
+          {change < 0 ? (
+            <CaretDownOutlined
+              style={{ color: '#f5222d', verticalAlign: 'text-bottom' }}
+            />
           ) : (
-            <CaretUpOutlined style={{ color: '#52c41a', verticalAlign: 'middle' }} />
+            <CaretUpOutlined
+              style={{ color: '#52c41a', verticalAlign: 'middle' }}
+            />
           )}
         </span>
       </Tooltip>
@@ -1929,6 +1946,7 @@ export const ShadowCard = styled(CardStyled)`
     transition: all 150ms ease-in-out 0s;
   }
 `
+
 
 ===== END components/dashboard-components/style.tsx =====
 
@@ -4857,7 +4875,6 @@ export default function MakerEdit({
 
 
 ===== BEGIN components/sculpture-maker-components/EditForm/SculptureEdit.tsx =====
-// C:\MyCode\Konnaxionv14\frontend\components\sculpture-maker-components\EditForm\SculptureEdit.tsx
 'use client';
 
 import React, { useCallback, useMemo, useRef, useState } from 'react';
@@ -4941,12 +4958,12 @@ export default function SculptureEdit({ sculpture, onSubmit }: SculptureEditProp
     async (values: FormValues) => {
       try {
         const file = toFile(values.image?.[0]);
-        let imageUrl = sculpture.imageUrl;
+        const imageUrl = sculpture.imageUrl;
 
         // TODO: uploader `file` vers votre backend si présent, puis affecter imageUrl.
 
         const updated: Sculpture = {
-          ...sculpture, // correction de l’ancienne faute de frappe
+          ...sculpture,
           title: values.title,
           description: values.description,
           location: {
@@ -5849,7 +5866,7 @@ import {
   ColStyled,
   VisitCard,
   LikeCard,
-  CommentCard
+  CommentCard,
 } from '../../dashboard-components/'
 import { Popover, DatePicker, Button } from 'antd'
 import { MoreOutlined } from '@ant-design/icons'
@@ -5911,7 +5928,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
   totalLikes,
   totalComments,
   totalVisits,
-  sculptureId
+  sculptureId,
 }) => {
   const [state, setState] = useState<TrendState>({
     TOTAL_VISITS: 0,
@@ -5925,13 +5942,15 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     DAILY_COMMENTS_CHANGE: 0,
     VISIT_DATA: [],
     LIKE_DATA: [],
-    COMMENT_DATA: []
+    COMMENT_DATA: [],
   })
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<RequestError | null>(null)
 
   const defaultEndDate = useRef<Dayjs>(dayjs(new Date())).current
-  const defaultStartDate = useRef<Dayjs>(dayjs(defaultEndDate).subtract(7, 'days')).current
+  const defaultStartDate = useRef<Dayjs>(
+    dayjs(defaultEndDate).subtract(7, 'days'),
+  ).current
 
   const [startDate, setStartDate] = useState<Dayjs>(defaultStartDate)
   const [endDate, setEndDate] = useState<Dayjs>(defaultEndDate)
@@ -5944,23 +5963,23 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         const defaultToday = defaultEndDate.format('YYYY-MM-DD')
 
         const likesPromise = api.get<Record<string, number>>(
-          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`,
         )
         const commentsPromise = api.get<Record<string, number>>(
-          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`,
         )
         const visitPromise = api.get<Record<string, number>>(
-          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`
+          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${today}`,
         )
 
         const defaultLikesPromise = api.get<Record<string, number>>(
-          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+          `/stats/likes/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`,
         )
         const defaultCommentsPromise = api.get<Record<string, number>>(
-          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+          `/stats/comments/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`,
         )
         const defaultVisitsPromise = api.get<Record<string, number>>(
-          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`
+          `/stats/visits/sculpture-id/${sculptureId}?fromDate=${past}&toDate=${defaultToday}`,
         )
 
         const [
@@ -5969,14 +5988,14 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
           rawVisits,
           rawDefaultLikes,
           rawDefaultComments,
-          rawDefaultVisits
+          rawDefaultVisits,
         ] = await Promise.all([
           likesPromise,
           commentsPromise,
           visitPromise,
           defaultLikesPromise,
           defaultCommentsPromise,
-          defaultVisitsPromise
+          defaultVisitsPromise,
         ])
 
         // format daily data statistics
@@ -6003,7 +6022,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         const DAILY_COMMENTS = lastComment
         const DAILY_COMMENTS_CHANGE = lastComment - prevComment
 
-        setState(s => ({
+        setState((s) => ({
           ...s,
           TOTAL_VISITS: totalVisits,
           DAILY_VISITS,
@@ -6016,11 +6035,14 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
           DAILY_COMMENTS_CHANGE,
           VISIT_DATA,
           LIKE_DATA,
-          COMMENT_DATA
+          COMMENT_DATA,
         }))
       } catch (e: unknown) {
-        const n = normalizeError(e as AxiosError<any>)
-        setError({ statusCode: n.statusCode ?? 500, message: n.message || 'Unknown error' })
+        const n = normalizeError(e as AxiosError<unknown>)
+        setError({
+          statusCode: n.statusCode ?? 500,
+          message: n.message || 'Unknown error',
+        })
       } finally {
         setLoading(false)
       }
@@ -6033,14 +6055,16 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     startDate,
     totalComments,
     totalLikes,
-    totalVisits
+    totalVisits,
   ])
 
   const dateFormat = 'MMM D YYYY'
   const staticToday = dayjs(new Date())
 
   const renderPicker = (start: Dayjs, end: Dayjs) => {
-    const disabledDate = (current: Dayjs) => current.valueOf() > staticToday.valueOf()
+    const disabledDate = (current: Dayjs) =>
+      current.valueOf() > staticToday.valueOf()
+
     return (
       <RangePicker
         defaultValue={[start, end]}
@@ -6051,9 +6075,18 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
         separator="-"
         disabledDate={disabledDate}
         ranges={{
-          'Past week': [dayjs(staticToday).subtract(7, 'days'), dayjs(staticToday)],
-          'Past 2 weeks': [dayjs(staticToday).subtract(14, 'days'), dayjs(staticToday)],
-          'Past month': [dayjs(staticToday).subtract(30, 'days'), dayjs(staticToday)]
+          'Past week': [
+            dayjs(staticToday).subtract(7, 'days'),
+            dayjs(staticToday),
+          ],
+          'Past 2 weeks': [
+            dayjs(staticToday).subtract(14, 'days'),
+            dayjs(staticToday),
+          ],
+          'Past month': [
+            dayjs(staticToday).subtract(30, 'days'),
+            dayjs(staticToday),
+          ],
         }}
         onChange={(dates) => {
           if (!dates || !dates[0] || !dates[1]) return
@@ -6078,7 +6111,7 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     DAILY_COMMENTS_CHANGE,
     VISIT_DATA,
     LIKE_DATA,
-    COMMENT_DATA
+    COMMENT_DATA,
   } = state
 
   if (loading) return <Loading />
@@ -6088,19 +6121,19 @@ const SculptureTrend: React.FC<SculptureTrendProps> = ({
     <CardStyled
       title="Trends"
       extra={
-        <Popover content={renderPicker(startDate, endDate)} trigger="click" placement="bottomRight">
+        <Popover
+          content={renderPicker(startDate, endDate)}
+          trigger="click"
+          placement="bottomRight"
+        >
           <Button type="text" icon={<MoreOutlined />} />
         </Popover>
       }
-      type="stats"
       style={{ marginTop: 12 }}
     >
       <ColStyled xs={24}>
         <ShadowCard>
-          <LikeCard
-            total={TOTAL_LIKES}
-            trend={LIKE_DATA.map(p => p.y)}
-          />
+          <LikeCard total={TOTAL_LIKES} trend={LIKE_DATA.map((p) => p.y)} />
         </ShadowCard>
       </ColStyled>
 
@@ -7691,9 +7724,8 @@ export default UserVisit;
 
 
 ===== BEGIN src/components/CommonWidget/page.tsx =====
-// pages/pageTemplate/components/CommonWidget.tsx
 import React from 'react';
-import styles from './CommonWidget.module.css';
+import styles from '@/shared/CommonWidget.module.css';
 
 interface CommonWidgetProps {
   title: string;
@@ -7704,7 +7736,7 @@ const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
   return (
     <div className={styles.widget}>
       <h2 className={styles.widgetTitle}>{title}</h2>
-      <p className={styles.widgetDescription}>{description}</p>
+      <p className={styles.widgetSubtitle}>{description}</p>
     </div>
   );
 };
