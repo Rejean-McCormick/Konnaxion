@@ -1,173 +1,424 @@
-﻿/* eslint-disable react/jsx-key */
+﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { Button, Dropdown, List, Space, Table, Typography, Avatar } from 'antd';
-import type { ColumnsType, TableProps } from 'antd/es/table';
-import type { MenuProps } from 'antd';
-import { DownOutlined, UsergroupAddOutlined, PlusOutlined } from '@ant-design/icons';
-import { PageContainer } from '@ant-design/pro-components';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Avatar,
+  Alert,
+  Button,
+  Col,
+  Dropdown,
+  Empty,
+  Input,
+  List,
+  MenuProps,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Typography,
+  message as antdMessage,
+} from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import type { TableProps } from 'antd';
+import {
+  DownOutlined,
+  TeamOutlined,
+  UsergroupAddOutlined,
+  PlusOutlined,
+  ProjectOutlined,
+  CalendarOutlined,
+} from '@ant-design/icons';
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
+const { Search } = Input;
+const { Option } = Select;
+
+type TeamRole = 'owner' | 'admin' | 'member' | 'observer';
+type MembershipStatus = 'active' | 'invited' | 'request_pending';
 
 interface TeamMember {
   id: string;
   name: string;
   role: string;
-  avatar?: string;
 }
 
-interface Team {
+interface MyTeamsApiTeam {
   id: string;
   name: string;
-  project: string;
-  members: TeamMember[];
-  recentActivity: string[];
+  project_title?: string | null;
+  membership_role: TeamRole;
+  membership_status?: MembershipStatus;
+  members_count?: number;
+  is_restricted?: boolean;
+  recent_activity?: string[];
+  members_preview?: TeamMember[];
 }
 
-type TeamRow = {
+interface TeamRow {
   key: string;
   teamId: string;
   teamName: string;
   projectName: string;
+  userRole: TeamRole;
+  membershipStatus: MembershipStatus;
   membersCount: number;
+  isRestricted: boolean;
   roster: TeamMember[];
   recentActivity: string[];
-};
+}
 
-const teamsData: Team[] = [
-  {
-    id: 't-1',
-    name: 'Frontend Guild',
-    project: 'Design System',
-    members: [
-      { id: 'u-1', name: 'John Doe', role: 'Lead' },
-      { id: 'u-2', name: 'Alice Smith', role: 'Developer' },
-      { id: 'u-3', name: 'Bob Johnson', role: 'Developer' },
-      { id: 'u-4', name: 'Eve Davis', role: 'QA' },
-      { id: 'u-5', name: 'Charlie Brown', role: 'Designer' },
-    ],
-    recentActivity: [
-      'John joined the team',
-      'Alice commented on PR #42',
-      'Bob merged branch feature/layout'
-    ],
-  },
-  {
-    id: 't-2',
-    name: 'Backend Core',
-    project: 'API Platform',
-    members: [
-      { id: 'u-6', name: 'Diana Prince', role: 'Lead' },
-      { id: 'u-7', name: 'Bruce Wayne', role: 'SRE' },
-      { id: 'u-8', name: 'Clark Kent', role: 'Developer' },
-    ],
-    recentActivity: [
-      'Diana created issue API-120',
-      'Bruce deployed v2.3.1',
-      'Clark fixed failing tests'
-    ],
-  },
-];
+const MY_TEAMS_ENDPOINT = '/api/konnected/teams/my-teams';
+const LEAVE_TEAM_ENDPOINT = (teamId: string) =>
+  `/api/konnected/teams/${encodeURIComponent(teamId)}/leave`;
 
-const toRows = (input: Team[]): TeamRow[] =>
-  input.map((t) => ({
-    key: t.id,
-    teamId: t.id,
-    teamName: t.name,
-    projectName: t.project,
-    membersCount: t.members.length,
-    roster: t.members,
-    recentActivity: t.recentActivity,
-  }));
+function mapToRows(payload: unknown): TeamRow[] {
+  const rawItems: MyTeamsApiTeam[] = Array.isArray(payload)
+    ? (payload as MyTeamsApiTeam[])
+    : (payload as { items?: MyTeamsApiTeam[] })?.items ?? [];
 
-export default function Page() {
+  return rawItems.map((t) => {
+    const roster =
+      t.members_preview ??
+      ([] as TeamMember[]);
+
+    return {
+      key: t.id,
+      teamId: t.id,
+      teamName: t.name,
+      projectName: t.project_title ?? '—',
+      userRole: t.membership_role,
+      membershipStatus: t.membership_status ?? 'active',
+      membersCount: t.members_count ?? roster.length,
+      isRestricted: Boolean(t.is_restricted),
+      roster,
+      recentActivity: t.recent_activity ?? [],
+    };
+  });
+}
+
+export default function MyTeamsPage(): JSX.Element {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [reloadFlag, setReloadFlag] = useState<number>(0);
+  const [error, setError] = useState<string | null>(null);
+
   const [selectedTeamKeys, setSelectedTeamKeys] = useState<React.Key[]>([]);
-  const [data, setData] = useState<TeamRow[]>(() => toRows(teamsData));
+  const [data, setData] = useState<TeamRow[]>([]);
+
+  const [searchText, setSearchText] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | TeamRole>('all');
+  const [statusFilter, setStatusFilter] =
+    useState<'all' | MembershipStatus>('all');
+  const [restrictedOnly, setRestrictedOnly] = useState(false);
+
+  const [leavingTeamId, setLeavingTeamId] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadTeams() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(MY_TEAMS_ENDPOINT, {
+          credentials: 'include',
+        });
+
+        if (!res.ok) {
+          throw new Error(
+            `Failed to load teams (${res.status} ${res.statusText})`,
+          );
+        }
+
+        const json = await res.json();
+        if (!cancelled) {
+          const rows = mapToRows(json);
+          setData(rows);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(
+            err instanceof Error ? err.message : 'Unknown error while loading teams.',
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadTeams();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reloadFlag]);
+
+  const handleLeaveTeam = async (team: TeamRow) => {
+    if (team.userRole === 'owner') {
+      antdMessage.warning(
+        'You are the owner of this team. Transfer ownership before leaving.',
+      );
+      return;
+    }
+
+    setLeavingTeamId(team.teamId);
+    try {
+      const res = await fetch(LEAVE_TEAM_ENDPOINT(team.teamId), {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(
+          `Failed to leave team (${res.status} ${res.statusText})`,
+        );
+      }
+
+      antdMessage.success(`You left ${team.teamName}.`);
+      setData((prev) => prev.filter((row) => row.teamId !== team.teamId));
+      setSelectedTeamKeys((prev) =>
+        prev.filter((key) => key !== team.key),
+      );
+    } catch (err) {
+      antdMessage.error(
+        err instanceof Error
+          ? err.message
+          : 'Could not leave the team. Please try again.',
+      );
+    } finally {
+      setLeavingTeamId(null);
+    }
+  };
+
+  const handleViewTeam = (team: TeamRow) => {
+    router.push(
+      `/konnected/teams-collaboration/my-teams/${encodeURIComponent(team.teamId)}`,
+    );
+  };
+
+  const handleInviteMembers = (team: TeamRow) => {
+    router.push(
+      `/konnected/teams-collaboration/team-builder?teamId=${encodeURIComponent(
+        team.teamId,
+      )}&mode=invite`,
+    );
+  };
+
+  const filteredData = useMemo(() => {
+    return data.filter((row) => {
+      if (searchText) {
+        const q = searchText.toLowerCase();
+        const matchesName =
+          row.teamName.toLowerCase().includes(q) ||
+          row.projectName.toLowerCase().includes(q);
+        if (!matchesName) return false;
+      }
+
+      if (roleFilter !== 'all' && row.userRole !== roleFilter) {
+        return false;
+      }
+
+      if (statusFilter !== 'all' && row.membershipStatus !== statusFilter) {
+        return false;
+      }
+
+      if (restrictedOnly && !row.isRestricted) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [data, searchText, roleFilter, statusFilter, restrictedOnly]);
+
+  const sortedData = useMemo(
+    () => [...filteredData].sort((a, b) => a.teamName.localeCompare(b.teamName)),
+    [filteredData],
+  );
+
+  const totalTeams = data.length;
+  const ownerAdminCount = data.filter(
+    (t) => t.userRole === 'owner' || t.userRole === 'admin',
+  ).length;
+  const restrictedCount = data.filter((t) => t.isRestricted).length;
+
+  const rowSelection: TableProps<TeamRow>['rowSelection'] = {
+    selectedRowKeys: selectedTeamKeys,
+    onChange: (keys) => setSelectedTeamKeys(keys as React.Key[]),
+  };
 
   const columns: ColumnsType<TeamRow> = [
     {
-      title: 'Équipe',
+      title: 'Team',
       dataIndex: 'teamName',
       key: 'teamName',
       render: (value: string, record) => (
         <Space direction="vertical" size={0}>
           <Text strong>{value}</Text>
-          <Text type="secondary">ID&nbsp;: {record.teamId}</Text>
+          <Text type="secondary">ID: {record.teamId}</Text>
         </Space>
       ),
     },
     {
-      title: 'Projet',
+      title: 'Project',
       dataIndex: 'projectName',
       key: 'projectName',
       ellipsis: true,
       render: (value: string) => <Text>{value}</Text>,
     },
     {
-      title: 'Membres',
-      dataIndex: 'roster',
-      key: 'roster',
-      render: (_: TeamMember[], record) => (
-        <List
-          dataSource={record.roster.slice(0, 3)}
-          renderItem={(m: TeamMember) => (
-            <List.Item style={{ paddingInline: 0 }} key={m.id}>
-              <List.Item.Meta
-                avatar={<Avatar>{m.name.charAt(0)}</Avatar>}
-                title={<Text>{m.name}</Text>}
-                description={<Text type="secondary">{m.role}</Text>}
-              />
-            </List.Item>
-          )}
-        />
-      ),
+      title: 'My role',
+      dataIndex: 'userRole',
+      key: 'userRole',
+      width: 140,
+      render: (role: TeamRole) => {
+        let color: string | undefined;
+        switch (role) {
+          case 'owner':
+            color = 'gold';
+            break;
+          case 'admin':
+            color = 'blue';
+            break;
+          case 'member':
+            color = 'green';
+            break;
+          case 'observer':
+            color = 'default';
+            break;
+          default:
+            color = 'default';
+        }
+        return <Tag color={color}>{role}</Tag>;
+      },
     },
     {
-      title: 'Activité récente',
+      title: 'Members',
+      dataIndex: 'roster',
+      key: 'roster',
+      width: 260,
+      render: (_: TeamMember[], record) => {
+        const preview = record.roster.slice(0, 3);
+        return preview.length ? (
+          <List
+            dataSource={preview}
+            renderItem={(m: TeamMember) => (
+              <List.Item style={{ paddingInline: 0 }} key={m.id}>
+                <List.Item.Meta
+                  avatar={<Avatar>{m.name.charAt(0)}</Avatar>}
+                  title={<Text>{m.name}</Text>}
+                  description={<Text type="secondary">{m.role}</Text>}
+                />
+              </List.Item>
+            )}
+          />
+        ) : (
+          <Text type="secondary">Members not loaded</Text>
+        );
+      },
+    },
+    {
+      title: 'Recent activity',
       dataIndex: 'recentActivity',
       key: 'recentActivity',
-      render: (activities: string[]) => (
-        <List
-          size="small"
-          dataSource={activities.slice(0, 3)}
-          renderItem={(msg) => <List.Item style={{ paddingInline: 0 }}>{msg}</List.Item>}
-        />
-      ),
+      width: 260,
+      render: (activities: string[]) =>
+        activities.length ? (
+          <List
+            size="small"
+            dataSource={activities.slice(0, 3)}
+            renderItem={(msg) => (
+              <List.Item style={{ paddingInline: 0 }}>{msg}</List.Item>
+            )}
+          />
+        ) : (
+          <Text type="secondary">No recent activity</Text>
+        ),
       responsive: ['lg'],
+    },
+    {
+      title: 'Status',
+      dataIndex: 'membershipStatus',
+      key: 'membershipStatus',
+      width: 140,
+      render: (status: MembershipStatus) => {
+        switch (status) {
+          case 'active':
+            return <Tag color="green">Active</Tag>;
+          case 'invited':
+            return <Tag color="blue">Invitation</Tag>;
+          case 'request_pending':
+            return <Tag color="orange">Request pending</Tag>;
+          default:
+            return <Tag>Unknown</Tag>;
+        }
+      },
+    },
+    {
+      title: 'Access',
+      dataIndex: 'isRestricted',
+      key: 'isRestricted',
+      width: 120,
+      render: (isRestricted: boolean) =>
+        isRestricted ? (
+          <Tag color="volcano">Restricted</Tag>
+        ) : (
+          <Tag color="default">Open</Tag>
+        ),
+      responsive: ['md'],
     },
     {
       title: 'Actions',
       key: 'actions',
       fixed: 'right',
-      width: 140,
+      width: 160,
       render: (_: unknown, record) => {
+        const items: MenuProps['items'] = [
+          { key: 'view', label: 'Open team' },
+          { key: 'invite', label: 'Invite members' },
+          { type: 'divider' },
+          {
+            key: 'leave',
+            danger: true,
+            label: 'Leave team',
+          },
+        ];
+
         const onMenuClick: MenuProps['onClick'] = ({ key }) => {
           switch (key) {
             case 'view':
-              // TODO: router.push(`/konnected/teams-collaboration/my-teams/${record.teamId}`);
+              handleViewTeam(record);
               break;
             case 'invite':
-              // TODO: ouvrir un modal d’invitation
+              handleInviteMembers(record);
               break;
-            case 'archive':
-              setData((prev) => prev.filter((r) => r.key !== record.key));
+            case 'leave':
+              void handleLeaveTeam(record);
               break;
             default:
               break;
           }
         };
 
-        const items: MenuProps['items'] = [
-          { key: 'view', label: 'Voir l’équipe' },
-          { key: 'invite', label: 'Inviter des membres' },
-          { type: 'divider' },
-          { key: 'archive', danger: true, label: 'Archiver' },
-        ];
+        const isLeaving = leavingTeamId === record.teamId;
 
         return (
-          <Dropdown menu={{ items, onClick: onMenuClick }} trigger={['click']}>
-            <Button>
+          <Dropdown
+            menu={{ items, onClick: onMenuClick }}
+            trigger={['click']}
+            disabled={isLeaving}
+          >
+            <Button loading={isLeaving}>
               Actions <DownOutlined />
             </Button>
           </Dropdown>
@@ -176,40 +427,176 @@ export default function Page() {
     },
   ];
 
-  const rowSelection: TableProps<TeamRow>['rowSelection'] = {
-    selectedRowKeys: selectedTeamKeys,
-    onChange: (keys) => setSelectedTeamKeys(keys),
-  };
+  const headerSecondaryActions = (
+    <Space>
+      <Button
+        icon={<ProjectOutlined />}
+        onClick={() =>
+          router.push('/konnected/teams-collaboration/project-workspaces')
+        }
+      >
+        Project workspaces
+      </Button>
+      <Button
+        icon={<CalendarOutlined />}
+        onClick={() =>
+          router.push('/konnected/teams-collaboration/activity-planner')
+        }
+      >
+        Activity planner
+      </Button>
+    </Space>
+  );
 
-  const sortedData = useMemo(
-    () => [...data].sort((a, b) => a.teamName.localeCompare(b.teamName)),
-    [data]
+  const headerPrimaryAction = (
+    <Button
+      type="primary"
+      icon={<PlusOutlined />}
+      onClick={() =>
+        router.push('/konnected/teams-collaboration/team-builder')
+      }
+    >
+      Create or join a team
+    </Button>
   );
 
   return (
-    <PageContainer
-      header={{
-        title: 'Mes équipes',
-        extra: [
-          <Button key="new" type="primary" icon={<PlusOutlined />}>
-            Nouvelle équipe
-          </Button>,
-          <Button key="invite" icon={<UsergroupAddOutlined />}>
-            Inviter
-          </Button>,
-        ],
-      }}
+    <KonnectedPageShell
+      title="My Teams"
+      subtitle={
+        <span>
+          Manage the collaboration teams you are part of in KonnectED. View
+          membership, recent activity, and jump into workspaces.
+        </span>
+      }
+      primaryAction={headerPrimaryAction}
+      secondaryActions={headerSecondaryActions}
     >
-      <Table<TeamRow>
-        rowKey="key"
-        size="middle"
-        bordered
-        columns={columns}
-        dataSource={sortedData}
-        rowSelection={rowSelection}
-        pagination={{ pageSize: 8, showSizeChanger: false }}
-        scroll={{ x: 900 }}
-      />
-    </PageContainer>
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col xs={24} sm={8}>
+          <Space direction="vertical" size={0}>
+            <Text type="secondary">Total teams</Text>
+            <Text strong>
+              <TeamOutlined style={{ marginRight: 4 }} />
+              {totalTeams}
+            </Text>
+          </Space>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Space direction="vertical" size={0}>
+            <Text type="secondary">Teams you own/admin</Text>
+            <Text strong>{ownerAdminCount}</Text>
+          </Space>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Space direction="vertical" size={0}>
+            <Text type="secondary">Restricted teams</Text>
+            <Text strong>{restrictedCount}</Text>
+          </Space>
+        </Col>
+      </Row>
+
+      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+        <Col xs={24} md={10}>
+          <Search
+            placeholder="Search by team or project name"
+            allowClear
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            onSearch={(value) => setSearchText(value)}
+          />
+        </Col>
+        <Col xs={12} md={6}>
+          <Select<'all' | TeamRole>
+            style={{ width: '100%' }}
+            value={roleFilter}
+            onChange={(val) => setRoleFilter(val)}
+          >
+            <Option value="all">All roles</Option>
+            <Option value="owner">Owner</Option>
+            <Option value="admin">Admin</Option>
+            <Option value="member">Member</Option>
+            <Option value="observer">Observer</Option>
+          </Select>
+        </Col>
+        <Col xs={12} md={6}>
+          <Select<'all' | MembershipStatus>
+            style={{ width: '100%' }}
+            value={statusFilter}
+            onChange={(val) => setStatusFilter(val)}
+          >
+            <Option value="all">All membership states</Option>
+            <Option value="active">Active</Option>
+            <Option value="invited">Invitations</Option>
+            <Option value="request_pending">Requests pending</Option>
+          </Select>
+        </Col>
+        <Col xs={24} md={2}>
+          <Space>
+            <Switch
+              checked={restrictedOnly}
+              onChange={(checked) => setRestrictedOnly(checked)}
+            />
+            <Text type="secondary">Restricted only</Text>
+          </Space>
+        </Col>
+      </Row>
+
+      {error && (
+        <Alert
+          type="error"
+          message="Unable to load your teams"
+          description={
+            <>
+              <Paragraph style={{ marginBottom: 8 }}>{error}</Paragraph>
+              <Button size="small" onClick={() => setReloadFlag((n) => n + 1)}>
+                Retry
+              </Button>
+            </>
+          }
+          showIcon
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      {!loading && !error && sortedData.length === 0 ? (
+        <Empty
+          description="You are not part of any team yet."
+          style={{ padding: '40px 0' }}
+        >
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() =>
+                router.push('/konnected/teams-collaboration/team-builder')
+              }
+            >
+              Create or join a team
+            </Button>
+            <Button
+              icon={<ProjectOutlined />}
+              onClick={() =>
+                router.push('/konnected/teams-collaboration/project-workspaces')
+              }
+            >
+              Browse project workspaces
+            </Button>
+          </Space>
+        </Empty>
+      ) : (
+        <Table<TeamRow>
+          rowKey="key"
+          size="middle"
+          bordered
+          loading={loading}
+          columns={columns}
+          dataSource={sortedData}
+          rowSelection={rowSelection}
+          pagination={{ pageSize: 8, showSizeChanger: false }}
+          scroll={{ x: 1000 }}
+        />
+      )}
+    </KonnectedPageShell>
   );
 }

@@ -2,12 +2,30 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { List, Card, Input, Select, Button, Drawer, Row, Col, Divider, Pagination, Tag } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Drawer,
+  Input,
+  Pagination,
+  Row,
+  Select,
+  Space,
+  Tabs,
+  Tag,
+  Tooltip,
+} from 'antd';
+import { PlusOutlined, SearchOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 
 const { Search } = Input;
 const { Option } = Select;
+
+type SortCriteria = 'newest' | 'mostMembers';
 
 interface Project {
   id: string;
@@ -17,7 +35,7 @@ interface Project {
   technologies: string[];
   domain: string;
   members: number;
-  createdAt: string;
+  createdAt: string; // ISO date string
 }
 
 // Sample data (replace with API data when ready)
@@ -37,265 +55,438 @@ const sampleProjects: Project[] = [
     name: 'Project Beta',
     description: 'A collaborative initiative for modern education.',
     owner: 'Bob',
-    technologies: ['Next.js', 'Tailwind CSS'],
+    technologies: ['Python', 'Django'],
     domain: 'Education',
     members: 12,
-    createdAt: '2023-09-02',
+    createdAt: '2023-08-15',
   },
   {
     id: '3',
     name: 'Project Gamma',
-    description: 'Developing a disruptive fintech solution.',
+    description: 'Fintech solution for inclusive banking.',
     owner: 'Charlie',
-    technologies: ['Angular', 'Firebase'],
+    technologies: ['React', 'Go'],
     domain: 'Finance',
-    members: 10,
-    createdAt: '2023-08-28',
+    members: 5,
+    createdAt: '2023-09-10',
   },
   {
     id: '4',
     name: 'Project Delta',
-    description: 'A marketing project aimed to improve brand engagement.',
+    description: 'Marketing analytics platform with AI insights.',
     owner: 'Diana',
-    technologies: ['Vue.js', 'SCSS'],
+    technologies: ['Vue', 'Node.js'],
     domain: 'Marketing',
-    members: 15,
-    createdAt: '2023-09-03',
+    members: 10,
+    createdAt: '2023-07-22',
   },
   {
     id: '5',
     name: 'Project Epsilon',
-    description: 'Design-focused project for innovative product development.',
-    owner: 'Edward',
-    technologies: ['Figma', 'Illustrator'],
+    description: 'Design-centric collaboration hub.',
+    owner: 'Eve',
+    technologies: ['Figma', 'TypeScript'],
     domain: 'Design',
-    members: 5,
-    createdAt: '2023-08-25',
+    members: 6,
+    createdAt: '2023-09-05',
   },
 ];
 
-export default function BrowseProjectsPage() {
+export default function BrowseProjectsPage(): JSX.Element {
   const router = useRouter();
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  // Filters & sort
   const [searchText, setSearchText] = useState('');
-  const [selectedDomain, setSelectedDomain] = useState('All');
-  const [selectedTechnology, setSelectedTechnology] = useState('All');
-  const [sortCriteria, setSortCriteria] = useState<'newest' | 'mostMembers'>('newest');
+  const [selectedDomain, setSelectedDomain] = useState<string>('All');
+  const [selectedTechnology, setSelectedTechnology] = useState<string>('All');
+  const [sortCriteria, setSortCriteria] = useState<SortCriteria>('newest');
+  const [activeDomainTabKey, setActiveDomainTabKey] = useState<string>('All');
 
-  // Pagination
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 5;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const pageSize = 6;
 
-  // Filtered list
-  const filteredProjects = useMemo(() => {
-    return sampleProjects.filter((project) => {
-      const matchesSearch =
-        project.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        project.description.toLowerCase().includes(searchText.toLowerCase());
-      const matchesDomain = selectedDomain === 'All' || project.domain === selectedDomain;
-      const matchesTechnology =
-        selectedTechnology === 'All' || project.technologies.includes(selectedTechnology);
-      return matchesSearch && matchesDomain && matchesTechnology;
+  const domainOptions = useMemo(() => {
+    const unique = Array.from(new Set(sampleProjects.map((p) => p.domain)));
+    return ['All', ...unique];
+  }, []);
+
+  const technologyOptions = useMemo(() => {
+    const allTechs = new Set<string>();
+    sampleProjects.forEach((p) => {
+      p.technologies.forEach((t) => allTechs.add(t));
     });
-  }, [searchText, selectedDomain, selectedTechnology]);
+    return ['All', ...Array.from(allTechs)];
+  }, []);
 
-  // Sorted list
+  const filteredProjects = useMemo(
+    () =>
+      sampleProjects.filter((project) => {
+        const matchesSearch =
+          !searchText ||
+          project.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          project.description.toLowerCase().includes(searchText.toLowerCase());
+
+        const matchesDomain =
+          selectedDomain === 'All' || project.domain === selectedDomain;
+
+        const matchesTechnology =
+          selectedTechnology === 'All' ||
+          project.technologies.includes(selectedTechnology);
+
+        return matchesSearch && matchesDomain && matchesTechnology;
+      }),
+    [searchText, selectedDomain, selectedTechnology],
+  );
+
   const sortedProjects = useMemo(() => {
-    return [...filteredProjects].sort((a, b) => {
-      if (sortCriteria === 'newest') {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-      if (sortCriteria === 'mostMembers') {
-        return b.members - a.members;
-      }
-      return 0;
-    });
+    const next = [...filteredProjects];
+    if (sortCriteria === 'newest') {
+      next.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+    } else if (sortCriteria === 'mostMembers') {
+      next.sort((a, b) => b.members - a.members);
+    }
+    return next;
   }, [filteredProjects, sortCriteria]);
 
-  // Pagination slice
   const paginatedProjects = useMemo(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return sortedProjects.slice(startIndex, startIndex + pageSize);
   }, [sortedProjects, currentPage]);
 
-  // Drawer handlers
-  const openDrawer = (project: Project) => {
+  const handleOpenDrawer = (project: Project) => {
     setSelectedProject(project);
     setDrawerVisible(true);
   };
 
-  const closeDrawer = () => {
+  const handleCloseDrawer = () => {
     setDrawerVisible(false);
     setSelectedProject(null);
   };
 
+  const handleDomainTabChange = (key: string) => {
+    setActiveDomainTabKey(key);
+    setSelectedDomain(key);
+    setCurrentPage(1);
+  };
+
   return (
-    <div className="container mx-auto p-5">
-      {/* Header */}
-      <h1 className="text-2xl font-bold mb-4">Browse Projects</h1>
-
-      {/* Search & Filters */}
-      <Row gutter={[16, 16]} className="mb-4">
-        <Col xs={24} sm={12}>
-          <Search
-            placeholder="Search projects..."
-            allowClear
-            onSearch={(value) => {
-              setSearchText(value);
-              setCurrentPage(1);
-            }}
-          />
-        </Col>
-        <Col xs={24} sm={6}>
-          <Select
-            value={selectedDomain}
-            style={{ width: '100%' }}
-            onChange={(value) => {
-              setSelectedDomain(value);
-              setCurrentPage(1);
-            }}
-          >
-            <Option value="All">All Domains</Option>
-            <Option value="Energy">Energy</Option>
-            <Option value="Education">Education</Option>
-            <Option value="Finance">Finance</Option>
-            <Option value="Marketing">Marketing</Option>
-            <Option value="Design">Design</Option>
-          </Select>
-        </Col>
-        <Col xs={24} sm={6}>
-          <Select
-            value={selectedTechnology}
-            style={{ width: '100%' }}
-            onChange={(value) => {
-              setSelectedTechnology(value);
-              setCurrentPage(1);
-            }}
-          >
-            <Option value="All">All Technologies</Option>
-            <Option value="React">React</Option>
-            <Option value="Next.js">Next.js</Option>
-            <Option value="Angular">Angular</Option>
-            <Option value="Node.js">Node.js</Option>
-            <Option value="Firebase">Firebase</Option>
-            <Option value="Tailwind CSS">Tailwind CSS</Option>
-            <Option value="Vue.js">Vue.js</Option>
-          </Select>
-        </Col>
-      </Row>
-
-      {/* Sort & Create */}
-      <Row justify="space-between" align="middle" className="mb-4">
-        <Col>
-          <Select value={sortCriteria} onChange={(value) => setSortCriteria(value)}>
-            <Option value="newest">Sort by Newest</Option>
-            <Option value="mostMembers">Sort by Most Members</Option>
-          </Select>
-        </Col>
-        <Col>
+    <PageContainer
+      ghost
+      header={{
+        title: 'Browse Projects',
+        subTitle: 'Discover projects and collaborate through KeenKonnect.',
+        extra: [
           <Button
+            key="create"
             type="primary"
             icon={<PlusOutlined />}
-            onClick={() => router.push('/keenkonnect/projects/create-new-project')}
+            onClick={() =>
+              router.push('/keenkonnect/projects/create-new-project')
+            }
           >
             Create New Project
-          </Button>
-        </Col>
-      </Row>
+          </Button>,
+        ],
+      }}
+    >
+      <ProCard ghost>
+        {/* Tabs + filters */}
+        <ProCard bordered={false}>
+          {/* Quick domain Tabs */}
+          <Tabs
+            activeKey={activeDomainTabKey}
+            onChange={handleDomainTabChange}
+            items={domainOptions.map((domain) => ({
+              key: domain,
+              label: domain === 'All' ? 'All Domains' : domain,
+            }))}
+          />
 
-      <Divider />
+          {/* Filters */}
+          <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
+            <Col xs={24} md={10}>
+              <Search
+                placeholder="Search by name or description"
+                allowClear
+                prefix={<SearchOutlined />}
+                value={searchText}
+                onChange={(e) => {
+                  setSearchText(e.target.value);
+                  setCurrentPage(1);
+                }}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={7}>
+              <Select
+                value={selectedDomain}
+                style={{ width: '100%' }}
+                onChange={(value) => {
+                  setSelectedDomain(value);
+                  setActiveDomainTabKey(value);
+                  setCurrentPage(1);
+                }}
+              >
+                {domainOptions.map((domain) => (
+                  <Option key={domain} value={domain}>
+                    {domain === 'All' ? 'All Domains' : domain}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+            <Col xs={24} sm={12} md={7}>
+              <Select
+                value={selectedTechnology}
+                style={{ width: '100%' }}
+                onChange={(value) => {
+                  setSelectedTechnology(value);
+                  setCurrentPage(1);
+                }}
+              >
+                {technologyOptions.map((tech) => (
+                  <Option key={tech} value={tech}>
+                    {tech === 'All' ? 'All Technologies' : tech}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+          </Row>
 
-      {/* Projects */}
-      <List
-        grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-        dataSource={paginatedProjects}
-        renderItem={(project: Project) => (
-          <List.Item key={project.id}>
-            <Card
-              hoverable
-              title={project.name}
-              extra={<span>{project.owner}</span>}
-              actions={[
-                <Button key="details" type="link" onClick={() => openDrawer(project)}>
-                  View Details
-                </Button>,
-                <Button
-                  key="join"
-                  type="link"
-                  onClick={() =>
-                    router.push(`/keenkonnect/projects/request-join?id=${project.id}`)
+          {/* Sort & result count */}
+          <Row
+            justify="space-between"
+            align="middle"
+            style={{ marginTop: 16 }}
+          >
+            <Col>
+              <Space size="middle">
+                <span>Sort by:</span>
+                <Select
+                  value={sortCriteria}
+                  style={{ width: 200 }}
+                  onChange={(value) =>
+                    setSortCriteria(value as SortCriteria)
                   }
                 >
-                  Request to Join
-                </Button>,
-              ]}
-            >
-              <p>{project.description}</p>
-              <div>
-                {project.technologies.map((tech, idx) => (
-                  <Tag key={idx}>{tech}</Tag>
-                ))}
-              </div>
-            </Card>
-          </List.Item>
-        )}
-      />
+                  <Option value="newest">Newest</Option>
+                  <Option value="mostMembers">Most Members</Option>
+                </Select>
+              </Space>
+            </Col>
+            <Col>
+              <span>
+                {sortedProjects.length} project
+                {sortedProjects.length !== 1 ? 's' : ''} found
+              </span>
+            </Col>
+          </Row>
+        </ProCard>
 
-      {/* Pagination */}
-      <Row justify="center" className="mt-4">
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={sortedProjects.length}
-          onChange={(page) => setCurrentPage(page)}
-          showSizeChanger={false}
-        />
-      </Row>
+        {/* Projects grid */}
+        <ProCard ghost style={{ marginTop: 24 }} bodyStyle={{ padding: 0 }}>
+          <Row gutter={[24, 24]}>
+            {paginatedProjects.map((project) => (
+              <Col key={project.id} xs={24} sm={12} lg={8}>
+                <Card
+                  hoverable
+                  title={project.name}
+                  onClick={() => handleOpenDrawer(project)}
+                  extra={
+                    <Space size={8}>
+                      <Tag color="blue">{project.domain}</Tag>
+                      <Tooltip title={`${project.members} members`}>
+                        <Space size={4}>
+                          <TeamOutlined />
+                          <span>{project.members}</span>
+                        </Space>
+                      </Tooltip>
+                    </Space>
+                  }
+                >
+                  <Space
+                    direction="vertical"
+                    size="small"
+                    style={{ width: '100%' }}
+                  >
+                    <div style={{ minHeight: 48 }}>{project.description}</div>
 
-      {/* Drawer */}
-      <Drawer
-        title={selectedProject?.name}
-        placement="right"
-        onClose={closeDrawer}
-        open={drawerVisible}
-        width={400}
-      >
-        {selectedProject && (
-          <div>
-            <p>
-              <strong>Owner:</strong> {selectedProject.owner}
-            </p>
-            <p>
-              <strong>Description:</strong> {selectedProject.description}
-            </p>
-            <p>
-              <strong>Domain:</strong> {selectedProject.domain}
-            </p>
-            <p>
-              <strong>Technologies:</strong> {selectedProject.technologies.join(', ')}
-            </p>
-            <p>
-              <strong>Members:</strong> {selectedProject.members}
-            </p>
-            <p>
-              <strong>Created At:</strong> {selectedProject.createdAt}
-            </p>
-            <Divider />
-            <Button
-              type="primary"
-              onClick={() =>
-                router.push(`/keenkonnect/projects/request-join?id=${selectedProject.id}`)
-              }
-            >
-              Request to Join
-            </Button>
+                    {/* Technologies */}
+                    <Space wrap>
+                      {project.technologies.map((tech) => (
+                        <Tag key={tech}>{tech}</Tag>
+                      ))}
+                    </Space>
+
+                    {/* Avatars + owner + CTA */}
+                    <Row
+                      justify="space-between"
+                      align="middle"
+                      style={{ marginTop: 8 }}
+                    >
+                      <Col>
+                        <Space size={8}>
+                          <Avatar.Group maxCount={3} size="small">
+                            <Avatar icon={<UserOutlined />} />
+                            <Avatar>
+                              {project.owner.charAt(0).toUpperCase()}
+                            </Avatar>
+                            <Avatar icon={<UserOutlined />} />
+                          </Avatar.Group>
+                          <span
+                            style={{
+                              fontSize: 12,
+                              color: 'rgba(0,0,0,0.45)',
+                            }}
+                          >
+                            Owner: {project.owner}
+                          </span>
+                        </Space>
+                      </Col>
+                      <Col>
+                        <Button
+                          type="link"
+                          size="small"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            router.push(
+                              `/keenkonnect/projects/request-join?id=${project.id}`,
+                            );
+                          }}
+                        >
+                          Request to Join
+                        </Button>
+                      </Col>
+                    </Row>
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+
+            {paginatedProjects.length === 0 && (
+              <Col span={24}>
+                <Card>
+                  <Space direction="vertical">
+                    <span>No projects match your filters.</span>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() =>
+                        router.push(
+                          '/keenkonnect/projects/create-new-project',
+                        )
+                      }
+                    >
+                      Start a New Project
+                    </Button>
+                  </Space>
+                </Card>
+              </Col>
+            )}
+          </Row>
+        </ProCard>
+
+        {/* Pagination */}
+        {sortedProjects.length > pageSize && (
+          <div style={{ textAlign: 'center', marginTop: 24 }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={sortedProjects.length}
+              showSizeChanger={false}
+              onChange={(page) => setCurrentPage(page)}
+            />
           </div>
         )}
-      </Drawer>
-    </div>
+
+        {/* Drawer: project details */}
+        <Drawer
+          title={selectedProject?.name}
+          placement="right"
+          width={420}
+          open={drawerVisible}
+          onClose={handleCloseDrawer}
+        >
+          {selectedProject && (
+            <Space
+              direction="vertical"
+              size="middle"
+              style={{ width: '100%' }}
+            >
+              <Space align="center">
+                <Avatar.Group maxCount={3}>
+                  <Avatar size="large" icon={<UserOutlined />} />
+                  <Avatar>
+                    {selectedProject.owner.charAt(0).toUpperCase()}
+                  </Avatar>
+                  <Avatar icon={<UserOutlined />} />
+                </Avatar.Group>
+                <div>
+                  <div>
+                    <strong>Owner: </strong>
+                    {selectedProject.owner}
+                  </div>
+                  <div>
+                    <strong>Members: </strong>
+                    {selectedProject.members}
+                  </div>
+                </div>
+              </Space>
+
+              <Divider />
+
+              <div>
+                <p>
+                  <strong>Description</strong>
+                </p>
+                <p>{selectedProject.description}</p>
+              </div>
+
+              <div>
+                <p>
+                  <strong>Domain</strong>
+                </p>
+                <Tag color="blue">{selectedProject.domain}</Tag>
+              </div>
+
+              <div>
+                <p>
+                  <strong>Technologies</strong>
+                </p>
+                <Space wrap>
+                  {selectedProject.technologies.map((tech) => (
+                    <Tag key={tech}>{tech}</Tag>
+                  ))}
+                </Space>
+              </div>
+
+              <div>
+                <p>
+                  <strong>Created At</strong>
+                </p>
+                <span>{selectedProject.createdAt}</span>
+              </div>
+
+              <Divider />
+
+              <Button
+                type="primary"
+                block
+                onClick={() =>
+                  router.push(
+                    `/keenkonnect/projects/request-join?id=${selectedProject.id}`,
+                  )
+                }
+              >
+                Request to Join
+              </Button>
+            </Space>
+          )}
+        </Drawer>
+      </ProCard>
+    </PageContainer>
   );
 }

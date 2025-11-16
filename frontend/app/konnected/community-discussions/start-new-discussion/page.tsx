@@ -1,92 +1,362 @@
-﻿'use client';
+﻿﻿'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import {
+  Alert,
+  Button,
+  Card,
+  Col,
   Form,
   Input,
-  Select,
-  Switch,
-  Button,
-  Typography,
   message as antdMessage,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Tag,
+  Typography,
+  Upload,
+  Radio,
 } from 'antd';
 import type { FormProps } from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
+import { InfoCircleOutlined, MessageOutlined, QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { TextArea } = Input;
-const { Paragraph } = Typography;
+const { Paragraph, Text } = Typography;
+
+type ThreadType = 'question' | 'discussion';
 
 type FormValues = {
   title: string;
   content?: string;
-  category?: 'general' | 'announcements' | string;
-  isQuestion?: boolean;
+  category: string;
+  threadType: ThreadType;
+  tags?: string[];
+  subscribeToReplies?: boolean;
+  attachments?: UploadFile[];
 };
 
+type CreateTopicPayload = {
+  title: string;
+  category: string;
+  threadType: ThreadType;
+  isQuestion: boolean;
+  tags?: string[];
+  initialPost?: {
+    content?: string;
+    attachments?: string[];
+  };
+  subscribeToReplies?: boolean;
+};
+
+/**
+ * Start New Discussion page for KonnectED → Community Discussions.
+ * Creates a ForumTopic + initial ForumPost against the backend API.
+ */
 export default function StartNewDiscussionPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
   const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
 
-  const onFinish: FormProps<FormValues>['onFinish'] = (_values) => {
-    antdMessage.success('Discussion posted');
-    router.push('/konnected/community-discussions/active-threads');
+  const buildPayload = (values: FormValues): CreateTopicPayload => {
+    const attachments = (values.attachments ?? []).map((file) => file.name);
+
+    return {
+      title: values.title.trim(),
+      category: values.category,
+      threadType: values.threadType,
+      isQuestion: values.threadType === 'question',
+      tags: values.tags?.map((t) => t.trim()).filter(Boolean),
+      initialPost: {
+        content: values.content?.trim() || undefined,
+        attachments: attachments.length ? attachments : undefined,
+      },
+      subscribeToReplies: values.subscribeToReplies ?? true,
+    };
+  };
+
+  const onFinish: FormProps<FormValues>['onFinish'] = async (values) => {
+    setSubmitting(true);
+    try {
+      const payload = buildPayload(values);
+
+      // TODO: align this path & payload with schema-endpoints.json
+      const res = await fetch('/api/konnected/community-discussions/topics', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        let backendMessage = 'Unable to create discussion.';
+        try {
+          const data = (await res.json()) as { message?: string };
+          if (data?.message) backendMessage = data.message;
+        } catch {
+          // ignore JSON parse errors
+        }
+        if (res.status === 403) {
+          antdMessage.error(backendMessage || 'You do not have permission to start a new discussion.');
+        } else if (res.status === 429) {
+          antdMessage.error(
+            backendMessage || 'You have created too many discussions in a short time. Please try again later.',
+          );
+        } else {
+          antdMessage.error(backendMessage);
+        }
+        return;
+      }
+
+      antdMessage.success('Discussion created successfully.');
+      router.push('/konnected/community-discussions/active-threads');
+    } catch (error) {
+      // Network or unexpected error
+      // eslint-disable-next-line no-console
+      console.error('Error creating discussion', error);
+      antdMessage.error('Something went wrong while creating the discussion. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const onFinishFailed: FormProps<FormValues>['onFinishFailed'] = () => {
-    antdMessage.error('Please fix the errors and try again.');
+    antdMessage.error('Please fix the highlighted fields and try again.');
   };
 
+  // Categories aligned with the Active Threads dummy data for now.
+  const CATEGORY_OPTIONS: { label: string; value: string }[] = [
+    { label: 'Math', value: 'Math' },
+    { label: 'Science', value: 'Science' },
+    { label: 'General', value: 'General' },
+  ];
+
+  const TAG_SUGGESTIONS = ['Exam prep', 'Project help', 'Tips & tricks', 'Resources', 'Mentoring'];
+
   return (
-    <PageContainer title="Start a New Discussion">
-      <Paragraph type="secondary" style={{ marginBottom: 24 }}>
-        Share a topic with the community.
-      </Paragraph>
+    <KonnectedPageShell
+      title="Start a New Discussion"
+      subtitle={
+        <span>
+          Share a question or topic with the KonnectED community. Your post may be surfaced in learning paths and
+          thematic forums.
+        </span>
+      }
+    >
+      <Row gutter={[24, 24]}>
+        {/* Main form column */}
+        <Col xs={24} md={16}>
+          <Card>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              <Alert
+                type="info"
+                showIcon
+                icon={<InfoCircleOutlined />}
+                message="Reminder: keep it constructive and on-topic"
+                description={
+                  <span>
+                    Discussions are visible across teams. Content may be routed to moderators before publication for
+                    low-trust accounts.
+                  </span>
+                }
+              />
 
-      <Form<FormValues>
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        initialValues={{ isQuestion: false }}
-      >
-        <Form.Item
-          label="Title"
-          name="title"
-          rules={[{ required: true, message: 'Please enter a title' }]}
-        >
-          <Input placeholder="e.g. How do we measure impact across teams?" />
-        </Form.Item>
+              <Form<FormValues>
+                form={form}
+                layout="vertical"
+                onFinish={onFinish}
+                onFinishFailed={onFinishFailed}
+                initialValues={{
+                  threadType: 'discussion',
+                  subscribeToReplies: true,
+                }}
+              >
+                {/* Title */}
+                <Form.Item
+                  label="Title"
+                  name="title"
+                  rules={[
+                    { required: true, message: 'Please enter a title' },
+                    { min: 10, message: 'The title should be at least 10 characters long.' },
+                    { max: 150, message: 'The title should be at most 150 characters.' },
+                    {
+                      validator: (_, value) => {
+                        if (typeof value === 'string' && !value.trim()) {
+                          return Promise.reject(new Error('The title cannot be empty or just spaces.'));
+                        }
+                        return Promise.resolve();
+                      },
+                    },
+                  ]}
+                >
+                  <Input placeholder="e.g. How do we measure impact across teams in cross-faculty projects?" />
+                </Form.Item>
 
-        <Form.Item label="Content" name="content">
-          <TextArea rows={6} placeholder="Add more details, links, or context…" />
-        </Form.Item>
+                {/* Thread type */}
+                <Form.Item
+                  label="Type of thread"
+                  name="threadType"
+                  rules={[{ required: true, message: 'Please select the type of discussion.' }]}
+                >
+                  <Radio.Group>
+                    <Radio.Button value="question">
+                      <Space>
+                        <QuestionCircleOutlined />
+                        <span>Question (Q&amp;A)</span>
+                      </Space>
+                    </Radio.Button>
+                    <Radio.Button value="discussion">
+                      <Space>
+                        <MessageOutlined />
+                        <span>Open discussion</span>
+                      </Space>
+                    </Radio.Button>
+                  </Radio.Group>
+                </Form.Item>
 
-        <Form.Item label="Category" name="category">
-          <Select
-            placeholder="Select a category"
-            options={[
-              { label: 'General', value: 'general' },
-              { label: 'Announcements', value: 'announcements' },
-            ]}
-            allowClear
-          />
-        </Form.Item>
+                {/* Category */}
+                <Form.Item
+                  label="Category / subject area"
+                  name="category"
+                  rules={[{ required: true, message: 'Please select a category.' }]}
+                >
+                  <Select
+                    placeholder="Select a category"
+                    options={CATEGORY_OPTIONS}
+                    allowClear
+                    showSearch
+                    optionFilterProp="label"
+                  />
+                </Form.Item>
 
-        <Form.Item
-          label="Is this a question?"
-          name="isQuestion"
-          valuePropName="checked"
-        >
-          <Switch />
-        </Form.Item>
+                {/* Content */}
+                <Form.Item
+                  label="Content"
+                  name="content"
+                  rules={[
+                    {
+                      max: 5000,
+                      message: 'The content is too long (max 5000 characters).',
+                    },
+                  ]}
+                  extra="Provide enough context so that others can give meaningful answers or contributions."
+                >
+                  <TextArea
+                    rows={6}
+                    placeholder="Describe your question or topic. You can mention specific courses, projects, or resources…"
+                    showCount
+                    maxLength={5000}
+                  />
+                </Form.Item>
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Post Discussion
-          </Button>
-        </Form.Item>
-      </Form>
-    </PageContainer>
+                {/* Tags */}
+                <Form.Item
+                  label="Tags"
+                  name="tags"
+                  tooltip="Use tags so your discussion can be surfaced in thematic forums and learning paths."
+                >
+                  <Select
+                    mode="tags"
+                    tokenSeparators={[',']}
+                    placeholder="Add tags (press Enter to confirm)…"
+                    options={TAG_SUGGESTIONS.map((t) => ({ label: t, value: t }))}
+                  />
+                </Form.Item>
+
+                {/* Attachments */}
+                <Form.Item
+                  label="Attachments"
+                  name="attachments"
+                  valuePropName="fileList"
+                  getValueFromEvent={(e: { fileList: UploadFile[] }) => e?.fileList}
+                  extra="Attach optional supporting files (e.g. PDF instructions, slides)."
+                >
+                  <Upload.Dragger
+                    multiple
+                    beforeUpload={() => false} // prevent auto-upload; backend integration can be wired later
+                    accept=".pdf,.doc,.docx,.ppt,.pptx,.png,.jpg,.jpeg"
+                  >
+                    <p className="ant-upload-drag-icon">
+                      <UploadOutlined />
+                    </p>
+                    <p className="ant-upload-text">Click or drag files to this area to attach</p>
+                    <p className="ant-upload-hint">Files will be included with your initial post when supported.</p>
+                  </Upload.Dragger>
+                </Form.Item>
+
+                {/* Notification / subscription */}
+                <Form.Item
+                  label="Notify me about replies"
+                  name="subscribeToReplies"
+                  valuePropName="checked"
+                  tooltip="You will receive notifications when someone replies or your post is updated."
+                >
+                  <Switch />
+                </Form.Item>
+
+                {/* Submit button */}
+                <Form.Item>
+                  <Space>
+                    <Button type="primary" htmlType="submit" loading={submitting}>
+                      Post discussion
+                    </Button>
+                    <Button
+                      htmlType="button"
+                      onClick={() =>
+                        router.push('/konnected/community-discussions/active-threads')
+                      }
+                    >
+                      Cancel
+                    </Button>
+                  </Space>
+                </Form.Item>
+              </Form>
+            </Space>
+          </Card>
+        </Col>
+
+        {/* Right-hand guidance / meta column */}
+        <Col xs={24} md={8}>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Card title="Good discussion practices">
+              <Space direction="vertical">
+                <Text>
+                  <Tag color="blue">Be specific</Tag> Clearly describe the context (course, team, project, tool).
+                </Text>
+                <Text>
+                  <Tag color="green">Show your attempt</Tag> For questions, explain what you already tried or
+                  understood.
+                </Text>
+                <Text>
+                  <Tag color="gold">Respect privacy</Tag> Avoid sharing sensitive personal or institutional data.
+                </Text>
+                <Text>
+                  <Tag color="purple">Use tags</Tag> Tags help link the discussion to Knowledge units and learning
+                  paths.
+                </Text>
+              </Space>
+            </Card>
+
+            <Card title="Moderation and visibility">
+              <Paragraph>
+                Posts may be queued for moderation based on your trust level or if they match sensitive topics.
+              </Paragraph>
+              <Paragraph>
+                If moderation is required, you&apos;ll see your topic as{' '}
+                <Text strong>“Pending review”</Text> until a moderator approves it.
+              </Paragraph>
+              <Paragraph>
+                You can later edit your post, close a question, or mark an answer as accepted from the thread detail
+                page (when implemented).
+              </Paragraph>
+            </Card>
+          </Space>
+        </Col>
+      </Row>
+    </KonnectedPageShell>
   );
 }

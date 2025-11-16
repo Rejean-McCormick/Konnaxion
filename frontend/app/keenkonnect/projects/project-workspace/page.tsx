@@ -1,45 +1,154 @@
-'use client'
+'use client';
 
-import React, { Suspense, useEffect, useState } from 'react'
-import MainLayout from '@/components/layout-components/MainLayout'
-import Head from 'next/head'
-import { Card, Row, Col, Spin, List } from 'antd'
-import api from '@/api'
+import React, { Suspense, useEffect, useState } from 'react';
+import Head from 'next/head';
+import { ProCard } from '@ant-design/pro-components';
+import { Comment } from '@ant-design/compatible';
+import type { MenuProps } from 'antd';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Drawer,
+  Empty,
+  List,
+  Menu,
+  Spin,
+  Tabs,
+  Tag,
+  Timeline,
+  Typography,
+  Space,
+} from 'antd';
+import api from '@/api';
+
+const { Title, Text, Paragraph } = Typography;
+const { TabPane } = Tabs;
 
 export default function PageWrapper() {
   return (
     <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
-      <>
-        <Content />
-      </>
+      <Content />
     </Suspense>
-  )
+  );
 }
 
-function Content() {
-  const [loading, setLoading] = useState(true)
-  const [workspace, setWorkspace] = useState<any>(null)
+function Content(): JSX.Element {
+  const [workspace, setWorkspace] = useState<any | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeKey, setActiveKey] = useState<string>('overview');
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [selectedTask, setSelectedTask] = useState<any | null>(null);
 
   useEffect(() => {
-    const load = async () => {
+    const fetchWorkspace = async () => {
       try {
-        const res = await api.get('/projects/workspace')
-        setWorkspace(res)
+        const data = await api.get('/projects/workspace');
+        setWorkspace(data ?? null);
       } catch (err) {
-        console.error('Workspace load error:', err)
+        // eslint-disable-next-line no-console
+        console.error('Failed to load project workspace', err);
+        setError('Error loading workspace. Some information may be unavailable.');
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    load()
-  }, [])
+    };
+
+    void fetchWorkspace();
+  }, []);
+
+  // Safely derive arrays from the workspace payload
+  const tasks: any[] = Array.isArray(workspace?.tasks)
+    ? ((workspace?.tasks as any[]) ?? [])
+    : [];
+  const members: any[] = Array.isArray(workspace?.members)
+    ? ((workspace?.members as any[]) ?? [])
+    : [];
+  const comments: any[] = Array.isArray(workspace?.comments)
+    ? ((workspace?.comments as any[]) ?? [])
+    : [];
+
+  let activity: any[] = [];
+  if (Array.isArray(workspace?.activity)) {
+    activity = (workspace?.activity as any[]) ?? [];
+  } else if (Array.isArray(workspace?.timeline)) {
+    activity = (workspace?.timeline as any[]) ?? [];
+  }
+
+  const derivedActivity =
+    activity.length > 0
+      ? activity
+      : tasks.map((task: any, index: number) => ({
+          key: task.id || `task-${index}`,
+          title: task.title,
+          description: task.description,
+          status: task.status,
+          date: task.dueDate || workspace?.deadline,
+        }));
+
+  const statusText: string = workspace?.status || 'Active';
+
+  const statusTagColor =
+    statusText === 'On Track'
+      ? 'success'
+      : statusText === 'At Risk'
+      ? 'warning'
+      : statusText === 'Blocked'
+      ? 'error'
+      : 'default';
+
+  const totalTasks = tasks.length;
+  const completedTasks = tasks.filter(
+    (task) => task.status === 'Done' || task.status === 'Completed',
+  ).length;
+  const inProgressTasks = tasks.filter(
+    (task) => task.status === 'In Progress' || task.status === 'Doing',
+  ).length;
+
+  const menuItems: MenuProps['items'] = [
+    {
+      key: 'overview',
+      label: 'Overview',
+    },
+    {
+      key: 'tasks',
+      label: 'Tasks & Sprints',
+    },
+    {
+      key: 'timeline',
+      label: 'Timeline',
+    },
+    {
+      key: 'discussion',
+      label: 'Discussion',
+    },
+  ];
+
+  const handleMenuClick: MenuProps['onClick'] = ({ key }) => {
+    setActiveKey(key as string);
+  };
+
+  const handleTabChange = (key: string) => {
+    setActiveKey(key);
+  };
+
+  const handleTaskClick = (task: any) => {
+    setSelectedTask(task);
+    setDrawerOpen(true);
+  };
 
   if (loading) {
     return (
-      <div style={{ padding: 40, textAlign: 'center' }}>
-        <Spin size="large" />
-      </div>
-    )
+      <>
+        <Head>
+          <title>KeenKonnect – Project Workspace</title>
+        </Head>
+        <div style={{ padding: 24, textAlign: 'center' }}>
+          <Spin size="large" />
+        </div>
+      </>
+    );
   }
 
   return (
@@ -48,37 +157,391 @@ function Content() {
         <title>KeenKonnect – Project Workspace</title>
       </Head>
 
-      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
-        Project Workspace
-      </h1>
+      <div style={{ padding: 24 }}>
+        <Title level={2} style={{ marginBottom: 8 }}>
+          {workspace?.name || 'Project Workspace'}
+        </Title>
 
-      <Row gutter={[24, 24]}>
-        <Col xs={24} md={16}>
-          <Card title="Tasks">
-            <List
-              dataSource={workspace?.tasks ?? []}
-              renderItem={(item: any) => (
-                <List.Item>
-                  <div>{item.title}</div>
-                </List.Item>
-              )}
-            />
-          </Card>
-        </Col>
+        <Paragraph type="secondary" style={{ marginBottom: 24, maxWidth: 720 }}>
+          {workspace?.description ||
+            'Central hub for coordinating your project, tracking tasks, and collaborating with your team in KeenKonnect.'}
+        </Paragraph>
 
-        <Col xs={24} md={8}>
-          <Card title="Team Members">
-            <List
-              dataSource={workspace?.members ?? []}
-              renderItem={(item: any) => (
-                <List.Item>
-                  <div>{item.name}</div>
-                </List.Item>
+        {error && (
+          <Paragraph type="danger" style={{ marginBottom: 16 }}>
+            {error}
+          </Paragraph>
+        )}
+
+        <ProCard split="vertical" gutter={24} bordered>
+          {/* Left column: context + menu + team */}
+          <ProCard
+            colSpan={{ xs: 24, sm: 24, md: 8, lg: 7, xl: 6 }}
+            title="Workspace overview"
+            bordered={false}
+          >
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <div>
+                <Text strong>Status:&nbsp;</Text>
+                <Tag color={statusTagColor}>{statusText}</Tag>
+              </div>
+
+              {workspace?.currentSprint && (
+                <div>
+                  <Text strong>Current sprint:&nbsp;</Text>
+                  <Text>{workspace.currentSprint}</Text>
+                </div>
               )}
-            />
-          </Card>
-        </Col>
-      </Row>
+
+              {workspace?.deadline && (
+                <div>
+                  <Text strong>Deadline:&nbsp;</Text>
+                  <Text>{workspace.deadline}</Text>
+                </div>
+              )}
+
+              <Space size="large" style={{ marginTop: 4 }}>
+                <Badge
+                  color="blue"
+                  text={
+                    <span>
+                      Total tasks:&nbsp;
+                      <Text strong>{totalTasks}</Text>
+                    </span>
+                  }
+                />
+                <Badge
+                  color="green"
+                  text={
+                    <span>
+                      Completed:&nbsp;
+                      <Text strong>{completedTasks}</Text>
+                    </span>
+                  }
+                />
+                <Badge
+                  color="gold"
+                  text={
+                    <span>
+                      In progress:&nbsp;
+                      <Text strong>{inProgressTasks}</Text>
+                    </span>
+                  }
+                />
+              </Space>
+
+              <div style={{ marginTop: 8 }}>
+                <Text strong style={{ display: 'block', marginBottom: 8 }}>
+                  Sections
+                </Text>
+                <Menu
+                  mode="inline"
+                  selectedKeys={[activeKey]}
+                  onClick={handleMenuClick}
+                  items={menuItems}
+                  style={{ borderRight: 0 }}
+                />
+              </div>
+
+              <div style={{ marginTop: 16 }}>
+                <Text strong style={{ display: 'block', marginBottom: 8 }}>
+                  Team members
+                </Text>
+                <List
+                  size="small"
+                  dataSource={members}
+                  locale={{ emptyText: 'No team members linked to this workspace yet.' }}
+                  renderItem={(member: any) => (
+                    <List.Item key={member.id || member.name}>
+                      <List.Item.Meta
+                        avatar={
+                          member.avatar ? (
+                            <Avatar size="small" src={member.avatar} />
+                          ) : (
+                            <Avatar size="small">
+                              {member.name?.charAt(0)?.toUpperCase() ?? '?'}
+                            </Avatar>
+                          )
+                        }
+                        title={member.name}
+                        description={member.role || member.title || 'Contributor'}
+                      />
+                    </List.Item>
+                  )}
+                />
+              </div>
+            </Space>
+          </ProCard>
+
+          {/* Right column: main content with tabs */}
+          <ProCard colSpan="auto" bordered={false}>
+            <Tabs activeKey={activeKey} onChange={handleTabChange}>
+              {/* OVERVIEW */}
+              <TabPane tab="Overview" key="overview">
+                <ProCard
+                  bordered
+                  title="Highlights"
+                  style={{ marginBottom: 16 }}
+                  bodyStyle={{ padding: 16 }}
+                >
+                  <List
+                    size="small"
+                    dataSource={[
+                      {
+                        key: 'status',
+                        label: 'Current status',
+                        value: statusText,
+                      },
+                      {
+                        key: 'sprint',
+                        label: 'Active sprint',
+                        value: workspace?.currentSprint || 'No active sprint configured',
+                      },
+                      {
+                        key: 'deadline',
+                        label: 'Next deadline',
+                        value: workspace?.deadline || 'No deadline set',
+                      },
+                    ]}
+                    renderItem={(item) => (
+                      <List.Item key={item.key}>
+                        <Space>
+                          <Text type="secondary">{item.label}:</Text>
+                          <Text>{item.value}</Text>
+                        </Space>
+                      </List.Item>
+                    )}
+                  />
+                </ProCard>
+
+                <ProCard
+                  bordered
+                  title="Recent activity"
+                  bodyStyle={{ padding: 16 }}
+                  extra={
+                    <Button
+                      type="link"
+                      size="small"
+                      onClick={() => setActiveKey('timeline')}
+                    >
+                      View full timeline
+                    </Button>
+                  }
+                >
+                  {derivedActivity.length === 0 ? (
+                    <Empty description="No recent activity yet." />
+                  ) : (
+                    <Timeline
+                      style={{ marginTop: 8 }}
+                      items={derivedActivity.slice(0, 5).map((item: any) => ({
+                        color:
+                          item.status === 'Completed' || item.status === 'Done'
+                            ? 'green'
+                            : item.status === 'Blocked'
+                            ? 'red'
+                            : 'blue',
+                        children: (
+                          <div>
+                            <Text strong>{item.title}</Text>
+                            {item.date && (
+                              <div>
+                                <Text type="secondary">{item.date}</Text>
+                              </div>
+                            )}
+                            {item.description && (
+                              <Paragraph style={{ marginBottom: 0 }}>
+                                {item.description}
+                              </Paragraph>
+                            )}
+                          </div>
+                        ),
+                      }))}
+                    />
+                  )}
+                </ProCard>
+              </TabPane>
+
+              {/* TASKS & SPRINTS */}
+              <TabPane tab="Tasks & Sprints" key="tasks">
+                <List
+                  itemLayout="horizontal"
+                  dataSource={tasks}
+                  locale={{
+                    emptyText: 'No tasks configured for this workspace yet.',
+                  }}
+                  renderItem={(task: any) => (
+                    <List.Item
+                      key={task.id || task.title}
+                      onClick={() => handleTaskClick(task)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <List.Item.Meta
+                        title={
+                          <Space size="small">
+                            <Text strong>{task.title}</Text>
+                            {task.status && <Tag>{task.status}</Tag>}
+                          </Space>
+                        }
+                        description={
+                          <Space direction="vertical" size={2}>
+                            {task.description && (
+                              <Text type="secondary">{task.description}</Text>
+                            )}
+                            <Space size="small">
+                              {task.assignee && (
+                                <Text type="secondary">
+                                  Owner:&nbsp;
+                                  <Text>{task.assignee}</Text>
+                                </Text>
+                              )}
+                              {task.dueDate && (
+                                <Text type="secondary">
+                                  · Due:&nbsp;
+                                  <Text>{task.dueDate}</Text>
+                                </Text>
+                              )}
+                            </Space>
+                          </Space>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              </TabPane>
+
+              {/* TIMELINE */}
+              <TabPane tab="Timeline" key="timeline">
+                {derivedActivity.length === 0 ? (
+                  <Empty description="No timeline events to show yet." />
+                ) : (
+                  <Timeline
+                    style={{ marginTop: 8 }}
+                    items={derivedActivity.map((item: any) => ({
+                      color:
+                        item.status === 'Completed' || item.status === 'Done'
+                          ? 'green'
+                          : item.status === 'Blocked'
+                          ? 'red'
+                          : 'blue',
+                      children: (
+                        <div>
+                          <Text strong>{item.title}</Text>
+                          {item.date && (
+                            <div>
+                              <Text type="secondary">{item.date}</Text>
+                            </div>
+                          )}
+                          {item.description && (
+                            <Paragraph style={{ marginBottom: 0 }}>
+                              {item.description}
+                            </Paragraph>
+                          )}
+                        </div>
+                      ),
+                    }))}
+                  />
+                )}
+              </TabPane>
+
+              {/* DISCUSSION */}
+              <TabPane tab="Discussion" key="discussion">
+                {comments.length === 0 ? (
+                  <Empty description="No discussion yet. Start the conversation with your team!" />
+                ) : (
+                  <List
+                    dataSource={comments}
+                    renderItem={(item: any) => (
+                      <li key={item.id || item.createdAt}>
+                        <Comment
+                          author={item.author || item.user}
+                          avatar={
+                            item.avatar ? (
+                              <Avatar src={item.avatar} />
+                            ) : (
+                              <Avatar>
+                                {(item.author || item.user || '?')
+                                  ?.charAt(0)
+                                  ?.toUpperCase()}
+                              </Avatar>
+                            )
+                          }
+                          content={item.content || item.message}
+                          datetime={item.datetime || item.createdAt}
+                        />
+                      </li>
+                    )}
+                  />
+                )}
+              </TabPane>
+            </Tabs>
+          </ProCard>
+        </ProCard>
+
+        {/* Task details drawer */}
+        <Drawer
+          title={selectedTask?.title || 'Task details'}
+          width={480}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          destroyOnClose
+        >
+          {selectedTask ? (
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              {selectedTask.status && (
+                <div>
+                  <Text strong>Status:&nbsp;</Text>
+                  <Tag>{selectedTask.status}</Tag>
+                </div>
+              )}
+
+              {selectedTask.assignee && (
+                <div>
+                  <Text strong>Assignee:&nbsp;</Text>
+                  <Text>{selectedTask.assignee}</Text>
+                </div>
+              )}
+
+              {selectedTask.dueDate && (
+                <div>
+                  <Text strong>Due date:&nbsp;</Text>
+                  <Text>{selectedTask.dueDate}</Text>
+                </div>
+              )}
+
+              {selectedTask.description && (
+                <div>
+                  <Text strong>Description</Text>
+                  <Paragraph style={{ marginTop: 4 }}>
+                    {selectedTask.description}
+                  </Paragraph>
+                </div>
+              )}
+
+              {Array.isArray(selectedTask.subtasks) &&
+                selectedTask.subtasks.length > 0 && (
+                  <div>
+                    <Text strong>Subtasks</Text>
+                    <List
+                      size="small"
+                      style={{ marginTop: 4 }}
+                      dataSource={selectedTask.subtasks}
+                      renderItem={(sub: any, index: number) => (
+                        <List.Item key={sub.id || index}>
+                          <List.Item.Meta
+                            title={sub.title}
+                            description={sub.status || undefined}
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  </div>
+                )}
+            </Space>
+          ) : (
+            <Empty description="No task selected." />
+          )}
+        </Drawer>
+      </div>
     </>
-  )
+  );
 }

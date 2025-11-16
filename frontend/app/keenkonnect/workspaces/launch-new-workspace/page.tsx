@@ -1,46 +1,51 @@
-'use client'
+'use client';
 
-import React, { Suspense } from 'react'
-import MainLayout from '@/components/layout-components/MainLayout'
-import Head from 'next/head'
+import React, { Suspense, useState } from 'react';
+import Head from 'next/head';
+import { useRouter } from 'next/navigation';
+import { Card, Result, Button, message } from 'antd';
 import {
-  Form,
-  Input,
-  Button,
-  Select,
-  DatePicker,
-  Card,
-  message,
-} from 'antd'
-import api from '@/api'
-import dayjs from 'dayjs'
+  ProForm,
+  ProFormText,
+  ProFormSelect,
+  ProFormSwitch,
+} from '@ant-design/pro-components';
+import api from '@/api';
 
-export default function PageWrapper() {
-  return (
-    <Suspense fallback={null}>
-      <>
-        <Content />
-      </>
-    </Suspense>
-  )
-}
+type LaunchWorkspaceFormValues = {
+  name: string;
+  team: string;
+  tools: string[];
+  isPublic: boolean;
+};
 
 function Content() {
-  const [form] = Form.useForm()
+  const router = useRouter();
+  const [submitted, setSubmitted] = useState(false);
+  const [lastValues, setLastValues] = useState<LaunchWorkspaceFormValues | null>(null);
 
-  const launchWorkspace = async (values: any) => {
+  const handleFinish = async (values: LaunchWorkspaceFormValues) => {
     try {
-      await api.post('/workspaces/launch', {
-        ...values,
-        startDate: values.startDate?.format('YYYY-MM-DD'),
-      })
-      message.success('Workspace launched successfully!')
-      form.resetFields()
-    } catch (err) {
-      console.error('Launch workspace error:', err)
-      message.error('Failed to launch workspace.')
+      await api.post('/workspaces/launch', values);
+      setLastValues(values);
+      setSubmitted(true);
+      return true;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      message.error("Échec du lancement de l'espace de travail. Veuillez réessayer.");
+      return false;
     }
-  }
+  };
+
+  const handleLaunchAnother = () => {
+    setSubmitted(false);
+    setLastValues(null);
+  };
+
+  const pageTitle = 'Launch a New Workspace';
+  const pageDescription =
+    "Configurez un nouvel espace de travail collaboratif pour votre équipe : choisissez l’équipe responsable, les outils inclus et la visibilité de l’espace.";
 
   return (
     <>
@@ -48,54 +53,114 @@ function Content() {
         <title>KeenKonnect – Launch New Workspace</title>
       </Head>
 
-      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
-        Launch New Workspace
-      </h1>
+      <div className="container mx-auto p-5">
+        <h1 className="text-2xl font-bold mb-4">{pageTitle}</h1>
+        <p className="text-gray-500 mb-6">{pageDescription}</p>
 
-      <Card>
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={launchWorkspace}
-          initialValues={{ startDate: dayjs() }}
-        >
-          <Form.Item
-            label="Workspace Name"
-            name="name"
-            rules={[{ required: true }]}
-          >
-            <Input placeholder="Enter workspace name" />
-          </Form.Item>
-
-          <Form.Item
-            label="Team"
-            name="team"
-            rules={[{ required: true }]}
-          >
-            <Select
-              placeholder="Select team"
-              options={[
-                { label: 'Team Alpha', value: 'alpha' },
-                { label: 'Team Beta', value: 'beta' },
+        <Card>
+          {submitted && lastValues ? (
+            <Result
+              status="success"
+              title="Espace de travail lancé avec succès"
+              subTitle={`L'espace « ${lastValues.name} » est maintenant prêt pour votre équipe.`}
+              extra={[
+                <Button type="primary" key="again" onClick={handleLaunchAnother}>
+                  Lancer un autre espace
+                </Button>,
+                <Button
+                  key="workspaces"
+                  onClick={() => router.push('/keenkonnect/workspaces/my-workspaces')}
+                >
+                  Voir mes espaces de travail
+                </Button>,
               ]}
             />
-          </Form.Item>
+          ) : (
+            <ProForm<LaunchWorkspaceFormValues>
+              layout="vertical"
+              onFinish={handleFinish}
+              initialValues={{
+                isPublic: true,
+              }}
+              submitter={{
+                searchConfig: {
+                  submitText: "Lancer l'espace",
+                },
+              }}
+            >
+              {/* Nom de l’espace */}
+              <ProFormText
+                name="name"
+                label="Nom de l’espace de travail"
+                placeholder="ex. KeenKonnect Quantum Strategy Lab"
+                rules={[
+                  { required: true, message: 'Veuillez donner un nom à cet espace.' },
+                ]}
+              />
 
-          <Form.Item label="Start Date" name="startDate">
-            <DatePicker style={{ width: '100%' }} />
-          </Form.Item>
+              {/* Équipe responsable */}
+              <ProFormSelect
+                name="team"
+                label="Équipe responsable"
+                placeholder="Sélectionnez une équipe"
+                options={[
+                  { label: 'Team Alpha – Strategic Vision', value: 'Team Alpha' },
+                  { label: 'Team Beta – Quantum Strategists', value: 'Team Beta' },
+                  { label: 'Team Gamma – Innovation Pod', value: 'Team Gamma' },
+                  { label: 'Special Guests – Invited Fellows', value: 'Special Guests' },
+                ]}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Veuillez sélectionner une équipe responsable.',
+                  },
+                ]}
+              />
 
-          <Form.Item label="Description" name="description">
-            <Input.TextArea rows={4} />
-          </Form.Item>
+              {/* Outils & environnements (multi‑select) */}
+              <ProFormSelect
+                name="tools"
+                label="Outils & environnements inclus"
+                placeholder="Choisissez un ou plusieurs environnements"
+                fieldProps={{
+                  mode: 'multiple',
+                }}
+                options={[
+                  { label: 'Data Science Notebook', value: 'Data Science Notebook' },
+                  { label: 'VR Lab', value: 'VR Lab' },
+                  { label: 'Programming Workspace', value: 'Programming Workspace' },
+                  { label: 'Design Studio', value: 'Design Studio' },
+                  { label: '3D Modeling', value: '3D Modeling' },
+                  { label: 'Virtual Whiteboard', value: 'Virtual Whiteboard' },
+                  { label: 'Brainstorming Hub', value: 'Brainstorming Hub' },
+                  { label: 'Prototyping Area', value: 'Prototyping Area' },
+                ]}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Veuillez choisir au moins un outil ou environnement.',
+                  },
+                ]}
+              />
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit" style={{ marginTop: 12 }}>
-              Launch Workspace
-            </Button>
-          </Form.Item>
-        </Form>
-      </Card>
+              {/* Visibilité */}
+              <ProFormSwitch
+                name="isPublic"
+                label="Espace visible à l’ensemble de KeenKonnect"
+                tooltip="Quand activé, les membres de KeenKonnect pourront découvrir cet espace et demander à le rejoindre."
+              />
+            </ProForm>
+          )}
+        </Card>
+      </div>
     </>
-  )
+  );
+}
+
+export default function PageWrapper() {
+  return (
+    <Suspense fallback={null}>
+      <Content />
+    </Suspense>
+  );
 }

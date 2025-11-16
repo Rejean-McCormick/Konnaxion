@@ -75,7 +75,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   /** Thème brut “tel que défini” */
   const raw: Partial<TokenBag> = useMemo(
-    () => (themes?.[themeType] ?? {}) as Partial<TokenBag>,
+    // IMPORTANT: pass through unknown as TS suggests, to avoid structural mismatch
+    () => ((themes?.[themeType] ?? {}) as unknown as Partial<TokenBag>),
     [themeType],
   )
 
@@ -179,7 +180,10 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   })
 
   /** 7) Exposer un token “safe” au contexte sans cast agressif */
-  const safeToken: Readonly<Partial<TokenBag>> = useMemo(() => Object.freeze({ ...raw }), [raw])
+  const safeToken: Readonly<Partial<TokenBag>> = useMemo(
+    () => Object.freeze({ ...raw }),
+    [raw],
+  )
 
   return (
     <ThemeContext.Provider value={{ token: safeToken, themeType, setThemeType, cycleTheme }}>

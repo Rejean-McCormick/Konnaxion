@@ -2,41 +2,47 @@ import { theme as antdTheme } from 'antd'
 const { darkAlgorithm } = antdTheme
 
 export default {
-  label         : 'Sunset',
-  icon          : '🌅',
+  label         : 'Bleu & Jaune',
+  icon          : '💙💛',
 
-  // Base algorithm (dark)
   algorithm     : darkAlgorithm,
 
-  // Seed tokens
-  colorPrimary           : '#FF4500',
-  colorLink              : '#FF8C00',
-  colorLinkHover         : '#FFA500',
+  // Couleurs principales
+  colorPrimary           : '#1E90FF',   // Bleu vif
+  colorLink              : '#FFD700',   // Jaune or
+  colorLinkHover         : '#FFE55C',
 
-  // Texte global
-  colorText              : '#FFFFFF',
+  // Texte
   colorTextBase          : '#FFFFFF',
-  colorTextSecondary     : '#FFD700',
+  colorText              : '#FFFFFF',
+  colorTextSecondary     : '#D0E4FF',
+  colorTextTertiary      : '#A9C8FF',
 
-  // Fonds
-  colorBgLayout          : '#2E1E1E',
-  colorBgContainer       : '#3C1E1E',
-  colorBgElevated        : '#4A2A2A',
+  // Fond global
+  colorBgBase            : '#0A1A2A',
+  colorBgContainer       : '#112B44',
+  colorBgElevated        : '#163454',
 
-  // **Ajout décisif** pour le sider
-  layoutColorBgSider     : '#2E1E1E',
+  // Boutons
+  colorPrimaryActive     : '#0F75E0',
+  colorPrimaryHover      : '#5AAEFF',
+  colorError             : '#FFCC00',
+
+  // Inputs / Champs
+  colorFillSecondary     : '#1A3C5F',
+  colorBorderInput       : '#4D8AD6',
 
   // Sidebar / Menu
   colorMenuItemText      : '#FFFFFF',
-  colorMenuItemHoverBg   : '#662222',
-  colorMenuItemSelectedBg: '#880000',
-  colorMenuItemSelectedText: '#FFFFFF',
+  colorMenuItemHoverBg   : '#1E3A5F',
+  colorMenuItemSelectedBg: '#255080',
+  colorMenuItemSelectedText: '#FFD700',
 
-  // Bordures / séparateurs
-  colorBorder            : '#FF4500',
-  colorSplit             : '#884A2E',
+  // Bordures
+  colorBorder            : '#1E90FF',
+  colorSplit             : '#15406A',
 
   // Ombres
-  boxShadow              : '0 4px 12px rgba(255,255,255,0.1)',
+  boxShadow              : '0 4px 12px rgba(0,0,0,0.25)',
   boxShadowSecondary     : '0 2px 8px rgba(0,0,0,0.2)',
 } as const

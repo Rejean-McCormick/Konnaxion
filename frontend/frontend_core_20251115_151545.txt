@@ -1,4 +1,4 @@
-===== TOC (29 fichiers) =====
+===== TOC (31 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\.all-contributorsrc
 2. C:\MyCode\Konnaxionv14\frontend\.prettierignore
 3. C:\MyCode\Konnaxionv14\frontend\.releaserc
@@ -25,9 +25,11 @@
 24. C:\MyCode\Konnaxionv14\frontend\routes.json
 25. C:\MyCode\Konnaxionv14\frontend\scanpathv1-frontend.py
 26. C:\MyCode\Konnaxionv14\frontend\scripts\find-routes.mjs
-27. C:\MyCode\Konnaxionv14\frontend\scripts\scan-endpoints.mjs
-28. C:\MyCode\Konnaxionv14\frontend\scripts\unwrap-mainlayout.mjs
-29. C:\MyCode\Konnaxionv14\frontend\tsconfig.json
+27. C:\MyCode\Konnaxionv14\frontend\scripts\find-unstyled-pages.mjs
+28. C:\MyCode\Konnaxionv14\frontend\scripts\scan-endpoints.mjs
+29. C:\MyCode\Konnaxionv14\frontend\scripts\scan-layout-anomalies.mjs
+30. C:\MyCode\Konnaxionv14\frontend\scripts\unwrap-mainlayout.mjs
+31. C:\MyCode\Konnaxionv14\frontend\tsconfig.json
 ===== END TOC =====
 
 
@@ -22126,6 +22128,73 @@ console.log(`found ${urls.length} routes -> routes.json`)
 ===== END scripts/find-routes.mjs =====
 
 
+===== BEGIN scripts/find-unstyled-pages.mjs =====
+// scripts/find-unstyled-pages.mjs
+import fs from 'fs';
+import path from 'path';
+import fg from 'fast-glob';
+
+const root = process.cwd();
+
+// Segments produits
+const patterns = [
+  'app/ekoh/**/page.tsx',
+  'app/ethikos/**/page.tsx',
+  'app/keenkonnect/**/page.tsx',
+  'app/konnected/**/page.tsx',
+  'app/kreative/**/page.tsx',
+];
+
+async function main() {
+  const files = await fg(patterns, { cwd: root });
+
+  const candidates = [];
+
+  for (const rel of files) {
+    const abs = path.join(root, rel);
+    const code = fs.readFileSync(abs, 'utf8');
+
+    // 1) déjà habillés -> on skip
+    if (
+      code.includes('PageContainer') ||
+      code.includes('className="container') ||
+      code.includes("className='container") ||
+      code.includes('container mx-auto') ||
+      code.includes('AppShell')
+    ) {
+      continue;
+    }
+
+    // 2) pages sans JSX évident -> on ignore (ex: redirections, simples wrappers)
+    if (!code.includes('return (')) {
+      continue;
+    }
+
+    candidates.push(rel);
+  }
+
+  if (!candidates.length) {
+    console.log('Aucune page suspecte trouvée.');
+    return;
+  }
+
+  console.log('Pages probablement sans padding/titre standard:\n');
+  for (const file of candidates) {
+    console.log(' -', file);
+  }
+
+  console.log('\nTotal:', candidates.length);
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+
+
+===== END scripts/find-unstyled-pages.mjs =====
+
+
 ===== BEGIN scripts/scan-endpoints.mjs =====
 import { promises as fs } from "fs";
 import path from "path";
@@ -22203,6 +22272,82 @@ function scanFile(file, text) {
 })();
 
 ===== END scripts/scan-endpoints.mjs =====
+
+
+===== BEGIN scripts/scan-layout-anomalies.mjs =====
+// scripts/scan-layout-anomalies.mjs
+import fs from 'fs';
+import path from 'path';
+import fg from 'fast-glob';
+
+const root = process.cwd();
+
+// Heuristiques de wrapper "correct"
+const WRAPPER_MARKERS = [
+  'PageContainer',
+  'container mx-auto p-5',
+];
+
+const MAINLAYOUT_IMPORTS = [
+  'import MainLayout from "@/components/layout-components/MainLayout"',
+  'import MainLayout from "@/shared/layout/MainLayout"',
+];
+
+async function main() {
+  // 1) Modules qui rendent leur propre layout
+  const moduleFiles = await fg(['modules/**/*.tsx'], { cwd: root });
+
+  const moduleOwnLayout = [];
+
+  for (const rel of moduleFiles) {
+    const abs = path.join(root, rel);
+    const code = fs.readFileSync(abs, 'utf8');
+
+    if (MAINLAYOUT_IMPORTS.some((s) => code.includes(s))) {
+      moduleOwnLayout.push(rel);
+    }
+  }
+
+  // 2) Pages app/** sans wrapper standard ou avec MainLayout direct
+  const appPages = await fg(['app/**/page.tsx'], { cwd: root });
+
+  const appWithMainLayout = [];
+  const appWithoutStandardWrapper = [];
+
+  for (const rel of appPages) {
+    const abs = path.join(root, rel);
+    const code = fs.readFileSync(abs, 'utf8');
+
+    // a) Page qui importe encore MainLayout
+    if (MAINLAYOUT_IMPORTS.some((s) => code.includes(s))) {
+      appWithMainLayout.push(rel);
+    }
+
+    // b) Page sans wrapper standard
+    const hasWrapper = WRAPPER_MARKERS.some((m) => code.includes(m));
+    if (!hasWrapper) {
+      appWithoutStandardWrapper.push(rel);
+    }
+  }
+
+  console.log('=== Modules avec MainLayout (shell complet dans modules/**) ===');
+  moduleOwnLayout.forEach((f) => console.log('  -', f));
+
+  console.log('\n=== app/**/page.tsx qui importent MainLayout (double shell potentiel) ===');
+  appWithMainLayout.forEach((f) => console.log('  -', f));
+
+  console.log('\n=== app/**/page.tsx sans wrapper standard (ni PageContainer ni container mx-auto p-5) ===');
+  appWithoutStandardWrapper.forEach((f) => console.log('  -', f));
+
+  console.log('\nDone.');
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+
+===== END scripts/scan-layout-anomalies.mjs =====
 
 
 ===== BEGIN scripts/unwrap-mainlayout.mjs =====

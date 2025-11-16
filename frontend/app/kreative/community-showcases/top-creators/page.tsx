@@ -1,11 +1,12 @@
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\top-creators\page.tsx
 'use client';
 
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Table, Avatar, Select, Typography, Space, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { TrophyOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
 
@@ -20,18 +21,48 @@ interface Creator {
 }
 
 const creatorsData: Creator[] = [
-  { id: '1', name: 'Alice Johnson', avatar: 'https://via.placeholder.com/80.png?text=A', contributions: 125, specialty: 'Digital Art' },
-  { id: '2', name: 'Bob Smith', avatar: 'https://via.placeholder.com/80.png?text=B', contributions: 110, specialty: 'Photography' },
-  { id: '3', name: 'Carol Lee', avatar: 'https://via.placeholder.com/80.png?text=C', contributions: 105, specialty: 'Mixed Media' },
-  { id: '4', name: 'David Kim', avatar: 'https://via.placeholder.com/80.png?text=D', contributions: 95, specialty: 'Painting' },
-  { id: '5', name: 'Eva Martinez', avatar: 'https://via.placeholder.com/80.png?text=E', contributions: 88, specialty: 'Illustration' },
+  {
+    id: '1',
+    name: 'Alice Johnson',
+    avatar: 'https://via.placeholder.com/80.png?text=A',
+    contributions: 125,
+    specialty: 'Digital Art',
+  },
+  {
+    id: '2',
+    name: 'Bob Smith',
+    avatar: 'https://via.placeholder.com/80.png?text=B',
+    contributions: 110,
+    specialty: 'Photography',
+  },
+  {
+    id: '3',
+    name: 'Carol Lee',
+    avatar: 'https://via.placeholder.com/80.png?text=C',
+    contributions: 105,
+    specialty: 'Mixed Media',
+  },
+  {
+    id: '4',
+    name: 'David Kim',
+    avatar: 'https://via.placeholder.com/80.png?text=D',
+    contributions: 95,
+    specialty: 'Painting',
+  },
+  {
+    id: '5',
+    name: 'Eva Martinez',
+    avatar: 'https://via.placeholder.com/80.png?text=E',
+    contributions: 88,
+    specialty: 'Illustration',
+  },
 ];
 
 export default function TopCreatorsPage(): JSX.Element {
   const router = useRouter();
-  const [timeFrame, setTimeFrame] = React.useState<TimeFrame>('all-time');
+  const [timeFrame, setTimeFrame] = useState<TimeFrame>('all-time');
 
-  const data = React.useMemo<Creator[]>(() => {
+  const data = useMemo<Creator[]>(() => {
     return timeFrame === 'this-month' ? creatorsData.slice(0, 3) : creatorsData;
   }, [timeFrame]);
 
@@ -41,7 +72,11 @@ export default function TopCreatorsPage(): JSX.Element {
       key: 'rank',
       width: 80,
       render: (_value, _record, index) =>
-        index < 3 ? <TrophyOutlined style={{ fontSize: 20, color: '#faad14' }} /> : <Text>{index + 1}</Text>,
+        index < 3 ? (
+          <TrophyOutlined style={{ fontSize: 20, color: '#faad14' }} />
+        ) : (
+          <Text>{index + 1}</Text>
+        ),
     },
     {
       title: 'Creator',
@@ -50,7 +85,10 @@ export default function TopCreatorsPage(): JSX.Element {
       render: (_value, record) => (
         <Space>
           <Avatar src={record.avatar} />
-          <Button type="link" onClick={() => router.push(`/kreative/profile/${record.id}`)}>
+          <Button
+            type="link"
+            onClick={() => router.push(`/kreative/profile/${record.id}`)}
+          >
             {record.name}
           </Button>
         </Space>
@@ -61,7 +99,7 @@ export default function TopCreatorsPage(): JSX.Element {
       dataIndex: 'contributions',
       key: 'contributions',
       width: 150,
-      render: (value, row) => <Text>{value}</Text>,
+      render: (value: number) => <Text>{value}</Text>,
     },
     {
       title: 'Specialty',
@@ -70,30 +108,39 @@ export default function TopCreatorsPage(): JSX.Element {
     },
   ];
 
-  return (
-    <PageContainer title="Top Creators">
-      <Space direction="vertical" style={{ width: '100%', marginBottom: 24 }}>
-        <Title level={4}>Leaderboard</Title>
-        <Space size="middle">
-          <Text strong>Filter by Time Frame:</Text>
-          <Select
-            value={timeFrame}
-            onChange={(v) => setTimeFrame(v as TimeFrame)}
-            style={{ width: 180 }}
-            options={[
-              { value: 'all-time', label: 'All Time' },
-              { value: 'this-month', label: 'This Month' },
-            ]}
-          />
-        </Space>
-      </Space>
-
-      <Table<Creator>
-        columns={columns}
-        dataSource={data}
-        rowKey="id"
-        pagination={{ pageSize: 5 }}
+  const timeframeSelector = (
+    <Space>
+      <Text strong>Filter by timeframe:</Text>
+      <Select
+        value={timeFrame}
+        onChange={(value: TimeFrame) => setTimeFrame(value)}
+        style={{ width: 180 }}
+        options={[
+          { value: 'all-time', label: 'All Time' },
+          { value: 'this-month', label: 'This Month' },
+        ]}
       />
-    </PageContainer>
+    </Space>
+  );
+
+  return (
+    <KreativePageShell
+      title="Top Creators"
+      subtitle="Leaderboard of creators with the most contributions across community showcases."
+      secondaryActions={timeframeSelector}
+    >
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Title level={4} style={{ margin: 0 }}>
+          Leaderboard
+        </Title>
+
+        <Table<Creator>
+          columns={columns}
+          dataSource={data}
+          rowKey="id"
+          pagination={{ pageSize: 5 }}
+        />
+      </Space>
+    </KreativePageShell>
   );
 }

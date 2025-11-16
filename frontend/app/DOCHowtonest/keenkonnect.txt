@@ -1,0 +1,434 @@
+Voici un modèle central que tu peux réutiliser comme **référence de layout KeenKonnect** et donner tel quel à une autre IA quand tu lui demandes de refactor des pages.
+
+Je vais d’abord te donner **le composant central**, puis **la structure de page de référence**, puis **les règles pour corriger les autres pages**.
+
+---
+
+## 1. Composant central : `<KeenPage>` (à créer une fois)
+
+> Objectif : toutes les pages KeenKonnect passent par ce wrapper, pour aligner :
+>
+> * largeur
+> * padding
+> * taille du titre
+> * zone de description
+> * toolbar à droite
+> * pas de breadcrumb local (on laisse le layout global le gérer)
+
+**Fichier suggéré** : `components/keenkonnect/KeenPage.tsx`
+
+```tsx
+'use client';
+
+import React from 'react';
+import Head from 'next/head';
+import usePageTitle from '@/hooks/usePageTitle';
+
+type KeenPageProps = {
+  /** Gros titre de la page, affiché en <h1> */
+  title: string;
+
+  /** Sous-titre / description sous le titre */
+  description?: string;
+
+  /** Titre <title> du navigateur. Si non fourni, on génère "KeenKonnect · {title}" */
+  metaTitle?: string;
+
+  /** Contenu principal de la page */
+  children: React.ReactNode;
+
+  /**
+   * Élément(s) à droite du titre (boutons d’action, filtres, etc.)
+   * ex: <Button type="primary">New</Button>
+   */
+  toolbar?: React.ReactNode;
+
+  /** Largeur max de la zone centrale */
+  maxWidth?: number | string;
+};
+
+export default function KeenPage({
+  title,
+  description,
+  metaTitle,
+  children,
+  toolbar,
+  maxWidth = 1200,
+}: KeenPageProps) {
+  const finalMetaTitle = metaTitle ?? `KeenKonnect · ${title}`;
+
+  // Synchronise le titre de l’onglet (hook existant dans ton codebase)
+  usePageTitle(finalMetaTitle);
+
+  return (
+    <>
+      <Head>
+        <title>{finalMetaTitle}</title>
+      </Head>
+
+      <div className="container mx-auto p-5" style={{ maxWidth }}>
+        {/* Header de page standardisé */}
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="text-2xl font-bold">{title}</h1>
+            {description && (
+              <p className="mt-1 text-gray-500">{description}</p>
+            )}
+          </div>
+
+          {toolbar && <div className="flex items-center gap-2">{toolbar}</div>}
+        </div>
+
+        {/* Contenu spécifique à la page */}
+        {children}
+      </div>
+    </>
+  );
+}
+```
+
+**Règles associées :**
+
+* ✅ **Toujours** utiliser `<KeenPage>` pour les pages KeenKonnect (sauf cas ultra-spéciaux).
+* ✅ Titre **toujours** en `text-2xl font-bold`, pas de `Typography.Title level={1}` ou `level={2}` différents selon les pages.
+* ✅ Padding global **toujours** `className="container mx-auto p-5"`.
+* ✅ Toolbar (boutons à droite du titre) passe par la prop `toolbar`.
+* 🚫 **Pas** de breadcrumb local dans les pages (le layout du haut s’en charge).
+* 🚫 **Pas** de `margin-top` énorme ou de `padding` custom sur le container : tout doit se faire à l’intérieur du contenu via des `Card`, `Row`, etc.
+
+---
+
+## 2. Page de référence (modèle à recopier)
+
+Ta page `search-filter-documents` est globalement le bon « look ».
+Voici la version **référencée** qui l’utilise via `<KeenPage>` :
+
+```tsx
+'use client';
+
+import React from 'react';
+import { Card, Alert } from 'antd';
+import type { PaginationProps } from 'antd';
+import {
+  ProTable,
+  QueryFilter,
+  ProFormText,
+  ProFormSelect,
+  ProFormDateRangePicker,
+} from '@ant-design/pro-components';
+import KeenPage from '@/components/keenkonnect/KeenPage';
+
+// ... types + données (DocumentResource, sampleDocuments, etc.)
+
+export default function SearchFilterDocumentsPage(): JSX.Element {
+  // ... state, filtres, useMemo, columns, paginationProps, etc.
+
+  return (
+    <KeenPage
+      title="Search & Filter Documents"
+      description="Advanced search and filtering for knowledge documents in KeenKonnect."
+    >
+      {/* Bloc filtres */}
+      <Card className="mb-4">
+        <QueryFilter
+          onFinish={handleFilterFinish}
+          onReset={handleFilterReset}
+          labelWidth="auto"
+          defaultCollapsed={false}
+          span={8}
+          initialValues={{ sort: DEFAULT_SORT }}
+        >
+          {/* ... champs de filtre */}
+        </QueryFilter>
+      </Card>
+
+      {/* Résumé + table */}
+      <Alert /* ...props */ className="mb-4" />
+
+      <Card>
+        <ProTable
+          /* ...props */
+        />
+        {/* Pagination externe */}
+      </Card>
+    </KeenPage>
+  );
+}
+```
+
+👉 **C’est cette structure qu’il faut viser partout** :
+`<KeenPage>` en haut, puis `Card`, `ProTable`, `StepsForm`, `Tabs`, etc. à l’intérieur.
+
+---
+
+## 3. Que corriger, et où ? (central vs par page)
+
+### 3.1. Ce qui se corrige **de manière centrale**
+
+En créant / imposant `<KeenPage>` tu centralises :
+
+1. **Taille & style du titre**
+
+   * `h1.text-2xl.font-bold` partout.
+   * Plus de `Typography.Title` avec des niveaux différents.
+
+2. **Padding & largeur**
+
+   * Tout le monde utilise `container mx-auto p-5` avec le même `maxWidth`.
+   * Plus de pages full-bleed sans padding.
+
+3. **Structure de base**
+
+   * Header de page = même layout : titre + description + toolbar à droite.
+   * Plus de pages où un bouton important flotte dans un coin sans alignement.
+
+4. **Fil d’Ariane (breadcrumb)**
+
+   * **Jamais** en local dans la page.
+   * Si un jour on veut ajouter un breadcrumb global, on le fait dans le layout `app/keenkonnect/layout.tsx` uniquement.
+
+Résultat : 80% des différences visuelles disparaissent juste en passant par `<KeenPage>`.
+
+---
+
+### 3.2. Ce qui doit être fait **par page** (mécanique mais simple)
+
+Pour chaque page existante (exemples : `my-projects`, `create-new-project`, `document-management`, `track-project-impact`, etc.) :
+
+#### 1. Remplacer le wrapper racine
+
+**Avant (exemples actuels) :**
+
+```tsx
+<div style={{ maxWidth: 960, margin: '0 auto', padding: 24 }}>
+  {/* ... */}
+</div>
+```
+
+ou
+
+```tsx
+<div className="container mx-auto p-5">
+  <h1 className="text-3xl font-semibold">Big Title</h1>
+  {/* ... */}
+</div>
+```
+
+ou
+
+```tsx
+<PageContainer
+  header={{
+    title: 'My Page',
+    breadcrumb: { /* ... */ },
+  }}
+>
+  {/* ... */}
+</PageContainer>
+```
+
+**Après (modèle unique) :**
+
+```tsx
+import KeenPage from '@/components/keenkonnect/KeenPage';
+
+export default function SomePage() {
+  return (
+    <KeenPage
+      title="My Page"
+      description="One-line description of what this page does."
+      toolbar={(
+        /* optionnel : boutons d’action à droite du titre */
+      )}
+    >
+      {/* Ancien contenu, sans h1, sans Head, sans breadcrumb */}
+    </KeenPage>
+  );
+}
+```
+
+> 🔁 **Important** :
+>
+> * Supprimer le `h1` local, `Typography.Title` principal, et les gros marges hautes — c’est géré par KeenPage.
+> * Si la page utilisait `PageContainer`, garder le contenu mais le mettre dans des `Card` ou `ProCard` à l’intérieur de `<KeenPage>`.
+
+#### 2. Supprimer les breadcumbs locaux
+
+Tout ce qui ressemble à :
+
+```tsx
+<Breadcrumb /* ... */ />
+```
+
+ou
+
+```tsx
+<PageContainer
+  header={{
+    breadcrumb: { /* ... */ },
+  }}
+/>
+```
+
+➡️ **À supprimer**.
+Breadcrumb = only via layout global (la “upper bar”).
+
+#### 3. Unifier les titres secondaires
+
+À l’intérieur des pages, pour les sous-sections, tu peux :
+
+* soit utiliser `Card` avec `title="..."`,
+* soit `h2` / `h3` tailwind (`text-lg font-semibold`, etc.) mais de façon cohérente :
+
+Par ex :
+
+```tsx
+<h2 className="text-lg font-semibold mb-2">Team Settings</h2>
+```
+
+ou
+
+```tsx
+<Card title="Team Settings" className="mb-4">
+  {/* ... */}
+</Card>
+```
+
+---
+
+## 4. Quels types de pages & comment les aligner
+
+Tu peux inclure ce bloc dans ta doc pour guider l’IA selon le type de page.
+
+### 4.1. Pages “form wizard” (StepsForm)
+
+Ex : `create-new-project`, `submit-impact-reports`, `match-preferences`, etc.
+
+**Pattern recommandé :**
+
+```tsx
+<KeenPage
+  title="Create New Project"
+  description="Use this guided wizard to describe your project and configure the team."
+>
+  <Card>
+    <StepsForm
+      onFinish={...}
+      formProps={{ layout: 'vertical' }}
+      submitter={{
+        // pas de nextText/prevText custom si le type ne le supporte pas
+      }}
+    >
+      {/* StepForm ... */}
+    </StepsForm>
+  </Card>
+</KeenPage>
+```
+
+**Checklist :**
+
+* Pas de marge/padding custom autour du `Card`.
+* StepForm toujours dans un `Card` (ou deux si besoin).
+* Titre principal géré par `<KeenPage>`.
+
+---
+
+### 4.2. Pages “tableau & filtres” (list, ProTable)
+
+Ex :
+`knowledge/search-filter-documents` (référence), `projects/my-projects`, `workspaces/my-workspaces`, `knowledge/document-management`.
+
+**Pattern recommandé :**
+
+```tsx
+<KeenPage
+  title="My Projects"
+  description="Browse and manage your KeenKonnect projects."
+  toolbar={(
+    <Button type="primary">New project</Button>
+  )}
+>
+  <Card className="mb-4">
+    {/* Filtres / QueryFilter / search bar */}
+  </Card>
+
+  <Card>
+    <ProTable /* ... */ />
+  </Card>
+</KeenPage>
+```
+
+---
+
+### 4.3. Pages “dashboard / analytics”
+
+Ex :
+`sustainability-impact/sustainability-dashboard`, `track-project-impact`.
+
+Même base, mais tu joues avec `Row`/`Col` + `Card`/`ProCard` :
+
+```tsx
+<KeenPage
+  title="Sustainability Impact Dashboard"
+  description="High-level dashboard aggregating sustainability impact across projects."
+>
+  <Row gutter={[16, 16]}>
+    <Col xs={24} md={12}>
+      <Card title="CO₂ saved">
+        {/* Graph / KPI */}
+      </Card>
+    </Col>
+    {/* ... */}
+  </Row>
+</KeenPage>
+```
+
+---
+
+## 5. Réponse directe à tes questions
+
+> **“what fix is needed for each page? is this a central fix, or a fix per page?”**
+
+* **Central** :
+
+  * Créer `<KeenPage>` et l’adopter comme **obligatoire** pour toutes les pages KeenKonnect.
+  * Imposer les règles :
+
+    * `container mx-auto p-5`
+    * `h1.text-2xl.font-bold`
+    * description en `text-gray-500`
+    * toolbar à droite via prop
+    * **aucun breadcrumb local**.
+
+* **Par page (mais mécanique)** :
+
+  * Remplacer le wrapper racine par `<KeenPage>`.
+  * Supprimer les `h1` / `Title` custom.
+  * Supprimer les breadcrumbs locaux.
+  * Remettre les contenus dans des `Card` / `Row` / `Col` avec marges cohérentes (`mb-4`, etc.).
+  * Pour les pages qui utilisaient `PageContainer`, migrer le header dans les props de `<KeenPage>`.
+
+> **“which page are ok (like search-filter-documents)”**
+
+À partir de ce qu’on a vu ensemble :
+
+* ✅ `knowledge/search-filter-documents`
+  → déjà très proche du modèle. Il suffit juste éventuellement de le faire passer par `<KeenPage>` mais visuellement tu es déjà dans le bon style.
+
+* ⚠️ Les autres pages qu’on a modifiées (projects, workspaces, sustainability, etc.)
+  → doivent être **alignées** sur ce modèle en les enveloppant dans `<KeenPage>` et en supprimant :
+
+  * leurs wrappers custom (`div` avec padding/margin),
+  * leurs gros `Title` Ant Design,
+  * leurs breadcrumbs locaux,
+  * leurs variations de padding.
+
+---
+
+### TL;DR à copier dans ton repo / Notion
+
+* Créer `components/keenkonnect/KeenPage.tsx` (code ci-dessus).
+* Toute nouvelle page KeenKonnect = **obligatoirement** basée sur `<KeenPage>`.
+* Toute page existante = refactor pour utiliser `<KeenPage>` et supprimer les layouts locaux.
+
+Si tu veux, ensuite, tu peux me coller le code d’une page “moche” et on la réécrit ensemble 100% alignée sur ce template.

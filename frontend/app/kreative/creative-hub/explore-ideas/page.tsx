@@ -1,25 +1,38 @@
 'use client';
 
+// File: C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
+
 import React, { useMemo, useState } from 'react';
-import { Row, Col, Card, Input, Select, Typography, Space, Pagination } from 'antd';
+import {
+  Row,
+  Col,
+  Card,
+  Input,
+  Select,
+  Typography,
+  Space,
+  Pagination,
+  Button,
+} from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text, Paragraph } = Typography;
 
 type Domain = 'Art' | 'Music' | 'Writing';
 type SortOpt = 'newest' | 'popular';
+type CategoryFilter = 'All' | Domain;
 
 interface CreativeIdea {
   id: string;
   title: string;
   excerpt: string;
   author: string;
-  domain: Domain;        // e.g., 'Art', 'Music', 'Writing'
-  thumbnail: string;     // URL for a thumbnail image
-  date: string;          // ISO date string for "newest" sort
-  popularity: number;    // e.g., likes/views for "most popular" sort
+  domain: Domain;
+  thumbnail: string;
+  date: string; // ISO date
+  popularity: number;
 }
 
 const creativeIdeasData: CreativeIdea[] = [
@@ -65,57 +78,71 @@ const creativeIdeasData: CreativeIdea[] = [
   },
 ];
 
-export default function ExploreIdeasPage() {
+export default function ExploreIdeasPage(): JSX.Element {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<'All' | Domain>('All');
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryFilter>('All');
   const [sortOption, setSortOption] = useState<SortOpt>('newest');
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 9;
 
-  // Filter and sort the creative ideas.
-  const filteredIdeas = useMemo(() => {
+  const filteredIdeas = useMemo<CreativeIdea[]>(() => {
     let ideas = [...creativeIdeasData];
 
     if (selectedCategory !== 'All') {
       ideas = ideas.filter((idea) => idea.domain === selectedCategory);
     }
+
     const q = searchQuery.trim().toLowerCase();
     if (q) {
       ideas = ideas.filter(
         (idea) =>
           idea.title.toLowerCase().includes(q) ||
-          idea.excerpt.toLowerCase().includes(q)
+          idea.excerpt.toLowerCase().includes(q),
       );
     }
+
     ideas =
       sortOption === 'newest'
         ? ideas.sort(
-            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
           )
         : ideas.sort((a, b) => b.popularity - a.popularity);
 
     return ideas;
   }, [searchQuery, selectedCategory, sortOption]);
 
-  // Apply pagination to the filtered ideas.
-  const paginatedIdeas = useMemo(() => {
+  const paginatedIdeas = useMemo<CreativeIdea[]>(() => {
     const startIndex = (currentPage - 1) * pageSize;
     return filteredIdeas.slice(startIndex, startIndex + pageSize);
   }, [filteredIdeas, currentPage]);
 
   const handleCardClick = (idea: CreativeIdea) => {
     router.push(`/kreative/creative-hub/idea/${idea.id}`);
+  };
 
   return (
-    <PageContainer title="Explore Ideas">
+    <KreativePageShell
+      title="Explore Ideas"
+      subtitle="Browse curated prompts and articles across creative domains."
+      primaryAction={
+        <Button
+          type="primary"
+          onClick={() =>
+            router.push('/kreative/idea-incubator/create-new-idea')
+          }
+        >
+          Create New Idea
+        </Button>
+      }
+    >
       <Space direction="vertical" size="middle" style={{ width: '100%' }}>
         <Space wrap>
           <Input
-            placeholder="Search ideas."
+            placeholder="Search ideas"
             prefix={<SearchOutlined />}
             value={searchQuery}
             onChange={(e) => {
@@ -123,11 +150,12 @@ export default function ExploreIdeasPage() {
               setCurrentPage(1);
             }}
             style={{ width: 300 }}
+            allowClear
           />
 
-          <Select
+          <Select<CategoryFilter>
             value={selectedCategory}
-            onChange={(value: 'All' | Domain) => {
+            onChange={(value) => {
               setSelectedCategory(value);
               setCurrentPage(1);
             }}
@@ -140,9 +168,9 @@ export default function ExploreIdeasPage() {
             style={{ width: 180 }}
           />
 
-          <Select
+          <Select<SortOpt>
             value={sortOption}
-            onChange={(value: SortOpt) => {
+            onChange={(value) => {
               setSortOption(value);
               setCurrentPage(1);
             }}
@@ -168,17 +196,24 @@ export default function ExploreIdeasPage() {
                 }
                 onClick={() => handleCardClick(idea)}
               >
-                {/* Single-line title clamp without AntD ellipsis rows */}
-                <Title level={4} className="clamp-1" style={{ marginBottom: 8 }}>
+                <Title
+                  level={4}
+                  className="clamp-1"
+                  style={{ marginBottom: 8 }}
+                >
                   {idea.title}
                 </Title>
 
-                {/* Multi-line summary clamp without AntD ellipsis rows */}
-                <Paragraph className="clamp-2" type="secondary" style={{ marginBottom: 12 }}>
+                <Paragraph
+                  className="clamp-2"
+                  type="secondary"
+                  style={{ marginBottom: 12 }}
+                >
                   {idea.excerpt}
                 </Paragraph>
 
-                <Text strong>By:</Text> {idea.author}
+                <Text strong>By: </Text>
+                <Text>{idea.author}</Text>
               </Card>
             </Col>
           ))}
@@ -190,6 +225,7 @@ export default function ExploreIdeasPage() {
             pageSize={pageSize}
             total={filteredIdeas.length}
             onChange={(page) => setCurrentPage(page)}
+            showSizeChanger={false}
           />
         </div>
       </Space>
@@ -207,7 +243,6 @@ export default function ExploreIdeasPage() {
           overflow: hidden;
         }
       `}</style>
-    </PageContainer>
+    </KreativePageShell>
   );
-}
 }

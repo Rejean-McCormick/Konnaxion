@@ -1,39 +1,78 @@
+// app/kreative/collaborative-spaces/start-new-space/page.tsx
 'use client';
 
-// File: app/kreative/collaborative-spaces/start-new-space/page.tsx
 import React, { useState } from 'react';
-import { Form, Input, Select, Radio, Button, Upload, Space as AntdSpace, message as antdMessage } from 'antd';
+import {
+  Form,
+  Input,
+  Select,
+  Radio,
+  Button,
+  Upload,
+  Space,
+  Typography,
+  message as antdMessage,
+} from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
 import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import { PageContainer } from '@ant-design/pro-components';
+import PageContainer from '@/components/PageContainer';
 
 const { TextArea } = Input;
 const { Option } = Select;
+const { Paragraph } = Typography;
 
-export default function StartNewSpacePage() {
-  const [form] = Form.useForm();
+type PrivacyOption = 'Public' | 'Private';
+
+interface InvitedMemberField {
+  email: string;
+}
+
+interface StartNewSpaceFormValues {
+  name: string;
+  description: string;
+  category: string;
+  privacy: PrivacyOption;
+  invitedMembers?: InvitedMemberField[];
+  banner?: UploadFile[];
+}
+
+// Minimal type for Upload onChange (keeps us away from implicit any)
+type UploadChangeParamLite = {
+  fileList: UploadFile[];
+};
+
+export default function StartNewSpacePage(): JSX.Element {
+  const [form] = Form.useForm<StartNewSpaceFormValues>();
   const router = useRouter();
-  const [fileList, setFileList] = useState<any[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
 
-  // Upload change handler
-  const handleFileChange = (info: any) => {
-    setFileList([...info.fileList]);
+  const handleFileChange = (info: UploadChangeParamLite) => {
+    setFileList(info.fileList);
   };
 
-  // Submit handler
-  const onFinish = (values: any) => {
+  const onFinish = (values: StartNewSpaceFormValues) => {
     const spaceData = {
       ...values,
       banner: fileList,
     };
+
+    // TODO: replace with real API call
+    // await api.createSpace(spaceData)
+
+    // eslint-disable-next-line no-console
     console.log('New Space Data:', spaceData);
     antdMessage.success('Your new space has been created successfully!');
-    router.push('/kreative/collaborative-spaces/new-space-id'); // TODO: replace with created ID
+    router.push('/kreative/collaborative-spaces/my-spaces');
   };
 
   return (
     <PageContainer title="Start a New Space">
-      <Form
+      <Paragraph type="secondary" style={{ marginBottom: 24 }}>
+        Define your collaborative space so others can discover and join the right context.
+      </Paragraph>
+
+      <Form<StartNewSpaceFormValues>
         form={form}
         layout="vertical"
         onFinish={onFinish}
@@ -90,27 +129,30 @@ export default function StartNewSpacePage() {
               <Form.List name="invitedMembers">
                 {(fields, { add, remove }) => (
                   <>
-                    <AntdSpace direction="vertical" style={{ width: '100%' }}>
+                    <Space direction="vertical" style={{ width: '100%' }}>
                       {fields.map((field) => (
-                        <AntdSpace key={field.key} align="baseline">
+                        <Space key={field.key} align="baseline">
                           <Form.Item
                             {...field}
                             name={[field.name, 'email']}
-                            rules={[{ required: true, message: 'Please enter an email address.' }]}
+                            rules={[
+                              { required: true, message: 'Please enter an email address.' },
+                              { type: 'email', message: 'Please enter a valid email address.' },
+                            ]}
                           >
                             <Input placeholder="Enter member email" />
                           </Form.Item>
                           <Button type="link" onClick={() => remove(field.name)}>
                             Remove
                           </Button>
-                        </AntdSpace>
+                        </Space>
                       ))}
                       <Form.Item>
                         <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
                           Invite Member
                         </Button>
                       </Form.Item>
-                    </AntdSpace>
+                    </Space>
                   </>
                 )}
               </Form.List>

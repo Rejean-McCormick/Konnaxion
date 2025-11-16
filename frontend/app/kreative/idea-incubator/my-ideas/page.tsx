@@ -1,13 +1,15 @@
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { List, Button, Badge, Input, Select, Space, Typography } from 'antd';
+import { Badge, Button, Input, List, Select, Space, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
 
 const { Title, Text } = Typography;
 
 type IdeaStatus = 'Seeking Collaboration' | 'In Progress';
+type StatusFilter = 'All' | IdeaStatus;
 
 interface Idea {
   id: string;
@@ -41,13 +43,13 @@ const dummyIdeas: Idea[] = [
   },
 ];
 
-export default function MyIdeasPage() {
+export default function MyIdeasPage(): JSX.Element {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<'All' | IdeaStatus>('All');
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('All');
 
-  const filteredIdeas = useMemo(() => {
+  const filteredIdeas = useMemo<Idea[]>(() => {
     let ideas = dummyIdeas;
     if (selectedStatus !== 'All') {
       ideas = ideas.filter((idea) => idea.status === selectedStatus);
@@ -64,13 +66,13 @@ export default function MyIdeasPage() {
       <Space direction="vertical" size="middle" style={{ width: '100%', marginBottom: 24 }}>
         <Space>
           <Input
-            placeholder="Search by title..."
+            placeholder="Search by title."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ width: 300 }}
             allowClear
           />
-          <Select
+          <Select<StatusFilter>
             value={selectedStatus}
             onChange={(value) => setSelectedStatus(value)}
             style={{ width: 220 }}

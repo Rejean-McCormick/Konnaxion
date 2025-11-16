@@ -1,6 +1,7 @@
-"use client";
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
+'use client';
 
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Form,
   Input,
@@ -9,11 +10,11 @@ import {
   Select,
   message as antdMessage,
   Alert,
-} from "antd";
-import type { UploadFile } from "antd/es/upload/interface";
-import { UploadOutlined } from "@ant-design/icons";
-import { useRouter } from "next/navigation";
-import PageContainer from "@/components/PageContainer";
+} from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
+import { UploadOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 type CreativeWorkFormValues = {
   title: string;
@@ -28,7 +29,7 @@ type UploadChangeParamLite = {
   fileList: UploadFile[];
 };
 
-export default function SubmitCreativeWorkPage() {
+export default function SubmitCreativeWorkPage(): JSX.Element {
   const [form] = Form.useForm<CreativeWorkFormValues>();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const router = useRouter();
@@ -45,21 +46,24 @@ export default function SubmitCreativeWorkPage() {
 
   const onFinish = async (values: CreativeWorkFormValues) => {
     if (!fileList.length) {
-      antdMessage.error("Veuillez joindre au moins un fichier.");
+      antdMessage.error('Veuillez joindre au moins un fichier.');
       return;
     }
     try {
       // TODO: remplacer par l'appel API réel d’envoi
       // await api.submitCreativeWork(values, fileList)
-      antdMessage.success("Création envoyée avec succès !");
-      router.push("/kreative/creative-hub");
+      antdMessage.success('Création envoyée avec succès !');
+      router.push('/kreative/dashboard');
     } catch {
       antdMessage.error("Erreur lors de l'envoi. Réessayez.");
     }
   };
 
   return (
-    <PageContainer title="Submit Creative Work">
+    <KreativePageShell
+      title="Submit Creative Work"
+      subtitle="Share your creative work with the community."
+    >
       <Alert
         type="info"
         showIcon
@@ -71,7 +75,7 @@ export default function SubmitCreativeWorkPage() {
         <Form.Item
           label="Title"
           name="title"
-          rules={[{ required: true, message: "Please enter a title" }]}
+          rules={[{ required: true, message: 'Please enter a title' }]}
         >
           <Input placeholder="e.g., Generative sculpture series" />
         </Form.Item>
@@ -79,7 +83,7 @@ export default function SubmitCreativeWorkPage() {
         <Form.Item
           label="Description"
           name="description"
-          rules={[{ required: true, message: "Please add a description" }]}
+          rules={[{ required: true, message: 'Please add a description' }]}
         >
           <Input.TextArea rows={4} placeholder="What did you make? How? Why?" />
         </Form.Item>
@@ -87,7 +91,7 @@ export default function SubmitCreativeWorkPage() {
         <Form.Item
           label="Category"
           name="category"
-          rules={[{ required: true, message: "Please pick a category" }]}
+          rules={[{ required: true, message: 'Please pick a category' }]}
         >
           <Select placeholder="Choose one">
             <Select.Option value="art">Art</Select.Option>
@@ -107,7 +111,7 @@ export default function SubmitCreativeWorkPage() {
               validator: (_, value: UploadFile[]) =>
                 value && value.length
                   ? Promise.resolve()
-                  : Promise.reject(new Error("Please attach at least one file")),
+                  : Promise.reject(new Error('Please attach at least one file')),
             },
           ]}
         >
@@ -131,6 +135,6 @@ export default function SubmitCreativeWorkPage() {
           </Button>
         </Form.Item>
       </Form>
-    </PageContainer>
+    </KreativePageShell>
   );
 }

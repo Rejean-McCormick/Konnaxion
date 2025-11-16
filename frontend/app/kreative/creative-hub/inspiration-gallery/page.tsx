@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -111,7 +112,7 @@ export default function InspirationGalleryPage(): JSX.Element {
       { key: 'Painting', label: 'Painting' },
       { key: 'Digital Art', label: 'Digital Art' },
     ],
-    []
+    [],
   );
 
   // Filter works based on selected category.
@@ -130,8 +131,8 @@ export default function InspirationGalleryPage(): JSX.Element {
   const toggleLike = (id: string): void => {
     setWorks((prev) =>
       prev.map((w) =>
-        w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w
-      )
+        w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w,
+      ),
     );
   };
 

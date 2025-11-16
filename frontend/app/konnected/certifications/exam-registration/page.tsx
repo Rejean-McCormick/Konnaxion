@@ -1,182 +1,706 @@
-﻿'use client'
+﻿'use client';
 
-// File: /app/konnected/certifications/exam-registration/page.tsx
-import React, { useState } from 'react';
-import type { NextPage } from 'next';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Empty,
   Form,
   Input,
-  Button,
-  Steps,
-  Select,
-  Radio,
-  Checkbox,
   Result,
+  Select,
+  Space,
+  Spin,
+  Steps,
+  Typography,
   message as antdMessage,
 } from 'antd';
+import type { FormInstance } from 'antd/es/form';
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 import PageContainer from '@/components/PageContainer';
 
 const { Step } = Steps;
 const { Option } = Select;
+const { Title, Paragraph, Text } = Typography;
 
-const ExamRegistration: NextPage = () => {
-  const [currentStep, setCurrentStep] = useState<number>(0);
-  const [form] = Form.useForm();
-  const [registrationData, setRegistrationData] = useState<any>({});
+/**
+ * NOTE ABOUT ENDPOINTS
+ *
+ * These constants assume the backend OpenAPI (schema-endpoints.json) exposes
+ * KonnectED → CertifiKation endpoints under `/api/konnected/certifications/...`.
+ * Adjust the paths to your actual routes if they differ.
+ */
+const EXAM_PATHS_ENDPOINT = '/api/konnected/certifications/paths/';
+const EXAM_SESSIONS_ENDPOINT = (pathId: number | string) =>
+  `/api/konnected/certifications/paths/${pathId}/sessions/`;
+const EXAM_REGISTRATION_ENDPOINT = '/api/konnected/certifications/evaluations/';
+const EXAM_ELIGIBILITY_ENDPOINT = (pathId: number | string) =>
+  `/api/konnected/certifications/paths/${pathId}/eligibility/`;
+
+/**
+ * Domain types derived from CertifiKation & Knowledge specs + API schema.
+ * Adjust the shapes to match your generated types from schema-endpoints.json.
+ */
+type CertificationPath = {
+  id: number;
+  name: string;
+  description?: string;
+  level?: string;
+  tags?: string[];
+  already_passed?: boolean;
+  cooldown_remaining_minutes?: number | null;
+};
+
+type ExamSession = {
+  id: number;
+  start_at: string; // ISO datetime
+  end_at?: string | null;
+  timezone?: string | null;
+  modality?: string | null; // e.g. 'online', 'remote_proctored', 'in_person'
+  location?: string | null;
+  capacity?: number | null;
+  seats_remaining?: number | null;
+  registration_deadline?: string | null;
+};
+
+type ExamEligibility = {
+  already_passed: boolean;
+  cooldown_remaining_minutes: number;
+};
+
+interface ExamRegistrationFormValues {
+  examPathId?: number;
+  sessionId?: number;
+  fullName?: string;
+  agreeTerms?: boolean;
+}
+
+type StepKey = 0 | 1 | 2;
+
+const steps: { key: StepKey; title: string; description?: string }[] = [
+  { key: 0, title: 'Choose exam', description: 'Select the certification you want to attempt.' },
+  {
+    key: 1,
+    title: 'Schedule & details',
+    description: 'Pick an exam session and confirm your details.',
+  },
+  { key: 2, title: 'Confirm', description: 'Review and submit your registration.' },
+];
+
+const ExamRegistrationPage: React.FC = () => {
+  const [form] = Form.useForm<ExamRegistrationFormValues>();
+
+  const [currentStep, setCurrentStep] = useState<StepKey>(0);
+  const [paths, setPaths] = useState<CertificationPath[]>([]);
+  const [pathsLoading, setPathsLoading] = useState<boolean>(false);
+  const [pathsError, setPathsError] = useState<string | null>(null);
+
+  const [sessions, setSessions] = useState<ExamSession[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState<boolean>(false);
+  const [sessionsError, setSessionsError] = useState<string | null>(null);
+
+  const [eligibility, setEligibility] = useState<ExamEligibility | null>(null);
+  const [eligibilityLoading, setEligibilityLoading] = useState<boolean>(false);
+
+  const [submitting, setSubmitting] = useState<boolean>(false);
   const [registrationCompleted, setRegistrationCompleted] = useState<boolean>(false);
 
-  const steps = [
-    { title: 'Choose Exam' },
-    { title: 'Schedule Details' },
-    { title: 'Confirmation' },
-  ];
+  /**
+   * Load available certification paths (exams) on mount.
+   */
+  useEffect(() => {
+    const fetchPaths = async () => {
+      setPathsLoading(true);
+      setPathsError(null);
+      try {
+        const res = await fetch(EXAM_PATHS_ENDPOINT, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
 
-  // Étape suivante
-  const next = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        setRegistrationData({ ...registrationData, ...values });
-        setCurrentStep((s) => s + 1);
-      })
-      .catch((info) => {
-        console.log('Validation Failed:', info);
+        if (!res.ok) {
+          throw new Error(`Failed to load certification programs (${res.status})`);
+        }
+
+        const data = (await res.json()) as CertificationPath[];
+        setPaths(data);
+      } catch (err: any) {
+        const msg = err?.message ?? 'Failed to load certification programs.';
+        setPathsError(msg);
+        antdMessage.error(msg);
+      } finally {
+        setPathsLoading(false);
+      }
+    };
+
+    void fetchPaths();
+  }, []);
+
+  const selectedPathId = Form.useWatch('examPathId', form);
+  const selectedSessionId = Form.useWatch('sessionId', form);
+  const fullName = Form.useWatch('fullName', form);
+
+  const selectedPath = useMemo(
+    () => paths.find((p) => p.id === selectedPathId),
+    [paths, selectedPathId],
+  );
+  const selectedSession = useMemo(
+    () => sessions.find((s) => s.id === selectedSessionId),
+    [sessions, selectedSessionId],
+  );
+
+  /**
+   * When the selected path changes, load sessions and eligibility.
+   */
+  useEffect(() => {
+    if (!selectedPathId) {
+      setSessions([]);
+      setEligibility(null);
+      return;
+    }
+
+    const fetchEligibility = async () => {
+      setEligibilityLoading(true);
+      try {
+        const res = await fetch(EXAM_ELIGIBILITY_ENDPOINT(selectedPathId), {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+        if (res.ok) {
+          const data = (await res.json()) as ExamEligibility;
+          setEligibility(data);
+        } else if (res.status === 404) {
+          // eligibility not implemented; fall back to path fields
+          setEligibility(null);
+        } else {
+          throw new Error(`Failed to load eligibility (${res.status})`);
+        }
+      } catch {
+        // Non-fatal: we can still continue with path-level info
+        setEligibility(null);
+      } finally {
+        setEligibilityLoading(false);
+      }
+    };
+
+    const fetchSessions = async () => {
+      setSessionsLoading(true);
+      setSessionsError(null);
+      try {
+        const res = await fetch(EXAM_SESSIONS_ENDPOINT(selectedPathId), {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        });
+
+        if (!res.ok) {
+          throw new Error(`Failed to load exam sessions (${res.status})`);
+        }
+
+        const data = (await res.json()) as ExamSession[];
+        setSessions(data);
+      } catch (err: any) {
+        const msg = err?.message ?? 'Failed to load exam sessions.';
+        setSessionsError(msg);
+        antdMessage.error(msg);
+      } finally {
+        setSessionsLoading(false);
+      }
+    };
+
+    void fetchEligibility();
+    void fetchSessions();
+  }, [selectedPathId]);
+
+  const isPathAlreadyPassed =
+    eligibility?.already_passed ?? (selectedPath?.already_passed ?? false);
+  const cooldownMinutes =
+    eligibility?.cooldown_remaining_minutes ?? (selectedPath?.cooldown_remaining_minutes ?? 0);
+  const isUnderCooldown = !!cooldownMinutes && cooldownMinutes > 0;
+
+  const cannotRegisterForPath = isPathAlreadyPassed || isUnderCooldown;
+
+  const handleNext = async () => {
+    try {
+      if (currentStep === 0) {
+        await form.validateFields(['examPathId']);
+      } else if (currentStep === 1) {
+        await form.validateFields(['sessionId', 'fullName', 'agreeTerms']);
+      }
+      setCurrentStep((prev) => (prev + 1) as StepKey);
+    } catch {
+      // errors are displayed by antd Form
+    }
+  };
+
+  const handlePrev = () => {
+    setCurrentStep((prev) => (prev - 1) as StepKey);
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await form.validateFields();
+    } catch {
+      return;
+    }
+
+    const values = form.getFieldsValue() as Required<ExamRegistrationFormValues>;
+
+    // Basic safety checks
+    if (!values.examPathId || !values.sessionId) {
+      antdMessage.error('Please select an exam and session before submitting.');
+      return;
+    }
+
+    const payload = {
+      path_id: values.examPathId,
+      session_id: values.sessionId,
+      full_name: values.fullName,
+      agreed_terms: values.agreeTerms === true,
+    };
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(EXAM_REGISTRATION_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(payload),
       });
+
+      if (res.ok || res.status === 201) {
+        setRegistrationCompleted(true);
+        antdMessage.success('Exam registration completed successfully.');
+        return;
+      }
+
+      if (res.status === 409) {
+        // Conflict: cooldown, already passed, capacity reached, etc.
+        const errorBody = (await res.json().catch(() => null)) as any;
+        const detail: string =
+          errorBody?.detail ||
+          errorBody?.message ||
+          'You cannot register for this exam at the moment.';
+
+        antdMessage.error(detail);
+        return;
+      }
+
+      // Other errors
+      const errorBody = (await res.json().catch(() => null)) as any;
+      const detail: string =
+        errorBody?.detail || errorBody?.message || 'Failed to complete registration.';
+      antdMessage.error(detail);
+    } catch (err: any) {
+      const msg = err?.message ?? 'Unexpected error while registering for the exam.';
+      antdMessage.error(msg);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  // Étape précédente
-  const prev = () => {
-    setCurrentStep((s) => s - 1);
+  const renderExamChoiceStep = () => {
+    if (pathsLoading) {
+      return (
+        <div className="flex justify-center py-8">
+          <Spin tip="Loading certification programs..." />
+        </div>
+      );
+    }
+
+    if (pathsError) {
+      return (
+        <Alert
+          type="error"
+          message="Unable to load certification programs"
+          description={pathsError}
+          showIcon
+        />
+      );
+    }
+
+    if (!paths.length) {
+      return (
+        <Empty
+          description="No certification programs are available for registration at this time."
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        />
+      );
+    }
+
+    return (
+      <Space direction="vertical" size="large" className="w-full">
+        <Form.Item
+          name="examPathId"
+          label="Certification exam"
+          rules={[{ required: true, message: 'Please select a certification exam.' }]}
+        >
+          <Select
+            placeholder="Select an exam to register for"
+            optionFilterProp="children"
+            showSearch
+          >
+            {paths.map((path) => (
+              <Option key={path.id} value={path.id}>
+                {path.name}
+                {path.level ? ` · ${path.level}` : ''}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
+
+        {selectedPath && (
+          <Card title={selectedPath.name} bordered>
+            {selectedPath.description && <Paragraph>{selectedPath.description}</Paragraph>}
+            {selectedPath.tags && selectedPath.tags.length > 0 && (
+              <Paragraph>
+                {selectedPath.tags.map((tag) => (
+                  <Text key={tag} code className="mr-2">
+                    {tag}
+                  </Text>
+                ))}
+              </Paragraph>
+            )}
+
+            <Space direction="vertical" size="small" style={{ marginTop: 8 }}>
+              {isPathAlreadyPassed && (
+                <Alert
+                  type="success"
+                  message="You are already certified for this path."
+                  description="Creating new attempts is not allowed because you already hold this certification."
+                  showIcon
+                />
+              )}
+
+              {isUnderCooldown && (
+                <Alert
+                  type="warning"
+                  message="Retry cooldown active"
+                  description={`You must wait ${cooldownMinutes} more minutes before registering another attempt for this exam.`}
+                  showIcon
+                />
+              )}
+            </Space>
+          </Card>
+        )}
+      </Space>
+    );
   };
 
-  // Soumission finale
-  const onSubmit = () => {
-    antdMessage.success('Registration complete!');
-    setRegistrationCompleted(true);
+  const renderScheduleStep = () => {
+    if (!selectedPathId) {
+      return (
+        <Alert
+          type="info"
+          message="Select an exam first"
+          description="Choose a certification exam in the previous step before picking a session."
+          showIcon
+        />
+      );
+    }
+
+    return (
+      <Space direction="vertical" size="large" className="w-full">
+        {sessionsLoading && (
+          <div className="flex justify-center py-4">
+            <Spin tip="Loading exam sessions..." />
+          </div>
+        )}
+
+        {sessionsError && (
+          <Alert
+            type="error"
+            message="Unable to load exam sessions"
+            description={sessionsError}
+            showIcon
+          />
+        )}
+
+        {!sessionsLoading && !sessionsError && sessions.length === 0 && (
+          <Alert
+            type="warning"
+            message="No sessions available"
+            description="There are currently no upcoming sessions for this exam. Please check back later or contact your administrator."
+            showIcon
+          />
+        )}
+
+        <Form.Item
+          name="sessionId"
+          label="Exam session"
+          rules={[{ required: true, message: 'Please select an exam session.' }]}
+        >
+          <Select placeholder="Select a session" disabled={sessions.length === 0}>
+            {sessions.map((session) => {
+              const start = new Date(session.start_at);
+              const end = session.end_at ? new Date(session.end_at) : null;
+              const timeLabel = `${start.toLocaleString()}${
+                end ? ` – ${end.toLocaleTimeString()}` : ''
+              }`;
+              const seats =
+                typeof session.seats_remaining === 'number'
+                  ? `${session.seats_remaining} seats left`
+                  : 'Capacity info unavailable';
+
+              const labelParts = [
+                timeLabel,
+                session.modality ? ` · ${session.modality}` : '',
+                session.location ? ` · ${session.location}` : '',
+                ` · ${seats}`,
+              ];
+
+              return (
+                <Option key={session.id} value={session.id}>
+                  {labelParts.join('')}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          name="fullName"
+          label="Full name"
+          rules={[{ required: true, message: 'Please enter your full name.' }]}
+        >
+          <Input placeholder="This will be used on your exam record and certificate" />
+        </Form.Item>
+
+        <Form.Item
+          name="agreeTerms"
+          valuePropName="checked"
+          rules={[
+            {
+              validator: (_, value) =>
+                value
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      new Error('You must agree to the exam policies to continue.'),
+                    ),
+            },
+          ]}
+        >
+          <Checkbox>
+            I confirm that I have read and agree to the exam terms, proctoring rules, and
+            integrity policies.
+          </Checkbox>
+        </Form.Item>
+
+        <Alert
+          type="info"
+          showIcon
+          message="Before you register"
+          description={
+            <span>
+              You will be able to view this exam and its status in your Exam Dashboard after
+              registration. You must achieve at least <b>80%</b> to pass, and there is a{' '}
+              <b>30-minute retry cooldown</b> if you fail an attempt.
+            </span>
+          }
+        />
+      </Space>
+    );
   };
 
-  // Contenu par étape
+  const renderConfirmStep = () => {
+    if (!selectedPath || !selectedSessionId) {
+      return (
+        <Alert
+          type="info"
+          message="Incomplete registration"
+          description="Please select an exam and session in the previous steps before confirming."
+          showIcon
+        />
+      );
+    }
+
+    const session = selectedSession!;
+    const start = new Date(session.start_at);
+    const end = session.end_at ? new Date(session.end_at) : null;
+
+    return (
+      <Space direction="vertical" size="large" className="w-full">
+        <Card title="Review your registration">
+          <Space direction="vertical" size="middle">
+            <div>
+              <Text type="secondary">Certification exam</Text>
+              <br />
+              <Text strong>{selectedPath.name}</Text>
+              {selectedPath.level && (
+                <>
+                  {' '}
+                  <Text type="secondary">· {selectedPath.level}</Text>
+                </>
+              )}
+            </div>
+
+            <div>
+              <Text type="secondary">Session</Text>
+              <br />
+              <Text strong>
+                {start.toLocaleString()}
+                {end && <> – {end.toLocaleTimeString()}</>}
+              </Text>
+              {session.modality && (
+                <>
+                  <br />
+                  <Text type="secondary">Mode: {session.modality}</Text>
+                </>
+              )}
+              {session.location && (
+                <>
+                  <br />
+                  <Text type="secondary">Location: {session.location}</Text>
+                </>
+              )}
+            </div>
+
+            <div>
+              <Text type="secondary">Name on record</Text>
+              <br />
+              <Text strong>{fullName || 'Not provided'}</Text>
+            </div>
+          </Space>
+        </Card>
+
+        <Alert
+          type="warning"
+          showIcon
+          message="Please confirm"
+          description="Once you submit, this session will be reserved for you, subject to capacity and eligibility checks. You may need to contact support to change or cancel your booking."
+        />
+      </Space>
+    );
+  };
+
   const renderStepContent = () => {
+    if (registrationCompleted) {
+      return null;
+    }
+
     switch (currentStep) {
       case 0:
-        return (
-          <>
-            <Form.Item
-              label="Select Exam"
-              name="examChoice"
-              rules={[{ required: true, message: 'Please select an exam' }]}
-            >
-              <Select placeholder="Choose an exam">
-                <Option value="exam1">Certification Exam Level 1</Option>
-                <Option value="exam2">Certification Exam Level 2</Option>
-                <Option value="exam3">Certification Exam Advanced</Option>
-              </Select>
-            </Form.Item>
-          </>
-        );
+        return renderExamChoiceStep();
       case 1:
-        return (
-          <>
-            <Form.Item
-              label="Preferred Exam Session"
-              name="examSession"
-              rules={[{ required: true, message: 'Please select an exam session' }]}
-            >
-              <Radio.Group>
-                <Radio value="session1">Monday, October 2, 2023 - Online</Radio>
-                <Radio value="session2">Wednesday, October 4, 2023 - Online</Radio>
-                <Radio value="session3">Friday, October 6, 2023 - In-Person</Radio>
-              </Radio.Group>
-            </Form.Item>
-            <Form.Item
-              label="Full Name"
-              name="fullName"
-              rules={[{ required: true, message: 'Please enter your full name' }]}
-            >
-              <Input placeholder="Enter your full name" />
-            </Form.Item>
-            <Form.Item
-              name="agreeTerms"
-              valuePropName="checked"
-              rules={[
-                {
-                  validator: (_, value) =>
-                    value ? Promise.resolve() : Promise.reject('You must agree to the terms'),
-                },
-              ]}
-            >
-              <Checkbox>I agree to the Terms and Conditions</Checkbox>
-            </Form.Item>
-          </>
-        );
+        return renderScheduleStep();
       case 2:
-        return (
-          <>
-            <p>
-              <strong>Exam Choice:</strong> {registrationData.examChoice}
-            </p>
-            <p>
-              <strong>Exam Session:</strong> {registrationData.examSession}
-            </p>
-            <p>
-              <strong>Full Name:</strong> {registrationData.fullName}
-            </p>
-          </>
-        );
+        return renderConfirmStep();
       default:
         return null;
     }
   };
 
-  // Résultat post-soumission
+  const renderFooterButtons = () => {
+    if (registrationCompleted) {
+      return null;
+    }
+
+    const isFirstStep = currentStep === 0;
+    const isLastStep = currentStep === steps.length - 1;
+
+    const nextDisabled =
+      currentStep === 0
+        ? !selectedPathId || cannotRegisterForPath
+        : currentStep === 1
+        ? !selectedSessionId
+        : false;
+
+    return (
+      <Space style={{ marginTop: 24 }}>
+        {!isFirstStep && (
+          <Button onClick={handlePrev} disabled={submitting}>
+            Back
+          </Button>
+        )}
+        {!isLastStep && (
+          <Button
+            type="primary"
+            onClick={handleNext}
+            disabled={nextDisabled || (currentStep === 0 && cannotRegisterForPath)}
+          >
+            Next
+          </Button>
+        )}
+        {isLastStep && (
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            loading={submitting}
+            disabled={cannotRegisterForPath}
+          >
+            Submit registration
+          </Button>
+        )}
+      </Space>
+    );
+  };
+
   if (registrationCompleted) {
     return (
-      <PageContainer title="Exam Registration">
-        <Result
-          status="success"
-          title="Registration Successful!"
-          subTitle={`You have successfully registered for ${registrationData.examChoice}. Further details have been sent to your email.`}
-          extra={[
-            <Button type="primary" key="explore">
-              Explore Certifications
-            </Button>,
-          ]}
-        />
-      </PageContainer>
+      <KonnectedPageShell
+        title="Exam registration completed"
+        subtitle="Your exam attempt has been scheduled. You can review your registrations and outcomes in the Exam Dashboard."
+      >
+        <PageContainer title="Exam registration completed">
+          <Result
+            status="success"
+            title="Your exam registration is confirmed"
+            subTitle="You will receive a confirmation with details by email. You can also review this exam under your Exam Dashboard."
+            extra={
+              <Space>
+                <Button type="primary" href="/konnected/certifications/exam-dashboard-results">
+                  Go to Exam Dashboard
+                </Button>
+                <Button href="/konnected/certifications/exam-preparation">
+                  View preparation resources
+                </Button>
+              </Space>
+            }
+          />
+        </PageContainer>
+      </KonnectedPageShell>
     );
   }
 
-  // Rendu principal
   return (
-    <PageContainer title="Exam Registration">
-      <Steps current={currentStep} style={{ marginBottom: 24 }}>
-        {steps.map((item) => (
-          <Step key={item.title} title={item.title} />
-        ))}
-      </Steps>
+    <KonnectedPageShell
+      title="Register for an exam"
+      subtitle="Choose a certification exam, pick a session, and confirm your registration."
+    >
+      <PageContainer title="Register for an exam">
+        <Card>
+          <Space direction="vertical" size="large" className="w-full">
+            <div>
+              <Steps current={currentStep} responsive>
+                {steps.map((step) => (
+                  <Step key={step.key} title={step.title} description={step.description} />
+                ))}
+              </Steps>
+            </div>
 
-      <Form form={form} layout="vertical">
-        {renderStepContent()}
-        <div style={{ marginTop: 24 }}>
-          {currentStep > 0 && (
-            <Button style={{ marginRight: 8 }} onClick={prev}>
-              Back
-            </Button>
-          )}
-          {currentStep < steps.length - 1 && (
-            <Button type="primary" onClick={next}>
-              Next
-            </Button>
-          )}
-          {currentStep === steps.length - 1 && (
-            <Button type="primary" onClick={onSubmit}>
-              Submit Registration
-            </Button>
-          )}
-        </div>
-      </Form>
-    </PageContainer>
+            {(eligibilityLoading || pathsLoading) && (
+              <Alert
+                type="info"
+                showIcon
+                message="Loading exam options"
+                description="We are loading the available certification programs and checking your eligibility."
+              />
+            )}
+
+            <Form<ExamRegistrationFormValues> layout="vertical" form={form}>
+              {renderStepContent()}
+            </Form>
+
+            {renderFooterButtons()}
+          </Space>
+        </Card>
+      </PageContainer>
+    </KonnectedPageShell>
   );
 };
 
-export default ExamRegistration;
+export default ExamRegistrationPage;

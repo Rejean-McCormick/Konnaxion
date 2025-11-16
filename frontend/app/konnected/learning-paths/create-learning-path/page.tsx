@@ -1,404 +1,743 @@
-'use client'
+"use client";
 
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Button,
-  Card,
-  Form,
+  Drawer,
+  Empty,
   Input,
-  List,
-  Modal,
   Select,
-  Steps,
+  Space,
+  Spin,
   Table,
+  Tag,
   Typography,
-} from 'antd';
-import PageContainer from '@/components/PageContainer';
+  message,
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
+import type { Key } from "react";
+import {
+  PageContainer,
+  ProCard,
+  ProDescriptions,
+  ProFormDependency,
+  ProFormInstance,
+  ProFormList,
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea,
+  StepsForm,
+} from "@ant-design/pro-components";
+import KonnectedPageShell from "../../KonnectedPageShell";
 
 const { Title, Paragraph } = Typography;
-const { Option } = Select;
+const { Search } = Input;
 
-type Step = {
-  id: string;
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
+
+type LearningPathStatus = "draft" | "published";
+
+type LearningPathStepForm = {
   title: string;
-  type: 'lesson' | 'quiz' | 'assignment';
-  content: string;
-  resourceIds: string[];
+  type: "lesson" | "quiz" | "assignment";
+  objective?: string;
+  resourceIds?: number[];
 };
 
-type LearningPath = {
-  id: string;
+type LearningPathFormValues = {
   name: string;
   description: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
-  steps: Step[];
-  tags: string[];
+  difficulty: "Beginner" | "Intermediate" | "Advanced";
+  tags?: string[];
+  steps?: LearningPathStepForm[];
 };
 
-const initialSteps: Step[] = [
-  {
-    id: 'step-1',
-    title: 'Introduction to the Subject',
-    type: 'lesson',
-    content: 'Overview of the key concepts that will be covered in this learning path.',
-    resourceIds: ['res-1', 'res-2'],
-  },
-  {
-    id: 'step-2',
-    title: 'Knowledge Check Quiz',
-    type: 'quiz',
-    content: 'A brief quiz to evaluate understanding of the introduction.',
-    resourceIds: [],
-  },
-];
+type KnowledgeResource = {
+  id: number;
+  title: string;
+  type: "article" | "video" | "lesson" | "quiz" | "dataset";
+  author?: string | null;
+  subject?: string | null;
+  estimated_duration_minutes?: number | null;
+};
 
-const availableResources = [
-  { id: 'res-1', name: 'Intro Article', type: 'Article' },
-  { id: 'res-2', name: 'Intro Video', type: 'Video' },
-  { id: 'res-3', name: 'Cheat Sheet', type: 'Document' },
-  { id: 'res-4', name: 'Practice Repo', type: 'Code' },
-];
+type ResourceSearchParams = {
+  q?: string;
+  type?: KnowledgeResource["type"] | "all";
+};
 
-const CreateLearningPath = () => {
-  const [form] = Form.useForm();
-  const [resourceForm] = Form.useForm();
-  const [stepForm] = Form.useForm();
+type ErrorResponse = {
+  detail?: string;
+};
 
-  const [currentStep, setCurrentStep] = useState(0);
-  const [steps, setSteps] = useState<Step[]>(initialSteps);
-  const [selectedStep, setSelectedStep] = useState<Step | null>(null);
-
-  const [isStepModalVisible, setStepModalVisible] = useState(false);
-  const [isResourceModalVisible, setResourceModalVisible] = useState(false);
-
-  const stepItems = [
-    { title: 'Basics' },
-    { title: 'Steps' },
-    { title: 'Resources' },
-    { title: 'Review & Create' },
-  ];
-
-  const onNext = () => setCurrentStep((s) => Math.min(s + 1, stepItems.length - 1));
-  const onPrev = () => setCurrentStep((s) => Math.max(s - 1, 0));
-
-  const handleAddStep = () => {
-    setSelectedStep(null);
-    stepForm.resetFields();
-    setStepModalVisible(true);
-  };
-
-  const handleEditStep = (step: Step) => {
-    setSelectedStep(step);
-    stepForm.setFieldsValue(step);
-    setStepModalVisible(true);
-  };
-
-  const handleDeleteStep = (id: string) => {
-    setSteps((prev) => prev.filter((s) => s.id !== id));
-  };
-
-  const submitStep = () => {
-    stepForm.validateFields().then((values: Omit<Step, 'id'>) => {
-      if (selectedStep) {
-        setSteps((prev) =>
-          prev.map((s) => (s.id === selectedStep.id ? { ...selectedStep, ...values } : s)),
-        );
-      } else {
-        const newStep: Step = {
-          id: `step-${Date.now()}`,
-          ...values,
-        };
-        setSteps((prev) => [...prev, newStep]);
-      }
-      setStepModalVisible(false);
-    });
-  };
-
-  const openResourceModal = (step: Step) => {
-    setSelectedStep(step);
-    resourceForm.setFieldsValue({ resourceIds: step.resourceIds });
-    setResourceModalVisible(true);
-  };
-
-  const submitResources = () => {
-    resourceForm.validateFields().then(({ resourceIds }: { resourceIds: string[] }) => {
-      if (selectedStep) {
-        setSteps((prev) =>
-          prev.map((s) => (s.id === selectedStep.id ? { ...s, resourceIds } : s)),
-        );
-      }
-      setResourceModalVisible(false);
-    });
-  };
-
-  const onFinishBasics = (_values: any) => {
-    // Basics are read from `form` during final submit
-  };
-
-  const onSubmitPath = async () => {
-    const basics = await form.validateFields();
-    const path: LearningPath = {
-      id: `path-${Date.now()}`,
-      name: basics.name,
-      description: basics.description,
-      difficulty: basics.difficulty,
-      steps,
-      tags: basics.tags || [],
+type KnowledgeResourceListResponse =
+  | KnowledgeResource[]
+  | {
+      results?: KnowledgeResource[];
     };
-    // TODO: Send `path` to your backend
-    console.log('New Learning Path:', path);
+
+const buildUrl = (path: string) => {
+  if (API_BASE) return `${API_BASE}${path}`;
+  return path;
+};
+
+async function createLearningPath(
+  values: LearningPathFormValues,
+  status: LearningPathStatus
+) {
+  const response = await fetch(buildUrl("/api/konnected/learning-paths/"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      name: values.name,
+      description: values.description,
+      difficulty: values.difficulty,
+      tags: values.tags ?? [],
+      status,
+      steps: (values.steps ?? []).map((step, index) => ({
+        order: index + 1,
+        title: step.title,
+        type: step.type,
+        objective: step.objective,
+        resource_ids: step.resourceIds ?? [],
+      })),
+    }),
+  });
+
+  if (!response.ok) {
+    let detail = "Failed to save learning path.";
+    try {
+      const data = (await response.json()) as ErrorResponse;
+      if (typeof data.detail === "string") detail = data.detail;
+      // If backend returns field-level errors, you could handle them here as well.
+    } catch {
+      // ignore JSON parse errors
+    }
+    throw new Error(detail);
+  }
+
+  return response.json().catch(() => null);
+}
+
+async function fetchKnowledgeResources(
+  params: ResourceSearchParams
+): Promise<KnowledgeResource[]> {
+  const search = new URLSearchParams();
+  if (params.q) search.set("q", params.q);
+  if (params.type && params.type !== "all") search.set("type", params.type);
+
+  const response = await fetch(
+    buildUrl(`/api/knowledge/resources/${search.toString() ? `?${search}` : ""}`)
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to load resources.");
+  }
+
+  const data = (await response.json()) as KnowledgeResourceListResponse;
+
+  if (Array.isArray(data)) return data as KnowledgeResource[];
+  if (Array.isArray(data.results)) return data.results as KnowledgeResource[];
+  return [];
+}
+
+const CONTENT_TYPE_OPTIONS: {
+  label: string;
+  value: ResourceSearchParams["type"];
+}[] = [
+  { label: "All types", value: "all" },
+  { label: "Articles", value: "article" },
+  { label: "Videos", value: "video" },
+  { label: "Lessons", value: "lesson" },
+  { label: "Quizzes", value: "quiz" },
+  { label: "Datasets", value: "dataset" },
+];
+
+const difficultyOptions = [
+  { label: "Beginner", value: "Beginner" },
+  { label: "Intermediate", value: "Intermediate" },
+  { label: "Advanced", value: "Advanced" },
+];
+
+const stepTypeOptions = [
+  { label: "Lesson", value: "lesson" },
+  { label: "Quiz", value: "quiz" },
+  { label: "Assignment", value: "assignment" },
+];
+
+const CreateLearningPathPage: React.FC = () => {
+  const formRef = useRef<ProFormInstance<LearningPathFormValues>>();
+  const [submitMode, setSubmitMode] = useState<LearningPathStatus>("draft");
+  const [submitting, setSubmitting] = useState(false);
+
+  const [resourceDrawerOpen, setResourceDrawerOpen] = useState(false);
+  const [resourceDrawerStepIndex, setResourceDrawerStepIndex] = useState<
+    number | null
+  >(null);
+  const [resourceSearchParams, setResourceSearchParams] =
+    useState<ResourceSearchParams>({});
+  const [resourcesLoading, setResourcesLoading] = useState(false);
+  const [resources, setResources] = useState<KnowledgeResource[]>([]);
+  const [selectedResourceIds, setSelectedResourceIds] = useState<Key[]>([]);
+
+  const openResourceDrawer = useCallback((stepIndex: number) => {
+    setResourceDrawerStepIndex(stepIndex);
+
+    const steps = formRef.current?.getFieldValue("steps") as
+      | LearningPathStepForm[]
+      | undefined;
+
+    if (steps && steps[stepIndex]?.resourceIds?.length) {
+      setSelectedResourceIds(steps[stepIndex].resourceIds as Key[]);
+    } else {
+      setSelectedResourceIds([]);
+    }
+
+    // Initial fetch
+    setResourcesLoading(true);
+    fetchKnowledgeResources({})
+      .then(setResources)
+      .catch((err) => {
+        message.error(err.message || "Failed to load resources.");
+        setResources([]);
+      })
+      .finally(() => setResourcesLoading(false));
+
+    setResourceDrawerOpen(true);
+  }, []);
+
+  const closeResourceDrawer = () => {
+    setResourceDrawerOpen(false);
+    setResourceDrawerStepIndex(null);
   };
 
-  const columns = [
-    { title: 'Title', dataIndex: 'title' as const },
-    {
-      title: 'Type',
-      dataIndex: 'type' as const,
-      render: (t: Step['type']) => t.charAt(0).toUpperCase() + t.slice(1),
+  const handleResourceSearch = useCallback(
+    (q?: string) => {
+      const nextParams: ResourceSearchParams = {
+        ...resourceSearchParams,
+        q: q || undefined,
+      };
+      setResourceSearchParams(nextParams);
+
+      setResourcesLoading(true);
+      fetchKnowledgeResources(nextParams)
+        .then(setResources)
+        .catch((err) => {
+          message.error(err.message || "Failed to load resources.");
+          setResources([]);
+        })
+        .finally(() => setResourcesLoading(false));
     },
-    { title: 'Content', dataIndex: 'content' as const, ellipsis: true },
-    {
-      title: 'Resources',
-      dataIndex: 'resourceIds' as const,
-      render: (ids: string[]) =>
-        ids.length ? (
-          <List
-            size="small"
-            dataSource={ids}
-            renderItem={(id) => {
-              const res = availableResources.find((r) => r.id === id);
-              return <List.Item>{res ? `${res.name} (${res.type})` : id}</List.Item>;
-            }}
-          />
-        ) : (
-          <em>None</em>
-        ),
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (_: any, record: Step) => (
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button onClick={() => handleEditStep(record)}>Edit</Button>
-          <Button onClick={() => openResourceModal(record)}>Resources</Button>
-          <Button danger onClick={() => handleDeleteStep(record.id)}>
-            Delete
-          </Button>
-        </div>
-      ),
-    },
-  ];
-
-  const StepBasics = (
-    <Card>
-      <Title level={4}>Learning Path Basics</Title>
-      <Paragraph>Provide the basic information for your learning path.</Paragraph>
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onFinishBasics}
-        initialValues={{ difficulty: 'Beginner', tags: ['Onboarding'] }}
-      >
-        <Form.Item
-          label="Path Name"
-          name="name"
-          rules={[{ required: true, message: 'Please enter a name for the learning path.' }]}
-        >
-          <Input placeholder="e.g., Web Fundamentals for New Team Members" />
-        </Form.Item>
-
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: 'Please enter a brief description.' }]}
-        >
-          <Input.TextArea rows={4} placeholder="Describe the goals and audience for this path..." />
-        </Form.Item>
-
-        <Form.Item label="Difficulty" name="difficulty" rules={[{ required: true }]}>
-          <Select>
-            <Option value="Beginner">Beginner</Option>
-            <Option value="Intermediate">Intermediate</Option>
-            <Option value="Advanced">Advanced</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="Tags" name="tags">
-          <Select mode="tags" placeholder="Add tags (optional)" />
-        </Form.Item>
-      </Form>
-    </Card>
+    [resourceSearchParams]
   );
 
-  const StepSteps = (
-    <Card>
-      <Title level={4}>Define Steps</Title>
-      <Paragraph>Create and organize the steps that make up this learning path.</Paragraph>
+  const handleResourceTypeChange = (
+    type: ResourceSearchParams["type"]
+  ): void => {
+    const nextParams: ResourceSearchParams = {
+      ...resourceSearchParams,
+      type,
+    };
+    setResourceSearchParams(nextParams);
 
-      <div style={{ marginBottom: 16 }}>
-        <Button type="primary" onClick={handleAddStep}>
-          Add Step
-        </Button>
-      </div>
+    setResourcesLoading(true);
+    fetchKnowledgeResources(nextParams)
+      .then(setResources)
+      .catch((err) => {
+        message.error(err.message || "Failed to load resources.");
+        setResources([]);
+      })
+      .finally(() => setResourcesLoading(false));
+  };
 
-      <Table rowKey="id" dataSource={steps} columns={columns} pagination={false} />
-    </Card>
+  const handleResourceDrawerOk = () => {
+    if (resourceDrawerStepIndex == null) {
+      closeResourceDrawer();
+      return;
+    }
+
+    const currentSteps =
+      (formRef.current?.getFieldValue("steps") as LearningPathStepForm[]) ?? [];
+
+    const updatedSteps = currentSteps.map((step, index) =>
+      index === resourceDrawerStepIndex
+        ? { ...step, resourceIds: selectedResourceIds as number[] }
+        : step
+    );
+
+    formRef.current?.setFieldsValue({ steps: updatedSteps });
+    closeResourceDrawer();
+  };
+
+  const resourceColumns: ColumnsType<KnowledgeResource> = useMemo(
+    () => [
+      {
+        title: "Title",
+        dataIndex: "title",
+        key: "title",
+      },
+      {
+        title: "Type",
+        dataIndex: "type",
+        key: "type",
+        render: (value) => <Tag>{value}</Tag>,
+      },
+      {
+        title: "Author",
+        dataIndex: "author",
+        key: "author",
+        render: (value) => value || "—",
+      },
+      {
+        title: "Subject",
+        dataIndex: "subject",
+        key: "subject",
+        render: (value) => value || "—",
+      },
+      {
+        title: "Estimated time",
+        dataIndex: "estimated_duration_minutes",
+        key: "estimated_duration_minutes",
+        render: (value) => (value ? `${value} min` : "—"),
+      },
+    ],
+    []
   );
 
-  const StepResources = (
-    <Card>
-      <Title level={4}>Manage Resources</Title>
-      <Paragraph>
-        Resources are supporting materials linked to steps (articles, videos, documents, code, etc.).
-        Use the “Resources” action on each step to attach relevant items.
-      </Paragraph>
-      <List
-        header="Available Resources"
-        dataSource={availableResources}
-        renderItem={(item) => (
-          <List.Item>
-            <List.Item.Meta title={`${item.name} (${item.type})`} description={`ID: ${item.id}`} />
-          </List.Item>
-        )}
-      />
-    </Card>
-  );
+  const handleFinish = async (values: LearningPathFormValues) => {
+    // Additional client-side publish-time rules:
+    if (submitMode === "published") {
+      if (!values.steps || values.steps.length === 0) {
+        message.error("You must add at least one step before publishing.");
+        return false;
+      }
 
-  const StepReview = (
-    <Card>
-      <Title level={4}>Review & Create</Title>
-      <Paragraph>Review all details, then click “Create Path”.</Paragraph>
+      const missingResources = values.steps.some(
+        (step) => !step.resourceIds || step.resourceIds.length === 0
+      );
+      if (missingResources) {
+        message.error(
+          "Each step must have at least one resource attached before publishing."
+        );
+        return false;
+      }
+    }
 
-      <Title level={5} style={{ marginTop: 8 }}>Basics</Title>
-      <List
-        size="small"
-        dataSource={[
-          { label: 'Name', value: form.getFieldValue('name') },
-          { label: 'Description', value: form.getFieldValue('description') },
-          { label: 'Difficulty', value: form.getFieldValue('difficulty') },
-          { label: 'Tags', value: (form.getFieldValue('tags') || []).join(', ') || '—' },
-        ]}
-        renderItem={(i) => (
-          <List.Item>
-            <strong style={{ width: 120, display: 'inline-block' }}>{i.label}:</strong>{' '}
-            {i.value || '—'}
-          </List.Item>
-        )}
-      />
-
-      <Title level={5} style={{ marginTop: 16 }}>Steps</Title>
-      <Table
-        rowKey="id"
-        dataSource={steps}
-        columns={[
-          { title: '#', render: (_: any, __: Step, idx: number) => idx + 1, width: 60 },
-          { title: 'Title', dataIndex: 'title' as const },
-          { title: 'Type', dataIndex: 'type' as const },
-          {
-            title: 'Resources',
-            dataIndex: 'resourceIds' as const,
-            render: (ids: string[]) => (ids?.length ?? 0),
-          },
-        ]}
-        pagination={false}
-      />
-
-      <div style={{ marginTop: 16 }}>
-        <Button type="primary" onClick={onSubmitPath}>
-          Create Path
-        </Button>
-      </div>
-    </Card>
-  );
+    setSubmitting(true);
+    try {
+      await createLearningPath(values, submitMode);
+      message.success(
+        submitMode === "published"
+          ? "Learning path published."
+          : "Learning path saved as draft."
+      );
+      return true;
+    } catch (error: any) {
+      message.error(error?.message || "Failed to save learning path.");
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
-    <>
-      <PageContainer title="Create Learning Path">
-        <Steps current={currentStep} items={stepItems} style={{ marginBottom: 24 }} />
+    <KonnectedPageShell
+      title="Create learning path"
+      subtitle="Author a structured sequence of resources that learners can follow."
+      primaryAction={null}
+    >
+      <PageContainer>
+        <ProCard>
+          <Alert
+            type="info"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="Use this wizard to define metadata, steps, and resources for a new learning path. You can save it as a draft or publish it when complete."
+          />
 
-        <div>
-          {currentStep === 0 && StepBasics}
-          {currentStep === 1 && StepSteps}
-          {currentStep === 2 && StepResources}
-          {currentStep === 3 && StepReview}
-        </div>
+          <StepsForm<LearningPathFormValues>
+            formRef={formRef}
+            onFinish={handleFinish}
+            submitter={{
+              render: (props) => {
+                const { onSubmit, onPre } = props;
+                return [
+                  <Button
+                    key="pre"
+                    onClick={() => {
+                      onPre?.();
+                    }}
+                  >
+                    Previous
+                  </Button>,
+                  <Button
+                    key="save-draft"
+                    onClick={() => {
+                      setSubmitMode("draft");
+                      onSubmit?.();
+                    }}
+                    loading={submitting}
+                  >
+                    Save draft
+                  </Button>,
+                  <Button
+                    key="publish"
+                    type="primary"
+                    onClick={() => {
+                      setSubmitMode("published");
+                      onSubmit?.();
+                    }}
+                    loading={submitting}
+                  >
+                    Publish
+                  </Button>,
+                ];
+              },
+            }}
+          >
+            <StepsForm.StepForm<LearningPathFormValues>
+              name="basic"
+              title="Basics"
+            >
+              <ProFormText
+                name="name"
+                label="Path name"
+                placeholder="e.g. Web fundamentals for new team members"
+                rules={[
+                  { required: true, message: "Please enter a path name." },
+                  {
+                    min: 4,
+                    message: "Name should be at least 4 characters long.",
+                  },
+                ]}
+              />
+              <ProFormTextArea
+                name="description"
+                label="Description"
+                placeholder="Describe who this path is for and what it covers."
+                fieldProps={{ autoSize: { minRows: 3, maxRows: 6 } }}
+                rules={[
+                  {
+                    required: true,
+                    message: "Please enter a description.",
+                  },
+                  {
+                    min: 20,
+                    message:
+                      "Description should be at least 20 characters long.",
+                  },
+                ]}
+              />
+              <ProFormSelect
+                name="difficulty"
+                label="Difficulty"
+                options={difficultyOptions}
+                placeholder="Select difficulty level"
+                rules={[
+                  { required: true, message: "Please select a difficulty." },
+                ]}
+              />
+              <ProFormSelect
+                name="tags"
+                label="Tags"
+                mode="tags"
+                placeholder="Add tags (optional)"
+                fieldProps={{ tokenSeparators: [","] }}
+              />
+            </StepsForm.StepForm>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 24 }}>
-          <Button onClick={onPrev} disabled={currentStep === 0}>
-            Previous
-          </Button>
-          <Button type="primary" onClick={onNext} disabled={currentStep === stepItems.length - 1}>
-            Next
-          </Button>
-        </div>
+            <StepsForm.StepForm<LearningPathFormValues>
+              name="steps"
+              title="Steps"
+            >
+              <ProFormList
+                name="steps"
+                label="Path steps"
+                creatorButtonProps={{
+                  position: "bottom",
+                  creatorButtonText: "Add step",
+                }}
+                rules={[
+                  {
+                    validator: async (_, value) => {
+                      if (!value || value.length === 0) {
+                        throw new Error(
+                          "You must add at least one step to the path."
+                        );
+                      }
+                    },
+                  },
+                ]}
+              >
+                {(field, index) => (
+                  <ProCard
+                    bordered
+                    style={{ marginBottom: 8 }}
+                    title={`Step ${index + 1}`}
+                  >
+                    <ProFormText
+                      name={[field.name, "title"]}
+                      label="Step title"
+                      placeholder="e.g. Introduction to HTML & CSS"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please enter a step title.",
+                        },
+                      ]}
+                    />
+                    <ProFormSelect
+                      name={[field.name, "type"]}
+                      label="Step type"
+                      options={stepTypeOptions}
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please select a step type.",
+                        },
+                      ]}
+                    />
+                    <ProFormTextArea
+                      name={[field.name, "objective"]}
+                      label="Learning objective"
+                      placeholder="What should learners be able to do after this step?"
+                      fieldProps={{
+                        autoSize: { minRows: 2, maxRows: 4 },
+                      }}
+                    />
+                  </ProCard>
+                )}
+              </ProFormList>
+            </StepsForm.StepForm>
+
+            <StepsForm.StepForm<LearningPathFormValues>
+              name="resources"
+              title="Resources"
+            >
+              <ProFormDependency name={["steps"]}>
+                {({ steps }) => {
+                  const stepList = (steps as LearningPathStepForm[]) ?? [];
+                  if (!stepList.length) {
+                    return (
+                      <Alert
+                        type="warning"
+                        showIcon
+                        message="You need to create at least one step in the previous step before attaching resources."
+                      />
+                    );
+                  }
+
+                  return (
+                    <>
+                      <Paragraph>
+                        Attach one or more library resources to each step. You
+                        can still save as a draft without completing all
+                        attachments, but every step must have at least one
+                        resource before publishing.
+                      </Paragraph>
+
+                      <Space direction="vertical" style={{ width: "100%" }}>
+                        {stepList.map((step, index) => (
+                          <ProCard
+                            key={index}
+                            bordered
+                            title={`Step ${index + 1}: ${
+                              step.title || "Untitled"
+                            }`}
+                            extra={
+                              <Button
+                                onClick={() => openResourceDrawer(index)}
+                                size="small"
+                              >
+                                Select resources
+                              </Button>
+                            }
+                          >
+                            {step.resourceIds && step.resourceIds.length > 0 ? (
+                              <Space wrap>
+                                {step.resourceIds.map((id) => (
+                                  <Tag key={id}>{`Resource #${id}`}</Tag>
+                                ))}
+                              </Space>
+                            ) : (
+                              <Paragraph type="secondary">
+                                No resources attached yet.
+                              </Paragraph>
+                            )}
+                          </ProCard>
+                        ))}
+                      </Space>
+                    </>
+                  );
+                }}
+              </ProFormDependency>
+            </StepsForm.StepForm>
+
+            <StepsForm.StepForm<LearningPathFormValues>
+              name="review"
+              title="Review & publish"
+            >
+              <ProFormDependency
+                name={["name", "description", "difficulty", "tags", "steps"]}
+              >
+                {({ name, description, difficulty, tags, steps }) => {
+                  const stepList = (steps as LearningPathStepForm[]) ?? [];
+
+                  return (
+                    <Space direction="vertical" style={{ width: "100%" }}>
+                      <ProDescriptions
+                        column={1}
+                        title="Path summary"
+                        dataSource={{
+                          name,
+                          description,
+                          difficulty,
+                          tags,
+                        }}
+                      >
+                        <ProDescriptions.Item label="Name" dataIndex="name" />
+                        <ProDescriptions.Item
+                          label="Description"
+                          dataIndex="description"
+                        />
+                        <ProDescriptions.Item
+                          label="Difficulty"
+                          dataIndex="difficulty"
+                        />
+                        <ProDescriptions.Item
+                          label="Tags"
+                          dataIndex="tags"
+                          render={(_, record) => {
+                            const value = (record as {
+                              tags?: string[];
+                            }).tags;
+
+                            return value && value.length ? (
+                              <Space wrap>
+                                {value.map((t) => (
+                                  <Tag key={t}>{t}</Tag>
+                                ))}
+                              </Space>
+                            ) : (
+                              <span>—</span>
+                            );
+                          }}
+                        />
+                      </ProDescriptions>
+
+                      <ProCard title="Steps" bordered>
+                        {stepList.length === 0 ? (
+                          <Paragraph type="secondary">
+                            No steps defined yet.
+                          </Paragraph>
+                        ) : (
+                          <Space direction="vertical" style={{ width: "100%" }}>
+                            {stepList.map((step, index) => (
+                              <ProCard
+                                key={index}
+                                bordered
+                                title={`Step ${index + 1}: ${
+                                  step.title || "Untitled"
+                                }`}
+                              >
+                                <Paragraph>
+                                  <strong>Type:</strong> {step.type}
+                                </Paragraph>
+                                {step.objective && (
+                                  <Paragraph>
+                                    <strong>Objective:</strong>{" "}
+                                    {step.objective}
+                                  </Paragraph>
+                                )}
+                                <Paragraph>
+                                  <strong>Resources:</strong>{" "}
+                                  {step.resourceIds &&
+                                  step.resourceIds.length > 0 ? (
+                                    <Space wrap>
+                                      {step.resourceIds.map((id) => (
+                                        <Tag key={id}>{`Resource #${id}`}</Tag>
+                                      ))}
+                                    </Space>
+                                  ) : (
+                                    <span>None</span>
+                                  )}
+                                </Paragraph>
+                              </ProCard>
+                            ))}
+                          </Space>
+                        )}
+                      </ProCard>
+
+                      {submitMode === "published" && (
+                        <Alert
+                          type="warning"
+                          showIcon
+                          message="Publishing will make this path visible to eligible learners. Make sure steps and resources are complete."
+                        />
+                      )}
+                    </Space>
+                  );
+                }}
+              </ProFormDependency>
+            </StepsForm.StepForm>
+          </StepsForm>
+        </ProCard>
       </PageContainer>
 
-      {/* Step Create/Edit Modal */}
-      <Modal
-        title={selectedStep ? 'Edit Step' : 'Add Step'}
-        open={isStepModalVisible}
-        onOk={submitStep}
-        onCancel={() => setStepModalVisible(false)}
+      <Drawer
+        title="Select resources"
+        width={720}
+        open={resourceDrawerOpen}
+        onClose={closeResourceDrawer}
+        destroyOnClose
+        extra={
+          <Space>
+            <Button onClick={closeResourceDrawer}>Cancel</Button>
+            <Button type="primary" onClick={handleResourceDrawerOk}>
+              Attach selected
+            </Button>
+          </Space>
+        }
       >
-        <Form form={stepForm} layout="vertical" initialValues={{ type: 'lesson' }}>
-          <Form.Item
-            name="title"
-            label="Step Title"
-            rules={[{ required: true, message: 'Please enter a step title.' }]}
-          >
-            <Input placeholder="e.g., Understanding HTML & CSS" />
-          </Form.Item>
+        <Space style={{ marginBottom: 16 }} wrap>
+          <Search
+            placeholder="Search resources"
+            allowClear
+            onSearch={(value) => handleResourceSearch(value || undefined)}
+            style={{ width: 260 }}
+          />
+          <Select
+            style={{ width: 200 }}
+            defaultValue="all"
+            options={CONTENT_TYPE_OPTIONS}
+            onChange={(value) =>
+              handleResourceTypeChange(value as ResourceSearchParams["type"])
+            }
+          />
+        </Space>
 
-          <Form.Item name="type" label="Step Type">
-            <Select>
-              <Option value="lesson">Lesson</Option>
-              <Option value="quiz">Quiz</Option>
-              <Option value="assignment">Assignment</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="content"
-            label="Content / Instructions"
-            rules={[{ required: true, message: 'Please provide content or instructions.' }]}
-          >
-            <Input.TextArea
-              rows={4}
-              placeholder="Write the lesson content, quiz outline, or assignment brief..."
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      {/* Resource Selector Modal */}
-      <Modal
-        title="Attach Resources"
-        open={isResourceModalVisible}
-        onOk={submitResources}
-        onCancel={() => setResourceModalVisible(false)}
-      >
-        <Form form={resourceForm} layout="vertical">
-          <Form.Item
-            name="resourceIds"
-            label="Resources"
-            rules={[{ required: true, message: 'Please select a resource.' }]}
-          >
-            <Select placeholder="Select resources" mode="multiple" allowClear>
-              {availableResources.map((resource) => (
-                <Option key={resource.id} value={resource.id}>
-                  {resource.name} ({resource.type})
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="note" label="Add a Note (optional)">
-            <Input placeholder="Enter any instructions or additional notes" />
-          </Form.Item>
-        </Form>
-      </Modal>
-    </>
+        {resourcesLoading ? (
+          <Spin />
+        ) : resources.length === 0 ? (
+          <Empty description="No resources found." />
+        ) : (
+          <Table<KnowledgeResource>
+            rowKey="id"
+            dataSource={resources}
+            columns={resourceColumns}
+            rowSelection={{
+              selectedRowKeys: selectedResourceIds,
+              onChange: (keys) => setSelectedResourceIds(keys),
+            }}
+            pagination={{ pageSize: 10 }}
+          />
+        )}
+      </Drawer>
+    </KonnectedPageShell>
   );
 };
 
-export default CreateLearningPath;
+export default CreateLearningPathPage;

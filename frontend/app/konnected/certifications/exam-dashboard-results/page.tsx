@@ -1,225 +1,891 @@
-// app/konnected/certifications/exam-dashboard-results/page.tsx
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import type { TableProps } from 'antd';
+import React, { useMemo, useState } from 'react'
 import {
+  Alert,
+  Badge,
+  Button,
   Card,
+  Col,
+  Drawer,
+  Empty,
+  List,
+  Result,
+  Row,
+  Space,
+  Spin,
   Statistic,
   Table,
-  Drawer,
-  Button,
+  Tag,
+  Tooltip,
   Typography,
-  Row,
-  Col,
-  List,
-  Alert,
-} from 'antd';
-import { EyeOutlined, FilePdfOutlined } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
+  message,
+} from 'antd'
+import type { ColumnsType } from 'antd/es/table'
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  FilePdfOutlined,
+  ReloadOutlined,
+  WarningOutlined,
+  EyeOutlined,
+} from '@ant-design/icons'
+import { useRequest } from 'ahooks'
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell'
+import api from '@/services/_request'
 
-const { Text } = Typography;
+const { Title, Text, Paragraph } = Typography
 
-type ExamOutcome = 'Pass' | 'Fail';
+// NOTE: These thresholds mirror the global params from the CertifiKation spec.
+// Keep in sync with backend/global-params.
+const CERT_PASS_PERCENT = 80
+const EXAM_RETRY_COOLDOWN_MIN = 30
 
-interface ExamResult {
-  id: string;
-  examName: string;
-  dateTaken: string;
-  score: number;
-  result: ExamOutcome;
-  details: string;
+// -----------------------------------------------------------------------------
+// Domain types (aligned with Evaluation / CertificationPath / Portfolio models)
+// -----------------------------------------------------------------------------
+
+export type EvaluationStatus =
+  | 'passed'
+  | 'failed'
+  | 'pending_peer'
+  | 'under_review'
+  | 'scheduled'
+  | 'in_progress'
+
+export interface ExamAttempt {
+  id: string
+  certificationPathId: string
+  certificationPathName: string
+  attemptNumber: number
+  takenAt: string // ISO date
+  deliveryMode: 'online' | 'offline' | 'blended'
+  proctored: boolean
+  scorePercent: number | null
+  maxScore: number | null
+  status: EvaluationStatus
+
+  // Peer validation / review
+  peerValidationRequired: boolean
+  peerValidationStatus?: 'approved' | 'rejected' | 'pending'
+  appealStatus?: 'none' | 'open' | 'resolved' | 'rejected'
+
+  // Portfolio / certificate linkage
+  certificateId?: string
+  certificateUrl?: string
+  portfolioItemId?: string
+  portfolioUrl?: string
+
+  // Retry & cooldown metadata
+  canRetry: boolean
+  nextRetryAt?: string // ISO date if blocked by cooldown
 }
 
-const upcomingExam:
-  | { examName: string; examDate: string; status: string }
-  | null = {
-  examName: 'Certification Exam Level 1',
-  examDate: '2023-10-10 10:00',
-  status: 'Registered',
-};
+interface ExamAttemptsResponse {
+  attempts: ExamAttempt[]
+}
 
-const examResultsData: ExamResult[] = [
-  {
-    id: '1',
-    examName: 'Certification Exam Level 1',
-    dateTaken: '2023-08-10',
-    score: 78,
-    result: 'Pass',
-    details:
-      'Score global de 78%. Excellente performance en théorie, à améliorer en pratique.',
-  },
-  {
-    id: '2',
-    examName: 'Certification Exam Level 1',
-    dateTaken: '2023-07-05',
-    score: 65,
-    result: 'Fail',
-    details:
-      'Score global de 65%. Points faibles identifiés en gestion des situations critiques.',
-  },
-];
+// -----------------------------------------------------------------------------
+// API endpoint helpers
+// -----------------------------------------------------------------------------
 
-const certificationsEarned: { id: string; title: string; pdfLink: string }[] = [
-  { id: 'cert1', title: 'Certification Exam Level 1', pdfLink: '#' },
-  { id: 'cert2', title: 'Advanced Certification Exam', pdfLink: '#' },
-];
+const EXAM_ATTEMPTS_ENDPOINT = '/konnected/certifications/exam-attempts/me'
+const EXAM_ATTEMPT_DETAIL_ENDPOINT = (attemptId: string) =>
+  `/konnected/certifications/exam-attempts/${attemptId}`
+const EXAM_APPEAL_ENDPOINT = (attemptId: string) =>
+  `/konnected/certifications/exam-attempts/${attemptId}/appeal`
+const EXAM_RETRY_ENDPOINT = (attemptId: string) =>
+  `/konnected/certifications/exam-attempts/${attemptId}/retry`
 
-export default function ExamDashboardResultsPage() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedExam, setSelectedExam] = useState<ExamResult | null>(null);
+async function fetchExamAttempts(): Promise<ExamAttemptsResponse> {
+  return api.get<ExamAttemptsResponse>(EXAM_ATTEMPTS_ENDPOINT)
+}
 
-  const columns: TableProps<ExamResult>['columns'] = [
-    { title: 'Exam Name', dataIndex: 'examName', key: 'examName' },
-    { title: 'Date Taken', dataIndex: 'dateTaken', key: 'dateTaken' },
+// -----------------------------------------------------------------------------
+// Utility helpers
+// -----------------------------------------------------------------------------
+
+const formatDateTime = (iso: string | undefined) => {
+  if (!iso) return '—'
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return iso
+  return date.toLocaleString()
+}
+
+const getStatusTag = (attempt: ExamAttempt) => {
+  if (attempt.status === 'scheduled') {
+    return (
+      <Tag icon={<ClockCircleOutlined />} color="default">
+        Scheduled
+      </Tag>
+    )
+  }
+
+  if (attempt.status === 'in_progress') {
+    return (
+      <Tag icon={<ClockCircleOutlined />} color="processing">
+        In progress
+      </Tag>
+    )
+  }
+
+  if (attempt.status === 'passed') {
+    if (attempt.peerValidationRequired && attempt.peerValidationStatus !== 'approved') {
+      // Passed automated evaluation but still waiting on peers
+      return (
+        <Tag icon={<ClockCircleOutlined />} color="processing">
+          Pending peer validation
+        </Tag>
+      )
+    }
+    return (
+      <Tag icon={<CheckCircleOutlined />} color="success">
+        Passed
+      </Tag>
+    )
+  }
+
+  if (attempt.status === 'failed') {
+    return (
+      <Tag icon={<ExclamationCircleOutlined />} color="error">
+        Not passed
+      </Tag>
+    )
+  }
+
+  if (attempt.status === 'pending_peer') {
+    return (
+      <Tag icon={<ClockCircleOutlined />} color="processing">
+        Pending peer validation
+      </Tag>
+    )
+  }
+
+  if (attempt.status === 'under_review') {
+    return (
+      <Tag icon={<ClockCircleOutlined />} color="warning">
+        Under review
+      </Tag>
+    )
+  }
+
+  return <Tag>Unknown</Tag>
+}
+
+const getAppealTag = (attempt: ExamAttempt) => {
+  if (!attempt.appealStatus || attempt.appealStatus === 'none') {
+    return null
+  }
+
+  if (attempt.appealStatus === 'open') {
+    return (
+      <Tag color="processing" icon={<ClockCircleOutlined />}>
+        Appeal open
+      </Tag>
+    )
+  }
+
+  if (attempt.appealStatus === 'resolved') {
+    return (
+      <Tag color="success" icon={<CheckCircleOutlined />}>
+        Appeal resolved
+      </Tag>
+    )
+  }
+
+  if (attempt.appealStatus === 'rejected') {
+    return (
+      <Tag color="error" icon={<ExclamationCircleOutlined />}>
+        Appeal rejected
+      </Tag>
+    )
+  }
+
+  return null
+}
+
+const getScoreColor = (percent: number | null) => {
+  if (percent == null) return undefined as
+    | 'success'
+    | 'warning'
+    | 'danger'
+    | undefined
+  if (percent >= CERT_PASS_PERCENT) return 'success' as const
+  if (percent >= CERT_PASS_PERCENT - 10) return 'warning' as const
+  return 'danger' as const
+}
+
+// -----------------------------------------------------------------------------
+// Main component
+// -----------------------------------------------------------------------------
+
+const ExamDashboardResultsPage: React.FC = () => {
+  const [selectedAttempt, setSelectedAttempt] = useState<ExamAttempt | null>(null)
+  const [appealLoadingId, setAppealLoadingId] = useState<string | null>(null)
+  const [retryLoadingId, setRetryLoadingId] = useState<string | null>(null)
+
+  const {
+    data,
+    loading,
+    error,
+    refresh: refreshAttempts,
+  } = useRequest(fetchExamAttempts, {
+    retryCount: 1,
+  })
+
+  const attempts = data?.attempts ?? []
+
+  const stats = useMemo(() => {
+    if (!attempts.length) {
+      return {
+        totalAttempts: 0,
+        passedCount: 0,
+        passRate: 0,
+        avgScore: 0,
+        uniqueCerts: 0,
+      }
+    }
+
+    const totalAttempts = attempts.length
+    const scoredAttempts = attempts.filter(
+      (a) => typeof a.scorePercent === 'number',
+    ) as Array<ExamAttempt & { scorePercent: number }>
+    const passedCount = scoredAttempts.filter((a) => a.scorePercent >= CERT_PASS_PERCENT).length
+    const passRate = totalAttempts ? Math.round((passedCount / totalAttempts) * 100) : 0
+    const avgScore = scoredAttempts.length
+      ? Math.round(
+          scoredAttempts.reduce((sum, a) => sum + (a.scorePercent ?? 0), 0) /
+            scoredAttempts.length,
+        )
+      : 0
+    const uniqueCerts = new Set(
+      attempts.map((a) => a.certificationPathId || a.certificationPathName),
+    ).size
+
+    return { totalAttempts, passedCount, passRate, avgScore, uniqueCerts }
+  }, [attempts])
+
+  const handleOpenDetails = async (attempt: ExamAttempt) => {
+    try {
+      const detail = await api.get<ExamAttempt>(EXAM_ATTEMPT_DETAIL_ENDPOINT(attempt.id))
+      setSelectedAttempt(detail)
+    } catch {
+      // Fallback to row data if detail endpoint is not yet wired.
+      setSelectedAttempt(attempt)
+    }
+  }
+
+  const handleCloseDetails = () => {
+    setSelectedAttempt(null)
+  }
+
+  const handleOpenCertificate = (attempt: ExamAttempt) => {
+    if (attempt.certificateUrl) {
+      window.open(attempt.certificateUrl, '_blank')
+    } else {
+      message.info('Certificate is not yet available for this attempt.')
+    }
+  }
+
+  const handleOpenPortfolio = (attempt: ExamAttempt) => {
+    if (attempt.portfolioUrl) {
+      window.open(attempt.portfolioUrl, '_blank')
+    } else {
+      message.info('This attempt is not yet linked to your portfolio.')
+    }
+  }
+
+  const handleOpenAppeal = async (attempt: ExamAttempt) => {
+    setAppealLoadingId(attempt.id)
+    try {
+      await api.post(EXAM_APPEAL_ENDPOINT(attempt.id))
+      message.success('Appeal request submitted. You will be notified when it is reviewed.')
+      await refreshAttempts()
+    } catch {
+      message.error('Unable to submit appeal. Please try again or contact support.')
+    } finally {
+      setAppealLoadingId(null)
+    }
+  }
+
+  const handleRetry = async (attempt: ExamAttempt) => {
+    setRetryLoadingId(attempt.id)
+    try {
+      await api.post(EXAM_RETRY_ENDPOINT(attempt.id))
+      message.success('Retry triggered. You will be redirected to the registration flow.')
+      // In a later iteration you might push to /konnected/certifications/exam-registration
+    } catch {
+      message.error('Unable to start a new attempt. Please try again or contact support.')
+    } finally {
+      setRetryLoadingId(null)
+    }
+  }
+
+  const columns: ColumnsType<ExamAttempt> = [
+    {
+      title: 'Certification path',
+      dataIndex: 'certificationPathName',
+      key: 'certificationPathName',
+      render: (text: string, record) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{text}</Text>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Attempt #{record.attemptNumber}
+          </Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      filters: [
+        { text: 'Passed', value: 'passed' },
+        { text: 'Not passed', value: 'failed' },
+        { text: 'Pending peer validation', value: 'pending_peer' },
+        { text: 'Under review', value: 'under_review' },
+      ],
+      onFilter: (value, record) => record.status === value,
+      render: (_value, record) => (
+        <Space direction="vertical" size={2}>
+          {getStatusTag(record)}
+          {getAppealTag(record)}
+        </Space>
+      ),
+    },
     {
       title: 'Score',
-      dataIndex: 'score',
-      key: 'score',
-      render: (score: number) => `${score}%`,
+      dataIndex: 'scorePercent',
+      key: 'scorePercent',
+      render: (value: number | null) => {
+        if (value == null) {
+          return <Text type="secondary">Pending</Text>
+        }
+        const color = getScoreColor(value)
+        return (
+          <Space direction="vertical" size={0}>
+            <Text
+              strong
+              type={
+                color === 'success'
+                  ? 'success'
+                  : color === 'danger'
+                  ? 'danger'
+                  : color === 'warning'
+                  ? 'warning'
+                  : undefined
+              }
+            >
+              {value}%
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Pass threshold: {CERT_PASS_PERCENT}%
+            </Text>
+          </Space>
+        )
+      },
     },
     {
-      title: 'Result',
-      dataIndex: 'result',
-      key: 'result',
-      render: (result: ExamOutcome) => (
-        <Text strong style={{ color: result === 'Pass' ? 'green' : 'red' }}>
-          {result}
-        </Text>
+      title: 'Date',
+      dataIndex: 'takenAt',
+      key: 'takenAt',
+      render: (value: string) => <Text>{formatDateTime(value)}</Text>,
+      sorter: (a, b) => {
+        const aTime = new Date(a.takenAt).getTime()
+        const bTime = new Date(b.takenAt).getTime()
+        return aTime - bTime
+      },
+      defaultSortOrder: 'descend',
+    },
+    {
+      title: 'Delivery',
+      dataIndex: 'deliveryMode',
+      key: 'deliveryMode',
+      render: (_value, record) => (
+        <Space direction="vertical" size={0}>
+          <Text>{record.deliveryMode === 'online' ? 'Online' : record.deliveryMode}</Text>
+          {record.proctored && (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Proctored
+            </Text>
+          )}
+        </Space>
       ),
     },
     {
-      title: 'Action',
-      key: 'action',
-      render: (_: unknown, record: ExamResult) => (
-        <Button
-          type="link"
-          icon={<EyeOutlined />}
-          onClick={() => {
-            setSelectedExam(record);
-            setDrawerOpen(true);
-          }}
-        >
-          View Details
-        </Button>
+      title: 'Validation',
+      key: 'validation',
+      render: (_value, record) => {
+        if (!record.peerValidationRequired) {
+          return <Text type="secondary">Not required</Text>
+        }
+        if (!record.peerValidationStatus || record.peerValidationStatus === 'pending') {
+          return (
+            <Tag icon={<ClockCircleOutlined />} color="processing">
+              Waiting for peers
+            </Tag>
+          )
+        }
+        if (record.peerValidationStatus === 'approved') {
+          return (
+            <Tag icon={<CheckCircleOutlined />} color="success">
+              Peer-approved
+            </Tag>
+          )
+        }
+        if (record.peerValidationStatus === 'rejected') {
+          return (
+            <Tag icon={<ExclamationCircleOutlined />} color="error">
+              Peer-rejected
+            </Tag>
+          )
+        }
+        return <Text type="secondary">—</Text>
+      },
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_value, record) => (
+        <Space>
+          <Tooltip title="View attempt details">
+            <Button
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => handleOpenDetails(record)}
+            />
+          </Tooltip>
+          <Tooltip title="Open certificate (if available)">
+            <Button
+              size="small"
+              icon={<FilePdfOutlined />}
+              onClick={() => handleOpenCertificate(record)}
+              disabled={!record.certificateUrl}
+            />
+          </Tooltip>
+          <Tooltip title="Open portfolio entry (if available)">
+            <Button
+              size="small"
+              onClick={() => handleOpenPortfolio(record)}
+              disabled={!record.portfolioUrl}
+            >
+              Portfolio
+            </Button>
+          </Tooltip>
+          <Tooltip title="Request a manual review of this attempt">
+            <Button
+              size="small"
+              type="default"
+              icon={<WarningOutlined />}
+              loading={appealLoadingId === record.id}
+              onClick={() => handleOpenAppeal(record)}
+              disabled={record.appealStatus === 'open'}
+            >
+              Appeal
+            </Button>
+          </Tooltip>
+          <Tooltip title="Start a new attempt (if allowed)">
+            <Button
+              size="small"
+              type="primary"
+              icon={<ReloadOutlined />}
+              loading={retryLoadingId === record.id}
+              onClick={() => handleRetry(record)}
+              disabled={!record.canRetry}
+            >
+              Retry
+            </Button>
+          </Tooltip>
+        </Space>
       ),
     },
-  ];
+  ]
 
-  const latest = examResultsData[0];
+  // ---------------------------------------------------------------------------
+  // Derived blocks
+  // ---------------------------------------------------------------------------
+
+  const kpiCards = (
+    <Row gutter={[16, 16]}>
+      <Col xs={24} sm={12} md={6}>
+        <Card>
+          <Statistic title="Total attempts" value={stats.totalAttempts} />
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <Card>
+          <Statistic
+            title="Paths passed"
+            value={stats.passedCount}
+            suffix={`/ ${stats.uniqueCerts || stats.totalAttempts || 0}`}
+          />
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <Card>
+          <Statistic title="Pass rate" value={stats.passRate} suffix="%" />
+        </Card>
+      </Col>
+      <Col xs={24} sm={12} md={6}>
+        <Card>
+          <Statistic title="Average score" value={stats.avgScore} suffix="%" />
+        </Card>
+      </Col>
+    </Row>
+  )
+
+  const cooldownAlerts = (() => {
+    const blockedAttempts = attempts.filter(
+      (a) => !a.canRetry && a.nextRetryAt && a.status === 'failed',
+    )
+    if (!blockedAttempts.length) return null
+
+    return (
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 16 }}
+        message="Retry cooldown in effect"
+        description={
+          <Space direction="vertical">
+            <Text>
+              Some attempts are temporarily blocked from retries to prevent burnout and
+              encourage reflection.
+            </Text>
+            <List
+              size="small"
+              dataSource={blockedAttempts}
+              renderItem={(a) => (
+                <List.Item>
+                  <Space direction="vertical" size={0}>
+                    <Text strong>{a.certificationPathName}</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Next retry available: {formatDateTime(a.nextRetryAt)}
+                    </Text>
+                  </Space>
+                </List.Item>
+              )}
+            />
+            <Text type="secondary">
+              Global policy: {EXAM_RETRY_COOLDOWN_MIN} minutes minimum between failed attempts
+              on the same path (configurable per tenant).
+            </Text>
+          </Space>
+        }
+      />
+    )
+  })()
+
+  // ---------------------------------------------------------------------------
+  // Global loading / error / empty handling
+  // ---------------------------------------------------------------------------
+
+  if (loading && !data) {
+    return (
+      <KonnectedPageShell
+        title="Exam Dashboard & Results"
+        subtitle="Track your certification exam attempts, scores, and outcomes."
+      >
+        <div style={{ padding: 24, textAlign: 'center' }}>
+          <Spin size="large" />
+        </div>
+      </KonnectedPageShell>
+    )
+  }
+
+  if (error) {
+    return (
+      <KonnectedPageShell
+        title="Exam Dashboard & Results"
+        subtitle="Track your certification exam attempts, scores, and outcomes."
+      >
+        <div style={{ padding: 24 }}>
+          <Result
+            status="error"
+            title="We could not load your exam results."
+            subTitle="There was a problem contacting the CertifiKation service. Please try again in a few seconds."
+            extra={
+              <Button type="primary" onClick={() => refreshAttempts()}>
+                Retry loading
+              </Button>
+            }
+          />
+        </div>
+      </KonnectedPageShell>
+    )
+  }
+
+  if (!attempts.length) {
+    return (
+      <KonnectedPageShell
+        title="Exam Dashboard & Results"
+        subtitle="Track your certification exam attempts, scores, and outcomes."
+      >
+        <Row gutter={24}>
+          <Col xs={24} md={16}>
+            <Card>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  <Space direction="vertical">
+                    <Text>You have not attempted any certification exams yet.</Text>
+                    <Text type="secondary">
+                      Once you complete an exam in the CertifiKation module, it will appear
+                      here with your score, status, and certificate links.
+                    </Text>
+                  </Space>
+                }
+              >
+                <Button
+                  type="primary"
+                  href="/konnected/certifications/exam-registration"
+                >
+                  Browse certification exams
+                </Button>
+              </Empty>
+            </Card>
+          </Col>
+          <Col xs={24} md={8}>
+            <Card title="How this dashboard works">
+              <Space direction="vertical">
+                <Text>
+                  This dashboard consolidates all your exam attempts from the CertifiKation
+                  module.
+                </Text>
+                <List
+                  size="small"
+                  dataSource={[
+                    'Each attempt shows your score, pass/fail status, and validation state.',
+                    'If peer validation is required, you will see when it is pending or approved.',
+                    'Once a certification is granted, you can open the official certificate and any portfolio entry.',
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <Text type="secondary">{item}</Text>
+                    </List.Item>
+                  )}
+                />
+              </Space>
+            </Card>
+          </Col>
+        </Row>
+      </KonnectedPageShell>
+    )
+  }
+
+  // ---------------------------------------------------------------------------
+  // Main content (normal case with attempts)
+  // ---------------------------------------------------------------------------
 
   return (
-    <PageContainer title="Exam Dashboard & Results">
-      {upcomingExam && (
-        <Card title="Upcoming Exam" style={{ marginBottom: 24 }}>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={8}>
-              <Text strong>Exam:</Text> {upcomingExam.examName}
-            </Col>
-            <Col xs={24} md={8}>
-              <Text strong>Date:</Text> {upcomingExam.examDate}
-            </Col>
-            <Col xs={24} md={8}>
-              <Text strong>Status:</Text> {upcomingExam.status}
-            </Col>
-          </Row>
-        </Card>
-      )}
+    <KonnectedPageShell
+      title="Exam Dashboard & Results"
+      subtitle="Track your certification exam attempts, scores, and outcomes."
+    >
+      <Space direction="vertical" size={24} style={{ width: '100%' }}>
+        {cooldownAlerts}
 
-      {latest && (
-        <Card title="Latest Exam Result" style={{ marginBottom: 24 }}>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <Statistic title="Score Achieved" value={latest.score} suffix="%" />
-            </Col>
-            <Col xs={24} md={12}>
-              <Statistic
-                title="Result"
-                value={latest.result}
-                valueStyle={{
-                  color: latest.result === 'Pass' ? '#3f8600' : '#cf1322',
-                }}
-              />
-            </Col>
-          </Row>
-        </Card>
-      )}
+        {kpiCards}
 
-      <Card title="Exam History" style={{ marginBottom: 24 }}>
-        <Table<ExamResult>
-          columns={columns}
-          dataSource={examResultsData}
-          rowKey="id"
-          pagination={{ pageSize: 5 }}
-        />
-      </Card>
-
-      <Card title="Certificates Earned" style={{ marginBottom: 24 }}>
-        <List
-          dataSource={certificationsEarned}
-          renderItem={(item) => (
-            <List.Item
-              actions={[
-                <Button key="dl" icon={<FilePdfOutlined />} type="link" href={item.pdfLink}>
-                  Download
-                </Button>,
-              ]}
+        <Row gutter={24}>
+          <Col xs={24} lg={16}>
+            <Card
+              title="Recent exam attempts"
+              extra={
+                <Space>
+                  <Badge color="success" text="Passed" />
+                  <Badge color="error" text="Not passed" />
+                  <Badge color="processing" text="Pending / In progress" />
+                </Space>
+              }
             >
-              <List.Item.Meta
-                title={item.title}
-                description={`Certificate ID: ${item.id}`}
+              <Table<ExamAttempt>
+                rowKey="id"
+                columns={columns}
+                dataSource={attempts}
+                loading={loading}
+                pagination={{ pageSize: 10, showSizeChanger: false }}
+                onRow={(record) => ({
+                  onClick: () => handleOpenDetails(record),
+                })}
               />
-            </List.Item>
+            </Card>
+          </Col>
+
+          <Col xs={24} lg={8}>
+            <Space direction="vertical" size={16} style={{ width: '100%' }}>
+              <Card title="Certification outcomes">
+                <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                  <Paragraph>
+                    When you pass a CertifiKation path (and, if required, peer validation is
+                    approved), your certification is:
+                  </Paragraph>
+                  <List
+                    size="small"
+                    dataSource={[
+                      'Recorded in the Evaluation & CertificationPath tables.',
+                      'Linked to your Portfolio as a verifiable achievement.',
+                      'Exposed as a downloadable/shareable certificate.',
+                    ]}
+                    renderItem={(item) => (
+                      <List.Item>
+                        <Text type="secondary">{item}</Text>
+                      </List.Item>
+                    )}
+                  />
+                </Space>
+              </Card>
+
+              <Card title="Tips for improving your score">
+                <List
+                  size="small"
+                  dataSource={[
+                    'Review the learning path content linked to this certification.',
+                    'Use the Exam Preparation page to practice with sample questions.',
+                    'Respect cooldowns between attempts to avoid rushed retries.',
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item>
+                      <Text type="secondary">{item}</Text>
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </Space>
+          </Col>
+        </Row>
+
+        {/* Details drawer */}
+        <Drawer
+          title="Exam attempt details"
+          width={520}
+          open={!!selectedAttempt}
+          onClose={handleCloseDetails}
+          destroyOnClose
+        >
+          {selectedAttempt ? (
+            <Space direction="vertical" size={16} style={{ width: '100%' }}>
+              <div>
+                <Title level={4}>{selectedAttempt.certificationPathName}</Title>
+                <Text type="secondary">
+                  Attempt #{selectedAttempt.attemptNumber} ·{' '}
+                  {formatDateTime(selectedAttempt.takenAt)}
+                </Text>
+              </div>
+
+              <Space size={16}>
+                <Statistic
+                  title="Score"
+                  value={selectedAttempt.scorePercent ?? 0}
+                  suffix="%"
+                />
+                <Statistic
+                  title="Pass threshold"
+                  value={CERT_PASS_PERCENT}
+                  suffix="%"
+                />
+              </Space>
+
+              <Space direction="vertical" size={8}>
+                <Text strong>Status</Text>
+                {getStatusTag(selectedAttempt)}
+                {getAppealTag(selectedAttempt)}
+              </Space>
+
+              <Space direction="vertical" size={8}>
+                <Text strong>Validation & review</Text>
+                <Space direction="vertical" size={4}>
+                  <Text>
+                    Peer validation required:{' '}
+                    {selectedAttempt.peerValidationRequired ? 'Yes' : 'No'}
+                  </Text>
+                  <Text>
+                    Peer validation status:{' '}
+                    {selectedAttempt.peerValidationStatus ?? '—'}
+                  </Text>
+                  <Text>Appeal status: {selectedAttempt.appealStatus ?? 'none'}</Text>
+                </Space>
+              </Space>
+
+              <Space direction="vertical" size={8}>
+                <Text strong>Delivery & conditions</Text>
+                <Space direction="vertical" size={4}>
+                  <Text>Mode: {selectedAttempt.deliveryMode}</Text>
+                  <Text>Proctored: {selectedAttempt.proctored ? 'Yes' : 'No'}</Text>
+                </Space>
+              </Space>
+
+              <Space direction="vertical" size={8}>
+                <Text strong>Linked assets</Text>
+                <Space>
+                  <Button
+                    icon={<FilePdfOutlined />}
+                    onClick={() => handleOpenCertificate(selectedAttempt)}
+                    disabled={!selectedAttempt.certificateUrl}
+                  >
+                    Open certificate
+                  </Button>
+                  <Button
+                    onClick={() => handleOpenPortfolio(selectedAttempt)}
+                    disabled={!selectedAttempt.portfolioUrl}
+                  >
+                    View portfolio entry
+                  </Button>
+                </Space>
+              </Space>
+
+              {selectedAttempt.nextRetryAt && (
+                <Alert
+                  type={selectedAttempt.canRetry ? 'success' : 'info'}
+                  showIcon
+                  message={
+                    selectedAttempt.canRetry
+                      ? 'You can start a new attempt now.'
+                      : 'Retry cooldown in effect for this path.'
+                  }
+                  description={
+                    <Space direction="vertical" size={4}>
+                      <Text>
+                        Next retry available: {formatDateTime(selectedAttempt.nextRetryAt)}
+                      </Text>
+                      <Text type="secondary">
+                        Global cooldown: {EXAM_RETRY_COOLDOWN_MIN} minutes between attempts
+                        on the same path.
+                      </Text>
+                    </Space>
+                  }
+                />
+              )}
+
+              <Space>
+                <Button
+                  type="default"
+                  icon={<WarningOutlined />}
+                  loading={appealLoadingId === selectedAttempt.id}
+                  onClick={() => handleOpenAppeal(selectedAttempt)}
+                  disabled={selectedAttempt.appealStatus === 'open'}
+                >
+                  Open appeal
+                </Button>
+                <Button
+                  type="primary"
+                  icon={<ReloadOutlined />}
+                  loading={retryLoadingId === selectedAttempt.id}
+                  onClick={() => handleRetry(selectedAttempt)}
+                  disabled={!selectedAttempt.canRetry}
+                >
+                  Start new attempt
+                </Button>
+              </Space>
+            </Space>
+          ) : (
+            <Spin />
           )}
-        />
-      </Card>
-
-      <Card>
-        <Alert
-          message="Next Steps: Explore further certification programs to advance your career."
-          type="info"
-          showIcon
-        />
-        <div style={{ marginTop: 16 }}>
-          <Button type="primary" href="/konnected/certifications/certification-programs">
-            Certification Programs
-          </Button>
-        </div>
-      </Card>
-
-      <Drawer
-        title="Exam Details"
-        placement="right"
-        onClose={() => setDrawerOpen(false)}
-        open={drawerOpen}
-      >
-        {selectedExam && (
-          <>
-            <p>
-              <strong>Exam Name:</strong> {selectedExam.examName}
-            </p>
-            <p>
-              <strong>Date Taken:</strong> {selectedExam.dateTaken}
-            </p>
-            <p>
-              <strong>Score:</strong> {selectedExam.score}%
-            </p>
-            <p>
-              <strong>Result:</strong>{' '}
-              <Text
-                strong
-                style={{ color: selectedExam.result === 'Pass' ? 'green' : 'red' }}
-              >
-                {selectedExam.result}
-              </Text>
-            </p>
-            <p>
-              <strong>Details:</strong>
-            </p>
-            <p>{selectedExam.details}</p>
-          </>
-        )}
-      </Drawer>
-    </PageContainer>
-  );
+        </Drawer>
+      </Space>
+    </KonnectedPageShell>
+  )
 }
+
+export default ExamDashboardResultsPage

@@ -1,17 +1,10 @@
+// File: app/kreative/community-showcases/submit-to-showcase/page.tsx
 'use client';
 
-/**
- * Page: /kreative/community-showcases/submit-to-showcase
- * Corrections:
- * - App Router: suppression de NextPage et du pattern getLayout/MainLayout.
- * - AntD Select: usage de `options` (compatible v4/v5) plutôt que Select.Option.
- * - Nettoyage des imports et du JSX, suppression des accolades orphelines.
- */
-
 import React, { useState } from 'react';
-import { Form, Input, Select, Button, Modal, message } from 'antd';
+import { Form, Input, Select, Button, Modal, message as antdMessage } from 'antd';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { TextArea } = Input;
 
@@ -23,7 +16,7 @@ type FormValues = {
   tags?: string[];
 };
 
-export default function SubmitToShowcasePage() {
+export default function SubmitToShowcasePage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
@@ -39,13 +32,13 @@ export default function SubmitToShowcasePage() {
   const onFinish = async (values: FormValues) => {
     setSubmitting(true);
     try {
-      // TODO: branchement API si/when disponible (ex: POST /api/showcases)
+      // TODO: plug into backend API when available (e.g. POST /api/showcases)
       // await fetch('/api/showcases', { method: 'POST', body: JSON.stringify(values) });
 
-      message.success('Submission received');
+      antdMessage.success('Submission received');
       setModalVisible(true);
     } catch (e) {
-      message.error("Une erreur est survenue lors de l'envoi.");
+      antdMessage.error("Une erreur est survenue lors de l'envoi.");
     } finally {
       setSubmitting(false);
     }
@@ -54,8 +47,11 @@ export default function SubmitToShowcasePage() {
   const onCancel = () => router.back();
 
   return (
-    <PageContainer title="Submit to Showcase">
-      <Form
+    <KreativePageShell
+      title="Submit to Showcase"
+      subtitle="Share a project you’re proud of with the Kreative community showcase."
+    >
+      <Form<FormValues>
         form={form}
         layout="vertical"
         onFinish={onFinish}
@@ -79,7 +75,9 @@ export default function SubmitToShowcasePage() {
             options={categories}
             showSearch
             filterOption={(input, option) =>
-              (option?.label as string).toLowerCase().includes(input.toLowerCase())
+              (option?.label as string)
+                .toLowerCase()
+                .includes(input.toLowerCase())
             }
           />
         </Form.Item>
@@ -89,7 +87,11 @@ export default function SubmitToShowcasePage() {
           name="description"
           rules={[{ required: true, message: 'Please add a short description' }]}
         >
-          <TextArea rows={5} placeholder="What is this project about?" allowClear />
+          <TextArea
+            rows={5}
+            placeholder="What is this project about?"
+            allowClear
+          />
         </Form.Item>
 
         <Form.Item label="Reference link (optional)" name="link">
@@ -126,10 +128,10 @@ export default function SubmitToShowcasePage() {
         cancelButtonProps={{ style: { display: 'none' } }}
       >
         <p>
-          Your project has been submitted for review. Moderators will evaluate your
-          submission shortly.
+          Your project has been submitted for review. Moderators will evaluate
+          your submission shortly.
         </p>
       </Modal>
-    </PageContainer>
+    </KreativePageShell>
   );
 }

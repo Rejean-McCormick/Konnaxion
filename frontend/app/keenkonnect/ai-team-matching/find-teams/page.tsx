@@ -1,205 +1,556 @@
-'use client'
+'use client';
 
-// app/keenkonnect/ai-team-matching/find-teams/page.tsx
 import React, { useMemo, useState } from 'react';
-import { Card, List, Input, Select, Button, Drawer, Row, Col, Tag, Divider } from 'antd';
+import {
+  Badge,
+  Button,
+  Card,
+  Divider,
+  Drawer,
+  Empty,
+  Input,
+  List,
+  Row,
+  Col,
+  Select,
+  Space,
+  Switch,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import {
+  FilterOutlined,
+  InfoCircleOutlined,
+  SearchOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+  HeartOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import PageContainer from '@/components/PageContainer';
 
-const { Search } = Input;
+const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 
-interface Team {
+type TeamSizeFilter = 'all' | 'small' | 'medium' | 'large';
+
+interface TeamMatch {
   id: string;
   name: string;
   description: string;
-  matchReason: string;
   domain: string;
+  members: string[];
   teamSize: number;
+  matchReason: string;
   isOpen: boolean;
-  members: string[]; // liste des membres ou noms pour affichage dans le Drawer
 }
 
-// Exemple de données simulées pour les équipes recommandées
-const sampleTeams: Team[] = [
+const sampleTeamMatches: TeamMatch[] = [
   {
     id: '1',
     name: 'AI Innovators',
     description: 'A team focused on cutting-edge AI projects and research.',
-    matchReason: 'Your skills in AI match this project’s needs.',
-    domain: 'Technology',
-    teamSize: 5,
-    isOpen: true,
+    domain: 'AI & Robotics',
     members: ['Alice', 'Bob', 'Charlie'],
+    teamSize: 3,
+    matchReason: 'Your background in robotics aligns with the team’s focus.',
+    isOpen: true,
   },
   {
     id: '2',
-    name: 'Data Wizards',
+    name: 'Sustainable Cities Lab',
     description:
-      'Experts in data science and machine learning working on real-world challenges.',
-    matchReason: 'Your expertise in data analytics is a perfect fit.',
-    domain: 'Data Science',
-    teamSize: 8,
-    isOpen: false,
-    members: ['Diana', 'Edward', 'Fiona', 'George'],
+      'Collaborating on innovative solutions for sustainable urban development.',
+    domain: 'Sustainable Cities',
+    members: ['Dana', 'Eve'],
+    teamSize: 2,
+    matchReason:
+      'Your interest in urban planning and green infrastructure is highly relevant.',
+    isOpen: true,
   },
   {
     id: '3',
-    name: 'Robotics R&D',
-    description: 'A collaborative group diving into the robotics innovations.',
-    matchReason: 'Your background in robotics aligns with the team’s focus.',
-    domain: 'Engineering',
-    teamSize: 6,
-    isOpen: true,
-    members: ['Hugo', 'Ivy', 'Jack'],
+    name: 'HealthTech Pioneers',
+    description:
+      'Exploring new technologies in health and wellness management.',
+    domain: 'Health & Wellness',
+    members: ['Frank', 'Grace', 'Heidi', 'Ivan'],
+    teamSize: 4,
+    matchReason:
+      'Your experience at the intersection of healthcare and digital platforms is a strong match.',
+    isOpen: false,
   },
 ];
 
-export default function FindTeamsPage() {
-  // États pour la recherche et les filtres
+const getTeamSizeTag = (size: number) => {
+  if (size <= 3) return { label: 'Small team', color: 'green' as const };
+  if (size <= 6) return { label: 'Medium team', color: 'blue' as const };
+  return { label: 'Large team', color: 'purple' as const };
+};
+
+const domainOptions = Array.from(new Set(sampleTeamMatches.map((t) => t.domain)));
+
+const FindTeamsPage: React.FC = () => {
+  const router = useRouter();
+
   const [searchText, setSearchText] = useState('');
-  const [selectedDomain, setSelectedDomain] = useState<string>('All');
-  const [selectedTeamSize, setSelectedTeamSize] = useState<string>('All');
+  const [domainFilter, setDomainFilter] = useState<string>('all');
+  const [teamSizeFilter, setTeamSizeFilter] = useState<TeamSizeFilter>('all');
+  const [openOnly, setOpenOnly] = useState<boolean>(false);
 
-  // État pour le Drawer et la sélection d'équipe
+  const [selectedTeam, setSelectedTeam] = useState<TeamMatch | null>(null);
   const [drawerVisible, setDrawerVisible] = useState(false);
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
 
-  // Filtrage des équipes en fonction des critères
-  const filteredTeams = useMemo(() => {
-    return sampleTeams.filter((team) => {
-      const matchesSearch =
-        searchText === '' ||
-        team.name.toLowerCase().includes(searchText.toLowerCase());
-      const matchesDomain =
-        selectedDomain === 'All' || team.domain === selectedDomain;
-      const matchesTeamSize =
-        selectedTeamSize === 'All' ||
-        (selectedTeamSize === 'Small' && team.teamSize < 6) ||
-        (selectedTeamSize === 'Medium' &&
-          team.teamSize >= 6 &&
-          team.teamSize <= 10) ||
-        (selectedTeamSize === 'Large' && team.teamSize > 10);
-      return matchesSearch && matchesDomain && matchesTeamSize;
-    });
-  }, [searchText, selectedDomain, selectedTeamSize]);
-
-  // Ouvrir / fermer le Drawer avec les détails d'une équipe
-  const openDrawer = (team: Team) => {
+  const handleOpenDrawer = (team: TeamMatch) => {
     setSelectedTeam(team);
     setDrawerVisible(true);
   };
 
-  const closeDrawer = () => {
+  const handleCloseDrawer = () => {
     setDrawerVisible(false);
     setSelectedTeam(null);
   };
 
+  const resetFilters = () => {
+    setSearchText('');
+    setDomainFilter('all');
+    setTeamSizeFilter('all');
+    setOpenOnly(false);
+  };
+
+  const filteredTeams = useMemo(
+    () =>
+      sampleTeamMatches.filter((team) => {
+        const matchesSearch =
+          !searchText ||
+          team.name.toLowerCase().includes(searchText.toLowerCase()) ||
+          team.description.toLowerCase().includes(searchText.toLowerCase()) ||
+          team.domain.toLowerCase().includes(searchText.toLowerCase());
+
+        const matchesDomain =
+          domainFilter === 'all' || team.domain === domainFilter;
+
+        const matchesOpen = !openOnly || team.isOpen;
+
+        let matchesSize = true;
+        if (teamSizeFilter === 'small') {
+          matchesSize = team.teamSize <= 3;
+        } else if (teamSizeFilter === 'medium') {
+          matchesSize = team.teamSize > 3 && team.teamSize <= 6;
+        } else if (teamSizeFilter === 'large') {
+          matchesSize = team.teamSize > 6;
+        }
+
+        return matchesSearch && matchesDomain && matchesOpen && matchesSize;
+      }),
+    [searchText, domainFilter, teamSizeFilter, openOnly],
+  );
+
+  const hasActiveFilters =
+    !!searchText ||
+    domainFilter !== 'all' ||
+    teamSizeFilter !== 'all' ||
+    openOnly;
+
+  const handleGoToPreferences = () => {
+    router.push('/keenkonnect/ai-team-matching/match-preferences');
+  };
+
+  const handleViewMatches = () => {
+    router.push('/keenkonnect/ai-team-matching/my-matches');
+  };
+
+  const handleViewWorkspace = (team: TeamMatch) => {
+    router.push(
+      `/keenkonnect/projects/project-workspace?teamId=${encodeURIComponent(
+        team.id,
+      )}`,
+    );
+  };
+
   return (
-    <div className="container mx-auto p-5">
-      {/* En-tête */}
-      <h1 className="text-2xl font-bold mb-4">Find Teams</h1>
+    <PageContainer title="Find AI‑recommended teams">
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {/* Intro / CTA */}
+        <Card>
+          <Row gutter={[16, 16]} align="middle">
+            <Col xs={24} md={16}>
+              <Space direction="vertical" size={8}>
+                <Title level={3} style={{ marginBottom: 0 }}>
+                  Discover teams that match your profile
+                </Title>
+                <Text type="secondary">
+                  KeenKonnect uses your skills, experience, and preferences to
+                  suggest teams where you’re likely to thrive. Refine the filters
+                  or adjust your preferences to tune the recommendations.
+                </Text>
+              </Space>
+            </Col>
+            <Col xs={24} md={8}>
+              <Space
+                direction="vertical"
+                size={8}
+                style={{ width: '100%', justifyContent: 'flex-end' }}
+              >
+                <Space wrap style={{ width: '100%', justifyContent: 'flex-end' }}>
+                  <Button
+                    onClick={handleGoToPreferences}
+                    icon={<FilterOutlined />}
+                  >
+                    Adjust match preferences
+                  </Button>
+                  <Button
+                    type="primary"
+                    onClick={handleViewMatches}
+                    icon={<TeamOutlined />}
+                  >
+                    View my matches
+                  </Button>
+                </Space>
+                <Text type="secondary">
+                  <InfoCircleOutlined /> Results are simulated mock data for UI
+                  only.
+                </Text>
+              </Space>
+            </Col>
+          </Row>
+        </Card>
 
-      {/* Barre de recherche et filtres */}
-      <Row gutter={[16, 16]} className="mb-4">
-        <Col xs={24} sm={8}>
-          <Search
-            placeholder="Search teams..."
-            allowClear
-            onSearch={(value) => setSearchText(value)}
-          />
-        </Col>
-        <Col xs={24} sm={8}>
-          <Select
-            value={selectedDomain}
-            style={{ width: '100%' }}
-            onChange={(value) => setSelectedDomain(value)}
-          >
-            <Option value="All">All Domains</Option>
-            <Option value="Technology">Technology</Option>
-            <Option value="Data Science">Data Science</Option>
-            <Option value="Engineering">Engineering</Option>
-          </Select>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Select
-            value={selectedTeamSize}
-            style={{ width: '100%' }}
-            onChange={(value) => setSelectedTeamSize(value)}
-          >
-            <Option value="All">All Sizes</Option>
-            <Option value="Small">Small (&lt; 6)</Option>
-            <Option value="Medium">Medium (6-10)</Option>
-            <Option value="Large">Large (&gt; 10)</Option>
-          </Select>
-        </Col>
-      </Row>
+        {/* Filters */}
+        <Card>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={10}>
+                <Input
+                  allowClear
+                  prefix={<SearchOutlined />}
+                  placeholder="Search teams, domains, keywords…"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                />
+              </Col>
+              <Col xs={24} sm={12} md={5}>
+                <Select
+                  style={{ width: '100%' }}
+                  value={domainFilter}
+                  onChange={(value) => setDomainFilter(value)}
+                  placeholder="Domain"
+                >
+                  <Option value="all">All domains</Option>
+                  {domainOptions.map((domain) => (
+                    <Option key={domain} value={domain}>
+                      {domain}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+              <Col xs={24} sm={12} md={5}>
+                <Select
+                  style={{ width: '100%' }}
+                  value={teamSizeFilter}
+                  onChange={(value: TeamSizeFilter) => setTeamSizeFilter(value)}
+                >
+                  <Option value="all">All team sizes</Option>
+                  <Option value="small">Small (≤3)</Option>
+                  <Option value="medium">Medium (4–6)</Option>
+                  <Option value="large">Large (7+)</Option>
+                </Select>
+              </Col>
+              <Col xs={24} sm={12} md={4}>
+                <Space>
+                  <Switch
+                    checked={openOnly}
+                    onChange={setOpenOnly}
+                    size="small"
+                  />
+                  <Text>Open to new members only</Text>
+                </Space>
+              </Col>
+            </Row>
 
-      <Divider />
+            {hasActiveFilters && (
+              <Row>
+                <Col span={24}>
+                  <Space wrap>
+                    {searchText && (
+                      <Tag closable onClose={() => setSearchText('')}>
+                        Search: {searchText}
+                      </Tag>
+                    )}
+                    {domainFilter !== 'all' && (
+                      <Tag closable onClose={() => setDomainFilter('all')}>
+                        Domain: {domainFilter}
+                      </Tag>
+                    )}
+                    {teamSizeFilter !== 'all' && (
+                      <Tag closable onClose={() => setTeamSizeFilter('all')}>
+                        Team size: {teamSizeFilter}
+                      </Tag>
+                    )}
+                    {openOnly && (
+                      <Tag closable onClose={() => setOpenOnly(false)}>
+                        Open teams only
+                      </Tag>
+                    )}
+                    <Button
+                      type="link"
+                      size="small"
+                      icon={<ReloadOutlined />}
+                      onClick={resetFilters}
+                    >
+                      Clear all filters
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
+            )}
+          </Space>
+        </Card>
 
-      {/* Liste de suggestions d'équipes */}
-      <List
-        grid={{ gutter: 16, xs: 1, sm: 2, md: 3 }}
-        dataSource={filteredTeams}
-        renderItem={(team: Team) => (
-          <List.Item key={team.id}>
-            <Card
-              hoverable
-              title={team.name}
-              extra={
-                team.isOpen ? (
-                  <Tag color="green">Open</Tag>
-                ) : (
-                  <Tag color="volcano">Approval Needed</Tag>
-                )
+        {/* Teams list */}
+        <Card
+          title={
+            <Space>
+              <TeamOutlined />
+              <span>Recommended teams</span>
+              <Badge
+                count={filteredTeams.length}
+                style={{ backgroundColor: '#1890ff' }}
+              />
+            </Space>
+          }
+        >
+          {filteredTeams.length === 0 ? (
+            <Empty
+              description={
+                <span>
+                  No teams match your current filters. Try broadening your search
+                  or{' '}
+                  <Button
+                    type="link"
+                    size="small"
+                    onClick={handleGoToPreferences}
+                  >
+                    updating your preferences
+                  </Button>
+                  .
+                </span>
               }
-            >
-              <p>{team.description}</p>
-              <p style={{ fontStyle: 'italic', color: '#888' }}>
-                Match: {team.matchReason}
-              </p>
-              <Button type="primary" onClick={() => openDrawer(team)}>
-                View Team
-              </Button>
-            </Card>
-          </List.Item>
-        )}
-      />
+            />
+          ) : (
+            <List
+              grid={{
+                gutter: 16,
+                xs: 1,
+                sm: 1,
+                md: 2,
+                lg: 2,
+                xl: 3,
+                xxl: 3,
+              }}
+              dataSource={filteredTeams}
+              renderItem={(team) => {
+                const sizeTag = getTeamSizeTag(team.teamSize);
 
-      {/* Drawer pour détails de l'équipe */}
+                return (
+                  <List.Item>
+                    <Card
+                      hoverable
+                      onClick={() => handleOpenDrawer(team)}
+                      actions={[
+                        <Tooltip
+                          key="join"
+                          title="Express interest in joining this team"
+                        >
+                          <Button
+                            type="link"
+                            icon={<UserAddOutlined />}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenDrawer(team);
+                            }}
+                          >
+                            Request to join
+                          </Button>
+                        </Tooltip>,
+                        <Tooltip key="save" title="Save this team for later">
+                          <Button
+                            type="link"
+                            icon={<HeartOutlined />}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Save
+                          </Button>
+                        </Tooltip>,
+                      ]}
+                    >
+                      <Space
+                        direction="vertical"
+                        size={8}
+                        style={{ width: '100%' }}
+                      >
+                        <Space align="center" style={{ width: '100%' }}>
+                          <Title
+                            level={5}
+                            style={{ marginBottom: 0, flex: 1 }}
+                          >
+                            {team.name}
+                          </Title>
+                          <Badge
+                            status={team.isOpen ? 'success' : 'default'}
+                            text={team.isOpen ? 'Open' : 'Currently full'}
+                          />
+                        </Space>
+
+                        <Text type="secondary">{team.description}</Text>
+
+                        <Space wrap size={[4, 4]}>
+                          <Tag color="geekblue">{team.domain}</Tag>
+                          <Tag color={sizeTag.color}>
+                            {sizeTag.label} ({team.teamSize})
+                          </Tag>
+                          <Tag>{team.members.join(', ')}</Tag>
+                        </Space>
+
+                        <Divider style={{ margin: '8px 0' }} />
+
+                        <Space direction="vertical" size={4}>
+                          <Text strong>Why this is a good match</Text>
+                          <Paragraph
+                            type="secondary"
+                            ellipsis={{ rows: 2 }}
+                            style={{ marginBottom: 0 }}
+                          >
+                            {team.matchReason}
+                          </Paragraph>
+                        </Space>
+
+                        <Button
+                          type="default"
+                          block
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenDrawer(team);
+                          }}
+                        >
+                          View details
+                        </Button>
+                      </Space>
+                    </Card>
+                  </List.Item>
+                );
+              }}
+            />
+          )}
+        </Card>
+      </Space>
+
+      {/* Details drawer */}
       <Drawer
-        title={selectedTeam?.name}
-        placement="right"
-        width={400}
-        onClose={closeDrawer}
+        title={
+          selectedTeam ? (
+            <Space direction="vertical" size={0}>
+              <Space align="center">
+                <TeamOutlined />
+                <span>{selectedTeam.name}</span>
+                {selectedTeam.isOpen && (
+                  <Tag color="green">Open to new members</Tag>
+                )}
+              </Space>
+              <Text type="secondary">{selectedTeam.domain}</Text>
+            </Space>
+          ) : (
+            'Team details'
+          )
+        }
+        width={520}
         open={drawerVisible}
+        onClose={handleCloseDrawer}
+        destroyOnClose
       >
         {selectedTeam && (
-          <div>
-            <p>
-              <strong>Description:</strong> {selectedTeam.description}
-            </p>
-            <p>
-              <strong>Domain:</strong> {selectedTeam.domain}
-            </p>
-            <p>
-              <strong>Team Size:</strong> {selectedTeam.teamSize}
-            </p>
-            <p>
-              <strong>Members:</strong> {selectedTeam.members.join(', ')}
-            </p>
-            <Divider />
-            <Button
-              type="primary"
-              onClick={() => {
-                // Simulation d'une demande d'adhésion
-                // TODO: implémenter la logique réelle de demande.
-                closeDrawer();
-              }}
-            >
-              Request to Join
-            </Button>
-          </div>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <section>
+              <Title level={5}>Overview</Title>
+              <Paragraph>{selectedTeam.description}</Paragraph>
+              <Text type="secondary">
+                <InfoCircleOutlined /> This team recommendation is based on your
+                profile and AI matching preferences.
+              </Text>
+            </section>
+
+            <section>
+              <Title level={5}>Why you’re a match</Title>
+              <Paragraph>{selectedTeam.matchReason}</Paragraph>
+            </section>
+
+            <section>
+              <Title level={5}>Team composition</Title>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Space size="small" wrap>
+                  <Tag icon={<TeamOutlined />}>
+                    {selectedTeam.teamSize} member
+                    {selectedTeam.teamSize > 1 ? 's' : ''}
+                  </Tag>
+                  {selectedTeam.isOpen ? (
+                    <Tag color="green">Actively recruiting</Tag>
+                  ) : (
+                    <Tag color="default">Currently full</Tag>
+                  )}
+                </Space>
+                <List
+                  size="small"
+                  bordered
+                  dataSource={selectedTeam.members}
+                  renderItem={(member, index) => (
+                    <List.Item>
+                      <Text>
+                        {index + 1}. {member}
+                      </Text>
+                    </List.Item>
+                  )}
+                />
+              </Space>
+            </section>
+
+            <section>
+              <Title level={5}>Next steps</Title>
+              <Space direction="vertical" style={{ width: '100%' }}>
+                <Button
+                  type="primary"
+                  icon={<UserAddOutlined />}
+                  block
+                  onClick={() => {
+                    // Placeholder for future integration
+                    // eslint-disable-next-line no-console
+                    console.log('Request to join', selectedTeam.id);
+                  }}
+                >
+                  Request to join this team
+                </Button>
+                <Button block onClick={() => handleViewWorkspace(selectedTeam)}>
+                  View team workspace (mock)
+                </Button>
+                <Button
+                  type="dashed"
+                  icon={<HeartOutlined />}
+                  block
+                  onClick={() => {
+                    // eslint-disable-next-line no-console
+                    console.log('Saved team', selectedTeam.id);
+                  }}
+                >
+                  Save this team
+                </Button>
+              </Space>
+            </section>
+          </Space>
         )}
       </Drawer>
-    </div>
+    </PageContainer>
   );
-}
+};
+
+export default FindTeamsPage;

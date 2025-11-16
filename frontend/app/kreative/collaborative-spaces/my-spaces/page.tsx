@@ -2,10 +2,22 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { List, Button, Input, Select, Badge, Avatar, Space, Row, Col, Typography } from 'antd';
+import {
+  List,
+  Button,
+  Input,
+  Select,
+  Badge,
+  Avatar,
+  Space,
+  Row,
+  Col,
+  Typography,
+  Empty,
+} from 'antd';
 import { TeamOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
 
@@ -53,17 +65,22 @@ export default function MySpacesPage(): JSX.Element {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const filteredSpaces = useMemo(() => {
+  const filteredSpaces = useMemo<CollaborativeSpace[]>(() => {
     let spaces = dummySpaces;
+
     if (selectedCategory !== 'All') {
       spaces = spaces.filter((s) => s.category === selectedCategory);
     }
+
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
       spaces = spaces.filter(
-        (s) => s.name.toLowerCase().includes(q) || s.topic.toLowerCase().includes(q),
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.topic.toLowerCase().includes(q),
       );
     }
+
     return spaces;
   }, [selectedCategory, searchQuery]);
 
@@ -71,17 +88,38 @@ export default function MySpacesPage(): JSX.Element {
     router.push(`/kreative/collaborative-spaces/${id}`);
   };
 
+  const hasSpaces = filteredSpaces.length > 0;
+
   return (
-    <PageContainer title="My Spaces">
-      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+    <KreativePageShell
+      title="My Spaces"
+      subtitle="Spaces you’ve joined or created across the Kreative collaborative hub."
+      primaryAction={
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={() =>
+            router.push('/kreative/collaborative-spaces/start-new-space')
+          }
+        >
+          Start a New Space
+        </Button>
+      }
+    >
+      <Row
+        justify="space-between"
+        align="middle"
+        style={{ marginBottom: 24 }}
+      >
         <Col>
-          <Space>
+          <Space wrap>
             <Input
-              placeholder="Search spaces."
+              placeholder="Search spaces..."
               prefix={<SearchOutlined />}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ width: 300 }}
+              allowClear
             />
             <Select
               value={selectedCategory}
@@ -96,56 +134,58 @@ export default function MySpacesPage(): JSX.Element {
             />
           </Space>
         </Col>
-        <Col>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => router.push('/kreative/collaborative-spaces/create')}
-          >
-            Start a New Space
-          </Button>
-        </Col>
       </Row>
 
-      <List<CollaborativeSpace>
-        itemLayout="horizontal"
-        dataSource={filteredSpaces ?? []}
-        renderItem={(space: CollaborativeSpace) => (
-          <List.Item
-            key={space.id}
-            actions={[
-              <Button key="enter" type="primary" onClick={() => enterSpace(space.id)}>
-                Enter Space
-              </Button>,
-            ]}
-          >
-            <List.Item.Meta
-              avatar={
-                space.unreadCount > 0 ? (
-                  <Badge count={space.unreadCount} offset={[-5, 5]}>
+      {hasSpaces ? (
+        <List<CollaborativeSpace>
+          itemLayout="horizontal"
+          dataSource={filteredSpaces}
+          renderItem={(space) => (
+            <List.Item
+              key={space.id}
+              actions={[
+                <Button
+                  key="enter"
+                  type="primary"
+                  onClick={() => enterSpace(space.id)}
+                >
+                  Enter Space
+                </Button>,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={
+                  space.unreadCount > 0 ? (
+                    <Badge count={space.unreadCount} offset={[-5, 5]}>
+                      <Avatar size="large" icon={<TeamOutlined />} />
+                    </Badge>
+                  ) : (
                     <Avatar size="large" icon={<TeamOutlined />} />
-                  </Badge>
-                ) : (
-                  <Avatar size="large" icon={<TeamOutlined />} />
-                )
-              }
-              title={
-                <Title level={4} style={{ margin: 0 }}>
-                  {space.name}
-                </Title>
-              }
-              description={
-                <Space direction="vertical" size={0}>
-                  <Text strong>Topic:</Text>
-                  <Text>{space.topic}</Text>
-                  <Text strong>Members:</Text>
-                  <Text>{space.membersCount}</Text>
-                </Space>
-              }
-            />
-          </List.Item>
-        )}
-      />
-    </PageContainer>
+                  )
+                }
+                title={
+                  <Title level={4} style={{ margin: 0 }}>
+                    {space.name}
+                  </Title>
+                }
+                description={
+                  <Space direction="vertical" size={0}>
+                    <Text strong>Topic:</Text>
+                    <Text>{space.topic}</Text>
+                    <Text strong>Members:</Text>
+                    <Text>{space.membersCount}</Text>
+                  </Space>
+                }
+              />
+            </List.Item>
+          )}
+        />
+      ) : (
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="You’re not part of any spaces yet. Start a new one or explore available spaces."
+        />
+      )}
+    </KreativePageShell>
   );
 }

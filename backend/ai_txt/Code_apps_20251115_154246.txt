@@ -1,0 +1,2693 @@
+===== TOC (76 fichiers) =====
+0001  C:\MyCode\Konnaxionv14\backend\konnaxion\__init__.py
+0002  C:\MyCode\Konnaxionv14\backend\konnaxion\conftest.py
+0003  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\__init__.py
+0004  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\sites\__init__.py
+0005  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\__init__.py
+0006  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\admin.py
+0007  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\api_views.py
+0008  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\apps.py
+0009  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\models.py
+0010  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\serializers.py
+0011  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\urls.py
+0012  C:\MyCode\Konnaxionv14\backend\konnaxion\ethikos\views.py
+0013  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\__init__.py
+0014  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\admin.py
+0015  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\api_views.py
+0016  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\apps.py
+0017  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\models.py
+0018  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\serializers.py
+0019  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\views.py
+0020  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\__init__.py
+0021  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\admin.py
+0022  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\api_views.py
+0023  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\apps.py
+0024  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\models.py
+0025  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\serializers.py
+0026  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\views.py
+0027  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\__init__.py
+0028  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\admin.py
+0029  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\api_views.py
+0030  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\apps.py
+0031  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\models.py
+0032  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\serializers.py
+0033  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\views.py
+0034  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\__init__.py
+0035  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\admin.py
+0036  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\api_views.py
+0037  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\apps.py
+0038  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\models.py
+0039  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\serializers.py
+0040  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\views.py
+0041  C:\MyCode\Konnaxionv14\backend\konnaxion\static\css\project.css
+0042  C:\MyCode\Konnaxionv14\backend\konnaxion\static\fonts\.gitkeep
+0043  C:\MyCode\Konnaxionv14\backend\konnaxion\static\js\project.js
+0044  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403.html
+0045  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403_csrf.html
+0046  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\404.html
+0047  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\500.html
+0048  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\account\base_manage_password.html
+0049  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\alert.html
+0050  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\badge.html
+0051  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\button.html
+0052  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\field.html
+0053  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\fields.html
+0054  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\panel.html
+0055  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\table.html
+0056  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\entrance.html
+0057  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\manage.html
+0058  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\base.html
+0059  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\about.html
+0060  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\home.html
+0061  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_detail.html
+0062  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_form.html
+0063  C:\MyCode\Konnaxionv14\backend\konnaxion\urls.py
+0064  C:\MyCode\Konnaxionv14\backend\konnaxion\users\__init__.py
+0065  C:\MyCode\Konnaxionv14\backend\konnaxion\users\adapters.py
+0066  C:\MyCode\Konnaxionv14\backend\konnaxion\users\admin.py
+0067  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\__init__.py
+0068  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\serializers.py
+0069  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\views.py
+0070  C:\MyCode\Konnaxionv14\backend\konnaxion\users\apps.py
+0071  C:\MyCode\Konnaxionv14\backend\konnaxion\users\context_processors.py
+0072  C:\MyCode\Konnaxionv14\backend\konnaxion\users\forms.py
+0073  C:\MyCode\Konnaxionv14\backend\konnaxion\users\models.py
+0074  C:\MyCode\Konnaxionv14\backend\konnaxion\users\tasks.py
+0075  C:\MyCode\Konnaxionv14\backend\konnaxion\users\urls.py
+0076  C:\MyCode\Konnaxionv14\backend\konnaxion\users\views.py
+===== END TOC =====
+
+
+===== BEGIN konnaxion/__init__.py =====
+__version__ = "0.1.0"
+__version_info__ = tuple(
+    int(num) if num.isdigit() else num
+    for num in __version__.replace("-", ".", 1).split(".")
+)
+
+===== END konnaxion/__init__.py =====
+
+
+===== BEGIN konnaxion/conftest.py =====
+import pytest
+
+from konnaxion.users.models import User
+from konnaxion.users.tests.factories import UserFactory
+
+
+@pytest.fixture(autouse=True)
+def _media_storage(settings, tmpdir) -> None:
+    settings.MEDIA_ROOT = tmpdir.strpath
+
+
+@pytest.fixture
+def user(db) -> User:
+    return UserFactory()
+
+===== END konnaxion/conftest.py =====
+
+
+===== BEGIN konnaxion/contrib/__init__.py =====
+"""
+To understand why this file is here, please read:
+
+https://cookiecutter-django.readthedocs.io/en/latest/5-help/faq.html#why-is-there-a-django-contrib-sites-directory-in-cookiecutter-django
+"""
+
+===== END konnaxion/contrib/__init__.py =====
+
+
+===== BEGIN konnaxion/contrib/sites/__init__.py =====
+"""
+To understand why this file is here, please read:
+
+https://cookiecutter-django.readthedocs.io/en/latest/5-help/faq.html#why-is-there-a-django-contrib-sites-directory-in-cookiecutter-django
+"""
+
+===== END konnaxion/contrib/sites/__init__.py =====
+
+
+===== BEGIN konnaxion/ethikos/__init__.py =====
+
+===== END konnaxion/ethikos/__init__.py =====
+
+
+===== BEGIN konnaxion/ethikos/admin.py =====
+# konnaxion/ethikos/admin.py
+from __future__ import annotations
+from typing import Sequence
+
+from django.apps import apps
+from django.contrib import admin
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+
+from .models import (
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+
+# ───────── Mix-in to show created/updated columns ─────────
+class TimestampMixin(admin.ModelAdmin):
+    date_hierarchy = "created_at"
+
+    def _time_fields(self) -> set[str]:
+        return {"created_at", "updated_at"} & {f.name for f in self.model._meta.get_fields()}
+
+    def get_readonly_fields(self, request, obj=None) -> Sequence[str]:
+        return (*super().get_readonly_fields(request, obj), *self._time_fields())
+
+    def get_list_display(self, request):
+        cols = list(super().get_list_display(request))
+        for f in self._time_fields():
+            if f not in cols:
+                cols.append(f)
+        return tuple(cols)
+
+# ───────── Category ─────────
+@admin.register(EthikosCategory)
+class EthikosCategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name",)
+    list_per_page = 30
+
+# ───────── Topic ─────────
+@admin.register(EthikosTopic)
+class EthikosTopicAdmin(TimestampMixin):
+    list_display = (
+        "title",
+        "category",
+        "expertise_category",
+        "status_badge",
+        "total_votes",
+        "created_by",
+        "last_activity",
+    )
+    list_filter = ("status", "category", "expertise_category")
+    search_fields = ("title", "description")
+    autocomplete_fields = ("category", "expertise_category", "created_by")
+    list_select_related = ("category", "expertise_category", "created_by")
+    ordering = ("-created_at",)
+
+    @admin.display(description=_("status"), ordering="status")
+    def status_badge(self, obj: EthikosTopic) -> str:
+        colour = {
+            EthikosTopic.OPEN: "green",
+            EthikosTopic.CLOSED: "red",
+            EthikosTopic.ARCHIVED: "grey",
+        }.get(obj.status, "black")
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            obj.get_status_display(),
+        )
+
+# ───────── Stance ─────────
+@admin.register(EthikosStance)
+class EthikosStanceAdmin(admin.ModelAdmin):
+    list_display = ("user", "topic", "value", "timestamp")
+    list_filter = ("value",)
+    search_fields = ("user__username", "topic__title")
+    autocomplete_fields = ("user", "topic")
+    ordering = ("-timestamp",)
+
+# ───────── Argument ─────────
+@admin.register(EthikosArgument)
+class EthikosArgumentAdmin(TimestampMixin):
+    list_display = ("short_content", "topic", "user", "side", "is_hidden")
+    list_filter = ("side", "is_hidden")
+    search_fields = ("content", "user__username", "topic__title")
+    autocomplete_fields = ("topic", "user", "parent")
+    list_select_related = ("topic", "user", "parent")
+
+    @admin.display(description=_("content"))
+    def short_content(self, obj: EthikosArgument) -> str:
+        return (obj.content[:60] + "…") if len(obj.content) > 60 else obj.content
+
+# ───────── Fallback auto-registration ─────────
+cfg = apps.get_app_config("ethikos")
+for mdl in cfg.get_models():
+    if not admin.site.is_registered(mdl):
+        admin.site.register(mdl)
+
+===== END konnaxion/ethikos/admin.py =====
+
+
+===== BEGIN konnaxion/ethikos/api_views.py =====
+# backend/konnaxion/ethikos/api_views.py
+
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+
+from .models import (
+    EthikosCategory,
+    EthikosTopic,
+    EthikosStance,
+    EthikosArgument,
+)
+from .serializers import (
+    EthikosCategorySerializer,
+    EthikosTopicSerializer,
+    EthikosStanceSerializer,
+    EthikosArgumentSerializer,
+)
+
+
+# ---- Permissions simples owner-or-read-only ---------------------------------
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    """
+    Lecture pour tous. Ecriture réservée au propriétaire.
+    - Topic: champ 'created_by'
+    - Stance/Argument: champ 'user'
+    """
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        owner_id = getattr(obj, "created_by_id", None) or getattr(obj, "user_id", None)
+        return owner_id == getattr(request.user, "id", None)
+
+
+# ---- Categories (lecture seule par défaut) ----------------------------------
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Liste et détail des catégories de débats.
+    """
+    queryset = EthikosCategory.objects.all().order_by("name")
+    serializer_class = EthikosCategorySerializer
+    permission_classes = [permissions.AllowAny]
+
+
+# ---- Topics -----------------------------------------------------------------
+class TopicViewSet(viewsets.ModelViewSet):
+    """
+    CRUD pour les sujets de débat.
+    Injecte 'created_by' et gère 'category' malgré le serializer read-only.
+    """
+    queryset = EthikosTopic.objects.select_related("created_by", "category")
+    serializer_class = EthikosTopicSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def _resolve_category(self, request, required: bool) -> EthikosCategory | None:
+        cat_id = request.data.get("category") or request.data.get("category_id")
+        if not cat_id:
+            if required:
+                raise ValidationError({"category": "Requis"})
+            return None
+        return get_object_or_404(EthikosCategory, pk=cat_id)
+
+    def perform_create(self, serializer):
+        category = self._resolve_category(self.request, required=True)
+        serializer.save(created_by=self.request.user, category=category)
+
+    def perform_update(self, serializer):
+        # category facultative en update
+        category = self._resolve_category(self.request, required=False)
+        if category is not None:
+            serializer.save(category=category)
+        else:
+            serializer.save()
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        cat = self.request.query_params.get("category")
+        if cat:
+            qs = qs.filter(category_id=cat)
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            qs = qs.filter(status=status_param)
+        return qs
+
+    @action(detail=True, methods=["get"], permission_classes=[permissions.AllowAny])
+    def preview(self, request, pk=None):
+        """
+        Retourne un aperçu minimal du topic.
+        Compatible avec un usage front de type .../topics/{id}/preview.
+        """
+        topic = self.get_object()
+        desc = topic.description or ""
+        preview_desc = desc if len(desc) <= 280 else (desc[:280] + "…")
+        data = {
+            "id": topic.id,
+            "title": topic.title,
+            "description": preview_desc,
+            "category": topic.category.name if topic.category_id else None,
+            "status": topic.status,
+            "total_votes": topic.total_votes,
+            "last_activity": topic.last_activity,
+        }
+        return Response(data, status=status.HTTP_200_OK)
+
+
+# ---- Stances ----------------------------------------------------------------
+class StanceViewSet(viewsets.ModelViewSet):
+    """
+    Crée/Met à jour la position d’un utilisateur sur un topic.
+    - GET list: filtrable par ?topic=<id>
+    - POST: upsert (update_or_create) pour respecter l'unicité (user, topic)
+    """
+    queryset = EthikosStance.objects.select_related("topic", "user")
+    serializer_class = EthikosStanceSerializer
+    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        topic_id = self.request.query_params.get("topic")
+        if topic_id:
+            qs = qs.filter(topic_id=topic_id)
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        topic_id = request.data.get("topic")
+        value = request.data.get("value")
+        if topic_id is None or value is None:
+            raise ValidationError({"topic": "Requis", "value": "Requis"})
+        # Upsert sur (user, topic) pour éviter les erreurs d'unicité
+        stance, created = EthikosStance.objects.update_or_create(
+            user=request.user,
+            topic_id=topic_id,
+            defaults={"value": value},
+        )
+        serializer = self.get_serializer(stance)
+        code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        return Response(serializer.data, status=code)
+
+    def perform_create(self, serializer):
+        # Non utilisé car create() est surchargé, mais gardé par sécurité.
+        serializer.save(user=self.request.user)
+
+
+# ---- Arguments --------------------------------------------------------------
+class ArgumentViewSet(viewsets.ModelViewSet):
+    """
+    Messages argumentés, threadés par 'parent' (pro/contra).
+    - GET list: filtrable par ?topic=<id>
+    - POST: fixe 'user' et accepte 'parent' même si le serializer le marque read-only.
+    """
+    queryset = EthikosArgument.objects.select_related("user", "topic", "parent")
+    serializer_class = EthikosArgumentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        topic_id = self.request.query_params.get("topic")
+        if topic_id:
+            qs = qs.filter(topic_id=topic_id)
+        return qs
+
+    def perform_create(self, serializer):
+        parent_id = self.request.data.get("parent")
+        extra = {"user": self.request.user}
+        if parent_id:
+            parent = get_object_or_404(EthikosArgument, pk=parent_id)
+            # Si 'topic' fourni et différent de celui du parent -> erreur
+            topic_in = self.request.data.get("topic")
+            if topic_in and int(topic_in) != parent.topic_id:
+                raise ValidationError({"parent": "Le parent doit appartenir au même topic."})
+            extra["parent"] = parent
+        serializer.save(**extra)
+
+===== END konnaxion/ethikos/api_views.py =====
+
+
+===== BEGIN konnaxion/ethikos/apps.py =====
+from django.apps import AppConfig
+
+
+class EthikosConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.ethikos"
+
+===== END konnaxion/ethikos/apps.py =====
+
+
+===== BEGIN konnaxion/ethikos/models.py =====
+# konnaxion/ethikos/models.py
+from django.conf import settings
+from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models
+
+# ───────────────────────────────────────────────────
+STANCE_MIN, STANCE_MAX = -3, 3
+# ───────────────────────────────────────────────────
+
+class EthikosCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self):
+        return self.name
+
+
+class EthikosTopic(models.Model):
+    """One debate question."""
+    OPEN, CLOSED, ARCHIVED = "open", "closed", "archived"
+    STATUS_CHOICES = [
+        (OPEN, "Open"),
+        (CLOSED, "Closed"),
+        (ARCHIVED, "Archived"),
+    ]
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.ForeignKey(
+        EthikosCategory, on_delete=models.PROTECT, related_name="topics"
+    )
+    expertise_category = models.ForeignKey(
+        "kollective_intelligence.ExpertiseCategory",
+        null=True, blank=True, on_delete=models.SET_NULL,
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_topics",
+    )
+
+    status = models.CharField(
+        max_length=8,              # fits “archived”
+        choices=STATUS_CHOICES,
+        default=OPEN,
+    )
+    total_votes = models.PositiveIntegerField(default=0)
+    last_activity = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self):
+        return self.title
+
+
+class EthikosStance(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_stances",
+    )
+    topic = models.ForeignKey(
+        EthikosTopic,
+        on_delete=models.CASCADE,
+        related_name="stances",
+    )
+    value = models.SmallIntegerField(
+        validators=[
+            MinValueValidator(STANCE_MIN),
+            MaxValueValidator(STANCE_MAX),
+        ]
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("user", "topic")
+        indexes = [models.Index(fields=("topic",)), models.Index(fields=("user",))]
+        constraints = [
+            models.CheckConstraint(
+                name="stance_value_between_-3_and_3",
+                condition=models.Q(value__gte=STANCE_MIN, value__lte=STANCE_MAX),
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.user} → {self.topic} = {self.value}"
+
+
+class EthikosArgument(models.Model):
+    PRO, CON = "pro", "con"
+    SIDE_CHOICES = [(PRO, "Pro"), (CON, "Con")]
+
+    topic = models.ForeignKey(
+        EthikosTopic, on_delete=models.CASCADE, related_name="arguments"
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_arguments",
+    )
+    content = models.TextField()
+    parent = models.ForeignKey(
+        "self",
+        null=True, blank=True,
+        on_delete=models.CASCADE,
+        related_name="replies",
+    )
+    side = models.CharField(
+        max_length=3, choices=SIDE_CHOICES, null=True, blank=True
+    )
+    is_hidden = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [models.Index(fields=("topic",)), models.Index(fields=("user",))]
+        ordering = ("created_at",)
+
+    def __str__(self):
+        return f"{self.user} on {self.topic}"
+
+===== END konnaxion/ethikos/models.py =====
+
+
+===== BEGIN konnaxion/ethikos/serializers.py =====
+# backend/konnaxion/ethikos/serializers.py
+
+from rest_framework import serializers
+from .models import (
+    EthikosCategory,
+    EthikosTopic,
+    EthikosStance,
+    EthikosArgument,
+)
+
+__all__ = [
+    "EthikosCategorySerializer",
+    "EthikosTopicSerializer",
+    "EthikosStanceSerializer",
+    "EthikosArgumentSerializer",
+]
+
+
+class EthikosCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EthikosCategory
+        fields = "__all__"
+        read_only_fields = ("id",)
+
+
+class EthikosTopicSerializer(serializers.ModelSerializer):
+    # Représentation en lecture seule (objet imbriqué)…
+    category = EthikosCategorySerializer(read_only=True)
+    created_by = serializers.StringRelatedField(read_only=True)
+    # …et champ d’entrée write-only pour la création/mise à jour.
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosCategory.objects.all(),
+        source="category",
+        write_only=True,
+        required=True,
+    )
+
+    class Meta:
+        model = EthikosTopic
+        fields = (
+            "id",
+            "title",
+            "description",
+            "category",        # read-only nested
+            "category_id",     # write-only PK
+            "expertise_category",
+            "status",
+            "total_votes",
+            "created_by",
+            "last_activity",
+            "created_at",
+        )
+        read_only_fields = (
+            "id",
+            "created_by",
+            "last_activity",
+            "created_at",
+            "total_votes",     # maintenu côté serveur
+        )
+
+
+class EthikosStanceSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = EthikosStance
+        fields = (
+            "id",
+            "user",
+            "topic",     # PK par défaut, utilisable en écriture
+            "value",
+            "timestamp",
+        )
+        read_only_fields = ("id", "user", "timestamp")
+
+
+class EthikosArgumentSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+    # pour la lecture: on expose l'id du parent
+    parent = serializers.PrimaryKeyRelatedField(read_only=True)
+    # pour l'écriture: on accepte parent_id
+    parent_id = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosArgument.objects.all(),
+        source="parent",
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = EthikosArgument
+        fields = (
+            "id",
+            "topic",         # PK par défaut
+            "user",
+            "content",
+            "parent",        # read-only id
+            "parent_id",     # write-only id
+            "side",
+            "is_hidden",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = ("id", "user", "created_at", "updated_at")
+
+    def validate(self, attrs):
+        """
+        Empêche d'attacher une réponse à un parent d'un autre topic.
+        """
+        topic = attrs.get("topic") or getattr(self.instance, "topic", None)
+        parent = attrs.get("parent")
+        if parent is not None and topic is not None and parent.topic_id != topic.id:
+            raise serializers.ValidationError(
+                {"parent_id": "Le parent appartient à un autre topic."}
+            )
+        return attrs
+
+===== END konnaxion/ethikos/serializers.py =====
+
+
+===== BEGIN konnaxion/ethikos/urls.py =====
+# backend/konnaxion/ethikos/urls.py
+
+from rest_framework.routers import DefaultRouter
+from .api_views import TopicViewSet, StanceViewSet, ArgumentViewSet
+
+# Optionnel : n'activer "categories" que si le ViewSet existe réellement.
+try:
+    from .api_views import CategoryViewSet  # type: ignore
+    _HAS_CATEGORY = True
+except Exception:
+    _HAS_CATEGORY = False
+
+router = DefaultRouter()
+router.register(r"topics", TopicViewSet, basename="ethikos-topic")
+router.register(r"stances", StanceViewSet, basename="ethikos-stance")
+router.register(r"arguments", ArgumentViewSet, basename="ethikos-argument")
+
+if _HAS_CATEGORY:
+    router.register(r"categories", CategoryViewSet, basename="ethikos-category")
+
+urlpatterns = router.urls
+
+===== END konnaxion/ethikos/urls.py =====
+
+
+===== BEGIN konnaxion/ethikos/views.py =====
+
+# Create your views here.
+# konnaxion/ethikos/api_views.py
+
+from rest_framework import viewsets, permissions, mixins
+from .models import EthikosTopic, EthikosStance, EthikosArgument
+from .serializers import (
+    EthikosTopicSerializer, EthikosStanceSerializer, EthikosArgumentSerializer
+)
+
+class TopicViewSet(viewsets.ModelViewSet):
+    queryset = EthikosTopic.objects.all()
+    serializer_class = EthikosTopicSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+class StanceViewSet(mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
+    queryset = EthikosStance.objects.all()
+    serializer_class = EthikosStanceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        # List stances for the current topic or user
+        topic_id = self.request.query_params.get("topic")
+        qs = super().get_queryset()
+        if topic_id:
+            qs = qs.filter(topic_id=topic_id)
+        return qs
+
+class ArgumentViewSet(viewsets.ModelViewSet):
+    queryset = EthikosArgument.objects.all()
+    serializer_class = EthikosArgumentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+===== END konnaxion/ethikos/views.py =====
+
+
+===== BEGIN konnaxion/keenkonnect/__init__.py =====
+
+===== END konnaxion/keenkonnect/__init__.py =====
+
+
+===== BEGIN konnaxion/keenkonnect/admin.py =====
+# template for konnaxion/<app>/admin.py
+from django.contrib import admin
+from django.apps import apps
+
+app_config = apps.get_app_config(__name__.split(".")[-2])  # resolves to the app name
+for model in app_config.get_models():
+    if not admin.site.is_registered(model):
+        admin.site.register(model)
+
+===== END konnaxion/keenkonnect/admin.py =====
+
+
+===== BEGIN konnaxion/keenkonnect/api_views.py =====
+from rest_framework import viewsets, permissions
+from .models import Project
+from .serializers import ProjectSerializer
+
+
+class ProjectViewSet(viewsets.ModelViewSet):
+    """
+    Marketplace projects / problems posted by users.
+    """
+    queryset = Project.objects.select_related("creator")
+    serializer_class = ProjectSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
+
+===== END konnaxion/keenkonnect/api_views.py =====
+
+
+===== BEGIN konnaxion/keenkonnect/apps.py =====
+from django.apps import AppConfig
+
+
+class KeenkonnectConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.keenkonnect"
+
+===== END konnaxion/keenkonnect/apps.py =====
+
+
+===== BEGIN konnaxion/keenkonnect/models.py =====
+from django.conf import settings
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+class Project(models.Model):
+    class Status(models.TextChoices):
+        IDEA = "idea", _("Idea")
+        INPROGRESS = "progress", _("In progress")
+        COMPLETED = "completed", _("Completed")
+        VALIDATED = "validated", _("Validated")
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    category = models.CharField(max_length=100)
+    creator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="created_projects",
+    )
+    status = models.CharField(
+        max_length=10, choices=Status.choices, default=Status.IDEA
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    tags = models.ManyToManyField("Tag", blank=True, related_name="projects")
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [models.Index(fields=("status", "category"))]
+
+    def __str__(self):
+        return self.title
+
+def project_file_path(instance, filename):
+    return f"projects/{instance.project_id}/{filename}"
+
+class ProjectResource(models.Model):
+    class FileType(models.TextChoices):
+        IMAGE = "image", _("Image")
+        DOC = "document", _("Document")
+        MODEL_3D = "3d_model", _("3D model")
+        OTHER = "other", _("Other")
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="resources")
+    title = models.CharField(max_length=200, blank=True)
+    description = models.TextField(blank=True)
+    file = models.FileField(upload_to=project_file_path, blank=True, null=True)
+    external_url = models.URLField(blank=True)
+    file_type = models.CharField(max_length=15, choices=FileType.choices)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    version = models.PositiveSmallIntegerField(default=1)
+    converted_path = models.FileField(upload_to=project_file_path, blank=True, null=True)
+
+    class Meta:
+        ordering = ("-uploaded_at",)
+
+class ProjectMessage(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="messages")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("created_at",)
+        indexes = [models.Index(fields=("project", "created_at"))]
+
+class ProjectTask(models.Model):
+    class TaskStatus(models.TextChoices):
+        TODO = "todo", _("To do")
+        IN_PROGRESS = "doing", _("In progress")
+        DONE = "done", _("Done")
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="tasks")
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    status = models.CharField(max_length=10, choices=TaskStatus.choices, default=TaskStatus.TODO)
+    assignee = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    due_date = models.DateField(blank=True, null=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ("order", "created_at")
+        indexes = [models.Index(fields=("project", "status"))]
+
+class ProjectTeam(models.Model):
+    class Role(models.TextChoices):
+        OWNER = "owner", _("Owner")
+        COLLABORATOR = "collaborator", _("Collaborator")
+        MENTOR = "mentor", _("Mentor")
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="team_memberships")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    role = models.CharField(max_length=15, choices=Role.choices, default=Role.COLLABORATOR)
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("project", "user")
+        indexes = [models.Index(fields=("project", "role"))]
+
+class ProjectRating(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="ratings")
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    value = models.SmallIntegerField(choices=[(1, "+1"), (-1, "-1")])
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("project", "user")
+        indexes = [models.Index(fields=("project",))]
+
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+===== END konnaxion/keenkonnect/models.py =====
+
+
+===== BEGIN konnaxion/keenkonnect/serializers.py =====
+from rest_framework import serializers
+from .models import Project
+
+__all__ = ["ProjectSerializer"]
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    # Affiche l'utilisateur créateur sous forme textuelle, non modifiable par l'API
+    creator = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Project
+        fields = "__all__"
+        read_only_fields = ("creator", "created_at", "updated_at")
+
+===== END konnaxion/keenkonnect/serializers.py =====
+
+
+===== BEGIN konnaxion/keenkonnect/views.py =====
+from django.shortcuts import render
+
+# Create your views here.
+
+===== END konnaxion/keenkonnect/views.py =====
+
+
+===== BEGIN konnaxion/kollective_intelligence/__init__.py =====
+
+===== END konnaxion/kollective_intelligence/__init__.py =====
+
+
+===== BEGIN konnaxion/kollective_intelligence/admin.py =====
+from django.contrib import admin
+from .models import ExpertiseCategory
+
+@admin.register(ExpertiseCategory)
+class ExpertiseCategoryAdmin(admin.ModelAdmin):
+    search_fields = ("name",)
+    list_display = ("name",)
+    list_per_page = 30
+
+# Register any other models generically if not already registered
+from django.apps import apps
+app_config = apps.get_app_config(__name__.split(".")[-2])
+for model in app_config.get_models():
+    if not admin.site.is_registered(model):
+        admin.site.register(model)
+
+===== END konnaxion/kollective_intelligence/admin.py =====
+
+
+===== BEGIN konnaxion/kollective_intelligence/api_views.py =====
+from rest_framework import viewsets, permissions
+from .models import Vote  # Only import real models
+from .serializers import VoteSerializer  # Only import real serializers
+
+class VoteViewSet(viewsets.ModelViewSet):
+    """
+    Weighted Smart-Vote cast on any target object (FK generic in the model).
+    """
+    queryset = Vote.objects.select_related("user")
+    serializer_class = VoteSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+# Remove ReputationViewSet entirely (no such model, no such serializer)
+
+===== END konnaxion/kollective_intelligence/api_views.py =====
+
+
+===== BEGIN konnaxion/kollective_intelligence/apps.py =====
+from django.apps import AppConfig
+
+
+class KollectiveIntelligenceConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.kollective_intelligence"
+
+===== END konnaxion/kollective_intelligence/apps.py =====
+
+
+===== BEGIN konnaxion/kollective_intelligence/models.py =====
+
+# kollective_intelligence/models.py
+from django.conf import settings
+from django.db import models
+from django.utils import timezone
+
+
+# ────────────────────────────────
+# Ekoh domain
+# ────────────────────────────────
+
+class ExpertiseCategory(models.Model):
+    """Catalog of knowledge domains.”"""
+    name = models.CharField(max_length=120, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
+class UserExpertiseScore(models.Model):
+    """Current domain-specific expertise weight per user.”"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             related_name="expertise_scores")
+    category = models.ForeignKey(ExpertiseCategory,
+                                 on_delete=models.CASCADE,
+                                 related_name="user_scores")
+    raw_score = models.DecimalField(max_digits=7, decimal_places=3)
+    weighted_score = models.DecimalField(max_digits=7, decimal_places=3)
+
+    class Meta:
+        unique_together = ("user", "category")
+        indexes = [models.Index(fields=["category", "-weighted_score"])]
+
+    def __str__(self):
+        return f"{self.user} – {self.category}: {self.weighted_score}"
+
+
+class UserEthicsScore(models.Model):
+    """Ethical multiplier influencing all expertise weights.”"""
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
+                                primary_key=True)
+    ethical_score = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.user}: {self.ethical_score}"
+
+
+class ScoreConfiguration(models.Model):
+    """Stores named weight configurations (global or field-specific).”"""
+    weight_name = models.CharField(max_length=64)
+    weight_value = models.DecimalField(max_digits=6, decimal_places=3)
+    field = models.CharField(max_length=64, blank=True, null=True)
+
+    class Meta:
+        unique_together = ("weight_name", "field")
+
+
+class ContextAnalysisLog(models.Model):
+    """Logs every AI adjustment applied to scores.”"""
+    entity_type = models.CharField(max_length=40)
+    entity_id = models.PositiveBigIntegerField()
+    field = models.CharField(max_length=64)
+    input_metadata = models.JSONField()
+    adjustments_applied = models.JSONField()
+    logged_at = models.DateTimeField(default=timezone.now)
+
+
+class ConfidentialitySetting(models.Model):
+    """Per-user anonymity preferences.”"""
+    PUBLIC = "public"
+    PSEUDONYM = "pseudonym"
+    ANONYMOUS = "anonymous"
+    LEVEL_CHOICES = [
+        (PUBLIC, "Public"),
+        (PSEUDONYM, "Pseudonym"),
+        (ANONYMOUS, "Anonymous"),
+    ]
+
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+                                on_delete=models.CASCADE,
+                                primary_key=True)
+    level = models.CharField(max_length=10, choices=LEVEL_CHOICES,
+                             default=PUBLIC)
+
+
+class ScoreHistory(models.Model):
+    """Keeps an audit trail of every score change.”"""
+    merit_score = models.ForeignKey(UserExpertiseScore,
+                                    on_delete=models.CASCADE,
+                                    related_name="history")
+    old_value = models.DecimalField(max_digits=7, decimal_places=3)
+    new_value = models.DecimalField(max_digits=7, decimal_places=3)
+    change_reason = models.CharField(max_length=255)
+    changed_at = models.DateTimeField(default=timezone.now)
+
+
+# ────────────────────────────────
+# Smart Vote domain
+# ────────────────────────────────
+
+class Vote(models.Model):
+    """Stores each raw and weighted vote.”"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             related_name="votes")
+    target_type = models.CharField(max_length=40)
+    target_id = models.PositiveBigIntegerField()
+    raw_value = models.DecimalField(max_digits=6, decimal_places=3)
+    weighted_value = models.DecimalField(max_digits=6, decimal_places=3)
+    voted_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        unique_together = ("user", "target_type", "target_id")
+
+
+class VoteModality(models.Model):
+    """Parameters for approval / ranking / rating, etc.”"""
+    name = models.CharField(max_length=40, unique=True)
+    parameters = models.JSONField()
+
+
+class EmergingExpert(models.Model):
+    """Flags fast-rising contributors.”"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             on_delete=models.CASCADE,
+                             related_name="emerging_expert_flags")
+    detection_date = models.DateField(default=timezone.now)
+    score_delta = models.DecimalField(max_digits=7, decimal_places=3)
+
+
+class VoteResult(models.Model):
+    """Aggregated weighted totals per target.”"""
+    target_type = models.CharField(max_length=40)
+    target_id = models.PositiveBigIntegerField()
+    sum_weighted_value = models.DecimalField(max_digits=12, decimal_places=3)
+    vote_count = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ("target_type", "target_id")
+
+
+class IntegrationMapping(models.Model):
+    """Links Smart Vote to other modules / domain objects.”"""
+    module_name = models.CharField(max_length=40)
+    context_type = models.CharField(max_length=40)
+    mapping_details = models.JSONField()
+
+===== END konnaxion/kollective_intelligence/models.py =====
+
+
+===== BEGIN konnaxion/kollective_intelligence/serializers.py =====
+# konnaxion/kollective_intelligence/serializers.py
+from rest_framework import serializers
+from .models import Vote   # import real models only
+
+__all__ = ["VoteSerializer"]            # export what actually exists
+
+class VoteSerializer(serializers.ModelSerializer):
+    """
+    Serialises the core Smart-Vote record.
+
+    Fields mirror the Vote model exactly as defined in v14:
+        id, user, target_type, target_id, raw_value, weighted_value, voted_at
+    """
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model  = Vote
+        fields = "__all__"
+
+===== END konnaxion/kollective_intelligence/serializers.py =====
+
+
+===== BEGIN konnaxion/kollective_intelligence/views.py =====
+from django.shortcuts import render
+
+# Create your views here.
+
+===== END konnaxion/kollective_intelligence/views.py =====
+
+
+===== BEGIN konnaxion/konnected/__init__.py =====
+
+===== END konnaxion/konnected/__init__.py =====
+
+
+===== BEGIN konnaxion/konnected/admin.py =====
+# template for konnaxion/<app>/admin.py
+from django.contrib import admin
+from django.apps import apps
+
+app_config = apps.get_app_config(__name__.split(".")[-2])  # resolves to the app name
+for model in app_config.get_models():
+    if not admin.site.is_registered(model):
+        admin.site.register(model)
+
+===== END konnaxion/konnected/admin.py =====
+
+
+===== BEGIN konnaxion/konnected/api_views.py =====
+# konnaxion/konnected/api_views.py
+from rest_framework import viewsets, permissions
+
+from .models import KnowledgeResource
+from .serializers import KnowledgeResourceSerializer
+
+
+class KnowledgeResourceViewSet(viewsets.ModelViewSet):
+    """
+    CRUD endpoints for KonnectED knowledge-library items
+    (video, document, course, other).
+
+    The model follows v14 spec:
+        id, title, type, url, author, created_at, updated_at
+    """
+    queryset = (
+        KnowledgeResource.objects
+        .select_related("author")        # eager-load author for list/detail
+    )
+    serializer_class = KnowledgeResourceSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        # Record the authenticated user as the author
+        serializer.save(author=self.request.user)
+
+===== END konnaxion/konnected/api_views.py =====
+
+
+===== BEGIN konnaxion/konnected/apps.py =====
+from django.apps import AppConfig
+
+
+class KonnectedConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.konnected"
+
+===== END konnaxion/konnected/apps.py =====
+
+
+===== BEGIN konnaxion/konnected/models.py =====
+# konnaxion/konnected/models.py
+from django.conf import settings
+from django.db import models
+
+class TimeStampedModel(models.Model):
+    """Adds created_at / updated_at to every table."""
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        abstract = True
+
+# ──────────────────────────────
+#  CertifiKation sub-module
+# ──────────────────────────────
+class CertificationPath(TimeStampedModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    def __str__(self):
+        return self.name
+
+class Evaluation(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    path = models.ForeignKey(CertificationPath, on_delete=models.CASCADE)
+    raw_score = models.FloatField()
+    metadata = models.JSONField()
+    def __str__(self):
+        return f"{self.user} – {self.path} ({self.raw_score})"
+
+class PeerValidation(TimeStampedModel):
+    class Decision(models.TextChoices):
+        APPROVED = "approved", "Approved"
+        REJECTED = "rejected", "Rejected"
+    evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE)
+    peer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    decision = models.CharField(max_length=8, choices=Decision.choices)
+    def __str__(self):
+        return f"{self.peer} → {self.evaluation} [{self.decision}]"
+
+class Portfolio(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    items = models.ManyToManyField('KnowledgeResource', blank=True, related_name='portfolios')
+    def __str__(self):
+        return self.title
+
+class InteropMapping(TimeStampedModel):
+    local_certification = models.ForeignKey(CertificationPath, on_delete=models.CASCADE)
+    external_system = models.CharField(max_length=120)
+    external_id = models.CharField(max_length=255)
+    def __str__(self):
+        return f"{self.external_system}:{self.external_id}"
+
+# ──────────────────────────────
+#  Knowledge sub-module
+# ──────────────────────────────
+class KnowledgeResource(TimeStampedModel):
+    class ResourceType(models.TextChoices):
+        VIDEO = "video", "Video"
+        DOC = "doc", "Document"
+        COURSE = "course", "Course"
+        OTHER = "other", "Other"
+    title = models.CharField(max_length=255)
+    type = models.CharField(max_length=10, choices=ResourceType.choices)
+    url = models.URLField()
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    def __str__(self):
+        return self.title
+
+class KnowledgeRecommendation(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    resource = models.ForeignKey(KnowledgeResource, on_delete=models.CASCADE)
+    recommended_at = models.DateTimeField()
+    def __str__(self):
+        return f"{self.user} ⇢ {self.resource}"
+
+# ──────────────────────────────
+#  Co-Creation sub-module
+# ──────────────────────────────
+class CoCreationProject(TimeStampedModel):
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        ACTIVE = "active", "Active"
+        ARCHIVED = "archived", "Archived"
+    title = models.CharField(max_length=255)
+    status = models.CharField(max_length=8, choices=Status.choices, default=Status.DRAFT)
+    def __str__(self):
+        return self.title
+
+class CoCreationContribution(TimeStampedModel):
+    project = models.ForeignKey(CoCreationProject, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+    def __str__(self):
+        return f"{self.user} → {self.project}"
+
+# ──────────────────────────────
+#  Forum sub-module
+# ──────────────────────────────
+class ForumTopic(TimeStampedModel):
+    title = models.CharField(max_length=255)
+    category = models.CharField(max_length=120)
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    def __str__(self):
+        return self.title
+
+class ForumPost(TimeStampedModel):
+    topic = models.ForeignKey(ForumTopic, on_delete=models.CASCADE, related_name="posts")
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+    def __str__(self):
+        return f"{self.author} @ {self.topic}"
+
+class LearningProgress(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    resource = models.ForeignKey(KnowledgeResource, on_delete=models.CASCADE)
+    progress_percent = models.DecimalField(max_digits=5, decimal_places=2)
+    class Meta:
+        unique_together = ("user", "resource")  # each user/resource pair only once
+    def __str__(self):
+        return f"{self.user} – {self.resource} ({self.progress_percent}%)"
+
+===== END konnaxion/konnected/models.py =====
+
+
+===== BEGIN konnaxion/konnected/serializers.py =====
+# konnaxion/konnected/serializers.py
+from rest_framework import serializers
+from .models import KnowledgeResource
+
+__all__ = ["KnowledgeResourceSerializer"]   # only export real serializers
+
+
+class KnowledgeResourceSerializer(serializers.ModelSerializer):
+    """
+    Serialises library items (video, doc, course…) defined by the
+    KnowledgeResource model in v14.
+    """
+    author = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model  = KnowledgeResource
+        fields = "__all__"
+
+===== END konnaxion/konnected/serializers.py =====
+
+
+===== BEGIN konnaxion/konnected/views.py =====
+from django.shortcuts import render
+
+# Create your views here.
+
+===== END konnaxion/konnected/views.py =====
+
+
+===== BEGIN konnaxion/kreative/__init__.py =====
+
+===== END konnaxion/kreative/__init__.py =====
+
+
+===== BEGIN konnaxion/kreative/admin.py =====
+# template for konnaxion/<app>/admin.py
+from django.contrib import admin
+from django.apps import apps
+
+app_config = apps.get_app_config(__name__.split(".")[-2])  # resolves to the app name
+for model in app_config.get_models():
+    if not admin.site.is_registered(model):
+        admin.site.register(model)
+
+===== END konnaxion/kreative/admin.py =====
+
+
+===== BEGIN konnaxion/kreative/api_views.py =====
+# konnaxion/kreative/api_views.py
+from rest_framework import viewsets, permissions
+
+from .models import KreativeArtwork, Gallery
+from .serializers import KreativeArtworkSerializer, GallerySerializer
+
+
+class KreativeArtworkViewSet(viewsets.ModelViewSet):
+    """
+    CRUD for uploaded artworks (image / video / audio / other).
+    Matches the KreativeArtwork model in v14.
+    """
+    queryset = KreativeArtwork.objects.select_related("artist")
+    serializer_class = KreativeArtworkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(artist=self.request.user)
+
+
+class GalleryViewSet(viewsets.ModelViewSet):
+    """
+    Curated collections of artworks.
+    """
+    queryset = Gallery.objects.select_related("created_by").prefetch_related("artworks")
+    serializer_class = GallerySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+===== END konnaxion/kreative/api_views.py =====
+
+
+===== BEGIN konnaxion/kreative/apps.py =====
+from django.apps import AppConfig
+
+
+class KreativeConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.kreative"
+
+===== END konnaxion/kreative/apps.py =====
+
+
+===== BEGIN konnaxion/kreative/models.py =====
+from django.conf import settings
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+# -- Simple reusable tag --
+class Tag(models.Model):
+    """
+    Simple tagging table that can be reused by other apps.
+    """
+    name = models.CharField(max_length=64, unique=True)
+
+    class Meta:
+        verbose_name = _("Tag")
+        verbose_name_plural = _("Tags")
+
+    def __str__(self):
+        return self.name
+
+# -- Artwork and curation --
+class KreativeArtwork(models.Model):
+    """
+    A single piece of art uploaded by a user.
+    """
+    class MediaType(models.TextChoices):
+        IMAGE = "image", _("Image")
+        VIDEO = "video", _("Video")
+        AUDIO = "audio", _("Audio")
+        OTHER = "other", _("Other")
+
+    artist = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="artworks",
+    )
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    media_file = models.FileField(upload_to="kreative/artworks/")
+    media_type = models.CharField(
+        max_length=10, choices=MediaType.choices, default=MediaType.IMAGE
+    )
+    year = models.PositiveIntegerField(null=True, blank=True)
+    medium = models.CharField(max_length=120, blank=True)
+    style = models.CharField(max_length=120, blank=True)
+    tags = models.ManyToManyField(Tag, through="ArtworkTag", blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Artwork")
+        verbose_name_plural = _("Artworks")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+class ArtworkTag(models.Model):
+    """
+    Through-table for artwork <-> tag, for ManyToMany.
+    """
+    artwork = models.ForeignKey(KreativeArtwork, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("artwork", "tag")
+
+# -- Gallery and ordering --
+class Gallery(models.Model):
+    """
+    A curated set of artworks.
+    """
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="galleries_created",
+    )
+    theme = models.CharField(max_length=120, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    artworks = models.ManyToManyField(
+        KreativeArtwork, through="GalleryArtwork", related_name="galleries"
+    )
+
+    class Meta:
+        verbose_name = _("Gallery")
+        verbose_name_plural = _("Galleries")
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+class GalleryArtwork(models.Model):
+    """
+    Through-table giving order inside a gallery.
+    """
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE)
+    artwork = models.ForeignKey(KreativeArtwork, on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ("gallery", "artwork")
+        ordering = ["order"]
+
+# -- Co-creation room --
+class CollabSession(models.Model):
+    """
+    Real-time co-creation room (painting, music, etc.).
+    """
+    SESSION_TYPES = [
+        ("painting", _("Painting")),
+        ("music", _("Music")),
+        ("mixed", _("Mixed Media")),
+    ]
+
+    name = models.CharField(max_length=255)
+    host = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="collab_sessions_hosted",
+    )
+    session_type = models.CharField(max_length=20, choices=SESSION_TYPES)
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+    final_artwork = models.ForeignKey(
+        KreativeArtwork,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="created_in_sessions",
+    )
+
+    class Meta:
+        verbose_name = _("Collaboration Session")
+        verbose_name_plural = _("Collaboration Sessions")
+        ordering = ["-started_at"]
+
+# -- Cultural heritage/tradition entry --
+class TraditionEntry(models.Model):
+    """
+    Cultural-heritage submission for Konservation archive.
+    """
+    REGION_MAX_LENGTH = 120
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    region = models.CharField(max_length=REGION_MAX_LENGTH)  # could be ref-table later
+    media_file = models.FileField(upload_to="kreative/traditions/")
+    submitted_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="tradition_entries",
+    )
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    approved = models.BooleanField(default=False)
+    approved_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tradition_entries_approved",
+    )
+    approved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("Tradition Entry")
+        verbose_name_plural = _("Tradition Entries")
+        ordering = ["-submitted_at"]
+
+    def __str__(self):
+        return self.title
+
+# -- NEW: VirtualExhibition, DigitalArchive, ArchiveDocument, AICatalogueEntry, CulturalPartner --
+class VirtualExhibition(models.Model):
+    """
+    Online curated show.
+    """
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Virtual Exhibition")
+        verbose_name_plural = _("Virtual Exhibitions")
+
+    def __str__(self):
+        return self.name
+
+class DigitalArchive(models.Model):
+    """
+    Stored artwork master entry (collection/archive).
+    """
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    url = models.URLField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("Digital Archive")
+        verbose_name_plural = _("Digital Archives")
+
+    def __str__(self):
+        return self.title
+
+class ArchiveDocument(models.Model):
+    """
+    Documents linked to archives (e.g., image, PDF, scan).
+    """
+    archive = models.ForeignKey(DigitalArchive, on_delete=models.CASCADE, related_name="documents")
+    document_type = models.CharField(max_length=64)
+    url = models.URLField()
+    metadata = models.JSONField(blank=True, default=dict)
+
+    class Meta:
+        verbose_name = _("Archive Document")
+        verbose_name_plural = _("Archive Documents")
+
+class AICatalogueEntry(models.Model):
+    """
+    AI-generated tags/classification for an archive document.
+    """
+    archive_document = models.ForeignKey(ArchiveDocument, on_delete=models.CASCADE, related_name="ai_entries")
+    tags = models.JSONField(blank=True, default=list)
+    classification = models.CharField(max_length=120, blank=True)
+
+    class Meta:
+        verbose_name = _("AI Catalogue Entry")
+        verbose_name_plural = _("AI Catalogue Entries")
+
+class CulturalPartner(models.Model):
+    """
+    Museum/heritage sources or partners.
+    """
+    name = models.CharField(max_length=255)
+    type = models.CharField(max_length=64)
+    contact_info = models.JSONField(blank=True, default=dict)
+
+    class Meta:
+        verbose_name = _("Cultural Partner")
+        verbose_name_plural = _("Cultural Partners")
+
+    def __str__(self):
+        return self.name
+
+===== END konnaxion/kreative/models.py =====
+
+
+===== BEGIN konnaxion/kreative/serializers.py =====
+# konnaxion/kreative/serializers.py
+from rest_framework import serializers
+from .models import KreativeArtwork, Gallery, Tag
+
+__all__ = [
+    "KreativeArtworkSerializer",
+    "GallerySerializer",
+]
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = "__all__"
+
+
+class KreativeArtworkSerializer(serializers.ModelSerializer):
+    artist = serializers.StringRelatedField(read_only=True)
+    tags   = TagSerializer(many=True, read_only=True)
+
+    class Meta:
+        model  = KreativeArtwork
+        fields = "__all__"
+
+
+class GallerySerializer(serializers.ModelSerializer):
+    created_by = serializers.StringRelatedField(read_only=True)
+    artworks   = KreativeArtworkSerializer(many=True, read_only=True)
+
+    class Meta:
+        model  = Gallery
+        fields = "__all__"
+
+===== END konnaxion/kreative/serializers.py =====
+
+
+===== BEGIN konnaxion/kreative/views.py =====
+from django.shortcuts import render
+
+# Create your views here.
+
+===== END konnaxion/kreative/views.py =====
+
+
+===== BEGIN konnaxion/static/css/project.css =====
+/* These styles are generated from project.scss. */
+
+.alert-debug {
+  color: black;
+  background-color: white;
+  border-color: #d6e9c6;
+}
+
+.alert-error {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+}
+
+===== END konnaxion/static/css/project.css =====
+
+
+===== BEGIN konnaxion/static/fonts/.gitkeep =====
+
+===== END konnaxion/static/fonts/.gitkeep =====
+
+
+===== BEGIN konnaxion/static/js/project.js =====
+/* Project specific Javascript goes here. */
+
+===== END konnaxion/static/js/project.js =====
+
+
+===== BEGIN konnaxion/templates/403.html =====
+{% extends "base.html" %}
+
+{% block title %}Forbidden (403){% endblock title %}
+{% block content %}
+  <h1>Forbidden (403)</h1>
+  <p>
+    {% if exception %}
+      {{ exception }}
+    {% else %}
+      You're not allowed to access this page.
+    {% endif %}
+  </p>
+{% endblock content %}
+
+===== END konnaxion/templates/403.html =====
+
+
+===== BEGIN konnaxion/templates/403_csrf.html =====
+{% extends "base.html" %}
+
+{% block title %}Forbidden (403){% endblock title %}
+{% block content %}
+  <h1>Forbidden (403)</h1>
+  <p>
+    {% if exception %}
+      {{ exception }}
+    {% else %}
+      You're not allowed to access this page.
+    {% endif %}
+  </p>
+{% endblock content %}
+
+===== END konnaxion/templates/403_csrf.html =====
+
+
+===== BEGIN konnaxion/templates/404.html =====
+{% extends "base.html" %}
+
+{% block title %}Page not found{% endblock title %}
+{% block content %}
+  <h1>Page not found</h1>
+  <p>
+    {% if exception %}
+      {{ exception }}
+    {% else %}
+      This is not the page you were looking for.
+    {% endif %}
+  </p>
+{% endblock content %}
+
+===== END konnaxion/templates/404.html =====
+
+
+===== BEGIN konnaxion/templates/500.html =====
+{% extends "base.html" %}
+
+{% block title %}Server Error{% endblock title %}
+{% block content %}
+  <h1>Ooops!!! 500</h1>
+  <h3>Looks like something went wrong!</h3>
+  <p>
+    We track these errors automatically, but if the problem persists feel free to contact us. In the meantime, try refreshing.
+  </p>
+{% endblock content %}
+
+===== END konnaxion/templates/500.html =====
+
+
+===== BEGIN konnaxion/templates/account/base_manage_password.html =====
+{% extends "account/base_manage.html" %}
+
+{% block main %}
+  <div class="card">
+    <div class="card-body">
+      {% block content %}
+      {% endblock content %}
+    </div>
+  </div>
+{% endblock main %}
+
+
+===== END konnaxion/templates/account/base_manage_password.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/elements/alert.html =====
+{% load i18n %}
+{% load allauth %}
+
+<div class="alert alert-error">
+  {% slot message %}
+{% endslot %}
+</div>
+
+===== END konnaxion/templates/allauth/elements/alert.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/elements/badge.html =====
+{% load allauth %}
+
+<span class="badge {% if 'success' in attrs.tags %}bg-success{% endif %} {% if 'warning' in attrs.tags %}bg-warning{% endif %} {% if 'secondary' in attrs.tags %}bg-secondary{% endif %} {% if 'danger' in attrs.tags %}bg-danger{% endif %} {% if 'primary' in attrs.tags %}bg-primary{% endif %}">
+  {% slot %}
+{% endslot %}
+</span>
+
+===== END konnaxion/templates/allauth/elements/badge.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/elements/button.html =====
+{% load allauth %}
+
+{% comment %} djlint:off {% endcomment %}
+<{% if attrs.href %}a href="{{ attrs.href }}"{% else %}button{% endif %}
+                      {% if attrs.form %}form="{{ attrs.form }}"{% endif %}
+                      {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+                      {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+                      {% if attrs.type %}type="{{ attrs.type }}"{% endif %}
+                      class="btn
+{% if 'success' in attrs.tags %}btn-success
+{% elif 'warning' in attrs.tags %}btn-warning
+{% elif 'secondary' in attrs.tags %}btn-secondary
+{% elif 'danger' in attrs.tags %}btn-danger
+{% elif 'primary' in attrs.tags %}btn-primary
+{% else %}btn-primary
+{% endif %}"
+>
+  {% slot %}
+  {% endslot %}
+  </{% if attrs.href %}a{% else %}button{% endif %}>
+
+===== END konnaxion/templates/allauth/elements/button.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/elements/field.html =====
+{% load allauth %}
+{% load crispy_forms_tags %}
+
+{% if attrs.type == "textarea" %}
+  <div class="row mb-3">
+    <div class="col-sm-10">
+      <label for="{{ attrs.id }}">
+        {% slot label %}
+      {% endslot %}
+    </label>
+  </div>
+  <textarea {% if attrs.required %}required{% endif %}
+            {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
+            {% if attrs.disabled %}disabled{% endif %}
+            {% if attrs.readonly %}readonly{% endif %}
+            {% if attrs.checked %}checked{% endif %}
+            {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+            {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+            {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+            class="form-control">{% slot value %}{% endslot %}</textarea>
+</div>
+{% elif attrs.type == "radio" %}
+<div class="row mb-3">
+  <div class="col-sm-10">
+    <div class="form-check">
+      <input {% if attrs.required %}required{% endif %}
+             {% if attrs.disabled %}disabled{% endif %}
+             {% if attrs.readonly %}readonly{% endif %}
+             {% if attrs.checked %}checked{% endif %}
+             {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+             {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+             {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+             {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+             value="{{ attrs.value|default_if_none:"" }}"
+             type="{{ attrs.type }}" />
+      <label class="form-check-label" for="{{ attrs.id }}">
+        {% slot label %}
+      {% endslot %}
+    </label>
+  </div>
+</div>
+</div>
+{% else %}
+<div class="col-sm-10">
+  <label for="{{ attrs.id }}">
+    {% slot label %}
+  {% endslot %}
+</label>
+</div>
+<div class="col-sm-10">
+  <input {% if attrs.required %}required{% endif %}
+         {% if attrs.disabled %}disabled{% endif %}
+         {% if attrs.readonly %}readonly{% endif %}
+         {% if attrs.checked %}checked{% endif %}
+         {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+         {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+         {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}
+         {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
+         value="{{ attrs.value|default_if_none:"" }}"
+         type="{{ attrs.type }}"
+         class="form-control" />
+</div>
+{% endif %}
+{% if slots.help_text %}
+  <div class="form-text">{% slot help_text %}{% endslot %}</div>
+{% endif %}
+
+===== END konnaxion/templates/allauth/elements/field.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/elements/fields.html =====
+{% load crispy_forms_tags %}
+
+{{ attrs.form|crispy }}
+
+===== END konnaxion/templates/allauth/elements/fields.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/elements/panel.html =====
+{% load allauth %}
+
+<section>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="card-title">
+        {% slot title %}
+      {% endslot %}
+    </h2>
+    {% slot body %}
+  {% endslot %}
+  {% if slots.actions %}
+    <ul>
+      {% for action in slots.actions %}<li>{{ action }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+</div>
+</div>
+</section>
+
+===== END konnaxion/templates/allauth/elements/panel.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/elements/table.html =====
+{% load allauth %}
+
+<table class="table">
+  {% slot %}
+{% endslot %}
+</table>
+
+===== END konnaxion/templates/allauth/elements/table.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/layouts/entrance.html =====
+{% extends "base.html" %}
+{% load i18n %}
+{% block bodyclass %}bg-light{% endblock bodyclass %}
+
+{% block css %}{{ block.super }}{% endblock css %}
+{% block title %}
+  {% block head_title %}
+    {% trans "Sign In" %}
+  {% endblock head_title %}
+{% endblock title %}
+{% block body %}
+  <div class="d-flex justify-content-center h-100 py-4">
+    <div class="col-md-4 py-4 my-4 px-4">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+            {{ message }}
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}
+      {% endblock content %}
+      {% block extra_body %}
+      {% endblock extra_body %}
+    </div>
+  </div>
+{% endblock body %}
+
+===== END konnaxion/templates/allauth/layouts/entrance.html =====
+
+
+===== BEGIN konnaxion/templates/allauth/layouts/manage.html =====
+{% extends "base.html" %}
+
+{% block main %}
+  {% block content %}
+  {% endblock content %}
+{% endblock main %}
+
+===== END konnaxion/templates/allauth/layouts/manage.html =====
+
+
+===== BEGIN konnaxion/templates/base.html =====
+
+{% load static i18n %}<!DOCTYPE html>
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <title>
+      {% block title %}
+      Konnaxion
+    {% endblock title %}
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+        content="Our Project" />
+  <meta name="author"
+        content="Rejean McCormick" />
+  <link rel="icon" href="{% static 'images/favicons/favicon.ico' %}" />
+  {% block css %}
+    <!-- Latest compiled and minified Bootstrap CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/css/bootstrap.min.css"
+          integrity="sha512-SbiR/eusphKoMVVXysTKG/7VseWii+Y3FdHrt0EpKgpToZeemhqHeZeLWLhJutz/2ut2Vw1uQEj2MbRF+TVBUA=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
+<!-- Your stuff: Third-party CSS libraries go here -->
+<!-- This file stores project-specific CSS -->
+
+  
+  <link href="{% static 'css/project.css' %}" rel="stylesheet" />
+
+
+{% endblock css %}
+<!-- Le javascript
+    ================================================== -->
+{# Placed at the top of the document so pages load faster with defer #}
+{% block javascript %}
+
+
+<!-- Bootstrap JS -->
+<script defer
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.2.3/js/bootstrap.min.js"
+        integrity="sha512-1/RvZTcCDEUjY/CypiMz+iqqtaoQfAITmNSJY17Myp4Ms5mdxPS5UV7iOfdZoxcGhzFbOm6sntTKJppjvuhg4g=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+<!-- Your stuff: Third-party javascript libraries go here -->
+
+
+<!-- place project specific Javascript in this file -->
+
+  
+  <script defer src="{% static 'js/project.js' %}"></script>
+
+
+{% endblock javascript %}
+</head>
+<body class="{% block bodyclass %}{% endblock bodyclass %}">
+  {% block body %}
+  <div class="mb-1">
+    <nav class="navbar navbar-expand-md navbar-light bg-light">
+      <div class="container-fluid">
+        <button class="navbar-toggler navbar-toggler-right"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="{% url 'home' %}">Konnaxion</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="{% url 'home' %}">Home <span class="visually-hidden">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'about' %}">About</a>
+            </li>
+            {% if request.user.is_authenticated %}
+              <li class="nav-item">
+                <a class="nav-link"
+                   href="{% url 'users:detail' request.user.username %}">{% translate "My Profile" %}</a>
+              </li>
+              <li class="nav-item">
+                {# URL provided by django-allauth/account/urls.py #}
+                <a class="nav-link" href="{% url 'account_logout' %}">{% translate "Sign Out" %}</a>
+              </li>
+            {% else %}
+              {% if ACCOUNT_ALLOW_REGISTRATION %}
+                <li class="nav-item">
+                  {# URL provided by django-allauth/account/urls.py #}
+                  <a id="sign-up-link" class="nav-link" href="{% url 'account_signup' %}">{% translate "Sign Up" %}</a>
+                </li>
+              {% endif %}
+              <li class="nav-item">
+                {# URL provided by django-allauth/account/urls.py #}
+                <a id="log-in-link" class="nav-link" href="{% url 'account_login' %}">{% translate "Sign In" %}</a>
+              </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </div>
+  <div class="container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-dismissible {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+          {{ message }}
+          <button type="button"
+                  class="btn-close"
+                  data-bs-dismiss="alert"
+                  aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% block main %}
+      {% block content %}
+        <p>Use this document as a way to quick start any new project.</p>
+      {% endblock content %}
+    {% endblock main %}
+
+  </div>
+  {% endblock body %}
+  <!-- /container -->
+  {% block modal %}
+  {% endblock modal %}
+  {% block inline_javascript %}
+    {% comment %}
+    Script tags with only code, no src (defer by default). To run
+    with a "defer" so that you run inline code:
+    <script>
+      window.addEventListener('DOMContentLoaded', () => {
+        /* Run whatever you want */
+      });
+    </script>
+    {% endcomment %}
+  {% endblock inline_javascript %}
+</body>
+</html>
+
+===== END konnaxion/templates/base.html =====
+
+
+===== BEGIN konnaxion/templates/pages/about.html =====
+{% extends "base.html" %}
+
+
+
+===== END konnaxion/templates/pages/about.html =====
+
+
+===== BEGIN konnaxion/templates/pages/home.html =====
+{% extends "base.html" %}
+
+
+
+===== END konnaxion/templates/pages/home.html =====
+
+
+===== BEGIN konnaxion/templates/users/user_detail.html =====
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+  User: 
+  
+    {{ object.username }}
+  
+  
+{% endblock title %}
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <h2>
+        
+        
+          {{ object.username }}
+        
+      </h2>
+      {% if object.name %}
+        <p>{{ object.name }}</p>
+      {% endif %}
+    </div>
+  </div>
+  {% if object == request.user %}
+    <!-- Action buttons -->
+    <div class="row">
+      <div class="col-sm-12">
+        <a class="btn btn-primary" href="{% url 'users:update' %}" role="button">My Info</a>
+        <a class="btn btn-primary"
+           href="{% url 'account_email' %}"
+           role="button">E-Mail</a>
+        <a class="btn btn-primary"
+           href="{% url 'mfa_index' %}"
+           role="button">MFA</a>
+        <!-- Your Stuff: Custom user template urls -->
+      </div>
+    </div>
+    <!-- End Action buttons -->
+  {% endif %}
+</div>
+{% endblock content %}
+
+===== END konnaxion/templates/users/user_detail.html =====
+
+
+===== BEGIN konnaxion/templates/users/user_form.html =====
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+
+
+  {{ user.username }}
+
+
+{% endblock title %}
+{% block content %}
+  <h1>
+  
+  
+    {{ user.username }}
+  
+  
+</h1>
+<form class="form-horizontal"
+      method="post"
+      action="{% url 'users:update' %}">
+  {% csrf_token %}
+  {{ form|crispy }}
+  <div class="control-group">
+    <div class="controls">
+      <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+  </div>
+</form>
+{% endblock content %}
+
+===== END konnaxion/templates/users/user_form.html =====
+
+
+===== BEGIN konnaxion/urls.py =====
+# konnaxion/urls.py
+
+from django.urls import path, include
+
+urlpatterns = [
+    # ...
+    path("api/ethikos/", include("konnaxion.ethikos.urls")),
+    # ...
+]
+
+===== END konnaxion/urls.py =====
+
+
+===== BEGIN konnaxion/users/__init__.py =====
+
+===== END konnaxion/users/__init__.py =====
+
+
+===== BEGIN konnaxion/users/adapters.py =====
+from __future__ import annotations
+
+import typing
+
+from allauth.account.adapter import DefaultAccountAdapter
+from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
+from django.conf import settings
+
+if typing.TYPE_CHECKING:
+    from allauth.socialaccount.models import SocialLogin
+    from django.http import HttpRequest
+
+    from konnaxion.users.models import User
+
+
+class AccountAdapter(DefaultAccountAdapter):
+    def is_open_for_signup(self, request: HttpRequest) -> bool:
+        return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
+
+
+class SocialAccountAdapter(DefaultSocialAccountAdapter):
+    def is_open_for_signup(
+        self,
+        request: HttpRequest,
+        sociallogin: SocialLogin,
+    ) -> bool:
+        return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
+
+    def populate_user(
+        self,
+        request: HttpRequest,
+        sociallogin: SocialLogin,
+        data: dict[str, typing.Any],
+    ) -> User:
+        """
+        Populates user information from social provider info.
+
+        See: https://docs.allauth.org/en/latest/socialaccount/advanced.html#creating-and-populating-user-instances
+        """
+        user = super().populate_user(request, sociallogin, data)
+        if not user.name:
+            if name := data.get("name"):
+                user.name = name
+            elif first_name := data.get("first_name"):
+                user.name = first_name
+                if last_name := data.get("last_name"):
+                    user.name += f" {last_name}"
+        return user
+
+===== END konnaxion/users/adapters.py =====
+
+
+===== BEGIN konnaxion/users/admin.py =====
+from allauth.account.decorators import secure_admin_login
+from django.conf import settings
+from django.contrib import admin
+from django.contrib.auth import admin as auth_admin
+from django.utils.translation import gettext_lazy as _
+
+from .forms import UserAdminChangeForm
+from .forms import UserAdminCreationForm
+from .models import User
+
+if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
+    # Force the `admin` sign in process to go through the `django-allauth` workflow:
+    # https://docs.allauth.org/en/latest/common/admin.html#admin
+    admin.autodiscover()
+    admin.site.login = secure_admin_login(admin.site.login)  # type: ignore[method-assign]
+
+
+@admin.register(User)
+class UserAdmin(auth_admin.UserAdmin):
+    form = UserAdminChangeForm
+    add_form = UserAdminCreationForm
+    fieldsets = (
+        (None, {"fields": ("username", "password")}),
+        (_("Personal info"), {"fields": ("name", "email")}),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+    )
+    list_display = ["username", "name", "is_superuser"]
+    search_fields = ["name"]
+
+===== END konnaxion/users/admin.py =====
+
+
+===== BEGIN konnaxion/users/api/__init__.py =====
+
+===== END konnaxion/users/api/__init__.py =====
+
+
+===== BEGIN konnaxion/users/api/serializers.py =====
+from rest_framework import serializers
+
+from konnaxion.users.models import User
+
+
+class UserSerializer(serializers.ModelSerializer[User]):
+    class Meta:
+        model = User
+        fields = ["username", "name", "url"]
+
+        extra_kwargs = {
+            "url": {"view_name": "api:user-detail", "lookup_field": "username"},
+        }
+
+===== END konnaxion/users/api/serializers.py =====
+
+
+===== BEGIN konnaxion/users/api/views.py =====
+from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.mixins import ListModelMixin
+from rest_framework.mixins import RetrieveModelMixin
+from rest_framework.mixins import UpdateModelMixin
+from rest_framework.response import Response
+from rest_framework.viewsets import GenericViewSet
+
+from konnaxion.users.models import User
+
+from .serializers import UserSerializer
+
+
+class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    lookup_field = "username"
+
+    def get_queryset(self, *args, **kwargs):
+        assert isinstance(self.request.user.id, int)
+        return self.queryset.filter(id=self.request.user.id)
+
+    @action(detail=False)
+    def me(self, request):
+        serializer = UserSerializer(request.user, context={"request": request})
+        return Response(status=status.HTTP_200_OK, data=serializer.data)
+
+===== END konnaxion/users/api/views.py =====
+
+
+===== BEGIN konnaxion/users/apps.py =====
+import contextlib
+
+from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
+
+
+class UsersConfig(AppConfig):
+    name = "konnaxion.users"
+    verbose_name = _("Users")
+
+    def ready(self):
+        with contextlib.suppress(ImportError):
+            import konnaxion.users.signals  # noqa: F401
+
+===== END konnaxion/users/apps.py =====
+
+
+===== BEGIN konnaxion/users/context_processors.py =====
+from django.conf import settings
+
+
+def allauth_settings(request):
+    """Expose some settings from django-allauth in templates."""
+    return {
+        "ACCOUNT_ALLOW_REGISTRATION": settings.ACCOUNT_ALLOW_REGISTRATION,
+    }
+
+===== END konnaxion/users/context_processors.py =====
+
+
+===== BEGIN konnaxion/users/forms.py =====
+from allauth.account.forms import SignupForm
+from allauth.socialaccount.forms import SignupForm as SocialSignupForm
+from django.contrib.auth import forms as admin_forms
+from django.utils.translation import gettext_lazy as _
+
+from .models import User
+
+
+class UserAdminChangeForm(admin_forms.UserChangeForm):
+    class Meta(admin_forms.UserChangeForm.Meta):  # type: ignore[name-defined]
+        model = User
+
+
+class UserAdminCreationForm(admin_forms.AdminUserCreationForm):
+    """
+    Form for User Creation in the Admin Area.
+    To change user signup, see UserSignupForm and UserSocialSignupForm.
+    """
+
+    class Meta(admin_forms.UserCreationForm.Meta):  # type: ignore[name-defined]
+        model = User
+        error_messages = {
+            "username": {"unique": _("This username has already been taken.")},
+        }
+
+
+class UserSignupForm(SignupForm):
+    """
+    Form that will be rendered on a user sign up section/screen.
+    Default fields will be added automatically.
+    Check UserSocialSignupForm for accounts created from social.
+    """
+
+
+class UserSocialSignupForm(SocialSignupForm):
+    """
+    Renders the form when user has signed up using social accounts.
+    Default fields will be added automatically.
+    See UserSignupForm otherwise.
+    """
+
+===== END konnaxion/users/forms.py =====
+
+
+===== BEGIN konnaxion/users/models.py =====
+from django.contrib.auth.models import AbstractUser
+from django.db.models import CharField
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+
+
+class User(AbstractUser):
+    """
+    Default custom user model for Konnaxion.
+    If adding fields that need to be filled at user signup,
+    check forms.SignupForm and forms.SocialSignupForms accordingly.
+    """
+
+    # First and last name do not cover name patterns around the globe
+    name = CharField(_("Name of User"), blank=True, max_length=255)
+    first_name = None  # type: ignore[assignment]
+    last_name = None  # type: ignore[assignment]
+
+    def get_absolute_url(self) -> str:
+        """Get URL for user's detail view.
+
+        Returns:
+            str: URL for user detail.
+
+        """
+        return reverse("users:detail", kwargs={"username": self.username})
+
+===== END konnaxion/users/models.py =====
+
+
+===== BEGIN konnaxion/users/tasks.py =====
+from celery import shared_task
+
+from .models import User
+
+
+@shared_task()
+def get_users_count():
+    """A pointless Celery task to demonstrate usage."""
+    return User.objects.count()
+
+===== END konnaxion/users/tasks.py =====
+
+
+===== BEGIN konnaxion/users/urls.py =====
+from django.urls import path
+
+from .views import user_detail_view
+from .views import user_redirect_view
+from .views import user_update_view
+
+app_name = "users"
+urlpatterns = [
+    path("~redirect/", view=user_redirect_view, name="redirect"),
+    path("~update/", view=user_update_view, name="update"),
+    path("<str:username>/", view=user_detail_view, name="detail"),
+]
+
+===== END konnaxion/users/urls.py =====
+
+
+===== BEGIN konnaxion/users/views.py =====
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import QuerySet
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import DetailView
+from django.views.generic import RedirectView
+from django.views.generic import UpdateView
+
+from konnaxion.users.models import User
+
+
+class UserDetailView(LoginRequiredMixin, DetailView):
+    model = User
+    slug_field = "username"
+    slug_url_kwarg = "username"
+
+
+user_detail_view = UserDetailView.as_view()
+
+
+class UserUpdateView(LoginRequiredMixin, SuccessMessageMixin, UpdateView):
+    model = User
+    fields = ["name"]
+    success_message = _("Information successfully updated")
+
+    def get_success_url(self) -> str:
+        assert self.request.user.is_authenticated  # type guard
+        return self.request.user.get_absolute_url()
+
+    def get_object(self, queryset: QuerySet | None=None) -> User:
+        assert self.request.user.is_authenticated  # type guard
+        return self.request.user
+
+
+user_update_view = UserUpdateView.as_view()
+
+
+class UserRedirectView(LoginRequiredMixin, RedirectView):
+    permanent = False
+
+    def get_redirect_url(self) -> str:
+        return reverse("users:detail", kwargs={"username": self.request.user.username})
+
+
+user_redirect_view = UserRedirectView.as_view()
+
+===== END konnaxion/users/views.py =====
+

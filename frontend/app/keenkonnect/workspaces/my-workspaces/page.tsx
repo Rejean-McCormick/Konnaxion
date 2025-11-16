@@ -1,8 +1,22 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { Card, List, Button, Badge, Row, Col, Select, Divider, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
+import {
+  Row,
+  Col,
+  Select,
+  Divider,
+  Typography,
+  Tag,
+  Dropdown,
+  Popconfirm,
+  message,
+  Button,
+} from 'antd';
+import type { MenuProps } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import { ProTable, type ProColumns } from '@ant-design/pro-components';
 
 const { Title, Text } = Typography;
 
@@ -55,31 +69,128 @@ export default function MyWorkspaces() {
 
   // Filter by project
   const [selectedProject, setSelectedProject] = useState<string>('All');
+  // Local list so we can "remove" a workspace from the view (Popconfirm action)
+  const [visibleWorkspaces, setVisibleWorkspaces] =
+    useState<Workspace[]>(sampleWorkspaces);
 
   const filteredWorkspaces = useMemo(() => {
-    if (selectedProject === 'All') return sampleWorkspaces;
-    return sampleWorkspaces.filter((ws) => ws.project === selectedProject);
-  }, [selectedProject]);
+    const base = visibleWorkspaces;
+    if (selectedProject === 'All') return base;
+    return base.filter((ws) => ws.project === selectedProject);
+  }, [selectedProject, visibleWorkspaces]);
 
   const activeCount = useMemo(
-    () => sampleWorkspaces.filter((ws) => ws.status === 'active').length,
-    []
+    () => visibleWorkspaces.filter((ws) => ws.status === 'active').length,
+    [visibleWorkspaces],
   );
 
   const projectOptions = useMemo(() => {
-    const projects = Array.from(new Set(sampleWorkspaces.map((ws) => ws.project)));
+    const projects = Array.from(
+      new Set(visibleWorkspaces.map((ws) => ws.project)),
+    );
     return ['All', ...projects];
-  }, []);
+  }, [visibleWorkspaces]);
 
-  const handleWorkspaceAction = (ws: Workspace) => {
-    // Use the real route that exists in your app
+  const handleWorkspacePrimaryAction = (ws: Workspace) => {
     router.push(`/keenkonnect/workspaces/launch-new-workspace?id=${ws.id}`);
   };
 
   const handleManageSettings = (ws: Workspace) => {
-    // Reuse the same page and flag "manage" to avoid 404s until a settings page exists
-    router.push(`/keenkonnect/workspaces/launch-new-workspace?id=${ws.id}&manage=1`);
+    // corrigé : "launch-new-workspace" (sans "s")
+    router.push(
+      `/keenkonnect/workspaces/launch-new-workspace?id=${ws.id}&manage=1`,
+    );
   };
+
+  const handleRemoveFromMyWorkspaces = (ws: Workspace) => {
+    setVisibleWorkspaces((prev) => prev.filter((item) => item.id !== ws.id));
+    message.success(`Workspace "${ws.name}" removed from your list.`);
+  };
+
+  const columns: ProColumns<Workspace>[] = [
+    {
+      title: 'Workspace',
+      dataIndex: 'name',
+      key: 'name',
+      render: (_dom, record) => (
+        <div>
+          <div style={{ fontWeight: 500 }}>{record.name}</div>
+          <Text type="secondary">{record.description}</Text>
+        </div>
+      ),
+    },
+    {
+      title: 'Project',
+      dataIndex: 'project',
+      key: 'project',
+    },
+    {
+      title: 'Environment',
+      dataIndex: 'environment',
+      key: 'environment',
+      // IMPORTANT : on respecte la signature (dom, entity, index, action, schema)
+      render: (_dom, record) => <Tag>{record.environment}</Tag>,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (_dom, record) =>
+        record.status === 'active' ? (
+          <Tag color="green">Active</Tag>
+        ) : (
+          <Tag color="default">Inactive</Tag>
+        ),
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      valueType: 'option',
+      render: (_dom, record) => {
+        const isActive = record.status === 'active';
+        const primaryLabel = isActive ? 'Join Now' : 'Launch';
+
+        const menuItems: MenuProps['items'] = [
+          {
+            key: 'manage',
+            label: 'Manage Settings',
+          },
+          {
+            key: 'remove',
+            label: (
+              <Popconfirm
+                title="Remove from My Workspaces?"
+                description="This will remove the workspace from your list (the workspace itself is not deleted)."
+                okText="Yes, remove"
+                cancelText="Cancel"
+                onConfirm={() => handleRemoveFromMyWorkspaces(record)}
+              >
+                <span>Remove from list</span>
+              </Popconfirm>
+            ),
+          },
+        ];
+
+        const onMenuClick: MenuProps['onClick'] = ({ key }) => {
+          if (key === 'manage') {
+            handleManageSettings(record);
+          }
+        };
+
+        return (
+          <Dropdown.Button
+            type="primary"
+            size="small"
+            menu={{ items: menuItems, onClick: onMenuClick }}
+            onClick={() => handleWorkspacePrimaryAction(record)}
+            icon={<DownOutlined />}
+          >
+            {primaryLabel}
+          </Dropdown.Button>
+        );
+      },
+    },
+  ];
 
   return (
     <div className="container mx-auto p-5">
@@ -87,8 +198,31 @@ export default function MyWorkspaces() {
       <Divider />
 
       <Row gutter={[16, 16]} className="mb-4">
-        <Col>
+        <Col xs={24} sm={12}>
           <Text strong>Total Active Workspaces: {activeCount}</Text>
+        </Col>
+        <Col
+          xs={24}
+          sm={12}
+          style={{ textAlign: 'right', marginTop: 8, marginBottom: 8 }}
+        >
+          <Button
+            type="default"
+            style={{ marginRight: 8 }}
+            onClick={() =>
+              router.push('/keenkonnect/workspaces/browse-available-workspaces')
+            }
+          >
+            Browse Available Workspaces
+          </Button>
+          <Button
+            type="primary"
+            onClick={() =>
+              router.push('/keenkonnect/workspaces/launch-new-workspace')
+            }
+          >
+            Launch New Workspace
+          </Button>
         </Col>
       </Row>
 
@@ -98,7 +232,7 @@ export default function MyWorkspaces() {
           <Select
             value={selectedProject}
             onChange={(value) => setSelectedProject(value)}
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginTop: 4 }}
             options={projectOptions.map((p) => ({ label: p, value: p }))}
           />
         </Col>
@@ -106,40 +240,16 @@ export default function MyWorkspaces() {
 
       <Divider />
 
-      <List
-        grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
+      <ProTable<Workspace>
+        rowKey="id"
+        columns={columns}
         dataSource={filteredWorkspaces}
-        renderItem={(workspace: Workspace) => (
-          <List.Item key={workspace.id}>
-            <Card
-              hoverable
-              title={workspace.name}
-              extra={
-                workspace.status === 'active' ? (
-                  <Badge status="success" text="Active" />
-                ) : (
-                  <Badge status="default" text="Inactive" />
-                )
-              }
-            >
-              <p>
-                <strong>Project:</strong> {workspace.project}
-              </p>
-              <p>
-                <strong>Description:</strong> {workspace.description}
-              </p>
-              <p>
-                <strong>Environment:</strong> {workspace.environment}
-              </p>
-              <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between' }}>
-                <Button type="primary" onClick={() => handleWorkspaceAction(workspace)}>
-                  {workspace.status === 'active' ? 'Join Now' : 'Launch'}
-                </Button>
-                <Button onClick={() => handleManageSettings(workspace)}>Manage Settings</Button>
-              </div>
-            </Card>
-          </List.Item>
-        )}
+        search={false}
+        pagination={{
+          pageSize: 5,
+          showSizeChanger: false,
+        }}
+        options={false}
       />
     </div>
   );

@@ -1,13 +1,18 @@
-// C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx
-
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import { Form, Input, Select, DatePicker, Button, Table, Row, Col, Card } from 'antd'
-import type { ColumnsType } from 'antd/es/table'
-import dayjs from 'dayjs'
-
-const { RangePicker } = DatePicker
+import Head from 'next/head'
+import { Card, Alert, Pagination, Tag } from 'antd'
+import type { PaginationProps } from 'antd'
+import dayjs, { Dayjs } from 'dayjs'
+import type { ProColumns } from '@ant-design/pro-components'
+import {
+  ProTable,
+  QueryFilter,
+  ProFormText,
+  ProFormSelect,
+  ProFormDateRangePicker,
+} from '@ant-design/pro-components'
 
 interface DocumentResource {
   key: string
@@ -21,193 +26,425 @@ interface DocumentResource {
   relevanceScore: number
 }
 
-type DateRange = [dayjs.Dayjs | null, dayjs.Dayjs | null] | null
+type DateRangeValue = [Dayjs, Dayjs] | undefined
+type SortOption = 'relevance' | 'date' | 'popularity'
 
-// Demo data
+interface FilterState {
+  keyword?: string
+  authors?: string[]
+  tags?: string[]
+  language?: string
+  dateRange?: DateRangeValue
+  sort: SortOption
+}
+
+// Demo data (même contenu que l’ancienne page)
 const sampleDocuments: DocumentResource[] = [
   {
     key: '1',
     title: 'Robotics Blueprint',
-    snippet: 'Detailed blueprint for advanced robotics design...',
+    snippet: 'Detailed blueprint for advanced robotics design.',
     author: 'Alice',
     tags: ['Robotics', 'Engineering'],
     language: 'English',
     version: '1.0',
     lastUpdated: '2023-09-01',
-    relevanceScore: 85,
+    relevanceScore: 95,
   },
   {
     key: '2',
-    title: 'Healthcare Protocols',
-    snippet: 'Updated protocols for modern healthcare systems...',
+    title: 'AI Ethics Guidelines',
+    snippet: 'Comprehensive guidelines for ethical AI development.',
     author: 'Bob',
-    tags: ['Healthcare', 'Medicine'],
-    language: 'French',
-    version: '2.1',
-    lastUpdated: '2023-08-28',
-    relevanceScore: 78,
-  },
-  {
-    key: '3',
-    title: 'AI Research Paper',
-    snippet: 'A research paper discussing the latest trends in AI...',
-    author: 'Charlie',
-    tags: ['Technology', 'AI'],
+    tags: ['AI', 'Ethics'],
     language: 'English',
-    version: '1.2',
-    lastUpdated: '2023-09-03',
+    version: '2.0',
+    lastUpdated: '2023-08-15',
     relevanceScore: 90,
   },
   {
+    key: '3',
+    title: 'Healthcare Innovation Report',
+    snippet: 'Annual report on innovation in healthcare technologies.',
+    author: 'Charlie',
+    tags: ['Healthcare', 'Innovation'],
+    language: 'French',
+    version: '1.2',
+    lastUpdated: '2023-07-20',
+    relevanceScore: 88,
+  },
+  {
     key: '4',
-    title: 'Sustainable Energy Report',
-    snippet: 'Comprehensive report on sustainable energy solutions...',
+    title: 'Environmental Impact Study',
+    snippet: 'Study on environmental impact of industrial activities.',
     author: 'Diana',
-    tags: ['Energy', 'Environment'],
+    tags: ['Environment', 'Sustainability'],
     language: 'English',
-    version: '3.0',
-    lastUpdated: '2023-08-20',
-    relevanceScore: 80,
+    version: '1.3',
+    lastUpdated: '2023-06-10',
+    relevanceScore: 85,
+  },
+  {
+    key: '5',
+    title: 'Quantum Computing Overview',
+    snippet: 'Introduction to quantum computing concepts and applications.',
+    author: 'Alice',
+    tags: ['Quantum', 'Computing'],
+    language: 'English',
+    version: '1.1',
+    lastUpdated: '2023-05-05',
+    relevanceScore: 92,
   },
 ]
 
-export default function SearchFilterDocuments() {
-  const [form] = Form.useForm()
+const allAuthors = Array.from(new Set(sampleDocuments.map((d) => d.author))).sort()
+const allTags = Array.from(
+  new Set(sampleDocuments.flatMap((d) => d.tags)),
+).sort()
+const allLanguages = Array.from(
+  new Set(sampleDocuments.map((d) => d.language)),
+).sort()
 
-  const [keyword, setKeyword] = useState<string>('')
-  const [authorFilter, setAuthorFilter] = useState<string[]>([])
-  const [tagFilter, setTagFilter] = useState<string[]>([])
-  const [dateRange, setDateRange] = useState<DateRange>(null)
-  const [sortCriteria, setSortCriteria] = useState<'relevance' | 'date' | 'popularity'>('relevance')
+const DEFAULT_SORT: SortOption = 'relevance'
+
+export default function SearchFilterDocumentsPage(): JSX.Element {
+  const [filters, setFilters] = useState<FilterState>({
+    sort: DEFAULT_SORT,
+  })
+  const [currentPage, setCurrentPage] = useState<number>(1)
+  const [pageSize, setPageSize] = useState<number>(5)
+
+  const handleFilterFinish = async (values: Record<string, any>) => {
+    const nextFilters: FilterState = {
+      keyword: values.keyword?.trim() || undefined,
+      authors: values.authors ?? [],
+      tags: values.tags ?? [],
+      language: values.language || undefined,
+      dateRange: values.dateRange as DateRangeValue,
+      sort: (values.sort as SortOption) ?? DEFAULT_SORT,
+    }
+
+    setFilters(nextFilters)
+    setCurrentPage(1)
+
+    // ProForm attend un bool pour onFinish
+    return true
+  }
+
+  const handleFilterReset = () => {
+    setFilters({ sort: DEFAULT_SORT })
+    setCurrentPage(1)
+  }
 
   const filteredDocuments = useMemo(() => {
+    const { keyword, authors, tags, language, dateRange } = filters
+
     return sampleDocuments.filter((doc) => {
       const matchesKeyword =
         !keyword ||
         doc.title.toLowerCase().includes(keyword.toLowerCase()) ||
         doc.snippet.toLowerCase().includes(keyword.toLowerCase())
 
-      const matchesAuthor = authorFilter.length === 0 || authorFilter.includes(doc.author)
+      const matchesAuthor =
+        !authors || authors.length === 0 || authors.includes(doc.author)
 
-      const matchesTags = tagFilter.length === 0 || tagFilter.every((t) => doc.tags.includes(t))
+      const matchesTags =
+        !tags ||
+        tags.length === 0 ||
+        tags.every((t) => doc.tags.includes(t))
+
+      const matchesLanguage =
+        !language || doc.language === language
 
       let matchesDate = true
       if (dateRange && dateRange[0] && dateRange[1]) {
+        const [start, end] = dateRange
         const docDate = dayjs(doc.lastUpdated)
-        matchesDate = docDate.isAfter(dateRange[0]) && docDate.isBefore(dateRange[1])
+
+        if (start) {
+          matchesDate =
+            docDate.isSame(start, 'day') || docDate.isAfter(start, 'day')
+        }
+        if (matchesDate && end) {
+          matchesDate =
+            docDate.isSame(end, 'day') || docDate.isBefore(end, 'day')
+        }
       }
 
-      return matchesKeyword && matchesAuthor && matchesTags && matchesDate
+      return (
+        matchesKeyword &&
+        matchesAuthor &&
+        matchesTags &&
+        matchesLanguage &&
+        matchesDate
+      )
     })
-  }, [keyword, authorFilter, tagFilter, dateRange])
+  }, [filters])
 
   const sortedDocuments = useMemo(() => {
     const docs = [...filteredDocuments]
-    if (sortCriteria === 'relevance') {
-      docs.sort((a, b) => b.relevanceScore - a.relevanceScore)
-    } else if (sortCriteria === 'date') {
-      docs.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime())
-    } else if (sortCriteria === 'popularity') {
-      // placeholder: implement when a popularity metric exists
-    }
-    return docs
-  }, [filteredDocuments, sortCriteria])
+    const sort = filters.sort
 
-  const columns: ColumnsType<DocumentResource> = [
-    { title: 'Title', dataIndex: 'title', key: 'title' },
-    { title: 'Snippet', dataIndex: 'snippet', key: 'snippet' },
-    { title: 'Author', dataIndex: 'author', key: 'author' },
-    { title: 'Language', dataIndex: 'language', key: 'language' },
-    { title: 'Version', dataIndex: 'version', key: 'version' },
-    { title: 'Last Updated', dataIndex: 'lastUpdated', key: 'lastUpdated' },
-    { title: 'Relevance', dataIndex: 'relevanceScore', key: 'relevanceScore' },
+    switch (sort) {
+      case 'date':
+        docs.sort(
+          (a, b) =>
+            new Date(b.lastUpdated).getTime() -
+            new Date(a.lastUpdated).getTime(),
+        )
+        break
+      case 'popularity':
+        // Placeholder : on réutilise le score de pertinence
+        docs.sort((a, b) => b.relevanceScore - a.relevanceScore)
+        break
+      case 'relevance':
+      default:
+        docs.sort((a, b) => b.relevanceScore - a.relevanceScore)
+        break
+    }
+
+    return docs
+  }, [filteredDocuments, filters.sort])
+
+  const paginatedDocuments = useMemo(() => {
+    const start = (currentPage - 1) * pageSize
+    const end = start + pageSize
+    return sortedDocuments.slice(start, end)
+  }, [sortedDocuments, currentPage, pageSize])
+
+  const total = sortedDocuments.length
+
+  const activeFilterCount = useMemo(() => {
+    let count = 0
+    if (filters.keyword && filters.keyword.trim()) count++
+    if (filters.authors && filters.authors.length > 0) count++
+    if (filters.tags && filters.tags.length > 0) count++
+    if (filters.language) count++
+    if (
+      filters.dateRange &&
+      filters.dateRange[0] &&
+      filters.dateRange[1]
+    ) {
+      count++
+    }
+    return count
+  }, [filters])
+
+  const columns: ProColumns<DocumentResource>[] = [
+    {
+      title: 'Title & Snippet',
+      dataIndex: 'title',
+      key: 'title',
+      ellipsis: true,
+      render: (_, record) => (
+        <div>
+          <div style={{ fontWeight: 500 }}>{record.title}</div>
+          <div
+            style={{
+              fontSize: 12,
+              color: 'rgba(0,0,0,0.45)',
+              marginTop: 4,
+            }}
+          >
+            {record.snippet}
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: 'Author',
+      dataIndex: 'author',
+      key: 'author',
+      width: 140,
+    },
+    {
+      title: 'Tags',
+      dataIndex: 'tags',
+      key: 'tags',
+      width: 220,
+      render: (_, record) => (
+        <>
+          {record.tags.map((tag) => (
+            <Tag key={tag}>{tag}</Tag>
+          ))}
+        </>
+      ),
+    },
+    {
+      title: 'Language',
+      dataIndex: 'language',
+      key: 'language',
+      width: 110,
+    },
+    {
+      title: 'Version',
+      dataIndex: 'version',
+      key: 'version',
+      width: 90,
+    },
+    {
+      title: 'Last Updated',
+      dataIndex: 'lastUpdated',
+      key: 'lastUpdated',
+      width: 140,
+    },
+    {
+      title: 'Relevance',
+      dataIndex: 'relevanceScore',
+      key: 'relevanceScore',
+      width: 120,
+      sorter: (a, b) => a.relevanceScore - b.relevanceScore,
+    },
   ]
 
+  const paginationProps: PaginationProps = {
+    current: currentPage,
+    pageSize,
+    total,
+    showSizeChanger: true,
+    pageSizeOptions: ['5', '10', '20'],
+    showTotal: (totalItems, range) =>
+      `${range[0]}-${range[1]} of ${totalItems} document${
+        totalItems > 1 ? 's' : ''
+      }`,
+    onChange: (page, size) => {
+      setCurrentPage(page)
+      setPageSize(size || pageSize)
+    },
+  }
+
+  const sortLabel = filters.sort
+    .toString()
+    .replace(/^\w/, (c) => c.toUpperCase())
+
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-2xl font-bold mb-4">Search &amp; Filter Documents</h1>
-
-      <Card className="mb-6">
-        <Form form={form} layout="vertical">
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12}>
-              <Form.Item label="Keywords">
-                <Input.Search
-                  placeholder="Enter keywords"
-                  allowClear
-                  onSearch={(v) => setKeyword(v)}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item label="Authors">
-                <Select
-                  mode="multiple"
-                  placeholder="Select authors"
-                  value={authorFilter}
-                  onChange={setAuthorFilter}
-                  options={['Alice', 'Bob', 'Charlie', 'Diana'].map((a) => ({
-                    value: a,
-                    label: a,
-                  }))}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item label="Tags">
-                <Select
-                  mode="multiple"
-                  placeholder="Select tags"
-                  value={tagFilter}
-                  onChange={setTagFilter}
-                  options={['Robotics', 'Healthcare', 'Technology', 'Energy', 'Environment'].map(
-                    (t) => ({ value: t, label: t }),
-                  )}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item label="Date Range">
-                <RangePicker onChange={(dates) => setDateRange(dates)} />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item label="Sort By">
-                <Select
-                  value={sortCriteria}
-                  onChange={(v) => setSortCriteria(v)}
-                  options={[
-                    { value: 'relevance', label: 'Relevance' },
-                    { value: 'date', label: 'Date' },
-                    { value: 'popularity', label: 'Popularity' },
-                  ]}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col xs={24} sm={12}>
-              <Form.Item>
-                <Button type="primary" onClick={() => form.submit()}>
-                  Apply Filters
-                </Button>
-              </Form.Item>
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-
-      <Card>
-        <Table<DocumentResource>
-          rowKey="key"
-          columns={columns}
-          dataSource={sortedDocuments}
-          pagination={{ pageSize: 5 }}
+    <>
+      <Head>
+        <title>KeenKonnect – Search &amp; Filter Documents</title>
+        <meta
+          name="description"
+          content="Advanced search and filtering for knowledge documents in KeenKonnect."
         />
-      </Card>
-    </div>
+      </Head>
+
+      <div className="container mx-auto p-5">
+        <h1 className="text-2xl font-bold mb-4">
+          Search &amp; Filter Documents
+        </h1>
+
+        {/* Bloc de filtres avancés (ProForm / QueryFilter) */}
+        <Card className="mb-4">
+          <QueryFilter
+            onFinish={handleFilterFinish}
+            onReset={handleFilterReset}
+            labelWidth="auto"
+            defaultCollapsed={false}
+            span={8}
+            initialValues={{ sort: DEFAULT_SORT }}
+          >
+            <ProFormText
+              name="keyword"
+              label="Keywords"
+              placeholder="Search by title or content"
+            />
+
+            <ProFormSelect
+              name="authors"
+              label="Authors"
+              placeholder="Select authors"
+              mode="multiple"
+              options={allAuthors.map((a) => ({
+                label: a,
+                value: a,
+              }))}
+            />
+
+            <ProFormSelect
+              name="tags"
+              label="Tags"
+              placeholder="Select tags"
+              mode="multiple"
+              options={allTags.map((t) => ({
+                label: t,
+                value: t,
+              }))}
+            />
+
+            <ProFormSelect
+              name="language"
+              label="Language"
+              placeholder="All languages"
+              allowClear
+              options={allLanguages.map((lang) => ({
+                label: lang,
+                value: lang,
+              }))}
+            />
+
+            <ProFormDateRangePicker
+              name="dateRange"
+              label="Last Updated"
+              placeholder={['From', 'To']}
+            />
+
+            <ProFormSelect
+              name="sort"
+              label="Sort By"
+              options={[
+                { label: 'Relevance', value: 'relevance' },
+                { label: 'Date', value: 'date' },
+                { label: 'Popularity', value: 'popularity' },
+              ]}
+            />
+          </QueryFilter>
+        </Card>
+
+        {/* Alert de synthèse des résultats / filtres */}
+        <Alert
+          type={total === 0 ? 'warning' : 'info'}
+          showIcon
+          className="mb-4"
+          message={
+            total === 0
+              ? 'No documents match your criteria.'
+              : `${total} document${total > 1 ? 's' : ''} match your criteria.`
+          }
+          description={
+            <div style={{ fontSize: 12 }}>
+              <div>
+                Sort:{' '}
+                <strong>
+                  {sortLabel}
+                </strong>
+              </div>
+              <div>
+                Active filters:{' '}
+                <strong>{activeFilterCount}</strong>
+              </div>
+            </div>
+          }
+        />
+
+        {/* Tableau principal (ProTable) + Pagination externe */}
+        <Card>
+          <ProTable<DocumentResource>
+            rowKey="key"
+            columns={columns}
+            dataSource={paginatedDocuments}
+            search={false}
+            options={false}
+            pagination={false} // Pagination gérée manuellement en dessous
+            rowSelection={false}
+            toolBarRender={false}
+          />
+
+          {total > 0 && (
+            <div style={{ marginTop: 16, textAlign: 'right' }}>
+              <Pagination {...paginationProps} />
+            </div>
+          )}
+        </Card>
+      </div>
+    </>
   )
 }

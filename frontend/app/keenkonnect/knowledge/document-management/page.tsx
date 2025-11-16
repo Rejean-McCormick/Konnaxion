@@ -1,220 +1,754 @@
-'use client'
+'use client';
 
-/**
- * KeenKonnect · Knowledge · Document Management
- *
- * Static, typed demo page showing:
- * - document content
- * - editable panel
- * - metadata
- * - version history
- * - comments thread
- *
- * Layout is handled by app/keenkonnect/layout.tsx (MainLayout),
- * so this page only renders its own content.
- */
-
-import React, { useState } from 'react'
-import Head from 'next/head'
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  Row,
-  Col,
-  Card,
-  Button,
-  Input,
-  Timeline,
-  Divider,
-  List,
   Avatar,
-  message as antdMessage,
-} from 'antd'
-import { SaveOutlined, UploadOutlined, EditOutlined } from '@ant-design/icons'
-import { Comment } from '@ant-design/compatible'
+  Button,
+  Card,
+  Col,
+  Divider,
+  Drawer,
+  Input,
+  List,
+  Row,
+  Space,
+  Switch,
+  Tag,
+  Tooltip,
+  message,
+} from 'antd';
+import {
+  EyeOutlined,
+  PlusOutlined,
+  SaveOutlined,
+  UploadOutlined,
+} from '@ant-design/icons';
+import {
+  EditableProTable,
+  ModalForm,
+  ProFormSelect,
+  ProFormSwitch,
+  ProFormText,
+  ProFormTextArea,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import { Comment } from '@ant-design/compatible';
+import usePageTitle from '@/hooks/usePageTitle';
 
-const { TextArea } = Input
+const { TextArea } = Input;
+
+type DocumentStatus = 'Draft' | 'Published' | 'Archived';
+
+type ManagedDocument = {
+  id: string;
+  title: string;
+  category: string;
+  language: string;
+  owner: string;
+  status: DocumentStatus;
+  aiIndexed: boolean;
+  visible: boolean;
+  version: string;
+  updatedAt: string;
+  tags: string[];
+  summary: string;
+};
 
 type VersionItem = {
-  key: string
-  time: string
-  event: string
-}
+  version: string;
+  timestamp: string;
+  author: string;
+  changeSummary: string;
+};
 
 type CommentItem = {
-  author: string
-  avatar: string
-  content: React.ReactNode
-  datetime: string
-}
+  id: number;
+  author: string;
+  avatar: string;
+  content: string;
+  datetime: string;
+};
 
-const documentMetadata = {
-  title: 'Innovative Research Document',
-  createdAt: '2023-08-01',
-  lastModified: '2023-09-05',
-  version: '2.0',
-  language: 'English',
-}
+type NewDocumentFormValues = {
+  title: string;
+  category: string;
+  language: string;
+  owner?: string;
+  status?: DocumentStatus;
+  aiIndexed?: boolean;
+  visible?: boolean;
+  tags?: string[];
+  summary?: string;
+};
+
+const initialDocuments: ManagedDocument[] = [
+  {
+    id: 'doc-1',
+    title: 'Innovative Research Document',
+    category: 'Research',
+    language: 'English',
+    owner: 'Dr. Alice Chen',
+    status: 'Published',
+    aiIndexed: true,
+    visible: true,
+    version: '1.4',
+    updatedAt: '2025-05-12',
+    tags: ['robotics', 'clinical-trials'],
+    summary:
+      'Over the last three funding cycles, the robotics and clinical teams have collaborated on a shared protocol that aligns safety thresholds and trial milestones across sites.',
+  },
+  {
+    id: 'doc-2',
+    title: 'Robotics Safety Guidelines – v2',
+    category: 'Safety & Compliance',
+    language: 'English',
+    owner: 'Security Office',
+    status: 'Draft',
+    aiIndexed: false,
+    visible: true,
+    version: '2.0-draft',
+    updatedAt: '2025-04-30',
+    tags: ['safety', 'protocol'],
+    summary:
+      'Draft revision of robotics safety guidelines, including new proximity sensor checks and human-in-the-loop overrides for high‑risk procedures.',
+  },
+  {
+    id: 'doc-3',
+    title: 'Clinical Trial Template (Phase II)',
+    category: 'Clinical Protocol',
+    language: 'French',
+    owner: 'Clinical Ops',
+    status: 'Published',
+    aiIndexed: true,
+    visible: true,
+    version: '1.1',
+    updatedAt: '2025-03-18',
+    tags: ['template', 'phase-II'],
+    summary:
+      'Standardized template for Phase II clinical trials, ready for localization and site‑specific amendments.',
+  },
+  {
+    id: 'doc-4',
+    title: 'Legacy Device Integration Notes',
+    category: 'Design Blueprint',
+    language: 'English',
+    owner: 'Systems Engineering',
+    status: 'Archived',
+    aiIndexed: false,
+    visible: false,
+    version: '0.9',
+    updatedAt: '2024-12-02',
+    tags: ['legacy', 'integration'],
+    summary:
+      'Historical notes on integrating first‑generation devices with the current control stack. Kept for traceability.',
+  },
+  {
+    id: 'doc-5',
+    title: 'Onboarding Learning Module – Robotics Basics',
+    category: 'Learning Module',
+    language: 'French',
+    owner: 'People & Culture',
+    status: 'Published',
+    aiIndexed: true,
+    visible: true,
+    version: '1.0',
+    updatedAt: '2025-01-10',
+    tags: ['onboarding', 'training'],
+    summary:
+      'Introductory learning module that covers robotics fundamentals, safety posture, and escalation paths for new team members.',
+  },
+];
 
 const versionHistory: VersionItem[] = [
-  { key: '1', time: '2023-08-05', event: 'Version 1.0 created by Alice' },
-  { key: '2', time: '2023-08-20', event: 'Version 1.5 updated by Bob' },
-  { key: '3', time: '2023-09-05', event: 'Version 2.0 published by Alice' },
-]
+  {
+    version: '1.4',
+    timestamp: '2025-05-12 10:15',
+    author: 'Dr. Alice Chen',
+    changeSummary: 'Clarified safety thresholds for Phase II trials.',
+  },
+  {
+    version: '1.3',
+    timestamp: '2025-03-28 16:42',
+    author: 'Dr. Omar El‑Sayed',
+    changeSummary: 'Added cross-site comparison metrics and monitoring hooks.',
+  },
+  {
+    version: '1.2',
+    timestamp: '2024-12-09 09:20',
+    author: 'Dr. Helena Ruiz',
+    changeSummary: 'Aligned terminology with the institutional ethics committee.',
+  },
+  {
+    version: '1.1',
+    timestamp: '2024-07-18 14:55',
+    author: 'Dr. Alice Chen',
+    changeSummary: 'Initial roll‑out for robotics–clinical protocol harmonization.',
+  },
+];
 
 const commentsData: CommentItem[] = [
   {
-    author: 'John',
-    avatar: '/avatars/john.png',
-    content: <p>Great improvements in this version!</p>,
-    datetime: '2023-09-06 09:15',
+    id: 1,
+    author: 'Dr. Alice Chen',
+    avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
+    content:
+      'Let’s keep the safety thresholds conservative for the first pilot sites. We can relax them once we have stable telemetry.',
+    datetime: '2 hours ago',
   },
   {
-    author: 'Emma',
-    avatar: '/avatars/emma.png',
-    content: <p>I suggest adding more details in the methodology section.</p>,
-    datetime: '2023-09-06 10:20',
+    id: 2,
+    author: 'Dr. Omar El‑Sayed',
+    avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
+    content:
+      'Agreed. I’d also like to add one more metric around post‑op mobility for the robotics‑assisted procedures.',
+    datetime: '1 hour ago',
   },
-]
+  {
+    id: 3,
+    author: 'Dr. Helena Ruiz',
+    avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
+    content:
+      'Once this goes live, I’ll present it to the ethics board. Please tag any sections you expect to change in the next revision.',
+    datetime: '25 minutes ago',
+  },
+];
 
-export default function DocumentManagementPage(): JSX.Element {
-  const userCanEdit = true
+const getStatusColor = (status: DocumentStatus): string => {
+  switch (status) {
+    case 'Published':
+      return 'green';
+    case 'Draft':
+      return 'gold';
+    case 'Archived':
+    default:
+      return 'default';
+  }
+};
 
-  const [documentContent, setDocumentContent] = useState<string>(
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum pretium, risus at fermentum cursus, purus lacus scelerisque dolor, nec dictum augue mi ut ligula. Sed vitae nisl vel metus tincidunt interdum.',
-  )
+export default function DocumentManagementPage() {
+  usePageTitle('KeenKonnect · Knowledge · Document Management');
+  const router = useRouter();
+
+  const [dataSource, setDataSource] = useState<ManagedDocument[]>(initialDocuments);
+  const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [selectedDocument, setSelectedDocument] =
+    useState<ManagedDocument | null>(null);
+
+  const updateDocument = (id: string, patch: Partial<ManagedDocument>) => {
+    setDataSource(prev =>
+      prev.map(item => (item.id === id ? { ...item, ...patch } : item)),
+    );
+    setSelectedDocument(prev =>
+      prev && prev.id === id ? ({ ...prev, ...patch } as ManagedDocument) : prev,
+    );
+  };
 
   const handleSaveChanges = () => {
-    // Simulate an API call
-    // In real usage, replace with your mutation:
-    // await api.patch('/knowledge/documents/:id', { content: documentContent })
+    if (!selectedDocument) return;
+    // Simulation d’un appel API
     // eslint-disable-next-line no-console
-    console.log('Saving changes:', documentContent)
-    antdMessage.success('Changes saved successfully.')
-  }
+    console.log('Saving changes for document', selectedDocument.id);
+    message.success('Changes saved (simulated).');
+  };
 
   const handlePublishNewVersion = () => {
-    // Simulate publish
+    if (!selectedDocument) return;
     // eslint-disable-next-line no-console
-    console.log('Publishing new version…')
-    antdMessage.success('New version published successfully.')
-  }
+    console.log('Publishing new version for document', selectedDocument.id);
+    message.success('New version published (simulated).');
+  };
+
+  const handleCreateDocument = async (values: NewDocumentFormValues) => {
+    const now = new Date();
+    const newDoc: ManagedDocument = {
+      id: `doc-${now.getTime()}`,
+      title: values.title,
+      category: values.category,
+      language: values.language,
+      owner: values.owner || 'You',
+      status: values.status || 'Draft',
+      aiIndexed: values.aiIndexed ?? true,
+      visible: values.visible ?? true,
+      version: '1.0',
+      updatedAt: now.toISOString().slice(0, 10),
+      tags: values.tags && values.tags.length ? values.tags : ['draft'],
+      summary:
+        values.summary ||
+        'New document created from Document Management. Replace this text with the actual content or link to your storage layer.',
+    };
+
+    setDataSource(prev => [...prev, newDoc]);
+    setSelectedDocument(newDoc);
+    setDrawerOpen(true);
+    message.success('Document entry created (local example).');
+
+    return true;
+  };
+
+  const columns: ProColumns<ManagedDocument>[] = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      ellipsis: true,
+      copyable: true,
+      formItemProps: {
+        rules: [{ required: true, message: 'Title is required' }],
+      },
+    },
+    {
+      title: 'Category',
+      dataIndex: 'category',
+      valueType: 'select',
+      filters: true,
+      onFilter: true,
+      valueEnum: {
+        Research: { text: 'Research' },
+        'Safety & Compliance': { text: 'Safety & Compliance' },
+        'Clinical Protocol': { text: 'Clinical Protocol' },
+        'Design Blueprint': { text: 'Design Blueprint' },
+        'Learning Module': { text: 'Learning Module' },
+      },
+    },
+    {
+      title: 'Language',
+      dataIndex: 'language',
+      valueType: 'select',
+      filters: true,
+      onFilter: true,
+      valueEnum: {
+        English: { text: 'English' },
+        French: { text: 'French' },
+      },
+      width: 110,
+    },
+    {
+      title: 'Owner',
+      dataIndex: 'owner',
+      width: 180,
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      valueType: 'select',
+      filters: true,
+      onFilter: true,
+      valueEnum: {
+        Draft: { text: 'Draft', status: 'Default' },
+        Published: { text: 'Published', status: 'Success' },
+        Archived: { text: 'Archived', status: 'Default' },
+      },
+      render: (_, record) => (
+        <Tag color={getStatusColor(record.status)}>{record.status}</Tag>
+      ),
+      width: 120,
+    },
+    {
+      title: 'AI indexing',
+      dataIndex: 'aiIndexed',
+      valueType: 'switch',
+      render: (_, record) => (
+        <Tooltip
+          title={
+            record.aiIndexed
+              ? 'Document is used by assistants and semantic search.'
+              : 'Document is excluded from AI‑powered features.'
+          }
+        >
+          <Switch
+            size="small"
+            checked={record.aiIndexed}
+            onChange={checked => updateDocument(record.id, { aiIndexed: checked })}
+          />
+        </Tooltip>
+      ),
+      width: 140,
+    },
+    {
+      title: 'Visible',
+      dataIndex: 'visible',
+      valueType: 'switch',
+      render: (_, record) => (
+        <Switch
+          size="small"
+          checked={record.visible}
+          onChange={checked => updateDocument(record.id, { visible: checked })}
+        />
+      ),
+      width: 110,
+    },
+    {
+      title: 'Tags',
+      dataIndex: 'tags',
+      search: false,
+      render: (_, record) =>
+        record.tags && record.tags.length ? (
+          <Space size={[0, 8]} wrap>
+            {record.tags.map(tag => (
+              <Tag key={tag}>{tag}</Tag>
+            ))}
+          </Space>
+        ) : (
+          <span style={{ color: '#999' }}>—</span>
+        ),
+    },
+    {
+      title: 'Last updated',
+      dataIndex: 'updatedAt',
+      valueType: 'date',
+      sorter: (a, b) =>
+        new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime(),
+      width: 140,
+    },
+    {
+      title: 'Version',
+      dataIndex: 'version',
+      width: 90,
+    },
+    {
+      title: 'Actions',
+      valueType: 'option',
+      fixed: 'right',
+      width: 170,
+      render: (_, record, __, action) => [
+        <a
+          key="view"
+          onClick={() => {
+            setSelectedDocument(record);
+            setDrawerOpen(true);
+          }}
+        >
+          Details
+        </a>,
+        <a
+          key="edit"
+          onClick={() => {
+            (action as any)?.startEditable?.(record.id);
+          }}
+        >
+          Edit
+        </a>,
+      ],
+    },
+  ];
 
   return (
-    <>
-      <Head>
-        <title>Document Management</title>
-        <meta
-          name="description"
-          content="Manage and edit your knowledge documents, view version history, and collaborate with reviewers."
-        />
-      </Head>
+    <div className="container mx-auto p-5">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-bold">Document Management</h1>
+          <p className="text-gray-500">
+            Manage your knowledge documents, control AI indexing and visibility, and
+            inspect versions and comments from one place.
+          </p>
+        </div>
+        <Space>
+          <Button
+            onClick={() =>
+              router.push('/keenkonnect/knowledge/browse-repository')
+            }
+          >
+            Go to library view
+          </Button>
+        </Space>
+      </div>
 
-      <div className="container mx-auto p-5">
-        {/* Page Header */}
-        <h1 className="text-2xl font-bold mb-4">Document Management</h1>
+      <EditableProTable<ManagedDocument>
+        rowKey="id"
+        bordered
+        size="small"
+        value={dataSource}
+        // important: value from EditableProTable is readonly, so clone it
+        onChange={(value: readonly ManagedDocument[]) =>
+          setDataSource([...value])
+        }
+        maxLength={50}
+        recordCreatorProps={{
+          position: 'bottom',
+          newRecordType: 'dataSource',
+          record: () => ({
+            id: `temp-${Date.now()}`,
+            title: 'New document',
+            category: 'Research',
+            language: 'English',
+            owner: 'You',
+            status: 'Draft' as DocumentStatus,
+            aiIndexed: true,
+            visible: true,
+            version: '0.1',
+            updatedAt: new Date().toISOString().slice(0, 10),
+            tags: ['draft'],
+            summary:
+              'New draft document created inline from the table. Use the drawer to refine metadata and content.',
+          }),
+        }}
+        toolBarRender={() => [
+          <ModalForm<NewDocumentFormValues>
+            key="new"
+            title="Add document entry"
+            trigger={
+              <Button type="primary" icon={<PlusOutlined />}>
+                New document
+              </Button>
+            }
+            modalProps={{ destroyOnClose: true }}
+            initialValues={{
+              status: 'Draft',
+              language: 'English',
+              aiIndexed: true,
+              visible: true,
+            }}
+            onFinish={handleCreateDocument}
+          >
+            <ProFormText
+              name="title"
+              label="Title"
+              rules={[{ required: true, message: 'Please enter a title' }]}
+            />
+            <ProFormSelect
+              name="category"
+              label="Category"
+              options={[
+                { label: 'Research', value: 'Research' },
+                { label: 'Safety & Compliance', value: 'Safety & Compliance' },
+                { label: 'Clinical Protocol', value: 'Clinical Protocol' },
+                { label: 'Design Blueprint', value: 'Design Blueprint' },
+                { label: 'Learning Module', value: 'Learning Module' },
+              ]}
+              rules={[{ required: true, message: 'Please choose a category' }]}
+            />
+            <ProFormSelect
+              name="language"
+              label="Language"
+              options={[
+                { label: 'English', value: 'English' },
+                { label: 'French', value: 'French' },
+              ]}
+              rules={[{ required: true, message: 'Please choose a language' }]}
+            />
+            <ProFormText name="owner" label="Owner" />
+            <ProFormSelect
+              name="status"
+              label="Status"
+              options={[
+                { label: 'Draft', value: 'Draft' },
+                { label: 'Published', value: 'Published' },
+                { label: 'Archived', value: 'Archived' },
+              ]}
+            />
+            <ProFormSelect
+              name="tags"
+              label="Tags"
+              mode="tags"
+              fieldProps={{
+                tokenSeparators: [','],
+              }}
+              placeholder="Add tags (press Enter or comma)"
+            />
+            <ProFormSwitch
+              name="aiIndexed"
+              label="Include in AI indexing"
+            />
+            <ProFormSwitch
+              name="visible"
+              label="Visible in library"
+            />
+            <ProFormTextArea
+              name="summary"
+              label="Short content / summary"
+              fieldProps={{ rows: 4 }}
+            />
+          </ModalForm>,
+          <Button
+            key="upload"
+            icon={<UploadOutlined />}
+            onClick={() =>
+              router.push('/keenkonnect/knowledge/upload-new-document')
+            }
+          >
+            Upload new file
+          </Button>,
+        ]}
+        columns={columns}
+        editable={{
+          type: 'multiple',
+          editableKeys,
+          onChange: setEditableRowKeys,
+          onSave: async (_key, row) => {
+            setDataSource(prev =>
+              prev.map(item => (item.id === row.id ? { ...item, ...row } : item)),
+            );
+          },
+        }}
+      />
 
-        <Row gutter={16}>
-          {/* Left Panel: Content Viewer */}
-          <Col xs={24} md={14}>
-            <Card title="Document Content" style={{ height: '100%', overflowY: 'auto' }}>
-              <div style={{ padding: 20 }}>
-                <p>{documentContent}</p>
+      <Drawer
+        title={selectedDocument ? 'Document details' : undefined}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        width={1000}
+        destroyOnClose
+      >
+        {selectedDocument && (
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="mb-1 text-xl font-semibold">
+                  {selectedDocument.title}
+                </h2>
+                <div className="text-sm text-gray-500">
+                  Last updated {selectedDocument.updatedAt} · Owner{' '}
+                  {selectedDocument.owner}
+                </div>
               </div>
-            </Card>
-          </Col>
+              <Space wrap>
+                <Tag color={getStatusColor(selectedDocument.status)}>
+                  {selectedDocument.status}
+                </Tag>
+                {selectedDocument.tags.map(tag => (
+                  <Tag key={tag}>{tag}</Tag>
+                ))}
+              </Space>
+            </div>
 
-          {/* Right Panel: Editor, Metadata, Version History & Comments */}
-          <Col xs={24} md={10}>
-            {/* Editor Panel (if editable) */}
-            <Card
-              title={userCanEdit ? 'Edit Document' : 'Document Details'}
-              extra={
-                userCanEdit ? (
-                  <Button icon={<EditOutlined />} onClick={() => {}}>
-                    Edit
-                  </Button>
-                ) : null
-              }
-              className="mb-4"
-            >
-              {userCanEdit ? (
-                <>
+            <Row gutter={16}>
+              <Col xs={24} md={14}>
+                <Card
+                  title="Real‑time editing (simulated)"
+                  extra={
+                    <Tooltip title="Open full editor in Konstruct (future integration)">
+                      <Button type="link" icon={<EyeOutlined />}>
+                        Open in Konstruct
+                      </Button>
+                    </Tooltip>
+                  }
+                >
                   <TextArea
                     rows={10}
-                    value={documentContent}
-                    onChange={(e) => setDocumentContent(e.target.value)}
+                    value={selectedDocument.summary}
+                    onChange={e =>
+                      updateDocument(selectedDocument.id, {
+                        summary: e.target.value,
+                      })
+                    }
                   />
                   <Divider />
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Space>
                     <Button
                       type="primary"
                       icon={<SaveOutlined />}
                       onClick={handleSaveChanges}
                     >
-                      Save Changes
+                      Save changes
                     </Button>
                     <Button
-                      type="default"
                       icon={<UploadOutlined />}
                       onClick={handlePublishNewVersion}
                     >
-                      Publish New Version
+                      Publish new version
                     </Button>
-                  </div>
-                </>
-              ) : (
-                <p>{documentContent}</p>
-              )}
-            </Card>
+                  </Space>
+                </Card>
+              </Col>
 
-            {/* Metadata Sidebar */}
-            <Card title="Document Metadata" className="mb-4">
-              <p>
-                <strong>Title:</strong> {documentMetadata.title}
-              </p>
-              <p>
-                <strong>Created At:</strong> {documentMetadata.createdAt}
-              </p>
-              <p>
-                <strong>Last Modified:</strong> {documentMetadata.lastModified}
-              </p>
-              <p>
-                <strong>Version:</strong> {documentMetadata.version}
-              </p>
-              <p>
-                <strong>Language:</strong> {documentMetadata.language}
-              </p>
-            </Card>
+              <Col xs={24} md={10}>
+                <Card title="Metadata & access control">
+                  <p>
+                    <strong>Category:</strong> {selectedDocument.category}
+                  </p>
+                  <p>
+                    <strong>Language:</strong> {selectedDocument.language}
+                  </p>
+                  <p>
+                    <strong>Version:</strong> {selectedDocument.version}
+                  </p>
+                  <p>
+                    <strong>AI indexing:</strong>{' '}
+                    <Switch
+                      size="small"
+                      checked={selectedDocument.aiIndexed}
+                      onChange={checked =>
+                        updateDocument(selectedDocument.id, {
+                          aiIndexed: checked,
+                        })
+                      }
+                    />
+                  </p>
+                  <p>
+                    <strong>Visible in library:</strong>{' '}
+                    <Switch
+                      size="small"
+                      checked={selectedDocument.visible}
+                      onChange={checked =>
+                        updateDocument(selectedDocument.id, {
+                          visible: checked,
+                        })
+                      }
+                    />
+                  </p>
+                  <p>
+                    <strong>Tags:</strong>{' '}
+                    {selectedDocument.tags.length ? (
+                      <Space size={[0, 8]} wrap>
+                        {selectedDocument.tags.map(tag => (
+                          <Tag key={tag}>{tag}</Tag>
+                        ))}
+                      </Space>
+                    ) : (
+                      <span style={{ color: '#999' }}>None</span>
+                    )}
+                  </p>
+                </Card>
 
-            {/* Version History */}
-            <Card title="Version History" className="mb-4">
-              <Timeline>
-                {versionHistory.map((version) => (
-                  <Timeline.Item key={version.key}>
-                    <strong>{version.time}</strong> - {version.event}
-                  </Timeline.Item>
-                ))}
-              </Timeline>
-              <Button type="link">Compare / Restore Versions</Button>
-            </Card>
-
-            {/* Comments / Collaboration Thread */}
-            <Card title="Comments" className="mb-4">
-              <List
-                itemLayout="horizontal"
-                dataSource={commentsData}
-                renderItem={(comment) => (
-                  <Comment
-                    author={comment.author}
-                    avatar={<Avatar src={comment.avatar} />}
-                    content={comment.content}
-                    datetime={comment.datetime}
+                <Card title="Version history" className="mt-4">
+                  <List
+                    size="small"
+                    dataSource={versionHistory}
+                    renderItem={item => (
+                      <List.Item key={item.version}>
+                        <List.Item.Meta
+                          title={`${item.version} · ${item.timestamp}`}
+                          description={
+                            <>
+                              <div>
+                                <strong>{item.author}</strong>
+                              </div>
+                              <div>{item.changeSummary}</div>
+                            </>
+                          }
+                        />
+                      </List.Item>
+                    )}
                   />
-                )}
-              />
-            </Card>
-          </Col>
-        </Row>
-      </div>
-    </>
-  )
+                  <Button
+                    type="link"
+                    style={{ padding: 0, marginTop: 8 }}
+                  >
+                    Compare / restore versions
+                  </Button>
+                </Card>
+
+                <Card title="Comments (simulated thread)" className="mt-4">
+                  <List
+                    itemLayout="horizontal"
+                    dataSource={commentsData}
+                    renderItem={comment => (
+                      <Comment
+                        key={comment.id}
+                        author={comment.author}
+                        avatar={<Avatar src={comment.avatar} />}
+                        content={comment.content}
+                        datetime={comment.datetime}
+                      />
+                    )}
+                  />
+                </Card>
+              </Col>
+            </Row>
+          </Space>
+        )}
+      </Drawer>
+    </div>
+  );
 }

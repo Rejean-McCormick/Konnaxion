@@ -1,119 +1,681 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { Card, Steps, Progress, Button, Typography, Empty } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Empty,
+  Progress,
+  Row,
+  Skeleton,
+  Space,
+  Tabs,
+  Tag,
+  Typography,
+  message as antdMessage,
+  Select,
+} from 'antd';
+import type { TabsProps } from 'antd';
+import { ClockCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
-const { Title, Paragraph } = Typography;
-const { Step } = Steps;
+const { Text, Paragraph, Title } = Typography;
+const { Option } = Select;
 
-type Lesson = { id: string; name: string; completed: boolean; href?: string };
-type LearningPath = {
+type LearningPathStatus = 'active' | 'completed' | 'archived';
+
+type Level = 'Beginner' | 'Intermediate' | 'Advanced';
+
+interface LearningPathProgress {
+  completedItems: number;
+  totalItems: number;
+  percentage: number;
+  lastActivityAt?: string;
+}
+
+interface LearningPath {
   id: string;
   title: string;
   description: string;
-  lessons: Lesson[];
+  level?: Level;
+  tags?: string[];
+  estimatedMinutes?: number;
+  status: LearningPathStatus;
+  progress: LearningPathProgress;
+  startedAt?: string;
+  completedAt?: string | null;
+  // Optional link to the next resource in the path
+  nextResourceHref?: string;
+  nextResourceLabel?: string;
+}
+
+type TabKey = 'active' | 'completed' | 'all';
+type SortKey = 'recent' | 'progress' | 'title';
+
+/**
+ * Fallback mock data so the page stays functional even without the backend.
+ * Replace this with real API data once endpoints are wired.
+ */
+const MOCK_LEARNING_PATHS: LearningPath[] = [
+  {
+    id: 'lp-beginner-web',
+    title: 'Beginner Web Development',
+    description:
+      'A structured path introducing HTML, CSS, and JavaScript fundamentals for first-time learners.',
+    level: 'Beginner',
+    tags: ['Web', 'Foundations', 'HTML/CSS/JS'],
+    estimatedMinutes: 360,
+    status: 'active',
+    progress: {
+      completedItems: 3,
+      totalItems: 5,
+      percentage: 60,
+      lastActivityAt: '2025-01-05T15:30:00Z',
+    },
+    startedAt: '2025-01-01T09:00:00Z',
+    completedAt: null,
+    nextResourceHref:
+      '/konnected/learning-library/browse-resources?pathId=lp-beginner-web',
+    nextResourceLabel: 'Continue with CSS Layouts',
+  },
+  {
+    id: 'lp-ai-ethics',
+    title: 'AI & Ethics',
+    description:
+      'Explore responsible AI design, bias mitigation, and governance frameworks across industries.',
+    level: 'Intermediate',
+    tags: ['AI', 'Ethics', 'Governance'],
+    estimatedMinutes: 420,
+    status: 'active',
+    progress: {
+      completedItems: 1,
+      totalItems: 6,
+      percentage: 17,
+      lastActivityAt: '2025-01-03T10:15:00Z',
+    },
+    startedAt: '2025-01-02T11:00:00Z',
+    completedAt: null,
+    nextResourceHref:
+      '/konnected/learning-library/browse-resources?pathId=lp-ai-ethics',
+    nextResourceLabel: 'Resume: What is Responsible AI?',
+  },
+  {
+    id: 'lp-sustainability',
+    title: 'Sustainability & Impact Projects',
+    description:
+      'A curated sequence of resources to design, measure, and communicate sustainability projects.',
+    level: 'Advanced',
+    tags: ['Sustainability', 'Impact', 'Measurement'],
+    estimatedMinutes: 540,
+    status: 'completed',
+    progress: {
+      completedItems: 8,
+      totalItems: 8,
+      percentage: 100,
+      lastActivityAt: '2024-12-20T16:00:00Z',
+    },
+    startedAt: '2024-11-15T09:00:00Z',
+    completedAt: '2024-12-20T16:00:00Z',
+    nextResourceHref:
+      '/konnected/learning-library/recommended-resources?fromPath=lp-sustainability',
+    nextResourceLabel: 'Go to recommended follow-ups',
+  },
+];
+
+function normalizeLearningPath(raw: any): LearningPath {
+  const totalItems =
+    raw?.progress?.totalItems ??
+    raw?.totalItems ??
+    raw?.modulesCount ??
+    raw?.resourcesCount ??
+    0;
+  const completedItems =
+    raw?.progress?.completedItems ??
+    raw?.completedItems ??
+    raw?.completedModules ??
+    0;
+  const percentage =
+    raw?.progress?.percentage ??
+    (totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0);
+
+  const status: LearningPathStatus =
+    raw?.status && ['active', 'completed', 'archived'].includes(raw.status)
+      ? raw.status
+      : percentage === 100
+      ? 'completed'
+      : 'active';
+
+  return {
+    id: String(raw.id ?? raw.learning_path_id ?? raw.slug ?? crypto.randomUUID()),
+    title: raw.title ?? raw.name ?? 'Untitled learning path',
+    description: raw.description ?? raw.summary ?? '',
+    level: raw.level as Level | undefined,
+    tags: raw.tags ?? raw.tagList ?? [],
+    estimatedMinutes:
+      raw.estimatedMinutes ?? raw.estimated_duration_minutes ?? undefined,
+    status,
+    progress: {
+      completedItems,
+      totalItems,
+      percentage,
+      lastActivityAt:
+        raw.progress?.lastActivityAt ??
+        raw.progress?.last_activity_at ??
+        raw.lastActivityAt ??
+        raw.last_activity_at ??
+        raw.updatedAt ??
+        raw.updated_at,
+    },
+    startedAt: raw.startedAt ?? raw.started_at,
+    completedAt: raw.completedAt ?? raw.completed_at ?? null,
+    nextResourceHref:
+      raw.nextResourceHref ??
+      raw.next_resource_href ??
+      (typeof window !== 'undefined' && raw.id
+        ? `/konnected/learning-library/browse-resources?pathId=${raw.id}`
+        : undefined),
+    nextResourceLabel:
+      raw.nextResourceLabel ??
+      raw.next_resource_label ??
+      undefined,
+  };
+}
+
+type MyLearningPathsApiResponse = {
+  items?: unknown[];
+  results?: unknown[];
 };
 
-const initialLearningPath: LearningPath = {
-  id: '1',
-  title: 'Beginner Web Development',
-  description:
-    'A comprehensive path to learn web development from scratch. You will start with HTML and CSS and move on to JavaScript and modern frameworks.',
-  lessons: [
-    { id: '1', name: 'HTML Basics', completed: true },
-    { id: '2', name: 'CSS Fundamentals', completed: true },
-    { id: '3', name: 'Introduction to JavaScript', completed: false },
-    { id: '4', name: 'Responsive Design', completed: false },
-    { id: '5', name: 'Basic React', completed: false },
-  ],
-};
+async function fetchMyLearningPaths(): Promise<LearningPath[]> {
+  try {
+    // Aligns with the OpenAPI "my learning paths" use-case.
+    const res = await fetch('/api/konnected/learning-paths/my', {
+      method: 'GET',
+      cache: 'no-store',
+    });
 
-export default function Page() {
+    if (!res.ok) {
+      throw new Error(`Failed to load learning paths (${res.status})`);
+    }
+
+    const json = (await res.json()) as MyLearningPathsApiResponse | unknown[];
+
+    const rawList: unknown[] = Array.isArray(json)
+      ? json
+      : (json.items ?? json.results ?? []);
+
+    if (!Array.isArray(rawList) || rawList.length === 0) {
+      // Fall back to mocks to keep UX rich
+      return MOCK_LEARNING_PATHS;
+    }
+
+    return rawList.map((item) => normalizeLearningPath(item));
+  } catch (err) {
+    // Fallback to mock data; we still surface a warning in the UI.
+    // eslint-disable-next-line no-console
+    console.error('Error fetching learning paths', err);
+    return MOCK_LEARNING_PATHS;
+  }
+}
+
+export default function MyLearningPathsPage(): JSX.Element {
   const router = useRouter();
-  const [learningPath] = useState<LearningPath | null>(initialLearningPath);
 
-  const progress = useMemo(() => {
-    if (!learningPath) return 0;
-    const total = learningPath.lessons.length || 1;
-    const done = learningPath.lessons.filter((l) => l.completed).length;
-    return Math.round((done / total) * 100);
-  }, [learningPath]);
+  const [paths, setPaths] = useState<LearningPath[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<TabKey>('active');
+  const [sortKey, setSortKey] = useState<SortKey>('recent');
 
-  const firstIncompleteIndex = useMemo(() => {
-    if (!learningPath) return -1;
-    return learningPath.lessons.findIndex((l) => !l.completed);
-  }, [learningPath]);
+  useEffect(() => {
+    let cancelled = false;
 
-  const nextLesson = useMemo<Lesson | null>(() => {
-    if (!learningPath) return null;
-    if (firstIncompleteIndex < 0) return null;
-    return learningPath.lessons[firstIncompleteIndex] ?? null;
-  }, [learningPath, firstIncompleteIndex]);
+    const load = async () => {
+      setLoading(true);
+      setError(null);
 
-  const goToLesson = (lessonId: string, href?: string) => {
-    router.push(href ?? `/konnected/learning-library/lesson/${lessonId}`);
+      try {
+        const data = await fetchMyLearningPaths();
+        if (!cancelled) {
+          setPaths(data);
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setError(
+            e?.message ?? 'Unable to load your learning paths right now.',
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const handleTabChange: TabsProps['onChange'] = (key) => {
+    setActiveTab(key as TabKey);
   };
 
-  if (!learningPath) {
-    return (
-      <div className="container mx-auto p-5">
-        <Title level={2}>My Learning Path</Title>
-        <Empty description="You are not enrolled in any learning path yet. Explore our available learning paths to get started." />
-      </div>
+  const handleSortChange = (value: SortKey) => {
+    setSortKey(value);
+  };
+
+  const handleResume = (path: LearningPath) => {
+    const href =
+      path.nextResourceHref ??
+      `/konnected/learning-library/browse-resources?pathId=${path.id}`;
+    router.push(href);
+  };
+
+  const handleMarkComplete = (pathId: string) => {
+    // TODO: POST /api/konnected/learning-paths/{id}/complete (OpenAPI: mark learner path as complete)
+    setPaths((prev) =>
+      (prev ?? []).map((p) =>
+        p.id === pathId
+          ? {
+              ...p,
+              status: 'completed',
+              completedAt: new Date().toISOString(),
+              progress: {
+                ...p.progress,
+                completedItems: p.progress.totalItems,
+                percentage: 100,
+              },
+            }
+          : p,
+      ),
     );
-  }
+    antdMessage.success('Learning path marked as completed.');
+  };
+
+  const handleLeavePath = (pathId: string) => {
+    // TODO: POST /api/konnected/learning-paths/{id}/leave (OpenAPI: leave learning path)
+    setPaths((prev) => (prev ?? []).filter((p) => p.id !== pathId));
+    antdMessage.success('Learning path removed from your list.');
+  };
+
+  const handleBrowseCatalog = () => {
+    router.push('/konnected/learning-library/browse-resources');
+  };
+
+  const stats = useMemo(() => {
+    if (!paths || paths.length === 0) {
+      return {
+        total: 0,
+        active: 0,
+        completed: 0,
+        avgCompletion: 0,
+      };
+    }
+
+    const total = paths.length;
+    const active = paths.filter((p) => p.status === 'active').length;
+    const completed = paths.filter((p) => p.status === 'completed').length;
+    const avgCompletion = Math.round(
+      paths.reduce((sum, p) => sum + (p.progress?.percentage ?? 0), 0) /
+        Math.max(total, 1),
+    );
+
+    return { total, active, completed, avgCompletion };
+  }, [paths]);
+
+  const filteredAndSortedPaths: LearningPath[] = useMemo(() => {
+    if (!paths) return [];
+
+    let filtered = paths;
+
+    if (activeTab === 'active') {
+      filtered = filtered.filter((p) => p.status === 'active');
+    } else if (activeTab === 'completed') {
+      filtered = filtered.filter((p) => p.status === 'completed');
+    } else if (activeTab === 'all') {
+      filtered = filtered.filter((p) => p.status !== 'archived');
+    }
+
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortKey === 'title') {
+        return a.title.localeCompare(b.title);
+      }
+
+      if (sortKey === 'progress') {
+        return (b.progress?.percentage ?? 0) - (a.progress?.percentage ?? 0);
+      }
+
+      // 'recent' (default) – use last activity or started date
+      const aDate =
+        a.progress?.lastActivityAt ??
+        a.completedAt ??
+        a.startedAt ??
+        '1970-01-01';
+      const bDate =
+        b.progress?.lastActivityAt ??
+        b.completedAt ??
+        b.startedAt ??
+        '1970-01-01';
+      return new Date(bDate).getTime() - new Date(aDate).getTime();
+    });
+
+    return sorted;
+  }, [paths, activeTab, sortKey]);
+
+  const hasAnyPaths = (paths?.length ?? 0) > 0;
+  const activeCount =
+    paths?.filter((p) => p.status === 'active').length ?? 0;
+  const completedCount =
+    paths?.filter((p) => p.status === 'completed').length ?? 0;
+
+  const tabsItems: TabsProps['items'] = [
+    {
+      key: 'active',
+      label: `Active (${activeCount})`,
+    },
+    {
+      key: 'completed',
+      label: `Completed (${completedCount})`,
+    },
+    {
+      key: 'all',
+      label: `All (${paths?.length ?? 0})`,
+    },
+  ];
 
   return (
-    <div className="container mx-auto p-5">
-      <Title level={2}>My Learning Path</Title>
+    <KonnectedPageShell
+      title="My Learning Paths"
+      subtitle="Track your in-progress and completed learning paths across the KonnectED Knowledge Library."
+      primaryAction={
+        <Button type="primary" onClick={handleBrowseCatalog}>
+          Browse new learning paths
+        </Button>
+      }
+      secondaryActions={
+        <Space>
+          <Text type="secondary">Sort by</Text>
+          <Select<SortKey>
+            value={sortKey}
+            size="small"
+            style={{ width: 160 }}
+            onChange={handleSortChange}
+          >
+            <Option value="recent">Most recent activity</Option>
+            <Option value="progress">Highest completion</Option>
+            <Option value="title">Title (A–Z)</Option>
+          </Select>
+        </Space>
+      }
+    >
+      {/* Top summary cards */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Space direction="vertical" size={4}>
+              <Text type="secondary">Active paths</Text>
+              <Title level={3} style={{ margin: 0 }}>
+                {stats.active}
+              </Title>
+            </Space>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Space direction="vertical" size={4}>
+              <Text type="secondary">Completed paths</Text>
+              <Title level={3} style={{ margin: 0 }}>
+                {stats.completed}
+              </Title>
+            </Space>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Space direction="vertical" size={4}>
+              <Text type="secondary">Total enrolled</Text>
+              <Title level={3} style={{ margin: 0 }}>
+                {stats.total}
+              </Title>
+            </Space>
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
+          <Card>
+            <Space direction="vertical" size={4} style={{ width: '100%' }}>
+              <Text type="secondary">Average completion</Text>
+              <Progress
+                percent={stats.avgCompletion}
+                size="small"
+                status={stats.avgCompletion === 100 ? 'success' : 'active'}
+              />
+            </Space>
+          </Card>
+        </Col>
+      </Row>
 
-      <Card className="mb-4">
-        <Title level={4}>{learningPath.title}</Title>
-        <Paragraph>{learningPath.description}</Paragraph>
-      </Card>
+      {error && (
+        <Alert
+          type="warning"
+          showIcon
+          closable
+          style={{ marginBottom: 16 }}
+          message="Unable to fully sync with the learning backend."
+          description={
+            <span>
+              Showing locally cached / mock data for now. Once the
+              KonnectED Learning Paths API is wired, this page will
+              refresh automatically.
+            </span>
+          }
+        />
+      )}
 
-      <Card className="mb-4">
-        <Title level={5}>Overall Progress</Title>
-        <Progress percent={progress} status="active" />
-        {nextLesson && (
-          <div style={{ marginTop: 12 }}>
-            <Button
-              type="primary"
-              onClick={() => {
-                if (!nextLesson) return;
-                goToLesson(nextLesson.id, nextLesson.href);
-              }}
-            >
-              Continue where you left off
-            </Button>
-          </div>
-        )}
-      </Card>
+      {/* Empty state when there is nothing at all */}
+      {!loading && !hasAnyPaths && (
+        <Card>
+          <Empty
+            description="You are not enrolled in any learning paths yet."
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Space direction="vertical">
+              <Button type="primary" onClick={handleBrowseCatalog}>
+                Explore the Knowledge Library
+              </Button>
+              <Text type="secondary">
+                Browse curated learning paths or assemble your own from
+                KonnectED resources.
+              </Text>
+            </Space>
+          </Empty>
+        </Card>
+      )}
 
-      <Card>
-        <Title level={5}>Your Lessons</Title>
-        <Steps direction="vertical" current={Math.max(firstIncompleteIndex, 0)}>
-          {learningPath.lessons.map((lesson, index) => (
-            <Step
-              key={lesson.id}
-              title={lesson.name}
-              status={
-                lesson.completed
-                  ? 'finish'
-                  : index === firstIncompleteIndex
-                  ? 'process'
-                  : 'wait'
-              }
-              description={
-                <Button type="link" onClick={() => goToLesson(lesson.id, lesson.href)}>
-                  Go to Lesson
-                </Button>
-              }
-            />
-          ))}
-        </Steps>
-      </Card>
-    </div>
+      {/* Tabs + list */}
+      {hasAnyPaths && (
+        <>
+          <Tabs
+            items={tabsItems}
+            activeKey={activeTab}
+            onChange={handleTabChange}
+            style={{ marginBottom: 16 }}
+          />
+
+          {loading ? (
+            <Row gutter={[16, 16]}>
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <Col xs={24} md={12} lg={8} key={idx}>
+                  <Card>
+                    <Skeleton active paragraph={{ rows: 4 }} />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          ) : filteredAndSortedPaths.length === 0 ? (
+            <Card>
+              <Empty
+                description={
+                  activeTab === 'active'
+                    ? 'No active learning paths in this view.'
+                    : activeTab === 'completed'
+                    ? 'You have not completed any learning paths yet.'
+                    : 'No learning paths match the current filters.'
+                }
+              >
+                {activeTab === 'active' && completedCount > 0 && (
+                  <Text type="secondary">
+                    You do have completed paths – switch to the
+                    &quot;Completed&quot; tab to review them.
+                  </Text>
+                )}
+                {activeTab === 'completed' && activeCount > 0 && (
+                  <Text type="secondary">
+                    You still have active paths in progress – check the
+                    &quot;Active&quot; tab to resume.
+                  </Text>
+                )}
+                {stats.total === 0 && (
+                  <Space direction="vertical" style={{ marginTop: 8 }}>
+                    <Button type="primary" onClick={handleBrowseCatalog}>
+                      Explore the Knowledge Library
+                    </Button>
+                  </Space>
+                )}
+              </Empty>
+            </Card>
+          ) : (
+            <Row gutter={[16, 16]}>
+              {filteredAndSortedPaths.map((path) => {
+                const minutes = path.estimatedMinutes ?? 0;
+                const hours = minutes / 60;
+                const isCompleted = path.status === 'completed';
+                const progress = path.progress?.percentage ?? 0;
+
+                return (
+                  <Col xs={24} md={12} lg={8} key={path.id}>
+                    <Card
+                      hoverable
+                      title={
+                        <Space>
+                          <span>{path.title}</span>
+                          {path.level && (
+                            <Tag color="blue">{path.level}</Tag>
+                          )}
+                          {isCompleted && (
+                            <Tag color="green">Completed</Tag>
+                          )}
+                        </Space>
+                      }
+                      extra={
+                        path.progress?.lastActivityAt ? (
+                          <Space size={4}>
+                            <ClockCircleOutlined />
+                            <Text type="secondary">
+                              Last activity{' '}
+                              {new Date(
+                                path.progress.lastActivityAt,
+                              ).toLocaleDateString()}
+                            </Text>
+                          </Space>
+                        ) : null
+                      }
+                      actions={[
+                        <Button
+                          key="resume"
+                          type="primary"
+                          icon={<PlayCircleOutlined />}
+                          onClick={() => handleResume(path)}
+                        >
+                          {isCompleted ? 'Review path' : 'Resume'}
+                        </Button>,
+                        !isCompleted && (
+                          <Button
+                            key="complete"
+                            type="default"
+                            onClick={() => handleMarkComplete(path.id)}
+                          >
+                            Mark complete
+                          </Button>
+                        ),
+                        <Button
+                          key="leave"
+                          type="link"
+                          danger
+                          onClick={() => handleLeavePath(path.id)}
+                        >
+                          Leave path
+                        </Button>,
+                      ].filter(Boolean)}
+                    >
+                      <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: '100%' }}
+                      >
+                        {path.description && (
+                          <Paragraph
+                            type="secondary"
+                            ellipsis={{ rows: 3 }}
+                            style={{ marginBottom: 8 }}
+                          >
+                            {path.description}
+                          </Paragraph>
+                        )}
+
+                        {path.tags && path.tags.length > 0 && (
+                          <Space wrap style={{ marginBottom: 4 }}>
+                            {path.tags.map((tag) => (
+                              <Tag key={tag}>{tag}</Tag>
+                            ))}
+                          </Space>
+                        )}
+
+                        <Space
+                          direction="vertical"
+                          style={{ width: '100%', marginTop: 4 }}
+                        >
+                          <Space
+                            align="center"
+                            style={{
+                              width: '100%',
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <Text type="secondary">
+                              {path.progress?.completedItems ?? 0} of{' '}
+                              {path.progress?.totalItems ?? 0} items
+                              completed
+                            </Text>
+                            {minutes > 0 && (
+                              <Text type="secondary">
+                                ~
+                                {hours >= 1
+                                  ? `${hours.toFixed(1)} h`
+                                  : `${minutes} min`}{' '}
+                                total
+                              </Text>
+                            )}
+                          </Space>
+                          <Progress
+                            percent={progress}
+                            status={isCompleted ? 'success' : 'active'}
+                            size="small"
+                          />
+                        </Space>
+                      </Space>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
+          )}
+        </>
+      )}
+    </KonnectedPageShell>
   );
 }

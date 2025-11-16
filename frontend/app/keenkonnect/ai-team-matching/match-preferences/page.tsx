@@ -1,267 +1,244 @@
 'use client';
 
 import React from 'react';
+import { Card, Space, Typography } from 'antd';
 import {
-  Typography,
-  Select,
-  InputNumber,
-  Slider,
-  Switch,
-  Radio,
-  Checkbox,
-  Button,
-  Form,
-  Space,
-  Divider,
-  Row,
-  Col,
-  Tabs,
-  message,
-} from 'antd';
-import { PageContainer } from '@ant-design/pro-components';
+  StepsForm,
+  ProFormSlider,
+  ProFormSelect,
+  ProFormSwitch,
+  ProFormTextArea,
+} from '@ant-design/pro-components';
 
-const { Title, Paragraph, Text } = Typography;
-const { TabPane } = Tabs;
-const { Option } = Select;
+const { Title, Paragraph } = Typography;
 
-type RateRange = [number, number];
-
-interface PreferencesFormValues {
-  profileFocus?: 'balanced' | 'explore' | 'deliver';
-  collaborationStyle?: 'async' | 'sync' | 'independent';
-  remoteOk?: boolean;
-
-  projectSize?: number;
-  desiredMonthlyRate?: RateRange;
-
-  minYearsExperience?: number;
-  primaryStack?: string[];
-  industry?: 'technology' | 'finance' | 'healthcare' | 'education' | 'energy' | 'design';
-
-  aiTools?: string[];
-  aiHighUsage?: boolean;
-
-  locationRadiusKm?: number;
-  availableNightsWeekends?: boolean;
-}
-
-export default function MatchPreferencesPage() {
-  const [form] = Form.useForm<PreferencesFormValues>();
-
-  const onFinish = (values: PreferencesFormValues) => {
-    // Ici vous pouvez déclencher un appel API ou stocker les préférences
-    // console.log('Match preferences:', values);
-    message.success('Préférences enregistrées.');
-  };
-
-  const onReset = () => {
-    form.resetFields();
-  };
-
+const MatchPreferencesPage: React.FC = () => {
   return (
-    <PageContainer
-      header={{
-        title: 'Préférences de mise en équipe',
-        breadcrumb: { items: [{ title: 'KeenKonnect' }, { title: 'AI Team Matching' }, { title: 'Match Preferences' }] },
-      }}
-    >
-      <Form<PreferencesFormValues>
-        form={form}
-        layout="vertical"
-        onFinish={onFinish}
-        initialValues={{
-          profileFocus: 'balanced',
-          collaborationStyle: 'async',
-          remoteOk: true,
-          projectSize: 5,
-          desiredMonthlyRate: [3, 7] as RateRange,
-          minYearsExperience: 3,
-          primaryStack: ['typescript', 'react'],
-          industry: 'technology',
-          aiTools: ['chatgpt'],
-          aiHighUsage: true,
-          locationRadiusKm: 25,
-          availableNightsWeekends: false,
-        }}
-      >
-        <Tabs defaultActiveKey="workstyle">
-          {/* === Onglet : style de travail === */}
-          <TabPane tab="Style de travail" key="workstyle">
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Orientation de profil"
-                  name="profileFocus"
-                  tooltip="Équilibre entre exploration et livraison"
-                >
-                  <Radio.Group>
-                    <Radio.Button value="balanced">Équilibré</Radio.Button>
-                    <Radio.Button value="explore">Explorer/Tester</Radio.Button>
-                    <Radio.Button value="deliver">Livrer/Exécuter</Radio.Button>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Style de collaboration"
-                  name="collaborationStyle"
-                >
-                  <Radio.Group>
-                    <Radio value="async">Asynchrone d’abord</Radio>
-                    <Radio value="sync">Synchrone</Radio>
-                    <Radio value="independent">Autonome</Radio>
-                  </Radio.Group>
-                </Form.Item>
-              </Col>
-            </Row>
+    <div style={{ maxWidth: 960, margin: '0 auto', padding: 24 }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <div>
+          <Title level={2} style={{ marginBottom: 8 }}>
+            Préférences de matching
+          </Title>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            Configure tes préférences pour que KeenKonnect puisse te proposer des équipes et
+            coéquipier·ères qui te correspondent vraiment.
+          </Paragraph>
+        </div>
 
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Télétravail accepté"
-                  name="remoteOk"
-                  valuePropName="checked"
-                >
-                  <Switch />
-                </Form.Item>
-              </Col>
-            </Row>
-          </TabPane>
+        <Card>
+          <StepsForm
+            containerStyle={{ maxWidth: 840, margin: '0 auto' }}
+            onFinish={async (values: Record<string, unknown>) => {
+              // TODO: brancher sur ton backend / API de matching
+              // eslint-disable-next-line no-console
+              console.log('Match preferences:', values);
+              return true;
+            }}
+            stepsFormRender={(dom, submitter) => (
+              <div>
+                {dom}
+                <div style={{ marginTop: 24 }}>{submitter}</div>
+              </div>
+            )}
+          >
+            {/* Étape 1 — Profil & objectifs */}
+            <StepsForm.StepForm
+              name="profile"
+              title="Profil & objectifs"
+              stepProps={{
+                description: 'Ce que tu cherches dans l’équipe',
+              }}
+            >
+              <ProFormSelect
+                name="matchGoal"
+                label="Objectif principal"
+                placeholder="Choisis ton objectif principal"
+                rules={[{ required: true, message: 'Merci de préciser ton objectif principal.' }]}
+                options={[
+                  { label: 'Trouver un·e cofondateur·rice', value: 'cofounder' },
+                  { label: 'Trouver une équipe pour un projet', value: 'join_team' },
+                  { label: 'Trouver des freelances / experts', value: 'freelance' },
+                  { label: 'Brainstorm / networking uniquement', value: 'networking' },
+                ]}
+              />
 
-          {/* === Onglet : mission & budget === */}
-          <TabPane tab="Taille & budget" key="tenure">
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Taille de mission (personnes)"
-                  name="projectSize"
-                >
-                  <InputNumber min={1} max={100} style={{ width: '100%' }} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="TJM / Budget mensuel (k€)"
-                  name="desiredMonthlyRate"
-                >
-                  <Slider
-                    range
-                    min={0}
-                    max={10}
-                    step={0.5}
-                    marks={{ 0: '0', 5: '5', 10: '10' }}
-                    // Si vous êtes en antd v5, préférez : tooltip={{ open: true }}
-                    tooltipVisible
-                  />
-                </Form.Item>
-              </Col>
-            </Row>
-          </TabPane>
+              <ProFormSlider
+                name="seniorityPreference"
+                label="Niveau d’expérience souhaité dans l’équipe"
+                min={1}
+                max={10}
+                marks={{
+                  1: 'Très junior',
+                  5: 'Mixte',
+                  10: 'Très senior',
+                }}
+                tooltip={{
+                  formatter: (value?: number) =>
+                    value !== undefined ? `${value}/10` : undefined,
+                }}
+              />
 
-          {/* === Onglet : expérience === */}
-          <TabPane tab="Expérience" key="experience">
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Années minimales d’expérience"
-                  name="minYearsExperience"
-                >
-                  <InputNumber min={0} max={50} style={{ width: '100%' }} />
-                </Form.Item>
-              </Col>
+              <ProFormSelect
+                name="timeCommitment"
+                label="Disponibilité souhaitée des membres"
+                placeholder="Sélectionne une option"
+                allowClear
+                options={[
+                  { label: 'Side project (3–5 h / semaine)', value: 'side' },
+                  { label: 'Engagement modéré (5–10 h / semaine)', value: 'medium' },
+                  { label: 'Engagement élevé (10h+ / semaine)', value: 'high' },
+                ]}
+              />
 
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Stack principale"
-                  name="primaryStack"
-                >
-                  <Select mode="multiple" allowClear placeholder="Choisir une stack…">
-                    <Option value="typescript">TypeScript</Option>
-                    <Option value="react">React</Option>
-                    <Option value="node">Node.js</Option>
-                    <Option value="python">Python</Option>
-                    <Option value="design">Design</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
+              <ProFormSwitch
+                name="remoteOnly"
+                label="Je veux uniquement des collaborations 100% à distance"
+                fieldProps={{
+                  checkedChildren: 'Oui',
+                  unCheckedChildren: 'Non',
+                }}
+              />
+            </StepsForm.StepForm>
 
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item label="Secteur" name="industry">
-                  <Select placeholder="Secteur d’activité">
-                    <Option value="technology">Tech</Option>
-                    <Option value="finance">Finance</Option>
-                    <Option value="healthcare">Santé</Option>
-                    <Option value="education">Éducation</Option>
-                    <Option value="energy">Énergie</Option>
-                    <Option value="design">Design</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </Row>
-          </TabPane>
+            {/* Étape 2 — Style d’équipe */}
+            <StepsForm.StepForm
+              name="team"
+              title="Style d’équipe"
+              stepProps={{
+                description: 'Comment tu aimes travailler',
+              }}
+            >
+              <ProFormSlider
+                name="teamSize"
+                label="Taille d’équipe idéale"
+                min={2}
+                max={12}
+                marks={{
+                  2: 'Très lean',
+                  5: 'Équipe moyenne',
+                  10: 'Grosse équipe',
+                }}
+              />
 
-          {/* === Onglet : IA === */}
-          <TabPane tab="IA" key="ai">
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item label="Outils IA" name="aiTools">
-                  <Select mode="multiple" allowClear placeholder="Sélectionner des outils…">
-                    <Option value="chatgpt">ChatGPT</Option>
-                    <Option value="midjourney">Midjourney</Option>
-                    <Option value="copilot">Copilot</Option>
-                    <Option value="other">Autre</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  label="Usage IA intensif"
-                  name="aiHighUsage"
-                  valuePropName="checked"
-                >
-                  <Switch />
-                </Form.Item>
-              </Col>
-            </Row>
-          </TabPane>
+              <ProFormSelect
+                name="communicationStyle"
+                label="Style de communication préféré"
+                placeholder="Sélectionne ce qui te ressemble le plus"
+                options={[
+                  {
+                    label: 'Très structuré (notes, comptes-rendus, suivi serré)',
+                    value: 'structured',
+                  },
+                  { label: 'Flexible mais réactif', value: 'flexible' },
+                  { label: 'Informel, au feeling', value: 'casual' },
+                ]}
+              />
 
-          {/* === Onglet : autres === */}
-          <TabPane tab="Autres" key="other">
-            <Row gutter={16}>
-              <Col xs={24} md={12}>
-                <Form.Item label="Rayon géographique (km)" name="locationRadiusKm">
-                  <Slider min={0} max={200} step={5} marks={{ 0: '0', 50: '50', 100: '100', 200: '200' }} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  name="availableNightsWeekends"
-                  valuePropName="checked"
-                  label="Disponible soir & week-end"
-                >
-                  <Checkbox>Oui</Checkbox>
-                </Form.Item>
-              </Col>
-            </Row>
-          </TabPane>
-        </Tabs>
+              <ProFormSlider
+                name="asyncPreference"
+                label="Préférence pour le travail asynchrone"
+                min={0}
+                max={10}
+                marks={{
+                  0: 'Tout en temps réel',
+                  5: 'Mixte',
+                  10: 'Quasi 100% asynchrone',
+                }}
+              />
 
-        <Divider />
+              <ProFormSwitch
+                name="needsFacilitator"
+                label="Je préfère qu’il y ait un·e facilitateur·rice / PM dans l’équipe"
+                fieldProps={{
+                  checkedChildren: 'Oui',
+                  unCheckedChildren: 'Pas nécessaire',
+                }}
+              />
 
-        <Space>
-          <Button type="primary" htmlType="submit">Enregistrer</Button>
-          <Button htmlType="button" onClick={onReset}>Réinitialiser</Button>
-        </Space>
-      </Form>
+              <ProFormSwitch
+                name="preferDiverseBackgrounds"
+                label="Je souhaite une équipe avec des profils très variés"
+                fieldProps={{
+                  checkedChildren: 'Oui',
+                  unCheckedChildren: 'Peu importe',
+                }}
+              />
+            </StepsForm.StepForm>
 
-      <Divider />
-      <Paragraph type="secondary">
-        <Text>
-          Ces préférences seront utilisées pour affiner les correspondances d’équipe IA.
-        </Text>
-      </Paragraph>
-    </PageContainer>
+            {/* Étape 3 — Contraintes & priorités */}
+            <StepsForm.StepForm
+              name="constraints"
+              title="Contraintes & priorités"
+              stepProps={{
+                description: 'Ce qui est non négociable pour toi',
+              }}
+            >
+              <ProFormSlider
+                name="timeZoneOverlap"
+                label="Chevauchement horaire minimum souhaité"
+                min={0}
+                max={8}
+                marks={{
+                  0: 'Peu importe',
+                  2: '2h',
+                  4: '4h',
+                  6: '6h',
+                  8: '8h+',
+                }}
+                tooltip={{
+                  formatter: (value?: number) =>
+                    value !== undefined ? `${value}h de chevauchement` : undefined,
+                }}
+              />
+
+              <ProFormSelect
+                name="meetingFrequency"
+                label="Fréquence de réunions souhaitée"
+                placeholder="Sélectionne une option"
+                allowClear
+                options={[
+                  { label: '1 fois par semaine', value: 'weekly' },
+                  { label: '2–3 fois par semaine', value: 'twice_week' },
+                  { label: 'Quotidien stand-up court', value: 'daily' },
+                  { label: 'Au besoin uniquement', value: 'on_demand' },
+                ]}
+              />
+
+              <ProFormSwitch
+                name="openToWeekend"
+                label="Ok pour travailler ponctuellement le week‑end"
+                fieldProps={{
+                  checkedChildren: 'Oui',
+                  unCheckedChildren: 'Non',
+                }}
+              />
+
+              <ProFormSwitch
+                name="openToNightSessions"
+                label="Ok pour des sessions tard le soir si nécessaire"
+                fieldProps={{
+                  checkedChildren: 'Oui',
+                  unCheckedChildren: 'Non',
+                }}
+              />
+
+              <ProFormTextArea
+                name="notes"
+                label="Détails complémentaires pour l’algorithme de matching"
+                placeholder="Ex.: je préfère les équipes qui prototypent rapidement, j’évite les projets blockchain, etc."
+                fieldProps={{
+                  autoSize: { minRows: 3, maxRows: 6 },
+                  showCount: true,
+                  maxLength: 600,
+                }}
+              />
+            </StepsForm.StepForm>
+          </StepsForm>
+        </Card>
+      </Space>
+    </div>
   );
-}
+};
+
+export default MatchPreferencesPage;

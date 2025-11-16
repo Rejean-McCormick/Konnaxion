@@ -1,338 +1,567 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
+  Alert,
   Button,
   Card,
   Col,
   DatePicker,
-  Divider,
   Form,
   Input,
-  Modal,
   Row,
   Select,
-  Slider,
   Space,
   Table,
   Tag,
   Typography,
 } from 'antd';
+import type { ColumnsType, TableProps } from 'antd/es/table';
 import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
-import type { ColumnsType } from 'antd/es/table';
-import type { SliderRangeProps } from 'antd/es/slider'; // <-- added
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
-import MainLayout from '@/shared/layout/MainLayout';
-
-const { Title, Paragraph, Text } = Typography;
 const { RangePicker } = DatePicker;
+const { Text } = Typography;
+const { Search } = Input;
 const { Option } = Select;
 
-type Resource = {
-  id: string;
-  title: string;
-  subject: string;
-  type: 'Article' | 'Video' | 'Course' | 'Book' | 'Podcast';
-  difficulty: number; // 1-5
-  createdAt: string; // ISO
-  tags: string[];
-};
+// Keep in sync with backend OpenAPI for Knowledge / library_resource_management search
+const KNOWLEDGE_SEARCH_ENDPOINT =
+  '/api/konnected/knowledge/resources/search';
 
-const MOCK_RESOURCES: Resource[] = [
-  {
-    id: '1',
-    title: 'Sustainable Design Principles',
-    subject: 'Sustainability',
-    type: 'Article',
-    difficulty: 2,
-    createdAt: '2025-01-02',
-    tags: ['eco', 'design'],
-  },
-  {
-    id: '2',
-    title: 'Advanced TypeScript Patterns',
-    subject: 'Engineering',
-    type: 'Course',
-    difficulty: 4,
-    createdAt: '2025-03-12',
-    tags: ['typescript', 'patterns'],
-  },
-  {
-    id: '3',
-    title: 'Community Moderation 101',
-    subject: 'Community',
-    type: 'Video',
-    difficulty: 1,
-    createdAt: '2024-11-14',
-    tags: ['moderation', 'basics'],
-  },
-  {
-    id: '4',
-    title: 'Ethical AI in Decision Making',
-    subject: 'Ethics',
-    type: 'Podcast',
-    difficulty: 3,
-    createdAt: '2025-07-09',
-    tags: ['ai', 'ethics'],
-  },
+type KnowledgeContentType = 'article' | 'video' | 'lesson' | 'quiz' | 'dataset';
+
+interface KnowledgeResource {
+  id: number | string;
+  title: string;
+  type: KnowledgeContentType | string;
+  url?: string | null;
+  subject?: string | null;
+  level?: string | null;
+  language?: string | null;
+  created_at?: string | null;
+  tags?: string[] | null;
+}
+
+interface KnowledgeSearchResponse {
+  count: number;
+  results: KnowledgeResource[];
+}
+
+interface SearchFormValues {
+  q?: string;
+  types?: KnowledgeContentType[];
+  subjects?: string[];
+  levels?: string[];
+  languages?: string[];
+  createdAt?: [dayjs.Dayjs, dayjs.Dayjs];
+}
+
+interface QueryState {
+  q?: string;
+  types?: KnowledgeContentType[];
+  subjects?: string[];
+  levels?: string[];
+  languages?: string[];
+  created_from?: string;
+  created_to?: string;
+  page: number;
+  page_size: number;
+}
+
+const DEFAULT_PAGE_SIZE = 10;
+
+const CONTENT_TYPES: KnowledgeContentType[] = [
+  'article',
+  'video',
+  'lesson',
+  'quiz',
+  'dataset',
 ];
 
-const ALL_SUBJECTS = ['Sustainability', 'Engineering', 'Community', 'Ethics', 'Leadership'];
-const ALL_TYPES: Resource['type'][] = ['Article', 'Video', 'Course', 'Book', 'Podcast'];
+// Seed taxonomies for now; can be driven by backend dictionaries later
+const SUBJECT_OPTIONS = [
+  'AI & Data',
+  'Sustainability & Climate',
+  'Healthcare & Wellbeing',
+  'Civic Innovation',
+  'Education & Skills',
+  'Design & Creativity',
+];
 
-const SearchFiltersPage: React.FC = () => {
-  const [query, setQuery] = useState<string>('');
+const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 
-  const [selectedSubjects, setSelectedSubjects] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<[Dayjs, Dayjs] | null>(null);
-  const [difficultyRange, setDifficultyRange] = useState<[number, number]>([1, 5]);
-  const [resourceTypes, setResourceTypes] = useState<Resource['type'][]>([]);
-  const [category, setCategory] = useState<string>('All');
+const LANGUAGE_OPTIONS = ['English', 'French', 'Spanish', 'Other'];
 
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+async function searchKnowledgeResources(query: QueryState): Promise<KnowledgeSearchResponse> {
+  const params = new URLSearchParams();
 
-  const resetFilters = () => {
-    setQuery('');
-    setSelectedSubjects([]);
-    setDateRange(null);
-    setDifficultyRange([1, 5]);
-    setResourceTypes([]);
-    setCategory('All');
+  if (query.q) params.set('q', query.q);
+  if (query.types && query.types.length > 0) {
+    params.set('type', query.types.join(','));
+  }
+  if (query.subjects && query.subjects.length > 0) {
+    params.set('subject', query.subjects.join(','));
+  }
+  if (query.levels && query.levels.length > 0) {
+    params.set('level', query.levels.join(','));
+  }
+  if (query.languages && query.languages.length > 0) {
+    params.set('language', query.languages.join(','));
+  }
+  if (query.created_from) {
+    params.set('created_from', query.created_from);
+  }
+  if (query.created_to) {
+    params.set('created_to', query.created_to);
+  }
+
+  params.set('page', String(query.page));
+  params.set('page_size', String(query.page_size));
+
+  const res = await fetch(`${KNOWLEDGE_SEARCH_ENDPOINT}?${params.toString()}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    // Include credentials if your API relies on cookies/session
+    credentials: 'include',
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    throw new Error(
+      body || `Knowledge search failed with status ${res.status}`,
+    );
+  }
+
+  const data = (await res.json()) as KnowledgeSearchResponse;
+  return data;
+}
+
+export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
+  const router = useRouter();
+  const [form] = Form.useForm<SearchFormValues>();
+
+  const [resources, setResources] = useState<KnowledgeResource[]>([]);
+  const [total, setTotal] = useState<number>(0);
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [lastQuery, setLastQuery] = useState<QueryState | null>(null);
+
+  const columns: ColumnsType<KnowledgeResource> = useMemo(
+    () => [
+      {
+        title: 'Title',
+        dataIndex: 'title',
+        key: 'title',
+        render: (value, record) => {
+          const href = record.url || '#';
+          const isClickable = Boolean(record.url);
+          return (
+            <Space direction="vertical" size={0}>
+              {isClickable ? (
+                <a
+                  href={href as string}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {value}
+                </a>
+              ) : (
+                <Text strong>{value}</Text>
+              )}
+              <Space size="small" wrap>
+                {record.subject && (
+                  <Tag color="blue">{record.subject}</Tag>
+                )}
+                {record.level && (
+                  <Tag color="purple">{record.level}</Tag>
+                )}
+                {record.language && (
+                  <Tag color="geekblue">{record.language}</Tag>
+                )}
+              </Space>
+            </Space>
+          );
+        },
+      },
+      {
+        title: 'Type',
+        dataIndex: 'type',
+        key: 'type',
+        width: 140,
+        render: (value: KnowledgeResource['type']) => (
+          <Tag>{String(value).toUpperCase()}</Tag>
+        ),
+      },
+      {
+        title: 'Tags',
+        dataIndex: 'tags',
+        key: 'tags',
+        width: 220,
+        render: (tags?: string[] | null) =>
+          tags && tags.length > 0 ? (
+            <Space size="small" wrap>
+              {tags.map((tag) => (
+                <Tag key={tag}>{tag}</Tag>
+              ))}
+            </Space>
+          ) : (
+            <Text type="secondary">No tags</Text>
+          ),
+      },
+      {
+        title: 'Added',
+        dataIndex: 'created_at',
+        key: 'created_at',
+        width: 140,
+        render: (value?: string | null) =>
+          value ? dayjs(value).format('YYYY-MM-DD') : '—',
+      },
+      {
+        title: 'Actions',
+        key: 'actions',
+        fixed: 'right',
+        width: 160,
+        render: (_: unknown, record) => (
+          <Space>
+            {record.url && (
+              <Button
+                type="link"
+                size="small"
+                onClick={() => {
+                  window.open(record.url as string, '_blank', 'noopener');
+                }}
+              >
+                Open
+              </Button>
+            )}
+            <Button
+              size="small"
+              onClick={() =>
+                router.push(
+                  `/konnected/learning-library/resource/${record.id}`,
+                )
+              }
+            >
+              View details
+            </Button>
+          </Space>
+        ),
+      },
+    ],
+    [router],
+  );
+
+  const runSearch = async (
+    overridePage?: number,
+    overridePageSize?: number,
+  ) => {
+    const formValues = form.getFieldsValue();
+
+    const pageToUse = overridePage ?? page;
+    const pageSizeToUse = overridePageSize ?? pageSize;
+
+    const query: QueryState = {
+      q: formValues.q?.trim() || undefined,
+      types: formValues.types,
+      subjects: formValues.subjects,
+      levels: formValues.levels,
+      languages: formValues.languages,
+      created_from: formValues.createdAt?.[0]
+        ? formValues.createdAt[0].startOf('day').toISOString()
+        : undefined,
+      created_to: formValues.createdAt?.[1]
+        ? formValues.createdAt[1].endOf('day').toISOString()
+        : undefined,
+      page: pageToUse,
+      page_size: pageSizeToUse,
+    };
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await searchKnowledgeResources(query);
+      setResources(response.results || []);
+      setTotal(response.count ?? response.results.length);
+      setPage(pageToUse);
+      setPageSize(pageSizeToUse);
+      setLastQuery(query);
+    } catch (e) {
+      const message =
+        e instanceof Error ? e.message : 'Unexpected error during search';
+      setError(message);
+      setResources([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredData = useMemo(() => {
-    return MOCK_RESOURCES.filter((res) => {
-      if (query.trim()) {
-        const q = query.trim().toLowerCase();
-        const hay = `${res.title} ${res.subject} ${res.tags.join(' ')}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
-
-      if (selectedSubjects.length > 0 && !selectedSubjects.includes(res.subject)) {
-        return false;
-      }
-
-      if (resourceTypes.length > 0 && !resourceTypes.includes(res.type)) {
-        return false;
-      }
-
-      if (res.difficulty < difficultyRange[0] || res.difficulty > difficultyRange[1]) {
-        return false;
-      }
-
-      if (dateRange) {
-        const [start, end] = dateRange;
-        const resDate = dayjs(res.createdAt);
-        if (resDate.isBefore(start, 'day') || resDate.isAfter(end, 'day')) {
-          return false;
-        }
-      }
-
-      if (category !== 'All') {
-        if (category === 'Featured' && res.id !== '1') return false;
-        if (category === 'New' && dayjs().diff(dayjs(res.createdAt), 'day') > 60) return false;
-      }
-
-      return true;
-    });
-  }, [query, selectedSubjects, resourceTypes, difficultyRange, dateRange, category]);
-
-  const columns: ColumnsType<Resource> = [
-    {
-      title: 'Title',
-      dataIndex: 'title',
-      key: 'title',
-      render: (_: unknown, record: Resource) => (
-        <Space direction="vertical" size={0}>
-          <Text strong>{record.title}</Text>
-          <Text type="secondary">{record.subject}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: 'Type',
-      dataIndex: 'type',
-      key: 'type',
-      render: (t: Resource['type']) => <Tag>{t}</Tag>,
-    },
-    {
-      title: 'Difficulty',
-      dataIndex: 'difficulty',
-      key: 'difficulty',
-      render: (d: number) => (
-        <Space>
-          <Text>{d}</Text>
-        </Space>
-      ),
-    },
-    {
-      title: 'Created',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (d: string) => dayjs(d).format('YYYY-MM-DD'),
-    },
-    {
-      title: 'Tags',
-      dataIndex: 'tags',
-      key: 'tags',
-      render: (tags: string[]) => (
-        <Space wrap>
-          {tags.map((t) => (
-            <Tag key={t}>{t}</Tag>
-          ))}
-        </Space>
-      ),
-    },
-  ];
-
-  // FIX: onChange must be (value: number[]) when range is enabled
-  const handleDifficultyChange: SliderRangeProps['onChange'] = (value) => {
-    const [min, max] = value as [number, number];
-    setDifficultyRange([min, max]);
+  const onFinish = () => {
+    // Reset to first page when filters change
+    runSearch(1, pageSize);
   };
 
-  const handleDateRangeChange = (dates: null | [Dayjs | null, Dayjs | null]) => {
-    if (dates && dates[0] && dates[1]) setDateRange([dates[0], dates[1]]);
-    else setDateRange(null);
+  const handleQuickSearch = (value: string) => {
+    form.setFieldsValue({ q: value });
+    runSearch(1, pageSize);
   };
+
+  const handleResetFilters = () => {
+    form.resetFields();
+    runSearch(1, DEFAULT_PAGE_SIZE);
+  };
+
+  const handleTableChange: TableProps<KnowledgeResource>['onChange'] = (
+    pagination,
+  ) => {
+    const nextPage = pagination.current || 1;
+    const nextPageSize = pagination.pageSize || DEFAULT_PAGE_SIZE;
+    runSearch(nextPage, nextPageSize);
+  };
+
+  useEffect(() => {
+    // Initial search on mount with default filters
+    runSearch(1, DEFAULT_PAGE_SIZE);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const hasActiveFilters = useMemo(() => {
+    const v = form.getFieldsValue();
+    return Boolean(
+      v.q ||
+        (v.types && v.types.length > 0) ||
+        (v.subjects && v.subjects.length > 0) ||
+        (v.levels && v.levels.length > 0) ||
+        (v.languages && v.languages.length > 0) ||
+        (v.createdAt && v.createdAt.length === 2),
+    );
+  }, [form]);
+
+  const secondaryActions = (
+    <Space>
+      <Search
+        placeholder="Quick search by title or description"
+        allowClear
+        enterButton={<SearchOutlined />}
+        onSearch={handleQuickSearch}
+        style={{ width: 280 }}
+      />
+      <Button
+        icon={<ReloadOutlined />}
+        onClick={handleResetFilters}
+        disabled={!hasActiveFilters && !lastQuery}
+      >
+        Reset filters
+      </Button>
+    </Space>
+  );
+
+  const primaryAction = (
+    <Button
+      type="primary"
+      icon={<FilterOutlined />}
+      onClick={() => runSearch(page, pageSize)}
+    >
+      Apply filters
+    </Button>
+  );
 
   return (
-    <MainLayout>
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Title level={2}>Learning Library — Search &amp; Filters</Title>
-          <Paragraph type="secondary">
-            Recherchez dans les ressources avec des filtres combinables (matière, type, difficulté, plage de dates, etc.).
-          </Paragraph>
-        </Col>
-
-        {/* Barre de recherche + actions */}
-        <Col span={24}>
-          <Card>
-            <Row gutter={[12, 12]} align="middle">
-              <Col xs={24} md={12}>
+    <KonnectedPageShell
+      title="Search the Learning Library"
+      subtitle="Run advanced searches across Knowledge resources using full-text and structured filters."
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+    >
+      <Card style={{ marginBottom: 16 }}>
+        <Form<SearchFormValues>
+          form={form}
+          layout="vertical"
+          onFinish={onFinish}
+        >
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={12} lg={8}>
+              <Form.Item
+                label="Keywords"
+                name="q"
+                tooltip="Searches over title and description using the PostgreSQL full-text backend."
+              >
                 <Input
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Rechercher par titre / sujet / tag…"
-                  allowClear
+                  placeholder="e.g. data visualization, climate, robotics"
                   prefix={<SearchOutlined />}
+                  allowClear
                 />
-              </Col>
-              <Col xs={24} md={12}>
-                <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-                  <Button icon={<FilterOutlined />} onClick={() => setAdvancedOpen(true)}>
-                    Filtres avancés
-                  </Button>
-                  <Button icon={<ReloadOutlined />} onClick={resetFilters}>
-                    Réinitialiser
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
+              </Form.Item>
+            </Col>
 
-            <Divider />
-
-            {/* Filtres rapides */}
-            <Row gutter={[12, 12]}>
-              <Col xs={24} md={8}>
-                <Text strong>Matières</Text>
+            <Col xs={24} md={12} lg={8}>
+              <Form.Item
+                label="Content type"
+                name="types"
+              >
                 <Select
                   mode="multiple"
-                  style={{ width: '100%' }}
-                  placeholder="Sélectionner des matières"
-                  value={selectedSubjects}
-                  onChange={setSelectedSubjects}
+                  allowClear
+                  placeholder="Select content types"
                 >
-                  {ALL_SUBJECTS.map((s) => (
+                  {CONTENT_TYPES.map((t) => (
+                    <Option key={t} value={t}>
+                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={12} lg={8}>
+              <Form.Item
+                label="Subjects"
+                name="subjects"
+              >
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Filter by subject or theme"
+                >
+                  {SUBJECT_OPTIONS.map((s) => (
                     <Option key={s} value={s}>
                       {s}
                     </Option>
                   ))}
                 </Select>
-              </Col>
+              </Form.Item>
+            </Col>
 
-              <Col xs={24} md={8}>
-                <Text strong>Types</Text>
+            <Col xs={24} md={12} lg={8}>
+              <Form.Item
+                label="Level"
+                name="levels"
+              >
                 <Select
                   mode="multiple"
-                  style={{ width: '100%' }}
-                  placeholder="Sélectionner des types"
-                  value={resourceTypes}
-                  onChange={(vals) => setResourceTypes(vals as Resource['type'][])}
+                  allowClear
+                  placeholder="Beginner, Intermediate, Advanced"
                 >
-                  {ALL_TYPES.map((t) => (
-                    <Option key={t} value={t}>
-                      {t}
+                  {LEVEL_OPTIONS.map((l) => (
+                    <Option key={l} value={l}>
+                      {l}
                     </Option>
                   ))}
                 </Select>
-              </Col>
+              </Form.Item>
+            </Col>
 
-              <Col xs={24} md={8}>
-                <Text strong>Difficulté</Text>
-                <Slider
-                  range={{ draggableTrack: true }}
-                  min={1}
-                  max={5}
-                  step={1}
-                  value={difficultyRange}        // [number, number] is fine for value
-                  onChange={handleDifficultyChange} // now typed as (value: number[]) => void
+            <Col xs={24} md={12} lg={8}>
+              <Form.Item
+                label="Language"
+                name="languages"
+              >
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder="Resource language"
+                >
+                  {LANGUAGE_OPTIONS.map((lang) => (
+                    <Option key={lang} value={lang}>
+                      {lang}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} md={12} lg={8}>
+              <Form.Item
+                label="Added to library"
+                name="createdAt"
+              >
+                <RangePicker
+                  style={{ width: '100%' }}
+                  allowEmpty={[true, true]}
                 />
-              </Col>
-            </Row>
-          </Card>
-        </Col>
+              </Form.Item>
+            </Col>
+          </Row>
 
-        {/* Résultats */}
-        <Col span={24}>
-          <Card>
-            <Space style={{ width: '100%', justifyContent: 'space-between', marginBottom: 12 }}>
-              <Text type="secondary">Résultats: {filteredData.length}</Text>
-              <Select value={category} onChange={setCategory} style={{ width: 180 }}>
-                <Option value="All">Toutes les catégories</Option>
-                <Option value="Featured">Mises en avant</Option>
-                <Option value="New">Nouveautés</Option>
-              </Select>
-            </Space>
-
-            <Table<Resource>
-              rowKey="id"
-              columns={columns}
-              dataSource={filteredData}
-              pagination={{ pageSize: 8 }}
-            />
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Filtres avancés */}
-      <Modal
-        open={advancedOpen}
-        title="Filtres avancés"
-        onOk={() => setAdvancedOpen(false)}
-        onCancel={() => setAdvancedOpen(false)}
-        okText="Appliquer"
-      >
-        <Form layout="vertical">
-          <Form.Item label="Plage de dates">
-            <RangePicker onChange={handleDateRangeChange} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item label="Mots-clés">
-            <Input
-              placeholder="Mots-clés additionnels…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              allowClear
-            />
-          </Form.Item>
+          <Row justify="end">
+            <Col>
+              <Space>
+                <Button onClick={handleResetFilters}>Clear all</Button>
+                <Button
+                  type="primary"
+                  icon={<SearchOutlined />}
+                  htmlType="submit"
+                >
+                  Search
+                </Button>
+              </Space>
+            </Col>
+          </Row>
         </Form>
-      </Modal>
-    </MainLayout>
-  );
-};
+      </Card>
 
-export default SearchFiltersPage;
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          message="Unable to run search"
+          description={error}
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      <Card>
+        <Space
+          direction="vertical"
+          style={{ width: '100%' }}
+          size="large"
+        >
+          <Space
+            style={{ width: '100%', justifyContent: 'space-between' }}
+          >
+            <Text type="secondary">
+              {loading
+                ? 'Searching…'
+                : `Showing ${resources.length} of ${total} result${
+                    total === 1 ? '' : 's'
+                  }`}
+            </Text>
+          </Space>
+
+          <Table<KnowledgeResource>
+            rowKey={(record) => String(record.id)}
+            columns={columns}
+            dataSource={resources}
+            loading={loading}
+            onChange={handleTableChange}
+            pagination={{
+              current: page,
+              total,
+              pageSize,
+              showSizeChanger: true,
+              pageSizeOptions: [10, 20, 50],
+              showTotal: (t, range) =>
+                `${range[0]}–${range[1]} of ${t} resources`,
+            }}
+            locale={{
+              emptyText: loading
+                ? 'Loading resources…'
+                : 'No resources match your current filters.',
+            }}
+            scroll={{ x: 900 }}
+            bordered
+            size="middle"
+          />
+        </Space>
+      </Card>
+    </KonnectedPageShell>
+  );
+}

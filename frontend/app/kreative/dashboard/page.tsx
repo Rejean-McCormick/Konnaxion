@@ -1,7 +1,7 @@
+// app/kreative/dashboard/page.tsx
 'use client';
 
 import React from 'react';
-import { NextPage } from 'next';
 import {
   Card,
   Avatar,
@@ -18,9 +18,16 @@ import {
   BulbOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
+import { useRouter } from 'next/navigation';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
+
+type QuickLink = {
+  title: string;
+  icon: React.ReactNode;
+  href: string;
+};
 
 /** Featured Project */
 const featuredProject = {
@@ -43,22 +50,22 @@ const topCreator = {
   stats: '48 Projects · 1200 Likes',
 };
 
-/** Quick Links */
-const quickLinks = [
+/** Quick Links (wired to existing Kreative routes) */
+const quickLinks: QuickLink[] = [
   {
     title: 'Explore Ideas',
     icon: <BulbOutlined style={{ fontSize: 24 }} />,
-    link: '/kreative/explore',
+    href: '/kreative/creative-hub/explore-ideas',
   },
   {
     title: 'Submit Work',
     icon: <UploadOutlined style={{ fontSize: 24 }} />,
-    link: '/kreative/submit',
+    href: '/kreative/creative-hub/submit-creative-work',
   },
   {
     title: 'View Gallery',
     icon: <PictureOutlined style={{ fontSize: 24 }} />,
-    link: '/kreative/gallery',
+    href: '/kreative/creative-hub/inspiration-gallery',
   },
 ];
 
@@ -86,9 +93,11 @@ const recentActivities = [
   },
 ];
 
-const KreativeDashboard: NextPage = () => {
+export default function KreativeDashboardPage(): JSX.Element {
+  const router = useRouter();
+
   return (
-    <PageContainer title="Kreative Dashboard">
+    <KreativePageShell title="Kreative Dashboard">
       <Row gutter={[24, 24]}>
         {/* Featured Project Highlight */}
         <Col xs={24} md={16}>
@@ -142,15 +151,13 @@ const KreativeDashboard: NextPage = () => {
         <Col xs={24} md={8}>
           <Card title="Quick Links">
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              {quickLinks.map((link, index) => (
+              {quickLinks.map((link) => (
                 <Button
-                  key={index}
+                  key={link.title}
                   type="primary"
                   block
                   icon={link.icon}
-                  onClick={() => {
-                    window.location.href = link.link;
-                  }}
+                  onClick={() => router.push(link.href)}
                 >
                   {link.title}
                 </Button>
@@ -176,8 +183,6 @@ const KreativeDashboard: NextPage = () => {
           </Card>
         </Col>
       </Row>
-    </PageContainer>
+    </KreativePageShell>
   );
-};
-
-export default KreativeDashboard;
+}

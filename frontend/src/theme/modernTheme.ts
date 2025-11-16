@@ -1,28 +1,24 @@
+// src/theme/modernTheme.ts
 import { theme } from 'antd';
 const { defaultAlgorithm } = theme;
 
 export default {
-  label       : 'Modern',
-  icon        : '🖌️',
+  label : 'Mauve + Rainbow',
+  icon  : '💜🌈',
 
-  algorithm   : defaultAlgorithm,
-  colorPrimary: '#475569',
-  colorInfo   : '#2563eb',
-  colorSuccess: '#22c55e',
-  colorWarning: '#facc15',
-  colorError  : '#ef4444',
+  algorithm       : defaultAlgorithm,
 
-  colorBgLayout   : '#f9fafb',
-  colorBgContainer: '#ffffff',
-  colorTextBase   : '#0f172a',
+  // Couleurs principales
+  colorPrimary    : '#8B5CF6',       // mauve
+  colorPrimaryBg  : '#8B5CF61a',
+  colorBgLayout   : '#F6F5F9',       // léger fond mauve/gris
+  colorBgContainer: '#FFFFFF',
+  colorTextBase   : '#1A1430',       // neutre foncé tirant sur le mauve
 
-  borderRadiusLG : 16,
-  controlHeight  : 40,
-
-  // Custom tokens
-  bgMain  : '#F9FAFB',
-  bgLight : '#FFFFFF',
-  bgDark  : '#E2E8F0',
-  textMain: '#0F172A',
-  accent  : '#475569',
+  // Tokens personnalisés (comme minimal/kktheme)
+  bgMain   : '#F6F5F9',
+  bgLight  : '#FFFFFF',
+  bgDark   : '#6D28D9',
+  textMain : '#1A1430',
+  accent   : '#FBBF24',              // accent “arc-en-ciel” chaud (doré)
 } as const;

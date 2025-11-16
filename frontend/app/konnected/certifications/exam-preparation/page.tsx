@@ -1,118 +1,604 @@
 ﻿// app/konnected/certifications/exam-preparation/page.tsx
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  Card,
-  List,
-  Button,
-  Steps,
-  Progress,
   Alert,
-  Typography,
-  Row,
+  Button,
+  Card,
   Col,
+  List,
+  Progress,
+  Row,
+  Statistic,
+  Steps,
+  Tabs,
+  Tag,
+  Typography,
+  Skeleton,
+  Space,
 } from 'antd';
-import { CheckCircleTwoTone, ArrowRightOutlined } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
+import {
+  ArrowRightOutlined,
+  CalendarOutlined,
+  CheckCircleTwoTone,
+  ClockCircleOutlined,
+  FileSearchOutlined,
+  FlagOutlined,
+  PlayCircleOutlined,
+  WarningTwoTone,
+} from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
 
-const { Title, Text } = Typography;
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
+import { get } from '@/services/_request';
+
+const { Text } = Typography;
 const { Step } = Steps;
 
-interface Module {
+const CERT_PASS_PERCENT = 80; // from CertifiKation spec
+const QUIZ_RETRY_COOLDOWN_MIN = 30; // from CertifiKation spec
+
+// TODO: align this with the actual OpenAPI path in schema-endpoints.json
+const EXAM_PREPARATION_ENDPOINT = 'certs/exam-preparation/plan';
+
+type PrepModuleType = 'content' | 'practice_quiz' | 'project' | 'checkpoint';
+
+type PrepModuleStatus = 'not_started' | 'in_progress' | 'completed';
+
+interface PrepModule {
   id: string;
   title: string;
-  completed: boolean;
-  progress: number;
+  type: PrepModuleType;
+  status: PrepModuleStatus;
+  progressPercent: number;
+  estimatedMinutes?: number | null;
+  lastTouchedAt?: string | null;
+  isCriticalWeakness?: boolean;
 }
 
-const studyModules: Module[] = [
-  { id: 'module1', title: 'Introduction to Certification Concepts', completed: true, progress: 100 },
-  { id: 'module2', title: 'Advanced Topics and Best Practices', completed: false, progress: 50 },
-  { id: 'module3', title: 'Practical Applications and Case Studies', completed: false, progress: 20 },
-  { id: 'module4', title: 'Exam Strategies and Tips', completed: false, progress: 0 },
-];
+interface FocusArea {
+  id: string;
+  label: string;
+  description?: string | null;
+  recommendedResourcesCount?: number | null;
+}
 
-const studyPlanSteps = [
-  'Read and review study materials',
-  'Complete interactive practice exercises',
-  'Attempt a practice quiz',
-  'Review feedback and focus on weaknesses',
-];
+interface ExamPreparationPathInfo {
+  id: number | string;
+  name: string;
+  description?: string | null;
+}
 
-export default function ExamPreparationPage() {
-  const overallProgress =
-    studyModules.reduce((acc, mod) => acc + mod.progress, 0) / studyModules.length;
+interface ExamPreparationExamInfo {
+  targetDate?: string | null;
+  recommendedStudyHours?: number | null;
+  lastScorePercent?: number | null;
+  lastResult?: 'pass' | 'fail' | null;
+  lastAttemptAt?: string | null;
+  attemptsUsed?: number | null;
+  attemptsAllowed?: number | null;
+  isCooldownActive?: boolean;
+  cooldownEndsAt?: string | null;
+  passPercent?: number | null;
+  retryCooldownMinutes?: number | null;
+}
 
-  const handleStartQuiz = () => {
-    console.log('Starting practice exam...');
+interface ExamPreparationResponse {
+  path?: ExamPreparationPathInfo | null;
+  exam?: ExamPreparationExamInfo | null;
+  overallProgressPercent?: number | null;
+  modules?: PrepModule[] | null;
+  focusAreas?: FocusArea[] | null;
+}
+
+function computeOverallProgress(modules: PrepModule[] | undefined | null): number {
+  if (!modules || modules.length === 0) {
+    return 0;
+  }
+  const sum = modules.reduce((acc, m) => acc + (m.progressPercent ?? 0), 0);
+  return Math.round(sum / modules.length);
+}
+
+function computeStepIndex(progress: number): number {
+  if (progress >= 90) return 3;
+  if (progress >= 60) return 2;
+  if (progress >= 30) return 1;
+  return 0;
+}
+
+function getReadinessBadge(
+  progress: number,
+  lastScore: number | null | undefined,
+  passPercent: number,
+): { status: 'ready' | 'almost' | 'not_ready'; label: string; color: 'green' | 'gold' | 'red' } {
+  if (lastScore != null && lastScore >= passPercent) {
+    return { status: 'ready', label: 'Ready based on last score', color: 'green' };
+  }
+  if (progress >= passPercent - 10) {
+    return { status: 'almost', label: 'Almost ready – focus on weak areas', color: 'gold' };
+  }
+  return { status: 'not_ready', label: 'Not ready yet – keep studying', color: 'red' };
+}
+
+async function fetchExamPreparation(): Promise<ExamPreparationResponse> {
+  // Uses the shared _request helper which already knows the /api base URL
+  return get<ExamPreparationResponse>(EXAM_PREPARATION_ENDPOINT);
+}
+
+export default function ExamPreparationPage(): JSX.Element {
+  const router = useRouter();
+
+  const { data, isLoading, error } = useQuery<ExamPreparationResponse>({
+    queryKey: ['certs', 'exam-preparation'],
+    queryFn: fetchExamPreparation,
+  });
+
+  const modules: PrepModule[] = data?.modules ?? [];
+  const focusAreas: FocusArea[] = data?.focusAreas ?? [];
+
+  const overallProgress = useMemo(() => {
+    return data?.overallProgressPercent != null
+      ? Math.round(data.overallProgressPercent)
+      : computeOverallProgress(modules);
+  }, [data?.overallProgressPercent, modules]);
+
+  const passPercent = data?.exam?.passPercent ?? CERT_PASS_PERCENT;
+  const retryCooldownMinutes =
+    data?.exam?.retryCooldownMinutes ?? QUIZ_RETRY_COOLDOWN_MIN;
+
+  const lastScore = data?.exam?.lastScorePercent ?? null;
+  const targetDate = data?.exam?.targetDate ?? null;
+  const isCooldownActive = data?.exam?.isCooldownActive ?? false;
+  const cooldownEndsAt = data?.exam?.cooldownEndsAt ?? null;
+
+  const readiness = getReadinessBadge(overallProgress, lastScore, passPercent);
+  const currentStepIndex = computeStepIndex(overallProgress);
+
+  const recommendedStudyHours = data?.exam?.recommendedStudyHours ?? null;
+
+  const handleGoToExamRegistration = () => {
+    router.push('/konnected/certifications/exam-registration');
   };
 
-  return (
-    <PageContainer title="Exam Preparation">
-      <Row gutter={[24, 24]}>
-        {/* Study Modules Overview */}
-        <Col xs={24} md={12}>
-          <Card title="Study Modules Overview">
-            <List
-              itemLayout="horizontal"
-              dataSource={studyModules ?? []}
-              renderItem={(module: Module) => (
-                <List.Item
-                  actions={[
-                    <Button type="link" key="view" icon={<ArrowRightOutlined />}>
-                      View Content
-                    </Button>,
-                  ]}
-                >
-                  <List.Item.Meta
-                    title={
-                      <span>
-                        {module.title}{' '}
-                        {module.completed && <CheckCircleTwoTone twoToneColor="#52c41a" />}
-                      </span>
-                    }
-                    description={
+  const handleGoToExamDashboard = () => {
+    router.push('/konnected/certifications/exam-dashboard-results');
+  };
+
+  const handleStartPracticeExam = () => {
+    // TODO: plug into automated_evaluation “practice mode” endpoint / route
+    router.push('/konnected/certifications/exam-dashboard-results');
+  };
+
+  const subtitle = (
+    <>
+      Get an at-a-glance view of your preparation for this certification path:
+      study modules, focus areas, readiness vs. the {passPercent}% pass threshold,
+      and next steps.
+    </>
+  );
+
+  const renderModulesList = () => {
+    if (!isLoading && modules.length === 0) {
+      return (
+        <Alert
+          type="info"
+          showIcon
+          message="No study modules are defined yet."
+          description="Once your CertificationPath is configured with learning units, they will appear here as a guided preparation plan."
+        />
+      );
+    }
+
+    if (isLoading) {
+      return <Skeleton active paragraph={{ rows: 4 }} />;
+    }
+
+    return (
+      <List
+        itemLayout="horizontal"
+        dataSource={modules}
+        renderItem={(module) => (
+          <List.Item
+            actions={[
+              <Button
+                type="link"
+                key="view"
+                icon={<ArrowRightOutlined />}
+                // TODO: route to the actual learning unit detail, once available
+                onClick={() => {
+                  // eslint-disable-next-line no-console
+                  console.log('Open module', module.id);
+                }}
+              >
+                View module
+              </Button>,
+            ]}
+          >
+            <List.Item.Meta
+              title={
+                <Space size="small">
+                  <span>{module.title}</span>
+                  {module.status === 'completed' && (
+                    <CheckCircleTwoTone twoToneColor="#52c41a" />
+                  )}
+                  {module.isCriticalWeakness && (
+                    <Tag color="volcano" icon={<WarningTwoTone twoToneColor="#fa541c" />}>
+                      Focus area
+                    </Tag>
+                  )}
+                </Space>
+              }
+              description={
+                <Space direction="vertical" size={2}>
+                  <Space size="small" wrap>
+                    <Tag>
+                      {module.type === 'content'
+                        ? 'Content'
+                        : module.type === 'practice_quiz'
+                        ? 'Practice quiz'
+                        : module.type === 'project'
+                        ? 'Project'
+                        : 'Checkpoint'}
+                    </Tag>
+                    <Text type="secondary">
+                      {module.status === 'completed'
+                        ? 'Completed'
+                        : module.status === 'in_progress'
+                        ? `In progress – ${module.progressPercent}%`
+                        : 'Not started yet'}
+                    </Text>
+                    {module.estimatedMinutes != null && (
                       <Text type="secondary">
-                        {module.completed ? 'Completed' : `In progress: ${module.progress}%`}
+                        • ~{module.estimatedMinutes} min
                       </Text>
-                    }
+                    )}
+                  </Space>
+                  <Progress
+                    percent={Math.round(module.progressPercent)}
+                    size="small"
+                    status={module.status === 'completed' ? 'success' : 'active'}
                   />
-                </List.Item>
-              )}
+                  {module.lastTouchedAt && (
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Last worked on:{' '}
+                      {dayjs(module.lastTouchedAt).format('MMM D, YYYY HH:mm')}
+                    </Text>
+                  )}
+                </Space>
+              }
             />
-          </Card>
-        </Col>
+          </List.Item>
+        )}
+      />
+    );
+  };
 
-        {/* Overall Progress + Plan */}
-        <Col xs={24} md={12}>
-          <Card title="Your Preparation Progress">
-            <Text>Your overall progress:</Text>
-            <Progress percent={Math.round(overallProgress)} status="active" />
-            <br />
-            <br />
-            <Title level={5}>Recommended Study Plan</Title>
-            <Steps direction="vertical" size="small" current={0}>
-              {studyPlanSteps.map((step, index) => (
-                <Step key={index} title={step} />
-              ))}
-            </Steps>
-            <br />
-            <Button type="primary" onClick={handleStartQuiz}>
-              Start Practice Exam
+  const renderFocusAreas = () => {
+    if (!isLoading && focusAreas.length === 0) {
+      return (
+        <Alert
+          type="info"
+          showIcon
+          message="No specific focus areas identified yet."
+          description="Once you complete some evaluations, the system will highlight weak domains to prioritize in your study time."
+        />
+      );
+    }
+
+    if (isLoading) {
+      return <Skeleton active paragraph={{ rows: 3 }} />;
+    }
+
+    return (
+      <List
+        dataSource={focusAreas}
+        renderItem={(area) => (
+          <List.Item>
+            <List.Item.Meta
+              title={
+                <Space>
+                  <FlagOutlined />
+                  <span>{area.label}</span>
+                </Space>
+              }
+              description={
+                <>
+                  {area.description && (
+                    <Text type="secondary" style={{ display: 'block' }}>
+                      {area.description}
+                    </Text>
+                  )}
+                  {area.recommendedResourcesCount != null && (
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {area.recommendedResourcesCount} recommended resources
+                      {area.recommendedResourcesCount === 1 ? '' : 's'} in Knowledge
+                    </Text>
+                  )}
+                </>
+              }
+            />
+          </List.Item>
+        )}
+      />
+    );
+  };
+
+  const mainTabsItems = [
+    {
+      key: 'plan',
+      label: 'Study plan & progress',
+      children: (
+        <Card bordered={false}>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <div>
+              <Text strong>Your overall preparation progress</Text>
+              <Progress
+                percent={overallProgress}
+                status={overallProgress >= passPercent ? 'success' : 'active'}
+              />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                Based on all study modules in this CertificationPath.
+              </Text>
+            </div>
+
+            <div>
+              <Text strong>Recommended sequence</Text>
+              <Steps
+                direction="vertical"
+                size="small"
+                current={currentStepIndex}
+                style={{ marginTop: 8 }}
+              >
+                <Step title="Study core content" description="Work through required modules and lessons." />
+                <Step
+                  title="Complete practice activities"
+                  description="Interactive exercises, quizzes, and projects."
+                />
+                <Step
+                  title="Attempt a practice evaluation"
+                  description={`Use automated_evaluation in “practice mode” to benchmark against ${passPercent}%.`}
+                />
+                <Step
+                  title="Review feedback & focus areas"
+                  description="Revisit weak domains before booking the official exam."
+                />
+              </Steps>
+            </div>
+
+            <Button
+              type="primary"
+              icon={<PlayCircleOutlined />}
+              onClick={handleStartPracticeExam}
+              disabled={isCooldownActive}
+            >
+              Start practice exam
             </Button>
-          </Card>
-        </Col>
 
-        {/* Tips */}
-        <Col xs={24}>
-          <Alert
-            message="Exam Tips: Remember to pace yourself, review your weak areas, and take breaks during your study sessions."
-            type="info"
-            showIcon
+            {isCooldownActive && cooldownEndsAt && (
+              <Alert
+                type="warning"
+                showIcon
+                message="Practice exam on cooldown"
+                description={
+                  <>
+                    You recently attempted a practice evaluation. You can try again after{' '}
+                    {dayjs(cooldownEndsAt).format('MMM D, YYYY HH:mm')} (cooldown{' '}
+                    {retryCooldownMinutes} minutes).
+                  </>
+                }
+              />
+            )}
+          </Space>
+        </Card>
+      ),
+    },
+    {
+      key: 'focus',
+      label: 'Focus areas',
+      children: <Card bordered={false}>{renderFocusAreas()}</Card>,
+    },
+  ];
+
+  return (
+    <KonnectedPageShell
+      title={data?.path?.name ?? 'Exam Preparation'}
+      subtitle={subtitle}
+      primaryAction={
+        <Button
+          type="primary"
+          icon={<CalendarOutlined />}
+          onClick={handleGoToExamRegistration}
+        >
+          Exam registration
+        </Button>
+      }
+      secondaryActions={
+        <Button
+          icon={<FileSearchOutlined />}
+          onClick={handleGoToExamDashboard}
+        >
+          Exam dashboard
+        </Button>
+      }
+    >
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="Unable to load your exam preparation data"
+          description="Please try again in a moment. If the problem persists, contact an administrator."
+        />
+      )}
+
+      <Row gutter={[24, 24]}>
+        {/* Left: modules + plan */}
+        <Col xs={24} lg={16}>
+          <Card
+            title={
+              data?.path?.name
+                ? `Study modules for: ${data.path.name}`
+                : 'Study modules'
+            }
+            extra={
+              <Tag color={readiness.color} icon={<FlagOutlined />}>
+                {readiness.label}
+              </Tag>
+            }
+            style={{ marginBottom: 24 }}
+          >
+            {renderModulesList()}
+          </Card>
+
+          <Tabs
+            defaultActiveKey="plan"
+            items={mainTabsItems}
+            destroyInactiveTabPane={false}
           />
         </Col>
+
+        {/* Right: metrics + focus summary */}
+        <Col xs={24} lg={8}>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Card>
+              {isLoading ? (
+                <Skeleton active paragraph={{ rows: 3 }} />
+              ) : (
+                <>
+                  <Row gutter={[16, 16]}>
+                    <Col span={12}>
+                      <Statistic
+                        title="Overall progress"
+                        value={overallProgress}
+                        suffix="%"
+                      />
+                    </Col>
+                    <Col span={12}>
+                      <Statistic
+                        title="Pass threshold"
+                        value={passPercent}
+                        suffix="%"
+                      />
+                    </Col>
+                  </Row>
+
+                  <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+                    <Col span={12}>
+                      <Statistic
+                        title="Recommended study time"
+                        value={
+                          recommendedStudyHours != null
+                            ? recommendedStudyHours
+                            : '—'
+                        }
+                        suffix={recommendedStudyHours != null ? 'hrs' : undefined}
+                        prefix={<ClockCircleOutlined />}
+                      />
+                    </Col>
+                    <Col span={12}>
+                      <Statistic
+                        title="Retry cooldown"
+                        value={retryCooldownMinutes}
+                        suffix="min"
+                        prefix={<ClockCircleOutlined />}
+                      />
+                    </Col>
+                  </Row>
+
+                  <div style={{ marginTop: 16 }}>
+                    <Text type="secondary" style={{ display: 'block' }}>
+                      Pass/fail uses a frozen threshold ({passPercent}%), and
+                      failed attempts are throttled by a{' '}
+                      {retryCooldownMinutes}-minute cooldown.
+                    </Text>
+                  </div>
+                </>
+              )}
+            </Card>
+
+            <Card title="Upcoming exam">
+              {isLoading ? (
+                <Skeleton active paragraph={{ rows: 2 }} />
+              ) : targetDate ? (
+                <>
+                  <Space direction="vertical" size="small">
+                    <Space>
+                      <CalendarOutlined />
+                      <Text strong>
+                        {dayjs(targetDate).format('MMMM D, YYYY')}
+                      </Text>
+                    </Space>
+                    <Text type="secondary">
+                      Make sure your preparation progress and practice scores are
+                      comfortably above {passPercent}% before this date.
+                    </Text>
+                  </Space>
+                  <Button
+                    type="link"
+                    icon={<CalendarOutlined />}
+                    style={{ marginTop: 12, paddingLeft: 0 }}
+                    onClick={handleGoToExamRegistration}
+                  >
+                    Adjust exam session
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Alert
+                    type="info"
+                    showIcon
+                    message="No exam date scheduled"
+                    description="Book a session to lock in your target exam date and align your study plan."
+                  />
+                  <Button
+                    type="primary"
+                    icon={<CalendarOutlined />}
+                    style={{ marginTop: 12 }}
+                    onClick={handleGoToExamRegistration}
+                  >
+                    Schedule exam
+                  </Button>
+                </>
+              )}
+            </Card>
+
+            <Card title="Focus summary">
+              {isLoading ? (
+                <Skeleton active paragraph={{ rows: 3 }} />
+              ) : (
+                <>
+                  {focusAreas.length > 0 ? (
+                    <>
+                      <Text>
+                        You have {focusAreas.length} identified focus{' '}
+                        {focusAreas.length === 1 ? 'area' : 'areas'} based on your
+                        evaluations.
+                      </Text>
+                      <div style={{ marginTop: 12 }}>{renderFocusAreas()}</div>
+                      <Button
+                        type="link"
+                        style={{ marginTop: 8, paddingLeft: 0 }}
+                        onClick={handleGoToExamDashboard}
+                      >
+                        View detailed breakdown in Exam Dashboard
+                      </Button>
+                    </>
+                  ) : (
+                    <Text type="secondary">
+                      Once you complete your first practice or official exam,
+                      we will highlight weak domains and recommended topics
+                      here.
+                    </Text>
+                  )}
+                </>
+              )}
+            </Card>
+          </Space>
+        </Col>
       </Row>
-    </PageContainer>
+    </KonnectedPageShell>
   );
 }
