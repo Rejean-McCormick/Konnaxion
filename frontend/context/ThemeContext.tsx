@@ -10,14 +10,15 @@ import React, {
   ReactNode,
   useMemo,
 } from 'react'
-import { ConfigProvider, theme as antdTheme } from 'antd'
+import { ConfigProvider, theme as antdTheme, App as AntdApp } from 'antd'
+import enUS from 'antd/locale/en_US'
 import themes, { ThemeType, themeKeys } from '@/theme'
 import type { ThemeObject } from '@/theme/types'
 
-/** Le “sac” de tokens que tes composants consomment côté app */
+/** The “bag” of design tokens your app consumes */
 type TokenBag = ThemeObject
 
-/** Variables CSS perso à exporter */
+/** Custom CSS variables to export on <html> */
 const cssVars = ['bgMain', 'bgLight', 'bgDark', 'textMain', 'accent'] as const
 
 interface ThemeContextProps {
@@ -35,7 +36,7 @@ export const useTheme = () => {
   return ctx
 }
 
-/** Supprime les clés dont la valeur est un objet vide */
+/** Strip keys whose value is an empty object */
 const pruneEmptyObjects = <T extends Record<string, any>>(obj: T): T =>
   Object.fromEntries(
     Object.entries(obj).filter(
@@ -44,40 +45,39 @@ const pruneEmptyObjects = <T extends Record<string, any>>(obj: T): T =>
   ) as T
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  /** 1) clé valide */
+  /** 1) Current theme key */
   const [themeType, setThemeType] = useState<ThemeType>('funky')
 
-  /** Restore depuis localStorage (coté client uniquement) */
+  /** Restore from localStorage on client */
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     try {
       const saved = localStorage.getItem('themeType') as ThemeType | null
       if (saved && themeKeys.includes(saved)) setThemeType(saved)
     } catch {
-      /* stockage indisponible : ignorer */
+      // Storage unavailable: ignore
     }
   }, [])
 
-  /** Thème brut “tel que défini” */
+  /** Raw theme object as defined in your theme registry */
   const raw: Partial<TokenBag> = useMemo(
-    // IMPORTANT: pass through unknown as TS suggests, to avoid structural mismatch
     () => ((themes?.[themeType] ?? {}) as unknown as Partial<TokenBag>),
     [themeType],
   )
 
-  /** 2) Exposer data-theme + classes + variables CSS, et nettoyer les anciennes valeurs */
+  /** 2) Expose data-theme + CSS classes + CSS variables on <html> */
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     const html = document.documentElement
 
-    // Attribut data-theme
+    // data-theme attribute
     html.setAttribute('data-theme', themeType)
 
-    // Classes normalisées
+    // Normalized classes
     themeKeys.forEach(k => html.classList.remove(`theme-${k}`))
     html.classList.add(`theme-${themeType}`)
 
-    // Variables CSS perso: set ou clear
+    // Custom CSS variables: set or clear
     cssVars.forEach(key => {
       const name = `--${key.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}`
       const val = (raw as any)[key]
@@ -86,17 +86,17 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     })
   }, [themeType, raw])
 
-  /** Persist */
+  /** Persist current theme key */
   useEffect(() => {
     if (typeof window === 'undefined') return
     try {
       localStorage.setItem('themeType', themeType)
     } catch {
-      /* stockage indisponible : ignorer */
+      // Storage unavailable: ignore
     }
   }, [themeType])
 
-  /** 3) Cycle sûr (même si themeKeys était vidé par erreur) */
+  /** Safe cycling even if themeKeys is accidentally empty */
   const cycleTheme = () => {
     const keys = themeKeys.length > 0 ? themeKeys : (['light'] as ThemeType[])
     const idx = keys.indexOf(themeType)
@@ -104,10 +104,10 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     setThemeType(next)
   }
 
-  /** 4) Laisser AntD dériver les alias; `algorithm` peut être absent dans `ThemeObject` */
+  /** Let AntD derive aliases; fallback to default algorithm */
   const algorithm = (raw as any).algorithm ?? antdTheme.defaultAlgorithm
 
-  /** 5) Overrides globaux strictement sur des seeds / communs si présents */
+  /** Global token overrides only where explicitly provided */
   const tokenOverrides: Record<string, any> = {
     ...(raw.colorPrimary != null && { colorPrimary: raw.colorPrimary }),
     ...(raw.colorInfo != null && { colorInfo: raw.colorInfo }),
@@ -133,7 +133,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }),
   }
 
-  /** 6) Remap des clés “raw” vers components.* puis purge des objets vides */
+  /** Map “raw” keys to component-level overrides, then strip empty objects */
   const componentsOverrides = pruneEmptyObjects({
     Layout: {
       ...(raw as any).layoutColorBgSider
@@ -159,20 +159,25 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         : {},
     }),
     Table: pruneEmptyObjects({
-      // AntD attend headerBg/headerColor
       ...(raw as any).tableHeaderBg ? { headerBg: (raw as any).tableHeaderBg } : {},
     }),
   })
 
-  /** 7) Exposer un token “safe” au contexte sans cast agressif */
+  /** Expose a frozen token bag to the rest of the app */
   const safeToken: Readonly<Partial<TokenBag>> = useMemo(
     () => Object.freeze({ ...raw }),
     [raw],
   )
 
   return (
-    <ThemeContext.Provider value={{ token: safeToken, themeType, setThemeType, cycleTheme }}>
+    <ThemeContext.Provider
+      value={{ token: safeToken, themeType, setThemeType, cycleTheme }}
+    >
       <ConfigProvider
+        /** Force English UI (no more Chinese labels) */
+        locale={enUS}
+        /** Optional global defaults */
+        componentSize="middle"
         theme={{
           algorithm,
           cssVar: true,
@@ -181,7 +186,10 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           components: componentsOverrides,
         }}
       >
-        {children}
+        {/* Ant Design App wrapper: enables context-aware message/notification/modal in React 19 */}
+        <AntdApp>
+          {children}
+        </AntdApp>
       </ConfigProvider>
     </ThemeContext.Provider>
   )

@@ -27,12 +27,16 @@ import {
   ReadOutlined,
   TeamOutlined,
 } from "@ant-design/icons";
-import { PageContainer, ProCard, StatisticCard } from "@ant-design/pro-components";
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from "@ant-design/pro-components";
 import KonnectedPageShell from "../KonnectedPageShell";
 
 const { Text, Title } = Typography;
 
-// ---------- Types ----------
+// ---------- Aggregated types used by the tiles ----------
 
 type CertificationSummary = {
   activePaths: number;
@@ -90,7 +94,15 @@ type CommunitySummary = {
 type TeamSummaryItem = {
   id: string;
   name: string;
-  memberCount: number;
+  /**
+   * Optional if backend does not expose a member count yet.
+   * When missing, we fall back to role‑based descriptions.
+   */
+  memberCount?: number;
+  /**
+   * Optional role of the current user in this team (owner, collaborator, mentor…).
+   */
+  role?: string;
 };
 
 type TeamsSummary = {
@@ -106,7 +118,63 @@ type UsageSummary = {
   certificationsEarnedLast30: number;
 };
 
-// ---------- Data hooks (best-effort; adjust endpoints to your OpenAPI) ----------
+// ---------- Raw API types (simplified, based on your backend models) ----------
+
+type ListResponse<T> = T[] | { results?: T[] };
+
+type PortfolioApi = {
+  id: number;
+  title: string;
+};
+
+type KnowledgeResourceApi = {
+  id: number;
+  title: string;
+  type?: string;
+};
+
+type LearningProgressApi = {
+  id: number;
+  resource: number | KnowledgeResourceApi;
+  progress_percent: string | number;
+  updated_at?: string;
+};
+
+type KnowledgeRecommendationApi = {
+  id: number;
+  resource: number | KnowledgeResourceApi;
+};
+
+type ForumTopicApi = {
+  id: number;
+  title: string;
+  updated_at?: string;
+};
+
+type CoCreationProjectApi = {
+  id: number;
+  title: string;
+  status: string;
+};
+
+type ProjectApi = {
+  id: number;
+  title: string;
+};
+
+type ProjectTeamApi = {
+  id: number;
+  project: number | ProjectApi;
+  role?: string;
+};
+
+type CommunityDashboardUsageApi = {
+  days_active_last_30?: number;
+  resources_completed_last_30?: number;
+  certifications_earned_last_30?: number;
+};
+
+// ---------- Generic helpers ----------
 
 async function fetchJSON<T>(url: string): Promise<T> {
   const res = await fetch(url, { credentials: "include" });
@@ -116,64 +184,365 @@ async function fetchJSON<T>(url: string): Promise<T> {
   return res.json() as Promise<T>;
 }
 
+async function fetchList<T>(url: string): Promise<T[]> {
+  const data = await fetchJSON<ListResponse<T>>(url);
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data.results)) return data.results;
+  return [];
+}
+
+function safeNumber(value: unknown): number {
+  if (typeof value === "number") return value;
+  if (typeof value === "string") {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+  return 0;
+}
+
+function pickTopN<T>(items: T[], n: number): T[] {
+  if (items.length <= n) return items;
+  return items.slice(0, n);
+}
+
+// Knowledge resources endpoint can have slightly different prefixes in your codebase.
+// This helper tries the most likely ones and returns the first that works.
+async function fetchKnowledgeResourcesList(): Promise<KnowledgeResourceApi[]> {
+  const candidates = [
+    "/api/knowledge-resources/",
+    "/api/knowledge/resources/",
+    "/api/konnected/resources/",
+  ] as const;
+
+  for (const url of candidates) {
+    try {
+      const items = await fetchList<KnowledgeResourceApi>(url);
+      // If the endpoint exists and responds, we use it even if empty.
+      return items;
+    } catch {
+      // Try next candidate
+    }
+  }
+  return [];
+}
+
+function getResourceIdFromProgress(item: LearningProgressApi): number | null {
+  if (typeof item.resource === "number") return item.resource;
+  if (
+    item.resource &&
+    typeof item.resource === "object" &&
+    "id" in item.resource
+  ) {
+    return (item.resource as KnowledgeResourceApi).id;
+  }
+  return null;
+}
+
+function getResourceIdFromRecommendation(
+  item: KnowledgeRecommendationApi
+): number | null {
+  if (typeof item.resource === "number") return item.resource;
+  if (
+    item.resource &&
+    typeof item.resource === "object" &&
+    "id" in item.resource
+  ) {
+    return (item.resource as KnowledgeResourceApi).id;
+  }
+  return null;
+}
+
+// ---------- Client‑side aggregation functions (using real backend endpoints) ----------
+
+async function buildCertificationSummary(): Promise<CertificationSummary> {
+  // Uses portfolios + learning‑progress as real backing data.
+  const [portfolios, progress] = await Promise.all([
+    fetchList<PortfolioApi>("/api/portfolios/").catch(() => []),
+    fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+  ]);
+
+  const progressValues = progress.map((p) => safeNumber(p.progress_percent));
+  const activePaths = progressValues.filter((v) => v > 0 && v < 100).length;
+  const completedPaths = progressValues.filter((v) => v >= 100).length;
+
+  return {
+    activePaths,
+    completedPaths,
+    certificatesCount: portfolios.length,
+    // These will become non‑zero once you expose evaluation / peer‑validation APIs
+    upcomingEvaluations: 0,
+    pendingPeerValidations: 0,
+    nextEvaluationDate: null,
+  };
+}
+
+async function buildLearningSummary(): Promise<LearningSummary> {
+  const [progressRecords, resources, recommendations] = await Promise.all([
+    fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+    fetchKnowledgeResourcesList().catch(() => []),
+    fetchList<KnowledgeRecommendationApi>("/api/knowledge-recommendations/").catch(
+      () => []
+    ),
+  ]);
+
+  const resourceMap = new Map<number, KnowledgeResourceApi>();
+  for (const r of resources) {
+    resourceMap.set(r.id, r);
+  }
+
+  const progressValues = progressRecords.map((p) =>
+    safeNumber(p.progress_percent)
+  );
+  const startedCount = progressRecords.length;
+  const completedCount = progressValues.filter((v) => v >= 100).length;
+  const averageProgressPercent =
+    progressValues.length > 0
+      ? progressValues.reduce((a, b) => a + b, 0) / progressValues.length
+      : 0;
+
+  const inProgressRecords = progressRecords.filter((p) => {
+    const v = safeNumber(p.progress_percent);
+    return v > 0 && v < 100;
+  });
+
+  const inProgress: LearningResourceSummaryItem[] = pickTopN(
+    inProgressRecords,
+    5
+  ).map((p) => {
+    const resId = getResourceIdFromProgress(p);
+    const resource = resId != null ? resourceMap.get(resId) : undefined;
+    const title =
+      resource?.title ??
+      (resId != null ? `Resource #${resId}` : `Progress #${p.id}`);
+    const type =
+      (resource?.type as LearningResourceSummaryItem["type"]) ?? "lesson";
+
+    return {
+      id: resId != null ? String(resId) : String(p.id),
+      title,
+      type,
+      progressPercent: safeNumber(p.progress_percent),
+    };
+  });
+
+  const recommended: LearningResourceSummaryItem[] = [];
+  for (const rec of recommendations) {
+    const resId = getResourceIdFromRecommendation(rec);
+    if (resId == null) continue;
+    const resource = resourceMap.get(resId);
+    if (!resource) continue;
+
+    recommended.push({
+      id: String(resId),
+      title: resource.title,
+      type: (resource.type as LearningResourceSummaryItem["type"]) ?? "article",
+    });
+
+    if (recommended.length >= 5) break;
+  }
+
+  return {
+    startedCount,
+    completedCount,
+    averageProgressPercent,
+    inProgress,
+    recommended,
+  };
+}
+
+async function buildLearningPathSummary(): Promise<LearningPathSummary> {
+  const [progressRecords, resources] = await Promise.all([
+    fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+    fetchKnowledgeResourcesList().catch(() => []),
+  ]);
+
+  const resourceMap = new Map<number, KnowledgeResourceApi>();
+  for (const r of resources) {
+    resourceMap.set(r.id, r);
+  }
+
+  const progressWithValues = progressRecords.map((record) => ({
+    record,
+    value: safeNumber(record.progress_percent),
+  }));
+
+  const activeRecords = progressWithValues.filter(
+    ({ value }) => value > 0 && value < 100
+  );
+  const completedRecords = progressWithValues.filter(
+    ({ value }) => value >= 100
+  );
+
+  let currentTitle: string | null = null;
+  let currentPercent: number | null = null;
+
+  const sortedActive = [...activeRecords].sort((a, b) => b.value - a.value);
+  const sortedAll = [...progressWithValues].sort((a, b) => b.value - a.value);
+  const candidate = sortedActive[0] ?? sortedAll[0];
+
+  if (candidate) {
+    const resId = getResourceIdFromProgress(candidate.record);
+    const resource = resId != null ? resourceMap.get(resId) : undefined;
+    currentTitle =
+      resource?.title ?? (resId != null ? `Resource #${resId}` : null);
+    currentPercent = candidate.value;
+  }
+
+  return {
+    myActivePaths: activeRecords.length,
+    myCompletedPaths: completedRecords.length,
+    myCurrentPathTitle: currentTitle,
+    myCurrentPathProgressPercent: currentPercent,
+    // These can be wired later to real educator / path‑management APIs.
+    isEducator: false,
+    managedPathsCount: 0,
+  };
+}
+
+async function buildCommunitySummary(): Promise<CommunitySummary> {
+  const [topics, coCreationProjects] = await Promise.all([
+    fetchList<ForumTopicApi>("/api/forum-topics/").catch(() => []),
+    fetchList<CoCreationProjectApi>("/api/co-creation-projects/").catch(
+      () => []
+    ),
+  ]);
+
+  const recentTopics: CommunityTopicSummary[] = pickTopN(
+    topics.sort((a, b) => {
+      const da = a.updated_at ? Date.parse(a.updated_at) : 0;
+      const db = b.updated_at ? Date.parse(b.updated_at) : 0;
+      return db - da;
+    }),
+    5
+  ).map((t) => ({
+    id: String(t.id),
+    title: t.title,
+    lastActivity: t.updated_at ?? "Recently",
+    // Per‑user unread counts require a dedicated API; default to 0 for now.
+    unreadCount: 0,
+  }));
+
+  const activeCoCreationProjects: CoCreationProjectSummary[] = pickTopN(
+    coCreationProjects.filter((p) => p.status === "active"),
+    5
+  ).map((p) => ({
+    id: String(p.id),
+    title: p.title,
+    status: p.status as CoCreationProjectSummary["status"],
+    // Real role would come from a membership API; use a neutral default.
+    role: "contributor",
+  }));
+
+  return {
+    activeThreadsCount: topics.length,
+    recentTopics,
+    activeCoCreationProjects,
+  };
+}
+
+async function buildTeamsSummary(): Promise<TeamsSummary> {
+  // Project-team memberships + projects, as exposed by your API root.
+  const [memberships, projects] = await Promise.all([
+    fetchList<ProjectTeamApi>("/api/project-teams/").catch(() => []),
+    fetchList<ProjectApi>("/api/projects/").catch(() => []),
+  ]);
+
+  const projectMap = new Map<number, ProjectApi>();
+  for (const p of projects) {
+    projectMap.set(p.id, p);
+  }
+
+  const teamsMap = new Map<number, TeamSummaryItem>();
+
+  for (const membership of memberships) {
+    const projId =
+      typeof membership.project === "number"
+        ? membership.project
+        : membership.project?.id;
+    if (!projId) continue;
+
+    if (!teamsMap.has(projId)) {
+      const project = projectMap.get(projId);
+      teamsMap.set(projId, {
+        id: String(projId),
+        name: project?.title ?? `Project #${projId}`,
+        role: membership.role,
+      });
+    }
+  }
+
+  const teams = Array.from(teamsMap.values());
+
+  return {
+    myTeamsCount: teams.length,
+    teams,
+    nextTeamActivityTitle: null,
+    nextTeamActivityDate: null,
+  };
+}
+
+async function buildUsageSummary(): Promise<UsageSummary> {
+  // Prefer the real aggregated endpoint if available.
+  try {
+    const data = await fetchJSON<CommunityDashboardUsageApi>(
+      "/api/community-dashboard/"
+    );
+    return {
+      daysActiveLast30: data.days_active_last_30 ?? 0,
+      resourcesCompletedLast30: data.resources_completed_last_30 ?? 0,
+      certificationsEarnedLast30: data.certifications_earned_last_30 ?? 0,
+    };
+  } catch {
+    // If the dashboard endpoint is not ready yet, fall back to zeros.
+    return {
+      daysActiveLast30: 0,
+      resourcesCompletedLast30: 0,
+      certificationsEarnedLast30: 0,
+    };
+  }
+}
+
+// ---------- Data hooks wired to the real aggregation helpers ----------
+
 function useCertificationSummary() {
   return useQuery<CertificationSummary>({
     queryKey: ["konnected", "dashboard", "certificationSummary"],
-    queryFn: () =>
-      fetchJSON<CertificationSummary>(
-        // Replace with your real aggregate endpoint or client-side aggregation route
-        "/api/konnected/certification/summary/"
-      ),
+    queryFn: buildCertificationSummary,
   });
 }
 
 function useLearningSummary() {
   return useQuery<LearningSummary>({
     queryKey: ["konnected", "dashboard", "learningSummary"],
-    queryFn: () =>
-      fetchJSON<LearningSummary>(
-        "/api/konnected/knowledge/dashboard-summary/"
-      ),
+    queryFn: buildLearningSummary,
   });
 }
 
 function useLearningPathSummary() {
   return useQuery<LearningPathSummary>({
     queryKey: ["konnected", "dashboard", "learningPathSummary"],
-    queryFn: () =>
-      fetchJSON<LearningPathSummary>(
-        "/api/konnected/learning-paths/dashboard-summary/"
-      ),
+    queryFn: buildLearningPathSummary,
   });
 }
 
 function useCommunitySummary() {
   return useQuery<CommunitySummary>({
     queryKey: ["konnected", "dashboard", "communitySummary"],
-    queryFn: () =>
-      fetchJSON<CommunitySummary>(
-        "/api/konnected/community/dashboard-summary/"
-      ),
+    queryFn: buildCommunitySummary,
   });
 }
 
 function useTeamsSummary() {
   return useQuery<TeamsSummary>({
     queryKey: ["konnected", "dashboard", "teamsSummary"],
-    queryFn: () =>
-      fetchJSON<TeamsSummary>(
-        "/api/konnected/teams/dashboard-summary/"
-      ),
+    queryFn: buildTeamsSummary,
   });
 }
 
 function useUsageSummary() {
   return useQuery<UsageSummary>({
     queryKey: ["konnected", "dashboard", "usageSummary"],
-    queryFn: () =>
-      fetchJSON<UsageSummary>(
-        "/api/reports/usage/konnected-summary/"
-      ),
+    queryFn: buildUsageSummary,
   });
 }
 
@@ -196,7 +565,10 @@ function CertificationsTile() {
         title="Certifications"
         bordered
         extra={
-          <Button type="link" href="/konnected/certifications/certification-programs">
+          <Button
+            type="link"
+            href="/konnected/certifications/certification-programs"
+          >
             View programs
           </Button>
         }
@@ -221,10 +593,16 @@ function CertificationsTile() {
       bordered
       extra={
         <Space>
-          <Button type="default" href="/konnected/certifications/exam-dashboard-results">
+          <Button
+            type="default"
+            href="/konnected/certifications/exam-dashboard-results"
+          >
             Exam results
           </Button>
-          <Button type="primary" href="/konnected/certifications/certification-programs">
+          <Button
+            type="primary"
+            href="/konnected/certifications/certification-programs"
+          >
             View programs
           </Button>
         </Space>
@@ -235,7 +613,10 @@ function CertificationsTile() {
           description="No certifications yet"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
-          <Button type="primary" href="/konnected/certifications/certification-programs">
+          <Button
+            type="primary"
+            href="/konnected/certifications/certification-programs"
+          >
             Explore certification programs
           </Button>
         </Empty>
@@ -275,7 +656,9 @@ function CertificationsTile() {
                 <Text strong>Pending peer validations:</Text>
                 <Badge
                   count={data.pendingPeerValidations}
-                  status={data.pendingPeerValidations > 0 ? "warning" : "default"}
+                  status={
+                    data.pendingPeerValidations > 0 ? "warning" : "default"
+                  }
                 />
               </Space>
             </Space>
@@ -324,7 +707,9 @@ function LearningTile() {
   }
 
   const hasProgress =
-    data.startedCount > 0 || data.completedCount > 0 || data.inProgress.length > 0;
+    data.startedCount > 0 ||
+    data.completedCount > 0 ||
+    data.inProgress.length > 0;
 
   return (
     <ProCard
@@ -332,10 +717,16 @@ function LearningTile() {
       bordered
       extra={
         <Space>
-          <Button type="default" href="/konnected/learning-library/recommended-resources">
+          <Button
+            type="default"
+            href="/konnected/learning-library/recommended-resources"
+          >
             Recommendations
           </Button>
-          <Button type="primary" href="/konnected/learning-library/browse-resources">
+          <Button
+            type="primary"
+            href="/konnected/learning-library/browse-resources"
+          >
             Browse library
           </Button>
         </Space>
@@ -343,124 +734,132 @@ function LearningTile() {
     >
       <Row gutter={[16, 16]}>
         <Col xs={24} md={10}>
-          <Space direction="vertical" size="large" style={{ width: "100%" }}>
-            <Space size="large" wrap>
-              <StatisticCard
-                statistic={{
-                  title: "Started",
-                  value: data.startedCount,
-                  prefix: <ReadOutlined />,
-                }}
-              />
-              <StatisticCard
-                statistic={{
-                  title: "Completed",
-                  value: data.completedCount,
-                  prefix: <CheckCircleOutlined />,
-                }}
-              />
-            </Space>
-            <div>
-              <Text strong>Average completion</Text>
-              <Progress
-                percent={Math.round(data.averageProgressPercent)}
-                status="normal"
-              />
-            </div>
+          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+            <StatisticCard
+              statistic={{
+                title: "Resources started",
+                value: data.startedCount,
+                prefix: <ReadOutlined />,
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: "Resources completed",
+                value: data.completedCount,
+                prefix: <CheckCircleOutlined />,
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: "Average progress",
+                value: Math.round(data.averageProgressPercent),
+                suffix: "%",
+                prefix: <LineChartOutlined />,
+              }}
+            />
           </Space>
         </Col>
         <Col xs={24} md={14}>
-          <Tabs
-            defaultActiveKey="in-progress"
-            items={[
-              {
-                key: "in-progress",
-                label: "In progress",
-                children: hasProgress ? (
-                  <List
-                    size="small"
-                    dataSource={data.inProgress}
-                    locale={{ emptyText: "No resources in progress" }}
-                    renderItem={(item) => (
-                      <List.Item
-                        actions={[
-                          <Button
-                            key="continue"
-                            type="link"
-                            href={`/course/${encodeURIComponent(item.id)}`}
-                          >
-                            Continue
-                          </Button>,
-                        ]}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <Space>
-                              <Text strong>{item.title}</Text>
-                              <Tag>{item.type}</Tag>
-                            </Space>
-                          }
-                          description={
-                            <Progress
-                              percent={Math.round(item.progressPercent ?? 0)}
-                              size="small"
-                              status="active"
-                            />
-                          }
-                        />
-                      </List.Item>
-                    )}
-                  />
-                ) : (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="No learning progress yet"
-                  >
-                    <Button
-                      type="primary"
-                      href="/konnected/learning-library/recommended-resources"
-                    >
-                      Start with recommendations
-                    </Button>
-                  </Empty>
-                ),
-              },
-              {
-                key: "recommended",
-                label: "Recommended",
-                children: (
-                  <List
-                    size="small"
-                    dataSource={data.recommended}
-                    locale={{ emptyText: "No recommendations available" }}
-                    renderItem={(item) => (
-                      <List.Item
-                        actions={[
-                          <Button
-                            key="start"
-                            type="link"
-                            href={`/course/${encodeURIComponent(item.id)}`}
-                          >
-                            Open
-                          </Button>,
-                        ]}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <Space>
-                              <Text strong>{item.title}</Text>
-                              <Tag color="blue">Recommended</Tag>
-                              <Tag>{item.type}</Tag>
-                            </Space>
-                          }
-                        />
-                      </List.Item>
-                    )}
-                  />
-                ),
-              },
-            ]}
-          />
+          {!hasProgress ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No learning activity yet"
+            >
+              <Button
+                type="primary"
+                href="/konnected/learning-library/browse-resources"
+              >
+                Start learning
+              </Button>
+            </Empty>
+          ) : (
+            <Tabs
+              defaultActiveKey="inProgress"
+              items={[
+                {
+                  key: "inProgress",
+                  label: "In progress",
+                  children: (
+                    <List
+                      size="small"
+                      dataSource={data.inProgress}
+                      locale={{ emptyText: "No resources in progress" }}
+                      renderItem={(item) => (
+                        <List.Item
+                          actions={[
+                            typeof item.progressPercent === "number" ? (
+                              <Tooltip
+                                key="progress"
+                                title={`${Math.round(
+                                  item.progressPercent
+                                )}% complete`}
+                              >
+                                <Progress
+                                  percent={Math.round(item.progressPercent)}
+                                  size="small"
+                                  style={{ width: 120 }}
+                                />
+                              </Tooltip>
+                            ) : null,
+                            <Button
+                              key="open"
+                              type="link"
+                              href={`/course/${encodeURIComponent(item.id)}`}
+                            >
+                              Open
+                            </Button>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={
+                              <Space>
+                                <Text strong>{item.title}</Text>
+                                <Tag>{item.type}</Tag>
+                              </Space>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  ),
+                },
+                {
+                  key: "recommended",
+                  label: "Recommended",
+                  children: (
+                    <List
+                      size="small"
+                      dataSource={data.recommended}
+                      locale={{ emptyText: "No recommendations available" }}
+                      renderItem={(item) => (
+                        <List.Item
+                          actions={[
+                            <Button
+                              key="start"
+                              type="link"
+                              href={`/course/${encodeURIComponent(item.id)}`}
+                            >
+                              Open
+                            </Button>,
+                          ]}
+                        >
+                          <List.Item.Meta
+                            title={
+                              <Space>
+                                <Text strong>{item.title}</Text>
+                                <Tag color="blue">Recommended</Tag>
+                                <Tag>{item.type}</Tag>
+                              </Space>
+                            }
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  ),
+                },
+              ]}
+            />
+          )}
         </Col>
       </Row>
     </ProCard>
@@ -495,7 +894,9 @@ function LearningPathsTile() {
   }
 
   const hasPaths =
-    data.myActivePaths > 0 || data.myCompletedPaths > 0 || !!data.myCurrentPathTitle;
+    data.myActivePaths > 0 ||
+    data.myCompletedPaths > 0 ||
+    !!data.myCurrentPathTitle;
 
   return (
     <ProCard
@@ -535,7 +936,10 @@ function LearningPathsTile() {
           description="No learning paths yet"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
-          <Button type="primary" href="/konnected/learning-library/browse-resources">
+          <Button
+            type="primary"
+            href="/konnected/learning-library/browse-resources"
+          >
             Start from library
           </Button>
         </Empty>
@@ -690,9 +1094,7 @@ function CommunityTile() {
                       ]}
                     >
                       <List.Item.Meta
-                        avatar={
-                          <Avatar icon={<TeamOutlined />} />
-                        }
+                        avatar={<Avatar icon={<TeamOutlined />} />}
                         title={topic.title}
                         description={
                           <Text type="secondary">
@@ -706,25 +1108,34 @@ function CommunityTile() {
               ),
             },
             {
-              key: "cocreation",
-              label: "Co-creation",
+              key: "coCreation",
+              label: "Co-creation projects",
               children: (
                 <List
                   size="small"
                   dataSource={data.activeCoCreationProjects}
                   locale={{ emptyText: "No active co-creation projects" }}
-                  renderItem={(proj) => (
+                  renderItem={(project) => (
                     <List.Item
                       actions={[
-                        <Tag key="role">{proj.role}</Tag>,
-                        <Tag key="status" color="blue">
-                          {proj.status}
-                        </Tag>,
+                        <Button
+                          key="view"
+                          type="link"
+                          href="/konnected/community-discussions/active-threads"
+                        >
+                          Open
+                        </Button>,
                       ]}
                     >
                       <List.Item.Meta
-                        avatar={<Avatar icon={<ReadOutlined />} />}
-                        title={proj.title}
+                        avatar={<Avatar icon={<FileTextOutlined />} />}
+                        title={project.title}
+                        description={
+                          <Space>
+                            <Tag color="green">{project.status}</Tag>
+                            <Tag>{project.role}</Tag>
+                          </Space>
+                        }
                       />
                     </List.Item>
                   )}
@@ -755,17 +1166,24 @@ function TeamsTile() {
         title="Teams & collaboration"
         bordered
         extra={
-          <Button type="link" href="/konnected/teams-collaboration/my-teams">
-            My teams
+          <Button
+            type="link"
+            href="/konnected/teams-collaboration/team-builder"
+          >
+            Discover teams
           </Button>
         }
       >
-        <Alert type="warning" showIcon message="Unable to load teams summary." />
+        <Alert
+          type="warning"
+          showIcon
+          message="Unable to load your teams."
+        />
       </ProCard>
     );
   }
 
-  const hasTeams = data.myTeamsCount > 0 || data.teams.length > 0;
+  const hasTeams = data.myTeamsCount > 0;
 
   return (
     <ProCard
@@ -773,14 +1191,17 @@ function TeamsTile() {
       bordered
       extra={
         <Space>
-          <Button type="default" href="/konnected/teams-collaboration/my-teams">
-            My teams
+          <Button
+            type="default"
+            href="/konnected/teams-collaboration/project-workspaces"
+          >
+            Project workspaces
           </Button>
           <Button
             type="primary"
-            href="/konnected/teams-collaboration/team-builder"
+            href="/konnected/teams-collaboration/my-teams"
           >
-            Team builder
+            My teams
           </Button>
         </Space>
       }
@@ -845,7 +1266,15 @@ function TeamsTile() {
                     </Avatar.Group>
                   }
                   title={team.name}
-                  description={`${team.memberCount} members`}
+                  description={
+                    team.memberCount != null
+                      ? `${team.memberCount} member${
+                          team.memberCount === 1 ? "" : "s"
+                        }`
+                      : team.role
+                      ? `Role: ${team.role}`
+                      : "Team member"
+                  }
                 />
               </List.Item>
             )}
@@ -932,7 +1361,10 @@ export default function KonnectedDashboardPage() {
       title="KonnectED dashboard"
       subtitle="Overview of your certifications, learning, community, and teams."
       primaryAction={
-        <Button type="primary" href="/konnected/learning-library/recommended-resources">
+        <Button
+          type="primary"
+          href="/konnected/learning-library/recommended-resources"
+        >
           Continue learning
         </Button>
       }

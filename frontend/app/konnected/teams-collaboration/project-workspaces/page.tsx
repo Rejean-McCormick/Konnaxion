@@ -39,9 +39,9 @@ const { Option } = Select;
 type WorkspaceVisibility = 'open' | 'team-only' | 'restricted';
 
 /**
- * Shape aligned with the KonnectED · Teams Collaboration spec:
- * - bridges a KeenKonnect Project + Collaboration Workspace
- * - scoped by team membership and role
+ * Row used by the UI.
+ * Currently backed directly by keenKonnect Projects from the backend.
+ * Team-related fields are left empty until KonnectED teams APIs are wired.
  */
 export interface ProjectWorkspaceRow {
   id: string;
@@ -54,10 +54,10 @@ export interface ProjectWorkspaceRow {
   /** e.g. "Active", "Planning", "Completed", "Archived" */
   status: string;
 
-  /** e.g. "Owner", "Facilitator", "Contributor", "Viewer" */
+  /** e.g. "Owner", "Contributor", "Viewer" */
   userRole: string;
 
-  /** true = workspace already launched in KeenKonnect */
+  /** true = workspace available in keenKonnect */
   isWorkspaceLaunched: boolean;
 
   /** last activity timestamp (ISO) */
@@ -67,7 +67,7 @@ export interface ProjectWorkspaceRow {
   totalMembers?: number | null;
   onlineMembers?: number | null;
 
-  /** linked KonnectED resources */
+  /** linked KonnectED resources (future) */
   linkedKnowledgeCount?: number | null;
   linkedCertificationsCount?: number | null;
 
@@ -78,16 +78,24 @@ export interface ProjectWorkspaceRow {
   canArchive?: boolean;
 }
 
-/**
- * API response is expected to follow the common list pattern:
- * {
- *   items: ProjectWorkspaceRow[];
- *   total: number;
- * }
- */
-interface WorkspaceListResponse {
-  items: ProjectWorkspaceRow[];
-  total: number;
+/** Shape of /api/keenkonnect/projects/ from the Django backend */
+interface ProjectApi {
+  id: number;
+  creator: string;
+  title: string;
+  description: string;
+  category: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  tags: number[];
+}
+
+/** Shape of /api/users/me/ */
+interface CurrentUserApi {
+  username: string;
+  name: string;
+  url: string;
 }
 
 type StatusFilterValue = 'all' | 'active' | 'planning' | 'completed' | 'archived';
@@ -110,8 +118,57 @@ function formatLastActivity(iso?: string | null): string {
   return date.toLocaleString();
 }
 
+/**
+ * Map backend project.status codes to human-readable workspace status labels.
+ * This keeps the filters ("Active", "Planning", etc.) working.
+ */
+function mapProjectStatusToLabel(statusCode: string): string {
+  const code = (statusCode ?? '').toLowerCase();
+  if (code === 'idea') return 'Planning';
+  if (code === 'progress' || code === 'in_progress') return 'Active';
+  if (code === 'completed' || code === 'done') return 'Completed';
+  if (code === 'validated') return 'Completed';
+  if (code === 'archived') return 'Archived';
+  return statusCode || 'Active';
+}
+
+/**
+ * Build a workspace row purely from real backend data.
+ * Team-related info is left empty until ProjectTeam/KonnectED teams APIs exist.
+ */
+function buildWorkspaceRow(
+  project: ProjectApi,
+  currentUsername: string | null,
+): ProjectWorkspaceRow {
+  const statusLabel = mapProjectStatusToLabel(project.status);
+  const isOwner = currentUsername != null && project.creator === currentUsername;
+
+  return {
+    id: String(project.id),
+    projectId: String(project.id),
+    // No explicit team model wired yet → keep empty, rendered as "—" in the UI
+    teamId: '',
+    teamName: '',
+    projectTitle: project.title,
+    status: statusLabel,
+    userRole: isOwner ? 'Owner' : 'Member',
+    isWorkspaceLaunched: true,
+    lastActivityAt: project.updated_at || project.created_at,
+    totalMembers: null,
+    onlineMembers: null,
+    linkedKnowledgeCount: null,
+    linkedCertificationsCount: null,
+    visibility: 'open',
+    canEnter: true,
+    canManage: isOwner,
+    canArchive: isOwner,
+  };
+}
+
 export default function KonnectedProjectWorkspacesPage(): JSX.Element {
   const router = useRouter();
+
+  const [messageApi, contextHolder] = antdMessage.useMessage();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [rows, setRows] = useState<ProjectWorkspaceRow[]>([]);
@@ -123,7 +180,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
     useState<OwnershipFilterValue>('all');
   const [teamFilter, setTeamFilter] = useState<string | 'all'>('all');
 
-  // --- Fetch data from backend ------------------------------------------------
+  // --- Fetch data from backend (real /api endpoints) -------------------------
 
   useEffect(() => {
     let isMounted = true;
@@ -132,21 +189,32 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
       try {
         setLoading(true);
 
-        // Endpoint naming aligned to KonnectED Teams Collaboration aggregation:
-        // backend should expose /konnected/teams/project-workspaces for the
-        // current user, returning { items, total }.
-        const response = await api.get<WorkspaceListResponse>(
-          '/konnected/teams/project-workspaces',
-        );
+        let currentUsername: string | null = null;
+
+        // Try to resolve current user, but do not fail the page if this call fails.
+        try {
+          const me = await api.get<CurrentUserApi>('users/me/');
+          currentUsername = me?.username ?? null;
+        } catch {
+          currentUsername = null;
+        }
+
+        // KeenKonnect projects list → /api/keenkonnect/projects/
+        const projects = await api.get<ProjectApi[]>('keenkonnect/projects/');
 
         if (!isMounted) return;
-        setRows(response.items ?? []);
-        setTotal(response.total ?? response.items?.length ?? 0);
+
+        const mapped = (projects ?? []).map((p) =>
+          buildWorkspaceRow(p, currentUsername),
+        );
+
+        setRows(mapped);
+        setTotal(mapped.length);
       } catch (error) {
         if (!isMounted) return;
         // eslint-disable-next-line no-console
         console.error('Failed to load project workspaces', error);
-        antdMessage.error(
+        messageApi.error(
           'Unable to load project workspaces. Please try again later.',
         );
       } finally {
@@ -156,14 +224,14 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
       }
     }
 
-    fetchWorkspaces();
+    void fetchWorkspaces();
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [messageApi]);
 
-  // --- Derived filters & stats ------------------------------------------------
+  // --- Derived filters & stats -----------------------------------------------
 
   const teamOptions = useMemo(() => {
     const uniqueTeams = Array.from(
@@ -172,57 +240,59 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
     return uniqueTeams.sort();
   }, [rows]);
 
-  const filteredRows = useMemo(() => {
-    return rows.filter((row) => {
-      // text search on project + team
-      if (searchText.trim()) {
-        const needle = searchText.toLowerCase();
-        const haystack = `${row.projectTitle} ${row.teamName}`.toLowerCase();
-        if (!haystack.includes(needle)) {
+  const filteredRows = useMemo(
+    () =>
+      rows.filter((row) => {
+        // text search on project + team
+        if (searchText.trim()) {
+          const needle = searchText.toLowerCase();
+          const haystack = `${row.projectTitle} ${row.teamName}`.toLowerCase();
+          if (!haystack.includes(needle)) {
+            return false;
+          }
+        }
+
+        // status filter – approximate mapping based on label
+        if (statusFilter !== 'all') {
+          const normalized = row.status.toLowerCase();
+          switch (statusFilter) {
+            case 'active':
+              if (!normalized.includes('active')) return false;
+              break;
+            case 'planning':
+              if (!normalized.includes('plan')) return false;
+              break;
+            case 'completed':
+              if (!normalized.includes('complete')) return false;
+              break;
+            case 'archived':
+              if (!normalized.includes('archiv')) return false;
+              break;
+            default:
+              break;
+          }
+        }
+
+        // ownership filter – role derived from backend creator vs current user
+        if (ownershipFilter !== 'all') {
+          const role = (row.userRole || '').toLowerCase();
+          if (ownershipFilter === 'owner') {
+            if (!role.includes('owner') && !role.includes('lead')) return false;
+          }
+          if (ownershipFilter === 'member') {
+            if (role.includes('owner') || role.includes('lead')) return false;
+          }
+        }
+
+        // team filter
+        if (teamFilter !== 'all' && row.teamName !== teamFilter) {
           return false;
         }
-      }
 
-      // status filter – approximate mapping based on label
-      if (statusFilter !== 'all') {
-        const normalized = row.status.toLowerCase();
-        switch (statusFilter) {
-          case 'active':
-            if (!normalized.includes('active')) return false;
-            break;
-          case 'planning':
-            if (!normalized.includes('plan')) return false;
-            break;
-          case 'completed':
-            if (!normalized.includes('complete')) return false;
-            break;
-          case 'archived':
-            if (!normalized.includes('archiv')) return false;
-            break;
-          default:
-            break;
-        }
-      }
-
-      // ownership filter – relies on semantic role label
-      if (ownershipFilter !== 'all') {
-        const role = (row.userRole || '').toLowerCase();
-        if (ownershipFilter === 'owner') {
-          if (!role.includes('owner') && !role.includes('lead')) return false;
-        }
-        if (ownershipFilter === 'member') {
-          if (role.includes('owner') || role.includes('lead')) return false;
-        }
-      }
-
-      // team filter
-      if (teamFilter !== 'all' && row.teamName !== teamFilter) {
-        return false;
-      }
-
-      return true;
-    });
-  }, [rows, searchText, statusFilter, ownershipFilter, teamFilter]);
+        return true;
+      }),
+    [rows, searchText, statusFilter, ownershipFilter, teamFilter],
+  );
 
   const totalActive = useMemo(
     () =>
@@ -239,43 +309,30 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
     [rows],
   );
 
-  const totalLinkedKnowledge = useMemo(
-    () =>
-      rows.reduce(
-        (acc, r) => acc + (r.linkedKnowledgeCount ?? 0),
-        0,
-      ),
-    [rows],
-  );
-
   // --- Navigation helpers -----------------------------------------------------
 
   const goToWorkspace = (row: ProjectWorkspaceRow) => {
     if (row.canEnter === false) {
-      antdMessage.warning(
-        'You do not have permission to enter this workspace.',
-      );
+      messageApi.warning('You do not have permission to enter this workspace.');
       return;
     }
 
-    // All “deep work” still occurs inside keenKonnect project workspace.
-    // We simply route to the existing workspace surface and let it resolve context.
-    router.push(`/keenkonnect/projects/project-workspace?projectId=${row.projectId}`);
+    router.push(
+      `/keenkonnect/projects/project-workspace?projectId=${row.projectId}`,
+    );
   };
 
   const goToTeam = (row: ProjectWorkspaceRow) => {
-    // For now, route back to KonnectED “My Teams” with a pre-selected context
-    // once that page is aware of query params. For now, just generally go there.
     router.push('/konnected/teams-collaboration/my-teams');
   };
 
   const handleArchiveWorkspace = (row: ProjectWorkspaceRow) => {
     if (!row.canArchive) {
-      antdMessage.warning('You do not have permission to archive this workspace.');
+      messageApi.warning('You do not have permission to archive this workspace.');
       return;
     }
-    // TODO: plug to API when archive endpoint is wired (e.g. PATCH /projects/{id}/archive/)
-    antdMessage.info(
+    // TODO: plug to a real archive endpoint when implemented (e.g. PATCH /projects/{id}/archive/)
+    messageApi.info(
       `Archive action would be sent for workspace "${row.projectTitle}".`,
     );
   };
@@ -305,17 +362,21 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
       dataIndex: 'teamName',
       key: 'teamName',
       width: 200,
-      render: (teamName: string, row) => (
-        <Space direction="vertical" size={0}>
-          <Space>
-            <TeamOutlined />
-            <Text>{teamName}</Text>
+      render: (teamName: string, row) => {
+        const name = teamName || '—';
+        const idLabel = row.teamId || '—';
+        return (
+          <Space direction="vertical" size={0}>
+            <Space>
+              <TeamOutlined />
+              <Text>{name}</Text>
+            </Space>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Team ID: {idLabel}
+            </Text>
           </Space>
-          <Text type="secondary" style={{ fontSize: 12 }}>
-            Team ID: {row.teamId}
-          </Text>
-        </Space>
-      ),
+        );
+      },
     },
     {
       title: 'Status',
@@ -338,12 +399,12 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
       key: 'members',
       width: 130,
       render: (_: unknown, row) => {
-        const total = row.totalMembers ?? 0;
-        const online = row.onlineMembers ?? 0;
+        const totalMembers = row.totalMembers ?? 0;
+        const onlineMembers = row.onlineMembers ?? 0;
         return (
           <Tooltip title="Online / total members in this workspace">
             <Text>
-              {online}/{total} online
+              {onlineMembers}/{totalMembers} online
             </Text>
           </Tooltip>
         );
@@ -443,7 +504,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
       title="Project Workspaces"
       subtitle={
         <span>
-          Bridge your KeenKonnect project workspaces with KonnectED learning
+          Bridge your keenKonnect project workspaces with KonnectED learning
           activities for each team.
         </span>
       }
@@ -467,6 +528,8 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         </Button>
       }
     >
+      {contextHolder}
+
       {/* Top KPIs */}
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={8}>
@@ -489,10 +552,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         </Col>
         <Col xs={24} sm={8}>
           <Card>
-            <Statistic
-              title="Workspaces you own"
-              value={totalOwned}
-            />
+            <Statistic title="Workspaces you own" value={totalOwned} />
           </Card>
         </Col>
       </Row>

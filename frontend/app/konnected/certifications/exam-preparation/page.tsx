@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Alert,
   Button,
@@ -41,8 +41,16 @@ const { Step } = Steps;
 const CERT_PASS_PERCENT = 80; // from CertifiKation spec
 const QUIZ_RETRY_COOLDOWN_MIN = 30; // from CertifiKation spec
 
-// TODO: align this with the actual OpenAPI path in schema-endpoints.json
-const EXAM_PREPARATION_ENDPOINT = 'certs/exam-preparation/plan';
+/**
+ * Endpoint helper for the preparation plan of a given CertificationPath.
+ * This is designed to be consistent with the other CertifiKation endpoints
+ * used by exam registration and exam dashboard.
+ *
+ * Final URL (with default API base) will be:
+ *   /api/konnected/certifications/paths/:pathId/preparation-plan/
+ */
+const EXAM_PREPARATION_ENDPOINT = (pathId: string | number) =>
+  `/konnected/certifications/paths/${pathId}/preparation-plan/`;
 
 type PrepModuleType = 'content' | 'practice_quiz' | 'project' | 'checkpoint';
 
@@ -123,17 +131,25 @@ function getReadinessBadge(
   return { status: 'not_ready', label: 'Not ready yet – keep studying', color: 'red' };
 }
 
-async function fetchExamPreparation(): Promise<ExamPreparationResponse> {
-  // Uses the shared _request helper which already knows the /api base URL
-  return get<ExamPreparationResponse>(EXAM_PREPARATION_ENDPOINT);
+async function fetchExamPreparation(pathId: string): Promise<ExamPreparationResponse> {
+  return get<ExamPreparationResponse>(EXAM_PREPARATION_ENDPOINT(pathId));
 }
 
 export default function ExamPreparationPage(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const { data, isLoading, error } = useQuery<ExamPreparationResponse>({
-    queryKey: ['certs', 'exam-preparation'],
-    queryFn: fetchExamPreparation,
+  const pathId = searchParams.get('pathId');
+  const pathNameFromUrl = searchParams.get('pathName') || undefined;
+
+  const {
+    data,
+    isLoading,
+    error,
+  } = useQuery<ExamPreparationResponse>({
+    queryKey: ['certs', 'exam-preparation', pathId],
+    queryFn: () => fetchExamPreparation(pathId as string),
+    enabled: !!pathId,
   });
 
   const modules: PrepModule[] = data?.modules ?? [];
@@ -159,6 +175,9 @@ export default function ExamPreparationPage(): JSX.Element {
 
   const recommendedStudyHours = data?.exam?.recommendedStudyHours ?? null;
 
+  const effectivePathName =
+    data?.path?.name ?? pathNameFromUrl ?? 'Exam Preparation';
+
   const handleGoToExamRegistration = () => {
     router.push('/konnected/certifications/exam-registration');
   };
@@ -168,7 +187,7 @@ export default function ExamPreparationPage(): JSX.Element {
   };
 
   const handleStartPracticeExam = () => {
-    // TODO: plug into automated_evaluation “practice mode” endpoint / route
+    // Future: plug into automated_evaluation “practice mode” endpoint / route
     router.push('/konnected/certifications/exam-dashboard-results');
   };
 
@@ -207,7 +226,7 @@ export default function ExamPreparationPage(): JSX.Element {
                 type="link"
                 key="view"
                 icon={<ArrowRightOutlined />}
-                // TODO: route to the actual learning unit detail, once available
+                // Future: route to the actual learning unit detail, once available
                 onClick={() => {
                   // eslint-disable-next-line no-console
                   console.log('Open module', module.id);
@@ -331,7 +350,7 @@ export default function ExamPreparationPage(): JSX.Element {
       key: 'plan',
       label: 'Study plan & progress',
       children: (
-        <Card bordered={false}>
+        <Card variant="borderless">
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <div>
               <Text strong>Your overall preparation progress</Text>
@@ -352,7 +371,10 @@ export default function ExamPreparationPage(): JSX.Element {
                 current={currentStepIndex}
                 style={{ marginTop: 8 }}
               >
-                <Step title="Study core content" description="Work through required modules and lessons." />
+                <Step
+                  title="Study core content"
+                  description="Work through required modules and lessons."
+                />
                 <Step
                   title="Complete practice activities"
                   description="Interactive exercises, quizzes, and projects."
@@ -398,13 +420,15 @@ export default function ExamPreparationPage(): JSX.Element {
     {
       key: 'focus',
       label: 'Focus areas',
-      children: <Card bordered={false}>{renderFocusAreas()}</Card>,
+      children: <Card variant="borderless">{renderFocusAreas()}</Card>,
     },
   ];
 
+  const noPathSelected = !pathId && !data;
+
   return (
     <KonnectedPageShell
-      title={data?.path?.name ?? 'Exam Preparation'}
+      title={effectivePathName}
       subtitle={subtitle}
       primaryAction={
         <Button
@@ -424,7 +448,17 @@ export default function ExamPreparationPage(): JSX.Element {
         </Button>
       }
     >
-      {error && (
+      {noPathSelected && (
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="No certification path selected"
+          description="Open this page from a specific Certification Program (e.g., from the Programs list) to see a tailored preparation plan."
+        />
+      )}
+
+      {error && !noPathSelected && (
         <Alert
           type="error"
           showIcon
@@ -456,7 +490,7 @@ export default function ExamPreparationPage(): JSX.Element {
           <Tabs
             defaultActiveKey="plan"
             items={mainTabsItems}
-            destroyInactiveTabPane={false}
+            destroyOnHidden={false}
           />
         </Col>
 
@@ -464,7 +498,7 @@ export default function ExamPreparationPage(): JSX.Element {
         <Col xs={24} lg={8}>
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
             <Card>
-              {isLoading ? (
+              {isLoading && pathId ? (
                 <Skeleton active paragraph={{ rows: 3 }} />
               ) : (
                 <>
@@ -520,7 +554,7 @@ export default function ExamPreparationPage(): JSX.Element {
             </Card>
 
             <Card title="Upcoming exam">
-              {isLoading ? (
+              {isLoading && pathId ? (
                 <Skeleton active paragraph={{ rows: 2 }} />
               ) : targetDate ? (
                 <>
@@ -566,7 +600,7 @@ export default function ExamPreparationPage(): JSX.Element {
             </Card>
 
             <Card title="Focus summary">
-              {isLoading ? (
+              {isLoading && pathId ? (
                 <Skeleton active paragraph={{ rows: 3 }} />
               ) : (
                 <>

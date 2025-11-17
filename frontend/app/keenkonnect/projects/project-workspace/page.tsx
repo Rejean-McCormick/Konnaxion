@@ -1,7 +1,9 @@
+// app/keenkonnect/projects/project-workspace/page.tsx
 'use client';
 
 import React, { Suspense, useEffect, useState } from 'react';
 import Head from 'next/head';
+import { useSearchParams } from 'next/navigation';
 import { ProCard } from '@ant-design/pro-components';
 import { Comment } from '@ant-design/compatible';
 import type { MenuProps } from 'antd';
@@ -25,6 +27,37 @@ import api from '@/api';
 const { Title, Text, Paragraph } = Typography;
 const { TabPane } = Tabs;
 
+const PROJECTS_ENDPOINT = '/api/projects/';
+
+interface ApiProject {
+  id: number;
+  title: string;
+  description: string;
+  creator: string;
+  category: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  tags: number[];
+}
+
+interface WorkspaceViewModel {
+  id: number;
+  name: string;
+  description?: string;
+  owner: string;
+  status: string;
+  domain?: string;
+  createdAt: string;
+  currentSprint?: string;
+  deadline?: string;
+  tasks?: any[];
+  members?: any[];
+  comments?: any[];
+  activity?: any[];
+  timeline?: any[];
+}
+
 export default function PageWrapper() {
   return (
     <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
@@ -34,7 +67,11 @@ export default function PageWrapper() {
 }
 
 function Content(): JSX.Element {
-  const [workspace, setWorkspace] = useState<any | null>(null);
+  const searchParams = useSearchParams();
+  const projectIdParam = searchParams.get('projectId') || searchParams.get('id');
+  const projectId = projectIdParam ? Number(projectIdParam) : null;
+
+  const [workspace, setWorkspace] = useState<WorkspaceViewModel | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [activeKey, setActiveKey] = useState<string>('overview');
@@ -42,31 +79,62 @@ function Content(): JSX.Element {
   const [selectedTask, setSelectedTask] = useState<any | null>(null);
 
   useEffect(() => {
+    if (!projectId) {
+      setError(
+        'No project selected. Open this workspace from the projects list or pass ?projectId=<id>.',
+      );
+      setLoading(false);
+      return;
+    }
+
     const fetchWorkspace = async () => {
       try {
-        const data = await api.get('/projects/workspace');
-        setWorkspace(data ?? null);
+        setLoading(true);
+        setError(null);
+
+        const data = await api.get<ApiProject>(
+          `${PROJECTS_ENDPOINT}${projectId}/`,
+        );
+
+        const mapped: WorkspaceViewModel = {
+          id: data.id,
+          name: data.title,
+          description: data.description ?? '',
+          owner: data.creator ?? '',
+          status: data.status || 'Active',
+          domain: data.category ?? 'Uncategorized',
+          createdAt: data.created_at,
+          // These can later be wired to real endpoints (tasks, messages, etc.)
+          tasks: [],
+          members: [],
+          comments: [],
+          activity: [],
+        };
+
+        setWorkspace(mapped);
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error('Failed to load project workspace', err);
-        setError('Error loading workspace. Some information may be unavailable.');
+        setError(
+          'Error loading workspace. Some information may be unavailable.',
+        );
       } finally {
         setLoading(false);
       }
     };
 
     void fetchWorkspace();
-  }, []);
+  }, [projectId]);
 
   // Safely derive arrays from the workspace payload
   const tasks: any[] = Array.isArray(workspace?.tasks)
-    ? ((workspace?.tasks as any[]) ?? [])
+    ? (workspace?.tasks as any[])
     : [];
   const members: any[] = Array.isArray(workspace?.members)
-    ? ((workspace?.members as any[]) ?? [])
+    ? (workspace?.members as any[])
     : [];
   const comments: any[] = Array.isArray(workspace?.comments)
-    ? ((workspace?.comments as any[]) ?? [])
+    ? (workspace?.comments as any[])
     : [];
 
   let activity: any[] = [];
@@ -250,7 +318,9 @@ function Content(): JSX.Element {
                 <List
                   size="small"
                   dataSource={members}
-                  locale={{ emptyText: 'No team members linked to this workspace yet.' }}
+                  locale={{
+                    emptyText: 'No team members linked to this workspace yet.',
+                  }}
                   renderItem={(member: any) => (
                     <List.Item key={member.id || member.name}>
                       <List.Item.Meta
@@ -264,7 +334,9 @@ function Content(): JSX.Element {
                           )
                         }
                         title={member.name}
-                        description={member.role || member.title || 'Contributor'}
+                        description={
+                          member.role || member.title || 'Contributor'
+                        }
                       />
                     </List.Item>
                   )}
@@ -295,12 +367,15 @@ function Content(): JSX.Element {
                       {
                         key: 'sprint',
                         label: 'Active sprint',
-                        value: workspace?.currentSprint || 'No active sprint configured',
+                        value:
+                          workspace?.currentSprint ||
+                          'No active sprint configured',
                       },
                       {
                         key: 'deadline',
                         label: 'Next deadline',
-                        value: workspace?.deadline || 'No deadline set',
+                        value:
+                          workspace?.deadline || 'No deadline set',
                       },
                     ]}
                     renderItem={(item) => (
@@ -335,7 +410,8 @@ function Content(): JSX.Element {
                       style={{ marginTop: 8 }}
                       items={derivedActivity.slice(0, 5).map((item: any) => ({
                         color:
-                          item.status === 'Completed' || item.status === 'Done'
+                          item.status === 'Completed' ||
+                          item.status === 'Done'
                             ? 'green'
                             : item.status === 'Blocked'
                             ? 'red'
@@ -367,7 +443,8 @@ function Content(): JSX.Element {
                   itemLayout="horizontal"
                   dataSource={tasks}
                   locale={{
-                    emptyText: 'No tasks configured for this workspace yet.',
+                    emptyText:
+                      'No tasks configured for this workspace yet.',
                   }}
                   renderItem={(task: any) => (
                     <List.Item
@@ -385,7 +462,9 @@ function Content(): JSX.Element {
                         description={
                           <Space direction="vertical" size={2}>
                             {task.description && (
-                              <Text type="secondary">{task.description}</Text>
+                              <Text type="secondary">
+                                {task.description}
+                              </Text>
                             )}
                             <Space size="small">
                               {task.assignee && (
@@ -418,7 +497,8 @@ function Content(): JSX.Element {
                     style={{ marginTop: 8 }}
                     items={derivedActivity.map((item: any) => ({
                       color:
-                        item.status === 'Completed' || item.status === 'Done'
+                        item.status === 'Completed' ||
+                        item.status === 'Done'
                           ? 'green'
                           : item.status === 'Blocked'
                           ? 'red'
@@ -445,97 +525,61 @@ function Content(): JSX.Element {
 
               {/* DISCUSSION */}
               <TabPane tab="Discussion" key="discussion">
-                {comments.length === 0 ? (
-                  <Empty description="No discussion yet. Start the conversation with your team!" />
-                ) : (
-                  <List
-                    dataSource={comments}
-                    renderItem={(item: any) => (
-                      <li key={item.id || item.createdAt}>
-                        <Comment
-                          author={item.author || item.user}
-                          avatar={
-                            item.avatar ? (
-                              <Avatar src={item.avatar} />
-                            ) : (
-                              <Avatar>
-                                {(item.author || item.user || '?')
-                                  ?.charAt(0)
-                                  ?.toUpperCase()}
-                              </Avatar>
-                            )
-                          }
-                          content={item.content || item.message}
-                          datetime={item.datetime || item.createdAt}
-                        />
-                      </li>
-                    )}
-                  />
-                )}
+                <List
+                  dataSource={comments}
+                  locale={{
+                    emptyText:
+                      'No discussion yet. Start the conversation with your team.',
+                  }}
+                  renderItem={(comment: any) => (
+                    <li key={comment.id}>
+                      <Comment
+                        author={comment.author}
+                        avatar={
+                          comment.avatar || (
+                            <Avatar>
+                              {comment.author
+                                ?.charAt(0)
+                                ?.toUpperCase() ?? '?'}
+                            </Avatar>
+                          )
+                        }
+                        content={comment.content}
+                        datetime={comment.datetime}
+                      />
+                    </li>
+                  )}
+                />
               </TabPane>
             </Tabs>
           </ProCard>
         </ProCard>
 
-        {/* Task details drawer */}
+        {/* Drawer for task details */}
         <Drawer
-          title={selectedTask?.title || 'Task details'}
-          width={480}
+          title={selectedTask?.title}
+          placement="right"
+          width={400}
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
-          destroyOnClose
         >
           {selectedTask ? (
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              {selectedTask.status && (
-                <div>
-                  <Text strong>Status:&nbsp;</Text>
-                  <Tag>{selectedTask.status}</Tag>
-                </div>
+              <div>
+                <Text strong>Status:</Text> {selectedTask.status || 'N/A'}
+              </div>
+              {selectedTask.description && (
+                <Paragraph>{selectedTask.description}</Paragraph>
               )}
-
-              {selectedTask.assignee && (
-                <div>
-                  <Text strong>Assignee:&nbsp;</Text>
-                  <Text>{selectedTask.assignee}</Text>
-                </div>
-              )}
-
+              <div>
+                <Text strong>Owner:</Text>{' '}
+                {selectedTask.assignee || 'Unassigned'}
+              </div>
               {selectedTask.dueDate && (
                 <div>
-                  <Text strong>Due date:&nbsp;</Text>
-                  <Text>{selectedTask.dueDate}</Text>
+                  <Text strong>Due date:</Text> {selectedTask.dueDate}
                 </div>
               )}
-
-              {selectedTask.description && (
-                <div>
-                  <Text strong>Description</Text>
-                  <Paragraph style={{ marginTop: 4 }}>
-                    {selectedTask.description}
-                  </Paragraph>
-                </div>
-              )}
-
-              {Array.isArray(selectedTask.subtasks) &&
-                selectedTask.subtasks.length > 0 && (
-                  <div>
-                    <Text strong>Subtasks</Text>
-                    <List
-                      size="small"
-                      style={{ marginTop: 4 }}
-                      dataSource={selectedTask.subtasks}
-                      renderItem={(sub: any, index: number) => (
-                        <List.Item key={sub.id || index}>
-                          <List.Item.Meta
-                            title={sub.title}
-                            description={sub.status || undefined}
-                          />
-                        </List.Item>
-                      )}
-                    />
-                  </div>
-                )}
             </Space>
           ) : (
             <Empty description="No task selected." />

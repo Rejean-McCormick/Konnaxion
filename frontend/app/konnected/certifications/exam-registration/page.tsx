@@ -1,7 +1,9 @@
 ﻿'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
+  App as AntdApp,
   Alert,
   Button,
   Card,
@@ -15,29 +17,30 @@ import {
   Spin,
   Steps,
   Typography,
-  message as antdMessage,
 } from 'antd';
-import type { FormInstance } from 'antd/es/form';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 import PageContainer from '@/components/PageContainer';
 
 const { Step } = Steps;
 const { Option } = Select;
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 /**
  * NOTE ABOUT ENDPOINTS
  *
- * These constants assume the backend OpenAPI (schema-endpoints.json) exposes
- * KonnectED → CertifiKation endpoints under `/api/konnected/certifications/...`.
- * Adjust the paths to your actual routes if they differ.
+ * These constants are aligned with the v14 backend spec:
+ * - Certification paths are exposed as `/api/certification-paths/` (CertificationPath model)
+ * - Exam attempts / registrations are exposed as `/api/evaluations/` (Evaluation model)
+ * - Optional nested helpers for sessions / eligibility live under `/api/certification-paths/:id/...`
+ *
+ * Adjust them if your actual Django router uses other names.
  */
-const EXAM_PATHS_ENDPOINT = '/api/konnected/certifications/paths/';
+const EXAM_PATHS_ENDPOINT = '/api/certification-paths/';
 const EXAM_SESSIONS_ENDPOINT = (pathId: number | string) =>
-  `/api/konnected/certifications/paths/${pathId}/sessions/`;
-const EXAM_REGISTRATION_ENDPOINT = '/api/konnected/certifications/evaluations/';
+  `/api/certification-paths/${pathId}/sessions/`;
+const EXAM_REGISTRATION_ENDPOINT = '/api/evaluations/';
 const EXAM_ELIGIBILITY_ENDPOINT = (pathId: number | string) =>
-  `/api/konnected/certifications/paths/${pathId}/eligibility/`;
+  `/api/certification-paths/${pathId}/eligibility/`;
 
 /**
  * Domain types derived from CertifiKation & Knowledge specs + API schema.
@@ -49,6 +52,7 @@ type CertificationPath = {
   description?: string;
   level?: string;
   tags?: string[];
+  // Optional, may be provided by backend via aggregate / annotated fields
   already_passed?: boolean;
   cooldown_remaining_minutes?: number | null;
 };
@@ -89,7 +93,9 @@ const steps: { key: StepKey; title: string; description?: string }[] = [
   { key: 2, title: 'Confirm', description: 'Review and submit your registration.' },
 ];
 
-const ExamRegistrationPage: React.FC = () => {
+const ExamRegistrationPageInner: React.FC = () => {
+  const { message: messageApi } = AntdApp.useApp();
+  const searchParams = useSearchParams();
   const [form] = Form.useForm<ExamRegistrationFormValues>();
 
   const [currentStep, setCurrentStep] = useState<StepKey>(0);
@@ -130,14 +136,31 @@ const ExamRegistrationPage: React.FC = () => {
       } catch (err: any) {
         const msg = err?.message ?? 'Failed to load certification programs.';
         setPathsError(msg);
-        antdMessage.error(msg);
+        messageApi.error(msg);
       } finally {
         setPathsLoading(false);
       }
     };
 
     void fetchPaths();
-  }, []);
+  }, [messageApi]);
+
+  // If the user came from the programs page with ?pathId=..., preselect it.
+  const initialPathIdFromQuery = searchParams.get('pathId');
+  useEffect(() => {
+    if (!initialPathIdFromQuery) return;
+    const numericId = Number(initialPathIdFromQuery);
+    if (Number.isNaN(numericId)) return;
+    if (!paths.length) return;
+
+    const exists = paths.some((p) => p.id === numericId);
+    if (!exists) return;
+
+    const current = form.getFieldValue('examPathId');
+    if (!current) {
+      form.setFieldsValue({ examPathId: numericId });
+    }
+  }, [initialPathIdFromQuery, paths, form]);
 
   const selectedPathId = Form.useWatch('examPathId', form);
   const selectedSessionId = Form.useWatch('sessionId', form);
@@ -154,6 +177,7 @@ const ExamRegistrationPage: React.FC = () => {
 
   /**
    * When the selected path changes, load sessions and eligibility.
+   * Both are optional server-side features; we treat 404 as "not implemented".
    */
   useEffect(() => {
     if (!selectedPathId) {
@@ -174,7 +198,7 @@ const ExamRegistrationPage: React.FC = () => {
           const data = (await res.json()) as ExamEligibility;
           setEligibility(data);
         } else if (res.status === 404) {
-          // eligibility not implemented; fall back to path fields
+          // Eligibility endpoint not implemented yet; fall back to path fields.
           setEligibility(null);
         } else {
           throw new Error(`Failed to load eligibility (${res.status})`);
@@ -206,7 +230,7 @@ const ExamRegistrationPage: React.FC = () => {
       } catch (err: any) {
         const msg = err?.message ?? 'Failed to load exam sessions.';
         setSessionsError(msg);
-        antdMessage.error(msg);
+        messageApi.error(msg);
       } finally {
         setSessionsLoading(false);
       }
@@ -214,7 +238,7 @@ const ExamRegistrationPage: React.FC = () => {
 
     void fetchEligibility();
     void fetchSessions();
-  }, [selectedPathId]);
+  }, [selectedPathId, messageApi]);
 
   const isPathAlreadyPassed =
     eligibility?.already_passed ?? (selectedPath?.already_passed ?? false);
@@ -250,14 +274,15 @@ const ExamRegistrationPage: React.FC = () => {
 
     const values = form.getFieldsValue() as Required<ExamRegistrationFormValues>;
 
-    // Basic safety checks
     if (!values.examPathId || !values.sessionId) {
-      antdMessage.error('Please select an exam and session before submitting.');
+      messageApi.error('Please select an exam and session before submitting.');
       return;
     }
 
+    // Payload aligned with Evaluation model as a realistic "exam attempt" creation.
+    // Backend can map these fields into Evaluation.metadata / scheduling fields.
     const payload = {
-      path_id: values.examPathId,
+      certification_path_id: values.examPathId,
       session_id: values.sessionId,
       full_name: values.fullName,
       agreed_terms: values.agreeTerms === true,
@@ -274,7 +299,7 @@ const ExamRegistrationPage: React.FC = () => {
 
       if (res.ok || res.status === 201) {
         setRegistrationCompleted(true);
-        antdMessage.success('Exam registration completed successfully.');
+        messageApi.success('Exam registration completed successfully.');
         return;
       }
 
@@ -286,18 +311,17 @@ const ExamRegistrationPage: React.FC = () => {
           errorBody?.message ||
           'You cannot register for this exam at the moment.';
 
-        antdMessage.error(detail);
+        messageApi.error(detail);
         return;
       }
 
-      // Other errors
       const errorBody = (await res.json().catch(() => null)) as any;
       const detail: string =
         errorBody?.detail || errorBody?.message || 'Failed to complete registration.';
-      antdMessage.error(detail);
+      messageApi.error(detail);
     } catch (err: any) {
       const msg = err?.message ?? 'Unexpected error while registering for the exam.';
-      antdMessage.error(msg);
+      messageApi.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -307,7 +331,10 @@ const ExamRegistrationPage: React.FC = () => {
     if (pathsLoading) {
       return (
         <div className="flex justify-center py-8">
-          <Spin tip="Loading certification programs..." />
+          <Space>
+            <Spin />
+            <Text>Loading certification programs...</Text>
+          </Space>
         </div>
       );
     }
@@ -354,7 +381,7 @@ const ExamRegistrationPage: React.FC = () => {
         </Form.Item>
 
         {selectedPath && (
-          <Card title={selectedPath.name} bordered>
+          <Card title={selectedPath.name}>
             {selectedPath.description && <Paragraph>{selectedPath.description}</Paragraph>}
             {selectedPath.tags && selectedPath.tags.length > 0 && (
               <Paragraph>
@@ -407,7 +434,10 @@ const ExamRegistrationPage: React.FC = () => {
       <Space direction="vertical" size="large" className="w-full">
         {sessionsLoading && (
           <div className="flex justify-center py-4">
-            <Spin tip="Loading exam sessions..." />
+            <Space>
+              <Spin />
+              <Text>Loading exam sessions...</Text>
+            </Space>
           </div>
         )}
 
@@ -702,5 +732,11 @@ const ExamRegistrationPage: React.FC = () => {
     </KonnectedPageShell>
   );
 };
+
+const ExamRegistrationPage: React.FC = () => (
+  <AntdApp>
+    <ExamRegistrationPageInner />
+  </AntdApp>
+);
 
 export default ExamRegistrationPage;

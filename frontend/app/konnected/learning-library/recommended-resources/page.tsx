@@ -73,13 +73,29 @@ interface RecommendationsResponse {
   count: number;
 }
 
-/**
- * Fetch personalized recommendations from backend.
- * Intended endpoint: GET /api/learn/recommendations
- * You can later move this into services/learn.ts and reuse it.
- */
-async function fetchRecommendations(): Promise<RecommendationsResponse> {
-  const res = await fetch('/api/learn/recommendations', {
+/* ------------------------------------------------------------------ */
+/*  Helpers to normalize API responses                                */
+/* ------------------------------------------------------------------ */
+
+function normalizeList<T = unknown>(raw: unknown): { items: T[]; count?: number } {
+  if (Array.isArray(raw)) {
+    return { items: raw as T[] };
+  }
+
+  if (raw && typeof raw === 'object') {
+    const obj = raw as { results?: unknown; items?: unknown; count?: number };
+    const items =
+      (Array.isArray(obj.results) && (obj.results as T[])) ||
+      (Array.isArray(obj.items) && (obj.items as T[])) ||
+      [];
+    return { items, count: typeof obj.count === 'number' ? obj.count : undefined };
+  }
+
+  return { items: [] };
+}
+
+async function fetchJson(url: string): Promise<unknown> {
+  const res = await fetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -88,15 +104,103 @@ async function fetchRecommendations(): Promise<RecommendationsResponse> {
   });
 
   if (!res.ok) {
-    throw new Error(`Failed to load recommendations (${res.status})`);
+    throw new Error(`Request failed (${res.status})`);
   }
 
-  return (await res.json()) as RecommendationsResponse;
+  return res.json();
+}
+
+function normalizeRecommendations(raw: unknown): RecommendationsResponse {
+  const { items, count } = normalizeList<any>(raw);
+
+  const mapped: KnowledgeRecommendationItem[] = items.map((row: any, index: number) => {
+    // Support both:
+    // - Recommendations API with row.resource, row.progress, row.score, row.reason...
+    // - Plain knowledge resources list where row itself is the resource.
+    const resourceRaw = row.resource ?? row;
+    const id = resourceRaw.id ?? row.id ?? index;
+
+    const resource: KnowledgeResource = {
+      id: String(id),
+      title: resourceRaw.title ?? 'Untitled resource',
+      summary: resourceRaw.summary ?? resourceRaw.description ?? '',
+      subject: resourceRaw.subject ?? undefined,
+      level: resourceRaw.level ?? undefined,
+      language: resourceRaw.language ?? undefined,
+      type: (resourceRaw.type ?? resourceRaw.resource_type ?? 'article') as ResourceType,
+      tags: resourceRaw.tags ?? [],
+      estimatedDurationMinutes:
+        resourceRaw.estimatedDurationMinutes ??
+        resourceRaw.estimated_minutes ??
+        resourceRaw.estimated_duration_minutes ??
+        undefined,
+      viewerUrl: resourceRaw.viewerUrl ?? resourceRaw.url ?? undefined,
+      offlineAvailable: Boolean(
+        resourceRaw.offlineAvailable ?? resourceRaw.is_offline_available,
+      ),
+      partOfPathTitle: resourceRaw.partOfPathTitle ?? undefined,
+    };
+
+    const progressSource = row.progress ?? resourceRaw.progress;
+    const progress: LearningProgress | undefined = progressSource
+      ? {
+          resourceId: String(id),
+          progressPercent:
+            progressSource.progressPercent ??
+            progressSource.progress_percent ??
+            0,
+          lastTouchedAt: progressSource.lastTouchedAt ?? progressSource.last_touched_at,
+        }
+      : undefined;
+
+    return {
+      recommendationId: String(row.id ?? `rec-${id}`),
+      score: typeof row.score === 'number' ? row.score : undefined,
+      reason: typeof row.reason === 'string' ? row.reason : undefined,
+      recommendedAt:
+        row.recommendedAt ??
+        row.recommended_at ??
+        resourceRaw.created_at ??
+        new Date().toISOString(),
+      source: row.source as RecommendationSource | undefined,
+      resource,
+      progress,
+    };
+  });
+
+  return {
+    results: mapped,
+    count: typeof count === 'number' ? count : mapped.length,
+  };
+}
+
+/**
+ * Fetch personalized recommendations from backend.
+ *
+ * Strategy:
+ * 1. Try dedicated endpoint: GET /api/knowledge-recommendations/
+ * 2. If unavailable, fall back to: GET /api/knowledge-resources/
+ */
+async function fetchRecommendations(): Promise<RecommendationsResponse> {
+  try {
+    const raw = await fetchJson('/api/knowledge-recommendations/');
+    return normalizeRecommendations(raw);
+  } catch (err) {
+    // If the dedicated recommendations endpoint is not implemented yet,
+    // fall back to the main knowledge resources list.
+    // This keeps the page usable while backend evolves.
+    console.warn('Falling back to /api/knowledge-resources/ for recommendations', err);
+  }
+
+  const rawFallback = await fetchJson('/api/knowledge-resources/');
+  return normalizeRecommendations(rawFallback);
 }
 
 /**
  * Send lightweight feedback about a recommendation.
- * Intended endpoint: POST /api/learn/recommendations/feedback
+ * Intended endpoint: POST /api/knowledge-recommendations/feedback/
+ *
+ * Errors are logged to console but do not break the UX.
  */
 async function sendRecommendationFeedback(opts: {
   recommendationId: string;
@@ -104,18 +208,20 @@ async function sendRecommendationFeedback(opts: {
   action: 'like' | 'dislike' | 'dismiss' | 'save_for_later';
   rating?: number;
 }) {
-  // Fire-and-forget; errors are surfaced via message but do not break the UI.
-  const res = await fetch('/api/learn/recommendations/feedback', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(opts),
-  });
-
-  if (!res.ok) {
-    throw new Error('Could not record feedback');
+  try {
+    await fetch('/api/knowledge-recommendations/feedback/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(opts),
+    });
+  } catch (err) {
+    // Backend for feedback is optional; do not surface hard failures to the user.
+    // A console warning is enough for debugging in development.
+    // eslint-disable-next-line no-console
+    console.warn('Failed to send recommendation feedback', err);
   }
 }
 
@@ -208,428 +314,319 @@ export default function RecommendedResourcesPage(): JSX.Element {
     async (
       rec: KnowledgeRecommendationItem,
       action: 'like' | 'dislike' | 'dismiss' | 'save_for_later',
-      rating?: number,
     ) => {
-      // Optimistic local update for "dismiss": remove card immediately.
-      if (action === 'dismiss') {
-        setRecommendations(prev => prev?.filter(r => r.recommendationId !== rec.recommendationId) ?? null);
-      }
-
       try {
         await sendRecommendationFeedback({
           recommendationId: rec.recommendationId,
           resourceId: rec.resource.id,
           action,
-          rating,
         });
 
         if (action === 'like') {
-          message.success('Thanks for your feedback.');
+          message.success('Thanks for the feedback! We will show you more similar content.');
         } else if (action === 'dislike') {
-          message.info("We'll show fewer resources like this.");
+          message.success('Got it. We will show you less of this kind of content.');
         } else if (action === 'save_for_later') {
-          message.success('Saved to your list.');
+          message.success('Saved for later learning.');
+        } else if (action === 'dismiss') {
+          message.success('This recommendation will be deprioritized.');
         }
       } catch (err) {
         const msg =
-          err instanceof Error ? err.message : 'Could not record your feedback. Please try again.';
+          err instanceof Error ? err.message : 'Could not record feedback on this recommendation.';
         message.error(msg);
-
-        // Rollback optimistic dismiss if it failed
-        if (action === 'dismiss') {
-          // Reload from cache/server
-          loadRecommendations();
-        }
       }
     },
-    [loadRecommendations],
+    [],
   );
 
-  // Derive "continue your learning" items (non-complete progress entries).
-  const continueItems = useMemo(
-    () =>
-      (recommendations ?? []).filter(
-        rec =>
-          rec.progress &&
-          rec.progress.progressPercent > 0 &&
-          rec.progress.progressPercent < 100,
-      ),
+  const hasRecommendations = useMemo(
+    () => Boolean(recommendations && recommendations.length > 0),
     [recommendations],
   );
-
-  // Simple KPI strip at the top.
-  const kpis = useMemo(() => {
-    const items = recommendations ?? [];
-    const total = items.length;
-    const inProgress = continueItems.length;
-    const newOnly = total - inProgress;
-
-    const totalMinutes = items.reduce(
-      (sum, rec) => sum + (rec.resource.estimatedDurationMinutes ?? 0),
-      0,
-    );
-
-    return {
-      total,
-      inProgress,
-      newOnly,
-      totalMinutes,
-    };
-  }, [recommendations, continueItems]);
-
-  const hasAnyData = (recommendations?.length ?? 0) > 0;
 
   return (
     <>
       <Head>
-        <title>KonnectED – Recommended Resources</title>
+        <title>Recommended learning resources – KonnectED</title>
       </Head>
 
       <KonnectedPageShell
-        title="Recommended Resources"
-        subtitle={
-          <>
-            Curated suggestions based on your activity, interests, and learning progress.{' '}
-            <Text type="secondary">
-              Recommendations blend your profile, subjects you engage with, and global trends.
-            </Text>
-          </>
-        }
+        title="Recommended for you"
+        subtitle="Personalized learning suggestions based on your activity and interests."
         primaryAction={
-          <Button
-            type="primary"
-            icon={<SettingOutlined />}
-            onClick={handleOpenPreferences}
-          >
-            Tune recommendations
-          </Button>
-        }
-        secondaryActions={
           <Space>
+            <Button icon={<SettingOutlined />} onClick={handleOpenPreferences}>
+              Adjust preferences
+            </Button>
             <Button
               icon={<ReloadOutlined />}
-              onClick={refreshSuggestions}
               loading={isRefreshing}
+              onClick={refreshSuggestions}
             >
-              Refresh
-            </Button>
-            <Button icon={<BookOutlined />} onClick={handleGoToCatalog}>
-              Browse catalog
+              Refresh suggestions
             </Button>
           </Space>
         }
+        secondaryActions={
+          <Button onClick={handleGoToCatalog} icon={<BookOutlined />}>
+            Browse full library
+          </Button>
+        }
       >
-        {/* Error & offline notice */}
-        {error && !hasAnyData && (
-          <div style={{ marginBottom: 16 }}>
-            <Alert
-              type="error"
-              message="Unable to load personalized recommendations"
-              description={error}
-              showIcon
-            />
-          </div>
-        )}
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={16}>
+            {error && !hasRecommendations && (
+              <Alert
+                type="error"
+                showIcon
+                message="Unable to load recommendations"
+                description={error}
+                style={{ marginBottom: 16 }}
+              />
+            )}
 
-        {hasOfflineFallback && (
-          <div style={{ marginBottom: 16 }}>
-            <Alert
-              type="warning"
-              showIcon
-              message="Showing last known recommendations"
-              description="We couldn't reach the recommendation service, so you're seeing the most recent cached suggestions."
-            />
-          </div>
-        )}
+            {hasOfflineFallback && (
+              <Alert
+                type="info"
+                showIcon
+                message="Showing last known recommendations"
+                description="These suggestions were loaded from your device cache because the recommendation backend is currently unavailable."
+                style={{ marginBottom: 16 }}
+              />
+            )}
 
-        {/* KPI strip */}
-        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small">
-              <Space direction="vertical" size={4}>
-                <Text type="secondary">Total suggestions</Text>
-                <Text strong>{kpis.total}</Text>
+            {loading && !hasRecommendations ? (
+              <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                <Skeleton active />
+                <Skeleton active />
+                <Skeleton active />
               </Space>
-            </Card>
+            ) : !hasRecommendations ? (
+              <Empty
+                description={
+                  <Space direction="vertical">
+                    <Text>No recommendations yet.</Text>
+                    <Text type="secondary">
+                      Start exploring the library or enroll in a learning path to help the system
+                      learn your interests.
+                    </Text>
+                  </Space>
+                }
+              >
+                <Button type="primary" icon={<BookOutlined />} onClick={handleGoToCatalog}>
+                  Explore the library
+                </Button>
+              </Empty>
+            ) : (
+              <List
+                itemLayout="vertical"
+                dataSource={recommendations ?? []}
+                renderItem={(rec) => (
+                  <List.Item key={rec.recommendationId}>
+                    <Card
+                      hoverable
+                      onClick={() => handleViewResource(rec.resource)}
+                      style={{ width: '100%' }}
+                    >
+                      <Space
+                        direction="vertical"
+                        style={{ width: '100%' }}
+                        size="small"
+                      >
+                        {/* Title row */}
+                        <Space
+                          style={{
+                            width: '100%',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                          }}
+                        >
+                          <Space direction="vertical" size={4}>
+                            <Space size={8} align="center">
+                              <Typography.Title
+                                level={4}
+                                style={{ marginBottom: 0, cursor: 'pointer' }}
+                              >
+                                {rec.resource.title}
+                              </Typography.Title>
+                              {rec.source && (
+                                <Tag color={rec.source === 'ml' ? 'blue' : 'green'}>
+                                  {rec.source === 'ml'
+                                    ? 'Suggested by AI'
+                                    : rec.source === 'editorial'
+                                    ? 'Curated'
+                                    : 'Trending'}
+                                </Tag>
+                              )}
+                            </Space>
+
+                            {rec.resource.summary && (
+                              <Text type="secondary">{rec.resource.summary}</Text>
+                            )}
+                          </Space>
+
+                          <Button
+                            type="link"
+                            icon={<ArrowRightOutlined />}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewResource(rec.resource);
+                            }}
+                          >
+                            Open
+                          </Button>
+                        </Space>
+
+                        {/* Meta row */}
+                        <Space
+                          size={[8, 8]}
+                          wrap
+                          style={{ marginTop: 8, width: '100%', justifyContent: 'space-between' }}
+                        >
+                          <Space size={[8, 8]} wrap>
+                            {rec.resource.subject && (
+                              <Tag color="blue">{rec.resource.subject}</Tag>
+                            )}
+                            {rec.resource.level && (
+                              <Tag color="purple">{rec.resource.level}</Tag>
+                            )}
+                            {rec.resource.language && (
+                              <Tag>{rec.resource.language}</Tag>
+                            )}
+                            <Tag color="geekblue" icon={<BookOutlined />}>
+                              {rec.resource.type}
+                            </Tag>
+                            {typeof rec.resource.estimatedDurationMinutes === 'number' && (
+                              <Tag color="gold">
+                                {rec.resource.estimatedDurationMinutes} min
+                              </Tag>
+                            )}
+                            {rec.resource.offlineAvailable && (
+                              <Tag color="success">Offline available</Tag>
+                            )}
+                            {rec.resource.partOfPathTitle && (
+                              <Tag color="cyan">
+                                Part of: {rec.resource.partOfPathTitle}
+                              </Tag>
+                            )}
+                          </Space>
+
+                          <Space direction="vertical" align="end">
+                            {rec.progress ? (
+                              <>
+                                <Progress
+                                  percent={rec.progress.progressPercent}
+                                  size="small"
+                                  style={{ minWidth: 80 }}
+                                />
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                  In progress
+                                </Text>
+                              </>
+                            ) : (
+                              <Text type="secondary" style={{ fontSize: 12 }}>
+                                Not started yet
+                              </Text>
+                            )}
+
+                            {typeof rec.score === 'number' && (
+                              <Space size={4} align="center">
+                                <StarFilled style={{ color: '#faad14' }} />
+                                <Text type="secondary" style={{ fontSize: 12 }}>
+                                  Relevance {(rec.score * 100).toFixed(0)}%
+                                </Text>
+                              </Space>
+                            )}
+                          </Space>
+                        </Space>
+
+                        {/* Actions row: feedback & save */}
+                        <Space
+                          style={{ marginTop: 12, width: '100%', justifyContent: 'space-between' }}
+                        >
+                          <Space size={8}>
+                            <Button
+                              size="small"
+                              icon={<LikeOutlined />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFeedback(rec, 'like');
+                              }}
+                            >
+                              Helpful
+                            </Button>
+                            <Button
+                              size="small"
+                              icon={<DislikeOutlined />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFeedback(rec, 'dislike');
+                              }}
+                            >
+                              Not relevant
+                            </Button>
+                          </Space>
+
+                          <Space size={8}>
+                            <Button
+                              size="small"
+                              type="link"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFeedback(rec, 'save_for_later');
+                              }}
+                            >
+                              Save for later
+                            </Button>
+                            <Button
+                              size="small"
+                              type="text"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleFeedback(rec, 'dismiss');
+                              }}
+                            >
+                              Dismiss
+                            </Button>
+                          </Space>
+                        </Space>
+                      </Space>
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            )}
           </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small">
-              <Space direction="vertical" size={4}>
-                <Text type="secondary">Continue in progress</Text>
-                <Text strong>{kpis.inProgress}</Text>
-              </Space>
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small">
-              <Space direction="vertical" size={4}>
-                <Text type="secondary">New suggestions</Text>
-                <Space size={4}>
-                  <FireOutlined />
-                  <Text strong>{kpis.newOnly}</Text>
-                </Space>
-              </Space>
-            </Card>
-          </Col>
-          <Col xs={24} sm={12} md={6}>
-            <Card size="small">
-              <Space direction="vertical" size={4}>
-                <Text type="secondary">Total learning time (approx.)</Text>
-                <Text strong>
-                  {kpis.totalMinutes > 0 ? `${kpis.totalMinutes} min` : '—'}
+
+          <Col xs={24} lg={8}>
+            <Card
+              title="How these suggestions work"
+              extra={<FireOutlined style={{ color: '#fa8c16' }} />}
+            >
+              <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <Text>
+                  Recommendations combine your recent activity, completed resources, and
+                  organization-wide priorities.
+                </Text>
+                <Text type="secondary">
+                  In this initial version, suggestions may be based on generic relevance such as
+                  topic popularity and recency if no personal history is available.
                 </Text>
               </Space>
+
+              <div style={{ marginTop: 16 }}>
+                <Button
+                  block
+                  onClick={handleGoToMyLearningPath}
+                  icon={<BookOutlined />}
+                >
+                  Go to my learning path
+                </Button>
+              </div>
             </Card>
           </Col>
         </Row>
-
-        {/* "Continue your learning" section */}
-        {loading && !hasAnyData ? (
-          <Skeleton active paragraph={{ rows: 4 }} />
-        ) : continueItems.length > 0 ? (
-          <div style={{ marginBottom: 32 }}>
-            <Space
-              align="center"
-              style={{ marginBottom: 12, justifyContent: 'space-between', width: '100%' }}
-            >
-              <Text strong>Continue your learning</Text>
-              <Button type="link" size="small" onClick={handleGoToMyLearningPath}>
-                Go to My Learning Path <ArrowRightOutlined />
-              </Button>
-            </Space>
-
-            <Row gutter={[16, 16]}>
-              {continueItems.map(rec => (
-                <Col xs={24} sm={12} md={8} key={rec.recommendationId}>
-                  <Card
-                    size="small"
-                    hoverable
-                    onClick={() => handleViewResource(rec.resource)}
-                    extra={
-                      <Button
-                        type="link"
-                        size="small"
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleViewResource(rec.resource);
-                        }}
-                      >
-                        Continue
-                      </Button>
-                    }
-                    title={rec.resource.title}
-                  >
-                    {rec.resource.subject && (
-                      <Text type="secondary">{rec.resource.subject}</Text>
-                    )}
-                    <div style={{ marginTop: 8 }}>
-                      <Progress
-                        percent={rec.progress?.progressPercent ?? 0}
-                        size="small"
-                        status="active"
-                      />
-                    </div>
-                    <div style={{ marginTop: 8 }}>
-                      {rec.resource.tags?.slice(0, 3).map(tag => (
-                        <Tag key={tag}>{tag}</Tag>
-                      ))}
-                    </div>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </div>
-        ) : null}
-
-        {/* Main recommendation grid */}
-        <div style={{ marginBottom: 16 }}>
-          <Text strong style={{ fontSize: 16 }}>
-            Personalized suggestions
-          </Text>
-        </div>
-
-        {loading && !hasAnyData ? (
-          <List
-            grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-            dataSource={Array.from({ length: 6 })}
-            renderItem={(_, idx) => (
-              <List.Item key={idx}>
-                <Card>
-                  <Skeleton active paragraph={{ rows: 4 }} />
-                </Card>
-              </List.Item>
-            )}
-          />
-        ) : !hasAnyData ? (
-          <Card>
-            <Empty
-              description={
-                <>
-                  <div>No personalized recommendations yet.</div>
-                  <Text type="secondary">
-                    Start by exploring the catalog or telling us your interests.
-                  </Text>
-                </>
-              }
-            >
-              <Space>
-                <Button type="primary" onClick={handleGoToCatalog}>
-                  Browse catalog
-                </Button>
-                <Button onClick={handleOpenPreferences} icon={<SettingOutlined />}>
-                  Tell us your interests
-                </Button>
-              </Space>
-            </Empty>
-          </Card>
-        ) : (
-          <List
-            grid={{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3 }}
-            dataSource={recommendations ?? []}
-            renderItem={rec => (
-              <List.Item key={rec.recommendationId}>
-                <Card
-                  hoverable
-                  title={rec.resource.title}
-                  onClick={() => handleViewResource(rec.resource)}
-                  extra={
-                    <Button
-                      type="link"
-                      size="small"
-                      onClick={e => {
-                        e.stopPropagation();
-                        handleViewResource(rec.resource);
-                      }}
-                    >
-                      View <ArrowRightOutlined />
-                    </Button>
-                  }
-                >
-                  {/* Meta line: subject / level / type */}
-                  <Space size={4} wrap style={{ marginBottom: 8 }}>
-                    {rec.resource.subject && (
-                      <Tag color="blue">{rec.resource.subject}</Tag>
-                    )}
-                    {rec.resource.level && (
-                      <Tag color="geekblue">{rec.resource.level}</Tag>
-                    )}
-                    <Tag>{rec.resource.type}</Tag>
-                    {rec.resource.language && (
-                      <Tag color="default">{rec.resource.language}</Tag>
-                    )}
-                    {rec.resource.partOfPathTitle && (
-                      <Tag color="purple">
-                        <BookOutlined /> {rec.resource.partOfPathTitle}
-                      </Tag>
-                    )}
-                    {rec.resource.offlineAvailable && (
-                      <Tag color="green">Available offline</Tag>
-                    )}
-                  </Space>
-
-                  {/* Summary */}
-                  {rec.resource.summary && (
-                    <Text style={{ display: 'block', marginBottom: 8 }}>
-                      {rec.resource.summary}
-                    </Text>
-                  )}
-
-                  {/* Reason / source */}
-                  {rec.reason && (
-                    <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
-                      {rec.reason}
-                    </Text>
-                  )}
-
-                  {/* Progress & score */}
-                  <Space
-                    style={{ marginTop: 12, width: '100%', justifyContent: 'space-between' }}
-                    align="center"
-                  >
-                    <Space size={4} align="center">
-                      {rec.progress && rec.progress.progressPercent > 0 ? (
-                        <>
-                          <Progress
-                            percent={rec.progress.progressPercent}
-                            size="small"
-                            style={{ minWidth: 80 }}
-                          />
-                          <Text type="secondary" style={{ fontSize: 12 }}>
-                            In progress
-                          </Text>
-                        </>
-                      ) : (
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          Not started yet
-                        </Text>
-                      )}
-                    </Space>
-
-                    {typeof rec.score === 'number' && (
-                      <Space size={4} align="center">
-                        <StarFilled style={{ color: '#faad14' }} />
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          Relevance {(rec.score * 100).toFixed(0)}%
-                        </Text>
-                      </Space>
-                    )}
-                  </Space>
-
-                  {/* Actions row: feedback & save */}
-                  <Space
-                    style={{ marginTop: 12, width: '100%', justifyContent: 'space-between' }}
-                  >
-                    <Space size={8}>
-                      <Button
-                        size="small"
-                        icon={<LikeOutlined />}
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleFeedback(rec, 'like');
-                        }}
-                      >
-                        Helpful
-                      </Button>
-                      <Button
-                        size="small"
-                        icon={<DislikeOutlined />}
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleFeedback(rec, 'dislike');
-                        }}
-                      >
-                        Not relevant
-                      </Button>
-                    </Space>
-
-                    <Space size={8}>
-                      <Button
-                        size="small"
-                        type="link"
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleFeedback(rec, 'save_for_later');
-                        }}
-                      >
-                        Save for later
-                      </Button>
-                      <Button
-                        size="small"
-                        type="text"
-                        onClick={e => {
-                          e.stopPropagation();
-                          handleFeedback(rec, 'dismiss');
-                        }}
-                      >
-                        Dismiss
-                      </Button>
-                    </Space>
-                  </Space>
-                </Card>
-              </List.Item>
-            )}
-          />
-        )}
       </KonnectedPageShell>
     </>
   );

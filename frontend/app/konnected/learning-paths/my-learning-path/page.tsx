@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Alert,
+  App as AntdApp,
   Button,
   Card,
   Col,
@@ -15,7 +16,6 @@ import {
   Tabs,
   Tag,
   Typography,
-  message as antdMessage,
   Select,
 } from 'antd';
 import type { TabsProps } from 'antd';
@@ -125,6 +125,16 @@ const MOCK_LEARNING_PATHS: LearningPath[] = [
   },
 ];
 
+function safeRandomId() {
+  if (
+    typeof crypto !== 'undefined' &&
+    typeof crypto.randomUUID === 'function'
+  ) {
+    return crypto.randomUUID();
+  }
+  return `lp-${Math.random().toString(36).slice(2)}`;
+}
+
 function normalizeLearningPath(raw: any): LearningPath {
   const totalItems =
     raw?.progress?.totalItems ??
@@ -148,8 +158,10 @@ function normalizeLearningPath(raw: any): LearningPath {
       ? 'completed'
       : 'active';
 
+  const rawId = raw?.id ?? raw?.learning_path_id ?? raw?.slug ?? safeRandomId();
+
   return {
-    id: String(raw.id ?? raw.learning_path_id ?? raw.slug ?? crypto.randomUUID()),
+    id: String(rawId),
     title: raw.title ?? raw.name ?? 'Untitled learning path',
     description: raw.description ?? raw.summary ?? '',
     level: raw.level as Level | undefined,
@@ -178,9 +190,7 @@ function normalizeLearningPath(raw: any): LearningPath {
         ? `/konnected/learning-library/browse-resources?pathId=${raw.id}`
         : undefined),
     nextResourceLabel:
-      raw.nextResourceLabel ??
-      raw.next_resource_label ??
-      undefined,
+      raw.nextResourceLabel ?? raw.next_resource_label ?? undefined,
   };
 }
 
@@ -189,16 +199,35 @@ type MyLearningPathsApiResponse = {
   results?: unknown[];
 };
 
-async function fetchMyLearningPaths(): Promise<LearningPath[]> {
+type FetchResult = {
+  data: LearningPath[];
+  error: Error | null;
+};
+
+/**
+ * Fetches learning paths for the current learner.
+ * Always resolves; on any failure it returns mock data plus an Error.
+ */
+async function fetchMyLearningPaths(): Promise<FetchResult> {
   try {
-    // Aligns with the OpenAPI "my learning paths" use-case.
     const res = await fetch('/api/konnected/learning-paths/my', {
       method: 'GET',
       cache: 'no-store',
     });
 
+    // Treat 404 as "backend not wired yet" – use mocks but surface a warning.
+    if (res.status === 404) {
+      const error = new Error('Learning paths API not available yet (404).');
+      // eslint-disable-next-line no-console
+      console.warn(error.message);
+      return { data: MOCK_LEARNING_PATHS, error };
+    }
+
     if (!res.ok) {
-      throw new Error(`Failed to load learning paths (${res.status})`);
+      const error = new Error(`Failed to load learning paths (${res.status}).`);
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return { data: MOCK_LEARNING_PATHS, error };
     }
 
     const json = (await res.json()) as MyLearningPathsApiResponse | unknown[];
@@ -208,21 +237,27 @@ async function fetchMyLearningPaths(): Promise<LearningPath[]> {
       : (json.items ?? json.results ?? []);
 
     if (!Array.isArray(rawList) || rawList.length === 0) {
-      // Fall back to mocks to keep UX rich
-      return MOCK_LEARNING_PATHS;
+      return { data: MOCK_LEARNING_PATHS, error: null };
     }
 
-    return rawList.map((item) => normalizeLearningPath(item));
+    return {
+      data: rawList.map((item) => normalizeLearningPath(item)),
+      error: null,
+    };
   } catch (err) {
-    // Fallback to mock data; we still surface a warning in the UI.
+    const error =
+      err instanceof Error
+        ? err
+        : new Error('Unable to load your learning paths right now.');
     // eslint-disable-next-line no-console
     console.error('Error fetching learning paths', err);
-    return MOCK_LEARNING_PATHS;
+    return { data: MOCK_LEARNING_PATHS, error };
   }
 }
 
 export default function MyLearningPathsPage(): JSX.Element {
   const router = useRouter();
+  const { message } = AntdApp.useApp();
 
   const [paths, setPaths] = useState<LearningPath[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -237,25 +272,19 @@ export default function MyLearningPathsPage(): JSX.Element {
       setLoading(true);
       setError(null);
 
-      try {
-        const data = await fetchMyLearningPaths();
-        if (!cancelled) {
-          setPaths(data);
-        }
-      } catch (e: any) {
-        if (!cancelled) {
-          setError(
-            e?.message ?? 'Unable to load your learning paths right now.',
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
+      const { data, error: loadError } = await fetchMyLearningPaths();
+
+      if (cancelled) return;
+
+      setPaths(data);
+      if (loadError) {
+        setError(loadError.message);
       }
+      setLoading(false);
     };
 
-    load();
+    void load();
+
     return () => {
       cancelled = true;
     };
@@ -277,7 +306,7 @@ export default function MyLearningPathsPage(): JSX.Element {
   };
 
   const handleMarkComplete = (pathId: string) => {
-    // TODO: POST /api/konnected/learning-paths/{id}/complete (OpenAPI: mark learner path as complete)
+    // TODO: POST /api/konnected/learning-paths/{id}/complete (mark learner path as complete)
     setPaths((prev) =>
       (prev ?? []).map((p) =>
         p.id === pathId
@@ -294,13 +323,13 @@ export default function MyLearningPathsPage(): JSX.Element {
           : p,
       ),
     );
-    antdMessage.success('Learning path marked as completed.');
+    message.success('Learning path marked as completed.');
   };
 
   const handleLeavePath = (pathId: string) => {
-    // TODO: POST /api/konnected/learning-paths/{id}/leave (OpenAPI: leave learning path)
+    // TODO: POST /api/konnected/learning-paths/{id}/leave (leave learning path)
     setPaths((prev) => (prev ?? []).filter((p) => p.id !== pathId));
-    antdMessage.success('Learning path removed from your list.');
+    message.success('Learning path removed from your list.');
   };
 
   const handleBrowseCatalog = () => {
@@ -368,8 +397,7 @@ export default function MyLearningPathsPage(): JSX.Element {
   }, [paths, activeTab, sortKey]);
 
   const hasAnyPaths = (paths?.length ?? 0) > 0;
-  const activeCount =
-    paths?.filter((p) => p.status === 'active').length ?? 0;
+  const activeCount = paths?.filter((p) => p.status === 'active').length ?? 0;
   const completedCount =
     paths?.filter((p) => p.status === 'completed').length ?? 0;
 
@@ -468,9 +496,9 @@ export default function MyLearningPathsPage(): JSX.Element {
           message="Unable to fully sync with the learning backend."
           description={
             <span>
-              Showing locally cached / mock data for now. Once the
-              KonnectED Learning Paths API is wired, this page will
-              refresh automatically.
+              Showing locally cached / mock data for now. Once the KonnectED
+              Learning Paths API is wired, this page will refresh
+              automatically.
             </span>
           }
         />
@@ -563,9 +591,7 @@ export default function MyLearningPathsPage(): JSX.Element {
                       title={
                         <Space>
                           <span>{path.title}</span>
-                          {path.level && (
-                            <Tag color="blue">{path.level}</Tag>
-                          )}
+                          {path.level && <Tag color="blue">{path.level}</Tag>}
                           {isCompleted && (
                             <Tag color="green">Completed</Tag>
                           )}
@@ -648,8 +674,7 @@ export default function MyLearningPathsPage(): JSX.Element {
                           >
                             <Text type="secondary">
                               {path.progress?.completedItems ?? 0} of{' '}
-                              {path.progress?.totalItems ?? 0} items
-                              completed
+                              {path.progress?.totalItems ?? 0} items completed
                             </Text>
                             {minutes > 0 && (
                               <Text type="secondary">

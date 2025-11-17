@@ -1,0 +1,3640 @@
+===== TOC (42 fichiers) =====
+1. C:\MyCode\Konnaxionv14\frontend\components\auth0-components\index.tsx
+2. C:\MyCode\Konnaxionv14\frontend\components\Button\Button.stories.tsx
+3. C:\MyCode\Konnaxionv14\frontend\components\Button\Button.tsx
+4. C:\MyCode\Konnaxionv14\frontend\components\charts\ChartCard.tsx
+5. C:\MyCode\Konnaxionv14\frontend\components\compat\Comment.tsx
+6. C:\MyCode\Konnaxionv14\frontend\components\compat\Icon.tsx
+7. C:\MyCode\Konnaxionv14\frontend\components\concatv3.py
+8. C:\MyCode\Konnaxionv14\frontend\components\CustomComment.tsx
+9. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\CommentCard.tsx
+10. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\index.tsx
+11. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LikeCard.tsx
+12. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LineChart.tsx
+13. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\StatisticCard.tsx
+14. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\style.tsx
+15. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
+16. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserPieChart.tsx
+17. C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\VisitCard.tsx
+18. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Drawer.tsx
+19. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Header.tsx
+20. C:\MyCode\Konnaxionv14\frontend\components\layout-components\LogoTitle.tsx
+21. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Main.tsx
+22. C:\MyCode\Konnaxionv14\frontend\components\layout-components\MainLayout.tsx
+23. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Menu.tsx
+24. C:\MyCode\Konnaxionv14\frontend\components\layout-components\Sider.tsx
+25. C:\MyCode\Konnaxionv14\frontend\components\Loading.tsx
+26. C:\MyCode\Konnaxionv14\frontend\components\map-components\ControlPanel.tsx
+27. C:\MyCode\Konnaxionv14\frontend\components\map-components\index.tsx
+28. C:\MyCode\Konnaxionv14\frontend\components\map-components\Map.tsx
+29. C:\MyCode\Konnaxionv14\frontend\components\map-components\MapMarker.tsx
+30. C:\MyCode\Konnaxionv14\frontend\components\map-components\StaticMap.tsx
+31. C:\MyCode\Konnaxionv14\frontend\components\PageContainer.tsx
+32. C:\MyCode\Konnaxionv14\frontend\components\shared\utils.tsx
+33. C:\MyCode\Konnaxionv14\frontend\components\TagsList.tsx
+34. C:\MyCode\Konnaxionv14\frontend\components\Tooltip\Tooltip.tsx
+35. C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
+36. C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx
+37. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserComments.tsx
+38. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
+39. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
+40. C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
+41. C:\MyCode\Konnaxionv14\frontend\src\components\CommonWidget\page.tsx
+42. C:\MyCode\Konnaxionv14\frontend\src\components\ThemeSwitcher.tsx
+===== END TOC =====
+
+
+===== BEGIN components/auth0-components/index.tsx =====
+'use client';
+
+/**
+ * Description: Auth0 component which manages authentication and admin authorization
+ * Author: Hieu Chu
+ */
+
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from 'react';
+import * as Auth0 from '@auth0/auth0-spa-js';
+import { normalizeError } from '../../shared/errors';
+
+const DEFAULT_REDIRECT_CALLBACK = () =>
+  window.history.replaceState({}, document.title, window.location.pathname);
+
+type Nullable<T> = T | null;
+
+interface Auth0ContextValue {
+  isAuthenticated: boolean;
+  user: Nullable<Auth0.User>;
+  loading: boolean;
+  popupOpen: boolean;
+  loginWithPopup: (params?: Auth0.PopupLoginOptions) => Promise<void>;
+  handleRedirectCallback: () => Promise<void>;
+  getIdTokenClaims: () => Promise<Auth0.IdToken | undefined>;
+  loginWithRedirect: (p?: Auth0.RedirectLoginOptions) => Promise<void>;
+  getTokenSilently: (p?: Auth0.GetTokenSilentlyOptions) => Promise<string>;
+  getTokenWithPopup: (p?: Auth0.GetTokenWithPopupOptions) => Promise<string | undefined>;
+  logout: (p?: Auth0.LogoutOptions) => void;
+}
+
+const Auth0Context = createContext<Auth0ContextValue | undefined>(undefined);
+
+export const useAuth0 = (): Auth0ContextValue => {
+  const ctx = useContext(Auth0Context);
+  if (!ctx) throw new Error('useAuth0 must be used within <Auth0Provider>');
+  return ctx;
+};
+
+type Auth0ProviderProps = {
+  children: ReactNode;
+  onRedirectCallback?: (appState?: unknown) => void;
+} & Auth0.Auth0ClientOptions;
+
+export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
+  children,
+  onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
+  ...initOptions
+}) => {
+  const [auth0Client, setAuth0Client] = useState<Auth0.Auth0Client | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [user, setUser] = useState<Auth0.User | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [popupOpen, setPopupOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const initAuth0 = async () => {
+      try {
+        const client = await Auth0.createAuth0Client({
+          ...initOptions,
+          // Ensure redirect_uri exists unless explicitly provided
+          authorizationParams: {
+            redirect_uri: window.location.origin,
+            ...(initOptions.authorizationParams ?? {}),
+          },
+        });
+        if (!mounted) return;
+        setAuth0Client(client);
+
+        // Handle redirect callback if returning from Auth0
+        if (
+          typeof window !== 'undefined' &&
+          window.location.search.includes('code=') &&
+          window.location.search.includes('state=')
+        ) {
+          const { appState } = await client.handleRedirectCallback();
+          onRedirectCallback?.(appState);
+        }
+
+        const authenticated = await client.isAuthenticated();
+        setIsAuthenticated(authenticated);
+
+        if (authenticated) {
+          const u = await client.getUser();
+          setUser(u ?? null);
+        }
+      } catch (e: unknown) {
+        const { message } = normalizeError(e);
+        // Keep surface minimal; log for diagnostics
+        // eslint-disable-next-line no-console
+        console.error('[Auth0] init failed:', message);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    void initAuth0();
+    return () => {
+      mounted = false;
+    };
+    // initOptions is stable in practice; if it changes, re-init intentionally
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const loginWithPopup = useCallback(
+    async (params?: Auth0.PopupLoginOptions) => {
+      if (!auth0Client) return;
+      setPopupOpen(true);
+      try {
+        await auth0Client.loginWithPopup(params);
+        const u = await auth0Client.getUser();
+        setUser(u ?? null);
+        setIsAuthenticated(true);
+      } catch (error: unknown) {
+        const { message, statusCode } = normalizeError(error);
+        // eslint-disable-next-line no-console
+        console.error('[Auth0] loginWithPopup failed:', statusCode, message);
+      } finally {
+        setPopupOpen(false);
+      }
+    },
+    [auth0Client]
+  );
+
+  const handleRedirectCallback = useCallback(async () => {
+    if (!auth0Client) return;
+    setLoading(true);
+    try {
+      await auth0Client.handleRedirectCallback();
+      const u = await auth0Client.getUser();
+      setIsAuthenticated(true);
+      setUser(u ?? null);
+    } finally {
+      setLoading(false);
+    }
+  }, [auth0Client]);
+
+  const getIdTokenClaims = useCallback(async () => {
+    if (!auth0Client) throw new Error('Auth0 client not initialized');
+    return auth0Client.getIdTokenClaims();
+  }, [auth0Client]);
+
+  const loginWithRedirect = useCallback(
+    async (p?: Auth0.RedirectLoginOptions) => {
+      if (!auth0Client) throw new Error('Auth0 client not initialized');
+      await auth0Client.loginWithRedirect(p);
+    },
+    [auth0Client]
+  );
+
+  const getTokenSilently = useCallback(
+    async (p?: Auth0.GetTokenSilentlyOptions) => {
+      if (!auth0Client) throw new Error('Auth0 client not initialized');
+      return auth0Client.getTokenSilently(p);
+    },
+    [auth0Client]
+  );
+
+  const getTokenWithPopup = useCallback(
+    async (p?: Auth0.GetTokenWithPopupOptions) => {
+      if (!auth0Client) throw new Error('Auth0 client not initialized');
+      return auth0Client.getTokenWithPopup(p);
+    },
+    [auth0Client]
+  );
+
+  const logout = useCallback(
+    (p?: Auth0.LogoutOptions) => {
+      if (!auth0Client) return;
+      auth0Client.logout({
+        logoutParams: {
+          returnTo: window.location.origin,
+          ...(p?.logoutParams ?? {}),
+        },
+        ...p,
+      });
+    },
+    [auth0Client]
+  );
+
+  const value: Auth0ContextValue = {
+    isAuthenticated,
+    user,
+    loading,
+    popupOpen,
+    loginWithPopup,
+    handleRedirectCallback,
+    getIdTokenClaims,
+    loginWithRedirect,
+    getTokenSilently,
+    getTokenWithPopup,
+    logout,
+  };
+
+  return <Auth0Context.Provider value={value}>{children}</Auth0Context.Provider>;
+};
+
+===== END components/auth0-components/index.tsx =====
+
+
+===== BEGIN components/Button/Button.stories.tsx =====
+import type { Meta, StoryObj } from "@storybook/react"
+import { Button } from "./Button"
+
+const meta: Meta<typeof Button> = {
+  title: "Button",
+  component: Button,
+  args: {
+    intent: "primary",
+    underline: false,
+    children: "Button",
+    size: "lg",
+  },
+  argTypes: {
+    intent: {
+      options: ["primary", "secondary"],
+      control: { type: "select" },
+    },
+    size: {
+      options: ["sm", "lg"],
+      control: { type: "select" },
+    },
+  },
+}
+
+type Story = StoryObj<typeof Button>
+
+export const Default: Story = {
+  render: (args, row) => <Button {...args} />,
+}
+
+export default meta
+
+===== END components/Button/Button.stories.tsx =====
+
+
+===== BEGIN components/Button/Button.tsx =====
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { twMerge } from "tailwind-merge"
+
+const button = cva(
+  [
+    "justify-center",
+    "inline-flex",
+    "items-center",
+    "rounded-xl",
+    "text-center",
+    "border",
+    "border-blue-400",
+    "transition-colors",
+    "delay-50",
+  ],
+  {
+    variants: {
+      intent: {
+        primary: ["bg-blue-400", "text-white", "hover:enabled:bg-blue-700"],
+        secondary: ["bg-transparent", "text-blue-400", "hover:enabled:bg-blue-400", "hover:enabled:text-white"],
+      },
+      size: {
+        sm: ["min-w-20", "h-full", "min-h-10", "text-sm", "py-1.5", "px-4"],
+        lg: ["min-w-32", "h-full", "min-h-12", "text-lg", "py-2.5", "px-6"],
+      },
+      underline: { true: ["underline"], false: [] },
+    },
+    defaultVariants: {
+      intent: "primary",
+      size: "lg",
+    },
+  }
+)
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLAnchorElement>, VariantProps<typeof button> {
+  underline?: boolean
+  href: string
+}
+
+export function Button({ className, intent, size, underline, ...props }: ButtonProps) {
+  return (
+    <a className={twMerge(button({ intent, size, className, underline }))} {...props}>
+      {props.children}
+    </a>
+  )
+}
+
+===== END components/Button/Button.tsx =====
+
+
+===== BEGIN components/charts/ChartCard.tsx =====
+// components/charts/ChartCard.tsx
+'use client';
+
+import React from 'react';
+import { Line, Area } from '@ant-design/plots';
+
+type ChartType = 'line' | 'area' | 'tinyLine';
+type Datum = Record<string, unknown>;
+
+export interface ChartCardProps {
+  /** choose a compact chart variant */
+  type: ChartType;
+  /** accepts any record array; map fields with xField/yField or let it auto-detect */
+  data: Datum[];
+  height?: number;
+  /** optional explicit field names (e.g. xField="ts", yField="value") */
+  xField?: string;
+  yField?: string;
+  /** forward any extra Ant Design Plot options */
+  [key: string]: any;
+}
+
+function pickField(data: Datum[], candidates: string[], fallback: string) {
+  if (!data?.length) return fallback;
+  const sample = data[0] as Record<string, unknown>;
+  for (const k of candidates) if (k in sample) return k;
+  return fallback;
+}
+
+export default function ChartCard({
+  type,
+  data,
+  height = 60,
+  xField,
+  yField,
+  ...rest
+}: ChartCardProps) {
+  // Auto-map common shapes: {x,y}, {ts,value}, {date,count}, etc.
+  const xf = xField ?? pickField(data, ['x', 'ts', 'date', 'label'], 'x');
+  const yf = yField ?? pickField(data, ['y', 'value', 'count'], 'y');
+
+  const common = {
+    data,
+    xField: xf,
+    yField: yf,
+    height,
+    autoFit: true,
+    ...rest, // allow overrides
+  } as any;
+
+  if (type === 'area') return <Area {...common} />;
+
+  // "tinyLine" = line with compact defaults; still uses <Line/>
+  const tinyOverrides = type === 'tinyLine' ? { legend: false } : undefined;
+
+  return <Line {...{ ...common, ...tinyOverrides }} />;
+}
+
+===== END components/charts/ChartCard.tsx =====
+
+
+===== BEGIN components/compat/Comment.tsx =====
+// components/compat/Comment.tsx
+import React from 'react'
+import { Avatar, List, Typography } from 'antd'
+
+type Props = {
+  author?: React.ReactNode
+  avatar?: React.ReactNode
+  content?: React.ReactNode
+  datetime?: React.ReactNode
+  className?: string
+  actions?: React.ReactNode[]
+}
+
+export default function Comment({ author, avatar, content, datetime, className, actions }: Props) {
+  return (
+    <List.Item className={className} actions={actions}>
+      <List.Item.Meta
+        avatar={avatar}
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span>{author}</span>
+            {datetime ? <Typography.Text type="secondary">{datetime}</Typography.Text> : null}
+          </div>
+        }
+        description={content}
+      />
+    </List.Item>
+  )
+}
+
+===== END components/compat/Comment.tsx =====
+
+
+===== BEGIN components/compat/Icon.tsx =====
+// components/compat/Icon.tsx
+import React from 'react'
+import {
+  DeleteOutlined,
+  EditOutlined,
+  LikeOutlined,
+  MessageOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+  InfoCircleOutlined,
+  WarningOutlined,
+  ArrowRightOutlined,
+  ArrowLeftOutlined,
+} from '@ant-design/icons'
+
+const MAP: Record<string, React.ComponentType<any>> = {
+  delete: DeleteOutlined,
+  edit: EditOutlined,
+  like: LikeOutlined,
+  message: MessageOutlined,
+  loading: LoadingOutlined,
+  plus: PlusOutlined,
+  'info-circle': InfoCircleOutlined,
+  warning: WarningOutlined,
+  'arrow-right': ArrowRightOutlined,
+  'arrow-left': ArrowLeftOutlined,
+}
+
+type Props = { type: string } & React.HTMLAttributes<HTMLSpanElement>
+
+export default function Icon({ type, ...rest }: Props) {
+  const C = MAP[type] ?? InfoCircleOutlined
+  return <C {...rest} />
+}
+
+===== END components/compat/Icon.tsx =====
+
+
+===== BEGIN components/concatv3.py =====
+#!/usr/bin/env python3
+"""
+Concatène tous les fichiers texte du dossier du script et de ses sous-dossiers.
+Par défaut, écrit le résultat dans "Code_<nom_dossier>_<YYYYMMDD_HHMMSS>.txt" à la racine du script.
+"""
+
+from __future__ import annotations
+import argparse
+import fnmatch
+import os
+from pathlib import Path
+from typing import Set, List, Optional
+from datetime import datetime
+
+DEFAULT_EXTS: Set[str] = {
+    ".tx", ".md", ".markdown",
+    ".json", ".yaml", ".yml", ".xml", ".toml", ".ini", ".cfg", ".conf", ".properties",
+    ".html", ".htm", ".css", ".scss", ".less",
+    ".js", ".jsx", ".ts", ".tsx", ".mjs", ".cjs",
+    ".py", ".pyi", ".ipynb",
+    ".java", ".kt", ".swift", ".rb", ".php", ".go", ".rs",
+    ".c", ".h", ".cpp", ".cc", ".hpp", ".cs",
+    ".sql",
+    ".sh", ".bash", ".zsh", ".fish", ".ps1", ".bat",
+    ".tex", ".bib",
+    ".graphql", ".gql",
+    ".gradle",
+    ".pl", ".lua", ".r",
+    ".env",
+}
+
+NAMES_WITHOUT_EXT: Set[str] = {
+    "Dockerfile", "Makefile", "CMakeLists.txt",
+    ".gitignore", ".gitattributes", ".editorconfig",
+    "Procfile", "Gemfile", "requirements.txt", "Pipfile", "poetry.lock",
+    "package.json", "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "tsconfig.json", "eslint.config.js", ".eslintrc", ".prettierrc",
+}
+
+DEFAULT_EXCLUDE_DIRS: Set[str] = {
+    ".git", ".hg", ".svn",
+    "node_modules", ".next", ".nuxt",
+    "dist", "build", "out", "coverage", ".cache",
+    ".venv", "venv", "__pycache__",
+    "target", "bin", "obj",
+}
+
+
+def parse_args() -> argparse.Namespace:
+    p = argparse.ArgumentParser(description="Concatène les fichiers texte du projet dans un seul fichier.")
+    p.add_argument("-o", "--out", default=None, help="Fichier de sortie (facultatif)")
+    p.add_argument("--ext", help="Extensions additionnelles ou personnalisées, séparées par des virgules")
+    p.add_argument("--include", action="append", default=[], help="Glob d'inclusion relatif à la racine (répétable)")
+    p.add_argument("--exclude", action="append", default=[], help="Glob d'exclusion relatif à la racine (répétable)")
+    p.add_argument("--max-size", type=int, default=2_000_000, help="Taille max par fichier en octets")
+    p.add_argument("--no-headers", action="store_true", help="Ne pas imprimer d'entêtes par fichier")
+    return p.parse_args()
+
+
+def normalize_exts(exts_csv: Optional[str]) -> Set[str]:
+    if not exts_csv:
+        return set(DEFAULT_EXTS)
+    parts = [e.strip().lower() for e in exts_csv.split(",") if e.strip()]
+    normed = set()
+    for e in parts:
+        if not e.startswith("."):
+            e = "." + e
+        normed.add(e)
+    return normed
+
+
+def is_probably_text(sample: bytes) -> bool:
+    if not sample:
+        return True
+    if b"\x00" in sample:
+        return False
+    try:
+        sample.decode("utf-8")
+        return True
+    except UnicodeDecodeError:
+        pass
+    ctrl_hits = 0
+    for b in sample:
+        if b < 32 and b not in (9, 10, 13):
+            ctrl_hits += 1
+    return (ctrl_hits / max(1, len(sample))) < 0.01
+
+
+def pick_encoding(path: Path) -> Optional[str]:
+    try:
+        with path.open("rb") as f:
+            sample = f.read(32768)
+    except Exception:
+        return None
+    if not is_probably_text(sample):
+        return None
+    for enc in ("utf-8", "utf-8-sig", "utf-16", "cp1252", "latin-1"):
+        try:
+            sample.decode(enc)
+            return enc
+        except UnicodeDecodeError:
+            continue
+    return "latin-1"
+
+
+def relpath(base: Path, p: Path) -> str:
+    try:
+        return str(p.relative_to(base))
+    except Exception:
+        return str(p)
+
+
+def should_include_file(base: Path, file_path: Path, allowed_exts: Set[str],
+                        include_globs: List[str], exclude_globs: List[str],
+                        max_size: int, out_path: Path) -> bool:
+    if not file_path.is_file():
+        return False
+    if file_path == out_path:
+        return False
+    if file_path.suffix.lower() == ".txt":
+        return False
+    try:
+        if file_path.stat().st_size > max_size:
+            return False
+    except Exception:
+        return False
+    rel = relpath(base, file_path)
+    for pat in exclude_globs:
+        if fnmatch.fnmatch(rel, pat):
+            return False
+    if include_globs:
+        ok = any(fnmatch.fnmatch(rel, pat) for pat in include_globs)
+        if not ok:
+            return False
+    if file_path.suffix.lower() in allowed_exts or file_path.name in NAMES_WITHOUT_EXT:
+        return True
+    enc = pick_encoding(file_path)
+    return enc is not None
+
+
+def main() -> None:
+    args = parse_args()
+    base_dir = Path(__file__).resolve().parent
+    self_path = Path(__file__).resolve()
+
+    if args.out:
+        out_path = (base_dir / args.out).resolve()
+    else:
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        out_name = f"Code_{base_dir.name}_{stamp}.txt"
+        out_path = (base_dir / out_name).resolve()
+
+    allowed_exts = normalize_exts(args.ext)
+    include_globs = list(args.include or [])
+    exclude_globs = list(args.exclude or [])
+
+    selected: List[Path] = []
+    for root, dirs, files in os.walk(base_dir, followlinks=False):
+        dirs[:] = [d for d in dirs if d not in DEFAULT_EXCLUDE_DIRS]
+        root_path = Path(root)
+        for name in files:
+            fp = root_path / name
+            # exclure le script exécuté lui-même
+            try:
+                if fp.resolve() == self_path:
+                    continue
+            except Exception:
+                pass
+            if should_include_file(base_dir, fp, allowed_exts, include_globs, exclude_globs, args.max_size, out_path):
+                selected.append(fp)
+
+    selected.sort(key=lambda p: relpath(base_dir, p).lower())
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with out_path.open("w", encoding="utf-8", newline="\n") as out:
+        for p in selected:
+            enc = pick_encoding(p) or "utf-8"
+            if not args.no_headers:
+                out.write(f"\n===== BEGIN {relpath(base_dir, p)} =====\n")
+            try:
+                with p.open("r", encoding=enc, errors="strict") as f:
+                    for line in f:
+                        out.write(line)
+            except UnicodeDecodeError:
+                with p.open("r", encoding="latin-1", errors="replace") as f:
+                    for line in f:
+                        out.write(line)
+            if not args.no_headers:
+                out.write(f"\n===== END {relpath(base_dir, p)} =====\n")
+            out.write("\n")
+
+    print(f"{len(selected)} fichier(s) concaténé(s) -> {relpath(base_dir, out_path)}")
+
+
+if __name__ == "__main__":
+    main()
+
+===== END components/concatv3.py =====
+
+
+===== BEGIN components/CustomComment.tsx =====
+'use client'
+
+import { Typography } from 'antd'
+
+export default function CustomComment({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <Typography.Text
+      type="secondary"
+      style={{ fontSize: 'var(--ant-font-size-sm)' }}
+    >
+      {children}
+    </Typography.Text>
+  )
+}
+
+===== END components/CustomComment.tsx =====
+
+
+===== BEGIN components/dashboard-components/CommentCard.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\CommentCard.tsx
+'use client'
+
+/**
+ * Description: Comment statistics card, including total comments and trend graph
+ * Author: Hieu Chu
+ */
+
+import React from 'react'
+import dynamic from 'next/dynamic'
+import type { AreaConfig } from '@ant-design/plots'
+import {
+  MainIcon,
+  CardDivider,
+  NumberInfoStyled,
+  CardFooter,
+  BarContainer,
+} from './style'
+
+type Point = { x: string | number; y: number }
+
+interface Props {
+  TOTAL_COMMENTS: number
+  DAILY_COMMENTS: number
+  DAILY_COMMENTS_CHANGE: number
+  COMMENT_DATA: Point[]
+}
+
+// SSR-safe dynamic import of the Area chart
+const Area = dynamic(() => import('@ant-design/plots').then(m => m.Area), {
+  ssr: false,
+})
+
+export default function CommentCard({
+  TOTAL_COMMENTS,
+  DAILY_COMMENTS,
+  DAILY_COMMENTS_CHANGE,
+  COMMENT_DATA,
+}: Props) {
+  const areaConfig: AreaConfig = {
+    data: COMMENT_DATA,
+    xField: 'x',
+    yField: 'y',
+    height: 90,
+    autoFit: true,
+    padding: 0,
+    // v2: axis unifié (remplace xAxis/yAxis)
+    axis: { x: false, y: false },
+    tooltip: {},
+    // v2: style au niveau du mark (remplace areaStyle)
+    style: { fillOpacity: 0.2 },
+  }
+
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <MainIcon type="message" twoToneColor="rgb(205, 34, 255)" />
+        <NumberInfoStyled subTitle="Comments" total={TOTAL_COMMENTS} />
+      </div>
+
+      <BarContainer>
+        <Area {...areaConfig} />
+      </BarContainer>
+
+      <CardDivider />
+
+      <CardFooter
+        title="Daily comments"
+        value={DAILY_COMMENTS}
+        change={DAILY_COMMENTS_CHANGE}
+      />
+    </>
+  )
+}
+
+===== END components/dashboard-components/CommentCard.tsx =====
+
+
+===== BEGIN components/dashboard-components/index.tsx =====
+import UserCard from './UserCard'
+import VisitCard from './VisitCard'
+import LikeCard from './LikeCard'
+import CommentCard from './CommentCard'
+import SculptureTable from './SculptureTable'
+import UserPieChart from './UserPieChart'
+import { ColStyled } from './style'
+
+export {
+  UserCard,
+  VisitCard,
+  LikeCard,
+  CommentCard,
+  SculptureTable,
+  UserPieChart,
+  ColStyled
+}
+
+===== END components/dashboard-components/index.tsx =====
+
+
+===== BEGIN components/dashboard-components/LikeCard.tsx =====
+'use client';
+
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { LineConfig } from '@ant-design/plots';
+
+// Use Line instead of TinyLine (works across versions)
+const Line = dynamic(() => import('@ant-design/plots').then(m => m.Line), {
+  ssr: false,
+});
+
+export interface LikeCardProps {
+  title?: string;        // Default: 'Likes'
+  total: number;         // Total likes
+  trend?: number[];      // Sparkline series
+  loading?: boolean;
+}
+
+const LikeCard: React.FC<LikeCardProps> = ({
+  title = 'Likes',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const series = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ x: i, y }));
+
+  const config: LineConfig = {
+    data,
+    xField: 'x',
+    yField: 'y',
+    smooth: true,
+    autoFit: true,
+    height: 56,
+    padding: 0,
+    xAxis: false,
+    yAxis: false,
+    tooltip: {},
+  };
+
+  return (
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <Line {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
+
+export default LikeCard;
+
+===== END components/dashboard-components/LikeCard.tsx =====
+
+
+===== BEGIN components/dashboard-components/LineChart.tsx =====
+'use client'
+import React from 'react';
+import {
+  LineChart as ReLineChart,
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+
+type DataPoint = {
+  time: string;
+  value: number;
+};
+
+type LineChartProps = {
+  data: DataPoint[];
+};
+
+const LineChart: React.FC<LineChartProps> = ({ data }) => {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <ReLineChart data={data}>
+        <CartesianGrid stroke="#ccc" />
+        <XAxis dataKey="time" />
+        <YAxis />
+        <Tooltip />
+        <Line type="monotone" dataKey="value" stroke="#8884d8" />
+      </ReLineChart>
+    </ResponsiveContainer>
+  );
+};
+
+export default LineChart;
+
+===== END components/dashboard-components/LineChart.tsx =====
+
+
+===== BEGIN components/dashboard-components/StatisticCard.tsx =====
+import React from 'react';
+import { Card, Statistic } from 'antd';
+
+type StatisticCardProps = {
+  title: string;
+  value: number;
+};
+
+const StatisticCard: React.FC<StatisticCardProps> = ({ title, value }) => {
+  return (
+    <Card>
+      <Statistic title={title} value={value} />
+    </Card>
+  );
+};
+
+export default StatisticCard;
+
+===== END components/dashboard-components/StatisticCard.tsx =====
+
+
+===== BEGIN components/dashboard-components/style.tsx =====
+/**
+ * Description: Stylesheet for dashboard components
+ * Author: Hieu Chu
+ */
+
+import React from 'react'
+import { Card, Tooltip, Divider, Col, Statistic } from 'antd'
+import styled from 'styled-components'
+import {
+  InfoCircleOutlined,
+  CaretDownOutlined,
+  CaretUpOutlined,
+} from '@ant-design/icons'
+import * as AntIcons from '@ant-design/icons'
+
+/** helper: map legacy Icon `type` strings (e.g. "shopping-cart") to v4 components */
+const legacyTypeToIcon = (type?: string) => {
+  if (!type) return null
+
+  const pascal =
+    type
+      .split('-')
+      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .join('') + 'Outlined'
+
+  const key = pascal as keyof typeof AntIcons
+  const Comp = AntIcons[key]
+
+  return (Comp as React.ComponentType | undefined) ?? null
+}
+
+export const CardStyled = (props: React.ComponentProps<typeof Card>) => {
+  const bodyStyle: React.CSSProperties = {
+    padding: '20px 24px 8px',
+  }
+  return <Card bodyStyle={bodyStyle} bordered={false} {...props} />
+}
+
+/**
+ * Replacement for `NumberInfo` from ant-design-pro.
+ * Keeps the same call sites: <NumberInfoStyled subTitle="..." total={123} />
+ */
+export const NumberInfoStyled = (props: {
+  subTitle?: React.ReactNode
+  total: number
+  precision?: number
+  prefix?: React.ReactNode
+  suffix?: React.ReactNode
+  style?: React.CSSProperties
+}) => {
+  const { subTitle, total, precision, prefix, suffix, style } = props
+  return (
+    <div style={{ display: 'inline-block', ...(style || {}) }}>
+      <Statistic
+        title={subTitle}
+        value={total}
+        precision={precision}
+        prefix={prefix}
+        suffix={suffix}
+        formatter={(v) => Number(v).toLocaleString()}
+        valueStyle={{ fontSize: 30 }}
+      />
+    </div>
+  )
+}
+
+export const HelperIcon = (props: React.ComponentProps<typeof Tooltip>) => (
+  <div style={{ marginLeft: 'auto', alignSelf: 'flex-start' }}>
+    <Tooltip {...props} placement="topLeft" arrowPointAtCenter>
+      <InfoCircleOutlined style={{ verticalAlign: -3, cursor: 'pointer' }} />
+    </Tooltip>
+  </div>
+)
+
+/**
+ * Backward compatible MainIcon.
+ * Preferred: <MainIcon icon={<YourIcon />} />
+ * Legacy support: <MainIcon type="shopping-cart" />
+ */
+export const MainIcon: React.FC<{
+  icon?: React.ReactElement
+  type?: string
+  style?: React.CSSProperties
+  twoToneColor?: string
+}> = ({ icon, type, style, twoToneColor, ...rest }) => {
+  const Comp = !icon && type ? legacyTypeToIcon(type) : null
+
+  // Loosen the element type so we can pass twoToneColor safely
+  const element: React.ReactElement<any> | null =
+    icon && React.isValidElement(icon)
+      ? (icon as React.ReactElement<any>)
+      : Comp
+      ? React.createElement(Comp)
+      : null
+
+  const mergedStyle: React.CSSProperties | undefined = element
+    ? {
+        ...(element.props.style ?? {}),
+        ...(style ?? {}),
+        fontSize: 54,
+      }
+    : undefined
+
+  return (
+    <div style={{ marginRight: 16 }} {...rest}>
+      {element
+        ? React.cloneElement(element, {
+            style: mergedStyle,
+            twoToneColor,
+          })
+        : null}
+    </div>
+  )
+}
+
+export const CardFooter: React.FC<{
+  title: React.ReactNode
+  value: number
+  change: number
+}> = ({ title, value, change }) => {
+  return (
+    <div style={{ position: 'relative', zIndex: 99 }}>
+      <span>{title}:</span>
+      <span style={{ marginLeft: 8, color: 'rgba(0,0,0,.85)' }}>
+        {value.toLocaleString()}
+      </span>
+      <Tooltip title="Change compared to yesterday">
+        <span style={{ marginLeft: 16 }}>
+          <span style={{ color: 'rgba(0,0,0,.55)', marginRight: 2 }}>
+            {change.toLocaleString()}
+          </span>
+
+          {/* Up/down icon */}
+          {change < 0 ? (
+            <CaretDownOutlined
+              style={{ color: '#f5222d', verticalAlign: 'text-bottom' }}
+            />
+          ) : (
+            <CaretUpOutlined
+              style={{ color: '#52c41a', verticalAlign: 'middle' }}
+            />
+          )}
+        </span>
+      </Tooltip>
+    </div>
+  )
+}
+
+export const ColStyled = styled(Col)`
+  padding-bottom: 12px;
+`
+
+export const CardDivider = styled(Divider)`
+  margin-top: 12px;
+  margin-bottom: 9px;
+`
+
+export const BarContainer = styled.div`
+  height: 90px;
+  margin-top: 10px;
+  margin-bottom: -10px;
+`
+
+export const ShadowCard = styled(CardStyled)`
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(242, 242, 242);
+  border-radius: 3px;
+  transition: all 150ms ease-in-out 0s;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 9px 24px;
+    cursor: pointer;
+    transition: all 150ms ease-in-out 0s;
+  }
+`
+
+
+===== END components/dashboard-components/style.tsx =====
+
+
+===== BEGIN components/dashboard-components/UserCard.tsx =====
+'use client';
+
+import React from 'react';
+import dynamic from 'next/dynamic';
+import { Card, Statistic, Skeleton } from 'antd';
+import type { ColumnConfig } from '@ant-design/plots';
+
+// SSR-safe dynamic import of Column
+const Column = dynamic(
+  () => import('@ant-design/plots').then((m) => m.Column),
+  { ssr: false }
+);
+
+export interface UserCardProps {
+  title?: string;        // Default: 'New Users'
+  total: number;         // Total users (or new users)
+  trend?: number[];      // Time series values
+  loading?: boolean;
+}
+
+const UserCard: React.FC<UserCardProps> = ({
+  title = 'New Users',
+  total,
+  trend = [],
+  loading = false,
+}) => {
+  const series: number[] = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ idx: String(i + 1), value: Number(y ?? 0) }));
+
+  const config: ColumnConfig = {
+    data,
+    xField: 'idx',
+    yField: 'value',
+    height: 56,
+    autoFit: true,
+    padding: 0,
+    legend: false,
+    xAxis: false,
+    yAxis: false,
+    label: false,
+    tooltip: false,
+    columnWidthRatio: 1,
+  };
+
+  return (
+    <Card bordered={false} bodyStyle={{ padding: 16 }}>
+      <Statistic title={title} value={total} />
+      {loading ? (
+        <Skeleton active paragraph={false} style={{ marginTop: 8 }} />
+      ) : (
+        <div style={{ marginTop: 8 }}>
+          <Column {...config} />
+        </div>
+      )}
+    </Card>
+  );
+};
+
+export default UserCard;
+
+===== END components/dashboard-components/UserCard.tsx =====
+
+
+===== BEGIN components/dashboard-components/UserPieChart.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserPieChart.tsx
+// Version corrigée basée sur le dump fourni. :contentReference[oaicite:0]{index=0}
+'use client'
+
+import React from 'react'
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts'
+import { CardStyled } from './style'
+
+type User = { userId: string }
+type Props = { users: User[] }
+type PieDatum = { name: string; value: number }
+
+export default function UserPieChart({ users }: Props) {
+  // Comptage sans indexation de tableau
+  let email = 0
+  let google = 0
+  let facebook = 0
+
+  for (const u of users) {
+    const id = u.userId
+    if (id.includes('auth0')) email += 1
+    else if (id.includes('google')) google += 1
+    else facebook += 1
+  }
+
+  const data: PieDatum[] = [
+    { name: 'Email', value: email },
+    { name: 'Google', value: google },
+    { name: 'Facebook', value: facebook },
+  ]
+
+  const COLORS = ['#A97BE9', '#EA4335', '#1890FF'] as const
+
+  return (
+    <CardStyled title="Proportion of Users">
+      <div style={{ width: '100%', height: 294 }}>
+        <ResponsiveContainer>
+          <PieChart>
+            <Pie
+              data={data}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={90}
+              label
+            >
+              {data.map((entry, i) => (
+                <Cell
+                  key={entry.name}
+                  // Évite l'indexation non sûre avec une couleur de repli
+                  fill={COLORS[i % COLORS.length] ?? '#8884d8'}
+                />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </CardStyled>
+  )
+}
+
+===== END components/dashboard-components/UserPieChart.tsx =====
+
+
+===== BEGIN components/dashboard-components/VisitCard.tsx =====
+'use client'
+
+/**
+ * Description: Visit statistics card, including total visits and trend graph
+ * Author: Hieu Chu
+ */
+
+import React from 'react'
+import ChartCard from '@/components/charts/ChartCard'
+import {
+  MainIcon,
+  CardDivider,
+  NumberInfoStyled,
+  CardFooter,
+  HelperIcon,
+  BarContainer,
+} from './style'
+
+type Point = { x: string | number; y: number }
+
+interface Props {
+  TOTAL_VISITS: number
+  DAILY_VISITS: number
+  DAILY_VISITS_CHANGE: number
+  VISIT_DATA: Point[]
+  SINGLE_SCULPTURE?: boolean
+}
+
+export default function VisitCard({
+  TOTAL_VISITS,
+  DAILY_VISITS,
+  DAILY_VISITS_CHANGE,
+  VISIT_DATA,
+  SINGLE_SCULPTURE,
+}: Props) {
+  return (
+    <>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <MainIcon type="environment" style={{ color: '#F73F3F' }} />
+        <NumberInfoStyled subTitle="Total visits" total={TOTAL_VISITS} />
+        {!SINGLE_SCULPTURE && (
+          <HelperIcon title="Total number of times sculptures have been visited" />
+        )}
+      </div>
+
+      <BarContainer>
+        <ChartCard type="area" data={VISIT_DATA} height={90} />
+      </BarContainer>
+
+      <CardDivider />
+
+      <CardFooter
+        title="Daily visits"
+        value={DAILY_VISITS}
+        change={DAILY_VISITS_CHANGE}
+      />
+    </>
+  )
+}
+
+===== END components/dashboard-components/VisitCard.tsx =====
+
+
+===== BEGIN components/layout-components/Drawer.tsx =====
+'use client'
+
+import React from 'react'
+import { Drawer } from 'antd'
+import styled from 'styled-components'
+
+/* ------------------------------------------------------------------ */
+/*  Drawer stylé : suit les variables CSS du thème et bloque le scroll */
+/* ------------------------------------------------------------------ */
+const StyledDrawer = styled(Drawer)`
+  .ant-drawer-wrapper-body {
+    overflow: hidden !important;
+  }
+
+  .ant-drawer-content {
+    background: var(--ant-color-bg-container) !important;
+    color: var(--ant-color-text);
+  }
+`
+
+interface Props {
+  drawerVisible: boolean
+  closeDrawer : () => void
+  children    : React.ReactNode
+}
+
+export default function LayoutDrawer({
+  drawerVisible,
+  closeDrawer,
+  children,
+}: Props) {
+  return (
+    <StyledDrawer
+      placement="left"
+      closable={false}
+      onClose={closeDrawer}
+      open={drawerVisible}
+        styles={{
+			body: {
+			margin: 0,
+			padding: 0,
+			background: 'var(--ant-color-bg-container)',
+		},
+      }}
+    >
+      {children}
+    </StyledDrawer>
+  )
+}
+
+===== END components/layout-components/Drawer.tsx =====
+
+
+===== BEGIN components/layout-components/Header.tsx =====
+'use client'
+
+import { Layout, Dropdown, Breadcrumb } from 'antd'
+import {
+  UserOutlined,
+  LogoutOutlined,
+  MenuUnfoldOutlined,
+  MenuFoldOutlined,
+} from '@ant-design/icons'
+import styled from 'styled-components'
+import Link from 'next/link'
+import nookies from 'nookies'
+import { useRouter, usePathname } from 'next/navigation'
+import { useMemo } from 'react'
+import ThemeSwitcher from '@/components/ThemeSwitcher'
+
+const { Header } = Layout
+
+/* -------- styled -------- */
+const NavBar = styled.div`
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding: 0 16px;
+`
+
+const Crumb = styled(Breadcrumb)`
+  margin-left: 20px; /* espace après le toggle */
+  color: var(--ant-color-text);
+  .ant-breadcrumb-separator {
+    color: var(--ant-color-text-secondary);
+  }
+`
+
+const HeaderBlock = styled.div`
+  padding: 0 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  &:hover {
+    background: var(--ant-color-fill-secondary);
+  }
+`
+
+/* -------- helpers -------- */
+const accountItems = [
+  { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
+  { type: 'divider' as const },
+  { key: 'logout', icon: <LogoutOutlined />, label: 'Logout' },
+]
+
+interface Route {
+  path?: string
+  name: string
+  views?: Route[]
+}
+
+const trail = (rs: Route[], cur: string): Route[] => {
+  for (const r of rs) {
+    if (r.views?.length) {
+      const sub = trail(r.views, cur)
+      if (sub.length) return [r, ...sub]
+    }
+    if (r.path && (cur === r.path || cur.startsWith(r.path))) return [r]
+  }
+  return []
+}
+
+/* -------- component -------- */
+interface Props {
+  collapsed: boolean
+  handleToggle: () => void
+  routes?: Route[]
+  selectedSidebar?: string
+}
+
+export default function HeaderBar({
+  collapsed,
+  handleToggle,
+  routes = [],
+  selectedSidebar = '',
+}: Props) {
+  const router = useRouter()
+  const pathname = usePathname() ?? '/'
+  const cur = pathname
+
+  const breadcrumbItems = useMemo(() => {
+    const br = trail(routes, cur)
+    const root = {
+      name:
+        (selectedSidebar?.[0]?.toUpperCase() ?? '') +
+        (selectedSidebar?.slice(1) ?? ''),
+      path: `/${selectedSidebar}`,
+    }
+    const crumbs = br.length ? [root, ...br] : [root]
+    return crumbs.map(c => ({
+      key: c.path ?? c.name,
+      title: c.path ? (
+        <Link
+          href={{ pathname: c.path, query: { sidebar: selectedSidebar } }}
+          style={{ color: 'var(--ant-color-text)' }}
+        >
+          {c.name}
+        </Link>
+      ) : (
+        <span style={{ color: 'var(--ant-color-text)' }}>{c.name}</span>
+      ),
+    }))
+  }, [routes, cur, selectedSidebar])
+
+  return (
+    <Header
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 100,
+        background: 'var(--ant-color-bg-container)',
+        padding: 0,
+        boxShadow: 'var(--ant-box-shadow-secondary)',
+      }}
+    >
+      <NavBar>
+        {/* Toggle sidebar */}
+        <div
+          onClick={handleToggle}
+          style={{ cursor: 'pointer', marginRight: 20 }}
+        >
+          {collapsed ? (
+            <MenuUnfoldOutlined style={{ fontSize: 20, color: 'var(--ant-color-text)' }} />
+          ) : (
+            <MenuFoldOutlined style={{ fontSize: 20, color: 'var(--ant-color-text)' }} />
+          )}
+        </div>
+
+        {/* Fil d’Ariane */}
+        <Crumb items={breadcrumbItems} />
+
+        {/* Zone droite : thème + compte */}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+          <ThemeSwitcher />
+
+          <Dropdown
+            placement="bottomRight"
+            menu={{
+              items: accountItems,
+              onClick: ({ key }) => {
+                if (key === 'logout') {
+                  nookies.destroy({}, 'auth0.is.authenticated')
+                  nookies.destroy({}, 'accessToken')
+                  router.push('/')
+                } else if (key === 'profile') {
+                  router.push('/users/id/123')
+                }
+              },
+            }}
+          >
+            <HeaderBlock>
+              <UserOutlined style={{ marginRight: 8, color: 'var(--ant-color-text)' }} /> Admin
+            </HeaderBlock>
+          </Dropdown>
+        </div>
+      </NavBar>
+    </Header>
+  )
+}
+
+===== END components/layout-components/Header.tsx =====
+
+
+===== BEGIN components/layout-components/LogoTitle.tsx =====
+// File: /components/layout-components/LogoTitle.tsx
+'use client'
+
+import styled from 'styled-components'
+import { Dropdown } from 'antd'
+
+/* ------------ styled ------------ */
+export const Logo = styled.img`
+  display: block;
+  height: 32px;
+  vertical-align: middle;
+`
+
+const Title = styled.span`
+  display: inline-block;
+  color: var(--ant-color-text);
+  font-weight: 600;
+  font-size: 20px;
+  margin-left: 12px;
+  font-family: 'Arial';
+  vertical-align: middle;
+`
+
+const TitleWrapper = styled.div`
+  position: relative;
+  height: 64px;
+  padding-left: 24px;
+  overflow: hidden;
+  line-height: 64px;
+  transition: background 0.3s ease;
+  background: var(--ant-color-bg-container);
+`
+
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+`
+
+/* ------------ mapping du label par sidebar ------------ */
+const titleMapping = {
+  ekoh        : 'EkoH',
+  ethikos     : 'EthiKos',
+  keenkonnect : 'keenKonnect',
+  konnected   : 'KonnectED',
+  kreative    : 'Kreative',
+} as const
+
+interface Props {
+  onSidebarChange : (key: string) => void
+  selectedSidebar?: string
+}
+
+/* ------------ composant ------------ */
+export default function LogoTitle({
+  onSidebarChange,
+  selectedSidebar,
+}: Props) {
+  const sidebar = selectedSidebar?.toLowerCase() ?? 'ekoh'
+
+  const menuItems = Object.entries(titleMapping).map(([key, label]) => ({
+    key, label,
+  }))
+
+  return (
+    <TitleWrapper>
+      <Dropdown
+        trigger={['click']}
+        menu={{
+          items: menuItems,
+          onClick: ({ key }) => onSidebarChange(key),
+          // **ici on force un fond opaque + ombre**
+          style: {
+            background: 'var(--ant-color-bg-container)',
+            boxShadow: 'var(--ant-box-shadow-secondary)',
+          },
+        }}
+      >
+        <LogoContainer>
+          <Logo src="/LogoK.svg" alt="Konnaxion logo" />
+          <Title>
+            {titleMapping[sidebar as keyof typeof titleMapping] ?? 'UOW Sculptures'}
+          </Title>
+        </LogoContainer>
+      </Dropdown>
+    </TitleWrapper>
+  )
+}
+
+===== END components/layout-components/LogoTitle.tsx =====
+
+
+===== BEGIN components/layout-components/Main.tsx =====
+// components/layout-components/Main.tsx
+'use client'
+
+import type { ComponentProps, ReactNode } from 'react'
+import { Layout } from 'antd'
+import styled, { css } from 'styled-components'
+
+const StyledMain = styled(
+  ({ collapsed: _c, ...rest }: { collapsed?: boolean } & ComponentProps<typeof Layout>) => (
+    <Layout {...rest} />
+  ),
+)<{ collapsed: boolean }>`
+  transition: 0.2s all;
+
+  /* décalage = largeur réelle du sider (ouvert) */
+  margin-left: 256px;
+
+  background: var(--ant-color-bg-layout);
+
+  /* décalage quand le sider est réduit */
+  ${({ collapsed }) =>
+    collapsed &&
+    css`
+      margin-left: 80px;
+    `}
+
+  @media (max-width: 575.98px) {
+    margin-left: 0;
+  }
+`
+
+export default function Main({
+  children,
+  collapsed,
+}: {
+  children: ReactNode
+  collapsed: boolean
+}) {
+  return <StyledMain collapsed={collapsed}>{children}</StyledMain>
+}
+
+===== END components/layout-components/Main.tsx =====
+
+
+===== BEGIN components/layout-components/MainLayout.tsx =====
+// components/layout-components/MainLayout.tsx
+'use client'
+
+import React, { useState, useEffect } from 'react'
+import { Layout } from 'antd'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+
+import FixedSider      from '@/components/layout-components/Sider'
+import Main            from '@/components/layout-components/Main'
+import HeaderComponent from '@/components/layout-components/Header'
+import LogoTitle       from '@/components/layout-components/LogoTitle'
+import DrawerComponent from '@/components/layout-components/Drawer'
+import MenuComponent   from '@/components/layout-components/Menu'
+import type { Route }  from '@/components/layout-components/Menu'
+
+interface RoutesConfig {
+  ekoh: Route[]
+  ethikos: Route[]
+  keenkonnect: Route[]
+  konnected: Route[]
+  kreative: Route[]
+}
+
+type SuiteKey = keyof RoutesConfig
+
+// Default entry route per module
+// NOTE: for Ethikos we point to Pulse Overview until /ethikos/dashboard exists.
+const DEFAULT_ENTRY: Record<SuiteKey, string> = {
+  ekoh       : '/ekoh/dashboard',
+  ethikos    : '/ethikos/pulse/overview',
+  keenkonnect: '/keenkonnect/dashboard',
+  konnected  : '/konnected/dashboard',
+  kreative   : '/kreative/dashboard',
+}
+
+const { Content } = Layout
+
+export default function MainLayout({
+  collapsed: initialCollapsed = false,
+  children,
+}: React.PropsWithChildren<{ collapsed?: boolean }>) {
+  const router   = useRouter()
+  const pathname = usePathname() ?? '/'
+  const q        = useSearchParams()
+
+  /* états */
+  const [collapsed, setCollapsed] = useState(initialCollapsed)
+  const [drawerVisible, setDrawer] = useState(false)
+
+  const [routes, setRoutes] = useState<RoutesConfig>({
+    ekoh: [], ethikos: [], keenkonnect: [], konnected: [], kreative: [],
+  })
+
+  // helper pour déterminer la suite initiale à partir de l’URL
+  const detectInitialSuite = (): SuiteKey => {
+    const fromQuery = q.get('sidebar') as SuiteKey | null
+    if (fromQuery && fromQuery in DEFAULT_ENTRY) return fromQuery
+
+    if (pathname.startsWith('/ethikos'))    return 'ethikos'
+    if (pathname.startsWith('/keenkonnect')) return 'keenkonnect'
+    if (pathname.startsWith('/konnected'))   return 'konnected'
+    if (pathname.startsWith('/kreative'))    return 'kreative'
+    if (pathname.startsWith('/ekoh'))        return 'ekoh'
+
+    return 'ekoh'
+  }
+
+  /* suite courante */
+  const [suite, setSuite] = useState<SuiteKey>(() => detectInitialSuite())
+
+  /* charger dynamiquement les routes */
+  useEffect(() => {
+    Promise.all([
+      import('@/routes/routesEkoh'),
+      import('@/routes/routesEthikos'),
+      import('@/routes/routesKeenkonnect'),
+      import('@/routes/routesKonnected'),
+      import('@/routes/routesKreative'),
+    ])
+      .then(([
+        { default: ekoh },
+        { default: ethikos },
+        { default: keen },
+        { default: konnected },
+        { default: kreative },
+      ]) => setRoutes({ ekoh, ethikos, keenkonnect: keen, konnected, kreative }))
+      .catch(err => console.error('Erreur chargement routes :', err))
+  }, [])
+
+  /* sync si ?sidebar change (navigation directe, back/forward, etc.) */
+  useEffect(() => {
+    const v = q.get('sidebar') as SuiteKey | null
+    if (v && v in DEFAULT_ENTRY && v !== suite) {
+      setSuite(v)
+    }
+  }, [q, suite])
+
+  const changeSuite = (key: string) => {
+    const k = key as SuiteKey
+
+    // mise à jour de l’état local
+    setSuite(k)
+
+    // on conserve les autres query params
+    const params = new URLSearchParams(Array.from(q.entries()))
+    params.set('sidebar', k)
+
+    const basePath = DEFAULT_ENTRY[k]          // route “dashboard” du module
+    const query    = params.toString()
+    const target   = query ? `${basePath}?${query}` : basePath
+
+    router.push(target)
+  }
+
+  const toggle = () => {
+    if (window.innerWidth >= 576) setCollapsed(!collapsed)
+    else setDrawer(v => !v)
+  }
+
+  const suiteRoutes = routes[suite] ?? []
+
+  return (
+    <Layout style={{ minHeight: '100vh', background: 'var(--ant-layout-color-bg-layout)' }}>
+      {/* SIDEBAR desktop */}
+      <FixedSider collapsed={collapsed} setCollapsed={setCollapsed}>
+        <LogoTitle onSidebarChange={changeSuite} selectedSidebar={suite} />
+        <MenuComponent
+          routes={suiteRoutes}
+          closeDrawer={() => setDrawer(false)}
+          selectedSidebar={suite}
+        />
+      </FixedSider>
+
+      {/* MAIN + HEADER */}
+      <Main collapsed={collapsed}>
+        <HeaderComponent
+          collapsed={collapsed}
+          handleToggle={toggle}
+          routes={suiteRoutes}
+          selectedSidebar={suite}
+        />
+        <Content
+          style={{
+            margin      : '20px 16px 15px 16px',
+            background  : 'var(--ant-color-bg-container)',
+            borderRadius: 8,
+          }}
+        >
+          {children}
+        </Content>
+      </Main>
+
+      {/* DRAWER mobile */}
+      <DrawerComponent
+        drawerVisible={drawerVisible}
+        closeDrawer={() => setDrawer(false)}
+      >
+        <LogoTitle onSidebarChange={changeSuite} selectedSidebar={suite} />
+        <MenuComponent
+          routes={suiteRoutes}
+          style={{ minHeight: '100vh' }}
+          closeDrawer={() => setDrawer(false)}
+          selectedSidebar={suite}
+        />
+      </DrawerComponent>
+    </Layout>
+  )
+}
+
+===== END components/layout-components/MainLayout.tsx =====
+
+
+===== BEGIN components/layout-components/Menu.tsx =====
+'use client'
+
+import React from 'react'
+import { Menu } from 'antd'
+import { usePathname } from 'next/navigation'
+import Link from 'next/link'
+
+export interface Route {
+  path?: string
+  name: string
+  icon?: React.ReactNode
+  views?: Route[]
+}
+
+interface Props {
+  routes: Route[]
+  style?: React.CSSProperties
+  closeDrawer: () => void
+  selectedSidebar: string
+}
+
+const MenuComponent: React.FC<Props> = ({
+  routes,
+  style,
+  closeDrawer,
+  selectedSidebar,
+}) => {
+  const pathname = usePathname()
+
+  /* helpers */
+  const toItems = (rs: Route[]): any[] =>
+    rs
+      .map(r =>
+        r.views?.length
+          ? {
+              key: r.name,
+              icon: r.icon,
+              label: r.name,
+              children: toItems(r.views),
+            }
+          : r.path
+          ? {
+              key: r.path,
+              icon: r.icon,
+              label: (
+                <Link
+                  href={{ pathname: r.path, query: { sidebar: selectedSidebar } }}
+                  onClick={closeDrawer}
+                >
+                  {r.name}
+                </Link>
+              ),
+            }
+          : null,
+      )
+      .filter(Boolean)
+
+  const flatten = (rs: Route[]): Route[] =>
+    rs.flatMap(r => (r.views?.length ? flatten(r.views) : [r]))
+
+  const selectedKeys = flatten(routes)
+    .filter(r => r.path && pathname.startsWith(r.path!))
+    .map(r => r.path!)
+
+  return (
+    <Menu
+      mode="inline"
+      selectedKeys={selectedKeys}
+      items={toItems(routes)}
+      style={{
+        background: 'var(--ant-color-bg-container)',
+        color     : 'var(--ant-color-text)',
+        padding   : '16px 0',
+        ...style,
+      }}
+    />
+  )
+}
+
+export default MenuComponent
+
+===== END components/layout-components/Menu.tsx =====
+
+
+===== BEGIN components/layout-components/Sider.tsx =====
+'use client'
+
+import { Layout } from 'antd'
+import styled     from 'styled-components'
+
+const { Sider } = Layout
+
+/* Sider fixe alimenté par les variables Ant Design */
+const FixedSider = styled(Sider)`
+  background : var(--ant-color-bg-container) !important;
+  overflow   : auto;
+  height     : 100vh;
+  position   : fixed;
+  left       : 0;
+  box-shadow : var(--ant-box-shadow-secondary, 2px 0 6px rgba(0, 21, 41, .35));
+  transition : background 0.3s ease;
+
+  @media (max-width: 575.98px) {
+    display: none;
+  }
+`
+
+interface Props {
+  collapsed    : boolean
+  setCollapsed : (c: boolean) => void
+  children     : React.ReactNode
+}
+
+export default function SiderWrapper({
+  collapsed,
+  setCollapsed,
+  children,
+}: Props) {
+  return (
+    <FixedSider
+      trigger={null}
+      width={256}
+      collapsible
+      collapsed={collapsed}
+      breakpoint="lg"
+      onBreakpoint={setCollapsed}
+    >
+      {children}
+    </FixedSider>
+  )
+}
+
+===== END components/layout-components/Sider.tsx =====
+
+
+===== BEGIN components/Loading.tsx =====
+// components/Loading.tsx
+import { Spin } from 'antd'
+export default function Loading() {
+  return (
+    <div style={{ padding: 24, textAlign: 'center' }}>
+      <Spin />
+    </div>
+  )
+}
+
+===== END components/Loading.tsx =====
+
+
+===== BEGIN components/map-components/ControlPanel.tsx =====
+/**
+ * Description: Helper control panel in Map view to show current co-ordinates of marker
+ * Author: Hieu Chu
+ */
+
+import React, { PureComponent } from 'react'
+
+type ControlPanelProps = {
+  lat: number
+  lng: number
+}
+
+export default class ControlPanel extends PureComponent<ControlPanelProps> {
+  render() {
+    const { lat, lng } = this.props
+    return (
+      <div className="control-panel">
+        <div>Latitude: {lat}</div>
+        <div>Longitude: {lng}</div>
+      </div>
+    )
+  }
+}
+
+===== END components/map-components/ControlPanel.tsx =====
+
+
+===== BEGIN components/map-components/index.tsx =====
+import Map from './Map'
+
+export default Map
+
+===== END components/map-components/index.tsx =====
+
+
+===== BEGIN components/map-components/Map.tsx =====
+'use client';
+
+/**
+ * Dynamic map view with geolocation control and draggable marker
+ */
+
+import { useMemo } from 'react';
+import type { CSSProperties } from 'react';
+import {
+  Map as ReactMapGL,
+  Marker,
+  NavigationControl,
+  FullscreenControl,
+  GeolocateControl,
+  type ViewState as MapViewState,
+  type ViewStateChangeEvent,
+} from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+import MapMarker from './MapMarker';
+import ControlPanel from './ControlPanel';
+
+/** Controls styling */
+const fullscreenControlStyle: CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  padding: '10px',
+};
+const navStyle: CSSProperties = {
+  position: 'absolute',
+  top: 36,
+  left: 0,
+  padding: '10px',
+};
+const geolocateStyle: CSSProperties = {
+  position: 'absolute',
+  bottom: 30,
+  right: 0,
+  margin: 10,
+};
+
+/** Public shape expected by parent (keeps prop contract minimal) */
+type ViewInput = {
+  latitude: number;
+  longitude: number;
+  zoom: number;
+  pitch?: number;
+  bearing?: number;
+  /** Optional on input to avoid breaking callers; we’ll default it */
+  padding?: { top: number; bottom: number; left: number; right: number };
+};
+
+type MarkerState = { markerLat: number; markerLng: number };
+
+type Props = {
+  view: ViewInput;
+  setView: (v: ViewInput) => void;
+  marker: MarkerState;
+  setMarker: (m: MarkerState) => void;
+};
+
+const DEFAULT_PADDING: MapViewState['padding'] = {
+  top: 0,
+  right: 0,
+  bottom: 0,
+  left: 0,
+};
+
+export default function Map({ view, setView, marker, setMarker }: Props) {
+  const token =
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
+    process.env.MAPBOX_ACCESS_TOKEN;
+
+  // Internal view that satisfies react-map-gl’s stricter ViewState typing
+  const controlledView: MapViewState = useMemo(
+    () => ({
+      latitude: view.latitude,
+      longitude: view.longitude,
+      zoom: view.zoom,
+      pitch: view.pitch ?? 0,
+      bearing: view.bearing ?? 0,
+      padding: view.padding ?? DEFAULT_PADDING,
+    }),
+    [view],
+  );
+
+  const handleMove = (evt: ViewStateChangeEvent) => {
+    const vs = evt.viewState;
+    // Feed a relaxed shape back to parent while preserving optional fields
+    setView({
+      latitude: vs.latitude,
+      longitude: vs.longitude,
+      zoom: vs.zoom,
+      pitch: vs.pitch,
+      bearing: vs.bearing,
+      padding: vs.padding,
+    });
+  };
+
+  return (
+    <ReactMapGL
+      /** Uncontrolled startup values for first render */
+      initialViewState={controlledView}
+      /**
+       * Keep it controlled. Cast only at the boundary to avoid
+       * polluting the rest of your code with map-specific width/height typing.
+       */
+      viewState={controlledView as unknown as MapViewState & { width: number; height: number }}
+      onMove={handleMove}
+      mapboxAccessToken={token}
+      mapStyle="mapbox://styles/mapbox/streets-v11"
+      style={{ width: '100%', height: '100%' }}
+    >
+      <Marker
+        longitude={marker.markerLng}
+        latitude={marker.markerLat}
+        draggable
+        onDragEnd={(e) => {
+          const { lng, lat } = e.lngLat;
+          setMarker({ markerLat: lat, markerLng: lng });
+        }}
+      >
+        <MapMarker />
+      </Marker>
+
+      <div style={fullscreenControlStyle}>
+        <FullscreenControl />
+      </div>
+
+      <div style={navStyle}>
+        <NavigationControl />
+      </div>
+
+      <GeolocateControl
+        style={geolocateStyle}
+        positionOptions={{ enableHighAccuracy: true }}
+        trackUserLocation
+        showUserLocation
+        onGeolocate={() =>
+          setView({
+            ...view,
+            // keep or increase zoom to a sensible level
+            zoom: Math.max(view.zoom ?? 0, 13),
+          })
+        }
+      />
+
+      <ControlPanel lat={marker.markerLat} lng={marker.markerLng} />
+    </ReactMapGL>
+  );
+}
+
+===== END components/map-components/Map.tsx =====
+
+
+===== BEGIN components/map-components/MapMarker.tsx =====
+/**
+ * Description: Marker custom icon
+ * Author: Hieu Chu
+ */
+
+import React, { PureComponent } from 'react'
+
+type MapMarkerProps = {
+  size?: number
+}
+
+const ICON = `M20.2,15.7L20.2,15.7c1.1-1.6,1.8-3.6,1.8-5.7c0-5.6-4.5-10-10-10S2,4.5,2,10c0,2,0.6,3.9,1.6,5.4c0,0.1,0.1,0.2,0.2,0.3
+  c0,0,0.1,0.1,0.1,0.2c0.2,0.3,0.4,0.6,0.7,0.9c2.6,3.1,7.4,7.6,7.4,7.6s4.8-4.5,7.4-7.5c0.2-0.3,0.5-0.6,0.7-0.9
+  C20.1,15.8,20.2,15.8,20.2,15.7z`
+
+const pinStyle: React.CSSProperties = {
+  fill: '#FF0000',
+  stroke: 'none',
+  transform: 'translate(-50%,-100%)'
+}
+
+export default class MapMarker extends PureComponent<MapMarkerProps> {
+  render() {
+    const { size = 20 } = this.props
+    return (
+      <svg height={size} viewBox="0 0 24 24" style={pinStyle}>
+        <path d={ICON} />
+      </svg>
+    )
+  }
+}
+
+===== END components/map-components/MapMarker.tsx =====
+
+
+===== BEGIN components/map-components/StaticMap.tsx =====
+'use client';
+
+/**
+ * Static map view
+ */
+
+import { useMemo, useState } from 'react';
+import type { CSSProperties } from 'react';
+import {
+  Map as ReactMapGL,
+  Marker,
+  FullscreenControl,
+  Popup,
+  GeolocateControl,
+  type ViewState as MapViewState,
+  type ViewStateChangeEvent,
+} from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
+
+import MapMarker from './MapMarker';
+
+const fullscreenControlStyle: CSSProperties = {
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  padding: '10px',
+};
+
+const geolocateStyle: CSSProperties = {
+  position: 'absolute',
+  bottom: 30,
+  right: 0,
+  margin: 10,
+};
+
+const DEFAULT_LOCATION = { latitude: -34.40581053569814, longitude: 150.87842788963476 };
+const DEFAULT_PADDING: MapViewState['padding'] = { top: 0, right: 0, bottom: 0, left: 0 };
+
+type Props = {
+  markerLat?: number;
+  markerLng?: number;
+};
+
+export default function MyStaticMap({ markerLat, markerLng }: Props) {
+  const token =
+    process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
+    process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
+    process.env.MAPBOX_ACCESS_TOKEN;
+
+  // Keep a local controlled view so geolocate/drag gestures remain in sync
+  const [vp, setVp] = useState<MapViewState>({
+    latitude: markerLat ?? DEFAULT_LOCATION.latitude,
+    longitude: markerLng ?? DEFAULT_LOCATION.longitude,
+    zoom: 15,
+    pitch: 50,
+    bearing: 0,
+    padding: DEFAULT_PADDING,
+  });
+
+  const initialView = useMemo(() => vp, []); // only for first paint
+
+  const onMove = (evt: ViewStateChangeEvent) => {
+    const vs = evt.viewState;
+    setVp((prev) => ({
+      ...prev,
+      latitude: vs.latitude,
+      longitude: vs.longitude,
+      zoom: vs.zoom,
+      pitch: vs.pitch,
+      bearing: vs.bearing,
+      padding: vs.padding ?? prev.padding,
+    }));
+  };
+
+  return (
+    <ReactMapGL
+      initialViewState={initialView}
+      // Keep controlled. Cast at the boundary to satisfy the library’s extra width/height typing.
+      viewState={vp as unknown as MapViewState & { width: number; height: number }}
+      onMove={onMove}
+      mapboxAccessToken={token}
+      mapStyle="mapbox://styles/mapbox/streets-v11"
+      style={{ width: '100%', height: '640px' }}
+    >
+      {markerLat != null && markerLng != null && (
+        <>
+          <Marker longitude={markerLng} latitude={markerLat}>
+            <MapMarker />
+          </Marker>
+
+          <Popup
+            anchor="bottom"
+            latitude={markerLat}
+            longitude={markerLng}
+            closeOnClick={false}
+            closeButton={false}
+            offset={[0, -20]}
+          >
+            <div style={{ marginLeft: 5, marginRight: 5 }}>
+              <div>Latitude: {markerLat}</div>
+              <div>Longitude: {markerLng}</div>
+            </div>
+          </Popup>
+        </>
+      )}
+
+      <div style={fullscreenControlStyle}>
+        <FullscreenControl />
+      </div>
+
+      <GeolocateControl
+        style={geolocateStyle}
+        positionOptions={{ enableHighAccuracy: true }}
+        trackUserLocation
+        showUserLocation
+        onGeolocate={() =>
+          setVp((v) => ({
+            ...v,
+            zoom: Math.max(v.zoom ?? 0, 14),
+          }))
+        }
+      />
+    </ReactMapGL>
+  );
+}
+
+===== END components/map-components/StaticMap.tsx =====
+
+
+===== BEGIN components/PageContainer.tsx =====
+'use client'
+
+import React, { ReactNode } from 'react'
+import styled from 'styled-components'
+
+interface PageContainerProps {
+  title: string
+  children: ReactNode
+}
+
+const Container = styled.div`
+  padding: var(--ant-space-lg);
+  background: var(--ant-color-bg-container);
+  color: var(--ant-color-text);
+`
+
+const Header = styled.header`
+  border-bottom: 1px solid var(--ant-color-split);
+  margin-bottom: var(--ant-space-lg);
+`
+
+const Title = styled.h1`
+  margin: 0;
+  color: var(--ant-color-text);
+`
+
+export default function PageContainer({
+  title,
+  children,
+}: PageContainerProps) {
+  return (
+    <Container>
+      <Header>
+        <Title>{title}</Title>
+      </Header>
+      <main>{children}</main>
+    </Container>
+  )
+}
+
+===== END components/PageContainer.tsx =====
+
+
+===== BEGIN components/shared/utils.tsx =====
+/**
+ * Shared utility functions
+ * - AntD v5 validators: return Promise<void>, no callback
+ * - No implicit any
+ */
+
+type FieldValidator = (_rule: unknown, value: unknown) => Promise<void>;
+
+/** Latitude valide strictement dans l'intervalle (-90, 90). */
+export const validateLatitude: FieldValidator = async (_rule, value) => {
+  // Champ non requis: ne pas invalider si vide
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return;
+  }
+
+  const num = typeof value === 'number' ? value : Number(String(value).trim());
+  if (Number.isNaN(num)) {
+    throw new Error('Please fill in a valid latitude value!');
+  }
+  // Reproduit la logique d’origine: bornes -90 et 90 sont considérées invalides
+  if (num <= -90 || num >= 90) {
+    throw new Error('Please fill in a valid latitude value!');
+  }
+};
+
+/** Longitude valide strictement dans l'intervalle (-180, 180). */
+export const validateLongitude: FieldValidator = async (_rule, value) => {
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return;
+  }
+
+  const num = typeof value === 'number' ? value : Number(String(value).trim());
+  if (Number.isNaN(num)) {
+    throw new Error('Please fill in a valid longitude value!');
+  }
+  // Reproduit la logique d’origine: bornes -180 et 180 sont considérées invalides
+  if (num <= -180 || num >= 180) {
+    throw new Error('Please fill in a valid longitude value!');
+  }
+};
+
+/**
+ * Supprime les accents pour faciliter les recherches "accent-insensitive".
+ * Conserve le comportement original (mise en minuscule).
+ */
+export const convertNonAccent = (str: string): string => {
+  if (str == null) return '';
+  // Normalisation unicode + suppression des diacritiques
+  let s = String(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // Spécifiques vietnamien (compat avec ancien code)
+  s = s.replace(/đ/g, 'd').replace(/Đ/g, 'd');
+  return s;
+};
+
+===== END components/shared/utils.tsx =====
+
+
+===== BEGIN components/TagsList.tsx =====
+'use client';
+
+import React from 'react';
+import { Card, List, Tag as AntdTag, Empty, Typography } from 'antd';
+
+const { Text } = Typography;
+
+export interface TagItem {
+  id: string;
+  name: string;
+  count?: number;
+}
+
+type TagsInput = TagItem[] | { data?: TagItem[] } | null | undefined;
+
+interface TagsListProps {
+  /** Peut être un tableau direct ou un objet de type AxiosResponse avec `.data` */
+  data?: TagsInput;
+  onSelectTag?: (tag: TagItem) => void;
+}
+
+/** Type guard pour un objet de forme { data: TagItem[] } */
+function hasDataArray(x: unknown): x is { data: TagItem[] } {
+  return !!x && typeof x === 'object' && Array.isArray((x as any).data);
+}
+
+/** Normalise l’entrée en tableau de tags */
+function toTagsArray(input: TagsInput): TagItem[] {
+  if (Array.isArray(input)) return input;
+  if (hasDataArray(input)) return input.data;
+  return [];
+}
+
+const TagsList: React.FC<TagsListProps> = ({ data, onSelectTag }) => {
+  const tags = React.useMemo<TagItem[]>(() => toTagsArray(data), [data]);
+
+  return (
+    <Card title="Tags">
+      {tags.length === 0 ? (
+        <Empty description="No tags" />
+      ) : (
+        <List<TagItem>
+          dataSource={tags}
+          renderItem={(item) => (
+            <List.Item key={item.id}>
+              <div className="flex items-center gap-8">
+                <div className="flex items-center gap-8">
+                  <AntdTag
+                    onClick={onSelectTag ? () => onSelectTag(item) : undefined}
+                    style={{ cursor: onSelectTag ? 'pointer' : 'default' }}
+                  >
+                    {item.name}
+                  </AntdTag>
+                  {typeof item.count === 'number' && (
+                    <Text type="secondary">{item.count}</Text>
+                  )}
+                </div>
+              </div>
+            </List.Item>
+          )}
+        />
+      )}
+    </Card>
+  );
+};
+
+export default TagsList;
+
+===== END components/TagsList.tsx =====
+
+
+===== BEGIN components/Tooltip/Tooltip.tsx =====
+"use client"
+
+import * as RadixTooltip from "@radix-ui/react-tooltip"
+import { cva, type VariantProps } from "class-variance-authority"
+import React from "react"
+import { twMerge } from "tailwind-merge"
+
+const tooltipContent = cva([], {
+  variants: {
+    intent: {
+      primary: ["rounded-md", "bg-zinc-700", "font-sans", "text-white"],
+    },
+    size: {
+      md: ["px-4", "py-2.5", "text-xs"],
+    },
+  },
+  defaultVariants: {
+    intent: "primary",
+    size: "md",
+  },
+})
+
+const tooltipArrow = cva([], {
+  variants: {
+    intent: {
+      primary: ["fill-zinc-700"],
+    },
+    size: {
+      md: ["w-4", "h-2"],
+    },
+  },
+  defaultVariants: {
+    intent: "primary",
+    size: "md",
+  },
+})
+
+export interface TooltipProps extends VariantProps<typeof tooltipContent>, RadixTooltip.TooltipProps {
+  explainer: React.ReactElement | string
+  children: React.ReactElement
+  className?: string
+  withArrow?: boolean
+  side?: "top" | "right" | "bottom" | "left"
+}
+
+export function Tooltip({
+  children,
+  explainer,
+  open,
+  defaultOpen,
+  onOpenChange,
+  intent,
+  size,
+  side = "top",
+  className,
+  withArrow,
+}: TooltipProps) {
+  return (
+    <RadixTooltip.Provider>
+      <RadixTooltip.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange} delayDuration={200}>
+        <RadixTooltip.Trigger asChild>{children}</RadixTooltip.Trigger>
+        <RadixTooltip.Portal>
+          <RadixTooltip.Content
+            side={side}
+            sideOffset={5}
+            className={twMerge(tooltipContent({ intent, size, className }))}
+          >
+            {explainer}
+            {withArrow ? <RadixTooltip.Arrow className={twMerge(tooltipArrow({ intent, size, className }))} /> : null}
+          </RadixTooltip.Content>
+        </RadixTooltip.Portal>
+      </RadixTooltip.Root>
+    </RadixTooltip.Provider>
+  )
+}
+
+===== END components/Tooltip/Tooltip.tsx =====
+
+
+===== BEGIN components/user-components/index.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
+'use client'
+
+/**
+ * Description: User management components
+ * Author: Hieu Chu
+ */
+
+import React, { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import dayjs from 'dayjs'
+
+import { Row, Input, Button, Spin } from 'antd'
+import type { InputRef } from 'antd/es/input'
+import { SearchOutlined } from '@ant-design/icons'
+import { Comment } from '@ant-design/compatible'
+
+import { ColStyled, CardStyled, StyledTable } from './style'
+import { get as apiGet } from '@/services/_request'
+import NextError from 'next/error'
+import { convertNonAccent } from '@/components/shared/utils'
+import { normalizeError } from '@/shared/errors'
+
+type RawUser = {
+  userId: string
+  email: string
+  name: string
+  nickname?: string
+  picture: string
+  joinDate: string | Date
+  totalLikes?: number | string
+  totalComments?: number | string
+  totalVisits?: number | string
+  role?: string | null
+}
+
+type UserRow = {
+  key: string
+  userId: string
+  email: string
+  name: string
+  nickname?: string
+  picture: string
+  joinDate: string
+  totalLikes: number
+  totalComments: number
+  totalVisits: number
+}
+
+/** Remplacement de l'ancien import './Loading' introuvable */
+const Loading: React.FC = () => (
+  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 48 }}>
+    <Spin size="large" />
+  </div>
+)
+
+const UserList: React.FC = () => {
+  const router = useRouter()
+
+  const [userList, setUserList] = useState<UserRow[]>([])
+  const searchInput = useRef<InputRef>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<{ statusCode: number; message: string } | null>(null)
+
+  useEffect(() => {
+    let mounted = true
+    const fetchUsers = async () => {
+      try {
+        // le helper retourne la payload directement
+        const users = await apiGet<RawUser[]>('/user')
+
+        const rows: UserRow[] = (users ?? [])
+          .filter((x) => !x.role)
+          .map((x) => ({
+            key: x.userId,
+            userId: x.userId,
+            email: x.email,
+            name: x.name,
+            nickname: x.nickname,
+            picture: x.picture,
+            joinDate: new Date(x.joinDate as any).toISOString(),
+            totalLikes: Number(x.totalLikes ?? 0),
+            totalComments: Number(x.totalComments ?? 0),
+            totalVisits: Number(x.totalVisits ?? 0),
+          }))
+          .sort((a, b) => new Date(b.joinDate).getTime() - new Date(a.joinDate).getTime())
+
+        if (mounted) setUserList(rows)
+      } catch (e: any) {
+        const err = (normalizeError?.(e) ?? {}) as { statusCode?: number; message?: string }
+        const statusCode = Number(err.statusCode ?? e?.response?.data?.statusCode ?? 500)
+        const message = String(err.message ?? 'Failed to load users')
+        if (mounted) setError({ statusCode, message })
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    fetchUsers()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  const handleSearch = (_selectedKeys: React.Key[], confirm: () => void) => confirm()
+  const handleReset = (clearFilters: () => void) => clearFilters()
+
+  const getUserSearchProps = () => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+    }: {
+      setSelectedKeys: (keys: React.Key[]) => void
+      selectedKeys: React.Key[]
+      confirm: () => void
+      clearFilters: () => void
+    }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          ref={searchInput}
+          placeholder="Search user"
+          value={(selectedKeys[0] as string) ?? ''}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => handleSearch(selectedKeys, confirm)}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <Button
+          type="primary"
+          onClick={() => handleSearch(selectedKeys, confirm)}
+          style={{ width: 90, marginRight: 8 }}
+        >
+          Search
+        </Button>
+        <Button onClick={() => handleReset(clearFilters)} style={{ width: 90 }}>
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: (filtered: boolean) => (
+      <SearchOutlined style={{ color: filtered ? '#1890ff' : '#7E7E7E' }} />
+    ),
+    onFilter: (value: string | number | boolean, record: UserRow) => {
+      const { email, name, nickname, userId } = record
+      const author = userId.includes('auth0') ? (nickname ?? name) : name
+      const v = String(value ?? '').toLowerCase()
+      return (
+        convertNonAccent(author.toLowerCase()).includes(v) ||
+        convertNonAccent(email.toLowerCase()).includes(v)
+      )
+    },
+    onFilterDropdownOpenChange: (open: boolean) => {
+      if (open) setTimeout(() => searchInput.current?.select?.(), 0)
+    },
+  })
+
+  const columns = [
+    {
+      title: 'User',
+      key: 'user',
+      render: (_: any, record: UserRow) => {
+        const { email, name, nickname, picture, userId } = record
+        const author = userId.includes('auth0') ? (nickname ?? name) : name
+        return (
+          <Comment
+            author={
+              <span style={{ fontSize: 14, fontWeight: 500, color: 'rgba(0, 0, 0, 0.65)' }}>
+                {author}
+              </span>
+            }
+            avatar={
+              <img
+                src={picture}
+                style={{ width: 42, height: 42, borderRadius: '50%', objectFit: 'cover' }}
+                alt={author}
+              />
+            }
+            content={<div style={{ fontSize: 14 }}>{email}</div>}
+          />
+        )
+      },
+      width: '30%',
+      ...getUserSearchProps(),
+    },
+    {
+      title: 'Connection type',
+      key: 'connection',
+      render: (_: any, record: UserRow) => {
+        const id = record.userId
+        const connection = id.includes('google')
+          ? 'Google'
+          : id.includes('facebook')
+          ? 'Facebook'
+          : 'Email'
+        return <span>{connection}</span>
+      },
+      filters: [
+        { text: 'Email', value: 'auth0' },
+        { text: 'Google', value: 'google' },
+        { text: 'Facebook', value: 'facebook' },
+      ],
+      onFilter: (value: string | number | boolean, record: UserRow) =>
+        record.userId.includes(String(value)),
+      width: '15%',
+    },
+    {
+      title: 'Join date',
+      key: 'joinDate',
+      render: (_: any, record: UserRow) => (
+        <span>{dayjs(record.joinDate).format('D MMMM YYYY')}</span>
+      ),
+      sorter: (a: UserRow, b: UserRow) =>
+        new Date(a.joinDate).getTime() - new Date(b.joinDate).getTime(),
+      sortDirections: ['ascend', 'descend'] as const,
+      width: '15%',
+    },
+    {
+      title: 'Likes',
+      dataIndex: 'totalLikes',
+      sorter: (a: UserRow, b: UserRow) => a.totalLikes - b.totalLikes,
+      sortDirections: ['descend', 'ascend'] as const,
+      width: '13.33%',
+    },
+    {
+      title: 'Comments',
+      dataIndex: 'totalComments',
+      sorter: (a: UserRow, b: UserRow) => a.totalComments - b.totalComments,
+      sortDirections: ['descend', 'ascend'] as const,
+      width: '13.33%',
+    },
+    {
+      title: 'Visits',
+      dataIndex: 'totalVisits',
+      sorter: (a: UserRow, b: UserRow) => a.totalVisits - b.totalVisits,
+      sortDirections: ['descend', 'ascend'] as const,
+      width: '13.33%',
+    },
+  ]
+
+  if (loading) return <Loading />
+  if (error) return <NextError statusCode={error.statusCode} title={error.message} />
+
+  return (
+    <Row gutter={16}>
+      <ColStyled xs={24}>
+        <CardStyled title="User Management">
+          <StyledTable
+            dataSource={userList}
+            columns={columns as any}
+            pagination={{ pageSize: 25, hideOnSinglePage: true }}
+            className="user-table"
+            onRow={(record: any) => ({
+              onClick: () => router.push(`/users/id/${record.key}`),
+            })}
+            style={{ maxWidth: 1100 }}
+          />
+        </CardStyled>
+      </ColStyled>
+    </Row>
+  )
+}
+
+export default UserList
+
+===== END components/user-components/index.tsx =====
+
+
+===== BEGIN components/user-components/style.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx  :contentReference[oaicite:0]{index=0}
+/**
+ * Description: Stylesheet for user components
+ * Author: Hieu Chu
+ */
+
+import type { ComponentProps } from 'react'
+import styled from 'styled-components'
+import { Card, Col, Form, Typography, Empty, Table } from 'antd'
+import Icon from '@/components/compat/Icon'
+
+const { Text } = Typography
+
+type CardStyledProps = ComponentProps<typeof Card>
+
+export const CardStyled = (props: CardStyledProps) => (
+  <Card bodyStyle={{ padding: '20px 24px 20px' }} variant="borderless" {...props} />
+)
+
+export const ColStyled = styled(Col)`
+  padding-bottom: 12px;
+`
+
+export const DescriptionIcon = styled(Icon)`
+  font-size: 20px;
+`
+
+export const ShadowCard = styled(CardStyled)`
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 9px 24px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(242, 242, 242);
+  border-radius: 3px;
+  transition: all 150ms ease-in-out 0s;
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 9px 24px;
+    cursor: pointer;
+    transition: all 150ms ease-in-out 0s;
+  }
+`
+
+export const CustomFormItem = styled(Form.Item)`
+  margin-bottom: 8px;
+
+  &.ant-form-item-with-help {
+    margin-bottom: 5px;
+  }
+`
+
+export const FormCol = styled(Col)`
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+`
+
+export const Subtitle = styled(Text)`
+  display: block;
+  margin-bottom: 12px;
+`
+
+export const EmptyImage = styled(Empty)`
+  height: 230px;
+  margin: 0;
+  border-bottom: 0.3px solid rgba(0, 0, 0, 0.25);
+
+  & .ant-empty-image {
+    margin-top: 220px;
+  }
+`
+
+export const StyledTable = styled(Table)`
+  .ant-table table {
+    border-left: 1px solid #e8e8e8;
+    border-top: 1px solid #e8e8e8;
+    border-right: 1px solid #e8e8e8;
+  }
+`
+
+===== END components/user-components/style.tsx =====
+
+
+===== BEGIN components/user-components/UserComments.tsx =====
+'use client';
+
+/**
+ * Description: User comments list component
+ * Author: Hieu Chu
+ */
+
+import React, { useMemo } from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import Link from 'next/link';
+import {
+  Card,
+  List,
+  Avatar,
+  Typography,
+  Dropdown,
+  Modal,
+  Tooltip,
+  Space,
+  Button,
+  Empty,
+  Input,
+  message as antdMessage,
+} from 'antd';
+import type { MenuProps } from 'antd';
+import {
+  ExclamationCircleOutlined,
+  EllipsisOutlined,
+  DeleteOutlined,
+} from '@ant-design/icons';
+
+import api from '@/services/_request';
+import { normalizeError } from '../../shared/errors';
+
+dayjs.extend(relativeTime);
+
+const { Text } = Typography;
+const { TextArea } = Input;
+
+interface CommentUser {
+  userId: string;
+  nickname?: string | null;
+  name?: string | null;
+  picture?: string | null;
+}
+
+interface CommentSculpture {
+  accessionId: string | number;
+  name: string;
+}
+
+export interface UserComment {
+  commentId: string;
+  content: string;
+  createdTime: string; // ISO 8601
+  user: CommentUser;
+  sculpture: CommentSculpture;
+}
+
+interface Props {
+  comments: UserComment[];
+  deleteComment: (id: string) => void;
+}
+
+const UserComments: React.FC<Props> = ({ comments, deleteComment }) => {
+  // Tri sans muter les props
+  const items = useMemo<UserComment[]>(
+    () =>
+      [...comments].sort(
+        (a, b) => Date.parse(b.createdTime) - Date.parse(a.createdTime),
+      ),
+    [comments],
+  );
+
+  const onMenuClick: MenuProps['onClick'] = ({ key }) => {
+    Modal.confirm({
+      title: 'Delete this comment permanently?',
+      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
+      style: { top: 110 },
+      maskClosable: true,
+      okText: 'Confirm',
+      okButtonProps: {
+        style: { background: '#ff4d4f', borderColor: '#ff4d4f' },
+      },
+      onOk: async () => {
+        try {
+          await api.delete(`/comment/${String(key)}`);
+          antdMessage.success('Deleted comment successfully!', 2);
+          deleteComment(String(key));
+        } catch (e) {
+          const { message } = normalizeError(e);
+          antdMessage.error(message || 'Failed to delete');
+        }
+      },
+    });
+  };
+
+  return (
+    <Card title="Comments" bodyStyle={{ padding: '20px 24px 0px' }} bordered={false}>
+      <List<UserComment>
+        itemLayout="horizontal"
+        dataSource={items}
+        className="comment-list"
+        locale={{
+          emptyText: (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Comments" />
+          ),
+        }}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+        renderItem={(x) => {
+          const displayName = x.user.userId.includes('auth0')
+            ? x.user.nickname ?? x.user.name ?? 'User'
+            : x.user.name ?? x.user.nickname ?? 'User';
+
+          return (
+            <List.Item
+              key={x.commentId}
+              actions={[
+                <Dropdown
+                  key="more"
+                  trigger={['click']}
+                  menu={{
+                    items: [
+                      { key: x.commentId, label: 'Delete comment', icon: <DeleteOutlined /> },
+                    ],
+                    onClick: onMenuClick,
+                  }}
+                >
+                  <Button type="text" aria-label="More actions" icon={<EllipsisOutlined />} />
+                </Dropdown>,
+              ]}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar src={x.user.picture ?? undefined} alt={displayName}>
+                    {!x.user.picture && displayName.charAt(0).toUpperCase()}
+                  </Avatar>
+                }
+                title={
+                  <Space size={8} wrap>
+                    <Text strong style={{ fontSize: 14, color: 'rgba(0,0,0,0.65)' }}>
+                      {displayName}
+                    </Text>
+                    <Tooltip title={dayjs(x.createdTime).format('D MMMM YYYY, h:mm:ss a')}>
+                      <Text type="secondary" style={{ fontSize: 14 }}>
+                        {dayjs(x.createdTime).fromNow()} in
+                      </Text>
+                    </Tooltip>
+                    <Link href={`/sculptures/id/${String(x.sculpture.accessionId)}`}>
+                      <Text style={{ fontSize: 14 }}>{x.sculpture.name}</Text>
+                    </Link>
+                  </Space>
+                }
+                description={
+                  <div style={{ fontSize: 14, whiteSpace: 'pre-wrap' }}>
+                    {x.content?.trim() ?? ''}
+                  </div>
+                }
+              />
+            </List.Item>
+          );
+        }}
+      />
+
+      {/* quick reply editor */}
+      <div style={{ padding: '16px 24px' }}>
+        <TextArea disabled placeholder="Use admin screen to reply" />
+      </div>
+    </Card>
+  );
+};
+
+export default UserComments;
+
+===== END components/user-components/UserComments.tsx =====
+
+
+===== BEGIN components/user-components/UserLikes.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserLikes.tsx
+// Source: dump original (UserLikes.tsx) 
+'use client';
+
+/**
+ * Description: User likes list component
+ * Author: Hieu Chu
+ */
+
+import React, { useMemo } from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Card, List, Tooltip, Empty, Avatar, Typography } from 'antd';
+import Link from 'next/link';
+
+dayjs.extend(relativeTime);
+
+type LikeImage = { url: string; created?: string | Date };
+type Sculpture = {
+  name: string;
+  images?: LikeImage[];
+  accessionId?: string | number;
+};
+
+type UserLikeItem = {
+  likedTime: string | Date;
+  sculptureId?: string | number;
+  sculpture: Sculpture;
+};
+
+interface UserLikesProps {
+  likes: UserLikeItem[];
+}
+
+const FALLBACK_IMG = '/static/no-image.png';
+
+const UserLikes: React.FC<UserLikesProps> = ({ likes }) => {
+  // Tri sans muter la prop et tri interne des images sans mutation
+  const items = useMemo<UserLikeItem[]>(() => {
+    const safeLikes = Array.isArray(likes) ? likes : [];
+    return safeLikes
+      .slice() // clone props
+      .sort(
+        (a, b) =>
+          new Date(b.likedTime).getTime() - new Date(a.likedTime).getTime(),
+      )
+      .map((x) => {
+        const sortedImages = (x.sculpture?.images ?? [])
+          .slice() // clone images
+          .sort(
+            (a, b) =>
+              new Date(a.created ?? 0).getTime() -
+              new Date(b.created ?? 0).getTime(),
+          );
+        return {
+          ...x,
+          sculpture: { ...x.sculpture, images: sortedImages },
+        };
+      });
+  }, [likes]);
+
+  return (
+    <Card
+      title="Likes"
+      bodyStyle={{ padding: '20px 24px 0px' }}
+      variant="borderless"
+      style={{ marginTop: 12 }}
+    >
+      <List<UserLikeItem>
+        itemLayout="horizontal"
+        dataSource={items}
+        className="comment-list"
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No Likes"
+            />
+          ),
+        }}
+        renderItem={(x) => {
+          const images = x.sculpture?.images ?? [];
+          const firstImageUrl =
+            images.length > 0 && images[0]?.url ? images[0].url : FALLBACK_IMG;
+          const targetId = x.sculptureId ?? x.sculpture?.accessionId;
+          const when = dayjs(x.likedTime);
+
+          const titleNode = (
+            <Typography.Text
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: 'rgba(0, 0, 0, 0.65)',
+              }}
+            >
+              {x.sculpture?.name ?? 'Unknown sculpture'}
+            </Typography.Text>
+          );
+
+          return (
+            <List.Item
+              key={`${String(targetId ?? x.sculpture?.name ?? 'unknown')}-${new Date(
+                x.likedTime,
+              ).getTime()}`}
+            >
+              <List.Item.Meta
+                avatar={
+                  <Avatar
+                    shape="square"
+                    size={42}
+                    src={firstImageUrl}
+                    alt={x.sculpture?.name ?? 'sculpture'}
+                    style={{ objectFit: 'cover', borderRadius: 4 }}
+                  />
+                }
+                title={
+                  targetId != null ? (
+                    <Link href={`/sculptures/id/${encodeURIComponent(String(targetId))}`}>
+                      {titleNode}
+                    </Link>
+                  ) : (
+                    titleNode
+                  )
+                }
+                description={
+                  <Tooltip title={when.format('D MMMM YYYY, h:mm:ss a')}>
+                    <Typography.Text
+                      style={{
+                        fontSize: 14,
+                        color: 'rgba(0, 0, 0, 0.35)',
+                      }}
+                    >
+                      {when.fromNow()}
+                    </Typography.Text>
+                  </Tooltip>
+                }
+              />
+            </List.Item>
+          );
+        }}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+      />
+    </Card>
+  );
+};
+
+export default UserLikes;
+
+===== END components/user-components/UserLikes.tsx =====
+
+
+===== BEGIN components/user-components/UserProfile.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
+// Référence dump: :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
+
+'use client';
+
+import React from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Card, Typography, List, Empty, Alert } from 'antd';
+import api from '@/api';
+import type { AxiosError } from 'axios';
+import { isAxiosError } from 'axios';
+
+const { Title, Text } = Typography;
+
+/** Types sûrs et minimaux pour ce composant */
+interface ProfileSummary {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  bio?: string;
+}
+
+interface CommentItem {
+  commentId: string;
+  author: string;
+  content: string;
+  createdAt: string; // ISO string
+}
+
+interface RequestError {
+  statusCode: number;
+  message: string;
+}
+
+const UserProfile: React.FC = () => {
+  const searchParams = useSearchParams();
+  const userId = searchParams.get('id') ?? '';
+
+  const [profile, setProfile] = React.useState<ProfileSummary | null>(null);
+  const [comments, setComments] = React.useState<CommentItem[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<RequestError | null>(null);
+
+  /** Supprime un commentaire localement avec typage strict */
+  const deleteComment = (commentId: string) => {
+    setComments((prev) => prev.filter((x) => x.commentId !== commentId));
+  };
+
+  React.useEffect(() => {
+    if (!userId) return;
+
+    let cancelled = false;
+    const run = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Client "payload-first": renvoie directement T, pas AxiosResponse<T>
+        const [p, c] = await Promise.all([
+          api.get<ProfileSummary>(`/users/${userId}`),
+          api.get<CommentItem[]>(`/users/${userId}/comments`),
+        ]);
+
+        if (cancelled) return;
+        setProfile(p);
+        setComments(c);
+      } catch (e: unknown) {
+        let statusCode = 500;
+        let message = 'Request failed';
+        if (isAxiosError<{ statusCode?: number; message?: string }>(e)) {
+          statusCode = e.response?.data?.statusCode ?? e.response?.status ?? 500;
+          message = e.response?.data?.message ?? e.message ?? 'Request failed';
+        } else if (e instanceof Error) {
+          message = e.message;
+        }
+        if (!cancelled) setError({ statusCode, message });
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  return (
+    <div className="p-6">
+      <Title level={2}>User Profile</Title>
+
+      {!userId && (
+        <Alert
+          type="warning"
+          message="Missing user id"
+          description="Ajoutez ?id=<USER_ID> à l’URL pour charger le profil."
+          className="mb-4"
+        />
+      )}
+
+      {error && (
+        <Alert
+          type="error"
+          showIcon
+          className="mb-4"
+          message={`Erreur ${error.statusCode}`}
+          description={error.message}
+        />
+      )}
+
+      <Card loading={loading} className="mb-6">
+        {profile ? (
+          <>
+            <Title level={4} className="mb-1">
+              {profile.name}
+            </Title>
+            {profile.bio ? <Text type="secondary">{profile.bio}</Text> : <Text type="secondary">No bio</Text>}
+          </>
+        ) : (
+          <Empty description="No profile loaded" />
+        )}
+      </Card>
+
+      <Card title="Recent comments" loading={loading}>
+        {comments.length === 0 ? (
+          <Empty description="No comments" />
+        ) : (
+          <List
+            dataSource={comments}
+            renderItem={(item) => (
+              <List.Item
+                key={item.commentId}
+                actions={[
+                  <button
+                    key="delete"
+                    onClick={() => deleteComment(item.commentId)}
+                    className="text-red-600"
+                    aria-label={`Delete comment ${item.commentId}`}
+                  >
+                    Delete
+                  </button>,
+                ]}
+              >
+                <List.Item.Meta
+                  title={
+                    <div className="flex items-center gap-2">
+                      <Text strong>{item.author}</Text>
+                      <Text type="secondary">{new Date(item.createdAt).toLocaleString()}</Text>
+                    </div>
+                  }
+                  description={item.content}
+                />
+              </List.Item>
+            )}
+          />
+        )}
+      </Card>
+    </div>
+  );
+};
+
+export default UserProfile;
+
+===== END components/user-components/UserProfile.tsx =====
+
+
+===== BEGIN components/user-components/UserVisit.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\user-components\UserVisit.tsx
+'use client';
+
+/**
+ * Description: User visit list component
+ * Author: Hieu Chu
+ */
+
+import type React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { Tooltip, List, Card, Empty } from 'antd';
+import { Comment } from '@ant-design/compatible';
+import Link from 'next/link';
+
+dayjs.extend(relativeTime);
+
+/** Types minimaux utilisés par ce composant */
+type ImageItem = { url: string; created: string | Date };
+
+export interface Visit {
+  visitTime: string | Date;
+  sculptureId: string | number;
+  sculpture: {
+    name: string;
+    images: ImageItem[];
+  };
+}
+
+type FormattedComment = {
+  author: React.ReactNode;
+  avatar: React.ReactNode;
+  content: React.ReactNode;
+};
+
+const FALLBACK_IMG = '/static/no-image.png';
+
+const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
+  // Ne pas muter la prop
+  // Clone + tri inverse par date de visite
+  const items: Visit[] = [...(visits ?? [])]
+    .sort(
+      (a, b) =>
+        new Date(b.visitTime).getTime() - new Date(a.visitTime).getTime(),
+    )
+    .map((v) => {
+      // Tri des images par date croissante
+      const images = [...(v.sculpture?.images ?? [])].sort(
+        (a, b) =>
+          new Date(a.created).getTime() - new Date(b.created).getTime(),
+      );
+      return { ...v, sculpture: { ...v.sculpture, images } };
+    });
+
+  const formattedComments: FormattedComment[] = items.map((x: Visit) => {
+    // Accès sûr à l’URL de la première image
+    const firstImageUrl = x.sculpture?.images?.[0]?.url ?? FALLBACK_IMG;
+
+    return {
+      author: (
+        <Link href={`/sculptures/id/${String(x.sculptureId)}`}>
+          <span
+            style={{
+              fontSize: 14,
+              fontWeight: 500,
+              color: 'rgba(0, 0, 0, 0.65)',
+            }}
+          >
+            {x.sculpture?.name ?? 'Untitled sculpture'}
+          </span>
+        </Link>
+      ),
+      avatar: (
+        <img
+          src={firstImageUrl}
+          alt={x.sculpture?.name ?? 'Sculpture'}
+          // Fallback d'image robuste
+          onError={(e) => {
+            // évite une boucle si le fallback est manquant
+            e.currentTarget.onerror = null;
+            e.currentTarget.src = FALLBACK_IMG;
+          }}
+          style={{
+            width: 42,
+            height: 42,
+            objectFit: 'cover',
+            borderRadius: 4,
+          }}
+        />
+      ),
+      content: (
+        <div style={{ fontSize: 14 }}>
+          <Tooltip title={dayjs(x.visitTime).format('D MMMM YYYY, h:mm:ss a')}>
+            <span style={{ fontSize: 14, color: 'rgba(0, 0, 0, 0.35)' }}>
+              {dayjs(x.visitTime).fromNow()}
+            </span>
+          </Tooltip>
+        </div>
+      ),
+    };
+  });
+
+  return (
+    <Card
+      title="Visits"
+      bodyStyle={{ padding: '20px 24px 0px' }}
+      variant="borderless"
+      style={{ marginTop: 12 }}
+    >
+      <List<FormattedComment>
+        itemLayout="horizontal"
+        dataSource={formattedComments}
+        className="comment-list"
+        locale={{
+          emptyText: (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No Visits" />
+          ),
+        }}
+        renderItem={(item: FormattedComment) => (
+          <li>
+            <Comment
+              author={item.author}
+              avatar={item.avatar}
+              content={item.content}
+              className="comment"
+            />
+          </li>
+        )}
+        pagination={{ pageSize: 15, hideOnSinglePage: true }}
+      />
+    </Card>
+  );
+};
+
+export default UserVisit;
+
+===== END components/user-components/UserVisit.tsx =====
+
+
+===== BEGIN src/components/CommonWidget/page.tsx =====
+import React from 'react';
+import styles from '@/shared/CommonWidget.module.css';
+
+interface CommonWidgetProps {
+  title: string;
+  description: string;
+}
+
+const CommonWidget: React.FC<CommonWidgetProps> = ({ title, description }) => {
+  return (
+    <div className={styles.widget}>
+      <h2 className={styles.widgetTitle}>{title}</h2>
+      <p className={styles.widgetSubtitle}>{description}</p>
+    </div>
+  );
+};
+
+export default CommonWidget;
+
+===== END src/components/CommonWidget/page.tsx =====
+
+
+===== BEGIN src/components/ThemeSwitcher.tsx =====
+import React from 'react';
+import { Button } from 'antd';
+import { useTheme } from '@/context/ThemeContext';
+
+const ThemeSwitcher: React.FC = () => {
+  const { token, cycleTheme } = useTheme();   // token contient label + icon
+
+  return (
+    <Button onClick={cycleTheme}>
+      {token.icon ? `${token.icon} ` : ''}{token.label ?? 'Theme'}
+    </Button>
+  );
+};
+
+export default ThemeSwitcher;
+
+===== END src/components/ThemeSwitcher.tsx =====
+

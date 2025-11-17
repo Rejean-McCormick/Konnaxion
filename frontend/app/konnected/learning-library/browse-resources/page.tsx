@@ -44,9 +44,9 @@ interface KnowledgeResource {
   id: string | number;
   title: string;
   description?: string;
-  subject: string;
-  level: KnowledgeLevel;
-  language: string;
+  subject?: string;
+  level?: KnowledgeLevel;
+  language?: string;
   resource_type: string; // e.g. 'video' | 'article' | 'course' | 'quiz'
   average_rating?: number | null;
   tags?: string[];
@@ -68,11 +68,13 @@ interface KnowledgeMetadataResponse {
 }
 
 /* ------------------------------------------------------------------ */
-/*  API endpoints (adapt path segments to match your OpenAPI)         */
+/*  API endpoints                                                      */
+/*  - Aligned with DRF router: /api/knowledge-resources/              */
+/*  - Metadata endpoint is optional; call is non-blocking.            */
 /* ------------------------------------------------------------------ */
 
-const KNOWLEDGE_RESOURCES_ENDPOINT = '/api/konnected/knowledge/resources/';
-const KNOWLEDGE_METADATA_ENDPOINT = '/api/konnected/knowledge/resources-meta/';
+const KNOWLEDGE_RESOURCES_ENDPOINT = '/api/knowledge-resources/';
+const KNOWLEDGE_METADATA_ENDPOINT = '/api/knowledge-resources/metadata/';
 
 interface FiltersState {
   query: string;
@@ -126,107 +128,125 @@ export default function BrowseResourcesPage(): JSX.Element {
   const [languages, setLanguages] = useState<string[]>([]);
   const [resourceTypes, setResourceTypes] = useState<string[]>([]);
 
-  // UI state
+  // Loading / error states
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMeta, setLoadingMeta] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  /* -------------------------------------------------------------- */
-  /*  Load metadata (subjects, levels, languages, types)            */
-  /* -------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*  Data fetching                                                      */
+  /* ------------------------------------------------------------------ */
 
-  useEffect(() => {
-    let cancelled = false;
+  const fetchResources = useCallback(
+    async (overridePage?: number, overridePageSize?: number) => {
+      setLoading(true);
+      setError(null);
 
-    const loadMetadata = async () => {
-      setLoadingMeta(true);
+      const currentPage = overridePage ?? page;
+      const currentPageSize = overridePageSize ?? pageSize;
+
       try {
-        const res = await axios.get<KnowledgeMetadataResponse>(
-          KNOWLEDGE_METADATA_ENDPOINT,
-        );
-        if (cancelled) return;
+        const params: Record<string, unknown> = {
+          page: currentPage,
+          page_size: currentPageSize,
+        };
 
-        setSubjects(res.data.subjects ?? []);
-        setLevels(res.data.levels ?? []);
-        setLanguages(res.data.languages ?? []);
-        setResourceTypes(res.data.resource_types ?? []);
-      } catch (e) {
-        // Non-blocking error: filters still work with empty options
-        // eslint-disable-next-line no-console
-        console.warn('Failed to load Knowledge metadata', e);
-      } finally {
-        if (!cancelled) {
-          setLoadingMeta(false);
+        if (filters.query) {
+          params.search = filters.query;
         }
+        if (filters.subject) {
+          params.subject = filters.subject;
+        }
+        if (filters.level) {
+          params.level = filters.level;
+        }
+        if (filters.language) {
+          params.language = filters.language;
+        }
+        if (filters.resourceType) {
+          params.resource_type = filters.resourceType;
+        }
+
+        const ordering = mapSortToOrdering(filters.sort);
+        if (ordering) {
+          params.ordering = ordering;
+        }
+
+        const response = await axios.get<KnowledgeResourceListResponse>(
+          KNOWLEDGE_RESOURCES_ENDPOINT,
+          { params },
+        );
+
+        setResources(response.data.results ?? []);
+        setTotal(response.data.count ?? response.data.results.length ?? 0);
+      } catch (err) {
+        const msg =
+          err instanceof Error ? err.message : 'Unable to load knowledge resources.';
+        setError(msg);
+        setResources([]);
+        setTotal(0);
+      } finally {
+        setLoading(false);
       }
-    };
+    },
+    [filters, page, pageSize],
+  );
 
-    loadMetadata();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  /* -------------------------------------------------------------- */
-  /*  Load resources list                                           */
-  /* -------------------------------------------------------------- */
-
-  const fetchResources = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchMetadata = useCallback(async () => {
+    setLoadingMeta(true);
 
     try {
-      const ordering = mapSortToOrdering(filters.sort);
+      const response = await axios.get<KnowledgeMetadataResponse>(KNOWLEDGE_METADATA_ENDPOINT);
+      const data = response.data;
 
-      const res = await axios.get<KnowledgeResourceListResponse>(
-        KNOWLEDGE_RESOURCES_ENDPOINT,
-        {
-          params: {
-            page,
-            page_size: pageSize,
-            q: filters.query || undefined,
-            subject: filters.subject || undefined,
-            level: filters.level || undefined,
-            language: filters.language || undefined,
-            resource_type: filters.resourceType || undefined,
-            ordering: ordering || undefined,
-          },
-        },
-      );
-
-      setResources(res.data.results ?? []);
-      setTotal(res.data.count ?? 0);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to load Knowledge resources', e);
-      setError('Unable to load resources. Please try again.');
-      setResources([]);
-      setTotal(0);
+      setSubjects(data.subjects ?? []);
+      setLevels(data.levels ?? []);
+      setLanguages(data.languages ?? []);
+      setResourceTypes(data.resource_types ?? []);
+    } catch {
+      // Metadata is purely additive; failure should not block the main list.
     } finally {
-      setLoading(false);
+      setLoadingMeta(false);
     }
-  }, [filters, page, pageSize]);
+  }, []);
+
+  // Single effect: reacts to page / size / filters
+  useEffect(() => {
+    fetchResources(page, pageSize);
+  }, [page, pageSize, fetchResources]);
 
   useEffect(() => {
-    fetchResources();
-  }, [fetchResources]);
+    fetchMetadata();
+  }, [fetchMetadata]);
 
-  /* -------------------------------------------------------------- */
-  /*  Handlers                                                      */
-  /* -------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*  Handlers                                                          */
+  /* ------------------------------------------------------------------ */
 
   const handleSearch = (value: string) => {
     setPage(1);
-    setFilters((prev) => ({ ...prev, query: value.trim() }));
+    setFilters((prev) => ({
+      ...prev,
+      query: value.trim(),
+    }));
   };
 
-  const handleFilterChange = <K extends keyof FiltersState>(
-    key: K,
-    value: FiltersState[K],
-  ) => {
+  const handleFilterChange =
+    <K extends keyof FiltersState>(key: K) =>
+    (value: FiltersState[K]) => {
+      setPage(1);
+      setFilters((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+    };
+
+  const handleSortChange = (value: SortOption) => {
     setPage(1);
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({
+      ...prev,
+      sort: value,
+    }));
   };
 
   const handleTableChangePage = (nextPage: number, nextPageSize?: number) => {
@@ -237,24 +257,13 @@ export default function BrowseResourcesPage(): JSX.Element {
   };
 
   const handleOpenResource = (record: KnowledgeResource) => {
+    // If you later add a dedicated resource detail route, adapt this.
     router.push(`/konnected/learning-library/resource/${record.id}`);
   };
 
-  const handleSaveOffline = (record: KnowledgeResource) => {
-    // Placeholder behaviour; plug into Offline Content API later
-    // eslint-disable-next-line no-console
-    console.info('Save offline requested for resource', record.id);
-  };
-
-  const handleShare = (record: KnowledgeResource) => {
-    // Placeholder behaviour; plug into share/clipboard API later
-    // eslint-disable-next-line no-console
-    console.info('Share requested for resource', record.id);
-  };
-
-  /* -------------------------------------------------------------- */
-  /*  Table configuration                                           */
-  /* -------------------------------------------------------------- */
+  /* ------------------------------------------------------------------ */
+  /*  Table columns                                                     */
+  /* ------------------------------------------------------------------ */
 
   const columns: ColumnsType<KnowledgeResource> = useMemo(
     () => [
@@ -262,18 +271,13 @@ export default function BrowseResourcesPage(): JSX.Element {
         title: 'Title',
         dataIndex: 'title',
         key: 'title',
-        width: 280,
         render: (value: string, record) => (
           <Space direction="vertical" size={2}>
-            <Button
-              type="link"
-              style={{ padding: 0 }}
-              onClick={() => handleOpenResource(record)}
-            >
+            <Button type="link" onClick={() => handleOpenResource(record)} style={{ padding: 0 }}>
               {value}
             </Button>
             {record.description && (
-              <Text type="secondary" ellipsis={{ tooltip: record.description }}>
+              <Text type="secondary" style={{ fontSize: 12 }}>
                 {record.description}
               </Text>
             )}
@@ -284,293 +288,349 @@ export default function BrowseResourcesPage(): JSX.Element {
         title: 'Subject',
         dataIndex: 'subject',
         key: 'subject',
-        width: 140,
-        render: (value: string) => <Tag>{value}</Tag>,
+        render: (value?: string) =>
+          value ? (
+            <Tag color="blue">{value}</Tag>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Not specified
+            </Text>
+          ),
       },
       {
         title: 'Type',
         dataIndex: 'resource_type',
         key: 'resource_type',
-        width: 120,
         render: (value: string) => (
-          <Tag color="default">{value.charAt(0).toUpperCase() + value.slice(1)}</Tag>
+          <Tag color="geekblue" style={{ textTransform: 'capitalize' }}>
+            {value || 'other'}
+          </Tag>
         ),
       },
       {
         title: 'Level',
         dataIndex: 'level',
         key: 'level',
-        width: 120,
-        render: (value: KnowledgeLevel) => (
-          <Tag>
-            {value === 'beginner'
-              ? 'Beginner'
-              : value === 'intermediate'
-              ? 'Intermediate'
-              : 'Advanced'}
-          </Tag>
-        ),
+        render: (value?: KnowledgeLevel) =>
+          value ? (
+            <Tag color="purple" style={{ textTransform: 'capitalize' }}>
+              {value}
+            </Tag>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              General
+            </Text>
+          ),
       },
       {
         title: 'Language',
         dataIndex: 'language',
         key: 'language',
-        width: 120,
+        render: (value?: string) =>
+          value ? (
+            <Tag>{value}</Tag>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              N/A
+            </Text>
+          ),
       },
       {
         title: 'Rating',
         dataIndex: 'average_rating',
         key: 'average_rating',
-        width: 160,
-        render: (value: number | null | undefined) =>
-          value != null ? (
+        render: (value?: number | null) =>
+          typeof value === 'number' ? (
             <Space size={4}>
-              <Rate allowHalf disabled value={value} />
-              <Text type="secondary">{value.toFixed(1)}</Text>
+              <Rate allowHalf disabled defaultValue={value} />
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {value.toFixed(1)}
+              </Text>
             </Space>
           ) : (
-            <Text type="secondary">Not rated</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Not rated yet
+            </Text>
           ),
       },
       {
         title: 'Tags',
         dataIndex: 'tags',
         key: 'tags',
-        width: 220,
-        render: (tags?: string[]) => {
-          if (!tags || !tags.length) {
-            return <Text type="secondary">—</Text>;
-          }
-          const maxVisible = 3;
-          const visible = tags.slice(0, maxVisible);
-          const remaining = tags.length - visible.length;
-
-          return (
+        render: (tags?: string[]) =>
+          tags && tags.length > 0 ? (
             <Space size={[4, 4]} wrap>
-              {visible.map((tag) => (
+              {tags.map((tag) => (
                 <Tag key={tag}>{tag}</Tag>
               ))}
-              {remaining > 0 && <Tag>+{remaining}</Tag>}
             </Space>
-          );
-        },
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              No tags
+            </Text>
+          ),
+      },
+      {
+        title: 'Estimated time',
+        dataIndex: 'estimated_minutes',
+        key: 'estimated_minutes',
+        render: (value?: number | null) =>
+          typeof value === 'number' ? (
+            <Text>{value} min</Text>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Not specified
+            </Text>
+          ),
       },
       {
         title: 'Progress',
         dataIndex: 'user_progress_percent',
         key: 'user_progress_percent',
-        width: 130,
-        render: (value: number | null | undefined) =>
-          value != null ? (
-            <Text>{`${Math.round(value)}%`}</Text>
+        render: (value?: number | null) =>
+          typeof value === 'number' ? (
+            <Text>{value.toFixed(0)}%</Text>
           ) : (
-            <Text type="secondary">Not started</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Not started
+            </Text>
           ),
       },
       {
         title: 'Actions',
         key: 'actions',
         fixed: 'right',
-        width: 190,
-        render: (_: unknown, record) => (
+        render: (_, record) => (
           <Space>
-            <Button type="primary" size="small" onClick={() => handleOpenResource(record)}>
+            <Button size="small" onClick={() => handleOpenResource(record)}>
               Open
             </Button>
             {record.is_offline_available && (
-              <Button
-                size="small"
-                icon={<DownloadOutlined />}
-                onClick={() => handleSaveOffline(record)}
-              >
+              <Button size="small" icon={<DownloadOutlined />}>
                 Offline
               </Button>
             )}
-            <Button
-              size="small"
-              icon={<ShareAltOutlined />}
-              onClick={() => handleShare(record)}
-            />
           </Space>
         ),
       },
     ],
-    [],
+    [handleOpenResource],
   );
 
-  /* -------------------------------------------------------------- */
-  /*  Derived UI bits                                               */
-  /* -------------------------------------------------------------- */
-
   const hasResults = resources.length > 0;
-  const showTotalLabel =
-    total > 0 ? `${total} resource${total > 1 ? 's' : ''} found` : undefined;
 
-  /* -------------------------------------------------------------- */
-  /*  Render                                                        */
-  /* -------------------------------------------------------------- */
+  const filtersActive = useMemo(
+    () =>
+      Boolean(
+        filters.query ||
+          filters.subject ||
+          filters.level ||
+          filters.language ||
+          filters.resourceType,
+      ),
+    [filters],
+  );
+
+  /* ------------------------------------------------------------------ */
+  /*  Render                                                            */
+  /* ------------------------------------------------------------------ */
 
   return (
     <KonnectedPageShell
-      title="KonnectED · Knowledge · Browse resources"
-      subtitle="Explore the shared learning library by subject, level, language, and content type."
-      secondaryActions={
+      title="Browse learning resources"
+      subtitle="Explore the shared knowledge library and filter by subject, level, language, and more."
+      primaryAction={
         <Space>
-          <Button icon={<FilterOutlined />}>Filters</Button>
+          <Button icon={<DownloadOutlined />}>Export selection</Button>
+          <Button icon={<ShareAltOutlined />}>Share filters</Button>
         </Space>
       }
-      primaryAction={
-        <Button
-          type="primary"
-          onClick={() => router.push('/konnected/learning-library/recommended-resources')}
-        >
-          View recommended
+      secondaryActions={
+        <Button icon={<FilterOutlined />} onClick={() => fetchResources(1, pageSize)}>
+          Refresh
         </Button>
       }
     >
-      <Row gutter={[24, 24]}>
-        {/* Left column: Filters */}
-        <Col xs={24} md={8} lg={7}>
-          <Card
-            title={
-              <Space>
-                <FilterOutlined />
-                <span>Filter resources</span>
-              </Space>
-            }
-          >
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <Search
-                placeholder="Search by title, keywords, or description"
-                allowClear
-                enterButton={<SearchOutlined />}
-                defaultValue={filters.query}
-                onSearch={handleSearch}
-              />
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <Card>
+            <Space direction="vertical" style={{ width: '100%' }} size="large">
+              {/* Search + quick filters row */}
+              <Row gutter={[16, 16]} align="middle">
+                <Col xs={24} md={10}>
+                  <Search
+                    placeholder="Search by title, subject, keywords…"
+                    allowClear
+                    enterButton={<SearchOutlined />}
+                    onSearch={handleSearch}
+                    defaultValue={filters.query}
+                  />
+                </Col>
 
-              <div>
-                <Text strong>Subject</Text>
-                <Select
-                  style={{ width: '100%', marginTop: 4 }}
-                  placeholder={loadingMeta ? 'Loading subjects…' : 'All subjects'}
-                  loading={loadingMeta}
-                  allowClear
-                  value={filters.subject}
-                  onChange={(value) => handleFilterChange('subject', value || undefined)}
-                  options={subjects.map((s) => ({ label: s, value: s }))}
-                />
-              </div>
+                <Col xs={24} md={14}>
+                  <Row gutter={[8, 8]} justify="end">
+                    <Col xs={24} md={12} lg={6}>
+                      <Select
+                        allowClear
+                        placeholder="Subject"
+                        value={filters.subject}
+                        style={{ width: '100%' }}
+                        loading={loadingMeta}
+                        onChange={handleFilterChange('subject')}
+                      >
+                        {subjects.map((subject) => (
+                          <Select.Option key={subject} value={subject}>
+                            {subject}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Col>
 
-              <div>
-                <Text strong>Level</Text>
-                <Select
-                  style={{ width: '100%', marginTop: 4 }}
-                  placeholder="All levels"
-                  allowClear
-                  value={filters.level}
-                  onChange={(value) => handleFilterChange('level', value || undefined)}
-                  options={
-                    levels.length
-                      ? levels.map((lvl) => ({
-                          label:
-                            lvl === 'beginner'
-                              ? 'Beginner'
-                              : lvl === 'intermediate'
-                              ? 'Intermediate'
-                              : 'Advanced',
-                          value: lvl,
-                        }))
-                      : [
-                          { label: 'Beginner', value: 'beginner' },
-                          { label: 'Intermediate', value: 'intermediate' },
-                          { label: 'Advanced', value: 'advanced' },
-                        ]
-                  }
-                />
-              </div>
+                    <Col xs={24} md={12} lg={5}>
+                      <Select
+                        allowClear
+                        placeholder="Level"
+                        value={filters.level}
+                        style={{ width: '100%' }}
+                        loading={loadingMeta}
+                        onChange={handleFilterChange('level')}
+                      >
+                        {levels.map((level) => (
+                          <Select.Option key={level} value={level}>
+                            {level.charAt(0).toUpperCase() + level.slice(1)}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Col>
 
-              <div>
-                <Text strong>Language</Text>
-                <Select
-                  style={{ width: '100%', marginTop: 4 }}
-                  placeholder="All languages"
-                  allowClear
-                  value={filters.language}
-                  onChange={(value) => handleFilterChange('language', value || undefined)}
-                  options={languages.map((lang) => ({ label: lang, value: lang }))}
-                />
-              </div>
+                    <Col xs={24} md={12} lg={5}>
+                      <Select
+                        allowClear
+                        placeholder="Language"
+                        value={filters.language}
+                        style={{ width: '100%' }}
+                        loading={loadingMeta}
+                        onChange={handleFilterChange('language')}
+                      >
+                        {languages.map((lang) => (
+                          <Select.Option key={lang} value={lang}>
+                            {lang}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Col>
 
-              <div>
-                <Text strong>Type</Text>
-                <Select
-                  style={{ width: '100%', marginTop: 4 }}
-                  placeholder="All content types"
-                  allowClear
-                  value={filters.resourceType}
-                  onChange={(value) =>
-                    handleFilterChange('resourceType', value || undefined)
-                  }
-                  options={resourceTypes.map((t) => ({
-                    label: t.charAt(0).toUpperCase() + t.slice(1),
-                    value: t,
-                  }))}
-                />
-              </div>
+                    <Col xs={24} md={12} lg={5}>
+                      <Select
+                        allowClear
+                        placeholder="Type"
+                        value={filters.resourceType}
+                        style={{ width: '100%' }}
+                        loading={loadingMeta}
+                        onChange={handleFilterChange('resourceType')}
+                      >
+                        {resourceTypes.map((t) => (
+                          <Select.Option key={t} value={t}>
+                            {t}
+                          </Select.Option>
+                        ))}
+                      </Select>
+                    </Col>
 
-              <div>
-                <Text strong>Sort by</Text>
-                <Select<SortOption>
-                  style={{ width: '100%', marginTop: 4 }}
-                  value={filters.sort}
-                  onChange={(value) => handleFilterChange('sort', value)}
-                  options={[
-                    { label: 'Relevance', value: 'relevance' },
-                    { label: 'Newest first', value: 'newest' },
-                    { label: 'Most popular', value: 'popular' },
-                    { label: 'Shortest duration', value: 'shortest' },
-                    { label: 'Longest duration', value: 'longest' },
-                  ]}
-                />
-              </div>
+                    <Col xs={24} md={12} lg={3}>
+                      <Select
+                        value={filters.sort}
+                        onChange={handleSortChange}
+                        style={{ width: '100%' }}
+                      >
+                        <Select.Option value="relevance">Best match</Select.Option>
+                        <Select.Option value="newest">Newest</Select.Option>
+                        <Select.Option value="popular">Most popular</Select.Option>
+                        <Select.Option value="shortest">Shortest first</Select.Option>
+                        <Select.Option value="longest">Longest first</Select.Option>
+                      </Select>
+                    </Col>
+                  </Row>
+                </Col>
+              </Row>
+
+              {/* Active filters / helper text */}
+              <Row>
+                <Col span={24}>
+                  {filtersActive ? (
+                    <Space size={[8, 8]} wrap>
+                      <Text type="secondary">Active filters:</Text>
+                      {filters.subject && <Tag color="blue">Subject: {filters.subject}</Tag>}
+                      {filters.level && (
+                        <Tag color="purple">
+                          Level:{' '}
+                          {filters.level.charAt(0).toUpperCase() + filters.level.slice(1)}
+                        </Tag>
+                      )}
+                      {filters.language && <Tag>Language: {filters.language}</Tag>}
+                      {filters.resourceType && (
+                        <Tag color="geekblue">Type: {filters.resourceType}</Tag>
+                      )}
+                      <Button
+                        size="small"
+                        onClick={() => {
+                          setFilters({ query: '', sort: 'relevance' });
+                          setPage(1);
+                        }}
+                      >
+                        Clear filters
+                      </Button>
+                    </Space>
+                  ) : (
+                    <Text type="secondary">
+                      Use the search box and filters above to explore the knowledge library.
+                    </Text>
+                  )}
+                </Col>
+              </Row>
             </Space>
           </Card>
         </Col>
 
-        {/* Right column: Results table */}
-        <Col xs={24} md={16} lg={17}>
+        <Col span={24}>
           <Card
-            title="Browse resources"
+            title="Library results"
             extra={
-              showTotalLabel && (
-                <Text type="secondary" style={{ whiteSpace: 'nowrap' }}>
-                  {showTotalLabel}
-                </Text>
-              )
+              <Space>
+                <Button
+                  icon={<FilterOutlined />}
+                  onClick={() => fetchResources(1, pageSize)}
+                  disabled={loading}
+                >
+                  Refresh
+                </Button>
+              </Space>
             }
           >
             {error && (
-              <div style={{ marginBottom: 16 }}>
-                <Alert
-                  type="error"
-                  showIcon
-                  message="Error loading resources"
-                  description={error}
-                />
-              </div>
+              <Alert
+                type="error"
+                showIcon
+                message="Unable to load resources"
+                description={error}
+                style={{ marginBottom: 16 }}
+              />
             )}
 
             {loading && !hasResults ? (
-              <div
+              <Spin
+                tip="Loading resources…"
+                size="large"
                 style={{
+                  width: '100%',
                   minHeight: 200,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                 }}
               >
-                <Spin tip="Loading resources…" />
-              </div>
+                <div />
+              </Spin>
             ) : (
               <>
                 <Table<KnowledgeResource>

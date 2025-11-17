@@ -1,9 +1,10 @@
-'use client'
+// app/keenkonnect/projects/create-new-project/page.tsx
+'use client';
 
-import React, { Suspense, useState } from 'react'
-import Head from 'next/head'
-import { useRouter } from 'next/navigation'
-import { Row, Col, Card, Typography, message } from 'antd'
+import React, { Suspense, useState } from 'react';
+import Head from 'next/head';
+import { useRouter } from 'next/navigation';
+import { Row, Col, Card, Typography, message } from 'antd';
 import {
   StepsForm,
   ProFormText,
@@ -11,64 +12,63 @@ import {
   ProFormSelect,
   ProFormDatePicker,
   ProFormUploadButton,
-} from '@ant-design/pro-components'
-import type { UploadFile } from 'antd/es/upload/interface'
-import api from '@/api'
+} from '@ant-design/pro-components';
+import type { UploadFile } from 'antd/es/upload/interface';
+import api from '@/api';
 
-const { Paragraph } = Typography
+const { Paragraph } = Typography;
+
+const PROJECTS_ENDPOINT = '/api/projects/';
 
 type CreateProjectFormValues = {
-  name: string
-  description?: string
-  team: string
-  startDate?: any
-  endDate?: any
-  attachments?: UploadFile[]
-  notes?: string
-}
+  name: string;
+  description?: string;
+  category?: string;
+  team?: string;
+  startDate?: any;
+  endDate?: any;
+  attachments?: UploadFile[];
+  notes?: string;
+};
 
 export default function PageWrapper() {
   return (
     <Suspense fallback={null}>
       <Content />
     </Suspense>
-  )
+  );
 }
 
 function Content() {
-  const router = useRouter()
-  const [submitting, setSubmitting] = useState(false)
+  const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
 
   const handleFinish = async (values: CreateProjectFormValues) => {
     try {
-      setSubmitting(true)
+      setSubmitting(true);
 
-      // On sérialise légèrement les fichiers pour l’instant
+      // Minimal payload aligned with Django ProjectSerializer
       const payload = {
-        ...values,
-        attachments:
-          values.attachments?.map((file) => ({
-            uid: file.uid,
-            name: file.name,
-            size: file.size,
-            type: file.type,
-          })) ?? [],
-      }
+        title: values.name,
+        description: values.description ?? '',
+        category: values.category ?? 'Uncategorized',
+        status: 'idea' as const,
+      };
 
-      await api.post('/projects/create', payload)
+      await api.post(PROJECTS_ENDPOINT, payload);
 
-      message.success('Project created successfully!')
-      router.push('/keenkonnect/projects/my-projects')
-      return true
+      message.success('Project created successfully!');
+      router.push('/keenkonnect/projects/my-projects');
+      return true;
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error('Create project error:', err)
-      message.error('Failed to create project.')
-      return false
+      console.error('Create project error:', err);
+      message.error('Failed to create project.');
+      return false;
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   return (
     <>
@@ -80,7 +80,8 @@ function Content() {
         <h1 className="text-2xl font-bold mb-2">Create New Project</h1>
         <Paragraph type="secondary" className="mb-4">
           Use this guided wizard to describe your project, configure the team and
-          timeline, and attach any supporting files.
+          timeline, and attach any supporting files. The core project record is
+          created in the Django backend.
         </Paragraph>
 
         <Row justify="center">
@@ -92,7 +93,6 @@ function Content() {
                   layout: 'vertical',
                 }}
                 submitter={{
-                  // SearchConfig in this version only supports submitText / resetText
                   searchConfig: {
                     submitText: 'Create Project',
                   },
@@ -118,19 +118,34 @@ function Content() {
                     placeholder="Describe your project goals, context, and expected outcomes"
                     fieldProps={{ rows: 4 }}
                   />
+
+                  <ProFormSelect
+                    name="category"
+                    label="Category"
+                    placeholder="Choose a domain or focus area"
+                    options={[
+                      { label: 'Civic', value: 'Civic' },
+                      { label: 'Arts', value: 'Arts' },
+                      { label: 'Education', value: 'Education' },
+                      { label: 'Environment', value: 'Environment' },
+                      { label: 'Other', value: 'Other' },
+                    ]}
+                  />
                 </StepsForm.StepForm>
 
-                {/* Step 2 – Team & Timeline (Select + DatePicker) */}
-                <StepsForm.StepForm name="team-settings" title="Team & Settings">
+                {/* Step 2 – Team & Timeline */}
+                <StepsForm.StepForm
+                  name="team-settings"
+                  title="Team & Timeline"
+                >
                   <ProFormSelect
                     name="team"
                     label="Team"
-                    placeholder="Select team"
+                    placeholder="Select team (optional for now)"
                     options={[
                       { label: 'Team Alpha', value: 'alpha' },
                       { label: 'Team Beta', value: 'beta' },
                     ]}
-                    rules={[{ required: true, message: 'Please select a team' }]}
                   />
 
                   <Row gutter={16}>
@@ -151,7 +166,7 @@ function Content() {
                   </Row>
                 </StepsForm.StepForm>
 
-                {/* Step 3 – Attachments & Notes (Upload + TextArea) */}
+                {/* Step 3 – Attachments & Notes */}
                 <StepsForm.StepForm
                   name="attachments"
                   title="Attachments & Notes"
@@ -162,7 +177,8 @@ function Content() {
                     max={5}
                     fieldProps={{
                       multiple: true,
-                      beforeUpload: () => false, // pas d’upload auto, on garde dans le form state
+                      // No automatic upload; files are kept in form state
+                      beforeUpload: () => false,
                       listType: 'text',
                     }}
                     extra="Optional: upload briefs, specs, or reference documents."
@@ -181,5 +197,5 @@ function Content() {
         </Row>
       </div>
     </>
-  )
+  );
 }

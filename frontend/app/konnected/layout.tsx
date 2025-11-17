@@ -15,14 +15,13 @@ interface SegmentLayoutProps {
 }
 
 /**
- * Inner shell that forces the KonnectED sidebar to be active
- * via the ?sidebar=konnected query param.
+ * Inner shell that *defaults* the sidebar to "konnected" via ?sidebar=konnected
+ * when the query param is missing.
  *
- * Responsibilities:
- * - Ensure that when a user is under /konnected/*, the "KonnectED" suite
- *   is selected in MainLayout (so the correct routes and label show up).
- * - Delegate all global chrome (sidebar, header, breadcrumbs) to MainLayout.
- * - Do NOT handle page-level titles or actions; those belong to KonnectedPageShell.
+ * Important:
+ * - If ?sidebar is already set (ekoh, ethikos, kreative, …), it is respected.
+ *   This lets the module switcher (LogoTitle) change suites even while you are
+ *   on a /konnected/* URL.
  */
 function KonnectedShell({ children }: SegmentLayoutProps) {
   const router = useRouter()
@@ -32,7 +31,9 @@ function KonnectedShell({ children }: SegmentLayoutProps) {
   useEffect(() => {
     const currentSidebar = searchParams.get('sidebar')
 
-    if (currentSidebar === 'konnected') return
+    // Only inject the default if the param is absent.
+    // Do NOT override if the user explicitly chose another suite.
+    if (currentSidebar !== null) return
 
     const params = new URLSearchParams(Array.from(searchParams.entries()))
     params.set('sidebar', 'konnected')

@@ -1,9 +1,10 @@
-﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\teams-collaboration\my-teams\page.tsx
+﻿// app/konnected/teams-collaboration/my-teams/page.tsx
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  App,
   Avatar,
   Alert,
   Button,
@@ -12,7 +13,6 @@ import {
   Empty,
   Input,
   List,
-  MenuProps,
   Row,
   Select,
   Space,
@@ -20,10 +20,9 @@ import {
   Table,
   Tag,
   Typography,
-  message as antdMessage,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import type { TableProps } from 'antd';
+import type { MenuProps, TableProps } from 'antd';
 import {
   DownOutlined,
   TeamOutlined,
@@ -47,6 +46,7 @@ interface TeamMember {
   role: string;
 }
 
+// Aligned with backend MyTeams API contract (v14 spec)
 interface MyTeamsApiTeam {
   id: string;
   name: string;
@@ -72,19 +72,21 @@ interface TeamRow {
   recentActivity: string[];
 }
 
+// Backend endpoints as per v14 spec
 const MY_TEAMS_ENDPOINT = '/api/konnected/teams/my-teams';
 const LEAVE_TEAM_ENDPOINT = (teamId: string) =>
   `/api/konnected/teams/${encodeURIComponent(teamId)}/leave`;
 
+/**
+ * Normalizes API payload (array or { items }) into table rows.
+ */
 function mapToRows(payload: unknown): TeamRow[] {
   const rawItems: MyTeamsApiTeam[] = Array.isArray(payload)
     ? (payload as MyTeamsApiTeam[])
     : (payload as { items?: MyTeamsApiTeam[] })?.items ?? [];
 
   return rawItems.map((t) => {
-    const roster =
-      t.members_preview ??
-      ([] as TeamMember[]);
+    const roster = t.members_preview ?? ([] as TeamMember[]);
 
     return {
       key: t.id,
@@ -103,6 +105,7 @@ function mapToRows(payload: unknown): TeamRow[] {
 
 export default function MyTeamsPage(): JSX.Element {
   const router = useRouter();
+  const { message } = App.useApp();
 
   const [loading, setLoading] = useState<boolean>(true);
   const [reloadFlag, setReloadFlag] = useState<number>(0);
@@ -119,21 +122,30 @@ export default function MyTeamsPage(): JSX.Element {
 
   const [leavingTeamId, setLeavingTeamId] = useState<string | null>(null);
 
+  // --- Load teams from backend ------------------------------------------------
   useEffect(() => {
     let cancelled = false;
 
     async function loadTeams() {
       setLoading(true);
       setError(null);
+
       try {
         const res = await fetch(MY_TEAMS_ENDPOINT, {
           credentials: 'include',
+          cache: 'no-store',
         });
 
+        // Treat a 404 as "endpoint not wired yet / no teams" and degrade gracefully
+        if (res.status === 404) {
+          if (!cancelled) {
+            setData([]);
+          }
+          return;
+        }
+
         if (!res.ok) {
-          throw new Error(
-            `Failed to load teams (${res.status} ${res.statusText})`,
-          );
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
         }
 
         const json = await res.json();
@@ -143,9 +155,9 @@ export default function MyTeamsPage(): JSX.Element {
         }
       } catch (err) {
         if (!cancelled) {
-          setError(
-            err instanceof Error ? err.message : 'Unknown error while loading teams.',
-          );
+          // eslint-disable-next-line no-console
+          console.error('Failed to load teams', err);
+          setError('Unable to load your teams right now. Please try again later.');
         }
       } finally {
         if (!cancelled) {
@@ -154,16 +166,18 @@ export default function MyTeamsPage(): JSX.Element {
       }
     }
 
-    loadTeams();
+    void loadTeams();
 
     return () => {
       cancelled = true;
     };
   }, [reloadFlag]);
 
+  // --- Actions ----------------------------------------------------------------
+
   const handleLeaveTeam = async (team: TeamRow) => {
     if (team.userRole === 'owner') {
-      antdMessage.warning(
+      message.warning(
         'You are the owner of this team. Transfer ownership before leaving.',
       );
       return;
@@ -180,22 +194,16 @@ export default function MyTeamsPage(): JSX.Element {
       });
 
       if (!res.ok) {
-        throw new Error(
-          `Failed to leave team (${res.status} ${res.statusText})`,
-        );
+        throw new Error(`HTTP ${res.status} ${res.statusText}`);
       }
 
-      antdMessage.success(`You left ${team.teamName}.`);
+      message.success(`You left ${team.teamName}.`);
       setData((prev) => prev.filter((row) => row.teamId !== team.teamId));
-      setSelectedTeamKeys((prev) =>
-        prev.filter((key) => key !== team.key),
-      );
+      setSelectedTeamKeys((prev) => prev.filter((key) => key !== team.key));
     } catch (err) {
-      antdMessage.error(
-        err instanceof Error
-          ? err.message
-          : 'Could not leave the team. Please try again.',
-      );
+      // eslint-disable-next-line no-console
+      console.error('Failed to leave team', err);
+      message.error('Could not leave the team. Please try again.');
     } finally {
       setLeavingTeamId(null);
     }
@@ -203,7 +211,9 @@ export default function MyTeamsPage(): JSX.Element {
 
   const handleViewTeam = (team: TeamRow) => {
     router.push(
-      `/konnected/teams-collaboration/my-teams/${encodeURIComponent(team.teamId)}`,
+      `/konnected/teams-collaboration/my-teams/${encodeURIComponent(
+        team.teamId,
+      )}`,
     );
   };
 
@@ -214,6 +224,8 @@ export default function MyTeamsPage(): JSX.Element {
       )}&mode=invite`,
     );
   };
+
+  // --- Filters & derived data -------------------------------------------------
 
   const filteredData = useMemo(() => {
     return data.filter((row) => {
@@ -460,6 +472,8 @@ export default function MyTeamsPage(): JSX.Element {
     </Button>
   );
 
+  const hasRows = sortedData.length > 0;
+
   return (
     <KonnectedPageShell
       title="My Teams"
@@ -559,7 +573,7 @@ export default function MyTeamsPage(): JSX.Element {
         />
       )}
 
-      {!loading && !error && sortedData.length === 0 ? (
+      {!loading && !error && !hasRows ? (
         <Empty
           description="You are not part of any team yet."
           style={{ padding: '40px 0' }}

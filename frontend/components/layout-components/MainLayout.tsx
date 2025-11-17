@@ -1,3 +1,4 @@
+// components/layout-components/MainLayout.tsx
 'use client'
 
 import React, { useState, useEffect } from 'react'
@@ -20,6 +21,18 @@ interface RoutesConfig {
   kreative: Route[]
 }
 
+type SuiteKey = keyof RoutesConfig
+
+// Default entry route per module
+// NOTE: for Ethikos we point to Pulse Overview until /ethikos/dashboard exists.
+const DEFAULT_ENTRY: Record<SuiteKey, string> = {
+  ekoh       : '/ekoh/dashboard',
+  ethikos    : '/ethikos/pulse/overview',
+  keenkonnect: '/keenkonnect/dashboard',
+  konnected  : '/konnected/dashboard',
+  kreative   : '/kreative/dashboard',
+}
+
 const { Content } = Layout
 
 export default function MainLayout({
@@ -27,7 +40,7 @@ export default function MainLayout({
   children,
 }: React.PropsWithChildren<{ collapsed?: boolean }>) {
   const router   = useRouter()
-  const pathname = usePathname()
+  const pathname = usePathname() ?? '/'
   const q        = useSearchParams()
 
   /* états */
@@ -38,8 +51,22 @@ export default function MainLayout({
     ekoh: [], ethikos: [], keenkonnect: [], konnected: [], kreative: [],
   })
 
-  /* suite depuis ?sidebar= */
-  const [suite, setSuite] = useState(q.get('sidebar') ?? 'ekoh')
+  // helper pour déterminer la suite initiale à partir de l’URL
+  const detectInitialSuite = (): SuiteKey => {
+    const fromQuery = q.get('sidebar') as SuiteKey | null
+    if (fromQuery && fromQuery in DEFAULT_ENTRY) return fromQuery
+
+    if (pathname.startsWith('/ethikos'))    return 'ethikos'
+    if (pathname.startsWith('/keenkonnect')) return 'keenkonnect'
+    if (pathname.startsWith('/konnected'))   return 'konnected'
+    if (pathname.startsWith('/kreative'))    return 'kreative'
+    if (pathname.startsWith('/ekoh'))        return 'ekoh'
+
+    return 'ekoh'
+  }
+
+  /* suite courante */
+  const [suite, setSuite] = useState<SuiteKey>(() => detectInitialSuite())
 
   /* charger dynamiquement les routes */
   useEffect(() => {
@@ -60,17 +87,29 @@ export default function MainLayout({
       .catch(err => console.error('Erreur chargement routes :', err))
   }, [])
 
-  /* sync si ?sidebar change */
+  /* sync si ?sidebar change (navigation directe, back/forward, etc.) */
   useEffect(() => {
-    const v = q.get('sidebar')
-    if (v && v !== suite) setSuite(v)
-  }, [q])
+    const v = q.get('sidebar') as SuiteKey | null
+    if (v && v in DEFAULT_ENTRY && v !== suite) {
+      setSuite(v)
+    }
+  }, [q, suite])
 
   const changeSuite = (key: string) => {
-    setSuite(key)
+    const k = key as SuiteKey
+
+    // mise à jour de l’état local
+    setSuite(k)
+
+    // on conserve les autres query params
     const params = new URLSearchParams(Array.from(q.entries()))
-    params.set('sidebar', key)
-    router.push(`${pathname}?${params.toString()}`)
+    params.set('sidebar', k)
+
+    const basePath = DEFAULT_ENTRY[k]          // route “dashboard” du module
+    const query    = params.toString()
+    const target   = query ? `${basePath}?${query}` : basePath
+
+    router.push(target)
   }
 
   const toggle = () => {
@@ -78,7 +117,7 @@ export default function MainLayout({
     else setDrawer(v => !v)
   }
 
-  const suiteRoutes = routes[suite as keyof RoutesConfig] ?? []
+  const suiteRoutes = routes[suite] ?? []
 
   return (
     <Layout style={{ minHeight: '100vh', background: 'var(--ant-layout-color-bg-layout)' }}>

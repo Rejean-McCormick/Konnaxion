@@ -7,6 +7,7 @@ import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import {
   Alert,
+  App as AntdApp,
   Badge,
   Button,
   Drawer,
@@ -16,7 +17,6 @@ import {
   Tag,
   Tooltip,
   Typography,
-  message as antdMessage,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -127,6 +127,8 @@ export default function CommunityModerationPage(): JSX.Element {
   const [detailDrawerItem, setDetailDrawerItem] = useState<ModerationQueueItem | null>(null);
   const [globalActionLoading, setGlobalActionLoading] = useState(false);
 
+  const { message } = AntdApp.useApp();
+
   const {
     data: rawData,
     loading,
@@ -157,14 +159,14 @@ export default function CommunityModerationPage(): JSX.Element {
       // actOnReport: remove = true => delete, false => keep
       const remove = action === 'remove';
       await actOnReport(record.id, remove);
-      antdMessage.success(
+      message.success(
         remove
           ? 'Content removed and report resolved.'
           : 'Content approved and report resolved.',
       );
       await refresh();
     } catch (e) {
-      antdMessage.error('Unable to process moderation action. Please try again.');
+      message.error('Unable to process moderation action. Please try again.');
     } finally {
       setGlobalActionLoading(false);
     }
@@ -172,7 +174,7 @@ export default function CommunityModerationPage(): JSX.Element {
 
   const onBulkAction = async (action: 'approve' | 'remove') => {
     if (!selectedRowKeys.length) {
-      antdMessage.info('Select at least one item to apply a bulk action.');
+      message.info('Select at least one item to apply a bulk action.');
       return;
     }
 
@@ -188,15 +190,15 @@ export default function CommunityModerationPage(): JSX.Element {
       const failures = results.filter((r) => r instanceof Error);
 
       if (failures.length === 0) {
-        antdMessage.success(
+        message.success(
           remove
             ? 'Selected content removed and reports resolved.'
             : 'Selected content approved and reports resolved.',
         );
       } else if (failures.length === selectedRowKeys.length) {
-        antdMessage.error('Bulk action failed for all selected items.');
+        message.error('Bulk action failed for all selected items.');
       } else {
-        antdMessage.warning(
+        message.warning(
           'Bulk action completed with some failures. Check the queue and retry if needed.',
         );
       }
@@ -204,7 +206,7 @@ export default function CommunityModerationPage(): JSX.Element {
       setSelectedRowKeys([]);
       await refresh();
     } catch {
-      antdMessage.error('Unexpected error while processing bulk action.');
+      message.error('Unexpected error while processing bulk action.');
     } finally {
       setGlobalActionLoading(false);
     }
@@ -660,9 +662,11 @@ export default function CommunityModerationPage(): JSX.Element {
         open={false}
         footer={null}
         closable={false}
-        destroyOnClose
+        destroyOnHidden
         // Reserved for future: escalation / mute / ban workflows
       />
     </KonnectedPageShell>
   );
 }
+
+// app/konnected/community-discussions/moderation/page.tsx

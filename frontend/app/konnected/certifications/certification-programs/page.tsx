@@ -75,13 +75,84 @@ interface ProgramsResponse {
 }
 
 /**
+ * Minimal payload shape coming from the CertifiKation paths endpoint.
+ * This mirrors what exam-registration already expects from:
+ *   GET /api/konnected/certifications/paths/
+ */
+interface CertificationPathPayload {
+  id: number;
+  name: string;
+  description?: string;
+  level?: string;
+  tags?: string[];
+  already_passed?: boolean;
+  cooldown_remaining_minutes?: number | null;
+}
+
+/**
+ * Maps backend "level" to the UI difficulty scale.
+ */
+function mapLevelToDifficulty(level?: string | null): ProgramDifficulty {
+  const normalized = (level ?? '').toLowerCase();
+
+  if (!normalized) return 'intermediate';
+  if (normalized.includes('beginner') || normalized.includes('intro')) return 'beginner';
+  if (normalized.includes('expert')) return 'expert';
+  if (normalized.includes('advanced')) return 'advanced';
+  return 'intermediate';
+}
+
+/**
+ * Maps a CertificationPath payload into the richer CertificationProgram
+ * shape used by this page. Fields with no direct backend equivalent are
+ * left undefined.
+ */
+function mapPathToProgram(path: CertificationPathPayload): CertificationProgram {
+  const difficulty = mapLevelToDifficulty(path.level);
+  const alreadyPassed = Boolean(path.already_passed);
+  const completionPercent = alreadyPassed ? 100 : 0;
+
+  const userProgress: ProgramUserProgress = {
+    status: alreadyPassed ? 'completed' : 'not_started',
+    completionPercent,
+  };
+
+  return {
+    id: String(path.id),
+    code: `PATH-${path.id}`,
+    title: path.name,
+    description: path.description ?? '',
+    difficulty,
+    category: undefined,
+    tags: path.tags ?? [],
+    skills: [],
+    requiresProctoring: false,
+    attemptsAllowed: undefined,
+    passPercent: CERT_PASS_PERCENT,
+    isFeatured: false,
+    kpi_enrolledCount: undefined,
+    kpi_completionRate: undefined,
+    userProgress,
+  };
+}
+
+/**
  * API client for the CertifiKation catalog.
- * Adjust the path string to match your actual backend route if needed.
+ *
+ * Uses the canonical KonnectED CertifiKation endpoint:
+ *   GET /api/konnected/certifications/paths/
+ *
+ * This keeps the Programs page aligned with the same source used by
+ * exam-registration, without relying on mock data.
  */
 async function fetchCertificationPrograms(): Promise<ProgramsResponse> {
-  // Backend path is derived from the CertifiKation / KonnectED API spec.
-  // Update if your OpenAPI uses a slightly different route.
-  return get<ProgramsResponse>('certs/programs');
+  const paths = await get<CertificationPathPayload[]>(
+    '/api/konnected/certifications/paths/',
+  );
+
+  return {
+    items: paths.map(mapPathToProgram),
+  };
 }
 
 export default function CertificationProgramsPage(): JSX.Element {
@@ -242,7 +313,6 @@ export default function CertificationProgramsPage(): JSX.Element {
           type="primary"
           icon={<SafetyCertificateOutlined />}
           onClick={() => {
-            // Simple heuristic: jump to first in-progress or featured program
             const target =
               programs.find((p) => p.userProgress?.status === 'in_progress') ??
               programs.find((p) => p.isFeatured) ??
@@ -576,46 +646,40 @@ export default function CertificationProgramsPage(): JSX.Element {
                         </Space>
 
                         <Space
-                          size={8}
-                          wrap
-                          style={{
-                            width: '100%',
-                            justifyContent: 'space-between',
-                          }}
+                          direction="vertical"
+                          size={4}
+                          style={{ width: '100%' }}
                         >
-                          <Space size={4} wrap>
-                            {program.skills?.slice(0, 3).map((skill) => (
-                              <Tag key={skill.id}>{skill.name}</Tag>
-                            ))}
-                            {program.skills && program.skills.length > 3 && (
-                              <Tag>+{program.skills.length - 3} more</Tag>
-                            )}
-                          </Space>
-
-                          {typeof program.estimatedHours === 'number' && (
-                            <Tooltip title="Estimated total learning time for this path">
-                              <span style={{ fontSize: 12, color: '#888' }}>
-                                ~{program.estimatedHours}h
-                              </span>
-                            </Tooltip>
-                          )}
+                          <div>
+                            <span style={{ fontSize: 12, color: '#999' }}>
+                              {program.kpi_enrolledCount != null && (
+                                <>
+                                  {program.kpi_enrolledCount} learners enrolled ·{' '}
+                                </>
+                              )}
+                              {program.kpi_completionRate != null && (
+                                <>
+                                  {program.kpi_completionRate}% completion rate
+                                </>
+                              )}
+                            </span>
+                          </div>
                         </Space>
 
                         <Space
                           style={{
                             marginTop: 8,
-                            width: '100%',
+                            display: 'flex',
                             justifyContent: 'space-between',
                           }}
                         >
                           <Button
-                            size="small"
                             type="link"
+                            size="small"
                             onClick={() => handleOpenDetails(program)}
                           >
                             View details
                           </Button>
-
                           <Button
                             type="primary"
                             size="small"
@@ -638,64 +702,32 @@ export default function CertificationProgramsPage(): JSX.Element {
           )}
         </Row>
 
-        {/* Pagination */}
-        {total > 0 && (
-          <div
-            style={{
-              marginTop: 16,
-              display: 'flex',
-              justifyContent: 'flex-end',
-            }}
-          >
-            <Space>
-              <span style={{ fontSize: 12, color: '#888' }}>
-                Showing {startIndex + 1}-{Math.min(startIndex + pageSize, total)} of {total}{' '}
-                programs
-              </span>
-              <Input
-                type="number"
-                min={3}
-                max={24}
-                value={pageSize}
-                style={{ width: 80 }}
-                onChange={(e) => {
-                  const value = Number(e.target.value) || 6;
-                  setPageSize(value);
-                  setCurrentPage(1);
-                }}
-                addonBefore="Page size"
-              />
-            </Space>
-          </div>
-        )}
-
-        {/* Drawer: full program details */}
+        {/* Details drawer */}
         <Drawer
-          open={drawerOpen}
+          title={selectedProgram?.title ?? 'Certification details'}
           width={520}
-          title={
-            <Space>
-              <SafetyCertificateOutlined />
-              <span>{selectedProgram?.title ?? 'Certification details'}</span>
-            </Space>
-          }
-          onClose={() => {
-            setDrawerOpen(false);
-            setSelectedProgram(null);
-          }}
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
           destroyOnClose
         >
           {selectedProgram && (
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              <Space size={8} wrap>
-                {selectedProgram.code && <Tag>{selectedProgram.code}</Tag>}
-                {renderDifficultyTag(selectedProgram.difficulty)}
-                {selectedProgram.category && (
-                  <Tag color="default">{selectedProgram.category}</Tag>
-                )}
-                {selectedProgram.requiresProctoring && (
-                  <Tag color="purple">Proctored exam</Tag>
-                )}
+              <Space direction="vertical" size={4}>
+                <Space size={8}>
+                  <SafetyCertificateOutlined />
+                  <span>{selectedProgram.title}</span>
+                </Space>
+                <div>
+                  {selectedProgram.code && (
+                    <Tag bordered={false}>{selectedProgram.code}</Tag>
+                  )}
+                  {selectedProgram.category && (
+                    <Tag color="default">{selectedProgram.category}</Tag>
+                  )}
+                  {selectedProgram.requiresProctoring && (
+                    <Tag color="purple">Proctored</Tag>
+                  )}
+                </div>
               </Space>
 
               <div>
@@ -744,8 +776,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                   <Space direction="vertical" size={8} style={{ width: '100%' }}>
                     <Space>
                       {renderStatusTag(selectedProgram)}
-                      {typeof selectedProgram.userProgress.completionPercent ===
-                        'number' && (
+                      {typeof selectedProgram.userProgress.completionPercent === 'number' && (
                         <span>
                           {selectedProgram.userProgress.completionPercent}
                           % complete

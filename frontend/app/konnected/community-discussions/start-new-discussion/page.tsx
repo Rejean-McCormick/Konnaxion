@@ -1,4 +1,5 @@
-﻿﻿'use client';
+﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
+'use client';
 
 import React, { useState } from 'react';
 import {
@@ -39,77 +40,116 @@ type FormValues = {
   attachments?: UploadFile[];
 };
 
-type CreateTopicPayload = {
-  title: string;
-  category: string;
-  threadType: ThreadType;
-  isQuestion: boolean;
-  tags?: string[];
-  initialPost?: {
-    content?: string;
-    attachments?: string[];
+type CreateBodies = {
+  topic: {
+    title: string;
+    category: string;
   };
-  subscribeToReplies?: boolean;
+  initialPostContent?: string;
 };
 
 /**
+ * Extracts a human-friendly error message from a DRF-style error response.
+ */
+async function extractBackendMessage(res: Response): Promise<string | undefined> {
+  try {
+    const data = (await res.json()) as any;
+    if (typeof data?.detail === 'string') return data.detail;
+    if (typeof data?.message === 'string') return data.message;
+    if (typeof data?.error === 'string') return data.error;
+  } catch {
+    // ignore JSON parse errors
+  }
+  return undefined;
+}
+
+/**
  * Start New Discussion page for KonnectED → Community Discussions.
- * Creates a ForumTopic + initial ForumPost against the backend API.
+ * Creates a ForumTopic, then (optionally) an initial ForumPost
+ * using the real backend endpoints /api/forum-topics/ and /api/forum-posts/.
  */
 export default function StartNewDiscussionPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
 
-  const buildPayload = (values: FormValues): CreateTopicPayload => {
-    const attachments = (values.attachments ?? []).map((file) => file.name);
+  const buildBodies = (values: FormValues): CreateBodies => {
+    const trimmedTitle = values.title.trim();
+    const trimmedContent = values.content?.trim();
 
     return {
-      title: values.title.trim(),
-      category: values.category,
-      threadType: values.threadType,
-      isQuestion: values.threadType === 'question',
-      tags: values.tags?.map((t) => t.trim()).filter(Boolean),
-      initialPost: {
-        content: values.content?.trim() || undefined,
-        attachments: attachments.length ? attachments : undefined,
+      topic: {
+        title: trimmedTitle,
+        category: values.category,
       },
-      subscribeToReplies: values.subscribeToReplies ?? true,
+      initialPostContent: trimmedContent || undefined,
     };
   };
 
   const onFinish: FormProps<FormValues>['onFinish'] = async (values) => {
     setSubmitting(true);
     try {
-      const payload = buildPayload(values);
+      const { topic, initialPostContent } = buildBodies(values);
 
-      // TODO: align this path & payload with schema-endpoints.json
-      const res = await fetch('/api/konnected/community-discussions/topics', {
+      // 1) Create the forum topic (thread) itself.
+      const topicRes = await fetch('/api/forum-topics/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload),
+        credentials: 'include',
+        body: JSON.stringify(topic),
       });
 
-      if (!res.ok) {
-        let backendMessage = 'Unable to create discussion.';
-        try {
-          const data = (await res.json()) as { message?: string };
-          if (data?.message) backendMessage = data.message;
-        } catch {
-          // ignore JSON parse errors
-        }
-        if (res.status === 403) {
-          antdMessage.error(backendMessage || 'You do not have permission to start a new discussion.');
-        } else if (res.status === 429) {
+      if (!topicRes.ok) {
+        const backendMessage =
+          (await extractBackendMessage(topicRes)) ?? 'Unable to create discussion.';
+        if (topicRes.status === 403) {
           antdMessage.error(
-            backendMessage || 'You have created too many discussions in a short time. Please try again later.',
+            backendMessage || 'You do not have permission to start a new discussion.',
+          );
+        } else if (topicRes.status === 429) {
+          antdMessage.error(
+            backendMessage ||
+              'You have created too many discussions in a short time. Please try again later.',
           );
         } else {
           antdMessage.error(backendMessage);
         }
         return;
+      }
+
+      const createdTopic = (await topicRes.json()) as { id: number | string };
+
+      // 2) Optionally create the initial post in the topic.
+      if (initialPostContent) {
+        const topicId = createdTopic?.id;
+        if (topicId == null) {
+          // Topic exists but we could not read its id – log and continue.
+          // eslint-disable-next-line no-console
+          console.warn('Created topic without id in response payload.', createdTopic);
+        } else {
+          const postBody = {
+            topic: Number(topicId),
+            content: initialPostContent,
+          };
+
+          const postRes = await fetch('/api/forum-posts/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(postBody),
+          });
+
+          if (!postRes.ok) {
+            const backendMessage =
+              (await extractBackendMessage(postRes)) ??
+              'Your topic was created, but the initial post could not be saved.';
+            antdMessage.warning(backendMessage);
+          }
+        }
       }
 
       antdMessage.success('Discussion created successfully.');
@@ -128,7 +168,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
     antdMessage.error('Please fix the highlighted fields and try again.');
   };
 
-  // Categories aligned with the Active Threads dummy data for now.
+  // Categories mapped to ForumTopic.category values. Adjust as needed.
   const CATEGORY_OPTIONS: { label: string; value: string }[] = [
     { label: 'Math', value: 'Math' },
     { label: 'Science', value: 'Science' },
@@ -142,8 +182,8 @@ export default function StartNewDiscussionPage(): JSX.Element {
       title="Start a New Discussion"
       subtitle={
         <span>
-          Share a question or topic with the KonnectED community. Your post may be surfaced in learning paths and
-          thematic forums.
+          Share a question or topic with the KonnectED community. Your post may be surfaced in learning
+          paths and thematic forums.
         </span>
       }
     >
@@ -159,8 +199,8 @@ export default function StartNewDiscussionPage(): JSX.Element {
                 message="Reminder: keep it constructive and on-topic"
                 description={
                   <span>
-                    Discussions are visible across teams. Content may be routed to moderators before publication for
-                    low-trust accounts.
+                    Discussions are visible across teams. Content may be routed to moderators before
+                    publication for low-trust accounts.
                   </span>
                 }
               />
@@ -186,7 +226,9 @@ export default function StartNewDiscussionPage(): JSX.Element {
                     {
                       validator: (_, value) => {
                         if (typeof value === 'string' && !value.trim()) {
-                          return Promise.reject(new Error('The title cannot be empty or just spaces.'));
+                          return Promise.reject(
+                            new Error('The title cannot be empty or just spaces.'),
+                          );
                         }
                         return Promise.resolve();
                       },
@@ -284,7 +326,9 @@ export default function StartNewDiscussionPage(): JSX.Element {
                       <UploadOutlined />
                     </p>
                     <p className="ant-upload-text">Click or drag files to this area to attach</p>
-                    <p className="ant-upload-hint">Files will be included with your initial post when supported.</p>
+                    <p className="ant-upload-hint">
+                      Files will be included with your initial post when supported.
+                    </p>
                   </Upload.Dragger>
                 </Form.Item>
 
@@ -325,33 +369,36 @@ export default function StartNewDiscussionPage(): JSX.Element {
             <Card title="Good discussion practices">
               <Space direction="vertical">
                 <Text>
-                  <Tag color="blue">Be specific</Tag> Clearly describe the context (course, team, project, tool).
+                  <Tag color="blue">Be specific</Tag> Clearly describe the context (course, team,
+                  project, tool).
                 </Text>
                 <Text>
-                  <Tag color="green">Show your attempt</Tag> For questions, explain what you already tried or
-                  understood.
+                  <Tag color="green">Show your attempt</Tag> For questions, explain what you already
+                  tried or understood.
                 </Text>
                 <Text>
-                  <Tag color="gold">Respect privacy</Tag> Avoid sharing sensitive personal or institutional data.
+                  <Tag color="gold">Respect privacy</Tag> Avoid sharing sensitive personal or
+                  institutional data.
                 </Text>
                 <Text>
-                  <Tag color="purple">Use tags</Tag> Tags help link the discussion to Knowledge units and learning
-                  paths.
+                  <Tag color="purple">Use tags</Tag> Tags help link the discussion to Knowledge units
+                  and learning paths.
                 </Text>
               </Space>
             </Card>
 
             <Card title="Moderation and visibility">
               <Paragraph>
-                Posts may be queued for moderation based on your trust level or if they match sensitive topics.
+                Posts may be queued for moderation based on your trust level or if they match
+                sensitive topics.
               </Paragraph>
               <Paragraph>
                 If moderation is required, you&apos;ll see your topic as{' '}
                 <Text strong>“Pending review”</Text> until a moderator approves it.
               </Paragraph>
               <Paragraph>
-                You can later edit your post, close a question, or mark an answer as accepted from the thread detail
-                page (when implemented).
+                You can later edit your post, close a question, or mark an answer as accepted from
+                the thread detail page (when implemented).
               </Paragraph>
             </Card>
           </Space>

@@ -15,8 +15,13 @@ interface SegmentLayoutProps {
 }
 
 /**
- * Inner shell that forces the KeenKonnect sidebar to be active
- * via the ?sidebar=keenkonnect query param.
+ * Inner shell that *defaults* the sidebar to "keenkonnect" via ?sidebar=keenkonnect
+ * when the query param is missing.
+ *
+ * Important:
+ * - If ?sidebar is already set (ekoh, ethikos, kreative, …), it is respected.
+ *   This lets the module switcher (LogoTitle) change suites even while you are
+ *   on a /keenkonnect/* URL.
  */
 function KeenKonnectShell({ children }: SegmentLayoutProps) {
   const router = useRouter()
@@ -26,7 +31,9 @@ function KeenKonnectShell({ children }: SegmentLayoutProps) {
   useEffect(() => {
     const currentSidebar = searchParams.get('sidebar')
 
-    if (currentSidebar === 'keenkonnect') return
+    // Only inject the default if the param is absent.
+    // Do NOT override if the user explicitly chose another suite.
+    if (currentSidebar !== null) return
 
     const params = new URLSearchParams(Array.from(searchParams.entries()))
     params.set('sidebar', 'keenkonnect')

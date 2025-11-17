@@ -89,14 +89,20 @@ interface ExamAttemptsResponse {
 // -----------------------------------------------------------------------------
 // API endpoint helpers
 // -----------------------------------------------------------------------------
+//
+// IMPORTANT:
+// - we use *relative* URLs WITHOUT a leading "/" so that axios baseURL
+//   (NEXT_PUBLIC_API_BASE or "/api") is correctly applied.
+// - On the wire this becomes:  /api/konnected/certifications/...
+//
 
-const EXAM_ATTEMPTS_ENDPOINT = '/konnected/certifications/exam-attempts/me'
+const EXAM_ATTEMPTS_ENDPOINT = 'konnected/certifications/exam-attempts/me'
 const EXAM_ATTEMPT_DETAIL_ENDPOINT = (attemptId: string) =>
-  `/konnected/certifications/exam-attempts/${attemptId}`
+  `konnected/certifications/exam-attempts/${attemptId}`
 const EXAM_APPEAL_ENDPOINT = (attemptId: string) =>
-  `/konnected/certifications/exam-attempts/${attemptId}/appeal`
+  `konnected/certifications/exam-attempts/${attemptId}/appeal`
 const EXAM_RETRY_ENDPOINT = (attemptId: string) =>
-  `/konnected/certifications/exam-attempts/${attemptId}/retry`
+  `konnected/certifications/exam-attempts/${attemptId}/retry`
 
 async function fetchExamAttempts(): Promise<ExamAttemptsResponse> {
   return api.get<ExamAttemptsResponse>(EXAM_ATTEMPTS_ENDPOINT)
@@ -205,15 +211,13 @@ const getAppealTag = (attempt: ExamAttempt) => {
   return null
 }
 
-const getScoreColor = (percent: number | null) => {
-  if (percent == null) return undefined as
-    | 'success'
-    | 'warning'
-    | 'danger'
-    | undefined
-  if (percent >= CERT_PASS_PERCENT) return 'success' as const
-  if (percent >= CERT_PASS_PERCENT - 10) return 'warning' as const
-  return 'danger' as const
+type ScoreColor = 'success' | 'warning' | 'danger' | undefined
+
+const getScoreColor = (percent: number | null): ScoreColor => {
+  if (percent == null) return undefined
+  if (percent >= CERT_PASS_PERCENT) return 'success'
+  if (percent >= CERT_PASS_PERCENT - 10) return 'warning'
+  return 'danger'
 }
 
 // -----------------------------------------------------------------------------

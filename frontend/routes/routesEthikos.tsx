@@ -1,9 +1,16 @@
 'use client'
 
 import React from 'react'
+import { DashboardOutlined } from '@ant-design/icons'
 
 // Type local minimal pour éviter toute dépendance
 type Route = { path?: string; name: string; icon?: React.ReactNode; views?: Route[] }
+
+const directDashboard: Route = {
+  path: '/ethikos/insights',
+  name: 'Dashboard',
+  icon: <DashboardOutlined />,
+}
 
 const learnGroup: Route = {
   name: 'Learn',
@@ -71,6 +78,7 @@ const trustGroup: Route = {
 }
 
 const routes: Route[] = [
+  directDashboard,
   adminGroup,
   decideGroup,
   deliberateGroup,

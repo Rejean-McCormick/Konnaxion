@@ -32,14 +32,14 @@ import { useQuery } from '@tanstack/react-query';
 import { api } from '@/shared/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
-const { Text, Title, Paragraph } = Typography;
+const { Text, Paragraph } = Typography;
 const { Option } = Select;
 
-const ACTIVE_THREADS_ENDPOINT =
-  '/api/konnected/community-discussions/active-threads';
+// Real backend endpoints (joined with api baseURL)
+const FORUM_TOPICS_ENDPOINT = 'forum-topics/';
+const FORUM_POSTS_ENDPOINT = 'forum-posts/';
 
 type TopicKind = 'question' | 'discussion';
-
 type TopicStatus = 'open' | 'closed' | 'archived';
 
 export interface ForumTopicSummary {
@@ -68,7 +68,27 @@ interface ActiveThreadsResponse {
   total: number;
 }
 
-/** Local UI state → query params mapping */
+// Shape returned by /api/forum-topics/
+interface ForumTopicApi {
+  id: number | string;
+  title: string;
+  category?: string | null;
+  creator?: string | number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// Shape returned by /api/forum-posts/
+interface ForumPostApi {
+  id: number | string;
+  topic: number | string;
+  author?: string | number | null;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Local UI state → query params mapping (purely client-side) */
 type TopicFilter = 'all' | 'questions' | 'discussions';
 type SortOption = 'recent' | 'most_replies' | 'most_active';
 
@@ -79,37 +99,139 @@ function useActiveThreads(params: {
   topicFilter: TopicFilter;
   sort: SortOption;
 }) {
-  const queryParams = useMemo(() => {
-    const base: Record<string, string | number | undefined> = {
+  const queryState = useMemo(
+    () => ({
       page: params.page,
-      page_size: params.pageSize,
-      q: params.search.trim() || undefined,
-      sort:
-        params.sort === 'recent'
-          ? 'last_activity_desc'
-          : params.sort === 'most_replies'
-          ? 'replies_desc'
-          : 'participants_desc',
-    };
+      pageSize: params.pageSize,
+      search: params.search.trim().toLowerCase(),
+      topicFilter: params.topicFilter,
+      sort: params.sort,
+    }),
+    [params.page, params.pageSize, params.search, params.topicFilter, params.sort],
+  );
 
-    if (params.topicFilter === 'questions') {
-      base.kind = 'question';
-    } else if (params.topicFilter === 'discussions') {
-      base.kind = 'discussion';
-    }
-
-    return base;
-  }, [params.page, params.pageSize, params.search, params.topicFilter, params.sort]);
-
-  return useQuery<ActiveThreadsResponse, Error, ActiveThreadsResponse, [string, typeof queryParams]>({
-    queryKey: ['konnected-active-threads', queryParams],
+  return useQuery<ActiveThreadsResponse, Error>({
+    queryKey: ['konnected-active-threads', queryState],
     staleTime: 60_000,
     queryFn: async () => {
-      const res = await api.get<ActiveThreadsResponse>(ACTIVE_THREADS_ENDPOINT, {
-        params: queryParams,
+      // Fetch raw topics and posts from the real backend.
+      const [topicsRes, postsRes] = await Promise.all([
+        api.get<ForumTopicApi[]>(FORUM_TOPICS_ENDPOINT),
+        api.get<ForumPostApi[]>(FORUM_POSTS_ENDPOINT),
+      ]);
+
+      const topics = topicsRes.data ?? [];
+      const posts = postsRes.data ?? [];
+
+      // Aggregate per-topic stats from posts.
+      const perTopicStats = new Map<
+        number,
+        { replies: number; lastActivityAt: string; lastActivityBy?: string | null }
+      >();
+
+      for (const post of posts) {
+        const topicIdNum = Number(post.topic);
+        if (!Number.isFinite(topicIdNum)) continue;
+
+        const current = perTopicStats.get(topicIdNum) ?? {
+          replies: 0,
+          lastActivityAt: '',
+          lastActivityBy: undefined,
+        };
+
+        const candidateTs = post.updated_at || post.created_at;
+        const candidateTime = new Date(candidateTs).getTime();
+        const existingTime = new Date(current.lastActivityAt || 0).getTime();
+
+        if (!Number.isNaN(candidateTime) && candidateTime >= existingTime) {
+          current.lastActivityAt = candidateTs;
+          current.lastActivityBy =
+            post.author != null ? String(post.author) : current.lastActivityBy;
+        }
+
+        current.replies += 1;
+        perTopicStats.set(topicIdNum, current);
+      }
+
+      // Build forum summaries from topics + aggregated stats.
+      let summaries: ForumTopicSummary[] = topics.map((topic) => {
+        const topicIdNum = Number(topic.id);
+        const stats = Number.isFinite(topicIdNum)
+          ? perTopicStats.get(topicIdNum as number)
+          : undefined;
+
+        const creatorName =
+          topic.creator != null ? String(topic.creator) : undefined;
+
+        const lastActivityAt =
+          stats?.lastActivityAt || topic.updated_at || topic.created_at;
+
+        const inferredKind: TopicKind =
+          topic.title?.trim().endsWith('?') ? 'question' : 'discussion';
+
+        return {
+          id: String(topic.id),
+          title: topic.title,
+          category: topic.category ?? null,
+          kind: inferredKind,
+          status: 'open',
+          tags: undefined,
+          replies_count: stats?.replies ?? 0,
+          participants_count: undefined,
+          last_activity_at: lastActivityAt,
+          last_activity_by: stats?.lastActivityBy ?? creatorName ?? null,
+          last_activity_snippet: undefined,
+          created_by_name: creatorName ?? null,
+          created_by_avatar_url: null,
+          is_pinned: false,
+          is_unread: false,
+          linked_resource_title: null,
+        };
       });
-      // FIX: api.get returns an AxiosResponse; we need the data payload
-      return res.data;
+
+      // Client-side search filter.
+      if (queryState.search) {
+        summaries = summaries.filter((t) => {
+          const haystack = `${t.title} ${t.category ?? ''}`.toLowerCase();
+          return haystack.includes(queryState.search);
+        });
+      }
+
+      // Thread type filter based on inferred kind.
+      if (queryState.topicFilter === 'questions') {
+        summaries = summaries.filter((t) => t.kind === 'question');
+      } else if (queryState.topicFilter === 'discussions') {
+        summaries = summaries.filter((t) => t.kind === 'discussion');
+      }
+
+      // Sorting.
+      summaries.sort((a, b) => {
+        if (queryState.sort === 'most_replies') {
+          return (b.replies_count ?? 0) - (a.replies_count ?? 0);
+        }
+        if (queryState.sort === 'most_active') {
+          const aMetric = (a.participants_count ?? 0) || a.replies_count;
+          const bMetric = (b.participants_count ?? 0) || b.replies_count;
+          return bMetric - aMetric;
+        }
+
+        // Default: most recent activity.
+        const aTime = new Date(a.last_activity_at).getTime();
+        const bTime = new Date(b.last_activity_at).getTime();
+        return (Number.isNaN(bTime) ? 0 : bTime) - (Number.isNaN(aTime) ? 0 : aTime);
+      });
+
+      const total = summaries.length;
+      const startIndex = (queryState.page - 1) * queryState.pageSize;
+      const endIndex = startIndex + queryState.pageSize;
+      const pageResults = summaries.slice(startIndex, endIndex);
+
+      return {
+        results: pageResults,
+        page: queryState.page,
+        page_size: queryState.pageSize,
+        total,
+      };
     },
   });
 }

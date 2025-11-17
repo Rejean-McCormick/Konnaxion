@@ -1,14 +1,32 @@
-'use client'
+// modules/konsensus/hooks/useLivePoll.ts
+"use client";
 
 import { useEffect } from "react";
-import { io } from "socket.io-client";
+import { useQueryClient } from "@tanstack/react-query";
+import type { PollId } from "./usePoll";
 
-export default function useLivePoll(id: string) {
+/**
+ * Lightweight "live" layer for Konsensus polls.
+ *
+ * Instead of a dedicated WebSocket endpoint (/api/poll/:id),
+ * this hook periodically invalidates the React Query cache
+ * so `usePoll` refetches fresh data from /api/votes/.
+ */
+export default function useLivePoll(
+  id: PollId,
+  intervalMs = 5000,
+): void {
+  const queryClient = useQueryClient();
+
   useEffect(() => {
-    const socket = io(`/api/poll/${id}`);
-    // ... listen to events
+    if (!id) return;
+
+    const timer = window.setInterval(() => {
+      queryClient.invalidateQueries({ queryKey: ["poll", id] });
+    }, intervalMs);
+
     return () => {
-      socket.disconnect();
+      window.clearInterval(timer);
     };
-  }, [id]);
+  }, [id, intervalMs, queryClient]);
 }

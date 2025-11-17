@@ -1,7 +1,17 @@
+// app/keenkonnect/projects/my-projects/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { Button, Typography, Space, Tag, Select, Dropdown, Progress } from 'antd';
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Button,
+  Typography,
+  Space,
+  Tag,
+  Select,
+  Dropdown,
+  Progress,
+  Spin,
+} from 'antd';
 import {
   EyeOutlined,
   EditOutlined,
@@ -13,82 +23,102 @@ import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useRouter } from 'next/navigation';
 import usePageTitle from '@/hooks/usePageTitle';
+import api from '@/api';
 
 const { Text } = Typography;
+const { Option } = Select;
 
-type ProjectStatus = 'draft' | 'active' | 'archived';
+const PROJECTS_ENDPOINT = '/api/projects/';
+
+type ProjectStatus = 'idea' | 'progress' | 'completed' | 'validated';
+
+interface ApiProject {
+  id: number;
+  title: string;
+  description: string;
+  creator: string;
+  category: string;
+  status: string;
+  created_at: string;
+  updated_at: string;
+  tags: number[];
+}
 
 interface Project {
-  id: string;
+  id: number;
   name: string;
   owner: string;
-  members: number;
+  category: string;
   status: ProjectStatus;
   createdAt: string; // ISO date string
-  progress: number; // 0–100
+  progress: number; // 0–100 (placeholder for now)
 }
 
 export default function MyProjectsPage(): JSX.Element {
   const router = useRouter();
   usePageTitle('KeenKonnect – My Projects');
 
-  // TODO: remplacer par des données réelles (API / SWR, etc.)
-  const [projects] = useState<Project[]>([
-    {
-      id: 'p-1',
-      name: 'Sustainable Plastics',
-      owner: 'Alice',
-      members: 8,
-      status: 'active',
-      createdAt: '2025-08-01',
-      progress: 72,
-    },
-    {
-      id: 'p-2',
-      name: 'AI Team Matching',
-      owner: 'Bob',
-      members: 5,
-      status: 'draft',
-      createdAt: '2025-09-15',
-      progress: 35,
-    },
-    {
-      id: 'p-3',
-      name: 'Energy Dashboard',
-      owner: 'Clara',
-      members: 12,
-      status: 'archived',
-      createdAt: '2025-02-10',
-      progress: 100,
-    },
-  ]);
-
+  const [projects, setProjects] = useState<Project[]>([]);
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        setLoading(true);
+
+        const data = await api.get<ApiProject[]>(PROJECTS_ENDPOINT);
+
+        const mapped: Project[] = data.map((p) => ({
+          id: p.id,
+          name: p.title,
+          owner: p.creator ?? '',
+          category: p.category ?? 'Uncategorized',
+          status: (p.status as ProjectStatus) || 'idea',
+          createdAt: p.created_at,
+          // For now, progress is a placeholder; you can later map it
+          // from tasks completion stats or a dedicated field.
+          progress: 0,
+        }));
+
+        setProjects(mapped);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('Failed to load projects', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchProjects();
+  }, []);
 
   const filtered: Project[] = useMemo(() => {
     if (statusFilter === 'all') return projects;
     return projects.filter((p) => p.status === statusFilter);
   }, [projects, statusFilter]);
 
-  const handleView = (id: string): void => {
-    router.push(`/keenkonnect/projects/${id}`);
+  const handleView = (id: number): void => {
+    router.push(`/keenkonnect/projects/project-workspace?projectId=${id}`);
   };
 
-  const handleEdit = (id: string): void => {
-    router.push(`/keenkonnect/projects/${id}/edit`);
+  const handleEdit = (id: number): void => {
+    // Placeholder: adapt when you add an edit page
+    router.push(`/keenkonnect/projects/project-workspace?projectId=${id}`);
   };
 
-  const handleLaunch = (id: string): void => {
-    router.push(`/keenkonnect/projects/${id}/launch`);
+  const handleLaunch = (id: number): void => {
+    router.push(`/keenkonnect/projects/project-workspace?projectId=${id}`);
   };
 
   const statusColors: Record<
     ProjectStatus,
     'default' | 'processing' | 'success' | 'warning' | 'error'
   > = {
-    draft: 'default',
-    active: 'success',
-    archived: 'warning',
+    idea: 'default',
+    progress: 'processing',
+    completed: 'success',
+    validated: 'success',
   };
 
   const columns: ProColumns<Project>[] = [
@@ -100,8 +130,8 @@ export default function MyProjectsPage(): JSX.Element {
         <Space direction="vertical" size={0}>
           <Text strong>{record.name}</Text>
           <Space size="small">
-            <Tag icon={<TeamOutlined />}>{record.members} members</Tag>
-            <Text type="secondary">Owner: {record.owner}</Text>
+            <Tag icon={<TeamOutlined />}>Owner: {record.owner || 'Unknown'}</Tag>
+            <Tag>{record.category}</Tag>
           </Space>
         </Space>
       ),
@@ -112,12 +142,15 @@ export default function MyProjectsPage(): JSX.Element {
       key: 'status',
       valueType: 'select',
       valueEnum: {
-        draft: { text: 'Draft' },
-        active: { text: 'Active' },
-        archived: { text: 'Archived' },
+        idea: { text: 'Idea' },
+        progress: { text: 'In progress' },
+        completed: { text: 'Completed' },
+        validated: { text: 'Validated' },
       },
       render: (_, record) => (
-        <Tag color={statusColors[record.status]}>{record.status}</Tag>
+        <Tag color={statusColors[record.status]}>
+          {record.status === 'progress' ? 'In progress' : record.status}
+        </Tag>
       ),
     },
     {
@@ -125,7 +158,6 @@ export default function MyProjectsPage(): JSX.Element {
       dataIndex: 'progress',
       key: 'progress',
       width: 200,
-      // IMPORTANT : on utilise (_, record) pour respecter la signature ProColumns
       render: (_, record) => (
         <Progress
           percent={record.progress}
@@ -199,6 +231,12 @@ export default function MyProjectsPage(): JSX.Element {
 
   return (
     <div>
+      {loading && (
+        <div style={{ textAlign: 'center', marginBottom: 16 }}>
+          <Spin />
+        </div>
+      )}
+
       <ProTable<Project>
         rowKey="id"
         headerTitle="My Projects"
@@ -207,6 +245,7 @@ export default function MyProjectsPage(): JSX.Element {
         pagination={{ pageSize: 10 }}
         search={false}
         options={false}
+        loading={loading}
         cardBordered
         toolBarRender={() => [
           <Space key="filters" align="center">
@@ -214,12 +253,13 @@ export default function MyProjectsPage(): JSX.Element {
             <Select<ProjectStatus | 'all'>
               value={statusFilter}
               onChange={(value) => setStatusFilter(value)}
-              style={{ width: 180 }}
+              style={{ width: 220 }}
             >
-              <Select.Option value="all">All</Select.Option>
-              <Select.Option value="draft">Draft</Select.Option>
-              <Select.Option value="active">Active</Select.Option>
-              <Select.Option value="archived">Archived</Select.Option>
+              <Option value="all">All</Option>
+              <Option value="idea">Idea</Option>
+              <Option value="progress">In progress</Option>
+              <Option value="completed">Completed</Option>
+              <Option value="validated">Validated</Option>
             </Select>
           </Space>,
           <Button
