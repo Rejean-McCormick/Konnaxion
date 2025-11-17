@@ -1,3 +1,4 @@
+# config/api_router.py
 """
 Central DRF router for every Konnaxion v14 API endpoint.
 `config/urls.py` only needs:
@@ -25,8 +26,15 @@ from konnaxion.keenkonnect.api_views import ProjectViewSet
 # ── Kollective Intelligence ───────────────────────────────
 from konnaxion.kollective_intelligence.api_views import VoteViewSet
 
-# ── KonnectED (Knowledge-library) ─────────────────────────
-from konnaxion.konnected.api_views import KnowledgeResourceViewSet
+# ── KonnectED (Knowledge + CertifiKation) ─────────────────
+from konnaxion.konnected.api_views import (
+    KnowledgeResourceViewSet,
+    CertificationPathViewSet,
+    EvaluationViewSet,
+    PeerValidationViewSet,
+    PortfolioViewSet,
+    ExamAttemptViewSet,
+)
 
 # ── Kreative ──────────────────────────────────────────────
 from konnaxion.kreative.api_views import KreativeArtworkViewSet, GalleryViewSet
@@ -52,8 +60,35 @@ router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-pr
 # Kollective Intelligence
 router.register("kollective/votes", VoteViewSet, basename="kollective-vote")
 
-# KonnectED
+# KonnectED – Knowledge
 router.register("konnected/resources", KnowledgeResourceViewSet, basename="konnected-resource")
+
+# KonnectED – CertifiKation
+router.register(
+    "konnected/certifications/paths",
+    CertificationPathViewSet,
+    basename="konnected-certification-path",
+)
+router.register(
+    "konnected/certifications/evaluations",
+    EvaluationViewSet,
+    basename="konnected-evaluation",
+)
+router.register(
+    "konnected/certifications/peer-validations",
+    PeerValidationViewSet,
+    basename="konnected-peer-validation",
+)
+router.register(
+    "konnected/portfolios",
+    PortfolioViewSet,
+    basename="konnected-portfolio",
+)
+router.register(
+    "konnected/certifications/exam-attempts",
+    ExamAttemptViewSet,
+    basename="konnected-exam-attempt",
+)
 
 # Kreative
 router.register("kreative/artworks",  KreativeArtworkViewSet, basename="kreative-artwork")

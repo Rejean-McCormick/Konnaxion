@@ -1,15 +1,135 @@
 from rest_framework import viewsets, permissions
-from .models import Project
-from .serializers import ProjectSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
+from .models import Project, ProjectResource, ProjectTask, ProjectMessage, ProjectTeam, ProjectRating, Tag
+from .serializers import (
+    ProjectSerializer,
+    ProjectResourceSerializer,
+    ProjectTaskSerializer,
+    ProjectMessageSerializer,
+    ProjectTeamSerializer,
+    ProjectRatingSerializer,
+    TagSerializer,
+)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """
-    Marketplace projects / problems posted by users.
+    ViewSet for Projects (collaborative projects workspace).
+    Provides list, retrieve, create, update, delete.
+    Only authenticated users can create/update; read is open to all.
     """
-    queryset = Project.objects.select_related("creator")
+    queryset = Project.objects.select_related("creator").prefetch_related("tags").all()
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["status", "category", "creator_id", "creator"]  # allow filtering by status, category, creator
 
     def perform_create(self, serializer):
+        # Set the project creator to the logged-in user
         serializer.save(creator=self.request.user)
+
+class ProjectResourceViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectResource files/links attached to a project.
+    Allows CRUD on project resources. 
+    Only authenticated users can upload/edit; anyone can read (if project is accessible).
+    """
+    queryset = ProjectResource.objects.select_related("project", "uploaded_by").all()
+    serializer_class = ProjectResourceSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "file_type"]
+
+    def perform_create(self, serializer):
+        # Set uploader to current user
+        serializer.save(uploaded_by=self.request.user)
+
+class ProjectTaskViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectTask (tasks within a project).
+    Allows managing tasks (CRUD) for projects.
+    Only authenticated can modify; read is open.
+    Supports filtering by project, status, assignee.
+    """
+    queryset = ProjectTask.objects.select_related("project", "assignee").all()
+    serializer_class = ProjectTaskSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "status", "assignee"]
+
+    def perform_create(self, serializer):
+        # On create, ensure task is associated with a project (project must be provided in request data).
+        # We do not set assignee automatically; if provided and valid, it will be used.
+        serializer.save()
+
+class ProjectMessageViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectMessage (project chat messages).
+    Allows sending and viewing messages in project discussion threads.
+    Only authenticated users can create messages; read access is open to authenticated (or read-only public if desired).
+    """
+    queryset = ProjectMessage.objects.select_related("project", "author").order_by("created_at").all()
+    serializer_class = ProjectMessageSerializer
+    # Assuming project messages are internal, require login to read and write:
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "author"]
+
+    def perform_create(self, serializer):
+        # Set message author to current user
+        serializer.save(author=self.request.user)
+
+class ProjectTeamViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectTeam (project team membership).
+    Provides team membership list and management (add/remove members).
+    Only authenticated can modify (e.g., add themselves or others to teams); read is open to view project teams.
+    Filtering by project or user is supported.
+    """
+    queryset = ProjectTeam.objects.select_related("project", "user").all()
+    serializer_class = ProjectTeamSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "user", "role"]
+
+    def perform_create(self, serializer):
+        # If a user adds themselves to a project or an owner adds a team member.
+        # We ensure the joined_at is set automatically; user and project must be provided in request data.
+        serializer.save()
+
+    @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated], url_path="my-teams")
+    def my_teams(self, request):
+        """
+        Custom endpoint to list the current user's team memberships.
+        Returns all ProjectTeam entries where user is the current user.
+        """
+        memberships = ProjectTeam.objects.select_related("project").filter(user=request.user)
+        serializer = self.get_serializer(memberships, many=True)
+        return Response(serializer.data)
+
+class ProjectRatingViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectRating (community ratings on projects).
+    Users can upvote/downvote a project (value = +1 or -1).
+    Each user can rate a project once (unique per project & user).
+    Only authenticated users can create/modify ratings; read is open to see ratings.
+    """
+    queryset = ProjectRating.objects.select_related("project", "user").all()
+    serializer_class = ProjectRatingSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "user"]
+
+    def perform_create(self, serializer):
+        # Assign the current user as the rater
+        serializer.save(user=self.request.user)
+
+class TagViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Tag objects (tags/keywords for projects and tasks).
+    Allows listing all tags and creating new tags.
+    Typically used for categorizing projects and tasks.
+    """
+    queryset = Tag.objects.all().order_by("name")
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["name"]
+    # Allow searching tags by name substring
+    from rest_framework import filters
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]

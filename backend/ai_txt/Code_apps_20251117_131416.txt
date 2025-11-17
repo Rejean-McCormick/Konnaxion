@@ -1,4 +1,4 @@
-===== TOC (76 fichiers) =====
+===== TOC (82 fichiers) =====
 0001  C:\MyCode\Konnaxionv14\backend\konnaxion\__init__.py
 0002  C:\MyCode\Konnaxionv14\backend\konnaxion\conftest.py
 0003  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\__init__.py
@@ -39,42 +39,48 @@
 0038  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\models.py
 0039  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\serializers.py
 0040  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\views.py
-0041  C:\MyCode\Konnaxionv14\backend\konnaxion\static\css\project.css
-0042  C:\MyCode\Konnaxionv14\backend\konnaxion\static\fonts\.gitkeep
-0043  C:\MyCode\Konnaxionv14\backend\konnaxion\static\js\project.js
-0044  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403.html
-0045  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403_csrf.html
-0046  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\404.html
-0047  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\500.html
-0048  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\account\base_manage_password.html
-0049  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\alert.html
-0050  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\badge.html
-0051  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\button.html
-0052  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\field.html
-0053  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\fields.html
-0054  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\panel.html
-0055  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\table.html
-0056  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\entrance.html
-0057  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\manage.html
-0058  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\base.html
-0059  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\about.html
-0060  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\home.html
-0061  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_detail.html
-0062  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_form.html
-0063  C:\MyCode\Konnaxionv14\backend\konnaxion\urls.py
-0064  C:\MyCode\Konnaxionv14\backend\konnaxion\users\__init__.py
-0065  C:\MyCode\Konnaxionv14\backend\konnaxion\users\adapters.py
-0066  C:\MyCode\Konnaxionv14\backend\konnaxion\users\admin.py
-0067  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\__init__.py
-0068  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\serializers.py
-0069  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\views.py
-0070  C:\MyCode\Konnaxionv14\backend\konnaxion\users\apps.py
-0071  C:\MyCode\Konnaxionv14\backend\konnaxion\users\context_processors.py
-0072  C:\MyCode\Konnaxionv14\backend\konnaxion\users\forms.py
-0073  C:\MyCode\Konnaxionv14\backend\konnaxion\users\models.py
-0074  C:\MyCode\Konnaxionv14\backend\konnaxion\users\tasks.py
-0075  C:\MyCode\Konnaxionv14\backend\konnaxion\users\urls.py
-0076  C:\MyCode\Konnaxionv14\backend\konnaxion\users\views.py
+0041  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\artworks\artwork_0.png
+0042  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\artworks\artwork_1.png
+0043  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\artworks\artwork_2.png
+0044  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\traditions\tradition_0.png
+0045  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\traditions\tradition_1.png
+0046  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\traditions\tradition_2.png
+0047  C:\MyCode\Konnaxionv14\backend\konnaxion\static\css\project.css
+0048  C:\MyCode\Konnaxionv14\backend\konnaxion\static\fonts\.gitkeep
+0049  C:\MyCode\Konnaxionv14\backend\konnaxion\static\js\project.js
+0050  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403.html
+0051  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403_csrf.html
+0052  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\404.html
+0053  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\500.html
+0054  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\account\base_manage_password.html
+0055  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\alert.html
+0056  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\badge.html
+0057  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\button.html
+0058  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\field.html
+0059  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\fields.html
+0060  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\panel.html
+0061  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\table.html
+0062  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\entrance.html
+0063  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\manage.html
+0064  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\base.html
+0065  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\about.html
+0066  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\home.html
+0067  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_detail.html
+0068  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_form.html
+0069  C:\MyCode\Konnaxionv14\backend\konnaxion\urls.py
+0070  C:\MyCode\Konnaxionv14\backend\konnaxion\users\__init__.py
+0071  C:\MyCode\Konnaxionv14\backend\konnaxion\users\adapters.py
+0072  C:\MyCode\Konnaxionv14\backend\konnaxion\users\admin.py
+0073  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\__init__.py
+0074  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\serializers.py
+0075  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\views.py
+0076  C:\MyCode\Konnaxionv14\backend\konnaxion\users\apps.py
+0077  C:\MyCode\Konnaxionv14\backend\konnaxion\users\context_processors.py
+0078  C:\MyCode\Konnaxionv14\backend\konnaxion\users\forms.py
+0079  C:\MyCode\Konnaxionv14\backend\konnaxion\users\models.py
+0080  C:\MyCode\Konnaxionv14\backend\konnaxion\users\tasks.py
+0081  C:\MyCode\Konnaxionv14\backend\konnaxion\users\urls.py
+0082  C:\MyCode\Konnaxionv14\backend\konnaxion\users\views.py
 ===== END TOC =====
 
 
@@ -773,20 +779,140 @@ for model in app_config.get_models():
 
 ===== BEGIN konnaxion/keenkonnect/api_views.py =====
 from rest_framework import viewsets, permissions
-from .models import Project
-from .serializers import ProjectSerializer
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
+from .models import Project, ProjectResource, ProjectTask, ProjectMessage, ProjectTeam, ProjectRating, Tag
+from .serializers import (
+    ProjectSerializer,
+    ProjectResourceSerializer,
+    ProjectTaskSerializer,
+    ProjectMessageSerializer,
+    ProjectTeamSerializer,
+    ProjectRatingSerializer,
+    TagSerializer,
+)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     """
-    Marketplace projects / problems posted by users.
+    ViewSet for Projects (collaborative projects workspace).
+    Provides list, retrieve, create, update, delete.
+    Only authenticated users can create/update; read is open to all.
     """
-    queryset = Project.objects.select_related("creator")
+    queryset = Project.objects.select_related("creator").prefetch_related("tags").all()
     serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["status", "category", "creator_id", "creator"]  # allow filtering by status, category, creator
 
     def perform_create(self, serializer):
+        # Set the project creator to the logged-in user
         serializer.save(creator=self.request.user)
+
+class ProjectResourceViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectResource files/links attached to a project.
+    Allows CRUD on project resources. 
+    Only authenticated users can upload/edit; anyone can read (if project is accessible).
+    """
+    queryset = ProjectResource.objects.select_related("project", "uploaded_by").all()
+    serializer_class = ProjectResourceSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "file_type"]
+
+    def perform_create(self, serializer):
+        # Set uploader to current user
+        serializer.save(uploaded_by=self.request.user)
+
+class ProjectTaskViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectTask (tasks within a project).
+    Allows managing tasks (CRUD) for projects.
+    Only authenticated can modify; read is open.
+    Supports filtering by project, status, assignee.
+    """
+    queryset = ProjectTask.objects.select_related("project", "assignee").all()
+    serializer_class = ProjectTaskSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "status", "assignee"]
+
+    def perform_create(self, serializer):
+        # On create, ensure task is associated with a project (project must be provided in request data).
+        # We do not set assignee automatically; if provided and valid, it will be used.
+        serializer.save()
+
+class ProjectMessageViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectMessage (project chat messages).
+    Allows sending and viewing messages in project discussion threads.
+    Only authenticated users can create messages; read access is open to authenticated (or read-only public if desired).
+    """
+    queryset = ProjectMessage.objects.select_related("project", "author").order_by("created_at").all()
+    serializer_class = ProjectMessageSerializer
+    # Assuming project messages are internal, require login to read and write:
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "author"]
+
+    def perform_create(self, serializer):
+        # Set message author to current user
+        serializer.save(author=self.request.user)
+
+class ProjectTeamViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectTeam (project team membership).
+    Provides team membership list and management (add/remove members).
+    Only authenticated can modify (e.g., add themselves or others to teams); read is open to view project teams.
+    Filtering by project or user is supported.
+    """
+    queryset = ProjectTeam.objects.select_related("project", "user").all()
+    serializer_class = ProjectTeamSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "user", "role"]
+
+    def perform_create(self, serializer):
+        # If a user adds themselves to a project or an owner adds a team member.
+        # We ensure the joined_at is set automatically; user and project must be provided in request data.
+        serializer.save()
+
+    @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated], url_path="my-teams")
+    def my_teams(self, request):
+        """
+        Custom endpoint to list the current user's team memberships.
+        Returns all ProjectTeam entries where user is the current user.
+        """
+        memberships = ProjectTeam.objects.select_related("project").filter(user=request.user)
+        serializer = self.get_serializer(memberships, many=True)
+        return Response(serializer.data)
+
+class ProjectRatingViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for ProjectRating (community ratings on projects).
+    Users can upvote/downvote a project (value = +1 or -1).
+    Each user can rate a project once (unique per project & user).
+    Only authenticated users can create/modify ratings; read is open to see ratings.
+    """
+    queryset = ProjectRating.objects.select_related("project", "user").all()
+    serializer_class = ProjectRatingSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["project", "user"]
+
+    def perform_create(self, serializer):
+        # Assign the current user as the rater
+        serializer.save(user=self.request.user)
+
+class TagViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Tag objects (tags/keywords for projects and tasks).
+    Allows listing all tags and creating new tags.
+    Typically used for categorizing projects and tasks.
+    """
+    queryset = Tag.objects.all().order_by("name")
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["name"]
+    # Allow searching tags by name substring
+    from rest_framework import filters
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
 
 ===== END konnaxion/keenkonnect/api_views.py =====
 
@@ -925,19 +1051,82 @@ class Tag(models.Model):
 
 ===== BEGIN konnaxion/keenkonnect/serializers.py =====
 from rest_framework import serializers
-from .models import Project
+from .models import Project, ProjectResource, ProjectTask, ProjectMessage, ProjectTeam, ProjectRating, Tag
 
-__all__ = ["ProjectSerializer"]
-
+# Exported classes for import elsewhere
+__all__ = [
+    "ProjectSerializer",
+    "ProjectResourceSerializer",
+    "ProjectTaskSerializer",
+    "ProjectMessageSerializer",
+    "ProjectTeamSerializer",
+    "ProjectRatingSerializer",
+    "TagSerializer",
+]
 
 class ProjectSerializer(serializers.ModelSerializer):
-    # Affiche l'utilisateur créateur sous forme textuelle, non modifiable par l'API
+    """Serializer for collaborative Project objects."""
+    # Display creator username/string, read-only (set in view)
     creator = serializers.StringRelatedField(read_only=True)
-
+    # We include tags as primary key list (many-to-many). They will appear as a list of tag IDs.
+    # created_at and updated_at are auto timestamps, set read-only
     class Meta:
         model = Project
         fields = "__all__"
         read_only_fields = ("creator", "created_at", "updated_at")
+
+class ProjectResourceSerializer(serializers.ModelSerializer):
+    """Serializer for ProjectResource (documents/files linked to a project)."""
+    # Show uploader as string, assign in view on create
+    uploaded_by = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = ProjectResource
+        fields = "__all__"
+        read_only_fields = ("id", "uploaded_by", "uploaded_at", "version", "converted_path")
+
+class ProjectTaskSerializer(serializers.ModelSerializer):
+    """Serializer for a ProjectTask (to-do or milestone in a project)."""
+    # Show assignee username if present
+    assignee = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = ProjectTask
+        fields = "__all__"
+        read_only_fields = ("id", "created_at")  # creator implicitly the project owner, created_at auto
+
+class ProjectMessageSerializer(serializers.ModelSerializer):
+    """Serializer for a ProjectMessage (chat message in a project thread)."""
+    # Show author username, assign in view
+    author = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = ProjectMessage
+        fields = "__all__"
+        read_only_fields = ("id", "author", "created_at")
+
+class ProjectTeamSerializer(serializers.ModelSerializer):
+    """Serializer for ProjectTeam (project membership with role)."""
+    # Show user and project names for context
+    user = serializers.StringRelatedField(read_only=True)
+    project = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = ProjectTeam
+        fields = "__all__"
+        read_only_fields = ("id", "joined_at")
+
+class ProjectRatingSerializer(serializers.ModelSerializer):
+    """Serializer for ProjectRating (user rating/upvote on a project)."""
+    # Show rater username, assign in view
+    user = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = ProjectRating
+        fields = "__all__"
+        read_only_fields = ("id", "user", "created_at")
+
+class TagSerializer(serializers.ModelSerializer):
+    """Serializer for Tag (keyword) objects."""
+    class Meta:
+        model = Tag
+        fields = "__all__"
+        # All fields (id and name) are included; name is unique. No special read_only needed.
 
 ===== END konnaxion/keenkonnect/serializers.py =====
 
@@ -977,21 +1166,43 @@ for model in app_config.get_models():
 
 ===== BEGIN konnaxion/kollective_intelligence/api_views.py =====
 from rest_framework import viewsets, permissions
-from .models import Vote  # Only import real models
-from .serializers import VoteSerializer  # Only import real serializers
+from .models import Vote, VoteResult, VoteModality
+from .serializers import VoteSerializer, VoteResultSerializer, VoteModalitySerializer
 
 class VoteViewSet(viewsets.ModelViewSet):
     """
-    Weighted Smart-Vote cast on any target object (FK generic in the model).
+    ViewSet for casting Votes in the smart voting system.
+    Users can create a vote (with raw value, system computes weighted value).
+    Only authenticated users can vote; listing votes may be restricted.
     """
-    queryset = Vote.objects.select_related("user")
+    queryset = Vote.objects.select_related("user").all()
     serializer_class = VoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # must be logged in to cast or view votes
+    filterset_fields = ["user", "target_type", "target_id"]
 
     def perform_create(self, serializer):
+        # Assign current user as the voter
         serializer.save(user=self.request.user)
 
-# Remove ReputationViewSet entirely (no such model, no such serializer)
+class VoteResultViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Read-only ViewSet for VoteResult (aggregated results of votes for a target).
+    Allows retrieving aggregated scores for content.
+    """
+    queryset = VoteResult.objects.all()
+    serializer_class = VoteResultSerializer
+    permission_classes = [permissions.AllowAny]  # anyone can view vote results
+    filterset_fields = ["target_type", "target_id"]
+
+class VoteModalityViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for VoteModality (voting mode definitions).
+    Typically managed by admins to define how votes are weighted.
+    """
+    queryset = VoteModality.objects.all()
+    serializer_class = VoteModalitySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["name"]
 
 ===== END konnaxion/kollective_intelligence/api_views.py =====
 
@@ -1161,23 +1372,37 @@ class IntegrationMapping(models.Model):
 
 
 ===== BEGIN konnaxion/kollective_intelligence/serializers.py =====
-# konnaxion/kollective_intelligence/serializers.py
 from rest_framework import serializers
-from .models import Vote   # import real models only
+from .models import Vote, VoteResult, VoteModality
 
-__all__ = ["VoteSerializer"]            # export what actually exists
+__all__ = ["VoteSerializer", "VoteResultSerializer", "VoteModalitySerializer"]
 
 class VoteSerializer(serializers.ModelSerializer):
     """
-    Serialises the core Smart-Vote record.
-
-    Fields mirror the Vote model exactly as defined in v14:
-        id, user, target_type, target_id, raw_value, weighted_value, voted_at
+    Serializer for Vote (individual vote record with raw and weighted values).
     """
     user = serializers.StringRelatedField(read_only=True)
-
     class Meta:
-        model  = Vote
+        model = Vote
+        fields = "__all__"
+        read_only_fields = ("id", "user", "voted_at")
+
+class VoteResultSerializer(serializers.ModelSerializer):
+    """
+    Serializer for VoteResult (aggregated vote totals for a target object).
+    Read-only - these results are typically computed, not created via API.
+    """
+    class Meta:
+        model = VoteResult
+        fields = "__all__"
+        read_only_fields = ("id",)  # all fields should be read-only in practice
+
+class VoteModalitySerializer(serializers.ModelSerializer):
+    """
+    Serializer for VoteModality (definition of a voting mode and its parameters).
+    """
+    class Meta:
+        model = VoteModality
         fields = "__all__"
 
 ===== END konnaxion/kollective_intelligence/serializers.py =====
@@ -1211,10 +1436,36 @@ for model in app_config.get_models():
 
 ===== BEGIN konnaxion/konnected/api_views.py =====
 # konnaxion/konnected/api_views.py
-from rest_framework import viewsets, permissions
+from datetime import timedelta
 
-from .models import KnowledgeResource
-from .serializers import KnowledgeResourceSerializer
+from django.conf import settings
+from django.utils import timezone
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from .models import (
+    CertificationPath,
+    Evaluation,
+    KnowledgeResource,
+    PeerValidation,
+    Portfolio,
+)
+from .serializers import (
+    CertificationPathSerializer,
+    EvaluationSerializer,
+    ExamAttemptSerializer,
+    KnowledgeResourceSerializer,
+    PeerValidationSerializer,
+    PortfolioSerializer,
+)
+
+# ---------------------------------------------------------------------------
+# Global parameters – aligned with v14 Global Parameter Reference
+# ---------------------------------------------------------------------------
+
+CERT_PASS_PERCENT: int = getattr(settings, "CERT_PASS_PERCENT", 80)
+QUIZ_RETRY_COOLDOWN_MIN: int = getattr(settings, "QUIZ_RETRY_COOLDOWN_MIN", 30)
 
 
 class KnowledgeResourceViewSet(viewsets.ModelViewSet):
@@ -1225,16 +1476,470 @@ class KnowledgeResourceViewSet(viewsets.ModelViewSet):
     The model follows v14 spec:
         id, title, type, url, author, created_at, updated_at
     """
-    queryset = (
-        KnowledgeResource.objects
-        .select_related("author")        # eager-load author for list/detail
-    )
+    queryset = KnowledgeResource.objects.select_related("author")
     serializer_class = KnowledgeResourceSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def perform_create(self, serializer):
         # Record the authenticated user as the author
         serializer.save(author=self.request.user)
+
+
+# ---------------------------------------------------------------------------
+#  CertifiKation – Certification paths + exam attempts
+# ---------------------------------------------------------------------------
+
+
+class CertificationPathViewSet(viewsets.ModelViewSet):
+    """
+    CRUD endpoints for certification / learning paths.
+
+    Base routes (mounted under /api/):
+
+        GET  /konnected/certifications/paths/
+        POST /konnected/certifications/paths/
+        GET  /konnected/certifications/paths/{id}/
+        ...
+
+    Extra actions (for Exam Registration page):
+
+        GET /konnected/certifications/paths/{id}/eligibility/
+        GET /konnected/certifications/paths/{id}/sessions/
+    """
+    queryset = CertificationPath.objects.all().order_by("name")
+    serializer_class = CertificationPathSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="eligibility",
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def eligibility(self, request, pk=None):
+        """
+        Returns whether the current user may register a new exam for this path.
+
+        Response shape matches ExamEligibility in the frontend:
+            { "already_passed": bool, "cooldown_remaining_minutes": number }
+        """
+        path = self.get_object()
+        user = request.user
+
+        evaluations = (
+            Evaluation.objects.filter(user=user, path=path)
+            .order_by("-created_at")
+        )
+
+        already_passed = False
+        cooldown_remaining = 0
+
+        if evaluations:
+            last_eval = evaluations[0]
+            score = last_eval.raw_score
+            metadata = last_eval.metadata or {}
+            pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+
+            if score is not None and score >= pass_threshold:
+                already_passed = True
+            else:
+                # Respect retry cooldown from the last attempt
+                delta_minutes = (timezone.now() - last_eval.created_at).total_seconds() / 60.0
+                if delta_minutes < QUIZ_RETRY_COOLDOWN_MIN:
+                    cooldown_remaining = int(
+                        max(0, round(QUIZ_RETRY_COOLDOWN_MIN - delta_minutes))
+                    )
+
+        return Response(
+            {
+                "already_passed": already_passed,
+                "cooldown_remaining_minutes": cooldown_remaining,
+            }
+        )
+
+    @action(
+        detail=True,
+        methods=["get"],
+        url_path="sessions",
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def sessions(self, request, pk=None):
+        """
+        Returns upcoming exam sessions for this certification path.
+
+        v14 does not yet define a persistent ExamSession model, so this
+        implementation returns a small synthetic schedule based on the
+        current time. You can replace this with real DB-backed sessions
+        later without changing the endpoint contract.
+        """
+        now = timezone.now()
+        base_start = now + timedelta(days=3)
+
+        sessions = []
+        for index in range(3):
+            start = base_start + timedelta(days=7 * index)
+            end = start + timedelta(hours=2)
+            sessions.append(
+                {
+                    "id": index + 1,
+                    "start_at": start.isoformat(),
+                    "end_at": end.isoformat(),
+                    "timezone": "UTC",
+                    "modality": "online",
+                    "location": "Remote proctored",
+                    "capacity": 25,
+                    "seats_remaining": 25,
+                    "registration_deadline": (start - timedelta(days=1)).isoformat(),
+                }
+            )
+
+        return Response(sessions)
+
+
+class EvaluationViewSet(viewsets.ModelViewSet):
+    """
+    Stores exam / assessment attempts for certification paths.
+
+    Base routes (mounted under /api/):
+
+        GET  /konnected/certifications/evaluations/
+        POST /konnected/certifications/evaluations/
+        GET  /konnected/certifications/evaluations/{id}/
+        ...
+
+    The queryset is always scoped to the authenticated user.
+    """
+    serializer_class = EvaluationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Evaluation.objects.none()
+        return (
+            Evaluation.objects.filter(user=user)
+            .select_related("path", "user")
+            .order_by("-created_at")
+        )
+
+    def create(self, request, *args, **kwargs):
+        """
+        Custom create to map the Exam Registration payload into the model.
+
+        The frontend (Exam Registration page) typically POSTs:
+
+            {
+              "path_id":        number,
+              "session_id":     number,
+              "full_name":      string,
+              "agreed_terms":   boolean
+            }
+
+        We map:
+            - user  ← request.user
+            - path  ← CertificationPath(path_id)
+            - raw_score ← 0.0 (exam not taken yet)
+            - metadata ← remaining booking details
+        """
+        user = request.user
+        data = request.data
+
+        path_id = data.get("path_id")
+        if not path_id:
+            return Response(
+                {"detail": "path_id is required."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            path = CertificationPath.objects.get(pk=path_id)
+        except CertificationPath.DoesNotExist:
+            return Response(
+                {"detail": "Unknown certification path."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        metadata = {
+            "session_id": data.get("session_id"),
+            "full_name": data.get("full_name"),
+            "agreed_terms": data.get("agreed_terms"),
+            # Reasonable defaults that the dashboard can later read/override
+            "delivery_mode": "online",
+            "proctored": True,
+            "status": "scheduled",
+        }
+
+        evaluation = Evaluation.objects.create(
+            user=user,
+            path=path,
+            raw_score=0.0,
+            metadata=metadata,
+        )
+
+        serializer = self.get_serializer(evaluation)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+
+class PeerValidationViewSet(viewsets.ModelViewSet):
+    """
+    API for peer mentors to record validation decisions on evaluations.
+    """
+    serializer_class = PeerValidationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return PeerValidation.objects.none()
+        if user.is_staff:
+            return PeerValidation.objects.all().select_related("evaluation", "peer")
+        return PeerValidation.objects.filter(peer=user).select_related("evaluation", "peer")
+
+    def perform_create(self, serializer):
+        serializer.save(peer=self.request.user)
+
+
+class PortfolioViewSet(viewsets.ModelViewSet):
+    """
+    CRUD endpoints for user skill portfolios (collections of KnowledgeResources).
+    """
+    serializer_class = PortfolioSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if not user.is_authenticated:
+            return Portfolio.objects.none()
+        return Portfolio.objects.filter(user=user).prefetch_related("items")
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class ExamAttemptViewSet(viewsets.ViewSet):
+    """
+    Read-only endpoints backing the Exam Dashboard UI.
+
+    This ViewSet does not map to a single model; instead it aggregates
+    Evaluation + PeerValidation (and, optionally, certificates/portfolio)
+    into ExamAttemptSerializer records.
+
+    Mounted under /api/ as:
+
+        GET /konnected/certifications/exam-attempts/
+        GET /konnected/certifications/exam-attempts/me/
+        GET /konnected/certifications/exam-attempts/{id}/
+        POST /konnected/certifications/exam-attempts/{id}/appeal/
+        POST /konnected/certifications/exam-attempts/{id}/retry/
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def _build_attempt(self, evaluation: Evaluation, attempt_number: int) -> dict:
+        metadata = evaluation.metadata or {}
+        path = evaluation.path
+
+        score_percent = metadata.get("score_percent")
+        if score_percent is None and evaluation.raw_score is not None:
+            score_percent = float(evaluation.raw_score)
+
+        max_score = metadata.get("max_score")
+        delivery_mode = metadata.get("delivery_mode", "online")
+        proctored = bool(metadata.get("proctored", False))
+
+        status_value = metadata.get("status")
+        if not status_value:
+            # Derive a simple status when none is explicitly stored
+            if score_percent is None or score_percent == 0:
+                status_value = "scheduled"
+            elif score_percent >= CERT_PASS_PERCENT:
+                status_value = "passed"
+            else:
+                status_value = "failed"
+
+        peer_required = bool(metadata.get("peer_validation_required", False))
+
+        peer_status = None
+        if peer_required:
+            peer_qs = PeerValidation.objects.filter(evaluation=evaluation)
+            decisions = {pv.decision for pv in peer_qs}
+            if "approved" in decisions:
+                peer_status = "approved"
+            elif "rejected" in decisions:
+                peer_status = "rejected"
+            elif decisions:
+                peer_status = "pending"
+            else:
+                peer_status = "pending"
+
+        appeal_status = metadata.get("appeal_status", "none")
+
+        cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
+        next_retry_at = evaluation.created_at + cooldown_delta
+        now = timezone.now()
+        can_retry = status_value != "passed" and now >= next_retry_at
+
+        certificate_id = metadata.get("certificate_id")
+        certificate_url = metadata.get("certificate_url")
+        portfolio_item_id = metadata.get("portfolio_item_id")
+        portfolio_url = metadata.get("portfolio_url")
+
+        return {
+            "id": str(evaluation.pk),
+            "certificationPathId": str(path.pk),
+            "certificationPathName": path.name,
+            "attemptNumber": attempt_number,
+            "takenAt": evaluation.created_at,
+            "deliveryMode": delivery_mode,
+            "proctored": proctored,
+            "scorePercent": score_percent,
+            "maxScore": max_score,
+            "status": status_value,
+            "peerValidationRequired": peer_required,
+            "peerValidationStatus": peer_status,
+            "appealStatus": appeal_status,
+            "certificateId": certificate_id,
+            "certificateUrl": certificate_url,
+            "portfolioItemId": portfolio_item_id,
+            "portfolioUrl": portfolio_url,
+            "canRetry": can_retry,
+            # Only expose a concrete nextRetryAt while cooldown is active
+            "nextRetryAt": None if can_retry else next_retry_at,
+        }
+
+    def list(self, request):
+        """
+        Alias for `me()` – global listing of attempts for the current user.
+        """
+        return self.me(request)
+
+    @action(detail=False, methods=["get"], url_path="me")
+    def me(self, request):
+        """
+        Returns all exam attempts for the authenticated user across paths.
+
+        Response shape matches the ExamDashboard `ExamAttemptsResponse`:
+            { "attempts": ExamAttempt[] }
+        """
+        user = request.user
+        evaluations = (
+            Evaluation.objects.filter(user=user)
+            .select_related("path")
+            .order_by("path_id", "created_at", "pk")
+        )
+
+        attempts_payload = []
+        attempt_counter_by_path: dict[int, int] = {}
+
+        for evaluation in evaluations:
+            path_id = evaluation.path_id
+            attempt_counter_by_path[path_id] = attempt_counter_by_path.get(path_id, 0) + 1
+            attempt_number = attempt_counter_by_path[path_id]
+            attempts_payload.append(self._build_attempt(evaluation, attempt_number))
+
+        serializer = ExamAttemptSerializer(attempts_payload, many=True)
+        return Response({"attempts": serializer.data})
+
+    def retrieve(self, request, pk=None):
+        """
+        Detailed view of a single exam attempt belonging to the current user.
+        """
+        user = request.user
+        try:
+            evaluation = (
+                Evaluation.objects.select_related("path")
+                .get(pk=pk, user=user)
+            )
+        except Evaluation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        # Compute attempt number within this path
+        ordered = (
+            Evaluation.objects.filter(user=user, path=evaluation.path)
+            .order_by("created_at", "pk")
+        )
+        attempt_number = 1
+        for idx, ev in enumerate(ordered, start=1):
+            if ev.pk == evaluation.pk:
+                attempt_number = idx
+                break
+
+        payload = self._build_attempt(evaluation, attempt_number)
+        serializer = ExamAttemptSerializer(payload)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=["post"], url_path="appeal")
+    def appeal(self, request, pk=None):
+        """
+        Lightweight stub for opening an appeal on an evaluation.
+
+        For v14 we simply mark the evaluation's metadata and return
+        the updated attempt. A richer workflow (notifications, tasks)
+        can be layered on top later.
+        """
+        try:
+            evaluation = Evaluation.objects.get(pk=pk, user=request.user)
+        except Evaluation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        metadata = evaluation.metadata or {}
+        metadata["appeal_status"] = "open"
+        evaluation.metadata = metadata
+        evaluation.save(update_fields=["metadata", "updated_at"])
+
+        return self.retrieve(request, pk=pk)
+
+    @action(detail=True, methods=["post"], url_path="retry")
+    def retry(self, request, pk=None):
+        """
+        Helper that creates a new scheduled Evaluation for the same path,
+        subject to the configured cooldown.
+
+        This is used by the Exam Dashboard "Retry" action.
+        """
+        try:
+            source_eval = (
+                Evaluation.objects.select_related("path")
+                .get(pk=pk, user=request.user)
+            )
+        except Evaluation.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
+        if timezone.now() < source_eval.created_at + cooldown_delta:
+            return Response(
+                {"detail": "Retry cooldown is still active for this exam."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        base_metadata = source_eval.metadata or {}
+        new_metadata = {
+            **base_metadata,
+            "status": "scheduled",
+            "is_retry": True,
+        }
+
+        new_eval = Evaluation.objects.create(
+            user=request.user,
+            path=source_eval.path,
+            raw_score=0.0,
+            metadata=new_metadata,
+        )
+
+        # Compute attempt number for the newly created evaluation
+        ordered = (
+            Evaluation.objects.filter(user=request.user, path=source_eval.path)
+            .order_by("created_at", "pk")
+        )
+        attempt_number = 1
+        for idx, ev in enumerate(ordered, start=1):
+            if ev.pk == new_eval.pk:
+                attempt_number = idx
+                break
+
+        payload = self._build_attempt(new_eval, attempt_number)
+        serializer = ExamAttemptSerializer(payload)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 ===== END konnaxion/konnected/api_views.py =====
 
@@ -1379,9 +2084,23 @@ class LearningProgress(TimeStampedModel):
 ===== BEGIN konnaxion/konnected/serializers.py =====
 # konnaxion/konnected/serializers.py
 from rest_framework import serializers
-from .models import KnowledgeResource
 
-__all__ = ["KnowledgeResourceSerializer"]   # only export real serializers
+from .models import (
+    CertificationPath,
+    Evaluation,
+    PeerValidation,
+    Portfolio,
+    KnowledgeResource,
+)
+
+__all__ = [
+    "KnowledgeResourceSerializer",
+    "CertificationPathSerializer",
+    "EvaluationSerializer",
+    "PeerValidationSerializer",
+    "PortfolioSerializer",
+    "ExamAttemptSerializer",
+]
 
 
 class KnowledgeResourceSerializer(serializers.ModelSerializer):
@@ -1392,8 +2111,133 @@ class KnowledgeResourceSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
-        model  = KnowledgeResource
+        model = KnowledgeResource
         fields = "__all__"
+
+
+class CertificationPathSerializer(serializers.ModelSerializer):
+    """
+    Minimal representation of a certification / learning path.
+
+    v14 only stores basic metadata in the database (name, description…).
+    Any extra fields used by the frontend (level, tags, KPIs) can be
+    added later either as DB columns or via a CMS / enrichment layer.
+    """
+
+    class Meta:
+        model = CertificationPath
+        fields = "__all__"
+
+
+class EvaluationSerializer(serializers.ModelSerializer):
+    """
+    Stores a single evaluation / exam attempt for a user on a path.
+
+    The JSON `metadata` field is intentionally flexible and can contain:
+        - delivery_mode, proctored, status
+        - session_id, full_name, agreed_terms
+        - score_percent, max_score
+        - appeal_status, peer_validation_required, etc.
+    """
+    user = serializers.StringRelatedField(read_only=True)
+    path = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Evaluation
+        fields = "__all__"
+        read_only_fields = ("id", "user", "path", "created_at", "updated_at")
+
+
+class PeerValidationSerializer(serializers.ModelSerializer):
+    """
+    Peer mentor validation on a given evaluation.
+    """
+    peer = serializers.StringRelatedField(read_only=True)
+    evaluation = serializers.PrimaryKeyRelatedField(queryset=Evaluation.objects.all())
+
+    class Meta:
+        model = PeerValidation
+        fields = "__all__"
+        read_only_fields = ("id", "peer", "created_at", "updated_at")
+
+
+class PortfolioSerializer(serializers.ModelSerializer):
+    """
+    User skill portfolio – curated collection of KnowledgeResources.
+    """
+    user = serializers.StringRelatedField(read_only=True)
+    items = serializers.PrimaryKeyRelatedField(
+        queryset=KnowledgeResource.objects.all(),
+        many=True,
+        required=False,
+    )
+
+    class Meta:
+        model = Portfolio
+        fields = "__all__"
+        read_only_fields = ("id", "user", "created_at", "updated_at")
+
+
+class ExamAttemptSerializer(serializers.Serializer):
+    """
+    Read-only projection used by the Exam Dashboard UI.
+
+    This is *not* backed by a dedicated model; it aggregates data coming
+    from Evaluation (+ PeerValidation, Portfolio / certificates) into a
+    single flattened record.
+
+    It matches the shape used in:
+      app/konnected/certifications/exam-dashboard-results/page.tsx
+    """
+    id = serializers.CharField()
+    certificationPathId = serializers.CharField()
+    certificationPathName = serializers.CharField()
+    attemptNumber = serializers.IntegerField()
+    takenAt = serializers.DateTimeField()
+
+    deliveryMode = serializers.CharField()
+    proctored = serializers.BooleanField()
+
+    scorePercent = serializers.FloatField(allow_null=True)
+    maxScore = serializers.FloatField(allow_null=True, required=False)
+
+    status = serializers.CharField()
+    peerValidationRequired = serializers.BooleanField()
+    peerValidationStatus = serializers.CharField(
+        allow_null=True,
+        required=False,
+    )
+    appealStatus = serializers.CharField(
+        allow_null=True,
+        required=False,
+    )
+
+    certificateId = serializers.CharField(
+        allow_null=True,
+        allow_blank=True,
+        required=False,
+    )
+    certificateUrl = serializers.CharField(
+        allow_null=True,
+        allow_blank=True,
+        required=False,
+    )
+    portfolioItemId = serializers.CharField(
+        allow_null=True,
+        allow_blank=True,
+        required=False,
+    )
+    portfolioUrl = serializers.CharField(
+        allow_null=True,
+        allow_blank=True,
+        required=False,
+    )
+
+    canRetry = serializers.BooleanField()
+    nextRetryAt = serializers.DateTimeField(
+        allow_null=True,
+        required=False,
+    )
 
 ===== END konnaxion/konnected/serializers.py =====
 
@@ -1425,36 +2269,83 @@ for model in app_config.get_models():
 
 
 ===== BEGIN konnaxion/kreative/api_views.py =====
-# konnaxion/kreative/api_views.py
 from rest_framework import viewsets, permissions
-
-from .models import KreativeArtwork, Gallery
-from .serializers import KreativeArtworkSerializer, GallerySerializer
-
+from .models import KreativeArtwork, Gallery, CollabSession, TraditionEntry, Tag
+from .serializers import (
+    KreativeArtworkSerializer, GallerySerializer,
+    CollabSessionSerializer, TraditionEntrySerializer, TagSerializer
+)
 
 class KreativeArtworkViewSet(viewsets.ModelViewSet):
     """
-    CRUD for uploaded artworks (image / video / audio / other).
-    Matches the KreativeArtwork model in v14.
+    ViewSet for KreativeArtwork (creative artworks uploaded by users).
+    Users must be authenticated to list or create artworks (art content is members-only).
     """
-    queryset = KreativeArtwork.objects.select_related("artist")
+    queryset = KreativeArtwork.objects.select_related("artist").prefetch_related("tags").all()
     serializer_class = KreativeArtworkSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]  # Only logged-in users can view or upload artworks
+    filterset_fields = ["artist", "media_type", "year"]
 
     def perform_create(self, serializer):
+        # Set the artist (uploader) to current user
         serializer.save(artist=self.request.user)
-
 
 class GalleryViewSet(viewsets.ModelViewSet):
     """
-    Curated collections of artworks.
+    ViewSet for Gallery (collections of artworks).
+    Galleries can be viewed by anyone; only authenticated users can create (curate) galleries.
     """
-    queryset = Gallery.objects.select_related("created_by").prefetch_related("artworks")
+    queryset = Gallery.objects.select_related("created_by").prefetch_related("artworks").all()
     serializer_class = GallerySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["created_by", "theme"]
 
     def perform_create(self, serializer):
+        # Set the curator/creator of the gallery to current user
         serializer.save(created_by=self.request.user)
+
+class CollabSessionViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for CollabSession (live collaboration sessions for artists).
+    Allows listing ongoing or past sessions and starting new sessions.
+    Auth required to create a session; reading sessions is allowed to all (to discover sessions).
+    """
+    queryset = CollabSession.objects.select_related("host", "final_artwork").all()
+    serializer_class = CollabSessionSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["session_type", "host", "ended_at"]
+
+    def perform_create(self, serializer):
+        # Set the session host to the current user
+        serializer.save(host=self.request.user)
+
+class TraditionEntryViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for TraditionEntry (submissions of cultural traditions for preservation).
+    Anyone can view approved tradition entries; authenticated users can submit new entries.
+    """
+    queryset = TraditionEntry.objects.select_related("submitted_by", "approved_by").all()
+    serializer_class = TraditionEntrySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["approved", "region", "submitted_by"]
+
+    def perform_create(self, serializer):
+        # Set the submitter to current user
+        serializer.save(submitted_by=self.request.user)
+        # Note: Approval fields are read-only. Approval is handled by admins separately.
+
+class KreativeTagViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for Tag in Kreative app (tags for artworks).
+    Allows listing and creating tags for categorizing artworks.
+    """
+    queryset = Tag.objects.all().order_by("name")
+    serializer_class = TagSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filterset_fields = ["name"]
+    from rest_framework import filters
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ["name"]
 
 ===== END konnaxion/kreative/api_views.py =====
 
@@ -1719,37 +2610,60 @@ class CulturalPartner(models.Model):
 
 
 ===== BEGIN konnaxion/kreative/serializers.py =====
-# konnaxion/kreative/serializers.py
 from rest_framework import serializers
-from .models import KreativeArtwork, Gallery, Tag
+from .models import KreativeArtwork, Gallery, CollabSession, TraditionEntry, Tag
 
 __all__ = [
     "KreativeArtworkSerializer",
     "GallerySerializer",
+    "CollabSessionSerializer",
+    "TraditionEntrySerializer",
+    "TagSerializer",
 ]
 
 class TagSerializer(serializers.ModelSerializer):
+    """Serializer for Tag (artwork/tagging keyword)."""
     class Meta:
         model = Tag
         fields = "__all__"
 
-
 class KreativeArtworkSerializer(serializers.ModelSerializer):
+    """Serializer for KreativeArtwork (a creative artwork uploaded by a user)."""
     artist = serializers.StringRelatedField(read_only=True)
-    tags   = TagSerializer(many=True, read_only=True)
-
+    # Embed tag details read-only: list tags with id and name
+    tags = TagSerializer(many=True, read_only=True)
     class Meta:
-        model  = KreativeArtwork
+        model = KreativeArtwork
         fields = "__all__"
-
+        read_only_fields = ("id", "artist", "created_at")
 
 class GallerySerializer(serializers.ModelSerializer):
+    """Serializer for Gallery (a curated collection of artworks)."""
     created_by = serializers.StringRelatedField(read_only=True)
-    artworks   = KreativeArtworkSerializer(many=True, read_only=True)
-
+    # List artworks in the gallery with their details (read-only for output).
+    artworks = KreativeArtworkSerializer(many=True, read_only=True)
     class Meta:
-        model  = Gallery
+        model = Gallery
         fields = "__all__"
+        read_only_fields = ("id", "created_by", "created_at")
+
+class CollabSessionSerializer(serializers.ModelSerializer):
+    """Serializer for CollabSession (real-time collaboration session for creatives)."""
+    host = serializers.StringRelatedField(read_only=True)
+    final_artwork = serializers.PrimaryKeyRelatedField(queryset=KreativeArtwork.objects.all(), allow_null=True, required=False)
+    class Meta:
+        model = CollabSession
+        fields = "__all__"
+        read_only_fields = ("id", "host", "started_at", "ended_at")
+
+class TraditionEntrySerializer(serializers.ModelSerializer):
+    """Serializer for TraditionEntry (cultural heritage submission for preservation)."""
+    submitted_by = serializers.StringRelatedField(read_only=True)
+    approved_by = serializers.StringRelatedField(read_only=True)
+    class Meta:
+        model = TraditionEntry
+        fields = "__all__"
+        read_only_fields = ("id", "submitted_by", "submitted_at", "approved", "approved_by", "approved_at")
 
 ===== END konnaxion/kreative/serializers.py =====
 
@@ -1760,6 +2674,36 @@ from django.shortcuts import render
 # Create your views here.
 
 ===== END konnaxion/kreative/views.py =====
+
+
+===== BEGIN konnaxion/media/kreative/artworks/artwork_0.png =====
+dummy content
+===== END konnaxion/media/kreative/artworks/artwork_0.png =====
+
+
+===== BEGIN konnaxion/media/kreative/artworks/artwork_1.png =====
+dummy content
+===== END konnaxion/media/kreative/artworks/artwork_1.png =====
+
+
+===== BEGIN konnaxion/media/kreative/artworks/artwork_2.png =====
+dummy content
+===== END konnaxion/media/kreative/artworks/artwork_2.png =====
+
+
+===== BEGIN konnaxion/media/kreative/traditions/tradition_0.png =====
+dummy content
+===== END konnaxion/media/kreative/traditions/tradition_0.png =====
+
+
+===== BEGIN konnaxion/media/kreative/traditions/tradition_1.png =====
+dummy content
+===== END konnaxion/media/kreative/traditions/tradition_1.png =====
+
+
+===== BEGIN konnaxion/media/kreative/traditions/tradition_2.png =====
+dummy content
+===== END konnaxion/media/kreative/traditions/tradition_2.png =====
 
 
 ===== BEGIN konnaxion/static/css/project.css =====
