@@ -1,8 +1,8 @@
+// components/dashboard-components/index.tsx
 import UserCard from './UserCard'
 import VisitCard from './VisitCard'
 import LikeCard from './LikeCard'
 import CommentCard from './CommentCard'
-import SculptureTable from './SculptureTable'
 import UserPieChart from './UserPieChart'
 import { ColStyled } from './style'
 
@@ -11,7 +11,6 @@ export {
   VisitCard,
   LikeCard,
   CommentCard,
-  SculptureTable,
   UserPieChart,
-  ColStyled
+  ColStyled,
 }

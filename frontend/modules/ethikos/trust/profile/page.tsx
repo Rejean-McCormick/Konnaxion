@@ -1,37 +1,73 @@
-'use client'
+'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Avatar, Descriptions, Tag, Timeline } from 'antd';
+import { Avatar, Descriptions, Tag, Timeline, Typography } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchUserProfile } from '@/services/trust';
+import { fetchUserProfile, type ReputationProfile } from '@/services/trust';
+
+const { Text } = Typography;
 
 export default function MyProfile() {
   usePageTitle('Trust · My Profile');
 
-  const { data, loading } = useRequest(fetchUserProfile);
+  // ahooks generics: <Data, Params>
+  const { data, loading } = useRequest<ReputationProfile, []>(fetchUserProfile);
+
+  const level = data?.level ?? 'Visitor';
+  const score = data?.score ?? 0;
+  const dimensions = data?.dimensions ?? [];
+  const recent = data?.recent ?? [];
+
+  const initial = level.charAt(0);
 
   return (
     <PageContainer ghost loading={loading}>
       <ProCard split="vertical">
+        {/* Left column: compact summary */}
         <ProCard colSpan="25%">
-          <Avatar size={120} src={data?.avatar ?? undefined} />
+          <Avatar size={120}>{initial}</Avatar>
+
           <Descriptions size="small" column={1} style={{ marginTop: 16 }}>
-            <Descriptions.Item label="Name">{data?.name}</Descriptions.Item>
-            <Descriptions.Item label="Joined">{data?.joined}</Descriptions.Item>
-            <Descriptions.Item label="Reputation">
-              <Tag color="blue">{data?.score}</Tag>
+            <Descriptions.Item label="Level">
+              <Tag color="blue">{level}</Tag>
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Reputation score">
+              <Text>{score}</Text>
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Dimensions">
+              {dimensions.length ? (
+                dimensions.map((d) => (
+                  <Tag key={d.key} style={{ marginBottom: 4 }}>
+                    {d.label}: {d.score}
+                  </Tag>
+                ))
+              ) : (
+                <Text type="secondary">No reputation data yet</Text>
+              )}
             </Descriptions.Item>
           </Descriptions>
         </ProCard>
+
+        {/* Right column: recent activity derived from `recent` */}
         <ProCard title="Recent Activity" ghost>
-          <Timeline>
-            {data?.activity?.map((a) => (
-              <Timeline.Item key={a.id}>
-                {a.when} · {a.text}
-              </Timeline.Item>
-            ))}
-          </Timeline>
+          {recent.length ? (
+            <Timeline>
+              {recent.map((item, idx) => (
+                <Timeline.Item
+                  key={idx}
+                  color={item.change >= 0 ? 'green' : 'red'}
+                >
+                  {item.label} · {item.change >= 0 ? '+' : ''}
+                  {item.change}
+                </Timeline.Item>
+              ))}
+            </Timeline>
+          ) : (
+            <Text type="secondary">No recent activity</Text>
+          )}
         </ProCard>
       </ProCard>
     </PageContainer>

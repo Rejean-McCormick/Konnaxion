@@ -1,33 +1,43 @@
-'use client'
+'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Badge, Card, Progress, Tooltip } from 'antd';
+import { Badge as AntBadge, Card, Empty } from 'antd';
 import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchUserBadges } from '@/services/trust';
+import type { Badge as UserBadge } from '@/services/trust';
 
 export default function Badges() {
   usePageTitle('Trust · Badges');
 
-  const { data, loading } = useRequest(fetchUserBadges);
+  // ✅ FIX: add second generic argument `[]`
+  const { data, loading } = useRequest<UserBadge[], []>(fetchUserBadges);
+  const badges = data ?? [];
 
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.earned?.map((b) => (
-          <Badge.Ribbon text="Earned" color="green" key={b.id}>
-            <Card title={b.name} style={{ width: 220, marginBottom: 16 }}>
-              <p>{b.desc}</p>
-            </Card>
-          </Badge.Ribbon>
-        ))}
+        {!loading && badges.length === 0 && (
+          <Empty description="No badges earned yet" />
+        )}
 
-        {data?.progress?.map((p) => (
-          <Tooltip title={`${p.current}/${p.required}`} key={p.id}>
-            <Card title={p.name} bordered={false} style={{ width: 220, marginBottom: 16 }}>
-              <Progress percent={Math.round((p.current / p.required) * 100)} />
+        {badges.map((badge) => (
+          <AntBadge.Ribbon
+            text={dayjs(badge.earnedAt).format('MMM D, YYYY')}
+            color="green"
+            key={badge.id}
+          >
+            <Card
+              title={badge.label}
+              style={{ width: 260, marginBottom: 16 }}
+            >
+              <p>{badge.description}</p>
+              <p style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
+                Earned on {dayjs(badge.earnedAt).format('MMM D, YYYY')}
+              </p>
             </Card>
-          </Tooltip>
+          </AntBadge.Ribbon>
         ))}
       </ProCard>
     </PageContainer>

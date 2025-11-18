@@ -83,14 +83,15 @@ function buildDailySeries<T>(
 ): DailyPoint[] {
   const now = dayjs()
   const start = now.startOf('day').subtract(days - 1, 'day')
-  const counts = new Array<number>(days).fill(0)
+  const counts: number[] = new Array<number>(days).fill(0)
 
   for (const item of items) {
     const d = dayjs(getDate(item))
     if (d.isBefore(start) || d.isAfter(now)) continue
     const offset = d.startOf('day').diff(start, 'day')
     if (offset >= 0 && offset < days) {
-      counts[offset] += 1
+      const current = counts[offset] ?? 0
+      counts[offset] = current + 1
     }
   }
 
@@ -98,7 +99,7 @@ function buildDailySeries<T>(
   for (let i = 0; i < days; i += 1) {
     series.push({
       date: start.add(i, 'day').toISOString(),
-      value: counts[i],
+      value: counts[i] ?? 0,
     })
   }
   return series
@@ -106,9 +107,15 @@ function buildDailySeries<T>(
 
 function percentDelta(series: DailyPoint[]): number | undefined {
   if (series.length < 2) return undefined
-  const latest = series[series.length - 1].value
-  const previous = series[series.length - 2].value
+
+  const latestPoint = series[series.length - 1]
+  const previousPoint = series[series.length - 2]
+  if (!latestPoint || !previousPoint) return undefined
+
+  const latest = latestPoint.value
+  const previous = previousPoint.value
   if (previous === 0) return undefined
+
   return Math.round(((latest - previous) / previous) * 100)
 }
 
@@ -122,6 +129,7 @@ function buildStanceHeatmap(stances: EthikosStanceApi[]) {
   const result: { day: string; hour: number; value: number }[] = []
   bucket.forEach((value, key) => {
     const [day, hourStr] = key.split('-')
+    if (!day || !hourStr) return
     result.push({ day, hour: Number(hourStr), value })
   })
   return result

@@ -1,228 +1,335 @@
 // app/ethikos/decide/public/page.tsx
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import React, { useMemo, useState } from 'react';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import { Select, Space, Input, Progress, Radio, Slider, message } from 'antd';
+import {
+  Alert,
+  Button,
+  Empty,
+  Input,
+  Progress,
+  Radio,
+  Slider,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+  message,
+} from 'antd';
 import type { RadioChangeEvent } from 'antd';
+import { InfoCircleOutlined, ThunderboltOutlined, SyncOutlined } from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
 import usePageTitle from '@/hooks/usePageTitle';
+import {
+  fetchPublicBallots,
+  submitPublicVote,
+  type PublicBallot,
+  type PublicBallotResponse,
+} from '@/services/decide';
 
-type Format = 'SINGLE' | 'MULTIPLE' | 'SCALE';
+const { Title, Paragraph } = Typography;
 
-export interface PublicTopic {
-  id: string | number;
-  question: string;
-  category: string;
-  responseformat_id: number; // 1 = binary, 2 = multiple, 3 = scale
-  options?: string[];        // SINGLE/MULTIPLE
-  labels?: string[];         // SCALE
-  turnout?: number;          // 0..100
+type BallotRow = PublicBallot;
+type QuickFilter = 'all' | 'closing-soon' | 'high-turnout';
+
+type SelectionMap = Record<string, string | undefined>;
+
+const DEFAULT_SCALE_OPTIONS = [
+  'Strongly disagree',
+  'Disagree',
+  'Neutral',
+  'Agree',
+  'Strongly agree',
+];
+
+const PAGE_SIZE = 8;
+
+function resolveOptions(ballot: BallotRow): string[] {
+  if (Array.isArray(ballot.options) && ballot.options.length > 0) {
+    return ballot.options;
+  }
+  return DEFAULT_SCALE_OPTIONS;
 }
 
-interface PagedResult<T> {
-  results: T[];
-  count: number;
-}
+export default function PublicVotingPage(): JSX.Element {
+  usePageTitle('Decide · Public Voting');
 
-export default function PublicVotePage(): JSX.Element {
-  usePageTitle('Décider — Public');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
+  const [selectedOptions, setSelectedOptions] = useState<SelectionMap>({});
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
 
-  // --- UI state ---
-  const [page, setPage] = useState<number>(1);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [activeCat, setActiveCat] = useState<string | undefined>(undefined);
+  const { data, loading, refresh } = useRequest<PublicBallotResponse, []>(
+    fetchPublicBallots,
+  );
 
-  // --- data ---
-  const [categories, setCategories] = useState<string[]>([]);
-  const [topicsData, setTopicsData] = useState<PagedResult<PublicTopic> | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const ballots = data?.ballots ?? [];
 
-  // Load category filter values
-  useEffect(() => {
-    let mounted = true;
-    (async () => {
-      try {
-        const catsRes = await axios.get<string[]>('/api/home/categories/');
-        if (!mounted) return;
-        setCategories(Array.isArray(catsRes.data) ? catsRes.data : []);
-      } catch (e) {
-        console.warn('Failed to load categories', e);
+  const filteredBallots = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+    const now = dayjs();
+
+    return ballots.filter((ballot) => {
+      if (
+        normalizedSearch &&
+        !ballot.title.toLowerCase().includes(normalizedSearch)
+      ) {
+        return false;
       }
-    })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
 
-  // Fetch topics list
-  const fetchTopics = useCallback(async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get<PagedResult<PublicTopic>>('/api/home/debatetopic/', {
-        params: {
-          page,
-          q: searchTerm || undefined,
-          cat: activeCat || undefined,
-        },
-      });
-      setTopicsData(res.data);
-    } catch (e) {
-      message.error("Échec du chargement des sujets.");
-    } finally {
-      setLoading(false);
+      if (quickFilter === 'closing-soon') {
+        const closes = dayjs(ballot.closesAt);
+        if (!closes.isValid()) return false;
+        return closes.diff(now, 'hour') <= 48;
+      }
+
+      if (quickFilter === 'high-turnout') {
+        return (ballot.turnout ?? 0) >= 50;
+      }
+
+      return true;
+    });
+  }, [ballots, quickFilter, searchTerm]);
+
+  const handleRadioChange = (id: string, e: RadioChangeEvent) => {
+    const value = e.target.value as string;
+    setSelectedOptions((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSliderChange = (
+    id: string,
+    value: number | [number, number],
+    options: string[],
+  ) => {
+    const rawIndex = Array.isArray(value) ? value[0] : value;
+    if (!options.length) return;
+
+    const safeIndex = Math.min(options.length - 1, Math.max(0, rawIndex));
+    const option = options[safeIndex];
+
+    setSelectedOptions((prev) => ({ ...prev, [id]: option }));
+  };
+
+  const handleSubmitVote = async (id: string) => {
+    const option = selectedOptions[id];
+    if (!option) {
+      message.warning('Select a stance before casting your vote.');
+      return;
     }
-  }, [activeCat, page, searchTerm]);
 
-  useEffect(() => {
-    fetchTopics();
-  }, [fetchTopics]);
+    try {
+      setSubmittingId(id);
+      await submitPublicVote(id, option);
+      message.success('Your vote has been recorded.');
+      await refresh();
+    } catch {
+      message.error('Failed to submit your vote. Please try again.');
+    } finally {
+      setSubmittingId(null);
+    }
+  };
 
-  // Submit a vote (adapt the endpoint as needed)
-  const submitVote = useCallback(
-    async (topic: PublicTopic, value: string | string[] | number) => {
-      try {
-        await axios.post(`/api/home/debatetopic/${topic.id}/vote`, { value });
-        message.success('Vote enregistré');
-        fetchTopics(); // refresh after voting
-      } catch {
-        message.error("Impossible d'enregistrer le vote");
-      }
+  const columns: ProColumns<BallotRow>[] = [
+    {
+      title: 'Question',
+      dataIndex: 'title',
+      width: 320,
+      ellipsis: true,
     },
-    [fetchTopics]
-  );
+    {
+      title: 'Your stance',
+      dataIndex: 'id',
+      width: 440,
+      render: (_, row) => {
+        const id = String(row.id);
+        const options = resolveOptions(row);
 
-  /**
-   * Per-topic vote UI:
-   * - SCALE: Slider with labeled marks (no unsafe array indexing)
-   * - MULTIPLE: Select[multiple]
-   * - SINGLE / default: Radio group
-   */
-  const renderVoteInput = useCallback(
-    (topic: PublicTopic) => {
-      // 3: scale
-      if (topic.responseformat_id === 3) {
-        const labels = topic.labels ?? topic.options ?? [];
-        const marks = labels.reduce<Record<number, React.ReactNode>>((acc, label, i) => {
-          acc[i] = label;
-          return acc;
-        }, {});
-        const max = Math.max(0, labels.length - 1);
-        const onAfterChange = (value: number | [number, number]) => {
-          const v = Array.isArray(value) ? value[0] : value;
-          submitVote(topic, v);
-        };
+        if (!options.length) {
+          return <Tag color="default">No voting options configured</Tag>;
+        }
+
+        const selected = selectedOptions[id];
+        const defaultIndex = Math.floor(options.length / 2);
+        const currentIndex = (() => {
+          if (!selected) return defaultIndex;
+          const idx = options.findIndex(
+            (opt) => opt.toLowerCase() === selected.toLowerCase(),
+          );
+          return idx >= 0 ? idx : defaultIndex;
+        })();
+
+        const marks = options.reduce<Record<number, React.ReactNode>>(
+          (acc, label, idx) => {
+            acc[idx] = <span style={{ fontSize: 11 }}>{label}</span>;
+            return acc;
+          },
+          {},
+        );
+
         return (
-          <Slider
-            marks={marks}
-            min={0}
-            max={max}
-            defaultValue={Math.round(max / 2)}
-            onAfterChange={onAfterChange}
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <Slider
+              min={0}
+              max={options.length - 1}
+              value={currentIndex}
+              marks={marks}
+              tooltip={{ formatter: (val) => options[val ?? defaultIndex] }}
+              onChange={(val) => handleSliderChange(id, val, options)}
+            />
+
+            <Radio.Group
+              size="small"
+              value={selected}
+              onChange={(e) => handleRadioChange(id, e)}
+            >
+              {options.map((opt) => (
+                <Radio.Button key={opt} value={opt}>
+                  {opt}
+                </Radio.Button>
+              ))}
+            </Radio.Group>
+
+            <Space size="small">
+              <Tag color={selected ? 'geekblue' : 'default'}>
+                {selected ? `Selected: ${selected}` : 'No vote yet'}
+              </Tag>
+              <Button
+                type="primary"
+                size="small"
+                icon={<ThunderboltOutlined />}
+                loading={submittingId === id}
+                disabled={!selected || submittingId === id}
+                onClick={() => handleSubmitVote(id)}
+              >
+                Cast vote
+              </Button>
+            </Space>
+          </Space>
+        );
+      },
+    },
+    {
+      title: 'Closes',
+      dataIndex: 'closesAt',
+      width: 180,
+      valueType: 'dateTime',
+      render: (_, row) => {
+        const closes = dayjs(row.closesAt);
+        const now = dayjs();
+        const diffHours = closes.diff(now, 'hour');
+        const closingSoon = diffHours <= 48;
+
+        return (
+          <Space direction="vertical" size={2}>
+            <span>{closes.format('YYYY-MM-DD HH:mm')}</span>
+            {closingSoon && <Tag color="volcano">Closing soon</Tag>}
+          </Space>
+        );
+      },
+    },
+    {
+      title: 'Turnout',
+      dataIndex: 'turnout',
+      width: 160,
+      render: (_, row) => {
+        const turnout = Math.round(row.turnout ?? 0);
+        const status = turnout >= 50 ? 'active' : 'normal';
+        return (
+          <Progress
+            percent={turnout}
+            size="small"
+            status={status as any}
           />
         );
-      }
-
-      // 2: multiple
-      if (topic.responseformat_id === 2) {
-        const opts = topic.options ?? topic.labels ?? [];
-        const onChange = (value: string[]) => submitVote(topic, value);
-        return (
-          <Select
-            mode="multiple"
-            placeholder="Sélectionnez…"
-            style={{ minWidth: 220 }}
-            onChange={onChange}
-            options={opts.map((o) => ({ label: o, value: o }))}
-          />
-        );
-      }
-
-      // 1: binary / single (default)
-      const opts = topic.options ?? ['Oui', 'Non'];
-      const onRadio: (e: RadioChangeEvent) => void = (e) => submitVote(topic, e.target.value as string);
-      return (
-        <Radio.Group onChange={onRadio}>
-          {opts.map((o) => (
-            <Radio key={o} value={o}>
-              {o}
-            </Radio>
-          ))}
-        </Radio.Group>
-      );
+      },
     },
-    [submitVote]
-  );
-
-  // Table columns (typed; ProTable v3 render signature respected)
-  const columns: ProColumns<PublicTopic>[] = useMemo(
-    () => [
-      {
-        title: 'Question',
-        dataIndex: 'question',
-        ellipsis: true,
-        width: 360,
-      },
-      {
-        title: 'Vote',
-        key: 'vote',
-        search: false,
-        width: 360,
-        render: (_dom, row) => renderVoteInput(row),
-      },
-      {
-        title: 'Participation',
-        dataIndex: 'turnout',
-        align: 'center',
-        width: 160,
-        render: (_dom, row) => <Progress percent={row.turnout ?? 0} size="small" />,
-      },
-    ],
-    [renderVoteInput]
-  );
+  ];
 
   return (
-    <PageContainer
-      ghost
-      header={{ title: 'Décider (public)' }}
-      content={
-        <Space wrap style={{ marginBottom: 16 }}>
-          <Select
-            allowClear
-            placeholder="Catégorie"
-            style={{ minWidth: 200 }}
-            value={activeCat}
-            onChange={(v) => setActiveCat(v || undefined)}
-            options={categories.map((c) => ({ label: c, value: c }))}
-          />
+    <PageContainer ghost loading={loading}>
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <div>
+          <Title level={2} style={{ marginBottom: 8 }}>
+            Public consultations
+          </Title>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            Express your stance with nuance. Each vote is stored as an Ethikos stance
+            (from −3 to +3) and may be weighted by Ekoh for impact analysis.
+          </Paragraph>
+        </div>
+
+        <Alert
+          type="info"
+          showIcon
+          message={
+            <Space>
+              <InfoCircleOutlined />
+              <span>
+                You can adjust your stance at any time while a consultation is open.
+                Results are visible in the Decide · Results Archive and Ethikos · Opinion
+                Analytics.
+              </span>
+            </Space>
+          }
+        />
+
+        <Space wrap>
           <Input.Search
+            placeholder="Search consultations…"
             allowClear
-            placeholder="Recherche…"
-            onSearch={(v) => {
-              setPage(1);
-              setSearchTerm(v);
-            }}
-            style={{ width: 260 }}
+            style={{ width: 280 }}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
+
+          <Radio.Group
+            size="small"
+            value={quickFilter}
+            onChange={(e) =>
+              setQuickFilter(e.target.value as QuickFilter)
+            }
+          >
+            <Radio.Button value="all">All</Radio.Button>
+            <Radio.Button value="closing-soon">Closing soon</Radio.Button>
+            <Radio.Button value="high-turnout">High participation</Radio.Button>
+          </Radio.Group>
+
+          <Tooltip title="Refresh open consultations">
+            <Button
+              size="small"
+              icon={<SyncOutlined />}
+              onClick={() => refresh()}
+            >
+              Refresh
+            </Button>
+          </Tooltip>
         </Space>
-      }
-    >
-      <ProTable<PublicTopic>
-        rowKey="id"
-        search={false}
-        options={false}
-        loading={loading}
-        columns={columns}
-        dataSource={topicsData?.results ?? []}
-        pagination={{
-          current: page,
-          total: topicsData?.count ?? 0,
-          showSizeChanger: false,
-          onChange: (p) => setPage(p),
-        }}
-        toolBarRender={false}
-      />
+
+        {filteredBallots.length === 0 ? (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              ballots.length === 0
+                ? 'No open public consultations right now.'
+                : 'No consultations match your search or filters.'
+            }
+          />
+        ) : (
+          <ProTable<BallotRow>
+            rowKey="id"
+            columns={columns}
+            dataSource={filteredBallots}
+            pagination={{ pageSize: PAGE_SIZE }}
+            search={false}
+            options={false}
+            toolBarRender={false}
+          />
+        )}
+      </Space>
     </PageContainer>
   );
 }

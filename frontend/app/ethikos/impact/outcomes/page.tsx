@@ -15,10 +15,14 @@ export default function Outcomes() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.kpis.map(k => (
+        {data?.kpis.map((k) => (
           <StatisticCard
             key={k.label}
-            statistic={{ title: k.label, value: k.value, suffix: k.delta && '%' }}
+            statistic={{
+              title: k.label,
+              value: k.value,
+              suffix: k.delta && '%',
+            }}
           />
         ))}
       </ProCard>

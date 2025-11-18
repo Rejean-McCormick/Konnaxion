@@ -1,4 +1,4 @@
-// C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\elite\page.tsx
+// app/ethikos/deliberate/elite/page.tsx
 'use client';
 
 import React from 'react';
@@ -12,7 +12,16 @@ import {
   ProFormSelect,
   type ProColumns,
 } from '@ant-design/pro-components';
-import { Button, Drawer, Empty, Space, Tag, Tooltip, message as antdMessage } from 'antd';
+import {
+  Alert,
+  Button,
+  Drawer,
+  Empty,
+  Space,
+  Tag,
+  Tooltip,
+  message as antdMessage,
+} from 'antd';
 import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
 import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
@@ -31,8 +40,8 @@ dayjs.extend(relativeTime);
 interface TopicRow extends Topic {
   createdAt: string;
   lastActivity: string;
-  hot: boolean;         // calculé côté serveur
-  stanceCount: number;  // utilisé par KPI et la colonne
+  hot: boolean;        // calculé côté serveur
+  stanceCount: number; // utilisé par KPI et la colonne
 }
 
 type TopicPreview = {
@@ -44,11 +53,13 @@ type TopicPreview = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Service wrapper (type-safe)                                        */
+/*  Service wrapper (type-safe)                                       */
 /* ------------------------------------------------------------------ */
-
-// Le service natif ne garantit pas `stanceCount`. On normalise ici pour
-// faire correspondre exactement <{ list: TopicRow[] }, []>.
+/**
+ * Le service natif ne garantit pas toujours `stanceCount`.
+ * On normalise ici le payload pour avoir exactement { list: TopicRow[] }.
+ * Cela colle au modèle EliteTopic / EthikosTopicApi côté backend v14.
+ */
 const useEliteService = () =>
   React.useCallback(async (): Promise<{ list: TopicRow[] }> => {
     const res = await fetchEliteTopics();
@@ -63,14 +74,15 @@ const useEliteService = () =>
 /*  Composant principal                                                */
 /* ------------------------------------------------------------------ */
 
-export default function EliteAgora() {
+export default function EliteAgora(): JSX.Element {
   usePageTitle('Deliberate · Elite Agora');
 
   /* ---------- data ---------- */
   const eliteService = useEliteService();
-  // useRequest attend 2 génériques <TData, TParams>. Le service n’a pas de params -> [].
+  // useRequest attend 2 génériques <TData, TParams>. Le service n’a pas de params → [].
   const { data, loading, refresh } = useRequest<{ list: TopicRow[] }, []>(eliteService);
-  useInterval(refresh, 60_000); // polling 1 min
+  // Polling léger pour rester proche du temps réel (sans WebSocket)
+  useInterval(refresh, 60_000);
 
   /* ---------- drawer state ---------- */
   const [previewId, setPreviewId] = React.useState<string | null>(null);
@@ -97,12 +109,17 @@ export default function EliteAgora() {
         label: 'Avg stances / topic',
         value: data?.list?.length
           ? Math.round(
-              data!.list.reduce((sum: number, t: TopicRow) => sum + (t.stanceCount ?? 0), 0) /
-                data!.list.length,
+              data!.list.reduce(
+                (sum: number, t: TopicRow) => sum + (t.stanceCount ?? 0),
+                0,
+              ) / data!.list.length,
             )
           : 0,
       },
-      { label: 'Hot topics', value: (data?.list ?? []).filter((t: TopicRow) => t.hot).length },
+      {
+        label: 'Hot topics',
+        value: (data?.list ?? []).filter((t: TopicRow) => t.hot).length,
+      },
     ],
     [data],
   );
@@ -122,7 +139,7 @@ export default function EliteAgora() {
       {
         title: 'Title',
         dataIndex: 'title',
-        render: (_: any, row: TopicRow) => (
+        render: (_dom: React.ReactNode, row: TopicRow) => (
           <a onClick={() => openPreview(row)} style={{ cursor: 'pointer' }}>
             {row.title}
           </a>
@@ -132,9 +149,11 @@ export default function EliteAgora() {
         title: 'Category',
         dataIndex: 'category',
         filters: categoryFilters,
-        onFilter: (value: React.Key | boolean, record: TopicRow) =>
+        onFilter: (value, record) =>
           String(record.category) === String(value),
-        render: (_: any, row: TopicRow) => <Tag color="geekblue">{row.category}</Tag>,
+        render: (_dom: React.ReactNode, row: TopicRow) => (
+          <Tag color="geekblue">{row.category}</Tag>
+        ),
       },
       {
         title: 'Stances',
@@ -146,13 +165,14 @@ export default function EliteAgora() {
         title: 'Last activity',
         dataIndex: 'lastActivity',
         // Pas de valueType non standard. On rend “fromNow” explicitement.
-        render: (_: any, row: TopicRow) => dayjs(row.lastActivity).fromNow(),
+        render: (_dom: React.ReactNode, row: TopicRow) =>
+          dayjs(row.lastActivity).fromNow(),
       },
       {
         title: '',
         dataIndex: 'hot',
         width: 60,
-        render: (_: any, row: TopicRow) =>
+        render: (_dom: React.ReactNode, row: TopicRow) =>
           row.hot ? (
             <Tooltip title="Trending">
               <FireOutlined style={{ color: '#fa541c' }} />
@@ -170,11 +190,37 @@ export default function EliteAgora() {
       loading={loading}
       extra={
         <Space>
-          <Button icon={<ReloadOutlined />} onClick={refresh} type="text" title="Refresh list" />
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={refresh}
+            type="text"
+            title="Refresh list"
+          />
           <NewTopicButton onCreated={refresh} />
         </Space>
       }
     >
+      {/* Context block: aligné avec la spec v14 (échelle -3…+3, quorum 12 experts) */}
+      <ProCard ghost style={{ marginBottom: 16 }}>
+        <Alert
+          type="info"
+          showIcon
+          message="Elite agora – expert‑only debates"
+          description={
+            <>
+              <div>
+                Stances use the seven‑level nuance scale from −3 (“strongly against”)
+                to +3 (“strongly for”), 0 = neutral.
+              </div>
+              <div>
+                Aggregated results are only surfaced once at least 12 distinct experts
+                have contributed on a topic (Ekoh &gt; 75th percentile in their domain).
+              </div>
+            </>
+          }
+        />
+      </ProCard>
+
       {/* KPI summary */}
       <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
         {headerStats.map((k) => (
@@ -186,7 +232,7 @@ export default function EliteAgora() {
         ))}
       </ProCard>
 
-      {/* liste */}
+      {/* Liste principale */}
       <ProTable<TopicRow>
         rowKey="id"
         columns={columns}
@@ -195,7 +241,7 @@ export default function EliteAgora() {
         pagination={{ pageSize: 10 }}
       />
 
-      {/* preview drawer */}
+      {/* Preview drawer */}
       <Drawer
         width={520}
         open={!!previewId}
@@ -210,7 +256,8 @@ export default function EliteAgora() {
               <strong>Category:</strong> {preview.category}
             </p>
             <p>
-              <strong>Opened:</strong> {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+              <strong>Opened:</strong>{' '}
+              {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
             </p>
             <h4>Latest statements</h4>
             <ul>
@@ -222,7 +269,9 @@ export default function EliteAgora() {
             </ul>
             <Button
               type="primary"
-              onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
+              onClick={() =>
+                window.location.assign(`/ethikos/deliberate/${preview.id}`)
+              }
             >
               Go to thread →
             </Button>
@@ -242,31 +291,44 @@ export default function EliteAgora() {
 function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   const [visible, setVisible] = React.useState(false);
 
-  const { runAsync, loading } = useRequest(createEliteTopic, {
-    manual: true,
-    onSuccess: () => {
-      antdMessage.success('Topic created 🎉');
-      setVisible(false);
-      onCreated();
+  // On fige les Params pour typer runAsync correctement
+  const { runAsync, loading } = useRequest<unknown, [{ title: string; category: string }]>(
+    createEliteTopic,
+    {
+      manual: true,
+      onSuccess: () => {
+        antdMessage.success('Topic created 🎉');
+        setVisible(false);
+        onCreated();
+      },
     },
-  });
+  );
 
   return (
     <>
-      <Button icon={<PlusOutlined />} type="primary" onClick={() => setVisible(true)}>
+      <Button
+        icon={<PlusOutlined />}
+        type="primary"
+        onClick={() => setVisible(true)}
+      >
         New Topic
       </Button>
-      <ModalForm
+
+      <ModalForm<{ title: string; category: string }>
         title="Create new topic"
         open={visible}
         onOpenChange={setVisible}
-        onFinish={async (values: { title: string; category: string }) => {
+        onFinish={async (values) => {
           await runAsync(values);
           return true;
         }}
         submitter={{ submitButtonProps: { loading } }}
       >
-        <ProFormText name="title" label="Title" rules={[{ required: true, min: 10 }]} />
+        <ProFormText
+          name="title"
+          label="Title"
+          rules={[{ required: true, min: 10 }]}
+        />
         <ProFormSelect
           name="category"
           label="Category"

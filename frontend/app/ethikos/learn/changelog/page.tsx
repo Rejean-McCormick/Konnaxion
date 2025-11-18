@@ -14,11 +14,14 @@ export default function Changelog() {
   return (
     <PageContainer ghost loading={loading}>
       <Timeline>
-        {data?.entries.map(e => (
+        {data?.entries.map((e) => (
           <Timeline.Item key={e.version} label={e.date}>
             <strong>{e.version}</strong>{' '}
-            {e.tags.map(t => (
-              <Tag key={t} color={t === 'NEW' ? 'green' : t === 'FIX' ? 'blue' : 'default'}>
+            {e.tags.map((t) => (
+              <Tag
+                key={t}
+                color={t === 'NEW' ? 'green' : t === 'FIX' ? 'blue' : 'default'}
+              >
                 {t}
               </Tag>
             ))}

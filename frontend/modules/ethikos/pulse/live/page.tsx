@@ -19,28 +19,41 @@ export default function PulseLive() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.counters.map((c) => (
-          <StatisticCard
-            key={c.label}
-            statistic={{
-              title: (
-                <Space>
-                  {c.label}
-                  <Badge status={c.trend > 0 ? 'success' : c.trend < 0 ? 'error' : 'default'} />
-                </Space>
-              ),
-              value: c.value,
-              precision: 0,
-            }}
-            chart={
-              <ChartCard
-                type="line"
-                data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
-                height={50}
-              />
-            }
-          />
-        ))}
+        {data?.counters.map((c) => {
+          // trend is optional, so normalise to 0 for TS safety
+          const trend = c.trend ?? 0;
+
+          return (
+            <StatisticCard
+              key={c.label}
+              statistic={{
+                title: (
+                  <Space>
+                    {c.label}
+                    <Badge
+                      status={
+                        trend > 0
+                          ? 'success'
+                          : trend < 0
+                          ? 'error'
+                          : 'default'
+                      }
+                    />
+                  </Space>
+                ),
+                value: c.value,
+                precision: 0,
+              }}
+              chart={
+                <ChartCard
+                  type="line"
+                  data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
+                  height={50}
+                />
+              }
+            />
+          );
+        })}
       </ProCard>
     </PageContainer>
   );

@@ -1,11 +1,20 @@
-'use client'
+// app/ethikos/pulse/live/page.tsx
+'use client';
 
-import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from '@ant-design/pro-components';
 import { Badge, Space } from 'antd';
 import { useInterval, useRequest } from 'ahooks';
 import ChartCard from '@/components/charts/ChartCard';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchPulseLiveData } from '@/services/pulse';   // ← import correct
+import { fetchPulseLiveData } from '@/services/pulse';
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
 
 export default function PulseLive() {
   usePageTitle('Pulse · Live Metrics');
@@ -19,28 +28,44 @@ export default function PulseLive() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.counters.map((c) => (
-          <StatisticCard
-            key={c.label}
-            statistic={{
-              title: (
-                <Space>
-                  {c.label}
-                  <Badge status={c.trend > 0 ? 'success' : c.trend < 0 ? 'error' : 'default'} />
-                </Space>
-              ),
-              value: c.value,
-              precision: 0,
-            }}
-            chart={
-              <ChartCard
-                type="line"
-                data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
-                height={50}
-              />
-            }
-          />
-        ))}
+        {data?.counters.map((c) => {
+          // trend is optional, normalise to 0 for safety
+          const trend = c.trend ?? 0;
+
+          return (
+            <StatisticCard
+              key={c.label}
+              statistic={{
+                title: (
+                  <Space>
+                    {c.label}
+                    <Badge
+                      status={
+                        trend > 0
+                          ? 'success'
+                          : trend < 0
+                          ? 'error'
+                          : 'default'
+                      }
+                    />
+                  </Space>
+                ),
+                value: c.value,
+                precision: 0,
+              }}
+              chart={
+                <ChartCard
+                  type="line"
+                  data={c.history.map(({ ts, value }) => ({
+                    x: ts,
+                    y: value,
+                  }))}
+                  height={50}
+                />
+              }
+            />
+          );
+        })}
       </ProCard>
     </PageContainer>
   );
@@ -49,6 +74,7 @@ export default function PulseLive() {
 /* ------------------------------------------------------------------ */
 /*  Local data-fetching hook                                           */
 /* ------------------------------------------------------------------ */
+
 function usePulseLive(polling = false) {
   return useRequest(fetchPulseLiveData, {
     pollingInterval: polling ? 20_000 : undefined,

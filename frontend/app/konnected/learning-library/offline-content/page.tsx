@@ -114,11 +114,14 @@ function normalizeList<T>(raw: unknown): T[] {
 // ---- Requests -------------------------------------------------------------
 
 async function fetchOfflinePackages(): Promise<OfflinePackage[]> {
-  const res = await api.get(OFFLINE_PACKAGE_LIST_ENDPOINT);
-  return normalizeList<OfflinePackage>(res.data);
+  // api.get already returns the data T (not AxiosResponse<T>)
+  const raw = await api.get(OFFLINE_PACKAGE_LIST_ENDPOINT);
+  return normalizeList<OfflinePackage>(raw);
 }
 
-async function createOfflinePackage(payload: CreateOfflinePackagePayload): Promise<void> {
+async function createOfflinePackage(
+  payload: CreateOfflinePackagePayload,
+): Promise<void> {
   await api.post(OFFLINE_PACKAGE_LIST_ENDPOINT, payload);
 }
 
@@ -131,8 +134,9 @@ async function syncOfflinePackage(id: OfflinePackage['id']): Promise<void> {
 }
 
 async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
-  const res = await api.get(OFFLINE_RESOURCES_ENDPOINT);
-  return normalizeList<OfflineableResource>(res.data);
+  // Same: api.get returns data, not { data }
+  const raw = await api.get(OFFLINE_RESOURCES_ENDPOINT);
+  return normalizeList<OfflineableResource>(raw);
 }
 
 // ---- Page -----------------------------------------------------------------
@@ -157,15 +161,24 @@ export default function OfflineContentPage(): JSX.Element {
     refresh: refreshResources,
   } = useRequest(fetchOfflineableResources);
 
-  const { loading: creating, runAsync: runCreatePackage } = useRequest(createOfflinePackage, {
-    manual: true,
-  });
-  const { loading: deleting, runAsync: runDeletePackage } = useRequest(deleteOfflinePackage, {
-    manual: true,
-  });
-  const { loading: syncing, runAsync: runSyncPackage } = useRequest(syncOfflinePackage, {
-    manual: true,
-  });
+  const { loading: creating, runAsync: runCreatePackage } = useRequest(
+    createOfflinePackage,
+    {
+      manual: true,
+    },
+  );
+  const { loading: deleting, runAsync: runDeletePackage } = useRequest(
+    deleteOfflinePackage,
+    {
+      manual: true,
+    },
+  );
+  const { loading: syncing, runAsync: runSyncPackage } = useRequest(
+    syncOfflinePackage,
+    {
+      manual: true,
+    },
+  );
 
   const packageList = packages ?? [];
   const resourceList = resources ?? [];
@@ -177,8 +190,13 @@ export default function OfflineContentPage(): JSX.Element {
       ['scheduled', 'building'].includes(p.status),
     ).length;
 
-    const totalSizeMb = packageList.reduce((acc, p) => acc + (p.totalSizeMb || 0), 0);
-    const eligibleResourcesCount = resourceList.filter((r) => r.offlineEligible).length;
+    const totalSizeMb = packageList.reduce(
+      (acc, p) => acc + (p.totalSizeMb || 0),
+      0,
+    );
+    const eligibleResourcesCount = resourceList.filter(
+      (r) => r.offlineEligible,
+    ).length;
 
     return {
       totalPackages,
@@ -211,7 +229,8 @@ export default function OfflineContentPage(): JSX.Element {
       key: 'status',
       render: (status: OfflinePackageStatus, record) => {
         let color: 'processing' | 'success' | 'error' | 'default' = 'default';
-        let label = status;
+        // Explicit string to avoid assigning "Scheduled"/"Ready" to OfflinePackageStatus
+        let label: string = status;
 
         if (status === 'scheduled' || status === 'building') {
           color = 'processing';
@@ -269,7 +288,9 @@ export default function OfflineContentPage(): JSX.Element {
       title: 'Auto sync',
       dataIndex: 'autoSync',
       key: 'autoSync',
-      render: (value?: boolean) => <Switch checked={Boolean(value)} size="small" disabled />,
+      render: (value?: boolean) => (
+        <Switch checked={Boolean(value)} size="small" disabled />
+      ),
     },
     {
       title: 'Actions',
@@ -337,7 +358,11 @@ export default function OfflineContentPage(): JSX.Element {
       dataIndex: 'offlineEligible',
       key: 'offlineEligible',
       render: (value: boolean) =>
-        value ? <Tag color="green">Eligible</Tag> : <Tag color="default">Online only</Tag>,
+        value ? (
+          <Tag color="green">Eligible</Tag>
+        ) : (
+          <Tag color="default">Online only</Tag>
+        ),
     },
     {
       title: 'Included in packages',
@@ -361,13 +386,17 @@ export default function OfflineContentPage(): JSX.Element {
   const handleCreatePackage = async (values: CreateOfflinePackagePayload) => {
     try {
       await runCreatePackage(values);
-      message.success('Offline package created. It will appear here once builds start.');
+      message.success(
+        'Offline package created. It will appear here once builds start.',
+      );
       setIsCreateModalOpen(false);
       createForm.resetFields();
       refreshPackages();
     } catch (err) {
       const msg =
-        err instanceof Error ? err.message : 'Failed to create offline package.';
+        err instanceof Error
+          ? err.message
+          : 'Failed to create offline package.';
       message.error(msg);
     }
   };
@@ -385,7 +414,9 @@ export default function OfflineContentPage(): JSX.Element {
           refreshPackages();
         } catch (err) {
           const msg =
-            err instanceof Error ? err.message : 'Failed to delete offline package.';
+            err instanceof Error
+              ? err.message
+              : 'Failed to delete offline package.';
           message.error(msg);
         }
       },
@@ -398,7 +429,8 @@ export default function OfflineContentPage(): JSX.Element {
       message.success('Sync request submitted.');
       refreshPackages();
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Failed to trigger sync.';
+      const msg =
+        err instanceof Error ? err.message : 'Failed to trigger sync.';
       message.error(msg);
     }
   };
@@ -487,7 +519,8 @@ export default function OfflineContentPage(): JSX.Element {
                     <Space direction="vertical">
                       <Text>No offline packages yet.</Text>
                       <Text type="secondary">
-                        Create a package to bundle resources for offline deployment to devices.
+                        Create a package to bundle resources for offline
+                        deployment to devices.
                       </Text>
                     </Space>
                   }
@@ -528,7 +561,7 @@ export default function OfflineContentPage(): JSX.Element {
           title="New offline package"
           open={isCreateModalOpen}
           onCancel={() => setIsCreateModalOpen(false)}
-          destroyOnHidden
+          destroyOnClose
           okText="Create package"
           okButtonProps={{ loading: creating }}
           onOk={() => createForm.submit()}

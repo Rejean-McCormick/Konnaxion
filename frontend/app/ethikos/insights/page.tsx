@@ -1,3 +1,4 @@
+// app/ethikos/insights/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -161,8 +162,11 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       if (regionFilter !== 'all' && (d.region ?? 'Unspecified') !== regionFilter)
         return false;
       if (start && end) {
-        const closed = dayjs(d.closesAt);
-        if (!closed.isBetween(start, end, 'day', '[]')) return false;
+        const closedTs = new Date(d.closesAt).getTime();
+        const startTs = start.toDate().getTime();
+        const endTs = end.toDate().getTime();
+        if (!Number.isFinite(closedTs)) return false;
+        if (closedTs < startTs || closedTs > endTs) return false;
       }
       return true;
     })
@@ -175,66 +179,82 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
   >();
 
   for (const d of filteredDecisions) {
-    const regionName = d.region ?? 'Unspecified';
-    const bucket =
-      decisionRegionMap.get(regionName) ?? {
-        region: regionName,
-        passed: 0,
-        rejected: 0,
-      };
-    if (d.passed) bucket.passed += 1;
-    else bucket.rejected += 1;
-    decisionRegionMap.set(regionName, bucket);
+    const region = d.region ?? 'Unspecified';
+    const bucket = decisionRegionMap.get(region) ?? {
+      region,
+      passed: 0,
+      rejected: 0,
+    };
+    if (d.passed) {
+      bucket.passed += 1;
+    } else {
+      bucket.rejected += 1;
+    }
+    decisionRegionMap.set(region, bucket);
   }
 
-  const decisionOutcomeData = Array.from(decisionRegionMap.values()).flatMap(
-    (b) => [
-      { region: b.region, result: 'Passed', count: b.passed },
-      { region: b.region, result: 'Rejected', count: b.rejected },
-    ],
-  );
+  const decisionOutcomeData = [
+    ...Array.from(decisionRegionMap.values()).map((r) => ({
+      region: r.region,
+      outcome: 'Passed',
+      value: r.passed,
+    })),
+    ...Array.from(decisionRegionMap.values()).map((r) => ({
+      region: r.region,
+      outcome: 'Rejected',
+      value: r.rejected,
+    })),
+  ];
 
   const decisionOutcomeConfig = {
     data: decisionOutcomeData,
-    xField: 'count',
-    yField: 'region',
-    seriesField: 'result',
-    isStack: true as const,
-    legend: { position: 'top-left' as const },
+    isGroup: true,
+    xField: 'region',
+    yField: 'value',
+    seriesField: 'outcome',
   };
 
   const decisionsColumns: ColumnsType<DecisionRow> = [
     {
-      title: 'Title',
+      title: 'Decision',
       dataIndex: 'title',
+      key: 'title',
+      ellipsis: true,
       width: 260,
     },
     {
       title: 'Result',
       dataIndex: 'passed',
+      key: 'passed',
       width: 120,
-      render: (value: boolean) => (
-        <Tag color={value ? 'green' : 'red'}>
-          {value ? 'PASSED' : 'REJECTED'}
+      render: (passed: boolean) => (
+        <Tag color={passed ? 'green' : 'red'}>
+          {passed ? 'PASSED' : 'REJECTED'}
         </Tag>
       ),
     },
     {
       title: 'Scope',
       dataIndex: 'scope',
+      key: 'scope',
       width: 120,
+      render: (scope: DecisionScope) => (
+        <Tag color={scope === 'Elite' ? 'geekblue' : 'default'}>{scope}</Tag>
+      ),
     },
     {
       title: 'Region',
       dataIndex: 'region',
-      width: 160,
-      render: (value?: string) => value ?? '—',
+      key: 'region',
+      ellipsis: true,
+      render: (region?: string) => region ?? <Text type="secondary">Unspecified</Text>,
     },
     {
       title: 'Closed at',
       dataIndex: 'closesAt',
-      width: 200,
-      render: (value: string) => dayjs(value).format('YYYY-MM-DD HH:mm'),
+      key: 'closesAt',
+      width: 180,
+      render: (value: string) => dayjs(value).format('YYYY-MM-DD'),
     },
   ];
 
@@ -460,35 +480,86 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       {/* ------------------------------------------------------------------ */}
       {/* Outcomes & decisions                                              */}
       {/* ------------------------------------------------------------------ */}
-      <ProCard
-        title={
-          <Space>
-            <BarChartOutlined />
-            <span>Decision outcomes & engagement</span>
-          </Space>
-        }
-        gutter={[16, 16]}
-        wrap
-      >
+      <ProCard gutter={[16, 16]} wrap>
         {/* Outcome KPIs */}
-        <ProCard colSpan={24} ghost style={{ marginBottom: 8 }}>
-          <Space wrap>
-            {outcomes.kpis.map((kpi) => (
-              <StatisticCard
-                key={kpi.key}
-                statistic={{
-                  title: kpi.label,
-                  value: kpi.value,
-                  description:
-                    kpi.delta !== undefined ? `${kpi.delta} vs previous` : undefined,
-                }}
-              />
-            ))}
+        <ProCard
+          colSpan={{ xs: 24, xl: 8 }}
+          title={
+            <Space>
+              <BarChartOutlined />
+              <span>Impact · Outcomes</span>
+            </Space>
+          }
+        >
+          <Space direction="vertical" style={{ width: '100%' }} size="large">
+            <Space size="large" wrap>
+              {outcomes.kpis.map((kpi) => (
+                <StatisticCard
+                  key={kpi.key}
+                  statistic={{
+                    title: kpi.label,
+                    value: kpi.value,
+                    suffix: kpi.key === 'agreement' ? '%' : undefined,
+                    description:
+                      typeof kpi.delta === 'number' ? (
+                        <span
+                          style={{
+                            color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                          }}
+                        >
+                          {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
+                        </span>
+                      ) : null,
+                  }}
+                />
+              ))}
+            </Space>
+
+            <Divider />
+
+            <Space direction="vertical" size={8}>
+              <Text type="secondary">Highlights</Text>
+              <ul style={{ paddingLeft: 20, margin: 0 }}>
+                <li>
+                  <Text>
+                    <Text strong>{outcomes.kpis.find((k) => k.key === 'resolved')?.value ?? 0}</Text>{' '}
+                    decisions resolved overall.
+                  </Text>
+                </li>
+                <li>
+                  <Text>
+                    Average agreement is{' '}
+                    <Text strong>
+                      {outcomes.kpis.find((k) => k.key === 'agreement')?.value ?? 0}%
+                    </Text>
+                    , combining stance direction and turnout.
+                  </Text>
+                </li>
+                <li>
+                  <Text>
+                    Participation volume is{' '}
+                    <Text strong>
+                      {outcomes.kpis.find((k) => k.key === 'participation')?.value ??
+                        0}
+                    </Text>{' '}
+                    total stances across all debates.
+                  </Text>
+                </li>
+              </ul>
+            </Space>
           </Space>
         </ProCard>
 
         {/* Outcome charts */}
-        <ProCard colSpan={{ xs: 24, lg: 12 }}>
+        <ProCard
+          colSpan={{ xs: 24, xl: 8 }}
+          title={
+            <Space>
+              <BarChartOutlined />
+              <span>Outcome distribution</span>
+            </Space>
+          }
+        >
           <Tabs
             items={outcomes.charts.map((c) => ({
               key: c.key,
@@ -503,27 +574,37 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
           />
         </ProCard>
 
-        {/* Decisions table + regional outcome chart */}
-        <ProCard colSpan={{ xs: 24, lg: 12 }} split="horizontal" ghost>
-          <ProCard title="Closed decisions">
-            <Table<DecisionRow>
-              size="small"
-              rowKey="id"
-              columns={decisionsColumns}
-              dataSource={filteredDecisions}
-              pagination={{ pageSize: 6 }}
-            />
-          </ProCard>
+        {/* Closed decisions table */}
+        <ProCard
+          colSpan={{ xs: 24, xl: 8 }}
+          title="Closed decisions · outcomes vs engagement"
+          extra={
+            <Text type="secondary">
+              Filtered: {filteredDecisions.length} / {decisions.items.length}
+            </Text>
+          }
+        >
+          <ProCard split="horizontal" ghost>
+            <ProCard title="Outcomes by region">
+              {decisionOutcomeData.length === 0 ? (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No regional outcome data for current filters"
+                />
+              ) : (
+                <Bar {...decisionOutcomeConfig} />
+              )}
+            </ProCard>
 
-          <ProCard title="Outcomes by region">
-            {decisionOutcomeData.length === 0 ? (
-              <Empty
-                description="No decisions in the selected filters"
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
+            <ProCard title="Closed decisions">
+              <Table<DecisionRow>
+                size="small"
+                columns={decisionsColumns}
+                dataSource={filteredDecisions}
+                pagination={{ pageSize: 8 }}
+                rowKey="key"
               />
-            ) : (
-              <Bar {...decisionOutcomeConfig} />
-            )}
+            </ProCard>
           </ProCard>
         </ProCard>
       </ProCard>

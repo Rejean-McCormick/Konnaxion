@@ -1,64 +1,135 @@
-'use client';
+'use client'
 
-import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
-import { Select } from 'antd';
-import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchImpactTracker, patchImpactStatus } from '@/services/impact';
+import type { ReactNode } from 'react'
+import { useMemo, useState } from 'react'
+import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components'
+import { Switch, Tag, Space, Typography, Alert, Segmented, Statistic, Button } from 'antd'
+import { ReloadOutlined } from '@ant-design/icons'
+import { useRequest } from 'ahooks'
+import usePageTitle from '@/hooks/usePageTitle'
+import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/services/admin'
 
-type TrackerRow = {
-  id: string;
-  title: string;
-  owner: string;
-  status: 'Planned' | 'In-Progress' | 'Completed' | 'Blocked';
-  updatedAt: string;
-};
+const { Text } = Typography
 
-export default function ImpactTracker() {
-  usePageTitle('Impact · Tracker');
+type StatusFilter = 'all' | 'enabled' | 'disabled'
 
-  const { data, loading, mutate } = useRequest(fetchImpactTracker);
+export default function RoleManagement() {
+  usePageTitle('Admin · Role Management')
 
-  const onStatusChange = async (id: string, status: TrackerRow['status']) => {
-    await patchImpactStatus(id, status);
-    mutate((d) => ({
-      items: d!.items.map((r) => (r.id === id ? { ...r, status } : r)),
-    }));
-  };
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
 
-  const columns: ProColumns<TrackerRow>[] = [
-    { title: 'Title', dataIndex: 'title', width: 260 },
-    { title: 'Owner', dataIndex: 'owner', width: 160 },
+  // ahooks v3 generics: <Data, ParamsTuple>. No params → []
+  const { data, loading, refresh } = useRequest<RolePayload, []>(fetchRoles)
+
+  const stats = useMemo(() => {
+    const items = data?.items ?? []
+    const totalRoles = items.length
+    const enabledRoles = items.filter((r) => r.enabled).length
+    const totalUsers = items.reduce((sum, r) => sum + (r.userCount ?? 0), 0)
+    return { totalRoles, enabledRoles, totalUsers }
+  }, [data])
+
+  const filteredItems = useMemo(() => {
+    const items = data?.items ?? []
+    if (statusFilter === 'enabled') return items.filter((r) => r.enabled)
+    if (statusFilter === 'disabled') return items.filter((r) => !r.enabled)
+    return items
+  }, [data, statusFilter])
+
+  const columns: ProColumns<RoleRow>[] = [
     {
-      title: 'Status',
-      dataIndex: 'status',
-      width: 180,
-      render: (_, row) => (
-        <Select
-          value={row.status}
-          options={[
-            { value: 'Planned', label: 'Planned' },
-            { value: 'In-Progress', label: 'In-Progress' },
-            { value: 'Completed', label: 'Completed' },
-            { value: 'Blocked', label: 'Blocked' },
-          ]}
-          onChange={(val) => onStatusChange(row.id, val as TrackerRow['status'])}
-          style={{ width: '100%' }}
+      title: 'Role',
+      dataIndex: 'name',
+      width: 220,
+      ellipsis: true,
+    },
+    {
+      title: 'Users',
+      dataIndex: 'userCount',
+      width: 120,
+      align: 'right',
+      render: (dom: ReactNode) => <Tag>{dom}</Tag>,
+    },
+    {
+      title: 'Enabled',
+      dataIndex: 'enabled',
+      width: 140,
+      valueType: 'switch',
+      render: (_: ReactNode, row: RoleRow) => (
+        <Switch
+          checked={row.enabled}
+          onChange={async (checked: boolean) => {
+            await toggleRole(row.id, checked)
+            refresh()
+          }}
         />
       ),
     },
-    { title: 'Updated', dataIndex: 'updatedAt', valueType: 'dateTime', sorter: true },
-  ];
+  ]
 
   return (
     <PageContainer ghost loading={loading}>
-      <ProTable<TrackerRow>
+      <Space
+        direction="vertical"
+        size="middle"
+        style={{ width: '100%', marginBottom: 16 }}
+      >
+        <Alert
+          type="info"
+          showIcon
+          message="Role-based access for Ethikos"
+          description={
+            <Text type="secondary">
+              Use roles to control who can moderate debates, manage consultations,
+              or access sensitive impact dashboards. Toggling a role updates access
+              for all users in that group.
+            </Text>
+          }
+        />
+
+        <Space
+          align="center"
+          style={{ width: '100%', justifyContent: 'space-between', flexWrap: 'wrap' }}
+        >
+          <Space size="large" wrap>
+            <Statistic title="Defined roles" value={stats.totalRoles} />
+            <Statistic title="Enabled roles" value={stats.enabledRoles} />
+            <Statistic title="Assigned users" value={stats.totalUsers} />
+          </Space>
+
+          <Space>
+            <Segmented
+              value={statusFilter}
+              onChange={(value) => setStatusFilter(value as StatusFilter)}
+              options={[
+                { label: 'All', value: 'all' },
+                { label: 'Enabled', value: 'enabled' },
+                { label: 'Disabled', value: 'disabled' },
+              ]}
+            />
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => refresh()}
+              type="default"
+            >
+              Refresh
+            </Button>
+          </Space>
+        </Space>
+      </Space>
+
+      <ProTable<RoleRow>
         rowKey="id"
         columns={columns}
-        dataSource={data?.items ?? []}
-        pagination={{ pageSize: 12 }}
+        dataSource={filteredItems}
+        pagination={false}
         search={false}
+        toolBarRender={() => [
+          <Text key="hint" type="secondary">
+            Toggle a role to enable or disable its permissions platform-wide.
+          </Text>,
+        ]}
       />
     </PageContainer>
-  );
+  )
 }

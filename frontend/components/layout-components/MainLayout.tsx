@@ -23,8 +23,10 @@ interface RoutesConfig {
 
 type SuiteKey = keyof RoutesConfig
 
+const SUITES: SuiteKey[] = ['ekoh', 'ethikos', 'keenkonnect', 'konnected', 'kreative']
+
 // Default entry route per module
-// NOTE: for Ethikos we point to Pulse Overview until /ethikos/dashboard exists.
+// NOTE: Ethikos points to Pulse Overview until /ethikos/dashboard exists.
 const DEFAULT_ENTRY: Record<SuiteKey, string> = {
   ekoh       : '/ekoh/dashboard',
   ethikos    : '/ethikos/pulse/overview',
@@ -33,17 +35,34 @@ const DEFAULT_ENTRY: Record<SuiteKey, string> = {
   kreative   : '/kreative/dashboard',
 }
 
+const isSuiteKey = (val: string | null): val is SuiteKey =>
+  !!val && (SUITES as string[]).includes(val)
+
+/**
+ * Determine active module from pathname + optional ?sidebar
+ */
+const detectSuite = (pathname: string, sidebarParam: string | null): SuiteKey => {
+  if (isSuiteKey(sidebarParam)) return sidebarParam
+
+  const segments = pathname.split('/')
+  const first = (segments[1] ?? '').toLowerCase()
+
+  if (isSuiteKey(first)) return first
+
+  return 'ekoh'
+}
+
 const { Content } = Layout
 
 export default function MainLayout({
   collapsed: initialCollapsed = false,
   children,
 }: React.PropsWithChildren<{ collapsed?: boolean }>) {
-  const router   = useRouter()
-  const pathname = usePathname() ?? '/'
-  const q        = useSearchParams()
+  const router        = useRouter()
+  const pathname      = usePathname() ?? '/'
+  const searchParams  = useSearchParams()
+  const sidebarParam  = searchParams.get('sidebar')
 
-  /* états */
   const [collapsed, setCollapsed] = useState(initialCollapsed)
   const [drawerVisible, setDrawer] = useState(false)
 
@@ -51,24 +70,12 @@ export default function MainLayout({
     ekoh: [], ethikos: [], keenkonnect: [], konnected: [], kreative: [],
   })
 
-  // helper pour déterminer la suite initiale à partir de l’URL
-  const detectInitialSuite = (): SuiteKey => {
-    const fromQuery = q.get('sidebar') as SuiteKey | null
-    if (fromQuery && fromQuery in DEFAULT_ENTRY) return fromQuery
+  // suite courante
+  const [suite, setSuite] = useState<SuiteKey>(() =>
+    detectSuite(pathname, sidebarParam),
+  )
 
-    if (pathname.startsWith('/ethikos'))    return 'ethikos'
-    if (pathname.startsWith('/keenkonnect')) return 'keenkonnect'
-    if (pathname.startsWith('/konnected'))   return 'konnected'
-    if (pathname.startsWith('/kreative'))    return 'kreative'
-    if (pathname.startsWith('/ekoh'))        return 'ekoh'
-
-    return 'ekoh'
-  }
-
-  /* suite courante */
-  const [suite, setSuite] = useState<SuiteKey>(() => detectInitialSuite())
-
-  /* charger dynamiquement les routes */
+  // charger dynamiquement les routes
   useEffect(() => {
     Promise.all([
       import('@/routes/routesEkoh'),
@@ -87,25 +94,22 @@ export default function MainLayout({
       .catch(err => console.error('Erreur chargement routes :', err))
   }, [])
 
-  /* sync si ?sidebar change (navigation directe, back/forward, etc.) */
+  // resynchroniser quand l’URL change (back/forward, liens internes, etc.)
   useEffect(() => {
-    const v = q.get('sidebar') as SuiteKey | null
-    if (v && v in DEFAULT_ENTRY && v !== suite) {
-      setSuite(v)
-    }
-  }, [q, suite])
+    const next = detectSuite(pathname, sidebarParam)
+    if (next !== suite) setSuite(next)
+  }, [pathname, sidebarParam, suite])
 
-  const changeSuite = (key: string) => {
-    const k = key as SuiteKey
+  const changeSuite = (rawKey: string) => {
+    if (!isSuiteKey(rawKey)) return
+    const key: SuiteKey = rawKey
 
-    // mise à jour de l’état local
-    setSuite(k)
+    setSuite(key)
 
-    // on conserve les autres query params
-    const params = new URLSearchParams(Array.from(q.entries()))
-    params.set('sidebar', k)
+    const params = new URLSearchParams(Array.from(searchParams.entries()))
+    params.set('sidebar', key)
 
-    const basePath = DEFAULT_ENTRY[k]          // route “dashboard” du module
+    const basePath = DEFAULT_ENTRY[key]
     const query    = params.toString()
     const target   = query ? `${basePath}?${query}` : basePath
 

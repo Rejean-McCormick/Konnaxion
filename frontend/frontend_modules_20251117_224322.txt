@@ -2107,28 +2107,41 @@ export default function PulseLive() {
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.counters.map((c) => (
-          <StatisticCard
-            key={c.label}
-            statistic={{
-              title: (
-                <Space>
-                  {c.label}
-                  <Badge status={c.trend > 0 ? 'success' : c.trend < 0 ? 'error' : 'default'} />
-                </Space>
-              ),
-              value: c.value,
-              precision: 0,
-            }}
-            chart={
-              <ChartCard
-                type="line"
-                data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
-                height={50}
-              />
-            }
-          />
-        ))}
+        {data?.counters.map((c) => {
+          // trend is optional, so normalise to 0 for TS safety
+          const trend = c.trend ?? 0;
+
+          return (
+            <StatisticCard
+              key={c.label}
+              statistic={{
+                title: (
+                  <Space>
+                    {c.label}
+                    <Badge
+                      status={
+                        trend > 0
+                          ? 'success'
+                          : trend < 0
+                          ? 'error'
+                          : 'default'
+                      }
+                    />
+                  </Space>
+                ),
+                value: c.value,
+                precision: 0,
+              }}
+              chart={
+                <ChartCard
+                  type="line"
+                  data={c.history.map(({ ts, value }) => ({ x: ts, y: value }))}
+                  height={50}
+                />
+              }
+            />
+          );
+        })}
       </ProCard>
     </PageContainer>
   );
@@ -2328,36 +2341,46 @@ export default function PulseTrends() {
 
 
 ===== BEGIN modules/ethikos/trust/badges/page.tsx =====
-'use client'
+'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Badge, Card, Progress, Tooltip } from 'antd';
+import { Badge as AntBadge, Card, Empty } from 'antd';
 import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchUserBadges } from '@/services/trust';
+import type { Badge as UserBadge } from '@/services/trust';
 
 export default function Badges() {
   usePageTitle('Trust · Badges');
 
-  const { data, loading } = useRequest(fetchUserBadges);
+  // ✅ FIX: add second generic argument `[]`
+  const { data, loading } = useRequest<UserBadge[], []>(fetchUserBadges);
+  const badges = data ?? [];
 
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
-        {data?.earned?.map((b) => (
-          <Badge.Ribbon text="Earned" color="green" key={b.id}>
-            <Card title={b.name} style={{ width: 220, marginBottom: 16 }}>
-              <p>{b.desc}</p>
-            </Card>
-          </Badge.Ribbon>
-        ))}
+        {!loading && badges.length === 0 && (
+          <Empty description="No badges earned yet" />
+        )}
 
-        {data?.progress?.map((p) => (
-          <Tooltip title={`${p.current}/${p.required}`} key={p.id}>
-            <Card title={p.name} bordered={false} style={{ width: 220, marginBottom: 16 }}>
-              <Progress percent={Math.round((p.current / p.required) * 100)} />
+        {badges.map((badge) => (
+          <AntBadge.Ribbon
+            text={dayjs(badge.earnedAt).format('MMM D, YYYY')}
+            color="green"
+            key={badge.id}
+          >
+            <Card
+              title={badge.label}
+              style={{ width: 260, marginBottom: 16 }}
+            >
+              <p>{badge.description}</p>
+              <p style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
+                Earned on {dayjs(badge.earnedAt).format('MMM D, YYYY')}
+              </p>
             </Card>
-          </Tooltip>
+          </AntBadge.Ribbon>
         ))}
       </ProCard>
     </PageContainer>
@@ -2422,40 +2445,76 @@ export default function Credentials() {
 
 
 ===== BEGIN modules/ethikos/trust/profile/page.tsx =====
-'use client'
+'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Avatar, Descriptions, Tag, Timeline } from 'antd';
+import { Avatar, Descriptions, Tag, Timeline, Typography } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchUserProfile } from '@/services/trust';
+import { fetchUserProfile, type ReputationProfile } from '@/services/trust';
+
+const { Text } = Typography;
 
 export default function MyProfile() {
   usePageTitle('Trust · My Profile');
 
-  const { data, loading } = useRequest(fetchUserProfile);
+  // ahooks generics: <Data, Params>
+  const { data, loading } = useRequest<ReputationProfile, []>(fetchUserProfile);
+
+  const level = data?.level ?? 'Visitor';
+  const score = data?.score ?? 0;
+  const dimensions = data?.dimensions ?? [];
+  const recent = data?.recent ?? [];
+
+  const initial = level.charAt(0);
 
   return (
     <PageContainer ghost loading={loading}>
       <ProCard split="vertical">
+        {/* Left column: compact summary */}
         <ProCard colSpan="25%">
-          <Avatar size={120} src={data?.avatar ?? undefined} />
+          <Avatar size={120}>{initial}</Avatar>
+
           <Descriptions size="small" column={1} style={{ marginTop: 16 }}>
-            <Descriptions.Item label="Name">{data?.name}</Descriptions.Item>
-            <Descriptions.Item label="Joined">{data?.joined}</Descriptions.Item>
-            <Descriptions.Item label="Reputation">
-              <Tag color="blue">{data?.score}</Tag>
+            <Descriptions.Item label="Level">
+              <Tag color="blue">{level}</Tag>
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Reputation score">
+              <Text>{score}</Text>
+            </Descriptions.Item>
+
+            <Descriptions.Item label="Dimensions">
+              {dimensions.length ? (
+                dimensions.map((d) => (
+                  <Tag key={d.key} style={{ marginBottom: 4 }}>
+                    {d.label}: {d.score}
+                  </Tag>
+                ))
+              ) : (
+                <Text type="secondary">No reputation data yet</Text>
+              )}
             </Descriptions.Item>
           </Descriptions>
         </ProCard>
+
+        {/* Right column: recent activity derived from `recent` */}
         <ProCard title="Recent Activity" ghost>
-          <Timeline>
-            {data?.activity?.map((a) => (
-              <Timeline.Item key={a.id}>
-                {a.when} · {a.text}
-              </Timeline.Item>
-            ))}
-          </Timeline>
+          {recent.length ? (
+            <Timeline>
+              {recent.map((item, idx) => (
+                <Timeline.Item
+                  key={idx}
+                  color={item.change >= 0 ? 'green' : 'red'}
+                >
+                  {item.label} · {item.change >= 0 ? '+' : ''}
+                  {item.change}
+                </Timeline.Item>
+              ))}
+            </Timeline>
+          ) : (
+            <Text type="secondary">No recent activity</Text>
+          )}
         </ProCard>
       </ProCard>
     </PageContainer>
