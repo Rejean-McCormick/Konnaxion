@@ -27,10 +27,6 @@ const { Text } = Typography;
 const { Search } = Input;
 const { Option } = Select;
 
-// Keep in sync with backend OpenAPI for Knowledge / library_resource_management search
-const KNOWLEDGE_SEARCH_ENDPOINT =
-  '/api/konnected/knowledge/resources/search';
-
 type KnowledgeContentType = 'article' | 'video' | 'lesson' | 'quiz' | 'dataset';
 
 interface KnowledgeResource {
@@ -95,13 +91,66 @@ const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 
 const LANGUAGE_OPTIONS = ['English', 'French', 'Spanish', 'Other'];
 
+// Existing backend uses a list endpoint for KnowledgeResource.
+// We support the main variants used elsewhere in the app and pick
+// the first one that responds.
+const KNOWLEDGE_SEARCH_ENDPOINTS = [
+  '/api/knowledge-resources/',
+  '/api/knowledge/resources/',
+  '/api/konnected/resources/',
+] as const;
+
+type RawKnowledgeSearchResponse =
+  | KnowledgeResource[]
+  | {
+      results?: KnowledgeResource[];
+      items?: KnowledgeResource[];
+      count?: number;
+      total?: number;
+    };
+
+function normalizeSearchResponse(raw: RawKnowledgeSearchResponse): KnowledgeSearchResponse {
+  if (Array.isArray(raw)) {
+    return {
+      count: raw.length,
+      results: raw,
+    };
+  }
+
+  const obj = raw ?? {};
+  const anyObj = obj as any;
+
+  const results: KnowledgeResource[] =
+    (Array.isArray(anyObj.results) && anyObj.results) ||
+    (Array.isArray(anyObj.items) && anyObj.items) ||
+    [];
+
+  const count: number =
+    typeof anyObj.count === 'number'
+      ? anyObj.count
+      : typeof anyObj.total === 'number'
+        ? anyObj.total
+        : results.length;
+
+  return { count, results };
+}
+
 async function searchKnowledgeResources(query: QueryState): Promise<KnowledgeSearchResponse> {
   const params = new URLSearchParams();
 
-  if (query.q) params.set('q', query.q);
-  if (query.types && query.types.length > 0) {
-    params.set('type', query.types.join(','));
+  // Text search: support both v14-style `q` and DRF SearchFilter's `search`
+  if (query.q) {
+    params.set('q', query.q);
+    params.set('search', query.q);
   }
+
+  if (query.types && query.types.length > 0) {
+    // Primary v14 param
+    params.set('type', query.types.join(','));
+    // Optional legacy alias used in some views
+    params.set('resource_type', query.types.join(','));
+  }
+
   if (query.subjects && query.subjects.length > 0) {
     params.set('subject', query.subjects.join(','));
   }
@@ -121,24 +170,45 @@ async function searchKnowledgeResources(query: QueryState): Promise<KnowledgeSea
   params.set('page', String(query.page));
   params.set('page_size', String(query.page_size));
 
-  const res = await fetch(`${KNOWLEDGE_SEARCH_ENDPOINT}?${params.toString()}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    // Include credentials if your API relies on cookies/session
-    credentials: 'include',
-  });
+  const qs = params.toString();
+  let lastError: unknown;
 
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(
-      body || `Knowledge search failed with status ${res.status}`,
-    );
+  for (const base of KNOWLEDGE_SEARCH_ENDPOINTS) {
+    const url = qs ? `${base}?${qs}` : base;
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      // For 404/405 we try the next candidate; for other codes we surface the error.
+      if (!res.ok) {
+        if (res.status === 404 || res.status === 405) {
+          lastError = new Error(`Knowledge search endpoint not available at ${base} (${res.status})`);
+          continue;
+        }
+
+        const body = await res.text().catch(() => '');
+        throw new Error(body || `Knowledge search failed with status ${res.status}`);
+      }
+
+      const json = (await res.json()) as RawKnowledgeSearchResponse;
+      return normalizeSearchResponse(json);
+    } catch (err) {
+      lastError = err;
+      // Try next candidate
+    }
   }
 
-  const data = (await res.json()) as KnowledgeSearchResponse;
-  return data;
+  const message =
+    lastError instanceof Error
+      ? lastError.message
+      : 'Unable to reach any knowledge search endpoint.';
+  throw new Error(message);
 }
 
 export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
@@ -151,7 +221,6 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastQuery, setLastQuery] = useState<QueryState | null>(null);
 
   const columns: ColumnsType<KnowledgeResource> = useMemo(
     () => [
@@ -176,15 +245,9 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
                 <Text strong>{value}</Text>
               )}
               <Space size="small" wrap>
-                {record.subject && (
-                  <Tag color="blue">{record.subject}</Tag>
-                )}
-                {record.level && (
-                  <Tag color="purple">{record.level}</Tag>
-                )}
-                {record.language && (
-                  <Tag color="geekblue">{record.language}</Tag>
-                )}
+                {record.subject && <Tag color="blue">{record.subject}</Tag>}
+                {record.level && <Tag color="purple">{record.level}</Tag>}
+                {record.language && <Tag color="geekblue">{record.language}</Tag>}
               </Space>
             </Space>
           );
@@ -196,7 +259,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
         key: 'type',
         width: 140,
         render: (value: KnowledgeResource['type']) => (
-          <Tag>{String(value).toUpperCase()}</Tag>
+          <Tag>{String(value ?? '').toUpperCase() || 'UNKNOWN'}</Tag>
         ),
       },
       {
@@ -212,7 +275,9 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
               ))}
             </Space>
           ) : (
-            <Text type="secondary">No tags</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              No tags
+            </Text>
           ),
       },
       {
@@ -221,7 +286,13 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
         key: 'created_at',
         width: 140,
         render: (value?: string | null) =>
-          value ? dayjs(value).format('YYYY-MM-DD') : '—',
+          value ? (
+            <Text>{dayjs(value).format('YYYY-MM-DD')}</Text>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Unknown
+            </Text>
+          ),
       },
       {
         title: 'Actions',
@@ -244,9 +315,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             <Button
               size="small"
               onClick={() =>
-                router.push(
-                  `/konnected/learning-library/resource/${record.id}`,
-                )
+                router.push(`/konnected/learning-library/resource/${record.id}`)
               }
             >
               View details
@@ -258,10 +327,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
     [router],
   );
 
-  const runSearch = async (
-    overridePage?: number,
-    overridePageSize?: number,
-  ) => {
+  const runSearch = async (overridePage?: number, overridePageSize?: number) => {
     const formValues = form.getFieldsValue();
 
     const pageToUse = overridePage ?? page;
@@ -292,7 +358,6 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       setTotal(response.count ?? response.results.length);
       setPage(pageToUse);
       setPageSize(pageSizeToUse);
-      setLastQuery(query);
     } catch (e) {
       const message =
         e instanceof Error ? e.message : 'Unexpected error during search';
@@ -306,17 +371,17 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
 
   const onFinish = () => {
     // Reset to first page when filters change
-    runSearch(1, pageSize);
+    void runSearch(1, pageSize);
   };
 
   const handleQuickSearch = (value: string) => {
     form.setFieldsValue({ q: value });
-    runSearch(1, pageSize);
+    void runSearch(1, pageSize);
   };
 
   const handleResetFilters = () => {
     form.resetFields();
-    runSearch(1, DEFAULT_PAGE_SIZE);
+    void runSearch(1, DEFAULT_PAGE_SIZE);
   };
 
   const handleTableChange: TableProps<KnowledgeResource>['onChange'] = (
@@ -324,26 +389,28 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
   ) => {
     const nextPage = pagination.current || 1;
     const nextPageSize = pagination.pageSize || DEFAULT_PAGE_SIZE;
-    runSearch(nextPage, nextPageSize);
+    void runSearch(nextPage, nextPageSize);
   };
 
   useEffect(() => {
     // Initial search on mount with default filters
-    runSearch(1, DEFAULT_PAGE_SIZE);
+    void runSearch(1, DEFAULT_PAGE_SIZE);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const hasActiveFilters = useMemo(() => {
-    const v = form.getFieldsValue();
-    return Boolean(
-      v.q ||
-        (v.types && v.types.length > 0) ||
-        (v.subjects && v.subjects.length > 0) ||
-        (v.levels && v.levels.length > 0) ||
-        (v.languages && v.languages.length > 0) ||
-        (v.createdAt && v.createdAt.length === 2),
-    );
-  }, [form]);
+  // Compute active filters on each render so the Reset button state stays in sync
+  const filterValues = form.getFieldsValue();
+  const hasActiveFilters = Boolean(
+    filterValues.q ||
+      (filterValues.types && filterValues.types.length > 0) ||
+      (filterValues.subjects && filterValues.subjects.length > 0) ||
+      (filterValues.levels && filterValues.levels.length > 0) ||
+      (filterValues.languages && filterValues.languages.length > 0) ||
+      (filterValues.createdAt &&
+        Array.isArray(filterValues.createdAt) &&
+        filterValues.createdAt[0] &&
+        filterValues.createdAt[1]),
+  );
 
   const secondaryActions = (
     <Space>
@@ -357,7 +424,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       <Button
         icon={<ReloadOutlined />}
         onClick={handleResetFilters}
-        disabled={!hasActiveFilters && !lastQuery}
+        disabled={!hasActiveFilters}
       >
         Reset filters
       </Button>
@@ -368,7 +435,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
     <Button
       type="primary"
       icon={<FilterOutlined />}
-      onClick={() => runSearch(page, pageSize)}
+      onClick={() => void runSearch(page, pageSize)}
     >
       Apply filters
     </Button>
@@ -382,11 +449,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       secondaryActions={secondaryActions}
     >
       <Card style={{ marginBottom: 16 }}>
-        <Form<SearchFormValues>
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-        >
+        <Form<SearchFormValues> form={form} layout="vertical" onFinish={onFinish}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12} lg={8}>
               <Form.Item
@@ -403,10 +466,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Content type"
-                name="types"
-              >
+              <Form.Item label="Content type" name="types">
                 <Select
                   mode="multiple"
                   allowClear
@@ -422,10 +482,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Subjects"
-                name="subjects"
-              >
+              <Form.Item label="Subjects" name="subjects">
                 <Select
                   mode="multiple"
                   allowClear
@@ -439,12 +496,11 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
                 </Select>
               </Form.Item>
             </Col>
+          </Row>
 
+          <Row gutter={[16, 16]}>
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Level"
-                name="levels"
-              >
+              <Form.Item label="Level" name="levels">
                 <Select
                   mode="multiple"
                   allowClear
@@ -460,10 +516,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Language"
-                name="languages"
-              >
+              <Form.Item label="Language" name="languages">
                 <Select
                   mode="multiple"
                   allowClear
@@ -479,14 +532,8 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Added to library"
-                name="createdAt"
-              >
-                <RangePicker
-                  style={{ width: '100%' }}
-                  allowEmpty={[true, true]}
-                />
+              <Form.Item label="Added to library" name="createdAt">
+                <RangePicker style={{ width: '100%' }} allowEmpty={[true, true]} />
               </Form.Item>
             </Col>
           </Row>
@@ -519,11 +566,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       )}
 
       <Card>
-        <Space
-          direction="vertical"
-          style={{ width: '100%' }}
-          size="large"
-        >
+        <Space direction="vertical" style={{ width: '100%' }} size="large">
           <Space
             style={{ width: '100%', justifyContent: 'space-between' }}
           >

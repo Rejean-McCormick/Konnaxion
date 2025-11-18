@@ -18,7 +18,8 @@ import api from '@/api';
 
 const { Paragraph } = Typography;
 
-const PROJECTS_ENDPOINT = '/api/projects/';
+// Backend route: /api/keenkonnect/projects/
+const PROJECTS_ENDPOINT = 'keenkonnect/projects/';
 
 type CreateProjectFormValues = {
   name: string;

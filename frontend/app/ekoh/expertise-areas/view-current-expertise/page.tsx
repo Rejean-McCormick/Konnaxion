@@ -1,13 +1,10 @@
 'use client'
 
-// pages/ekoh/expertise-areas/view-current-expertise/index.tsx
+// app/ekoh/expertise-areas/view-current-expertise/page.tsx
 import React from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Card, List, Progress, Tag, Typography } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
-
-const { Title } = Typography;
+import { Card, List, Progress, Tag } from 'antd';
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 // Exemple de données simulées pour l'expertise de l'utilisateur
 interface Expertise {
@@ -42,7 +39,7 @@ const expertiseData: Expertise[] = [
   },
 ];
 
-const ViewCurrentExpertise = () => {
+export default function ViewCurrentExpertise(): JSX.Element {
   return (
     <>
       <Head>
@@ -52,11 +49,11 @@ const ViewCurrentExpertise = () => {
           content="View your recognized expertise areas along with proficiency levels and contribution details."
         />
       </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de la page */}
-        <Title level={2}>Expertise Areas</Title>
 
-        {/* Liste des domaines d'expertise */}
+      <EkohPageShell
+        title="Expertise Areas"
+        subtitle="Overview of your recognized domains, proficiency levels, and contributions."
+      >
         <Card className="mb-6">
           <List
             itemLayout="vertical"
@@ -81,9 +78,7 @@ const ViewCurrentExpertise = () => {
             )}
           />
         </Card>
-      </div>
+      </EkohPageShell>
     </>
   );
 }
-
-export default ViewCurrentExpertise;

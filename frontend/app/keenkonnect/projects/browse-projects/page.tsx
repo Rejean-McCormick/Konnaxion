@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Head from 'next/head';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import {
   Avatar,
@@ -29,11 +30,13 @@ import {
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import api from '@/api';
+import usePageTitle from '@/hooks/usePageTitle';
 
 const { Search } = Input;
 const { Option } = Select;
 
-const PROJECTS_ENDPOINT = '/api/projects/';
+// Aligned with Django router: /api/keenkonnect/projects/
+const PROJECTS_ENDPOINT = 'keenkonnect/projects/'; // relative to NEXT_PUBLIC_API_BASE
 
 type SortCriteria = 'newest' | 'mostMembers';
 
@@ -62,6 +65,9 @@ interface Project {
 
 export default function BrowseProjectsPage(): JSX.Element {
   const router = useRouter();
+
+  // Sync browser tab title with suite naming
+  usePageTitle('KeenKonnect · Browse Projects');
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -182,338 +188,381 @@ export default function BrowseProjectsPage(): JSX.Element {
   };
 
   return (
-    <PageContainer
-      ghost
-      header={{
-        title: 'Browse Projects',
-        subTitle:
-          'Discover projects and collaborate through KeenKonnect. Data is loaded from the Django backend.',
-        extra: [
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() =>
-              router.push('/keenkonnect/projects/create-new-project')
-            }
-          >
-            Create New Project
-          </Button>,
-        ],
-      }}
-    >
-      <ProCard ghost>
-        {loading && (
-          <div style={{ textAlign: 'center', padding: 24 }}>
-            <Spin />
-          </div>
-        )}
+    <>
+      <Head>
+        <title>KeenKonnect – Browse Projects</title>
+      </Head>
 
-        {error && (
-          <div style={{ marginBottom: 16 }}>
-            <Tag color="red">{error}</Tag>
-          </div>
-        )}
+      <PageContainer
+        ghost
+        header={{
+          title: 'Browse Projects',
+          subTitle:
+            'Discover projects and collaborate through KeenKonnect. Data is loaded from the Django backend.',
+          extra: [
+            <Button
+              key="create"
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() =>
+                router.push('/keenkonnect/projects/create-new-project')
+              }
+            >
+              Create New Project
+            </Button>,
+          ],
+        }}
+      >
+        <ProCard ghost>
+          {loading && (
+            <div style={{ textAlign: 'center', padding: 24 }}>
+              <Spin />
+            </div>
+          )}
 
-        {/* Tabs + filters */}
-        <ProCard bordered={false}>
-          {/* Quick domain Tabs */}
-          <Tabs
-            activeKey={activeDomainTabKey}
-            onChange={handleDomainTabChange}
-            items={domainOptions.map((domain) => ({
-              key: domain,
-              label: domain === 'All' ? 'All Domains' : domain,
-            }))}
-          />
+          {error && (
+            <div style={{ marginBottom: 16 }}>
+              <Tag color="red">{error}</Tag>
+            </div>
+          )}
 
-          {/* Filters */}
-          <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
-            <Col xs={24} md={10}>
-              <Search
-                placeholder="Search by name or description"
-                allowClear
-                prefix={<SearchOutlined />}
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={7}>
-              <Select
-                value={selectedDomain}
-                style={{ width: '100%' }}
-                onChange={(value) => {
-                  setSelectedDomain(value);
-                  setActiveDomainTabKey(value);
-                  setCurrentPage(1);
-                }}
-              >
-                {domainOptions.map((domain) => (
-                  <Option key={domain} value={domain}>
-                    {domain === 'All' ? 'All Domains' : domain}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-            <Col xs={24} sm={12} md={7}>
-              <Select
-                value={selectedTechnology}
-                style={{ width: '100%' }}
-                onChange={(value) => {
-                  setSelectedTechnology(value);
-                  setCurrentPage(1);
-                }}
-              >
-                {technologyOptions.map((tech) => (
-                  <Option key={tech} value={tech}>
-                    {tech === 'All' ? 'All Technologies' : tech}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
+          {/* Tabs + filters */}
+          <ProCard bordered={false}>
+            {/* Quick domain Tabs */}
+            <Tabs
+              activeKey={activeDomainTabKey}
+              onChange={handleDomainTabChange}
+              items={domainOptions.map((domain) => ({
+                key: domain,
+                label: domain === 'All' ? 'All Domains' : domain,
+              }))}
+            />
 
-          {/* Sort & result count */}
-          <Row
-            justify="space-between"
-            align="middle"
-            style={{ marginTop: 16 }}
-          >
-            <Col>
-              <Space size="middle">
-                <span>Sort by:</span>
+            {/* Filters */}
+            <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
+              <Col xs={24} md={10}>
+                <Search
+                  placeholder="Search by name or description"
+                  allowClear
+                  prefix={<SearchOutlined />}
+                  value={searchText}
+                  onChange={(e) => {
+                    setSearchText(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </Col>
+              <Col xs={24} sm={12} md={7}>
                 <Select
-                  value={sortCriteria}
-                  style={{ width: 200 }}
-                  onChange={(value) =>
-                    setSortCriteria(value as SortCriteria)
-                  }
+                  value={selectedDomain}
+                  style={{ width: '100%' }}
+                  onChange={(value) => {
+                    setSelectedDomain(value);
+                    setActiveDomainTabKey(value);
+                    setCurrentPage(1);
+                  }}
                 >
-                  <Option value="newest">Newest</Option>
-                  <Option value="mostMembers">Most Members</Option>
+                  {domainOptions.map((domain) => (
+                    <Option key={domain} value={domain}>
+                      {domain === 'All' ? 'All Domains' : domain}
+                    </Option>
+                  ))}
                 </Select>
-              </Space>
-            </Col>
-            <Col>
-              <span>
-                {sortedProjects.length} project
-                {sortedProjects.length !== 1 ? 's' : ''} found
-              </span>
-            </Col>
-          </Row>
-        </ProCard>
+              </Col>
+              <Col xs={24} sm={12} md={7}>
+                <Select
+                  value={selectedTechnology}
+                  style={{ width: '100%' }}
+                  onChange={(value) => {
+                    setSelectedTechnology(value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  {technologyOptions.map((tech) => (
+                    <Option key={tech} value={tech}>
+                      {tech === 'All' ? 'All Technologies' : tech}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+            </Row>
 
-        {/* Projects grid */}
-        <ProCard ghost style={{ marginTop: 24 }} bodyStyle={{ padding: 0 }}>
-          {projects.length === 0 && !loading ? (
-            <Empty description="No projects available yet." />
-          ) : (
-            <Row gutter={[24, 24]}>
-              {paginatedProjects.map((project) => (
-                <Col key={project.id} xs={24} sm={12} lg={8}>
-                  <Card
-                    hoverable
-                    title={project.name}
-                    onClick={() => handleOpenDrawer(project)}
-                    extra={
-                      <Space size={8}>
-                        <Tag color="blue">{project.domain}</Tag>
-                        <Tooltip title={`${project.members} members`}>
-                          <Space size={4}>
-                            <TeamOutlined />
-                            <span>{project.members}</span>
-                          </Space>
-                        </Tooltip>
-                      </Space>
-                    }
+            {/* Sorter */}
+            <Row style={{ marginTop: 16 }}>
+              <Col span={24}>
+                <Space>
+                  <span>Sort by:</span>
+                  <Select<SortCriteria>
+                    value={sortCriteria}
+                    onChange={(value) => setSortCriteria(value)}
+                    style={{ width: 180 }}
                   >
-                    <Space
-                      direction="vertical"
-                      size="small"
-                      style={{ width: '100%' }}
+                    <Option value="newest">Newest first</Option>
+                    <Option value="mostMembers">Most members</Option>
+                  </Select>
+                </Space>
+              </Col>
+            </Row>
+          </ProCard>
+
+          {/* Content */}
+          <ProCard ghost style={{ marginTop: 16 }}>
+            {projects.length === 0 && !loading && !error && (
+              <Empty
+                description={
+                  <Space direction="vertical">
+                    <span>No projects found yet.</span>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() =>
+                        router.push('/keenkonnect/projects/create-new-project')
+                      }
                     >
-                      <div style={{ minHeight: 48 }}>
-                        {project.description || 'No description provided yet.'}
-                      </div>
+                      Create the first project
+                    </Button>
+                  </Space>
+                }
+              />
+            )}
 
-                      {/* Technologies */}
-                      <Space wrap>
-                        {project.technologies.length === 0 ? (
-                          <Tag>No technologies listed</Tag>
-                        ) : (
-                          project.technologies.map((tech) => (
-                            <Tag key={tech}>{tech}</Tag>
-                          ))
-                        )}
-                      </Space>
-
-                      {/* Avatars + owner + CTA */}
-                      <Row
-                        justify="space-between"
-                        align="middle"
-                        style={{ marginTop: 8 }}
-                      >
-                        <Col>
-                          <Space size={8}>
-                            <Avatar.Group maxCount={3} size="small">
-                              <Avatar icon={<UserOutlined />} />
-                              <Avatar>
-                                {project.owner
-                                  ? project.owner.charAt(0).toUpperCase()
-                                  : '?'}
-                              </Avatar>
-                              <Avatar icon={<UserOutlined />} />
-                            </Avatar.Group>
-                            <span
-                              style={{
-                                fontSize: 12,
-                                color: 'rgba(0,0,0,0.45)',
+            {projects.length > 0 && (
+              <Row gutter={[16, 16]}>
+                {paginatedProjects.map((project) => (
+                  <Col key={project.id} xs={24} sm={12} md={8}>
+                    <Card
+                      hoverable
+                      title={
+                        <Space>
+                          <TeamOutlined />
+                          <span>{project.name}</span>
+                        </Space>
+                      }
+                      onClick={() => handleOpenDrawer(project)}
+                      extra={
+                        <Space size={8}>
+                          <Tooltip title="Open workspace">
+                            <Button
+                              type="link"
+                              icon={<UserOutlined />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(
+                                  `/keenkonnect/projects/project-workspace?projectId=${project.id}`,
+                                );
                               }}
                             >
-                              Owner: {project.owner || 'Unknown'}
-                            </span>
-                          </Space>
-                        </Col>
-                        <Col>
-                          <Button
-                            type="link"
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(
-                                `/keenkonnect/projects/project-workspace?projectId=${project.id}`,
-                              );
-                            }}
-                          >
-                            Open workspace
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Space>
-                  </Card>
-                </Col>
-              ))}
-
-              {paginatedProjects.length === 0 && projects.length > 0 && (
-                <Col span={24}>
-                  <Card>
-                    <Space direction="vertical">
-                      <span>No projects match your filters.</span>
-                      <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={() =>
-                          router.push(
-                            '/keenkonnect/projects/create-new-project',
-                          )
-                        }
+                              Open
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="View collaborators (coming soon)">
+                            <Button
+                              type="link"
+                              icon={<TeamOutlined />}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Team
+                            </Button>
+                          </Tooltip>
+                        </Space>
+                      }
+                    >
+                      <Space
+                        direction="vertical"
+                        size={8}
+                        style={{ width: '100%' }}
                       >
-                        Start a New Project
-                      </Button>
-                    </Space>
-                  </Card>
-                </Col>
-              )}
-            </Row>
+                        <div>
+                          <Tag color="blue">{project.domain}</Tag>
+                        </div>
+
+                        <div
+                          style={{
+                            minHeight: 48,
+                            color: 'rgba(0,0,0,0.65)',
+                            fontSize: 13,
+                          }}
+                        >
+                          {project.description ||
+                            'No description provided yet.'}
+                        </div>
+
+                        {/* Technologies */}
+                        <Space wrap>
+                          {project.technologies.length === 0 ? (
+                            <Tag>No technologies listed</Tag>
+                          ) : (
+                            project.technologies.map((tech) => (
+                              <Tag key={tech}>{tech}</Tag>
+                            ))
+                          )}
+                        </Space>
+
+                        {/* Avatars + owner + CTA */}
+                        <Row
+                          justify="space-between"
+                          align="middle"
+                          style={{ marginTop: 8 }}
+                        >
+                          <Col>
+                            <Space size={8}>
+                              <Avatar.Group maxCount={3} size="small">
+                                <Avatar icon={<UserOutlined />} />
+                                <Avatar>
+                                  {project.owner
+                                    ? project.owner.charAt(0).toUpperCase()
+                                    : '?'}
+                                </Avatar>
+                                <Avatar icon={<UserOutlined />} />
+                              </Avatar.Group>
+                              <span
+                                style={{
+                                  fontSize: 12,
+                                  color: 'rgba(0,0,0,0.45)',
+                                }}
+                              >
+                                Owner: {project.owner || 'Unknown'}
+                              </span>
+                            </Space>
+                          </Col>
+                          <Col>
+                            <Button
+                              type="link"
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(
+                                  `/keenkonnect/projects/project-workspace?projectId=${project.id}`,
+                                );
+                              }}
+                            >
+                              Open workspace
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Space>
+                    </Card>
+                  </Col>
+                ))}
+
+                {paginatedProjects.length === 0 && projects.length > 0 && (
+                  <Col span={24}>
+                    <Card>
+                      <Space direction="vertical">
+                        <span>No projects match your filters.</span>
+                        <Button
+                          type="primary"
+                          icon={<PlusOutlined />}
+                          onClick={() =>
+                            router.push(
+                              '/keenkonnect/projects/create-new-project',
+                            )
+                          }
+                        >
+                          Start a New Project
+                        </Button>
+                      </Space>
+                    </Card>
+                  </Col>
+                )}
+              </Row>
+            )}
+          </ProCard>
+
+          {/* Pagination */}
+          {sortedProjects.length > pageSize && (
+            <div style={{ textAlign: 'center', marginTop: 24 }}>
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={sortedProjects.length}
+                showSizeChanger={false}
+                onChange={(page) => setCurrentPage(page)}
+              />
+            </div>
           )}
-        </ProCard>
 
-        {/* Pagination */}
-        {sortedProjects.length > pageSize && (
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Pagination
-              current={currentPage}
-              pageSize={pageSize}
-              total={sortedProjects.length}
-              showSizeChanger={false}
-              onChange={(page) => setCurrentPage(page)}
-            />
-          </div>
-        )}
+          {/* Drawer: project details */}
+          <Drawer
+            title={selectedProject?.name}
+            placement="right"
+            width={420}
+            open={drawerVisible}
+            onClose={handleCloseDrawer}
+          >
+            {selectedProject && (
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <Space align="center">
+                  <Avatar.Group maxCount={3}>
+                    <Avatar size="large" icon={<UserOutlined />} />
+                    <Avatar>
+                      {selectedProject.owner
+                        ? selectedProject.owner.charAt(0).toUpperCase()
+                        : '?'}
+                    </Avatar>
+                    <Avatar icon={<UserOutlined />} />
+                  </Avatar.Group>
+                  <div>
+                    <div>
+                      <strong>Owner: </strong>
+                      {selectedProject.owner || 'Unknown'}
+                    </div>
+                    <div>
+                      <strong>Members: </strong>
+                      {selectedProject.members}
+                    </div>
+                  </div>
+                </Space>
 
-        {/* Drawer: project details */}
-        <Drawer
-          title={selectedProject?.name}
-          placement="right"
-          width={420}
-          open={drawerVisible}
-          onClose={handleCloseDrawer}
-        >
-          {selectedProject && (
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ width: '100%' }}
-            >
-              <Space align="center">
-                <Avatar.Group maxCount={3}>
-                  <Avatar size="large" icon={<UserOutlined />} />
-                  <Avatar>
-                    {selectedProject.owner
-                      ? selectedProject.owner.charAt(0).toUpperCase()
-                      : '?'}
-                  </Avatar>
-                  <Avatar icon={<UserOutlined />} />
-                </Avatar.Group>
+                <Divider />
+
                 <div>
-                  <div>
-                    <strong>Owner: </strong>
-                    {selectedProject.owner || 'Unknown'}
-                  </div>
-                  <div>
-                    <strong>Members: </strong>
-                    {selectedProject.members}
-                  </div>
+                  <p>
+                    <strong>Description</strong>
+                  </p>
+                  <p>
+                    {selectedProject.description ||
+                      'No detailed description provided yet.'}
+                  </p>
+                </div>
+
+                <div>
+                  <p>
+                    <strong>Domain</strong>
+                  </p>
+                  <Tag color="blue">{selectedProject.domain}</Tag>
+                </div>
+
+                <div>
+                  <p>
+                    <strong>Technologies</strong>
+                  </p>
+                  <Space wrap>
+                    {selectedProject.technologies.length === 0 ? (
+                      <Tag>No technologies listed</Tag>
+                    ) : (
+                      selectedProject.technologies.map((tech) => (
+                        <Tag key={tech}>{tech}</Tag>
+                      ))
+                    )}
+                  </Space>
+                </div>
+
+                <div>
+                  <p>
+                    <strong>Created At</strong>
+                  </p>
+                  <span>{selectedProject.createdAt}</span>
                 </div>
               </Space>
-
-              <Divider />
-
-              <div>
-                <p>
-                  <strong>Description</strong>
-                </p>
-                <p>
-                  {selectedProject.description ||
-                    'No detailed description provided yet.'}
-                </p>
-              </div>
-
-              <div>
-                <p>
-                  <strong>Domain</strong>
-                </p>
-                <Tag color="blue">{selectedProject.domain}</Tag>
-              </div>
-
-              <div>
-                <p>
-                  <strong>Technologies</strong>
-                </p>
-                <Space wrap>
-                  {selectedProject.technologies.length === 0 ? (
-                    <Tag>No technologies listed</Tag>
-                  ) : (
-                    selectedProject.technologies.map((tech) => (
-                      <Tag key={tech}>{tech}</Tag>
-                    ))
-                  )}
-                </Space>
-              </div>
-
-              <div>
-                <p>
-                  <strong>Created At</strong>
-                </p>
-                <span>{selectedProject.createdAt}</span>
-              </div>
-            </Space>
-          )}
-        </Drawer>
-      </ProCard>
-    </PageContainer>
+            )}
+          </Drawer>
+        </ProCard>
+      </PageContainer>
+    </>
   );
 }

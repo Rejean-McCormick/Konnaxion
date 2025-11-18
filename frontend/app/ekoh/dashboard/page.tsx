@@ -1,23 +1,24 @@
 'use client'
 
-// pages/ekoh/dashboard/index.tsx
+// app/ekoh/dashboard/page.tsx
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
 import { Card, Statistic, Row, Col, Tabs } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
 import LineChart from '@/components/dashboard-components/LineChart';
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 const { TabPane } = Tabs;
 
-const EkohDashboard = () => {
-  // États simulant des données utilisateur
-  const [ekohScore, setEkohScore] = useState<number>(80);
-  const [smartVoteWeight, setSmartVoteWeight] = useState<number>(70);
-  const [badgesEarned, setBadgesEarned] = useState<number>(12);
+type TrendPoint = { time: string; score: number };
 
-  // Données pour le graphique de tendance (Ekoh score over time)
-  const [trendData, setTrendData] = useState<Array<{ time: string; score: number }>>([
+const EkohDashboard = (): JSX.Element => {
+  // Simulated user metrics
+  const [ekohScore] = useState<number>(80);
+  const [smartVoteWeight] = useState<number>(70);
+  const [badgesEarned] = useState<number>(12);
+
+  // Trend data (Ekoh score over time)
+  const [trendData, setTrendData] = useState<TrendPoint[]>([
     { time: '08:00', score: 70 },
     { time: '10:00', score: 72 },
     { time: '12:00', score: 75 },
@@ -27,26 +28,31 @@ const EkohDashboard = () => {
     { time: '20:00', score: 80 },
   ]);
 
-  // Notable achievements et recent contributions (données simulées)
-  const notableAchievements = [
+  // Notable achievements and recent contributions (mock data)
+  const notableAchievements: string[] = [
     'Reached Expert Level 5',
     'Highest vote weight: 78%',
     'Awarded "Community Champion" badge',
   ];
-  const recentContributions = [
+
+  const recentContributions: string[] = [
     'Voted on Economic Reform Proposal',
     'Commented on Climate Policy Debate',
     'Shared article on Smart Voting Impact',
   ];
 
-  // Simulation d'actualisation du graphique (optionnelle)
+  // Optional simulation to refresh the trend chart
   useEffect(() => {
     const interval = setInterval(() => {
-      // Simuler une mise à jour du score en ajoutant un nouveau point et en conservant les 7 derniers points
-      const newTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const newTime = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
       const newScore = 70 + Math.floor(Math.random() * 20);
-      setTrendData(prev => [...prev.slice(-6), { time: newTime, score: newScore }]);
+
+      setTrendData((prev) => [...prev.slice(-6), { time: newTime, score: newScore }]);
     }, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -54,12 +60,16 @@ const EkohDashboard = () => {
     <>
       <Head>
         <title>Ekoh Dashboard</title>
-        <meta name="description" content="Overview of your reputation and influence in the Ekoh system." />
+        <meta
+          name="description"
+          content="Overview of your reputation and influence in the Ekoh system."
+        />
       </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de la page */}
-        <h1 className="text-2xl font-bold mb-4">Ekoh Dashboard</h1>
 
+      <EkohPageShell
+        title="Ekoh dashboard"
+        subtitle="Overview of your reputation, voting influence, expertise, and badges."
+      >
         {/* Overview cards */}
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={8}>
@@ -82,15 +92,22 @@ const EkohDashboard = () => {
         {/* Reputation trend chart */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Reputation Trend Over Time</h2>
-          {/* On transforme les données pour que le composant LineChart attende {time, value} */}
-          <LineChart data={trendData.map(item => ({ time: item.time, value: item.score }))} />
+          <LineChart
+            data={trendData.map((item) => ({
+              time: item.time,
+              value: item.score,
+            }))}
+          />
         </Card>
 
-        {/* Onglets pour les vues approfondies */}
+        {/* Detailed views tabs */}
         <Card className="mb-6">
           <Tabs defaultActiveKey="overview">
             <TabPane tab="Overview" key="overview">
-              <p>This section provides an overall summary of your reputation, voting influence, expertise, and badges.</p>
+              <p>
+                This section provides an overall summary of your reputation, voting influence,
+                expertise, and badges.
+              </p>
             </TabPane>
             <TabPane tab="Voting Influence" key="votingInfluence">
               <p>Detailed view on your Smart Vote weight and how it affects overall decisions.</p>
@@ -109,8 +126,8 @@ const EkohDashboard = () => {
           <Col xs={24} md={12}>
             <Card title="Notable Achievements" className="mb-6">
               <ul>
-                {notableAchievements.map((achievement, index) => (
-                  <li key={index}>{achievement}</li>
+                {notableAchievements.map((achievement) => (
+                  <li key={achievement}>{achievement}</li>
                 ))}
               </ul>
             </Card>
@@ -118,16 +135,16 @@ const EkohDashboard = () => {
           <Col xs={24} md={12}>
             <Card title="Recent Contributions" className="mb-6">
               <ul>
-                {recentContributions.map((contribution, index) => (
-                  <li key={index}>{contribution}</li>
+                {recentContributions.map((contribution) => (
+                  <li key={contribution}>{contribution}</li>
                 ))}
               </ul>
             </Card>
           </Col>
         </Row>
-      </div>
+      </EkohPageShell>
     </>
   );
-}
+};
 
 export default EkohDashboard;

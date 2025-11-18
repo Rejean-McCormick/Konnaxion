@@ -3,7 +3,7 @@
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Row,
   Col,
@@ -19,6 +19,7 @@ import {
   Button,
   Alert,
   Spin,
+  message,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -47,34 +48,47 @@ interface KnowledgeResource {
   subject?: string;
   level?: KnowledgeLevel;
   language?: string;
-  resource_type: string; // e.g. 'video' | 'article' | 'course' | 'quiz'
+  /** Canonical enum from Knowledge module (article, video, lesson, quiz, dataset, …) */
+  resource_type: string;
   average_rating?: number | null;
   tags?: string[];
   estimated_minutes?: number | null;
   is_offline_available?: boolean;
   user_progress_percent?: number | null;
+  /** Backend-aligned extras (not all are rendered, but used for navigation) */
+  url?: string | null;
+  type?: string | null;
+  author?: string | null;
+  created_at?: string | null;
 }
 
 interface KnowledgeResourceListResponse {
-  count: number;
-  results: KnowledgeResource[];
+  count?: number;
+  results?: KnowledgeResource[];
+  items?: KnowledgeResource[];
+  total?: number;
 }
 
 interface KnowledgeMetadataResponse {
-  subjects: string[];
-  levels: KnowledgeLevel[];
-  languages: string[];
-  resource_types: string[];
+  subjects?: string[];
+  levels?: KnowledgeLevel[];
+  languages?: string[];
+  resource_types?: string[];
 }
+
+/* Reasonable defaults based on the Knowledge module spec */
+const DEFAULT_LEVELS: KnowledgeLevel[] = ['beginner', 'intermediate', 'advanced'];
+const DEFAULT_RESOURCE_TYPES = ['article', 'video', 'lesson', 'quiz', 'dataset'];
+const DEFAULT_LANGUAGES = ['English', 'French', 'Spanish', 'Other'];
 
 /* ------------------------------------------------------------------ */
 /*  API endpoints                                                      */
-/*  - Aligned with DRF router: /api/knowledge-resources/              */
+/*  - Aligned with DRF router: /api/konnected/resources/              */
 /*  - Metadata endpoint is optional; call is non-blocking.            */
 /* ------------------------------------------------------------------ */
 
-const KNOWLEDGE_RESOURCES_ENDPOINT = '/api/knowledge-resources/';
-const KNOWLEDGE_METADATA_ENDPOINT = '/api/knowledge-resources/metadata/';
+const KNOWLEDGE_RESOURCES_ENDPOINT = '/api/konnected/resources/';
+const KNOWLEDGE_METADATA_ENDPOINT = '/api/konnected/resources/metadata/';
 
 interface FiltersState {
   query: string;
@@ -103,12 +117,17 @@ function mapSortToOrdering(sort: SortOption): string | undefined {
   }
 }
 
+function normalizeArray<T>(values: T[] | undefined, fallback: T[]): T[] {
+  return values && values.length > 0 ? values : fallback;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page component                                                     */
 /* ------------------------------------------------------------------ */
 
 export default function BrowseResourcesPage(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Filters & pagination
   const [filters, setFilters] = useState<FiltersState>({
@@ -124,14 +143,58 @@ export default function BrowseResourcesPage(): JSX.Element {
 
   // Metadata for filters
   const [subjects, setSubjects] = useState<string[]>([]);
-  const [levels, setLevels] = useState<KnowledgeLevel[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [resourceTypes, setResourceTypes] = useState<string[]>([]);
+  const [levels, setLevels] = useState<KnowledgeLevel[]>(DEFAULT_LEVELS);
+  const [languages, setLanguages] = useState<string[]>(DEFAULT_LANGUAGES);
+  const [resourceTypes, setResourceTypes] = useState<string[]>(DEFAULT_RESOURCE_TYPES);
 
   // Loading / error states
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMeta, setLoadingMeta] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState<boolean>(false);
+  const [sharing, setSharing] = useState<boolean>(false);
+
+  /* ------------------------------------------------------------------ */
+  /*  Query-string ↔ state sync (for "Share filters" links)             */
+  /* ------------------------------------------------------------------ */
+
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const q = searchParams.get('q') ?? '';
+    const subject = searchParams.get('subject') || undefined;
+    const levelParam = searchParams.get('level') as KnowledgeLevel | null;
+    const language = searchParams.get('language') || undefined;
+    const resourceType = searchParams.get('resourceType') || undefined;
+    const sortParam = searchParams.get('sort') as SortOption | null;
+
+    const nextFilters: FiltersState = {
+      query: q,
+      subject,
+      level:
+        levelParam && (DEFAULT_LEVELS as readonly string[]).includes(levelParam)
+          ? levelParam
+          : undefined,
+      language,
+      resourceType,
+      sort:
+        sortParam && ['relevance', 'newest', 'popular', 'shortest', 'longest'].includes(sortParam)
+          ? sortParam
+          : 'relevance',
+    };
+
+    const urlPage = Number(searchParams.get('page') || '1');
+    const urlPageSize = Number(searchParams.get('page_size') || '12');
+
+    setFilters(nextFilters);
+    if (!Number.isNaN(urlPage) && urlPage > 0) {
+      setPage(urlPage);
+    }
+    if (!Number.isNaN(urlPageSize) && urlPageSize > 0) {
+      setPageSize(urlPageSize);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   /* ------------------------------------------------------------------ */
   /*  Data fetching                                                      */
@@ -177,8 +240,30 @@ export default function BrowseResourcesPage(): JSX.Element {
           { params },
         );
 
-        setResources(response.data.results ?? []);
-        setTotal(response.data.count ?? response.data.results.length ?? 0);
+        const raw = response.data as unknown;
+        let items: KnowledgeResource[] = [];
+        let count = 0;
+
+        if (Array.isArray(raw)) {
+          items = raw as KnowledgeResource[];
+          count = items.length;
+        } else if (raw && typeof raw === 'object') {
+          const obj = raw as KnowledgeResourceListResponse;
+          const maybeResults =
+            (Array.isArray(obj.results) && obj.results) ||
+            (Array.isArray(obj.items) && obj.items) ||
+            [];
+          items = maybeResults;
+          count =
+            typeof obj.count === 'number'
+              ? obj.count
+              : typeof obj.total === 'number'
+              ? obj.total
+              : items.length;
+        }
+
+        setResources(items);
+        setTotal(count);
       } catch (err) {
         const msg =
           err instanceof Error ? err.message : 'Unable to load knowledge resources.';
@@ -197,14 +282,18 @@ export default function BrowseResourcesPage(): JSX.Element {
 
     try {
       const response = await axios.get<KnowledgeMetadataResponse>(KNOWLEDGE_METADATA_ENDPOINT);
-      const data = response.data;
+      const data = response.data ?? {};
 
       setSubjects(data.subjects ?? []);
-      setLevels(data.levels ?? []);
-      setLanguages(data.languages ?? []);
-      setResourceTypes(data.resource_types ?? []);
+      setLevels(normalizeArray(data.levels, DEFAULT_LEVELS));
+      setLanguages(normalizeArray(data.languages, DEFAULT_LANGUAGES));
+      setResourceTypes(normalizeArray(data.resource_types, DEFAULT_RESOURCE_TYPES));
     } catch {
       // Metadata is purely additive; failure should not block the main list.
+      setSubjects([]);
+      setLevels(DEFAULT_LEVELS);
+      setLanguages(DEFAULT_LANGUAGES);
+      setResourceTypes(DEFAULT_RESOURCE_TYPES);
     } finally {
       setLoadingMeta(false);
     }
@@ -257,8 +346,131 @@ export default function BrowseResourcesPage(): JSX.Element {
   };
 
   const handleOpenResource = (record: KnowledgeResource) => {
-    // If you later add a dedicated resource detail route, adapt this.
-    router.push(`/konnected/learning-library/resource/${record.id}`);
+    // Prefer explicit URL from backend (can be external or internal).
+    if (record.url) {
+      const href = String(record.url);
+      if (href.startsWith('http://') || href.startsWith('https://')) {
+        window.open(href, '_blank', 'noopener,noreferrer');
+      } else {
+        router.push(href);
+      }
+      return;
+    }
+
+    // Fallback to course player route described in Knowledge module docs.
+    const id = encodeURIComponent(String(record.id));
+    router.push(`/course/${id}`);
+  };
+
+  const buildShareSearchParams = () => {
+    const params = new URLSearchParams();
+
+    if (filters.query) params.set('q', filters.query);
+    if (filters.subject) params.set('subject', filters.subject);
+    if (filters.level) params.set('level', filters.level);
+    if (filters.language) params.set('language', filters.language);
+    if (filters.resourceType) params.set('resourceType', filters.resourceType);
+    if (filters.sort && filters.sort !== 'relevance') params.set('sort', filters.sort);
+
+    if (page !== 1) params.set('page', String(page));
+    if (pageSize !== 12) params.set('page_size', String(pageSize));
+
+    return params;
+  };
+
+  const handleExportCurrentPage = async () => {
+    if (!resources.length) {
+      message.info('There are no resources to export for the current filters.');
+      return;
+    }
+
+    try {
+      setExporting(true);
+
+      const header = [
+        'id',
+        'title',
+        'subject',
+        'level',
+        'language',
+        'resource_type',
+        'average_rating',
+        'estimated_minutes',
+        'tags',
+        'is_offline_available',
+        'user_progress_percent',
+      ];
+
+      const rows = resources.map((r) => [
+        r.id,
+        r.title,
+        r.subject ?? '',
+        r.level ?? '',
+        r.language ?? '',
+        r.resource_type ?? '',
+        r.average_rating ?? '',
+        r.estimated_minutes ?? '',
+        (r.tags ?? []).join('|'),
+        r.is_offline_available ? 'yes' : 'no',
+        r.user_progress_percent ?? '',
+      ]);
+
+      const encodeCell = (value: unknown): string => {
+        const str =
+          value === null || value === undefined ? '' : String(value);
+        if (/[",\n]/.test(str)) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      const csv = [header, ...rows]
+        .map((row) => row.map(encodeCell).join(','))
+        .join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      link.href = url;
+      link.download = `konnected-learning-library-${timestamp}.csv`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      message.success('Exported current page of results as CSV.');
+    } catch {
+      message.error('Unable to export resources. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleShareFilters = async () => {
+    try {
+      setSharing(true);
+      const params = buildShareSearchParams();
+      const basePath = '/konnected/learning-library/browse-resources';
+      const queryString = params.toString();
+      const href = `${basePath}${queryString ? `?${queryString}` : ''}`;
+
+      if (typeof window !== 'undefined') {
+        const fullUrl = `${window.location.origin}${href}`;
+        try {
+          await navigator.clipboard.writeText(fullUrl);
+          message.success('Link with current filters copied to your clipboard.');
+        } catch {
+          message.warning('Unable to copy link automatically. The URL has been updated instead.');
+        }
+      }
+
+      router.push(href);
+    } finally {
+      setSharing(false);
+    }
   };
 
   /* ------------------------------------------------------------------ */
@@ -273,7 +485,11 @@ export default function BrowseResourcesPage(): JSX.Element {
         key: 'title',
         render: (value: string, record) => (
           <Space direction="vertical" size={2}>
-            <Button type="link" onClick={() => handleOpenResource(record)} style={{ padding: 0 }}>
+            <Button
+              type="link"
+              onClick={() => handleOpenResource(record)}
+              style={{ padding: 0 }}
+            >
               {value}
             </Button>
             {record.description && (
@@ -318,7 +534,7 @@ export default function BrowseResourcesPage(): JSX.Element {
             </Tag>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              General
+              Any level
             </Text>
           ),
       },
@@ -328,10 +544,10 @@ export default function BrowseResourcesPage(): JSX.Element {
         key: 'language',
         render: (value?: string) =>
           value ? (
-            <Tag>{value}</Tag>
+            <Tag color="cyan">{value}</Tag>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              N/A
+              Not specified
             </Text>
           ),
       },
@@ -339,12 +555,13 @@ export default function BrowseResourcesPage(): JSX.Element {
         title: 'Rating',
         dataIndex: 'average_rating',
         key: 'average_rating',
+        width: 150,
         render: (value?: number | null) =>
-          typeof value === 'number' ? (
+          value != null ? (
             <Space size={4}>
-              <Rate allowHalf disabled defaultValue={value} />
+              <Rate disabled allowHalf defaultValue={value} />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                {value.toFixed(1)}
+                ({value.toFixed(1)})
               </Text>
             </Space>
           ) : (
@@ -354,13 +571,41 @@ export default function BrowseResourcesPage(): JSX.Element {
           ),
       },
       {
+        title: 'Duration / min',
+        dataIndex: 'estimated_minutes',
+        key: 'estimated_minutes',
+        width: 120,
+        render: (value?: number | null) =>
+          value != null ? (
+            <Text>{value} min</Text>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              —
+            </Text>
+          ),
+      },
+      {
+        title: 'Progress',
+        dataIndex: 'user_progress_percent',
+        key: 'user_progress_percent',
+        width: 120,
+        render: (value?: number | null) =>
+          value != null ? (
+            <Text>{value}%</Text>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Not started
+            </Text>
+          ),
+      },
+      {
         title: 'Tags',
         dataIndex: 'tags',
         key: 'tags',
-        render: (tags?: string[]) =>
-          tags && tags.length > 0 ? (
-            <Space size={[4, 4]} wrap>
-              {tags.map((tag) => (
+        render: (value?: string[]) =>
+          value && value.length > 0 ? (
+            <Space wrap size={4}>
+              {value.map((tag) => (
                 <Tag key={tag}>{tag}</Tag>
               ))}
             </Space>
@@ -371,45 +616,34 @@ export default function BrowseResourcesPage(): JSX.Element {
           ),
       },
       {
-        title: 'Estimated time',
-        dataIndex: 'estimated_minutes',
-        key: 'estimated_minutes',
-        render: (value?: number | null) =>
-          typeof value === 'number' ? (
-            <Text>{value} min</Text>
+        title: 'Offline',
+        dataIndex: 'is_offline_available',
+        key: 'is_offline_available',
+        width: 120,
+        render: (value?: boolean) =>
+          value ? (
+            <Tag color="green">Available</Tag>
           ) : (
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Not specified
-            </Text>
-          ),
-      },
-      {
-        title: 'Progress',
-        dataIndex: 'user_progress_percent',
-        key: 'user_progress_percent',
-        render: (value?: number | null) =>
-          typeof value === 'number' ? (
-            <Text>{value.toFixed(0)}%</Text>
-          ) : (
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Not started
-            </Text>
+            <Tag>Online only</Tag>
           ),
       },
       {
         title: 'Actions',
         key: 'actions',
         fixed: 'right',
-        render: (_, record) => (
+        width: 150,
+        render: (_: unknown, record) => (
           <Space>
-            <Button size="small" onClick={() => handleOpenResource(record)}>
+            <Button size="small" type="link" onClick={() => handleOpenResource(record)}>
               Open
             </Button>
-            {record.is_offline_available && (
-              <Button size="small" icon={<DownloadOutlined />}>
-                Offline
-              </Button>
-            )}
+            <Button
+              size="small"
+              icon={<DownloadOutlined />}
+              disabled={!record.is_offline_available}
+            >
+              Offline
+            </Button>
           </Space>
         ),
       },
@@ -419,16 +653,46 @@ export default function BrowseResourcesPage(): JSX.Element {
 
   const hasResults = resources.length > 0;
 
-  const filtersActive = useMemo(
-    () =>
-      Boolean(
-        filters.query ||
-          filters.subject ||
-          filters.level ||
-          filters.language ||
-          filters.resourceType,
-      ),
-    [filters],
+  const filtersActive = useMemo(() => {
+    const { query, subject, level, language, resourceType, sort } = filters;
+    return Boolean(
+      query || subject || level || language || resourceType || sort !== 'relevance',
+    );
+  }, [filters]);
+
+  /* ------------------------------------------------------------------ */
+  /*  Header actions                                                     */
+  /* ------------------------------------------------------------------ */
+
+  const headerPrimaryAction = (
+    <Space>
+      <Button
+        icon={<DownloadOutlined />}
+        onClick={handleExportCurrentPage}
+        disabled={!hasResults}
+        loading={exporting}
+      >
+        Export selection
+      </Button>
+      <Button
+        icon={<ShareAltOutlined />}
+        onClick={handleShareFilters}
+        disabled={!hasResults && !filtersActive}
+        loading={sharing}
+      >
+        Share filters
+      </Button>
+    </Space>
+  );
+
+  const headerSecondaryActions = (
+    <Button
+      icon={<FilterOutlined />}
+      onClick={() => fetchResources(1, pageSize)}
+      disabled={loading}
+    >
+      Refresh
+    </Button>
   );
 
   /* ------------------------------------------------------------------ */
@@ -439,156 +703,144 @@ export default function BrowseResourcesPage(): JSX.Element {
     <KonnectedPageShell
       title="Browse learning resources"
       subtitle="Explore the shared knowledge library and filter by subject, level, language, and more."
-      primaryAction={
-        <Space>
-          <Button icon={<DownloadOutlined />}>Export selection</Button>
-          <Button icon={<ShareAltOutlined />}>Share filters</Button>
-        </Space>
-      }
-      secondaryActions={
-        <Button icon={<FilterOutlined />} onClick={() => fetchResources(1, pageSize)}>
-          Refresh
-        </Button>
-      }
+      primaryAction={headerPrimaryAction}
+      secondaryActions={headerSecondaryActions}
     >
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card>
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-              {/* Search + quick filters row */}
-              <Row gutter={[16, 16]} align="middle">
-                <Col xs={24} md={10}>
-                  <Search
-                    placeholder="Search by title, subject, keywords…"
-                    allowClear
-                    enterButton={<SearchOutlined />}
-                    onSearch={handleSearch}
-                    defaultValue={filters.query}
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} md={10}>
+                <Search
+                  placeholder="Search by title or description"
+                  allowClear
+                  enterButton={<SearchOutlined />}
+                  onSearch={handleSearch}
+                />
+              </Col>
+
+              <Col xs={24} md={14}>
+                <Row gutter={[8, 8]} justify="end">
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.subject}
+                      onChange={handleFilterChange('subject')}
+                      allowClear
+                      placeholder="All subjects"
+                      style={{ width: '100%' }}
+                      options={subjects.map((s) => ({ label: s, value: s }))}
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.level}
+                      onChange={handleFilterChange('level')}
+                      allowClear
+                      placeholder="Any level"
+                      style={{ width: '100%' }}
+                      options={levels.map((lvl) => ({
+                        label: lvl.charAt(0).toUpperCase() + lvl.slice(1),
+                        value: lvl,
+                      }))}
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.language}
+                      onChange={handleFilterChange('language')}
+                      allowClear
+                      placeholder="Any language"
+                      style={{ width: '100%' }}
+                      options={languages.map((lng) => ({ label: lng, value: lng }))}
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.resourceType}
+                      onChange={handleFilterChange('resourceType')}
+                      allowClear
+                      placeholder="All types"
+                      style={{ width: '100%' }}
+                      options={resourceTypes.map((t) => ({
+                        label: t.charAt(0).toUpperCase() + t.slice(1),
+                        value: t,
+                      }))}
+                    />
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+
+            <Row
+              style={{ marginTop: 16 }}
+              justify="space-between"
+              align="middle"
+              gutter={[8, 8]}
+            >
+              <Col>
+                {filtersActive ? (
+                  <Text type="secondary">
+                    <strong>Active filters:</strong>{' '}
+                    {filters.query && (
+                      <>
+                        Search = <strong>"{filters.query}"</strong>{' '}
+                      </>
+                    )}
+                    {filters.subject && (
+                      <>
+                        Subject = <strong>{filters.subject}</strong>{' '}
+                      </>
+                    )}
+                    {filters.level && (
+                      <>
+                        Level = <strong>{filters.level}</strong>{' '}
+                      </>
+                    )}
+                    {filters.language && (
+                      <>
+                        Language = <strong>{filters.language}</strong>{' '}
+                      </>
+                    )}
+                    {filters.resourceType && (
+                      <>
+                        Type = <strong>{filters.resourceType}</strong>{' '}
+                      </>
+                    )}
+                    {filters.sort !== 'relevance' && (
+                      <>
+                        Sort = <strong>{filters.sort}</strong>
+                      </>
+                    )}
+                  </Text>
+                ) : (
+                  <Text type="secondary">
+                    Use the search box and filters above to explore the knowledge library.
+                  </Text>
+                )}
+              </Col>
+              <Col>
+                <Space align="center">
+                  <Text type="secondary">Sort by</Text>
+                  <Select<SortOption>
+                    value={filters.sort}
+                    onChange={handleSortChange}
+                    style={{ width: 180 }}
+                    options={[
+                      { label: 'Best match', value: 'relevance' },
+                      { label: 'Newest first', value: 'newest' },
+                      { label: 'Most popular', value: 'popular' },
+                      { label: 'Shortest duration', value: 'shortest' },
+                      { label: 'Longest duration', value: 'longest' },
+                    ]}
                   />
-                </Col>
-
-                <Col xs={24} md={14}>
-                  <Row gutter={[8, 8]} justify="end">
-                    <Col xs={24} md={12} lg={6}>
-                      <Select
-                        allowClear
-                        placeholder="Subject"
-                        value={filters.subject}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('subject')}
-                      >
-                        {subjects.map((subject) => (
-                          <Select.Option key={subject} value={subject}>
-                            {subject}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={5}>
-                      <Select
-                        allowClear
-                        placeholder="Level"
-                        value={filters.level}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('level')}
-                      >
-                        {levels.map((level) => (
-                          <Select.Option key={level} value={level}>
-                            {level.charAt(0).toUpperCase() + level.slice(1)}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={5}>
-                      <Select
-                        allowClear
-                        placeholder="Language"
-                        value={filters.language}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('language')}
-                      >
-                        {languages.map((lang) => (
-                          <Select.Option key={lang} value={lang}>
-                            {lang}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={5}>
-                      <Select
-                        allowClear
-                        placeholder="Type"
-                        value={filters.resourceType}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('resourceType')}
-                      >
-                        {resourceTypes.map((t) => (
-                          <Select.Option key={t} value={t}>
-                            {t}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={3}>
-                      <Select
-                        value={filters.sort}
-                        onChange={handleSortChange}
-                        style={{ width: '100%' }}
-                      >
-                        <Select.Option value="relevance">Best match</Select.Option>
-                        <Select.Option value="newest">Newest</Select.Option>
-                        <Select.Option value="popular">Most popular</Select.Option>
-                        <Select.Option value="shortest">Shortest first</Select.Option>
-                        <Select.Option value="longest">Longest first</Select.Option>
-                      </Select>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-
-              {/* Active filters / helper text */}
-              <Row>
-                <Col span={24}>
-                  {filtersActive ? (
-                    <Space size={[8, 8]} wrap>
-                      <Text type="secondary">Active filters:</Text>
-                      {filters.subject && <Tag color="blue">Subject: {filters.subject}</Tag>}
-                      {filters.level && (
-                        <Tag color="purple">
-                          Level:{' '}
-                          {filters.level.charAt(0).toUpperCase() + filters.level.slice(1)}
-                        </Tag>
-                      )}
-                      {filters.language && <Tag>Language: {filters.language}</Tag>}
-                      {filters.resourceType && (
-                        <Tag color="geekblue">Type: {filters.resourceType}</Tag>
-                      )}
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          setFilters({ query: '', sort: 'relevance' });
-                          setPage(1);
-                        }}
-                      >
-                        Clear filters
-                      </Button>
-                    </Space>
-                  ) : (
-                    <Text type="secondary">
-                      Use the search box and filters above to explore the knowledge library.
+                  {loadingMeta && (
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Updating filter options…
                     </Text>
                   )}
-                </Col>
-              </Row>
-            </Space>
+                </Space>
+              </Col>
+            </Row>
           </Card>
         </Col>
 
@@ -646,8 +898,8 @@ export default function BrowseResourcesPage(): JSX.Element {
                     emptyText: (
                       <div style={{ padding: '24px 0' }}>
                         <Text type="secondary">
-                          No resources match your filters yet. Try adjusting your search
-                          terms or filter options.
+                          No resources match your filters yet. Try adjusting your search terms or
+                          filter options.
                         </Text>
                       </div>
                     ),

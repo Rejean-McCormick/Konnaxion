@@ -1,6 +1,6 @@
-
+// modules/insights/hooks/useReport.ts
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/shared/api";
+import api from "@/api";
 
 type SmartVoteResp = { labels: string[]; votes: number[]; avg_score: number[] };
 type UsageResp = { labels: string[]; mau: number[]; projects: number[]; docs: number[] };
@@ -18,8 +18,8 @@ export function useReport<E extends keyof EndpointMap>(
 ) {
   return useQuery<EndpointMap[E]>({
     queryKey: [endpoint, params],
-    queryFn: async () =>
-      (await api.get(`/reports/${endpoint}`, { params })).data,
     staleTime: 300_000,
+    queryFn: async () =>
+      api.get<EndpointMap[E]>(`/reports/${endpoint}`, { params }),
   });
 }

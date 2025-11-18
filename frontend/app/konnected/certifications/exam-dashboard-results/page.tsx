@@ -1,6 +1,8 @@
+// app/konnected/certifications/exam-dashboard-results/page.tsx
 'use client'
 
 import React, { useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Alert,
   Badge,
@@ -32,6 +34,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons'
 import { useRequest } from 'ahooks'
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell'
 import api from '@/services/_request'
 
@@ -229,6 +232,10 @@ const ExamDashboardResultsPage: React.FC = () => {
   const [appealLoadingId, setAppealLoadingId] = useState<string | null>(null)
   const [retryLoadingId, setRetryLoadingId] = useState<string | null>(null)
 
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathIdFromQuery = searchParams.get('pathId')
+
   const {
     data,
     loading,
@@ -238,7 +245,16 @@ const ExamDashboardResultsPage: React.FC = () => {
     retryCount: 1,
   })
 
-  const attempts = data?.attempts ?? []
+  const allAttempts = data?.attempts ?? []
+
+  // If pathId is present, filter attempts to that certification path
+  const attempts = useMemo(
+    () =>
+      pathIdFromQuery
+        ? allAttempts.filter((a) => a.certificationPathId === pathIdFromQuery)
+        : allAttempts,
+    [allAttempts, pathIdFromQuery],
+  )
 
   const stats = useMemo(() => {
     if (!attempts.length) {
@@ -256,7 +272,9 @@ const ExamDashboardResultsPage: React.FC = () => {
       (a) => typeof a.scorePercent === 'number',
     ) as Array<ExamAttempt & { scorePercent: number }>
     const passedCount = scoredAttempts.filter((a) => a.scorePercent >= CERT_PASS_PERCENT).length
-    const passRate = totalAttempts ? Math.round((passedCount / totalAttempts) * 100) : 0
+    const passRate = scoredAttempts.length
+      ? Math.round((passedCount / scoredAttempts.length) * 100)
+      : 0
     const avgScore = scoredAttempts.length
       ? Math.round(
           scoredAttempts.reduce((sum, a) => sum + (a.scorePercent ?? 0), 0) /
@@ -286,7 +304,7 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   const handleOpenCertificate = (attempt: ExamAttempt) => {
     if (attempt.certificateUrl) {
-      window.open(attempt.certificateUrl, '_blank')
+      window.open(attempt.certificateUrl, '_blank', 'noopener,noreferrer')
     } else {
       message.info('Certificate is not yet available for this attempt.')
     }
@@ -294,7 +312,7 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   const handleOpenPortfolio = (attempt: ExamAttempt) => {
     if (attempt.portfolioUrl) {
-      window.open(attempt.portfolioUrl, '_blank')
+      window.open(attempt.portfolioUrl, '_blank', 'noopener,noreferrer')
     } else {
       message.info('This attempt is not yet linked to your portfolio.')
     }
@@ -303,9 +321,10 @@ const ExamDashboardResultsPage: React.FC = () => {
   const handleOpenAppeal = async (attempt: ExamAttempt) => {
     setAppealLoadingId(attempt.id)
     try {
-      await api.post(EXAM_APPEAL_ENDPOINT(attempt.id))
+      const updated = await api.post<ExamAttempt>(EXAM_APPEAL_ENDPOINT(attempt.id))
+      setSelectedAttempt((prev) => (prev && prev.id === attempt.id ? updated : prev))
+      refreshAttempts()
       message.success('Appeal request submitted. You will be notified when it is reviewed.')
-      await refreshAttempts()
     } catch {
       message.error('Unable to submit appeal. Please try again or contact support.')
     } finally {
@@ -316,11 +335,34 @@ const ExamDashboardResultsPage: React.FC = () => {
   const handleRetry = async (attempt: ExamAttempt) => {
     setRetryLoadingId(attempt.id)
     try {
-      await api.post(EXAM_RETRY_ENDPOINT(attempt.id))
-      message.success('Retry triggered. You will be redirected to the registration flow.')
-      // In a later iteration you might push to /konnected/certifications/exam-registration
-    } catch {
-      message.error('Unable to start a new attempt. Please try again or contact support.')
+      const newAttempt = await api.post<ExamAttempt>(EXAM_RETRY_ENDPOINT(attempt.id))
+      refreshAttempts()
+      message.success('New attempt scheduled successfully.')
+
+      // Redirect into the certification flow for this path
+      if (newAttempt.certificationPathId) {
+        router.push(
+          `/konnected/certifications/exam-preparation?pathId=${newAttempt.certificationPathId}`,
+        )
+      } else if (attempt.certificationPathId) {
+        router.push(
+          `/konnected/certifications/exam-preparation?pathId=${attempt.certificationPathId}`,
+        )
+      }
+    } catch (err: any) {
+      const detail =
+        (err &&
+          typeof err === 'object' &&
+          'response' in err &&
+          (err as any).response?.data?.detail) ||
+        null
+
+      if (detail) {
+        // e.g. "Retry cooldown is still active for this exam."
+        message.error(detail)
+      } else {
+        message.error('Unable to start a new attempt. Please try again or contact support.')
+      }
     } finally {
       setRetryLoadingId(null)
     }
@@ -620,7 +662,8 @@ const ExamDashboardResultsPage: React.FC = () => {
     )
   }
 
-  if (!attempts.length) {
+  // No attempts at all for this user (global empty state)
+  if (!allAttempts.length) {
     return (
       <KonnectedPageShell
         title="Exam Dashboard & Results"
@@ -671,6 +714,41 @@ const ExamDashboardResultsPage: React.FC = () => {
                   )}
                 />
               </Space>
+            </Card>
+          </Col>
+        </Row>
+      </KonnectedPageShell>
+    )
+  }
+
+  // There are attempts overall, but none for the current path filter
+  if (!attempts.length) {
+    return (
+      <KonnectedPageShell
+        title="Exam Dashboard & Results"
+        subtitle="Track your certification exam attempts, scores, and outcomes."
+      >
+        <Row gutter={24}>
+          <Col xs={24} md={16}>
+            <Card>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  <Space direction="vertical">
+                    <Text>No attempts yet for this certification.</Text>
+                    <Text type="secondary">
+                      You can register for an exam session from the Exam Registration page.
+                    </Text>
+                  </Space>
+                }
+              >
+                <Button
+                  type="primary"
+                  href="/konnected/certifications/exam-registration"
+                >
+                  Go to exam registration
+                </Button>
+              </Empty>
             </Card>
           </Col>
         </Row>

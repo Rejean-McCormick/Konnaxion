@@ -801,6 +801,7 @@ export {
 
 
 ===== BEGIN components/dashboard-components/LikeCard.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LikeCard.tsx
 'use client';
 
 import React from 'react';
@@ -809,7 +810,7 @@ import { Card, Statistic, Skeleton } from 'antd';
 import type { LineConfig } from '@ant-design/plots';
 
 // Use Line instead of TinyLine (works across versions)
-const Line = dynamic(() => import('@ant-design/plots').then(m => m.Line), {
+const Line = dynamic(() => import('@ant-design/plots').then((m) => m.Line), {
   ssr: false,
 });
 
@@ -826,8 +827,8 @@ const LikeCard: React.FC<LikeCardProps> = ({
   trend = [],
   loading = false,
 }) => {
-  const series = Array.isArray(trend) ? trend : [];
-  const data = series.map((y, i) => ({ x: i, y }));
+  const series: number[] = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ x: i, y: Number(y ?? 0) }));
 
   const config: LineConfig = {
     data,
@@ -862,7 +863,9 @@ export default LikeCard;
 
 
 ===== BEGIN components/dashboard-components/LineChart.tsx =====
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LineChart.tsx
+'use client';
+
 import React from 'react';
 import {
   LineChart as ReLineChart,
@@ -874,26 +877,105 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-type DataPoint = {
-  time: string;
+export type LineChartPoint = {
+  /** X-axis label (time, date, category). */
+  time: string | number;
+  /** Primary series value. */
   value: number;
 };
 
-type LineChartProps = {
-  data: DataPoint[];
-};
+export interface LineChartProps {
+  /** Data series to display. Use { time, value } shape. */
+  data: LineChartPoint[] | null | undefined;
+  /** Chart height in pixels (inside the responsive container). Defaults to 300. */
+  height?: number;
+  /** Label used for the value in the tooltip. Defaults to "Value". */
+  valueLabel?: string;
+  /** Stroke color for the line. */
+  stroke?: string;
+  /** Show background grid. Defaults to true. */
+  showGrid?: boolean;
+  /** Render a simple placeholder instead of the chart. */
+  loading?: boolean;
+  /** Message shown when there is no data. */
+  emptyMessage?: string;
+  /** Optional explicit Y-axis domain, e.g. [0, 100]. */
+  yDomain?: [number | 'auto', number | 'auto'];
+}
 
-const LineChart: React.FC<LineChartProps> = ({ data }) => {
+const DEFAULT_EMPTY_MESSAGE = 'No data available';
+
+const LineChart: React.FC<LineChartProps> = ({
+  data,
+  height = 300,
+  valueLabel,
+  stroke = '#8884d8',
+  showGrid = true,
+  loading = false,
+  emptyMessage = DEFAULT_EMPTY_MESSAGE,
+  yDomain,
+}) => {
+  const safeData = Array.isArray(data) ? data : [];
+  const hasData = safeData.length > 0;
+
+  if (loading) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height,
+          borderRadius: 4,
+          backgroundColor: '#f5f5f5',
+        }}
+      />
+    );
+  }
+
+  if (!hasData) {
+    return (
+      <div
+        style={{
+          width: '100%',
+          height,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 12,
+          color: 'var(--ant-color-text-secondary, #999)',
+        }}
+      >
+        {emptyMessage}
+      </div>
+    );
+  }
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <ReLineChart data={data}>
-        <CartesianGrid stroke="#ccc" />
-        <XAxis dataKey="time" />
-        <YAxis />
-        <Tooltip />
-        <Line type="monotone" dataKey="value" stroke="#8884d8" />
-      </ReLineChart>
-    </ResponsiveContainer>
+    <div style={{ width: '100%', height }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <ReLineChart
+          data={safeData}
+          margin={{ top: 8, right: 16, bottom: 8, left: 0 }}
+        >
+          {showGrid && <CartesianGrid stroke="#ccc" />}
+          <XAxis dataKey="time" />
+          <YAxis domain={yDomain ?? ['auto', 'auto']} />
+          <Tooltip
+            formatter={(value: number | string) => [
+              value,
+              valueLabel ?? 'Value',
+            ]}
+          />
+          <Line
+            type="monotone"
+            dataKey="value"
+            stroke={stroke}
+            strokeWidth={2}
+            dot={false}
+            isAnimationActive
+          />
+        </ReLineChart>
+      </ResponsiveContainer>
+    </div>
   );
 };
 
@@ -903,18 +985,218 @@ export default LineChart;
 
 
 ===== BEGIN components/dashboard-components/StatisticCard.tsx =====
-import React from 'react';
-import { Card, Statistic } from 'antd';
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\StatisticCard.tsx
+'use client';
 
-type StatisticCardProps = {
-  title: string;
-  value: number;
+import React from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { Card, Skeleton, Statistic, Tooltip, Typography } from 'antd';
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
+
+const { Text } = Typography;
+
+export type TrendDirection = 'up' | 'down' | 'neutral';
+
+export interface StatisticCardProps {
+  /** Main label for the metric (preferred). */
+  label?: ReactNode;
+  /** Backwards‑compat: legacy title prop, falls back to `label` if provided. */
+  title?: ReactNode;
+
+  /** Primary numeric value for the metric. */
+  value: number | null | undefined;
+
+  /** Decimal precision for the main value. */
+  precision?: number;
+
+  /** Suffix for the main value (%, ms, pts, etc.). */
+  suffix?: ReactNode;
+
+  /** Optional icon shown next to the label. */
+  icon?: ReactNode;
+
+  /** Small helper text under the main value. */
+  description?: ReactNode;
+
+  /**
+   * Delta / variation vs previous period (usually in percentage points).
+   * Example: +12.5 means “up 12.5%”.
+   */
+  delta?: number | null;
+
+  /**
+   * Direction of the trend. If omitted, it is inferred from `delta`
+   * (positive → up, negative → down, zero → neutral).
+   */
+  trend?: TrendDirection;
+
+  /** Optional label explaining the delta (“vs last 30 days”, etc.). */
+  deltaLabel?: ReactNode;
+
+  /** Show a loading skeleton instead of the numeric content. */
+  loading?: boolean;
+
+  /** Make the card clickable. */
+  onClick?: () => void;
+
+  /** Allow callers to tweak the outer card style. */
+  style?: CSSProperties;
+}
+
+const isFiniteNumber = (v: unknown): v is number =>
+  typeof v === 'number' && Number.isFinite(v);
+
+const getTrend = (delta: number, explicit?: TrendDirection): TrendDirection => {
+  if (explicit) return explicit;
+  if (delta > 0) return 'up';
+  if (delta < 0) return 'down';
+  return 'neutral';
 };
 
-const StatisticCard: React.FC<StatisticCardProps> = ({ title, value }) => {
+const StatisticCard: React.FC<StatisticCardProps> = ({
+  label,
+  title,
+  value,
+  precision,
+  suffix,
+  icon,
+  description,
+  delta,
+  trend,
+  deltaLabel,
+  loading = false,
+  onClick,
+  style,
+}) => {
+  const hasValue = isFiniteNumber(value);
+
+  const effectiveTrend =
+    delta != null && isFiniteNumber(delta) ? getTrend(delta, trend) : null;
+
+  const trendColor =
+    effectiveTrend === 'up'
+      ? '#3f8600'
+      : effectiveTrend === 'down'
+      ? '#cf1322'
+      : 'var(--ant-color-text-secondary, rgba(0,0,0,.45))';
+
   return (
-    <Card>
-      <Statistic title={title} value={value} />
+    <Card
+      bordered={false}
+      bodyStyle={{ padding: 16 }}
+      style={{
+        cursor: onClick ? 'pointer' : 'default',
+        background: 'var(--ant-color-bg-container)',
+        ...style,
+      }}
+      onClick={onClick}
+    >
+      {/* Header: icon + label */}
+      {(label ?? title) && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: 4,
+            gap: 8,
+          }}
+        >
+          {icon && (
+            <span style={{ display: 'inline-flex', alignItems: 'center' }}>
+              {icon}
+            </span>
+          )}
+          <Text
+            style={{
+              fontSize: 14,
+              color: 'var(--ant-color-text-secondary, rgba(0,0,0,.65))',
+            }}
+          >
+            {label ?? title}
+          </Text>
+        </div>
+      )}
+
+      {/* Main value */}
+      {loading ? (
+        <Skeleton
+          active
+          title={{ width: '60%' }}
+          paragraph={false}
+          style={{ marginTop: 4, marginBottom: 4 }}
+        />
+      ) : (
+        <Statistic
+          value={hasValue ? value! : 0}
+          precision={hasValue ? precision : undefined}
+          suffix={hasValue ? suffix : undefined}
+          valueStyle={{
+            fontSize: 28,
+            fontWeight: 500,
+            color: 'var(--ant-color-text, rgba(0,0,0,.85))',
+          }}
+          formatter={
+            hasValue
+              ? undefined
+              : () => (
+                  <span
+                    style={{
+                      color:
+                        'var(--ant-color-text-disabled, rgba(0,0,0,.25))',
+                    }}
+                  >
+                    —
+                  </span>
+                )
+          }
+        />
+      )}
+
+      {/* Helper text */}
+      {description && !loading && (
+        <Text
+          type="secondary"
+          style={{ display: 'block', marginTop: 4, fontSize: 12 }}
+        >
+          {description}
+        </Text>
+      )}
+
+      {/* Delta / trend */}
+      {effectiveTrend && delta != null && isFiniteNumber(delta) && !loading && (
+        <div style={{ marginTop: 8, fontSize: 12 }}>
+          <Tooltip
+            title={deltaLabel ?? 'Change over the comparison period'}
+          >
+            <span style={{ color: trendColor }}>
+              {effectiveTrend === 'up' && (
+                <CaretUpOutlined style={{ marginRight: 4 }} />
+              )}
+              {effectiveTrend === 'down' && (
+                <CaretDownOutlined style={{ marginRight: 4 }} />
+              )}
+              {Math.abs(delta).toLocaleString(undefined, {
+                minimumFractionDigits:
+                  typeof precision === 'number' ? precision : 1,
+                maximumFractionDigits:
+                  typeof precision === 'number' ? precision : 1,
+              })}
+              <span style={{ marginLeft: 2 }}>%</span>
+              {deltaLabel && (
+                <span
+                  style={{
+                    marginLeft: 6,
+                    color:
+                      'var(--ant-color-text-secondary, rgba(0,0,0,.45))',
+                  }}
+                >
+                  {deltaLabel}
+                </span>
+              )}
+            </span>
+          </Tooltip>
+        </div>
+      )}
     </Card>
   );
 };
@@ -925,6 +1207,7 @@ export default StatisticCard;
 
 
 ===== BEGIN components/dashboard-components/style.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\style.tsx
 /**
  * Description: Stylesheet for dashboard components
  * Author: Hieu Chu
@@ -947,7 +1230,7 @@ const legacyTypeToIcon = (type?: string) => {
   const pascal =
     type
       .split('-')
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
       .join('') + 'Outlined'
 
   const key = pascal as keyof typeof AntIcons
@@ -984,7 +1267,7 @@ export const NumberInfoStyled = (props: {
         precision={precision}
         prefix={prefix}
         suffix={suffix}
-        formatter={(v) => Number(v).toLocaleString()}
+        formatter={v => Number(v).toLocaleString()}
         valueStyle={{ fontSize: 30 }}
       />
     </div>
@@ -1057,7 +1340,6 @@ export const CardFooter: React.FC<{
             {change.toLocaleString()}
           </span>
 
-          {/* Up/down icon */}
           {change < 0 ? (
             <CaretDownOutlined
               style={{ color: '#f5222d', verticalAlign: 'text-bottom' }}
@@ -1103,11 +1385,11 @@ export const ShadowCard = styled(CardStyled)`
   }
 `
 
-
 ===== END components/dashboard-components/style.tsx =====
 
 
 ===== BEGIN components/dashboard-components/UserCard.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
 'use client';
 
 import React from 'react';
@@ -1122,9 +1404,9 @@ const Column = dynamic(
 );
 
 export interface UserCardProps {
-  title?: string;        // Default: 'New Users'
-  total: number;         // Total users (or new users)
-  trend?: number[];      // Time series values
+  title?: string;   // Default: 'New Users'
+  total: number;    // Total users (or new users)
+  trend?: number[]; // Time series values
   loading?: boolean;
 }
 
@@ -1135,7 +1417,10 @@ const UserCard: React.FC<UserCardProps> = ({
   loading = false,
 }) => {
   const series: number[] = Array.isArray(trend) ? trend : [];
-  const data = series.map((y, i) => ({ idx: String(i + 1), value: Number(y ?? 0) }));
+  const data = series.map((y, i) => ({
+    idx: String(i + 1),
+    value: Number(y ?? 0),
+  }));
 
   const config: ColumnConfig = {
     data,
@@ -1173,10 +1458,9 @@ export default UserCard;
 
 ===== BEGIN components/dashboard-components/UserPieChart.tsx =====
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserPieChart.tsx
-// Version corrigée basée sur le dump fourni. :contentReference[oaicite:0]{index=0}
-'use client'
+'use client';
 
-import React from 'react'
+import React from 'react';
 import {
   PieChart,
   Pie,
@@ -1184,69 +1468,166 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-} from 'recharts'
-import { CardStyled } from './style'
+} from 'recharts';
+import { CardStyled } from './style';
 
-type User = { userId: string }
-type Props = { users: User[] }
-type PieDatum = { name: string; value: number }
+export interface UserPieChartUser {
+  userId: string;
+}
 
-export default function UserPieChart({ users }: Props) {
-  // Comptage sans indexation de tableau
-  let email = 0
-  let google = 0
-  let facebook = 0
+export interface UserSegment {
+  key?: string;
+  label: string;
+  value: number;
+  color?: string;
+}
+
+export interface UserPieChartProps {
+  /**
+   * Raw users; used to derive provider-based segments if `segments` is not provided.
+   */
+  users?: UserPieChartUser[];
+  /**
+   * Explicit segments (e.g. by expertise, activity); takes precedence over `users` if non-empty.
+   */
+  segments?: UserSegment[];
+  /**
+   * Card title.
+   */
+  title?: string;
+  /**
+   * Inner chart container height in pixels.
+   */
+  height?: number;
+  /**
+   * Optional legend label formatter.
+   */
+  legendFormatter?: (label: string) => string;
+}
+
+type PieDatum = {
+  name: string;
+  value: number;
+  color?: string;
+};
+
+const DEFAULT_COLORS = [
+  '#A97BE9',
+  '#EA4335',
+  '#1890FF',
+  '#13C2C2',
+  '#FAAD14',
+] as const;
+
+const buildProviderSegments = (users: UserPieChartUser[]): UserSegment[] => {
+  let email = 0;
+  let google = 0;
+  let facebook = 0;
 
   for (const u of users) {
-    const id = u.userId
-    if (id.includes('auth0')) email += 1
-    else if (id.includes('google')) google += 1
-    else facebook += 1
+    const id = u.userId || '';
+    if (id.includes('auth0')) email += 1;
+    else if (id.includes('google')) google += 1;
+    else if (id.includes('facebook')) facebook += 1;
+    else email += 1; // Fallback: treat unknown provider as "Email / other"
   }
 
-  const data: PieDatum[] = [
-    { name: 'Email', value: email },
-    { name: 'Google', value: google },
-    { name: 'Facebook', value: facebook },
-  ]
+  return [
+    { key: 'email', label: 'Email', value: email, color: DEFAULT_COLORS[0] },
+    { key: 'google', label: 'Google', value: google, color: DEFAULT_COLORS[1] },
+    {
+      key: 'facebook',
+      label: 'Facebook',
+      value: facebook,
+      color: DEFAULT_COLORS[2],
+    },
+  ];
+};
 
-  const COLORS = ['#A97BE9', '#EA4335', '#1890FF'] as const
+const toPieData = (segments: UserSegment[]): PieDatum[] =>
+  segments.map((s) => ({
+    name: s.label,
+    value: typeof s.value === 'number' ? s.value : 0,
+    color: s.color,
+  }));
+
+const UserPieChart: React.FC<UserPieChartProps> = ({
+  users,
+  segments,
+  title = 'Proportion of Users',
+  height = 294,
+  legendFormatter,
+}) => {
+  const effectiveSegments: UserSegment[] =
+    Array.isArray(segments) && segments.length > 0
+      ? segments
+      : Array.isArray(users) && users.length > 0
+      ? buildProviderSegments(users)
+      : [];
+
+  const data: PieDatum[] = toPieData(effectiveSegments);
+  const total = data.reduce((sum, d) => sum + (d.value || 0), 0);
+
+  const legendFormatterImpl =
+    legendFormatter &&
+    ((value: string) => legendFormatter(value) as React.ReactNode);
 
   return (
-    <CardStyled title="Proportion of Users">
-      <div style={{ width: '100%', height: 294 }}>
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={90}
-              label
-            >
-              {data.map((entry, i) => (
-                <Cell
-                  key={entry.name}
-                  // Évite l'indexation non sûre avec une couleur de repli
-                  fill={COLORS[i % COLORS.length] ?? '#8884d8'}
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+    <CardStyled title={title}>
+      {total === 0 ? (
+        <div
+          style={{
+            height,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'rgba(0,0,0,0.45)',
+            fontSize: 14,
+          }}
+        >
+          No user data available yet.
+        </div>
+      ) : (
+        <div style={{ width: '100%', height }}>
+          <ResponsiveContainer>
+            <PieChart>
+              <Pie
+                data={data}
+                dataKey="value"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={90}
+                label
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={entry.name}
+                    fill={
+                      entry.color ??
+                      DEFAULT_COLORS[index % DEFAULT_COLORS.length] ??
+                      '#8884d8'
+                    }
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend formatter={legendFormatterImpl ?? undefined} />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
     </CardStyled>
-  )
-}
+  );
+};
+
+export default UserPieChart;
 
 ===== END components/dashboard-components/UserPieChart.tsx =====
 
 
 ===== BEGIN components/dashboard-components/VisitCard.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\VisitCard.tsx
 'use client'
 
 /**
@@ -1311,6 +1692,7 @@ export default function VisitCard({
 
 
 ===== BEGIN components/layout-components/Drawer.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\layout-components\Drawer.tsx
 'use client'
 
 import React from 'react'
@@ -1318,7 +1700,7 @@ import { Drawer } from 'antd'
 import styled from 'styled-components'
 
 /* ------------------------------------------------------------------ */
-/*  Drawer stylé : suit les variables CSS du thème et bloque le scroll */
+/*  Themed layout drawer: respects CSS vars and prevents body scroll  */
 /* ------------------------------------------------------------------ */
 const StyledDrawer = styled(Drawer)`
   .ant-drawer-wrapper-body {
@@ -1333,27 +1715,34 @@ const StyledDrawer = styled(Drawer)`
 
 interface Props {
   drawerVisible: boolean
-  closeDrawer : () => void
-  children    : React.ReactNode
+  closeDrawer: () => void
+  children: React.ReactNode
+  /** Optional placement override; defaults to left to match existing layout */
+  placement?: 'left' | 'right' | 'top' | 'bottom'
+  /** Optional width override; falls back to Ant Design default when omitted */
+  width?: number | string
 }
 
 export default function LayoutDrawer({
   drawerVisible,
   closeDrawer,
   children,
+  placement = 'left',
+  width,
 }: Props) {
   return (
     <StyledDrawer
-      placement="left"
+      placement={placement}
       closable={false}
       onClose={closeDrawer}
       open={drawerVisible}
-        styles={{
-			body: {
-			margin: 0,
-			padding: 0,
-			background: 'var(--ant-color-bg-container)',
-		},
+      width={width}
+      styles={{
+        body: {
+          margin: 0,
+          padding: 0,
+          background: 'var(--ant-color-bg-container)',
+        },
       }}
     >
       {children}
@@ -1365,21 +1754,26 @@ export default function LayoutDrawer({
 
 
 ===== BEGIN components/layout-components/Header.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\layout-components\Header.tsx
 'use client'
 
 import { Layout, Dropdown, Breadcrumb } from 'antd'
+import type { MenuProps } from 'antd'
 import {
   UserOutlined,
   LogoutOutlined,
+  LoginOutlined,
   MenuUnfoldOutlined,
   MenuFoldOutlined,
 } from '@ant-design/icons'
 import styled from 'styled-components'
 import Link from 'next/link'
-import nookies from 'nookies'
 import { useRouter, usePathname } from 'next/navigation'
-import { useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import ThemeSwitcher from '@/components/ThemeSwitcher'
+import { GlobalSearchBar } from '@/global/components'
+import api from '@/api'
+import type { Route } from '@/components/layout-components/Menu'
 
 const { Header } = Layout
 
@@ -1389,37 +1783,69 @@ const NavBar = styled.div`
   align-items: center;
   height: 64px;
   padding: 0 16px;
+  gap: 16px;
 `
 
 const Crumb = styled(Breadcrumb)`
-  margin-left: 20px; /* espace après le toggle */
+  margin-left: 4px;
   color: var(--ant-color-text);
+
+  .ant-breadcrumb-link,
   .ant-breadcrumb-separator {
     color: var(--ant-color-text-secondary);
+    font-size: 13px;
   }
 `
 
 const HeaderBlock = styled.div`
   padding: 0 12px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--ant-color-border);
+  background: var(--ant-color-bg-elevated);
   cursor: pointer;
-  transition: all 0.3s;
+  font-size: 13px;
+  color: var(--ant-color-text);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+
   &:hover {
     background: var(--ant-color-fill-secondary);
+    box-shadow: 0 0 0 1px var(--ant-color-border-secondary);
   }
 `
 
-/* -------- helpers -------- */
-const accountItems = [
-  { key: 'profile', icon: <UserOutlined />, label: 'Profile' },
-  { type: 'divider' as const },
-  { key: 'logout', icon: <LogoutOutlined />, label: 'Logout' },
-]
+const CenterRegion = styled.div`
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 16px;
+`
 
-interface Route {
-  path?: string
-  name: string
-  views?: Route[]
+const SearchWrapper = styled.div`
+  flex: 1;
+  min-width: 0;
+`
+
+/* ------------ mapping du label par sidebar (aligné sur LogoTitle) ------------ */
+const SUITE_LABELS: Record<string, string> = {
+  ekoh: 'EkoH',
+  ethikos: 'EthiKos',
+  keenkonnect: 'keenKonnect',
+  konnected: 'KonnectED',
+  kreative: 'Kreative',
 }
+
+/* -------- types & helpers -------- */
+type CurrentUser = {
+  username: string
+  name: string | null
+}
+
+// Derive the click event type from MenuProps['onClick']
+type AccountMenuClickEvent = Parameters<NonNullable<MenuProps['onClick']>>[0]
 
 const trail = (rs: Route[], cur: string): Route[] => {
   for (const r of rs) {
@@ -1450,15 +1876,103 @@ export default function HeaderBar({
   const pathname = usePathname() ?? '/'
   const cur = pathname
 
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
+  const [loadingUser, setLoadingUser] = useState(true)
+
+  // Detect auth state via users/me/ endpoint (cookie-based, aligned with backend)
+  useEffect(() => {
+    let canceled = false
+
+    const load = async () => {
+      try {
+        const data = await api.get<CurrentUser>('users/me/')
+        if (!canceled) {
+          setCurrentUser(data)
+        }
+      } catch {
+        if (!canceled) {
+          setCurrentUser(null)
+        }
+      } finally {
+        if (!canceled) {
+          setLoadingUser(false)
+        }
+      }
+    }
+
+    void load()
+
+    return () => {
+      canceled = true
+    }
+  }, [])
+
+  const accountMenuItems = useMemo<MenuProps['items']>(() => {
+    if (currentUser) {
+      return [
+        {
+          key: 'profile',
+          icon: <UserOutlined />,
+          label: 'My profile',
+        },
+        { type: 'divider' as const },
+        {
+          key: 'logout',
+          icon: <LogoutOutlined />,
+          label: 'Sign out',
+        },
+      ]
+    }
+
+    return [
+      {
+        key: 'signin',
+        icon: <LoginOutlined />,
+        label: 'Sign in',
+      },
+    ]
+  }, [currentUser])
+
+  const handleAccountMenuClick: MenuProps['onClick'] = useCallback(
+    ({ key }: AccountMenuClickEvent) => {
+      if (key === 'profile') {
+        // Canonical entry for "my profile" in v14 (Trust · Profile)
+        router.push('/ethikos/trust/profile')
+        return
+      }
+
+      if (key === 'logout') {
+        // Delegate logout to backend (Allauth) with a full reload
+        window.location.href = '/accounts/logout/'
+        return
+      }
+
+      if (key === 'signin') {
+        window.location.href = '/accounts/login/'
+      }
+    },
+    [router],
+  )
+
   const breadcrumbItems = useMemo(() => {
     const br = trail(routes, cur)
+    const normalizedSidebar = selectedSidebar?.toLowerCase() ?? ''
+
+    const rootName =
+      SUITE_LABELS[normalizedSidebar] ??
+      (normalizedSidebar
+        ? normalizedSidebar.charAt(0).toUpperCase() + normalizedSidebar.slice(1)
+        : 'Home')
+
+    const rootPath = normalizedSidebar ? `/${normalizedSidebar}` : '/'
+
     const root = {
-      name:
-        (selectedSidebar?.[0]?.toUpperCase() ?? '') +
-        (selectedSidebar?.slice(1) ?? ''),
-      path: `/${selectedSidebar}`,
+      name: rootName,
+      path: rootPath,
     }
+
     const crumbs = br.length ? [root, ...br] : [root]
+
     return crumbs.map(c => ({
       key: c.path ?? c.name,
       title: c.path ? (
@@ -1473,6 +1987,14 @@ export default function HeaderBar({
       ),
     }))
   }, [routes, cur, selectedSidebar])
+
+  const displayName = useMemo(
+    () =>
+      (currentUser?.name && currentUser.name.trim()) ||
+      currentUser?.username ||
+      'Account',
+    [currentUser],
+  )
 
   return (
     <Header
@@ -1489,39 +2011,44 @@ export default function HeaderBar({
         {/* Toggle sidebar */}
         <div
           onClick={handleToggle}
-          style={{ cursor: 'pointer', marginRight: 20 }}
+          style={{ cursor: 'pointer', marginRight: 4 }}
         >
           {collapsed ? (
-            <MenuUnfoldOutlined style={{ fontSize: 20, color: 'var(--ant-color-text)' }} />
+            <MenuUnfoldOutlined
+              style={{ fontSize: 20, color: 'var(--ant-color-text)' }}
+            />
           ) : (
-            <MenuFoldOutlined style={{ fontSize: 20, color: 'var(--ant-color-text)' }} />
+            <MenuFoldOutlined
+              style={{ fontSize: 20, color: 'var(--ant-color-text)' }}
+            />
           )}
         </div>
 
-        {/* Fil d’Ariane */}
-        <Crumb items={breadcrumbItems} />
+        {/* Fil d’Ariane + recherche globale */}
+        <CenterRegion>
+          <Crumb items={breadcrumbItems} />
+
+          <SearchWrapper>
+            <GlobalSearchBar />
+          </SearchWrapper>
+        </CenterRegion>
 
         {/* Zone droite : thème + compte */}
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <ThemeSwitcher />
 
           <Dropdown
             placement="bottomRight"
             menu={{
-              items: accountItems,
-              onClick: ({ key }) => {
-                if (key === 'logout') {
-                  nookies.destroy({}, 'auth0.is.authenticated')
-                  nookies.destroy({}, 'accessToken')
-                  router.push('/')
-                } else if (key === 'profile') {
-                  router.push('/users/id/123')
-                }
-              },
+              items: accountMenuItems,
+              onClick: handleAccountMenuClick,
             }}
           >
             <HeaderBlock>
-              <UserOutlined style={{ marginRight: 8, color: 'var(--ant-color-text)' }} /> Admin
+              <UserOutlined
+                style={{ marginRight: 8, color: 'var(--ant-color-text)' }}
+              />
+              {loadingUser ? 'Loading…' : displayName}
             </HeaderBlock>
           </Dropdown>
         </div>
@@ -1534,90 +2061,155 @@ export default function HeaderBar({
 
 
 ===== BEGIN components/layout-components/LogoTitle.tsx =====
-// File: /components/layout-components/LogoTitle.tsx
+// C:\MyCode\Konnaxionv14\frontend\components\layout-components\LogoTitle.tsx
 'use client'
 
 import styled from 'styled-components'
 import { Dropdown } from 'antd'
+import type { MenuProps } from 'antd'
+import Link from 'next/link'
+import { DownOutlined } from '@ant-design/icons'
 
-/* ------------ styled ------------ */
-export const Logo = styled.img`
-  display: block;
-  height: 32px;
-  vertical-align: middle;
-`
+/* ------------ module keys & mappings ------------ */
 
-const Title = styled.span`
-  display: inline-block;
-  color: var(--ant-color-text);
-  font-weight: 600;
-  font-size: 20px;
-  margin-left: 12px;
-  font-family: 'Arial';
-  vertical-align: middle;
-`
+const SUITE_KEYS = ['ekoh', 'ethikos', 'keenkonnect', 'konnected', 'kreative'] as const
+type SuiteKey = (typeof SUITE_KEYS)[number]
 
-const TitleWrapper = styled.div`
-  position: relative;
-  height: 64px;
-  padding-left: 24px;
-  overflow: hidden;
-  line-height: 64px;
-  transition: background 0.3s ease;
-  background: var(--ant-color-bg-container);
-`
-
-const LogoContainer = styled.div`
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-`
-
-/* ------------ mapping du label par sidebar ------------ */
-const titleMapping = {
-  ekoh        : 'EkoH',
-  ethikos     : 'EthiKos',
-  keenkonnect : 'keenKonnect',
-  konnected   : 'KonnectED',
-  kreative    : 'Kreative',
-} as const
-
-interface Props {
-  onSidebarChange : (key: string) => void
-  selectedSidebar?: string
+const TITLE_BY_SUITE: Record<SuiteKey, string> = {
+  ekoh       : 'EkoH',
+  ethikos    : 'EthiKos',
+  keenkonnect: 'keenKonnect',
+  konnected  : 'KonnectED',
+  kreative   : 'Kreative',
 }
 
-/* ------------ composant ------------ */
+const DEFAULT_ENTRY: Record<SuiteKey, string> = {
+  ekoh       : '/ekoh/dashboard',
+  ethikos    : '/ethikos/pulse/overview',
+  keenkonnect: '/keenkonnect/dashboard',
+  konnected  : '/konnected/dashboard',
+  kreative   : '/kreative/dashboard',
+}
+
+/* ------------ styled ------------ */
+
+const TitleWrapper = styled.div<{ $variant: 'sider' | 'header' }>`
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 64px;
+  padding-left: ${({ $variant }) => ($variant === 'sider' ? '24px' : '16px')};
+  padding-right: 16px;
+  gap: 12px;
+  overflow: hidden;
+  background: var(--ant-color-bg-container);
+  transition: background 0.3s ease;
+`
+
+const Logo = styled.img`
+  display: block;
+  height: 32px;
+  width: auto;
+`
+
+const ModuleToggle = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--ant-color-text);
+  font-weight: 600;
+  font-size: 18px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ant-color-fill-secondary);
+  }
+`
+
+/* ------------ types ------------ */
+
+interface LogoTitleProps {
+  /** Callback when the user selects another module from the dropdown */
+  onSidebarChange: (key: SuiteKey) => void
+  /** Current active module key (e.g. "ekoh", "ethikos", …) */
+  selectedSidebar?: string | SuiteKey
+  /** Visual variant for use in the top header vs. the sider */
+  variant?: 'sider' | 'header'
+  /** Optional passthrough className for external styling */
+  className?: string
+}
+
+/* ------------ helpers ------------ */
+
+const menuItems: MenuProps['items'] = SUITE_KEYS.map(key => ({
+  key,
+  label: TITLE_BY_SUITE[key],
+}))
+
+function normalizeSuite(raw: string | SuiteKey | null | undefined): SuiteKey {
+  if (!raw) return 'ekoh'
+  const lower = String(raw).toLowerCase()
+  if ((SUITE_KEYS as readonly string[]).includes(lower as SuiteKey)) {
+    return lower as SuiteKey
+  }
+  return 'ekoh'
+}
+
+/* ------------ component ------------ */
+
 export default function LogoTitle({
   onSidebarChange,
   selectedSidebar,
-}: Props) {
-  const sidebar = selectedSidebar?.toLowerCase() ?? 'ekoh'
+  variant = 'sider',
+  className,
+}: LogoTitleProps) {
+  const suite = normalizeSuite(selectedSidebar)
+  const label = TITLE_BY_SUITE[suite]
+  const homeHref = DEFAULT_ENTRY[suite]
 
-  const menuItems = Object.entries(titleMapping).map(([key, label]) => ({
-    key, label,
-  }))
+  const handleMenuClick: MenuProps['onClick'] = info => {
+    const key = String(info.key) as SuiteKey
+    if ((SUITE_KEYS as readonly string[]).includes(key)) {
+      onSidebarChange(key)
+    }
+  }
 
   return (
-    <TitleWrapper>
+    <TitleWrapper $variant={variant} className={className}>
+      {/* Brand logo → navigates to the current module dashboard */}
+      <Link
+        href={{ pathname: homeHref, query: { sidebar: suite } }}
+        aria-label="Go to module dashboard"
+        style={{
+          display        : 'inline-flex',
+          alignItems     : 'center',
+          textDecoration : 'none',
+        }}
+      >
+        <Logo src="/LogoK.svg" alt="Konnaxion logo" />
+      </Link>
+
+      {/* Module switcher dropdown (EkoH, ethiKos, keenKonnect, …) */}
       <Dropdown
         trigger={['click']}
         menu={{
-          items: menuItems,
-          onClick: ({ key }) => onSidebarChange(key),
-          // **ici on force un fond opaque + ombre**
-          style: {
+          items : menuItems,
+          onClick: handleMenuClick,
+          style : {
             background: 'var(--ant-color-bg-container)',
-            boxShadow: 'var(--ant-box-shadow-secondary)',
+            boxShadow : 'var(--ant-box-shadow-secondary)',
           },
         }}
       >
-        <LogoContainer>
-          <Logo src="/LogoK.svg" alt="Konnaxion logo" />
-          <Title>
-            {titleMapping[sidebar as keyof typeof titleMapping] ?? 'UOW Sculptures'}
-          </Title>
-        </LogoContainer>
+        <ModuleToggle type="button">
+          <span>{label ?? 'Konnaxion'}</span>
+          <DownOutlined />
+        </ModuleToggle>
       </Dropdown>
     </TitleWrapper>
   )
@@ -1672,85 +2264,110 @@ export default function Main({
 
 
 ===== BEGIN components/layout-components/MainLayout.tsx =====
-// components/layout-components/MainLayout.tsx
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\components\layout-components\MainLayout.tsx
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { Layout } from 'antd'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react';
+import { Layout } from 'antd';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-import FixedSider      from '@/components/layout-components/Sider'
-import Main            from '@/components/layout-components/Main'
-import HeaderComponent from '@/components/layout-components/Header'
-import LogoTitle       from '@/components/layout-components/LogoTitle'
-import DrawerComponent from '@/components/layout-components/Drawer'
-import MenuComponent   from '@/components/layout-components/Menu'
-import type { Route }  from '@/components/layout-components/Menu'
+import FixedSider from '@/components/layout-components/Sider';
+import Main from '@/components/layout-components/Main';
+import HeaderComponent from '@/components/layout-components/Header';
+import LogoTitle from '@/components/layout-components/LogoTitle';
+import DrawerComponent from '@/components/layout-components/Drawer';
+import MenuComponent from '@/components/layout-components/Menu';
+import type { Route } from '@/components/layout-components/Menu';
+
+const { Content } = Layout;
 
 interface RoutesConfig {
-  ekoh: Route[]
-  ethikos: Route[]
-  keenkonnect: Route[]
-  konnected: Route[]
-  kreative: Route[]
+  ekoh: Route[];
+  ethikos: Route[];
+  keenkonnect: Route[];
+  konnected: Route[];
+  kreative: Route[];
 }
 
-type SuiteKey = keyof RoutesConfig
+type SuiteKey = keyof RoutesConfig;
 
-const SUITES: SuiteKey[] = ['ekoh', 'ethikos', 'keenkonnect', 'konnected', 'kreative']
+const SUITES: SuiteKey[] = [
+  'ekoh',
+  'ethikos',
+  'keenkonnect',
+  'konnected',
+  'kreative',
+];
 
-// Default entry route per module
-// NOTE: Ethikos points to Pulse Overview until /ethikos/dashboard exists.
+// Default entry route per module – aligned with v14 routes config
 const DEFAULT_ENTRY: Record<SuiteKey, string> = {
-  ekoh       : '/ekoh/dashboard',
-  ethikos    : '/ethikos/pulse/overview',
+  ekoh: '/ekoh/dashboard',
+  ethikos: '/ethikos/insights',
   keenkonnect: '/keenkonnect/dashboard',
-  konnected  : '/konnected/dashboard',
-  kreative   : '/kreative/dashboard',
-}
+  konnected: '/konnected/dashboard',
+  kreative: '/kreative/dashboard',
+};
 
 const isSuiteKey = (val: string | null): val is SuiteKey =>
-  !!val && (SUITES as string[]).includes(val)
+  typeof val === 'string' && SUITES.includes(val as SuiteKey);
 
 /**
  * Determine active module from pathname + optional ?sidebar
+ *
+ * ?sidebar wins when it matches a known suite.
+ * Otherwise infer from the first path segment.
+ * /konsensus is mapped to the Kollective Intelligence suite (ekoh).
  */
 const detectSuite = (pathname: string, sidebarParam: string | null): SuiteKey => {
-  if (isSuiteKey(sidebarParam)) return sidebarParam
+  if (isSuiteKey(sidebarParam)) return sidebarParam;
 
-  const segments = pathname.split('/')
-  const first = (segments[1] ?? '').toLowerCase()
+  const safePath = pathname || '/';
+  const segments = safePath.split('/');
+  const first = (segments[1] ?? '').toLowerCase();
 
-  if (isSuiteKey(first)) return first
+  if (first === 'konsensus') {
+    // Konsensus Center lives under the Kollective Intelligence umbrella
+    return 'ekoh';
+  }
 
-  return 'ekoh'
-}
+  if (isSuiteKey(first)) return first;
 
-const { Content } = Layout
+  return 'ekoh';
+};
+
+type MainLayoutProps = React.PropsWithChildren<{
+  collapsed?: boolean;
+}>;
 
 export default function MainLayout({
   collapsed: initialCollapsed = false,
   children,
-}: React.PropsWithChildren<{ collapsed?: boolean }>) {
-  const router        = useRouter()
-  const pathname      = usePathname() ?? '/'
-  const searchParams  = useSearchParams()
-  const sidebarParam  = searchParams.get('sidebar')
+}: MainLayoutProps) {
+  const router = useRouter();
+  const pathname = usePathname() ?? '/';
+  const searchParams = useSearchParams();
+  const sidebarParam = searchParams.get('sidebar');
 
-  const [collapsed, setCollapsed] = useState(initialCollapsed)
-  const [drawerVisible, setDrawer] = useState(false)
+  const [collapsed, setCollapsed] = useState<boolean>(initialCollapsed);
+  const [drawerVisible, setDrawer] = useState<boolean>(false);
 
   const [routes, setRoutes] = useState<RoutesConfig>({
-    ekoh: [], ethikos: [], keenkonnect: [], konnected: [], kreative: [],
-  })
+    ekoh: [],
+    ethikos: [],
+    keenkonnect: [],
+    konnected: [],
+    kreative: [],
+  });
 
-  // suite courante
+  // Current suite
   const [suite, setSuite] = useState<SuiteKey>(() =>
     detectSuite(pathname, sidebarParam),
-  )
+  );
 
-  // charger dynamiquement les routes
+  // Dynamically load sidebar routes for each suite
   useEffect(() => {
+    let isMounted = true;
+
     Promise.all([
       import('@/routes/routesEkoh'),
       import('@/routes/routesEthikos'),
@@ -1758,48 +2375,82 @@ export default function MainLayout({
       import('@/routes/routesKonnected'),
       import('@/routes/routesKreative'),
     ])
-      .then(([
-        { default: ekoh },
-        { default: ethikos },
-        { default: keen },
-        { default: konnected },
-        { default: kreative },
-      ]) => setRoutes({ ekoh, ethikos, keenkonnect: keen, konnected, kreative }))
-      .catch(err => console.error('Erreur chargement routes :', err))
-  }, [])
+      .then(
+        ([
+          { default: ekoh },
+          { default: ethikos },
+          { default: keen },
+          { default: konnected },
+          { default: kreative },
+        ]) => {
+          if (!isMounted) return;
+          setRoutes({
+            ekoh,
+            ethikos,
+            keenkonnect: keen,
+            konnected,
+            kreative,
+          });
+        },
+      )
+      // eslint-disable-next-line no-console
+      .catch((err) => console.error('Erreur chargement routes :', err));
 
-  // resynchroniser quand l’URL change (back/forward, liens internes, etc.)
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Resync suite when URL changes (back/forward or internal navigation)
   useEffect(() => {
-    const next = detectSuite(pathname, sidebarParam)
-    if (next !== suite) setSuite(next)
-  }, [pathname, sidebarParam, suite])
+    const next = detectSuite(pathname, sidebarParam);
+    if (next !== suite) {
+      setSuite(next);
+    }
+  }, [pathname, sidebarParam, suite]);
 
   const changeSuite = (rawKey: string) => {
-    if (!isSuiteKey(rawKey)) return
-    const key: SuiteKey = rawKey
+    if (!isSuiteKey(rawKey)) return;
+    const key: SuiteKey = rawKey;
 
-    setSuite(key)
+    setSuite(key);
 
-    const params = new URLSearchParams(Array.from(searchParams.entries()))
-    params.set('sidebar', key)
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.set('sidebar', key);
 
-    const basePath = DEFAULT_ENTRY[key]
-    const query    = params.toString()
-    const target   = query ? `${basePath}?${query}` : basePath
+    const basePath = DEFAULT_ENTRY[key];
+    const query = params.toString();
+    const target = query ? `${basePath}?${query}` : basePath;
 
-    router.push(target)
-  }
+    router.push(target);
+  };
 
   const toggle = () => {
-    if (window.innerWidth >= 576) setCollapsed(!collapsed)
-    else setDrawer(v => !v)
-  }
+    // Guard for environments where window might not exist (tests, SSR edge cases)
+    if (typeof window === 'undefined') {
+      setCollapsed((prev) => !prev);
+      return;
+    }
 
-  const suiteRoutes = routes[suite] ?? []
+    if (window.innerWidth >= 576) {
+      // Desktop: toggle sider collapse
+      setCollapsed((prev) => !prev);
+    } else {
+      // Mobile: open/close drawer instead of touching sider
+      setDrawer((prev) => !prev);
+    }
+  };
+
+  const suiteRoutes = routes[suite] ?? [];
 
   return (
-    <Layout style={{ minHeight: '100vh', background: 'var(--ant-layout-color-bg-layout)' }}>
-      {/* SIDEBAR desktop */}
+    <Layout
+      style={{
+        minHeight: '100vh',
+        background: 'var(--ant-layout-color-bg-layout)',
+      }}
+    >
+      {/* SIDEBAR – desktop */}
       <FixedSider collapsed={collapsed} setCollapsed={setCollapsed}>
         <LogoTitle onSidebarChange={changeSuite} selectedSidebar={suite} />
         <MenuComponent
@@ -1819,8 +2470,8 @@ export default function MainLayout({
         />
         <Content
           style={{
-            margin      : '20px 16px 15px 16px',
-            background  : 'var(--ant-color-bg-container)',
+            margin: '20px 16px 15px 16px',
+            background: 'var(--ant-color-bg-container)',
             borderRadius: 8,
           }}
         >
@@ -1828,7 +2479,7 @@ export default function MainLayout({
         </Content>
       </Main>
 
-      {/* DRAWER mobile */}
+      {/* DRAWER – mobile */}
       <DrawerComponent
         drawerVisible={drawerVisible}
         closeDrawer={() => setDrawer(false)}
@@ -1842,114 +2493,156 @@ export default function MainLayout({
         />
       </DrawerComponent>
     </Layout>
-  )
+  );
 }
 
 ===== END components/layout-components/MainLayout.tsx =====
 
 
 ===== BEGIN components/layout-components/Menu.tsx =====
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\components\layout-components\Menu.tsx
+'use client';
 
-import React from 'react'
-import { Menu } from 'antd'
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
+import React from 'react';
+import type { CSSProperties, ReactNode } from 'react';
+import { Menu } from 'antd';
+import type { MenuProps } from 'antd';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export interface Route {
-  path?: string
-  name: string
-  icon?: React.ReactNode
-  views?: Route[]
+  path?: string;
+  name: string;
+  icon?: ReactNode;
+  views?: Route[];
 }
 
-interface Props {
-  routes: Route[]
-  style?: React.CSSProperties
-  closeDrawer: () => void
-  selectedSidebar: string
+export interface MenuComponentProps {
+  routes: Route[];
+  style?: CSSProperties;
+  closeDrawer: () => void;
+  selectedSidebar: string;
 }
 
-const MenuComponent: React.FC<Props> = ({
+type MenuItem = Required<MenuProps>['items'][number];
+
+const flattenRoutes = (routes: Route[]): Route[] =>
+  routes.flatMap((route) =>
+    route.views && route.views.length > 0
+      ? flattenRoutes(route.views)
+      : [route],
+  );
+
+const toMenuItems = (
+  routes: Route[],
+  selectedSidebar: string,
+  closeDrawer: () => void,
+): MenuItem[] =>
+  routes
+    .map<MenuItem | null>((route) => {
+      if (route.views && route.views.length > 0) {
+        return {
+          key: route.name,
+          icon: route.icon,
+          label: route.name,
+          children: toMenuItems(route.views, selectedSidebar, closeDrawer),
+        };
+      }
+
+      if (!route.path) {
+        return null;
+      }
+
+      return {
+        key: route.path,
+        icon: route.icon,
+        label: (
+          <Link
+            href={{ pathname: route.path, query: { sidebar: selectedSidebar } }}
+            onClick={closeDrawer}
+          >
+            {route.name}
+          </Link>
+        ),
+      };
+    })
+    .filter((item): item is MenuItem => item !== null);
+
+const MenuComponent: React.FC<MenuComponentProps> = ({
   routes,
   style,
   closeDrawer,
   selectedSidebar,
 }) => {
-  const pathname = usePathname()
+  const pathname = usePathname() ?? '/';
 
-  /* helpers */
-  const toItems = (rs: Route[]): any[] =>
-    rs
-      .map(r =>
-        r.views?.length
-          ? {
-              key: r.name,
-              icon: r.icon,
-              label: r.name,
-              children: toItems(r.views),
-            }
-          : r.path
-          ? {
-              key: r.path,
-              icon: r.icon,
-              label: (
-                <Link
-                  href={{ pathname: r.path, query: { sidebar: selectedSidebar } }}
-                  onClick={closeDrawer}
-                >
-                  {r.name}
-                </Link>
-              ),
-            }
-          : null,
-      )
-      .filter(Boolean)
+  const flat = React.useMemo(() => flattenRoutes(routes), [routes]);
 
-  const flatten = (rs: Route[]): Route[] =>
-    rs.flatMap(r => (r.views?.length ? flatten(r.views) : [r]))
+  const selectedKey = React.useMemo(() => {
+    const matches = flat.filter(
+      (route) => route.path && pathname.startsWith(route.path),
+    );
 
-  const selectedKeys = flatten(routes)
-    .filter(r => r.path && pathname.startsWith(r.path!))
-    .map(r => r.path!)
+    if (!matches.length) {
+      return undefined;
+    }
+
+    // Choose the most specific match (longest path)
+    const best = matches.reduce((currentBest, route) => {
+      if (!currentBest.path) return route;
+      if (!route.path) return currentBest;
+      return route.path.length > currentBest.path.length
+        ? route
+        : currentBest;
+    });
+
+    return best.path;
+  }, [flat, pathname]);
+
+  const items = React.useMemo(
+    () => toMenuItems(routes, selectedSidebar, closeDrawer),
+    [routes, selectedSidebar, closeDrawer],
+  );
 
   return (
     <Menu
       mode="inline"
-      selectedKeys={selectedKeys}
-      items={toItems(routes)}
+      selectedKeys={selectedKey ? [selectedKey] : []}
+      items={items}
       style={{
         background: 'var(--ant-color-bg-container)',
-        color     : 'var(--ant-color-text)',
-        padding   : '16px 0',
+        color: 'var(--ant-color-text)',
+        padding: '16px 0',
         ...style,
       }}
     />
-  )
-}
+  );
+};
 
-export default MenuComponent
+export default MenuComponent;
 
 ===== END components/layout-components/Menu.tsx =====
 
 
 ===== BEGIN components/layout-components/Sider.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\layout-components\Sider.tsx
 'use client'
 
+import type { ReactNode } from 'react'
 import { Layout } from 'antd'
-import styled     from 'styled-components'
+import styled from 'styled-components'
 
 const { Sider } = Layout
 
 /* Sider fixe alimenté par les variables Ant Design */
 const FixedSider = styled(Sider)`
-  background : var(--ant-color-bg-container) !important;
-  overflow   : auto;
-  height     : 100vh;
-  position   : fixed;
-  left       : 0;
-  box-shadow : var(--ant-box-shadow-secondary, 2px 0 6px rgba(0, 21, 41, .35));
-  transition : background 0.3s ease;
+  background: var(--ant-color-bg-container) !important;
+  overflow: auto;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  box-shadow: var(--ant-box-shadow-secondary, 2px 0 6px rgba(0, 21, 41, 0.35));
+  transition: background 0.3s ease;
 
   @media (max-width: 575.98px) {
     display: none;
@@ -1957,9 +2650,9 @@ const FixedSider = styled(Sider)`
 `
 
 interface Props {
-  collapsed    : boolean
-  setCollapsed : (c: boolean) => void
-  children     : React.ReactNode
+  collapsed: boolean
+  setCollapsed: (c: boolean) => void
+  children: ReactNode
 }
 
 export default function SiderWrapper({
@@ -1985,64 +2678,333 @@ export default function SiderWrapper({
 
 
 ===== BEGIN components/Loading.tsx =====
-// components/Loading.tsx
-import { Spin } from 'antd'
-export default function Loading() {
+// C:\MyCode\Konnaxionv14\frontend\components\Loading.tsx
+'use client';
+
+import { Spin } from 'antd';
+
+export type LoadingProps = {
+  /** If true, centers the spinner in the viewport for route-level usage */
+  fullscreen?: boolean;
+  /** Optional helper text shown under the spinner */
+  message?: string;
+};
+
+export default function Loading({
+  fullscreen = false,
+  message,
+}: LoadingProps) {
+  const style = fullscreen
+    ? {
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }
+    : {
+      padding: 24,
+      textAlign: 'center' as const,
+    };
+
   return (
-    <div style={{ padding: 24, textAlign: 'center' }}>
-      <Spin />
+    <div style={style} aria-busy="true" aria-live="polite">
+      <Spin size={fullscreen ? 'large' : 'default'} />
+      {message ? <div style={{ marginTop: 8 }}>{message}</div> : null}
     </div>
-  )
+  );
 }
 
 ===== END components/Loading.tsx =====
 
 
 ===== BEGIN components/map-components/ControlPanel.tsx =====
+// C:\MyCode\Konnaxionv14\frontend\components\map-components\ControlPanel.tsx
 /**
- * Description: Helper control panel in Map view to show current co-ordinates of marker
- * Author: Hieu Chu
+ * Map control panel shown on top of the interactive map.
+ * Displays current coordinates and optionally exposes zoom, filters, view‑mode and layer controls.
  */
 
-import React, { PureComponent } from 'react'
+import React, { type CSSProperties } from 'react';
 
-type ControlPanelProps = {
-  lat: number
-  lng: number
+export type ViewMode = 'default' | 'satellite' | 'terrain';
+
+export interface MapFilterOption {
+  id: string;
+  label: string;
 }
 
-export default class ControlPanel extends PureComponent<ControlPanelProps> {
-  render() {
-    const { lat, lng } = this.props
-    return (
-      <div className="control-panel">
-        <div>Latitude: {lat}</div>
-        <div>Longitude: {lng}</div>
+export interface MapLayerOption {
+  id: string;
+  label: string;
+  active: boolean;
+}
+
+export interface ControlPanelProps {
+  /** Current marker latitude */
+  lat: number;
+  /** Current marker longitude */
+  lng: number;
+
+  /** Current zoom level (if provided, enables the zoom slider when paired with onZoomChange) */
+  zoom?: number;
+  /** Optional slider minimum for zoom control */
+  minZoom?: number;
+  /** Optional slider maximum for zoom control */
+  maxZoom?: number;
+  /** Called when zoom slider changes */
+  onZoomChange?: (zoom: number) => void;
+
+  /** Active base map style */
+  viewMode?: ViewMode;
+  /** Called when user selects a different base map view */
+  onViewModeChange?: (mode: ViewMode) => void;
+
+  /** Available filters for map content (projects, impact categories, etc.) */
+  filters?: MapFilterOption[];
+  /** Currently selected filter id; null/undefined means "All" */
+  selectedFilterId?: string | null;
+  /** Called when filter changes; null means "All" */
+  onFilterChange?: (id: string | null) => void;
+
+  /** Toggleable overlay layers (heatmap, markers, clusters, etc.) */
+  layers?: MapLayerOption[];
+  /** Called when a layer checkbox is toggled */
+  onLayerToggle?: (id: string, active: boolean) => void;
+
+  /** Optional recenter action (e.g. to recenter view on marker) */
+  onRecenter?: () => void;
+
+  /** Extra styling hooks */
+  className?: string;
+  style?: CSSProperties;
+}
+
+const basePanelStyle: CSSProperties = {
+  position: 'absolute',
+  top: 12,
+  right: 12,
+  padding: 12,
+  width: 260,
+  maxWidth: 'calc(100% - 24px)',
+  boxSizing: 'border-box',
+  background: 'var(--ant-color-bg-container, rgba(255,255,255,0.95))',
+  boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+  borderRadius: 4,
+  fontSize: 12,
+  lineHeight: 1.5,
+};
+
+const sectionTitleStyle: CSSProperties = {
+  fontWeight: 600,
+  marginBottom: 4,
+};
+
+const rowStyle: CSSProperties = {
+  marginBottom: 8,
+};
+
+const chipContainerStyle: CSSProperties = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  gap: 6,
+};
+
+const chipStyle: CSSProperties = {
+  border: '1px solid rgba(0,0,0,0.15)',
+  borderRadius: 16,
+  padding: '2px 8px',
+  fontSize: 11,
+  background: 'var(--ant-color-bg-elevated, #fff)',
+  cursor: 'pointer',
+};
+
+const chipActiveStyle: CSSProperties = {
+  ...chipStyle,
+  background: 'var(--ant-color-primary-bg, #e6f4ff)',
+  borderColor: 'var(--ant-color-primary, #1677ff)',
+  color: 'var(--ant-color-primary-text, #1677ff)',
+};
+
+const layerRowStyle: CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  marginBottom: 4,
+};
+
+const ControlPanel: React.FC<ControlPanelProps> = ({
+  lat,
+  lng,
+  zoom,
+  minZoom = 1,
+  maxZoom = 18,
+  viewMode,
+  onViewModeChange,
+  filters,
+  selectedFilterId,
+  onFilterChange,
+  layers,
+  onLayerToggle,
+  onZoomChange,
+  onRecenter,
+  className,
+  style,
+}) => {
+  const zoomValue = typeof zoom === 'number' ? zoom : undefined;
+  const hasZoomControl = zoomValue !== undefined && !!onZoomChange;
+  const hasFilters = Array.isArray(filters) && filters.length > 0;
+  const hasLayers = Array.isArray(layers) && layers.length > 0;
+  const hasViewMode = !!viewMode && !!onViewModeChange;
+
+  const formatCoord = (value: number): string =>
+    Number.isFinite(value) ? value.toFixed(5) : '—';
+
+  return (
+    <div
+      className={className}
+      style={{
+        ...basePanelStyle,
+        ...style,
+      }}
+    >
+      {/* Coordinates */}
+      <div style={rowStyle}>
+        <div style={sectionTitleStyle}>Location</div>
+        <div>Latitude: {formatCoord(lat)}</div>
+        <div>Longitude: {formatCoord(lng)}</div>
+        {onRecenter && (
+          <button
+            type="button"
+            onClick={onRecenter}
+            style={{
+              marginTop: 6,
+              padding: '2px 8px',
+              fontSize: 11,
+              borderRadius: 12,
+              border: '1px solid rgba(0,0,0,0.15)',
+              background: 'var(--ant-color-bg-elevated, #fff)',
+              cursor: 'pointer',
+            }}
+          >
+            Recenter map
+          </button>
+        )}
       </div>
-    )
-  }
-}
+
+      {/* Zoom control */}
+      {hasZoomControl && zoomValue !== undefined && (
+        <div style={rowStyle}>
+          <div style={sectionTitleStyle}>Zoom</div>
+          <input
+            type="range"
+            min={minZoom}
+            max={maxZoom}
+            step={0.1}
+            value={zoomValue}
+            onChange={(e) => onZoomChange?.(Number(e.target.value))}
+            style={{ width: '100%' }}
+          />
+          <div style={{ marginTop: 2 }}>Current: {zoomValue.toFixed(1)}</div>
+        </div>
+      )}
+
+      {/* View mode selector */}
+      {hasViewMode && (
+        <div style={rowStyle}>
+          <div style={sectionTitleStyle}>View</div>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {(['default', 'satellite', 'terrain'] as ViewMode[]).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => onViewModeChange(mode)}
+                style={viewMode === mode ? chipActiveStyle : chipStyle}
+              >
+                {mode === 'default'
+                  ? 'Standard'
+                  : mode.charAt(0).toUpperCase() + mode.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Filters */}
+      {hasFilters && (
+        <div style={rowStyle}>
+          <div style={sectionTitleStyle}>Filters</div>
+          <div style={chipContainerStyle}>
+            <button
+              type="button"
+              onClick={() => onFilterChange?.(null)}
+              style={!selectedFilterId ? chipActiveStyle : chipStyle}
+            >
+              All
+            </button>
+            {(filters ?? []).map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => onFilterChange?.(f.id)}
+                style={
+                  selectedFilterId === f.id ? chipActiveStyle : chipStyle
+                }
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Layer toggles */}
+      {hasLayers && (
+        <div style={rowStyle}>
+          <div style={sectionTitleStyle}>Layers</div>
+          {(layers ?? []).map((layer) => (
+            <label key={layer.id} style={layerRowStyle}>
+              <input
+                type="checkbox"
+                checked={!!layer.active}
+                onChange={(e) =>
+                  onLayerToggle?.(layer.id, e.target.checked)
+                }
+              />
+              <span>{layer.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ControlPanel;
 
 ===== END components/map-components/ControlPanel.tsx =====
 
 
 ===== BEGIN components/map-components/index.tsx =====
-import Map from './Map'
+// C:\MyCode\Konnaxionv14\frontend\components\map-components\index.tsx
+export { default as Map } from './Map'
+export { default as StaticMap } from './StaticMap'
 
-export default Map
+export { default } from './Map'
 
 ===== END components/map-components/index.tsx =====
 
 
 ===== BEGIN components/map-components/Map.tsx =====
-'use client';
+// C:\MyCode\Konnaxionv14\frontend\components\map-components\Map.tsx
+'use client'
 
 /**
- * Dynamic map view with geolocation control and draggable marker
+ * Dynamic map view with geolocation control and draggable marker.
+ * Controlled via `view` and `marker` props so parent pages own the state.
  */
 
-import { useMemo } from 'react';
-import type { CSSProperties } from 'react';
+import { useMemo } from 'react'
+import type { CSSProperties } from 'react'
 import {
   Map as ReactMapGL,
   Marker,
@@ -2051,11 +3013,11 @@ import {
   GeolocateControl,
   type ViewState as MapViewState,
   type ViewStateChangeEvent,
-} from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+} from 'react-map-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
-import MapMarker from './MapMarker';
-import ControlPanel from './ControlPanel';
+import MapMarker from './MapMarker'
+import ControlPanel from './ControlPanel'
 
 /** Controls styling */
 const fullscreenControlStyle: CSSProperties = {
@@ -2063,52 +3025,54 @@ const fullscreenControlStyle: CSSProperties = {
   top: 0,
   left: 0,
   padding: '10px',
-};
+}
+
 const navStyle: CSSProperties = {
   position: 'absolute',
   top: 36,
   left: 0,
   padding: '10px',
-};
+}
+
 const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
   right: 0,
   margin: 10,
-};
+}
 
 /** Public shape expected by parent (keeps prop contract minimal) */
 type ViewInput = {
-  latitude: number;
-  longitude: number;
-  zoom: number;
-  pitch?: number;
-  bearing?: number;
-  /** Optional on input to avoid breaking callers; we’ll default it */
-  padding?: { top: number; bottom: number; left: number; right: number };
-};
+  latitude: number
+  longitude: number
+  zoom: number
+  pitch?: number
+  bearing?: number
+  /** Optional on input to avoid breaking callers; defaults inside component */
+  padding?: { top: number; bottom: number; left: number; right: number }
+}
 
-type MarkerState = { markerLat: number; markerLng: number };
+type MarkerState = { markerLat: number; markerLng: number }
 
 type Props = {
-  view: ViewInput;
-  setView: (v: ViewInput) => void;
-  marker: MarkerState;
-  setMarker: (m: MarkerState) => void;
-};
+  view: ViewInput
+  setView: (v: ViewInput) => void
+  marker: MarkerState
+  setMarker: (m: MarkerState) => void
+}
 
 const DEFAULT_PADDING: MapViewState['padding'] = {
   top: 0,
   right: 0,
   bottom: 0,
   left: 0,
-};
+}
 
 export default function Map({ view, setView, marker, setMarker }: Props) {
   const token =
     process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
     process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
-    process.env.MAPBOX_ACCESS_TOKEN;
+    process.env.MAPBOX_ACCESS_TOKEN
 
   // Internal view that satisfies react-map-gl’s stricter ViewState typing
   const controlledView: MapViewState = useMemo(
@@ -2121,10 +3085,11 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
       padding: view.padding ?? DEFAULT_PADDING,
     }),
     [view],
-  );
+  )
 
   const handleMove = (evt: ViewStateChangeEvent) => {
-    const vs = evt.viewState;
+    const vs = evt.viewState
+
     // Feed a relaxed shape back to parent while preserving optional fields
     setView({
       latitude: vs.latitude,
@@ -2133,8 +3098,8 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
       pitch: vs.pitch,
       bearing: vs.bearing,
       padding: vs.padding,
-    });
-  };
+    })
+  }
 
   return (
     <ReactMapGL
@@ -2144,7 +3109,12 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
        * Keep it controlled. Cast only at the boundary to avoid
        * polluting the rest of your code with map-specific width/height typing.
        */
-      viewState={controlledView as unknown as MapViewState & { width: number; height: number }}
+      viewState={
+        controlledView as unknown as MapViewState & {
+          width: number
+          height: number
+        }
+      }
       onMove={handleMove}
       mapboxAccessToken={token}
       mapStyle="mapbox://styles/mapbox/streets-v11"
@@ -2154,9 +3124,9 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
         longitude={marker.markerLng}
         latitude={marker.markerLat}
         draggable
-        onDragEnd={(e) => {
-          const { lng, lat } = e.lngLat;
-          setMarker({ markerLat: lat, markerLng: lng });
+        onDragEnd={e => {
+          const { lng, lat } = e.lngLat
+          setMarker({ markerLat: lat, markerLng: lng })
         }}
       >
         <MapMarker />
@@ -2186,7 +3156,7 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
 
       <ControlPanel lat={marker.markerLat} lng={marker.markerLng} />
     </ReactMapGL>
-  );
+  )
 }
 
 ===== END components/map-components/Map.tsx =====

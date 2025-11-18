@@ -1,11 +1,13 @@
-'use client';
+// C:\MyCode\Konnaxionv14\frontend\components\map-components\Map.tsx
+'use client'
 
 /**
- * Dynamic map view with geolocation control and draggable marker
+ * Dynamic map view with geolocation control and draggable marker.
+ * Controlled via `view` and `marker` props so parent pages own the state.
  */
 
-import { useMemo } from 'react';
-import type { CSSProperties } from 'react';
+import { useMemo } from 'react'
+import type { CSSProperties } from 'react'
 import {
   Map as ReactMapGL,
   Marker,
@@ -14,11 +16,11 @@ import {
   GeolocateControl,
   type ViewState as MapViewState,
   type ViewStateChangeEvent,
-} from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+} from 'react-map-gl'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
-import MapMarker from './MapMarker';
-import ControlPanel from './ControlPanel';
+import MapMarker from './MapMarker'
+import ControlPanel from './ControlPanel'
 
 /** Controls styling */
 const fullscreenControlStyle: CSSProperties = {
@@ -26,52 +28,54 @@ const fullscreenControlStyle: CSSProperties = {
   top: 0,
   left: 0,
   padding: '10px',
-};
+}
+
 const navStyle: CSSProperties = {
   position: 'absolute',
   top: 36,
   left: 0,
   padding: '10px',
-};
+}
+
 const geolocateStyle: CSSProperties = {
   position: 'absolute',
   bottom: 30,
   right: 0,
   margin: 10,
-};
+}
 
 /** Public shape expected by parent (keeps prop contract minimal) */
 type ViewInput = {
-  latitude: number;
-  longitude: number;
-  zoom: number;
-  pitch?: number;
-  bearing?: number;
-  /** Optional on input to avoid breaking callers; we’ll default it */
-  padding?: { top: number; bottom: number; left: number; right: number };
-};
+  latitude: number
+  longitude: number
+  zoom: number
+  pitch?: number
+  bearing?: number
+  /** Optional on input to avoid breaking callers; defaults inside component */
+  padding?: { top: number; bottom: number; left: number; right: number }
+}
 
-type MarkerState = { markerLat: number; markerLng: number };
+type MarkerState = { markerLat: number; markerLng: number }
 
 type Props = {
-  view: ViewInput;
-  setView: (v: ViewInput) => void;
-  marker: MarkerState;
-  setMarker: (m: MarkerState) => void;
-};
+  view: ViewInput
+  setView: (v: ViewInput) => void
+  marker: MarkerState
+  setMarker: (m: MarkerState) => void
+}
 
 const DEFAULT_PADDING: MapViewState['padding'] = {
   top: 0,
   right: 0,
   bottom: 0,
   left: 0,
-};
+}
 
 export default function Map({ view, setView, marker, setMarker }: Props) {
   const token =
     process.env.NEXT_PUBLIC_MAPBOX_TOKEN ??
     process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN ??
-    process.env.MAPBOX_ACCESS_TOKEN;
+    process.env.MAPBOX_ACCESS_TOKEN
 
   // Internal view that satisfies react-map-gl’s stricter ViewState typing
   const controlledView: MapViewState = useMemo(
@@ -84,10 +88,11 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
       padding: view.padding ?? DEFAULT_PADDING,
     }),
     [view],
-  );
+  )
 
   const handleMove = (evt: ViewStateChangeEvent) => {
-    const vs = evt.viewState;
+    const vs = evt.viewState
+
     // Feed a relaxed shape back to parent while preserving optional fields
     setView({
       latitude: vs.latitude,
@@ -96,8 +101,8 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
       pitch: vs.pitch,
       bearing: vs.bearing,
       padding: vs.padding,
-    });
-  };
+    })
+  }
 
   return (
     <ReactMapGL
@@ -107,7 +112,12 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
        * Keep it controlled. Cast only at the boundary to avoid
        * polluting the rest of your code with map-specific width/height typing.
        */
-      viewState={controlledView as unknown as MapViewState & { width: number; height: number }}
+      viewState={
+        controlledView as unknown as MapViewState & {
+          width: number
+          height: number
+        }
+      }
       onMove={handleMove}
       mapboxAccessToken={token}
       mapStyle="mapbox://styles/mapbox/streets-v11"
@@ -117,9 +127,9 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
         longitude={marker.markerLng}
         latitude={marker.markerLat}
         draggable
-        onDragEnd={(e) => {
-          const { lng, lat } = e.lngLat;
-          setMarker({ markerLat: lat, markerLng: lng });
+        onDragEnd={e => {
+          const { lng, lat } = e.lngLat
+          setMarker({ markerLat: lat, markerLng: lng })
         }}
       >
         <MapMarker />
@@ -149,5 +159,5 @@ export default function Map({ view, setView, marker, setMarker }: Props) {
 
       <ControlPanel lat={marker.markerLat} lng={marker.markerLng} />
     </ReactMapGL>
-  );
+  )
 }

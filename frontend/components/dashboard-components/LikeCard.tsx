@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LikeCard.tsx
 'use client';
 
 import React from 'react';
@@ -6,7 +7,7 @@ import { Card, Statistic, Skeleton } from 'antd';
 import type { LineConfig } from '@ant-design/plots';
 
 // Use Line instead of TinyLine (works across versions)
-const Line = dynamic(() => import('@ant-design/plots').then(m => m.Line), {
+const Line = dynamic(() => import('@ant-design/plots').then((m) => m.Line), {
   ssr: false,
 });
 
@@ -23,8 +24,8 @@ const LikeCard: React.FC<LikeCardProps> = ({
   trend = [],
   loading = false,
 }) => {
-  const series = Array.isArray(trend) ? trend : [];
-  const data = series.map((y, i) => ({ x: i, y }));
+  const series: number[] = Array.isArray(trend) ? trend : [];
+  const data = series.map((y, i) => ({ x: i, y: Number(y ?? 0) }));
 
   const config: LineConfig = {
     data,

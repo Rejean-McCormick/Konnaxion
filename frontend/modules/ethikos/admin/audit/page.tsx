@@ -5,16 +5,7 @@ import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-compon
 import { Tag } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchAuditLogs } from '@/services/admin';
-
-type LogRow = {
-  id: string;
-  actor: string;
-  action: string;
-  target: string;
-  severity: 'info' | 'warn' | 'critical';
-  ts: string;
-};
+import { fetchAuditLogs, type LogRow } from '@/services/audit';
 
 export default function AuditLogs() {
   usePageTitle('Admin · Audit Logs');
@@ -22,16 +13,42 @@ export default function AuditLogs() {
   const { data, loading } = useRequest(fetchAuditLogs);
 
   const columns: ProColumns<LogRow>[] = [
-    { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
-    { title: 'Actor', dataIndex: 'actor', width: 120 },
-    { title: 'Action', dataIndex: 'action', width: 200 },
-    { title: 'Target', dataIndex: 'target', ellipsis: true },
+    {
+      title: 'Time',
+      dataIndex: 'ts',
+      valueType: 'dateTime',
+      width: 180,
+      sorter: true,
+    },
+    {
+      title: 'Actor',
+      dataIndex: 'actor',
+      width: 120,
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      width: 200,
+    },
+    {
+      title: 'Target',
+      dataIndex: 'target',
+      ellipsis: true,
+    },
     {
       title: 'Severity',
       dataIndex: 'severity',
       width: 120,
       render: (_, row) => (
-        <Tag color={row.severity === 'critical' ? 'red' : row.severity === 'warn' ? 'orange' : 'blue'}>
+        <Tag
+          color={
+            row.severity === 'critical'
+              ? 'red'
+              : row.severity === 'warn'
+              ? 'orange'
+              : 'blue'
+          }
+        >
           {row.severity}
         </Tag>
       ),

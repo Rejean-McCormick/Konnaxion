@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\style.tsx
 /**
  * Description: Stylesheet for dashboard components
  * Author: Hieu Chu
@@ -20,7 +21,7 @@ const legacyTypeToIcon = (type?: string) => {
   const pascal =
     type
       .split('-')
-      .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+      .map(s => s.charAt(0).toUpperCase() + s.slice(1))
       .join('') + 'Outlined'
 
   const key = pascal as keyof typeof AntIcons
@@ -57,7 +58,7 @@ export const NumberInfoStyled = (props: {
         precision={precision}
         prefix={prefix}
         suffix={suffix}
-        formatter={(v) => Number(v).toLocaleString()}
+        formatter={v => Number(v).toLocaleString()}
         valueStyle={{ fontSize: 30 }}
       />
     </div>
@@ -130,7 +131,6 @@ export const CardFooter: React.FC<{
             {change.toLocaleString()}
           </span>
 
-          {/* Up/down icon */}
           {change < 0 ? (
             <CaretDownOutlined
               style={{ color: '#f5222d', verticalAlign: 'text-bottom' }}
@@ -175,4 +175,3 @@ export const ShadowCard = styled(CardStyled)`
     transition: all 150ms ease-in-out 0s;
   }
 `
-

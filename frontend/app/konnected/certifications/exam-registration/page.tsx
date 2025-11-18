@@ -1,3 +1,4 @@
+﻿// app/konnected/certifications/exam-registration/page.tsx
 ﻿'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -29,18 +30,18 @@ const { Paragraph, Text } = Typography;
  * NOTE ABOUT ENDPOINTS
  *
  * These constants are aligned with the v14 backend spec:
- * - Certification paths are exposed as `/api/certification-paths/` (CertificationPath model)
- * - Exam attempts / registrations are exposed as `/api/evaluations/` (Evaluation model)
- * - Optional nested helpers for sessions / eligibility live under `/api/certification-paths/:id/...`
- *
- * Adjust them if your actual Django router uses other names.
+ * - Certification paths:   /api/konnected/certifications/paths/
+ * - Exam registrations:    /api/konnected/certifications/evaluations/
+ * - Eligibility / sessions:
+ *     /api/konnected/certifications/paths/:id/eligibility/
+ *     /api/konnected/certifications/paths/:id/sessions/
  */
-const EXAM_PATHS_ENDPOINT = '/api/certification-paths/';
+const EXAM_PATHS_ENDPOINT = '/api/konnected/certifications/paths/';
 const EXAM_SESSIONS_ENDPOINT = (pathId: number | string) =>
-  `/api/certification-paths/${pathId}/sessions/`;
-const EXAM_REGISTRATION_ENDPOINT = '/api/evaluations/';
+  `/api/konnected/certifications/paths/${pathId}/sessions/`;
+const EXAM_REGISTRATION_ENDPOINT = '/api/konnected/certifications/evaluations/';
 const EXAM_ELIGIBILITY_ENDPOINT = (pathId: number | string) =>
-  `/api/certification-paths/${pathId}/eligibility/`;
+  `/api/konnected/certifications/paths/${pathId}/eligibility/`;
 
 /**
  * Domain types derived from CertifiKation & Knowledge specs + API schema.
@@ -178,13 +179,18 @@ const ExamRegistrationPageInner: React.FC = () => {
   /**
    * When the selected path changes, load sessions and eligibility.
    * Both are optional server-side features; we treat 404 as "not implemented".
+   * Also clear any previously selected session to avoid stale selections.
    */
   useEffect(() => {
     if (!selectedPathId) {
       setSessions([]);
       setEligibility(null);
+      form.setFieldsValue({ sessionId: undefined });
       return;
     }
+
+    // Reset session selection whenever the path changes.
+    form.setFieldsValue({ sessionId: undefined });
 
     const fetchEligibility = async () => {
       setEligibilityLoading(true);
@@ -238,7 +244,7 @@ const ExamRegistrationPageInner: React.FC = () => {
 
     void fetchEligibility();
     void fetchSessions();
-  }, [selectedPathId, messageApi]);
+  }, [selectedPathId, messageApi, form]);
 
   const isPathAlreadyPassed =
     eligibility?.already_passed ?? (selectedPath?.already_passed ?? false);
@@ -279,10 +285,10 @@ const ExamRegistrationPageInner: React.FC = () => {
       return;
     }
 
-    // Payload aligned with Evaluation model as a realistic "exam attempt" creation.
-    // Backend can map these fields into Evaluation.metadata / scheduling fields.
+    // Payload aligned with EvaluationViewSet.create:
+    //   { path_id, session_id, full_name, agreed_terms }
     const payload = {
-      certification_path_id: values.examPathId,
+      path_id: values.examPathId,
       session_id: values.sessionId,
       full_name: values.fullName,
       agreed_terms: values.agreeTerms === true,
@@ -537,7 +543,8 @@ const ExamRegistrationPageInner: React.FC = () => {
   };
 
   const renderConfirmStep = () => {
-    if (!selectedPath || !selectedSessionId) {
+    // Also guard on selectedSession to avoid crashes if sessions changed.
+    if (!selectedPath || !selectedSessionId || !selectedSession) {
       return (
         <Alert
           type="info"
@@ -548,7 +555,7 @@ const ExamRegistrationPageInner: React.FC = () => {
       );
     }
 
-    const session = selectedSession!;
+    const session = selectedSession;
     const start = new Date(session.start_at);
     const end = session.end_at ? new Date(session.end_at) : null;
 

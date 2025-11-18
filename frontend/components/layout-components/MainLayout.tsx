@@ -1,82 +1,107 @@
-// components/layout-components/MainLayout.tsx
-'use client'
+// C:\MyCode\Konnaxionv14\frontend\components\layout-components\MainLayout.tsx
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import { Layout } from 'antd'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import React, { useEffect, useState } from 'react';
+import { Layout } from 'antd';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 
-import FixedSider      from '@/components/layout-components/Sider'
-import Main            from '@/components/layout-components/Main'
-import HeaderComponent from '@/components/layout-components/Header'
-import LogoTitle       from '@/components/layout-components/LogoTitle'
-import DrawerComponent from '@/components/layout-components/Drawer'
-import MenuComponent   from '@/components/layout-components/Menu'
-import type { Route }  from '@/components/layout-components/Menu'
+import FixedSider from '@/components/layout-components/Sider';
+import Main from '@/components/layout-components/Main';
+import HeaderComponent from '@/components/layout-components/Header';
+import LogoTitle from '@/components/layout-components/LogoTitle';
+import DrawerComponent from '@/components/layout-components/Drawer';
+import MenuComponent from '@/components/layout-components/Menu';
+import type { Route } from '@/components/layout-components/Menu';
+
+const { Content } = Layout;
 
 interface RoutesConfig {
-  ekoh: Route[]
-  ethikos: Route[]
-  keenkonnect: Route[]
-  konnected: Route[]
-  kreative: Route[]
+  ekoh: Route[];
+  ethikos: Route[];
+  keenkonnect: Route[];
+  konnected: Route[];
+  kreative: Route[];
 }
 
-type SuiteKey = keyof RoutesConfig
+type SuiteKey = keyof RoutesConfig;
 
-const SUITES: SuiteKey[] = ['ekoh', 'ethikos', 'keenkonnect', 'konnected', 'kreative']
+const SUITES: SuiteKey[] = [
+  'ekoh',
+  'ethikos',
+  'keenkonnect',
+  'konnected',
+  'kreative',
+];
 
-// Default entry route per module
-// NOTE: Ethikos points to Pulse Overview until /ethikos/dashboard exists.
+// Default entry route per module – aligned with v14 routes config
 const DEFAULT_ENTRY: Record<SuiteKey, string> = {
-  ekoh       : '/ekoh/dashboard',
-  ethikos    : '/ethikos/pulse/overview',
+  ekoh: '/ekoh/dashboard',
+  ethikos: '/ethikos/insights',
   keenkonnect: '/keenkonnect/dashboard',
-  konnected  : '/konnected/dashboard',
-  kreative   : '/kreative/dashboard',
-}
+  konnected: '/konnected/dashboard',
+  kreative: '/kreative/dashboard',
+};
 
 const isSuiteKey = (val: string | null): val is SuiteKey =>
-  !!val && (SUITES as string[]).includes(val)
+  typeof val === 'string' && SUITES.includes(val as SuiteKey);
 
 /**
  * Determine active module from pathname + optional ?sidebar
+ *
+ * ?sidebar wins when it matches a known suite.
+ * Otherwise infer from the first path segment.
+ * /konsensus is mapped to the Kollective Intelligence suite (ekoh).
  */
 const detectSuite = (pathname: string, sidebarParam: string | null): SuiteKey => {
-  if (isSuiteKey(sidebarParam)) return sidebarParam
+  if (isSuiteKey(sidebarParam)) return sidebarParam;
 
-  const segments = pathname.split('/')
-  const first = (segments[1] ?? '').toLowerCase()
+  const safePath = pathname || '/';
+  const segments = safePath.split('/');
+  const first = (segments[1] ?? '').toLowerCase();
 
-  if (isSuiteKey(first)) return first
+  if (first === 'konsensus') {
+    // Konsensus Center lives under the Kollective Intelligence umbrella
+    return 'ekoh';
+  }
 
-  return 'ekoh'
-}
+  if (isSuiteKey(first)) return first;
 
-const { Content } = Layout
+  return 'ekoh';
+};
+
+type MainLayoutProps = React.PropsWithChildren<{
+  collapsed?: boolean;
+}>;
 
 export default function MainLayout({
   collapsed: initialCollapsed = false,
   children,
-}: React.PropsWithChildren<{ collapsed?: boolean }>) {
-  const router        = useRouter()
-  const pathname      = usePathname() ?? '/'
-  const searchParams  = useSearchParams()
-  const sidebarParam  = searchParams.get('sidebar')
+}: MainLayoutProps) {
+  const router = useRouter();
+  const pathname = usePathname() ?? '/';
+  const searchParams = useSearchParams();
+  const sidebarParam = searchParams.get('sidebar');
 
-  const [collapsed, setCollapsed] = useState(initialCollapsed)
-  const [drawerVisible, setDrawer] = useState(false)
+  const [collapsed, setCollapsed] = useState<boolean>(initialCollapsed);
+  const [drawerVisible, setDrawer] = useState<boolean>(false);
 
   const [routes, setRoutes] = useState<RoutesConfig>({
-    ekoh: [], ethikos: [], keenkonnect: [], konnected: [], kreative: [],
-  })
+    ekoh: [],
+    ethikos: [],
+    keenkonnect: [],
+    konnected: [],
+    kreative: [],
+  });
 
-  // suite courante
+  // Current suite
   const [suite, setSuite] = useState<SuiteKey>(() =>
     detectSuite(pathname, sidebarParam),
-  )
+  );
 
-  // charger dynamiquement les routes
+  // Dynamically load sidebar routes for each suite
   useEffect(() => {
+    let isMounted = true;
+
     Promise.all([
       import('@/routes/routesEkoh'),
       import('@/routes/routesEthikos'),
@@ -84,48 +109,82 @@ export default function MainLayout({
       import('@/routes/routesKonnected'),
       import('@/routes/routesKreative'),
     ])
-      .then(([
-        { default: ekoh },
-        { default: ethikos },
-        { default: keen },
-        { default: konnected },
-        { default: kreative },
-      ]) => setRoutes({ ekoh, ethikos, keenkonnect: keen, konnected, kreative }))
-      .catch(err => console.error('Erreur chargement routes :', err))
-  }, [])
+      .then(
+        ([
+          { default: ekoh },
+          { default: ethikos },
+          { default: keen },
+          { default: konnected },
+          { default: kreative },
+        ]) => {
+          if (!isMounted) return;
+          setRoutes({
+            ekoh,
+            ethikos,
+            keenkonnect: keen,
+            konnected,
+            kreative,
+          });
+        },
+      )
+      // eslint-disable-next-line no-console
+      .catch((err) => console.error('Erreur chargement routes :', err));
 
-  // resynchroniser quand l’URL change (back/forward, liens internes, etc.)
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Resync suite when URL changes (back/forward or internal navigation)
   useEffect(() => {
-    const next = detectSuite(pathname, sidebarParam)
-    if (next !== suite) setSuite(next)
-  }, [pathname, sidebarParam, suite])
+    const next = detectSuite(pathname, sidebarParam);
+    if (next !== suite) {
+      setSuite(next);
+    }
+  }, [pathname, sidebarParam, suite]);
 
   const changeSuite = (rawKey: string) => {
-    if (!isSuiteKey(rawKey)) return
-    const key: SuiteKey = rawKey
+    if (!isSuiteKey(rawKey)) return;
+    const key: SuiteKey = rawKey;
 
-    setSuite(key)
+    setSuite(key);
 
-    const params = new URLSearchParams(Array.from(searchParams.entries()))
-    params.set('sidebar', key)
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.set('sidebar', key);
 
-    const basePath = DEFAULT_ENTRY[key]
-    const query    = params.toString()
-    const target   = query ? `${basePath}?${query}` : basePath
+    const basePath = DEFAULT_ENTRY[key];
+    const query = params.toString();
+    const target = query ? `${basePath}?${query}` : basePath;
 
-    router.push(target)
-  }
+    router.push(target);
+  };
 
   const toggle = () => {
-    if (window.innerWidth >= 576) setCollapsed(!collapsed)
-    else setDrawer(v => !v)
-  }
+    // Guard for environments where window might not exist (tests, SSR edge cases)
+    if (typeof window === 'undefined') {
+      setCollapsed((prev) => !prev);
+      return;
+    }
 
-  const suiteRoutes = routes[suite] ?? []
+    if (window.innerWidth >= 576) {
+      // Desktop: toggle sider collapse
+      setCollapsed((prev) => !prev);
+    } else {
+      // Mobile: open/close drawer instead of touching sider
+      setDrawer((prev) => !prev);
+    }
+  };
+
+  const suiteRoutes = routes[suite] ?? [];
 
   return (
-    <Layout style={{ minHeight: '100vh', background: 'var(--ant-layout-color-bg-layout)' }}>
-      {/* SIDEBAR desktop */}
+    <Layout
+      style={{
+        minHeight: '100vh',
+        background: 'var(--ant-layout-color-bg-layout)',
+      }}
+    >
+      {/* SIDEBAR – desktop */}
       <FixedSider collapsed={collapsed} setCollapsed={setCollapsed}>
         <LogoTitle onSidebarChange={changeSuite} selectedSidebar={suite} />
         <MenuComponent
@@ -145,8 +204,8 @@ export default function MainLayout({
         />
         <Content
           style={{
-            margin      : '20px 16px 15px 16px',
-            background  : 'var(--ant-color-bg-container)',
+            margin: '20px 16px 15px 16px',
+            background: 'var(--ant-color-bg-container)',
             borderRadius: 8,
           }}
         >
@@ -154,7 +213,7 @@ export default function MainLayout({
         </Content>
       </Main>
 
-      {/* DRAWER mobile */}
+      {/* DRAWER – mobile */}
       <DrawerComponent
         drawerVisible={drawerVisible}
         closeDrawer={() => setDrawer(false)}
@@ -168,5 +227,5 @@ export default function MainLayout({
         />
       </DrawerComponent>
     </Layout>
-  )
+  );
 }

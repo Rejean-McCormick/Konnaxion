@@ -1,4 +1,5 @@
-﻿'use client';
+﻿// app/konnected/certifications/certification-programs/page.tsx
+'use client';
 
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -12,6 +13,7 @@ import {
   Drawer,
   Empty,
   Input,
+  Pagination,
   Progress,
   Row,
   Space,
@@ -146,9 +148,7 @@ function mapPathToProgram(path: CertificationPathPayload): CertificationProgram 
  * exam-registration, without relying on mock data.
  */
 async function fetchCertificationPrograms(): Promise<ProgramsResponse> {
-  const paths = await get<CertificationPathPayload[]>(
-    '/api/konnected/certifications/paths/',
-  );
+  const paths = await get<CertificationPathPayload[]>('konnected/certifications/paths/');
 
   return {
     items: paths.map(mapPathToProgram),
@@ -606,6 +606,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                         </Space>
                       }
                       extra={renderStatusTag(program)}
+                      onClick={() => handleOpenDetails(program)}
                     >
                       <Space direction="vertical" size={8} style={{ width: '100%' }}>
                         <div>
@@ -645,46 +646,22 @@ export default function CertificationProgramsPage(): JSX.Element {
                           />
                         </Space>
 
-                        <Space
-                          direction="vertical"
-                          size={4}
-                          style={{ width: '100%' }}
-                        >
-                          <div>
-                            <span style={{ fontSize: 12, color: '#999' }}>
-                              {program.kpi_enrolledCount != null && (
-                                <>
-                                  {program.kpi_enrolledCount} learners enrolled ·{' '}
-                                </>
-                              )}
-                              {program.kpi_completionRate != null && (
-                                <>
-                                  {program.kpi_completionRate}% completion rate
-                                </>
-                              )}
-                            </span>
-                          </div>
-                        </Space>
+                        {!!program.tags?.length && (
+                          <Space wrap size={4}>
+                            {program.tags.map((tag) => (
+                              <Tag key={tag}>{tag}</Tag>
+                            ))}
+                          </Space>
+                        )}
 
-                        <Space
-                          style={{
-                            marginTop: 8,
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Button
-                            type="link"
-                            size="small"
-                            onClick={() => handleOpenDetails(program)}
-                          >
-                            View details
-                          </Button>
+                        <Space style={{ justifyContent: 'space-between', width: '100%' }}>
                           <Button
                             type="primary"
-                            size="small"
                             icon={<ArrowRightOutlined />}
-                            onClick={() => handleStartOrContinue(program)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartOrContinue(program);
+                            }}
                           >
                             {program.userProgress?.status === 'completed'
                               ? 'View results'
@@ -702,32 +679,45 @@ export default function CertificationProgramsPage(): JSX.Element {
           )}
         </Row>
 
-        {/* Details drawer */}
+        {total > pageSize && (
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={total}
+              showSizeChanger
+              pageSizeOptions={['6', '12', '24']}
+              onChange={(page, size) => {
+                setCurrentPage(page);
+                if (size && size !== pageSize) {
+                  setPageSize(size);
+                }
+              }}
+            />
+          </div>
+        )}
+
         <Drawer
-          title={selectedProgram?.title ?? 'Certification details'}
-          width={520}
+          title={selectedProgram?.title}
           open={drawerOpen}
+          width={480}
           onClose={() => setDrawerOpen(false)}
-          destroyOnClose
         >
           {selectedProgram && (
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
               <Space direction="vertical" size={4}>
-                <Space size={8}>
-                  <SafetyCertificateOutlined />
-                  <span>{selectedProgram.title}</span>
-                </Space>
-                <div>
+                <Space wrap>
                   {selectedProgram.code && (
                     <Tag bordered={false}>{selectedProgram.code}</Tag>
                   )}
+                  {renderDifficultyTag(selectedProgram.difficulty)}
                   {selectedProgram.category && (
                     <Tag color="default">{selectedProgram.category}</Tag>
                   )}
                   {selectedProgram.requiresProctoring && (
                     <Tag color="purple">Proctored</Tag>
                   )}
-                </div>
+                </Space>
               </Space>
 
               <div>
@@ -776,7 +766,8 @@ export default function CertificationProgramsPage(): JSX.Element {
                   <Space direction="vertical" size={8} style={{ width: '100%' }}>
                     <Space>
                       {renderStatusTag(selectedProgram)}
-                      {typeof selectedProgram.userProgress.completionPercent === 'number' && (
+                      {typeof selectedProgram.userProgress.completionPercent ===
+                        'number' && (
                         <span>
                           {selectedProgram.userProgress.completionPercent}
                           % complete

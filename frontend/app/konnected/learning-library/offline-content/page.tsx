@@ -88,16 +88,22 @@ interface CreateOfflinePackagePayload {
 // NOTE: Endpoint paths/response wrappers are inferred.
 // Align them with schema-endpoints.json when wiring to the real backend.
 
-const OFFLINE_PACKAGE_LIST_ENDPOINT = '/konnected/knowledge/offline-packages/';
+// Use relative URLs so that NEXT_PUBLIC_API_BASE or "/api" baseURL applies
+// consistently (see services/_request.ts and Global Parameter Reference).
+const OFFLINE_PACKAGE_LIST_ENDPOINT = 'konnected/knowledge/offline-packages/';
 const OFFLINE_PACKAGE_DETAIL_ENDPOINT = (id: OfflinePackage['id']) =>
-  `/konnected/knowledge/offline-packages/${id}/`;
+  `konnected/knowledge/offline-packages/${id}/`;
 const OFFLINE_PACKAGE_SYNC_ENDPOINT = (id: OfflinePackage['id']) =>
-  `/konnected/knowledge/offline-packages/${id}/sync/`;
+  `konnected/knowledge/offline-packages/${id}/sync/`;
 
-// For now we reuse the canonical library endpoint as the source of offlineable
-// resources. Additional flags such as `offlineEligible` can later be surfaced
-// directly from the backend.
-const OFFLINE_RESOURCES_ENDPOINT = '/api/knowledge-resources/';
+// Knowledge module (KonnectED) offline-eligible resources.
+// We probe a small set of candidate endpoints to stay aligned with the v14
+// Knowledge spec while the backend paths stabilise.
+const OFFLINE_RESOURCES_ENDPOINTS: readonly string[] = [
+  '/api/knowledge-resources/',
+  '/api/knowledge/resources/',
+  '/api/konnected/resources/',
+];
 
 function normalizeList<T>(raw: unknown): T[] {
   if (Array.isArray(raw)) return raw as T[];
@@ -126,17 +132,123 @@ async function createOfflinePackage(
 }
 
 async function deleteOfflinePackage(id: OfflinePackage['id']): Promise<void> {
-  await api.delete(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id));
+  await api.delete( OFFLINE_PACKAGE_DETAIL_ENDPOINT(id) );
 }
 
 async function syncOfflinePackage(id: OfflinePackage['id']): Promise<void> {
   await api.post(OFFLINE_PACKAGE_SYNC_ENDPOINT(id));
 }
 
+/**
+ * Update a subset of package fields (currently autoSync).
+ * This is wired to the "Auto sync" toggle in the table.
+ */
+async function updateOfflinePackage(
+  id: OfflinePackage['id'],
+  payload: Partial<Pick<OfflinePackage, 'autoSync'>>,
+): Promise<OfflinePackage> {
+  return api.patch<OfflinePackage>(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id), payload);
+}
+
 async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
-  // Same: api.get returns data, not { data }
-  const raw = await api.get(OFFLINE_RESOURCES_ENDPOINT);
-  return normalizeList<OfflineableResource>(raw);
+  let lastError: unknown;
+
+  for (const url of OFFLINE_RESOURCES_ENDPOINTS) {
+    try {
+      const res = await fetch(url, { credentials: 'include' });
+
+      if (!res.ok) {
+        lastError = new Error(
+          `Offline resources endpoint ${url} returned ${res.status}`,
+        );
+        continue;
+      }
+
+      const json = await res.json();
+      const rawItems = normalizeList<any>(json);
+
+      const mapped: OfflineableResource[] = rawItems.map((raw) => {
+        // Normalise type to the v14 CONTENT_TYPES_ALLOWED enum
+        // ("article", "video", "lesson", "quiz", "dataset").
+        const typeValue: string =
+          (raw.type ??
+            raw.resource_type ??
+            raw.content_type ??
+            'article') as string;
+
+        const normalizedType = String(typeValue).toLowerCase();
+
+        let type: ResourceType;
+        if (
+          normalizedType === 'article' ||
+          normalizedType === 'video' ||
+          normalizedType === 'lesson' ||
+          normalizedType === 'quiz' ||
+          normalizedType === 'dataset'
+        ) {
+          type = normalizedType as ResourceType;
+        } else if (normalizedType === 'course' || normalizedType === 'module') {
+          type = 'lesson';
+        } else if (
+          normalizedType === 'doc' ||
+          normalizedType === 'document' ||
+          normalizedType === 'file'
+        ) {
+          type = 'article';
+        } else {
+          type = 'article';
+        }
+
+        const sizeMb =
+          typeof raw.sizeMb === 'number'
+            ? raw.sizeMb
+            : typeof raw.size_mb === 'number'
+              ? raw.size_mb
+              : typeof raw.bundle_size_mb === 'number'
+                ? raw.bundle_size_mb
+                : undefined;
+
+        const offlineEligible = Boolean(
+          raw.offlineEligible ??
+            raw.offline_available ??
+            raw.offlineAvailable ??
+            raw.is_offline_available ??
+            raw.can_be_offlined,
+        );
+
+        const includedInPackages: string[] | undefined =
+          (raw.includedInPackages as string[] | undefined) ??
+          (raw.packages as string[] | undefined) ??
+          undefined;
+
+        return {
+          id: raw.id,
+          title: raw.title ?? '',
+          type,
+          subject: raw.subject ?? raw.topic ?? raw.domain ?? undefined,
+          level: raw.level ?? raw.difficulty ?? undefined,
+          language: raw.language ?? raw.lang ?? undefined,
+          sizeMb,
+          offlineEligible,
+          includedInPackages,
+        };
+      });
+
+      return mapped;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  if (lastError) {
+    throw lastError instanceof Error
+      ? lastError
+      : new Error('Unable to load offlineable resources.');
+  }
+
+  // Fallback: no known endpoint responded; return empty list
+  // so the rest of the UI still renders.
+  return [];
 }
 
 // ---- Page -----------------------------------------------------------------
@@ -175,6 +287,12 @@ export default function OfflineContentPage(): JSX.Element {
   );
   const { loading: syncing, runAsync: runSyncPackage } = useRequest(
     syncOfflinePackage,
+    {
+      manual: true,
+    },
+  );
+  const { loading: updatingPackage, runAsync: runUpdatePackage } = useRequest(
+    updateOfflinePackage,
     {
       manual: true,
     },
@@ -288,8 +406,29 @@ export default function OfflineContentPage(): JSX.Element {
       title: 'Auto sync',
       dataIndex: 'autoSync',
       key: 'autoSync',
-      render: (value?: boolean) => (
-        <Switch checked={Boolean(value)} size="small" disabled />
+      render: (value: boolean | undefined, record) => (
+        <Switch
+          checked={Boolean(value)}
+          size="small"
+          loading={updatingPackage}
+          onChange={async (checked) => {
+            try {
+              await runUpdatePackage(record.id, { autoSync: checked });
+              message.success(
+                checked
+                  ? 'Package enrolled in the weekly offline build.'
+                  : 'Package removed from the automatic offline build.',
+              );
+              refreshPackages();
+            } catch (err) {
+              const msg =
+                err instanceof Error
+                  ? err.message
+                  : 'Failed to update auto-sync setting.';
+              message.error(msg);
+            }
+          }}
+        />
       ),
     },
     {
@@ -302,6 +441,7 @@ export default function OfflineContentPage(): JSX.Element {
             size="small"
             loading={syncing}
             onClick={() => handleSyncPackage(record)}
+            disabled={record.status === 'building'}
           >
             Sync now
           </Button>
@@ -489,8 +629,8 @@ export default function OfflineContentPage(): JSX.Element {
                 type="warning"
                 showIcon
                 style={{ marginTop: 16 }}
-                message="Some offline APIs are not fully wired yet"
-                description="Package management and resource eligibility are using placeholder endpoints. Once the backend is ready, this page will display live data."
+                message="Some offline APIs may not be fully wired yet"
+                description="Offline package management and resource eligibility depend on KonnectED’s Knowledge backend. Once all endpoints are live, this page will display real-time data."
               />
             )}
           </Col>
@@ -647,7 +787,7 @@ export default function OfflineContentPage(): JSX.Element {
             </Form.Item>
 
             <Form.Item label="Language filter" name="languageFilter">
-              <Input placeholder="Optional language filter, e.g. English" />
+              <Input placeholder="Optional language filter, e.g. en, fr" />
             </Form.Item>
           </Form>
         </Modal>

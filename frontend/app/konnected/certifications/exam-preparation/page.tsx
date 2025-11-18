@@ -46,11 +46,13 @@ const QUIZ_RETRY_COOLDOWN_MIN = 30; // from CertifiKation spec
  * This is designed to be consistent with the other CertifiKation endpoints
  * used by exam registration and exam dashboard.
  *
- * Final URL (with default API base) will be:
- *   /api/konnected/certifications/paths/:pathId/preparation-plan/
+ * IMPORTANT:
+ * - we use a *relative* URL WITHOUT a leading "/" so that axios baseURL
+ *   (NEXT_PUBLIC_API_BASE or "/api") is correctly applied.
+ * - On the wire this becomes: /api/konnected/certifications/paths/:pathId/preparation-plan/
  */
 const EXAM_PREPARATION_ENDPOINT = (pathId: string | number) =>
-  `/konnected/certifications/paths/${pathId}/preparation-plan/`;
+  `konnected/certifications/paths/${pathId}/preparation-plan/`;
 
 type PrepModuleType = 'content' | 'practice_quiz' | 'project' | 'checkpoint';
 
@@ -142,11 +144,7 @@ export default function ExamPreparationPage(): JSX.Element {
   const pathId = searchParams.get('pathId');
   const pathNameFromUrl = searchParams.get('pathName') || undefined;
 
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery<ExamPreparationResponse>({
+  const { data, isLoading, error } = useQuery<ExamPreparationResponse>({
     queryKey: ['certs', 'exam-preparation', pathId],
     queryFn: () => fetchExamPreparation(pathId as string),
     enabled: !!pathId,
@@ -454,7 +452,7 @@ export default function ExamPreparationPage(): JSX.Element {
           showIcon
           style={{ marginBottom: 16 }}
           message="No certification path selected"
-          description="Open this page from a specific Certification Program (e.g., from the Programs list) to see a tailored preparation plan."
+          description="Open this page from a specific Certification Program (e.g. from the Programs list) to see a tailored preparation plan."
         />
       )}
 
@@ -490,7 +488,7 @@ export default function ExamPreparationPage(): JSX.Element {
           <Tabs
             defaultActiveKey="plan"
             items={mainTabsItems}
-            destroyOnHidden={false}
+            destroyInactiveTabPane={false}
           />
         </Col>
 

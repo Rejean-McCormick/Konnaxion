@@ -1,3 +1,4 @@
+// C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
 'use client';
 
 import React from 'react';
@@ -12,9 +13,9 @@ const Column = dynamic(
 );
 
 export interface UserCardProps {
-  title?: string;        // Default: 'New Users'
-  total: number;         // Total users (or new users)
-  trend?: number[];      // Time series values
+  title?: string;   // Default: 'New Users'
+  total: number;    // Total users (or new users)
+  trend?: number[]; // Time series values
   loading?: boolean;
 }
 
@@ -25,7 +26,10 @@ const UserCard: React.FC<UserCardProps> = ({
   loading = false,
 }) => {
   const series: number[] = Array.isArray(trend) ? trend : [];
-  const data = series.map((y, i) => ({ idx: String(i + 1), value: Number(y ?? 0) }));
+  const data = series.map((y, i) => ({
+    idx: String(i + 1),
+    value: Number(y ?? 0),
+  }));
 
   const config: ColumnConfig = {
     data,

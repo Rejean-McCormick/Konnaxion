@@ -1,8 +1,16 @@
 // services/admin.ts
 import { get, post, patch } from './_request'
+import type { AuditPayload as AuditPayloadBase, LogRow as AuditLogRow } from './audit'
+import { fetchAuditLogs as fetchAuditLogsRaw } from './audit'
 
 // ----- Shared Admin types -----
-export type RoleRow = { id: string; name: string; userCount: number; enabled: boolean }
+export type RoleRow = {
+  id: string
+  name: string
+  userCount: number
+  enabled: boolean
+}
+
 export type RolePayload = { items: RoleRow[] }
 
 export type Report = {
@@ -12,18 +20,12 @@ export type Report = {
   type: 'Spam' | 'Harassment' | 'Misinformation'
   status: 'Pending' | 'Resolved'
 }
+
 export type ModerationPayload = { items: Report[] }
 
-// Narrow log shape used by admin pages
-export type LogRow = {
-  id: string
-  actor: string
-  action: string
-  target: string
-  severity: 'info' | 'warn' | 'critical'
-  ts: string
-}
-export type AuditPayload = { items: LogRow[] }
+// Re‑export canonical audit types from services/audit
+export type LogRow = AuditLogRow
+export type AuditPayload = AuditPayloadBase
 
 // ----- API calls with explicit return types -----
 export async function fetchModerationQueue(): Promise<ModerationPayload> {
@@ -42,6 +44,12 @@ export async function toggleRole(id: string, enabled: boolean): Promise<void> {
   return patch<void>(`admin/roles/${id}`, { enabled })
 }
 
+/**
+ * Convenience wrapper for audit logs used by the Admin UI.
+ * It delegates to the canonical implementation in services/audit
+ * and intentionally exposes a no‑arg signature so that
+ * `useRequest<AuditPayload, []>(fetchAuditLogs)` keeps working.
+ */
 export async function fetchAuditLogs(): Promise<AuditPayload> {
-  return get<AuditPayload>('admin/audit')
+  return fetchAuditLogsRaw()
 }

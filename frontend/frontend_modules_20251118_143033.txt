@@ -1,4 +1,4 @@
-===== TOC (158 fichiers) =====
+===== TOC (157 fichiers) =====
 1. C:\MyCode\Konnaxionv14\frontend\modules\admin\components\index.ts
 2. C:\MyCode\Konnaxionv14\frontend\modules\admin\components\ModerationQueue.tsx
 3. C:\MyCode\Konnaxionv14\frontend\modules\admin\components\UserStats.tsx
@@ -42,121 +42,120 @@
 41. C:\MyCode\Konnaxionv14\frontend\modules\global\components\index.ts
 42. C:\MyCode\Konnaxionv14\frontend\modules\global\hooks\index.ts
 43. C:\MyCode\Konnaxionv14\frontend\modules\global\hooks\useGlobalSearch.ts
-44. C:\MyCode\Konnaxionv14\frontend\modules\global\hooks\useGlobalSearch.ts.bak
-45. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\index.ts
-46. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\MyWork.tsx
-47. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\Search.tsx
-48. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\__stories__\SmartVoteChart.stories.tsx
-49. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\DomainHeatMap.tsx
-50. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\ErrorRateSparkline.tsx
-51. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\ExportCSVButton.tsx
-52. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\index.ts
-53. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\LatencySLOGauge.tsx
-54. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\SmartVoteChart.tsx
-55. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\TimeRangePicker.tsx
-56. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\UsageBigNumbers.tsx
-57. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\__tests__\useReport.test.tsx
-58. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\index.ts
-59. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\useReport.ts
-60. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\useReportStream.ts
-61. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\CustomBuilderPage.tsx
-62. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\index.ts
-63. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\InsightsHomePage.tsx
-64. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\PerfDashboard.tsx
-65. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\SmartVoteDashboard.tsx
-66. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\UsageDashboard.tsx
-67. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\find-teams\components\CommonWidget\page.tsx
-68. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\match-preferences\components\CommonWidget\page.tsx
-69. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\my-matches\components\CommonWidget\page.tsx
-70. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\dashboard\components\CommonWidget\page.tsx
-71. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\browse-repository\components\CommonWidget\page.tsx
-72. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\document-management\components\CommonWidget\page.tsx
-73. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\search-filter-documents\components\CommonWidget\page.tsx
-74. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\upload-new-document\components\CommonWidget\page.tsx
-75. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\browse-projects\components\CommonWidget\page.tsx
-76. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\create-new-project\components\CommonWidget\page.tsx
-77. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\my-projects\components\CommonWidget\page.tsx
-78. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\project-workspace\components\CommonWidget\page.tsx
-79. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\submit-impact-reports\components\CommonWidget\page.tsx
-80. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\sustainability-dashboard\components\CommonWidget\page.tsx
-81. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\track-project-impact\components\CommonWidget\page.tsx
-82. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\account-preferences\components\CommonWidget\page.tsx
-83. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\manage-expertise-areas\components\CommonWidget\page.tsx
-84. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\view-reputation-ekoh\components\CommonWidget\page.tsx
-85. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\browse-available-workspaces\components\CommonWidget\page.tsx
-86. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\launch-new-workspace\components\CommonWidget\page.tsx
-87. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\my-workspaces\components\CommonWidget\page.tsx
-88. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\certification-programs\components\CommonWidget\page.tsx
-89. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-dashboard-results\components\CommonWidget\page.tsx
-90. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-preparation\components\CommonWidget\page.tsx
-91. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-registration\components\CommonWidget\page.tsx
-92. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\active-threads\components\CommonWidget\page.tsx
-93. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\moderation\components\CommonWidget\page.tsx
-94. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\start-new-discussion\components\CommonWidget\page.tsx
-95. C:\MyCode\Konnaxionv14\frontend\modules\konnected\dashboard\components\CommonWidget\page.tsx
-96. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\browse-resources\components\CommonWidget\page.tsx
-97. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\offline-content\components\CommonWidget\page.tsx
-98. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\recommended-resources\components\CommonWidget\page.tsx
-99. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\search-filters\components\CommonWidget\page.tsx
-100. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\create-learning-path\components\CommonWidget\page.tsx
-101. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\manage-existing-paths\components\CommonWidget\page.tsx
-102. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\my-learning-path\components\CommonWidget\page.tsx
-103. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\activity-planner\components\CommonWidget\page.tsx
-104. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\my-teams\components\CommonWidget\page.tsx
-105. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\project-workspaces\components\CommonWidget\page.tsx
-106. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\team-builder\components\CommonWidget\page.tsx
-107. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\index.ts
-108. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\PollBarChart.tsx
-109. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\VoteButtons.tsx
-110. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\index.ts
-111. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\useLivePoll.ts
-112. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\usePoll.ts
-113. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\pages\index.ts
-114. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\pages\PollPage.tsx
-115. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationForm.tsx
-116. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationList.tsx
-117. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationVotePanel.tsx
-118. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ImpactTimeline.tsx
-119. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\index.ts
-120. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ResultsChart.tsx
-121. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ResultsDashboard.tsx
-122. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\SuggestionBoard.tsx
-123. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\SuggestionsBoard.tsx
-124. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\index.ts
-125. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultation.ts
-126. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultationResults.ts
-127. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultations.ts
-128. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultationVote.ts
-129. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useImpact.ts
-130. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useSuggestions.ts
-131. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationDetailPage.tsx
-132. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationHub.tsx
-133. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationsHomePage.tsx
-134. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\index.ts
-135. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ResultsPage.tsx
-136. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\SuggestionPage.tsx
-137. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\index.ts
-138. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\OpportunityList.tsx
-139. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\ProfileCard.tsx
-140. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\index.ts
-141. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\useOpportunities.ts
-142. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\useProfiles.ts
-143. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\ConnectCenter.tsx
-144. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\index.ts
-145. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\PublicProfile.tsx
-146. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\find-spaces\components\CommonWidget\page.tsx
-147. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\my-spaces\components\CommonWidget\page.tsx
-148. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\start-new-space\components\CommonWidget\page.tsx
-149. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\featured-projects\components\CommonWidget\page.tsx
-150. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\submit-to-showcase\components\CommonWidget\page.tsx
-151. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\top-creators\components\CommonWidget\page.tsx
-152. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\explore-ideas\components\CommonWidget\page.tsx
-153. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\inspiration-gallery\components\CommonWidget\page.tsx
-154. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\submit-creative-work\components\CommonWidget\page.tsx
-155. C:\MyCode\Konnaxionv14\frontend\modules\kreative\dashboard\components\CommonWidget\page.tsx
-156. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\collaborate-on-ideas\components\CommonWidget\page.tsx
-157. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\create-new-idea\components\CommonWidget\page.tsx
-158. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\my-ideas\components\CommonWidget\page.tsx
+44. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\index.ts
+45. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\MyWork.tsx
+46. C:\MyCode\Konnaxionv14\frontend\modules\global\pages\Search.tsx
+47. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\__stories__\SmartVoteChart.stories.tsx
+48. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\DomainHeatMap.tsx
+49. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\ErrorRateSparkline.tsx
+50. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\ExportCSVButton.tsx
+51. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\index.ts
+52. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\LatencySLOGauge.tsx
+53. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\SmartVoteChart.tsx
+54. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\TimeRangePicker.tsx
+55. C:\MyCode\Konnaxionv14\frontend\modules\insights\components\UsageBigNumbers.tsx
+56. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\__tests__\useReport.test.tsx
+57. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\index.ts
+58. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\useReport.ts
+59. C:\MyCode\Konnaxionv14\frontend\modules\insights\hooks\useReportStream.ts
+60. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\CustomBuilderPage.tsx
+61. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\index.ts
+62. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\InsightsHomePage.tsx
+63. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\PerfDashboard.tsx
+64. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\SmartVoteDashboard.tsx
+65. C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\UsageDashboard.tsx
+66. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\find-teams\components\CommonWidget\page.tsx
+67. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\match-preferences\components\CommonWidget\page.tsx
+68. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\my-matches\components\CommonWidget\page.tsx
+69. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\dashboard\components\CommonWidget\page.tsx
+70. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\browse-repository\components\CommonWidget\page.tsx
+71. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\document-management\components\CommonWidget\page.tsx
+72. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\search-filter-documents\components\CommonWidget\page.tsx
+73. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\knowledge\upload-new-document\components\CommonWidget\page.tsx
+74. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\browse-projects\components\CommonWidget\page.tsx
+75. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\create-new-project\components\CommonWidget\page.tsx
+76. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\my-projects\components\CommonWidget\page.tsx
+77. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\projects\project-workspace\components\CommonWidget\page.tsx
+78. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\submit-impact-reports\components\CommonWidget\page.tsx
+79. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\sustainability-dashboard\components\CommonWidget\page.tsx
+80. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\sustainability-impact\track-project-impact\components\CommonWidget\page.tsx
+81. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\account-preferences\components\CommonWidget\page.tsx
+82. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\manage-expertise-areas\components\CommonWidget\page.tsx
+83. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\user-reputation\view-reputation-ekoh\components\CommonWidget\page.tsx
+84. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\browse-available-workspaces\components\CommonWidget\page.tsx
+85. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\launch-new-workspace\components\CommonWidget\page.tsx
+86. C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\workspaces\my-workspaces\components\CommonWidget\page.tsx
+87. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\certification-programs\components\CommonWidget\page.tsx
+88. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-dashboard-results\components\CommonWidget\page.tsx
+89. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-preparation\components\CommonWidget\page.tsx
+90. C:\MyCode\Konnaxionv14\frontend\modules\konnected\certifications\exam-registration\components\CommonWidget\page.tsx
+91. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\active-threads\components\CommonWidget\page.tsx
+92. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\moderation\components\CommonWidget\page.tsx
+93. C:\MyCode\Konnaxionv14\frontend\modules\konnected\community-discussions\start-new-discussion\components\CommonWidget\page.tsx
+94. C:\MyCode\Konnaxionv14\frontend\modules\konnected\dashboard\components\CommonWidget\page.tsx
+95. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\browse-resources\components\CommonWidget\page.tsx
+96. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\offline-content\components\CommonWidget\page.tsx
+97. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\recommended-resources\components\CommonWidget\page.tsx
+98. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-library\search-filters\components\CommonWidget\page.tsx
+99. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\create-learning-path\components\CommonWidget\page.tsx
+100. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\manage-existing-paths\components\CommonWidget\page.tsx
+101. C:\MyCode\Konnaxionv14\frontend\modules\konnected\learning-paths\my-learning-path\components\CommonWidget\page.tsx
+102. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\activity-planner\components\CommonWidget\page.tsx
+103. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\my-teams\components\CommonWidget\page.tsx
+104. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\project-workspaces\components\CommonWidget\page.tsx
+105. C:\MyCode\Konnaxionv14\frontend\modules\konnected\teams-collaboration\team-builder\components\CommonWidget\page.tsx
+106. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\index.ts
+107. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\PollBarChart.tsx
+108. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\components\VoteButtons.tsx
+109. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\index.ts
+110. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\useLivePoll.ts
+111. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\hooks\usePoll.ts
+112. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\pages\index.ts
+113. C:\MyCode\Konnaxionv14\frontend\modules\konsensus\pages\PollPage.tsx
+114. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationForm.tsx
+115. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationList.tsx
+116. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ConsultationVotePanel.tsx
+117. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ImpactTimeline.tsx
+118. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\index.ts
+119. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ResultsChart.tsx
+120. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\ResultsDashboard.tsx
+121. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\SuggestionBoard.tsx
+122. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\components\SuggestionsBoard.tsx
+123. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\index.ts
+124. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultation.ts
+125. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultationResults.ts
+126. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultations.ts
+127. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useConsultationVote.ts
+128. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useImpact.ts
+129. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\hooks\useSuggestions.ts
+130. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationDetailPage.tsx
+131. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationHub.tsx
+132. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ConsultationsHomePage.tsx
+133. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\index.ts
+134. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\ResultsPage.tsx
+135. C:\MyCode\Konnaxionv14\frontend\modules\konsultations\pages\SuggestionPage.tsx
+136. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\index.ts
+137. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\OpportunityList.tsx
+138. C:\MyCode\Konnaxionv14\frontend\modules\kontact\components\ProfileCard.tsx
+139. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\index.ts
+140. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\useOpportunities.ts
+141. C:\MyCode\Konnaxionv14\frontend\modules\kontact\hooks\useProfiles.ts
+142. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\ConnectCenter.tsx
+143. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\index.ts
+144. C:\MyCode\Konnaxionv14\frontend\modules\kontact\pages\PublicProfile.tsx
+145. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\find-spaces\components\CommonWidget\page.tsx
+146. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\my-spaces\components\CommonWidget\page.tsx
+147. C:\MyCode\Konnaxionv14\frontend\modules\kreative\collaborative-spaces\start-new-space\components\CommonWidget\page.tsx
+148. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\featured-projects\components\CommonWidget\page.tsx
+149. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\submit-to-showcase\components\CommonWidget\page.tsx
+150. C:\MyCode\Konnaxionv14\frontend\modules\kreative\community-showcases\top-creators\components\CommonWidget\page.tsx
+151. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\explore-ideas\components\CommonWidget\page.tsx
+152. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\inspiration-gallery\components\CommonWidget\page.tsx
+153. C:\MyCode\Konnaxionv14\frontend\modules\kreative\creative-hub\submit-creative-work\components\CommonWidget\page.tsx
+154. C:\MyCode\Konnaxionv14\frontend\modules\kreative\dashboard\components\CommonWidget\page.tsx
+155. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\collaborate-on-ideas\components\CommonWidget\page.tsx
+156. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\create-new-idea\components\CommonWidget\page.tsx
+157. C:\MyCode\Konnaxionv14\frontend\modules\kreative\idea-incubator\my-ideas\components\CommonWidget\page.tsx
 ===== END TOC =====
 
 
@@ -679,16 +678,7 @@ import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-compon
 import { Tag } from 'antd';
 import { useRequest } from 'ahooks';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchAuditLogs } from '@/services/admin';
-
-type LogRow = {
-  id: string;
-  actor: string;
-  action: string;
-  target: string;
-  severity: 'info' | 'warn' | 'critical';
-  ts: string;
-};
+import { fetchAuditLogs, type LogRow } from '@/services/audit';
 
 export default function AuditLogs() {
   usePageTitle('Admin · Audit Logs');
@@ -696,16 +686,42 @@ export default function AuditLogs() {
   const { data, loading } = useRequest(fetchAuditLogs);
 
   const columns: ProColumns<LogRow>[] = [
-    { title: 'Time', dataIndex: 'ts', valueType: 'dateTime', width: 180, sorter: true },
-    { title: 'Actor', dataIndex: 'actor', width: 120 },
-    { title: 'Action', dataIndex: 'action', width: 200 },
-    { title: 'Target', dataIndex: 'target', ellipsis: true },
+    {
+      title: 'Time',
+      dataIndex: 'ts',
+      valueType: 'dateTime',
+      width: 180,
+      sorter: true,
+    },
+    {
+      title: 'Actor',
+      dataIndex: 'actor',
+      width: 120,
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      width: 200,
+    },
+    {
+      title: 'Target',
+      dataIndex: 'target',
+      ellipsis: true,
+    },
     {
       title: 'Severity',
       dataIndex: 'severity',
       width: 120,
       render: (_, row) => (
-        <Tag color={row.severity === 'critical' ? 'red' : row.severity === 'warn' ? 'orange' : 'blue'}>
+        <Tag
+          color={
+            row.severity === 'critical'
+              ? 'red'
+              : row.severity === 'warn'
+              ? 'orange'
+              : 'blue'
+          }
+        >
           {row.severity}
         </Tag>
       ),
@@ -2595,8 +2611,9 @@ export { GlobalSearchBar } from './GlobalSearchBar';
 
 ===== BEGIN modules/global/hooks/useGlobalSearch.ts =====
 ﻿// modules/global/hooks/useGlobalSearch.ts
+"use client";
+
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/shared/api";
 
 export interface GlobalSearchResult {
   id: string;
@@ -2605,11 +2622,16 @@ export interface GlobalSearchResult {
   path: string;
 }
 
+interface SearchResponse {
+  results: GlobalSearchResult[];
+}
+
 /**
- * Client-side search: GET /api/search?q=…
- * Correction:
- * - n’utilise plus "/api/search" avec baseURL "/api" (évite "/api/api/search")
- * - garde axios (shared/api) qui ne déballe pas .data
+ * Client-side global search.
+ *
+ * Hits the Next.js route: GET /_api/search?q=…
+ * - avoids mixing with the backend API baseURL (/api, NEXT_PUBLIC_API_BASE, etc.)
+ * - normalizes the `{ results: [...] }` response to `GlobalSearchResult[]`
  */
 export default function useGlobalSearch(query: string) {
   const q = query?.trim() ?? "";
@@ -2620,49 +2642,30 @@ export default function useGlobalSearch(query: string) {
     staleTime: 60_000,
     retry: 1,
     queryFn: async () => {
-      const res = await api.get<GlobalSearchResult[]>("/api/search", { params: { q } });
-      return res.data;
+      const params = new URLSearchParams({ q });
+
+      const res = await fetch(`/_api/search?${params.toString()}`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      });
+
+      if (!res.ok) {
+        const body = await res.text().catch(() => "");
+        throw new Error(body || `Search failed with status ${res.status}`);
+      }
+
+      const json = (await res.json()) as SearchResponse;
+
+      return Array.isArray(json.results) ? json.results : [];
     },
   });
 }
 
 ===== END modules/global/hooks/useGlobalSearch.ts =====
-
-
-===== BEGIN modules/global/hooks/useGlobalSearch.ts.bak =====
-﻿// modules/global/hooks/useGlobalSearch.ts
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/shared/api";
-
-export interface GlobalSearchResult {
-  id: string;
-  title: string;
-  snippet: string;
-  path: string;
-}
-
-/**
- * Client-side search: GET /api/search?q=…
- * Correction:
- * - n’utilise plus "/api/search" avec baseURL "/api" (évite "/api/api/search")
- * - garde axios (shared/api) qui ne déballe pas .data
- */
-export default function useGlobalSearch(query: string) {
-  const q = query?.trim() ?? "";
-
-  return useQuery<GlobalSearchResult[], Error>({
-    queryKey: ["global-search", q],
-    enabled: q.length > 0,
-    staleTime: 60_000,
-    retry: 1,
-    queryFn: async () => {
-      const res = await api.get<GlobalSearchResult[]>("/search", { params: { q } });
-      return res.data;
-    },
-  });
-}
-
-===== END modules/global/hooks/useGlobalSearch.ts.bak =====
 
 
 ===== BEGIN modules/global/pages/index.ts =====
@@ -3027,9 +3030,9 @@ export { default as useReportStream } from './useReportStream';
 
 
 ===== BEGIN modules/insights/hooks/useReport.ts =====
-
+// modules/insights/hooks/useReport.ts
 import { useQuery } from "@tanstack/react-query";
-import { api } from "@/shared/api";
+import api from "@/api";
 
 type SmartVoteResp = { labels: string[]; votes: number[]; avg_score: number[] };
 type UsageResp = { labels: string[]; mau: number[]; projects: number[]; docs: number[] };
@@ -3047,9 +3050,9 @@ export function useReport<E extends keyof EndpointMap>(
 ) {
   return useQuery<EndpointMap[E]>({
     queryKey: [endpoint, params],
-    queryFn: async () =>
-      (await api.get(`/reports/${endpoint}`, { params })).data,
     staleTime: 300_000,
+    queryFn: async () =>
+      api.get<EndpointMap[E]>(`/reports/${endpoint}`, { params }),
   });
 }
 

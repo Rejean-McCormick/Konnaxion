@@ -109,16 +109,66 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   /** Global token overrides only where explicitly provided */
   const tokenOverrides: Record<string, any> = {
+    // Core semantic colors
     ...(raw.colorPrimary != null && { colorPrimary: raw.colorPrimary }),
+    ...((raw as any).colorPrimaryBg != null && {
+      colorPrimaryBg: (raw as any).colorPrimaryBg,
+    }),
+    ...((raw as any).colorPrimaryHover != null && {
+      colorPrimaryHover: (raw as any).colorPrimaryHover,
+    }),
+    ...((raw as any).colorPrimaryActive != null && {
+      colorPrimaryActive: (raw as any).colorPrimaryActive,
+    }),
     ...(raw.colorInfo != null && { colorInfo: raw.colorInfo }),
     ...(raw.colorSuccess != null && { colorSuccess: raw.colorSuccess }),
     ...(raw.colorWarning != null && { colorWarning: raw.colorWarning }),
     ...(raw.colorError != null && { colorError: raw.colorError }),
 
+    // Backgrounds
+    ...((raw as any).colorBgBase != null && {
+      colorBgBase: (raw as any).colorBgBase,
+    }),
     ...(raw.colorBgLayout != null && { colorBgLayout: raw.colorBgLayout }),
     ...(raw.colorBgContainer != null && { colorBgContainer: raw.colorBgContainer }),
     ...(raw.colorBgElevated != null && { colorBgElevated: raw.colorBgElevated }),
+    ...(raw.colorBgMask != null && { colorBgMask: raw.colorBgMask }),
+    ...(raw.colorBgSpotlight != null && { colorBgSpotlight: raw.colorBgSpotlight }),
+    ...(raw.colorBgSolid != null && { colorBgSolid: raw.colorBgSolid }),
+    ...(raw.colorBgSolidHover != null && {
+      colorBgSolidHover: raw.colorBgSolidHover,
+    }),
+    ...(raw.colorBgPopconfirm != null && {
+      colorBgPopconfirm: raw.colorBgPopconfirm,
+    }),
 
+    // Text
+    ...(raw.colorText != null && { colorText: raw.colorText }),
+    ...(raw.colorTextBase != null && { colorTextBase: raw.colorTextBase }),
+    ...(raw.colorTextSecondary != null && {
+      colorTextSecondary: raw.colorTextSecondary,
+    }),
+    ...(raw.colorTextTertiary != null && {
+      colorTextTertiary: raw.colorTextTertiary,
+    }),
+    ...(raw.colorTextPlaceholder != null && {
+      colorTextPlaceholder: raw.colorTextPlaceholder,
+    }),
+    ...(raw.colorTextDisabled != null && {
+      colorTextDisabled: raw.colorTextDisabled,
+    }),
+
+    // Borders
+    ...(raw.colorBorder != null && { colorBorder: raw.colorBorder }),
+    ...(raw.colorSplit != null && { colorSplit: raw.colorSplit }),
+
+    // Shadows
+    ...((raw as any).boxShadow != null && { boxShadow: (raw as any).boxShadow }),
+    ...((raw as any).boxShadowSecondary != null && {
+      boxShadowSecondary: (raw as any).boxShadowSecondary,
+    }),
+
+    // Radius / typography / layout
     ...(raw.borderRadius != null && { borderRadius: raw.borderRadius }),
     ...(raw.borderRadiusLG != null && { borderRadiusLG: raw.borderRadiusLG }),
     ...(raw.controlHeight != null && { controlHeight: raw.controlHeight }),
@@ -133,6 +183,22 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }),
   }
 
+  /**
+   * Normalize menu-related raw keys across themes:
+   * - funkyTheme uses custom menuItem* keys
+   * - other themes (light/dark/cyber/ocean/sunset) use colorMenuItem* keys
+   * This helper merges both into AntD Menu component tokens.
+   */
+  const menuItemTextColor =
+    (raw as any).menuItemTextColor ?? (raw as any).colorMenuItemText
+  const menuItemHoverBg =
+    (raw as any).menuItemHoverBg ?? (raw as any).colorMenuItemHoverBg
+  const menuItemSelectedBg =
+    (raw as any).menuItemSelectedBg ?? (raw as any).colorMenuItemSelectedBg
+  const menuItemSelectedColor =
+    (raw as any).menuItemSelectedText ?? (raw as any).colorMenuItemSelectedText
+  const menuBg = (raw as any).menuBg
+
   /** Map “raw” keys to component-level overrides, then strip empty objects */
   const componentsOverrides = pruneEmptyObjects({
     Layout: {
@@ -141,11 +207,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         : {},
     },
     Menu: pruneEmptyObjects({
-      ...(raw as any).menuItemTextColor ? { itemColor: (raw as any).menuItemTextColor } : {},
-      ...(raw as any).menuItemHoverBg ? { itemHoverBg: (raw as any).menuItemHoverBg } : {},
-      ...(raw as any).menuItemSelectedBg
-        ? { itemSelectedBg: (raw as any).menuItemSelectedBg }
-        : {},
+      ...(menuItemTextColor ? { itemColor: menuItemTextColor } : {}),
+      ...(menuItemHoverBg ? { itemHoverBg: menuItemHoverBg } : {}),
+      ...(menuItemSelectedBg ? { itemSelectedBg: menuItemSelectedBg } : {}),
+      ...(menuItemSelectedColor ? { itemSelectedColor: menuItemSelectedColor } : {}),
+      ...(menuBg ? { itemBg: menuBg } : {}),
     }),
     Dropdown: pruneEmptyObjects({
       ...(raw as any).dropdownBg ? { colorBgElevated: (raw as any).dropdownBg } : {},
@@ -174,9 +240,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       value={{ token: safeToken, themeType, setThemeType, cycleTheme }}
     >
       <ConfigProvider
-        /** Force English UI (no more Chinese labels) */
         locale={enUS}
-        /** Optional global defaults */
         componentSize="middle"
         theme={{
           algorithm,
@@ -186,10 +250,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
           components: componentsOverrides,
         }}
       >
-        {/* Ant Design App wrapper: enables context-aware message/notification/modal in React 19 */}
-        <AntdApp>
-          {children}
-        </AntdApp>
+        <AntdApp>{children}</AntdApp>
       </ConfigProvider>
     </ThemeContext.Provider>
   )

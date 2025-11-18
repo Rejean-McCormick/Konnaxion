@@ -810,24 +810,25 @@ export default function EarnedBadgesDisplay() {
 ===== BEGIN app/ekoh/dashboard/page.tsx =====
 'use client'
 
-// pages/ekoh/dashboard/index.tsx
+// app/ekoh/dashboard/page.tsx
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
 import { Card, Statistic, Row, Col, Tabs } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
 import LineChart from '@/components/dashboard-components/LineChart';
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 const { TabPane } = Tabs;
 
-const EkohDashboard = () => {
-  // États simulant des données utilisateur
-  const [ekohScore, setEkohScore] = useState<number>(80);
-  const [smartVoteWeight, setSmartVoteWeight] = useState<number>(70);
-  const [badgesEarned, setBadgesEarned] = useState<number>(12);
+type TrendPoint = { time: string; score: number };
 
-  // Données pour le graphique de tendance (Ekoh score over time)
-  const [trendData, setTrendData] = useState<Array<{ time: string; score: number }>>([
+const EkohDashboard = (): JSX.Element => {
+  // Simulated user metrics
+  const [ekohScore] = useState<number>(80);
+  const [smartVoteWeight] = useState<number>(70);
+  const [badgesEarned] = useState<number>(12);
+
+  // Trend data (Ekoh score over time)
+  const [trendData, setTrendData] = useState<TrendPoint[]>([
     { time: '08:00', score: 70 },
     { time: '10:00', score: 72 },
     { time: '12:00', score: 75 },
@@ -837,26 +838,31 @@ const EkohDashboard = () => {
     { time: '20:00', score: 80 },
   ]);
 
-  // Notable achievements et recent contributions (données simulées)
-  const notableAchievements = [
+  // Notable achievements and recent contributions (mock data)
+  const notableAchievements: string[] = [
     'Reached Expert Level 5',
     'Highest vote weight: 78%',
     'Awarded "Community Champion" badge',
   ];
-  const recentContributions = [
+
+  const recentContributions: string[] = [
     'Voted on Economic Reform Proposal',
     'Commented on Climate Policy Debate',
     'Shared article on Smart Voting Impact',
   ];
 
-  // Simulation d'actualisation du graphique (optionnelle)
+  // Optional simulation to refresh the trend chart
   useEffect(() => {
     const interval = setInterval(() => {
-      // Simuler une mise à jour du score en ajoutant un nouveau point et en conservant les 7 derniers points
-      const newTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const newTime = new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
       const newScore = 70 + Math.floor(Math.random() * 20);
-      setTrendData(prev => [...prev.slice(-6), { time: newTime, score: newScore }]);
+
+      setTrendData((prev) => [...prev.slice(-6), { time: newTime, score: newScore }]);
     }, 5000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -864,12 +870,16 @@ const EkohDashboard = () => {
     <>
       <Head>
         <title>Ekoh Dashboard</title>
-        <meta name="description" content="Overview of your reputation and influence in the Ekoh system." />
+        <meta
+          name="description"
+          content="Overview of your reputation and influence in the Ekoh system."
+        />
       </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de la page */}
-        <h1 className="text-2xl font-bold mb-4">Ekoh Dashboard</h1>
 
+      <EkohPageShell
+        title="Ekoh dashboard"
+        subtitle="Overview of your reputation, voting influence, expertise, and badges."
+      >
         {/* Overview cards */}
         <Row gutter={16} className="mb-6">
           <Col xs={24} sm={8}>
@@ -892,15 +902,22 @@ const EkohDashboard = () => {
         {/* Reputation trend chart */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-2">Reputation Trend Over Time</h2>
-          {/* On transforme les données pour que le composant LineChart attende {time, value} */}
-          <LineChart data={trendData.map(item => ({ time: item.time, value: item.score }))} />
+          <LineChart
+            data={trendData.map((item) => ({
+              time: item.time,
+              value: item.score,
+            }))}
+          />
         </Card>
 
-        {/* Onglets pour les vues approfondies */}
+        {/* Detailed views tabs */}
         <Card className="mb-6">
           <Tabs defaultActiveKey="overview">
             <TabPane tab="Overview" key="overview">
-              <p>This section provides an overall summary of your reputation, voting influence, expertise, and badges.</p>
+              <p>
+                This section provides an overall summary of your reputation, voting influence,
+                expertise, and badges.
+              </p>
             </TabPane>
             <TabPane tab="Voting Influence" key="votingInfluence">
               <p>Detailed view on your Smart Vote weight and how it affects overall decisions.</p>
@@ -919,8 +936,8 @@ const EkohDashboard = () => {
           <Col xs={24} md={12}>
             <Card title="Notable Achievements" className="mb-6">
               <ul>
-                {notableAchievements.map((achievement, index) => (
-                  <li key={index}>{achievement}</li>
+                {notableAchievements.map((achievement) => (
+                  <li key={achievement}>{achievement}</li>
                 ))}
               </ul>
             </Card>
@@ -928,17 +945,17 @@ const EkohDashboard = () => {
           <Col xs={24} md={12}>
             <Card title="Recent Contributions" className="mb-6">
               <ul>
-                {recentContributions.map((contribution, index) => (
-                  <li key={index}>{contribution}</li>
+                {recentContributions.map((contribution) => (
+                  <li key={contribution}>{contribution}</li>
                 ))}
               </ul>
             </Card>
           </Col>
         </Row>
-      </div>
+      </EkohPageShell>
     </>
   );
-}
+};
 
 export default EkohDashboard;
 
@@ -1021,14 +1038,11 @@ export default EkohPageShell;
 ===== BEGIN app/ekoh/expertise-areas/view-current-expertise/page.tsx =====
 'use client'
 
-// pages/ekoh/expertise-areas/view-current-expertise/index.tsx
+// app/ekoh/expertise-areas/view-current-expertise/page.tsx
 import React from 'react';
 import Head from 'next/head';
-import type { NextPage } from 'next';
-import { Card, List, Progress, Tag, Typography } from 'antd';
-import MainLayout from '@/components/layout-components/MainLayout';
-
-const { Title } = Typography;
+import { Card, List, Progress, Tag } from 'antd';
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 // Exemple de données simulées pour l'expertise de l'utilisateur
 interface Expertise {
@@ -1063,7 +1077,7 @@ const expertiseData: Expertise[] = [
   },
 ];
 
-const ViewCurrentExpertise = () => {
+export default function ViewCurrentExpertise(): JSX.Element {
   return (
     <>
       <Head>
@@ -1073,11 +1087,11 @@ const ViewCurrentExpertise = () => {
           content="View your recognized expertise areas along with proficiency levels and contribution details."
         />
       </Head>
-      <div className="container mx-auto p-5">
-        {/* En-tête de la page */}
-        <Title level={2}>Expertise Areas</Title>
 
-        {/* Liste des domaines d'expertise */}
+      <EkohPageShell
+        title="Expertise Areas"
+        subtitle="Overview of your recognized domains, proficiency levels, and contributions."
+      >
         <Card className="mb-6">
           <List
             itemLayout="vertical"
@@ -1102,12 +1116,10 @@ const ViewCurrentExpertise = () => {
             )}
           />
         </Card>
-      </div>
+      </EkohPageShell>
     </>
   );
 }
-
-export default ViewCurrentExpertise;
 
 ===== END app/ekoh/expertise-areas/view-current-expertise/page.tsx =====
 
@@ -7267,12 +7279,17 @@ function filterSeriesByDays(data: any[], days: number): any[] {
 
   const now = dayjs();
   const start = now.startOf('day').subtract(days - 1, 'day');
+  const startTs = start.valueOf();
+  const endTs = now.endOf('day').valueOf();
 
-  return data.filter((row) => {
-    const value = row.date ?? row.x ?? row.ts;
+  return data.filter((row: any) => {
+    const value = row?.date ?? row?.x ?? row?.ts;
     if (!value) return true;
-    const d = dayjs(value);
-    return d.isSameOrAfter(start, 'day') && d.isSameOrBefore(now, 'day');
+
+    const d = dayjs(value).startOf('day');
+    const ts = d.valueOf();
+
+    return ts >= startTs && ts <= endTs;
   });
 }
 
@@ -7310,11 +7327,15 @@ export default function PulseTrends(): JSX.Element {
     // Use the last date from the last non-heatmap series as a simple "data up to" marker
     for (let i = charts.length - 1; i >= 0; i -= 1) {
       const chart = charts[i];
+      if (!chart) continue;
       if (chart.type === 'heatmap') continue;
+
       const series = (chart.config?.data ?? []) as any[];
       if (!series.length) continue;
-      const last = series[series.length - 1];
+
+      const last = series[series.length - 1] as any;
       if (!last?.date) continue;
+
       return dayjs(last.date).format('MMM D');
     }
     return null;
@@ -7396,9 +7417,7 @@ export default function PulseTrends(): JSX.Element {
         <Space>
           {lastUpdatedLabel && (
             <Tooltip title={`Data up to ${lastUpdatedLabel}`}>
-              <Badge
-                count={<ClockCircleOutlined />}
-              />
+              <Badge count={<ClockCircleOutlined />} />
             </Tooltip>
           )}
 
@@ -12051,6 +12070,7 @@ export default function SegmentLayout({ children }: SegmentLayoutProps) {
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Head from 'next/head';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import {
   Avatar,
@@ -12078,11 +12098,13 @@ import {
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import api from '@/api';
+import usePageTitle from '@/hooks/usePageTitle';
 
 const { Search } = Input;
 const { Option } = Select;
 
-const PROJECTS_ENDPOINT = '/api/projects/';
+// Aligned with Django router: /api/keenkonnect/projects/
+const PROJECTS_ENDPOINT = 'keenkonnect/projects/'; // relative to NEXT_PUBLIC_API_BASE
 
 type SortCriteria = 'newest' | 'mostMembers';
 
@@ -12111,6 +12133,9 @@ interface Project {
 
 export default function BrowseProjectsPage(): JSX.Element {
   const router = useRouter();
+
+  // Sync browser tab title with suite naming
+  usePageTitle('KeenKonnect · Browse Projects');
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -12231,339 +12256,382 @@ export default function BrowseProjectsPage(): JSX.Element {
   };
 
   return (
-    <PageContainer
-      ghost
-      header={{
-        title: 'Browse Projects',
-        subTitle:
-          'Discover projects and collaborate through KeenKonnect. Data is loaded from the Django backend.',
-        extra: [
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() =>
-              router.push('/keenkonnect/projects/create-new-project')
-            }
-          >
-            Create New Project
-          </Button>,
-        ],
-      }}
-    >
-      <ProCard ghost>
-        {loading && (
-          <div style={{ textAlign: 'center', padding: 24 }}>
-            <Spin />
-          </div>
-        )}
+    <>
+      <Head>
+        <title>KeenKonnect – Browse Projects</title>
+      </Head>
 
-        {error && (
-          <div style={{ marginBottom: 16 }}>
-            <Tag color="red">{error}</Tag>
-          </div>
-        )}
+      <PageContainer
+        ghost
+        header={{
+          title: 'Browse Projects',
+          subTitle:
+            'Discover projects and collaborate through KeenKonnect. Data is loaded from the Django backend.',
+          extra: [
+            <Button
+              key="create"
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() =>
+                router.push('/keenkonnect/projects/create-new-project')
+              }
+            >
+              Create New Project
+            </Button>,
+          ],
+        }}
+      >
+        <ProCard ghost>
+          {loading && (
+            <div style={{ textAlign: 'center', padding: 24 }}>
+              <Spin />
+            </div>
+          )}
 
-        {/* Tabs + filters */}
-        <ProCard bordered={false}>
-          {/* Quick domain Tabs */}
-          <Tabs
-            activeKey={activeDomainTabKey}
-            onChange={handleDomainTabChange}
-            items={domainOptions.map((domain) => ({
-              key: domain,
-              label: domain === 'All' ? 'All Domains' : domain,
-            }))}
-          />
+          {error && (
+            <div style={{ marginBottom: 16 }}>
+              <Tag color="red">{error}</Tag>
+            </div>
+          )}
 
-          {/* Filters */}
-          <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
-            <Col xs={24} md={10}>
-              <Search
-                placeholder="Search by name or description"
-                allowClear
-                prefix={<SearchOutlined />}
-                value={searchText}
-                onChange={(e) => {
-                  setSearchText(e.target.value);
-                  setCurrentPage(1);
-                }}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={7}>
-              <Select
-                value={selectedDomain}
-                style={{ width: '100%' }}
-                onChange={(value) => {
-                  setSelectedDomain(value);
-                  setActiveDomainTabKey(value);
-                  setCurrentPage(1);
-                }}
-              >
-                {domainOptions.map((domain) => (
-                  <Option key={domain} value={domain}>
-                    {domain === 'All' ? 'All Domains' : domain}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-            <Col xs={24} sm={12} md={7}>
-              <Select
-                value={selectedTechnology}
-                style={{ width: '100%' }}
-                onChange={(value) => {
-                  setSelectedTechnology(value);
-                  setCurrentPage(1);
-                }}
-              >
-                {technologyOptions.map((tech) => (
-                  <Option key={tech} value={tech}>
-                    {tech === 'All' ? 'All Technologies' : tech}
-                  </Option>
-                ))}
-              </Select>
-            </Col>
-          </Row>
+          {/* Tabs + filters */}
+          <ProCard bordered={false}>
+            {/* Quick domain Tabs */}
+            <Tabs
+              activeKey={activeDomainTabKey}
+              onChange={handleDomainTabChange}
+              items={domainOptions.map((domain) => ({
+                key: domain,
+                label: domain === 'All' ? 'All Domains' : domain,
+              }))}
+            />
 
-          {/* Sort & result count */}
-          <Row
-            justify="space-between"
-            align="middle"
-            style={{ marginTop: 16 }}
-          >
-            <Col>
-              <Space size="middle">
-                <span>Sort by:</span>
+            {/* Filters */}
+            <Row gutter={[16, 16]} style={{ marginTop: 8 }}>
+              <Col xs={24} md={10}>
+                <Search
+                  placeholder="Search by name or description"
+                  allowClear
+                  prefix={<SearchOutlined />}
+                  value={searchText}
+                  onChange={(e) => {
+                    setSearchText(e.target.value);
+                    setCurrentPage(1);
+                  }}
+                />
+              </Col>
+              <Col xs={24} sm={12} md={7}>
                 <Select
-                  value={sortCriteria}
-                  style={{ width: 200 }}
-                  onChange={(value) =>
-                    setSortCriteria(value as SortCriteria)
-                  }
+                  value={selectedDomain}
+                  style={{ width: '100%' }}
+                  onChange={(value) => {
+                    setSelectedDomain(value);
+                    setActiveDomainTabKey(value);
+                    setCurrentPage(1);
+                  }}
                 >
-                  <Option value="newest">Newest</Option>
-                  <Option value="mostMembers">Most Members</Option>
+                  {domainOptions.map((domain) => (
+                    <Option key={domain} value={domain}>
+                      {domain === 'All' ? 'All Domains' : domain}
+                    </Option>
+                  ))}
                 </Select>
-              </Space>
-            </Col>
-            <Col>
-              <span>
-                {sortedProjects.length} project
-                {sortedProjects.length !== 1 ? 's' : ''} found
-              </span>
-            </Col>
-          </Row>
-        </ProCard>
+              </Col>
+              <Col xs={24} sm={12} md={7}>
+                <Select
+                  value={selectedTechnology}
+                  style={{ width: '100%' }}
+                  onChange={(value) => {
+                    setSelectedTechnology(value);
+                    setCurrentPage(1);
+                  }}
+                >
+                  {technologyOptions.map((tech) => (
+                    <Option key={tech} value={tech}>
+                      {tech === 'All' ? 'All Technologies' : tech}
+                    </Option>
+                  ))}
+                </Select>
+              </Col>
+            </Row>
 
-        {/* Projects grid */}
-        <ProCard ghost style={{ marginTop: 24 }} bodyStyle={{ padding: 0 }}>
-          {projects.length === 0 && !loading ? (
-            <Empty description="No projects available yet." />
-          ) : (
-            <Row gutter={[24, 24]}>
-              {paginatedProjects.map((project) => (
-                <Col key={project.id} xs={24} sm={12} lg={8}>
-                  <Card
-                    hoverable
-                    title={project.name}
-                    onClick={() => handleOpenDrawer(project)}
-                    extra={
-                      <Space size={8}>
-                        <Tag color="blue">{project.domain}</Tag>
-                        <Tooltip title={`${project.members} members`}>
-                          <Space size={4}>
-                            <TeamOutlined />
-                            <span>{project.members}</span>
-                          </Space>
-                        </Tooltip>
-                      </Space>
-                    }
+            {/* Sorter */}
+            <Row style={{ marginTop: 16 }}>
+              <Col span={24}>
+                <Space>
+                  <span>Sort by:</span>
+                  <Select<SortCriteria>
+                    value={sortCriteria}
+                    onChange={(value) => setSortCriteria(value)}
+                    style={{ width: 180 }}
                   >
-                    <Space
-                      direction="vertical"
-                      size="small"
-                      style={{ width: '100%' }}
+                    <Option value="newest">Newest first</Option>
+                    <Option value="mostMembers">Most members</Option>
+                  </Select>
+                </Space>
+              </Col>
+            </Row>
+          </ProCard>
+
+          {/* Content */}
+          <ProCard ghost style={{ marginTop: 16 }}>
+            {projects.length === 0 && !loading && !error && (
+              <Empty
+                description={
+                  <Space direction="vertical">
+                    <span>No projects found yet.</span>
+                    <Button
+                      type="primary"
+                      icon={<PlusOutlined />}
+                      onClick={() =>
+                        router.push('/keenkonnect/projects/create-new-project')
+                      }
                     >
-                      <div style={{ minHeight: 48 }}>
-                        {project.description || 'No description provided yet.'}
-                      </div>
+                      Create the first project
+                    </Button>
+                  </Space>
+                }
+              />
+            )}
 
-                      {/* Technologies */}
-                      <Space wrap>
-                        {project.technologies.length === 0 ? (
-                          <Tag>No technologies listed</Tag>
-                        ) : (
-                          project.technologies.map((tech) => (
-                            <Tag key={tech}>{tech}</Tag>
-                          ))
-                        )}
-                      </Space>
-
-                      {/* Avatars + owner + CTA */}
-                      <Row
-                        justify="space-between"
-                        align="middle"
-                        style={{ marginTop: 8 }}
-                      >
-                        <Col>
-                          <Space size={8}>
-                            <Avatar.Group maxCount={3} size="small">
-                              <Avatar icon={<UserOutlined />} />
-                              <Avatar>
-                                {project.owner
-                                  ? project.owner.charAt(0).toUpperCase()
-                                  : '?'}
-                              </Avatar>
-                              <Avatar icon={<UserOutlined />} />
-                            </Avatar.Group>
-                            <span
-                              style={{
-                                fontSize: 12,
-                                color: 'rgba(0,0,0,0.45)',
+            {projects.length > 0 && (
+              <Row gutter={[16, 16]}>
+                {paginatedProjects.map((project) => (
+                  <Col key={project.id} xs={24} sm={12} md={8}>
+                    <Card
+                      hoverable
+                      title={
+                        <Space>
+                          <TeamOutlined />
+                          <span>{project.name}</span>
+                        </Space>
+                      }
+                      onClick={() => handleOpenDrawer(project)}
+                      extra={
+                        <Space size={8}>
+                          <Tooltip title="Open workspace">
+                            <Button
+                              type="link"
+                              icon={<UserOutlined />}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(
+                                  `/keenkonnect/projects/project-workspace?projectId=${project.id}`,
+                                );
                               }}
                             >
-                              Owner: {project.owner || 'Unknown'}
-                            </span>
-                          </Space>
-                        </Col>
-                        <Col>
-                          <Button
-                            type="link"
-                            size="small"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              router.push(
-                                `/keenkonnect/projects/project-workspace?projectId=${project.id}`,
-                              );
-                            }}
-                          >
-                            Open workspace
-                          </Button>
-                        </Col>
-                      </Row>
-                    </Space>
-                  </Card>
-                </Col>
-              ))}
-
-              {paginatedProjects.length === 0 && projects.length > 0 && (
-                <Col span={24}>
-                  <Card>
-                    <Space direction="vertical">
-                      <span>No projects match your filters.</span>
-                      <Button
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={() =>
-                          router.push(
-                            '/keenkonnect/projects/create-new-project',
-                          )
-                        }
+                              Open
+                            </Button>
+                          </Tooltip>
+                          <Tooltip title="View collaborators (coming soon)">
+                            <Button
+                              type="link"
+                              icon={<TeamOutlined />}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              Team
+                            </Button>
+                          </Tooltip>
+                        </Space>
+                      }
+                    >
+                      <Space
+                        direction="vertical"
+                        size={8}
+                        style={{ width: '100%' }}
                       >
-                        Start a New Project
-                      </Button>
-                    </Space>
-                  </Card>
-                </Col>
-              )}
-            </Row>
+                        <div>
+                          <Tag color="blue">{project.domain}</Tag>
+                        </div>
+
+                        <div
+                          style={{
+                            minHeight: 48,
+                            color: 'rgba(0,0,0,0.65)',
+                            fontSize: 13,
+                          }}
+                        >
+                          {project.description ||
+                            'No description provided yet.'}
+                        </div>
+
+                        {/* Technologies */}
+                        <Space wrap>
+                          {project.technologies.length === 0 ? (
+                            <Tag>No technologies listed</Tag>
+                          ) : (
+                            project.technologies.map((tech) => (
+                              <Tag key={tech}>{tech}</Tag>
+                            ))
+                          )}
+                        </Space>
+
+                        {/* Avatars + owner + CTA */}
+                        <Row
+                          justify="space-between"
+                          align="middle"
+                          style={{ marginTop: 8 }}
+                        >
+                          <Col>
+                            <Space size={8}>
+                              <Avatar.Group maxCount={3} size="small">
+                                <Avatar icon={<UserOutlined />} />
+                                <Avatar>
+                                  {project.owner
+                                    ? project.owner.charAt(0).toUpperCase()
+                                    : '?'}
+                                </Avatar>
+                                <Avatar icon={<UserOutlined />} />
+                              </Avatar.Group>
+                              <span
+                                style={{
+                                  fontSize: 12,
+                                  color: 'rgba(0,0,0,0.45)',
+                                }}
+                              >
+                                Owner: {project.owner || 'Unknown'}
+                              </span>
+                            </Space>
+                          </Col>
+                          <Col>
+                            <Button
+                              type="link"
+                              size="small"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                router.push(
+                                  `/keenkonnect/projects/project-workspace?projectId=${project.id}`,
+                                );
+                              }}
+                            >
+                              Open workspace
+                            </Button>
+                          </Col>
+                        </Row>
+                      </Space>
+                    </Card>
+                  </Col>
+                ))}
+
+                {paginatedProjects.length === 0 && projects.length > 0 && (
+                  <Col span={24}>
+                    <Card>
+                      <Space direction="vertical">
+                        <span>No projects match your filters.</span>
+                        <Button
+                          type="primary"
+                          icon={<PlusOutlined />}
+                          onClick={() =>
+                            router.push(
+                              '/keenkonnect/projects/create-new-project',
+                            )
+                          }
+                        >
+                          Start a New Project
+                        </Button>
+                      </Space>
+                    </Card>
+                  </Col>
+                )}
+              </Row>
+            )}
+          </ProCard>
+
+          {/* Pagination */}
+          {sortedProjects.length > pageSize && (
+            <div style={{ textAlign: 'center', marginTop: 24 }}>
+              <Pagination
+                current={currentPage}
+                pageSize={pageSize}
+                total={sortedProjects.length}
+                showSizeChanger={false}
+                onChange={(page) => setCurrentPage(page)}
+              />
+            </div>
           )}
-        </ProCard>
 
-        {/* Pagination */}
-        {sortedProjects.length > pageSize && (
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Pagination
-              current={currentPage}
-              pageSize={pageSize}
-              total={sortedProjects.length}
-              showSizeChanger={false}
-              onChange={(page) => setCurrentPage(page)}
-            />
-          </div>
-        )}
+          {/* Drawer: project details */}
+          <Drawer
+            title={selectedProject?.name}
+            placement="right"
+            width={420}
+            open={drawerVisible}
+            onClose={handleCloseDrawer}
+          >
+            {selectedProject && (
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <Space align="center">
+                  <Avatar.Group maxCount={3}>
+                    <Avatar size="large" icon={<UserOutlined />} />
+                    <Avatar>
+                      {selectedProject.owner
+                        ? selectedProject.owner.charAt(0).toUpperCase()
+                        : '?'}
+                    </Avatar>
+                    <Avatar icon={<UserOutlined />} />
+                  </Avatar.Group>
+                  <div>
+                    <div>
+                      <strong>Owner: </strong>
+                      {selectedProject.owner || 'Unknown'}
+                    </div>
+                    <div>
+                      <strong>Members: </strong>
+                      {selectedProject.members}
+                    </div>
+                  </div>
+                </Space>
 
-        {/* Drawer: project details */}
-        <Drawer
-          title={selectedProject?.name}
-          placement="right"
-          width={420}
-          open={drawerVisible}
-          onClose={handleCloseDrawer}
-        >
-          {selectedProject && (
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ width: '100%' }}
-            >
-              <Space align="center">
-                <Avatar.Group maxCount={3}>
-                  <Avatar size="large" icon={<UserOutlined />} />
-                  <Avatar>
-                    {selectedProject.owner
-                      ? selectedProject.owner.charAt(0).toUpperCase()
-                      : '?'}
-                  </Avatar>
-                  <Avatar icon={<UserOutlined />} />
-                </Avatar.Group>
+                <Divider />
+
                 <div>
-                  <div>
-                    <strong>Owner: </strong>
-                    {selectedProject.owner || 'Unknown'}
-                  </div>
-                  <div>
-                    <strong>Members: </strong>
-                    {selectedProject.members}
-                  </div>
+                  <p>
+                    <strong>Description</strong>
+                  </p>
+                  <p>
+                    {selectedProject.description ||
+                      'No detailed description provided yet.'}
+                  </p>
+                </div>
+
+                <div>
+                  <p>
+                    <strong>Domain</strong>
+                  </p>
+                  <Tag color="blue">{selectedProject.domain}</Tag>
+                </div>
+
+                <div>
+                  <p>
+                    <strong>Technologies</strong>
+                  </p>
+                  <Space wrap>
+                    {selectedProject.technologies.length === 0 ? (
+                      <Tag>No technologies listed</Tag>
+                    ) : (
+                      selectedProject.technologies.map((tech) => (
+                        <Tag key={tech}>{tech}</Tag>
+                      ))
+                    )}
+                  </Space>
+                </div>
+
+                <div>
+                  <p>
+                    <strong>Created At</strong>
+                  </p>
+                  <span>{selectedProject.createdAt}</span>
                 </div>
               </Space>
-
-              <Divider />
-
-              <div>
-                <p>
-                  <strong>Description</strong>
-                </p>
-                <p>
-                  {selectedProject.description ||
-                    'No detailed description provided yet.'}
-                </p>
-              </div>
-
-              <div>
-                <p>
-                  <strong>Domain</strong>
-                </p>
-                <Tag color="blue">{selectedProject.domain}</Tag>
-              </div>
-
-              <div>
-                <p>
-                  <strong>Technologies</strong>
-                </p>
-                <Space wrap>
-                  {selectedProject.technologies.length === 0 ? (
-                    <Tag>No technologies listed</Tag>
-                  ) : (
-                    selectedProject.technologies.map((tech) => (
-                      <Tag key={tech}>{tech}</Tag>
-                    ))
-                  )}
-                </Space>
-              </div>
-
-              <div>
-                <p>
-                  <strong>Created At</strong>
-                </p>
-                <span>{selectedProject.createdAt}</span>
-              </div>
-            </Space>
-          )}
-        </Drawer>
-      </ProCard>
-    </PageContainer>
+            )}
+          </Drawer>
+        </ProCard>
+      </PageContainer>
+    </>
   );
 }
 
@@ -12591,7 +12659,8 @@ import api from '@/api';
 
 const { Paragraph } = Typography;
 
-const PROJECTS_ENDPOINT = '/api/projects/';
+// Backend route: /api/keenkonnect/projects/
+const PROJECTS_ENDPOINT = 'keenkonnect/projects/';
 
 type CreateProjectFormValues = {
   name: string;
@@ -16428,7 +16497,8 @@ export default function MyWorkspaces() {
 
 
 ===== BEGIN app/konnected/certifications/certification-programs/page.tsx =====
-﻿'use client';
+﻿// app/konnected/certifications/certification-programs/page.tsx
+'use client';
 
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16442,6 +16512,7 @@ import {
   Drawer,
   Empty,
   Input,
+  Pagination,
   Progress,
   Row,
   Space,
@@ -16576,9 +16647,7 @@ function mapPathToProgram(path: CertificationPathPayload): CertificationProgram 
  * exam-registration, without relying on mock data.
  */
 async function fetchCertificationPrograms(): Promise<ProgramsResponse> {
-  const paths = await get<CertificationPathPayload[]>(
-    '/api/konnected/certifications/paths/',
-  );
+  const paths = await get<CertificationPathPayload[]>('konnected/certifications/paths/');
 
   return {
     items: paths.map(mapPathToProgram),
@@ -17036,6 +17105,7 @@ export default function CertificationProgramsPage(): JSX.Element {
                         </Space>
                       }
                       extra={renderStatusTag(program)}
+                      onClick={() => handleOpenDetails(program)}
                     >
                       <Space direction="vertical" size={8} style={{ width: '100%' }}>
                         <div>
@@ -17075,46 +17145,22 @@ export default function CertificationProgramsPage(): JSX.Element {
                           />
                         </Space>
 
-                        <Space
-                          direction="vertical"
-                          size={4}
-                          style={{ width: '100%' }}
-                        >
-                          <div>
-                            <span style={{ fontSize: 12, color: '#999' }}>
-                              {program.kpi_enrolledCount != null && (
-                                <>
-                                  {program.kpi_enrolledCount} learners enrolled ·{' '}
-                                </>
-                              )}
-                              {program.kpi_completionRate != null && (
-                                <>
-                                  {program.kpi_completionRate}% completion rate
-                                </>
-                              )}
-                            </span>
-                          </div>
-                        </Space>
+                        {!!program.tags?.length && (
+                          <Space wrap size={4}>
+                            {program.tags.map((tag) => (
+                              <Tag key={tag}>{tag}</Tag>
+                            ))}
+                          </Space>
+                        )}
 
-                        <Space
-                          style={{
-                            marginTop: 8,
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                          }}
-                        >
-                          <Button
-                            type="link"
-                            size="small"
-                            onClick={() => handleOpenDetails(program)}
-                          >
-                            View details
-                          </Button>
+                        <Space style={{ justifyContent: 'space-between', width: '100%' }}>
                           <Button
                             type="primary"
-                            size="small"
                             icon={<ArrowRightOutlined />}
-                            onClick={() => handleStartOrContinue(program)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStartOrContinue(program);
+                            }}
                           >
                             {program.userProgress?.status === 'completed'
                               ? 'View results'
@@ -17132,32 +17178,45 @@ export default function CertificationProgramsPage(): JSX.Element {
           )}
         </Row>
 
-        {/* Details drawer */}
+        {total > pageSize && (
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <Pagination
+              current={currentPage}
+              pageSize={pageSize}
+              total={total}
+              showSizeChanger
+              pageSizeOptions={['6', '12', '24']}
+              onChange={(page, size) => {
+                setCurrentPage(page);
+                if (size && size !== pageSize) {
+                  setPageSize(size);
+                }
+              }}
+            />
+          </div>
+        )}
+
         <Drawer
-          title={selectedProgram?.title ?? 'Certification details'}
-          width={520}
+          title={selectedProgram?.title}
           open={drawerOpen}
+          width={480}
           onClose={() => setDrawerOpen(false)}
-          destroyOnClose
         >
           {selectedProgram && (
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
               <Space direction="vertical" size={4}>
-                <Space size={8}>
-                  <SafetyCertificateOutlined />
-                  <span>{selectedProgram.title}</span>
-                </Space>
-                <div>
+                <Space wrap>
                   {selectedProgram.code && (
                     <Tag bordered={false}>{selectedProgram.code}</Tag>
                   )}
+                  {renderDifficultyTag(selectedProgram.difficulty)}
                   {selectedProgram.category && (
                     <Tag color="default">{selectedProgram.category}</Tag>
                   )}
                   {selectedProgram.requiresProctoring && (
                     <Tag color="purple">Proctored</Tag>
                   )}
-                </div>
+                </Space>
               </Space>
 
               <div>
@@ -17206,7 +17265,8 @@ export default function CertificationProgramsPage(): JSX.Element {
                   <Space direction="vertical" size={8} style={{ width: '100%' }}>
                     <Space>
                       {renderStatusTag(selectedProgram)}
-                      {typeof selectedProgram.userProgress.completionPercent === 'number' && (
+                      {typeof selectedProgram.userProgress.completionPercent ===
+                        'number' && (
                         <span>
                           {selectedProgram.userProgress.completionPercent}
                           % complete
@@ -17258,9 +17318,11 @@ export default function CertificationProgramsPage(): JSX.Element {
 
 
 ===== BEGIN app/konnected/certifications/exam-dashboard-results/page.tsx =====
+// app/konnected/certifications/exam-dashboard-results/page.tsx
 'use client'
 
 import React, { useMemo, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import {
   Alert,
   Badge,
@@ -17292,6 +17354,7 @@ import {
   EyeOutlined,
 } from '@ant-design/icons'
 import { useRequest } from 'ahooks'
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell'
 import api from '@/services/_request'
 
@@ -17489,6 +17552,10 @@ const ExamDashboardResultsPage: React.FC = () => {
   const [appealLoadingId, setAppealLoadingId] = useState<string | null>(null)
   const [retryLoadingId, setRetryLoadingId] = useState<string | null>(null)
 
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const pathIdFromQuery = searchParams.get('pathId')
+
   const {
     data,
     loading,
@@ -17498,7 +17565,16 @@ const ExamDashboardResultsPage: React.FC = () => {
     retryCount: 1,
   })
 
-  const attempts = data?.attempts ?? []
+  const allAttempts = data?.attempts ?? []
+
+  // If pathId is present, filter attempts to that certification path
+  const attempts = useMemo(
+    () =>
+      pathIdFromQuery
+        ? allAttempts.filter((a) => a.certificationPathId === pathIdFromQuery)
+        : allAttempts,
+    [allAttempts, pathIdFromQuery],
+  )
 
   const stats = useMemo(() => {
     if (!attempts.length) {
@@ -17516,7 +17592,9 @@ const ExamDashboardResultsPage: React.FC = () => {
       (a) => typeof a.scorePercent === 'number',
     ) as Array<ExamAttempt & { scorePercent: number }>
     const passedCount = scoredAttempts.filter((a) => a.scorePercent >= CERT_PASS_PERCENT).length
-    const passRate = totalAttempts ? Math.round((passedCount / totalAttempts) * 100) : 0
+    const passRate = scoredAttempts.length
+      ? Math.round((passedCount / scoredAttempts.length) * 100)
+      : 0
     const avgScore = scoredAttempts.length
       ? Math.round(
           scoredAttempts.reduce((sum, a) => sum + (a.scorePercent ?? 0), 0) /
@@ -17546,7 +17624,7 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   const handleOpenCertificate = (attempt: ExamAttempt) => {
     if (attempt.certificateUrl) {
-      window.open(attempt.certificateUrl, '_blank')
+      window.open(attempt.certificateUrl, '_blank', 'noopener,noreferrer')
     } else {
       message.info('Certificate is not yet available for this attempt.')
     }
@@ -17554,7 +17632,7 @@ const ExamDashboardResultsPage: React.FC = () => {
 
   const handleOpenPortfolio = (attempt: ExamAttempt) => {
     if (attempt.portfolioUrl) {
-      window.open(attempt.portfolioUrl, '_blank')
+      window.open(attempt.portfolioUrl, '_blank', 'noopener,noreferrer')
     } else {
       message.info('This attempt is not yet linked to your portfolio.')
     }
@@ -17563,9 +17641,10 @@ const ExamDashboardResultsPage: React.FC = () => {
   const handleOpenAppeal = async (attempt: ExamAttempt) => {
     setAppealLoadingId(attempt.id)
     try {
-      await api.post(EXAM_APPEAL_ENDPOINT(attempt.id))
+      const updated = await api.post<ExamAttempt>(EXAM_APPEAL_ENDPOINT(attempt.id))
+      setSelectedAttempt((prev) => (prev && prev.id === attempt.id ? updated : prev))
+      refreshAttempts()
       message.success('Appeal request submitted. You will be notified when it is reviewed.')
-      await refreshAttempts()
     } catch {
       message.error('Unable to submit appeal. Please try again or contact support.')
     } finally {
@@ -17576,11 +17655,34 @@ const ExamDashboardResultsPage: React.FC = () => {
   const handleRetry = async (attempt: ExamAttempt) => {
     setRetryLoadingId(attempt.id)
     try {
-      await api.post(EXAM_RETRY_ENDPOINT(attempt.id))
-      message.success('Retry triggered. You will be redirected to the registration flow.')
-      // In a later iteration you might push to /konnected/certifications/exam-registration
-    } catch {
-      message.error('Unable to start a new attempt. Please try again or contact support.')
+      const newAttempt = await api.post<ExamAttempt>(EXAM_RETRY_ENDPOINT(attempt.id))
+      refreshAttempts()
+      message.success('New attempt scheduled successfully.')
+
+      // Redirect into the certification flow for this path
+      if (newAttempt.certificationPathId) {
+        router.push(
+          `/konnected/certifications/exam-preparation?pathId=${newAttempt.certificationPathId}`,
+        )
+      } else if (attempt.certificationPathId) {
+        router.push(
+          `/konnected/certifications/exam-preparation?pathId=${attempt.certificationPathId}`,
+        )
+      }
+    } catch (err: any) {
+      const detail =
+        (err &&
+          typeof err === 'object' &&
+          'response' in err &&
+          (err as any).response?.data?.detail) ||
+        null
+
+      if (detail) {
+        // e.g. "Retry cooldown is still active for this exam."
+        message.error(detail)
+      } else {
+        message.error('Unable to start a new attempt. Please try again or contact support.')
+      }
     } finally {
       setRetryLoadingId(null)
     }
@@ -17880,7 +17982,8 @@ const ExamDashboardResultsPage: React.FC = () => {
     )
   }
 
-  if (!attempts.length) {
+  // No attempts at all for this user (global empty state)
+  if (!allAttempts.length) {
     return (
       <KonnectedPageShell
         title="Exam Dashboard & Results"
@@ -17931,6 +18034,41 @@ const ExamDashboardResultsPage: React.FC = () => {
                   )}
                 />
               </Space>
+            </Card>
+          </Col>
+        </Row>
+      </KonnectedPageShell>
+    )
+  }
+
+  // There are attempts overall, but none for the current path filter
+  if (!attempts.length) {
+    return (
+      <KonnectedPageShell
+        title="Exam Dashboard & Results"
+        subtitle="Track your certification exam attempts, scores, and outcomes."
+      >
+        <Row gutter={24}>
+          <Col xs={24} md={16}>
+            <Card>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  <Space direction="vertical">
+                    <Text>No attempts yet for this certification.</Text>
+                    <Text type="secondary">
+                      You can register for an exam session from the Exam Registration page.
+                    </Text>
+                  </Space>
+                }
+              >
+                <Button
+                  type="primary"
+                  href="/konnected/certifications/exam-registration"
+                >
+                  Go to exam registration
+                </Button>
+              </Empty>
             </Card>
           </Col>
         </Row>
@@ -18206,11 +18344,13 @@ const QUIZ_RETRY_COOLDOWN_MIN = 30; // from CertifiKation spec
  * This is designed to be consistent with the other CertifiKation endpoints
  * used by exam registration and exam dashboard.
  *
- * Final URL (with default API base) will be:
- *   /api/konnected/certifications/paths/:pathId/preparation-plan/
+ * IMPORTANT:
+ * - we use a *relative* URL WITHOUT a leading "/" so that axios baseURL
+ *   (NEXT_PUBLIC_API_BASE or "/api") is correctly applied.
+ * - On the wire this becomes: /api/konnected/certifications/paths/:pathId/preparation-plan/
  */
 const EXAM_PREPARATION_ENDPOINT = (pathId: string | number) =>
-  `/konnected/certifications/paths/${pathId}/preparation-plan/`;
+  `konnected/certifications/paths/${pathId}/preparation-plan/`;
 
 type PrepModuleType = 'content' | 'practice_quiz' | 'project' | 'checkpoint';
 
@@ -18302,11 +18442,7 @@ export default function ExamPreparationPage(): JSX.Element {
   const pathId = searchParams.get('pathId');
   const pathNameFromUrl = searchParams.get('pathName') || undefined;
 
-  const {
-    data,
-    isLoading,
-    error,
-  } = useQuery<ExamPreparationResponse>({
+  const { data, isLoading, error } = useQuery<ExamPreparationResponse>({
     queryKey: ['certs', 'exam-preparation', pathId],
     queryFn: () => fetchExamPreparation(pathId as string),
     enabled: !!pathId,
@@ -18614,7 +18750,7 @@ export default function ExamPreparationPage(): JSX.Element {
           showIcon
           style={{ marginBottom: 16 }}
           message="No certification path selected"
-          description="Open this page from a specific Certification Program (e.g., from the Programs list) to see a tailored preparation plan."
+          description="Open this page from a specific Certification Program (e.g. from the Programs list) to see a tailored preparation plan."
         />
       )}
 
@@ -18650,7 +18786,7 @@ export default function ExamPreparationPage(): JSX.Element {
           <Tabs
             defaultActiveKey="plan"
             items={mainTabsItems}
-            destroyOnHidden={false}
+            destroyInactiveTabPane={false}
           />
         </Col>
 
@@ -18801,6 +18937,7 @@ export default function ExamPreparationPage(): JSX.Element {
 
 
 ===== BEGIN app/konnected/certifications/exam-registration/page.tsx =====
+﻿// app/konnected/certifications/exam-registration/page.tsx
 ﻿'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -18832,18 +18969,18 @@ const { Paragraph, Text } = Typography;
  * NOTE ABOUT ENDPOINTS
  *
  * These constants are aligned with the v14 backend spec:
- * - Certification paths are exposed as `/api/certification-paths/` (CertificationPath model)
- * - Exam attempts / registrations are exposed as `/api/evaluations/` (Evaluation model)
- * - Optional nested helpers for sessions / eligibility live under `/api/certification-paths/:id/...`
- *
- * Adjust them if your actual Django router uses other names.
+ * - Certification paths:   /api/konnected/certifications/paths/
+ * - Exam registrations:    /api/konnected/certifications/evaluations/
+ * - Eligibility / sessions:
+ *     /api/konnected/certifications/paths/:id/eligibility/
+ *     /api/konnected/certifications/paths/:id/sessions/
  */
-const EXAM_PATHS_ENDPOINT = '/api/certification-paths/';
+const EXAM_PATHS_ENDPOINT = '/api/konnected/certifications/paths/';
 const EXAM_SESSIONS_ENDPOINT = (pathId: number | string) =>
-  `/api/certification-paths/${pathId}/sessions/`;
-const EXAM_REGISTRATION_ENDPOINT = '/api/evaluations/';
+  `/api/konnected/certifications/paths/${pathId}/sessions/`;
+const EXAM_REGISTRATION_ENDPOINT = '/api/konnected/certifications/evaluations/';
 const EXAM_ELIGIBILITY_ENDPOINT = (pathId: number | string) =>
-  `/api/certification-paths/${pathId}/eligibility/`;
+  `/api/konnected/certifications/paths/${pathId}/eligibility/`;
 
 /**
  * Domain types derived from CertifiKation & Knowledge specs + API schema.
@@ -18981,13 +19118,18 @@ const ExamRegistrationPageInner: React.FC = () => {
   /**
    * When the selected path changes, load sessions and eligibility.
    * Both are optional server-side features; we treat 404 as "not implemented".
+   * Also clear any previously selected session to avoid stale selections.
    */
   useEffect(() => {
     if (!selectedPathId) {
       setSessions([]);
       setEligibility(null);
+      form.setFieldsValue({ sessionId: undefined });
       return;
     }
+
+    // Reset session selection whenever the path changes.
+    form.setFieldsValue({ sessionId: undefined });
 
     const fetchEligibility = async () => {
       setEligibilityLoading(true);
@@ -19041,7 +19183,7 @@ const ExamRegistrationPageInner: React.FC = () => {
 
     void fetchEligibility();
     void fetchSessions();
-  }, [selectedPathId, messageApi]);
+  }, [selectedPathId, messageApi, form]);
 
   const isPathAlreadyPassed =
     eligibility?.already_passed ?? (selectedPath?.already_passed ?? false);
@@ -19082,10 +19224,10 @@ const ExamRegistrationPageInner: React.FC = () => {
       return;
     }
 
-    // Payload aligned with Evaluation model as a realistic "exam attempt" creation.
-    // Backend can map these fields into Evaluation.metadata / scheduling fields.
+    // Payload aligned with EvaluationViewSet.create:
+    //   { path_id, session_id, full_name, agreed_terms }
     const payload = {
-      certification_path_id: values.examPathId,
+      path_id: values.examPathId,
       session_id: values.sessionId,
       full_name: values.fullName,
       agreed_terms: values.agreeTerms === true,
@@ -19340,7 +19482,8 @@ const ExamRegistrationPageInner: React.FC = () => {
   };
 
   const renderConfirmStep = () => {
-    if (!selectedPath || !selectedSessionId) {
+    // Also guard on selectedSession to avoid crashes if sessions changed.
+    if (!selectedPath || !selectedSessionId || !selectedSession) {
       return (
         <Alert
           type="info"
@@ -19351,7 +19494,7 @@ const ExamRegistrationPageInner: React.FC = () => {
       );
     }
 
-    const session = selectedSession!;
+    const session = selectedSession;
     const start = new Date(session.start_at);
     const end = session.end_at ? new Date(session.end_at) : null;
 
@@ -22811,7 +22954,7 @@ export default function SegmentLayout({ children }: SegmentLayoutProps) {
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Row,
   Col,
@@ -22827,6 +22970,7 @@ import {
   Button,
   Alert,
   Spin,
+  message,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -22855,34 +22999,47 @@ interface KnowledgeResource {
   subject?: string;
   level?: KnowledgeLevel;
   language?: string;
-  resource_type: string; // e.g. 'video' | 'article' | 'course' | 'quiz'
+  /** Canonical enum from Knowledge module (article, video, lesson, quiz, dataset, …) */
+  resource_type: string;
   average_rating?: number | null;
   tags?: string[];
   estimated_minutes?: number | null;
   is_offline_available?: boolean;
   user_progress_percent?: number | null;
+  /** Backend-aligned extras (not all are rendered, but used for navigation) */
+  url?: string | null;
+  type?: string | null;
+  author?: string | null;
+  created_at?: string | null;
 }
 
 interface KnowledgeResourceListResponse {
-  count: number;
-  results: KnowledgeResource[];
+  count?: number;
+  results?: KnowledgeResource[];
+  items?: KnowledgeResource[];
+  total?: number;
 }
 
 interface KnowledgeMetadataResponse {
-  subjects: string[];
-  levels: KnowledgeLevel[];
-  languages: string[];
-  resource_types: string[];
+  subjects?: string[];
+  levels?: KnowledgeLevel[];
+  languages?: string[];
+  resource_types?: string[];
 }
+
+/* Reasonable defaults based on the Knowledge module spec */
+const DEFAULT_LEVELS: KnowledgeLevel[] = ['beginner', 'intermediate', 'advanced'];
+const DEFAULT_RESOURCE_TYPES = ['article', 'video', 'lesson', 'quiz', 'dataset'];
+const DEFAULT_LANGUAGES = ['English', 'French', 'Spanish', 'Other'];
 
 /* ------------------------------------------------------------------ */
 /*  API endpoints                                                      */
-/*  - Aligned with DRF router: /api/knowledge-resources/              */
+/*  - Aligned with DRF router: /api/konnected/resources/              */
 /*  - Metadata endpoint is optional; call is non-blocking.            */
 /* ------------------------------------------------------------------ */
 
-const KNOWLEDGE_RESOURCES_ENDPOINT = '/api/knowledge-resources/';
-const KNOWLEDGE_METADATA_ENDPOINT = '/api/knowledge-resources/metadata/';
+const KNOWLEDGE_RESOURCES_ENDPOINT = '/api/konnected/resources/';
+const KNOWLEDGE_METADATA_ENDPOINT = '/api/konnected/resources/metadata/';
 
 interface FiltersState {
   query: string;
@@ -22911,12 +23068,17 @@ function mapSortToOrdering(sort: SortOption): string | undefined {
   }
 }
 
+function normalizeArray<T>(values: T[] | undefined, fallback: T[]): T[] {
+  return values && values.length > 0 ? values : fallback;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Page component                                                     */
 /* ------------------------------------------------------------------ */
 
 export default function BrowseResourcesPage(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Filters & pagination
   const [filters, setFilters] = useState<FiltersState>({
@@ -22932,14 +23094,58 @@ export default function BrowseResourcesPage(): JSX.Element {
 
   // Metadata for filters
   const [subjects, setSubjects] = useState<string[]>([]);
-  const [levels, setLevels] = useState<KnowledgeLevel[]>([]);
-  const [languages, setLanguages] = useState<string[]>([]);
-  const [resourceTypes, setResourceTypes] = useState<string[]>([]);
+  const [levels, setLevels] = useState<KnowledgeLevel[]>(DEFAULT_LEVELS);
+  const [languages, setLanguages] = useState<string[]>(DEFAULT_LANGUAGES);
+  const [resourceTypes, setResourceTypes] = useState<string[]>(DEFAULT_RESOURCE_TYPES);
 
   // Loading / error states
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMeta, setLoadingMeta] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [exporting, setExporting] = useState<boolean>(false);
+  const [sharing, setSharing] = useState<boolean>(false);
+
+  /* ------------------------------------------------------------------ */
+  /*  Query-string ↔ state sync (for "Share filters" links)             */
+  /* ------------------------------------------------------------------ */
+
+  useEffect(() => {
+    if (!searchParams) return;
+
+    const q = searchParams.get('q') ?? '';
+    const subject = searchParams.get('subject') || undefined;
+    const levelParam = searchParams.get('level') as KnowledgeLevel | null;
+    const language = searchParams.get('language') || undefined;
+    const resourceType = searchParams.get('resourceType') || undefined;
+    const sortParam = searchParams.get('sort') as SortOption | null;
+
+    const nextFilters: FiltersState = {
+      query: q,
+      subject,
+      level:
+        levelParam && (DEFAULT_LEVELS as readonly string[]).includes(levelParam)
+          ? levelParam
+          : undefined,
+      language,
+      resourceType,
+      sort:
+        sortParam && ['relevance', 'newest', 'popular', 'shortest', 'longest'].includes(sortParam)
+          ? sortParam
+          : 'relevance',
+    };
+
+    const urlPage = Number(searchParams.get('page') || '1');
+    const urlPageSize = Number(searchParams.get('page_size') || '12');
+
+    setFilters(nextFilters);
+    if (!Number.isNaN(urlPage) && urlPage > 0) {
+      setPage(urlPage);
+    }
+    if (!Number.isNaN(urlPageSize) && urlPageSize > 0) {
+      setPageSize(urlPageSize);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   /* ------------------------------------------------------------------ */
   /*  Data fetching                                                      */
@@ -22985,8 +23191,30 @@ export default function BrowseResourcesPage(): JSX.Element {
           { params },
         );
 
-        setResources(response.data.results ?? []);
-        setTotal(response.data.count ?? response.data.results.length ?? 0);
+        const raw = response.data as unknown;
+        let items: KnowledgeResource[] = [];
+        let count = 0;
+
+        if (Array.isArray(raw)) {
+          items = raw as KnowledgeResource[];
+          count = items.length;
+        } else if (raw && typeof raw === 'object') {
+          const obj = raw as KnowledgeResourceListResponse;
+          const maybeResults =
+            (Array.isArray(obj.results) && obj.results) ||
+            (Array.isArray(obj.items) && obj.items) ||
+            [];
+          items = maybeResults;
+          count =
+            typeof obj.count === 'number'
+              ? obj.count
+              : typeof obj.total === 'number'
+              ? obj.total
+              : items.length;
+        }
+
+        setResources(items);
+        setTotal(count);
       } catch (err) {
         const msg =
           err instanceof Error ? err.message : 'Unable to load knowledge resources.';
@@ -23005,14 +23233,18 @@ export default function BrowseResourcesPage(): JSX.Element {
 
     try {
       const response = await axios.get<KnowledgeMetadataResponse>(KNOWLEDGE_METADATA_ENDPOINT);
-      const data = response.data;
+      const data = response.data ?? {};
 
       setSubjects(data.subjects ?? []);
-      setLevels(data.levels ?? []);
-      setLanguages(data.languages ?? []);
-      setResourceTypes(data.resource_types ?? []);
+      setLevels(normalizeArray(data.levels, DEFAULT_LEVELS));
+      setLanguages(normalizeArray(data.languages, DEFAULT_LANGUAGES));
+      setResourceTypes(normalizeArray(data.resource_types, DEFAULT_RESOURCE_TYPES));
     } catch {
       // Metadata is purely additive; failure should not block the main list.
+      setSubjects([]);
+      setLevels(DEFAULT_LEVELS);
+      setLanguages(DEFAULT_LANGUAGES);
+      setResourceTypes(DEFAULT_RESOURCE_TYPES);
     } finally {
       setLoadingMeta(false);
     }
@@ -23065,8 +23297,131 @@ export default function BrowseResourcesPage(): JSX.Element {
   };
 
   const handleOpenResource = (record: KnowledgeResource) => {
-    // If you later add a dedicated resource detail route, adapt this.
-    router.push(`/konnected/learning-library/resource/${record.id}`);
+    // Prefer explicit URL from backend (can be external or internal).
+    if (record.url) {
+      const href = String(record.url);
+      if (href.startsWith('http://') || href.startsWith('https://')) {
+        window.open(href, '_blank', 'noopener,noreferrer');
+      } else {
+        router.push(href);
+      }
+      return;
+    }
+
+    // Fallback to course player route described in Knowledge module docs.
+    const id = encodeURIComponent(String(record.id));
+    router.push(`/course/${id}`);
+  };
+
+  const buildShareSearchParams = () => {
+    const params = new URLSearchParams();
+
+    if (filters.query) params.set('q', filters.query);
+    if (filters.subject) params.set('subject', filters.subject);
+    if (filters.level) params.set('level', filters.level);
+    if (filters.language) params.set('language', filters.language);
+    if (filters.resourceType) params.set('resourceType', filters.resourceType);
+    if (filters.sort && filters.sort !== 'relevance') params.set('sort', filters.sort);
+
+    if (page !== 1) params.set('page', String(page));
+    if (pageSize !== 12) params.set('page_size', String(pageSize));
+
+    return params;
+  };
+
+  const handleExportCurrentPage = async () => {
+    if (!resources.length) {
+      message.info('There are no resources to export for the current filters.');
+      return;
+    }
+
+    try {
+      setExporting(true);
+
+      const header = [
+        'id',
+        'title',
+        'subject',
+        'level',
+        'language',
+        'resource_type',
+        'average_rating',
+        'estimated_minutes',
+        'tags',
+        'is_offline_available',
+        'user_progress_percent',
+      ];
+
+      const rows = resources.map((r) => [
+        r.id,
+        r.title,
+        r.subject ?? '',
+        r.level ?? '',
+        r.language ?? '',
+        r.resource_type ?? '',
+        r.average_rating ?? '',
+        r.estimated_minutes ?? '',
+        (r.tags ?? []).join('|'),
+        r.is_offline_available ? 'yes' : 'no',
+        r.user_progress_percent ?? '',
+      ]);
+
+      const encodeCell = (value: unknown): string => {
+        const str =
+          value === null || value === undefined ? '' : String(value);
+        if (/[",\n]/.test(str)) {
+          return `"${str.replace(/"/g, '""')}"`;
+        }
+        return str;
+      };
+
+      const csv = [header, ...rows]
+        .map((row) => row.map(encodeCell).join(','))
+        .join('\n');
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      link.href = url;
+      link.download = `konnected-learning-library-${timestamp}.csv`;
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      message.success('Exported current page of results as CSV.');
+    } catch {
+      message.error('Unable to export resources. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleShareFilters = async () => {
+    try {
+      setSharing(true);
+      const params = buildShareSearchParams();
+      const basePath = '/konnected/learning-library/browse-resources';
+      const queryString = params.toString();
+      const href = `${basePath}${queryString ? `?${queryString}` : ''}`;
+
+      if (typeof window !== 'undefined') {
+        const fullUrl = `${window.location.origin}${href}`;
+        try {
+          await navigator.clipboard.writeText(fullUrl);
+          message.success('Link with current filters copied to your clipboard.');
+        } catch {
+          message.warning('Unable to copy link automatically. The URL has been updated instead.');
+        }
+      }
+
+      router.push(href);
+    } finally {
+      setSharing(false);
+    }
   };
 
   /* ------------------------------------------------------------------ */
@@ -23081,7 +23436,11 @@ export default function BrowseResourcesPage(): JSX.Element {
         key: 'title',
         render: (value: string, record) => (
           <Space direction="vertical" size={2}>
-            <Button type="link" onClick={() => handleOpenResource(record)} style={{ padding: 0 }}>
+            <Button
+              type="link"
+              onClick={() => handleOpenResource(record)}
+              style={{ padding: 0 }}
+            >
               {value}
             </Button>
             {record.description && (
@@ -23126,7 +23485,7 @@ export default function BrowseResourcesPage(): JSX.Element {
             </Tag>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              General
+              Any level
             </Text>
           ),
       },
@@ -23136,10 +23495,10 @@ export default function BrowseResourcesPage(): JSX.Element {
         key: 'language',
         render: (value?: string) =>
           value ? (
-            <Tag>{value}</Tag>
+            <Tag color="cyan">{value}</Tag>
           ) : (
             <Text type="secondary" style={{ fontSize: 12 }}>
-              N/A
+              Not specified
             </Text>
           ),
       },
@@ -23147,12 +23506,13 @@ export default function BrowseResourcesPage(): JSX.Element {
         title: 'Rating',
         dataIndex: 'average_rating',
         key: 'average_rating',
+        width: 150,
         render: (value?: number | null) =>
-          typeof value === 'number' ? (
+          value != null ? (
             <Space size={4}>
-              <Rate allowHalf disabled defaultValue={value} />
+              <Rate disabled allowHalf defaultValue={value} />
               <Text type="secondary" style={{ fontSize: 12 }}>
-                {value.toFixed(1)}
+                ({value.toFixed(1)})
               </Text>
             </Space>
           ) : (
@@ -23162,13 +23522,41 @@ export default function BrowseResourcesPage(): JSX.Element {
           ),
       },
       {
+        title: 'Duration / min',
+        dataIndex: 'estimated_minutes',
+        key: 'estimated_minutes',
+        width: 120,
+        render: (value?: number | null) =>
+          value != null ? (
+            <Text>{value} min</Text>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              —
+            </Text>
+          ),
+      },
+      {
+        title: 'Progress',
+        dataIndex: 'user_progress_percent',
+        key: 'user_progress_percent',
+        width: 120,
+        render: (value?: number | null) =>
+          value != null ? (
+            <Text>{value}%</Text>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Not started
+            </Text>
+          ),
+      },
+      {
         title: 'Tags',
         dataIndex: 'tags',
         key: 'tags',
-        render: (tags?: string[]) =>
-          tags && tags.length > 0 ? (
-            <Space size={[4, 4]} wrap>
-              {tags.map((tag) => (
+        render: (value?: string[]) =>
+          value && value.length > 0 ? (
+            <Space wrap size={4}>
+              {value.map((tag) => (
                 <Tag key={tag}>{tag}</Tag>
               ))}
             </Space>
@@ -23179,45 +23567,34 @@ export default function BrowseResourcesPage(): JSX.Element {
           ),
       },
       {
-        title: 'Estimated time',
-        dataIndex: 'estimated_minutes',
-        key: 'estimated_minutes',
-        render: (value?: number | null) =>
-          typeof value === 'number' ? (
-            <Text>{value} min</Text>
+        title: 'Offline',
+        dataIndex: 'is_offline_available',
+        key: 'is_offline_available',
+        width: 120,
+        render: (value?: boolean) =>
+          value ? (
+            <Tag color="green">Available</Tag>
           ) : (
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Not specified
-            </Text>
-          ),
-      },
-      {
-        title: 'Progress',
-        dataIndex: 'user_progress_percent',
-        key: 'user_progress_percent',
-        render: (value?: number | null) =>
-          typeof value === 'number' ? (
-            <Text>{value.toFixed(0)}%</Text>
-          ) : (
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              Not started
-            </Text>
+            <Tag>Online only</Tag>
           ),
       },
       {
         title: 'Actions',
         key: 'actions',
         fixed: 'right',
-        render: (_, record) => (
+        width: 150,
+        render: (_: unknown, record) => (
           <Space>
-            <Button size="small" onClick={() => handleOpenResource(record)}>
+            <Button size="small" type="link" onClick={() => handleOpenResource(record)}>
               Open
             </Button>
-            {record.is_offline_available && (
-              <Button size="small" icon={<DownloadOutlined />}>
-                Offline
-              </Button>
-            )}
+            <Button
+              size="small"
+              icon={<DownloadOutlined />}
+              disabled={!record.is_offline_available}
+            >
+              Offline
+            </Button>
           </Space>
         ),
       },
@@ -23227,16 +23604,46 @@ export default function BrowseResourcesPage(): JSX.Element {
 
   const hasResults = resources.length > 0;
 
-  const filtersActive = useMemo(
-    () =>
-      Boolean(
-        filters.query ||
-          filters.subject ||
-          filters.level ||
-          filters.language ||
-          filters.resourceType,
-      ),
-    [filters],
+  const filtersActive = useMemo(() => {
+    const { query, subject, level, language, resourceType, sort } = filters;
+    return Boolean(
+      query || subject || level || language || resourceType || sort !== 'relevance',
+    );
+  }, [filters]);
+
+  /* ------------------------------------------------------------------ */
+  /*  Header actions                                                     */
+  /* ------------------------------------------------------------------ */
+
+  const headerPrimaryAction = (
+    <Space>
+      <Button
+        icon={<DownloadOutlined />}
+        onClick={handleExportCurrentPage}
+        disabled={!hasResults}
+        loading={exporting}
+      >
+        Export selection
+      </Button>
+      <Button
+        icon={<ShareAltOutlined />}
+        onClick={handleShareFilters}
+        disabled={!hasResults && !filtersActive}
+        loading={sharing}
+      >
+        Share filters
+      </Button>
+    </Space>
+  );
+
+  const headerSecondaryActions = (
+    <Button
+      icon={<FilterOutlined />}
+      onClick={() => fetchResources(1, pageSize)}
+      disabled={loading}
+    >
+      Refresh
+    </Button>
   );
 
   /* ------------------------------------------------------------------ */
@@ -23247,156 +23654,144 @@ export default function BrowseResourcesPage(): JSX.Element {
     <KonnectedPageShell
       title="Browse learning resources"
       subtitle="Explore the shared knowledge library and filter by subject, level, language, and more."
-      primaryAction={
-        <Space>
-          <Button icon={<DownloadOutlined />}>Export selection</Button>
-          <Button icon={<ShareAltOutlined />}>Share filters</Button>
-        </Space>
-      }
-      secondaryActions={
-        <Button icon={<FilterOutlined />} onClick={() => fetchResources(1, pageSize)}>
-          Refresh
-        </Button>
-      }
+      primaryAction={headerPrimaryAction}
+      secondaryActions={headerSecondaryActions}
     >
       <Row gutter={[16, 16]}>
         <Col span={24}>
           <Card>
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-              {/* Search + quick filters row */}
-              <Row gutter={[16, 16]} align="middle">
-                <Col xs={24} md={10}>
-                  <Search
-                    placeholder="Search by title, subject, keywords…"
-                    allowClear
-                    enterButton={<SearchOutlined />}
-                    onSearch={handleSearch}
-                    defaultValue={filters.query}
+            <Row gutter={[16, 16]} align="middle">
+              <Col xs={24} md={10}>
+                <Search
+                  placeholder="Search by title or description"
+                  allowClear
+                  enterButton={<SearchOutlined />}
+                  onSearch={handleSearch}
+                />
+              </Col>
+
+              <Col xs={24} md={14}>
+                <Row gutter={[8, 8]} justify="end">
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.subject}
+                      onChange={handleFilterChange('subject')}
+                      allowClear
+                      placeholder="All subjects"
+                      style={{ width: '100%' }}
+                      options={subjects.map((s) => ({ label: s, value: s }))}
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.level}
+                      onChange={handleFilterChange('level')}
+                      allowClear
+                      placeholder="Any level"
+                      style={{ width: '100%' }}
+                      options={levels.map((lvl) => ({
+                        label: lvl.charAt(0).toUpperCase() + lvl.slice(1),
+                        value: lvl,
+                      }))}
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.language}
+                      onChange={handleFilterChange('language')}
+                      allowClear
+                      placeholder="Any language"
+                      style={{ width: '100%' }}
+                      options={languages.map((lng) => ({ label: lng, value: lng }))}
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Select
+                      value={filters.resourceType}
+                      onChange={handleFilterChange('resourceType')}
+                      allowClear
+                      placeholder="All types"
+                      style={{ width: '100%' }}
+                      options={resourceTypes.map((t) => ({
+                        label: t.charAt(0).toUpperCase() + t.slice(1),
+                        value: t,
+                      }))}
+                    />
+                  </Col>
+                </Row>
+              </Col>
+            </Row>
+
+            <Row
+              style={{ marginTop: 16 }}
+              justify="space-between"
+              align="middle"
+              gutter={[8, 8]}
+            >
+              <Col>
+                {filtersActive ? (
+                  <Text type="secondary">
+                    <strong>Active filters:</strong>{' '}
+                    {filters.query && (
+                      <>
+                        Search = <strong>"{filters.query}"</strong>{' '}
+                      </>
+                    )}
+                    {filters.subject && (
+                      <>
+                        Subject = <strong>{filters.subject}</strong>{' '}
+                      </>
+                    )}
+                    {filters.level && (
+                      <>
+                        Level = <strong>{filters.level}</strong>{' '}
+                      </>
+                    )}
+                    {filters.language && (
+                      <>
+                        Language = <strong>{filters.language}</strong>{' '}
+                      </>
+                    )}
+                    {filters.resourceType && (
+                      <>
+                        Type = <strong>{filters.resourceType}</strong>{' '}
+                      </>
+                    )}
+                    {filters.sort !== 'relevance' && (
+                      <>
+                        Sort = <strong>{filters.sort}</strong>
+                      </>
+                    )}
+                  </Text>
+                ) : (
+                  <Text type="secondary">
+                    Use the search box and filters above to explore the knowledge library.
+                  </Text>
+                )}
+              </Col>
+              <Col>
+                <Space align="center">
+                  <Text type="secondary">Sort by</Text>
+                  <Select<SortOption>
+                    value={filters.sort}
+                    onChange={handleSortChange}
+                    style={{ width: 180 }}
+                    options={[
+                      { label: 'Best match', value: 'relevance' },
+                      { label: 'Newest first', value: 'newest' },
+                      { label: 'Most popular', value: 'popular' },
+                      { label: 'Shortest duration', value: 'shortest' },
+                      { label: 'Longest duration', value: 'longest' },
+                    ]}
                   />
-                </Col>
-
-                <Col xs={24} md={14}>
-                  <Row gutter={[8, 8]} justify="end">
-                    <Col xs={24} md={12} lg={6}>
-                      <Select
-                        allowClear
-                        placeholder="Subject"
-                        value={filters.subject}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('subject')}
-                      >
-                        {subjects.map((subject) => (
-                          <Select.Option key={subject} value={subject}>
-                            {subject}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={5}>
-                      <Select
-                        allowClear
-                        placeholder="Level"
-                        value={filters.level}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('level')}
-                      >
-                        {levels.map((level) => (
-                          <Select.Option key={level} value={level}>
-                            {level.charAt(0).toUpperCase() + level.slice(1)}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={5}>
-                      <Select
-                        allowClear
-                        placeholder="Language"
-                        value={filters.language}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('language')}
-                      >
-                        {languages.map((lang) => (
-                          <Select.Option key={lang} value={lang}>
-                            {lang}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={5}>
-                      <Select
-                        allowClear
-                        placeholder="Type"
-                        value={filters.resourceType}
-                        style={{ width: '100%' }}
-                        loading={loadingMeta}
-                        onChange={handleFilterChange('resourceType')}
-                      >
-                        {resourceTypes.map((t) => (
-                          <Select.Option key={t} value={t}>
-                            {t}
-                          </Select.Option>
-                        ))}
-                      </Select>
-                    </Col>
-
-                    <Col xs={24} md={12} lg={3}>
-                      <Select
-                        value={filters.sort}
-                        onChange={handleSortChange}
-                        style={{ width: '100%' }}
-                      >
-                        <Select.Option value="relevance">Best match</Select.Option>
-                        <Select.Option value="newest">Newest</Select.Option>
-                        <Select.Option value="popular">Most popular</Select.Option>
-                        <Select.Option value="shortest">Shortest first</Select.Option>
-                        <Select.Option value="longest">Longest first</Select.Option>
-                      </Select>
-                    </Col>
-                  </Row>
-                </Col>
-              </Row>
-
-              {/* Active filters / helper text */}
-              <Row>
-                <Col span={24}>
-                  {filtersActive ? (
-                    <Space size={[8, 8]} wrap>
-                      <Text type="secondary">Active filters:</Text>
-                      {filters.subject && <Tag color="blue">Subject: {filters.subject}</Tag>}
-                      {filters.level && (
-                        <Tag color="purple">
-                          Level:{' '}
-                          {filters.level.charAt(0).toUpperCase() + filters.level.slice(1)}
-                        </Tag>
-                      )}
-                      {filters.language && <Tag>Language: {filters.language}</Tag>}
-                      {filters.resourceType && (
-                        <Tag color="geekblue">Type: {filters.resourceType}</Tag>
-                      )}
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          setFilters({ query: '', sort: 'relevance' });
-                          setPage(1);
-                        }}
-                      >
-                        Clear filters
-                      </Button>
-                    </Space>
-                  ) : (
-                    <Text type="secondary">
-                      Use the search box and filters above to explore the knowledge library.
+                  {loadingMeta && (
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Updating filter options…
                     </Text>
                   )}
-                </Col>
-              </Row>
-            </Space>
+                </Space>
+              </Col>
+            </Row>
           </Card>
         </Col>
 
@@ -23454,8 +23849,8 @@ export default function BrowseResourcesPage(): JSX.Element {
                     emptyText: (
                       <div style={{ padding: '24px 0' }}>
                         <Text type="secondary">
-                          No resources match your filters yet. Try adjusting your search
-                          terms or filter options.
+                          No resources match your filters yet. Try adjusting your search terms or
+                          filter options.
                         </Text>
                       </div>
                     ),
@@ -23589,16 +23984,22 @@ interface CreateOfflinePackagePayload {
 // NOTE: Endpoint paths/response wrappers are inferred.
 // Align them with schema-endpoints.json when wiring to the real backend.
 
-const OFFLINE_PACKAGE_LIST_ENDPOINT = '/konnected/knowledge/offline-packages/';
+// Use relative URLs so that NEXT_PUBLIC_API_BASE or "/api" baseURL applies
+// consistently (see services/_request.ts and Global Parameter Reference).
+const OFFLINE_PACKAGE_LIST_ENDPOINT = 'konnected/knowledge/offline-packages/';
 const OFFLINE_PACKAGE_DETAIL_ENDPOINT = (id: OfflinePackage['id']) =>
-  `/konnected/knowledge/offline-packages/${id}/`;
+  `konnected/knowledge/offline-packages/${id}/`;
 const OFFLINE_PACKAGE_SYNC_ENDPOINT = (id: OfflinePackage['id']) =>
-  `/konnected/knowledge/offline-packages/${id}/sync/`;
+  `konnected/knowledge/offline-packages/${id}/sync/`;
 
-// For now we reuse the canonical library endpoint as the source of offlineable
-// resources. Additional flags such as `offlineEligible` can later be surfaced
-// directly from the backend.
-const OFFLINE_RESOURCES_ENDPOINT = '/api/knowledge-resources/';
+// Knowledge module (KonnectED) offline-eligible resources.
+// We probe a small set of candidate endpoints to stay aligned with the v14
+// Knowledge spec while the backend paths stabilise.
+const OFFLINE_RESOURCES_ENDPOINTS: readonly string[] = [
+  '/api/knowledge-resources/',
+  '/api/knowledge/resources/',
+  '/api/konnected/resources/',
+];
 
 function normalizeList<T>(raw: unknown): T[] {
   if (Array.isArray(raw)) return raw as T[];
@@ -23627,17 +24028,123 @@ async function createOfflinePackage(
 }
 
 async function deleteOfflinePackage(id: OfflinePackage['id']): Promise<void> {
-  await api.delete(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id));
+  await api.delete( OFFLINE_PACKAGE_DETAIL_ENDPOINT(id) );
 }
 
 async function syncOfflinePackage(id: OfflinePackage['id']): Promise<void> {
   await api.post(OFFLINE_PACKAGE_SYNC_ENDPOINT(id));
 }
 
+/**
+ * Update a subset of package fields (currently autoSync).
+ * This is wired to the "Auto sync" toggle in the table.
+ */
+async function updateOfflinePackage(
+  id: OfflinePackage['id'],
+  payload: Partial<Pick<OfflinePackage, 'autoSync'>>,
+): Promise<OfflinePackage> {
+  return api.patch<OfflinePackage>(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id), payload);
+}
+
 async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
-  // Same: api.get returns data, not { data }
-  const raw = await api.get(OFFLINE_RESOURCES_ENDPOINT);
-  return normalizeList<OfflineableResource>(raw);
+  let lastError: unknown;
+
+  for (const url of OFFLINE_RESOURCES_ENDPOINTS) {
+    try {
+      const res = await fetch(url, { credentials: 'include' });
+
+      if (!res.ok) {
+        lastError = new Error(
+          `Offline resources endpoint ${url} returned ${res.status}`,
+        );
+        continue;
+      }
+
+      const json = await res.json();
+      const rawItems = normalizeList<any>(json);
+
+      const mapped: OfflineableResource[] = rawItems.map((raw) => {
+        // Normalise type to the v14 CONTENT_TYPES_ALLOWED enum
+        // ("article", "video", "lesson", "quiz", "dataset").
+        const typeValue: string =
+          (raw.type ??
+            raw.resource_type ??
+            raw.content_type ??
+            'article') as string;
+
+        const normalizedType = String(typeValue).toLowerCase();
+
+        let type: ResourceType;
+        if (
+          normalizedType === 'article' ||
+          normalizedType === 'video' ||
+          normalizedType === 'lesson' ||
+          normalizedType === 'quiz' ||
+          normalizedType === 'dataset'
+        ) {
+          type = normalizedType as ResourceType;
+        } else if (normalizedType === 'course' || normalizedType === 'module') {
+          type = 'lesson';
+        } else if (
+          normalizedType === 'doc' ||
+          normalizedType === 'document' ||
+          normalizedType === 'file'
+        ) {
+          type = 'article';
+        } else {
+          type = 'article';
+        }
+
+        const sizeMb =
+          typeof raw.sizeMb === 'number'
+            ? raw.sizeMb
+            : typeof raw.size_mb === 'number'
+              ? raw.size_mb
+              : typeof raw.bundle_size_mb === 'number'
+                ? raw.bundle_size_mb
+                : undefined;
+
+        const offlineEligible = Boolean(
+          raw.offlineEligible ??
+            raw.offline_available ??
+            raw.offlineAvailable ??
+            raw.is_offline_available ??
+            raw.can_be_offlined,
+        );
+
+        const includedInPackages: string[] | undefined =
+          (raw.includedInPackages as string[] | undefined) ??
+          (raw.packages as string[] | undefined) ??
+          undefined;
+
+        return {
+          id: raw.id,
+          title: raw.title ?? '',
+          type,
+          subject: raw.subject ?? raw.topic ?? raw.domain ?? undefined,
+          level: raw.level ?? raw.difficulty ?? undefined,
+          language: raw.language ?? raw.lang ?? undefined,
+          sizeMb,
+          offlineEligible,
+          includedInPackages,
+        };
+      });
+
+      return mapped;
+    } catch (err) {
+      lastError = err;
+    }
+  }
+
+  if (lastError) {
+    throw lastError instanceof Error
+      ? lastError
+      : new Error('Unable to load offlineable resources.');
+  }
+
+  // Fallback: no known endpoint responded; return empty list
+  // so the rest of the UI still renders.
+  return [];
 }
 
 // ---- Page -----------------------------------------------------------------
@@ -23676,6 +24183,12 @@ export default function OfflineContentPage(): JSX.Element {
   );
   const { loading: syncing, runAsync: runSyncPackage } = useRequest(
     syncOfflinePackage,
+    {
+      manual: true,
+    },
+  );
+  const { loading: updatingPackage, runAsync: runUpdatePackage } = useRequest(
+    updateOfflinePackage,
     {
       manual: true,
     },
@@ -23789,8 +24302,29 @@ export default function OfflineContentPage(): JSX.Element {
       title: 'Auto sync',
       dataIndex: 'autoSync',
       key: 'autoSync',
-      render: (value?: boolean) => (
-        <Switch checked={Boolean(value)} size="small" disabled />
+      render: (value: boolean | undefined, record) => (
+        <Switch
+          checked={Boolean(value)}
+          size="small"
+          loading={updatingPackage}
+          onChange={async (checked) => {
+            try {
+              await runUpdatePackage(record.id, { autoSync: checked });
+              message.success(
+                checked
+                  ? 'Package enrolled in the weekly offline build.'
+                  : 'Package removed from the automatic offline build.',
+              );
+              refreshPackages();
+            } catch (err) {
+              const msg =
+                err instanceof Error
+                  ? err.message
+                  : 'Failed to update auto-sync setting.';
+              message.error(msg);
+            }
+          }}
+        />
       ),
     },
     {
@@ -23803,6 +24337,7 @@ export default function OfflineContentPage(): JSX.Element {
             size="small"
             loading={syncing}
             onClick={() => handleSyncPackage(record)}
+            disabled={record.status === 'building'}
           >
             Sync now
           </Button>
@@ -23990,8 +24525,8 @@ export default function OfflineContentPage(): JSX.Element {
                 type="warning"
                 showIcon
                 style={{ marginTop: 16 }}
-                message="Some offline APIs are not fully wired yet"
-                description="Package management and resource eligibility are using placeholder endpoints. Once the backend is ready, this page will display live data."
+                message="Some offline APIs may not be fully wired yet"
+                description="Offline package management and resource eligibility depend on KonnectED’s Knowledge backend. Once all endpoints are live, this page will display real-time data."
               />
             )}
           </Col>
@@ -24148,7 +24683,7 @@ export default function OfflineContentPage(): JSX.Element {
             </Form.Item>
 
             <Form.Item label="Language filter" name="languageFilter">
-              <Input placeholder="Optional language filter, e.g. English" />
+              <Input placeholder="Optional language filter, e.g. en, fr" />
             </Form.Item>
           </Form>
         </Modal>
@@ -24208,9 +24743,12 @@ interface KnowledgeResource {
   type: ResourceType;
   tags?: string[];
   estimatedDurationMinutes?: number;
-  viewerUrl?: string; // e.g. /course/[slug] or /konnected/learning-library/resource/[id]
+  // e.g. /course/[slug] or /konnected/learning-library/resource/[id]
+  viewerUrl?: string;
+  // Whether this resource is available in offline bundles
   offlineAvailable?: boolean;
-  partOfPathTitle?: string; // e.g. certification/learning-path label
+  // Optional label if this resource is part of a learning path / certification
+  partOfPathTitle?: string;
 }
 
 interface LearningProgress {
@@ -24273,63 +24811,99 @@ async function fetchJson(url: string): Promise<unknown> {
   return res.json();
 }
 
+// Simple numeric normalizer to cope with string/number fields from the API
+function safeNumber(value: unknown): number {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : 0;
+  }
+  return 0;
+}
+
 function normalizeRecommendations(raw: unknown): RecommendationsResponse {
   const { items, count } = normalizeList<any>(raw);
 
-  const mapped: KnowledgeRecommendationItem[] = items.map((row: any, index: number) => {
-    // Support both:
-    // - Recommendations API with row.resource, row.progress, row.score, row.reason...
-    // - Plain knowledge resources list where row itself is the resource.
-    const resourceRaw = row.resource ?? row;
-    const id = resourceRaw.id ?? row.id ?? index;
+  const mapped: KnowledgeRecommendationItem[] = items.map(
+    (row: any, index: number) => {
+      // Support both:
+      // - Recommendations API with row.resource, row.progress, row.score, row.reason...
+      // - Plain knowledge resources list where row itself is the resource.
+      const resourceRaw = row.resource ?? row;
+      const id = resourceRaw.id ?? row.id ?? index;
 
-    const resource: KnowledgeResource = {
-      id: String(id),
-      title: resourceRaw.title ?? 'Untitled resource',
-      summary: resourceRaw.summary ?? resourceRaw.description ?? '',
-      subject: resourceRaw.subject ?? undefined,
-      level: resourceRaw.level ?? undefined,
-      language: resourceRaw.language ?? undefined,
-      type: (resourceRaw.type ?? resourceRaw.resource_type ?? 'article') as ResourceType,
-      tags: resourceRaw.tags ?? [],
-      estimatedDurationMinutes:
-        resourceRaw.estimatedDurationMinutes ??
-        resourceRaw.estimated_minutes ??
-        resourceRaw.estimated_duration_minutes ??
-        undefined,
-      viewerUrl: resourceRaw.viewerUrl ?? resourceRaw.url ?? undefined,
-      offlineAvailable: Boolean(
-        resourceRaw.offlineAvailable ?? resourceRaw.is_offline_available,
-      ),
-      partOfPathTitle: resourceRaw.partOfPathTitle ?? undefined,
-    };
+      const rawType = (resourceRaw.type ?? resourceRaw.resource_type ?? 'article') as string;
+      const normalizedType: ResourceType =
+        rawType === 'doc'
+          ? 'article'
+          : rawType === 'course'
+          ? 'lesson'
+          : (['article', 'video', 'lesson', 'quiz', 'dataset'] as const).includes(
+              rawType as ResourceType,
+            )
+          ? (rawType as ResourceType)
+          : 'article';
 
-    const progressSource = row.progress ?? resourceRaw.progress;
-    const progress: LearningProgress | undefined = progressSource
-      ? {
+      const resource: KnowledgeResource = {
+        id: String(id),
+        title: resourceRaw.title ?? 'Untitled resource',
+        summary: resourceRaw.summary ?? resourceRaw.description ?? '',
+        subject: resourceRaw.subject ?? undefined,
+        level: resourceRaw.level ?? undefined,
+        language: resourceRaw.language ?? undefined,
+        type: normalizedType,
+        tags: resourceRaw.tags ?? resourceRaw.keywords ?? [],
+        estimatedDurationMinutes:
+          resourceRaw.estimatedDurationMinutes ??
+          resourceRaw.estimated_minutes ??
+          resourceRaw.estimated_duration_minutes ??
+          undefined,
+        viewerUrl: resourceRaw.viewerUrl ?? resourceRaw.url ?? undefined,
+        offlineAvailable: Boolean(
+          resourceRaw.offlineAvailable ??
+            resourceRaw.is_offline_available ??
+            resourceRaw.offlineEligible ??
+            resourceRaw.offline_eligible,
+        ),
+        partOfPathTitle:
+          resourceRaw.partOfPathTitle ??
+          resourceRaw.path_title ??
+          resourceRaw.path_label ??
+          undefined,
+      };
+
+      const progressSource = row.progress ?? resourceRaw.progress;
+      let progress: LearningProgress | undefined;
+      if (progressSource) {
+        const rawPercent =
+          progressSource.progressPercent ?? progressSource.progress_percent;
+        const percent = Math.max(0, Math.min(100, safeNumber(rawPercent)));
+
+        progress = {
           resourceId: String(id),
-          progressPercent:
-            progressSource.progressPercent ??
-            progressSource.progress_percent ??
-            0,
-          lastTouchedAt: progressSource.lastTouchedAt ?? progressSource.last_touched_at,
-        }
-      : undefined;
+          progressPercent: percent,
+          lastTouchedAt:
+            progressSource.lastTouchedAt ?? progressSource.last_touched_at,
+        };
+      }
 
-    return {
-      recommendationId: String(row.id ?? `rec-${id}`),
-      score: typeof row.score === 'number' ? row.score : undefined,
-      reason: typeof row.reason === 'string' ? row.reason : undefined,
-      recommendedAt:
-        row.recommendedAt ??
-        row.recommended_at ??
-        resourceRaw.created_at ??
-        new Date().toISOString(),
-      source: row.source as RecommendationSource | undefined,
-      resource,
-      progress,
-    };
-  });
+      const rawScore = row.score ?? row.relevance_score;
+
+      return {
+        recommendationId: String(row.id ?? `rec-${id}`),
+        score: typeof rawScore === 'number' ? rawScore : undefined,
+        reason: typeof row.reason === 'string' ? row.reason : undefined,
+        recommendedAt:
+          row.recommendedAt ??
+          row.recommended_at ??
+          resourceRaw.created_at ??
+          new Date().toISOString(),
+        source: row.source as RecommendationSource | undefined,
+        resource,
+        progress,
+      };
+    },
+  );
 
   return {
     results: mapped,
@@ -24338,39 +24912,54 @@ function normalizeRecommendations(raw: unknown): RecommendationsResponse {
 }
 
 /**
- * Fetch personalized recommendations from backend.
- *
  * Strategy:
- * 1. Try dedicated endpoint: GET /api/knowledge-recommendations/
- * 2. If unavailable, fall back to: GET /api/knowledge-resources/
+ * 1. Try the dedicated /api/knowledge-recommendations/ endpoint (when wired).
+ * 2. Fall back to the main KnowledgeResource list. To stay robust against
+ *    backend refactors, we try the known path variants used across v14:
+ *      - /api/knowledge-resources/
+ *      - /api/knowledge/resources/
+ *      - /api/konnected/resources/  (current DRF router)
  */
 async function fetchRecommendations(): Promise<RecommendationsResponse> {
+  // 1) Dedicated recommendations endpoint
   try {
     const raw = await fetchJson('/api/knowledge-recommendations/');
     return normalizeRecommendations(raw);
   } catch (err) {
-    // If the dedicated recommendations endpoint is not implemented yet,
-    // fall back to the main knowledge resources list.
-    // This keeps the page usable while backend evolves.
-    console.warn('Falling back to /api/knowledge-resources/ for recommendations', err);
+    // eslint-disable-next-line no-console
+    console.warn(
+      'Falling back to KnowledgeResource list for recommendations',
+      err,
+    );
   }
 
-  const rawFallback = await fetchJson('/api/knowledge-resources/');
-  return normalizeRecommendations(rawFallback);
+  // 2) Fallback: generic knowledge resources list
+  const fallbackEndpoints = [
+    '/api/knowledge-resources/',
+    '/api/knowledge/resources/',
+    '/api/konnected/resources/',
+  ];
+
+  for (const url of fallbackEndpoints) {
+    try {
+      const rawFallback = await fetchJson(url);
+      return normalizeRecommendations(rawFallback);
+    } catch {
+      // try next variant
+    }
+  }
+
+  throw new Error('Unable to load knowledge resources from any endpoint.');
 }
 
 /**
- * Send lightweight feedback about a recommendation.
- * Intended endpoint: POST /api/knowledge-recommendations/feedback/
- *
- * Errors are logged to console but do not break the UX.
+ * Optional: send feedback so the ML layer can learn.
+ * For now this is best-effort; failures are non-blocking for the UI.
  */
-async function sendRecommendationFeedback(opts: {
-  recommendationId: string;
-  resourceId: string;
-  action: 'like' | 'dislike' | 'dismiss' | 'save_for_later';
-  rating?: number;
-}) {
+async function sendRecommendationFeedback(
+  item: KnowledgeRecommendationItem,
+  feedback: 'like' | 'dislike',
+): Promise<void> {
   try {
     await fetch('/api/knowledge-recommendations/feedback/', {
       method: 'POST',
@@ -24378,416 +24967,482 @@ async function sendRecommendationFeedback(opts: {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify(opts),
+      body: JSON.stringify({
+        recommendationId: item.recommendationId,
+        resourceId: item.resource.id,
+        feedback,
+      }),
     });
   } catch (err) {
-    // Backend for feedback is optional; do not surface hard failures to the user.
-    // A console warning is enough for debugging in development.
     // eslint-disable-next-line no-console
     console.warn('Failed to send recommendation feedback', err);
   }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Page component                                                     */
+/* ------------------------------------------------------------------ */
+
 export default function RecommendedResourcesPage(): JSX.Element {
   const router = useRouter();
 
-  const [recommendations, setRecommendations] = useState<KnowledgeRecommendationItem[] | null>(
-    null,
-  );
-  const [loading, setLoading] = useState<boolean>(true);
+  const [recommendations, setRecommendations] = useState<KnowledgeRecommendationItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  const [hasOfflineFallback, setHasOfflineFallback] = useState<boolean>(false);
+  const [hasLoadedOnce, setHasLoadedOnce] = useState<boolean>(false);
+  const [likeInFlightIds, setLikeInFlightIds] = useState<Set<string>>(new Set());
 
-  const loadRecommendations = useCallback(async () => {
-    setError(null);
+  const hasRecommendations = recommendations.length > 0;
+
+  const sortedRecommendations = useMemo(
+    () =>
+      [...recommendations].sort((a, b) => {
+        if (typeof a.score === 'number' && typeof b.score === 'number') {
+          return b.score - a.score;
+        }
+
+        return (
+          new Date(b.recommendedAt).getTime() -
+          new Date(a.recommendedAt).getTime()
+        );
+      }),
+    [recommendations],
+  );
+
+  const handleReload = useCallback(async () => {
     setLoading(true);
+    setError(null);
 
     try {
       const data = await fetchRecommendations();
-      setRecommendations(data.results ?? []);
-      setHasOfflineFallback(false);
+      setRecommendations(data.results);
+      setHasLoadedOnce(true);
 
-      // Optionally cache the last successful payload for offline use.
-      try {
-        localStorage.setItem('konnected:recommended-resources:last', JSON.stringify(data));
-      } catch {
-        // ignore localStorage failures
+      if (!data.results.length) {
+        message.info(
+          'No personalized recommendations yet. Try completing a few lessons or rating resources.',
+        );
       }
     } catch (err) {
       const msg =
-        err instanceof Error ? err.message : 'Unable to load personalized recommendations.';
+        err instanceof Error
+          ? err.message
+          : 'Unable to load recommendations right now.';
       setError(msg);
 
-      // Try to recover from a cached result (offline / backend down).
-      try {
-        const cached = localStorage.getItem('konnected:recommended-resources:last');
-        if (cached) {
-          const parsed = JSON.parse(cached) as RecommendationsResponse;
-          setRecommendations(parsed.results ?? []);
-          setHasOfflineFallback(true);
+      if (!hasLoadedOnce) {
+        // Soft fallback: try to use cached sample data from localStorage if present
+        try {
+          const cached = window.localStorage.getItem(
+            'konnected:sample:knowledge-recommendations',
+          );
+          if (cached) {
+            const parsed = JSON.parse(cached) as unknown;
+            const normalized = normalizeRecommendations(parsed);
+            setRecommendations(normalized.results);
+          }
+        } catch {
+          // ignore
         }
-      } catch {
-        // ignore cache errors
       }
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [hasLoadedOnce]);
 
   useEffect(() => {
-    loadRecommendations();
-  }, [loadRecommendations]);
+    void handleReload();
+  }, [handleReload]);
 
-  const refreshSuggestions = useCallback(async () => {
-    setIsRefreshing(true);
+  const handleViewResource = (item: KnowledgeRecommendationItem) => {
+    const href =
+      item.resource.viewerUrl ??
+      `/konnected/learning-library/resource/${encodeURIComponent(
+        item.resource.id,
+      )}`;
+
+    router.push(href);
+  };
+
+  const handleFeedback = async (
+    item: KnowledgeRecommendationItem,
+    feedback: 'like' | 'dislike',
+  ) => {
+    const key = `${item.recommendationId}:${feedback}`;
+
+    setLikeInFlightIds((prev) => {
+      const next = new Set(prev);
+      next.add(key);
+      return next;
+    });
+
     try {
-      await loadRecommendations();
+      await sendRecommendationFeedback(item, feedback);
+      message.success(
+        feedback === 'like'
+          ? 'Thanks! We will show you more content like this.'
+          : 'We will show you this type of content less often.',
+      );
+    } catch (err) {
+      const msg =
+        err instanceof Error
+          ? err.message
+          : 'Could not send feedback. Please try again later.';
+      message.error(msg);
     } finally {
-      setIsRefreshing(false);
+      setLikeInFlightIds((prev) => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
     }
-  }, [loadRecommendations]);
+  };
 
-  const handleOpenPreferences = useCallback(() => {
-    // Placeholder for a full preferences drawer / page
-    message.info('Learning preferences editor will allow tuning recommendations (coming soon).');
-  }, []);
-
-  const handleViewResource = useCallback(
-    (resource: KnowledgeResource) => {
-      if (resource.viewerUrl) {
-        router.push(resource.viewerUrl);
-      } else {
-        // Fallback: keep existing pattern for now
-        router.push(`/konnected/learning-library/resource/${resource.id}`);
-      }
-    },
-    [router],
-  );
-
-  const handleGoToCatalog = useCallback(() => {
-    router.push('/konnected/learning-library/browse-resources');
-  }, [router]);
-
-  const handleGoToMyLearningPath = useCallback(() => {
-    router.push('/konnected/learning-paths/my-learning-path');
-  }, [router]);
-
-  const handleFeedback = useCallback(
-    async (
-      rec: KnowledgeRecommendationItem,
-      action: 'like' | 'dislike' | 'dismiss' | 'save_for_later',
-    ) => {
-      try {
-        await sendRecommendationFeedback({
-          recommendationId: rec.recommendationId,
-          resourceId: rec.resource.id,
-          action,
-        });
-
-        if (action === 'like') {
-          message.success('Thanks for the feedback! We will show you more similar content.');
-        } else if (action === 'dislike') {
-          message.success('Got it. We will show you less of this kind of content.');
-        } else if (action === 'save_for_later') {
-          message.success('Saved for later learning.');
-        } else if (action === 'dismiss') {
-          message.success('This recommendation will be deprioritized.');
-        }
-      } catch (err) {
-        const msg =
-          err instanceof Error ? err.message : 'Could not record feedback on this recommendation.';
-        message.error(msg);
-      }
-    },
-    [],
-  );
-
-  const hasRecommendations = useMemo(
-    () => Boolean(recommendations && recommendations.length > 0),
-    [recommendations],
+  const renderHeaderTags = () => (
+    <Space size={[8, 8]} wrap>
+      <Tag icon={<StarFilled />} color="gold">
+        Personalized
+      </Tag>
+      <Tag icon={<BookOutlined />} color="geekblue">
+        Knowledge Library
+      </Tag>
+      <Tag icon={<FireOutlined />} color="volcano">
+        Early prototype
+      </Tag>
+    </Space>
   );
 
   return (
     <>
       <Head>
-        <title>Recommended learning resources – KonnectED</title>
+        <title>Recommended resources – KonnectED</title>
       </Head>
 
       <KonnectedPageShell
-        title="Recommended for you"
-        subtitle="Personalized learning suggestions based on your activity and interests."
+        title="Recommended resources"
+        subtitle="Personalized learning suggestions based on your activity in the KonnectED Knowledge Library."
         primaryAction={
-          <Space>
-            <Button icon={<SettingOutlined />} onClick={handleOpenPreferences}>
-              Adjust preferences
-            </Button>
-            <Button
-              icon={<ReloadOutlined />}
-              loading={isRefreshing}
-              onClick={refreshSuggestions}
-            >
-              Refresh suggestions
-            </Button>
-          </Space>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => void handleReload()}
+            loading={loading}
+          >
+            Refresh recommendations
+          </Button>
         }
         secondaryActions={
-          <Button onClick={handleGoToCatalog} icon={<BookOutlined />}>
-            Browse full library
-          </Button>
+          <Space>
+            <Button
+              icon={<BookOutlined />}
+              onClick={() =>
+                router.push('/konnected/learning-library/browse-resources')
+              }
+            >
+              Browse library
+            </Button>
+            <Button icon={<SettingOutlined />} disabled>
+              Recommendation settings
+            </Button>
+          </Space>
         }
       >
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={16}>
-            {error && !hasRecommendations && (
-              <Alert
-                type="error"
-                showIcon
-                message="Unable to load recommendations"
-                description={error}
-                style={{ marginBottom: 16 }}
-              />
-            )}
+            <Card
+              title={
+                <Space size={8} align="center">
+                  <span>Recommended for you</span>
+                  {renderHeaderTags()}
+                </Space>
+              }
+            >
+              {error && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  style={{ marginBottom: 16 }}
+                  message="We couldn't load live recommendations."
+                  description={
+                    <span>
+                      {error}{' '}
+                      <Text type="secondary">
+                        If this keeps happening, the personalized recommendation
+                        API for KonnectED may not be wired yet. In that case we
+                        will fall back to generic library suggestions.
+                      </Text>
+                    </span>
+                  }
+                />
+              )}
 
-            {hasOfflineFallback && (
-              <Alert
-                type="info"
-                showIcon
-                message="Showing last known recommendations"
-                description="These suggestions were loaded from your device cache because the recommendation backend is currently unavailable."
-                style={{ marginBottom: 16 }}
-              />
-            )}
+              {!hasRecommendations && loading && (
+                <div
+                  style={{
+                    minHeight: 200,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Skeleton active paragraph={{ rows: 4 }} />
+                </div>
+              )}
 
-            {loading && !hasRecommendations ? (
-              <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                <Skeleton active />
-                <Skeleton active />
-                <Skeleton active />
-              </Space>
-            ) : !hasRecommendations ? (
-              <Empty
-                description={
-                  <Space direction="vertical">
-                    <Text>No recommendations yet.</Text>
-                    <Text type="secondary">
-                      Start exploring the library or enroll in a learning path to help the system
-                      learn your interests.
-                    </Text>
-                  </Space>
-                }
-              >
-                <Button type="primary" icon={<BookOutlined />} onClick={handleGoToCatalog}>
-                  Explore the library
-                </Button>
-              </Empty>
-            ) : (
-              <List
-                itemLayout="vertical"
-                dataSource={recommendations ?? []}
-                renderItem={(rec) => (
-                  <List.Item key={rec.recommendationId}>
-                    <Card
-                      hoverable
-                      onClick={() => handleViewResource(rec.resource)}
-                      style={{ width: '100%' }}
+              {!loading && !hasRecommendations && !error && (
+                <Empty
+                  description={
+                    <Space direction="vertical" size={4}>
+                      <span>No recommendations yet.</span>
+                      <Text type="secondary">
+                        Start a learning path or complete a few resources so we
+                        can tailor suggestions to you.
+                      </Text>
+                    </Space>
+                  }
+                />
+              )}
+
+              {hasRecommendations && (
+                <List
+                  itemLayout="vertical"
+                  dataSource={sortedRecommendations}
+                  renderItem={(rec) => (
+                    <List.Item
+                      key={rec.recommendationId}
+                      actions={[
+                        <Space key="actions" size={8}>
+                          <Button
+                            type="link"
+                            icon={<ArrowRightOutlined />}
+                            onClick={() => handleViewResource(rec)}
+                          >
+                            Open
+                          </Button>
+                          <Button
+                            type="text"
+                            icon={<LikeOutlined />}
+                            loading={likeInFlightIds.has(
+                              `${rec.recommendationId}:like`,
+                            )}
+                            onClick={() => handleFeedback(rec, 'like')}
+                          >
+                            Helpful
+                          </Button>
+                          <Button
+                            type="text"
+                            icon={<DislikeOutlined />}
+                            loading={likeInFlightIds.has(
+                              `${rec.recommendationId}:dislike`,
+                            )}
+                            onClick={() => handleFeedback(rec, 'dislike')}
+                          >
+                            Not for me
+                          </Button>
+                        </Space>,
+                      ]}
                     >
-                      <Space
-                        direction="vertical"
-                        style={{ width: '100%' }}
-                        size="small"
-                      >
-                        {/* Title row */}
-                        <Space
-                          style={{
-                            width: '100%',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
-                          }}
-                        >
-                          <Space direction="vertical" size={4}>
-                            <Space size={8} align="center">
-                              <Typography.Title
-                                level={4}
-                                style={{ marginBottom: 0, cursor: 'pointer' }}
-                              >
-                                {rec.resource.title}
-                              </Typography.Title>
+                      <List.Item.Meta
+                        title={
+                          <Space direction="vertical" size={0}>
+                            <Space size={8} wrap>
+                              <Text strong>{rec.resource.title}</Text>
+                              {rec.resource.type && (
+                                <Tag
+                                  color="geekblue"
+                                  style={{ textTransform: 'capitalize' }}
+                                >
+                                  {rec.resource.type}
+                                </Tag>
+                              )}
+                              {rec.resource.level && (
+                                <Tag color="purple">{rec.resource.level}</Tag>
+                              )}
+                              {rec.resource.subject && (
+                                <Tag color="blue">{rec.resource.subject}</Tag>
+                              )}
                               {rec.source && (
-                                <Tag color={rec.source === 'ml' ? 'blue' : 'green'}>
+                                <Tag>
                                   {rec.source === 'ml'
                                     ? 'Suggested by AI'
                                     : rec.source === 'editorial'
-                                    ? 'Curated'
+                                    ? 'Curator pick'
                                     : 'Trending'}
                                 </Tag>
                               )}
                             </Space>
-
-                            {rec.resource.summary && (
-                              <Text type="secondary">{rec.resource.summary}</Text>
-                            )}
-                          </Space>
-
-                          <Button
-                            type="link"
-                            icon={<ArrowRightOutlined />}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleViewResource(rec.resource);
-                            }}
-                          >
-                            Open
-                          </Button>
-                        </Space>
-
-                        {/* Meta row */}
-                        <Space
-                          size={[8, 8]}
-                          wrap
-                          style={{ marginTop: 8, width: '100%', justifyContent: 'space-between' }}
-                        >
-                          <Space size={[8, 8]} wrap>
-                            {rec.resource.subject && (
-                              <Tag color="blue">{rec.resource.subject}</Tag>
-                            )}
-                            {rec.resource.level && (
-                              <Tag color="purple">{rec.resource.level}</Tag>
-                            )}
-                            {rec.resource.language && (
-                              <Tag>{rec.resource.language}</Tag>
-                            )}
-                            <Tag color="geekblue" icon={<BookOutlined />}>
-                              {rec.resource.type}
-                            </Tag>
-                            {typeof rec.resource.estimatedDurationMinutes === 'number' && (
-                              <Tag color="gold">
-                                {rec.resource.estimatedDurationMinutes} min
-                              </Tag>
-                            )}
-                            {rec.resource.offlineAvailable && (
-                              <Tag color="success">Offline available</Tag>
-                            )}
-                            {rec.resource.partOfPathTitle && (
-                              <Tag color="cyan">
-                                Part of: {rec.resource.partOfPathTitle}
-                              </Tag>
-                            )}
-                          </Space>
-
-                          <Space direction="vertical" align="end">
-                            {rec.progress ? (
-                              <>
-                                <Progress
-                                  percent={rec.progress.progressPercent}
-                                  size="small"
-                                  style={{ minWidth: 80 }}
-                                />
-                                <Text type="secondary" style={{ fontSize: 12 }}>
-                                  In progress
-                                </Text>
-                              </>
-                            ) : (
+                            {rec.reason && (
                               <Text type="secondary" style={{ fontSize: 12 }}>
-                                Not started yet
+                                {rec.reason}
                               </Text>
                             )}
-
-                            {typeof rec.score === 'number' && (
-                              <Space size={4} align="center">
-                                <StarFilled style={{ color: '#faad14' }} />
-                                <Text type="secondary" style={{ fontSize: 12 }}>
-                                  Relevance {(rec.score * 100).toFixed(0)}%
-                                </Text>
-                              </Space>
+                          </Space>
+                        }
+                        description={
+                          <Space
+                            direction="vertical"
+                            size={4}
+                            style={{ width: '100%' }}
+                          >
+                            {rec.resource.summary && (
+                              <Text>{rec.resource.summary}</Text>
                             )}
+                            <Space size={[8, 8]} wrap>
+                              {rec.resource.language && (
+                                <Tag>{rec.resource.language}</Tag>
+                              )}
+                              {rec.resource.tags?.map((tag) => (
+                                <Tag key={tag}>{tag}</Tag>
+                              ))}
+                              {rec.resource.estimatedDurationMinutes != null && (
+                                <Tag>
+                                  ≈ {rec.resource.estimatedDurationMinutes} min
+                                </Tag>
+                              )}
+                              {rec.resource.offlineAvailable && (
+                                <Tag color="green">Offline available</Tag>
+                              )}
+                              {rec.resource.partOfPathTitle && (
+                                <Tag color="magenta">
+                                  Part of{' '}
+                                  <Text strong>
+                                    {rec.resource.partOfPathTitle}
+                                  </Text>
+                                </Tag>
+                              )}
+                            </Space>
+                            <Row gutter={16}>
+                              <Col xs={24} sm={12}>
+                                {rec.progress ? (
+                                  <Space
+                                    direction="vertical"
+                                    size={2}
+                                    style={{ width: '100%' }}
+                                  >
+                                    <Text
+                                      type="secondary"
+                                      style={{ fontSize: 12 }}
+                                    >
+                                      Your progress
+                                    </Text>
+                                    <Progress
+                                      percent={rec.progress.progressPercent}
+                                      size="small"
+                                      status={
+                                        rec.progress.progressPercent === 100
+                                          ? 'success'
+                                          : 'active'
+                                      }
+                                    />
+                                    {rec.progress.lastTouchedAt && (
+                                      <Text
+                                        type="secondary"
+                                        style={{ fontSize: 12 }}
+                                      >
+                                        Last activity:{' '}
+                                        {new Date(
+                                          rec.progress.lastTouchedAt,
+                                        ).toLocaleString()}
+                                      </Text>
+                                    )}
+                                  </Space>
+                                ) : (
+                                  <Text
+                                    type="secondary"
+                                    style={{ fontSize: 12 }}
+                                  >
+                                    You have not started this resource yet.
+                                  </Text>
+                                )}
+                              </Col>
+                              <Col xs={24} sm={12}>
+                                <Space
+                                  direction="vertical"
+                                  size={2}
+                                  style={{ width: '100%' }}
+                                >
+                                  {typeof rec.score === 'number' && (
+                                    <Text
+                                      type="secondary"
+                                      style={{ fontSize: 12 }}
+                                    >
+                                      Relevance score:{' '}
+                                      <Text strong>
+                                        {(rec.score * 100).toFixed(0)}%
+                                      </Text>
+                                    </Text>
+                                  )}
+                                  <Text
+                                    type="secondary"
+                                    style={{ fontSize: 12 }}
+                                  >
+                                    Recommended on:{' '}
+                                    {new Date(
+                                      rec.recommendedAt,
+                                    ).toLocaleDateString()}
+                                  </Text>
+                                </Space>
+                              </Col>
+                            </Row>
                           </Space>
-                        </Space>
-
-                        {/* Actions row: feedback & save */}
-                        <Space
-                          style={{ marginTop: 12, width: '100%', justifyContent: 'space-between' }}
-                        >
-                          <Space size={8}>
-                            <Button
-                              size="small"
-                              icon={<LikeOutlined />}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFeedback(rec, 'like');
-                              }}
-                            >
-                              Helpful
-                            </Button>
-                            <Button
-                              size="small"
-                              icon={<DislikeOutlined />}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFeedback(rec, 'dislike');
-                              }}
-                            >
-                              Not relevant
-                            </Button>
-                          </Space>
-
-                          <Space size={8}>
-                            <Button
-                              size="small"
-                              type="link"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFeedback(rec, 'save_for_later');
-                              }}
-                            >
-                              Save for later
-                            </Button>
-                            <Button
-                              size="small"
-                              type="text"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleFeedback(rec, 'dismiss');
-                              }}
-                            >
-                              Dismiss
-                            </Button>
-                          </Space>
-                        </Space>
-                      </Space>
-                    </Card>
-                  </List.Item>
-                )}
-              />
-            )}
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              )}
+            </Card>
           </Col>
 
           <Col xs={24} lg={8}>
-            <Card
-              title="How these suggestions work"
-              extra={<FireOutlined style={{ color: '#fa8c16' }} />}
-            >
-              <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                <Text>
-                  Recommendations combine your recent activity, completed resources, and
-                  organization-wide priorities.
-                </Text>
-                <Text type="secondary">
-                  In this initial version, suggestions may be based on generic relevance such as
-                  topic popularity and recency if no personal history is available.
-                </Text>
-              </Space>
+            <Space direction="vertical" size={16} style={{ width: '100%' }}>
+              <Card title="How these recommendations work">
+                <Space direction="vertical" size={4}>
+                  <Text>
+                    KonnectED recommendations are an early prototype. They will
+                    eventually use your learning paths, progress, and Ekoh score
+                    to tailor suggestions.
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    For now, recommendations may rely on simple heuristics like
+                    subject matches, language preferences, and popularity.
+                  </Text>
+                </Space>
+              </Card>
 
-              <div style={{ marginTop: 16 }}>
-                <Button
-                  block
-                  onClick={handleGoToMyLearningPath}
-                  icon={<BookOutlined />}
-                >
-                  Go to my learning path
-                </Button>
-              </div>
-            </Card>
+              <Card title="Tips to improve recommendations">
+                <List
+                  size="small"
+                  dataSource={[
+                    'Complete or mark a few lessons as done.',
+                    'Rate or leave feedback on resources.',
+                    'Join a learning path and follow it for a while.',
+                    'Try content in your preferred language first.',
+                  ]}
+                  renderItem={(tip) => <List.Item>{tip}</List.Item>}
+                />
+              </Card>
+
+              <Card title="KonnectED tips & summary">
+                <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    Looking for a more structured experience?
+                  </Text>
+                  <Button
+                    type="primary"
+                    icon={<BookOutlined />}
+                    onClick={() =>
+                      router.push('/konnected/learning-paths/my-learning-path')
+                    }
+                  >
+                    Go to my learning paths
+                  </Button>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    Or browse curated learning paths and certification programs
+                    from the main dashboard.
+                  </Text>
+                </Space>
+              </Card>
+            </Space>
           </Col>
         </Row>
       </KonnectedPageShell>
@@ -24827,10 +25482,6 @@ const { RangePicker } = DatePicker;
 const { Text } = Typography;
 const { Search } = Input;
 const { Option } = Select;
-
-// Keep in sync with backend OpenAPI for Knowledge / library_resource_management search
-const KNOWLEDGE_SEARCH_ENDPOINT =
-  '/api/konnected/knowledge/resources/search';
 
 type KnowledgeContentType = 'article' | 'video' | 'lesson' | 'quiz' | 'dataset';
 
@@ -24896,13 +25547,66 @@ const LEVEL_OPTIONS = ['Beginner', 'Intermediate', 'Advanced'];
 
 const LANGUAGE_OPTIONS = ['English', 'French', 'Spanish', 'Other'];
 
+// Existing backend uses a list endpoint for KnowledgeResource.
+// We support the main variants used elsewhere in the app and pick
+// the first one that responds.
+const KNOWLEDGE_SEARCH_ENDPOINTS = [
+  '/api/knowledge-resources/',
+  '/api/knowledge/resources/',
+  '/api/konnected/resources/',
+] as const;
+
+type RawKnowledgeSearchResponse =
+  | KnowledgeResource[]
+  | {
+      results?: KnowledgeResource[];
+      items?: KnowledgeResource[];
+      count?: number;
+      total?: number;
+    };
+
+function normalizeSearchResponse(raw: RawKnowledgeSearchResponse): KnowledgeSearchResponse {
+  if (Array.isArray(raw)) {
+    return {
+      count: raw.length,
+      results: raw,
+    };
+  }
+
+  const obj = raw ?? {};
+  const anyObj = obj as any;
+
+  const results: KnowledgeResource[] =
+    (Array.isArray(anyObj.results) && anyObj.results) ||
+    (Array.isArray(anyObj.items) && anyObj.items) ||
+    [];
+
+  const count: number =
+    typeof anyObj.count === 'number'
+      ? anyObj.count
+      : typeof anyObj.total === 'number'
+        ? anyObj.total
+        : results.length;
+
+  return { count, results };
+}
+
 async function searchKnowledgeResources(query: QueryState): Promise<KnowledgeSearchResponse> {
   const params = new URLSearchParams();
 
-  if (query.q) params.set('q', query.q);
-  if (query.types && query.types.length > 0) {
-    params.set('type', query.types.join(','));
+  // Text search: support both v14-style `q` and DRF SearchFilter's `search`
+  if (query.q) {
+    params.set('q', query.q);
+    params.set('search', query.q);
   }
+
+  if (query.types && query.types.length > 0) {
+    // Primary v14 param
+    params.set('type', query.types.join(','));
+    // Optional legacy alias used in some views
+    params.set('resource_type', query.types.join(','));
+  }
+
   if (query.subjects && query.subjects.length > 0) {
     params.set('subject', query.subjects.join(','));
   }
@@ -24922,24 +25626,45 @@ async function searchKnowledgeResources(query: QueryState): Promise<KnowledgeSea
   params.set('page', String(query.page));
   params.set('page_size', String(query.page_size));
 
-  const res = await fetch(`${KNOWLEDGE_SEARCH_ENDPOINT}?${params.toString()}`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    // Include credentials if your API relies on cookies/session
-    credentials: 'include',
-  });
+  const qs = params.toString();
+  let lastError: unknown;
 
-  if (!res.ok) {
-    const body = await res.text().catch(() => '');
-    throw new Error(
-      body || `Knowledge search failed with status ${res.status}`,
-    );
+  for (const base of KNOWLEDGE_SEARCH_ENDPOINTS) {
+    const url = qs ? `${base}?${qs}` : base;
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      // For 404/405 we try the next candidate; for other codes we surface the error.
+      if (!res.ok) {
+        if (res.status === 404 || res.status === 405) {
+          lastError = new Error(`Knowledge search endpoint not available at ${base} (${res.status})`);
+          continue;
+        }
+
+        const body = await res.text().catch(() => '');
+        throw new Error(body || `Knowledge search failed with status ${res.status}`);
+      }
+
+      const json = (await res.json()) as RawKnowledgeSearchResponse;
+      return normalizeSearchResponse(json);
+    } catch (err) {
+      lastError = err;
+      // Try next candidate
+    }
   }
 
-  const data = (await res.json()) as KnowledgeSearchResponse;
-  return data;
+  const message =
+    lastError instanceof Error
+      ? lastError.message
+      : 'Unable to reach any knowledge search endpoint.';
+  throw new Error(message);
 }
 
 export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
@@ -24952,7 +25677,6 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
   const [pageSize, setPageSize] = useState<number>(DEFAULT_PAGE_SIZE);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastQuery, setLastQuery] = useState<QueryState | null>(null);
 
   const columns: ColumnsType<KnowledgeResource> = useMemo(
     () => [
@@ -24977,15 +25701,9 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
                 <Text strong>{value}</Text>
               )}
               <Space size="small" wrap>
-                {record.subject && (
-                  <Tag color="blue">{record.subject}</Tag>
-                )}
-                {record.level && (
-                  <Tag color="purple">{record.level}</Tag>
-                )}
-                {record.language && (
-                  <Tag color="geekblue">{record.language}</Tag>
-                )}
+                {record.subject && <Tag color="blue">{record.subject}</Tag>}
+                {record.level && <Tag color="purple">{record.level}</Tag>}
+                {record.language && <Tag color="geekblue">{record.language}</Tag>}
               </Space>
             </Space>
           );
@@ -24997,7 +25715,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
         key: 'type',
         width: 140,
         render: (value: KnowledgeResource['type']) => (
-          <Tag>{String(value).toUpperCase()}</Tag>
+          <Tag>{String(value ?? '').toUpperCase() || 'UNKNOWN'}</Tag>
         ),
       },
       {
@@ -25013,7 +25731,9 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
               ))}
             </Space>
           ) : (
-            <Text type="secondary">No tags</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              No tags
+            </Text>
           ),
       },
       {
@@ -25022,7 +25742,13 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
         key: 'created_at',
         width: 140,
         render: (value?: string | null) =>
-          value ? dayjs(value).format('YYYY-MM-DD') : '—',
+          value ? (
+            <Text>{dayjs(value).format('YYYY-MM-DD')}</Text>
+          ) : (
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Unknown
+            </Text>
+          ),
       },
       {
         title: 'Actions',
@@ -25045,9 +25771,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             <Button
               size="small"
               onClick={() =>
-                router.push(
-                  `/konnected/learning-library/resource/${record.id}`,
-                )
+                router.push(`/konnected/learning-library/resource/${record.id}`)
               }
             >
               View details
@@ -25059,10 +25783,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
     [router],
   );
 
-  const runSearch = async (
-    overridePage?: number,
-    overridePageSize?: number,
-  ) => {
+  const runSearch = async (overridePage?: number, overridePageSize?: number) => {
     const formValues = form.getFieldsValue();
 
     const pageToUse = overridePage ?? page;
@@ -25093,7 +25814,6 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       setTotal(response.count ?? response.results.length);
       setPage(pageToUse);
       setPageSize(pageSizeToUse);
-      setLastQuery(query);
     } catch (e) {
       const message =
         e instanceof Error ? e.message : 'Unexpected error during search';
@@ -25107,17 +25827,17 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
 
   const onFinish = () => {
     // Reset to first page when filters change
-    runSearch(1, pageSize);
+    void runSearch(1, pageSize);
   };
 
   const handleQuickSearch = (value: string) => {
     form.setFieldsValue({ q: value });
-    runSearch(1, pageSize);
+    void runSearch(1, pageSize);
   };
 
   const handleResetFilters = () => {
     form.resetFields();
-    runSearch(1, DEFAULT_PAGE_SIZE);
+    void runSearch(1, DEFAULT_PAGE_SIZE);
   };
 
   const handleTableChange: TableProps<KnowledgeResource>['onChange'] = (
@@ -25125,26 +25845,28 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
   ) => {
     const nextPage = pagination.current || 1;
     const nextPageSize = pagination.pageSize || DEFAULT_PAGE_SIZE;
-    runSearch(nextPage, nextPageSize);
+    void runSearch(nextPage, nextPageSize);
   };
 
   useEffect(() => {
     // Initial search on mount with default filters
-    runSearch(1, DEFAULT_PAGE_SIZE);
+    void runSearch(1, DEFAULT_PAGE_SIZE);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const hasActiveFilters = useMemo(() => {
-    const v = form.getFieldsValue();
-    return Boolean(
-      v.q ||
-        (v.types && v.types.length > 0) ||
-        (v.subjects && v.subjects.length > 0) ||
-        (v.levels && v.levels.length > 0) ||
-        (v.languages && v.languages.length > 0) ||
-        (v.createdAt && v.createdAt.length === 2),
-    );
-  }, [form]);
+  // Compute active filters on each render so the Reset button state stays in sync
+  const filterValues = form.getFieldsValue();
+  const hasActiveFilters = Boolean(
+    filterValues.q ||
+      (filterValues.types && filterValues.types.length > 0) ||
+      (filterValues.subjects && filterValues.subjects.length > 0) ||
+      (filterValues.levels && filterValues.levels.length > 0) ||
+      (filterValues.languages && filterValues.languages.length > 0) ||
+      (filterValues.createdAt &&
+        Array.isArray(filterValues.createdAt) &&
+        filterValues.createdAt[0] &&
+        filterValues.createdAt[1]),
+  );
 
   const secondaryActions = (
     <Space>
@@ -25158,7 +25880,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       <Button
         icon={<ReloadOutlined />}
         onClick={handleResetFilters}
-        disabled={!hasActiveFilters && !lastQuery}
+        disabled={!hasActiveFilters}
       >
         Reset filters
       </Button>
@@ -25169,7 +25891,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
     <Button
       type="primary"
       icon={<FilterOutlined />}
-      onClick={() => runSearch(page, pageSize)}
+      onClick={() => void runSearch(page, pageSize)}
     >
       Apply filters
     </Button>
@@ -25183,11 +25905,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       secondaryActions={secondaryActions}
     >
       <Card style={{ marginBottom: 16 }}>
-        <Form<SearchFormValues>
-          form={form}
-          layout="vertical"
-          onFinish={onFinish}
-        >
+        <Form<SearchFormValues> form={form} layout="vertical" onFinish={onFinish}>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12} lg={8}>
               <Form.Item
@@ -25204,10 +25922,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Content type"
-                name="types"
-              >
+              <Form.Item label="Content type" name="types">
                 <Select
                   mode="multiple"
                   allowClear
@@ -25223,10 +25938,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Subjects"
-                name="subjects"
-              >
+              <Form.Item label="Subjects" name="subjects">
                 <Select
                   mode="multiple"
                   allowClear
@@ -25240,12 +25952,11 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
                 </Select>
               </Form.Item>
             </Col>
+          </Row>
 
+          <Row gutter={[16, 16]}>
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Level"
-                name="levels"
-              >
+              <Form.Item label="Level" name="levels">
                 <Select
                   mode="multiple"
                   allowClear
@@ -25261,10 +25972,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Language"
-                name="languages"
-              >
+              <Form.Item label="Language" name="languages">
                 <Select
                   mode="multiple"
                   allowClear
@@ -25280,14 +25988,8 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
             </Col>
 
             <Col xs={24} md={12} lg={8}>
-              <Form.Item
-                label="Added to library"
-                name="createdAt"
-              >
-                <RangePicker
-                  style={{ width: '100%' }}
-                  allowEmpty={[true, true]}
-                />
+              <Form.Item label="Added to library" name="createdAt">
+                <RangePicker style={{ width: '100%' }} allowEmpty={[true, true]} />
               </Form.Item>
             </Col>
           </Row>
@@ -25320,11 +26022,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
       )}
 
       <Card>
-        <Space
-          direction="vertical"
-          style={{ width: '100%' }}
-          size="large"
-        >
+        <Space direction="vertical" style={{ width: '100%' }} size="large">
           <Space
             style={{ width: '100%', justifyContent: 'space-between' }}
           >
