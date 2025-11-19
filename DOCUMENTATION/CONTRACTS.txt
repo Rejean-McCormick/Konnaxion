@@ -1,0 +1,246 @@
+Below is the “contract” for each frontend module you listed.
+
+Each module is described in terms of:
+
+1. Which backend endpoints it uses.
+2. What entities it visualizes.
+3. How it plugs into the global shell and services layer.
+
+---
+
+## Ethikos (Deliberation module)
+
+### 1) Backend endpoints
+
+Ethikos uses the `konnaxion.ethikos` backend app, exposed under `/api/ethikos/...` via the central DRF router. 
+
+Core endpoints:
+
+* `/api/ethikos/topics/` – `TopicViewSet` (list/create/update/delete topics)
+* `/api/ethikos/stances/` – `StanceViewSet` (user stances per topic)
+* `/api/ethikos/arguments/` – `ArgumentViewSet` (arguments/replies per topic)
+* `/api/ethikos/categories/` – `EthikosCategoryViewSet` (optional, only if implemented)
+
+Compat aliases (same logic, different URL root): 
+
+* `/api/deliberate/...`
+* `/api/deliberate/elite/...`
+
+### 2) Entities visualized
+
+From migrations: 
+
+* `EthikosTopic` — debate topic, with `title`, `description`, `status` (`open`/`closed`/`archived`), `total_votes`, `last_activity`, timestamps, `category`, `created_by`, optional `expertise_category`.
+* `EthikosStance` — stance per `(user, topic)`, numeric `value` constrained to **[−3, 3]**, with timestamp; unique `(user, topic)`.
+* `EthikosArgument` — discussion entry, with `content`, optional `side` (`pro`/`con`), `parent` for threaded replies, `is_hidden`, timestamps.
+* `EthikosCategory` — topic grouping (`name`, `description`).
+
+Ethikos screens should therefore show:
+
+* Topic lists and detail views.
+* Per-topic stance summaries and the current user’s stance.
+* Argument trees (threaded, with pro/con tagging).
+* Filters by category or expertise when needed.
+
+### 3) Integration with shell and services
+
+* Frontend code lives in `modules/ethikos`.
+* Navigation comes from `routesEthikos.tsx` (and any global `routes.json`), not from ad-hoc menus.
+* Data access goes through an Ethikos service module (e.g. `services/ethikos`) which wraps the `/api/ethikos/...` and `/api/deliberate/...` endpoints.
+* All Ethikos pages are rendered inside the **global shell** (e.g. `MainLayout` / shared layout) and use shared UI primitives/charts, not their own root layout.
+
+---
+
+## KeenKonnect (Projects & collaboration)
+
+### 1) Backend endpoints
+
+KeenKonnect uses the `konnaxion.keenkonnect` app, exposed as:
+
+* `/api/keenkonnect/projects/` – `ProjectViewSet`
+
+  * Standard DRF routes: list, create, retrieve, update, delete.
+  * Any nested actions for tasks, messages, etc., remain under this prefix.
+
+### 2) Entities visualized
+
+From migrations: 
+
+* `Project` — central collaboration entity: `title`, `description`, `category`, `status` (`idea`/`progress`/`completed`/`validated`), timestamps, `creator`, many-to-many `tags`.
+* `Tag` — project classification label.
+* `ProjectTask` — tasks with `title`, `description`, `status` (`todo`/`doing`/`done`), `order`, optional `due_date`, `assignee`.
+* `ProjectTeam` — membership with `role` (`owner`/`collaborator`/`mentor`) and `joined_at`.
+* `ProjectMessage` — message threads per project, ordered by `created_at`.
+* `ProjectResource` — resources attached to a project (`file`, `external_url`, `file_type`, versions, `uploaded_by`).
+* `ProjectRating` — +1/−1 ratings, unique per `(project, user)`.
+
+KeenKonnect screens visualize:
+
+* Project lists (with filters by status/category/tag).
+* Project detail dashboards (tasks board, team, resources, messages, ratings).
+* Kanban-style task boards grouped by status.
+* Team and roles views.
+
+### 3) Integration with shell and services
+
+* Frontend code lives in `modules/keenkonnect`.
+* Routes are defined in `routesKeenkonnect.tsx` and merged into the global navigation.
+* Data access goes through a KeenKonnect service module (`services/keenkonnect`) calling `/api/keenkonnect/projects/...`.
+* All pages are rendered inside the shared layout and reuse common components (cards, forms, lists, charts) instead of introducing a separate “projects app shell”.
+
+---
+
+## KonnectED (Knowledge, learning, certification)
+
+### 1) Backend endpoints
+
+KonnectED uses the `konnaxion.konnected` app. API routes from the central router:
+
+* `/api/konnected/resources/` → `KnowledgeResourceViewSet`
+* `/api/konnected/certifications/paths/` → `CertificationPathViewSet`
+* `/api/konnected/certifications/evaluations/` → `EvaluationViewSet`
+* `/api/konnected/certifications/peer-validations/` → `PeerValidationViewSet`
+* `/api/konnected/certifications/exam-attempts/` → `ExamAttemptViewSet`
+* `/api/konnected/portfolios/` → `PortfolioViewSet`
+
+### 2) Entities visualized
+
+From migrations: 
+
+* `KnowledgeResource` — content item with `title`, `type` (`video`/`doc`/`course`/`other`), `url`, optional `author`.
+* `KnowledgeRecommendation` — recommendation mapping (`user`, `resource`, `recommended_at`).
+* `LearningProgress` — `progress_percent` for `(user, resource)`.
+* `CertificationPath` — named path with `description`.
+* `Evaluation` — evaluation per `(user, path)` with `raw_score` and `metadata`.
+* `PeerValidation` — peer `decision` (`approved`/`rejected`) attached to an `Evaluation`.
+* `Portfolio` — user portfolio with `title`, `description`, many-to-many `items` (`KnowledgeResource`).
+* Forum and co-creation entities:
+
+  * `ForumTopic`, `ForumPost`
+  * `CoCreationProject`, `CoCreationContribution`
+* `InteropMapping` — maps internal certifications to external systems.
+
+KonnectED screens visualize:
+
+* Knowledge catalog and detail views.
+* “Recommended for you” lists.
+* Certification paths with user progress/status.
+* Evaluations and peer validation flows.
+* User portfolios and learning dashboards.
+* Forum/co‑creation areas when needed.
+
+### 3) Integration with shell and services
+
+* Frontend code lives in `modules/konnected`.
+* Routes are defined in `routesKonnected.tsx` and integrated into the global navigation.
+* All network calls go through a KonnectED service wrapper (`services/konnected`) for `/api/konnected/...`.
+* Pages are rendered inside the global shell and reuse shared layout and chart components for progress and scores.
+
+---
+
+## Kreative (Creativity, culture, archives)
+
+### 1) Backend endpoints
+
+Kreative uses the `konnaxion.kreative` app. DRF viewsets registered in the router:
+
+* `/api/kreative/artworks/` → `KreativeArtworkViewSet`
+* `/api/kreative/galleries/` → `GalleryViewSet`
+
+Any further Kreative endpoints should live under `/api/kreative/...`.
+
+### 2) Entities visualized
+
+From migrations: 
+
+* Creative entities:
+
+  * `KreativeArtwork` — artwork with media file, `media_type` (image/video/audio/other), `title`, `description`, optional `year`, `medium`, `style`, `artist`, timestamps.
+  * `Gallery` — `title`, `description`, optional `theme`, `created_at`, `created_by`, many-to-many `artworks` via `GalleryArtwork`.
+  * `GalleryArtwork` — ordered link between gallery and artwork.
+  * `Tag` / `ArtworkTag` — tagging for artworks.
+  * `CollabSession` — `name`, `session_type` (painting/music/mixed), `host`, `started_at`/`ended_at`, optional `final_artwork`.
+* Cultural heritage:
+
+  * `TraditionEntry` — `title`, `description`, `region`, `media_file`, `submitted_by`, approval flags and timestamps.
+* Archives & AI:
+
+  * `DigitalArchive` — `title`, `description`, optional `url`.
+  * `ArchiveDocument` — `document_type`, `url`, `metadata`, `archive`.
+  * `CulturalPartner` — `name`, `type`, `contact_info`.
+  * `VirtualExhibition` — `name`, `description`, `created_at`.
+  * `AICatalogueEntry` — `tags` (JSON list), `classification`, linked to `ArchiveDocument`.
+
+Kreative screens visualize:
+
+* Artworks grids/details.
+* Galleries and curated sequences.
+* Collaboration sessions and resulting works.
+* Tradition submission/review workflows.
+* Archive/exhibition explorers and AI-generated tags/classifications.
+
+### 3) Integration with shell and services
+
+* Frontend code lives in `modules/kreative`.
+* Routes are defined in `routesKreative.tsx`.
+* Data access goes through a Kreative service module (`services/kreative`) wrapping `/api/kreative/artworks/`, `/api/kreative/galleries/`, and any future archive-related endpoints.
+* All views render inside the global layout and participate in the single shared theme system (via the existing theme context and ThemeSwitcher).
+
+---
+
+## Insights (Analytics over kollective & domains)
+
+### 1) Backend endpoints
+
+Insights has no dedicated backend app; it sits on top of existing ones.
+
+Core data source is `konnaxion.kollective_intelligence`:
+
+* `/api/kollective/votes/` → `VoteViewSet` (individual votes)
+
+Analytics will typically combine this with domain endpoints:
+
+* Ethikos: `/api/ethikos/topics/`, `/api/ethikos/stances/`, `/api/ethikos/arguments/`
+* KeenKonnect: `/api/keenkonnect/projects/` 
+* KonnectED: `/api/konnected/resources/`, `/api/konnected/certifications/...`, `/api/konnected/portfolios/`
+* Kreative: `/api/kreative/artworks/`, `/api/kreative/galleries/`
+
+If dedicated analytics endpoints are added, they should be implemented in `kollective_intelligence` (or a similar backend module) and registered in `config/api_router.py`.
+
+### 2) Entities visualized
+
+From `konnaxion.kollective_intelligence` migrations: 
+
+* `Vote` — per-user vote on `(target_type, target_id)` with `raw_value`, `weighted_value`, `voted_at`.
+* `VoteResult` — aggregate per `(target_type, target_id)` with `sum_weighted_value`, `vote_count`.
+* `ExpertiseCategory` — expertise domains.
+* `UserExpertiseScore` — `raw_score`, `weighted_score` per user/category.
+* `UserEthicsScore` — per-user ethical score.
+* `ScoreConfiguration`, `ScoreHistory` — weight parameters and change history.
+* `ConfidentialitySetting` — visibility mode (`public`/`pseudonym`/`anonymous`).
+* `VoteModality` — param sets defining vote mechanics.
+* `ContextAnalysisLog`, `IntegrationMapping`, `EmergingExpert` — context logging, integration mappings, and signals for emerging experts.
+
+Insights visualizes:
+
+* Aggregated voting outcomes over topics, projects, resources, etc.
+* Score distributions (expertise, ethics) and their evolution.
+* Impact indicators / KPIs across modules (Ethikos, KeenKonnect, KonnectED, Kreative).
+* Possibly emerging experts and modality effects.
+
+### 3) Integration with shell and services
+
+* Frontend code lives in `modules/insights`.
+* Routes for dashboards/analytics views are part of the global routing configuration (e.g. dedicated `routesInsights.tsx` or central routes file).
+* Data access:
+
+  * Use an Insights service wrapper (`services/insights`) that composes calls to:
+
+    * A kollective service (`services/kollective`) for `/api/kollective/votes/` and any analytics endpoints.
+    * Domain services (`services/ethikos`, `services/keenkonnect`, `services/konnected`, `services/kreative`).
+  * Charts and dashboards should not embed raw `fetch` logic; all aggregation happens in the service layer.
+* All dashboards are rendered in the shared layout and should use the common chart components (line charts, KPI cards, etc.) already present in the shared components bundle.
+
+---
+
+

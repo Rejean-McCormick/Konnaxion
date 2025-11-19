@@ -1,15 +1,15 @@
 export type ThemeId =
-  | "sandstone"
-  | "blueCanvas"
-  | "midnightHarbor"
-  | "deepCurrent"
-  | "sunburst"
-  | "neonCircuit"
-  | "candyCarnival"
-  | "mauveAurora";
+  | 'light'
+  | 'modern'
+  | 'dark'
+  | 'ocean'
+  | 'sunset'
+  | 'cyber'
+  | 'funky'
+  | 'mauveRainbow';
 
 export interface ThemeColors {
-  // Brand + primary
+  // Brand + primary stack
   brand: string;
   primary: string;
   primarySoft: string;
@@ -37,10 +37,6 @@ export interface ThemeColors {
   accent4?: string;
   accent5?: string;
 
-  // Sidebar/menu selection helpers
-  menuSelectedBg?: string;
-  menuSelectedText?: string;
-
   // Optional extras
   brandAccent?: string;
   focusRing?: string;
@@ -54,21 +50,19 @@ export interface ThemeColors {
 
 export interface Theme {
   id: ThemeId;
-  name: string;   // internal / free use
-  label: string;  // what you show in ThemeSwitcher
-  icon: string;   // emoji/icon for ThemeSwitcher
+  name: string;
   isDark: boolean;
   colors: ThemeColors;
 }
 
-export const BRAND_HEX = "#1e6864";
+export const BRAND_HEX = '#1e6864';
 
 export const sharedStatusColors: Pick<
   ThemeColors,
-  "success" | "warning" | "danger" | "info"
+  'success' | 'warning' | 'danger' | 'info'
 > = {
-  success: "#2f9e63", // muted green
-  warning: "#e39b27", // muted amber
-  danger: "#d14444",  // muted red
-  info: "#3b8a86",    // teal-ish info
+  success: '#2f9e63',
+  warning: '#e39b27',
+  danger: '#d14444',
+  info: '#3b8a86',
 };

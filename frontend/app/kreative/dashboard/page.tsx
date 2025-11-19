@@ -23,6 +23,10 @@ import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
 
+// Base URL for the backend API (used for media files)
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+
 type QuickLink = {
   title: string;
   icon: React.ReactNode;
@@ -32,21 +36,33 @@ type QuickLink = {
 /** Featured Project */
 const featuredProject = {
   title: 'Dreamscape: A Visual Journey',
-  imageUrl: 'https://via.placeholder.com/600x300.png?text=Featured+Project',
+  imageUrl: `${API_BASE}/media/kreative/artworks/artwork_0.png`,
 };
 
 /** Inspiration Gallery (carousel) */
 const inspirationGallery = [
-  { id: '1', imageUrl: 'https://via.placeholder.com/600x300.png?text=Art+1' },
-  { id: '2', imageUrl: 'https://via.placeholder.com/600x300.png?text=Art+2' },
-  { id: '3', imageUrl: 'https://via.placeholder.com/600x300.png?text=Art+3' },
-  { id: '4', imageUrl: 'https://via.placeholder.com/600x300.png?text=Art+4' },
+  {
+    id: '1',
+    imageUrl: `${API_BASE}/media/kreative/artworks/artwork_0.png`,
+  },
+  {
+    id: '2',
+    imageUrl: `${API_BASE}/media/kreative/artworks/artwork_1.png`,
+  },
+  {
+    id: '3',
+    imageUrl: `${API_BASE}/media/kreative/artworks/artwork_2.png`,
+  },
+  {
+    id: '4',
+    imageUrl: `${API_BASE}/media/kreative/artworks/default_profile.png`,
+  },
 ];
 
 /** Top Creator */
 const topCreator = {
   name: 'Sophia Rivera',
-  avatar: 'https://via.placeholder.com/80.png?text=S',
+  avatar: `${API_BASE}/media/kreative/artworks/default_profile.png`,
   stats: '48 Projects · 1200 Likes',
 };
 
@@ -118,7 +134,11 @@ export default function KreativeDashboardPage(): JSX.Element {
         {/* Top Creator Spotlight */}
         <Col xs={24} md={8}>
           <Card>
-            <Space direction="vertical" align="center" style={{ width: '100%' }}>
+            <Space
+              direction="vertical"
+              align="center"
+              style={{ width: '100%' }}
+            >
               <Avatar size={80} src={topCreator.avatar} />
               <Title level={4} style={{ margin: 0 }}>
                 {topCreator.name}
@@ -139,7 +159,11 @@ export default function KreativeDashboardPage(): JSX.Element {
                   <img
                     alt={`Art ${item.id}`}
                     src={item.imageUrl}
-                    style={{ width: '100%', height: 300, objectFit: 'cover' }}
+                    style={{
+                      width: '100%',
+                      height: 300,
+                      objectFit: 'cover',
+                    }}
                   />
                 </div>
               ))}
@@ -150,7 +174,11 @@ export default function KreativeDashboardPage(): JSX.Element {
         {/* Quick Links */}
         <Col xs={24} md={8}>
           <Card title="Quick Links">
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space
+              direction="vertical"
+              size="middle"
+              style={{ width: '100%' }}
+            >
               {quickLinks.map((link) => (
                 <Button
                   key={link.title}
@@ -176,7 +204,10 @@ export default function KreativeDashboardPage(): JSX.Element {
               dataSource={recentActivities}
               renderItem={(item) => (
                 <List.Item>
-                  <List.Item.Meta title={item.text} description={item.time} />
+                  <List.Item.Meta
+                    title={item.text}
+                    description={item.time}
+                  />
                 </List.Item>
               )}
             />

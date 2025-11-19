@@ -1,26 +1,45 @@
-// src/theme/index.ts
-import light        from './lightTheme';
-import dark         from './darkTheme';
-import funky        from './funkyTheme';
-import cyber        from './cyberTheme';
-import kktheme      from './kktheme';
-import sunsetTheme  from './sunsetTheme';
-import oceanTheme   from './oceanTheme';
-import minimalTheme from './minimalTheme';
-import modernTheme  from './modernTheme';
+import type { Theme, ThemeId } from "./types";
 
-export const themes = {
-  light,
-  dark,
-  funky,
-  cyber,
-  kktheme,
-  sunsetTheme,
-  oceanTheme,
-  minimalTheme,
-  modernTheme,
-} as const;
+import sandstoneTheme from "./theme01";
+import blueCanvasTheme from "./theme02";
+import midnightHarborTheme from "./theme03";
+import deepCurrentTheme from "./theme04";
+import sunburstTheme from "./theme05";
+import neonCircuitTheme from "./theme06";
+import candyCarnivalTheme from "./theme07";
+import mauveAuroraTheme from "./theme08";
 
-export type ThemeType = keyof typeof themes;
-export const themeKeys = Object.keys(themes) as ThemeType[];
-export default themes;
+export const allThemes: Theme[] = [
+  sandstoneTheme,
+  blueCanvasTheme,
+  midnightHarborTheme,
+  deepCurrentTheme,
+  sunburstTheme,
+  neonCircuitTheme,
+  candyCarnivalTheme,
+  mauveAuroraTheme,
+];
+
+export const defaultTheme = sandstoneTheme;
+
+export const themeById: Record<ThemeId, Theme> = {
+  sandstone: sandstoneTheme,
+  blueCanvas: blueCanvasTheme,
+  midnightHarbor: midnightHarborTheme,
+  deepCurrent: deepCurrentTheme,
+  sunburst: sunburstTheme,
+  neonCircuit: neonCircuitTheme,
+  candyCarnival: candyCarnivalTheme,
+  mauveAurora: mauveAuroraTheme,
+};
+
+export {
+  sandstoneTheme,
+  blueCanvasTheme,
+  midnightHarborTheme,
+  deepCurrentTheme,
+  sunburstTheme,
+  neonCircuitTheme,
+  candyCarnivalTheme,
+  mauveAuroraTheme,
+};
