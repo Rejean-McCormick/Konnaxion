@@ -2,7 +2,13 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import { PageContainer, ProTable } from '@ant-design/pro-components';
+import Link from 'next/link';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+} from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
 import {
   Alert,
@@ -19,11 +25,16 @@ import {
   message,
 } from 'antd';
 import type { RadioChangeEvent } from 'antd';
-import { InfoCircleOutlined, ThunderboltOutlined, SyncOutlined } from '@ant-design/icons';
-import { useRequest } from 'ahooks';
+import {
+  BarChartOutlined,
+  InfoCircleOutlined,
+  ThunderboltOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
+import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
 
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '../../EthikosPageShell';
 import {
   fetchPublicBallots,
   submitPublicVote,
@@ -31,7 +42,7 @@ import {
   type PublicBallotResponse,
 } from '@/services/decide';
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 
 type BallotRow = PublicBallot;
 type QuickFilter = 'all' | 'closing-soon' | 'high-turnout';
@@ -56,8 +67,6 @@ function resolveOptions(ballot: BallotRow): string[] {
 }
 
 export default function PublicVotingPage(): JSX.Element {
-  usePageTitle('Decide · Public Voting');
-
   const [searchTerm, setSearchTerm] = useState('');
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
   const [selectedOptions, setSelectedOptions] = useState<SelectionMap>({});
@@ -67,7 +76,33 @@ export default function PublicVotingPage(): JSX.Element {
     fetchPublicBallots,
   );
 
+  useInterval(refresh, 60_000);
+
   const ballots = data?.ballots ?? [];
+
+  const headerStats = useMemo(
+    () => {
+      const total = ballots.length;
+      const avgTurnout = total
+        ? Math.round(
+            ballots.reduce((sum, b) => sum + (b.turnout ?? 0), 0) / total,
+          )
+        : 0;
+
+      const closingSoon = ballots.filter((ballot) => {
+        const closes = dayjs(ballot.closesAt);
+        if (!closes.isValid()) return false;
+        return closes.diff(dayjs(), 'hour') <= 48;
+      }).length;
+
+      return [
+        { label: 'Active consultations', value: total },
+        { label: 'Avg participation', value: avgTurnout, suffix: '%' },
+        { label: 'Closing ≤ 48h', value: closingSoon },
+      ];
+    },
+    [ballots],
+  );
 
   const filteredBallots = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -250,86 +285,148 @@ export default function PublicVotingPage(): JSX.Element {
   ];
 
   return (
-    <PageContainer ghost loading={loading}>
-      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-        <div>
-          <Title level={2} style={{ marginBottom: 8 }}>
-            Public consultations
-          </Title>
-          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Express your stance with nuance. Each vote is stored as an Ethikos stance
-            (from −3 to +3) and may be weighted by Ekoh for impact analysis.
-          </Paragraph>
-        </div>
-
-        <Alert
-          type="info"
-          showIcon
-          message={
-            <Space>
-              <InfoCircleOutlined />
-              <span>
-                You can adjust your stance at any time while a consultation is open.
-                Results are visible in the Decide · Results Archive and Ethikos · Opinion
-                Analytics.
-              </span>
-            </Space>
-          }
-        />
-
-        <Space wrap>
-          <Input.Search
-            placeholder="Search consultations…"
-            allowClear
-            style={{ width: 280 }}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+    <EthikosPageShell
+      sectionLabel="Decide"
+      title="Public consultations"
+      subtitle={
+        <span>
+          Open consultations where any verified participant can express a nuanced stance on
+          Korum debates. Votes use a −3…+3 stance scale and feed into the Ethikos opinion layer.
+        </span>
+      }
+      primaryAction={
+        <Link href="/ethikos/decide/results" prefetch={false}>
+          <Button type="primary" icon={<BarChartOutlined />}>
+            Open results archive
+          </Button>
+        </Link>
+      }
+      secondaryActions={
+        <Space>
+          <Link href="/ethikos/decide/elite" prefetch={false}>
+            <Button>Switch to elite ballots</Button>
+          </Link>
+          <Link href="/ethikos/decide/methodology" prefetch={false}>
+            <Button icon={<InfoCircleOutlined />}>Voting methodology</Button>
+          </Link>
+        </Space>
+      }
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            message={
+              <Space>
+                <InfoCircleOutlined />
+                <span>
+                  You can adjust your stance at any time while a consultation is open.
+                  Results feed into the Decide · Results Archive and Ethikos · Opinion
+                  Analytics.
+                </span>
+              </Space>
+            }
           />
 
-          <Radio.Group
-            size="small"
-            value={quickFilter}
-            onChange={(e) =>
-              setQuickFilter(e.target.value as QuickFilter)
+          <ProCard gutter={16} wrap>
+            {headerStats.map((stat) => (
+              <StatisticCard
+                key={stat.label}
+                colSpan={{ xs: 24, sm: 8 }}
+                statistic={{
+                  title: stat.label,
+                  value: stat.value,
+                  suffix: stat.suffix,
+                }}
+              />
+            ))}
+          </ProCard>
+
+          <ProCard
+            ghost
+            style={{ marginBottom: 0 }}
+            title="Find an open consultation"
+            extra={
+              <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                Search by title, or focus on consultations that are closing soon or have
+                high participation.
+              </Paragraph>
             }
           >
-            <Radio.Button value="all">All</Radio.Button>
-            <Radio.Button value="closing-soon">Closing soon</Radio.Button>
-            <Radio.Button value="high-turnout">High participation</Radio.Button>
-          </Radio.Group>
+            <Space wrap>
+              <Input.Search
+                placeholder="Search consultations…"
+                allowClear
+                style={{ width: 280 }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
 
-          <Tooltip title="Refresh open consultations">
-            <Button
-              size="small"
-              icon={<SyncOutlined />}
-              onClick={() => refresh()}
-            >
-              Refresh
-            </Button>
-          </Tooltip>
+              <Radio.Group
+                size="small"
+                value={quickFilter}
+                onChange={(e) =>
+                  setQuickFilter(e.target.value as QuickFilter)
+                }
+              >
+                <Radio.Button value="all">All</Radio.Button>
+                <Radio.Button value="closing-soon">Closing soon</Radio.Button>
+                <Radio.Button value="high-turnout">High participation</Radio.Button>
+              </Radio.Group>
+
+              <Tooltip title="Refresh open consultations">
+                <Button
+                  size="small"
+                  icon={<SyncOutlined />}
+                  onClick={() => refresh()}
+                >
+                  Refresh
+                </Button>
+              </Tooltip>
+            </Space>
+          </ProCard>
+
+          {filteredBallots.length === 0 ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                ballots.length === 0
+                  ? 'No open public consultations right now.'
+                  : 'No consultations match your search or filters.'
+              }
+            />
+          ) : (
+            <ProTable<BallotRow>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredBallots}
+              pagination={{ pageSize: PAGE_SIZE }}
+              search={false}
+              options={false}
+              toolBarRender={false}
+            />
+          )}
+
+          <ProCard
+            ghost
+            style={{ marginTop: 16 }}
+            title="Where to go next"
+          >
+            <Space wrap>
+              <Button href="/ethikos/decide/elite">
+                View elite ballots
+              </Button>
+              <Button href="/ethikos/decide/results" icon={<BarChartOutlined />}>
+                Results archive
+              </Button>
+              <Button href="/ethikos/insights">
+                Opinion analytics
+              </Button>
+            </Space>
+          </ProCard>
         </Space>
-
-        {filteredBallots.length === 0 ? (
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description={
-              ballots.length === 0
-                ? 'No open public consultations right now.'
-                : 'No consultations match your search or filters.'
-            }
-          />
-        ) : (
-          <ProTable<BallotRow>
-            rowKey="id"
-            columns={columns}
-            dataSource={filteredBallots}
-            pagination={{ pageSize: PAGE_SIZE }}
-            search={false}
-            options={false}
-            toolBarRender={false}
-          />
-        )}
-      </Space>
-    </PageContainer>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }

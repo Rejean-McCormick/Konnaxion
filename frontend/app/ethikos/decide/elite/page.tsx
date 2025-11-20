@@ -1,4 +1,9 @@
 // app/ethikos/decide/elite/page.tsx
+// Updated implementation for the Elite ballots page.
+// Source (original dump): app/ethikos/decide/elite/page.tsx 
+// Services: fetchEliteBallots (services/decide.ts) 
+// Services: fetchTopicPreview / types (services/deliberate.ts)
+
 'use client';
 
 import React from 'react';
@@ -28,7 +33,6 @@ import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
 
 import EthikosPageShell from '../../EthikosPageShell';
-import usePageTitle from '@/hooks/usePageTitle';
 import { fetchEliteBallots } from '@/services/decide';
 import { fetchTopicPreview, type TopicPreviewResponse } from '@/services/deliberate';
 import type { Ballot } from '@/types';
@@ -40,11 +44,9 @@ type Preview = TopicPreviewResponse;
 const { Paragraph, Title } = Typography;
 
 export default function EliteBallots(): JSX.Element {
-  usePageTitle('Decide · Elite Ballots');
-
   // Data: open elite ballots
   const { data, loading, refresh } = useRequest<{ ballots: Row[] }, []>(fetchEliteBallots);
-  useInterval(refresh, 60_000); // refresh every 60s
+  useInterval(refresh, 60_000); // auto-refresh every 60s
 
   const ballots = data?.ballots ?? [];
 
@@ -76,9 +78,7 @@ export default function EliteBallots(): JSX.Element {
     const total = ballots.length;
     const avgTurnout =
       total > 0
-        ? Math.round(
-            ballots.reduce((sum, b) => sum + (b.turnout ?? 0), 0) / total,
-          )
+        ? Math.round(ballots.reduce((sum, b) => sum + (b.turnout ?? 0), 0) / total)
         : 0;
     const closingSoon = ballots.filter((b) => dayjs(b.closesAt).diff(dayjs(), 'hour') <= 24).length;
 
@@ -114,6 +114,7 @@ export default function EliteBallots(): JSX.Element {
         title: 'Title',
         dataIndex: 'title',
         width: 320,
+        ellipsis: true,
         render: (_dom, row) => (
           <Button type="link" onClick={() => openPreview(row)} style={{ padding: 0 }}>
             {row.title}
@@ -130,12 +131,8 @@ export default function EliteBallots(): JSX.Element {
           const hoursLeft = closes.diff(now, 'hour');
           const isClosed = closes.isBefore(now);
 
-          if (isClosed) {
-            return <Tag>Closed</Tag>;
-          }
-          if (hoursLeft <= 24) {
-            return <Tag color="red">Closing soon</Tag>;
-          }
+          if (isClosed) return <Tag>Closed</Tag>;
+          if (hoursLeft <= 24) return <Tag color="red">Closing soon</Tag>;
           return <Tag color="green">Open</Tag>;
         },
       },
@@ -260,6 +257,7 @@ export default function EliteBallots(): JSX.Element {
             dataSource={filteredBallots}
             pagination={{ pageSize: 8 }}
             search={false}
+            options={false}
             toolBarRender={() => [
               <Segmented
                 key="view"

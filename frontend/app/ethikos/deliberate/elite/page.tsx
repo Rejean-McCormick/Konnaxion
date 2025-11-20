@@ -2,6 +2,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import {
   PageContainer,
   ProCard,
@@ -22,12 +23,12 @@ import {
   Tooltip,
   message as antdMessage,
 } from 'antd';
-import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined, FireOutlined, ReadOutlined } from '@ant-design/icons';
 import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '../../EthikosPageShell';
 import { fetchEliteTopics, createEliteTopic, fetchTopicPreview } from '@/services/deliberate';
 import type { Topic } from '@/types';
 
@@ -40,7 +41,7 @@ dayjs.extend(relativeTime);
 interface TopicRow extends Topic {
   createdAt: string;
   lastActivity: string;
-  hot: boolean;        // calculé côté serveur
+  hot: boolean; // calculé côté serveur
   stanceCount: number; // utilisé par KPI et la colonne
 }
 
@@ -75,8 +76,6 @@ const useEliteService = () =>
 /* ------------------------------------------------------------------ */
 
 export default function EliteAgora(): JSX.Element {
-  usePageTitle('Deliberate · Elite Agora');
-
   /* ---------- data ---------- */
   const eliteService = useEliteService();
   // useRequest attend 2 génériques <TData, TParams>. Le service n’a pas de params → [].
@@ -185,102 +184,118 @@ export default function EliteAgora(): JSX.Element {
 
   /* ---------- rendu ---------- */
   return (
-    <PageContainer
-      ghost
-      loading={loading}
-      extra={
-        <Space>
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={refresh}
-            type="text"
-            title="Refresh list"
-          />
-          <NewTopicButton onCreated={refresh} />
-        </Space>
+    <EthikosPageShell
+      title="Deliberate · Elite Agora"
+      metaTitle="Deliberate · Elite Agora"
+      subtitle={
+        <span>
+          Expert‑only structured debates in Korum that use the −3…+3 stance scale and Ekoh expert
+          quorum rules before surfacing aggregated results.
+        </span>
+      }
+      primaryAction={
+        <Link href="/ethikos/deliberate/guidelines" prefetch={false}>
+          <Button icon={<ReadOutlined />}>Participation guidelines</Button>
+        </Link>
       }
     >
-      {/* Context block: aligné avec la spec v14 (échelle -3…+3, quorum 12 experts) */}
-      <ProCard ghost style={{ marginBottom: 16 }}>
-        <Alert
-          type="info"
-          showIcon
-          message="Elite agora – expert‑only debates"
-          description={
-            <>
-              <div>
-                Stances use the seven‑level nuance scale from −3 (“strongly against”)
-                to +3 (“strongly for”), 0 = neutral.
-              </div>
-              <div>
-                Aggregated results are only surfaced once at least 12 distinct experts
-                have contributed on a topic (Ekoh &gt; 75th percentile in their domain).
-              </div>
-            </>
-          }
-        />
-      </ProCard>
-
-      {/* KPI summary */}
-      <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
-        {headerStats.map((k) => (
-          <StatisticCard
-            key={k.label}
-            colSpan={{ xs: 24, sm: 8 }}
-            statistic={{ title: k.label, value: k.value }}
-          />
-        ))}
-      </ProCard>
-
-      {/* Liste principale */}
-      <ProTable<TopicRow>
-        rowKey="id"
-        columns={columns}
-        dataSource={data?.list}
-        search={{ labelWidth: 90, filterType: 'light' }}
-        pagination={{ pageSize: 10 }}
-      />
-
-      {/* Preview drawer */}
-      <Drawer
-        width={520}
-        open={!!previewId}
-        onClose={() => setPreviewId(null)}
-        title={preview?.title || 'Preview'}
-      >
-        {previewLoading ? (
-          <Empty description="Loading…" />
-        ) : preview ? (
-          <>
-            <p>
-              <strong>Category:</strong> {preview.category}
-            </p>
-            <p>
-              <strong>Opened:</strong>{' '}
-              {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
-            </p>
-            <h4>Latest statements</h4>
-            <ul>
-              {preview.latest.map((s) => (
-                <li key={s.id}>
-                  <em>{s.author}</em> — {s.body}
-                </li>
-              ))}
-            </ul>
+      <PageContainer
+        ghost
+        loading={loading}
+        extra={
+          <Space>
             <Button
-              type="primary"
-              onClick={() =>
-                window.location.assign(`/ethikos/deliberate/${preview.id}`)
-              }
-            >
-              Go to thread →
-            </Button>
-          </>
-        ) : (
-          <Empty />
-        )}
-      </Drawer>
-    </PageContainer>
+              icon={<ReloadOutlined />}
+              onClick={refresh}
+              type="text"
+              title="Refresh list"
+            />
+            <NewTopicButton onCreated={refresh} />
+          </Space>
+        }
+      >
+        {/* Context block: aligné avec la spec v14 (échelle -3…+3, quorum 12 experts) */}
+        <ProCard ghost style={{ marginBottom: 16 }}>
+          <Alert
+            type="info"
+            showIcon
+            message="Elite agora – expert‑only debates"
+            description={
+              <>
+                <div>
+                  Stances use the seven‑level nuance scale from −3 (“strongly against”) to +3
+                  (“strongly for”), 0 = neutral.
+                </div>
+                <div>
+                  Aggregated results are only surfaced once at least 12 distinct experts have
+                  contributed on a topic (Ekoh &gt; 75th percentile in their domain).
+                </div>
+              </>
+            }
+          />
+        </ProCard>
+
+        {/* KPI summary */}
+        <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+          {headerStats.map((k) => (
+            <StatisticCard
+              key={k.label}
+              colSpan={{ xs: 24, sm: 8 }}
+              statistic={{ title: k.label, value: k.value }}
+            />
+          ))}
+        </ProCard>
+
+        {/* Liste principale */}
+        <ProTable<TopicRow>
+          rowKey="id"
+          columns={columns}
+          dataSource={data?.list}
+          search={{ labelWidth: 90, filterType: 'light' }}
+          pagination={{ pageSize: 10 }}
+        />
+
+        {/* Preview drawer */}
+        <Drawer
+          width={520}
+          open={!!previewId}
+          onClose={() => setPreviewId(null)}
+          title={preview?.title || 'Preview'}
+        >
+          {previewLoading ? (
+            <Empty description="Loading…" />
+          ) : preview ? (
+            <>
+              <p>
+                <strong>Category:</strong> {preview.category}
+              </p>
+              <p>
+                <strong>Opened:</strong>{' '}
+                {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+              </p>
+              <h4>Latest statements</h4>
+              <ul>
+                {preview.latest.map((s) => (
+                  <li key={s.id}>
+                    <em>{s.author}</em> — {s.body}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                type="primary"
+                onClick={() =>
+                  window.location.assign(`/ethikos/deliberate/${preview.id}`)
+                }
+              >
+                Go to thread →
+              </Button>
+            </>
+          ) : (
+            <Empty />
+          )}
+        </Drawer>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 

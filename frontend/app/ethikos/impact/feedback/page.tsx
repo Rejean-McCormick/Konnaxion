@@ -1,15 +1,19 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRequest } from 'ahooks';
 
-import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Comment } from '@ant-design/compatible';
 import {
-  Button,
+  PageContainer,
+  ProCard,
+  ProForm,
+  ProFormTextArea,
+} from '@ant-design/pro-components';
+import {
+  Comment,
   Divider,
   Empty,
-  Input,
+  Form,
   List,
   Rate,
   Space,
@@ -18,6 +22,7 @@ import {
   message,
 } from 'antd';
 
+import EthikosPageShell from '../../EthikosPageShell';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchFeedback, submitFeedback, type FeedbackItem } from '@/services/impact';
 
@@ -27,13 +32,17 @@ type FeedbackResponse = {
   items: FeedbackItem[];
 };
 
+type FeedbackFormValues = {
+  body: string;
+  rating?: number;
+};
+
 export default function FeedbackLoops(): JSX.Element {
   usePageTitle('Impact · Feedback');
 
+  const [form] = Form.useForm<FeedbackFormValues>();
+
   const { data, loading, refresh } = useRequest<FeedbackResponse, []>(fetchFeedback);
-  const [feedback, setFeedback] = useState('');
-  const [stars, setStars] = useState<number>(0);
-  const [sending, setSending] = useState(false);
 
   const items = data?.items ?? [];
 
@@ -47,17 +56,19 @@ export default function FeedbackLoops(): JSX.Element {
     return Number((total / withRatings.length).toFixed(1));
   }, [items]);
 
-  const handleSubmit = async () => {
-    const trimmed = feedback.trim();
-    if (!trimmed) return;
+  const handleFinish = async (values: FeedbackFormValues): Promise<boolean> => {
+    const trimmed = values.body?.trim();
+    if (!trimmed) {
+      message.warning('Please enter your feedback before submitting.');
+      return false;
+    }
 
-    setSending(true);
     try {
-      await submitFeedback({ body: trimmed, rating: stars || undefined });
-      setFeedback('');
-      setStars(0);
+      await submitFeedback({ body: trimmed, rating: values.rating || undefined });
+      form.resetFields();
       await refresh();
       message.success('Thanks, your feedback has been recorded.');
+      return true;
     } catch (err) {
       const rawMessage =
         err instanceof Error ? err.message : 'Unable to submit feedback. Please try again.';
@@ -67,103 +78,125 @@ export default function FeedbackLoops(): JSX.Element {
           ? 'The feedback channel is not configured yet. Please contact an administrator.'
           : rawMessage;
       message.error(friendly);
-    } finally {
-      setSending(false);
+      return false;
     }
   };
 
   return (
-    <PageContainer ghost loading={loading}>
-      <ProCard title="Share your feedback" ghost>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            This channel closes the feedback loop for the Ethikos module. Tell us what worked,
-            what felt confusing, or what is missing. Please avoid sharing personal or sensitive
-            data.
-          </Paragraph>
+    <EthikosPageShell
+      title="Feedback loop"
+      sectionLabel="Impact"
+      subtitle="Share how Ethikos works (or doesn’t) for you. Feedback is stored as anonymised arguments on a dedicated topic."
+    >
+      <PageContainer ghost loading={loading}>
+        <ProCard title="Share your feedback" ghost>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+              This channel closes the feedback loop for the Ethikos module. Tell us what worked,
+              what felt confusing, or what is missing. Please avoid sharing personal or sensitive
+              data.
+            </Paragraph>
 
-          <div>
-            <Text strong>Overall experience</Text>
-            <div>
-              <Rate onChange={setStars} value={stars} />
-            </div>
-          </div>
-
-          <Input.TextArea
-            rows={4}
-            placeholder="Share a concrete story, suggestion or pain point…"
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-          />
-
-          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-            <Text type="secondary">
-              Feedback becomes an anonymised argument in a dedicated Ethikos topic.
-            </Text>
-            <Button
-              type="primary"
-              onClick={handleSubmit}
-              loading={sending}
-              disabled={!feedback.trim()}
+            <ProForm<FeedbackFormValues>
+              form={form}
+              layout="vertical"
+              onFinish={handleFinish}
+              submitter={{
+                searchConfig: {
+                  submitText: 'Submit feedback',
+                },
+                render: (_props, dom) => (
+                  <Space
+                    style={{
+                      width: '100%',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text type="secondary">
+                      Feedback becomes an anonymised argument in a dedicated Ethikos topic.
+                    </Text>
+                    <Space>{dom}</Space>
+                  </Space>
+                ),
+              }}
             >
-              Submit feedback
-            </Button>
-          </Space>
-        </Space>
-      </ProCard>
+              <Form.Item
+                label="Overall experience"
+                name="rating"
+                valuePropName="value"
+              >
+                <Rate />
+              </Form.Item>
 
-      <ProCard
-        title="Community feedback"
-        ghost
-        style={{ marginTop: 24 }}
-        extra={
-          items.length ? (
-            <Space size="middle">
-              <Tag>{items.length} entries</Tag>
-              {typeof averageRating === 'number' && (
-                <Space size={4}>
-                  <Text type="secondary">Avg. rating</Text>
-                  <Rate disabled allowHalf value={averageRating} />
-                  <Text type="secondary">{averageRating.toFixed(1)}/5</Text>
-                </Space>
-              )}
-            </Space>
-          ) : null
-        }
-      >
-        {items.length ? (
-          <>
-            <List
-              itemLayout="horizontal"
-              dataSource={items}
-              renderItem={(f) => (
-                <li key={f.id}>
-                  <Comment
-                    author={f.author}
-                    datetime={f.createdAt}
-                    content={
-                      <>
-                        {typeof f.rating === 'number' && (
-                          <div style={{ marginBottom: 4 }}>
-                            <Rate disabled value={f.rating} />
-                          </div>
-                        )}
-                        <Paragraph style={{ marginBottom: 0 }}>{f.body}</Paragraph>
-                      </>
-                    }
-                  />
-                </li>
-              )}
-            />
-            <Divider style={{ marginTop: 16, marginBottom: 0 }} />
-            <Text type="secondary">
-              Older feedback is kept as part of the impact audit trail.
-            </Text>
-          </>
-        ) : (
-          <Empty description="No feedback yet. Be the first to share how Ethikos works for you." />
-        )}
-      </ProCard>
-    </PageContainer>
+              <ProFormTextArea
+                name="body"
+                label="Your feedback"
+                placeholder="Share a concrete story, suggestion or pain point…"
+                fieldProps={{ rows: 4 }}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter your feedback.',
+                  },
+                ]}
+              />
+            </ProForm>
+          </Space>
+        </ProCard>
+
+        <ProCard
+          title="Community feedback"
+          ghost
+          style={{ marginTop: 24 }}
+          extra={
+            items.length ? (
+              <Space size="middle">
+                <Tag>{items.length} entries</Tag>
+                {typeof averageRating === 'number' && (
+                  <Space size={4}>
+                    <Text type="secondary">Avg. rating</Text>
+                    <Rate disabled allowHalf value={averageRating} />
+                    <Text type="secondary">{averageRating.toFixed(1)}/5</Text>
+                  </Space>
+                )}
+              </Space>
+            ) : null
+          }
+        >
+          {items.length ? (
+            <>
+              <List
+                itemLayout="horizontal"
+                dataSource={items}
+                renderItem={(f) => (
+                  <li key={f.id}>
+                    <Comment
+                      author={f.author}
+                      datetime={f.createdAt}
+                      content={
+                        <>
+                          {typeof f.rating === 'number' && (
+                            <div style={{ marginBottom: 4 }}>
+                              <Rate disabled value={f.rating} />
+                            </div>
+                          )}
+                          <Paragraph style={{ marginBottom: 0 }}>{f.body}</Paragraph>
+                        </>
+                      }
+                    />
+                  </li>
+                )}
+              />
+              <Divider style={{ marginTop: 16, marginBottom: 0 }} />
+              <Text type="secondary">
+                Older feedback is kept as part of the impact audit trail.
+              </Text>
+            </>
+          ) : (
+            <Empty description="No feedback yet. Be the first to share how Ethikos works for you." />
+          )}
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }

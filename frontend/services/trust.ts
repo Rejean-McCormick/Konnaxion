@@ -14,6 +14,11 @@ export interface ReputationProfile {
   score: number
   dimensions: ReputationDimension[]
   recent: { label: string; change: number }[]
+
+  /** Identity info derived from /users/me/ so UIs can show name + avatar */
+  username?: string
+  displayName?: string
+  avatarUrl?: string | null
 }
 
 export interface Badge {
@@ -31,11 +36,17 @@ export interface Credential {
   url?: string
 }
 
+/**
+ * Shape of /users/me/ coming from the backend.
+ * avatar_url / picture are optional and can be wired later on the server.
+ */
 interface UserMeApi {
   username: string
   name: string | null
   email: string
   url: string
+  avatar_url?: string | null
+  picture?: string | null
 }
 
 interface EthikosStanceApi {
@@ -85,6 +96,8 @@ export async function fetchUserProfile(): Promise<ReputationProfile> {
   ])
 
   const username = me.username
+  const displayName = me.name ?? me.username
+  const avatarUrl = me.avatar_url ?? me.picture ?? null
 
   const myStances = stances.filter((s) => s.user === username)
   const myArguments = args.filter((a) => a.user === username)
@@ -101,8 +114,7 @@ export async function fetchUserProfile(): Promise<ReputationProfile> {
 
   const stanceDates = myStances.map((s) => s.timestamp)
   const recentStances = countLastDays(stanceDates, 30)
-  const previousStances =
-    countLastDays(stanceDates, 60) - recentStances
+  const previousStances = countLastDays(stanceDates, 60) - recentStances
 
   const recent: { label: string; change: number }[] = [
     {
@@ -145,6 +157,9 @@ export async function fetchUserProfile(): Promise<ReputationProfile> {
     score,
     dimensions,
     recent,
+    username,
+    displayName,
+    avatarUrl,
   }
 }
 

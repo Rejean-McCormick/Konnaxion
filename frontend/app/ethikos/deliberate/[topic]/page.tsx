@@ -7,6 +7,7 @@ import {
   Alert,
   Button,
   Card,
+  Comment,
   Divider,
   Empty,
   Input,
@@ -21,13 +22,12 @@ import {
   Typography,
   message,
 } from 'antd';
-import { Comment } from '@ant-design/compatible';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchTopicDetail,
   fetchTopicPreview,
@@ -182,8 +182,6 @@ export default function TopicThreadPage() {
       ? topicParam[0]
       : undefined;
 
-  usePageTitle('Deliberate · Thread');
-
   // Topic meta (title, category, opened at, latest)
   const {
     data: preview,
@@ -300,309 +298,326 @@ export default function TopicThreadPage() {
 
   if (!topicId) {
     return (
-      <PageContainer ghost>
-        <Empty description="No topic specified" />
-      </PageContainer>
+      <EthikosPageShell
+        title="Deliberation thread"
+        sectionLabel="Deliberate"
+        subtitle="Nuanced stance‑taking and structured arguments on a single question."
+      >
+        <PageContainer ghost>
+          <Empty description="No topic specified" />
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
+  const shellTitle = preview?.title ?? 'Deliberation thread';
+  const shellSubtitle = preview
+    ? 'Nuanced stance‑taking and structured arguments on this topic.'
+    : 'Nuanced stance‑taking and structured arguments on a single question.';
+
   return (
-    <PageContainer ghost loading={loadingPreview && !preview}>
-      {preview ? (
-        <>
-          <Title level={3} style={{ marginTop: 0 }}>
-            {preview.title}
-          </Title>
-          <Paragraph type="secondary" style={{ marginBottom: 24 }}>
-            {preview.category ? `${preview.category} · ` : ''}
-            {preview.createdAt ? dayjs(preview.createdAt).fromNow() : null}
-          </Paragraph>
+    <EthikosPageShell
+      title={shellTitle}
+      sectionLabel="Deliberate"
+      subtitle={shellSubtitle}
+    >
+      <PageContainer ghost loading={loadingPreview && !preview}>
+        {preview ? (
+          <>
+            <Title level={3} style={{ marginTop: 0 }}>
+              {preview.title}
+            </Title>
+            <Paragraph type="secondary" style={{ marginBottom: 24 }}>
+              {preview.category ? `${preview.category} · ` : ''}
+              {preview.createdAt ? dayjs(preview.createdAt).fromNow() : null}
+            </Paragraph>
 
-          <ProCard gutter={16} wrap>
-            {/* Left column: stance capture + summary */}
-            <ProCard colSpan={{ xs: 24, md: 8 }} bordered split="horizontal">
-              <ProCard title="Your stance" bordered={false}>
-                <Paragraph type="secondary">
-                  Use the scale below to register how strongly you are for or against this topic.
-                  You can update your stance as the debate evolves.
-                </Paragraph>
+            <ProCard gutter={16} wrap>
+              {/* Left column: stance capture + summary */}
+              <ProCard colSpan={{ xs: 24, md: 8 }} bordered split="horizontal">
+                <ProCard title="Your stance" bordered={false}>
+                  <Paragraph type="secondary">
+                    Use the scale below to register how strongly you are for or against this topic.
+                    You can update your stance as the debate evolves.
+                  </Paragraph>
 
-                <div style={{ marginTop: 16 }}>
-                  <Slider
-                    min={-3}
-                    max={3}
-                    step={1}
-                    dots
-                    marks={sliderMarks}
-                    value={stanceValue}
-                    tooltip={{
-                      formatter: (v) =>
-                        typeof v === 'number' ? stanceLabel(v) : '',
-                    }}
-                    onChange={(v) => setStanceValue(v as number)}
-                  />
+                  <div style={{ marginTop: 16 }}>
+                    <Slider
+                      min={-3}
+                      max={3}
+                      step={1}
+                      dots
+                      marks={sliderMarks}
+                      value={stanceValue}
+                      tooltip={{
+                        formatter: (v) =>
+                          typeof v === 'number' ? stanceLabel(v) : '',
+                      }}
+                      onChange={(v) => setStanceValue(v as number)}
+                    />
+                    <Space
+                      style={{
+                        marginTop: 8,
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}
+                    >
+                      <Text type="secondary">Strongly against</Text>
+                      <Text type="secondary">Neutral</Text>
+                      <Text type="secondary">Strongly for</Text>
+                    </Space>
+
+                    <Paragraph style={{ marginTop: 8 }}>
+                      Current selection:{' '}
+                      <Text strong>{stanceLabel(stanceValue)}</Text>
+                    </Paragraph>
+
+                    <Space style={{ marginTop: 8 }}>
+                      <Button
+                        type="primary"
+                        onClick={handleSubmitStance}
+                        loading={savingStance}
+                      >
+                        Save stance
+                      </Button>
+                      <Button
+                        onClick={() => setStanceValue(0)}
+                        disabled={savingStance}
+                      >
+                        Reset to neutral
+                      </Button>
+                    </Space>
+
+                    <Alert
+                      style={{ marginTop: 16 }}
+                      type="info"
+                      showIcon
+                      message="One stance per topic"
+                      description="You can adjust your position at any time; only your latest stance is used in the consensus."
+                    />
+                  </div>
+                </ProCard>
+
+                <ProCard title="Collective stance" bordered={false}>
+                  <Paragraph type="secondary">
+                    Snapshot of all recorded stances on this topic.
+                  </Paragraph>
+
                   <Space
-                    style={{
-                      marginTop: 8,
-                      justifyContent: 'space-between',
-                      width: '100%',
-                    }}
+                    size="large"
+                    style={{ marginTop: 16, flexWrap: 'wrap' }}
                   >
-                    <Text type="secondary">Strongly against</Text>
-                    <Text type="secondary">Neutral</Text>
-                    <Text type="secondary">Strongly for</Text>
+                    <Statistic
+                      title="Participants"
+                      value={stanceStats.total}
+                      loading={loadingStances}
+                    />
+                    <Statistic
+                      title="Average stance"
+                      value={stanceStats.average}
+                      precision={2}
+                      loading={loadingStances}
+                    />
+                    <Statistic
+                      title="For / Against balance"
+                      value={
+                        stanceStats.total > 0
+                          ? Math.round(
+                              (1 -
+                                Math.abs(
+                                  stanceStats.positive - stanceStats.negative,
+                                ) /
+                                  stanceStats.total) *
+                                100,
+                            )
+                          : 100
+                      }
+                      suffix="%"
+                      loading={loadingStances}
+                    />
                   </Space>
 
-                  <Paragraph style={{ marginTop: 8 }}>
-                    Current selection:{' '}
-                    <Text strong>{stanceLabel(stanceValue)}</Text>
+                  <Divider />
+
+                  {stanceStats.total > 0 ? (
+                    <Space
+                      direction="vertical"
+                      style={{ width: '100%' }}
+                      size="small"
+                    >
+                      <div>
+                        <Text>For</Text>
+                        <Progress
+                          percent={Math.round(
+                            (stanceStats.positive / stanceStats.total) * 100,
+                          )}
+                          showInfo
+                        />
+                      </div>
+                      <div>
+                        <Text>Neutral</Text>
+                        <Progress
+                          percent={Math.round(
+                            (stanceStats.neutral / stanceStats.total) * 100,
+                          )}
+                          showInfo
+                        />
+                      </div>
+                      <div>
+                        <Text>Against</Text>
+                        <Progress
+                          percent={Math.round(
+                            (stanceStats.negative / stanceStats.total) * 100,
+                          )}
+                          showInfo
+                        />
+                      </div>
+
+                      <Paragraph style={{ marginTop: 8 }}>
+                        <Tag color="geekblue">−3 … +3 scale</Tag>{' '}
+                        <Text type="secondary">
+                          0 = neutral; negative values = against; positive values
+                          = for.
+                        </Text>
+                      </Paragraph>
+                    </Space>
+                  ) : (
+                    <Empty
+                      description="No stances recorded yet"
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      style={{ marginTop: 16 }}
+                    />
+                  )}
+                </ProCard>
+              </ProCard>
+
+              {/* Right column: debate thread + contribution form */}
+              <ProCard colSpan={{ xs: 24, md: 16 }} bordered split="horizontal">
+                <ProCard title="Debate thread" bordered={false}>
+                  {detail?.statements?.length ? (
+                    <Tabs
+                      defaultActiveKey="timeline"
+                      items={[
+                        {
+                          key: 'timeline',
+                          label: 'Timeline',
+                          children: (
+                            <Timeline
+                              items={detail.statements.map((s) => ({
+                                key: s.id,
+                                children: <StatementTimelineItem statement={s} />,
+                              }))}
+                            />
+                          ),
+                        },
+                        {
+                          key: 'list',
+                          label: 'List view',
+                          children: (
+                            <List<Statement>
+                              dataSource={sortedStatements}
+                              loading={loadingDetail && !detail}
+                              locale={{
+                                emptyText: (
+                                  <Empty description="No arguments yet" />
+                                ),
+                              }}
+                              renderItem={(s) => (
+                                <li key={s.id}>
+                                  <Comment
+                                    author={s.author}
+                                    datetime={dayjs(s.createdAt).fromNow()}
+                                    content={
+                                      <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
+                                        {s.body}
+                                      </Paragraph>
+                                    }
+                                  />
+                                </li>
+                              )}
+                            />
+                          ),
+                        },
+                      ]}
+                    />
+                  ) : loadingDetail ? (
+                    <Card loading />
+                  ) : (
+                    <Empty description="No arguments yet" />
+                  )}
+                </ProCard>
+
+                <ProCard title="Add an argument" bordered={false}>
+                  <Paragraph type="secondary">
+                    Contribute a concise, evidence-based argument. Links and
+                    sources are encouraged; personal attacks are not allowed.
                   </Paragraph>
+
+                  <TextArea
+                    rows={4}
+                    placeholder="Write your argument…"
+                    value={newArgument}
+                    onChange={(e) => setNewArgument(e.target.value)}
+                    style={{ marginTop: 8 }}
+                  />
 
                   <Space style={{ marginTop: 8 }}>
                     <Button
                       type="primary"
-                      onClick={handleSubmitStance}
-                      loading={savingStance}
+                      onClick={handleSubmitArgument}
+                      loading={savingArgument}
+                      disabled={!newArgument.trim()}
                     >
-                      Save stance
+                      Post argument
                     </Button>
                     <Button
-                      onClick={() => setStanceValue(0)}
-                      disabled={savingStance}
+                      onClick={() => setNewArgument('')}
+                      disabled={savingArgument || !newArgument}
                     >
-                      Reset to neutral
+                      Clear
                     </Button>
                   </Space>
 
-                  <Alert
-                    style={{ marginTop: 16 }}
-                    type="info"
-                    showIcon
-                    message="One stance per topic"
-                    description="You can adjust your position at any time; only your latest stance is used in the consensus."
-                  />
-                </div>
-              </ProCard>
-
-              <ProCard title="Collective stance" bordered={false}>
-                <Paragraph type="secondary">
-                  Snapshot of all recorded stances on this topic.
-                </Paragraph>
-
-                <Space
-                  size="large"
-                  style={{ marginTop: 16, flexWrap: 'wrap' }}
-                >
-                  <Statistic
-                    title="Participants"
-                    value={stanceStats.total}
-                    loading={loadingStances}
-                  />
-                  <Statistic
-                    title="Average stance"
-                    value={stanceStats.average}
-                    precision={2}
-                    loading={loadingStances}
-                  />
-                  <Statistic
-                    title="For / Against balance"
-                    value={
-                      stanceStats.total > 0
-                        ? Math.round(
-                            (1 -
-                              Math.abs(
-                                stanceStats.positive - stanceStats.negative,
-                              ) /
-                                stanceStats.total) *
-                              100,
-                          )
-                        : 100
-                    }
-                    suffix="%"
-                    loading={loadingStances}
-                  />
-                </Space>
-
-                <Divider />
-
-                {stanceStats.total > 0 ? (
-                  <Space
-                    direction="vertical"
-                    style={{ width: '100%' }}
-                    size="small"
-                  >
-                    <div>
-                      <Text>For</Text>
-                      <Progress
-                        percent={Math.round(
-                          (stanceStats.positive / stanceStats.total) * 100,
-                        )}
-                        showInfo
-                      />
-                    </div>
-                    <div>
-                      <Text>Neutral</Text>
-                      <Progress
-                        percent={Math.round(
-                          (stanceStats.neutral / stanceStats.total) * 100,
-                        )}
-                        showInfo
-                      />
-                    </div>
-                    <div>
-                      <Text>Against</Text>
-                      <Progress
-                        percent={Math.round(
-                          (stanceStats.negative / stanceStats.total) * 100,
-                        )}
-                        showInfo
-                      />
-                    </div>
-
-                    <Paragraph style={{ marginTop: 8 }}>
-                      <Tag color="geekblue">−3 … +3 scale</Tag>{' '}
-                      <Text type="secondary">
-                        0 = neutral; negative values = against; positive values
-                        = for.
-                      </Text>
-                    </Paragraph>
-                  </Space>
-                ) : (
-                  <Empty
-                    description="No stances recorded yet"
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    style={{ marginTop: 16 }}
-                  />
-                )}
+                  <Paragraph style={{ marginTop: 8 }}>
+                    <Text type="secondary">
+                      Reminder: arguments that are off-topic or abusive may be
+                      hidden after repeated reports.
+                    </Text>
+                  </Paragraph>
+                </ProCard>
               </ProCard>
             </ProCard>
 
-            {/* Right column: debate thread + contribution form */}
-            <ProCard colSpan={{ xs: 24, md: 16 }} bordered split="horizontal">
-              <ProCard title="Debate thread" bordered={false}>
-                {detail?.statements?.length ? (
-                  <Tabs
-                    defaultActiveKey="timeline"
-                    items={[
-                      {
-                        key: 'timeline',
-                        label: 'Timeline',
-                        children: (
-                          <Timeline
-                            items={detail.statements.map((s) => ({
-                              key: s.id,
-                              children: <StatementTimelineItem statement={s} />,
-                            }))}
-                          />
-                        ),
-                      },
-                      {
-                        key: 'list',
-                        label: 'List view',
-                        children: (
-                          <List<Statement>
-                            dataSource={sortedStatements}
-                            loading={loadingDetail && !detail}
-                            locale={{
-                              emptyText: (
-                                <Empty description="No arguments yet" />
-                              ),
-                            }}
-                            renderItem={(s) => (
-                              <li key={s.id}>
-                                <Comment
-                                  author={s.author}
-                                  datetime={dayjs(s.createdAt).fromNow()}
-                                  content={
-                                    <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
-                                      {s.body}
-                                    </Paragraph>
-                                  }
-                                />
-                              </li>
-                            )}
-                          />
-                        ),
-                      },
-                    ]}
-                  />
-                ) : loadingDetail ? (
-                  <Card loading />
-                ) : (
-                  <Empty description="No arguments yet" />
-                )}
-              </ProCard>
-
-              <ProCard title="Add an argument" bordered={false}>
-                <Paragraph type="secondary">
-                  Contribute a concise, evidence-based argument. Links and
-                  sources are encouraged; personal attacks are not allowed.
-                </Paragraph>
-
-                <TextArea
-                  rows={4}
-                  placeholder="Write your argument…"
-                  value={newArgument}
-                  onChange={(e) => setNewArgument(e.target.value)}
-                  style={{ marginTop: 8 }}
+            {/* Optional quick glance at the last few statements from the preview */}
+            {preview.latest?.length ? (
+              <Card
+                title="Latest highlights"
+                style={{ marginTop: 24 }}
+                bodyStyle={{ padding: 0 }}
+              >
+                <List
+                  dataSource={preview.latest}
+                  renderItem={(s) => (
+                    <li key={s.id}>
+                      <Comment
+                        author={s.author}
+                        content={
+                          <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
+                            {s.body}
+                          </Paragraph>
+                        }
+                      />
+                    </li>
+                  )}
                 />
-
-                <Space style={{ marginTop: 8 }}>
-                  <Button
-                    type="primary"
-                    onClick={handleSubmitArgument}
-                    loading={savingArgument}
-                    disabled={!newArgument.trim()}
-                  >
-                    Post argument
-                  </Button>
-                  <Button
-                    onClick={() => setNewArgument('')}
-                    disabled={savingArgument || !newArgument}
-                  >
-                    Clear
-                  </Button>
-                </Space>
-
-                <Paragraph style={{ marginTop: 8 }}>
-                  <Text type="secondary">
-                    Reminder: arguments that are off-topic or abusive may be
-                    hidden after repeated reports.
-                  </Text>
-                </Paragraph>
-              </ProCard>
-            </ProCard>
-          </ProCard>
-
-          {/* Optional quick glance at the last few statements from the preview */}
-          {preview.latest?.length ? (
-            <Card
-              title="Latest highlights"
-              style={{ marginTop: 24 }}
-              bodyStyle={{ padding: 0 }}
-            >
-              <List
-                dataSource={preview.latest}
-                renderItem={(s) => (
-                  <li key={s.id}>
-                    <Comment
-                      author={s.author}
-                      content={
-                        <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
-                          {s.body}
-                        </Paragraph>
-                      }
-                    />
-                  </li>
-                )}
-              />
-            </Card>
-          ) : null}
-        </>
-      ) : (
-        !loadingPreview && <Empty />
-      )}
-    </PageContainer>
+              </Card>
+            ) : null}
+          </>
+        ) : (
+          !loadingPreview && <Empty />
+        )}
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 

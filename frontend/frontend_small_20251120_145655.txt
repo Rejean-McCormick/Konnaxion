@@ -13,7 +13,6 @@
 
 
 ===== BEGIN context/ThemeContext.tsx =====
-// File: /context/ThemeContext.tsx
 'use client'
 
 import React, {
@@ -22,19 +21,41 @@ import React, {
   useState,
   useLayoutEffect,
   useEffect,
-  ReactNode,
   useMemo,
+  type ReactNode,
 } from 'react'
 import { ConfigProvider, theme as antdTheme, App as AntdApp } from 'antd'
 import enUS from 'antd/locale/en_US'
-import themes, { ThemeType, themeKeys } from '@/theme'
-import type { ThemeObject } from '@/theme/types'
 
-/** The “bag” of design tokens your app consumes */
-type TokenBag = ThemeObject
+import { themeById, defaultTheme } from '@/theme'
+import type { Theme as ThemeModel, ThemeId, ThemeColors } from '@/theme/types'
+
+/** Theme ids from the registry */
+type ThemeType = ThemeId
+
+/** What the rest of the app sees as “tokens” */
+type TokenBag = ThemeColors & {
+  id: ThemeId
+  name: string
+  /** UI label used by ThemeSwitcher */
+  label: string
+  /** Icon/emoji used by ThemeSwitcher */
+  icon?: string
+  isDark: boolean
+  // Convenience fields for CSS vars / layout
+  bgMain: string
+  bgLight: string
+  bgDark: string
+  textMain: string
+  accent: string
+}
 
 /** Custom CSS variables to export on <html> */
 const cssVars = ['bgMain', 'bgLight', 'bgDark', 'textMain', 'accent'] as const
+type CssVarKey = (typeof cssVars)[number]
+
+/** All known theme keys from the registry */
+const THEME_KEYS = Object.keys(themeById) as ThemeType[]
 
 interface ThemeContextProps {
   token: Readonly<Partial<TokenBag>>
@@ -45,9 +66,11 @@ interface ThemeContextProps {
 
 const ThemeContext = createContext<ThemeContextProps | null>(null)
 
-export const useTheme = () => {
+export const useTheme = (): ThemeContextProps => {
   const ctx = useContext(ThemeContext)
-  if (!ctx) throw new Error('useTheme must be used inside ThemeProvider')
+  if (!ctx) {
+    throw new Error('useTheme must be used inside ThemeProvider')
+  }
   return ctx
 }
 
@@ -60,27 +83,62 @@ const pruneEmptyObjects = <T extends Record<string, any>>(obj: T): T =>
   ) as T
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  /** 1) Current theme key */
-  const [themeType, setThemeType] = useState<ThemeType>('funky')
+  /** Current theme id */
+  const [themeType, setThemeType] = useState<ThemeType>(defaultTheme.id)
 
   /** Restore from localStorage on client */
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     try {
       const saved = localStorage.getItem('themeType') as ThemeType | null
-      if (saved && themeKeys.includes(saved)) setThemeType(saved)
+      if (saved && THEME_KEYS.includes(saved)) {
+        setThemeType(saved)
+      }
     } catch {
       // Storage unavailable: ignore
     }
   }, [])
 
-  /** Raw theme object as defined in your theme registry */
-  const raw: Partial<TokenBag> = useMemo(
-    () => ((themes?.[themeType] ?? {}) as unknown as Partial<TokenBag>),
+  /** Current theme from registry */
+  const currentTheme: ThemeModel = useMemo(
+    () => themeById[themeType] ?? defaultTheme,
     [themeType],
   )
 
-  /** 2) Expose data-theme + CSS classes + CSS variables on <html> */
+  const colors: ThemeColors = currentTheme.colors
+
+  /** Palette + meta + convenience fields */
+  const tokenBag: TokenBag = useMemo(
+    () => ({
+      id: currentTheme.id,
+      name: currentTheme.name,
+      label: currentTheme.label ?? currentTheme.name,
+      icon: currentTheme.icon,
+      isDark: currentTheme.isDark,
+      ...colors,
+      bgMain: colors.background,
+      bgLight: colors.surface,
+      bgDark: colors.backgroundAlt ?? colors.surfaceAlt ?? colors.background,
+      textMain: colors.text,
+      accent: colors.accent1 ?? colors.primary ?? colors.brand,
+    }),
+    [
+      currentTheme.id,
+      currentTheme.name,
+      currentTheme.label,
+      currentTheme.icon,
+      currentTheme.isDark,
+      colors,
+    ],
+  )
+
+  /** Frozen token for consumers (includes id/name/label/icon) */
+  const safeToken: Readonly<Partial<TokenBag>> = useMemo(
+    () => Object.freeze({ ...tokenBag }),
+    [tokenBag],
+  )
+
+  /** data-theme + CSS classes + CSS variables on <html> */
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return
     const html = document.documentElement
@@ -89,19 +147,30 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     html.setAttribute('data-theme', themeType)
 
     // Normalized classes
-    themeKeys.forEach(k => html.classList.remove(`theme-${k}`))
+    THEME_KEYS.forEach(k => html.classList.remove(`theme-${k}`))
     html.classList.add(`theme-${themeType}`)
 
-    // Custom CSS variables: set or clear
+    // Custom CSS variables
+    const cssValues: Record<CssVarKey, string | undefined> = {
+      bgMain: tokenBag.bgMain,
+      bgLight: tokenBag.bgLight,
+      bgDark: tokenBag.bgDark,
+      textMain: tokenBag.textMain,
+      accent: tokenBag.accent,
+    }
+
     cssVars.forEach(key => {
       const name = `--${key.replace(/[A-Z]/g, m => '-' + m.toLowerCase())}`
-      const val = (raw as any)[key]
-      if (val != null) html.style.setProperty(name, String(val))
-      else html.style.removeProperty(name)
+      const val = cssValues[key]
+      if (val != null) {
+        html.style.setProperty(name, String(val))
+      } else {
+        html.style.removeProperty(name)
+      }
     })
-  }, [themeType, raw])
+  }, [themeType, tokenBag])
 
-  /** Persist current theme key */
+  /** Persist current theme id */
   useEffect(() => {
     if (typeof window === 'undefined') return
     try {
@@ -111,143 +180,87 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }
   }, [themeType])
 
-  /** Safe cycling even if themeKeys is accidentally empty */
+  /** Cycle through themes in THEME_KEYS order */
   const cycleTheme = () => {
-    const keys = themeKeys.length > 0 ? themeKeys : (['light'] as ThemeType[])
+    const keys = THEME_KEYS.length > 0 ? THEME_KEYS : ([defaultTheme.id] as ThemeType[])
     const idx = keys.indexOf(themeType)
-    const next = keys[(idx + 1) % keys.length] ?? 'light'
+    const next = keys[(idx + 1) % keys.length] ?? defaultTheme.id
     setThemeType(next)
   }
 
-  /** Let AntD derive aliases; fallback to default algorithm */
-  const algorithm = (raw as any).algorithm ?? antdTheme.defaultAlgorithm
+  /** Light vs dark algorithm for AntD */
+  const algorithm =
+    currentTheme.isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm
 
-  /** Global token overrides only where explicitly provided */
-  const tokenOverrides: Record<string, any> = {
-    // Core semantic colors
-    ...(raw.colorPrimary != null && { colorPrimary: raw.colorPrimary }),
-    ...((raw as any).colorPrimaryBg != null && {
-      colorPrimaryBg: (raw as any).colorPrimaryBg,
-    }),
-    ...((raw as any).colorPrimaryHover != null && {
-      colorPrimaryHover: (raw as any).colorPrimaryHover,
-    }),
-    ...((raw as any).colorPrimaryActive != null && {
-      colorPrimaryActive: (raw as any).colorPrimaryActive,
-    }),
-    ...(raw.colorInfo != null && { colorInfo: raw.colorInfo }),
-    ...(raw.colorSuccess != null && { colorSuccess: raw.colorSuccess }),
-    ...(raw.colorWarning != null && { colorWarning: raw.colorWarning }),
-    ...(raw.colorError != null && { colorError: raw.colorError }),
+  /** Global AntD token overrides derived from palette */
+  const tokenOverrides = useMemo(() => {
+    const c = colors
+    return {
+      // Core semantic colors
+      colorPrimary: c.primary ?? c.brand,
+      colorInfo: c.accent1 ?? c.primary ?? c.brand,
+      colorSuccess: c.success,
+      colorWarning: c.warning,
+      colorError: c.danger,
 
-    // Backgrounds
-    ...((raw as any).colorBgBase != null && {
-      colorBgBase: (raw as any).colorBgBase,
-    }),
-    ...(raw.colorBgLayout != null && { colorBgLayout: raw.colorBgLayout }),
-    ...(raw.colorBgContainer != null && { colorBgContainer: raw.colorBgContainer }),
-    ...(raw.colorBgElevated != null && { colorBgElevated: raw.colorBgElevated }),
-    ...(raw.colorBgMask != null && { colorBgMask: raw.colorBgMask }),
-    ...(raw.colorBgSpotlight != null && { colorBgSpotlight: raw.colorBgSpotlight }),
-    ...(raw.colorBgSolid != null && { colorBgSolid: raw.colorBgSolid }),
-    ...(raw.colorBgSolidHover != null && {
-      colorBgSolidHover: raw.colorBgSolidHover,
-    }),
-    ...(raw.colorBgPopconfirm != null && {
-      colorBgPopconfirm: raw.colorBgPopconfirm,
-    }),
+      // Backgrounds
+      colorBgBase: c.background,
+      colorBgLayout: c.background,
+      colorBgContainer: c.surface,
+      colorBgElevated: c.surfaceAlt ?? c.surface,
 
-    // Text
-    ...(raw.colorText != null && { colorText: raw.colorText }),
-    ...(raw.colorTextBase != null && { colorTextBase: raw.colorTextBase }),
-    ...(raw.colorTextSecondary != null && {
-      colorTextSecondary: raw.colorTextSecondary,
-    }),
-    ...(raw.colorTextTertiary != null && {
-      colorTextTertiary: raw.colorTextTertiary,
-    }),
-    ...(raw.colorTextPlaceholder != null && {
-      colorTextPlaceholder: raw.colorTextPlaceholder,
-    }),
-    ...(raw.colorTextDisabled != null && {
-      colorTextDisabled: raw.colorTextDisabled,
-    }),
+      // Text
+      colorTextBase: c.text,
+      colorText: c.text,
+      colorTextSecondary: c.textMuted ?? c.text,
+      colorTextTertiary: c.textMuted ?? c.text,
+      colorTextPlaceholder: c.textMuted ?? c.text,
+      colorTextDisabled: c.textMuted ?? c.text,
 
-    // Borders
-    ...(raw.colorBorder != null && { colorBorder: raw.colorBorder }),
-    ...(raw.colorSplit != null && { colorSplit: raw.colorSplit }),
+      // Borders
+      colorBorder: c.border,
+      colorSplit: c.borderStrong ?? c.border,
+    }
+  }, [colors])
 
-    // Shadows
-    ...((raw as any).boxShadow != null && { boxShadow: (raw as any).boxShadow }),
-    ...((raw as any).boxShadowSecondary != null && {
-      boxShadowSecondary: (raw as any).boxShadowSecondary,
-    }),
-
-    // Radius / typography / layout
-    ...(raw.borderRadius != null && { borderRadius: raw.borderRadius }),
-    ...(raw.borderRadiusLG != null && { borderRadiusLG: raw.borderRadiusLG }),
-    ...(raw.controlHeight != null && { controlHeight: raw.controlHeight }),
-    ...(raw.fontFamily != null && { fontFamily: raw.fontFamily }),
-    ...(raw.fontSize != null && { fontSize: raw.fontSize }),
-    ...(raw.fontSizeLG != null && { fontSizeLG: raw.fontSizeLG }),
-    ...(raw.paddingContentHorizontalLG != null && {
-      paddingContentHorizontalLG: raw.paddingContentHorizontalLG,
-    }),
-    ...(raw.paddingContentVerticalLG != null && {
-      paddingContentVerticalLG: raw.paddingContentVerticalLG,
-    }),
-  }
-
-  /**
-   * Normalize menu-related raw keys across themes:
-   * - funkyTheme uses custom menuItem* keys
-   * - other themes (light/dark/cyber/ocean/sunset) use colorMenuItem* keys
-   * This helper merges both into AntD Menu component tokens.
-   */
-  const menuItemTextColor =
-    (raw as any).menuItemTextColor ?? (raw as any).colorMenuItemText
-  const menuItemHoverBg =
-    (raw as any).menuItemHoverBg ?? (raw as any).colorMenuItemHoverBg
-  const menuItemSelectedBg =
-    (raw as any).menuItemSelectedBg ?? (raw as any).colorMenuItemSelectedBg
-  const menuItemSelectedColor =
-    (raw as any).menuItemSelectedText ?? (raw as any).colorMenuItemSelectedText
-  const menuBg = (raw as any).menuBg
-
-  /** Map “raw” keys to component-level overrides, then strip empty objects */
-  const componentsOverrides = pruneEmptyObjects({
-    Layout: {
-      ...(raw as any).layoutColorBgSider
-        ? { siderBg: (raw as any).layoutColorBgSider }
-        : {},
-    },
-    Menu: pruneEmptyObjects({
-      ...(menuItemTextColor ? { itemColor: menuItemTextColor } : {}),
-      ...(menuItemHoverBg ? { itemHoverBg: menuItemHoverBg } : {}),
-      ...(menuItemSelectedBg ? { itemSelectedBg: menuItemSelectedBg } : {}),
-      ...(menuItemSelectedColor ? { itemSelectedColor: menuItemSelectedColor } : {}),
-      ...(menuBg ? { itemBg: menuBg } : {}),
-    }),
-    Dropdown: pruneEmptyObjects({
-      ...(raw as any).dropdownBg ? { colorBgElevated: (raw as any).dropdownBg } : {},
-      ...(raw as any).dropdownItemHoverBg
-        ? { controlItemBgHover: (raw as any).dropdownItemHoverBg }
-        : {},
-    }),
-    Popconfirm: pruneEmptyObjects({
-      ...(raw as any).colorBgPopconfirm
-        ? { colorBgElevated: (raw as any).colorBgPopconfirm }
-        : {},
-    }),
-    Table: pruneEmptyObjects({
-      ...(raw as any).tableHeaderBg ? { headerBg: (raw as any).tableHeaderBg } : {},
-    }),
-  })
-
-  /** Expose a frozen token bag to the rest of the app */
-  const safeToken: Readonly<Partial<TokenBag>> = useMemo(
-    () => Object.freeze({ ...raw }),
-    [raw],
+  /** Component-level overrides from palette */
+  const componentsOverrides = useMemo(
+    () =>
+      pruneEmptyObjects({
+        Layout: {
+          siderBg: colors.backgroundAlt ?? colors.background,
+        },
+        Menu: pruneEmptyObjects({
+          itemBg: colors.surface,
+          itemColor: colors.textMuted ?? colors.text,
+          itemHoverBg: colors.backgroundAlt ?? colors.surfaceAlt ?? colors.surface,
+          itemSelectedBg:
+            colors.menuSelectedBg ??
+            colors.primarySubtle ??
+            colors.accent1 ??
+            colors.surfaceAlt ??
+            colors.surface,
+          itemSelectedColor:
+            colors.menuSelectedText ??
+            colors.textOnBrand ??
+            '#ffffff',
+        }),
+        Dropdown: pruneEmptyObjects({
+          colorBgElevated: colors.surfaceAlt ?? colors.surface,
+          controlItemBgHover:
+            colors.primarySubtle ??
+            colors.accent1 ??
+            colors.surfaceAlt ??
+            colors.surface,
+        }),
+        Popconfirm: pruneEmptyObjects({
+          colorBgElevated: colors.surfaceAlt ?? colors.surface,
+        }),
+        Table: pruneEmptyObjects({
+          headerBg: colors.surfaceAlt ?? colors.surface,
+        }),
+      }),
+    [colors],
   )
 
   return (

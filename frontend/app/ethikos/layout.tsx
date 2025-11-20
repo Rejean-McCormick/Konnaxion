@@ -1,12 +1,29 @@
 // app/ethikos/layout.tsx
 'use client'
 
+/**
+ * Updated Ethikos segment layout.
+ *
+ * Changes:
+ *  - Keep existing defaulting to ?sidebar=ethikos (preserves URL hash on replace).
+ *  - Use shared <MainLayout /> container for global nav + header.
+ *  - Improve Suspense fallback with reusable <Loading fullscreen />.
+ *  - Wrap children with ProComponents <WaterMark> to subtly brand the suite.
+ *
+ * Source references:
+ *  - Original layout baseline: :contentReference[oaicite:0]{index=0}
+ *  - MainLayout (global AntD shell): :contentReference[oaicite:1]{index=1}
+ *  - Loading component used in fallback: :contentReference[oaicite:2]{index=2}
+ */
+
 import type { ReactNode } from 'react'
 import React, { Suspense, useEffect } from 'react'
-import { Layout, Spin } from 'antd'
+import { Layout } from 'antd'
+import { WaterMark } from '@ant-design/pro-components'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import MainLayout from '@/components/layout-components/MainLayout'
+import Loading from '@/components/Loading'
 
 const { Content } = Layout
 
@@ -38,10 +55,24 @@ function EthikosShell({ children }: SegmentLayoutProps) {
     const params = new URLSearchParams(Array.from(searchParams.entries()))
     params.set('sidebar', 'ethikos')
 
-    router.replace(`${pathname}?${params.toString()}`)
+    // Preserve current hash if present (client-only)
+    const hash =
+      typeof window !== 'undefined' && window.location?.hash
+        ? window.location.hash
+        : ''
+
+    router.replace(`${pathname}?${params.toString()}${hash}`)
+    // We intentionally depend on the stable searchParams object + router + pathname.
   }, [router, pathname, searchParams])
 
-  return <MainLayout>{children}</MainLayout>
+  return (
+    <MainLayout>
+      {/* Subtle suite watermark; page-level PageContainer can still set ghost or override visuals */}
+      <WaterMark content="ethiKos" gap={[120, 120]} fontColor="rgba(0,0,0,0.04)">
+        {children}
+      </WaterMark>
+    </MainLayout>
+  )
 }
 
 /**
@@ -63,7 +94,7 @@ export default function SegmentLayout({ children }: SegmentLayoutProps) {
               justifyContent: 'center',
             }}
           >
-            <Spin size="large" />
+            <Loading fullscreen message="Loading ethiKos…" />
           </Content>
         </Layout>
       }

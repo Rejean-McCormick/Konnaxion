@@ -36,7 +36,7 @@ import { useRequest } from 'ahooks';
 import dayjs, { Dayjs } from 'dayjs';
 
 import ChartCard from '@/components/charts/ChartCard';
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchPulseOverview,
   fetchPulseTrends,
@@ -90,8 +90,6 @@ async function fetchOpinionAnalytics(): Promise<OpinionAnalyticsData> {
 /* ------------------------------------------------------------------ */
 
 export default function EthikosOpinionAnalytics(): JSX.Element {
-  usePageTitle('Ethikos · Opinion Analytics');
-
   const [timeRange, setTimeRange] = useState<RangeValue>(() => [
     dayjs().subtract(30, 'day'),
     dayjs(),
@@ -110,37 +108,75 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       ).format('HH:mm:ss')
     : null;
 
+  const secondaryActions = (
+    <Space>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+      <Button
+        icon={<SyncOutlined />}
+        onClick={() => refresh()}
+        size="small"
+        type="text"
+      />
+    </Space>
+  );
+
+  const shellProps = {
+    title: 'Opinion analytics',
+    subtitle:
+      'Cross-cutting analytics across debates, participation and decision outcomes in ethiKos.',
+    sectionLabel: 'Insights',
+    secondaryActions,
+  } as const;
+
   /* ---------- loading skeleton ---------- */
   if (loading && !data) {
     return (
-      <PageContainer ghost>
-        <Skeleton active />
-      </PageContainer>
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Skeleton active />
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   /* ---------- error state ---------- */
   if (error) {
     return (
-      <PageContainer ghost>
-        <Empty
-          description="Failed to load opinion analytics"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
-          <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
-            Retry
-          </Button>
-        </Empty>
-      </PageContainer>
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Empty
+            description="Failed to load opinion analytics"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Button
+              icon={<SyncOutlined />}
+              onClick={refresh}
+              type="primary"
+            >
+              Retry
+            </Button>
+          </Empty>
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   /* ---------- empty safeguard ---------- */
   if (!data) {
     return (
-      <PageContainer ghost>
-        <Empty description="No analytics data available yet" />
-      </PageContainer>
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Empty description="No analytics data available yet" />
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
@@ -247,7 +283,8 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       dataIndex: 'region',
       key: 'region',
       ellipsis: true,
-      render: (region?: string) => region ?? <Text type="secondary">Unspecified</Text>,
+      render: (region?: string) =>
+        region ?? <Text type="secondary">Unspecified</Text>,
     },
     {
       title: 'Closed at',
@@ -259,355 +296,341 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
   ];
 
   return (
-    <PageContainer
-      ghost
-      extra={
-        <Space>
-          {lastUpdated && (
-            <Badge
-              count={
-                <Tooltip title={`Last refreshed at ${lastUpdated}`}>
-                  <ClockCircleOutlined style={{ color: '#52c41a' }} />
-                </Tooltip>
+    <EthikosPageShell {...shellProps}>
+      <PageContainer ghost>
+        {/* ------------------------------------------------------------------ */}
+        {/* Filters                                                            */}
+        {/* ------------------------------------------------------------------ */}
+        <ProCard ghost style={{ marginBottom: 16 }}>
+          <Space wrap align="center">
+            <Space>
+              <FilterOutlined />
+              <Text strong>Filters</Text>
+            </Space>
+
+            <Divider type="vertical" />
+
+            <Space size="small">
+              <Text type="secondary">Time window</Text>
+              <RangePicker
+                allowEmpty={[true, true]}
+                value={timeRange ?? undefined}
+                onChange={(range) => setTimeRange(range as RangeValue)}
+              />
+            </Space>
+
+            <Space size="small">
+              <Text type="secondary">Scope</Text>
+              <Select<'all' | DecisionScope>
+                style={{ minWidth: 120 }}
+                value={scopeFilter}
+                onChange={(val) => setScopeFilter(val)}
+              >
+                <Option value="all">All</Option>
+                <Option value="Elite">Elite</Option>
+                <Option value="Public">Public</Option>
+              </Select>
+            </Space>
+
+            <Space size="small">
+              <Text type="secondary">Region</Text>
+              <Select<string | 'all'>
+                style={{ minWidth: 160 }}
+                value={regionFilter}
+                onChange={(val) => setRegionFilter(val)}
+              >
+                <Option value="all">All regions</Option>
+                {allRegions.map((region) => (
+                  <Option key={region} value={region}>
+                    {region}
+                  </Option>
+                ))}
+              </Select>
+            </Space>
+          </Space>
+        </ProCard>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Overview KPIs (Pulse overview)                                    */}
+        {/* ------------------------------------------------------------------ */}
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          {overview.kpis.map((kpi) => (
+            <StatisticCard
+              key={kpi.label}
+              colSpan={{
+                xs: 24,
+                sm: 12,
+                md: 12,
+                lg: 6,
+              }}
+              statistic={{
+                title: kpi.label,
+                value: kpi.value,
+                suffix: kpi.delta !== undefined ? '%' : undefined,
+                description:
+                  kpi.delta !== undefined ? (
+                    <span
+                      style={{
+                        color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                      }}
+                    >
+                      {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
+                    </span>
+                  ) : null,
+              }}
+              chart={
+                <ChartCard
+                  type="area"
+                  height={60}
+                  data={kpi.history.map((h) => ({
+                    x: h.date,
+                    y: h.value,
+                  }))}
+                  tooltip={{
+                    formatter: (datum: any) =>
+                      `${dayjs(datum.x).format('MMM D')}: ${datum.y}`,
+                  }}
+                />
               }
             />
-          )}
-          <Button
-            icon={<SyncOutlined />}
-            onClick={() => refresh()}
-            size="small"
-            type="text"
-          />
-        </Space>
-      }
-    >
-      {/* ------------------------------------------------------------------ */}
-      {/* Filters                                                           */}
-      {/* ------------------------------------------------------------------ */}
-      <ProCard ghost style={{ marginBottom: 16 }}>
-        <Space wrap align="center">
-          <Space>
-            <FilterOutlined />
-            <Text strong>Filters</Text>
-          </Space>
+          ))}
+        </ProCard>
 
-          <Divider type="vertical" />
-
-          <Space size="small">
-            <Text type="secondary">Time window</Text>
-            <RangePicker
-              allowEmpty={[true, true]}
-              value={timeRange ?? undefined}
-              onChange={(range) => setTimeRange(range as RangeValue)}
-            />
-          </Space>
-
-          <Space size="small">
-            <Text type="secondary">Scope</Text>
-            <Select<'all' | DecisionScope>
-              style={{ minWidth: 120 }}
-              value={scopeFilter}
-              onChange={(val) => setScopeFilter(val)}
-            >
-              <Option value="all">All</Option>
-              <Option value="Elite">Elite</Option>
-              <Option value="Public">Public</Option>
-            </Select>
-          </Space>
-
-          <Space size="small">
-            <Text type="secondary">Region</Text>
-            <Select<string | 'all'>
-              style={{ minWidth: 160 }}
-              value={regionFilter}
-              onChange={(val) => setRegionFilter(val)}
-            >
-              <Option value="all">All regions</Option>
-              {allRegions.map((region) => (
-                <Option key={region} value={region}>
-                  {region}
-                </Option>
-              ))}
-            </Select>
-          </Space>
-        </Space>
-      </ProCard>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Overview KPIs (Pulse overview)                                    */}
-      {/* ------------------------------------------------------------------ */}
-      <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
-        {overview.kpis.map((kpi) => (
-          <StatisticCard
-            key={kpi.label}
-            colSpan={{
-              xs: 24,
-              sm: 12,
-              md: 12,
-              lg: 6,
-            }}
-            statistic={{
-              title: kpi.label,
-              value: kpi.value,
-              suffix: kpi.delta !== undefined ? '%' : undefined,
-              description:
-                kpi.delta !== undefined ? (
-                  <span
-                    style={{
-                      color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
-                    }}
-                  >
-                    {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
-                  </span>
-                ) : null,
-            }}
-            chart={
-              <ChartCard
-                type="area"
-                height={60}
-                data={kpi.history.map((h) => ({
-                  x: h.date,
-                  y: h.value,
-                }))}
-                tooltip={{
-                  formatter: (datum: any) =>
-                    `${dayjs(datum.x).format('MMM D')}: ${datum.y}`,
-                }}
-              />
-            }
-          />
-        ))}
-      </ProCard>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Live participation counters                                       */}
-      {/* ------------------------------------------------------------------ */}
-      <ProCard
-        title={
-          <Space>
-            <AreaChartOutlined />
-            <span>Live participation</span>
-          </Space>
-        }
-        gutter={[16, 16]}
-        wrap
-        style={{ marginBottom: 16 }}
-      >
-        {live.counters.map((c) => (
-          <StatisticCard
-            key={c.label}
-            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-            statistic={{
-              title: (
-                <Space>
-                  {c.label}
-                  <Badge
-                    status={
-                      c.trend && c.trend > 0
-                        ? 'success'
-                        : c.trend && c.trend < 0
-                        ? 'error'
-                        : 'default'
-                    }
-                  />
-                </Space>
-              ),
-              value: c.value,
-              precision: 0,
-            }}
-            chart={
-              <ChartCard
-                type="line"
-                data={c.history.map(({ ts, value }) => ({
-                  x: ts,
-                  y: value,
-                }))}
-                height={50}
-              />
-            }
-          />
-        ))}
-      </ProCard>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* Trends & participation health                                     */}
-      {/* ------------------------------------------------------------------ */}
-      <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+        {/* ------------------------------------------------------------------ */}
+        {/* Live participation counters                                       */}
+        {/* ------------------------------------------------------------------ */}
         <ProCard
-          colSpan={{ xs: 24, xl: 16 }}
           title={
             <Space>
               <AreaChartOutlined />
-              <span>Opinion trends</span>
+              <span>Live participation</span>
             </Space>
           }
+          gutter={[16, 16]}
+          wrap
+          style={{ marginBottom: 16 }}
         >
-          <Tabs
-            items={trends.charts.map((c) => ({
-              key: c.key,
-              label: c.title,
-              children: (
-                <ProCard ghost>
-                  {c.type === 'line' && <Line {...c.config} />}
-                  {c.type === 'area' && <Area {...c.config} />}
-                  {c.type === 'heatmap' && <Heatmap {...c.config} />}
-                </ProCard>
-              ),
-            }))}
-          />
+          {live.counters.map((c) => (
+            <StatisticCard
+              key={c.label}
+              colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+              statistic={{
+                title: (
+                  <Space>
+                    {c.label}
+                    <Badge
+                      status={
+                        c.trend && c.trend > 0
+                          ? 'success'
+                          : c.trend && c.trend < 0
+                          ? 'error'
+                          : 'default'
+                      }
+                    />
+                  </Space>
+                ),
+                value: c.value,
+                precision: 0,
+              }}
+              chart={
+                <ChartCard
+                  type="line"
+                  data={c.history.map(({ ts, value }) => ({
+                    x: ts,
+                    y: value,
+                  }))}
+                  height={50}
+                />
+              }
+            />
+          ))}
         </ProCard>
 
-        <ProCard
-          colSpan={{ xs: 24, xl: 8 }}
-          title={
-            <Space>
-              <PieChartOutlined />
-              <span>Participation health</span>
-            </Space>
-          }
-        >
-          <ProCard split="horizontal" ghost>
-            <ProCard title="Diversity radar">
-              <Radar {...health.radarConfig} />
-            </ProCard>
-            <ProCard title="Ethics score breakdown">
-              <Pie {...health.pieConfig} />
+        {/* ------------------------------------------------------------------ */}
+        {/* Trends & participation health                                     */}
+        {/* ------------------------------------------------------------------ */}
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          <ProCard
+            colSpan={{ xs: 24, xl: 16 }}
+            title={
+              <Space>
+                <AreaChartOutlined />
+                <span>Opinion trends</span>
+              </Space>
+            }
+          >
+            <Tabs
+              items={trends.charts.map((c) => ({
+                key: c.key,
+                label: c.title,
+                children: (
+                  <ProCard ghost>
+                    {c.type === 'line' && <Line {...c.config} />}
+                    {c.type === 'area' && <Area {...c.config} />}
+                    {c.type === 'heatmap' && <Heatmap {...c.config} />}
+                  </ProCard>
+                ),
+              }))}
+            />
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <PieChartOutlined />
+                <span>Participation health</span>
+              </Space>
+            }
+          >
+            <ProCard split="horizontal" ghost>
+              <ProCard title="Diversity radar">
+                <Radar {...health.radarConfig} />
+              </ProCard>
+              <ProCard title="Ethics score breakdown">
+                <Pie {...health.pieConfig} />
+              </ProCard>
             </ProCard>
           </ProCard>
         </ProCard>
-      </ProCard>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* Outcomes & decisions                                              */}
-      {/* ------------------------------------------------------------------ */}
-      <ProCard gutter={[16, 16]} wrap>
-        {/* Outcome KPIs */}
-        <ProCard
-          colSpan={{ xs: 24, xl: 8 }}
-          title={
-            <Space>
-              <BarChartOutlined />
-              <span>Impact · Outcomes</span>
-            </Space>
-          }
-        >
-          <Space direction="vertical" style={{ width: '100%' }} size="large">
-            <Space size="large" wrap>
-              {outcomes.kpis.map((kpi) => (
-                <StatisticCard
-                  key={kpi.key}
-                  statistic={{
-                    title: kpi.label,
-                    value: kpi.value,
-                    suffix: kpi.key === 'agreement' ? '%' : undefined,
-                    description:
-                      typeof kpi.delta === 'number' ? (
-                        <span
-                          style={{
-                            color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
-                          }}
-                        >
-                          {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
-                        </span>
-                      ) : null,
-                  }}
-                />
-              ))}
-            </Space>
+        {/* ------------------------------------------------------------------ */}
+        {/* Outcomes & decisions                                              */}
+        {/* ------------------------------------------------------------------ */}
+        <ProCard gutter={[16, 16]} wrap>
+          {/* Outcome KPIs */}
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <BarChartOutlined />
+                <span>Impact · Outcomes</span>
+              </Space>
+            }
+          >
+            <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <Space size="large" wrap>
+                {outcomes.kpis.map((kpi) => (
+                  <StatisticCard
+                    key={kpi.key}
+                    statistic={{
+                      title: kpi.label,
+                      value: kpi.value,
+                      suffix: kpi.key === 'agreement' ? '%' : undefined,
+                      description:
+                        typeof kpi.delta === 'number' ? (
+                          <span
+                            style={{
+                              color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                            }}
+                          >
+                            {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
+                          </span>
+                        ) : null,
+                    }}
+                  />
+                ))}
+              </Space>
 
-            <Divider />
+              <Divider />
 
-            <Space direction="vertical" size={8}>
-              <Text type="secondary">Highlights</Text>
-              <ul style={{ paddingLeft: 20, margin: 0 }}>
-                <li>
-                  <Text>
-                    <Text strong>{outcomes.kpis.find((k) => k.key === 'resolved')?.value ?? 0}</Text>{' '}
-                    decisions resolved overall.
-                  </Text>
-                </li>
-                <li>
-                  <Text>
-                    Average agreement is{' '}
-                    <Text strong>
-                      {outcomes.kpis.find((k) => k.key === 'agreement')?.value ?? 0}%
+              <Space direction="vertical" size={8}>
+                <Text type="secondary">Highlights</Text>
+                <ul style={{ paddingLeft: 20, margin: 0 }}>
+                  <li>
+                    <Text>
+                      <Text strong>
+                        {outcomes.kpis.find((k) => k.key === 'resolved')?.value ??
+                          0}
+                      </Text>{' '}
+                      decisions resolved overall.
                     </Text>
-                    , combining stance direction and turnout.
-                  </Text>
-                </li>
-                <li>
-                  <Text>
-                    Participation volume is{' '}
-                    <Text strong>
-                      {outcomes.kpis.find((k) => k.key === 'participation')?.value ??
-                        0}
-                    </Text>{' '}
-                    total stances across all debates.
-                  </Text>
-                </li>
-              </ul>
+                  </li>
+                  <li>
+                    <Text>
+                      Average agreement is{' '}
+                      <Text strong>
+                        {outcomes.kpis.find((k) => k.key === 'agreement')?.value ??
+                          0}
+                        %
+                      </Text>
+                      , combining stance direction and turnout.
+                    </Text>
+                  </li>
+                  <li>
+                    <Text>
+                      Participation volume is{' '}
+                      <Text strong>
+                        {outcomes.kpis.find((k) => k.key === 'participation')
+                          ?.value ?? 0}
+                      </Text>{' '}
+                      total stances across all debates.
+                    </Text>
+                  </li>
+                </ul>
+              </Space>
             </Space>
-          </Space>
-        </ProCard>
+          </ProCard>
 
-        {/* Outcome charts */}
-        <ProCard
-          colSpan={{ xs: 24, xl: 8 }}
-          title={
-            <Space>
-              <BarChartOutlined />
-              <span>Outcome distribution</span>
-            </Space>
-          }
-        >
-          <Tabs
-            items={outcomes.charts.map((c) => ({
-              key: c.key,
-              label: c.title,
-              children: (
-                <ProCard ghost>
-                  {c.type === 'line' && <Line {...c.config} />}
-                  {c.type === 'bar' && <Bar {...c.config} />}
-                </ProCard>
-              ),
-            }))}
-          />
-        </ProCard>
+          {/* Outcome charts */}
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <BarChartOutlined />
+                <span>Outcome distribution</span>
+              </Space>
+            }
+          >
+            <Tabs
+              items={outcomes.charts.map((c) => ({
+                key: c.key,
+                label: c.title,
+                children: (
+                  <ProCard ghost>
+                    {c.type === 'line' && <Line {...c.config} />}
+                    {c.type === 'bar' && <Bar {...c.config} />}
+                  </ProCard>
+                ),
+              }))}
+            />
+          </ProCard>
 
-        {/* Closed decisions table */}
-        <ProCard
-          colSpan={{ xs: 24, xl: 8 }}
-          title="Closed decisions · outcomes vs engagement"
-          extra={
-            <Text type="secondary">
-              Filtered: {filteredDecisions.length} / {decisions.items.length}
-            </Text>
-          }
-        >
-          <ProCard split="horizontal" ghost>
-            <ProCard title="Outcomes by region">
-              {decisionOutcomeData.length === 0 ? (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No regional outcome data for current filters"
+          {/* Closed decisions table */}
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title="Closed decisions · outcomes vs engagement"
+            extra={
+              <Text type="secondary">
+                Filtered: {filteredDecisions.length} / {decisions.items.length}
+              </Text>
+            }
+          >
+            <ProCard split="horizontal" ghost>
+              <ProCard title="Outcomes by region">
+                {decisionOutcomeData.length === 0 ? (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No regional outcome data for current filters"
+                  />
+                ) : (
+                  <Bar {...decisionOutcomeConfig} />
+                )}
+              </ProCard>
+
+              <ProCard title="Closed decisions">
+                <Table<DecisionRow>
+                  size="small"
+                  columns={decisionsColumns}
+                  dataSource={filteredDecisions}
+                  pagination={{ pageSize: 8 }}
+                  rowKey="key"
                 />
-              ) : (
-                <Bar {...decisionOutcomeConfig} />
-              )}
-            </ProCard>
-
-            <ProCard title="Closed decisions">
-              <Table<DecisionRow>
-                size="small"
-                columns={decisionsColumns}
-                dataSource={filteredDecisions}
-                pagination={{ pageSize: 8 }}
-                rowKey="key"
-              />
+              </ProCard>
             </ProCard>
           </ProCard>
         </ProCard>
-      </ProCard>
-    </PageContainer>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }

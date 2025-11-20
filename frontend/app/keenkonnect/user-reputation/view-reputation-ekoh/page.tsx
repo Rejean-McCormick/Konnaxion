@@ -1,3 +1,4 @@
+// app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx
 'use client';
 
 import React, { type ReactNode } from 'react';
@@ -13,26 +14,19 @@ import {
   Space,
   Row,
   Col,
+  Spin,
+  Alert,
 } from 'antd';
 import {
-  TrophyOutlined,
   StarFilled,
   ThunderboltOutlined,
   ExperimentOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
 import usePageTitle from '@/hooks/usePageTitle';
+import useReputationEvents from '@/hooks/useReputationEvents';
 
 const { Title, Text } = Typography;
-
-type ReputationSummary = {
-  ekohScore: number;
-  smartVoteWeight: number;
-  trustTier: string;
-  totalVotes: number;
-  domains: string[];
-  lastSync: string;
-};
 
 type ExpertiseArea = {
   id: string;
@@ -41,31 +35,11 @@ type ExpertiseArea = {
   level: 'core' | 'supporting';
 };
 
-type ReputationEvent = {
-  id: string;
-  when: string;
-  title: string;
-  detail: string;
-};
-
-type Badge = {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  icon: ReactNode;
-  color: string;
-};
-
-const reputation: ReputationSummary = {
-  ekohScore: 1234,
-  smartVoteWeight: 2.7,
-  trustTier: 'Emerging Expert',
-  totalVotes: 148,
-  domains: ['Sustainability', 'Product Strategy', 'AI Ethics'],
-  lastSync: '2024-10-15',
-};
-
+/**
+ * Static placeholder until we have a real "expertise from Ekoh" API.
+ * This only affects the lower section – the core score/timeline/badges
+ * now come from the backend.
+ */
 const expertiseAreas: ExpertiseArea[] = [
   {
     id: 'exp-1',
@@ -87,86 +61,76 @@ const expertiseAreas: ExpertiseArea[] = [
   },
 ];
 
-const reputationTimeline: ReputationEvent[] = [
-  {
-    id: 'evt-1',
-    when: '2024-03-15',
-    title: 'Ekoh profile linked to KeenKonnect',
-    detail: 'Your existing Ekoh trust score is now visible inside KeenKonnect.',
-  },
-  {
-    id: 'evt-2',
-    when: '2024-05-02',
-    title: 'First project created from Ekoh contacts',
-    detail:
-      'You started a sustainability-focused project with 4 contributors you interacted with on Ekoh.',
-  },
-  {
-    id: 'evt-3',
-    when: '2024-07-21',
-    title: 'Smart vote weight increased',
-    detail:
-      'Your consistent high-quality contributions raised your smart vote weight above 2×.',
-  },
-  {
-    id: 'evt-4',
-    when: '2024-09-10',
-    title: 'Emerging Expert tier unlocked',
-    detail:
-      'You crossed the threshold to be highlighted in team matching for Sustainability & Product Strategy.',
-  },
-];
-
-const badges: Badge[] = [
-  {
-    id: 'badge-1',
-    name: 'Emerging Expert',
-    description:
-      'Recognized as an emerging expert in at least one core domain. Your profile is surfaced more often in KeenKonnect team search.',
-    category: 'Expertise',
-    icon: <StarFilled />,
-    color: 'gold',
-  },
-  {
-    id: 'badge-2',
-    name: 'High-Impact Contributor',
-    description:
-      'Your votes and contributions frequently shift consensus. Used to weigh your input more strongly in collaborative decisions.',
-    category: 'Impact',
-    icon: <ThunderboltOutlined />,
-    color: 'volcano',
-  },
-  {
-    id: 'badge-3',
-    name: 'Experimentation Champion',
-    description:
-      'You consistently propose and document experiments. Teams looking for experimentation skills see you higher in results.',
-    category: 'Practice',
-    icon: <ExperimentOutlined />,
-    color: 'geekblue',
-  },
-  {
-    id: 'badge-4',
-    name: 'Trusted Collaborator',
-    description:
-      'Peers repeatedly endorse your reliability. This badge boosts your visibility for long-running KeenKonnect projects.',
-    category: 'Collaboration',
+/**
+ * Badge metadata for visual display, keyed by backend badge id.
+ * Back-end provides: id, label, description, earnedAt.
+ * Here we attach category, color and icon for the UI.
+ */
+const BADGE_META: Record<
+  string,
+  { icon: ReactNode; color: string; category: string }
+> = {
+  'first-stance': {
     icon: <TeamOutlined />,
     color: 'green',
+    category: 'Participation',
   },
-  {
-    id: 'badge-5',
-    name: 'Top 5% in Sustainability',
-    description:
-      'Your Ekoh score in Sustainability sits in the top 5%. Used when teams search for climate & impact-related expertise.',
-    category: 'Domain signal',
-    icon: <TrophyOutlined />,
-    color: 'purple',
+  'argument-builder': {
+    icon: <ExperimentOutlined />,
+    color: 'geekblue',
+    category: 'Depth',
   },
-];
+  'active-voter': {
+    icon: <ThunderboltOutlined />,
+    color: 'volcano',
+    category: 'Voting',
+  },
+};
 
 export default function ViewReputationEkohPage(): JSX.Element {
   usePageTitle('KeenKonnect · Ekoh reputation');
+
+  const { data, isLoading, isError, error } = useReputationEvents();
+
+  const profile = data?.profile;
+  const timeline = data?.timeline ?? [];
+  const rawBadges = data?.badges ?? [];
+
+  // High-level numbers derived from Ekoh profile
+  const ekohScore = profile?.score ?? 0;
+
+  const influenceDimension = profile?.dimensions.find(
+    (d) => d.key === 'influence',
+  );
+
+  // Simple, explicit mapping from influence index (0–100) to a weight multiplier
+  const smartVoteWeight =
+    influenceDimension != null
+      ? Number((1 + influenceDimension.score / 50).toFixed(1))
+      : 1.0;
+
+  // Aggregated interaction index – not a literal count, but a readable big number
+  const totalInteractions =
+    profile != null ? Math.max(ekohScore, 0) : 0;
+
+  const tierLabel =
+    profile?.level === 'Steward'
+      ? 'Trusted steward'
+      : profile?.level === 'Contributor'
+      ? 'Active contributor'
+      : profile?.level === 'Visitor'
+      ? 'New voice'
+      : 'Not initialized yet';
+
+  const badges = rawBadges.map((b) => {
+    const meta =
+      BADGE_META[b.id] ?? {
+        icon: <StarFilled />,
+        color: 'default',
+        category: 'Reputation',
+      };
+    return { ...b, ...meta };
+  });
 
   return (
     <>
@@ -175,7 +139,7 @@ export default function ViewReputationEkohPage(): JSX.Element {
       </Head>
 
       <div className="container mx-auto p-5">
-        {/* Titre aligné sur la page de référence */}
+        {/* Page header */}
         <header className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Ekoh reputation</h1>
           <p className="text-gray-500">
@@ -183,9 +147,29 @@ export default function ViewReputationEkohPage(): JSX.Element {
           </p>
         </header>
 
-        {/* Bloc principal : résumé + timeline */}
+        {/* Loading / error states for the reputation fetch */}
+        {isLoading && (
+          <div className="mb-4">
+            <Spin />
+          </div>
+        )}
+
+        {isError && (
+          <div className="mb-4">
+            <Alert
+              type="error"
+              message="Unable to load Ekoh reputation"
+              description={
+                (error as Error | undefined)?.message ??
+                'Please try again in a moment.'
+              }
+            />
+          </div>
+        )}
+
+        {/* Main two-column layout: summary + timeline */}
         <Row gutter={[24, 24]}>
-          {/* Colonne gauche : profil + résumé Ekoh */}
+          {/* Left: profile + summary card */}
           <Col xs={24} lg={8}>
             <Card>
               <Space
@@ -193,7 +177,13 @@ export default function ViewReputationEkohPage(): JSX.Element {
                 align="center"
                 style={{ width: '100%' }}
               >
-                <Avatar size={80} style={{ backgroundColor: '#1677ff' }}>
+                <Avatar
+                  size={80}
+                  style={{
+                    backgroundColor: '#1e6864',
+                    color: '#ffffff',
+                  }}
+                >
                   EK
                 </Avatar>
 
@@ -215,39 +205,37 @@ export default function ViewReputationEkohPage(): JSX.Element {
                 labelStyle={{ width: 160 }}
               >
                 <Descriptions.Item label="Ekoh score">
-                  <Text strong>{reputation.ekohScore}</Text>
+                  <Text strong>{ekohScore}</Text>
                 </Descriptions.Item>
+
                 <Descriptions.Item label="Smart vote weight">
-                  <Text strong>{reputation.smartVoteWeight.toFixed(1)}×</Text>{' '}
-                  <Text type="secondary">(relative influence)</Text>
+                  <Text strong>{smartVoteWeight.toFixed(1)}×</Text>{' '}
+                  <Text type="secondary">(relative influence index)</Text>
                 </Descriptions.Item>
+
                 <Descriptions.Item label="Tier">
-                  <Tag color="blue">{reputation.trustTier}</Tag>
+                  <Tag color="blue">{tierLabel}</Tag>
                 </Descriptions.Item>
-                <Descriptions.Item label="Primary domains">
-                  <Space size={4} wrap>
-                    {reputation.domains.map((d) => (
-                      <Tag key={d}>{d}</Tag>
-                    ))}
-                  </Space>
-                </Descriptions.Item>
+
                 <Descriptions.Item label="Last sync from Ekoh">
-                  <Text type="secondary">{reputation.lastSync}</Text>
+                  <Text type="secondary">
+                    Based on your recent Ethikos &amp; KonnectED activity.
+                  </Text>
                 </Descriptions.Item>
               </Descriptions>
             </Card>
           </Col>
 
-          {/* Colonne droite : stats + timeline */}
+          {/* Right: big stats + timeline */}
           <Col xs={24} lg={16}>
-            {/* Stats en 3 colonnes */}
+            {/* 3-number summary */}
             <Card className="mb-4">
               <Row gutter={[16, 16]}>
                 <Col xs={24} md={8}>
                   <Space direction="vertical">
                     <Text type="secondary">Global Ekoh score</Text>
                     <Title level={3} style={{ margin: 0 }}>
-                      {reputation.ekohScore}
+                      {ekohScore}
                     </Title>
                     <Text type="secondary">
                       Used as a global trust signal across all KeenKonnect
@@ -255,37 +243,42 @@ export default function ViewReputationEkohPage(): JSX.Element {
                     </Text>
                   </Space>
                 </Col>
+
                 <Col xs={24} md={8}>
                   <Space direction="vertical">
                     <Text type="secondary">Smart vote weight</Text>
                     <Title level={3} style={{ margin: 0 }}>
-                      {reputation.smartVoteWeight.toFixed(1)}×
+                      {smartVoteWeight.toFixed(1)}×
                     </Title>
                     <Text type="secondary">
-                      Your votes weigh more when teams use Ekoh-backed decisions.
+                      Your votes weigh more when teams use Ekoh-backed
+                      decisions.
                     </Text>
                   </Space>
                 </Col>
+
                 <Col xs={24} md={8}>
                   <Space direction="vertical">
-                    <Text type="secondary">Validated interactions</Text>
+                    <Text type="secondary">
+                      Validated interactions (index)
+                    </Text>
                     <Title level={3} style={{ margin: 0 }}>
-                      {reputation.totalVotes}
+                      {totalInteractions}
                     </Title>
                     <Text type="secondary">
-                      Conversations, votes &amp; reviews used to compute your
-                      reputation.
+                      Aggregated indicator based on your contributions and
+                      votes.
                     </Text>
                   </Space>
                 </Col>
               </Row>
             </Card>
 
-            {/* Timeline */}
+            {/* Timeline from backend-derived events */}
             <Card title="Reputation timeline">
               <Timeline
                 mode="left"
-                items={reputationTimeline.map((item) => ({
+                items={timeline.map((item) => ({
                   key: item.id,
                   label: item.when,
                   children: (
@@ -302,7 +295,7 @@ export default function ViewReputationEkohPage(): JSX.Element {
           </Col>
         </Row>
 
-        {/* Expertise importée depuis Ekoh */}
+        {/* Expertise section (still static for now) */}
         <Card
           title="Expertise imported from Ekoh"
           className="mt-6"
@@ -324,7 +317,8 @@ export default function ViewReputationEkohPage(): JSX.Element {
                     <Text type="secondary" strong>
                       {area.domain}
                     </Text>{' '}
-                    – used for project matching &amp; workspace recommendations.
+                    – used for project matching &amp; workspace
+                    recommendations.
                   </Text>
                 </Space>
               </List.Item>
@@ -332,7 +326,7 @@ export default function ViewReputationEkohPage(): JSX.Element {
           />
         </Card>
 
-        {/* Badges & achievements */}
+        {/* Badges mapped from backend -> visual cards */}
         <Card
           title="Badges & achievements from Ekoh"
           extra={
@@ -359,7 +353,7 @@ export default function ViewReputationEkohPage(): JSX.Element {
                     />
                     <div>
                       <Space style={{ marginBottom: 4 }}>
-                        <Text strong>{badge.name}</Text>
+                        <Text strong>{badge.label}</Text>
                         <Tag color={badge.color}>{badge.category}</Tag>
                       </Space>
                       <Text type="secondary">{badge.description}</Text>

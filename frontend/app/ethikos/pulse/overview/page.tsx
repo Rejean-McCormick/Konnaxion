@@ -1,6 +1,12 @@
 // app/ethikos/pulse/overview/page.tsx
 'use client';
 
+/* Sources:
+   - Current page implementation in dump: app/ethikos/pulse/overview/page.tsx  :contentReference[oaicite:0]{index=0}
+   - Data service used here: services/pulse.ts                                  :contentReference[oaicite:1]{index=1}
+   - Shared page shell wrapper: app/ethikos/EthikosPageShell.tsx                :contentReference[oaicite:2]{index=2}
+*/
+
 import type { ReactNode } from 'react';
 import {
   PageContainer,
@@ -30,11 +36,12 @@ import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
 import ChartCard from '@/components/charts/ChartCard';
-import usePageTitle from '@/hooks/usePageTitle';
 import { fetchPulseOverview } from '@/services/pulse';
 import EthikosPageShell from '../../EthikosPageShell';
 
 const { Text } = Typography;
+
+type OverviewData = Awaited<ReturnType<typeof fetchPulseOverview>>;
 
 const KPI_DEFINITIONS: Record<string, { description: string; color: string }> = {
   topics: {
@@ -64,7 +71,7 @@ const KPI_DEFINITIONS: Record<string, { description: string; color: string }> = 
 /* ------------------------------------------------------------------ */
 
 function usePulseOverview() {
-  return useRequest(fetchPulseOverview, { refreshDeps: [] });
+  return useRequest<OverviewData, []>(fetchPulseOverview, { refreshDeps: [] });
 }
 
 /* ------------------------------------------------------------------ */
@@ -72,8 +79,6 @@ function usePulseOverview() {
 /* ------------------------------------------------------------------ */
 
 export default function PulseOverview() {
-  usePageTitle('Pulse · Overview');
-
   const { data, loading, error, refresh } = usePulseOverview();
   const lastUpdated = data ? dayjs(data.refreshedAt).format('HH:mm:ss') : null;
 
@@ -212,7 +217,9 @@ export default function PulseOverview() {
                           <Tag color={meta.color}>{kpi.label}</Tag>
                           {typeof kpi.delta === 'number' && (
                             <Text type={kpi.delta >= 0 ? 'success' : 'danger'}>
-                              {kpi.delta >= 0 ? `+${kpi.delta}%` : `${kpi.delta}%`}
+                              {kpi.delta >= 0
+                                ? `+${kpi.delta}%`
+                                : `${kpi.delta}%`}
                             </Text>
                           )}
                         </Space>

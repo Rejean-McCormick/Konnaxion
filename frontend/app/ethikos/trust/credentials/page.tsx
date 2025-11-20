@@ -1,42 +1,155 @@
 // app/ethikos/trust/credentials/page.tsx
 'use client';
 
-import { useState } from 'react';
+/**
+ * Sources used to build this implementation:
+ * - Baseline page from the app dump (existing upload flow, alert, steps content).
+ * - Trust services showing `uploadCredential` helper (currently a stub without a real backend).
+ */
+
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
-import { PageContainer, ProCard } from '@ant-design/pro-components';
+import dayjs from 'dayjs';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  ProDescriptions,
+  type ProColumns,
+} from '@ant-design/pro-components';
 import {
   Alert,
   Button,
   Divider,
+  Drawer,
   List,
+  Popconfirm,
   Result,
   Space,
   Steps,
   Tag,
+  Tooltip,
   Typography,
   Upload,
   message as antdMessage,
 } from 'antd';
 import {
+  ClockCircleOutlined,
+  EyeInvisibleOutlined,
+  FileTextOutlined,
   InboxOutlined,
   SafetyCertificateOutlined,
-  EyeInvisibleOutlined,
-  ClockCircleOutlined,
 } from '@ant-design/icons';
-import usePageTitle from '@/hooks/usePageTitle';
-import { uploadCredential } from '@/services/trust';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '../../EthikosPageShell';
+import { uploadCredential, type Credential } from '@/services/trust';
+
+/* ---------------------------------------------
+ * Types & local helpers
+ * ------------------------------------------- */
+
+type CredentialStatus = 'Verified' | 'Pending' | 'Rejected';
+
+type CredentialRow = Credential & {
+  status: CredentialStatus;
+  notes?: string;
+};
+
+const statusColor: Record<CredentialStatus, string> = {
+  Verified: 'green',
+  Pending: 'gold',
+  Rejected: 'red',
+};
+
+function toTitleFromFilename(name?: string): string {
+  if (!name) return 'Untitled credential';
+  return name.replace(/\.[a-zA-Z0-9]+$/, '').replace(/[_\-]+/g, ' ').trim();
+}
+
+/* ---------------------------------------------
+ * Data fetching (no backend yet → returns mock)
+ * When backend is ready, replace the body with a GET
+ * using the shared axios helper, e.g.:
+ *   const { items } = await get<{items: CredentialRow[]}>('trust/credentials')
+ * ------------------------------------------- */
+async function fetchUserCredentials(): Promise<CredentialRow[]> {
+  // Mocked examples to drive the UI until the real endpoint exists.
+  return [
+    {
+      id: 'cred-001',
+      title: 'MSc Climate Policy',
+      issuer: 'London School of Economics',
+      issuedAt: '2022-09-01T00:00:00.000Z',
+      url: 'https://example.org/lse-msc.pdf',
+      status: 'Verified',
+      notes: 'Verified by steward #42',
+    },
+    {
+      id: 'cred-002',
+      title: 'Professional Engineer (P.Eng.)',
+      issuer: 'PEO',
+      issuedAt: '2021-03-15T00:00:00.000Z',
+      status: 'Pending',
+      notes: 'Queued for human review',
+    },
+    {
+      id: 'cred-003',
+      title: 'Research Fellow – Energy Policy',
+      issuer: 'Policy Institute',
+      issuedAt: '2020-01-10T00:00:00.000Z',
+      status: 'Rejected',
+      notes: 'Insufficient documentation',
+    },
+  ];
+}
+
+/* ---------------------------------------------
+ * Component
+ * ------------------------------------------- */
 
 const { Text, Paragraph } = Typography;
 
 export default function Credentials() {
-  usePageTitle('Trust · Credentials');
-
   const [done, setDone] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [lastFileName, setLastFileName] = useState<string | undefined>();
+  const [detail, setDetail] = useState<CredentialRow | null>(null);
 
+  // Existing stepper UX: 0=Upload, 1=Review, 2=Outcome
   const currentStep = done ? 2 : uploading ? 1 : 0;
 
+  // List of existing credentials (mocked for now; see fetcher above).
+  const { data, loading, refresh, mutate } = useRequest<CredentialRow[], []>(
+    fetchUserCredentials,
+  );
+
+  const rows = data ?? [];
+
+  // Quick counters
+  const counters = useMemo(() => {
+    const verified = rows.filter((r) => r.status === 'Verified').length;
+    const pending = rows.filter((r) => r.status === 'Pending').length;
+    const rejected = rows.filter((r) => r.status === 'Rejected').length;
+    return { verified, pending, rejected, total: rows.length };
+  }, [rows]);
+
+  const summaryTags = (
+    <Space wrap>
+      <Tag key="total">Total: {counters.total}</Tag>
+      <Tag color="green" key="v">
+        Verified: {counters.verified}
+      </Tag>
+      <Tag color="gold" key="p">
+        Pending: {counters.pending}
+      </Tag>
+      <Tag color="red" key="r">
+        Rejected: {counters.rejected}
+      </Tag>
+    </Space>
+  );
+
+  // Upload handler, wired to services/trust::uploadCredential
   const uploadProps = {
     name: 'file',
     multiple: false,
@@ -61,12 +174,31 @@ export default function Credentials() {
 
       return true;
     },
-    customRequest: async ({ file, onSuccess, onError }: any) => {
+    customRequest: async ({
+      file,
+      onSuccess,
+      onError,
+    }: {
+      file: File;
+      onSuccess?: (res: unknown) => void;
+      onError?: (err: unknown) => void;
+    }) => {
       try {
         setUploading(true);
-        setLastFileName((file as File).name);
-        await uploadCredential(file as File);
+        setLastFileName(file.name);
+        await uploadCredential(file); // no-op until backend exists
         onSuccess?.('ok');
+
+        // Optimistic insert into the table list as "Pending"
+        const optimistic: CredentialRow = {
+          id: `tmp-${Date.now()}`,
+          title: toTitleFromFilename(file.name),
+          issuer: '—',
+          issuedAt: new Date().toISOString(),
+          status: 'Pending',
+          notes: 'Awaiting manual verification',
+        };
+        mutate([optimistic, ...rows]);
         setDone(true);
         antdMessage.success('Credential uploaded. It will be reviewed shortly.');
       } catch (error) {
@@ -78,8 +210,104 @@ export default function Credentials() {
     },
   };
 
-  return (
+  // Table columns
+  const columns: ProColumns<CredentialRow>[] = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      ellipsis: true,
+      render: (_, row) => (
+        <Space size={6}>
+          <FileTextOutlined />
+          {row.url ? (
+            <a href={row.url} target="_blank" rel="noreferrer">
+              {row.title}
+            </a>
+          ) : (
+            <span>{row.title}</span>
+          )}
+        </Space>
+      ),
+    },
+    { title: 'Issuer', dataIndex: 'issuer', width: 220, ellipsis: true },
+    {
+      title: 'Issued',
+      dataIndex: 'issuedAt',
+      width: 140,
+      valueType: 'date',
+      renderText: (v) => dayjs(v).format('YYYY-MM-DD'),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      width: 120,
+      valueEnum: {
+        Verified: { text: 'Verified', status: 'Success' },
+        Pending: { text: 'Pending', status: 'Processing' },
+        Rejected: { text: 'Rejected', status: 'Error' },
+      },
+      render: (_, row) => <Tag color={statusColor[row.status]}>{row.status}</Tag>,
+    },
+    {
+      title: 'Actions',
+      width: 260,
+      valueType: 'option',
+      render: (_, row) => {
+        const canDownload = !!row.url;
+        return [
+          <Button size="small" key="view" onClick={() => setDetail(row)}>
+            View
+          </Button>,
+          <Button
+            size="small"
+            key="download"
+            disabled={!canDownload}
+            href={row.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Download
+          </Button>,
+          row.status !== 'Rejected' ? (
+            <Popconfirm
+              key="remove"
+              title="Request removal?"
+              description="A steward will review and remove this credential from your profile."
+              onConfirm={() => {
+                antdMessage.success('Removal request submitted.');
+              }}
+            >
+              <Button size="small" danger>
+                Request removal
+              </Button>
+            </Popconfirm>
+          ) : (
+            <Tooltip
+              key="resubmit"
+              title="Attach additional documents and re‑submit"
+            >
+              <Button
+                size="small"
+                type="dashed"
+                onClick={() => {
+                  antdMessage.info(
+                    'Re‑submit by uploading an updated document below.',
+                  );
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                Re‑submit
+              </Button>
+            </Tooltip>
+          ),
+        ];
+      },
+    },
+  ];
+
+  const pageBody = (
     <PageContainer ghost>
+      {/* Intro & guidance */}
       <Alert
         type="info"
         showIcon
@@ -93,15 +321,16 @@ export default function Credentials() {
         }
         description={
           <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
-            Upload real‑world credentials (certifications, professional memberships, academic
-            records) that help stewards understand why your voice carries expertise in certain
-            debates. These documents are reviewed manually and do not replace community‑based
-            reputation.
+            Upload real‑world credentials (certifications, professional memberships,
+            academic records) that help stewards understand why your voice carries
+            expertise in certain debates. These documents are reviewed manually and do
+            not replace community‑based reputation.
           </Paragraph>
         }
       />
 
       <ProCard gutter={16} wrap>
+        {/* Left column: upload flow */}
         <ProCard
           colSpan={{ xs: 24, lg: 14 }}
           title="Upload a new credential"
@@ -121,8 +350,8 @@ export default function Credentials() {
                     </div>
                   )}
                   <Text>
-                    Your document is now queued for human review. If accepted, it will appear as a
-                    verified note in your Ethikos trust profile.
+                    Your document is now queued for human review. If accepted, it will
+                    appear as a verified note in your Ethikos trust profile.
                   </Text>
                 </>
               }
@@ -158,18 +387,20 @@ export default function Credentials() {
 
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Text type="secondary">
-                  Tip: upload focused evidence rather than full CVs. For example, a single
-                  certification for climate policy is more helpful than a long résumé.
+                  Tip: upload focused evidence rather than full CVs. For example, a
+                  single certification for climate policy is more helpful than a long
+                  résumé.
                 </Text>
                 <Text type="secondary">
-                  You can always complement these documents with activity‑based reputation earned
-                  through debates, voting and impact work.
+                  You can always complement these documents with activity‑based
+                  reputation earned through debates, voting and impact work.
                 </Text>
               </Space>
             </>
           )}
         </ProCard>
 
+        {/* Right column: how it works + examples */}
         <ProCard
           colSpan={{ xs: 24, lg: 10 }}
           title="How credentials fit into Ethikos trust"
@@ -182,7 +413,8 @@ export default function Credentials() {
             items={[
               {
                 title: 'Upload',
-                description: 'You submit a credential associated with your real‑world expertise.',
+                description:
+                  'You submit a credential associated with your real‑world expertise.',
               },
               {
                 title: 'Review',
@@ -238,7 +470,83 @@ export default function Credentials() {
             )}
           />
         </ProCard>
+
+        {/* Full-width: My credentials */}
+        <ProCard colSpan={24} title="My credentials" ghost>
+          <ProTable<CredentialRow>
+            rowKey="id"
+            loading={loading}
+            columns={columns}
+            dataSource={rows}
+            pagination={{ pageSize: 5, showSizeChanger: true }}
+            search={false}
+            toolBarRender={() => [
+              <Tooltip key="refresh" title="Refresh">
+                <Button onClick={() => refresh()}>Refresh</Button>
+              </Tooltip>,
+            ]}
+          />
+        </ProCard>
       </ProCard>
+
+      {/* Drawer: credential details */}
+      <Drawer
+        open={!!detail}
+        width={520}
+        title="Credential details"
+        onClose={() => setDetail(null)}
+      >
+        {detail && (
+          <ProDescriptions<CredentialRow>
+            column={1}
+            dataSource={detail}
+            columns={[
+              { title: 'Title', dataIndex: 'title' },
+              { title: 'Issuer', dataIndex: 'issuer' },
+              {
+                title: 'Issued',
+                dataIndex: 'issuedAt',
+                render: (_, row) => dayjs(row.issuedAt).format('YYYY-MM-DD'),
+              },
+              {
+                title: 'Status',
+                dataIndex: 'status',
+                render: (_, row) => (
+                  <Tag color={statusColor[row.status]}>{row.status}</Tag>
+                ),
+              },
+              detail.url
+                ? {
+                    title: 'Document',
+                    dataIndex: 'url',
+                    render: (_, row) => (
+                      <a href={row.url} target="_blank" rel="noreferrer">
+                        Open document
+                      </a>
+                    ),
+                  }
+                : undefined,
+              detail.notes
+                ? {
+                    title: 'Notes',
+                    dataIndex: 'notes',
+                  }
+                : undefined,
+            ].filter(Boolean) as ProColumns<CredentialRow>[]}
+          />
+        )}
+      </Drawer>
     </PageContainer>
+  );
+
+  return (
+    <EthikosPageShell
+      title="Credentials"
+      sectionLabel="Trust"
+      subtitle="Upload and manage real‑world credentials that help stewards understand your expertise in Ethikos debates."
+      secondaryActions={summaryTags}
+    >
+      {pageBody}
+    </EthikosPageShell>
   );
 }

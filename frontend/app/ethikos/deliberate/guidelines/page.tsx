@@ -17,7 +17,6 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import usePageTitle from '@/hooks/usePageTitle';
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 
 const { Title, Paragraph, Text } = Typography;
@@ -81,12 +80,11 @@ const quickChecklistItems: string[] = [
 ];
 
 export default function Guidelines() {
-  usePageTitle('Deliberate · Guidelines');
-
   return (
     <EthikosPageShell
       title="Deliberation guidelines"
       subtitle="Shared rules for Korum debates and Konsultations consultations in ethiKos."
+      sectionLabel="Deliberate"
     >
       <PageContainer ghost>
         <Row gutter={[24, 24]}>
@@ -131,7 +129,9 @@ export default function Guidelines() {
                     'Doxxing or disclosure of private data',
                     'Incitement to violence or illegal activity',
                   ]}
-                  renderItem={(item) => <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>}
+                  renderItem={(item) => (
+                    <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                  )}
                 />
               </Card>
             </Space>
@@ -153,7 +153,9 @@ export default function Guidelines() {
                   'Threaded arguments (Korum) where reasoning and evidence are visible.',
                   'Time‑boxed consultations (Konsultations) with transparent weighted results.',
                 ]}
-                renderItem={(item) => <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
               />
 
               <Alert
@@ -164,8 +166,8 @@ export default function Guidelines() {
                 description={
                   <Space direction="vertical">
                     <Text>
-                      • Stance scale is fixed at −3…+3; 0 = neutral. Your slider should reflect
-                      what you actually argue.
+                      • Stance scale is fixed at −3…+3; 0 = neutral. Your slider should reflect what
+                      you actually argue.
                     </Text>
                     <Text>
                       • Moderation auto‑hide is triggered after <strong>3 independent reports</strong>.
@@ -204,7 +206,9 @@ export default function Guidelines() {
                   'Make it possible for others to verify what you claim.',
                   'Remain readable and accessible to non‑experts where possible.',
                 ]}
-                renderItem={(item) => <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
               />
             </section>
 
@@ -227,7 +231,9 @@ export default function Guidelines() {
                   'Signal disagreement explicitly (e.g. “I disagree because…”), not by sarcasm alone.',
                   'Use formatting (short paragraphs, bullet points) to make complex ideas readable.',
                 ]}
-                renderItem={(item) => <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
               />
             </section>
 
@@ -249,7 +255,9 @@ export default function Guidelines() {
                   'If you rely on secondary sources (media, blogs), prefer outlets with clear editorial standards.',
                   'Clearly mark personal experience as such and avoid overgeneralising from it.',
                 ]}
-                renderItem={(item) => <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
               />
 
               <Card
@@ -315,7 +323,9 @@ export default function Guidelines() {
                   'Avoid repeating the same argument without engaging with counter‑arguments.',
                   'Flag possible conflicts of interest when relevant to the topic.',
                 ]}
-                renderItem={(item) => <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
               />
             </section>
 
@@ -407,8 +417,8 @@ export default function Guidelines() {
                       <>
                         <Text strong>1. Trigger</Text>
                         <Paragraph style={{ marginBottom: 0 }}>
-                          You receive a notice that a post was removed or that your participation
-                          is temporarily limited.
+                          You receive a notice that a post was removed or that your participation is
+                          temporarily limited.
                         </Paragraph>
                       </>
                     ),
@@ -432,8 +442,8 @@ export default function Guidelines() {
                       <>
                         <Text strong>3. Secondary review</Text>
                         <Paragraph style={{ marginBottom: 0 }}>
-                          A moderator other than the original reviewer, where possible, examines
-                          the case and may ask for clarification.
+                          A moderator other than the original reviewer, where possible, examines the
+                          case and may ask for clarification.
                         </Paragraph>
                       </>
                     ),
