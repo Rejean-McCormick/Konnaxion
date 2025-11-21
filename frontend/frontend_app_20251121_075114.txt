@@ -1396,8 +1396,6 @@ export default function CurrentVotingWeightPage() {
 // app/ethikos/admin/audit/page.tsx
 'use client';
 
-// :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1} :contentReference[oaicite:2]{index=2}
-
 // Enhanced Ethikos admin audit logs view using Ant Design ProComponents
 // and the canonical audit services.
 
@@ -1434,7 +1432,7 @@ import {
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchAuditLogs,
   type AuditPayload,
@@ -1448,8 +1446,6 @@ type SeverityFilter = 'all' | NonNullable<LogRow['severity']>;
 type TimeWindow = '24h' | '7d' | '30d' | 'all';
 
 export default function AuditLogs(): JSX.Element {
-  usePageTitle('Admin · Audit Logs');
-
   const [query, setQuery] = React.useState<AuditQueryParams>({
     page: 1,
     pageSize: 20,
@@ -1715,239 +1711,244 @@ export default function AuditLogs(): JSX.Element {
 
   const hasAnyData = totalCount > 0;
 
-  return (
-    <PageContainer
-      ghost
-      loading={loading}
-      extra={
-        <Space>
-          {lastRefreshedLabel && (
-            <Tooltip title={`Last refreshed at ${lastRefreshedLabel}`}>
-              <Badge
-                count={<ClockCircleOutlined style={{ color: '#52c41a' }} />}
-              />
-            </Tooltip>
-          )}
-          <Button
-            icon={<ReloadOutlined />}
-            size="small"
-            onClick={() => refresh()}
+  const secondaryActions = (
+    <Space>
+      {lastRefreshedLabel && (
+        <Tooltip title={`Last refreshed at ${lastRefreshedLabel}`}>
+          <Badge
+            count={<ClockCircleOutlined style={{ color: '#52c41a' }} />}
           />
-        </Space>
-      }
-    >
-      {!hasAnyData && !loading && !error && (
-        <Empty
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No audit events have been recorded yet."
-          style={{ marginBottom: 16 }}
-        />
+        </Tooltip>
       )}
-
-      {unauthorized && (
-        <Alert
-          type="warning"
-          showIcon
-          style={{ marginBottom: 16 }}
-          message="You do not have permission to view audit logs."
-          description="Ask an administrator to grant you the ADMIN role in Ethikos to access the audit trail."
-        />
-      )}
-
-      {error && !unauthorized && (
-        <Alert
-          type="error"
-          showIcon
-          style={{ marginBottom: 16 }}
-          message="Unable to load audit logs."
-          description="Check your connection or try again. If the problem persists, the Ethikos audit service may be temporarily unavailable."
-        />
-      )}
-
-      {/* KPI band */}
-      <ProCard gutter={16} wrap style={{ marginBottom: 16 }} ghost>
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 6 }}
-          statistic={{
-            title: 'Events (all)',
-            value: totalCount,
-            description: 'Total events matching current server filters',
-          }}
-        />
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 6 }}
-          statistic={{
-            title: 'Events in view',
-            value: pageCount,
-            description: 'After local time window filter',
-          }}
-        />
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 6 }}
-          statistic={{
-            title: 'Critical / Warn',
-            value: criticalCount,
-            suffix:
-              warnCount > 0 ? ` critical · ${warnCount} warn` : ' critical',
-            description: 'On the current page',
-          }}
-        />
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 6 }}
-          statistic={{
-            title: 'Outcome (ok / warn / error)',
-            value: okStatus,
-            suffix: ` / ${warnStatus} / ${errorStatus}`,
-            description: 'Status of operations on this page',
-          }}
-        />
-      </ProCard>
-
-      {/* Filters */}
-      <ProCard ghost style={{ marginBottom: 16 }}>
-        <Space wrap align="center" size={[16, 12]}>
-          <Space>
-            <FilterOutlined />
-            <Text strong>Filters</Text>
-          </Space>
-
-          <Segmented
-            options={[
-              { label: 'All severities', value: 'all' },
-              { label: 'Info', value: 'info' },
-              { label: 'Warn', value: 'warn' },
-              { label: 'Critical', value: 'critical' },
-            ]}
-            value={severityFilter}
-            onChange={handleSeverityChange}
-          />
-
-          <Segmented
-            options={[
-              { label: 'Last 24h', value: '24h' },
-              { label: '7 days', value: '7d' },
-              { label: '30 days', value: '30d' },
-              { label: 'All time', value: 'all' },
-            ]}
-            value={timeWindow}
-            onChange={(value) =>
-              setTimeWindow(value as TimeWindow)
-            }
-          />
-
-          <Input.Search
-            allowClear
-            placeholder="Search actor, action, or target"
-            style={{ width: 280 }}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onSearch={handleSearch}
-          />
-        </Space>
-      </ProCard>
-
-      {/* Main table */}
-      <ProTable<LogRow>
-        rowKey="id"
-        search={false}
-        options={false}
-        loading={loading}
-        columns={columns}
-        dataSource={visibleLogs}
-        pagination={{
-          current: data?.page ?? query.page ?? 1,
-          pageSize: data?.pageSize ?? query.pageSize ?? 20,
-          total: data?.total,
-          showSizeChanger: true,
-          showTotal: (total) => `${total} events`,
-        }}
-        onChange={handleTableChange}
-        scroll={{ x: 1100 }}
-        locale={{
-          emptyText: unauthorized
-            ? 'Access denied for audit logs.'
-            : 'No audit events to display.',
-        }}
+      <Button
+        icon={<ReloadOutlined />}
+        size="small"
+        onClick={() => refresh()}
       />
+    </Space>
+  );
 
-      {/* Detail drawer */}
-      <Drawer
-        title="Audit event details"
-        width={520}
-        open={!!detailRow}
-        onClose={() => setDetailRow(null)}
-        destroyOnClose
-      >
-        {detailRow && (
-          <Space
-            direction="vertical"
-            size="middle"
-            style={{ width: '100%' }}
-          >
-            <Space wrap>
-              {severityTag(detailRow.severity)}
-              {statusTag(detailRow.status)}
-              {detailRow.entity && <Tag>{detailRow.entity}</Tag>}
-              {detailRow.entityId && (
-                <Tag color="purple">#{String(detailRow.entityId)}</Tag>
-              )}
+  return (
+    <EthikosPageShell
+      title="Audit logs"
+      sectionLabel="Admin"
+      subtitle="Immutable trail of sensitive actions across Ethikos for governance, debugging, and incident response."
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost loading={loading}>
+        {!hasAnyData && !loading && !error && (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No audit events have been recorded yet."
+            style={{ marginBottom: 16 }}
+          />
+        )}
+
+        {unauthorized && (
+          <Alert
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="You do not have permission to view audit logs."
+            description="Ask an administrator to grant you the ADMIN role in Ethikos to access the audit trail."
+          />
+        )}
+
+        {error && !unauthorized && (
+          <Alert
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="Unable to load audit logs."
+            description="Check your connection or try again. If the problem persists, the Ethikos audit service may be temporarily unavailable."
+          />
+        )}
+
+        {/* KPI band */}
+        <ProCard gutter={16} wrap style={{ marginBottom: 16 }} ghost>
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 6 }}
+            statistic={{
+              title: 'Events (all)',
+              value: totalCount,
+              description: 'Total events matching current server filters',
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 6 }}
+            statistic={{
+              title: 'Events in view',
+              value: pageCount,
+              description: 'After local time window filter',
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 6 }}
+            statistic={{
+              title: 'Critical / Warn',
+              value: criticalCount,
+              suffix:
+                warnCount > 0 ? ` critical · ${warnCount} warn` : ' critical',
+              description: 'On the current page',
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 6 }}
+            statistic={{
+              title: 'Outcome (ok / warn / error)',
+              value: okStatus,
+              suffix: ` / ${warnStatus} / ${errorStatus}`,
+              description: 'Status of operations on this page',
+            }}
+          />
+        </ProCard>
+
+        {/* Filters */}
+        <ProCard ghost style={{ marginBottom: 16 }}>
+          <Space wrap align="center" size={[16, 12]}>
+            <Space>
+              <FilterOutlined />
+              <Text strong>Filters</Text>
             </Space>
 
-            <Descriptions column={1} size="small" bordered>
-              <Descriptions.Item label="Time">
-                {dayjs(detailRow.ts).format('YYYY-MM-DD HH:mm:ss')}
-              </Descriptions.Item>
-              <Descriptions.Item label="Actor">
-                {detailRow.actor || (
-                  <Text type="secondary">System</Text>
-                )}
-              </Descriptions.Item>
-              <Descriptions.Item label="Action">
-                {detailRow.action}
-              </Descriptions.Item>
-              {detailRow.target && (
-                <Descriptions.Item label="Target">
-                  {detailRow.target}
-                </Descriptions.Item>
-              )}
-              {detailRow.ip && (
-                <Descriptions.Item label="Source IP">
-                  {detailRow.ip}
-                </Descriptions.Item>
-              )}
-              {detailRow.status && (
-                <Descriptions.Item label="Outcome">
-                  {statusTag(detailRow.status)}
-                </Descriptions.Item>
-              )}
-            </Descriptions>
+            <Segmented
+              options={[
+                { label: 'All severities', value: 'all' },
+                { label: 'Info', value: 'info' },
+                { label: 'Warn', value: 'warn' },
+                { label: 'Critical', value: 'critical' },
+              ]}
+              value={severityFilter}
+              onChange={handleSeverityChange}
+            />
 
-            {detailRow.meta &&
-              Object.keys(detailRow.meta).length > 0 && (
-                <div>
-                  <Text strong>Raw metadata</Text>
-                  <Paragraph type="secondary">
-                    JSON payload supplied by the backend for this
-                    event.
-                  </Paragraph>
-                  <pre
-                    style={{
-                      maxHeight: 260,
-                      overflow: 'auto',
-                      background: '#f5f5f5',
-                      padding: 12,
-                      borderRadius: 4,
-                      fontSize: 12,
-                    }}
-                  >
-                    {JSON.stringify(detailRow.meta, null, 2)}
-                  </pre>
-                </div>
-              )}
+            <Segmented
+              options={[
+                { label: 'Last 24h', value: '24h' },
+                { label: '7 days', value: '7d' },
+                { label: '30 days', value: '30d' },
+                { label: 'All time', value: 'all' },
+              ]}
+              value={timeWindow}
+              onChange={(value) =>
+                setTimeWindow(value as TimeWindow)
+              }
+            />
+
+            <Input.Search
+              allowClear
+              placeholder="Search actor, action, or target"
+              style={{ width: 280 }}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+              onSearch={handleSearch}
+            />
           </Space>
-        )}
-      </Drawer>
-    </PageContainer>
+        </ProCard>
+
+        {/* Main table */}
+        <ProTable<LogRow>
+          rowKey="id"
+          search={false}
+          options={false}
+          loading={loading}
+          columns={columns}
+          dataSource={visibleLogs}
+          pagination={{
+            current: data?.page ?? query.page ?? 1,
+            pageSize: data?.pageSize ?? query.pageSize ?? 20,
+            total: data?.total,
+            showSizeChanger: true,
+            showTotal: (total) => `${total} events`,
+          }}
+          onChange={handleTableChange}
+          scroll={{ x: 1100 }}
+          locale={{
+            emptyText: unauthorized
+              ? 'Access denied for audit logs.'
+              : 'No audit events to display.',
+          }}
+        />
+
+        {/* Detail drawer */}
+        <Drawer
+          title="Audit event details"
+          width={520}
+          open={!!detailRow}
+          onClose={() => setDetailRow(null)}
+          destroyOnClose
+        >
+          {detailRow && (
+            <Space
+              direction="vertical"
+              size="middle"
+              style={{ width: '100%' }}
+            >
+              <Space wrap>
+                {severityTag(detailRow.severity)}
+                {statusTag(detailRow.status)}
+                {detailRow.entity && <Tag>{detailRow.entity}</Tag>}
+                {detailRow.entityId && (
+                  <Tag color="purple">#{String(detailRow.entityId)}</Tag>
+                )}
+              </Space>
+
+              <Descriptions column={1} size="small" bordered>
+                <Descriptions.Item label="Time">
+                  {dayjs(detailRow.ts).format('YYYY-MM-DD HH:mm:ss')}
+                </Descriptions.Item>
+                <Descriptions.Item label="Actor">
+                  {detailRow.actor || (
+                    <Text type="secondary">System</Text>
+                  )}
+                </Descriptions.Item>
+                <Descriptions.Item label="Action">
+                  {detailRow.action}
+                </Descriptions.Item>
+                {detailRow.target && (
+                  <Descriptions.Item label="Target">
+                    {detailRow.target}
+                  </Descriptions.Item>
+                )}
+                {detailRow.ip && (
+                  <Descriptions.Item label="Source IP">
+                    {detailRow.ip}
+                  </Descriptions.Item>
+                )}
+                {detailRow.status && (
+                  <Descriptions.Item label="Outcome">
+                    {statusTag(detailRow.status)}
+                  </Descriptions.Item>
+                )}
+              </Descriptions>
+
+              {detailRow.meta &&
+                Object.keys(detailRow.meta).length > 0 && (
+                  <div>
+                    <Text strong>Raw metadata</Text>
+                    <Paragraph type="secondary">
+                      JSON payload supplied by the backend for this
+                      event.
+                    </Paragraph>
+                    <pre
+                      style={{
+                        maxHeight: 260,
+                        overflow: 'auto',
+                        background: '#f5f5f5',
+                        padding: 12,
+                        borderRadius: 4,
+                        fontSize: 12,
+                      }}
+                    >
+                      {JSON.stringify(detailRow.meta, null, 2)}
+                    </pre>
+                  </div>
+                )}
+            </Space>
+          )}
+        </Drawer>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -1960,9 +1961,11 @@ export default function AuditLogs(): JSX.Element {
 
 import React, { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import { PageContainer } from '@ant-design/pro-components';
-import { ProTable } from '@ant-design/pro-components';
-import type { ProColumns } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProTable,
+  type ProColumns,
+} from '@ant-design/pro-components';
 import {
   Alert,
   App as AntdApp,
@@ -1983,8 +1986,13 @@ import {
   StopOutlined,
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchModerationQueue, actOnReport, type ModerationPayload } from '@/services/admin';
+
+import EthikosPageShell from '../../EthikosPageShell';
+import {
+  fetchModerationQueue,
+  actOnReport,
+  type ModerationPayload,
+} from '@/services/admin';
 
 const { Text, Paragraph } = Typography;
 
@@ -2027,9 +2035,6 @@ interface ModerationQueueItem {
 /**
  * Normalizes whatever the backend returns from admin/moderation
  * into a richer, Ethikos‑specific moderation item.
- *
- * Works with the current ModerationPayload shape and can tolerate
- * future expansions (topicId, argumentId, severity, etc.).
  */
 function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
   if (!raw) return [];
@@ -2047,7 +2052,6 @@ function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
         ? item.status
         : 'Pending';
 
-    // Basic heuristics to enrich from whatever the backend gives us
     const targetType: ModerationTargetType =
       (item.targetType as ModerationTargetType) ??
       (item.entityType as ModerationTargetType) ??
@@ -2091,15 +2095,12 @@ function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
 }
 
 export default function EthikosModerationPage(): JSX.Element {
-  usePageTitle('Admin · Moderation');
-
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [activeStatusFilter, setActiveStatusFilter] = useState<ModerationStatus | 'all'>(
-    'Pending',
-  );
-  const [detailDrawerItem, setDetailDrawerItem] = useState<ModerationQueueItem | null>(
-    null,
-  );
+  const [activeStatusFilter, setActiveStatusFilter] = useState<
+    ModerationStatus | 'all'
+  >('Pending');
+  const [detailDrawerItem, setDetailDrawerItem] =
+    useState<ModerationQueueItem | null>(null);
   const [globalActionLoading, setGlobalActionLoading] = useState(false);
 
   const { message } = AntdApp.useApp();
@@ -2131,7 +2132,6 @@ export default function EthikosModerationPage(): JSX.Element {
   ) => {
     try {
       setGlobalActionLoading(true);
-      // actOnReport: remove = true => delete argument/content, false => approve+resolve
       const remove = action === 'remove';
       await actOnReport(record.id, remove);
       message.success(
@@ -2214,12 +2214,30 @@ export default function EthikosModerationPage(): JSX.Element {
     </Space>
   );
 
+  const headerActions = (
+    <Space>
+      {statusFilterButtons}
+      <Button
+        icon={<ReloadOutlined />}
+        onClick={() => refresh()}
+        loading={loading || globalActionLoading}
+        disabled={!!unauthorized}
+      >
+        Refresh queue
+      </Button>
+    </Space>
+  );
+
   const severityTag = (severity?: Severity): ReactNode => {
     if (!severity) return null;
     const color =
       severity === 'high' ? 'red' : severity === 'medium' ? 'orange' : 'blue';
     const text =
-      severity === 'high' ? 'High severity' : severity === 'medium' ? 'Medium' : 'Low';
+      severity === 'high'
+        ? 'High severity'
+        : severity === 'medium'
+        ? 'Medium'
+        : 'Low';
 
     return (
       <Tag color={color}>
@@ -2323,7 +2341,8 @@ export default function EthikosModerationPage(): JSX.Element {
       ],
       onFilter: (value, record) =>
         record.status === (String(value) as ModerationStatus),
-      render: (_dom: ReactNode, record: ModerationQueueItem) => statusBadge(record.status),
+      render: (_dom: ReactNode, record: ModerationQueueItem) =>
+        statusBadge(record.status),
     },
     {
       title: 'Timeline',
@@ -2408,38 +2427,9 @@ export default function EthikosModerationPage(): JSX.Element {
     },
   ];
 
-  return (
+  const pageBody = (
     <PageContainer ghost loading={loading}>
       <Space direction="vertical" style={{ width: '100%' }} size="large">
-        <Space
-          align="center"
-          style={{
-            width: '100%',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-          }}
-        >
-          <div>
-            <Text strong>Ethikos moderation queue</Text>
-            <br />
-            <Text type="secondary">
-              Review and act on reports for debate arguments, topics, and participant
-              behaviour.
-            </Text>
-          </div>
-          <Space>
-            {statusFilterButtons}
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => refresh()}
-              loading={loading || globalActionLoading}
-              disabled={!!unauthorized}
-            >
-              Refresh queue
-            </Button>
-          </Space>
-        </Space>
-
         {unauthorized && (
           <Alert
             type="error"
@@ -2457,10 +2447,10 @@ export default function EthikosModerationPage(): JSX.Element {
             description={
               <>
                 Arguments that receive three or more independent reports are
-                automatically hidden until a moderator reviews them. Approve content
-                that fits the Ethikos charter (respect, evidence‑based reasoning, and
-                inclusion), remove content that clearly violates it, and escalate
-                borderline or sensitive cases.
+                automatically hidden until a moderator reviews them. Approve
+                content that fits the Ethikos charter (respect, evidence‑based
+                reasoning, and inclusion), remove content that clearly violates
+                it, and escalate borderline or sensitive cases.
               </>
             }
           />
@@ -2524,7 +2514,9 @@ export default function EthikosModerationPage(): JSX.Element {
                   description="This will remove content for all selected reports and resolve them."
                   okText="Remove"
                   okType="danger"
-                  icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+                  icon={
+                    <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
+                  }
                   disabled={!!unauthorized || !selectedRowKeys.length}
                   onConfirm={() => onBulkAction('remove')}
                 >
@@ -2550,12 +2542,18 @@ export default function EthikosModerationPage(): JSX.Element {
           onClose={() => setDetailDrawerItem(null)}
         >
           {detailDrawerItem && (
-            <Space direction="vertical" style={{ width: '100%' }} size="middle">
+            <Space
+              direction="vertical"
+              style={{ width: '100%' }}
+              size="middle"
+            >
               <Space>
                 {targetTag(detailDrawerItem)}
                 {severityTag(detailDrawerItem.severity)}
                 {statusBadge(detailDrawerItem.status)}
-                {detailDrawerItem.reason && <Tag>{detailDrawerItem.reason}</Tag>}
+                {detailDrawerItem.reason && (
+                  <Tag>{detailDrawerItem.reason}</Tag>
+                )}
               </Space>
 
               {detailDrawerItem.contextTitle && (
@@ -2577,7 +2575,8 @@ export default function EthikosModerationPage(): JSX.Element {
                 <Paragraph>
                   {detailDrawerItem.authorName && (
                     <>
-                      Author: <Text strong>{detailDrawerItem.authorName}</Text>
+                      Author:{' '}
+                      <Text strong>{detailDrawerItem.authorName}</Text>
                       <br />
                     </>
                   )}
@@ -2606,20 +2605,24 @@ export default function EthikosModerationPage(): JSX.Element {
                   {detailDrawerItem.createdAt && (
                     <>
                       Reported:{' '}
-                      {new Date(detailDrawerItem.createdAt).toLocaleString(
-                        undefined,
-                        { dateStyle: 'medium', timeStyle: 'short' },
-                      )}
+                      {new Date(
+                        detailDrawerItem.createdAt,
+                      ).toLocaleString(undefined, {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      })}
                       <br />
                     </>
                   )}
                   {detailDrawerItem.lastActionAt && (
                     <>
                       Last action:{' '}
-                      {new Date(detailDrawerItem.lastActionAt).toLocaleString(
-                        undefined,
-                        { dateStyle: 'medium', timeStyle: 'short' },
-                      )}
+                      {new Date(
+                        detailDrawerItem.lastActionAt,
+                      ).toLocaleString(undefined, {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      })}
                     </>
                   )}
                 </Paragraph>
@@ -2637,17 +2640,33 @@ export default function EthikosModerationPage(): JSX.Element {
       </Space>
     </PageContainer>
   );
+
+  return (
+    <EthikosPageShell
+      title="Moderation queue"
+      sectionLabel="Admin"
+      subtitle="Review and act on reports for debate arguments, topics, and participant behaviour."
+      secondaryActions={headerActions}
+    >
+      {pageBody}
+    </EthikosPageShell>
+  );
 }
 
 ===== END app/ethikos/admin/moderation/page.tsx =====
 
 
 ===== BEGIN app/ethikos/admin/roles/page.tsx =====
+// app/ethikos/admin/roles/page.tsx
 'use client';
 
 import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
-import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProTable,
+  type ProColumns,
+} from '@ant-design/pro-components';
 import {
   Alert,
   Button,
@@ -2660,16 +2679,20 @@ import {
 } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/services/admin';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchRoles,
+  toggleRole,
+  type RoleRow,
+  type RolePayload,
+} from '@/services/admin';
 
 const { Text } = Typography;
 
 type StatusFilter = 'all' | 'enabled' | 'disabled';
 
 export default function RoleManagement() {
-  usePageTitle('Admin · Role Management');
-
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   // ahooks v3 generics: <Data, ParamsTuple>. No params → []
@@ -2679,7 +2702,10 @@ export default function RoleManagement() {
     const items = data?.items ?? [];
     const totalRoles = items.length;
     const enabledRoles = items.filter((r) => r.enabled).length;
-    const totalUsers = items.reduce((sum, r) => sum + (r.userCount ?? 0), 0);
+    const totalUsers = items.reduce(
+      (sum, r) => sum + (r.userCount ?? 0),
+      0,
+    );
     return { totalRoles, enabledRoles, totalUsers };
   }, [data]);
 
@@ -2722,69 +2748,82 @@ export default function RoleManagement() {
   ];
 
   return (
-    <PageContainer ghost loading={loading}>
-      <Space
-        direction="vertical"
-        size="middle"
-        style={{ width: '100%', marginBottom: 16 }}
-      >
-        <Alert
-          type="info"
-          showIcon
-          message="Role-based access for Ethikos"
-          description={
-            <Text type="secondary">
-              Use roles to control who can moderate debates, manage consultations,
-              or access sensitive impact dashboards. Toggling a role updates access
-              for all users in that group.
-            </Text>
-          }
-        />
-
+    <EthikosPageShell
+      title="Role management"
+      sectionLabel="Admin"
+      subtitle="Configure who can moderate debates, manage consultations, or access sensitive impact dashboards in Ethikos."
+    >
+      <PageContainer ghost loading={loading}>
         <Space
-          align="center"
-          style={{ width: '100%', justifyContent: 'space-between', flexWrap: 'wrap' }}
+          direction="vertical"
+          size="middle"
+          style={{ width: '100%', marginBottom: 16 }}
         >
-          <Space size="large" wrap>
-            <Statistic title="Defined roles" value={stats.totalRoles} />
-            <Statistic title="Enabled roles" value={stats.enabledRoles} />
-            <Statistic title="Assigned users" value={stats.totalUsers} />
-          </Space>
+          <Alert
+            type="info"
+            showIcon
+            message="Role-based access for Ethikos"
+            description={
+              <Text type="secondary">
+                Use roles to control who can moderate debates, manage
+                consultations, or access sensitive impact dashboards.
+                Toggling a role updates access for all users in that group.
+              </Text>
+            }
+          />
 
-          <Space>
-            <Segmented
-              value={statusFilter}
-              onChange={(value) => setStatusFilter(value as StatusFilter)}
-              options={[
-                { label: 'All', value: 'all' },
-                { label: 'Enabled', value: 'enabled' },
-                { label: 'Disabled', value: 'disabled' },
-              ]}
-            />
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => refresh()}
-              type="default"
-            >
-              Refresh
-            </Button>
+          <Space
+            align="center"
+            style={{
+              width: '100%',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Space size="large" wrap>
+              <Statistic title="Defined roles" value={stats.totalRoles} />
+              <Statistic title="Enabled roles" value={stats.enabledRoles} />
+              <Statistic title="Assigned users" value={stats.totalUsers} />
+            </Space>
+
+            <Space>
+              <Segmented
+                value={statusFilter}
+                onChange={(value) =>
+                  setStatusFilter(value as StatusFilter)
+                }
+                options={[
+                  { label: 'All', value: 'all' },
+                  { label: 'Enabled', value: 'enabled' },
+                  { label: 'Disabled', value: 'disabled' },
+                ]}
+              />
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => refresh()}
+                type="default"
+              >
+                Refresh
+              </Button>
+            </Space>
           </Space>
         </Space>
-      </Space>
 
-      <ProTable<RoleRow>
-        rowKey="id"
-        columns={columns}
-        dataSource={filteredItems}
-        pagination={false}
-        search={false}
-        toolBarRender={() => [
-          <Text key="hint" type="secondary">
-            Toggle a role to enable or disable its permissions platform-wide.
-          </Text>,
-        ]}
-      />
-    </PageContainer>
+        <ProTable<RoleRow>
+          rowKey="id"
+          columns={columns}
+          dataSource={filteredItems}
+          pagination={false}
+          search={false}
+          toolBarRender={() => [
+            <Text key="hint" type="secondary">
+              Toggle a role to enable or disable its permissions
+              platform-wide.
+            </Text>,
+          ]}
+        />
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -2796,7 +2835,7 @@ export default function RoleManagement() {
 // Updated implementation for the Elite ballots page.
 // Source (original dump): app/ethikos/decide/elite/page.tsx 
 // Services: fetchEliteBallots (services/decide.ts) 
-// Services: fetchTopicPreview / types (services/deliberate.ts) :contentReference[oaicite:2]{index=2}
+// Services: fetchTopicPreview / types (services/deliberate.ts)
 
 'use client';
 
@@ -2827,7 +2866,6 @@ import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
 
 import EthikosPageShell from '../../EthikosPageShell';
-import usePageTitle from '@/hooks/usePageTitle';
 import { fetchEliteBallots } from '@/services/decide';
 import { fetchTopicPreview, type TopicPreviewResponse } from '@/services/deliberate';
 import type { Ballot } from '@/types';
@@ -2839,8 +2877,6 @@ type Preview = TopicPreviewResponse;
 const { Paragraph, Title } = Typography;
 
 export default function EliteBallots(): JSX.Element {
-  usePageTitle('Decide · Elite Ballots');
-
   // Data: open elite ballots
   const { data, loading, refresh } = useRequest<{ ballots: Row[] }, []>(fetchEliteBallots);
   useInterval(refresh, 60_000); // auto-refresh every 60s
@@ -3147,13 +3183,10 @@ import {
 } from '@ant-design/icons';
 
 import EthikosPageShell from '../../EthikosPageShell';
-import usePageTitle from '@/hooks/usePageTitle';
 
 const { Title, Paragraph, Text } = Typography;
 
 export default function Methodology(): JSX.Element {
-  usePageTitle('Decide · Methodology');
-
   return (
     <EthikosPageShell
       title="Voting methodology"
@@ -4160,7 +4193,6 @@ import dayjs from 'dayjs';
 import { useRequest } from 'ahooks';
 
 import EthikosPageShell from '../../EthikosPageShell';
-import usePageTitle from '@/hooks/usePageTitle';
 import {
   fetchDecisionResults,
   type DecisionResult,
@@ -4176,8 +4208,6 @@ type ResultFilter = 'all' | 'passed' | 'rejected';
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
 export default function ResultsArchive(): JSX.Element {
-  usePageTitle('Decide · Results Archive');
-
   const { data, loading, refresh } = useRequest<DecisionResultsResponse, []>(
     fetchDecisionResults,
   );
@@ -4430,6 +4460,7 @@ import {
   Alert,
   Button,
   Card,
+  Comment,
   Divider,
   Empty,
   Input,
@@ -4444,13 +4475,11 @@ import {
   Typography,
   message,
 } from 'antd';
-import { Comment } from '@ant-design/compatible';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import usePageTitle from '@/hooks/usePageTitle';
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchTopicDetail,
@@ -4605,8 +4634,6 @@ export default function TopicThreadPage() {
       : Array.isArray(topicParam)
       ? topicParam[0]
       : undefined;
-
-  usePageTitle('Deliberate · Thread');
 
   // Topic meta (title, category, opened at, latest)
   const {
@@ -6144,16 +6171,20 @@ export default EthikosPageShell;
 ===== BEGIN app/ethikos/impact/feedback/page.tsx =====
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useRequest } from 'ahooks';
 
-import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Comment } from '@ant-design/compatible';
 import {
-  Button,
+  PageContainer,
+  ProCard,
+  ProForm,
+  ProFormTextArea,
+} from '@ant-design/pro-components';
+import {
+  Comment,
   Divider,
   Empty,
-  Input,
+  Form,
   List,
   Rate,
   Space,
@@ -6162,6 +6193,7 @@ import {
   message,
 } from 'antd';
 
+import EthikosPageShell from '../../EthikosPageShell';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchFeedback, submitFeedback, type FeedbackItem } from '@/services/impact';
 
@@ -6171,13 +6203,17 @@ type FeedbackResponse = {
   items: FeedbackItem[];
 };
 
+type FeedbackFormValues = {
+  body: string;
+  rating?: number;
+};
+
 export default function FeedbackLoops(): JSX.Element {
   usePageTitle('Impact · Feedback');
 
+  const [form] = Form.useForm<FeedbackFormValues>();
+
   const { data, loading, refresh } = useRequest<FeedbackResponse, []>(fetchFeedback);
-  const [feedback, setFeedback] = useState('');
-  const [stars, setStars] = useState<number>(0);
-  const [sending, setSending] = useState(false);
 
   const items = data?.items ?? [];
 
@@ -6191,17 +6227,19 @@ export default function FeedbackLoops(): JSX.Element {
     return Number((total / withRatings.length).toFixed(1));
   }, [items]);
 
-  const handleSubmit = async () => {
-    const trimmed = feedback.trim();
-    if (!trimmed) return;
+  const handleFinish = async (values: FeedbackFormValues): Promise<boolean> => {
+    const trimmed = values.body?.trim();
+    if (!trimmed) {
+      message.warning('Please enter your feedback before submitting.');
+      return false;
+    }
 
-    setSending(true);
     try {
-      await submitFeedback({ body: trimmed, rating: stars || undefined });
-      setFeedback('');
-      setStars(0);
+      await submitFeedback({ body: trimmed, rating: values.rating || undefined });
+      form.resetFields();
       await refresh();
       message.success('Thanks, your feedback has been recorded.');
+      return true;
     } catch (err) {
       const rawMessage =
         err instanceof Error ? err.message : 'Unable to submit feedback. Please try again.';
@@ -6211,104 +6249,126 @@ export default function FeedbackLoops(): JSX.Element {
           ? 'The feedback channel is not configured yet. Please contact an administrator.'
           : rawMessage;
       message.error(friendly);
-    } finally {
-      setSending(false);
+      return false;
     }
   };
 
   return (
-    <PageContainer ghost loading={loading}>
-      <ProCard title="Share your feedback" ghost>
-        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            This channel closes the feedback loop for the Ethikos module. Tell us what worked,
-            what felt confusing, or what is missing. Please avoid sharing personal or sensitive
-            data.
-          </Paragraph>
+    <EthikosPageShell
+      title="Feedback loop"
+      sectionLabel="Impact"
+      subtitle="Share how Ethikos works (or doesn’t) for you. Feedback is stored as anonymised arguments on a dedicated topic."
+    >
+      <PageContainer ghost loading={loading}>
+        <ProCard title="Share your feedback" ghost>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+              This channel closes the feedback loop for the Ethikos module. Tell us what worked,
+              what felt confusing, or what is missing. Please avoid sharing personal or sensitive
+              data.
+            </Paragraph>
 
-          <div>
-            <Text strong>Overall experience</Text>
-            <div>
-              <Rate onChange={setStars} value={stars} />
-            </div>
-          </div>
-
-          <Input.TextArea
-            rows={4}
-            placeholder="Share a concrete story, suggestion or pain point…"
-            value={feedback}
-            onChange={(e) => setFeedback(e.target.value)}
-          />
-
-          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-            <Text type="secondary">
-              Feedback becomes an anonymised argument in a dedicated Ethikos topic.
-            </Text>
-            <Button
-              type="primary"
-              onClick={handleSubmit}
-              loading={sending}
-              disabled={!feedback.trim()}
+            <ProForm<FeedbackFormValues>
+              form={form}
+              layout="vertical"
+              onFinish={handleFinish}
+              submitter={{
+                searchConfig: {
+                  submitText: 'Submit feedback',
+                },
+                render: (_props, dom) => (
+                  <Space
+                    style={{
+                      width: '100%',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text type="secondary">
+                      Feedback becomes an anonymised argument in a dedicated Ethikos topic.
+                    </Text>
+                    <Space>{dom}</Space>
+                  </Space>
+                ),
+              }}
             >
-              Submit feedback
-            </Button>
-          </Space>
-        </Space>
-      </ProCard>
+              <Form.Item
+                label="Overall experience"
+                name="rating"
+                valuePropName="value"
+              >
+                <Rate />
+              </Form.Item>
 
-      <ProCard
-        title="Community feedback"
-        ghost
-        style={{ marginTop: 24 }}
-        extra={
-          items.length ? (
-            <Space size="middle">
-              <Tag>{items.length} entries</Tag>
-              {typeof averageRating === 'number' && (
-                <Space size={4}>
-                  <Text type="secondary">Avg. rating</Text>
-                  <Rate disabled allowHalf value={averageRating} />
-                  <Text type="secondary">{averageRating.toFixed(1)}/5</Text>
-                </Space>
-              )}
-            </Space>
-          ) : null
-        }
-      >
-        {items.length ? (
-          <>
-            <List
-              itemLayout="horizontal"
-              dataSource={items}
-              renderItem={(f) => (
-                <li key={f.id}>
-                  <Comment
-                    author={f.author}
-                    datetime={f.createdAt}
-                    content={
-                      <>
-                        {typeof f.rating === 'number' && (
-                          <div style={{ marginBottom: 4 }}>
-                            <Rate disabled value={f.rating} />
-                          </div>
-                        )}
-                        <Paragraph style={{ marginBottom: 0 }}>{f.body}</Paragraph>
-                      </>
-                    }
-                  />
-                </li>
-              )}
-            />
-            <Divider style={{ marginTop: 16, marginBottom: 0 }} />
-            <Text type="secondary">
-              Older feedback is kept as part of the impact audit trail.
-            </Text>
-          </>
-        ) : (
-          <Empty description="No feedback yet. Be the first to share how Ethikos works for you." />
-        )}
-      </ProCard>
-    </PageContainer>
+              <ProFormTextArea
+                name="body"
+                label="Your feedback"
+                placeholder="Share a concrete story, suggestion or pain point…"
+                fieldProps={{ rows: 4 }}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter your feedback.',
+                  },
+                ]}
+              />
+            </ProForm>
+          </Space>
+        </ProCard>
+
+        <ProCard
+          title="Community feedback"
+          ghost
+          style={{ marginTop: 24 }}
+          extra={
+            items.length ? (
+              <Space size="middle">
+                <Tag>{items.length} entries</Tag>
+                {typeof averageRating === 'number' && (
+                  <Space size={4}>
+                    <Text type="secondary">Avg. rating</Text>
+                    <Rate disabled allowHalf value={averageRating} />
+                    <Text type="secondary">{averageRating.toFixed(1)}/5</Text>
+                  </Space>
+                )}
+              </Space>
+            ) : null
+          }
+        >
+          {items.length ? (
+            <>
+              <List
+                itemLayout="horizontal"
+                dataSource={items}
+                renderItem={(f) => (
+                  <li key={f.id}>
+                    <Comment
+                      author={f.author}
+                      datetime={f.createdAt}
+                      content={
+                        <>
+                          {typeof f.rating === 'number' && (
+                            <div style={{ marginBottom: 4 }}>
+                              <Rate disabled value={f.rating} />
+                            </div>
+                          )}
+                          <Paragraph style={{ marginBottom: 0 }}>{f.body}</Paragraph>
+                        </>
+                      }
+                    />
+                  </li>
+                )}
+              />
+              <Divider style={{ marginTop: 16, marginBottom: 0 }} />
+              <Text type="secondary">
+                Older feedback is kept as part of the impact audit trail.
+              </Text>
+            </>
+          ) : (
+            <Empty description="No feedback yet. Be the first to share how Ethikos works for you." />
+          )}
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -6316,34 +6376,27 @@ export default function FeedbackLoops(): JSX.Element {
 
 
 ===== BEGIN app/ethikos/impact/outcomes/page.tsx =====
+// app/ethikos/impact/outcomes/page.tsx
 'use client';
 
 import {
   PageContainer,
   ProCard,
   StatisticCard,
+  ProTable,
+  type ProColumns,
 } from '@ant-design/pro-components';
 import { Line, Bar } from '@ant-design/plots';
-import {
-  Tabs,
-  Empty,
-  Space,
-  Table,
-  Tag,
-  Typography,
-  Divider,
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import { Tabs, Empty, Space, Tag, Typography, Divider } from 'antd';
 import { BarChartOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useRequest } from 'ahooks';
 
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '../../EthikosPageShell';
 import { fetchImpactOutcomes } from '@/services/impact';
 import {
   fetchDecisionResults,
   type DecisionResult,
-  type DecisionScope,
 } from '@/services/decide';
 
 const { Text } = Typography;
@@ -6354,8 +6407,6 @@ type DecisionResultsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
 type DecisionRow = DecisionResult & { key: string };
 
 export default function Outcomes() {
-  usePageTitle('Impact · Outcomes');
-
   const { data: outcomesData, loading: loadingOutcomes } =
     useRequest<OutcomesData, []>(fetchImpactOutcomes);
 
@@ -6416,7 +6467,7 @@ export default function Outcomes() {
     seriesField: 'outcome',
   };
 
-  const decisionsColumns: ColumnsType<DecisionRow> = [
+  const decisionsColumns: ProColumns<DecisionRow>[] = [
     {
       title: 'Decision',
       dataIndex: 'title',
@@ -6429,9 +6480,9 @@ export default function Outcomes() {
       dataIndex: 'passed',
       key: 'passed',
       width: 120,
-      render: (passed: boolean) => (
-        <Tag color={passed ? 'green' : 'red'}>
-          {passed ? 'PASSED' : 'REJECTED'}
+      render: (_, row) => (
+        <Tag color={row.passed ? 'green' : 'red'}>
+          {row.passed ? 'PASSED' : 'REJECTED'}
         </Tag>
       ),
     },
@@ -6440,8 +6491,10 @@ export default function Outcomes() {
       dataIndex: 'scope',
       key: 'scope',
       width: 120,
-      render: (scope: DecisionScope) => (
-        <Tag color={scope === 'Elite' ? 'geekblue' : 'default'}>{scope}</Tag>
+      render: (_, row) => (
+        <Tag color={row.scope === 'Elite' ? 'geekblue' : 'default'}>
+          {row.scope}
+        </Tag>
       ),
     },
     {
@@ -6449,173 +6502,190 @@ export default function Outcomes() {
       dataIndex: 'region',
       key: 'region',
       ellipsis: true,
-      render: (region?: string) =>
-        region ?? <Text type="secondary">Unspecified</Text>,
+      render: (_, row) =>
+        row.region ?? <Text type="secondary">Unspecified</Text>,
     },
     {
       title: 'Closed at',
       dataIndex: 'closesAt',
       key: 'closesAt',
       width: 180,
-      render: (value: string) => dayjs(value).format('YYYY-MM-DD'),
+      valueType: 'date',
+      render: (_, row) => dayjs(row.closesAt).format('YYYY-MM-DD'),
     },
   ];
 
   return (
-    <PageContainer ghost loading={loading}>
-      <ProCard gutter={[16, 16]} wrap>
-        {/* Outcome KPIs */}
-        <ProCard
-          colSpan={{ xs: 24, xl: 8 }}
-          title={
-            <Space>
-              <BarChartOutlined />
-              <span>Impact · Outcomes</span>
-            </Space>
-          }
-        >
-          {kpis.length ? (
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-              <Space size="large" wrap>
-                {kpis.map((kpi) => (
-                  <StatisticCard
-                    key={kpi.key}
-                    statistic={{
-                      title: kpi.label,
-                      value: kpi.value,
-                      suffix: kpi.key === 'agreement' ? '%' : undefined,
-                      description:
-                        typeof kpi.delta === 'number' ? (
-                          <span
-                            style={{
-                              color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
-                            }}
-                          >
-                            {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
-                          </span>
-                        ) : null,
-                    }}
-                  />
-                ))}
+    <EthikosPageShell
+      title="Impact · Outcomes"
+      subtitle="Aggregated decision outcomes, agreement levels and regional distribution across Ethikos debates."
+    >
+      <PageContainer ghost loading={loading}>
+        <ProCard gutter={[16, 16]} wrap>
+          {/* Outcome KPIs */}
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <BarChartOutlined />
+                <span>Impact · Outcomes</span>
               </Space>
+            }
+          >
+            {kpis.length ? (
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="large"
+              >
+                <Space size="large" wrap>
+                  {kpis.map((kpi) => (
+                    <StatisticCard
+                      key={kpi.key}
+                      statistic={{
+                        title: kpi.label,
+                        value: kpi.value,
+                        suffix: kpi.key === 'agreement' ? '%' : undefined,
+                        description:
+                          typeof kpi.delta === 'number' ? (
+                            <span
+                              style={{
+                                color:
+                                  kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                              }}
+                            >
+                              {kpi.delta >= 0 ? '▲' : '▼'}{' '}
+                              {Math.abs(kpi.delta)}%
+                            </span>
+                          ) : null,
+                      }}
+                    />
+                  ))}
+                </Space>
 
-              <Divider />
+                <Divider />
 
-              <Space direction="vertical" size={8}>
-                <Text type="secondary">Highlights</Text>
-                <ul style={{ paddingLeft: 20, margin: 0 }}>
-                  <li>
-                    <Text>
-                      <Text strong>
-                        {kpis.find((k) => k.key === 'resolved')?.value ?? 0}
-                      </Text>{' '}
-                      decisions resolved overall.
-                    </Text>
-                  </li>
-                  <li>
-                    <Text>
-                      Average agreement is{' '}
-                      <Text strong>
-                        {kpis.find((k) => k.key === 'agreement')?.value ?? 0}%
+                <Space direction="vertical" size={8}>
+                  <Text type="secondary">Highlights</Text>
+                  <ul style={{ paddingLeft: 20, margin: 0 }}>
+                    <li>
+                      <Text>
+                        <Text strong>
+                          {kpis.find((k) => k.key === 'resolved')?.value ?? 0}
+                        </Text>{' '}
+                        decisions resolved overall.
                       </Text>
-                      , combining stance direction and turnout.
-                    </Text>
-                  </li>
-                  <li>
-                    <Text>
-                      Participation volume is{' '}
-                      <Text strong>
-                        {kpis.find((k) => k.key === 'participation')?.value ?? 0}
-                      </Text>{' '}
-                      total stances across all debates.
-                    </Text>
-                  </li>
-                </ul>
+                    </li>
+                    <li>
+                      <Text>
+                        Average agreement is{' '}
+                        <Text strong>
+                          {kpis.find((k) => k.key === 'agreement')?.value ?? 0}
+                          %
+                        </Text>
+                        , combining stance direction and turnout.
+                      </Text>
+                    </li>
+                    <li>
+                      <Text>
+                        Participation volume is{' '}
+                        <Text strong>
+                          {kpis.find((k) => k.key === 'participation')?.value ??
+                            0}
+                        </Text>{' '}
+                        total stances across all debates.
+                      </Text>
+                    </li>
+                  </ul>
+                </Space>
               </Space>
-            </Space>
-          ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No outcome metrics available yet"
-            />
-          )}
-        </ProCard>
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No outcome metrics available yet"
+              />
+            )}
+          </ProCard>
 
-        {/* Outcome charts */}
-        <ProCard
-          colSpan={{ xs: 24, xl: 8 }}
-          title={
-            <Space>
-              <BarChartOutlined />
-              <span>Outcome distribution</span>
-            </Space>
-          }
-        >
-          {charts.length ? (
-            <Tabs
-              items={charts.map((c) => ({
-                key: c.key,
-                label: c.title,
-                children: (
-                  <ProCard ghost>
-                    {c.type === 'line' && <Line {...c.config} />}
-                    {c.type === 'bar' && <Bar {...c.config} />}
-                  </ProCard>
-                ),
-              }))}
-            />
-          ) : (
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description="No outcome charts available yet"
-            />
-          )}
-        </ProCard>
+          {/* Outcome charts */}
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <BarChartOutlined />
+                <span>Outcome distribution</span>
+              </Space>
+            }
+          >
+            {charts.length ? (
+              <Tabs
+                items={charts.map((c) => ({
+                  key: c.key,
+                  label: c.title,
+                  children: (
+                    <ProCard ghost>
+                      {c.type === 'line' && <Line {...c.config} />}
+                      {c.type === 'bar' && <Bar {...c.config} />}
+                    </ProCard>
+                  ),
+                }))}
+              />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No outcome charts available yet"
+              />
+            )}
+          </ProCard>
 
-        {/* Closed decisions summary */}
-        <ProCard
-          colSpan={{ xs: 24, xl: 8 }}
-          title="Closed decisions · outcomes vs engagement"
-          extra={
-            <Text type="secondary">
-              {decisionRows.length
-                ? `${decisionRows.length} closed decisions`
-                : 'No closed decisions yet'}
-            </Text>
-          }
-        >
-          <ProCard split="horizontal" ghost>
-            <ProCard title="Outcomes by region">
-              {decisionOutcomeData.length === 0 ? (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No regional outcome data available"
-                />
-              ) : (
-                <Bar {...decisionOutcomeConfig} />
-              )}
-            </ProCard>
+          {/* Closed decisions summary */}
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title="Closed decisions · outcomes vs engagement"
+            extra={
+              <Text type="secondary">
+                {decisionRows.length
+                  ? `${decisionRows.length} closed decisions`
+                  : 'No closed decisions yet'}
+              </Text>
+            }
+          >
+            <ProCard split="horizontal" ghost>
+              <ProCard title="Outcomes by region">
+                {decisionOutcomeData.length === 0 ? (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No regional outcome data available"
+                  />
+                ) : (
+                  <Bar {...decisionOutcomeConfig} />
+                )}
+              </ProCard>
 
-            <ProCard title="Closed decisions">
-              {decisionRows.length === 0 ? (
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No closed decisions yet"
-                />
-              ) : (
-                <Table<DecisionRow>
-                  size="small"
-                  columns={decisionsColumns}
-                  dataSource={decisionRows}
-                  pagination={{ pageSize: 8 }}
-                  rowKey="key"
-                />
-              )}
+              <ProCard title="Closed decisions">
+                {decisionRows.length === 0 ? (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No closed decisions yet"
+                  />
+                ) : (
+                  <ProTable<DecisionRow>
+                    rowKey="key"
+                    size="small"
+                    columns={decisionsColumns}
+                    dataSource={decisionRows}
+                    pagination={{ pageSize: 8 }}
+                    search={false}
+                    options={false}
+                    toolBarRender={false}
+                  />
+                )}
+              </ProCard>
             </ProCard>
           </ProCard>
         </ProCard>
-      </ProCard>
-    </PageContainer>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -6623,6 +6693,7 @@ export default function Outcomes() {
 
 
 ===== BEGIN app/ethikos/impact/tracker/page.tsx =====
+// app/ethikos/impact/tracker/page.tsx
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -6647,7 +6718,7 @@ import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '../../EthikosPageShell';
 import {
   fetchImpactTracker,
   patchImpactStatus,
@@ -6677,8 +6748,6 @@ const STATUS_COLORS: Record<ImpactStatus, string> = {
 };
 
 export default function ImpactTracker(): JSX.Element {
-  usePageTitle('Impact · Tracker');
-
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
@@ -6783,85 +6852,92 @@ export default function ImpactTracker(): JSX.Element {
   ];
 
   return (
-    <PageContainer ghost loading={loading}>
-      <Space
-        direction="vertical"
-        size="middle"
-        style={{ width: '100%', marginBottom: 16 }}
-      >
-        <Alert
-          type="info"
-          showIcon
-          message="Impact tracker"
-          description={
-            <Text type="secondary">
-              Each row represents an Ethikos decision topic. Use the status to
-              indicate whether a debate is still planned, currently in progress,
-              completed, or blocked awaiting follow‑up.
-            </Text>
-          }
-        />
-
+    <EthikosPageShell
+      title="Impact tracker"
+      sectionLabel="Impact"
+      metaTitle="Impact · Tracker"
+      subtitle="Track the implementation status and follow‑up of Ethikos debates and decisions."
+    >
+      <PageContainer ghost loading={loading}>
         <Space
-          align="center"
-          style={{
-            width: '100%',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-          }}
+          direction="vertical"
+          size="middle"
+          style={{ width: '100%', marginBottom: 16 }}
         >
-          <Space size="large" wrap>
-            <Statistic title="Tracked topics" value={stats.total} />
-            <Statistic
-              title="Active (planned + in progress)"
-              value={stats.active}
-            />
-            <Statistic title="Completed" value={stats.completed} />
-            <Statistic title="Blocked" value={stats.blocked} />
-          </Space>
+          <Alert
+            type="info"
+            showIcon
+            message="Impact tracker"
+            description={
+              <Text type="secondary">
+                Each row represents an Ethikos decision topic. Use the status to
+                indicate whether a debate is still planned, currently in progress,
+                completed, or blocked awaiting follow‑up.
+              </Text>
+            }
+          />
 
-          <Space>
-            <Segmented
-              value={statusFilter}
-              onChange={(value) => setStatusFilter(value as StatusFilter)}
-              options={[
-                { label: 'Active', value: 'active' },
-                { label: 'All', value: 'all' },
-                { label: 'Planned', value: 'Planned' },
-                { label: 'In progress', value: 'In-Progress' },
-                { label: 'Completed', value: 'Completed' },
-                { label: 'Blocked', value: 'Blocked' },
-              ]}
-            />
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => refresh()}
-              type="default"
-            >
-              Refresh
-            </Button>
+          <Space
+            align="center"
+            style={{
+              width: '100%',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Space size="large" wrap>
+              <Statistic title="Tracked topics" value={stats.total} />
+              <Statistic
+                title="Active (planned + in progress)"
+                value={stats.active}
+              />
+              <Statistic title="Completed" value={stats.completed} />
+              <Statistic title="Blocked" value={stats.blocked} />
+            </Space>
+
+            <Space>
+              <Segmented
+                value={statusFilter}
+                onChange={(value) => setStatusFilter(value as StatusFilter)}
+                options={[
+                  { label: 'Active', value: 'active' },
+                  { label: 'All', value: 'all' },
+                  { label: 'Planned', value: 'Planned' },
+                  { label: 'In progress', value: 'In-Progress' },
+                  { label: 'Completed', value: 'Completed' },
+                  { label: 'Blocked', value: 'Blocked' },
+                ]}
+              />
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => refresh()}
+                type="default"
+              >
+                Refresh
+              </Button>
+            </Space>
           </Space>
         </Space>
-      </Space>
 
-      {filteredItems.length === 0 && !loading ? (
-        <Empty description="No Ethikos topics found yet. Create a debate or consultation to start tracking impact." />
-      ) : (
-        <ProTable<TrackerItem>
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredItems}
-          pagination={{ pageSize: 12 }}
-          search={false}
-          toolBarRender={() => [
-            <Text key="hint" type="secondary">
-              Adjust the status when a debate moves from planning to active work
-              or when a decision is finalised.
-            </Text>,
-          ]}
-        />
-      )}
-    </PageContainer>
+        {filteredItems.length === 0 && !loading ? (
+          <Empty description="No Ethikos topics found yet. Create a debate or consultation to start tracking impact." />
+        ) : (
+          <ProTable<TrackerItem>
+            rowKey="id"
+            columns={columns}
+            dataSource={filteredItems}
+            pagination={{ pageSize: 12 }}
+            search={false}
+            toolBarRender={() => [
+              <Text key="hint" type="secondary">
+                Adjust the status when a debate moves from planning to active work
+                or when a decision is finalised.
+              </Text>,
+            ]}
+          />
+        )}
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -7622,7 +7698,7 @@ export default function SegmentLayout({ children }: SegmentLayoutProps) {
 ===== BEGIN app/ethikos/learn/changelog/page.tsx =====
 'use client';
 
-// Updated from original implementation in app/ethikos/learn/changelog/page.tsx. :contentReference[oaicite:0]{index=0}
+// Updated from original implementation in app/ethikos/learn/changelog/page.tsx.
 import React, { useMemo, useState } from 'react';
 import {
   PageContainer,
@@ -7661,7 +7737,8 @@ import {
   fetchChangelog,
   type Changelog,
   type ChangelogEntry,
-} from '@/services/learn'; // types & data shape. :contentReference[oaicite:1]{index=1}
+} from '@/services/learn';
+import EthikosPageShell from '../../EthikosPageShell';
 
 const { RangePicker } = DatePicker;
 const { Text, Title } = Typography;
@@ -7684,6 +7761,7 @@ function normalizeTag(t: string): string {
 }
 
 export default function Changelog() {
+  // Kept for compatibility; EthikosPageShell will set the final <title>.
   usePageTitle('Learn · Changelog');
 
   const { data, loading, error, refresh } = useRequest<Changelog, []>(
@@ -7846,300 +7924,317 @@ export default function Changelog() {
         }))
       : [];
 
+  const shellTitle = 'Learn · Changelog';
+  const shellSubtitle =
+    'Versioned changes, fixes and improvements across the Ethikos layer.';
+  const shellSectionLabel = 'Learn';
+
+  const compactActions = (
+    <Space>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last entry date ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+      <Button icon={<ReloadOutlined />} onClick={refresh} type="text" />
+    </Space>
+  );
+
+  const fullActions = (
+    <Space wrap>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last entry date ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+
+      <Segmented
+        value={view}
+        onChange={(val) => setView(val as typeof view)}
+        options={[
+          { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
+          { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
+        ]}
+      />
+
+      <Tooltip title="Export JSON">
+        <Button icon={<DownloadOutlined />} onClick={exportJSON} size="small" />
+      </Tooltip>
+
+      <Tooltip title="Copy Markdown">
+        <Button icon={<CopyOutlined />} onClick={copyMarkdown} size="small" />
+      </Tooltip>
+
+      <Tooltip title="Refresh">
+        <Button icon={<ReloadOutlined />} onClick={refresh} size="small" />
+      </Tooltip>
+    </Space>
+  );
+
   // Loading / error / empty
   if (loading && !data) {
     return (
-      <PageContainer ghost loading>
-        <div style={{ height: 240 }} />
-      </PageContainer>
+      <EthikosPageShell
+        title={shellTitle}
+        sectionLabel={shellSectionLabel}
+        subtitle={shellSubtitle}
+      >
+        <PageContainer ghost loading>
+          <div style={{ height: 240 }} />
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   if (error) {
     return (
-      <PageContainer
-        ghost
-        extra={
-          <Space>
-            {lastUpdated && (
-              <Badge
-                count={
-                  <Tooltip title={`Last entry date ${lastUpdated}`}>
-                    <ClockCircleOutlined style={{ color: '#52c41a' }} />
-                  </Tooltip>
-                }
-              />
-            )}
-            <Button icon={<ReloadOutlined />} onClick={refresh} type="text" />
-          </Space>
-        }
+      <EthikosPageShell
+        title={shellTitle}
+        sectionLabel={shellSectionLabel}
+        subtitle={shellSubtitle}
+        secondaryActions={compactActions}
       >
-        <Empty description="Failed to load changelog." />
-      </PageContainer>
+        <PageContainer ghost>
+          <Empty description="Failed to load changelog." />
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   if (!filtered.length && !loading) {
     return (
-      <PageContainer
-        ghost
-        extra={
-          <Space>
-            {lastUpdated && (
-              <Badge
-                count={
-                  <Tooltip title={`Last entry date ${lastUpdated}`}>
-                    <ClockCircleOutlined style={{ color: '#52c41a' }} />
-                  </Tooltip>
-                }
-              />
-            )}
-            <Button icon={<ReloadOutlined />} onClick={refresh} type="text" />
-          </Space>
-        }
+      <EthikosPageShell
+        title={shellTitle}
+        sectionLabel={shellSectionLabel}
+        subtitle={shellSubtitle}
+        secondaryActions={compactActions}
       >
-        <ProCard>
-          <Empty description="No changelog entries match your filters." />
-        </ProCard>
-      </PageContainer>
+        <PageContainer ghost>
+          <ProCard>
+            <Empty description="No changelog entries match your filters." />
+          </ProCard>
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   return (
-    <PageContainer
-      ghost
-      loading={loading}
-      extra={
-        <Space wrap>
-          {lastUpdated && (
-            <Badge
-              count={
-                <Tooltip title={`Last entry date ${lastUpdated}`}>
-                  <ClockCircleOutlined style={{ color: '#52c41a' }} />
-                </Tooltip>
-              }
-            />
-          )}
-
-          <Segmented
-            value={view}
-            onChange={(val) => setView(val as typeof view)}
-            options={[
-              { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
-              { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
-            ]}
-          />
-
-          <Tooltip title="Export JSON">
-            <Button
-              icon={<DownloadOutlined />}
-              onClick={exportJSON}
-              size="small"
-            />
-          </Tooltip>
-
-          <Tooltip title="Copy Markdown">
-            <Button icon={<CopyOutlined />} onClick={copyMarkdown} size="small" />
-          </Tooltip>
-
-          <Tooltip title="Refresh">
-            <Button icon={<ReloadOutlined />} onClick={refresh} size="small" />
-          </Tooltip>
-        </Space>
-      }
+    <EthikosPageShell
+      title={shellTitle}
+      sectionLabel={shellSectionLabel}
+      subtitle={shellSubtitle}
+      secondaryActions={fullActions}
     >
-      {/* KPI / stats */}
-      <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
-          statistic={{
-            title: 'Entries',
-            value: totalEntries,
-            description: <Text type="secondary">After filters</Text>,
-          }}
-        />
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
-          statistic={{
-            title: 'Versions',
-            value: versionCount,
-            description: <Text type="secondary">In current view</Text>,
-          }}
-        />
-        {tagCounts.map(([tag, count]) => (
+      <PageContainer ghost loading={loading}>
+        {/* KPI / stats */}
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
           <StatisticCard
-            key={tag}
             colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
             statistic={{
-              title: (
-                <Space>
-                  <Tag color={TAG_COLOR[tag] ?? 'default'}>{tag}</Tag>
-                </Space>
-              ),
-              value: count,
-              description: <Text type="secondary">Entries with tag</Text>,
+              title: 'Entries',
+              value: totalEntries,
+              description: <Text type="secondary">After filters</Text>,
             }}
           />
-        ))}
-      </ProCard>
-
-      {/* Filters + content */}
-      <ProCard split="vertical" ghost>
-        {/* Left: filters + anchors */}
-        <ProCard
-          colSpan={{ xs: 24, md: 8, lg: 7, xl: 6 }}
-          title={
-            <Space>
-              <FilterOutlined />
-              <span>Filter</span>
-            </Space>
-          }
-        >
-          <Space direction="vertical" style={{ width: '100%' }} size="large">
-            <div>
-              <Text type="secondary">Search</Text>
-              <Input.Search
-                placeholder="Version or note text…"
-                allowClear
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                style={{ marginTop: 8 }}
-              />
-            </div>
-
-            <div>
-              <Text type="secondary">Date range</Text>
-              <div style={{ marginTop: 8 }}>
-                <RangePicker
-                  allowEmpty={[true, true]}
-                  value={range as any}
-                  onChange={(val) => setRange(val as RangeValue)}
-                  style={{ width: '100%' }}
-                />
-              </div>
-            </div>
-
-            <div>
-              <Text type="secondary">Tags</Text>
-              <div style={{ marginTop: 8 }}>
-                <Space size={[6, 8]} wrap>
-                  {allTags.length === 0 ? (
-                    <Text type="secondary">No tags</Text>
-                  ) : (
-                    allTags.map((t) => (
-                      <Tag.CheckableTag
-                        key={t}
-                        checked={selectedTags.includes(t)}
-                        onChange={(checked) => {
-                          setSelectedTags((prev) =>
-                            checked
-                              ? [...prev, t]
-                              : prev.filter((p) => p !== t),
-                          );
-                        }}
-                      >
-                        <Tag
-                          color={TAG_COLOR[t] ?? 'default'}
-                          style={{ marginRight: 0 }}
-                        >
-                          {t}
-                        </Tag>
-                      </Tag.CheckableTag>
-                    ))
-                  )}
-                </Space>
-              </div>
-            </div>
-
-            <div>
-              <Text type="secondary">Versions</Text>
-              <Anchor
-                affix={false}
-                items={anchorItems}
-                style={{ marginTop: 8, maxHeight: 320, overflow: 'auto' }}
-              />
-            </div>
-          </Space>
-        </ProCard>
-
-        {/* Right: content */}
-        <ProCard
-          colSpan={{ xs: 24, md: 16, lg: 17, xl: 18 }}
-          title={
-            <Space>
-              {view === 'timeline' ? <ApartmentOutlined /> : <UnorderedListOutlined />}
-              <span>Changelog entries</span>
-            </Space>
-          }
-        >
-          {view === 'timeline' ? (
-            <Timeline mode="left">
-              {filtered.map((e, idx) => {
-                const id = `ver-${e.version}`;
-                return (
-                  <Timeline.Item
-                    key={`${e.version}-${e.date}-${idx}`}
-                    label={dayjs(e.date).format('YYYY-MM-DD')}
-                    dot={<CalendarOutlined />}
-                  >
-                    <div id={id} style={{ scrollMarginTop: 72 }}>
-                      <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                        <Space size="small" align="center" wrap>
-                          <Title level={5} style={{ margin: 0 }}>
-                            {e.version}
-                          </Title>
-                          {renderTags(e.tags)}
-                        </Space>
-                        <ul style={{ marginTop: 4 }}>
-                          {e.notes.map((n, i) => (
-                            <li key={i}>
-                              <Text>{n}</Text>
-                            </li>
-                          ))}
-                        </ul>
-                      </Space>
-                    </div>
-                  </Timeline.Item>
-                );
-              })}
-            </Timeline>
-          ) : (
-            <ProList<ChangelogEntry>
-              rowKey={(row, idx) => `${row.version}-${row.date}-${idx}`}
-              dataSource={filtered}
-              split
-              pagination={{ pageSize: 10, showSizeChanger: false }}
-              metas={{
-                title: {
-                  render: (_, row) => (
-                    <Space size="small" wrap>
-                      <Text strong>{row.version}</Text>
-                      <Tag icon={<CalendarOutlined />}>
-                        {dayjs(row.date).format('YYYY-MM-DD')}
-                      </Tag>
-                    </Space>
-                  ),
-                },
-                subTitle: {
-                  render: (_, row) => renderTags(row.tags),
-                },
-                description: {
-                  render: (_, row) => (
-                    <ul style={{ marginTop: 4 }}>
-                      {row.notes.map((n, i) => (
-                        <li key={i}>
-                          <Text>{n}</Text>
-                        </li>
-                      ))}
-                    </ul>
-                  ),
-                },
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
+            statistic={{
+              title: 'Versions',
+              value: versionCount,
+              description: <Text type="secondary">In current view</Text>,
+            }}
+          />
+          {tagCounts.map(([tag, count]) => (
+            <StatisticCard
+              key={tag}
+              colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
+              statistic={{
+                title: (
+                  <Space>
+                    <Tag color={TAG_COLOR[tag] ?? 'default'}>{tag}</Tag>
+                  </Space>
+                ),
+                value: count,
+                description: <Text type="secondary">Entries with tag</Text>,
               }}
             />
-          )}
+          ))}
         </ProCard>
-      </ProCard>
-    </PageContainer>
+
+        {/* Filters + content */}
+        <ProCard split="vertical" ghost>
+          {/* Left: filters + anchors */}
+          <ProCard
+            colSpan={{ xs: 24, md: 8, lg: 7, xl: 6 }}
+            title={
+              <Space>
+                <FilterOutlined />
+                <span>Filter</span>
+              </Space>
+            }
+          >
+            <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <div>
+                <Text type="secondary">Search</Text>
+                <Input.Search
+                  placeholder="Version or note text…"
+                  allowClear
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  style={{ marginTop: 8 }}
+                />
+              </div>
+
+              <div>
+                <Text type="secondary">Date range</Text>
+                <div style={{ marginTop: 8 }}>
+                  <RangePicker
+                    allowEmpty={[true, true]}
+                    value={range as any}
+                    onChange={(val) => setRange(val as RangeValue)}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Text type="secondary">Tags</Text>
+                <div style={{ marginTop: 8 }}>
+                  <Space size={[6, 8]} wrap>
+                    {allTags.length === 0 ? (
+                      <Text type="secondary">No tags</Text>
+                    ) : (
+                      allTags.map((t) => (
+                        <Tag.CheckableTag
+                          key={t}
+                          checked={selectedTags.includes(t)}
+                          onChange={(checked) => {
+                            setSelectedTags((prev) =>
+                              checked
+                                ? [...prev, t]
+                                : prev.filter((p) => p !== t),
+                            );
+                          }}
+                        >
+                          <Tag
+                            color={TAG_COLOR[t] ?? 'default'}
+                            style={{ marginRight: 0 }}
+                          >
+                            {t}
+                          </Tag>
+                        </Tag.CheckableTag>
+                      ))
+                    )}
+                  </Space>
+                </div>
+              </div>
+
+              <div>
+                <Text type="secondary">Versions</Text>
+                <Anchor
+                  affix={false}
+                  items={anchorItems}
+                  style={{ marginTop: 8, maxHeight: 320, overflow: 'auto' }}
+                />
+              </div>
+            </Space>
+          </ProCard>
+
+          {/* Right: content */}
+          <ProCard
+            colSpan={{ xs: 24, md: 16, lg: 17, xl: 18 }}
+            title={
+              <Space>
+                {view === 'timeline' ? (
+                  <ApartmentOutlined />
+                ) : (
+                  <UnorderedListOutlined />
+                )}
+                <span>Changelog entries</span>
+              </Space>
+            }
+          >
+            {view === 'timeline' ? (
+              <Timeline mode="left">
+                {filtered.map((e, idx) => {
+                  const id = `ver-${e.version}`;
+                  return (
+                    <Timeline.Item
+                      key={`${e.version}-${e.date}-${idx}`}
+                      label={dayjs(e.date).format('YYYY-MM-DD')}
+                      dot={<CalendarOutlined />}
+                    >
+                      <div id={id} style={{ scrollMarginTop: 72 }}>
+                        <Space
+                          direction="vertical"
+                          size="small"
+                          style={{ width: '100%' }}
+                        >
+                          <Space size="small" align="center" wrap>
+                            <Title level={5} style={{ margin: 0 }}>
+                              {e.version}
+                            </Title>
+                            {renderTags(e.tags)}
+                          </Space>
+                          <ul style={{ marginTop: 4 }}>
+                            {e.notes.map((n, i) => (
+                              <li key={i}>
+                                <Text>{n}</Text>
+                              </li>
+                            ))}
+                          </ul>
+                        </Space>
+                      </div>
+                    </Timeline.Item>
+                  );
+                })}
+              </Timeline>
+            ) : (
+              <ProList<ChangelogEntry>
+                rowKey={(row, idx) => `${row.version}-${row.date}-${idx}`}
+                dataSource={filtered}
+                split
+                pagination={{ pageSize: 10, showSizeChanger: false }}
+                metas={{
+                  title: {
+                    render: (_, row) => (
+                      <Space size="small" wrap>
+                        <Text strong>{row.version}</Text>
+                        <Tag icon={<CalendarOutlined />}>
+                          {dayjs(row.date).format('YYYY-MM-DD')}
+                        </Tag>
+                      </Space>
+                    ),
+                  },
+                  subTitle: {
+                    render: (_, row) => renderTags(row.tags),
+                  },
+                  description: {
+                    render: (_, row) => (
+                      <ul style={{ marginTop: 4 }}>
+                        {row.notes.map((n, i) => (
+                          <li key={i}>
+                            <Text>{n}</Text>
+                          </li>
+                        ))}
+                      </ul>
+                    ),
+                  },
+                }}
+              />
+            )}
+          </ProCard>
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -8174,13 +8269,11 @@ import {
 } from 'antd';
 import { SyncOutlined, DownloadOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
 import { fetchGlossary } from '@/services/learn';
 import type { GlossaryItem } from '@/services/learn';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 
 export default function Glossary() {
-  usePageTitle('Learn · Glossary');
-
   const { data, loading, error, refresh } = useRequest(fetchGlossary);
   const [query, setQuery] = useState('');
   const [letter, setLetter] = useState<string>('all');
@@ -8262,84 +8355,85 @@ export default function Glossary() {
     URL.revokeObjectURL(url);
   }
 
+  const headerStats = (
+    <Space size="large" wrap>
+      <Statistic title="Total terms" value={items.length} />
+      <Statistic title="Shown" value={filtered.length} />
+      <Tooltip title="Reload from server">
+        <Button icon={<SyncOutlined />} onClick={refresh} />
+      </Tooltip>
+    </Space>
+  );
+
   return (
-    <PageContainer
-      ghost
-      loading={loading}
-      extra={
-        <Space size="large" wrap>
-          <Statistic title="Total terms" value={items.length} />
-          <Statistic title="Shown" value={filtered.length} />
-          <Tooltip title="Reload from server">
-            <Button icon={<SyncOutlined />} onClick={refresh} />
-          </Tooltip>
-        </Space>
-      }
+    <EthikosPageShell
+      title="Glossary"
+      sectionLabel="Learn"
+      subtitle="Glossary terms are synced from your Ethikos categories."
+      secondaryActions={headerStats}
     >
-      <Space
-        direction="vertical"
-        size="middle"
-        style={{ width: '100%', marginBottom: 8 }}
-      >
-        <Typography.Text type="secondary">
-          Glossary terms are synced from your Ethikos categories.
-        </Typography.Text>
-
-        <Space wrap>
-          <Input.Search
-            placeholder="Search by term or definition…"
-            allowClear
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={{ width: 360 }}
-          />
-          <Segmented
-            options={letters}
-            value={letter}
-            onChange={(val) => setLetter(String(val))}
-          />
-          <Button
-            icon={<DownloadOutlined />}
-            onClick={() => exportCsv(filtered)}
-          >
-            Export CSV
-          </Button>
-        </Space>
-      </Space>
-
-      {error && (
-        <Typography.Paragraph type="danger" style={{ marginBottom: 16 }}>
-          Unable to load the glossary right now. Please try again later.
-        </Typography.Paragraph>
-      )}
-
-      <ProTable<GlossaryItem>
-        rowKey="id"
-        size="small"
-        columns={columns}
-        dataSource={filtered}
-        search={false}
-        pagination={{ pageSize: 20, showSizeChanger: true, showQuickJumper: true }}
-        options={{ fullScreen: true, density: true, setting: true }}
-        toolBarRender={() => [
-          <Typography.Text key="count" type="secondary">
-            {filtered.length} of {items.length} terms
-          </Typography.Text>,
-        ]}
-        locale={{
-          emptyText: (
-            <Empty
-              description={
-                query || letter !== 'all'
-                  ? 'No terms match your filters'
-                  : 'No glossary terms available yet'
-              }
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
+      <PageContainer ghost loading={loading}>
+        <Space
+          direction="vertical"
+          size="middle"
+          style={{ width: '100%', marginBottom: 8 }}
+        >
+          <Space wrap>
+            <Input.Search
+              placeholder="Search by term or definition…"
+              allowClear
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ width: 360 }}
             />
-          ),
-        }}
-      />
-    </PageContainer>
+            <Segmented
+              options={letters}
+              value={letter}
+              onChange={(val) => setLetter(String(val))}
+            />
+            <Button
+              icon={<DownloadOutlined />}
+              onClick={() => exportCsv(filtered)}
+            >
+              Export CSV
+            </Button>
+          </Space>
+        </Space>
+
+        {error && (
+          <Typography.Paragraph type="danger" style={{ marginBottom: 16 }}>
+            Unable to load the glossary right now. Please try again later.
+          </Typography.Paragraph>
+        )}
+
+        <ProTable<GlossaryItem>
+          rowKey="id"
+          size="small"
+          columns={columns}
+          dataSource={filtered}
+          search={false}
+          pagination={{ pageSize: 20, showSizeChanger: true, showQuickJumper: true }}
+          options={{ fullScreen: true, density: true, setting: true }}
+          toolBarRender={() => [
+            <Typography.Text key="count" type="secondary">
+              {filtered.length} of {items.length} terms
+            </Typography.Text>,
+          ]}
+          locale={{
+            emptyText: (
+              <Empty
+                description={
+                  query || letter !== 'all'
+                    ? 'No terms match your filters'
+                    : 'No glossary terms available yet'
+                }
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            ),
+          }}
+        />
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -8353,8 +8447,8 @@ export default function Glossary() {
  * Ethikos · Learn · Guides
  *
  * References:
- * - Baseline page implementation from the app dump. :contentReference[oaicite:0]{index=0}
- * - Data service: services/learn.ts (fetchGuides). :contentReference[oaicite:1]{index=1}
+ * - Baseline page implementation from the app dump.
+ * - Data service: services/learn.ts (fetchGuides).
  */
 
 import { useMemo, useState } from 'react'
@@ -8376,7 +8470,7 @@ import {
 } from 'antd'
 import { LinkOutlined, SyncOutlined, ReadOutlined } from '@ant-design/icons'
 import { useRequest } from 'ahooks'
-import usePageTitle from '@/hooks/usePageTitle'
+import EthikosPageShell from '../../EthikosPageShell'
 import { fetchGuides } from '@/services/learn'
 
 type GuideSection = {
@@ -8392,8 +8486,6 @@ function wordsOf(text: string) {
 }
 
 export default function Guides() {
-  usePageTitle('Learn · Guides')
-
   const { data, loading, error, refresh } = useRequest(fetchGuides)
   const [query, setQuery] = useState('')
 
@@ -8439,19 +8531,26 @@ export default function Guides() {
     return { filtered, totals, pieData, anchorItems }
   }, [sections, query])
 
+  const shellProps = {
+    title: 'Guides',
+    sectionLabel: 'Learn',
+  } as const
+
   /* ---------- error state ---------- */
   if (error) {
     return (
-      <PageContainer ghost>
-        <Empty
-          description="Failed to load guides"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
-          <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
-            Retry
-          </Button>
-        </Empty>
-      </PageContainer>
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Empty
+            description="Failed to load guides"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
+              Retry
+            </Button>
+          </Empty>
+        </PageContainer>
+      </EthikosPageShell>
     )
   }
 
@@ -8466,132 +8565,134 @@ export default function Guides() {
   }
 
   return (
-    <PageContainer
-      ghost
-      loading={loading}
-      extra={
-        <Space size="large">
-          <Space direction="vertical" size={0}>
-            <Typography.Text type="secondary">Guides</Typography.Text>
-            <Typography.Text strong>{sections.length}</Typography.Text>
+    <EthikosPageShell {...shellProps}>
+      <PageContainer
+        ghost
+        loading={loading}
+        extra={
+          <Space size="large">
+            <Space direction="vertical" size={0}>
+              <Typography.Text type="secondary">Guides</Typography.Text>
+              <Typography.Text strong>{sections.length}</Typography.Text>
+            </Space>
+            <Space direction="vertical" size={0}>
+              <Typography.Text type="secondary">Est. reading</Typography.Text>
+              <Typography.Text strong>
+                {computed.totals.minutes} min
+              </Typography.Text>
+            </Space>
           </Space>
-          <Space direction="vertical" size={0}>
-            <Typography.Text type="secondary">Est. reading</Typography.Text>
-            <Typography.Text strong>
-              {computed.totals.minutes} min
-            </Typography.Text>
-          </Space>
-        </Space>
-      }
-    >
-      {/* Overview stats */}
-      <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
-        <StatisticCard
-          statistic={{
-            title: 'Total guides',
-            value: sections.length,
-            icon: <ReadOutlined />,
-          }}
-        />
-        <StatisticCard
-          statistic={{
-            title: 'Words (filtered)',
-            value: computed.totals.words,
-          }}
-        />
-        <StatisticCard
-          statistic={{
-            title: 'Est. read time',
-            value: computed.totals.minutes,
-            suffix: 'min',
-          }}
-        />
-        <ProCard colSpan="100%" ghost />
-      </ProCard>
-
-      <ProCard split="vertical" ghost>
-        {/* Left: Navigation & search */}
-        <ProCard
-          colSpan={{ xs: 24, sm: 24, md: 7, lg: 6, xl: 6 }}
-          title="Navigate guides"
-        >
-          <Typography.Paragraph type="secondary">
-            Practical walkthroughs for using ethiKos: when to launch a debate,
-            choosing Elite vs Public, and how outcomes flow into impact.
-          </Typography.Paragraph>
-
-          <Input.Search
-            placeholder="Filter guides…"
-            allowClear
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            style={{ marginBottom: 16 }}
+        }
+      >
+        {/* Overview stats */}
+        <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+          <StatisticCard
+            statistic={{
+              title: 'Total guides',
+              value: sections.length,
+              icon: <ReadOutlined />,
+            }}
           />
-
-          <Anchor
-            affix={false}
-            items={computed.anchorItems}
-            style={{ maxHeight: 360, overflow: 'auto' }}
+          <StatisticCard
+            statistic={{
+              title: 'Words (filtered)',
+              value: computed.totals.words,
+            }}
           />
+          <StatisticCard
+            statistic={{
+              title: 'Est. read time',
+              value: computed.totals.minutes,
+              suffix: 'min',
+            }}
+          />
+          <ProCard colSpan="100%" ghost />
+        </ProCard>
 
-          <Typography.Paragraph
-            type="secondary"
-            style={{ marginTop: 16, marginBottom: 0 }}
+        <ProCard split="vertical" ghost>
+          {/* Left: Navigation & search */}
+          <ProCard
+            colSpan={{ xs: 24, sm: 24, md: 7, lg: 6, xl: 6 }}
+            title="Navigate guides"
           >
-            {computed.filtered.length} guide
-            {computed.filtered.length === 1 ? '' : 's'} match your filter.
-          </Typography.Paragraph>
+            <Typography.Paragraph type="secondary">
+              Practical walkthroughs for using ethiKos: when to launch a debate,
+              choosing Elite vs Public, and how outcomes flow into impact.
+            </Typography.Paragraph>
+
+            <Input.Search
+              placeholder="Filter guides…"
+              allowClear
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              style={{ marginBottom: 16 }}
+            />
+
+            <Anchor
+              affix={false}
+              items={computed.anchorItems}
+              style={{ maxHeight: 360, overflow: 'auto' }}
+            />
+
+            <Typography.Paragraph
+              type="secondary"
+              style={{ marginTop: 16, marginBottom: 0 }}
+            >
+              {computed.filtered.length} guide
+              {computed.filtered.length === 1 ? '' : 's'} match your filter.
+            </Typography.Paragraph>
+          </ProCard>
+
+          {/* Right: Content + mini chart */}
+          <ProCard
+            colSpan={{ xs: 24, sm: 24, md: 17, lg: 18, xl: 18 }}
+            title="Guided flows"
+          >
+            {computed.filtered.length === 0 ? (
+              <Empty description="No guides match your query." />
+            ) : (
+              <>
+                {/* Mini chart to visualize section sizes */}
+                <ProCard
+                  ghost
+                  style={{ marginBottom: 16 }}
+                  title="Guide size breakdown"
+                >
+                  <Pie {...pieConfig} />
+                </ProCard>
+
+                {computed.filtered.map((s) => (
+                  <section key={s.id} id={s.id} style={{ marginBottom: 32 }}>
+                    <Space align="baseline" size="middle">
+                      <Typography.Title level={3} style={{ marginTop: 0 }}>
+                        {s.title}
+                      </Typography.Title>
+                      <Tag>{s.minutes} min</Tag>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<LinkOutlined />}
+                        onClick={() => {
+                          const url = `${location.pathname}#${s.id}`
+                          navigator.clipboard?.writeText(url)
+                        }}
+                      >
+                        Copy link
+                      </Button>
+                    </Space>
+                    <Typography.Paragraph style={{ whiteSpace: 'pre-line' }}>
+                      {s.content}
+                    </Typography.Paragraph>
+                  </section>
+                ))}
+              </>
+            )}
+          </ProCard>
         </ProCard>
 
-        {/* Right: Content + mini chart */}
-        <ProCard
-          colSpan={{ xs: 24, sm: 24, md: 17, lg: 18, xl: 18 }}
-          title="Guided flows"
-        >
-          {computed.filtered.length === 0 ? (
-            <Empty description="No guides match your query." />
-          ) : (
-            <>
-              {/* Mini chart to visualize section sizes */}
-              <ProCard
-                ghost
-                style={{ marginBottom: 16 }}
-                title="Guide size breakdown"
-              >
-                <Pie {...pieConfig} />
-              </ProCard>
-
-              {computed.filtered.map((s) => (
-                <section key={s.id} id={s.id} style={{ marginBottom: 32 }}>
-                  <Space align="baseline" size="middle">
-                    <Typography.Title level={3} style={{ marginTop: 0 }}>
-                      {s.title}
-                    </Typography.Title>
-                    <Tag>{s.minutes} min</Tag>
-                    <Button
-                      type="text"
-                      size="small"
-                      icon={<LinkOutlined />}
-                      onClick={() => {
-                        const url = `${location.pathname}#${s.id}`
-                        navigator.clipboard?.writeText(url)
-                      }}
-                    >
-                      Copy link
-                    </Button>
-                  </Space>
-                  <Typography.Paragraph style={{ whiteSpace: 'pre-line' }}>
-                    {s.content}
-                  </Typography.Paragraph>
-                </section>
-              ))}
-            </>
-          )}
-        </ProCard>
-      </ProCard>
-
-      <FloatButton.BackTop visibilityHeight={240} />
-    </PageContainer>
+        <FloatButton.BackTop visibilityHeight={240} />
+      </PageContainer>
+    </EthikosPageShell>
   )
 }
 
@@ -8628,6 +8729,7 @@ import { SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
+import EthikosPageShell from '../../EthikosPageShell';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchPulseHealth, type HealthSummary } from '@/services/pulse';
 
@@ -8656,38 +8758,45 @@ export default function PulseHealth(): JSX.Element {
   );
 
   const lastUpdated = data ? dayjs(data.refreshedAt).format('HH:mm:ss') : null;
+  const shellTitle = 'Pulse · Participation Health';
 
   /* ---------- loading skeleton ---------- */
   if (loading && !data) {
     return (
-      <PageContainer ghost>
-        <Skeleton active />
-      </PageContainer>
+      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+        <PageContainer ghost>
+          <Skeleton active />
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   /* ---------- error state ---------- */
   if (error) {
     return (
-      <PageContainer ghost>
-        <Empty
-          description="Failed to load participation health"
-          image={Empty.PRESENTED_IMAGE_SIMPLE}
-        >
-          <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
-            Retry
-          </Button>
-        </Empty>
-      </PageContainer>
+      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+        <PageContainer ghost>
+          <Empty
+            description="Failed to load participation health"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
+              Retry
+            </Button>
+          </Empty>
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   /* ---------- empty safeguard ---------- */
   if (!data) {
     return (
-      <PageContainer ghost>
-        <Empty description="No participation data available yet" />
-      </PageContainer>
+      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+        <PageContainer ghost>
+          <Empty description="No participation data available yet" />
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
@@ -8721,109 +8830,130 @@ export default function PulseHealth(): JSX.Element {
     return { label: p.type, count: p.value, percent };
   });
 
+  const secondaryActions = (
+    <Space>
+      <Badge status={healthStatus} text={healthLabel} />
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+      <Button
+        icon={<SyncOutlined />}
+        onClick={refresh}
+        size="small"
+        type="text"
+      />
+    </Space>
+  );
+
   return (
-    <PageContainer
-      ghost
-      extra={
-        <Space>
-          <Badge status={healthStatus} text={healthLabel} />
-          {lastUpdated && (
-            <Badge
-              count={
-                <Tooltip title={`Last refreshed at ${lastUpdated}`}>
-                  <ClockCircleOutlined style={{ color: '#52c41a' }} />
-                </Tooltip>
-              }
-            />
-          )}
-          <Button icon={<SyncOutlined />} onClick={refresh} size="small" type="text" />
-        </Space>
-      }
+    <EthikosPageShell
+      title={shellTitle}
+      sectionLabel="Pulse"
+      secondaryActions={secondaryActions}
     >
-      {/* KPI summary */}
-      <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-          statistic={{
-            title: 'Participation',
-            value: participation ?? 0,
-            suffix: '%',
-            description: (
-              <Text type="secondary">Share of users who have expressed a stance.</Text>
-            ),
-          }}
-        />
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-          statistic={{
-            title: 'Engagement',
-            value: engagement ?? 0,
-            suffix: '%',
-            description: (
-              <Text type="secondary">Voting and reactions across recent debates.</Text>
-            ),
-          }}
-        />
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-          statistic={{
-            title: 'Balance',
-            value: balance ?? 0,
-            suffix: '%',
-            description: (
-              <Text type="secondary">
-                How evenly positions are distributed between positive and negative.
-              </Text>
-            ),
-          }}
-        />
-        <StatisticCard
-          colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-          statistic={{
-            title: 'Constructiveness',
-            value: constructiveness ?? 0,
-            suffix: '%',
-            description: (
-              <Text type="secondary">Composite of participation and balance.</Text>
-            ),
-          }}
-        />
-      </ProCard>
-
-      {/* Radar + sentiment breakdown */}
-      <ProCard gutter={[16, 16]} wrap>
-        <ProCard
-          colSpan={{ xs: 24, xl: 14 }}
-          title="Participation health radar"
-          extra={<Text type="secondary">Each axis normalised to 0–100.</Text>}
-        >
-          <Radar {...data.radarConfig} />
+      <PageContainer ghost>
+        {/* KPI summary */}
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Participation',
+              value: participation ?? 0,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  Share of users who have expressed a stance.
+                </Text>
+              ),
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Engagement',
+              value: engagement ?? 0,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  Voting and reactions across recent debates.
+                </Text>
+              ),
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Balance',
+              value: balance ?? 0,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  How evenly positions are distributed between positive and
+                  negative.
+                </Text>
+              ),
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Constructiveness',
+              value: constructiveness ?? 0,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  Composite of participation and balance.
+                </Text>
+              ),
+            }}
+          />
         </ProCard>
 
-        <ProCard colSpan={{ xs: 24, xl: 10 }} title="Ethics sentiment breakdown" split="horizontal">
-          <ProCard ghost>
-            <Pie {...data.pieConfig} />
+        {/* Radar + sentiment breakdown */}
+        <ProCard gutter={[16, 16]} wrap>
+          <ProCard
+            colSpan={{ xs: 24, xl: 14 }}
+            title="Participation health radar"
+            extra={<Text type="secondary">Each axis normalised to 0–100.</Text>}
+          >
+            <Radar {...data.radarConfig} />
           </ProCard>
 
-          <ProCard ghost>
-            <List
-              size="small"
-              dataSource={sentimentDetails}
-              renderItem={(item) => (
-                <List.Item>
-                  <Space>
-                    <Text strong>{item.label}</Text>
-                    <Text type="secondary">
-                      {item.count} stances ({item.percent}%)
-                    </Text>
-                  </Space>
-                </List.Item>
-              )}
-            />
+          <ProCard
+            colSpan={{ xs: 24, xl: 10 }}
+            title="Ethics sentiment breakdown"
+            split="horizontal"
+          >
+            <ProCard ghost>
+              <Pie {...data.pieConfig} />
+            </ProCard>
+
+            <ProCard ghost>
+              <List
+                size="small"
+                dataSource={sentimentDetails}
+                renderItem={(item) => (
+                  <List.Item>
+                    <Space>
+                      <Text strong>{item.label}</Text>
+                      <Text type="secondary">
+                        {item.count} stances ({item.percent}%)
+                      </Text>
+                    </Space>
+                  </List.Item>
+                )}
+              />
+            </ProCard>
           </ProCard>
         </ProCard>
-      </ProCard>
-    </PageContainer>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -8840,12 +8970,6 @@ export default function PulseHealth(): JSX.Element {
  * - Add live activity feed (topics, stances, arguments)
  * - Add "Open debates" table with last activity
  * - Wire into existing services/hooks and axios helper
- *
- * References:
- * - Existing page scaffold & counters rendering: :contentReference[oaicite:0]{index=0}
- * - Pulse services (fetchPulseLiveData & DTOs): :contentReference[oaicite:1]{index=1}
- * - Ethikos page shell wrapper: :contentReference[oaicite:2]{index=2}
- * - Axios data helpers (get/post/…): :contentReference[oaicite:3]{index=3}
  */
 
 import React from 'react';
@@ -8882,7 +9006,6 @@ import { useInterval, useRequest } from 'ahooks';
 
 import EthikosPageShell from '../../EthikosPageShell';
 import ChartCard from '@/components/charts/ChartCard';
-import usePageTitle from '@/hooks/usePageTitle';
 import { fetchPulseLiveData, type LiveCounter } from '@/services/pulse';
 import { get } from '@/services/_request';
 
@@ -9022,8 +9145,6 @@ function truncate(s: string, n = 100) {
 /* ------------------------------------------------------------------ */
 
 export default function PulseLive(): JSX.Element {
-  usePageTitle('Pulse · Live participation');
-
   const [autoRefresh, setAutoRefresh] = React.useState(true);
   const [lastUpdated, setLastUpdated] = React.useState<string | null>(null);
 
@@ -9227,7 +9348,15 @@ export default function PulseLive(): JSX.Element {
                           <a href={`/ethikos/deliberate/${item.topicId}`}>
                             {item.title}
                           </a>
-                          <Tag color={item.kind === 'topic' ? 'blue' : item.kind === 'stance' ? 'purple' : 'cyan'}>
+                          <Tag
+                            color={
+                              item.kind === 'topic'
+                                ? 'blue'
+                                : item.kind === 'stance'
+                                ? 'purple'
+                                : 'cyan'
+                            }
+                          >
                             {item.kind}
                           </Tag>
                         </Space>
@@ -9320,7 +9449,6 @@ import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
 import ChartCard from '@/components/charts/ChartCard';
-import usePageTitle from '@/hooks/usePageTitle';
 import { fetchPulseOverview } from '@/services/pulse';
 import EthikosPageShell from '../../EthikosPageShell';
 
@@ -9364,8 +9492,6 @@ function usePulseOverview() {
 /* ------------------------------------------------------------------ */
 
 export default function PulseOverview() {
-  usePageTitle('Pulse · Overview');
-
   const { data, loading, error, refresh } = usePulseOverview();
   const lastUpdated = data ? dayjs(data.refreshedAt).format('HH:mm:ss') : null;
 
@@ -9504,7 +9630,9 @@ export default function PulseOverview() {
                           <Tag color={meta.color}>{kpi.label}</Tag>
                           {typeof kpi.delta === 'number' && (
                             <Text type={kpi.delta >= 0 ? 'success' : 'danger'}>
-                              {kpi.delta >= 0 ? `+${kpi.delta}%` : `${kpi.delta}%`}
+                              {kpi.delta >= 0
+                                ? `+${kpi.delta}%`
+                                : `${kpi.delta}%`}
                             </Text>
                           )}
                         </Space>
@@ -10015,14 +10143,13 @@ export default function PulseTrends(): JSX.Element {
 'use client';
 
 // Source references (current code + services):
-// - Current page baseline in dump: app/ethikos/trust/badges/page.tsx :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
-// - Trust services (types + fetchUserBadges): frontend/services/trust.ts :contentReference[oaicite:2]{index=2}
+// - Current page baseline in dump: app/ethikos/trust/badges/page.tsx
+// - Trust services (types + fetchUserBadges): frontend/services/trust.ts
 
 import { useMemo, useState } from 'react';
 import { PageContainer, ProCard, ProList } from '@ant-design/pro-components';
 import {
   Badge as AntBadge,
-  Card,
   Divider,
   Empty,
   Input,
@@ -10035,7 +10162,8 @@ import {
 } from 'antd';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
-import usePageTitle from '@/hooks/usePageTitle';
+
+import EthikosPageShell from '../../EthikosPageShell';
 import { fetchUserBadges, type Badge as TrustBadge } from '@/services/trust';
 
 const { Text, Paragraph } = Typography;
@@ -10053,7 +10181,10 @@ type CatalogItem = {
   requirement: string;
 };
 
-const BADGE_CATEGORY_META: Record<string, { label: CatalogCategory; color: string }> = {
+const BADGE_CATEGORY_META: Record<
+  string,
+  { label: CatalogCategory; color: string }
+> = {
   'first-stance': { label: 'Stances', color: 'blue' },
   'argument-builder': { label: 'Arguments', color: 'purple' },
   'active-voter': { label: 'Voting', color: 'green' },
@@ -10085,8 +10216,6 @@ const BADGE_CATALOG: CatalogItem[] = [
 ];
 
 export default function Badges() {
-  usePageTitle('Trust · Badges');
-
   const { data, loading } = useRequest<TrustBadge[], []>(fetchUserBadges);
   const badges = data ?? [];
   const earnedIds = useMemo(() => new Set(badges.map((b) => b.id)), [badges]);
@@ -10096,7 +10225,9 @@ export default function Badges() {
   const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
 
   // Controls for "Badge catalog"
-  const [catalogCategory, setCatalogCategory] = useState<CatalogCategory | 'All'>('All');
+  const [catalogCategory, setCatalogCategory] = useState<
+    CatalogCategory | 'All'
+  >('All');
   const [catalogShow, setCatalogShow] = useState<CatalogShow>('all');
   const [catalogSearch, setCatalogSearch] = useState('');
 
@@ -10105,13 +10236,21 @@ export default function Badges() {
 
   // ---------- derived stats ----------
   const totalBadges = badges.length;
-  const recent90 = badges.filter((b) => dayjs(b.earnedAt).isAfter(dayjs().subtract(90, 'day'))).length;
+  const recent90 = badges.filter((b) =>
+    dayjs(b.earnedAt).isAfter(dayjs().subtract(90, 'day')),
+  ).length;
 
   let firstEarned: string | undefined;
   let lastEarned: string | undefined;
   if (badges.length > 0) {
-    firstEarned = badges.reduce((min, b) => (dayjs(b.earnedAt).isBefore(min) ? b.earnedAt : min), badges[0].earnedAt);
-    lastEarned = badges.reduce((max, b) => (dayjs(b.earnedAt).isAfter(max) ? b.earnedAt : max), badges[0].earnedAt);
+    firstEarned = badges.reduce(
+      (min, b) => (dayjs(b.earnedAt).isBefore(min) ? b.earnedAt : min),
+      badges[0].earnedAt,
+    );
+    lastEarned = badges.reduce(
+      (max, b) => (dayjs(b.earnedAt).isAfter(max) ? b.earnedAt : max),
+      badges[0].earnedAt,
+    );
   }
 
   // ---------- "Your badges" grid (filters + sorting) ----------
@@ -10163,230 +10302,274 @@ export default function Badges() {
     }
 
     // Keep earned first within each view for clarity
-    rows.sort((a, b) => (a.earned === b.earned ? a.label.localeCompare(b.label) : a.earned ? -1 : 1));
+    rows.sort((a, b) =>
+      a.earned === b.earned
+        ? a.label.localeCompare(b.label)
+        : a.earned
+        ? -1
+        : 1,
+    );
     return rows;
   }, [badges, earnedIds, catalogCategory, catalogShow, catalogSearch]);
 
+  const shellProps = {
+    title: 'Badges',
+    sectionLabel: 'Trust',
+  } as const;
+
   return (
-    <PageContainer ghost loading={loading}>
-      {/* Summary / explanation */}
-      <ProCard gutter={[16, 16]} wrap>
-        <ProCard
-          colSpan={{ xs: 24, md: 12 }}
-          bordered
-          title="Reputation badges"
-          subTitle="Derived from what you actually do in Ethikos"
-        >
-          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-            <Paragraph type="secondary">
-              Badges are granted automatically from your real activity in debates, arguments and
-              weighted votes. They cannot be edited or purchased.
-            </Paragraph>
-            <Paragraph type="secondary">
-              Use them as a compact way to communicate your track record when you join new
-              consultations or structured debates.
-            </Paragraph>
-          </Space>
-        </ProCard>
-
-        <ProCard colSpan={{ xs: 24, md: 12 }} bordered title="At a glance">
-          <Space size="large" wrap>
-            <Statistic title="Badges earned" value={totalBadges} />
-            <Statistic title="Last 90 days" value={recent90} />
-            {firstEarned && (
-              <Statistic title="First badge" value={dayjs(firstEarned).format('MMM D, YYYY')} />
-            )}
-            {lastEarned && (
-              <Statistic title="Most recent" value={dayjs(lastEarned).format('MMM D, YYYY')} />
-            )}
-          </Space>
-        </ProCard>
-      </ProCard>
-
-      {/* Badge grid + controls */}
-      <ProCard
-        style={{ marginTop: 16 }}
-        bordered
-        title="Your badges"
-        extra={
-          <Space size="middle" wrap>
-            <Space size={4}>
-              <Text type="secondary">Show</Text>
-              <Select<TimeFilter>
-                size="small"
-                value={timeFilter}
-                onChange={setTimeFilter}
-                style={{ minWidth: 150 }}
-                options={[
-                  { value: 'all', label: 'All time' },
-                  { value: '90d', label: 'Last 90 days' },
-                  { value: '365d', label: 'Last 12 months' },
-                ]}
-              />
-            </Space>
-            <Space size={4}>
-              <Text type="secondary">Sort</Text>
-              <Select<SortOrder>
-                size="small"
-                value={sortOrder}
-                onChange={setSortOrder}
-                style={{ minWidth: 150 }}
-                options={[
-                  { value: 'newest', label: 'Newest first' },
-                  { value: 'oldest', label: 'Oldest first' },
-                ]}
-              />
-            </Space>
-          </Space>
-        }
-      >
-        <Divider style={{ margin: '8px 0 16px' }} />
-
+    <EthikosPageShell {...shellProps}>
+      <PageContainer ghost loading={loading}>
+        {/* Summary / explanation */}
         <ProCard gutter={[16, 16]} wrap>
-          {filteredBadges.length > 0 ? (
-            filteredBadges.map((badge) => {
-              const meta = BADGE_CATEGORY_META[badge.id];
+          <ProCard
+            colSpan={{ xs: 24, md: 12 }}
+            bordered
+            title="Reputation badges"
+            subTitle="Derived from what you actually do in Ethikos"
+          >
+            <Space
+              direction="vertical"
+              size="middle"
+              style={{ width: '100%' }}
+            >
+              <Paragraph type="secondary">
+                Badges are granted automatically from your real activity in
+                debates, arguments and weighted votes. They cannot be edited or
+                purchased.
+              </Paragraph>
+              <Paragraph type="secondary">
+                Use them as a compact way to communicate your track record when
+                you join new consultations or structured debates.
+              </Paragraph>
+            </Space>
+          </ProCard>
 
-              return (
-                <AntBadge.Ribbon
-                  key={badge.id}
-                  text={dayjs(badge.earnedAt).format('MMM D, YYYY')}
-                  color="green"
-                >
-                  <Card
-                    hoverable
-                    onClick={() => setDetail(badge)}
-                    title={
-                      <Space size={8}>
-                        <span>{badge.label}</span>
-                        {meta && <Tag color={meta.color}>{meta.label}</Tag>}
-                      </Space>
-                    }
-                    style={{ width: 260, marginBottom: 16 }}
-                  >
-                    <Paragraph type="secondary" style={{ marginBottom: 8 }}>
-                      {badge.description}
-                    </Paragraph>
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      Earned on {dayjs(badge.earnedAt).format('MMM D, YYYY')}
-                    </Text>
-                  </Card>
-                </AntBadge.Ribbon>
-              );
-            })
-          ) : (
-            <Empty description="No badges in this view" />
-          )}
-        </ProCard>
-      </ProCard>
-
-      {/* Catalog & criteria */}
-      <ProCard
-        style={{ marginTop: 16 }}
-        title="Badge catalog & criteria"
-        bordered
-        extra={
-          <Space wrap>
-            <Select<CatalogShow>
-              size="small"
-              value={catalogShow}
-              onChange={setCatalogShow}
-              style={{ minWidth: 140 }}
-              options={[
-                { value: 'all', label: 'All' },
-                { value: 'earned', label: 'Earned' },
-                { value: 'locked', label: 'Locked' },
-              ]}
-            />
-            <Select<CatalogCategory | 'All'>
-              size="small"
-              value={catalogCategory}
-              onChange={setCatalogCategory}
-              style={{ minWidth: 160 }}
-              options={[
-                { value: 'All', label: 'All categories' },
-                { value: 'Stances', label: 'Stances' },
-                { value: 'Arguments', label: 'Arguments' },
-                { value: 'Voting', label: 'Voting' },
-              ]}
-            />
-            <Input
-              size="small"
-              placeholder="Search catalog…"
-              allowClear
-              value={catalogSearch}
-              onChange={(e) => setCatalogSearch(e.target.value)}
-              style={{ width: 220 }}
-            />
-          </Space>
-        }
-      >
-        <ProList<CatalogItem & { earned: boolean; earnedAt?: string }>
-          rowKey="id"
-          dataSource={catalogRows}
-          split
-          metas={{
-            title: {
-              dataIndex: 'label',
-            },
-            subTitle: {
-              render: (_, row) => {
-                const meta = BADGE_CATEGORY_META[row.id];
-                return meta ? <Tag color={meta.color}>{meta.label}</Tag> : null;
-              },
-            },
-            description: {
-              render: (_, row) => (
-                <Space direction="vertical" size={2}>
-                  <Text type="secondary">{row.description}</Text>
-                  <Text type="secondary">Criteria: {row.requirement}</Text>
-                </Space>
-              ),
-            },
-            extra: {
-              render: (_, row) =>
-                row.earned ? (
-                  <Tag color="green">Earned {row.earnedAt && `· ${dayjs(row.earnedAt).format('MMM D, YYYY')}`}</Tag>
-                ) : (
-                  <Tag>Locked</Tag>
-                ),
-            },
-          }}
-        />
-      </ProCard>
-
-      {/* Detail modal */}
-      <Modal
-        open={!!detail}
-        title={
-          detail ? (
-            <Space size={8}>
-              <span>{detail.label}</span>
-              {BADGE_CATEGORY_META[detail.id] && (
-                <Tag color={BADGE_CATEGORY_META[detail.id].color}>
-                  {BADGE_CATEGORY_META[detail.id].label}
-                </Tag>
+          <ProCard
+            colSpan={{ xs: 24, md: 12 }}
+            bordered
+            title="At a glance"
+          >
+            <Space size="large" wrap>
+              <Statistic title="Badges earned" value={totalBadges} />
+              <Statistic title="Last 90 days" value={recent90} />
+              {firstEarned && (
+                <Statistic
+                  title="First badge"
+                  value={dayjs(firstEarned).format('MMM D, YYYY')}
+                />
+              )}
+              {lastEarned && (
+                <Statistic
+                  title="Most recent"
+                  value={dayjs(lastEarned).format('MMM D, YYYY')}
+                />
               )}
             </Space>
-          ) : (
-            'Badge'
-          )
-        }
-        onCancel={() => setDetail(null)}
-        onOk={() => setDetail(null)}
-        okText="Close"
-        cancelButtonProps={{ style: { display: 'none' } }}
-      >
-        {detail ? (
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Paragraph>{detail.description}</Paragraph>
-            <Text type="secondary">
-              Earned on {dayjs(detail.earnedAt).format('MMMM D, YYYY')}
-            </Text>
-          </Space>
-        ) : null}
-      </Modal>
-    </PageContainer>
+          </ProCard>
+        </ProCard>
+
+        {/* Badge grid + controls */}
+        <ProCard
+          style={{ marginTop: 16 }}
+          bordered
+          title="Your badges"
+          extra={
+            <Space size="middle" wrap>
+              <Space size={4}>
+                <Text type="secondary">Show</Text>
+                <Select<TimeFilter>
+                  size="small"
+                  value={timeFilter}
+                  onChange={setTimeFilter}
+                  style={{ minWidth: 150 }}
+                  options={[
+                    { value: 'all', label: 'All time' },
+                    { value: '90d', label: 'Last 90 days' },
+                    { value: '365d', label: 'Last 12 months' },
+                  ]}
+                />
+              </Space>
+              <Space size={4}>
+                <Text type="secondary">Sort</Text>
+                <Select<SortOrder>
+                  size="small"
+                  value={sortOrder}
+                  onChange={setSortOrder}
+                  style={{ minWidth: 150 }}
+                  options={[
+                    { value: 'newest', label: 'Newest first' },
+                    { value: 'oldest', label: 'Oldest first' },
+                  ]}
+                />
+              </Space>
+            </Space>
+          }
+        >
+          <Divider style={{ margin: '8px 0 16px' }} />
+
+          <ProCard gutter={[16, 16]} wrap>
+            {filteredBadges.length > 0 ? (
+              filteredBadges.map((badge) => {
+                const meta = BADGE_CATEGORY_META[badge.id];
+
+                return (
+                  <AntBadge.Ribbon
+                    key={badge.id}
+                    text={dayjs(badge.earnedAt).format('MMM D, YYYY')}
+                    color="green"
+                  >
+                    <ProCard
+                      hoverable
+                      onClick={() => setDetail(badge)}
+                      title={
+                        <Space size={8}>
+                          <span>{badge.label}</span>
+                          {meta && <Tag color={meta.color}>{meta.label}</Tag>}
+                        </Space>
+                      }
+                      style={{ width: 260, marginBottom: 16 }}
+                    >
+                      <Paragraph
+                        type="secondary"
+                        style={{ marginBottom: 8 }}
+                      >
+                        {badge.description}
+                      </Paragraph>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        Earned on{' '}
+                        {dayjs(badge.earnedAt).format('MMM D, YYYY')}
+                      </Text>
+                    </ProCard>
+                  </AntBadge.Ribbon>
+                );
+              })
+            ) : (
+              <Empty description="No badges in this view" />
+            )}
+          </ProCard>
+        </ProCard>
+
+        {/* Catalog & criteria */}
+        <ProCard
+          style={{ marginTop: 16 }}
+          title="Badge catalog & criteria"
+          bordered
+          extra={
+            <Space wrap>
+              <Select<CatalogShow>
+                size="small"
+                value={catalogShow}
+                onChange={setCatalogShow}
+                style={{ minWidth: 140 }}
+                options={[
+                  { value: 'all', label: 'All' },
+                  { value: 'earned', label: 'Earned' },
+                  { value: 'locked', label: 'Locked' },
+                ]}
+              />
+              <Select<CatalogCategory | 'All'>
+                size="small"
+                value={catalogCategory}
+                onChange={setCatalogCategory}
+                style={{ minWidth: 160 }}
+                options={[
+                  { value: 'All', label: 'All categories' },
+                  { value: 'Stances', label: 'Stances' },
+                  { value: 'Arguments', label: 'Arguments' },
+                  { value: 'Voting', label: 'Voting' },
+                ]}
+              />
+              <Input
+                size="small"
+                placeholder="Search catalog…"
+                allowClear
+                value={catalogSearch}
+                onChange={(e) => setCatalogSearch(e.target.value)}
+                style={{ width: 220 }}
+              />
+            </Space>
+          }
+        >
+          <ProList<CatalogItem & { earned: boolean; earnedAt?: string }>
+            rowKey="id"
+            dataSource={catalogRows}
+            split
+            metas={{
+              title: {
+                dataIndex: 'label',
+              },
+              subTitle: {
+                render: (_, row) => {
+                  const meta = BADGE_CATEGORY_META[row.id];
+                  return meta ? (
+                    <Tag color={meta.color}>{meta.label}</Tag>
+                  ) : null;
+                },
+              },
+              description: {
+                render: (_, row) => (
+                  <Space direction="vertical" size={2}>
+                    <Text type="secondary">{row.description}</Text>
+                    <Text type="secondary">
+                      Criteria: {row.requirement}
+                    </Text>
+                  </Space>
+                ),
+              },
+              extra: {
+                render: (_, row) =>
+                  row.earned ? (
+                    <Tag color="green">
+                      Earned{' '}
+                      {row.earnedAt &&
+                        `· ${dayjs(row.earnedAt).format('MMM D, YYYY')}`}
+                    </Tag>
+                  ) : (
+                    <Tag>Locked</Tag>
+                  ),
+              },
+            }}
+          />
+        </ProCard>
+
+        {/* Detail modal */}
+        <Modal
+          open={!!detail}
+          title={
+            detail ? (
+              <Space size={8}>
+                <span>{detail.label}</span>
+                {BADGE_CATEGORY_META[detail.id] && (
+                  <Tag color={BADGE_CATEGORY_META[detail.id].color}>
+                    {BADGE_CATEGORY_META[detail.id].label}
+                  </Tag>
+                )}
+              </Space>
+            ) : (
+              'Badge'
+            )
+          }
+          onCancel={() => setDetail(null)}
+          onOk={() => setDetail(null)}
+          okText="Close"
+          cancelButtonProps={{ style: { display: 'none' } }}
+        >
+          {detail ? (
+            <Space
+              direction="vertical"
+              size="small"
+              style={{ width: '100%' }}
+            >
+              <Paragraph>{detail.description}</Paragraph>
+              <Text type="secondary">
+                Earned on {dayjs(detail.earnedAt).format('MMMM D, YYYY')}
+              </Text>
+            </Space>
+          ) : null}
+        </Modal>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 
@@ -10399,8 +10582,8 @@ export default function Badges() {
 
 /**
  * Sources used to build this implementation:
- * - Baseline page from the app dump (existing upload flow, alert, steps content). :contentReference[oaicite:0]{index=0}
- * - Trust services showing `uploadCredential` helper (currently a stub without a real backend). :contentReference[oaicite:1]{index=1}
+ * - Baseline page from the app dump (existing upload flow, alert, steps content).
+ * - Trust services showing `uploadCredential` helper (currently a stub without a real backend).
  */
 
 import { useMemo, useState } from 'react';
@@ -10437,7 +10620,8 @@ import {
   SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import usePageTitle from '@/hooks/usePageTitle';
+
+import EthikosPageShell from '../../EthikosPageShell';
 import { uploadCredential, type Credential } from '@/services/trust';
 
 /* ---------------------------------------------
@@ -10506,8 +10690,6 @@ async function fetchUserCredentials(): Promise<CredentialRow[]> {
 const { Text, Paragraph } = Typography;
 
 export default function Credentials() {
-  usePageTitle('Trust · Credentials');
-
   const [done, setDone] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [lastFileName, setLastFileName] = useState<string | undefined>();
@@ -10531,7 +10713,22 @@ export default function Credentials() {
     return { verified, pending, rejected, total: rows.length };
   }, [rows]);
 
-  // Upload handler, wired to services/trust::uploadCredential (stub for now).  :contentReference[oaicite:2]{index=2}
+  const summaryTags = (
+    <Space wrap>
+      <Tag key="total">Total: {counters.total}</Tag>
+      <Tag color="green" key="v">
+        Verified: {counters.verified}
+      </Tag>
+      <Tag color="gold" key="p">
+        Pending: {counters.pending}
+      </Tag>
+      <Tag color="red" key="r">
+        Rejected: {counters.rejected}
+      </Tag>
+    </Space>
+  );
+
+  // Upload handler, wired to services/trust::uploadCredential
   const uploadProps = {
     name: 'file',
     multiple: false,
@@ -10664,12 +10861,17 @@ export default function Credentials() {
               </Button>
             </Popconfirm>
           ) : (
-            <Tooltip key="resubmit" title="Attach additional documents and re‑submit">
+            <Tooltip
+              key="resubmit"
+              title="Attach additional documents and re‑submit"
+            >
               <Button
                 size="small"
                 type="dashed"
                 onClick={() => {
-                  antdMessage.info('Re‑submit by uploading an updated document below.');
+                  antdMessage.info(
+                    'Re‑submit by uploading an updated document below.',
+                  );
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
               >
@@ -10682,17 +10884,9 @@ export default function Credentials() {
     },
   ];
 
-  return (
-    <PageContainer
-      ghost
-      extra={[
-        <Tag key="total">Total: {counters.total}</Tag>,
-        <Tag color="green" key="v">Verified: {counters.verified}</Tag>,
-        <Tag color="gold" key="p">Pending: {counters.pending}</Tag>,
-        <Tag color="red" key="r">Rejected: {counters.rejected}</Tag>,
-      ]}
-    >
-      {/* Intro & guidance (from baseline)  :contentReference[oaicite:3]{index=3} */}
+  const pageBody = (
+    <PageContainer ghost>
+      {/* Intro & guidance */}
       <Alert
         type="info"
         showIcon
@@ -10706,10 +10900,10 @@ export default function Credentials() {
         }
         description={
           <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
-            Upload real‑world credentials (certifications, professional memberships, academic
-            records) that help stewards understand why your voice carries expertise in certain
-            debates. These documents are reviewed manually and do not replace community‑based
-            reputation.
+            Upload real‑world credentials (certifications, professional memberships,
+            academic records) that help stewards understand why your voice carries
+            expertise in certain debates. These documents are reviewed manually and do
+            not replace community‑based reputation.
           </Paragraph>
         }
       />
@@ -10735,8 +10929,8 @@ export default function Credentials() {
                     </div>
                   )}
                   <Text>
-                    Your document is now queued for human review. If accepted, it will appear as a
-                    verified note in your Ethikos trust profile.
+                    Your document is now queued for human review. If accepted, it will
+                    appear as a verified note in your Ethikos trust profile.
                   </Text>
                 </>
               }
@@ -10772,19 +10966,20 @@ export default function Credentials() {
 
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <Text type="secondary">
-                  Tip: upload focused evidence rather than full CVs. For example, a single
-                  certification for climate policy is more helpful than a long résumé.
+                  Tip: upload focused evidence rather than full CVs. For example, a
+                  single certification for climate policy is more helpful than a long
+                  résumé.
                 </Text>
                 <Text type="secondary">
-                  You can always complement these documents with activity‑based reputation earned
-                  through debates, voting and impact work.
+                  You can always complement these documents with activity‑based
+                  reputation earned through debates, voting and impact work.
                 </Text>
               </Space>
             </>
           )}
         </ProCard>
 
-        {/* Right column: how it works + my credentials list */}
+        {/* Right column: how it works + examples */}
         <ProCard
           colSpan={{ xs: 24, lg: 10 }}
           title="How credentials fit into Ethikos trust"
@@ -10797,7 +10992,8 @@ export default function Credentials() {
             items={[
               {
                 title: 'Upload',
-                description: 'You submit a credential associated with your real‑world expertise.',
+                description:
+                  'You submit a credential associated with your real‑world expertise.',
               },
               {
                 title: 'Review',
@@ -10921,6 +11117,17 @@ export default function Credentials() {
       </Drawer>
     </PageContainer>
   );
+
+  return (
+    <EthikosPageShell
+      title="Credentials"
+      sectionLabel="Trust"
+      subtitle="Upload and manage real‑world credentials that help stewards understand your expertise in Ethikos debates."
+      secondaryActions={summaryTags}
+    >
+      {pageBody}
+    </EthikosPageShell>
+  );
 }
 
 ===== END app/ethikos/trust/credentials/page.tsx =====
@@ -10933,10 +11140,10 @@ export default function Credentials() {
  * Updated implementation for: frontend/app/ethikos/trust/profile/page.tsx
  *
  * Baseline references:
- * - Previous app page structure & imports. :contentReference[oaicite:0]{index=0}
- * - Modules variant of the Trust profile page (layout & summary patterns). :contentReference[oaicite:1]{index=1}
- * - Trust services: ReputationProfile types, fetchUserProfile, fetchUserBadges. :contentReference[oaicite:2]{index=2}
- * - Combined reputation timeline hook (profile + badges → timeline). :contentReference[oaicite:3]{index=3}
+ * - Previous app page structure & imports.
+ * - Modules variant of the Trust profile page (layout & summary patterns).
+ * - Trust services: ReputationProfile types, fetchUserProfile, fetchUserBadges.
+ * - Combined reputation timeline hook (profile + badges → timeline).
  */
 
 import React, { useMemo } from 'react';
@@ -10971,15 +11178,13 @@ import {
 import { Radar } from '@ant-design/plots';
 import dayjs from 'dayjs';
 
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import useReputationEvents from '@/hooks/useReputationEvents';
 import type { ReputationProfile } from '@/services/trust';
 
 const { Text, Title } = Typography;
 
 export default function TrustProfilePage() {
-  usePageTitle('Trust · My Profile');
-
   // Compose profile + badges + synthetic timeline using existing services
   const { data, isLoading, error, refetch } = useReputationEvents();
   const profile: ReputationProfile | undefined = data?.profile;
@@ -11020,350 +11225,373 @@ export default function TrustProfilePage() {
     } as const;
   }, [dimensions]);
 
-  // Empty/error handling
+  const primaryAction = (
+    <Link href="/ethikos/insights">
+      <Button type="primary">Open analytics</Button>
+    </Link>
+  );
+
+  const secondaryActions = (
+    <Space>
+      <Link href="/ethikos/trust/credentials">
+        <Button icon={<SafetyCertificateOutlined />}>Upload credential</Button>
+      </Link>
+      <Link href="/ethikos/trust/badges">
+        <Button>View badges</Button>
+      </Link>
+    </Space>
+  );
+
+  // Error state wrapped in EthikosPageShell
   if (error) {
     return (
-      <PageContainer ghost>
-        <ProCard ghost>
-          <Space
-            direction="vertical"
-            size="large"
-            style={{ width: '100%', textAlign: 'center' }}
-          >
-            <Empty description="Unable to load trust profile" />
-            <Button onClick={() => refetch()} type="primary">
-              Retry
-            </Button>
-          </Space>
-        </ProCard>
-      </PageContainer>
+      <EthikosPageShell
+        title="My trust profile"
+        sectionLabel="Trust"
+        primaryAction={primaryAction}
+        secondaryActions={secondaryActions}
+      >
+        <PageContainer ghost>
+          <ProCard ghost>
+            <Space
+              direction="vertical"
+              size="large"
+              style={{ width: '100%', textAlign: 'center' }}
+            >
+              <Empty description="Unable to load trust profile" />
+              <Button onClick={() => refetch()} type="primary">
+                Retry
+              </Button>
+            </Space>
+          </ProCard>
+        </PageContainer>
+      </EthikosPageShell>
     );
   }
 
   return (
-    <PageContainer
-      ghost
-      loading={isLoading}
-      extra={
-        <Space>
-          <Link href="/ethikos/trust/credentials">
-            <Button icon={<SafetyCertificateOutlined />}>Upload credential</Button>
-          </Link>
-          <Link href="/ethikos/trust/badges">
-            <Button>View badges</Button>
-          </Link>
-          <Link href="/ethikos/insights">
-            <Button type="primary">Open analytics</Button>
-          </Link>
-        </Space>
-      }
+    <EthikosPageShell
+      title="My trust profile"
+      sectionLabel="Trust"
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
     >
-      {/* KPI strip */}
-      <ProCard gutter={16} wrap>
-        <StatisticCard
-          key="overall-score"
-          colSpan={{ xs: 24, sm: 12, lg: 6 }}
-          statistic={{
-            title: 'Overall reputation score',
-            value: Math.round(score),
-            suffix: '/100',
-            description: (
-              <Space size={4} wrap>
-                <Text type="secondary">Level:</Text>
-                <Tag
-                  color={
-                    level === 'Steward'
-                      ? 'gold'
-                      : level === 'Contributor'
-                      ? 'blue'
-                      : 'default'
-                  }
-                  style={{ marginInlineStart: 4 }}
-                >
-                  {level}
-                </Tag>
-              </Space>
-            ),
-          }}
-          chart={
-            <div style={{ paddingInline: 8 }}>
-              <Progress percent={Math.round(score)} showInfo={false} />
-            </div>
-          }
-        />
-
-        <StatisticCard
-          key="active-dimensions"
-          colSpan={{ xs: 24, sm: 12, lg: 6 }}
-          statistic={{
-            title: 'Active dimensions',
-            value: dimensions.length,
-            description: (
-              <Text type="secondary">
-                {dimensions.length > 0
-                  ? 'Deliberation, Participation, Influence'
-                  : 'No tracked signals yet'}
-              </Text>
-            ),
-          }}
-        />
-
-        <StatisticCard
-          key="recent-delta"
-          colSpan={{ xs: 24, sm: 12, lg: 6 }}
-          statistic={{
-            title: 'Recent change (30 days)',
-            value: Math.abs(netRecentDelta),
-            suffix: netRecentDelta === 0 ? '' : ' pts',
-            description:
-              netRecentDelta > 0 ? (
-                <span style={{ color: '#3f8600' }}>
-                  <ArrowUpOutlined /> Improved vs previous period
-                </span>
-              ) : netRecentDelta < 0 ? (
-                <span style={{ color: '#cf1322' }}>
-                  <ArrowDownOutlined /> Declined vs previous period
-                </span>
-              ) : (
-                <Text type="secondary">No significant change</Text>
-              ),
-          }}
-        />
-
-        <StatisticCard
-          key="top-dimension"
-          colSpan={{ xs: 24, sm: 12, lg: 6 }}
-          statistic={{
-            title: 'Top dimension',
-            value: topDimension?.score ?? 0,
-            suffix: topDimension ? `/100` : undefined,
-            description: topDimension ? (
-              <Tag>{topDimension.label}</Tag>
-            ) : (
-              <Text type="secondary">N/A</Text>
-            ),
-          }}
-        />
-      </ProCard>
-
-      {/* Main content: summary + breakdown + timeline */}
-      <ProCard gutter={16} split="vertical" wrap>
-        {/* Left summary panel */}
-        <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <Space align="center" size="middle">
-              <AntBadge.Ribbon text="Profile" color="purple">
-                <Avatar
-                  size={64}
-                  style={{ background: 'var(--ant-color-warning-bg)' }}
-                  icon={<CrownOutlined />}
-                >
-                  {initial}
-                </Avatar>
-              </AntBadge.Ribbon>
-              <div>
-                <Title level={4} style={{ marginBottom: 4 }}>
-                  My trust profile
-                </Title>
-                <Text type="secondary">
-                  Reputation, participation and influence across Ethikos debates.
-                </Text>
-              </div>
-            </Space>
-
-            <div>
-              <Text type="secondary">Overall score</Text>
-              <div style={{ marginTop: 8 }}>
-                <Progress
-                  type="circle"
-                  percent={Math.round(score)}
-                  size={96}
-                />
-              </div>
-            </div>
-
-            <Descriptions
-              size="small"
-              column={1}
-              labelStyle={{ width: 160 }}
-              style={{ marginTop: 8 }}
-            >
-              <Descriptions.Item label="Level">
-                <Tag
-                  color={
-                    level === 'Steward'
-                      ? 'gold'
-                      : level === 'Contributor'
-                      ? 'blue'
-                      : 'default'
-                  }
-                >
-                  {level}
-                </Tag>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Dimensions tracked">
-                {dimensions.length ? (
-                  <Space size={[4, 4]} wrap>
-                    {dimensions.map((dim) => (
-                      <Tag key={dim.key}>{dim.label}</Tag>
-                    ))}
-                  </Space>
-                ) : (
-                  <Text type="secondary">No reputation data yet.</Text>
-                )}
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Net change (30d)">
-                <Space>
-                  {netRecentDelta > 0 && (
-                    <Text type="success">+{netRecentDelta}</Text>
-                  )}
-                  {netRecentDelta < 0 && (
-                    <Text type="danger">{netRecentDelta}</Text>
-                  )}
-                  {netRecentDelta === 0 && (
-                    <Text type="secondary">0</Text>
-                  )}
-                </Space>
-              </Descriptions.Item>
-            </Descriptions>
-
-            <Divider style={{ margin: '8px 0' }} />
-
-            <Space wrap>
-              <Link href="/ethikos/trust/credentials">
-                <Button icon={<SafetyCertificateOutlined />}>
-                  Upload credential
-                </Button>
-              </Link>
-              <Link href="/ethikos/trust/badges">
-                <Button>View badges</Button>
-              </Link>
-            </Space>
-          </Space>
-        </ProCard>
-
-        {/* Right: breakdown + timeline */}
-        <ProCard colSpan={{ xs: 24, md: 16 }} split="horizontal">
-          <ProCard title="Score by dimension">
-            {dimensions.length ? (
-              dimensions.map((dim) => (
-                <div key={dim.key} style={{ marginBottom: 16 }}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      marginBottom: 6,
-                    }}
+      <PageContainer ghost loading={isLoading}>
+        {/* KPI strip */}
+        <ProCard gutter={16} wrap>
+          <StatisticCard
+            key="overall-score"
+            colSpan={{ xs: 24, sm: 12, lg: 6 }}
+            statistic={{
+              title: 'Overall reputation score',
+              value: Math.round(score),
+              suffix: '/100',
+              description: (
+                <Space size={4} wrap>
+                  <Text type="secondary">Level:</Text>
+                  <Tag
+                    color={
+                      level === 'Steward'
+                        ? 'gold'
+                        : level === 'Contributor'
+                        ? 'blue'
+                        : 'default'
+                    }
+                    style={{ marginInlineStart: 4 }}
                   >
-                    <Text>{dim.label}</Text>
-                    <Text type="secondary">{Math.round(dim.score)}/100</Text>
-                  </div>
-                  <Progress percent={Math.round(dim.score)} showInfo={false} />
+                    {level}
+                  </Tag>
+                </Space>
+              ),
+            }}
+            chart={
+              <div style={{ paddingInline: 8 }}>
+                <Progress percent={Math.round(score)} showInfo={false} />
+              </div>
+            }
+          />
+
+          <StatisticCard
+            key="active-dimensions"
+            colSpan={{ xs: 24, sm: 12, lg: 6 }}
+            statistic={{
+              title: 'Active dimensions',
+              value: dimensions.length,
+              description: (
+                <Text type="secondary">
+                  {dimensions.length > 0
+                    ? 'Deliberation, Participation, Influence'
+                    : 'No tracked signals yet'}
+                </Text>
+              ),
+            }}
+          />
+
+          <StatisticCard
+            key="recent-delta"
+            colSpan={{ xs: 24, sm: 12, lg: 6 }}
+            statistic={{
+              title: 'Recent change (30 days)',
+              value: Math.abs(netRecentDelta),
+              suffix: netRecentDelta === 0 ? '' : ' pts',
+              description:
+                netRecentDelta > 0 ? (
+                  <span style={{ color: '#3f8600' }}>
+                    <ArrowUpOutlined /> Improved vs previous period
+                  </span>
+                ) : netRecentDelta < 0 ? (
+                  <span style={{ color: '#cf1322' }}>
+                    <ArrowDownOutlined /> Declined vs previous period
+                  </span>
+                ) : (
+                  <Text type="secondary">No significant change</Text>
+                ),
+            }}
+          />
+
+          <StatisticCard
+            key="top-dimension"
+            colSpan={{ xs: 24, sm: 12, lg: 6 }}
+            statistic={{
+              title: 'Top dimension',
+              value: topDimension?.score ?? 0,
+              suffix: topDimension ? '/100' : undefined,
+              description: topDimension ? (
+                <Tag>{topDimension.label}</Tag>
+              ) : (
+                <Text type="secondary">N/A</Text>
+              ),
+            }}
+          />
+        </ProCard>
+
+        {/* Main content: summary + breakdown + timeline */}
+        <ProCard gutter={16} split="vertical" wrap>
+          {/* Left summary panel */}
+          <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              <Space align="center" size="middle">
+                <AntBadge.Ribbon text="Profile" color="purple">
+                  <Avatar
+                    size={64}
+                    style={{ background: 'var(--ant-color-warning-bg)' }}
+                    icon={<CrownOutlined />}
+                  >
+                    {initial}
+                  </Avatar>
+                </AntBadge.Ribbon>
+                <div>
+                  <Title level={4} style={{ marginBottom: 4 }}>
+                    My trust profile
+                  </Title>
+                  <Text type="secondary">
+                    Reputation, participation and influence across Ethikos debates.
+                  </Text>
                 </div>
-              ))
-            ) : (
-              <Text type="secondary">
-                As you participate in debates, we will break down how your score
-                is composed.
-              </Text>
-            )}
-          </ProCard>
+              </Space>
 
-          <ProCard title="Reputation timeline">
-            {timeline.length ? (
-              <Timeline
-                mode="left"
-                items={timeline.map((evt) => ({
-                  key: evt.id,
-                  dot: <ClockCircleOutlined />,
-                  label: dayjs(evt.when).isValid()
-                    ? dayjs(evt.when).format('YYYY-MM-DD')
-                    : evt.when,
-                  children: (
-                    <Space direction="vertical" size={0}>
-                      <Text strong>{evt.title}</Text>
-                      <Text type="secondary">{evt.detail}</Text>
-                    </Space>
-                  ),
-                }))}
-              />
-            ) : (
-              <Text type="secondary">
-                We haven’t detected any recent changes in your Ethikos activity.
-              </Text>
-            )}
-          </ProCard>
-        </ProCard>
-      </ProCard>
+              <div>
+                <Text type="secondary">Overall score</Text>
+                <div style={{ marginTop: 8 }}>
+                  <Progress
+                    type="circle"
+                    percent={Math.round(score)}
+                    size={96}
+                  />
+                </div>
+              </div>
 
-      {/* Secondary row: radar + recent badges */}
-      <ProCard gutter={16} wrap style={{ marginTop: 16 }}>
-        <ProCard
-          colSpan={{ xs: 24, lg: 14 }}
-          title={
-            <Space>
-              <span>Trust signal radar</span>
-              <Tooltip title="Normalised per-dimension scores (0–100)">
-                <AntBadge status="processing" />
-              </Tooltip>
-            </Space>
-          }
-        >
-          {dimensions.length ? (
-            <Radar {...radarConfig} />
-          ) : (
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No dimension data yet" />
-          )}
-        </ProCard>
-
-        <ProCard
-          colSpan={{ xs: 24, lg: 10 }}
-          title="Recent badges"
-          extra={<Link href="/ethikos/trust/badges">All badges</Link>}
-          split="horizontal"
-        >
-          <ProCard ghost>
-            {badges.length ? (
-              <List
+              <Descriptions
                 size="small"
-                dataSource={badges.slice(0, 3)}
-                renderItem={(b) => (
-                  <List.Item key={b.id}>
-                    <List.Item.Meta
-                      title={
-                        <Space>
-                          <Text strong>{b.label}</Text>
-                          <Tag color="green">Verified</Tag>
-                        </Space>
-                      }
-                      description={
-                        <Space direction="vertical" size={0}>
-                          <Text type="secondary">{b.description}</Text>
-                          <Text type="secondary">
-                            Earned {dayjs(b.earnedAt).format('MMM D, YYYY')}
-                          </Text>
-                        </Space>
-                      }
+                column={1}
+                labelStyle={{ width: 160 }}
+                style={{ marginTop: 8 }}
+              >
+                <Descriptions.Item label="Level">
+                  <Tag
+                    color={
+                      level === 'Steward'
+                        ? 'gold'
+                        : level === 'Contributor'
+                        ? 'blue'
+                        : 'default'
+                    }
+                  >
+                    {level}
+                  </Tag>
+                </Descriptions.Item>
+
+                <Descriptions.Item label="Dimensions tracked">
+                  {dimensions.length ? (
+                    <Space size={[4, 4]} wrap>
+                      {dimensions.map((dim) => (
+                        <Tag key={dim.key}>{dim.label}</Tag>
+                      ))}
+                    </Space>
+                  ) : (
+                    <Text type="secondary">No reputation data yet.</Text>
+                  )}
+                </Descriptions.Item>
+
+                <Descriptions.Item label="Net change (30d)">
+                  <Space>
+                    {netRecentDelta > 0 && (
+                      <Text type="success">+{netRecentDelta}</Text>
+                    )}
+                    {netRecentDelta < 0 && (
+                      <Text type="danger">{netRecentDelta}</Text>
+                    )}
+                    {netRecentDelta === 0 && (
+                      <Text type="secondary">0</Text>
+                    )}
+                  </Space>
+                </Descriptions.Item>
+              </Descriptions>
+
+              <Divider style={{ margin: '8px 0' }} />
+
+              <Space wrap>
+                <Link href="/ethikos/trust/credentials">
+                  <Button icon={<SafetyCertificateOutlined />}>
+                    Upload credential
+                  </Button>
+                </Link>
+                <Link href="/ethikos/trust/badges">
+                  <Button>View badges</Button>
+                </Link>
+              </Space>
+            </Space>
+          </ProCard>
+
+          {/* Right: breakdown + timeline */}
+          <ProCard colSpan={{ xs: 24, md: 16 }} split="horizontal">
+            <ProCard title="Score by dimension">
+              {dimensions.length ? (
+                dimensions.map((dim) => (
+                  <div key={dim.key} style={{ marginBottom: 16 }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        marginBottom: 6,
+                      }}
+                    >
+                      <Text>{dim.label}</Text>
+                      <Text type="secondary">
+                        {Math.round(dim.score)}/100
+                      </Text>
+                    </div>
+                    <Progress
+                      percent={Math.round(dim.score)}
+                      showInfo={false}
                     />
-                  </List.Item>
-                )}
-              />
+                  </div>
+                ))
+              ) : (
+                <Text type="secondary">
+                  As you participate in debates, we will break down how your
+                  score is composed.
+                </Text>
+              )}
+            </ProCard>
+
+            <ProCard title="Reputation timeline">
+              {timeline.length ? (
+                <Timeline
+                  mode="left"
+                  items={timeline.map((evt) => ({
+                    key: evt.id,
+                    dot: <ClockCircleOutlined />,
+                    label: dayjs(evt.when).isValid()
+                      ? dayjs(evt.when).format('YYYY-MM-DD')
+                      : evt.when,
+                    children: (
+                      <Space direction="vertical" size={0}>
+                        <Text strong>{evt.title}</Text>
+                        <Text type="secondary">{evt.detail}</Text>
+                      </Space>
+                    ),
+                  }))}
+                />
+              ) : (
+                <Text type="secondary">
+                  We haven’t detected any recent changes in your Ethikos activity.
+                </Text>
+              )}
+            </ProCard>
+          </ProCard>
+        </ProCard>
+
+        {/* Secondary row: radar + recent badges */}
+        <ProCard gutter={16} wrap style={{ marginTop: 16 }}>
+          <ProCard
+            colSpan={{ xs: 24, lg: 14 }}
+            title={
+              <Space>
+                <span>Trust signal radar</span>
+                <Tooltip title="Normalised per-dimension scores (0–100)">
+                  <AntBadge status="processing" />
+                </Tooltip>
+              </Space>
+            }
+          >
+            {dimensions.length ? (
+              <Radar {...radarConfig} />
             ) : (
-              <Empty description="No badges earned yet" />
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No dimension data yet"
+              />
             )}
           </ProCard>
 
-          <ProCard ghost>
-            <Text type="secondary">
-              Badges are derived from your Ekoh activity (stances, arguments, votes) and are used as
-              discovery signals in KeenKonnect.
-            </Text>
+          <ProCard
+            colSpan={{ xs: 24, lg: 10 }}
+            title="Recent badges"
+            extra={<Link href="/ethikos/trust/badges">All badges</Link>}
+            split="horizontal"
+          >
+            <ProCard ghost>
+              {badges.length ? (
+                <List
+                  size="small"
+                  dataSource={badges.slice(0, 3)}
+                  renderItem={(b) => (
+                    <List.Item key={b.id}>
+                      <List.Item.Meta
+                        title={
+                          <Space>
+                            <Text strong>{b.label}</Text>
+                            <Tag color="green">Verified</Tag>
+                          </Space>
+                        }
+                        description={
+                          <Space direction="vertical" size={0}>
+                            <Text type="secondary">{b.description}</Text>
+                            <Text type="secondary">
+                              Earned {dayjs(b.earnedAt).format('MMM D, YYYY')}
+                            </Text>
+                          </Space>
+                        }
+                      />
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty description="No badges earned yet" />
+              )}
+            </ProCard>
+
+            <ProCard ghost>
+              <Text type="secondary">
+                Badges are derived from your Ekoh activity (stances, arguments,
+                votes) and are used as discovery signals in KeenKonnect.
+              </Text>
+            </ProCard>
           </ProCard>
         </ProCard>
-      </ProCard>
-    </PageContainer>
+      </PageContainer>
+    </EthikosPageShell>
   );
 }
 

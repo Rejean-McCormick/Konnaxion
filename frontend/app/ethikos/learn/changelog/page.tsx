@@ -35,17 +35,18 @@ import {
 import { useRequest } from 'ahooks';
 import dayjs, { Dayjs } from 'dayjs';
 import usePageTitle from '@/hooks/usePageTitle';
-import {
-  fetchChangelog,
-  type Changelog,
-  type ChangelogEntry,
-} from '@/services/learn';
+import { fetchChangelog, type ChangelogEntry } from '@/services/learn';
 import EthikosPageShell from '../../EthikosPageShell';
 
 const { RangePicker } = DatePicker;
 const { Text, Title } = Typography;
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
+
+// Local response type matching services/learn.ts
+type ChangelogResponse = {
+  entries: ChangelogEntry[];
+};
 
 const TAG_COLOR: Record<string, string> = {
   NEW: 'green',
@@ -66,15 +67,15 @@ export default function Changelog() {
   // Kept for compatibility; EthikosPageShell will set the final <title>.
   usePageTitle('Learn · Changelog');
 
-  const { data, loading, error, refresh } = useRequest<Changelog, []>(
+  const { data, loading, error, refresh } = useRequest<ChangelogResponse, []>(
     fetchChangelog,
   );
 
   // Raw entries
-  const entries = data?.entries ?? [];
+  const entries: ChangelogEntry[] = data?.entries ?? [];
 
   // Sort newest → oldest
-  const sortedEntries = useMemo(
+  const sortedEntries = useMemo<ChangelogEntry[]>(
     () =>
       [...entries].sort(
         (a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf(),
@@ -83,18 +84,20 @@ export default function Changelog() {
   );
 
   // Derive available tags (normalized)
-  const allTags = useMemo(
+  const allTags = useMemo<string[]>(
     () =>
       Array.from(
         new Set(
-          sortedEntries.flatMap((e) => e.tags.map((t) => normalizeTag(t))),
+          sortedEntries.flatMap((e: ChangelogEntry) =>
+            e.tags.map((t: string) => normalizeTag(t)),
+          ),
         ),
       ).sort(),
     [sortedEntries],
   );
 
   // Derive versions (keep order of first appearance in sorted list)
-  const allVersions = useMemo(() => {
+  const allVersions = useMemo<string[]>(() => {
     const seen = new Set<string>();
     const out: string[] = [];
     for (const e of sortedEntries) {
@@ -113,24 +116,23 @@ export default function Changelog() {
   const [view, setView] = useState<'timeline' | 'list'>('timeline');
 
   // Filtered list
-  const filtered = useMemo(() => {
-    let list = sortedEntries;
+  const filtered = useMemo<ChangelogEntry[]>(() => {
+    let list: ChangelogEntry[] = sortedEntries;
 
     // text search (version or notes)
     const q = query.trim().toLowerCase();
     if (q) {
-      list = list.filter(
-        (e) =>
-          e.version.toLowerCase().includes(q) ||
-          e.notes.some((n) => n.toLowerCase().includes(q)),
-      );
+      list = list.filter((e: ChangelogEntry) => {
+        if (e.version.toLowerCase().includes(q)) return true;
+        return e.notes.some((n: string) => n.toLowerCase().includes(q));
+      });
     }
 
     // tag filter (OR)
     if (selectedTags.length > 0) {
       const allow = new Set(selectedTags.map(normalizeTag));
-      list = list.filter((e) =>
-        e.tags.map(normalizeTag).some((t) => allow.has(t)),
+      list = list.filter((e: ChangelogEntry) =>
+        e.tags.map(normalizeTag).some((t: string) => allow.has(t)),
       );
     }
 
@@ -138,7 +140,7 @@ export default function Changelog() {
     if (range && range[0] && range[1]) {
       const start = range[0].startOf('day').valueOf();
       const end = range[1].endOf('day').valueOf();
-      list = list.filter((e) => {
+      list = list.filter((e: ChangelogEntry) => {
         const t = dayjs(e.date).valueOf();
         return t >= start && t <= end;
       });
@@ -153,7 +155,7 @@ export default function Changelog() {
     () => new Set(filtered.map((e) => e.version)).size,
     [filtered],
   );
-  const tagCounts = useMemo(() => {
+  const tagCounts = useMemo<[string, number][]>(() => {
     const m = new Map<string, number>();
     for (const e of filtered) {
       for (const t of e.tags) {
@@ -187,9 +189,9 @@ export default function Changelog() {
   async function copyMarkdown() {
     const md = filtered
       .map(
-        (e) =>
+        (e: ChangelogEntry) =>
           `### ${e.version} — ${dayjs(e.date).format('YYYY-MM-DD')}\n` +
-          e.notes.map((n) => `- ${n}`).join('\n'),
+          e.notes.map((n: string) => `- ${n}`).join('\n'),
       )
       .join('\n\n');
     try {
@@ -203,7 +205,7 @@ export default function Changelog() {
   function renderTags(tags: string[]) {
     return (
       <Space size={[4, 4]} wrap>
-        {tags.map((t) => {
+        {tags.map((t: string) => {
           const key = normalizeTag(t);
           const color = TAG_COLOR[key] ?? 'default';
           return (
@@ -414,7 +416,7 @@ export default function Changelog() {
                     {allTags.length === 0 ? (
                       <Text type="secondary">No tags</Text>
                     ) : (
-                      allTags.map((t) => (
+                      allTags.map((t: string) => (
                         <Tag.CheckableTag
                           key={t}
                           checked={selectedTags.includes(t)}
@@ -466,7 +468,7 @@ export default function Changelog() {
           >
             {view === 'timeline' ? (
               <Timeline mode="left">
-                {filtered.map((e, idx) => {
+                {filtered.map((e: ChangelogEntry, idx: number) => {
                   const id = `ver-${e.version}`;
                   return (
                     <Timeline.Item
@@ -487,7 +489,7 @@ export default function Changelog() {
                             {renderTags(e.tags)}
                           </Space>
                           <ul style={{ marginTop: 4 }}>
-                            {e.notes.map((n, i) => (
+                            {e.notes.map((n: string, i: number) => (
                               <li key={i}>
                                 <Text>{n}</Text>
                               </li>
@@ -507,7 +509,7 @@ export default function Changelog() {
                 pagination={{ pageSize: 10, showSizeChanger: false }}
                 metas={{
                   title: {
-                    render: (_, row) => (
+                    render: (_dom, row) => (
                       <Space size="small" wrap>
                         <Text strong>{row.version}</Text>
                         <Tag icon={<CalendarOutlined />}>
@@ -517,12 +519,12 @@ export default function Changelog() {
                     ),
                   },
                   subTitle: {
-                    render: (_, row) => renderTags(row.tags),
+                    render: (_dom, row) => renderTags(row.tags),
                   },
                   description: {
-                    render: (_, row) => (
+                    render: (_dom, row) => (
                       <ul style={{ marginTop: 4 }}>
-                        {row.notes.map((n, i) => (
+                        {row.notes.map((n: string, i: number) => (
                           <li key={i}>
                             <Text>{n}</Text>
                           </li>
