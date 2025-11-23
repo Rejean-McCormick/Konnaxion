@@ -28,37 +28,43 @@ const EXPERTISE_CATALOG: ExpertiseItem[] = [
   {
     key: 'frontend',
     label: 'Frontend Development',
-    description: 'React, TypeScript, modern component patterns and design systems.',
+    description:
+      'React, TypeScript, modern component patterns and design systems.',
     defaultLevel: 4.5,
   },
   {
     key: 'backend',
     label: 'Backend Development',
-    description: 'APIs, microservices, Node.js / Python, data modelling & reliability.',
+    description:
+      'APIs, microservices, Node.js / Python, data modelling & reliability.',
     defaultLevel: 4,
   },
   {
     key: 'uiux',
     label: 'UI/UX Design',
-    description: 'User journeys, wireframes, interactive prototypes, design systems.',
+    description:
+      'User journeys, wireframes, interactive prototypes, design systems.',
     defaultLevel: 4.5,
   },
   {
     key: 'data-science',
     label: 'Data Science',
-    description: 'Exploratory analysis, ML models, dashboards, decision support.',
+    description:
+      'Exploratory analysis, ML models, dashboards, decision support.',
     defaultLevel: 3.5,
   },
   {
     key: 'devops',
     label: 'DevOps',
-    description: 'CI/CD, observability, infrastructure-as-code, cloud environments.',
+    description:
+      'CI/CD, observability, infrastructure-as-code, cloud environments.',
     defaultLevel: 3.5,
   },
   {
     key: 'mobile',
     label: 'Mobile Development',
-    description: 'Native & cross‑platform apps, performance and offline patterns.',
+    description:
+      'Native & cross‑platform apps, performance and offline patterns.',
     defaultLevel: 3,
   },
   {
@@ -70,12 +76,16 @@ const EXPERTISE_CATALOG: ExpertiseItem[] = [
   {
     key: 'pm',
     label: 'Project Management',
-    description: 'Roadmapping, stakeholder alignment, agile delivery and rituals.',
+    description:
+      'Roadmapping, stakeholder alignment, agile delivery and rituals.',
     defaultLevel: 4,
   },
 ];
 
-const CURRENT_EXPERTISE_INITIAL: string[] = ['Frontend Development', 'UI/UX Design'];
+const CURRENT_EXPERTISE_INITIAL: string[] = [
+  'Frontend Development',
+  'UI/UX Design',
+];
 
 const SELECTABLE_FIELDS: string[] = [
   'React',
@@ -98,7 +108,9 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
 
   // Gestion interne de la sélection via Tag.CheckableTag
-  const [selectedTags, setSelectedTags] = useState<string[]>(CURRENT_EXPERTISE_INITIAL);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    CURRENT_EXPERTISE_INITIAL,
+  );
 
   // Liste pour l’aperçu (List + Rate) basée sur les tags sélectionnés
   const previewExpertise = useMemo(
@@ -126,7 +138,8 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
     <PageContainer title="Manage Expertise Areas">
       {/* ✅ description moved inside instead of using a PageContainer prop */}
       <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-        Declare and fine‑tune the expertise areas used by Ekoh, KeenKonnect matching, and Smart Vote.
+        Declare and fine‑tune the expertise areas used by Ekoh, KeenKonnect
+        matching, and Smart Vote.
       </Paragraph>
 
       <Divider orientation="left">Your expertise profile</Divider>
@@ -223,7 +236,8 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         itemLayout="vertical"
         dataSource={previewExpertise}
         locale={{
-          emptyText: 'Select at least one expertise area above to see the preview.',
+          emptyText:
+            'Select at least one expertise area above to see the preview.',
         }}
         renderItem={(item) => (
           <List.Item key={item.key}>

@@ -47,8 +47,8 @@ router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 router.register("users", UserViewSet, basename="user")
 
 # ethiKos
-router.register("ethikos/topics",    TopicViewSet,    basename="ethikos-topic")
-router.register("ethikos/stances",   StanceViewSet,   basename="ethikos-stance")
+router.register("ethikos/topics", TopicViewSet, basename="ethikos-topic")
+router.register("ethikos/stances", StanceViewSet, basename="ethikos-stance")
 router.register("ethikos/arguments", ArgumentViewSet, basename="ethikos-argument")
 # Register categories only if the ViewSet exists in the codebase
 if EthikosCategoryViewSet is not None:
@@ -91,8 +91,8 @@ router.register(
 )
 
 # Kreative
-router.register("kreative/artworks",  KreativeArtworkViewSet, basename="kreative-artwork")
-router.register("kreative/galleries", GalleryViewSet,        basename="kreative-gallery")
+router.register("kreative/artworks", KreativeArtworkViewSet, basename="kreative-artwork")
+router.register("kreative/galleries", GalleryViewSet, basename="kreative-gallery")
 
 # ---------------------------------------------------------------------------
 

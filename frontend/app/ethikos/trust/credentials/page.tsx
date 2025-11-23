@@ -16,7 +16,6 @@ import {
   ProTable,
   ProDescriptions,
   type ProColumns,
-  type ProDescriptionsItemProps,
 } from '@ant-design/pro-components';
 import {
   Alert,
@@ -34,7 +33,6 @@ import {
   Upload,
   message as antdMessage,
 } from 'antd';
-import type { UploadProps } from 'antd';
 import {
   ClockCircleOutlined,
   EyeInvisibleOutlined,
@@ -107,53 +105,6 @@ async function fetchUserCredentials(): Promise<CredentialRow[]> {
 }
 
 /* ---------------------------------------------
- * Helpers
- * ------------------------------------------- */
-
-function buildDescriptionColumns(
-  detail: CredentialRow,
-): ProDescriptionsItemProps<CredentialRow>[] {
-  const columns: ProDescriptionsItemProps<CredentialRow>[] = [
-    { title: 'Title', dataIndex: 'title' },
-    { title: 'Issuer', dataIndex: 'issuer' },
-    {
-      title: 'Issued',
-      dataIndex: 'issuedAt',
-      render: (_: any, row: CredentialRow) =>
-        dayjs(row.issuedAt).format('YYYY-MM-DD'),
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (_: any, row: CredentialRow) => (
-        <Tag color={statusColor[row.status]}>{row.status}</Tag>
-      ),
-    },
-  ];
-
-  if (detail.url) {
-    columns.push({
-      title: 'Document',
-      dataIndex: 'url',
-      render: () => (
-        <a href={detail.url} target="_blank" rel="noreferrer">
-          Open document
-        </a>
-      ),
-    });
-  }
-
-  if (detail.notes) {
-    columns.push({
-      title: 'Notes',
-      dataIndex: 'notes',
-    });
-  }
-
-  return columns;
-}
-
-/* ---------------------------------------------
  * Component
  * ------------------------------------------- */
 
@@ -199,12 +150,12 @@ export default function Credentials() {
   );
 
   // Upload handler, wired to services/trust::uploadCredential
-  const uploadProps: UploadProps = {
+  const uploadProps = {
     name: 'file',
     multiple: false,
     maxCount: 1,
     accept: '.pdf,.jpg,.jpeg,.png',
-    beforeUpload: (file) => {
+    beforeUpload: (file: any) => {
       const isAllowedType =
         file.type === 'application/pdf' ||
         file.type === 'image/jpeg' ||
@@ -223,40 +174,39 @@ export default function Credentials() {
 
       return true;
     },
-    customRequest: (options) => {
-      const { file, onSuccess, onError } = options;
+    customRequest: async ({
+      file,
+      onSuccess,
+      onError,
+    }: {
+      file: File;
+      onSuccess?: (res: unknown) => void;
+      onError?: (err: unknown) => void;
+    }) => {
+      try {
+        setUploading(true);
+        setLastFileName(file.name);
+        await uploadCredential(file); // no-op until backend exists
+        onSuccess?.('ok');
 
-      // Fire-and-forget async flow; outer function returns void (matches UploadProps)
-      void (async () => {
-        try {
-          const realFile = file as File;
-          setUploading(true);
-          setLastFileName(realFile.name);
-          await uploadCredential(realFile); // no-op until backend exists
-          onSuccess?.('ok' as any);
-
-          // Optimistic insert into the table list as "Pending"
-          const optimistic: CredentialRow = {
-            id: `tmp-${Date.now()}`,
-            title: toTitleFromFilename(realFile.name),
-            issuer: '—',
-            issuedAt: new Date().toISOString(),
-            status: 'Pending',
-            notes: 'Awaiting manual verification',
-          };
-
-          mutate?.([optimistic, ...rows]);
-          setDone(true);
-          antdMessage.success(
-            'Credential uploaded. It will be reviewed shortly.',
-          );
-        } catch (error) {
-          onError?.(error as Error);
-          antdMessage.error('Upload failed. Please try again.');
-        } finally {
-          setUploading(false);
-        }
-      })();
+        // Optimistic insert into the table list as "Pending"
+        const optimistic: CredentialRow = {
+          id: `tmp-${Date.now()}`,
+          title: toTitleFromFilename(file.name),
+          issuer: '—',
+          issuedAt: new Date().toISOString(),
+          status: 'Pending',
+          notes: 'Awaiting manual verification',
+        };
+        mutate([optimistic, ...rows]);
+        setDone(true);
+        antdMessage.success('Credential uploaded. It will be reviewed shortly.');
+      } catch (error) {
+        onError?.(error);
+        antdMessage.error('Upload failed. Please try again.');
+      } finally {
+        setUploading(false);
+      }
     },
   };
 
@@ -266,7 +216,7 @@ export default function Credentials() {
       title: 'Title',
       dataIndex: 'title',
       ellipsis: true,
-      render: (_dom, row) => (
+      render: (_, row) => (
         <Space size={6}>
           <FileTextOutlined />
           {row.url ? (
@@ -296,7 +246,7 @@ export default function Credentials() {
         Pending: { text: 'Pending', status: 'Processing' },
         Rejected: { text: 'Rejected', status: 'Error' },
       },
-      render: (_dom, row) => (
+      render: (_, row) => (
         <Tag color={statusColor[row.status]}>{row.status}</Tag>
       ),
     },
@@ -304,7 +254,7 @@ export default function Credentials() {
       title: 'Actions',
       width: 260,
       valueType: 'option',
-      render: (_dom, row) => {
+      render: (_, row) => {
         const canDownload = !!row.url;
         return [
           <Button size="small" key="view" onClick={() => setDetail(row)}>
@@ -336,19 +286,19 @@ export default function Credentials() {
           ) : (
             <Tooltip
               key="resubmit"
-              title="Attach additional documents and re-submit"
+              title="Attach additional documents and re‑submit"
             >
               <Button
                 size="small"
                 type="dashed"
                 onClick={() => {
                   antdMessage.info(
-                    'Re-submit by uploading an updated document below.',
+                    'Re‑submit by uploading an updated document below.',
                   );
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
               >
-                Re-submit
+                Re‑submit
               </Button>
             </Tooltip>
           ),
@@ -373,10 +323,10 @@ export default function Credentials() {
         }
         description={
           <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
-            Upload real-world credentials (certifications, professional
-            memberships, academic records) that help stewards understand why
-            your voice carries expertise in certain debates. These documents are
-            reviewed manually and do not replace community-based reputation.
+            Upload real‑world credentials (certifications, professional memberships,
+            academic records) that help stewards understand why your voice carries
+            expertise in certain debates. These documents are reviewed manually and do
+            not replace community‑based reputation.
           </Paragraph>
         }
       />
@@ -402,9 +352,8 @@ export default function Credentials() {
                     </div>
                   )}
                   <Text>
-                    Your document is now queued for human review. If accepted,
-                    it will appear as a verified note in your Ethikos trust
-                    profile.
+                    Your document is now queued for human review. If accepted, it will
+                    appear as a verified note in your Ethikos trust profile.
                   </Text>
                 </>
               }
@@ -432,23 +381,26 @@ export default function Credentials() {
                   Click or drag a credential file to this area to upload
                 </p>
                 <p className="ant-upload-hint">
-                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at
-                  a time.
+                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at a
+                  time.
                 </p>
               </Upload.Dragger>
 
               <Divider />
 
-              <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <Space
+                direction="vertical"
+                size="small"
+                style={{ width: '100%' }}
+              >
                 <Text type="secondary">
-                  Tip: upload focused evidence rather than full CVs. For
-                  example, a single certification for climate policy is more
-                  helpful than a long résumé.
+                  Tip: upload focused evidence rather than full CVs. For example, a
+                  single certification for climate policy is more helpful than a long
+                  résumé.
                 </Text>
                 <Text type="secondary">
-                  You can always complement these documents with
-                  activity-based reputation earned through debates, voting and
-                  impact work.
+                  You can always complement these documents with activity‑based
+                  reputation earned through debates, voting and impact work.
                 </Text>
               </Space>
             </>
@@ -469,7 +421,7 @@ export default function Credentials() {
               {
                 title: 'Upload',
                 description:
-                  'You submit a credential associated with your real-world expertise.',
+                  'You submit a credential associated with your real‑world expertise.',
               },
               {
                 title: 'Review',
@@ -494,7 +446,7 @@ export default function Credentials() {
               'Professional licensure (e.g. bar membership, medical board certification).',
               'Academic degrees in fields relevant to debates you join.',
               'Official appointments or advisory roles in public institutions.',
-              'Peer-reviewed publications or major reports where you are a named author.',
+              'Peer‑reviewed publications or major reports where you are a named author.',
             ]}
             renderItem={(item) => (
               <List.Item>
@@ -555,7 +507,40 @@ export default function Credentials() {
           <ProDescriptions<CredentialRow>
             column={1}
             dataSource={detail}
-            columns={buildDescriptionColumns(detail)}
+            columns={[
+              { title: 'Title', dataIndex: 'title' },
+              { title: 'Issuer', dataIndex: 'issuer' },
+              {
+                title: 'Issued',
+                dataIndex: 'issuedAt',
+                render: (_, row) =>
+                  dayjs(row.issuedAt).format('YYYY-MM-DD'),
+              },
+              {
+                title: 'Status',
+                dataIndex: 'status',
+                render: (_, row) => (
+                  <Tag color={statusColor[row.status]}>{row.status}</Tag>
+                ),
+              },
+              detail.url
+                ? {
+                    title: 'Document',
+                    dataIndex: 'url',
+                    render: (_, row) => (
+                      <a href={row.url} target="_blank" rel="noreferrer">
+                        Open document
+                      </a>
+                    ),
+                  }
+                : undefined,
+              detail.notes
+                ? {
+                    title: 'Notes',
+                    dataIndex: 'notes',
+                  }
+                : undefined,
+            ].filter(Boolean) as ProColumns<CredentialRow>[]}
           />
         )}
       </Drawer>
@@ -566,7 +551,7 @@ export default function Credentials() {
     <EthikosPageShell
       title="Credentials"
       sectionLabel="Trust"
-      subtitle="Upload and manage real-world credentials that help stewards understand your expertise in Ethikos debates."
+      subtitle="Upload and manage real‑world credentials that help stewards understand your expertise in Ethikos debates."
       secondaryActions={summaryTags}
     >
       {pageBody}

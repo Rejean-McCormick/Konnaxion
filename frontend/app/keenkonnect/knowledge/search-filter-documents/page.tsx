@@ -1,7 +1,7 @@
+// app/keenkonnect/knowledge/search-filter-documents/page.tsx
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import Head from 'next/head'
 import { Card, Alert, Pagination, Tag } from 'antd'
 import type { PaginationProps } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
@@ -13,6 +13,7 @@ import {
   ProFormSelect,
   ProFormDateRangePicker,
 } from '@ant-design/pro-components'
+import KeenPage from '@/app/keenkonnect/KeenPageShell'
 
 interface DocumentResource {
   key: string
@@ -38,7 +39,7 @@ interface FilterState {
   sort: SortOption
 }
 
-// Demo data (même contenu que l’ancienne page)
+// Demo data (same content as the previous version)
 const sampleDocuments: DocumentResource[] = [
   {
     key: '1',
@@ -98,12 +99,8 @@ const sampleDocuments: DocumentResource[] = [
 ]
 
 const allAuthors = Array.from(new Set(sampleDocuments.map((d) => d.author))).sort()
-const allTags = Array.from(
-  new Set(sampleDocuments.flatMap((d) => d.tags)),
-).sort()
-const allLanguages = Array.from(
-  new Set(sampleDocuments.map((d) => d.language)),
-).sort()
+const allTags = Array.from(new Set(sampleDocuments.flatMap((d) => d.tags))).sort()
+const allLanguages = Array.from(new Set(sampleDocuments.map((d) => d.language))).sort()
 
 const DEFAULT_SORT: SortOption = 'relevance'
 
@@ -127,7 +124,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
     setFilters(nextFilters)
     setCurrentPage(1)
 
-    // ProForm attend un bool pour onFinish
+    // ProForm expects a boolean from onFinish
     return true
   }
 
@@ -149,12 +146,9 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
         !authors || authors.length === 0 || authors.includes(doc.author)
 
       const matchesTags =
-        !tags ||
-        tags.length === 0 ||
-        tags.every((t) => doc.tags.includes(t))
+        !tags || tags.length === 0 || tags.every((t) => doc.tags.includes(t))
 
-      const matchesLanguage =
-        !language || doc.language === language
+      const matchesLanguage = !language || doc.language === language
 
       let matchesDate = true
       if (dateRange && dateRange[0] && dateRange[1]) {
@@ -194,7 +188,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
         )
         break
       case 'popularity':
-        // Placeholder : on réutilise le score de pertinence
+        // Placeholder: reuse relevance score
         docs.sort((a, b) => b.relevanceScore - a.relevanceScore)
         break
       case 'relevance':
@@ -220,11 +214,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
     if (filters.authors && filters.authors.length > 0) count++
     if (filters.tags && filters.tags.length > 0) count++
     if (filters.language) count++
-    if (
-      filters.dateRange &&
-      filters.dateRange[0] &&
-      filters.dateRange[1]
-    ) {
+    if (filters.dateRange && filters.dateRange[0] && filters.dateRange[1]) {
       count++
     }
     return count
@@ -318,133 +308,118 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
     .replace(/^\w/, (c) => c.toUpperCase())
 
   return (
-    <>
-      <Head>
-        <title>KeenKonnect – Search &amp; Filter Documents</title>
-        <meta
-          name="description"
-          content="Advanced search and filtering for knowledge documents in KeenKonnect."
-        />
-      </Head>
-
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">
-          Search &amp; Filter Documents
-        </h1>
-
-        {/* Bloc de filtres avancés (ProForm / QueryFilter) */}
-        <Card className="mb-4">
-          <QueryFilter
-            onFinish={handleFilterFinish}
-            onReset={handleFilterReset}
-            labelWidth="auto"
-            defaultCollapsed={false}
-            span={8}
-            initialValues={{ sort: DEFAULT_SORT }}
-          >
-            <ProFormText
-              name="keyword"
-              label="Keywords"
-              placeholder="Search by title or content"
-            />
-
-            <ProFormSelect
-              name="authors"
-              label="Authors"
-              placeholder="Select authors"
-              mode="multiple"
-              options={allAuthors.map((a) => ({
-                label: a,
-                value: a,
-              }))}
-            />
-
-            <ProFormSelect
-              name="tags"
-              label="Tags"
-              placeholder="Select tags"
-              mode="multiple"
-              options={allTags.map((t) => ({
-                label: t,
-                value: t,
-              }))}
-            />
-
-            <ProFormSelect
-              name="language"
-              label="Language"
-              placeholder="All languages"
-              allowClear
-              options={allLanguages.map((lang) => ({
-                label: lang,
-                value: lang,
-              }))}
-            />
-
-            <ProFormDateRangePicker
-              name="dateRange"
-              label="Last Updated"
-              placeholder={['From', 'To']}
-            />
-
-            <ProFormSelect
-              name="sort"
-              label="Sort By"
-              options={[
-                { label: 'Relevance', value: 'relevance' },
-                { label: 'Date', value: 'date' },
-                { label: 'Popularity', value: 'popularity' },
-              ]}
-            />
-          </QueryFilter>
-        </Card>
-
-        {/* Alert de synthèse des résultats / filtres */}
-        <Alert
-          type={total === 0 ? 'warning' : 'info'}
-          showIcon
-          className="mb-4"
-          message={
-            total === 0
-              ? 'No documents match your criteria.'
-              : `${total} document${total > 1 ? 's' : ''} match your criteria.`
-          }
-          description={
-            <div style={{ fontSize: 12 }}>
-              <div>
-                Sort:{' '}
-                <strong>
-                  {sortLabel}
-                </strong>
-              </div>
-              <div>
-                Active filters:{' '}
-                <strong>{activeFilterCount}</strong>
-              </div>
-            </div>
-          }
-        />
-
-        {/* Tableau principal (ProTable) + Pagination externe */}
-        <Card>
-          <ProTable<DocumentResource>
-            rowKey="key"
-            columns={columns}
-            dataSource={paginatedDocuments}
-            search={false}
-            options={false}
-            pagination={false} // Pagination gérée manuellement en dessous
-            rowSelection={false}
-            toolBarRender={false}
+    <KeenPage
+      title="Search & Filter Documents"
+      description="Advanced search and filtering for knowledge documents in KeenKonnect."
+    >
+      {/* Advanced filters (QueryFilter) */}
+      <Card className="mb-4">
+        <QueryFilter
+          onFinish={handleFilterFinish}
+          onReset={handleFilterReset}
+          labelWidth="auto"
+          defaultCollapsed={false}
+          span={8}
+          initialValues={{ sort: DEFAULT_SORT }}
+        >
+          <ProFormText
+            name="keyword"
+            label="Keywords"
+            placeholder="Search by title or content"
           />
 
-          {total > 0 && (
-            <div style={{ marginTop: 16, textAlign: 'right' }}>
-              <Pagination {...paginationProps} />
+          <ProFormSelect
+            name="authors"
+            label="Authors"
+            placeholder="Select authors"
+            mode="multiple"
+            options={allAuthors.map((a) => ({
+              label: a,
+              value: a,
+            }))}
+          />
+
+          <ProFormSelect
+            name="tags"
+            label="Tags"
+            placeholder="Select tags"
+            mode="multiple"
+            options={allTags.map((t) => ({
+              label: t,
+              value: t,
+            }))}
+          />
+
+          <ProFormSelect
+            name="language"
+            label="Language"
+            placeholder="All languages"
+            allowClear
+            options={allLanguages.map((lang) => ({
+              label: lang,
+              value: lang,
+            }))}
+          />
+
+          <ProFormDateRangePicker
+            name="dateRange"
+            label="Last Updated"
+            placeholder={['From', 'To']}
+          />
+
+          <ProFormSelect
+            name="sort"
+            label="Sort By"
+            options={[
+              { label: 'Relevance', value: 'relevance' },
+              { label: 'Date', value: 'date' },
+              { label: 'Popularity', value: 'popularity' },
+            ]}
+          />
+        </QueryFilter>
+      </Card>
+
+      {/* Summary of results / filters */}
+      <Alert
+        type={total === 0 ? 'warning' : 'info'}
+        showIcon
+        className="mb-4"
+        message={
+          total === 0
+            ? 'No documents match your criteria.'
+            : `${total} document${total > 1 ? 's' : ''} match your criteria.`
+        }
+        description={
+          <div style={{ fontSize: 12 }}>
+            <div>
+              Sort: <strong>{sortLabel}</strong>
             </div>
-          )}
-        </Card>
-      </div>
-    </>
+            <div>
+              Active filters: <strong>{activeFilterCount}</strong>
+            </div>
+          </div>
+        }
+      />
+
+      {/* Main table + external pagination */}
+      <Card>
+        <ProTable<DocumentResource>
+          rowKey="key"
+          columns={columns}
+          dataSource={paginatedDocuments}
+          search={false}
+          options={false}
+          pagination={false} // Manual pagination below
+          rowSelection={false}
+          toolBarRender={false}
+        />
+
+        {total > 0 && (
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <Pagination {...paginationProps} />
+          </div>
+        )}
+      </Card>
+    </KeenPage>
   )
 }

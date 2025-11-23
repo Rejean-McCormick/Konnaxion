@@ -81,7 +81,7 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
     )
     def eligibility(self, request, pk=None):
         """
-        Returns whether the current user may register a new exam for this path.
+        Returns a simple eligibility view for this certification path.
 
         Response shape matches ExamEligibility in the frontend:
             { "already_passed": bool, "cooldown_remaining_minutes": number }
@@ -97,8 +97,8 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         already_passed = False
         cooldown_remaining = 0
 
-        if evaluations:
-            last_eval = evaluations[0]
+        last_eval = evaluations.first()
+        if last_eval is not None:
             score = last_eval.raw_score
             metadata = last_eval.metadata or {}
             pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
@@ -310,12 +310,15 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         delivery_mode = metadata.get("delivery_mode", "online")
         proctored = bool(metadata.get("proctored", False))
 
+        # Use per-evaluation pass threshold if present
+        pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+
         status_value = metadata.get("status")
         if not status_value:
             # Derive a simple status when none is explicitly stored
             if score_percent is None or score_percent == 0:
                 status_value = "scheduled"
-            elif score_percent >= CERT_PASS_PERCENT:
+            elif score_percent >= pass_threshold:
                 status_value = "passed"
             else:
                 status_value = "failed"
@@ -468,6 +471,20 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         except Evaluation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        metadata = source_eval.metadata or {}
+
+        # Compute score_percent and pass threshold to determine if the exam is already passed
+        score_percent = metadata.get("score_percent")
+        if score_percent is None and source_eval.raw_score is not None:
+            score_percent = float(source_eval.raw_score)
+        pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+
+        if score_percent is not None and score_percent >= pass_threshold:
+            return Response(
+                {"detail": "You cannot retry an exam that has already been passed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
         if timezone.now() < source_eval.created_at + cooldown_delta:
             return Response(
@@ -475,7 +492,7 @@ class ExamAttemptViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        base_metadata = source_eval.metadata or {}
+        base_metadata = metadata
         new_metadata = {
             **base_metadata,
             "status": "scheduled",
