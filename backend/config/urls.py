@@ -8,6 +8,11 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
+from konnaxion.moderation.api_views import (
+    ModerationQueueView,
+    ModerationDecisionView,
+)
+
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
@@ -37,6 +42,22 @@ urlpatterns += [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
 
     # ------------------------------------------------------------------
+    # Admin moderation endpoints (backed by konnaxion.moderation.api_views)
+    #   GET  /api/admin/moderation
+    #   POST /api/admin/moderation/<id>
+    # ------------------------------------------------------------------
+    path(
+        "api/admin/moderation",
+        ModerationQueueView.as_view(),
+        name="admin-moderation-queue",
+    ),
+    path(
+        "api/admin/moderation/<int:pk>",
+        ModerationDecisionView.as_view(),
+        name="admin-moderation-decision",
+    ),
+
+    # ------------------------------------------------------------------
     # Compat FE aliases: map "deliberate" to existing Ethikos endpoints.
     # Gives /api/deliberate/topics|stances|arguments and
     #      /api/deliberate/elite/topics|stances|arguments
@@ -47,7 +68,10 @@ urlpatterns += [
     ),
     path(
         "api/deliberate/elite/",
-        include(("konnaxion.ethikos.urls", "deliberate_elite"), namespace="deliberate_elite"),
+        include(
+            ("konnaxion.ethikos.urls", "deliberate_elite"),
+            namespace="deliberate_elite",
+        ),
     ),
 ]
 

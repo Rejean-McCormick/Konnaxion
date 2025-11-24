@@ -13,18 +13,32 @@ from konnaxion.users.api.views import UserViewSet  # /api/users/...
 
 # ── ethiKos ───────────────────────────────────────────────
 from konnaxion.ethikos import api_views as ethikos_api  # module import, safer
+
 # Required
 TopicViewSet = ethikos_api.TopicViewSet
 StanceViewSet = ethikos_api.StanceViewSet
 ArgumentViewSet = ethikos_api.ArgumentViewSet
-# Optional (will be None if not implemented yet)
-EthikosCategoryViewSet = getattr(ethikos_api, "EthikosCategoryViewSet", None)
+
+# Optional category ViewSet (name can be CategoryViewSet or EthikosCategoryViewSet)
+EthikosCategoryViewSet = getattr(
+    ethikos_api,
+    "CategoryViewSet",
+    getattr(ethikos_api, "EthikosCategoryViewSet", None),
+)
 
 # ── keenKonnect ───────────────────────────────────────────
 from konnaxion.keenkonnect.api_views import ProjectViewSet
 
 # ── Kollective Intelligence ───────────────────────────────
-from konnaxion.kollective_intelligence.api_views import VoteViewSet
+# Vote-related ViewSets are optional for now; the app's api_views module may be incomplete.
+try:
+    from konnaxion.kollective_intelligence.api_views import (  # type: ignore[attr-defined]
+        VoteViewSet,
+        VoteResultViewSet,
+    )
+except Exception:
+    VoteViewSet = None  # type: ignore[assignment]
+    VoteResultViewSet = None  # type: ignore[assignment]
 
 # ── KonnectED (Knowledge + CertifiKation) ─────────────────
 from konnaxion.konnected.api_views import (
@@ -35,6 +49,13 @@ from konnaxion.konnected.api_views import (
     PortfolioViewSet,
     ExamAttemptViewSet,
 )
+
+# OfflinePackageViewSet is optional; it will be present once the offline-packages
+# feature is implemented in konnected.api_views.
+try:
+    from konnaxion.konnected.api_views import OfflinePackageViewSet  # type: ignore[attr-defined]
+except Exception:
+    OfflinePackageViewSet = None  # type: ignore[assignment]
 
 # ── Kreative ──────────────────────────────────────────────
 from konnaxion.kreative.api_views import KreativeArtworkViewSet, GalleryViewSet
@@ -50,18 +71,43 @@ router.register("users", UserViewSet, basename="user")
 router.register("ethikos/topics", TopicViewSet, basename="ethikos-topic")
 router.register("ethikos/stances", StanceViewSet, basename="ethikos-stance")
 router.register("ethikos/arguments", ArgumentViewSet, basename="ethikos-argument")
+
 # Register categories only if the ViewSet exists in the codebase
 if EthikosCategoryViewSet is not None:
-    router.register("ethikos/categories", EthikosCategoryViewSet, basename="ethikos-category")
+    router.register(
+        "ethikos/categories",
+        EthikosCategoryViewSet,
+        basename="ethikos-category",
+    )
 
 # keenKonnect
 router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-project")
 
-# Kollective Intelligence
-router.register("kollective/votes", VoteViewSet, basename="kollective-vote")
+# Kollective Intelligence (optional until Vote* ViewSets are implemented)
+if VoteViewSet is not None:
+    router.register("kollective/votes", VoteViewSet, basename="kollective-vote")
+
+if VoteResultViewSet is not None:
+    router.register(
+        "kollective/vote-results",
+        VoteResultViewSet,
+        basename="kollective-vote-result",
+    )
 
 # KonnectED – Knowledge
-router.register("konnected/resources", KnowledgeResourceViewSet, basename="konnected-resource")
+router.register(
+    "konnected/resources",
+    KnowledgeResourceViewSet,
+    basename="konnected-resource",
+)
+
+# KonnectED – Offline packages (optional; only if ViewSet exists)
+if OfflinePackageViewSet is not None:
+    router.register(
+        "konnected/knowledge/offline-packages",
+        OfflinePackageViewSet,
+        basename="konnected-offline-package",
+    )
 
 # KonnectED – CertifiKation
 router.register(
@@ -91,8 +137,16 @@ router.register(
 )
 
 # Kreative
-router.register("kreative/artworks", KreativeArtworkViewSet, basename="kreative-artwork")
-router.register("kreative/galleries", GalleryViewSet, basename="kreative-gallery")
+router.register(
+    "kreative/artworks",
+    KreativeArtworkViewSet,
+    basename="kreative-artwork",
+)
+router.register(
+    "kreative/galleries",
+    GalleryViewSet,
+    basename="kreative-gallery",
+)
 
 # ---------------------------------------------------------------------------
 

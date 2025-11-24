@@ -90,19 +90,19 @@ interface CreateOfflinePackagePayload {
 
 // Use relative URLs so that NEXT_PUBLIC_API_BASE or "/api" baseURL applies
 // consistently (see services/_request.ts and Global Parameter Reference).
-const OFFLINE_PACKAGE_LIST_ENDPOINT = 'konnected/knowledge/offline-packages/';
+const OFFLINE_PACKAGE_LIST_ENDPOINT = 'konnected/offline-packages/';
 const OFFLINE_PACKAGE_DETAIL_ENDPOINT = (id: OfflinePackage['id']) =>
-  `konnected/knowledge/offline-packages/${id}/`;
+  `konnected/offline-packages/${id}/`;
 const OFFLINE_PACKAGE_SYNC_ENDPOINT = (id: OfflinePackage['id']) =>
-  `konnected/knowledge/offline-packages/${id}/sync/`;
+  `konnected/offline-packages/${id}/sync/`;
 
 // Knowledge module (KonnectED) offline-eligible resources.
 // We probe a small set of candidate endpoints to stay aligned with the v14
 // Knowledge spec while the backend paths stabilise.
 const OFFLINE_RESOURCES_ENDPOINTS: readonly string[] = [
+  '/api/konnected/resources/',
   '/api/knowledge-resources/',
   '/api/knowledge/resources/',
-  '/api/konnected/resources/',
 ];
 
 function normalizeList<T>(raw: unknown): T[] {
@@ -132,7 +132,7 @@ async function createOfflinePackage(
 }
 
 async function deleteOfflinePackage(id: OfflinePackage['id']): Promise<void> {
-  await api.delete( OFFLINE_PACKAGE_DETAIL_ENDPOINT(id) );
+  await api.delete(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id));
 }
 
 async function syncOfflinePackage(id: OfflinePackage['id']): Promise<void> {

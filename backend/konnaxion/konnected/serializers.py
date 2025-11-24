@@ -24,6 +24,7 @@ class KnowledgeResourceSerializer(serializers.ModelSerializer):
     Serialises library items (video, doc, course…) defined by the
     KnowledgeResource model in v14.
     """
+
     author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
@@ -55,6 +56,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
         - score_percent, max_score
         - appeal_status, peer_validation_required, etc.
     """
+
     user = serializers.StringRelatedField(read_only=True)
     path = serializers.PrimaryKeyRelatedField(read_only=True)
 
@@ -68,6 +70,7 @@ class PeerValidationSerializer(serializers.ModelSerializer):
     """
     Peer mentor validation on a given evaluation.
     """
+
     peer = serializers.StringRelatedField(read_only=True)
     evaluation = serializers.PrimaryKeyRelatedField(queryset=Evaluation.objects.all())
 
@@ -81,6 +84,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
     """
     User skill portfolio – curated collection of KnowledgeResources.
     """
+
     user = serializers.StringRelatedField(read_only=True)
     items = serializers.PrimaryKeyRelatedField(
         queryset=KnowledgeResource.objects.all(),
@@ -105,6 +109,7 @@ class ExamAttemptSerializer(serializers.Serializer):
     It matches the shape used in:
       app/konnected/certifications/exam-dashboard-results/page.tsx
     """
+
     id = serializers.CharField()
     certificationPathId = serializers.CharField()
     certificationPathName = serializers.CharField()

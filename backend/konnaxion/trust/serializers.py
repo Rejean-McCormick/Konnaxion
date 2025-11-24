@@ -1,4 +1,4 @@
-# backend/konnaxion/<trust_app_or_kollective>/serializers.py
+# backend/konnaxion/trust/serializers.py
 
 from __future__ import annotations
 
@@ -28,6 +28,15 @@ class CredentialSerializer(serializers.ModelSerializer):
         format=None,  # ISO 8601
     )
 
+    # Upload field: the raw file coming from the client, mapped to the model's
+    # FileField (assumed to be named `document`).
+    # This is write‑only and is not exposed in responses.
+    file = serializers.FileField(
+        write_only=True,
+        required=True,
+        source="document",
+    )
+
     # Public URL to the stored document (built from FileField).
     url = serializers.SerializerMethodField()
 
@@ -51,6 +60,7 @@ class CredentialSerializer(serializers.ModelSerializer):
             "url",
             "status",
             "notes",
+            "file",  # write-only input for uploads
         )
         read_only_fields = (
             "id",
@@ -58,6 +68,79 @@ class CredentialSerializer(serializers.ModelSerializer):
             "status",
             "notes",
         )
+        extra_kwargs = {
+            "title": {"required": False, "allow_blank": True},
+            "issuer": {"required": False, "allow_blank": True},
+        }
+
+    # ------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------
+
+    def create(self, validated_data: dict) -> Credential:
+        """
+        Create a new Credential attached to the current user.
+
+        Behaviour:
+        - `file` (document) is required.
+        - `title` defaults to a cleaned-up version of the filename if omitted.
+        - `issuer` is optional, defaults to empty string.
+        - `issued_at` is optional and may be null.
+        - `status` is initialised as a "pending" value.
+        - `notes` is set to a default review message.
+        """
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        if user is None or not getattr(user, "is_authenticated", False):
+            raise serializers.ValidationError(
+                {"non_field_errors": ["Authentication required to upload credentials."]}
+            )
+
+        # Because `file` is declared with source="document",
+        # the validated key here is "document".
+        document = validated_data.pop("document", None)
+        if document is None:
+            raise serializers.ValidationError({"file": ["This field is required."]})
+
+        title: Optional[str] = validated_data.get("title") or None
+        issuer: str = (validated_data.get("issuer") or "").strip()
+        issued_at = validated_data.get("issued_at")
+
+        # Derive title from filename if not provided
+        if not title and getattr(document, "name", None):
+            fname = document.name
+            base = fname.rsplit(".", 1)[0]
+            base = base.replace("_", " ").replace("-", " ").strip()
+            title = base or "Untitled credential"
+
+        # Resolve an appropriate "pending" status value.
+        status_value = None
+        status_enum = getattr(Credential, "Status", None)
+        if status_enum is not None and hasattr(status_enum, "PENDING"):
+            status_value = status_enum.PENDING
+        elif hasattr(Credential, "STATUS_PENDING"):
+            status_value = getattr(Credential, "STATUS_PENDING")
+        else:
+            # Fallback string; the display label will be normalised by get_status()
+            status_value = "pending"
+
+        default_notes = getattr(
+            Credential,
+            "DEFAULT_PENDING_NOTES",
+            "Awaiting manual verification",
+        )
+
+        credential = Credential.objects.create(
+            user=user,
+            title=title or "Untitled credential",
+            issuer=issuer,
+            issued_at=issued_at,
+            document=document,
+            status=status_value,
+            notes=default_notes,
+        )
+        return credential
 
     # ------------------------------------------------------------------
     # Computed fields
@@ -67,9 +150,10 @@ class CredentialSerializer(serializers.ModelSerializer):
         """
         Returns an absolute URL to the uploaded document, if available.
 
-        Assumes the model exposes a FileField named `document`.
+        Prefers a FileField named `document`, but will also fall back to `file`
+        if present on the model.
         """
-        file_field = getattr(obj, "document", None)
+        file_field = getattr(obj, "document", None) or getattr(obj, "file", None)
         if not file_field:
             return None
 

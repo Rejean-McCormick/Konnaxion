@@ -1,4 +1,4 @@
-===== TOC (82 fichiers) =====
+===== TOC (83 fichiers) =====
 0001  C:\MyCode\Konnaxionv14\backend\konnaxion\__init__.py
 0002  C:\MyCode\Konnaxionv14\backend\konnaxion\conftest.py
 0003  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\__init__.py
@@ -31,56 +31,57 @@
 0030  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\apps.py
 0031  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\models.py
 0032  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\serializers.py
-0033  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\views.py
-0034  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\__init__.py
-0035  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\admin.py
-0036  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\api_views.py
-0037  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\apps.py
-0038  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\models.py
-0039  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\serializers.py
-0040  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\views.py
-0041  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\artworks\artwork_0.png
-0042  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\artworks\artwork_1.png
-0043  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\artworks\artwork_2.png
-0044  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\traditions\tradition_0.png
-0045  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\traditions\tradition_1.png
-0046  C:\MyCode\Konnaxionv14\backend\konnaxion\media\kreative\traditions\tradition_2.png
-0047  C:\MyCode\Konnaxionv14\backend\konnaxion\static\css\project.css
-0048  C:\MyCode\Konnaxionv14\backend\konnaxion\static\fonts\.gitkeep
-0049  C:\MyCode\Konnaxionv14\backend\konnaxion\static\js\project.js
-0050  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403.html
-0051  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403_csrf.html
-0052  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\404.html
-0053  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\500.html
-0054  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\account\base_manage_password.html
-0055  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\alert.html
-0056  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\badge.html
-0057  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\button.html
-0058  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\field.html
-0059  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\fields.html
-0060  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\panel.html
-0061  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\table.html
-0062  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\entrance.html
-0063  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\manage.html
-0064  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\base.html
-0065  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\about.html
-0066  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\home.html
-0067  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_detail.html
-0068  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_form.html
+0033  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\tasks.py
+0034  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\views.py
+0035  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\__init__.py
+0036  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\admin.py
+0037  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\api_views.py
+0038  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\apps.py
+0039  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\models.py
+0040  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\serializers.py
+0041  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\views.py
+0042  C:\MyCode\Konnaxionv14\backend\konnaxion\moderation\api_views.py
+0043  C:\MyCode\Konnaxionv14\backend\konnaxion\moderation\models.py
+0044  C:\MyCode\Konnaxionv14\backend\konnaxion\moderation\serializers.py
+0045  C:\MyCode\Konnaxionv14\backend\konnaxion\static\css\project.css
+0046  C:\MyCode\Konnaxionv14\backend\konnaxion\static\fonts\.gitkeep
+0047  C:\MyCode\Konnaxionv14\backend\konnaxion\static\js\project.js
+0048  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403.html
+0049  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\403_csrf.html
+0050  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\404.html
+0051  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\500.html
+0052  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\account\base_manage_password.html
+0053  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\alert.html
+0054  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\badge.html
+0055  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\button.html
+0056  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\field.html
+0057  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\fields.html
+0058  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\panel.html
+0059  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\elements\table.html
+0060  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\entrance.html
+0061  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\allauth\layouts\manage.html
+0062  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\base.html
+0063  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\about.html
+0064  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\pages\home.html
+0065  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_detail.html
+0066  C:\MyCode\Konnaxionv14\backend\konnaxion\templates\users\user_form.html
+0067  C:\MyCode\Konnaxionv14\backend\konnaxion\trust\models.py
+0068  C:\MyCode\Konnaxionv14\backend\konnaxion\trust\serializers.py
 0069  C:\MyCode\Konnaxionv14\backend\konnaxion\urls.py
 0070  C:\MyCode\Konnaxionv14\backend\konnaxion\users\__init__.py
 0071  C:\MyCode\Konnaxionv14\backend\konnaxion\users\adapters.py
 0072  C:\MyCode\Konnaxionv14\backend\konnaxion\users\admin.py
 0073  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\__init__.py
 0074  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\serializers.py
-0075  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\views.py
-0076  C:\MyCode\Konnaxionv14\backend\konnaxion\users\apps.py
-0077  C:\MyCode\Konnaxionv14\backend\konnaxion\users\context_processors.py
-0078  C:\MyCode\Konnaxionv14\backend\konnaxion\users\forms.py
-0079  C:\MyCode\Konnaxionv14\backend\konnaxion\users\models.py
-0080  C:\MyCode\Konnaxionv14\backend\konnaxion\users\tasks.py
-0081  C:\MyCode\Konnaxionv14\backend\konnaxion\users\urls.py
-0082  C:\MyCode\Konnaxionv14\backend\konnaxion\users\views.py
+0075  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\urls.py
+0076  C:\MyCode\Konnaxionv14\backend\konnaxion\users\api\views.py
+0077  C:\MyCode\Konnaxionv14\backend\konnaxion\users\apps.py
+0078  C:\MyCode\Konnaxionv14\backend\konnaxion\users\context_processors.py
+0079  C:\MyCode\Konnaxionv14\backend\konnaxion\users\forms.py
+0080  C:\MyCode\Konnaxionv14\backend\konnaxion\users\models.py
+0081  C:\MyCode\Konnaxionv14\backend\konnaxion\users\tasks.py
+0082  C:\MyCode\Konnaxionv14\backend\konnaxion\users\urls.py
+0083  C:\MyCode\Konnaxionv14\backend\konnaxion\users\views.py
 ===== END TOC =====
 
 
@@ -1165,44 +1166,121 @@ for model in app_config.get_models():
 
 
 ===== BEGIN konnaxion/kollective_intelligence/api_views.py =====
-from rest_framework import viewsets, permissions
-from .models import Vote, VoteResult, VoteModality
-from .serializers import VoteSerializer, VoteResultSerializer, VoteModalitySerializer
+# konnaxion/kollective_intelligence/api_views.py
+
+from rest_framework import permissions, viewsets
+
+from .models import Vote, VoteResult
+from .serializers import VoteSerializer, VoteResultSerializer
+
+
+__all__ = [
+    "VoteViewSet",
+    "VoteResultViewSet",
+]
+
 
 class VoteViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for casting Votes in the smart voting system.
-    Users can create a vote (with raw value, system computes weighted value).
-    Only authenticated users can vote; listing votes may be restricted.
+    Smart‑Vote endpoint for raw + weighted ballots.
+
+    Mounted via `config/api_router.py` as:
+
+        /api/kollective/votes/
+
+    Behaviour:
+
+    - GET /api/kollective/votes/
+        List votes, optionally filtered by:
+          * target_type
+          * target_id
+          * user (username)
+
+    - POST /api/kollective/votes/
+        Create a new vote. The authenticated user is always
+        set as `user` on the Vote model, regardless of payload.
+
+    The serializer exposes:
+
+      id, user (string), target_type, target_id,
+      raw_value, weighted_value, voted_at
     """
-    queryset = Vote.objects.select_related("user").all()
+
     serializer_class = VoteSerializer
-    permission_classes = [permissions.IsAuthenticated]  # must be logged in to cast or view votes
-    filterset_fields = ["user", "target_type", "target_id"]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Apply simple filters based on query params so the UI
+        can request votes for a particular poll/target.
+
+        Supported query params:
+          - target_type
+          - target_id
+          - user (matches related User.username)
+        """
+        qs = Vote.objects.select_related("user").all()
+
+        params = self.request.query_params
+
+        target_type = params.get("target_type")
+        if target_type:
+            qs = qs.filter(target_type=target_type)
+
+        target_id = params.get("target_id")
+        if target_id:
+            try:
+                qs = qs.filter(target_id=int(target_id))
+            except (TypeError, ValueError):
+                # Ignore invalid target_id; return unfiltered by id
+                pass
+
+        username = params.get("user")
+        if username:
+            qs = qs.filter(user__username=username)
+
+        return qs.order_by("-voted_at")
 
     def perform_create(self, serializer):
-        # Assign current user as the voter
+        """
+        On creation, always associate the vote with the
+        currently authenticated user.
+        """
         serializer.save(user=self.request.user)
+
 
 class VoteResultViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Read-only ViewSet for VoteResult (aggregated results of votes for a target).
-    Allows retrieving aggregated scores for content.
-    """
-    queryset = VoteResult.objects.all()
-    serializer_class = VoteResultSerializer
-    permission_classes = [permissions.AllowAny]  # anyone can view vote results
-    filterset_fields = ["target_type", "target_id"]
+    Read‑only access to aggregated vote results, if you choose
+    to expose them via the same app.
 
-class VoteModalityViewSet(viewsets.ModelViewSet):
+    Typical usage (future/optional):
+
+        GET /api/kollective/vote-results/?target_type=...&target_id=...
+
+    Not currently wired in `config/api_router.py`, but available
+    for easy registration later.
     """
-    ViewSet for VoteModality (voting mode definitions).
-    Typically managed by admins to define how votes are weighted.
-    """
-    queryset = VoteModality.objects.all()
-    serializer_class = VoteModalitySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    filterset_fields = ["name"]
+
+    serializer_class = VoteResultSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        qs = VoteResult.objects.all()
+        params = self.request.query_params
+
+        target_type = params.get("target_type")
+        if target_type:
+            qs = qs.filter(target_type=target_type)
+
+        target_id = params.get("target_id")
+        if target_id:
+            try:
+                qs = qs.filter(target_id=int(target_id))
+            except (TypeError, ValueError):
+                pass
+
+        return qs.order_by("target_type", "target_id")
 
 ===== END konnaxion/kollective_intelligence/api_views.py =====
 
@@ -1372,38 +1450,230 @@ class IntegrationMapping(models.Model):
 
 
 ===== BEGIN konnaxion/kollective_intelligence/serializers.py =====
+# konnaxion/kollective_intelligence/serializers.py
 from rest_framework import serializers
-from .models import Vote, VoteResult, VoteModality
 
-__all__ = ["VoteSerializer", "VoteResultSerializer", "VoteModalitySerializer"]
+from .models import (
+    ExpertiseCategory,
+    UserExpertiseScore,
+    UserEthicsScore,
+    ScoreConfiguration,
+    ContextAnalysisLog,
+    ConfidentialitySetting,
+    ScoreHistory,
+    Vote,
+    VoteModality,
+    EmergingExpert,
+    VoteResult,
+    IntegrationMapping,
+)
+
+__all__ = [
+    "ExpertiseCategorySerializer",
+    "UserExpertiseScoreSerializer",
+    "UserEthicsScoreSerializer",
+    "ScoreConfigurationSerializer",
+    "ContextAnalysisLogSerializer",
+    "ConfidentialitySettingSerializer",
+    "ScoreHistorySerializer",
+    "VoteSerializer",
+    "VoteResultSerializer",
+    "VoteModalitySerializer",
+    "EmergingExpertSerializer",
+    "IntegrationMappingSerializer",
+]
+
+
+# ────────────────────────────────
+# Ekoh / reputation domain
+# ────────────────────────────────
+
+
+class ExpertiseCategorySerializer(serializers.ModelSerializer):
+    """
+    Simple catalogue of knowledge / expertise domains.
+    """
+
+    class Meta:
+        model = ExpertiseCategory
+        fields = "__all__"
+        read_only_fields = ("id",)
+
+
+class UserExpertiseScoreSerializer(serializers.ModelSerializer):
+    """
+    Current domain‑specific expertise weight per user.
+
+    The `user` and `category` relations are exposed read‑only for display,
+    while `category_id` is used for writes. The view is expected to inject
+    the authenticated user on create/update.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    category = ExpertiseCategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        source="category",
+        queryset=ExpertiseCategory.objects.all(),
+        write_only=True,
+        required=True,
+    )
+
+    class Meta:
+        model = UserExpertiseScore
+        fields = (
+            "id",
+            "user",
+            "category",
+            "category_id",
+            "raw_score",
+            "weighted_score",
+        )
+        read_only_fields = ("id", "user")
+
+
+class UserEthicsScoreSerializer(serializers.ModelSerializer):
+    """
+    Ethical multiplier influencing all expertise weights.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = UserEthicsScore
+        fields = "__all__"
+        read_only_fields = ("user",)
+
+
+class ScoreConfigurationSerializer(serializers.ModelSerializer):
+    """
+    Named weight configuration (global or field‑specific).
+    """
+
+    class Meta:
+        model = ScoreConfiguration
+        fields = "__all__"
+        read_only_fields = ("id",)
+
+
+class ContextAnalysisLogSerializer(serializers.ModelSerializer):
+    """
+    Audit log of AI/context adjustments applied to scores.
+
+    Exposed as read‑only; entries are intended to be created server‑side.
+    """
+
+    class Meta:
+        model = ContextAnalysisLog
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "entity_type",
+            "entity_id",
+            "field",
+            "input_metadata",
+            "adjustments_applied",
+            "logged_at",
+        )
+
+
+class ConfidentialitySettingSerializer(serializers.ModelSerializer):
+    """
+    Per‑user anonymity / visibility preferences.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = ConfidentialitySetting
+        fields = "__all__"
+        read_only_fields = ("user",)
+
+
+class ScoreHistorySerializer(serializers.ModelSerializer):
+    """
+    Immutable audit trail of expertise score changes.
+    """
+
+    merit_score = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = ScoreHistory
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "merit_score",
+            "old_value",
+            "new_value",
+            "change_reason",
+            "changed_at",
+        )
+
+
+# ────────────────────────────────
+# Smart Vote domain
+# ────────────────────────────────
+
 
 class VoteSerializer(serializers.ModelSerializer):
     """
     Serializer for Vote (individual vote record with raw and weighted values).
     """
+
     user = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Vote
         fields = "__all__"
         read_only_fields = ("id", "user", "voted_at")
 
+
 class VoteResultSerializer(serializers.ModelSerializer):
     """
     Serializer for VoteResult (aggregated vote totals for a target object).
-    Read-only - these results are typically computed, not created via API.
+
+    Read‑only – these results are typically computed by background jobs
+    or database queries, not created directly via the public API.
     """
+
     class Meta:
         model = VoteResult
         fields = "__all__"
-        read_only_fields = ("id",)  # all fields should be read-only in practice
+        read_only_fields = ("id",)
+
 
 class VoteModalitySerializer(serializers.ModelSerializer):
     """
     Serializer for VoteModality (definition of a voting mode and its parameters).
     """
+
     class Meta:
         model = VoteModality
         fields = "__all__"
+        read_only_fields = ("id",)
+
+
+class EmergingExpertSerializer(serializers.ModelSerializer):
+    """
+    Flags fast‑rising contributors in a given period.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = EmergingExpert
+        fields = "__all__"
+        read_only_fields = ("id", "user")
+
+
+class IntegrationMappingSerializer(serializers.ModelSerializer):
+    """
+    Links Smart Vote / Ekoh context to other modules' objects.
+    """
+
+    class Meta:
+        model = IntegrationMapping
+        fields = "__all__"
+        read_only_fields = ("id",)
 
 ===== END konnaxion/kollective_intelligence/serializers.py =====
 
@@ -1422,14 +1692,192 @@ from django.shortcuts import render
 
 
 ===== BEGIN konnaxion/konnected/admin.py =====
-# template for konnaxion/<app>/admin.py
-from django.contrib import admin
-from django.apps import apps
+# backend/konnaxion/konnected/admin.py
+from __future__ import annotations
 
-app_config = apps.get_app_config(__name__.split(".")[-2])  # resolves to the app name
-for model in app_config.get_models():
-    if not admin.site.is_registered(model):
-        admin.site.register(model)
+from typing import Sequence
+
+from django.apps import apps
+from django.contrib import admin
+
+from .models import (
+    CertificationPath,
+    CoCreationContribution,
+    CoCreationProject,
+    Evaluation,
+    ForumPost,
+    ForumTopic,
+    InteropMapping,
+    KnowledgeRecommendation,
+    KnowledgeResource,
+    LearningProgress,
+    PeerValidation,
+    Portfolio,
+)
+
+
+# ───────── Generic timestamp mixin (created_at / updated_at) ─────────
+class TimestampMixin(admin.ModelAdmin):
+    """
+    Common admin behaviour for TimeStampedModel-based models:
+    - expose created_at / updated_at as read-only
+    - add them to list_display
+    """
+    date_hierarchy = "created_at"
+
+    def _time_fields(self) -> set[str]:
+        return {"created_at", "updated_at"} & {
+            f.name for f in self.model._meta.get_fields()
+        }
+
+    def get_readonly_fields(self, request, obj=None) -> Sequence[str]:  # type: ignore[override]
+        return (*super().get_readonly_fields(request, obj), *self._time_fields())
+
+    def get_list_display(self, request):  # type: ignore[override]
+        cols = list(super().get_list_display(request))
+        for f in self._time_fields():
+            if f not in cols:
+                cols.append(f)
+        return tuple(cols)
+
+
+# ───────── CertifiKation sub-module ─────────
+@admin.register(CertificationPath)
+class CertificationPathAdmin(TimestampMixin):
+    list_display = ("name", "description")
+    search_fields = ("name", "description")
+    ordering = ("name",)
+
+
+@admin.register(Evaluation)
+class EvaluationAdmin(TimestampMixin):
+    list_display = ("user", "path", "raw_score", "created_at")
+    list_filter = ("path",)
+    search_fields = (
+        "user__username",
+        "path__name",
+    )
+    autocomplete_fields = ("user", "path")
+    list_select_related = ("user", "path")
+    ordering = ("-created_at",)
+
+
+@admin.register(PeerValidation)
+class PeerValidationAdmin(TimestampMixin):
+    list_display = ("evaluation", "peer", "decision", "created_at")
+    list_filter = ("decision",)
+    search_fields = (
+        "peer__username",
+        "evaluation__id",
+        "evaluation__path__name",
+    )
+    autocomplete_fields = ("evaluation", "peer")
+    list_select_related = ("evaluation", "peer")
+
+
+@admin.register(Portfolio)
+class PortfolioAdmin(TimestampMixin):
+    list_display = ("title", "user", "items_count", "created_at")
+    search_fields = ("title", "user__username")
+    autocomplete_fields = ("user",)
+    filter_horizontal = ("items",)
+
+    def items_count(self, obj: Portfolio) -> int:
+        return obj.items.count()
+
+    items_count.short_description = "Items"  # type: ignore[attr-defined]
+
+
+@admin.register(InteropMapping)
+class InteropMappingAdmin(TimestampMixin):
+    list_display = ("local_certification", "external_system", "external_id")
+    search_fields = (
+        "external_system",
+        "external_id",
+        "local_certification__name",
+    )
+    autocomplete_fields = ("local_certification",)
+    list_select_related = ("local_certification",)
+
+
+# ───────── Knowledge sub-module ─────────
+@admin.register(KnowledgeResource)
+class KnowledgeResourceAdmin(TimestampMixin):
+    list_display = ("title", "type", "url", "author", "created_at")
+    list_filter = ("type",)
+    search_fields = ("title", "url", "author__username")
+    autocomplete_fields = ("author",)
+    list_select_related = ("author",)
+
+
+@admin.register(KnowledgeRecommendation)
+class KnowledgeRecommendationAdmin(TimestampMixin):
+    list_display = ("user", "resource", "recommended_at", "created_at")
+    search_fields = ("user__username", "resource__title")
+    autocomplete_fields = ("user", "resource")
+    list_select_related = ("user", "resource")
+
+
+@admin.register(LearningProgress)
+class LearningProgressAdmin(TimestampMixin):
+    list_display = ("user", "resource", "progress_percent", "created_at")
+    search_fields = ("user__username", "resource__title")
+    autocomplete_fields = ("user", "resource")
+    list_select_related = ("user", "resource")
+
+
+# ───────── Co‑Creation sub-module ─────────
+@admin.register(CoCreationProject)
+class CoCreationProjectAdmin(TimestampMixin):
+    list_display = ("title", "status", "created_at")
+    list_filter = ("status",)
+    search_fields = ("title",)
+
+
+@admin.register(CoCreationContribution)
+class CoCreationContributionAdmin(TimestampMixin):
+    list_display = ("project", "user", "short_content", "created_at")
+    search_fields = ("content", "user__username", "project__title")
+    autocomplete_fields = ("project", "user")
+    list_select_related = ("project", "user")
+
+    def short_content(self, obj: CoCreationContribution) -> str:
+        text = obj.content or ""
+        return (text[:60] + "…") if len(text) > 60 else text
+
+    short_content.short_description = "Content"  # type: ignore[attr-defined]
+
+
+# ───────── Forum sub-module ─────────
+@admin.register(ForumTopic)
+class ForumTopicAdmin(TimestampMixin):
+    list_display = ("title", "category", "creator", "created_at")
+    list_filter = ("category",)
+    search_fields = ("title", "category", "creator__username")
+    autocomplete_fields = ("creator",)
+    list_select_related = ("creator",)
+
+
+@admin.register(ForumPost)
+class ForumPostAdmin(TimestampMixin):
+    list_display = ("topic", "author", "short_content", "created_at")
+    search_fields = ("content", "topic__title", "author__username")
+    autocomplete_fields = ("topic", "author")
+    list_select_related = ("topic", "author")
+
+    def short_content(self, obj: ForumPost) -> str:
+        text = obj.content or ""
+        return (text[:60] + "…") if len(text) > 60 else text
+
+    short_content.short_description = "Content"  # type: ignore[attr-defined]
+
+
+# ───────── Fallback auto-registration ─────────
+# Ensure any future models in this app still appear in the admin.
+cfg = apps.get_app_config("konnected")
+for mdl in cfg.get_models():
+    if not admin.site.is_registered(mdl):
+        admin.site.register(mdl)
 
 ===== END konnaxion/konnected/admin.py =====
 
@@ -1468,6 +1916,43 @@ CERT_PASS_PERCENT: int = getattr(settings, "CERT_PASS_PERCENT", 80)
 QUIZ_RETRY_COOLDOWN_MIN: int = getattr(settings, "QUIZ_RETRY_COOLDOWN_MIN", 30)
 
 
+def _generate_synthetic_exam_sessions(now=None):
+    """
+    Helper for generating a small synthetic exam schedule.
+
+    v14 does not yet define a persistent ExamSession model; both the
+    CertificationPathViewSet.sessions action and the Evaluation
+    registration logic use this helper so that the schedule is
+    consistent across endpoints.
+
+    Returns a list of dicts with:
+        id, start_at, end_at, timezone, modality, location,
+        capacity, seats_remaining, registration_deadline.
+    """
+    if now is None:
+        now = timezone.now()
+
+    base_start = now + timedelta(days=3)
+    sessions = []
+    for index in range(3):
+        start = base_start + timedelta(days=7 * index)
+        end = start + timedelta(hours=2)
+        sessions.append(
+            {
+                "id": index + 1,
+                "start_at": start.isoformat(),
+                "end_at": end.isoformat(),
+                "timezone": "UTC",
+                "modality": "online",
+                "location": "Remote proctored",
+                "capacity": 25,
+                "seats_remaining": 25,
+                "registration_deadline": (start - timedelta(days=1)).isoformat(),
+            }
+        )
+    return sessions
+
+
 class KnowledgeResourceViewSet(viewsets.ModelViewSet):
     """
     CRUD endpoints for KonnectED knowledge-library items
@@ -1501,10 +1986,11 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         GET  /konnected/certifications/paths/{id}/
         ...
 
-    Extra actions (for Exam Registration page):
+    Extra actions (for Exam Registration and Exam Preparation pages):
 
         GET /konnected/certifications/paths/{id}/eligibility/
         GET /konnected/certifications/paths/{id}/sessions/
+        GET /konnected/certifications/paths/{id}/preparation-plan/
     """
     queryset = CertificationPath.objects.all().order_by("name")
     serializer_class = CertificationPathSerializer
@@ -1518,7 +2004,7 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
     )
     def eligibility(self, request, pk=None):
         """
-        Returns whether the current user may register a new exam for this path.
+        Returns a simple eligibility view for this certification path.
 
         Response shape matches ExamEligibility in the frontend:
             { "already_passed": bool, "cooldown_remaining_minutes": number }
@@ -1534,8 +2020,8 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         already_passed = False
         cooldown_remaining = 0
 
-        if evaluations:
-            last_eval = evaluations[0]
+        last_eval = evaluations.first()
+        if last_eval is not None:
             score = last_eval.raw_score
             metadata = last_eval.metadata or {}
             pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
@@ -1560,6 +2046,105 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["get"],
+        url_path="preparation-plan",
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def preparation_plan(self, request, pk=None):
+        """
+        Returns a lightweight exam preparation snapshot for this path.
+
+        Response shape matches ExamPreparationResponse used by the
+        Exam Preparation page in the frontend. For v14 this endpoint
+        focuses on summarising exam attempts and cooldowns; study
+        modules and focus areas are returned as empty lists until
+        richer learning-path models are introduced.
+        """
+        path = self.get_object()
+        user = request.user
+
+        evaluations = (
+            Evaluation.objects.filter(user=user, path=path)
+            .order_by("-created_at")
+        )
+        last_eval = evaluations.first()
+
+        if last_eval is not None:
+            metadata = last_eval.metadata or {}
+
+            score_percent = metadata.get("score_percent")
+            if score_percent is None and last_eval.raw_score is not None:
+                score_percent = float(last_eval.raw_score)
+
+            pass_percent = metadata.get("pass_percent", CERT_PASS_PERCENT)
+
+            last_result = None
+            if score_percent is not None:
+                last_result = "pass" if score_percent >= pass_percent else "fail"
+
+            attempts_used = evaluations.count()
+            attempts_allowed = metadata.get("attempts_allowed")
+
+            cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
+            cooldown_ends_at_dt = last_eval.created_at + cooldown_delta
+            now = timezone.now()
+            is_cooldown_active = now < cooldown_ends_at_dt
+            cooldown_ends_at = (
+                cooldown_ends_at_dt.isoformat() if is_cooldown_active else None
+            )
+
+            # When evaluation registrations come from the Exam Registration page,
+            # we store an ISO target_date in metadata based on the chosen session.
+            target_date = metadata.get("target_date")
+
+            exam_payload = {
+                "targetDate": target_date,
+                "recommendedStudyHours": metadata.get("recommended_study_hours"),
+                "lastScorePercent": score_percent,
+                "lastResult": last_result,
+                "lastAttemptAt": last_eval.created_at.isoformat(),
+                "attemptsUsed": attempts_used,
+                "attemptsAllowed": attempts_allowed,
+                "isCooldownActive": is_cooldown_active,
+                "cooldownEndsAt": cooldown_ends_at,
+                "passPercent": pass_percent,
+                "retryCooldownMinutes": QUIZ_RETRY_COOLDOWN_MIN,
+            }
+        else:
+            # No attempts yet – still return exam metadata so the UI can
+            # show thresholds and cooldown policy.
+            exam_payload = {
+                "targetDate": None,
+                "recommendedStudyHours": None,
+                "lastScorePercent": None,
+                "lastResult": None,
+                "lastAttemptAt": None,
+                "attemptsUsed": 0,
+                "attemptsAllowed": None,
+                "isCooldownActive": False,
+                "cooldownEndsAt": None,
+                "passPercent": CERT_PASS_PERCENT,
+                "retryCooldownMinutes": QUIZ_RETRY_COOLDOWN_MIN,
+            }
+
+        payload = {
+            "path": {
+                "id": path.pk,
+                "name": path.name,
+                "description": path.description,
+            },
+            # Study modules and focus areas are intentionally empty for now.
+            # A future learning-path model can populate these without
+            # changing the endpoint contract.
+            "exam": exam_payload,
+            "overallProgressPercent": None,
+            "modules": [],
+            "focusAreas": [],
+        }
+        return Response(payload)
+
+    @action(
+        detail=True,
+        methods=["get"],
         url_path="sessions",
         permission_classes=[permissions.IsAuthenticated],
     )
@@ -1572,27 +2157,7 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         current time. You can replace this with real DB-backed sessions
         later without changing the endpoint contract.
         """
-        now = timezone.now()
-        base_start = now + timedelta(days=3)
-
-        sessions = []
-        for index in range(3):
-            start = base_start + timedelta(days=7 * index)
-            end = start + timedelta(hours=2)
-            sessions.append(
-                {
-                    "id": index + 1,
-                    "start_at": start.isoformat(),
-                    "end_at": end.isoformat(),
-                    "timezone": "UTC",
-                    "modality": "online",
-                    "location": "Remote proctored",
-                    "capacity": 25,
-                    "seats_remaining": 25,
-                    "registration_deadline": (start - timedelta(days=1)).isoformat(),
-                }
-            )
-
+        sessions = _generate_synthetic_exam_sessions()
         return Response(sessions)
 
 
@@ -1659,15 +2224,35 @@ class EvaluationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        session_id = data.get("session_id")
+        target_date = None
+
+        # Best-effort mapping of the chosen synthetic session to a target date.
+        if session_id is not None:
+            try:
+                session_id_int = int(session_id)
+            except (TypeError, ValueError):
+                session_id_int = None
+
+            if session_id_int is not None:
+                for session in _generate_synthetic_exam_sessions():
+                    if session["id"] == session_id_int:
+                        target_date = session["start_at"]
+                        break
+
         metadata = {
-            "session_id": data.get("session_id"),
+            "session_id": session_id,
             "full_name": data.get("full_name"),
             "agreed_terms": data.get("agreed_terms"),
-            # Reasonable defaults that the dashboard can later read/override
+            # Reasonable defaults that the dashboard and preparation page
+            # can later read/override.
             "delivery_mode": "online",
             "proctored": True,
             "status": "scheduled",
         }
+
+        if target_date is not None:
+            metadata["target_date"] = target_date
 
         evaluation = Evaluation.objects.create(
             user=user,
@@ -1747,12 +2332,15 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         delivery_mode = metadata.get("delivery_mode", "online")
         proctored = bool(metadata.get("proctored", False))
 
+        # Use per-evaluation pass threshold if present
+        pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+
         status_value = metadata.get("status")
         if not status_value:
             # Derive a simple status when none is explicitly stored
             if score_percent is None or score_percent == 0:
                 status_value = "scheduled"
-            elif score_percent >= CERT_PASS_PERCENT:
+            elif score_percent >= pass_threshold:
                 status_value = "passed"
             else:
                 status_value = "failed"
@@ -1905,6 +2493,20 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         except Evaluation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+        metadata = source_eval.metadata or {}
+
+        # Compute score_percent and pass threshold to determine if the exam is already passed
+        score_percent = metadata.get("score_percent")
+        if score_percent is None and source_eval.raw_score is not None:
+            score_percent = float(source_eval.raw_score)
+        pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+
+        if score_percent is not None and score_percent >= pass_threshold:
+            return Response(
+                {"detail": "You cannot retry an exam that has already been passed."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
         if timezone.now() < source_eval.created_at + cooldown_delta:
             return Response(
@@ -1912,7 +2514,7 @@ class ExamAttemptViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        base_metadata = source_eval.metadata or {}
+        base_metadata = metadata
         new_metadata = {
             **base_metadata,
             "status": "scheduled",
@@ -1956,16 +2558,19 @@ class KonnectedConfig(AppConfig):
 
 
 ===== BEGIN konnaxion/konnected/models.py =====
-# konnaxion/konnected/models.py
+# backend/konnaxion/konnected/models.py
 from django.conf import settings
 from django.db import models
+
 
 class TimeStampedModel(models.Model):
     """Adds created_at / updated_at to every table."""
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
     class Meta:
         abstract = True
+
 
 # ──────────────────────────────
 #  CertifiKation sub-module
@@ -1973,41 +2578,56 @@ class TimeStampedModel(models.Model):
 class CertificationPath(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    def __str__(self):
+
+    def __str__(self) -> str:
         return self.name
+
 
 class Evaluation(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     path = models.ForeignKey(CertificationPath, on_delete=models.CASCADE)
     raw_score = models.FloatField()
     metadata = models.JSONField()
-    def __str__(self):
+
+    def __str__(self) -> str:
         return f"{self.user} – {self.path} ({self.raw_score})"
+
 
 class PeerValidation(TimeStampedModel):
     class Decision(models.TextChoices):
         APPROVED = "approved", "Approved"
         REJECTED = "rejected", "Rejected"
+
     evaluation = models.ForeignKey(Evaluation, on_delete=models.CASCADE)
     peer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     decision = models.CharField(max_length=8, choices=Decision.choices)
-    def __str__(self):
+
+    def __str__(self) -> str:
         return f"{self.peer} → {self.evaluation} [{self.decision}]"
+
 
 class Portfolio(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    items = models.ManyToManyField('KnowledgeResource', blank=True, related_name='portfolios')
-    def __str__(self):
+    items = models.ManyToManyField(
+        "KnowledgeResource",
+        blank=True,
+        related_name="portfolios",
+    )
+
+    def __str__(self) -> str:
         return self.title
+
 
 class InteropMapping(TimeStampedModel):
     local_certification = models.ForeignKey(CertificationPath, on_delete=models.CASCADE)
     external_system = models.CharField(max_length=120)
     external_id = models.CharField(max_length=255)
-    def __str__(self):
+
+    def __str__(self) -> str:
         return f"{self.external_system}:{self.external_id}"
+
 
 # ──────────────────────────────
 #  Knowledge sub-module
@@ -2018,19 +2638,155 @@ class KnowledgeResource(TimeStampedModel):
         DOC = "doc", "Document"
         COURSE = "course", "Course"
         OTHER = "other", "Other"
+
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=10, choices=ResourceType.choices)
     url = models.URLField()
-    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    def __str__(self):
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+    )
+
+    def __str__(self) -> str:
         return self.title
+
 
 class KnowledgeRecommendation(TimeStampedModel):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     resource = models.ForeignKey(KnowledgeResource, on_delete=models.CASCADE)
     recommended_at = models.DateTimeField()
-    def __str__(self):
+
+    def __str__(self) -> str:
         return f"{self.user} ⇢ {self.resource}"
+
+
+class LearningProgress(TimeStampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    resource = models.ForeignKey(KnowledgeResource, on_delete=models.CASCADE)
+    progress_percent = models.DecimalField(max_digits=5, decimal_places=2)
+
+    class Meta:
+        unique_together = ("user", "resource")  # each user/resource pair only once
+
+    def __str__(self) -> str:
+        return f"{self.user} – {self.resource} ({self.progress_percent}%)"
+
+
+# ──────────────────────────────
+#  Offline content packaging
+# ──────────────────────────────
+class OfflinePackage(TimeStampedModel):
+    """
+    Represents an offline bundle of KonnectED resources.
+
+    Backing model for the Offline Content page:
+      app/konnected/learning-library/offline-content/page.tsx
+
+    Fields map to the OfflinePackage type used by the frontend.
+    """
+
+    class Status(models.TextChoices):
+        SCHEDULED = "scheduled", "Scheduled"
+        BUILDING = "building", "Building"
+        READY = "ready", "Ready"
+        FAILED = "failed", "Failed"
+
+    class TargetDeviceType(models.TextChoices):
+        LAPTOP = "laptop", "Laptop / desktop"
+        TABLET = "tablet", "Tablet"
+        USB = "usb", "USB / external media"
+        OTHER = "other", "Other / mixed devices"
+
+    # Human-facing metadata
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+
+    # Lifecycle and build state
+    status = models.CharField(
+        max_length=16,
+        choices=Status.choices,
+        default=Status.SCHEDULED,
+    )
+    item_count = models.PositiveIntegerField(
+        default=0,
+        help_text="Number of resources included in the last built bundle.",
+    )
+    total_size_mb = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        help_text="Approximate total bundle size in megabytes.",
+    )
+    last_built_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When this package was last fully built.",
+    )
+
+    target_device_type = models.CharField(
+        max_length=16,
+        choices=TargetDeviceType.choices,
+        blank=True,
+        help_text="Intended primary device type, if any.",
+    )
+    auto_sync = models.BooleanField(
+        default=False,
+        help_text="If true, include in scheduled offline build jobs.",
+    )
+    build_progress_percent = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Current build progress (0–100).",
+    )
+    last_error_message = models.TextField(
+        blank=True,
+        help_text="Last build error, if the package is in a failed state.",
+    )
+
+    # Selection filters / constraints (mirror CreateOfflinePackagePayload)
+    max_size_mb = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Optional upper bound for package size in MB.",
+    )
+    include_types = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Optional list of content types to include (article, video, lesson, quiz, dataset).",
+    )
+    subject_filter = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional subject/topic filter applied when resolving resources.",
+    )
+    level_filter = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional difficulty/level filter.",
+    )
+    language_filter = models.CharField(
+        max_length=32,
+        blank=True,
+        help_text="Optional language filter (e.g. 'en', 'fr').",
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="offline_packages",
+        help_text="User who created this offline package definition.",
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
 
 # ──────────────────────────────
 #  Co-Creation sub-module
@@ -2040,17 +2796,26 @@ class CoCreationProject(TimeStampedModel):
         DRAFT = "draft", "Draft"
         ACTIVE = "active", "Active"
         ARCHIVED = "archived", "Archived"
+
     title = models.CharField(max_length=255)
-    status = models.CharField(max_length=8, choices=Status.choices, default=Status.DRAFT)
-    def __str__(self):
+    status = models.CharField(
+        max_length=8,
+        choices=Status.choices,
+        default=Status.DRAFT,
+    )
+
+    def __str__(self) -> str:
         return self.title
+
 
 class CoCreationContribution(TimeStampedModel):
     project = models.ForeignKey(CoCreationProject, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
-    def __str__(self):
+
+    def __str__(self) -> str:
         return f"{self.user} → {self.project}"
+
 
 # ──────────────────────────────
 #  Forum sub-module
@@ -2059,24 +2824,22 @@ class ForumTopic(TimeStampedModel):
     title = models.CharField(max_length=255)
     category = models.CharField(max_length=120)
     creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    def __str__(self):
+
+    def __str__(self) -> str:
         return self.title
 
+
 class ForumPost(TimeStampedModel):
-    topic = models.ForeignKey(ForumTopic, on_delete=models.CASCADE, related_name="posts")
+    topic = models.ForeignKey(
+        ForumTopic,
+        on_delete=models.CASCADE,
+        related_name="posts",
+    )
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     content = models.TextField()
-    def __str__(self):
-        return f"{self.author} @ {self.topic}"
 
-class LearningProgress(TimeStampedModel):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    resource = models.ForeignKey(KnowledgeResource, on_delete=models.CASCADE)
-    progress_percent = models.DecimalField(max_digits=5, decimal_places=2)
-    class Meta:
-        unique_together = ("user", "resource")  # each user/resource pair only once
-    def __str__(self):
-        return f"{self.user} – {self.resource} ({self.progress_percent}%)"
+    def __str__(self) -> str:
+        return f"{self.author} @ {self.topic}"
 
 ===== END konnaxion/konnected/models.py =====
 
@@ -2108,6 +2871,7 @@ class KnowledgeResourceSerializer(serializers.ModelSerializer):
     Serialises library items (video, doc, course…) defined by the
     KnowledgeResource model in v14.
     """
+
     author = serializers.StringRelatedField(read_only=True)
 
     class Meta:
@@ -2139,6 +2903,7 @@ class EvaluationSerializer(serializers.ModelSerializer):
         - score_percent, max_score
         - appeal_status, peer_validation_required, etc.
     """
+
     user = serializers.StringRelatedField(read_only=True)
     path = serializers.PrimaryKeyRelatedField(read_only=True)
 
@@ -2152,6 +2917,7 @@ class PeerValidationSerializer(serializers.ModelSerializer):
     """
     Peer mentor validation on a given evaluation.
     """
+
     peer = serializers.StringRelatedField(read_only=True)
     evaluation = serializers.PrimaryKeyRelatedField(queryset=Evaluation.objects.all())
 
@@ -2165,6 +2931,7 @@ class PortfolioSerializer(serializers.ModelSerializer):
     """
     User skill portfolio – curated collection of KnowledgeResources.
     """
+
     user = serializers.StringRelatedField(read_only=True)
     items = serializers.PrimaryKeyRelatedField(
         queryset=KnowledgeResource.objects.all(),
@@ -2189,6 +2956,7 @@ class ExamAttemptSerializer(serializers.Serializer):
     It matches the shape used in:
       app/konnected/certifications/exam-dashboard-results/page.tsx
     """
+
     id = serializers.CharField()
     certificationPathId = serializers.CharField()
     certificationPathName = serializers.CharField()
@@ -2240,6 +3008,523 @@ class ExamAttemptSerializer(serializers.Serializer):
     )
 
 ===== END konnaxion/konnected/serializers.py =====
+
+
+===== BEGIN konnaxion/konnected/tasks.py =====
+# konnaxion/konnected/tasks.py
+from __future__ import annotations
+
+import json
+import logging
+from pathlib import Path
+from typing import Iterable, Sequence
+
+from celery import shared_task
+from django.conf import settings
+from django.utils import timezone
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Optional imports – keep this module importable even before all models exist.
+# ---------------------------------------------------------------------------
+
+try:
+    from .models import KnowledgeResource  # type: ignore[attr-defined]
+except Exception:  # pragma: no cover - defensive import for early migrations
+    KnowledgeResource = None  # type: ignore[assignment]
+
+try:
+    from .models import OfflinePackage  # type: ignore[attr-defined]
+except Exception:  # pragma: no cover - model may not exist yet
+    OfflinePackage = None  # type: ignore[assignment]
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _offline_root() -> Path:
+    """
+    Resolve the directory where offline exports/manifests are written.
+
+    By default this is <MEDIA_ROOT>/offline_packages.
+    """
+    media_root = Path(getattr(settings, "MEDIA_ROOT", "."))
+    base = media_root / "offline_packages"
+    base.mkdir(parents=True, exist_ok=True)
+    return base
+
+
+def _serialize_resource(resource: object) -> dict:
+    """
+    Minimal serialisation of a KnowledgeResource for inclusion in offline bundles.
+
+    The shape is intentionally simple and stable; the frontend's offline viewer
+    can evolve independently as long as these core keys remain available.
+    """
+    created_at = getattr(resource, "created_at", None)
+    updated_at = getattr(resource, "updated_at", None)
+
+    return {
+        "id": getattr(resource, "pk", None),
+        "title": getattr(resource, "title", None),
+        "type": getattr(resource, "type", None),
+        "url": getattr(resource, "url", None),
+        "author_id": getattr(resource, "author_id", None),
+        "created_at": created_at.isoformat() if hasattr(created_at, "isoformat") else None,
+        "updated_at": updated_at.isoformat() if hasattr(updated_at, "isoformat") else None,
+    }
+
+
+def _estimate_resource_size_mb(resource: object) -> float:
+    """
+    Best-effort size estimation for a resource, in megabytes.
+
+    We look for a few commonly-used attributes; if none is present,
+    we fall back to 0.0 to avoid over-counting.
+    """
+    candidates = (
+        getattr(resource, "size_mb", None),
+        getattr(resource, "sizeMb", None),
+        getattr(resource, "bundle_size_mb", None),
+        getattr(resource, "bundleSizeMb", None),
+    )
+    for value in candidates:
+        if value is None:
+            continue
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            continue
+    return 0.0
+
+
+def _safe_slug(value: str, fallback: str) -> str:
+    """
+    Very small, dependency-free slugifier for filenames.
+    """
+    value = (value or "").strip() or fallback
+    slug_chars: list[str] = []
+    for ch in value:
+        slug_chars.append(ch.lower() if ch.isalnum() else "-")
+    slug = "".join(slug_chars).strip("-")
+    return slug or fallback
+
+
+def _ensure_offline_package_model():
+    """
+    Return the OfflinePackage model or raise a clear error if it is missing.
+    """
+    if OfflinePackage is None:
+        msg = (
+            "OfflinePackage model is not available. "
+            "Define the model in konnaxion.konnected.models and run migrations "
+            "before using offline package tasks."
+        )
+        raise RuntimeError(msg)
+    return OfflinePackage
+
+
+def _select_resources_for_package(package: object) -> Iterable[object]:
+    """
+    Return an iterable of KnowledgeResource objects to include in a package.
+
+    Selection is intentionally conservative so it remains safe while the schema
+    evolves:
+
+    - If KnowledgeResource is not available, returns an empty list.
+    - Otherwise, starts from all resources ordered by id.
+    - Optionally applies filters based on fields present on the OfflinePackage:
+        * include_types / includeTypes  -> KnowledgeResource.type
+        * subject_filter                -> KnowledgeResource.subject (if present)
+        * level_filter                  -> KnowledgeResource.level (if present)
+        * language_filter               -> KnowledgeResource.language (if present)
+
+    Any filter whose corresponding field does not yet exist on the model is
+    silently ignored.
+    """
+    if KnowledgeResource is None:
+        return []
+
+    qs = KnowledgeResource.objects.all().order_by("id")  # type: ignore[union-attr]
+
+    # ---- Type filter -------------------------------------------------------
+    include_types = getattr(package, "include_types", None) or getattr(
+        package,
+        "includeTypes",
+        None,
+    )
+    if include_types:
+        if isinstance(include_types, str):
+            include_types_list = [t.strip() for t in include_types.split(",") if t.strip()]
+        else:
+            include_types_list = list(include_types)
+        if include_types_list:
+            try:
+                qs = qs.filter(type__in=include_types_list)
+            except Exception:
+                # If the filter fails for any reason, fall back to the unfiltered qs.
+                pass
+
+    # ---- Subject / level / language filters (optional) --------------------
+    # Only apply where both the package and model expose matching attributes.
+    filters: dict[str, str] = {}
+    for field, pkg_attr in (
+        ("subject", "subject_filter"),
+        ("level", "level_filter"),
+        ("language", "language_filter"),
+    ):
+        value = getattr(package, pkg_attr, None)
+        if value in (None, ""):
+            continue
+        if hasattr(KnowledgeResource, field):  # type: ignore[arg-type]
+            filters[field] = value
+
+    if filters:
+        try:
+            qs = qs.filter(**filters)
+        except Exception:
+            # Ignore filter errors and return the broader queryset.
+            pass
+
+    return qs
+
+
+def _enforce_size_limit(resources: Sequence[object], max_size_mb: float | None) -> list[object]:
+    """
+    Apply an approximate max-size constraint to the given resources.
+
+    If max_size_mb is None or <= 0, the input sequence is returned as a list.
+    Otherwise, resources are accumulated until the size limit would be exceeded.
+    """
+    if max_size_mb is None or max_size_mb <= 0:
+        return list(resources)
+
+    selected: list[object] = []
+    total = 0.0
+
+    for res in resources:
+        size = _estimate_resource_size_mb(res)
+        # Always include at least the first resource, even if it exceeds the limit.
+        if selected and total + size > max_size_mb:
+            break
+        selected.append(res)
+        total += size
+
+    return selected
+
+
+def _write_package_manifest(package: object, resources: Sequence[object]) -> Path:
+    """
+    Write a JSON manifest for an OfflinePackage and return the file path.
+
+    The manifest currently includes:
+    - package metadata (id, name, filters)
+    - generation timestamp
+    - a list of serialised KnowledgeResource items
+    """
+    base_dir = _offline_root()
+    package_id = getattr(package, "pk", "unknown")
+    name = getattr(package, "name", "") or f"package-{package_id}"
+    slug = _safe_slug(name, f"package-{package_id}")
+    timestamp = timezone.now().strftime("%Y%m%d-%H%M%S")
+    filename = f"offline_pkg_{slug}_{timestamp}.json"
+    path = base_dir / filename
+
+    package_meta = {
+        "id": package_id,
+        "name": getattr(package, "name", None),
+        "description": getattr(package, "description", None),
+        "target_device_type": getattr(package, "target_device_type", None)
+        or getattr(package, "targetDeviceType", None),
+        "max_size_mb": getattr(package, "max_size_mb", None)
+        or getattr(package, "maxSizeMb", None),
+        "include_types": list(
+            getattr(package, "include_types", None)
+            or getattr(package, "includeTypes", None)
+            or [],
+        ),
+        "subject_filter": getattr(package, "subject_filter", None),
+        "level_filter": getattr(package, "level_filter", None),
+        "language_filter": getattr(package, "language_filter", None),
+    }
+
+    manifest = {
+        "package": package_meta,
+        "generated_at": timezone.now().isoformat(),
+        "items": [_serialize_resource(res) for res in resources],
+    }
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(manifest, f, ensure_ascii=False, indent=2)
+
+    return path
+
+
+def _update_package_resources(package: object, resources: Sequence[object]) -> None:
+    """
+    Attach the selected resources to the package via a ManyToMany relation, if present.
+
+    Expected future schema: OfflinePackage.resources -> KnowledgeResource.m2m.
+    If the relation does not exist yet, this is a no-op.
+    """
+    rel = getattr(package, "resources", None)
+    if rel is None:
+        # M2M relation not defined yet – nothing to do.
+        return
+
+    try:
+        rel.set(resources)
+    except Exception:
+        logger.exception(
+            "Failed to update resources for OfflinePackage #%s",
+            getattr(package, "pk", "?"),
+        )
+
+
+def _set_package_status(
+    package: object,
+    *,
+    status: str | None = None,
+    progress: float | None = None,
+    error: str | None = None,
+    item_count: int | None = None,
+    total_size_mb: float | None = None,
+    last_built_at=None,
+    bundle_path: Path | str | None = None,
+) -> None:
+    """
+    Update common OfflinePackage fields in a defensive way.
+
+    This helper deliberately avoids `update_fields` so it stays safe even if the
+    exact field set changes; unknown attributes simply become transient and are
+    ignored by the ORM.
+    """
+    if status is not None:
+        setattr(package, "status", status)
+
+    if progress is not None:
+        setattr(package, "build_progress_percent", float(progress))
+
+    if error is not None:
+        setattr(package, "last_error_message", error)
+    elif error is None and getattr(package, "last_error_message", None):
+        # Clear stale errors on success.
+        setattr(package, "last_error_message", None)
+
+    if item_count is not None:
+        setattr(package, "item_count", int(item_count))
+
+    if total_size_mb is not None:
+        setattr(package, "total_size_mb", float(total_size_mb))
+
+    if last_built_at is not None:
+        setattr(package, "last_built_at", last_built_at)
+
+    if bundle_path is not None:
+        setattr(package, "bundle_path", str(bundle_path))
+
+    try:
+        package.save()  # type: ignore[call-arg]
+    except Exception:
+        logger.exception(
+            "Failed to save OfflinePackage #%s",
+            getattr(package, "pk", "?"),
+        )
+
+
+# ---------------------------------------------------------------------------
+# Celery tasks
+# ---------------------------------------------------------------------------
+
+
+@shared_task()
+def export_knowledge_resources_for_offline() -> str:
+    """
+    Generate a JSON dump of all KnowledgeResource rows for offline use.
+
+    The resulting file is written into <MEDIA_ROOT>/offline_packages and the
+    absolute filesystem path is returned as the task result.
+    """
+    if KnowledgeResource is None:
+        msg = "KnowledgeResource model not available; cannot export offline data."
+        logger.warning(msg)
+        return ""
+
+    base_dir = _offline_root()
+    timestamp = timezone.now().strftime("%Y%m%d-%H%M%S")
+    out_path = base_dir / f"knowledge_resources_{timestamp}.json"
+
+    items: list[dict] = []
+    # Use iterator() to avoid loading everything into memory at once.
+    qs = KnowledgeResource.objects.all().order_by("id")  # type: ignore[union-attr]
+    for res in qs.iterator():
+        items.append(_serialize_resource(res))
+
+    payload = {
+        "generated_at": timezone.now().isoformat(),
+        "count": len(items),
+        "items": items,
+    }
+
+    with out_path.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+    logger.info("Exported %s knowledge resources to %s", len(items), out_path)
+    return str(out_path)
+
+
+@shared_task()
+def build_offline_package(package_id: int | str) -> dict:
+    """
+    Build or rebuild a single OfflinePackage.
+
+    This task:
+    - Resolves candidate KnowledgeResource rows according to the package filters.
+    - Applies an optional maxSizeMb constraint.
+    - Writes a JSON manifest for the bundle under <MEDIA_ROOT>/offline_packages.
+    - Updates the package's status / counts / size metrics.
+
+    The return value is a small summary dict suitable for logging or debugging.
+    """
+    model = _ensure_offline_package_model()
+
+    try:
+        package = model.objects.get(pk=package_id)  # type: ignore[attr-defined]
+    except model.DoesNotExist:  # type: ignore[attr-defined]
+        logger.error("OfflinePackage #%s does not exist; skipping build.", package_id)
+        return {"id": package_id, "status": "missing"}
+
+    logger.info(
+        "Starting build for OfflinePackage #%s (%s)",
+        getattr(package, "pk", None),
+        getattr(package, "name", ""),
+    )
+
+    # Mark as building before doing any heavy work.
+    _set_package_status(package, status="building", progress=0.0, error=None)
+
+    if KnowledgeResource is None:
+        error = "KnowledgeResource model not available; cannot build offline package."
+        logger.error(error)
+        _set_package_status(package, status="failed", progress=0.0, error=error)
+        return {
+            "id": getattr(package, "pk", package_id),
+            "status": "failed",
+            "error": error,
+        }
+
+    try:
+        # Resolve candidate resources and optional max size.
+        qs = _select_resources_for_package(package)
+        max_size_raw = getattr(package, "max_size_mb", None) or getattr(
+            package,
+            "maxSizeMb",
+            None,
+        )
+        try:
+            max_size_value: float | None
+            max_size_value = float(max_size_raw) if max_size_raw is not None else None
+        except (TypeError, ValueError):
+            max_size_value = None
+
+        # Evaluate queryset and enforce size constraint (if any).
+        resources = list(qs)
+        resources = _enforce_size_limit(resources, max_size_value)
+
+        total_size_mb = sum(_estimate_resource_size_mb(r) for r in resources)
+        manifest_path = _write_package_manifest(package, resources)
+        _update_package_resources(package, resources)
+
+        now = timezone.now()
+        _set_package_status(
+            package,
+            status="ready",
+            progress=100.0,
+            error=None,
+            item_count=len(resources),
+            total_size_mb=total_size_mb,
+            last_built_at=now,
+            bundle_path=manifest_path,
+        )
+
+        logger.info(
+            "OfflinePackage #%s built successfully: %s items, %.2f MB (manifest: %s)",
+            getattr(package, "pk", None),
+            len(resources),
+            total_size_mb,
+            manifest_path,
+        )
+
+        return {
+            "id": getattr(package, "pk", package_id),
+            "status": getattr(package, "status", None),
+            "item_count": len(resources),
+            "total_size_mb": total_size_mb,
+            "manifest_path": str(manifest_path),
+        }
+
+    except Exception as exc:  # pragma: no cover - defensive logging
+        error = f"{exc.__class__.__name__}: {exc}"
+        logger.exception(
+            "Failed to build OfflinePackage #%s",
+            getattr(package, "pk", package_id),
+        )
+        _set_package_status(
+            package,
+            status="failed",
+            progress=0.0,
+            error=error,
+        )
+        return {
+            "id": getattr(package, "pk", package_id),
+            "status": "failed",
+            "error": error,
+        }
+
+
+@shared_task()
+def build_offline_packages_for_auto_sync() -> int:
+    """
+    Enqueue builds for all OfflinePackage objects enrolled in automatic sync.
+
+    This task is intended to be scheduled by Celery beat according to the
+    OFFLINE_PACKAGE_CRON setting (see Global Parameter Reference).
+    """
+    model = OfflinePackage
+    if model is None:
+        logger.warning(
+            "OfflinePackage model not available; auto-sync task has nothing to do.",
+        )
+        return 0
+
+    qs = model.objects.all()  # type: ignore[union-attr]
+    # Prefer packages explicitly opted into automatic sync.
+    try:
+        qs = qs.filter(auto_sync=True)
+    except Exception:
+        # If the field does not exist yet, fall back to all packages.
+        pass
+
+    # Avoid scheduling duplicate work for packages already building.
+    try:
+        qs = qs.exclude(status="building")
+    except Exception:
+        # If there is no status field, just proceed with the base queryset.
+        pass
+
+    count = 0
+    for pkg in qs.iterator():
+        build_offline_package.delay(pkg.pk)
+        count += 1
+
+    logger.info("Scheduled builds for %s auto-sync offline packages.", count)
+    return count
+
+===== END konnaxion/konnected/tasks.py =====
 
 
 ===== BEGIN konnaxion/konnected/views.py =====
@@ -2676,34 +3961,1025 @@ from django.shortcuts import render
 ===== END konnaxion/kreative/views.py =====
 
 
-===== BEGIN konnaxion/media/kreative/artworks/artwork_0.png =====
-dummy content
-===== END konnaxion/media/kreative/artworks/artwork_0.png =====
+===== BEGIN konnaxion/moderation/api_views.py =====
+# backend/konnaxion/moderation/api_views.py
+"""REST API for moderation and audit-log admin endpoints.
+
+This module exposes three endpoints (to be wired in ``config/urls.py``):
+
+    GET  /admin/moderation
+    POST /admin/moderation/<id>
+    GET  /admin/audit/logs
+
+They are consumed by:
+
+  - services/admin.fetchModerationQueue
+  - services/admin.actOnReport
+  - services/audit.fetchAuditLogs
+  - the Ethikos / KonnectED admin moderation & audit UIs.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import generics, permissions, status
+from rest_framework import serializers as drf_serializers
+from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .models import AuditLogEntry, ModerationReport
+from .serializers import ModerationReportSerializer
 
 
-===== BEGIN konnaxion/media/kreative/artworks/artwork_1.png =====
-dummy content
-===== END konnaxion/media/kreative/artworks/artwork_1.png =====
+class IsModerationAdmin(permissions.BasePermission):
+    """
+    Permission class for moderation and audit endpoints.
+
+    Default behaviour:
+      - requires an authenticated user
+      - and user.is_staff or user.is_superuser
+
+    If you later introduce a dedicated "moderator" role or group,
+    you can extend ``has_permission`` accordingly (e.g. check groups).
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        user = request.user
+        if not user or not user.is_authenticated:
+            return False
+        # Keep it simple and predictable: staff/superusers only by default
+        return bool(getattr(user, "is_staff", False) or getattr(user, "is_superuser", False))
 
 
-===== BEGIN konnaxion/media/kreative/artworks/artwork_2.png =====
-dummy content
-===== END konnaxion/media/kreative/artworks/artwork_2.png =====
+class ModerationQueueView(generics.ListAPIView):
+    """
+    GET /admin/moderation
+
+    Returns the global moderation queue used by several frontends.
+
+    Response shape is intentionally simple and stable::
+
+        {
+            "items": [
+                {
+                    "id": "...",
+                    "content": "...",
+                    "reporter": "...",
+                    "type": "Spam" | "Harassment" | "Misinformation",
+                    "status": "Pending" | "Resolved" | "Escalated",
+                    ...  # optional richer fields
+                },
+                ...
+            ]
+        }
+
+    The serializer can expose additional fields (targetType, targetId,
+    severity, timestamps, etc.). Frontends are defensive and will
+    gracefully consume whatever superset you provide.
+    """
+
+    serializer_class = ModerationReportSerializer
+    permission_classes = [IsModerationAdmin]
+    pagination_class = None  # return full queue, not paginated
+
+    def get_queryset(self):
+        qs = ModerationReport.objects.all()
+
+        # Optional status filter: /admin/moderation?status=Pending
+        status_param = self.request.query_params.get("status")
+        if status_param and any(f.name == "status" for f in ModerationReport._meta.fields):
+            qs = qs.filter(status=status_param)
+
+        # Prefer created_at ordering if the field exists
+        if any(f.name == "created_at" for f in ModerationReport._meta.fields):
+            qs = qs.order_by("-created_at")
+        else:
+            qs = qs.order_by("-pk")
+
+        return qs
+
+    def list(self, request, *args, **kwargs) -> Response:  # type: ignore[override]
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        # Wrap into {items: [...]} to match services/admin.ModerationPayload
+        return Response({"items": serializer.data})
 
 
-===== BEGIN konnaxion/media/kreative/traditions/tradition_0.png =====
-dummy content
-===== END konnaxion/media/kreative/traditions/tradition_0.png =====
+class ModerationDecisionView(APIView):
+    """
+    POST /admin/moderation/<id>
+
+    Body::
+
+        { "remove": true | false }
+
+    Semantics:
+      - remove = true  → content should be removed/hidden, report resolved
+      - remove = false → content is approved/kept, report resolved
+
+    Frontends do not rely on a particular response body; a 2xx with
+    empty content is sufficient. This view returns HTTP 204 on success.
+    """
+
+    permission_classes = [IsModerationAdmin]
+
+    def post(self, request, pk: int, *args: Any, **kwargs: Any) -> Response:
+        report = get_object_or_404(ModerationReport, pk=pk)
+
+        if "remove" not in request.data:
+            raise ValidationError({"remove": "This field is required."})
+
+        remove = bool(request.data.get("remove"))
+
+        # Always mark as resolved in the moderation queue.
+        # Prefer a typed constant on the model if it exists.
+        if hasattr(report, "status"):
+            resolved_value = getattr(report, "STATUS_RESOLVED", None)
+            if resolved_value is None:
+                # Fallback to simple string value if no constant defined
+                resolved_value = "Resolved"
+            setattr(report, "status", resolved_value)
+
+        # Optional bookkeeping fields on the model, if they exist.
+        now = timezone.now()
+
+        if hasattr(report, "last_action_at"):
+            setattr(report, "last_action_at", now)
+
+        if hasattr(report, "resolved_at"):
+            setattr(report, "resolved_at", now)
+
+        if hasattr(report, "resolved_by") and getattr(request.user, "is_authenticated", False):
+            # type: ignore[assignment]
+            setattr(report, "resolved_by", request.user)
+
+        # If the domain model exposes a helper method to apply the decision
+        # to the underlying target object, call it defensively.
+        apply_fn = getattr(report, "apply_decision", None)
+        if callable(apply_fn):
+            # Recommended signature on the model::
+            #   def apply_decision(self, *, remove: bool, actor: User | None) -> None: ...
+            apply_fn(remove=remove, actor=request.user if request.user.is_authenticated else None)
+
+        # Finally persist changes on the report itself.
+        report.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-===== BEGIN konnaxion/media/kreative/traditions/tradition_1.png =====
-dummy content
-===== END konnaxion/media/kreative/traditions/tradition_1.png =====
+# ---------------------------------------------------------------------------
+# Audit-log API
+# ---------------------------------------------------------------------------
 
 
-===== BEGIN konnaxion/media/kreative/traditions/tradition_2.png =====
-dummy content
-===== END konnaxion/media/kreative/traditions/tradition_2.png =====
+class AuditLogEntrySerializer(drf_serializers.ModelSerializer):
+    """
+    Serializer aligned with services/audit.ts::LogRow.
+
+    The only difference is that ``entityId`` is backed by the ``entity_id``
+    model field.
+    """
+
+    entityId = drf_serializers.CharField(
+        source="entity_id",
+        required=False,
+        allow_blank=True,
+    )
+
+    class Meta:
+        model = AuditLogEntry
+        fields = (
+            "id",
+            "ts",
+            "actor",
+            "action",
+            "target",
+            "severity",
+            "entity",
+            "entityId",
+            "ip",
+            "status",
+            "meta",
+        )
+        read_only_fields = fields
+
+
+class AuditLogPagination(PageNumberPagination):
+    """
+    Page-number pagination matching the admin audit UI contract.
+
+    Query params:
+
+      - ``page``     – 1‑based page index
+      - ``pageSize`` – number of items per page (max 200)
+    """
+
+    page_query_param = "page"
+    page_size_query_param = "pageSize"
+    page_size = 20
+    max_page_size = 200
+
+    def get_paginated_response(self, data):
+        assert self.request is not None  # for type checkers
+        return Response(
+            {
+                "items": data,
+                "page": self.page.number,
+                "pageSize": self.get_page_size(self.request),
+                "total": self.page.paginator.count,
+            }
+        )
+
+
+class AuditLogListView(generics.ListAPIView):
+    """
+    GET /admin/audit/logs
+
+    Paginated, filterable audit log stream used by the admin UI.
+
+    Supported query params:
+
+        page      – 1-based page index (default: 1)
+        pageSize  – page size (default: 20, max: 200)
+        q         – free-text search across actor, action, target, entity
+        severity  – 'info' | 'warn' | 'critical'
+        sort      – one of 'ts', '-ts', 'actor', '-actor',
+                    'action', '-action', 'severity', '-severity',
+                    'status', '-status'
+
+    Response shape::
+
+        {
+            "items": [...],
+            "page": <int>,
+            "pageSize": <int>,
+            "total": <int>
+        }
+    """
+
+    serializer_class = AuditLogEntrySerializer
+    permission_classes = [IsModerationAdmin]
+    pagination_class = AuditLogPagination
+
+    def get_queryset(self):
+        qs = AuditLogEntry.objects.all()
+        params = self.request.query_params
+
+        severity = params.get("severity")
+        if severity:
+            qs = qs.filter(severity=severity)
+
+        q = params.get("q")
+        if q:
+            qs = qs.filter(
+                Q(actor__icontains=q)
+                | Q(action__icontains=q)
+                | Q(target__icontains=q)
+                | Q(entity__icontains=q)
+            )
+
+        sort = params.get("sort") or "-ts"
+        allowed_sorts = {
+            "ts",
+            "-ts",
+            "actor",
+            "-actor",
+            "action",
+            "-action",
+            "severity",
+            "-severity",
+            "status",
+            "-status",
+        }
+        if sort not in allowed_sorts:
+            sort = "-ts"
+
+        # Secondary order for deterministic pagination
+        return qs.order_by(sort, "-id")
+
+===== END konnaxion/moderation/api_views.py =====
+
+
+===== BEGIN konnaxion/moderation/models.py =====
+# backend/konnaxion/moderation/models.py
+from __future__ import annotations
+
+from typing import Any
+
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+# ---------------------------------------------------------------------------
+#  Enumerations
+# ---------------------------------------------------------------------------
+
+
+class ModerationTargetType(models.TextChoices):
+    TOPIC = "topic", _("Topic")
+    POST = "post", _("Post / argument")
+    USER = "user", _("User")
+    OTHER = "other", _("Other")
+
+
+class ModerationStatus(models.TextChoices):
+    # Values match what the Ethikos admin UI expects from the API
+    PENDING = "Pending", _("Pending")
+    RESOLVED = "Resolved", _("Resolved")
+    ESCALATED = "Escalated", _("Escalated")
+
+
+class ModerationSeverity(models.TextChoices):
+    LOW = "low", _("Low")
+    MEDIUM = "medium", _("Medium")
+    HIGH = "high", _("High")
+
+
+class ModerationReason(models.TextChoices):
+    # Values match admin.services.Report["type"]
+    SPAM = "Spam", _("Spam")
+    HARASSMENT = "Harassment", _("Harassment")
+    MISINFORMATION = "Misinformation", _("Misinformation")
+    OTHER = "Other", _("Other")
+
+
+class ModerationActionType(models.TextChoices):
+    APPROVE = "approve", _("Approve content")
+    REMOVE = "remove", _("Remove content")
+    ESCALATE = "escalate", _("Escalate / flag")
+    IGNORE = "ignore", _("Ignore / keep pending")
+
+
+class AuditSeverity(models.TextChoices):
+    # Matches services/audit.LogRow["severity"]
+    INFO = "info", _("Info")
+    WARN = "warn", _("Warning")
+    CRITICAL = "critical", _("Critical")
+
+
+class AuditStatus(models.TextChoices):
+    # Matches services/audit.LogRow["status"]
+    OK = "ok", _("OK")
+    WARN = "warn", _("Warning")
+    ERROR = "error", _("Error")
+
+
+# ---------------------------------------------------------------------------
+#  Moderation models
+# ---------------------------------------------------------------------------
+
+
+class ModerationCase(models.Model):
+    """
+    Canonical moderation queue entry, independent from the source system.
+
+    This aggregates one or more user reports for the same target object.
+    It is what you typically expose to `/admin/moderation` and adapt into
+    the Ethikos moderation queue shape on the API layer.
+    """
+
+    # Optional generic relation to the moderated object (topic, argument, user, etc.)
+    target_content_type = models.ForeignKey(
+        ContentType,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="moderation_cases",
+    )
+    target_object_id = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text=_("Primary key of the moderated object, stored as text."),
+    )
+    target_object = GenericForeignKey("target_content_type", "target_object_id")
+
+    # High-level identifiers expected by the frontend adapters
+    target_type = models.CharField(
+        max_length=16,
+        choices=ModerationTargetType.choices,
+        default=ModerationTargetType.POST,
+        help_text=_("UI-level category of the moderated target (topic, post, user, …)."),
+    )
+    target_id = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text=_("External identifier exposed to frontends (argumentId, topicId, userId, …)."),
+    )
+    context_title = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_("Debate / consultation context, e.g. topic title."),
+    )
+    content_preview = models.TextField(
+        blank=True,
+        help_text=_("Short snapshot of the offending content for quick review."),
+    )
+
+    # Offender metadata
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="moderation_cases_authored",
+    )
+    author_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_("Cached author label for admin views."),
+    )
+
+    # Queue state
+    status = models.CharField(
+        max_length=16,
+        choices=ModerationStatus.choices,
+        default=ModerationStatus.PENDING,
+        db_index=True,
+    )
+    severity = models.CharField(
+        max_length=8,
+        choices=ModerationSeverity.choices,
+        default=ModerationSeverity.MEDIUM,
+        db_index=True,
+    )
+    report_count = models.PositiveIntegerField(
+        default=0,
+        help_text=_("Denormalized number of merged user reports for this case."),
+    )
+
+    # Governance metadata
+    source = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text=_("Originating app or module (e.g. 'ethikos', 'keenkonnect')."),
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_action_at = models.DateTimeField(auto_now=True)
+
+    last_moderated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="moderation_cases_moderated",
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("status", "severity")),
+            models.Index(fields=("target_type", "target_id")),
+            models.Index(fields=("created_at",)),
+        ]
+        verbose_name = _("Moderation case")
+        verbose_name_plural = _("Moderation cases")
+
+    def __str__(self) -> str:
+        snippet = (self.content_preview[:40] + "…") if self.content_preview else f"#{self.pk}"
+        ctx = self.context_title or snippet
+        return f"[{self.status}] {ctx}"
+
+    def recalculate_report_count(self, *, commit: bool = True) -> int:
+        """
+        Recompute `report_count` from the related ModerationReport rows.
+        Call this from admin actions or signals if you change reports in bulk.
+        """
+        count = self.reports.count()
+        self.report_count = count
+        if commit:
+            self.save(update_fields=["report_count"])
+        return count
+
+
+class ModerationReport(models.Model):
+    """
+    Individual user report that feeds a ModerationCase.
+
+    This is the canonical storage for `/report` endpoints from any module
+    (Ethikos debates, consultations, project messages, …).
+    """
+
+    case = models.ForeignKey(
+        ModerationCase,
+        on_delete=models.CASCADE,
+        related_name="reports",
+    )
+
+    reporter = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="moderation_reports",
+    )
+    reporter_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_("Cached reporter label for admin views."),
+    )
+
+    type = models.CharField(
+        max_length=32,
+        choices=ModerationReason.choices,
+        default=ModerationReason.SPAM,
+        help_text=_("Primary moderation reason label."),
+    )
+    message = models.TextField(
+        blank=True,
+        help_text=_("Optional free-text notes supplied by the reporter."),
+    )
+
+    meta = models.JSONField(
+        blank=True,
+        default=dict,
+        help_text=_("Arbitrary JSON payload with source-specific details."),
+    )
+    ip_address = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text=_("Source IP address of the reporter, if tracked."),
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("type",)),
+            models.Index(fields=("created_at",)),
+        ]
+        verbose_name = _("Moderation report")
+        verbose_name_plural = _("Moderation reports")
+
+    def __str__(self) -> str:
+        return f"{self.get_type_display()} on case #{self.case_id}"
+
+
+class ModerationAction(models.Model):
+    """
+    Moderator decision attached to a ModerationCase.
+
+    You can use this to drive the queue (approve/remove/escalate) and
+    optionally link it to an AuditLogEntry for full traceability.
+    """
+
+    case = models.ForeignKey(
+        ModerationCase,
+        on_delete=models.CASCADE,
+        related_name="actions",
+    )
+    moderator = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="moderation_actions",
+    )
+    action = models.CharField(
+        max_length=16,
+        choices=ModerationActionType.choices,
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text=_("Optional internal notes from the moderator."),
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    audit_entry = models.ForeignKey(
+        "AuditLogEntry",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="moderation_actions",
+        help_text=_("Optional link to the audit log entry for this decision."),
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+        verbose_name = _("Moderation action")
+        verbose_name_plural = _("Moderation actions")
+
+    def __str__(self) -> str:
+        return f"{self.get_action_display()} on case #{self.case_id}"
+
+
+# ---------------------------------------------------------------------------
+#  Audit log model
+# ---------------------------------------------------------------------------
+
+
+class AuditLogEntry(models.Model):
+    """
+    Canonical audit log entry used by Ethikos admin and other apps.
+
+    It is intentionally aligned with `services/audit.ts`'s `LogRow`:
+      - `id`       → primary key
+      - `ts`       → timestamp
+      - `actor`    → denormalised actor label
+      - `action`   → logical action identifier
+      - `target`   → human-readable context
+      - `severity` → 'info' | 'warn' | 'critical'
+      - `entity`   → machine entity type (topic, argument, user, …)
+      - `entityId` → comes from `entity_id` here
+      - `ip`       → source IP
+      - `status`   → 'ok' | 'warn' | 'error'
+      - `meta`     → JSON blob
+    """
+
+    ts = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+        help_text=_("Timestamp when the event occurred."),
+    )
+
+    # Optional structured link to the actor
+    actor_user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="audit_entries",
+        help_text=_("Optional link to the user that triggered the event."),
+    )
+    actor = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_("Denormalized actor label exposed in the API."),
+    )
+
+    action = models.CharField(
+        max_length=128,
+        help_text=_("Logical action identifier, e.g. 'UPDATE_TOPIC'."),
+    )
+    target = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text=_("Human-readable target used in the admin UI."),
+    )
+
+    entity = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text=_("Machine-oriented entity type, e.g. 'topic', 'argument', 'user'."),
+    )
+    entity_id = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text=_("Primary key of the entity in the source system, stored as text."),
+    )
+
+    # Optional generic FK to the underlying object
+    entity_content_type = models.ForeignKey(
+        ContentType,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="audit_entries",
+    )
+    entity_object_id = models.CharField(
+        max_length=64,
+        blank=True,
+    )
+    entity_object = GenericForeignKey("entity_content_type", "entity_object_id")
+
+    severity = models.CharField(
+        max_length=10,
+        choices=AuditSeverity.choices,
+        default=AuditSeverity.INFO,
+        db_index=True,
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=AuditStatus.choices,
+        default=AuditStatus.OK,
+        db_index=True,
+    )
+    ip = models.GenericIPAddressField(
+        null=True,
+        blank=True,
+        help_text=_("Source IP address, if available."),
+    )
+    meta = models.JSONField(
+        blank=True,
+        default=dict,
+        help_text=_("Free-form JSON payload with extra context for the event."),
+    )
+
+    class Meta:
+        ordering = ("-ts",)
+        indexes = [
+            models.Index(fields=("ts",)),
+            models.Index(fields=("severity",)),
+            models.Index(fields=("status",)),
+            models.Index(fields=("entity", "entity_id")),
+        ]
+        verbose_name = _("Audit log entry")
+        verbose_name_plural = _("Audit log entries")
+
+    def __str__(self) -> str:
+        return f"{self.ts.isoformat()} {self.action}"
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        """
+        Ensure `actor` is filled when a structured `actor_user` exists.
+        """
+        if self.actor_user and not self.actor:
+            # Prefer get_username() when available
+            get_username = getattr(self.actor_user, "get_username", None)
+            self.actor = get_username() if callable(get_username) else str(self.actor_user)
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def log(
+        cls,
+        *,
+        actor_user: Any | None = None,
+        actor: str | None = None,
+        action: str,
+        target: str | None = None,
+        entity: str | None = None,
+        entity_id: str | int | None = None,
+        severity: AuditSeverity | str = AuditSeverity.INFO,
+        status: AuditStatus | str = AuditStatus.OK,
+        ip: str | None = None,
+        meta: dict[str, Any] | None = None,
+    ) -> "AuditLogEntry":
+        """
+        Convenience helper to create an audit entry from application code.
+
+        Example::
+
+            AuditLogEntry.log(
+                actor_user=request.user,
+                action="UPDATE_TOPIC",
+                target=topic.title,
+                entity="topic",
+                entity_id=topic.pk,
+                severity=AuditSeverity.INFO,
+                status=AuditStatus.OK,
+                meta={"topic_id": topic.pk},
+            )
+        """
+        if entity_id is not None and not isinstance(entity_id, str):
+            entity_id = str(entity_id)
+
+        entry = cls(
+            actor_user=actor_user,
+            actor=actor or "",
+            action=action,
+            target=target or "",
+            entity=entity or "",
+            entity_id=entity_id or "",
+            severity=severity,
+            status=status,
+            ip=ip,
+            meta=meta or {},
+        )
+        entry.save()
+        return entry
+
+===== END konnaxion/moderation/models.py =====
+
+
+===== BEGIN konnaxion/moderation/serializers.py =====
+# backend/konnaxion/moderation/serializers.py
+
+from __future__ import annotations
+
+from rest_framework import serializers
+
+from .models import AuditLogEntry, ModerationReport
+
+
+__all__ = [
+    "ModerationReportSerializer",
+    "ModerationActionSerializer",
+    "AuditLogEntrySerializer",
+]
+
+
+class ModerationReportSerializer(serializers.ModelSerializer):
+    """
+    Serializer used by the admin moderation UIs.
+
+    It exposes both:
+      - the original minimal moderation shape used by services/admin.Report
+        (id, content, reporter, type, status)
+      - richer fields consumed by the newer Ethikos/KonnectED moderation pages.
+
+    The underlying DB model is ModerationReport, but many queue-related
+    fields are denormalised on the related ModerationCase and exposed here
+    via `source="case.*"`.
+    """
+
+    # ------------------------------------------------------------------
+    # Legacy Admin UI shape (services/admin.Report)
+    # ------------------------------------------------------------------
+
+    # Short preview of the offending content, taken from the ModerationCase.
+    content = serializers.CharField(
+        source="case.content_preview",
+        read_only=True,
+    )
+
+    # Primary moderation reason; matches ModerationReason values
+    # ("Spam", "Harassment", "Misinformation", …).
+    type = serializers.CharField()
+
+    # Queue-level state and severity from the ModerationCase.
+    status = serializers.CharField(source="case.status", read_only=True)
+    severity = serializers.CharField(source="case.severity", read_only=True)
+
+    # Human-readable relations
+    reporter = serializers.StringRelatedField(read_only=True)
+    author = serializers.StringRelatedField(source="case.author", read_only=True)
+
+    # High-level identifiers from the ModerationCase
+    target_type = serializers.CharField(source="case.target_type", read_only=True)
+    target_id = serializers.CharField(source="case.target_id", read_only=True)
+
+    created_at = serializers.DateTimeField(source="case.created_at", read_only=True)
+    # Backwards-compatible alias: some code expects `updated_at`; we map it
+    # to the last moderation action timestamp on the case.
+    updated_at = serializers.DateTimeField(source="case.last_action_at", read_only=True)
+
+    # ------------------------------------------------------------------
+    # CamelCase aliases for Ethikos / KonnectED adapters
+    # ------------------------------------------------------------------
+
+    targetType = serializers.CharField(source="case.target_type", read_only=True)
+    targetId = serializers.CharField(source="case.target_id", read_only=True)
+
+    createdAt = serializers.DateTimeField(source="case.created_at", read_only=True)
+    lastActionAt = serializers.DateTimeField(source="case.last_action_at", read_only=True)
+
+    reporterName = serializers.SerializerMethodField()
+    authorName = serializers.SerializerMethodField()
+
+    # Some adapters look at `reason` while others use `type`.
+    # Expose both; they are the same logical field.
+    reason = serializers.CharField(source="type", read_only=True)
+
+    # Reporter free-text message / notes (stored on ModerationReport)
+    reporterMessage = serializers.CharField(
+        source="message",
+        allow_blank=True,
+        required=False,
+    )
+
+    # Denormalised number of merged reports for this case
+    reportCount = serializers.IntegerField(
+        source="case.report_count",
+        read_only=True,
+        default=1,
+    )
+
+    class Meta:
+        model = ModerationReport
+        fields = (
+            # Core moderation payload expected by services/admin.Report
+            "id",
+            "content",
+            "reporter",
+            "type",
+            "status",
+            # Extended queue metadata
+            "reason",
+            "severity",
+            "message",
+            "author",
+            "target_type",
+            "target_id",
+            "created_at",
+            "updated_at",
+            # Aliases / enriched fields for richer UIs
+            "targetType",
+            "targetId",
+            "createdAt",
+            "lastActionAt",
+            "reporterName",
+            "authorName",
+            "reporterMessage",
+            "reportCount",
+        )
+        read_only_fields = (
+            "id",
+            "status",
+            "severity",
+            "reporter",
+            "author",
+            "target_type",
+            "target_id",
+            "created_at",
+            "updated_at",
+            "targetType",
+            "targetId",
+            "createdAt",
+            "lastActionAt",
+            "reportCount",
+        )
+
+    # ------------------------------------------------------------------
+    # Name helpers
+    # ------------------------------------------------------------------
+
+    def get_reporterName(self, obj: ModerationReport) -> str:
+        """
+        Prefer the cached reporter_name if present,
+        otherwise derive from the related User.
+        """
+        if getattr(obj, "reporter_name", ""):
+            return obj.reporter_name
+
+        user = getattr(obj, "reporter", None)
+        if user is None:
+            return ""
+
+        name = getattr(user, "name", None)
+        if name:
+            return name
+
+        get_username = getattr(user, "get_username", None)
+        if callable(get_username):
+            return get_username() or str(user)
+
+        return str(user)
+
+    def get_authorName(self, obj: ModerationReport) -> str:
+        """
+        Prefer the cached author_name on the ModerationCase if present,
+        otherwise derive from the related author User.
+        """
+        case = getattr(obj, "case", None)
+        if case is None:
+            return ""
+
+        if getattr(case, "author_name", ""):
+            return case.author_name
+
+        user = getattr(case, "author", None)
+        if user is None:
+            return ""
+
+        name = getattr(user, "name", None)
+        if name:
+            return name
+
+        get_username = getattr(user, "get_username", None)
+        if callable(get_username):
+            return get_username() or str(user)
+
+        return str(user)
+
+
+class ModerationActionSerializer(serializers.Serializer):
+    """
+    Payload used by POST admin/moderation/{id}/ from the frontend.
+
+    Field:
+        remove: if true, the offending content is removed and the report is
+                marked as resolved; if false, the content is approved and
+                the report is simply resolved.
+    """
+
+    remove = serializers.BooleanField()
+
+
+class AuditLogEntrySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the canonical audit-log row shape consumed by
+    services/audit.ts (LogRow).
+    """
+
+    # Frontend expects `entityId`; the model stores `entity_id`.
+    entityId = serializers.CharField(source="entity_id", read_only=True)
+
+    class Meta:
+        model = AuditLogEntry
+        fields = (
+            "id",
+            "ts",
+            "actor",
+            "action",
+            "target",
+            "severity",
+            "entity",
+            "entityId",
+            "ip",
+            "status",
+            "meta",
+        )
+        read_only_fields = fields
+
+===== END konnaxion/moderation/serializers.py =====
 
 
 ===== BEGIN konnaxion/static/css/project.css =====
@@ -3276,6 +5552,296 @@ dummy content
 ===== END konnaxion/templates/users/user_form.html =====
 
 
+===== BEGIN konnaxion/trust/models.py =====
+# konnaxion/trust/models.py
+from __future__ import annotations
+
+from django.conf import settings
+from django.db import models
+
+__all__ = ["Credential"]
+
+
+class Credential(models.Model):
+    """
+    Real‑world credential uploaded by a user for the Trust module.
+
+    This model backs:
+      - The Trust credentials UI (Ethikos > Trust > Credentials).
+      - The `CredentialSerializer` in `konnaxion/trust/serializers.py`.
+    """
+
+    class Status(models.TextChoices):
+        # Values and labels are kept identical so the API can safely expose
+        # "Pending" | "Verified" | "Rejected" to the frontend.
+        PENDING = "Pending", "Pending"
+        VERIFIED = "Verified", "Verified"
+        REJECTED = "Rejected", "Rejected"
+
+    # Owner of the credential
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="trust_credentials",
+        help_text="User who submitted this credential.",
+    )
+
+    # Basic metadata
+    title = models.CharField(
+        max_length=255,
+        help_text="Short title, e.g. 'MSc Climate Policy'.",
+    )
+    issuer = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Issuing institution or body.",
+    )
+    issued_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When the credential was issued (if known).",
+    )
+
+    # Uploaded document (PDF / JPG / PNG, etc.)
+    file = models.FileField(
+        upload_to="trust/credentials/%Y/%m/%d",
+        blank=True,
+        null=True,
+        help_text="Binary document attached to this credential.",
+    )
+
+    # Review state + notes (managed by stewards/admins)
+    status = models.CharField(
+        max_length=16,
+        choices=Status.choices,
+        default=Status.PENDING,
+        help_text="Review status in the trust workflow.",
+    )
+    notes = models.TextField(
+        blank=True,
+        help_text="Optional reviewer notes shown read‑only in the UI.",
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("user", "status")),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.title} ({self.user})"
+
+    # ------------------------------------------------------------------
+    # Compatibility alias for serializers
+    # ------------------------------------------------------------------
+    @property
+    def document(self):
+        """
+        Alias to the underlying `file` field.
+
+        `konnaxion/trust/serializers.py` looks for a `document` attribute
+        when building the public URL; exposing this property keeps that
+        serializer working without duplicating the storage field.
+        """
+        return self.file
+
+===== END konnaxion/trust/models.py =====
+
+
+===== BEGIN konnaxion/trust/serializers.py =====
+# backend/konnaxion/trust/serializers.py
+
+from __future__ import annotations
+
+from typing import Optional
+
+from rest_framework import serializers
+
+from .models import Credential
+
+__all__ = ["CredentialSerializer"]
+
+
+class CredentialSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user-submitted real‑world credentials used in the Trust module.
+
+    It matches the `Credential` / `CredentialRow` shape used on the frontend:
+      - services/trust.ts  → interface Credential
+      - app/ethikos/trust/credentials/page.tsx → type CredentialRow
+    """
+
+    # Frontend expects `issuedAt` (camelCase), mapped to model field `issued_at`.
+    issuedAt = serializers.DateTimeField(
+        source="issued_at",
+        required=False,
+        allow_null=True,
+        format=None,  # ISO 8601
+    )
+
+    # Upload field: the raw file coming from the client, mapped to the model's
+    # FileField (assumed to be named `document`).
+    # This is write‑only and is not exposed in responses.
+    file = serializers.FileField(
+        write_only=True,
+        required=True,
+        source="document",
+    )
+
+    # Public URL to the stored document (built from FileField).
+    url = serializers.SerializerMethodField()
+
+    # Human-readable review status ("Verified" | "Pending" | "Rejected").
+    status = serializers.SerializerMethodField()
+
+    # Optional reviewer notes; exposed read-only to the end-user.
+    notes = serializers.CharField(
+        read_only=True,
+        allow_blank=True,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = Credential
+        fields = (
+            "id",
+            "title",
+            "issuer",
+            "issuedAt",
+            "url",
+            "status",
+            "notes",
+            "file",  # write-only input for uploads
+        )
+        read_only_fields = (
+            "id",
+            "url",
+            "status",
+            "notes",
+        )
+        extra_kwargs = {
+            "title": {"required": False, "allow_blank": True},
+            "issuer": {"required": False, "allow_blank": True},
+        }
+
+    # ------------------------------------------------------------------
+    # Creation
+    # ------------------------------------------------------------------
+
+    def create(self, validated_data: dict) -> Credential:
+        """
+        Create a new Credential attached to the current user.
+
+        Behaviour:
+        - `file` (document) is required.
+        - `title` defaults to a cleaned-up version of the filename if omitted.
+        - `issuer` is optional, defaults to empty string.
+        - `issued_at` is optional and may be null.
+        - `status` is initialised as a "pending" value.
+        - `notes` is set to a default review message.
+        """
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+
+        if user is None or not getattr(user, "is_authenticated", False):
+            raise serializers.ValidationError(
+                {"non_field_errors": ["Authentication required to upload credentials."]}
+            )
+
+        # Because `file` is declared with source="document",
+        # the validated key here is "document".
+        document = validated_data.pop("document", None)
+        if document is None:
+            raise serializers.ValidationError({"file": ["This field is required."]})
+
+        title: Optional[str] = validated_data.get("title") or None
+        issuer: str = (validated_data.get("issuer") or "").strip()
+        issued_at = validated_data.get("issued_at")
+
+        # Derive title from filename if not provided
+        if not title and getattr(document, "name", None):
+            fname = document.name
+            base = fname.rsplit(".", 1)[0]
+            base = base.replace("_", " ").replace("-", " ").strip()
+            title = base or "Untitled credential"
+
+        # Resolve an appropriate "pending" status value.
+        status_value = None
+        status_enum = getattr(Credential, "Status", None)
+        if status_enum is not None and hasattr(status_enum, "PENDING"):
+            status_value = status_enum.PENDING
+        elif hasattr(Credential, "STATUS_PENDING"):
+            status_value = getattr(Credential, "STATUS_PENDING")
+        else:
+            # Fallback string; the display label will be normalised by get_status()
+            status_value = "pending"
+
+        default_notes = getattr(
+            Credential,
+            "DEFAULT_PENDING_NOTES",
+            "Awaiting manual verification",
+        )
+
+        credential = Credential.objects.create(
+            user=user,
+            title=title or "Untitled credential",
+            issuer=issuer,
+            issued_at=issued_at,
+            document=document,
+            status=status_value,
+            notes=default_notes,
+        )
+        return credential
+
+    # ------------------------------------------------------------------
+    # Computed fields
+    # ------------------------------------------------------------------
+
+    def get_url(self, obj: Credential) -> Optional[str]:
+        """
+        Returns an absolute URL to the uploaded document, if available.
+
+        Prefers a FileField named `document`, but will also fall back to `file`
+        if present on the model.
+        """
+        file_field = getattr(obj, "document", None) or getattr(obj, "file", None)
+        if not file_field:
+            return None
+
+        try:
+            relative_url = file_field.url
+        except Exception:
+            # File may not exist in storage yet
+            return None
+
+        request = self.context.get("request")
+        if request is not None:
+            return request.build_absolute_uri(relative_url)
+        return relative_url
+
+    def get_status(self, obj: Credential) -> Optional[str]:
+        """
+        Returns a human‑friendly review status string for the UI.
+
+        If the model defines `get_status_display()` (e.g. via Django `choices`),
+        that label is used; otherwise, the raw value is title‑cased.
+        """
+        display = getattr(obj, "get_status_display", None)
+        if callable(display):
+            return display()
+
+        raw = getattr(obj, "status", None)
+        if isinstance(raw, str):
+            return raw.replace("_", " ").title()
+        return raw
+
+===== END konnaxion/trust/serializers.py =====
+
+
 ===== BEGIN konnaxion/urls.py =====
 # konnaxion/urls.py
 
@@ -3349,19 +5915,19 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
 
 
 ===== BEGIN konnaxion/users/admin.py =====
+# konnaxion/users/admin.py
 from allauth.account.decorators import secure_admin_login
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from .forms import UserAdminChangeForm
-from .forms import UserAdminCreationForm
+from .forms import UserAdminChangeForm, UserAdminCreationForm
 from .models import User
 
-if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
-    # Force the `admin` sign in process to go through the `django-allauth` workflow:
-    # https://docs.allauth.org/en/latest/common/admin.html#admin
+if getattr(settings, "DJANGO_ADMIN_FORCE_ALLAUTH", False):
+    # Force the `admin` sign-in process to go through django‑allauth.
     admin.autodiscover()
     admin.site.login = secure_admin_login(admin.site.login)  # type: ignore[method-assign]
 
@@ -3370,9 +5936,60 @@ if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
 class UserAdmin(auth_admin.UserAdmin):
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
+
+    # ---- Avatar helpers (safe even if no avatar field exists yet) ----
+    def _avatar_url(self, obj: User) -> str:
+        """
+        Resolve the best available avatar URL for this user:
+        - If a file field exists (avatar_file / avatar / profile_image / image), use its .url.
+        - Else if an explicit avatar_url attribute or property exists, use it.
+        - Else fall back to the default image in MEDIA: /kreative/artworks/default_profile.png.
+        """
+        # 1) Common file-field names we may add later
+        for fname in ("avatar_file", "avatar", "profile_image", "image"):
+            f = getattr(obj, fname, None)
+            if f:
+                url = getattr(f, "url", None) or str(f)
+                if url:
+                    return url
+
+        # 2) Optional computed/explicit URL
+        candidate = getattr(obj, "avatar_url", None)
+        if callable(candidate):
+            try:
+                candidate = candidate()
+            except Exception:
+                candidate = None
+        if isinstance(candidate, str) and candidate:
+            return candidate
+
+        # 3) Default placeholder in MEDIA
+        media_url = getattr(settings, "MEDIA_URL", "/media/")
+        return f"{media_url.rstrip('/')}/kreative/artworks/default_profile.png"
+
+    @admin.display(description=_("Avatar"))
+    def thumbnail(self, obj: User) -> str:
+        url = self._avatar_url(obj)
+        return format_html(
+            '<img src="{}" alt="avatar" style="height:32px;width:32px;'
+            "border-radius:50%;object-fit:cover;vertical-align:middle;\"/>",
+            url,
+        )
+
+    @admin.display(description=_("Preview"))
+    def avatar_preview(self, obj: User) -> str:
+        url = self._avatar_url(obj)
+        return format_html(
+            '<img src="{}" alt="avatar preview" style="height:96px;width:96px;'
+            'border-radius:50%;object-fit:cover;border:1px solid #e5e5e5;"/>',
+            url,
+        )
+
+    # ---- Admin layout ----
     fieldsets = (
         (None, {"fields": ("username", "password")}),
         (_("Personal info"), {"fields": ("name", "email")}),
+        (_("Profile image"), {"fields": ("avatar_preview",)}),  # read‑only preview
         (
             _("Permissions"),
             {
@@ -3387,8 +6004,12 @@ class UserAdmin(auth_admin.UserAdmin):
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
-    list_display = ["username", "name", "is_superuser"]
-    search_fields = ["name"]
+    readonly_fields = ("avatar_preview",)
+
+    list_display = ["thumbnail", "username", "name", "email", "is_staff", "is_superuser"]
+    list_filter = ["is_staff", "is_superuser", "is_active", "groups"]
+    search_fields = ["username", "name", "email"]
+    ordering = ["username"]
 
 ===== END konnaxion/users/admin.py =====
 
@@ -3399,50 +6020,135 @@ class UserAdmin(auth_admin.UserAdmin):
 
 
 ===== BEGIN konnaxion/users/api/serializers.py =====
+# backend/konnaxion/users/api/serializers.py
+
+from __future__ import annotations
+
+from urllib.parse import urlparse
+
+from django.conf import settings
 from rest_framework import serializers
 
 from konnaxion.users.models import User
 
 
+# Optional project-level override in settings.py:
+# DEFAULT_AVATAR_PATH = "kreative/artworks/default_profile.png"
+DEFAULT_AVATAR_PATH = getattr(
+    settings, "DEFAULT_AVATAR_PATH", "kreative/artworks/default_profile.png"
+)
+
+
+def _is_absolute(url: str) -> bool:
+    try:
+        p = urlparse(url)
+        return p.scheme in ("http", "https")
+    except Exception:
+        return False
+
+
+def _join_media_url(path: str) -> str:
+    """
+    Join MEDIA_URL and a relative media path into a single URL string.
+    Works whether MEDIA_URL is absolute (e.g. https://cdn/...) or relative (/media/).
+    """
+    base = (settings.MEDIA_URL or "/media/").rstrip("/")
+    rel = path.lstrip("/")
+    return f"{base}/{rel}"
+
+
 class UserSerializer(serializers.ModelSerializer[User]):
+    # Exposed to the frontend: absolute URL for the user's avatar (or default)
+    avatar_url = serializers.SerializerMethodField()
+
     class Meta:
         model = User
-        fields = ["username", "name", "url"]
-
+        fields = ["username", "name", "url", "avatar_url"]
         extra_kwargs = {
             "url": {"view_name": "api:user-detail", "lookup_field": "username"},
         }
 
+    def get_avatar_url(self, obj: User) -> str:
+        """
+        Rules:
+        - If the User model has an ImageField `avatar` with a URL, use it.
+          (If storage returns an absolute URL, return as-is.)
+        - Else fall back to DEFAULT_AVATAR_PATH under MEDIA_URL.
+        - If `request` is available, return an absolute URL for relative paths.
+        """
+        request = self.context.get("request")
+
+        # Prefer a real uploaded avatar if present
+        avatar = getattr(obj, "avatar", None)
+        if avatar is not None and getattr(avatar, "url", None):
+            url = avatar.url  # may already be absolute (e.g. S3)
+            if _is_absolute(url):
+                return url
+            return request.build_absolute_uri(url) if request else url
+
+        # Fallback: default image under MEDIA_URL
+        fallback_rel = _join_media_url(DEFAULT_AVATAR_PATH)
+        if _is_absolute(fallback_rel):
+            # MEDIA_URL might be absolute (CDN)
+            return fallback_rel
+        return request.build_absolute_uri(fallback_rel) if request else fallback_rel
+
 ===== END konnaxion/users/api/serializers.py =====
 
 
+===== BEGIN konnaxion/users/api/urls.py =====
+# backend/konnaxion/users/api/urls.py
+from rest_framework.routers import DefaultRouter
+from .views import UserViewSet
+
+app_name = "users_api"  # distinct namespace to avoid clashing with central "api"
+router = DefaultRouter()
+router.register(r"", UserViewSet, basename="user")
+
+urlpatterns = router.urls
+
+===== END konnaxion/users/api/urls.py =====
+
+
 ===== BEGIN konnaxion/users/api/views.py =====
-from rest_framework import status
+from rest_framework import status, permissions
 from rest_framework.decorators import action
-from rest_framework.mixins import ListModelMixin
-from rest_framework.mixins import RetrieveModelMixin
-from rest_framework.mixins import UpdateModelMixin
+from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, UpdateModelMixin
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
 from konnaxion.users.models import User
-
 from .serializers import UserSerializer
 
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
+    """
+    /api/users/           → list (current user only)
+    /api/users/{username}/ → retrieve
+    /api/users/me/        → current user (explicit)
+    """
     serializer_class = UserSerializer
     queryset = User.objects.all()
     lookup_field = "username"
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self, *args, **kwargs):
-        assert isinstance(self.request.user.id, int)
-        return self.queryset.filter(id=self.request.user.id)
+    def get_queryset(self):
+        """
+        Limit list queries to the authenticated user.
+        """
+        user = self.request.user
+        if not getattr(user, "is_authenticated", False):
+            return User.objects.none()
+        return self.queryset.filter(id=user.id)
 
-    @action(detail=False)
+    @action(detail=False, methods=["get"], url_path="me", url_name="me")
     def me(self, request):
-        serializer = UserSerializer(request.user, context={"request": request})
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+        """
+        Return the authenticated user's own record using the same serializer,
+        so fields like `avatar_url` can build an absolute URL from `request`.
+        """
+        serializer = self.get_serializer(request.user, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 ===== END konnaxion/users/api/views.py =====
 
@@ -3525,6 +6231,7 @@ class UserSocialSignupForm(SocialSignupForm):
 
 ===== BEGIN konnaxion/users/models.py =====
 from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.db.models import CharField
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -3541,6 +6248,15 @@ class User(AbstractUser):
     name = CharField(_("Name of User"), blank=True, max_length=255)
     first_name = None  # type: ignore[assignment]
     last_name = None  # type: ignore[assignment]
+
+    # Chosen artwork used as this user's profile picture
+    profile_artwork = models.ForeignKey(
+        "kreative.KreativeArtwork",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="users_using_as_profile",
+    )
 
     def get_absolute_url(self) -> str:
         """Get URL for user's detail view.

@@ -1,4 +1,4 @@
-===== TOC (19 fichiers) =====
+===== TOC (24 fichiers) =====
 0001  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\sites\migrations\0001_initial.py
 0002  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\sites\migrations\0002_alter_domain_unique.py
 0003  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\sites\migrations\0003_set_site_domain_and_name.py
@@ -10,14 +10,19 @@
 0009  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\migrations\0001_initial.py
 0010  C:\MyCode\Konnaxionv14\backend\konnaxion\keenkonnect\migrations\__init__.py
 0011  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\migrations\0001_initial.py
-0012  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\migrations\__init__.py
-0013  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\0001_initial.py
-0014  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\__init__.py
-0015  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0001_initial.py
-0016  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0002_archivedocument_culturalpartner_digitalarchive_and_more.py
-0017  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\__init__.py
-0018  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0001_initial.py
-0019  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\__init__.py
+0012  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\migrations\00xx_expertise_tags_api.py
+0013  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\migrations\__init__.py
+0014  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\0001_initial.py
+0015  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\0002_offline_packages.py
+0016  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\00xx_offline_packages.py
+0017  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\__init__.py
+0018  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0001_initial.py
+0019  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0002_archivedocument_culturalpartner_digitalarchive_and_more.py
+0020  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\__init__.py
+0021  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0001_initial.py
+0022  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0002_user_avatar.py
+0023  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0003_remove_user_avatar_user_profile_artwork.py
+0024  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\__init__.py
 ===== END TOC =====
 
 
@@ -629,6 +634,107 @@ class Migration(migrations.Migration):
 ===== END konnaxion/kollective_intelligence/migrations/0001_initial.py =====
 
 
+===== BEGIN konnaxion/kollective_intelligence/migrations/00xx_expertise_tags_api.py =====
+# backend/konnaxion/kollective_intelligence/migrations/00xx_expertise_tags_api.py
+from django.db import migrations
+
+# Baseline expertise “tags” that will be exposed via the expertise-tags API.
+# For now we only persist the human‑readable name on ExpertiseCategory.
+EXPERTISE_TAGS = [
+    # key, label, description
+    (
+        "frontend",
+        "Frontend Development",
+        "React, TypeScript, modern component patterns and design systems.",
+    ),
+    (
+        "backend",
+        "Backend Development",
+        "APIs, microservices, Node.js / Python, data modelling & reliability.",
+    ),
+    (
+        "uiux",
+        "UI/UX Design",
+        "User journeys, wireframes, interactive prototypes, design systems.",
+    ),
+    (
+        "data-science",
+        "Data Science",
+        "Exploratory analysis, ML models, dashboards, decision support.",
+    ),
+    (
+        "devops",
+        "DevOps",
+        "CI/CD, observability, infrastructure-as-code, cloud environments.",
+    ),
+    (
+        "mobile",
+        "Mobile Development",
+        "Native & cross‑platform apps, performance and offline patterns.",
+    ),
+    (
+        "qa",
+        "QA",
+        "Testing strategy, automation, regression & release quality.",
+    ),
+    (
+        "pm",
+        "Project Management",
+        "Roadmapping, stakeholder alignment, agile delivery and rituals.",
+    ),
+]
+
+
+def forwards_create_expertise_tags(apps, schema_editor):
+    """
+    Seed baseline expertise categories used by:
+    - Ekoh reputation / expertise weights
+    - KeenKonnect matching
+    - Smart Vote weighting
+
+    We only persist the `.name` (label) on ExpertiseCategory so this
+    migration remains compatible even if the model is later extended.
+    """
+    ExpertiseCategory = apps.get_model(
+        "kollective_intelligence", "ExpertiseCategory"
+    )
+
+    for key, label, _description in EXPERTISE_TAGS:
+        # Use label as the canonical category name for now.
+        ExpertiseCategory.objects.get_or_create(name=label)
+
+
+def backwards_delete_expertise_tags(apps, schema_editor):
+    """
+    Reverse operation: remove only the categories created by this migration,
+    leaving any user‑defined or later categories untouched.
+    """
+    ExpertiseCategory = apps.get_model(
+        "kollective_intelligence", "ExpertiseCategory"
+    )
+
+    labels = [label for _key, label, _desc in EXPERTISE_TAGS]
+    ExpertiseCategory.objects.filter(name__in=labels).delete()
+
+
+class Migration(migrations.Migration):
+
+    # When you rename this file to a real migration (e.g. 0002_expertise_tags_api.py),
+    # keep the dependency pointing to the initial schema migration.
+    dependencies = [
+        ("kollective_intelligence", "0001_initial"),
+    ]
+
+    operations = [
+        migrations.RunPython(
+            forwards_create_expertise_tags,
+            backwards_delete_expertise_tags,
+        ),
+    ]
+
+===== END konnaxion/kollective_intelligence/migrations/00xx_expertise_tags_api.py =====
+
+
 ===== BEGIN konnaxion/kollective_intelligence/migrations/__init__.py =====
 
 ===== END konnaxion/kollective_intelligence/migrations/__init__.py =====
@@ -823,6 +929,417 @@ class Migration(migrations.Migration):
     ]
 
 ===== END konnaxion/konnected/migrations/0001_initial.py =====
+
+
+===== BEGIN konnaxion/konnected/migrations/0002_offline_packages.py =====
+# backend/konnaxion/konnected/migrations/0002_offline_packages.py
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ("konnected", "0001_initial"),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name="OfflinePackage",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                ("name", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True)),
+                (
+                    "status",
+                    models.CharField(
+                        max_length=16,
+                        default="scheduled",
+                        choices=[
+                            ("scheduled", "Scheduled"),
+                            ("building", "Building"),
+                            ("ready", "Ready"),
+                            ("failed", "Failed"),
+                        ],
+                    ),
+                ),
+                ("item_count", models.PositiveIntegerField(default=0)),
+                (
+                    "total_size_mb",
+                    models.DecimalField(
+                        max_digits=10,
+                        decimal_places=2,
+                        default=0,
+                    ),
+                ),
+                ("last_built_at", models.DateTimeField(blank=True, null=True)),
+                (
+                    "target_device_type",
+                    models.CharField(
+                        max_length=16,
+                        blank=True,
+                        choices=[
+                            ("laptop", "Laptop / desktop"),
+                            ("tablet", "Tablet"),
+                            ("usb", "USB / external media"),
+                            ("other", "Other"),
+                        ],
+                    ),
+                ),
+                ("auto_sync", models.BooleanField(default=False)),
+                (
+                    "build_progress_percent",
+                    models.PositiveSmallIntegerField(blank=True, null=True),
+                ),
+                ("last_error_message", models.TextField(blank=True)),
+                ("max_size_mb", models.PositiveIntegerField(blank=True, null=True)),
+                (
+                    "include_types",
+                    models.JSONField(
+                        blank=True,
+                        default=list,
+                        help_text=(
+                            "List of resource types to include "
+                            "(e.g. article, video, lesson, quiz, dataset)."
+                        ),
+                    ),
+                ),
+                (
+                    "subject_filter",
+                    models.CharField(
+                        max_length=255,
+                        blank=True,
+                        help_text="Optional subject/topic filter applied when resolving resources.",
+                    ),
+                ),
+                (
+                    "level_filter",
+                    models.CharField(
+                        max_length=255,
+                        blank=True,
+                        help_text="Optional level/difficulty filter.",
+                    ),
+                ),
+                (
+                    "language_filter",
+                    models.CharField(
+                        max_length=50,
+                        blank=True,
+                        help_text="Optional language filter (e.g. 'en', 'fr').",
+                    ),
+                ),
+            ],
+            options={
+                "ordering": ("name",),
+            },
+        ),
+    ]
+
+===== END konnaxion/konnected/migrations/0002_offline_packages.py =====
+
+
+===== BEGIN konnaxion/konnected/migrations/00xx_offline_packages.py =====
+// frontend/modules/kontact/pages/ConnectCenter.tsx
+'use client';
+
+import React, { useMemo, useState } from 'react';
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import {
+  Alert,
+  Empty,
+  Input,
+  Segmented,
+  Space,
+  Tag,
+  Typography,
+} from 'antd';
+import { LinkOutlined, TeamOutlined } from '@ant-design/icons';
+
+import { useOpportunities, useProfiles } from '@/kontact/hooks';
+import {
+  OpportunityList as RawOpportunityList,
+  ProfileCard as RawProfileCard,
+} from '@/kontact/components';
+import usePageTitle from '@/hooks/usePageTitle';
+
+const { Title, Paragraph } = Typography;
+
+/* ------------------------------------------------------------------ */
+/*  Domain types                                                       */
+/* ------------------------------------------------------------------ */
+
+export interface KontactOpportunity {
+  id: string;
+  title: string;
+  summary?: string;
+  type?: string;
+  sourceModule?: string; // e.g. "KeenKonnect", "Ethikos", "Kreative"
+  url?: string;
+  tags?: string[];
+  matchScore?: number; // 0–100
+}
+
+export interface KontactProfile {
+  id: string;
+  name: string;
+  headline?: string;
+  location?: string;
+  roles?: string[];
+  skills?: string[];
+  url?: string;
+  avatarUrl?: string;
+  matchScore?: number; // 0–100
+}
+
+/**
+ * Expected shape for the kontact hooks.
+ * The current stub implementations can safely return `undefined` or partials;
+ * this page defensively normalises everything.
+ */
+interface UseOpportunitiesResult {
+  items?: KontactOpportunity[];
+  isLoading?: boolean;
+  isError?: boolean;
+  error?: Error | null;
+}
+
+interface UseProfilesResult {
+  items?: KontactProfile[];
+  isLoading?: boolean;
+  isError?: boolean;
+  error?: Error | null;
+}
+
+/**
+ * Props used by the kontact presentational components.
+ * We cast the current stubs to these shapes so this page can compile
+ * before their implementations are written.
+ */
+interface OpportunityListProps {
+  items: KontactOpportunity[];
+  loading?: boolean;
+  emptyMessage?: string;
+}
+
+interface ProfileCardProps {
+  profile: KontactProfile;
+}
+
+/* Cast stub components to the props we intend to support. */
+const OpportunityList =
+  RawOpportunityList as unknown as React.ComponentType<OpportunityListProps>;
+const ProfileCard =
+  RawProfileCard as unknown as React.ComponentType<ProfileCardProps>;
+
+type ViewMode = 'all' | 'opportunities' | 'people';
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
+
+export default function ConnectCenter() {
+  usePageTitle('Kontact · Connect Center');
+
+  const [query, setQuery] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>('all');
+
+  // Normalise hook return values so current stubs don't crash the page
+  const oppRaw =
+    ((useOpportunities as unknown as () => UseOpportunitiesResult | undefined)() ??
+      {}) as UseOpportunitiesResult;
+  const profRaw =
+    ((useProfiles as unknown as () => UseProfilesResult | undefined)() ??
+      {}) as UseProfilesResult;
+
+  const opportunities = oppRaw.items ?? [];
+  const profiles = profRaw.items ?? [];
+
+  const loading = Boolean(oppRaw.isLoading || profRaw.isLoading);
+  const oppError = oppRaw.isError ? oppRaw.error : null;
+  const profError = profRaw.isError ? profRaw.error : null;
+  const hasError = Boolean(oppError || profError);
+
+  const totalOpps = opportunities.length;
+  const totalProfiles = profiles.length;
+
+  const trimmedQuery = query.trim().toLowerCase();
+
+  const filteredOpps = useMemo(() => {
+    if (!trimmedQuery) return opportunities;
+    return opportunities.filter((item) => {
+      const haystack = [
+        item.title,
+        item.summary,
+        item.type,
+        item.sourceModule,
+        ...(item.tags ?? []),
+      ]
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(trimmedQuery);
+    });
+  }, [opportunities, trimmedQuery]);
+
+  const filteredProfiles = useMemo(() => {
+    if (!trimmedQuery) return profiles;
+    return profiles.filter((p) => {
+      const haystack = [
+        p.name,
+        p.headline,
+        p.location,
+        ...(p.roles ?? []),
+        ...(p.skills ?? []),
+      ]
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(trimmedQuery);
+    });
+  }, [profiles, trimmedQuery]);
+
+  const showOpps = viewMode === 'all' || viewMode === 'opportunities';
+  const showProfiles = viewMode === 'all' || viewMode === 'people';
+
+  return (
+    <PageContainer ghost loading={loading}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {/* Header copy */}
+        <div>
+          <Title level={3} style={{ marginBottom: 8 }}>
+            Connect Center
+          </Title>
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            Discover collaboration opportunities and people across Konnaxion.
+            This view aggregates leads from teams, debates, workspaces and
+            consultations into a single stream you can act on.
+          </Paragraph>
+        </div>
+
+        {/* Search + mode toggle + status */}
+        <ProCard ghost>
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
+            <Space
+              style={{
+                width: '100%',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+              }}
+            >
+              <Input.Search
+                placeholder="Search by keyword, skill, topic, or organisation…"
+                allowClear
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                style={{ maxWidth: 420 }}
+              />
+
+              <Space size="middle" wrap>
+                <Segmented
+                  value={viewMode}
+                  onChange={(val) => setViewMode(val as ViewMode)}
+                  options={[
+                    { label: 'All', value: 'all' },
+                    { label: 'Opportunities', value: 'opportunities' },
+                    { label: 'People', value: 'people' },
+                  ]}
+                />
+                <Tag icon={<LinkOutlined />} color="blue">
+                  {totalOpps} opportunities · {totalProfiles} people
+                </Tag>
+              </Space>
+            </Space>
+
+            {hasError && (
+              <Alert
+                type="error"
+                showIcon
+                message="Some recommendations could not be loaded"
+                description={
+                  <>
+                    {oppError && (
+                      <>
+                        Opportunities: {oppError.message}
+                        <br />
+                      </>
+                    )}
+                    {profError && <>People: {profError.message}</>}
+                  </>
+                }
+              />
+            )}
+          </Space>
+        </ProCard>
+
+        {/* Two-column layout: opportunities + people */}
+        <ProCard gutter={16} wrap>
+          {showOpps && (
+            <ProCard
+              colSpan={{ xs: 24, lg: 14 }}
+              ghost
+              title={
+                <Space>
+                  <LinkOutlined />
+                  <span>Opportunities for you</span>
+                </Space>
+              }
+            >
+              {filteredOpps.length ? (
+                <OpportunityList
+                  items={filteredOpps}
+                  loading={loading && !opportunities.length}
+                  emptyMessage="No opportunities match your filters."
+                />
+              ) : trimmedQuery || totalOpps > 0 ? (
+                <Empty description="No opportunities match your filters." />
+              ) : (
+                <Empty description="No opportunities yet. Once teams, workspaces and consultations start publishing openings, they will appear here." />
+              )}
+            </ProCard>
+          )}
+
+          {showProfiles && (
+            <ProCard
+              colSpan={{ xs: 24, lg: 10 }}
+              ghost
+              title={
+                <Space>
+                  <TeamOutlined />
+                  <span>People to connect with</span>
+                </Space>
+              }
+            >
+              {filteredProfiles.length ? (
+                <Space
+                  direction="vertical"
+                  size="middle"
+                  style={{ width: '100%' }}
+                >
+                  {filteredProfiles.map((profile) => (
+                    <ProfileCard key={profile.id} profile={profile} />
+                  ))}
+                </Space>
+              ) : trimmedQuery || totalProfiles > 0 ? (
+                <Empty description="No people match your filters." />
+              ) : (
+                <Empty description="No recommendations yet. As you participate across the platform, suggested profiles will appear here." />
+              )}
+            </ProCard>
+          )}
+        </ProCard>
+      </Space>
+    </PageContainer>
+  );
+}
+
+===== END konnaxion/konnected/migrations/00xx_offline_packages.py =====
 
 
 ===== BEGIN konnaxion/konnected/migrations/__init__.py =====
@@ -1111,6 +1628,61 @@ class Migration(migrations.Migration):
     ]
 
 ===== END konnaxion/users/migrations/0001_initial.py =====
+
+
+===== BEGIN konnaxion/users/migrations/0002_user_avatar.py =====
+# backend/konnaxion/users/migrations/0002_user_avatar.py
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ("users", "0001_initial"),
+    ]
+
+    operations = [
+        migrations.AddField(
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(
+                upload_to="users/avatars/",
+                blank=True,
+                null=True,
+            ),
+        ),
+    ]
+
+===== END konnaxion/users/migrations/0002_user_avatar.py =====
+
+
+===== BEGIN konnaxion/users/migrations/0003_remove_user_avatar_user_profile_artwork.py =====
+# Generated by Django 5.1.9 on 2025-11-20 15:39
+
+import django.db.models.deletion
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('kreative', '0002_archivedocument_culturalpartner_digitalarchive_and_more'),
+        ('users', '0002_user_avatar'),
+    ]
+
+    operations = [
+        migrations.RemoveField(
+            model_name='user',
+            name='avatar',
+        ),
+        migrations.AddField(
+            model_name='user',
+            name='profile_artwork',
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='users_using_as_profile', to='kreative.kreativeartwork'),
+        ),
+    ]
+
+===== END konnaxion/users/migrations/0003_remove_user_avatar_user_profile_artwork.py =====
 
 
 ===== BEGIN konnaxion/users/migrations/__init__.py =====

@@ -31,6 +31,43 @@ CERT_PASS_PERCENT: int = getattr(settings, "CERT_PASS_PERCENT", 80)
 QUIZ_RETRY_COOLDOWN_MIN: int = getattr(settings, "QUIZ_RETRY_COOLDOWN_MIN", 30)
 
 
+def _generate_synthetic_exam_sessions(now=None):
+    """
+    Helper for generating a small synthetic exam schedule.
+
+    v14 does not yet define a persistent ExamSession model; both the
+    CertificationPathViewSet.sessions action and the Evaluation
+    registration logic use this helper so that the schedule is
+    consistent across endpoints.
+
+    Returns a list of dicts with:
+        id, start_at, end_at, timezone, modality, location,
+        capacity, seats_remaining, registration_deadline.
+    """
+    if now is None:
+        now = timezone.now()
+
+    base_start = now + timedelta(days=3)
+    sessions = []
+    for index in range(3):
+        start = base_start + timedelta(days=7 * index)
+        end = start + timedelta(hours=2)
+        sessions.append(
+            {
+                "id": index + 1,
+                "start_at": start.isoformat(),
+                "end_at": end.isoformat(),
+                "timezone": "UTC",
+                "modality": "online",
+                "location": "Remote proctored",
+                "capacity": 25,
+                "seats_remaining": 25,
+                "registration_deadline": (start - timedelta(days=1)).isoformat(),
+            }
+        )
+    return sessions
+
+
 class KnowledgeResourceViewSet(viewsets.ModelViewSet):
     """
     CRUD endpoints for KonnectED knowledge-library items
@@ -64,10 +101,11 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         GET  /konnected/certifications/paths/{id}/
         ...
 
-    Extra actions (for Exam Registration page):
+    Extra actions (for Exam Registration and Exam Preparation pages):
 
         GET /konnected/certifications/paths/{id}/eligibility/
         GET /konnected/certifications/paths/{id}/sessions/
+        GET /konnected/certifications/paths/{id}/preparation-plan/
     """
     queryset = CertificationPath.objects.all().order_by("name")
     serializer_class = CertificationPathSerializer
@@ -123,6 +161,105 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["get"],
+        url_path="preparation-plan",
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def preparation_plan(self, request, pk=None):
+        """
+        Returns a lightweight exam preparation snapshot for this path.
+
+        Response shape matches ExamPreparationResponse used by the
+        Exam Preparation page in the frontend. For v14 this endpoint
+        focuses on summarising exam attempts and cooldowns; study
+        modules and focus areas are returned as empty lists until
+        richer learning-path models are introduced.
+        """
+        path = self.get_object()
+        user = request.user
+
+        evaluations = (
+            Evaluation.objects.filter(user=user, path=path)
+            .order_by("-created_at")
+        )
+        last_eval = evaluations.first()
+
+        if last_eval is not None:
+            metadata = last_eval.metadata or {}
+
+            score_percent = metadata.get("score_percent")
+            if score_percent is None and last_eval.raw_score is not None:
+                score_percent = float(last_eval.raw_score)
+
+            pass_percent = metadata.get("pass_percent", CERT_PASS_PERCENT)
+
+            last_result = None
+            if score_percent is not None:
+                last_result = "pass" if score_percent >= pass_percent else "fail"
+
+            attempts_used = evaluations.count()
+            attempts_allowed = metadata.get("attempts_allowed")
+
+            cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
+            cooldown_ends_at_dt = last_eval.created_at + cooldown_delta
+            now = timezone.now()
+            is_cooldown_active = now < cooldown_ends_at_dt
+            cooldown_ends_at = (
+                cooldown_ends_at_dt.isoformat() if is_cooldown_active else None
+            )
+
+            # When evaluation registrations come from the Exam Registration page,
+            # we store an ISO target_date in metadata based on the chosen session.
+            target_date = metadata.get("target_date")
+
+            exam_payload = {
+                "targetDate": target_date,
+                "recommendedStudyHours": metadata.get("recommended_study_hours"),
+                "lastScorePercent": score_percent,
+                "lastResult": last_result,
+                "lastAttemptAt": last_eval.created_at.isoformat(),
+                "attemptsUsed": attempts_used,
+                "attemptsAllowed": attempts_allowed,
+                "isCooldownActive": is_cooldown_active,
+                "cooldownEndsAt": cooldown_ends_at,
+                "passPercent": pass_percent,
+                "retryCooldownMinutes": QUIZ_RETRY_COOLDOWN_MIN,
+            }
+        else:
+            # No attempts yet – still return exam metadata so the UI can
+            # show thresholds and cooldown policy.
+            exam_payload = {
+                "targetDate": None,
+                "recommendedStudyHours": None,
+                "lastScorePercent": None,
+                "lastResult": None,
+                "lastAttemptAt": None,
+                "attemptsUsed": 0,
+                "attemptsAllowed": None,
+                "isCooldownActive": False,
+                "cooldownEndsAt": None,
+                "passPercent": CERT_PASS_PERCENT,
+                "retryCooldownMinutes": QUIZ_RETRY_COOLDOWN_MIN,
+            }
+
+        payload = {
+            "path": {
+                "id": path.pk,
+                "name": path.name,
+                "description": path.description,
+            },
+            # Study modules and focus areas are intentionally empty for now.
+            # A future learning-path model can populate these without
+            # changing the endpoint contract.
+            "exam": exam_payload,
+            "overallProgressPercent": None,
+            "modules": [],
+            "focusAreas": [],
+        }
+        return Response(payload)
+
+    @action(
+        detail=True,
+        methods=["get"],
         url_path="sessions",
         permission_classes=[permissions.IsAuthenticated],
     )
@@ -135,27 +272,7 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         current time. You can replace this with real DB-backed sessions
         later without changing the endpoint contract.
         """
-        now = timezone.now()
-        base_start = now + timedelta(days=3)
-
-        sessions = []
-        for index in range(3):
-            start = base_start + timedelta(days=7 * index)
-            end = start + timedelta(hours=2)
-            sessions.append(
-                {
-                    "id": index + 1,
-                    "start_at": start.isoformat(),
-                    "end_at": end.isoformat(),
-                    "timezone": "UTC",
-                    "modality": "online",
-                    "location": "Remote proctored",
-                    "capacity": 25,
-                    "seats_remaining": 25,
-                    "registration_deadline": (start - timedelta(days=1)).isoformat(),
-                }
-            )
-
+        sessions = _generate_synthetic_exam_sessions()
         return Response(sessions)
 
 
@@ -222,15 +339,35 @@ class EvaluationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        session_id = data.get("session_id")
+        target_date = None
+
+        # Best-effort mapping of the chosen synthetic session to a target date.
+        if session_id is not None:
+            try:
+                session_id_int = int(session_id)
+            except (TypeError, ValueError):
+                session_id_int = None
+
+            if session_id_int is not None:
+                for session in _generate_synthetic_exam_sessions():
+                    if session["id"] == session_id_int:
+                        target_date = session["start_at"]
+                        break
+
         metadata = {
-            "session_id": data.get("session_id"),
+            "session_id": session_id,
             "full_name": data.get("full_name"),
             "agreed_terms": data.get("agreed_terms"),
-            # Reasonable defaults that the dashboard can later read/override
+            # Reasonable defaults that the dashboard and preparation page
+            # can later read/override.
             "delivery_mode": "online",
             "proctored": True,
             "status": "scheduled",
         }
+
+        if target_date is not None:
+            metadata["target_date"] = target_date
 
         evaluation = Evaluation.objects.create(
             user=user,

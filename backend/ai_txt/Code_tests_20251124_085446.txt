@@ -147,7 +147,11 @@ class TestUserViewSet:
 
         view.request = request
 
-        assert user in view.get_queryset()
+        qs = view.get_queryset()
+        # The authenticated user must be in the queryset…
+        assert user in qs
+        # …and for the /api/users/ endpoint we only expose the current user
+        assert qs.count() == 1
 
     def test_me(self, user: User, api_rf: APIRequestFactory):
         view = UserViewSet()
@@ -158,11 +162,19 @@ class TestUserViewSet:
 
         response = view.me(request)  # type: ignore[call-arg, arg-type, misc]
 
-        assert response.data == {
-            "username": user.username,
-            "url": f"http://testserver/api/users/{user.username}/",
-            "name": user.name,
-        }
+        assert response.status_code == 200
+
+        data = response.data
+        # Existing fields
+        assert data["username"] == user.username
+        assert data["url"] == f"http://testserver/api/users/{user.username}/"
+        assert data["name"] == user.name
+
+        # New field for avatar support in the frontend
+        assert "avatar_url" in data
+        # Optional: if you enforce a non-empty URL, keep this; otherwise remove it.
+        # assert isinstance(data["avatar_url"], str)
+        # assert data["avatar_url"] != ""
 
 ===== END konnaxion/users/tests/api/test_views.py =====
 

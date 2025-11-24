@@ -5,6 +5,7 @@ import ssl
 from pathlib import Path
 
 import environ
+from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
 # konnaxion/
@@ -24,14 +25,14 @@ DEBUG = env.bool("DJANGO_DEBUG", False)
 # In Windows, this must be set to your system time zone.
 TIME_ZONE = "UTC"
 # https://docs.djangoproject.com/en/dev/ref/settings/#language-code
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
 # https://docs.djangoproject.com/en/dev/ref/settings/#languages
-# from django.utils.translation import gettext_lazy as _
-# LANGUAGES = [
-#     ('en', _('English')),
-#     ('fr-fr', _('French')),
-#     ('pt-br', _('Portuguese')),
-# ]
+LANGUAGES = [
+    ("en", _("English")),
+    ("fr", _("French")),
+    ("es", _("Spanish")),
+    ("ar", _("Arabic")),
+]
 # https://docs.djangoproject.com/en/dev/ref/settings/#site-id
 SITE_ID = 1
 # https://docs.djangoproject.com/en/dev/ref/settings/#use-i18n
@@ -48,6 +49,11 @@ DATABASES = {"default": env.db("DATABASE_URL")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 # https://docs.djangoproject.com/en/stable/ref/settings/#std:setting-DEFAULT_AUTO_FIELD
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# SEARCH BACKEND (v14 parameter reference)
+# ------------------------------------------------------------------------------
+# Global search backend choice – currently PostgreSQL full-text.
+SEARCH_BACKEND = "postgres"
 
 # URLS
 # ------------------------------------------------------------------------------
@@ -84,12 +90,12 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "konnaxion.users",                    
-    "konnaxion.kollective_intelligence",  
-    "konnaxion.ethikos",                  
-    "konnaxion.keenkonnect",              
-    "konnaxion.konnected",               
-    "konnaxion.kreative",                 
+    "konnaxion.users",
+    "konnaxion.kollective_intelligence",
+    "konnaxion.ethikos",
+    "konnaxion.keenkonnect",
+    "konnaxion.konnected",
+    "konnaxion.kreative",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

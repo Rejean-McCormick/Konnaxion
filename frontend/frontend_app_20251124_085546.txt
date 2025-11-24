@@ -106,58 +106,230 @@
 ===== BEGIN app/_api/admin/moderation/route.ts =====
 import { NextResponse } from 'next/server'
 
-interface ModerationItem {
+type ReportType = 'Spam' | 'Harassment' | 'Misinformation'
+type ReportStatus = 'Pending' | 'Resolved'
+
+export interface Report {
   id: string
-  type: string
   content: string
-  reason: string
-  userId: string
-  createdAt: string
+  reporter: string
+  type: ReportType
+  status: ReportStatus
+}
+
+export interface ModerationPayload {
+  items: Report[]
+}
+
+/**
+ * Resolve the backend base URL in the same spirit as services/_request.ts.
+ * In practice, NEXT_PUBLIC_API_BASE should be something like
+ *   http://localhost:8000/api
+ * or the public API root for your Django backend.
+ */
+function resolveApiBase(): string {
+  const raw = process.env.NEXT_PUBLIC_API_BASE || 'http://localhost:8000'
+  // Normalize to avoid trailing slash issues when concatenating paths
+  return raw.replace(/\/+$/, '')
 }
 
 export async function GET() {
-  // TODO: fetch your real moderation queue here
-  const queue: ModerationItem[] = [
-    {
-      id: '1',
-      type: 'comment',
-      content: 'Offensive comment text here',
-      reason: 'profanity',
-      userId: 'user_123',
-      createdAt: new Date().toISOString(),
-    },
-  ]
+  const apiBase = resolveApiBase()
+  const url = `${apiBase}/admin/moderation`
 
-  return NextResponse.json<ModerationItem[]>(queue, {
-    status: 200,
-    headers: { 'Cache-Control': 'no-store' },
-  })
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+      },
+      // Ensure we always hit the live queue, not a cached copy
+      cache: 'no-store',
+    })
+
+    if (res.ok) {
+      const raw = await res.json()
+
+      // Normalise shape to ModerationPayload:
+      // - if backend already returns { items: [...] }, use it as‑is
+      // - if backend returns a bare array, wrap it
+      let payload: ModerationPayload
+
+      if (Array.isArray(raw)) {
+        payload = { items: raw as Report[] }
+      } else if (Array.isArray((raw as any)?.items)) {
+        payload = { items: (raw as any).items as Report[] }
+      } else {
+        payload = { items: [] }
+      }
+
+      return NextResponse.json<ModerationPayload>(payload, {
+        status: 200,
+        headers: { 'Cache-Control': 'no-store' },
+      })
+    }
+
+    // Backend responded but with an error status
+    return NextResponse.json(
+      {
+        error: 'Failed to fetch moderation queue from backend.',
+        statusCode: res.status,
+      },
+      {
+        status: res.status,
+        headers: { 'Cache-Control': 'no-store' },
+      },
+    )
+  } catch (error) {
+    // Fallback: deterministic stub, matching ModerationPayload
+    const fallback: ModerationPayload = {
+      items: [
+        {
+          id: 'stub-1',
+          content: 'Example content flagged for potential harassment.',
+          reporter: 'alice@example.com',
+          type: 'Harassment',
+          status: 'Pending',
+        },
+        {
+          id: 'stub-2',
+          content: 'Example spam message that has already been resolved.',
+          reporter: 'moderation-bot',
+          type: 'Spam',
+          status: 'Resolved',
+        },
+      ],
+    }
+
+    return NextResponse.json<ModerationPayload>(fallback, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store',
+        'X-Konnaxion-Moderation-Mode': 'mock',
+      },
+    })
+  }
 }
 
 ===== END app/_api/admin/moderation/route.ts =====
 
 
 ===== BEGIN app/_api/admin/stats/route.ts =====
-import { NextResponse } from 'next/server'
+import { NextResponse } from 'next/server';
 
 interface AdminStats {
-  totalUsers: number
-  activeUsers: number
-  newUsers: number
+  totalUsers: number;
+  activeUsers: number;
+  newUsers: number;
+}
+
+interface UsageReport {
+  labels: string[];
+  mau: number[];
+  projects?: number[];
+  docs?: number[];
+}
+
+const FALLBACK_STATS: AdminStats = {
+  totalUsers: 1234,
+  activeUsers: 567,
+  newUsers: 89,
+};
+
+// Same default window as the Insights "Usage" report.
+const USAGE_QUERY = '?range=30d&grouping=day';
+
+// Base URL for the backend (matches how the rest of the app calls it)
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+
+/**
+ * Build the absolute URL for the usage report on the analytics backend.
+ * This mirrors how the insights hooks call `/reports/usage`.
+ */
+function buildUsageUrl(): string {
+  const base = API_BASE.endsWith('/') ? API_BASE.slice(0, -1) : API_BASE;
+  return `${base}/reports/usage${USAGE_QUERY}`;
+}
+
+/**
+ * Fetches the usage report from the analytics backend.
+ * If anything goes wrong, returns null so the caller can fall back
+ * to static placeholder values.
+ */
+async function fetchUsageReport(): Promise<UsageReport | null> {
+  try {
+    const url = buildUsageUrl();
+
+    const res = await fetch(url, {
+      headers: { Accept: 'application/json' },
+      // This is an admin dashboard metric; we want fresh data.
+      cache: 'no-store',
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = (await res.json()) as UsageReport;
+
+    if (!data || !Array.isArray(data.mau)) {
+      return null;
+    }
+
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Derives simple admin-friendly stats from the usage report:
+ * - totalUsers  = max MAU over the window (rough upper bound)
+ * - activeUsers = last MAU point
+ * - newUsers    = positive delta between last and previous MAU point
+ */
+function deriveAdminStats(report: UsageReport): AdminStats {
+  const series = Array.isArray(report.mau) ? report.mau : [];
+
+  if (series.length === 0) {
+    // If the report is empty, keep the previous placeholder behavior.
+    return { ...FALLBACK_STATS };
+  }
+
+  let totalUsers = 0;
+  for (const value of series) {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      if (value > totalUsers) {
+        totalUsers = value;
+      }
+    }
+  }
+
+  const last = series[series.length - 1];
+  const prev = series.length > 1 ? series[series.length - 2] : last;
+
+  const activeUsers =
+    typeof last === 'number' && Number.isFinite(last) ? last : 0;
+
+  const prevValue =
+    typeof prev === 'number' && Number.isFinite(prev) ? prev : activeUsers;
+
+  const newUsers = Math.max(activeUsers - prevValue, 0);
+
+  return { totalUsers, activeUsers, newUsers };
 }
 
 export async function GET() {
-  // TODO: hook up your real DB call here
-  const stats: AdminStats = {
-    totalUsers: 1234,
-    activeUsers: 567,
-    newUsers: 89,
-  }
+  const report = await fetchUsageReport();
+  const stats = report ? deriveAdminStats(report) : FALLBACK_STATS;
 
   return NextResponse.json<AdminStats>(stats, {
     status: 200,
-    headers: { 'Cache-Control': 'no-store' },
-  })
+    headers: {
+      'Cache-Control': 'no-store',
+    },
+  });
 }
 
 ===== END app/_api/admin/stats/route.ts =====
@@ -180,36 +352,307 @@ export async function GET() {
 
 
 ===== BEGIN app/_api/search/route.ts =====
+// app/_api/search/route.ts
 import { NextRequest, NextResponse } from 'next/server'
+import fs from 'fs/promises'
+import path from 'path'
 
-interface SearchResult {
+export const runtime = 'nodejs'
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export interface SearchResult {
   id: string
   title: string
   snippet: string
   path: string
 }
 
-export async function GET(request: NextRequest) {
-  const url = new URL(request.url)
-  const q = url.searchParams.get('q')?.trim() || ''
-  if (!q) {
-    return NextResponse.json({ error: 'Missing query parameter `q`' }, { status: 400 })
+interface RoutesJsonEntry {
+  path: string
+}
+
+interface KnowledgeResource {
+  id: string | number
+  title: string
+  description?: string | null
+  subject?: string | null
+  level?: string | null
+  language?: string | null
+  url?: string | null
+  type?: string | null
+  resource_type?: string | null
+}
+
+type RawKnowledgeSearchResponse =
+  | KnowledgeResource[]
+  | {
+      results?: KnowledgeResource[]
+      items?: KnowledgeResource[]
+      count?: number
+      total?: number
+    }
+
+interface SearchResponseBody {
+  results: SearchResult[]
+}
+
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
+
+const ROUTES_JSON_PATH = path.join(process.cwd(), 'routes.json')
+
+// Keep this small – it’s just a quick “jump” helper in the UI.
+const MAX_RESULTS_PER_SECTION = 5
+const MIN_QUERY_LENGTH = 2
+
+// Preferred order for the Knowledge / KonnectED search endpoint.
+// These mirror the other Knowledge-related pages in the app.
+const KNOWLEDGE_SEARCH_ENDPOINTS = [
+  '/api/konnected/resources/',
+  '/api/knowledge-resources/',
+  '/api/knowledge/resources/',
+] as const
+
+// Use the same base URL convention as services/_request.ts
+const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/+$/, '')
+
+// ---------------------------------------------------------------------------
+// Helpers – generic
+// ---------------------------------------------------------------------------
+
+function toTitleCase(segment: string): string {
+  return segment
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
+}
+
+function pathToTitle(p: string): string {
+  if (p === '/') return 'Home'
+  const segments = p.split('/').filter(Boolean)
+  if (!segments.length) return 'Home'
+  return segments.map(toTitleCase).join(' · ')
+}
+
+function buildBackendUrl(endpoint: string): string {
+  const trimmed = endpoint.trim()
+  if (/^https?:\/\//i.test(trimmed)) return trimmed
+  if (!API_BASE) return trimmed
+  if (trimmed.startsWith('/')) return `${API_BASE}${trimmed}`
+  return `${API_BASE}/${trimmed}`
+}
+
+function normalizeKnowledgeResults(raw: RawKnowledgeSearchResponse | null | undefined): KnowledgeResource[] {
+  if (!raw) return []
+
+  if (Array.isArray(raw)) {
+    return raw
   }
 
-  // TODO: replace with real search logic
-  const results: SearchResult[] = [
-    {
-      id: 'item-1',
-      title: `Result for "${q}" #1`,
-      snippet: 'A brief snippet of matching content…',
-      path: `/some/path/1`,
-    },
-  ]
+  const obj = raw as { results?: unknown; items?: unknown }
+  if (Array.isArray(obj.results)) return obj.results as KnowledgeResource[]
+  if (Array.isArray(obj.items)) return obj.items as KnowledgeResource[]
+  return []
+}
 
-  return NextResponse.json<{ results: SearchResult[] }>({ results }, {
-    status: 200,
-    headers: { 'Cache-Control': 'no-store' },
+function buildKnowledgeSnippet(resource: KnowledgeResource): string {
+  const parts: string[] = []
+
+  if (resource.subject) parts.push(resource.subject)
+  if (resource.level) parts.push(resource.level)
+  if (resource.language) parts.push(resource.language)
+
+  if (parts.length > 0) {
+    return parts.join(' · ')
+  }
+
+  const desc =
+    typeof resource.description === 'string'
+      ? resource.description.replace(/\s+/g, ' ').trim()
+      : ''
+
+  if (desc) {
+    return desc.length > 120 ? `${desc.slice(0, 117)}…` : desc
+  }
+
+  return 'Learning resource'
+}
+
+// ---------------------------------------------------------------------------
+// Routes.json search (navigation hints)
+// ---------------------------------------------------------------------------
+
+async function loadRoutes(): Promise<RoutesJsonEntry[]> {
+  try {
+    const content = await fs.readFile(ROUTES_JSON_PATH, 'utf8')
+    const urls = JSON.parse(content) as string[]
+    return urls.map((p) => ({ path: p }))
+  } catch {
+    // If routes.json is missing or invalid we simply return no route results.
+    return []
+  }
+}
+
+async function searchRoutes(q: string): Promise<SearchResult[]> {
+  const routes = await loadRoutes()
+  if (!routes.length) return []
+
+  const needle = q.toLowerCase()
+  type Scored = { entry: RoutesJsonEntry; score: number }
+
+  const scored: Scored[] = []
+
+  for (const entry of routes) {
+    const p = entry.path
+    if (!p) continue
+
+    const title = pathToTitle(p)
+    const haystack = `${p.toLowerCase()} ${title.toLowerCase()}`
+    const idx = haystack.indexOf(needle)
+    if (idx === -1) continue
+
+    // Simple scoring:
+    // - match at beginning is better
+    // - shorter paths win for ties
+    const score = (idx === 0 ? 2 : 1) + 1 / (p.length + 1)
+    scored.push({ entry, score })
+  }
+
+  scored.sort((a, b) => b.score - a.score)
+
+  return scored.slice(0, MAX_RESULTS_PER_SECTION).map(({ entry }) => {
+    const p = entry.path
+    const title = pathToTitle(p)
+
+    return {
+      id: `route:${p}`,
+      title,
+      snippet: `Navigate to ${p}`,
+      path: p,
+    }
   })
+}
+
+// ---------------------------------------------------------------------------
+// Knowledge search (KonnectED / learning resources)
+// ---------------------------------------------------------------------------
+
+async function searchKnowledge(q: string, request: NextRequest): Promise<SearchResult[]> {
+  const trimmed = q.trim()
+  if (!trimmed) return []
+
+  const params = new URLSearchParams()
+  params.set('q', trimmed)
+  // Keep it small – this is just one section of global search.
+  params.set('page', '1')
+  params.set('page_size', String(MAX_RESULTS_PER_SECTION))
+
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+  }
+
+  const auth = request.headers.get('authorization')
+  if (auth) headers['Authorization'] = auth
+
+  const cookie = request.headers.get('cookie')
+  if (cookie) headers['Cookie'] = cookie
+
+  for (const endpoint of KNOWLEDGE_SEARCH_ENDPOINTS) {
+    const baseUrl = buildBackendUrl(endpoint)
+    const url = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${params.toString()}`
+
+    try {
+      const res = await fetch(url, {
+        method: 'GET',
+        headers,
+      })
+
+      if (!res.ok) {
+        // Try the next candidate for 404/405; ignore others silently.
+        if (res.status === 404 || res.status === 405) {
+          continue
+        }
+        continue
+      }
+
+      const raw = (await res.json()) as RawKnowledgeSearchResponse
+      const resources = normalizeKnowledgeResults(raw)
+      if (!resources.length) return []
+
+      return resources.slice(0, MAX_RESULTS_PER_SECTION).map((r) => ({
+        id: `knowledge:${String(r.id)}`,
+        title: r.title,
+        snippet: buildKnowledgeSnippet(r),
+        path:
+          r.url && typeof r.url === 'string'
+            ? r.url
+            : `/konnected/learning-library/browse-resources?resource=${encodeURIComponent(
+                String(r.id),
+              )}`,
+      }))
+    } catch {
+      // Move on to the next endpoint.
+      continue
+    }
+  }
+
+  return []
+}
+
+// ---------------------------------------------------------------------------
+// Route handler
+// ---------------------------------------------------------------------------
+
+export async function GET(request: NextRequest) {
+  const q = request.nextUrl.searchParams.get('q')?.trim() ?? ''
+
+  if (!q) {
+    return NextResponse.json(
+      { error: 'Missing query parameter `q`' },
+      {
+        status: 400,
+        headers: { 'Cache-Control': 'no-store' },
+      },
+    )
+  }
+
+  if (q.length < MIN_QUERY_LENGTH) {
+    // Too short – avoid hammering the backend for single-character queries.
+    const body: SearchResponseBody = { results: [] }
+    return NextResponse.json(body, {
+      status: 200,
+      headers: { 'Cache-Control': 'no-store' },
+    })
+  }
+
+  try {
+    const [routeResults, knowledgeResults] = await Promise.all([
+      searchRoutes(q),
+      searchKnowledge(q, request),
+    ])
+
+    const results: SearchResult[] = [...routeResults, ...knowledgeResults]
+
+    const body: SearchResponseBody = { results }
+
+    return NextResponse.json(body, {
+      status: 200,
+      headers: { 'Cache-Control': 'no-store' },
+    })
+  } catch (err) {
+    // In case of any unexpected failure, return a safe, empty payload.
+    const body: SearchResponseBody = { results: [] }
+
+    return NextResponse.json(body, {
+      status: 500,
+      headers: { 'Cache-Control': 'no-store' },
+    })
+  }
 }
 
 ===== END app/_api/search/route.ts =====
@@ -660,8 +1103,9 @@ Si tu veux, ensuite, tu peux me coller le code d’une page “moche” et on la
 import React, { useState, useMemo } from 'react';
 import Head from 'next/head';
 import { Card, List, Modal, Select, Row, Col, Typography, Empty, Divider } from 'antd';
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Option } = Select;
 
 interface Badge {
@@ -673,33 +1117,73 @@ interface Badge {
   description: string;
 }
 
+// Temporary mock data – to be replaced by a real Ekoh badges service
 const sampleBadges: Badge[] = [
-  { id: '1', name: 'Top Contributor', icon: '/badges/top-contributor.png', category: 'Expertise', dateEarned: '2023-08-20', description: 'Awarded for exceptional contributions in discussions.' },
-  { id: '2', name: 'Community Champion', icon: '/badges/community-champion.png', category: 'Community', dateEarned: '2023-07-15', description: 'Recognizes outstanding community engagement and support.' },
-  { id: '3', name: 'Innovator', icon: '/badges/innovator.png', category: 'Innovation', dateEarned: '2023-06-10', description: 'Awarded for innovative ideas and solutions.' },
-  { id: '4', name: 'Expert Reviewer', icon: '/badges/expert-reviewer.png', category: 'Expertise', dateEarned: '2023-05-22', description: 'Given to users providing insightful reviews.' },
-  { id: '5', name: 'Active Participant', icon: '/badges/active-participant.png', category: 'Community', dateEarned: '2023-09-01', description: 'Recognizes consistent participation over time.' },
+  {
+    id: '1',
+    name: 'Top Contributor',
+    icon: '/badges/top-contributor.png',
+    category: 'Expertise',
+    dateEarned: '2023-08-20',
+    description: 'Awarded for exceptional contributions in discussions.',
+  },
+  {
+    id: '2',
+    name: 'Community Champion',
+    icon: '/badges/community-champion.png',
+    category: 'Community',
+    dateEarned: '2023-07-15',
+    description: 'Recognizes outstanding community engagement and support.',
+  },
+  {
+    id: '3',
+    name: 'Innovator',
+    icon: '/badges/innovator.png',
+    category: 'Innovation',
+    dateEarned: '2023-06-10',
+    description: 'Awarded for innovative ideas and solutions.',
+  },
+  {
+    id: '4',
+    name: 'Expert Reviewer',
+    icon: '/badges/expert-reviewer.png',
+    category: 'Expertise',
+    dateEarned: '2023-05-22',
+    description: 'Given to users providing insightful reviews.',
+  },
+  {
+    id: '5',
+    name: 'Active Participant',
+    icon: '/badges/active-participant.png',
+    category: 'Community',
+    dateEarned: '2023-09-01',
+    description: 'Recognizes consistent participation over time.',
+  },
 ];
 
-export default function EarnedBadgesDisplay() {
+export default function EarnedBadgesDisplay(): JSX.Element {
   const [filterCategory, setFilterCategory] = useState<string>('All');
   const [sortOrder, setSortOrder] = useState<string>('Newest');
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const totalBadges = sampleBadges.length;
-  const userLevel = totalBadges >= 5 ? 'Gold' : totalBadges >= 3 ? 'Silver' : 'Bronze';
+  const userLevel =
+    totalBadges >= 5 ? 'Gold' : totalBadges >= 3 ? 'Silver' : 'Bronze';
 
   const displayedBadges = useMemo(() => {
     let badges = [...sampleBadges];
+
     if (filterCategory !== 'All') {
       badges = badges.filter((badge) => badge.category === filterCategory);
     }
+
     badges.sort((a, b) => {
       const dateA = new Date(a.dateEarned).getTime();
       const dateB = new Date(b.dateEarned).getTime();
       return sortOrder === 'Newest' ? dateB - dateA : dateA - dateB;
     });
+
     return badges;
   }, [filterCategory, sortOrder]);
 
@@ -708,79 +1192,112 @@ export default function EarnedBadgesDisplay() {
     setModalVisible(true);
   };
 
+  const closeModal = () => {
+    setModalVisible(false);
+    setSelectedBadge(null);
+  };
+
   return (
     <>
       <Head>
-        <title>Achievements & Badges</title>
+        <title>Achievements & Badges – Ekoh</title>
         <meta
           name="description"
-          content="View all your earned badges and achievements with filtering and detailed views."
+          content="View all your earned Ekoh badges and achievements with filtering and detailed views."
         />
       </Head>
 
-      <div className="container mx-auto p-5">
-        <Title level={2}>Achievements & Badges</Title>
-        <Divider />
+      <EkohPageShell
+        title="Achievements & badges"
+        subtitle="View the badges you have earned in Ekoh and explore what they represent."
+      >
+        {/* Summary */}
+        <Card className="mb-6">
+          <Row gutter={16}>
+            <Col xs={24} sm={12}>
+              <Text strong>Total badges:&nbsp;</Text>
+              <Text>{totalBadges}</Text>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Text strong>Level:&nbsp;</Text>
+              <Text>{userLevel}</Text>
+            </Col>
+          </Row>
+        </Card>
 
-        <Row gutter={16} className="mb-6">
-          <Col xs={24} sm={12}>
-            <Text strong>Total Badges:</Text> <Text>{totalBadges}</Text>
-          </Col>
-          <Col xs={24} sm={12}>
-            <Text strong>Level:</Text> <Text>{userLevel}</Text>
-          </Col>
-        </Row>
+        {/* Filters */}
+        <Card className="mb-6">
+          <Divider orientation="left">Filters</Divider>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12}>
+              <Text>Filter by category</Text>
+              <Select
+                defaultValue="All"
+                style={{ width: '100%', marginTop: 8 }}
+                onChange={(v) => setFilterCategory(v)}
+              >
+                <Option value="All">All</Option>
+                <Option value="Expertise">Expertise</Option>
+                <Option value="Community">Community</Option>
+                <Option value="Innovation">Innovation</Option>
+              </Select>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Text>Sort by date earned</Text>
+              <Select
+                defaultValue="Newest"
+                style={{ width: '100%', marginTop: 8 }}
+                onChange={(v) => setSortOrder(v)}
+              >
+                <Option value="Newest">Newest</Option>
+                <Option value="Oldest">Oldest</Option>
+              </Select>
+            </Col>
+          </Row>
+        </Card>
 
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col xs={24} sm={12}>
-            <Text>Filter by Category:</Text>
-            <Select defaultValue="All" style={{ width: '100%' }} onChange={(v) => setFilterCategory(v)}>
-              <Option value="All">All</Option>
-              <Option value="Expertise">Expertise</Option>
-              <Option value="Community">Community</Option>
-              <Option value="Innovation">Innovation</Option>
-            </Select>
-          </Col>
-          <Col xs={24} sm={12}>
-            <Text>Sort by Date Earned:</Text>
-            <Select defaultValue="Newest" style={{ width: '100%' }} onChange={(v) => setSortOrder(v)}>
-              <Option value="Newest">Newest</Option>
-              <Option value="Oldest">Oldest</Option>
-            </Select>
-          </Col>
-        </Row>
-
-        {displayedBadges.length > 0 ? (
-          <List
-            grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }}
-            dataSource={displayedBadges ?? []}
-            renderItem={(badge: Badge) => (
-              <List.Item>
-                <Card
-                  hoverable
-                  onClick={() => showBadgeDetails(badge)}
-                  cover={
-                    <img
-                      alt={badge.name}
-                      src={badge.icon}
-                      style={{ padding: '10px', objectFit: 'contain', height: 120 }}
+        {/* Badge grid */}
+        <Card>
+          {displayedBadges.length > 0 ? (
+            <List
+              grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 4, xl: 4 }}
+              dataSource={displayedBadges}
+              renderItem={(badge: Badge) => (
+                <List.Item>
+                  <Card
+                    hoverable
+                    onClick={() => showBadgeDetails(badge)}
+                    cover={
+                      <img
+                        alt={badge.name}
+                        src={badge.icon}
+                        style={{
+                          padding: '10px',
+                          objectFit: 'contain',
+                          height: 120,
+                        }}
+                      />
+                    }
+                  >
+                    <Card.Meta
+                      title={badge.name}
+                      description={badge.category}
                     />
-                  }
-                >
-                  <Card.Meta title={badge.name} description={badge.category} />
-                </Card>
-              </List.Item>
-            )}
-          />
-        ) : (
-          <Empty description="No badges earned yet." />
-        )}
+                  </Card>
+                </List.Item>
+              )}
+            />
+          ) : (
+            <Empty description="No badges earned yet." />
+          )}
+        </Card>
 
+        {/* Detail modal */}
         <Modal
           title={selectedBadge?.name}
           open={modalVisible}
-          onOk={() => setModalVisible(false)}
-          onCancel={() => setModalVisible(false)}
+          onOk={closeModal}
+          onCancel={closeModal}
           footer={null}
         >
           {selectedBadge && (
@@ -788,18 +1305,23 @@ export default function EarnedBadgesDisplay() {
               <img
                 alt={selectedBadge.name}
                 src={selectedBadge.icon}
-                style={{ width: '100%', maxHeight: 150, objectFit: 'contain', marginBottom: 16 }}
+                style={{
+                  width: '100%',
+                  maxHeight: 150,
+                  objectFit: 'contain',
+                  marginBottom: 16,
+                }}
               />
               <p>
                 <strong>Description:</strong> {selectedBadge.description}
               </p>
               <p>
-                <strong>Date Earned:</strong> {selectedBadge.dateEarned}
+                <strong>Date earned:</strong> {selectedBadge.dateEarned}
               </p>
             </div>
           )}
         </Modal>
-      </div>
+      </EkohPageShell>
     </>
   );
 }
@@ -1139,13 +1661,13 @@ export default function SegmentLayout({ children }: { children: React.ReactNode 
 
 
 ===== BEGIN app/ekoh/overview-analytics/current-ekoh-score/page.tsx =====
-'use client'
+// app/ekoh/overview-analytics/current-ekoh-score/page.tsx
+'use client';
 
-import React, { useState, useEffect } from 'react'
-import Head from 'next/head'
-import type { NextPage } from 'next'
-import { Card, Alert, Timeline, Table } from 'antd'
-import MainLayout from '@/components/layout-components/MainLayout'
+import React, { useState, useEffect } from 'react';
+import Head from 'next/head';
+import { Card, Alert, Timeline, Table } from 'antd';
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 import {
   PieChart as RePieChart,
   Pie,
@@ -1158,18 +1680,18 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-} from 'recharts'
+} from 'recharts';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28']
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 
-type Point = { date: string; score: number }
+type Point = { date: string; score: number };
 
-const CurrentEkohScore = () => {
+const CurrentEkohScore = (): JSX.Element => {
   const [pieData] = useState([
     { name: 'Expertise', value: 40 },
     { name: 'Community Feedback', value: 35 },
     { name: 'Ethics', value: 25 },
-  ])
+  ]);
 
   const [trendData, setTrendData] = useState<Point[]>([
     { date: '2023-08-01', score: 60 },
@@ -1179,57 +1701,66 @@ const CurrentEkohScore = () => {
     { date: '2023-08-05', score: 70 },
     { date: '2023-08-06', score: 72 },
     { date: '2023-08-07', score: 75 },
-  ])
+  ]);
 
   const timelineData = [
     { key: '1', time: '2023-08-02', event: 'Achieved Expert Level 3' },
     { key: '2', time: '2023-08-04', event: 'Received high community feedback' },
     { key: '3', time: '2023-08-06', event: 'Ethics audit improved rating' },
-  ]
+  ];
 
   const tableColumns = [
     { title: 'Date', dataIndex: 'date', key: 'date' },
     { title: 'Contribution Detail', dataIndex: 'detail', key: 'detail' },
-  ]
+  ];
 
   const tableData = [
     { key: '1', date: '2023-08-02', detail: 'Expert review added +4 points' },
     { key: '2', date: '2023-08-04', detail: 'Community vote increased score by +3 points' },
     { key: '3', date: '2023-08-06', detail: 'Ethics audit contributed +2 points' },
-  ]
+  ];
 
+  // Simple live update to simulate a moving score trend
   useEffect(() => {
     const tick = () => {
-      const datePart = new Date().toLocaleDateString('en-CA') // "YYYY-MM-DD"
-      const newScore = 60 + Math.floor(Math.random() * 20)
+      const datePart = new Date().toLocaleDateString('en-CA'); // "YYYY-MM-DD"
+      const newScore = 60 + Math.floor(Math.random() * 20);
 
-      setTrendData(prev => {
-        const last = prev.slice(-7)
-        const existingIndex = last.findIndex(p => p.date === datePart)
+      setTrendData((prev) => {
+        const last = prev.slice(-7);
+        const existingIndex = last.findIndex((p) => p.date === datePart);
 
         if (existingIndex >= 0) {
-          // Évite Point | undefined: pas d’indexation, on map
-          return last.map((p, i) => (i === existingIndex ? { date: p.date, score: newScore } : p))
+          return last.map((p, i) =>
+            i === existingIndex ? { date: p.date, score: newScore } : p,
+          );
         }
 
-        return [...prev.slice(-6), { date: datePart, score: newScore }]
-      })
-    }
+        return [...prev.slice(-6), { date: datePart, score: newScore }];
+      });
+    };
 
-    tick()
-    const id = setInterval(tick, 5000)
-    return () => clearInterval(id)
-  }, [])
+    tick();
+    const id = setInterval(tick, 5000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <>
       <Head>
-        <title>Current Ekoh Score – Overview & Analytics</title>
-        <meta name="description" content="Detailed breakdown of your Ekoh score with charts, timeline, and evaluation details." />
+        {/* Use the spec term “Score Analytics” for this Ekoh view */}
+        <title>Ekoh – Score Analytics</title>
+        <meta
+          name="description"
+          content="Donut and trend line view of the factors contributing to your Ekoh score, plus key events and recent evaluations."
+        />
       </Head>
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Current Ekoh Score – Overview & Analytics</h1>
 
+      <EkohPageShell
+        title="Score Analytics"
+        subtitle="Breakdown of your Ekoh score factors over time, with key events and recent evaluations."
+      >
+        {/* Score breakdown donut */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Score Breakdown</h2>
           <div style={{ width: '100%', height: 300 }}>
@@ -1237,9 +1768,20 @@ const CurrentEkohScore = () => {
               <RePieChart>
                 <ReTooltip />
                 <Legend verticalAlign="bottom" height={36} />
-                <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} dataKey="value" paddingAngle={5}>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  dataKey="value"
+                  paddingAngle={5}
+                >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Pie>
               </RePieChart>
@@ -1247,6 +1789,7 @@ const CurrentEkohScore = () => {
           </div>
         </Card>
 
+        {/* Historical trend line */}
         <Card className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Historical Trend</h2>
           <div style={{ width: '100%', height: 250 }}>
@@ -1262,10 +1805,13 @@ const CurrentEkohScore = () => {
           </div>
         </Card>
 
+        {/* Key events timeline */}
         <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Key Events Influencing Your Score</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Key Events Influencing Your Score
+          </h2>
           <Timeline>
-            {timelineData.map(item => (
+            {timelineData.map((item) => (
               <Timeline.Item key={item.key}>
                 <strong>{item.time}</strong> - {item.event}
               </Timeline.Item>
@@ -1273,8 +1819,11 @@ const CurrentEkohScore = () => {
           </Timeline>
         </Card>
 
+        {/* Calculation explanation */}
         <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">How Your Score is Calculated</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            How Your Score is Calculated
+          </h2>
           <Alert
             message="Score Calculation Explained"
             description="Your Ekoh score is derived from a weighted combination of your expertise level, community feedback, and ethical evaluations. This transparent approach ensures that every contribution is fairly recognized."
@@ -1283,18 +1832,19 @@ const CurrentEkohScore = () => {
           />
         </Card>
 
+        {/* Recent contributing evaluations */}
         <Card>
-          <h2 className="text-xl font-semibold mb-4">Recent Evaluations Impacting Your Score</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            Recent Evaluations Impacting Your Score
+          </h2>
           <Table columns={tableColumns} dataSource={tableData} pagination={false} />
         </Card>
-      </div>
+      </EkohPageShell>
     </>
-  )
-}
+  );
+};
 
-
-
-export default CurrentEkohScore
+export default CurrentEkohScore;
 
 ===== END app/ekoh/overview-analytics/current-ekoh-score/page.tsx =====
 
@@ -7733,17 +8283,18 @@ import {
 import { useRequest } from 'ahooks';
 import dayjs, { Dayjs } from 'dayjs';
 import usePageTitle from '@/hooks/usePageTitle';
-import {
-  fetchChangelog,
-  type Changelog,
-  type ChangelogEntry,
-} from '@/services/learn';
+import { fetchChangelog, type ChangelogEntry } from '@/services/learn';
 import EthikosPageShell from '../../EthikosPageShell';
 
 const { RangePicker } = DatePicker;
 const { Text, Title } = Typography;
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
+
+// Local response type matching services/learn.ts
+type ChangelogResponse = {
+  entries: ChangelogEntry[];
+};
 
 const TAG_COLOR: Record<string, string> = {
   NEW: 'green',
@@ -7764,15 +8315,15 @@ export default function Changelog() {
   // Kept for compatibility; EthikosPageShell will set the final <title>.
   usePageTitle('Learn · Changelog');
 
-  const { data, loading, error, refresh } = useRequest<Changelog, []>(
+  const { data, loading, error, refresh } = useRequest<ChangelogResponse, []>(
     fetchChangelog,
   );
 
   // Raw entries
-  const entries = data?.entries ?? [];
+  const entries: ChangelogEntry[] = data?.entries ?? [];
 
   // Sort newest → oldest
-  const sortedEntries = useMemo(
+  const sortedEntries = useMemo<ChangelogEntry[]>(
     () =>
       [...entries].sort(
         (a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf(),
@@ -7781,18 +8332,20 @@ export default function Changelog() {
   );
 
   // Derive available tags (normalized)
-  const allTags = useMemo(
+  const allTags = useMemo<string[]>(
     () =>
       Array.from(
         new Set(
-          sortedEntries.flatMap((e) => e.tags.map((t) => normalizeTag(t))),
+          sortedEntries.flatMap((e: ChangelogEntry) =>
+            e.tags.map((t: string) => normalizeTag(t)),
+          ),
         ),
       ).sort(),
     [sortedEntries],
   );
 
   // Derive versions (keep order of first appearance in sorted list)
-  const allVersions = useMemo(() => {
+  const allVersions = useMemo<string[]>(() => {
     const seen = new Set<string>();
     const out: string[] = [];
     for (const e of sortedEntries) {
@@ -7811,24 +8364,23 @@ export default function Changelog() {
   const [view, setView] = useState<'timeline' | 'list'>('timeline');
 
   // Filtered list
-  const filtered = useMemo(() => {
-    let list = sortedEntries;
+  const filtered = useMemo<ChangelogEntry[]>(() => {
+    let list: ChangelogEntry[] = sortedEntries;
 
     // text search (version or notes)
     const q = query.trim().toLowerCase();
     if (q) {
-      list = list.filter(
-        (e) =>
-          e.version.toLowerCase().includes(q) ||
-          e.notes.some((n) => n.toLowerCase().includes(q)),
-      );
+      list = list.filter((e: ChangelogEntry) => {
+        if (e.version.toLowerCase().includes(q)) return true;
+        return e.notes.some((n: string) => n.toLowerCase().includes(q));
+      });
     }
 
     // tag filter (OR)
     if (selectedTags.length > 0) {
       const allow = new Set(selectedTags.map(normalizeTag));
-      list = list.filter((e) =>
-        e.tags.map(normalizeTag).some((t) => allow.has(t)),
+      list = list.filter((e: ChangelogEntry) =>
+        e.tags.map(normalizeTag).some((t: string) => allow.has(t)),
       );
     }
 
@@ -7836,7 +8388,7 @@ export default function Changelog() {
     if (range && range[0] && range[1]) {
       const start = range[0].startOf('day').valueOf();
       const end = range[1].endOf('day').valueOf();
-      list = list.filter((e) => {
+      list = list.filter((e: ChangelogEntry) => {
         const t = dayjs(e.date).valueOf();
         return t >= start && t <= end;
       });
@@ -7851,7 +8403,7 @@ export default function Changelog() {
     () => new Set(filtered.map((e) => e.version)).size,
     [filtered],
   );
-  const tagCounts = useMemo(() => {
+  const tagCounts = useMemo<[string, number][]>(() => {
     const m = new Map<string, number>();
     for (const e of filtered) {
       for (const t of e.tags) {
@@ -7885,9 +8437,9 @@ export default function Changelog() {
   async function copyMarkdown() {
     const md = filtered
       .map(
-        (e) =>
+        (e: ChangelogEntry) =>
           `### ${e.version} — ${dayjs(e.date).format('YYYY-MM-DD')}\n` +
-          e.notes.map((n) => `- ${n}`).join('\n'),
+          e.notes.map((n: string) => `- ${n}`).join('\n'),
       )
       .join('\n\n');
     try {
@@ -7901,7 +8453,7 @@ export default function Changelog() {
   function renderTags(tags: string[]) {
     return (
       <Space size={[4, 4]} wrap>
-        {tags.map((t) => {
+        {tags.map((t: string) => {
           const key = normalizeTag(t);
           const color = TAG_COLOR[key] ?? 'default';
           return (
@@ -8112,7 +8664,7 @@ export default function Changelog() {
                     {allTags.length === 0 ? (
                       <Text type="secondary">No tags</Text>
                     ) : (
-                      allTags.map((t) => (
+                      allTags.map((t: string) => (
                         <Tag.CheckableTag
                           key={t}
                           checked={selectedTags.includes(t)}
@@ -8164,7 +8716,7 @@ export default function Changelog() {
           >
             {view === 'timeline' ? (
               <Timeline mode="left">
-                {filtered.map((e, idx) => {
+                {filtered.map((e: ChangelogEntry, idx: number) => {
                   const id = `ver-${e.version}`;
                   return (
                     <Timeline.Item
@@ -8185,7 +8737,7 @@ export default function Changelog() {
                             {renderTags(e.tags)}
                           </Space>
                           <ul style={{ marginTop: 4 }}>
-                            {e.notes.map((n, i) => (
+                            {e.notes.map((n: string, i: number) => (
                               <li key={i}>
                                 <Text>{n}</Text>
                               </li>
@@ -8205,7 +8757,7 @@ export default function Changelog() {
                 pagination={{ pageSize: 10, showSizeChanger: false }}
                 metas={{
                   title: {
-                    render: (_, row) => (
+                    render: (_dom, row) => (
                       <Space size="small" wrap>
                         <Text strong>{row.version}</Text>
                         <Tag icon={<CalendarOutlined />}>
@@ -8215,12 +8767,12 @@ export default function Changelog() {
                     ),
                   },
                   subTitle: {
-                    render: (_, row) => renderTags(row.tags),
+                    render: (_dom, row) => renderTags(row.tags),
                   },
                   description: {
-                    render: (_, row) => (
+                    render: (_dom, row) => (
                       <ul style={{ marginTop: 4 }}>
-                        {row.notes.map((n, i) => (
+                        {row.notes.map((n: string, i: number) => (
                           <li key={i}>
                             <Text>{n}</Text>
                           </li>
@@ -10825,7 +11377,9 @@ export default function Credentials() {
         Pending: { text: 'Pending', status: 'Processing' },
         Rejected: { text: 'Rejected', status: 'Error' },
       },
-      render: (_, row) => <Tag color={statusColor[row.status]}>{row.status}</Tag>,
+      render: (_, row) => (
+        <Tag color={statusColor[row.status]}>{row.status}</Tag>
+      ),
     },
     {
       title: 'Actions',
@@ -10958,13 +11512,18 @@ export default function Credentials() {
                   Click or drag a credential file to this area to upload
                 </p>
                 <p className="ant-upload-hint">
-                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at a time.
+                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at a
+                  time.
                 </p>
               </Upload.Dragger>
 
               <Divider />
 
-              <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <Space
+                direction="vertical"
+                size="small"
+                style={{ width: '100%' }}
+              >
                 <Text type="secondary">
                   Tip: upload focused evidence rather than full CVs. For example, a
                   single certification for climate policy is more helpful than a long
@@ -11085,7 +11644,8 @@ export default function Credentials() {
               {
                 title: 'Issued',
                 dataIndex: 'issuedAt',
-                render: (_, row) => dayjs(row.issuedAt).format('YYYY-MM-DD'),
+                render: (_, row) =>
+                  dayjs(row.issuedAt).format('YYYY-MM-DD'),
               },
               {
                 title: 'Status',
@@ -14818,10 +15378,10 @@ export default function DocumentManagementPage() {
 
 
 ===== BEGIN app/keenkonnect/knowledge/search-filter-documents/page.tsx =====
+// app/keenkonnect/knowledge/search-filter-documents/page.tsx
 'use client'
 
 import React, { useMemo, useState } from 'react'
-import Head from 'next/head'
 import { Card, Alert, Pagination, Tag } from 'antd'
 import type { PaginationProps } from 'antd'
 import dayjs, { Dayjs } from 'dayjs'
@@ -14833,6 +15393,7 @@ import {
   ProFormSelect,
   ProFormDateRangePicker,
 } from '@ant-design/pro-components'
+import KeenPage from '@/app/keenkonnect/KeenPageShell'
 
 interface DocumentResource {
   key: string
@@ -14858,7 +15419,7 @@ interface FilterState {
   sort: SortOption
 }
 
-// Demo data (même contenu que l’ancienne page)
+// Demo data (same content as the previous version)
 const sampleDocuments: DocumentResource[] = [
   {
     key: '1',
@@ -14918,12 +15479,8 @@ const sampleDocuments: DocumentResource[] = [
 ]
 
 const allAuthors = Array.from(new Set(sampleDocuments.map((d) => d.author))).sort()
-const allTags = Array.from(
-  new Set(sampleDocuments.flatMap((d) => d.tags)),
-).sort()
-const allLanguages = Array.from(
-  new Set(sampleDocuments.map((d) => d.language)),
-).sort()
+const allTags = Array.from(new Set(sampleDocuments.flatMap((d) => d.tags))).sort()
+const allLanguages = Array.from(new Set(sampleDocuments.map((d) => d.language))).sort()
 
 const DEFAULT_SORT: SortOption = 'relevance'
 
@@ -14947,7 +15504,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
     setFilters(nextFilters)
     setCurrentPage(1)
 
-    // ProForm attend un bool pour onFinish
+    // ProForm expects a boolean from onFinish
     return true
   }
 
@@ -14969,12 +15526,9 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
         !authors || authors.length === 0 || authors.includes(doc.author)
 
       const matchesTags =
-        !tags ||
-        tags.length === 0 ||
-        tags.every((t) => doc.tags.includes(t))
+        !tags || tags.length === 0 || tags.every((t) => doc.tags.includes(t))
 
-      const matchesLanguage =
-        !language || doc.language === language
+      const matchesLanguage = !language || doc.language === language
 
       let matchesDate = true
       if (dateRange && dateRange[0] && dateRange[1]) {
@@ -15014,7 +15568,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
         )
         break
       case 'popularity':
-        // Placeholder : on réutilise le score de pertinence
+        // Placeholder: reuse relevance score
         docs.sort((a, b) => b.relevanceScore - a.relevanceScore)
         break
       case 'relevance':
@@ -15040,11 +15594,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
     if (filters.authors && filters.authors.length > 0) count++
     if (filters.tags && filters.tags.length > 0) count++
     if (filters.language) count++
-    if (
-      filters.dateRange &&
-      filters.dateRange[0] &&
-      filters.dateRange[1]
-    ) {
+    if (filters.dateRange && filters.dateRange[0] && filters.dateRange[1]) {
       count++
     }
     return count
@@ -15138,134 +15688,119 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
     .replace(/^\w/, (c) => c.toUpperCase())
 
   return (
-    <>
-      <Head>
-        <title>KeenKonnect – Search &amp; Filter Documents</title>
-        <meta
-          name="description"
-          content="Advanced search and filtering for knowledge documents in KeenKonnect."
-        />
-      </Head>
-
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">
-          Search &amp; Filter Documents
-        </h1>
-
-        {/* Bloc de filtres avancés (ProForm / QueryFilter) */}
-        <Card className="mb-4">
-          <QueryFilter
-            onFinish={handleFilterFinish}
-            onReset={handleFilterReset}
-            labelWidth="auto"
-            defaultCollapsed={false}
-            span={8}
-            initialValues={{ sort: DEFAULT_SORT }}
-          >
-            <ProFormText
-              name="keyword"
-              label="Keywords"
-              placeholder="Search by title or content"
-            />
-
-            <ProFormSelect
-              name="authors"
-              label="Authors"
-              placeholder="Select authors"
-              mode="multiple"
-              options={allAuthors.map((a) => ({
-                label: a,
-                value: a,
-              }))}
-            />
-
-            <ProFormSelect
-              name="tags"
-              label="Tags"
-              placeholder="Select tags"
-              mode="multiple"
-              options={allTags.map((t) => ({
-                label: t,
-                value: t,
-              }))}
-            />
-
-            <ProFormSelect
-              name="language"
-              label="Language"
-              placeholder="All languages"
-              allowClear
-              options={allLanguages.map((lang) => ({
-                label: lang,
-                value: lang,
-              }))}
-            />
-
-            <ProFormDateRangePicker
-              name="dateRange"
-              label="Last Updated"
-              placeholder={['From', 'To']}
-            />
-
-            <ProFormSelect
-              name="sort"
-              label="Sort By"
-              options={[
-                { label: 'Relevance', value: 'relevance' },
-                { label: 'Date', value: 'date' },
-                { label: 'Popularity', value: 'popularity' },
-              ]}
-            />
-          </QueryFilter>
-        </Card>
-
-        {/* Alert de synthèse des résultats / filtres */}
-        <Alert
-          type={total === 0 ? 'warning' : 'info'}
-          showIcon
-          className="mb-4"
-          message={
-            total === 0
-              ? 'No documents match your criteria.'
-              : `${total} document${total > 1 ? 's' : ''} match your criteria.`
-          }
-          description={
-            <div style={{ fontSize: 12 }}>
-              <div>
-                Sort:{' '}
-                <strong>
-                  {sortLabel}
-                </strong>
-              </div>
-              <div>
-                Active filters:{' '}
-                <strong>{activeFilterCount}</strong>
-              </div>
-            </div>
-          }
-        />
-
-        {/* Tableau principal (ProTable) + Pagination externe */}
-        <Card>
-          <ProTable<DocumentResource>
-            rowKey="key"
-            columns={columns}
-            dataSource={paginatedDocuments}
-            search={false}
-            options={false}
-            pagination={false} // Pagination gérée manuellement en dessous
-            rowSelection={false}
-            toolBarRender={false}
+    <KeenPage
+      title="Search & Filter Documents"
+      description="Advanced search and filtering for knowledge documents in KeenKonnect."
+    >
+      {/* Advanced filters (QueryFilter) */}
+      <Card className="mb-4">
+        <QueryFilter
+          onFinish={handleFilterFinish}
+          onReset={handleFilterReset}
+          labelWidth="auto"
+          defaultCollapsed={false}
+          span={8}
+          initialValues={{ sort: DEFAULT_SORT }}
+        >
+          <ProFormText
+            name="keyword"
+            label="Keywords"
+            placeholder="Search by title or content"
           />
 
-          {total > 0 && (
-            <div style={{ marginTop: 16, textAlign: 'right' }}>
-              <Pagination {...paginationProps} />
+          <ProFormSelect
+            name="authors"
+            label="Authors"
+            placeholder="Select authors"
+            mode="multiple"
+            options={allAuthors.map((a) => ({
+              label: a,
+              value: a,
+            }))}
+          />
+
+          <ProFormSelect
+            name="tags"
+            label="Tags"
+            placeholder="Select tags"
+            mode="multiple"
+            options={allTags.map((t) => ({
+              label: t,
+              value: t,
+            }))}
+          />
+
+          <ProFormSelect
+            name="language"
+            label="Language"
+            placeholder="All languages"
+            allowClear
+            options={allLanguages.map((lang) => ({
+              label: lang,
+              value: lang,
+            }))}
+          />
+
+          <ProFormDateRangePicker
+            name="dateRange"
+            label="Last Updated"
+            placeholder={['From', 'To']}
+          />
+
+          <ProFormSelect
+            name="sort"
+            label="Sort By"
+            options={[
+              { label: 'Relevance', value: 'relevance' },
+              { label: 'Date', value: 'date' },
+              { label: 'Popularity', value: 'popularity' },
+            ]}
+          />
+        </QueryFilter>
+      </Card>
+
+      {/* Summary of results / filters */}
+      <Alert
+        type={total === 0 ? 'warning' : 'info'}
+        showIcon
+        className="mb-4"
+        message={
+          total === 0
+            ? 'No documents match your criteria.'
+            : `${total} document${total > 1 ? 's' : ''} match your criteria.`
+        }
+        description={
+          <div style={{ fontSize: 12 }}>
+            <div>
+              Sort: <strong>{sortLabel}</strong>
             </div>
-          )}
-        </Card>
-      </div>
-    </>
+            <div>
+              Active filters: <strong>{activeFilterCount}</strong>
+            </div>
+          </div>
+        }
+      />
+
+      {/* Main table + external pagination */}
+      <Card>
+        <ProTable<DocumentResource>
+          rowKey="key"
+          columns={columns}
+          dataSource={paginatedDocuments}
+          search={false}
+          options={false}
+          pagination={false} // Manual pagination below
+          rowSelection={false}
+          toolBarRender={false}
+        />
+
+        {total > 0 && (
+          <div style={{ marginTop: 16, textAlign: 'right' }}>
+            <Pagination {...paginationProps} />
+          </div>
+        )}
+      </Card>
+    </KeenPage>
   )
 }
 
@@ -18633,37 +19168,43 @@ const EXPERTISE_CATALOG: ExpertiseItem[] = [
   {
     key: 'frontend',
     label: 'Frontend Development',
-    description: 'React, TypeScript, modern component patterns and design systems.',
+    description:
+      'React, TypeScript, modern component patterns and design systems.',
     defaultLevel: 4.5,
   },
   {
     key: 'backend',
     label: 'Backend Development',
-    description: 'APIs, microservices, Node.js / Python, data modelling & reliability.',
+    description:
+      'APIs, microservices, Node.js / Python, data modelling & reliability.',
     defaultLevel: 4,
   },
   {
     key: 'uiux',
     label: 'UI/UX Design',
-    description: 'User journeys, wireframes, interactive prototypes, design systems.',
+    description:
+      'User journeys, wireframes, interactive prototypes, design systems.',
     defaultLevel: 4.5,
   },
   {
     key: 'data-science',
     label: 'Data Science',
-    description: 'Exploratory analysis, ML models, dashboards, decision support.',
+    description:
+      'Exploratory analysis, ML models, dashboards, decision support.',
     defaultLevel: 3.5,
   },
   {
     key: 'devops',
     label: 'DevOps',
-    description: 'CI/CD, observability, infrastructure-as-code, cloud environments.',
+    description:
+      'CI/CD, observability, infrastructure-as-code, cloud environments.',
     defaultLevel: 3.5,
   },
   {
     key: 'mobile',
     label: 'Mobile Development',
-    description: 'Native & cross‑platform apps, performance and offline patterns.',
+    description:
+      'Native & cross‑platform apps, performance and offline patterns.',
     defaultLevel: 3,
   },
   {
@@ -18675,12 +19216,16 @@ const EXPERTISE_CATALOG: ExpertiseItem[] = [
   {
     key: 'pm',
     label: 'Project Management',
-    description: 'Roadmapping, stakeholder alignment, agile delivery and rituals.',
+    description:
+      'Roadmapping, stakeholder alignment, agile delivery and rituals.',
     defaultLevel: 4,
   },
 ];
 
-const CURRENT_EXPERTISE_INITIAL: string[] = ['Frontend Development', 'UI/UX Design'];
+const CURRENT_EXPERTISE_INITIAL: string[] = [
+  'Frontend Development',
+  'UI/UX Design',
+];
 
 const SELECTABLE_FIELDS: string[] = [
   'React',
@@ -18703,7 +19248,9 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
 
   // Gestion interne de la sélection via Tag.CheckableTag
-  const [selectedTags, setSelectedTags] = useState<string[]>(CURRENT_EXPERTISE_INITIAL);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    CURRENT_EXPERTISE_INITIAL,
+  );
 
   // Liste pour l’aperçu (List + Rate) basée sur les tags sélectionnés
   const previewExpertise = useMemo(
@@ -18731,7 +19278,8 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
     <PageContainer title="Manage Expertise Areas">
       {/* ✅ description moved inside instead of using a PageContainer prop */}
       <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-        Declare and fine‑tune the expertise areas used by Ekoh, KeenKonnect matching, and Smart Vote.
+        Declare and fine‑tune the expertise areas used by Ekoh, KeenKonnect
+        matching, and Smart Vote.
       </Paragraph>
 
       <Divider orientation="left">Your expertise profile</Divider>
@@ -18828,7 +19376,8 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         itemLayout="vertical"
         dataSource={previewExpertise}
         locale={{
-          emptyText: 'Select at least one expertise area above to see the preview.',
+          emptyText:
+            'Select at least one expertise area above to see the preview.',
         }}
         renderItem={(item) => (
           <List.Item key={item.key}>
@@ -27476,19 +28025,19 @@ interface CreateOfflinePackagePayload {
 
 // Use relative URLs so that NEXT_PUBLIC_API_BASE or "/api" baseURL applies
 // consistently (see services/_request.ts and Global Parameter Reference).
-const OFFLINE_PACKAGE_LIST_ENDPOINT = 'konnected/knowledge/offline-packages/';
+const OFFLINE_PACKAGE_LIST_ENDPOINT = 'konnected/offline-packages/';
 const OFFLINE_PACKAGE_DETAIL_ENDPOINT = (id: OfflinePackage['id']) =>
-  `konnected/knowledge/offline-packages/${id}/`;
+  `konnected/offline-packages/${id}/`;
 const OFFLINE_PACKAGE_SYNC_ENDPOINT = (id: OfflinePackage['id']) =>
-  `konnected/knowledge/offline-packages/${id}/sync/`;
+  `konnected/offline-packages/${id}/sync/`;
 
 // Knowledge module (KonnectED) offline-eligible resources.
 // We probe a small set of candidate endpoints to stay aligned with the v14
 // Knowledge spec while the backend paths stabilise.
 const OFFLINE_RESOURCES_ENDPOINTS: readonly string[] = [
+  '/api/konnected/resources/',
   '/api/knowledge-resources/',
   '/api/knowledge/resources/',
-  '/api/konnected/resources/',
 ];
 
 function normalizeList<T>(raw: unknown): T[] {
@@ -27518,7 +28067,7 @@ async function createOfflinePackage(
 }
 
 async function deleteOfflinePackage(id: OfflinePackage['id']): Promise<void> {
-  await api.delete( OFFLINE_PACKAGE_DETAIL_ENDPOINT(id) );
+  await api.delete(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id));
 }
 
 async function syncOfflinePackage(id: OfflinePackage['id']): Promise<void> {

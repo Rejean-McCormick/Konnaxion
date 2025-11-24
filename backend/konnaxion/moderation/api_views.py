@@ -1,43 +1,48 @@
 # backend/konnaxion/moderation/api_views.py
-"""
-REST API for the cross‑module moderation queue.
+"""REST API for moderation and audit-log admin endpoints.
 
-This module exposes two endpoints (to be wired in config/urls.py):
+This module exposes three endpoints (to be wired in ``config/urls.py``):
 
-    GET  /api/admin/moderation
-    POST /api/admin/moderation/<id>
+    GET  /admin/moderation
+    POST /admin/moderation/<id>
+    GET  /admin/audit/logs
 
 They are consumed by:
+
   - services/admin.fetchModerationQueue
   - services/admin.actOnReport
-and by the Ethikos / KonnectED admin moderation UIs.
+  - services/audit.fetchAuditLogs
+  - the Ethikos / KonnectED admin moderation & audit UIs.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import generics, permissions, status
+from rest_framework import serializers as drf_serializers
 from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import ModerationReport
+from .models import AuditLogEntry, ModerationReport
 from .serializers import ModerationReportSerializer
 
 
 class IsModerationAdmin(permissions.BasePermission):
     """
-    Permission class for moderation endpoints.
+    Permission class for moderation and audit endpoints.
 
     Default behaviour:
       - requires an authenticated user
       - and user.is_staff or user.is_superuser
 
     If you later introduce a dedicated "moderator" role or group,
-    you can extend `has_permission` accordingly (e.g. check groups).
+    you can extend ``has_permission`` accordingly (e.g. check groups).
     """
 
     def has_permission(self, request, view) -> bool:  # type: ignore[override]
@@ -50,11 +55,11 @@ class IsModerationAdmin(permissions.BasePermission):
 
 class ModerationQueueView(generics.ListAPIView):
     """
-    GET /api/admin/moderation
+    GET /admin/moderation
 
     Returns the global moderation queue used by several frontends.
 
-    Response shape is intentionally simple and stable:
+    Response shape is intentionally simple and stable::
 
         {
             "items": [
@@ -64,7 +69,7 @@ class ModerationQueueView(generics.ListAPIView):
                     "reporter": "...",
                     "type": "Spam" | "Harassment" | "Misinformation",
                     "status": "Pending" | "Resolved" | "Escalated",
-                    ... // optional richer fields
+                    ...  # optional richer fields
                 },
                 ...
             ]
@@ -82,7 +87,7 @@ class ModerationQueueView(generics.ListAPIView):
     def get_queryset(self):
         qs = ModerationReport.objects.all()
 
-        # Optional status filter: /api/admin/moderation?status=Pending
+        # Optional status filter: /admin/moderation?status=Pending
         status_param = self.request.query_params.get("status")
         if status_param and any(f.name == "status" for f in ModerationReport._meta.fields):
             qs = qs.filter(status=status_param)
@@ -98,15 +103,16 @@ class ModerationQueueView(generics.ListAPIView):
     def list(self, request, *args, **kwargs) -> Response:  # type: ignore[override]
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
-        # Wrap into { items: [...] } to match services/admin.ModernationPayload
+        # Wrap into {items: [...]} to match services/admin.ModerationPayload
         return Response({"items": serializer.data})
 
 
 class ModerationDecisionView(APIView):
     """
-    POST /api/admin/moderation/<id>
+    POST /admin/moderation/<id>
 
-    Body:
+    Body::
+
         { "remove": true | false }
 
     Semantics:
@@ -153,7 +159,7 @@ class ModerationDecisionView(APIView):
         # to the underlying target object, call it defensively.
         apply_fn = getattr(report, "apply_decision", None)
         if callable(apply_fn):
-            # Recommended signature on the model:
+            # Recommended signature on the model::
             #   def apply_decision(self, *, remove: bool, actor: User | None) -> None: ...
             apply_fn(remove=remove, actor=request.user if request.user.is_authenticated else None)
 
@@ -161,3 +167,134 @@ class ModerationDecisionView(APIView):
         report.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# ---------------------------------------------------------------------------
+# Audit-log API
+# ---------------------------------------------------------------------------
+
+
+class AuditLogEntrySerializer(drf_serializers.ModelSerializer):
+    """
+    Serializer aligned with services/audit.ts::LogRow.
+
+    The only difference is that ``entityId`` is backed by the ``entity_id``
+    model field.
+    """
+
+    entityId = drf_serializers.CharField(
+        source="entity_id",
+        required=False,
+        allow_blank=True,
+    )
+
+    class Meta:
+        model = AuditLogEntry
+        fields = (
+            "id",
+            "ts",
+            "actor",
+            "action",
+            "target",
+            "severity",
+            "entity",
+            "entityId",
+            "ip",
+            "status",
+            "meta",
+        )
+        read_only_fields = fields
+
+
+class AuditLogPagination(PageNumberPagination):
+    """
+    Page-number pagination matching the admin audit UI contract.
+
+    Query params:
+
+      - ``page``     – 1‑based page index
+      - ``pageSize`` – number of items per page (max 200)
+    """
+
+    page_query_param = "page"
+    page_size_query_param = "pageSize"
+    page_size = 20
+    max_page_size = 200
+
+    def get_paginated_response(self, data):
+        assert self.request is not None  # for type checkers
+        return Response(
+            {
+                "items": data,
+                "page": self.page.number,
+                "pageSize": self.get_page_size(self.request),
+                "total": self.page.paginator.count,
+            }
+        )
+
+
+class AuditLogListView(generics.ListAPIView):
+    """
+    GET /admin/audit/logs
+
+    Paginated, filterable audit log stream used by the admin UI.
+
+    Supported query params:
+
+        page      – 1-based page index (default: 1)
+        pageSize  – page size (default: 20, max: 200)
+        q         – free-text search across actor, action, target, entity
+        severity  – 'info' | 'warn' | 'critical'
+        sort      – one of 'ts', '-ts', 'actor', '-actor',
+                    'action', '-action', 'severity', '-severity',
+                    'status', '-status'
+
+    Response shape::
+
+        {
+            "items": [...],
+            "page": <int>,
+            "pageSize": <int>,
+            "total": <int>
+        }
+    """
+
+    serializer_class = AuditLogEntrySerializer
+    permission_classes = [IsModerationAdmin]
+    pagination_class = AuditLogPagination
+
+    def get_queryset(self):
+        qs = AuditLogEntry.objects.all()
+        params = self.request.query_params
+
+        severity = params.get("severity")
+        if severity:
+            qs = qs.filter(severity=severity)
+
+        q = params.get("q")
+        if q:
+            qs = qs.filter(
+                Q(actor__icontains=q)
+                | Q(action__icontains=q)
+                | Q(target__icontains=q)
+                | Q(entity__icontains=q)
+            )
+
+        sort = params.get("sort") or "-ts"
+        allowed_sorts = {
+            "ts",
+            "-ts",
+            "actor",
+            "-actor",
+            "action",
+            "-action",
+            "severity",
+            "-severity",
+            "status",
+            "-status",
+        }
+        if sort not in allowed_sorts:
+            sort = "-ts"
+
+        # Secondary order for deterministic pagination
+        return qs.order_by(sort, "-id")
