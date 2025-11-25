@@ -33,8 +33,11 @@ Central DRF router for every Konnaxion v14 API endpoint.
     path("api/", include("config.api_router"))
 """
 
+from typing import Optional, Type
+
 from django.conf import settings
 from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework.viewsets import ViewSet
 
 # ── Core / Users ──────────────────────────────────────────
 from konnaxion.users.api.views import UserViewSet  # /api/users/...
@@ -48,7 +51,7 @@ StanceViewSet = ethikos_api.StanceViewSet
 ArgumentViewSet = ethikos_api.ArgumentViewSet
 
 # Optional category ViewSet (name can be CategoryViewSet or EthikosCategoryViewSet)
-EthikosCategoryViewSet = getattr(
+EthikosCategoryViewSet: Optional[Type[ViewSet]] = getattr(
     ethikos_api,
     "CategoryViewSet",
     getattr(ethikos_api, "EthikosCategoryViewSet", None),
@@ -92,6 +95,19 @@ from konnaxion.kreative.api_views import KreativeArtworkViewSet, GalleryViewSet
 
 router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
+
+def register_optional(
+    prefix: str,
+    viewset: Optional[Type[ViewSet]],
+    basename: str,
+) -> None:
+    """
+    Helper for optional ViewSets: only register if the ViewSet exists.
+    """
+    if viewset is not None:
+        router.register(prefix, viewset, basename=basename)
+
+
 # Core / Users
 router.register("users", UserViewSet, basename="user")
 
@@ -101,26 +117,26 @@ router.register("ethikos/stances", StanceViewSet, basename="ethikos-stance")
 router.register("ethikos/arguments", ArgumentViewSet, basename="ethikos-argument")
 
 # Register categories only if the ViewSet exists in the codebase
-if EthikosCategoryViewSet is not None:
-    router.register(
-        "ethikos/categories",
-        EthikosCategoryViewSet,
-        basename="ethikos-category",
-    )
+register_optional(
+    "ethikos/categories",
+    EthikosCategoryViewSet,
+    basename="ethikos-category",
+)
 
 # keenKonnect
 router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-project")
 
 # Kollective Intelligence (optional until Vote* ViewSets are implemented)
-if VoteViewSet is not None:
-    router.register("kollective/votes", VoteViewSet, basename="kollective-vote")
-
-if VoteResultViewSet is not None:
-    router.register(
-        "kollective/vote-results",
-        VoteResultViewSet,
-        basename="kollective-vote-result",
-    )
+register_optional(
+    "kollective/votes",
+    VoteViewSet,
+    basename="kollective-vote",
+)
+register_optional(
+    "kollective/vote-results",
+    VoteResultViewSet,
+    basename="kollective-vote-result",
+)
 
 # KonnectED – Knowledge
 router.register(
@@ -130,12 +146,11 @@ router.register(
 )
 
 # KonnectED – Offline packages (optional; only if ViewSet exists)
-if OfflinePackageViewSet is not None:
-    router.register(
-        "konnected/knowledge/offline-packages",
-        OfflinePackageViewSet,
-        basename="konnected-offline-package",
-    )
+register_optional(
+    "konnected/knowledge/offline-packages",
+    OfflinePackageViewSet,
+    basename="konnected-offline-package",
+)
 
 # KonnectED – CertifiKation
 router.register(
@@ -365,6 +380,8 @@ LOCAL_APPS = [
     "konnaxion.keenkonnect",
     "konnaxion.konnected",
     "konnaxion.kreative",
+    "konnaxion.moderation",
+    "konnaxion.trust",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

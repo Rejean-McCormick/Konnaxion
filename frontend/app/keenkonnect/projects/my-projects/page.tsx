@@ -28,7 +28,8 @@ import api from '@/api';
 const { Text } = Typography;
 const { Option } = Select;
 
-const PROJECTS_ENDPOINT = '/api/projects/';
+// Aligne avec le backend: /api/keenkonnect/projects/
+const PROJECTS_ENDPOINT = 'keenkonnect/projects/';
 
 type ProjectStatus = 'idea' | 'progress' | 'completed' | 'validated';
 

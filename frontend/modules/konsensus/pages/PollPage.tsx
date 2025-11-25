@@ -13,8 +13,9 @@ import PollBarChart from "../components/PollBarChart";
 /**
  * Konsensus Center – Smart‑Vote yes/no poll.
  *
- * Reads aggregated results from /api/votes/ (via usePoll)
- * and posts new votes back to /api/votes/.
+ * Reads aggregated results from the Smart‑Vote API
+ * (kollective/votes/) via usePoll, and posts new votes
+ * back to the same endpoint.
  */
 export default function PollPage() {
   const pollId = DEFAULT_POLL_ID;
@@ -38,7 +39,7 @@ export default function PollPage() {
     const rawValue = normalized === "yes" ? 1 : -1;
 
     try {
-      await api.post("/api/votes/", {
+      await api.post("kollective/votes/", {
         target_type: cfg.targetType,
         target_id: cfg.targetId,
         raw_value: rawValue,

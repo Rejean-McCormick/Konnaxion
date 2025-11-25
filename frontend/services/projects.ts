@@ -3,6 +3,8 @@
 
 import { get, post, put, del } from './_request';
 
+export type ProjectId = number | string;
+
 export type ProjectStatusApi = 'idea' | 'progress' | 'completed' | 'validated';
 
 export interface ApiProject {
@@ -17,21 +19,23 @@ export interface ApiProject {
   tags: number[];
 }
 
+const PROJECTS_ENDPOINT = 'projects/';
+
 /**
  * Fetch list of collaborative projects.
  * Backend: GET /api/projects/
  */
 export async function fetchProjects(): Promise<ApiProject[]> {
   // baseURL is provided by NEXT_PUBLIC_API_BASE (e.g. http://localhost:8000/api)
-  return get<ApiProject[]>('projects/');
+  return get<ApiProject[]>(PROJECTS_ENDPOINT);
 }
 
 /**
  * Fetch a single project by id.
  * Backend: GET /api/projects/:id/
  */
-export async function fetchProject(id: number | string): Promise<ApiProject> {
-  return get<ApiProject>(`projects/${id}/`);
+export async function fetchProject(id: ProjectId): Promise<ApiProject> {
+  return get<ApiProject>(`${PROJECTS_ENDPOINT}${id}/`);
 }
 
 export interface CreateProjectPayload {
@@ -50,7 +54,7 @@ export interface CreateProjectPayload {
 export async function createProject(
   payload: CreateProjectPayload,
 ): Promise<ApiProject> {
-  return post<ApiProject>('projects/', payload);
+  return post<ApiProject>(PROJECTS_ENDPOINT, payload);
 }
 
 /**
@@ -58,16 +62,16 @@ export async function createProject(
  * Backend: PUT /api/projects/:id/
  */
 export async function updateProject(
-  id: number | string,
+  id: ProjectId,
   payload: Partial<CreateProjectPayload>,
 ): Promise<ApiProject> {
-  return put<ApiProject>(`projects/${id}/`, payload);
+  return put<ApiProject>(`${PROJECTS_ENDPOINT}${id}/`, payload);
 }
 
 /**
  * Delete an existing project.
  * Backend: DELETE /api/projects/:id/
  */
-export async function deleteProject(id: number | string): Promise<void> {
-  await del<void>(`projects/${id}/`);
+export async function deleteProject(id: ProjectId): Promise<void> {
+  await del<void>(`${PROJECTS_ENDPOINT}${id}/`);
 }

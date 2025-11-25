@@ -1,3 +1,4 @@
+// env.mjs
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
@@ -6,14 +7,15 @@ export const env = createEnv({
     ANALYZE: z
       .enum(["true", "false"])
       .optional()
+      .default("false")
       .transform((v) => v === "true"),
 
-    // ← add this line
+    // URL du backend HTTP exposé au frontend
     NEXT_PUBLIC_API_BASE: z.string().url().default("http://localhost:8000"),
   },
 
   client: {
-    // expose to the browser as well
+    // exposé au navigateur
     NEXT_PUBLIC_API_BASE: z.string().url().default("http://localhost:8000"),
   },
 

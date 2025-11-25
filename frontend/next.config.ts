@@ -27,5 +27,7 @@ const baseConfig: NextConfig = {
   },
 }
 
-const withAnalyzer = withBundleAnalyzer({ enabled: env.ANALYZE === "true" })
-export default (env.ANALYZE === "true" ? withAnalyzer(baseConfig) : baseConfig)
+// env.ANALYZE est déjà un booléen grâce à env.mjs
+const withAnalyzer = withBundleAnalyzer({ enabled: env.ANALYZE })
+
+export default env.ANALYZE ? withAnalyzer(baseConfig) : baseConfig

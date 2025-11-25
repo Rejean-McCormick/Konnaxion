@@ -10,7 +10,8 @@ import type { PollId } from "./usePoll";
  *
  * Instead of a dedicated WebSocket endpoint (/api/poll/:id),
  * this hook periodically invalidates the React Query cache
- * so `usePoll` refetches fresh data from /api/votes/.
+ * so `usePoll` refetches fresh data from the Smart‑Vote API
+ * (kollective/votes/).
  */
 export default function useLivePoll(
   id: PollId,

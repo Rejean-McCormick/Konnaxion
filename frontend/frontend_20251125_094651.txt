@@ -9,6 +9,16 @@ C:\MyCode\Konnaxionv14\frontend\api.ts
 C:\MyCode\Konnaxionv14\frontend\concat_frontend.py
 C:\MyCode\Konnaxionv14\frontend\env.mjs
 C:\MyCode\Konnaxionv14\frontend\eslint.config.mjs
+C:\MyCode\Konnaxionv14\frontend\frontend_app_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_components_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_core_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_modules_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_routes_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_services_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_shared_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_small_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_tests_e2e_20251125_094626.txt
+C:\MyCode\Konnaxionv14\frontend\frontend_theme_styles_20251125_094626.txt
 C:\MyCode\Konnaxionv14\frontend\how to typecheck.txt
 C:\MyCode\Konnaxionv14\frontend\instrumentation.ts
 C:\MyCode\Konnaxionv14\frontend\jest.config.ts
@@ -517,6 +527,8 @@ C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\PerfDashboard.tsx
 C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\SmartVoteDashboard.tsx
 C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\UsageDashboard.tsx
 C:\MyCode\Konnaxionv14\frontend\modules\insights\pages\index.ts
+C:\MyCode\Konnaxionv14\frontend\modules\insights\types
+C:\MyCode\Konnaxionv14\frontend\modules\insights\types\liveReportState.ts
 C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect
 C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching
 C:\MyCode\Konnaxionv14\frontend\modules\keenkonnect\ai-team-matching\find-teams

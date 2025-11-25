@@ -96,6 +96,8 @@ LOCAL_APPS = [
     "konnaxion.keenkonnect",
     "konnaxion.konnected",
     "konnaxion.kreative",
+    "konnaxion.moderation",
+    "konnaxion.trust",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

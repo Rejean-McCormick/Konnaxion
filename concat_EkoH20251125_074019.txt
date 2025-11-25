@@ -1,0 +1,3034 @@
+===== TOC (68 files) =====
+0001  .github/workflows/ekoh-smartvote.yml
+0002  .github/workflows/secrets-example.yml
+0003  .pre-commit-config.yaml
+0004  config/celery.py
+0005  config/settings_addons.py
+0006  create_ekoh_scaffold - addition.bat
+0007  create_ekoh_scaffold.bat
+0008  docker-compose.dev.yml
+0009  Dockerfile.dev
+0010  docs/openapi.yaml
+0011  infra/db/partition_helper.sql
+0012  Makefile
+0013  modules/ekoh-smartvote/charts/ekoh-smartvote/values.yaml
+0014  modules/ekoh-smartvote/ekoh/-models.py
+0015  modules/ekoh-smartvote/ekoh/__init__.py
+0016  modules/ekoh-smartvote/ekoh/admin.py
+0017  modules/ekoh-smartvote/ekoh/admin_partition.py
+0018  modules/ekoh-smartvote/ekoh/apps.py
+0019  modules/ekoh-smartvote/ekoh/fixtures/isced_f_2013.json
+0020  modules/ekoh-smartvote/ekoh/management/commands/load_isced.py
+0021  modules/ekoh-smartvote/ekoh/migrations/0001_initial.py
+0022  modules/ekoh-smartvote/ekoh/migrations/__init__.py
+0023  modules/ekoh-smartvote/ekoh/models/__init__.py
+0024  modules/ekoh-smartvote/ekoh/models/audit.py
+0025  modules/ekoh-smartvote/ekoh/models/config.py
+0026  modules/ekoh-smartvote/ekoh/models/privacy.py
+0027  modules/ekoh-smartvote/ekoh/models/scores.py
+0028  modules/ekoh-smartvote/ekoh/models/taxonomy.py
+0029  modules/ekoh-smartvote/ekoh/serializers/__init__.py
+0030  modules/ekoh-smartvote/ekoh/serializers/profile.py
+0031  modules/ekoh-smartvote/ekoh/services/__init__.py
+0032  modules/ekoh-smartvote/ekoh/services/contextual_analysis.py
+0033  modules/ekoh-smartvote/ekoh/services/multidimensional_scoring.py
+0034  modules/ekoh-smartvote/ekoh/tasks/__init__.py
+0035  modules/ekoh-smartvote/ekoh/tasks/contextual.py
+0036  modules/ekoh-smartvote/ekoh/tasks/recalc.py
+0037  modules/ekoh-smartvote/ekoh/tests/__init__.py
+0038  modules/ekoh-smartvote/ekoh/tests/test_models.py
+0039  modules/ekoh-smartvote/ekoh/tests/test_services.py
+0040  modules/ekoh-smartvote/ekoh/urls.py
+0041  modules/ekoh-smartvote/ekoh/views/__init__.py
+0042  modules/ekoh-smartvote/ekoh/views/profile.py
+0043  modules/ekoh-smartvote/fixtures/isced_f_2013.json
+0044  modules/ekoh-smartvote/smart_vote/__init__.py
+0045  modules/ekoh-smartvote/smart_vote/admin.py
+0046  modules/ekoh-smartvote/smart_vote/apps.py
+0047  modules/ekoh-smartvote/smart_vote/migrations/0001_initial.py
+0048  modules/ekoh-smartvote/smart_vote/migrations/0002_consultation.py
+0049  modules/ekoh-smartvote/smart_vote/migrations/__init__.py
+0050  modules/ekoh-smartvote/smart_vote/models.py
+0051  modules/ekoh-smartvote/smart_vote/models/consultation.py
+0052  modules/ekoh-smartvote/smart_vote/models/consultation_relevance.py
+0053  modules/ekoh-smartvote/smart_vote/models/core.py
+0054  modules/ekoh-smartvote/smart_vote/serializers/__init__.py
+0055  modules/ekoh-smartvote/smart_vote/serializers/ballot.py
+0056  modules/ekoh-smartvote/smart_vote/services/__init__.py
+0057  modules/ekoh-smartvote/smart_vote/services/weight_calculator.py
+0058  modules/ekoh-smartvote/smart_vote/tasks/__init__.py
+0059  modules/ekoh-smartvote/smart_vote/tasks/aggregator.py
+0060  modules/ekoh-smartvote/smart_vote/tests/__init__.py
+0061  modules/ekoh-smartvote/smart_vote/urls.py
+0062  modules/ekoh-smartvote/smart_vote/views/__init__.py
+0063  modules/ekoh-smartvote/smart_vote/views/cast.py
+0064  paths.txt
+0065  pyproject.toml
+0066  README.md
+0067  ruff.toml
+0068  ToDo (instructions).txt
+===== END TOC =====
+
+
+===== BEGIN .github/workflows/ekoh-smartvote.yml (#0001) =====
+name: ekoh-smartvote
+
+on:
+  push:
+    paths:
+      - "modules/ekoh-smartvote/**"
+      - ".github/workflows/ekoh-smartvote.yml"
+  pull_request:
+    paths:
+      - "modules/ekoh-smartvote/**"
+      - ".github/workflows/ekoh-smartvote.yml"
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ekoh_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DJANGO_SETTINGS_MODULE: config.settings
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/ekoh_test
+      CELERY_BROKER_URL: redis://localhost:6379/0
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Install dependencies (no root)
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-interaction --no-root
+
+      - name: Run Ruff lint
+        run: poetry run ruff check modules
+
+      - name: Run Black (check-only)
+        run: poetry run black --check .
+
+      - name: Run test suite
+        run: |
+          poetry run python manage.py migrate --noinput
+          poetry run pytest -q
+
+===== END .github/workflows/ekoh-smartvote.yml (#0001) =====
+
+===== BEGIN .github/workflows/secrets-example.yml (#0002) =====
+name: ekoh-smartvote-secrets-example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check-secrets:
+    runs-on: ubuntu-latest
+    env:
+      # These must be set in your repo’s Settings → Secrets
+      DJANGO_SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+      VAULT_TOKEN:        ${{ secrets.VAULT_TOKEN }}
+      CELERY_BROKER_URL:  ${{ secrets.CELERY_BROKER_URL }}
+      KAFKA_BOOTSTRAP_SERVERS: ${{ secrets.KAFKA_BOOTSTRAP_SERVERS }}
+    steps:
+      - name: Print loaded secrets (masked)
+        run: |
+          echo "DJANGO_SECRET_KEY is set"
+          echo "VAULT_TOKEN is set"
+          echo "CELERY_BROKER_URL=$CELERY_BROKER_URL"
+          echo "KAFKA_BOOTSTRAP_SERVERS=$KAFKA_BOOTSTRAP_SERVERS"
+
+===== END .github/workflows/secrets-example.yml (#0002) =====
+
+===== BEGIN .pre-commit-config.yaml (#0003) =====
+repos:
+  # Ruff — lint + fix
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.4.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+
+  # Black — code formatter
+  - repo: https://github.com/psf/black
+    rev: 24.4.2
+    hooks:
+      - id: black
+        language_version: python3.12
+
+  # isort — import sorter (Black-compatible profile)
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: ["--profile=black"]
+
+  # Prettier — JS / JSON / YAML formatting (front-end)
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: "v3.2.5"
+    hooks:
+      - id: prettier
+        additional_dependencies: ["prettier@3.2.5"]
+
+  # Check for large files accidentally committed
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: check-added-large-files
+
+===== END .pre-commit-config.yaml (#0003) =====
+
+===== BEGIN config/celery.py (#0004) =====
+import os
+from celery import Celery
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+
+app = Celery("konnaxion-ekoh-smartvote")
+
+# Load Celery config from Django settings, using the `CELERY_` prefix.
+app.config_from_object("django.conf:settings", namespace="CELERY")
+
+# Auto-discover tasks in all installed Django apps.
+app.autodiscover_tasks()
+
+@app.task(bind=True)
+def debug_task(self):
+    print(f"Celery debug: {self.request!r}")
+
+===== END config/celery.py (#0004) =====
+
+===== BEGIN config/settings_addons.py (#0005) =====
+import os
+from datetime import timedelta
+from pathlib import Path
+
+# ── Secret key fallback (local only) ────────────────────────────────
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-secret-change-me")
+
+# ── Register EkoH & Smart-Vote apps ────────────────────────────────
+INSTALLED_APPS += ["konnaxion.ekoh", "konnaxion.smart_vote"]
+
+# ── Shared-schema search_path ──────────────────────────────────────
+DATABASES["default"].setdefault("OPTIONS", {})
+DATABASES["default"]["OPTIONS"]["options"] = "-c search_path=ekoh_smartvote,public"
+
+# ── Celery settings ────────────────────────────────────────────────
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_TIMEZONE = "UTC"
+
+from celery.schedules import crontab  # noqa: E402
+
+CELERY_BEAT_SCHEDULE = {
+    "ekoh-score-recalc": {
+        "task": "ekoh_score_recalc",
+        "schedule": crontab(hour=2, minute=0),  # nightly
+    },
+    "vote-aggregate": {
+        "task": "vote_aggregate",
+        "schedule": timedelta(seconds=60),
+    },
+}
+
+# ── Kafka bootstrap (optional) ─────────────────────────────────────
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
+
+# ── Fixture directory for load_isced command ───────────────────────
+FIXTURE_DIRS = [
+    Path(__file__).resolve().parent.parent
+    / "modules"
+    / "ekoh-smartvote"
+    / "ekoh"
+    / "fixtures"
+]
+
+===== END config/settings_addons.py (#0005) =====
+
+===== BEGIN create_ekoh_scaffold - addition.bat (#0006) =====
+@echo off
+REM =============================================================
+REM  create_missing_ekoh_files.bat
+REM  Creates EMPTY placeholder files still outstanding.
+REM  No content, no comments—just stub files Git can track.
+REM =============================================================
+
+SETLOCAL
+set MOD=modules\ekoh-smartvote
+
+REM ---------- 1. Directories ----------
+for %%D in (
+    "%MOD%\smart_vote\models"
+    "%MOD%\smart_vote\migrations"
+    "%MOD%\ekoh\tasks"
+    "%MOD%\ekoh"
+    "%MOD%\ekoh\fixtures"
+    ".github\workflows"
+    "docs"
+    "config"
+) do if not exist "%%~D" md "%%~D"
+
+REM ---------- 2. Empty files ----------
+for %%F in (
+    "%MOD%\smart_vote\models\consultation.py"
+    "%MOD%\smart_vote\models\consultation_relevance.py"
+    "%MOD%\smart_vote\migrations\0002_consultation.py"
+    "%MOD%\ekoh\tasks\contextual.py"
+    "%MOD%\ekoh\admin_partition.py"
+    "config\settings_addons.py"
+    "config\celery.py"
+    "docs\openapi.yaml"
+    ".github\workflows\secrets-example.yml"
+    "%MOD%\ekoh\fixtures\isced_f_2013.json"
+) do if not exist "%%~F" copy nul "%%~F" >nul
+
+echo.
+echo Empty placeholder files created.
+ENDLOCAL
+
+===== END create_ekoh_scaffold - addition.bat (#0006) =====
+
+===== BEGIN create_ekoh_scaffold.bat (#0007) =====
+@echo off
+REM =========================================================
+REM  create_ekoh_empty_scaffold.bat
+REM  Creates every folder & EMPTY placeholder file
+REM  needed for the EkoH-SmartVote module.
+REM  Run from repo root:  C:\path\to\Konnaxion> create_ekoh_empty_scaffold.bat
+REM =========================================================
+
+SETLOCAL ENABLEDELAYEDEXPANSION
+set MOD=modules\ekoh-smartvote
+
+REM ------------------------------------------------------------------
+REM 1. Directory tree
+REM ------------------------------------------------------------------
+for %%D in (
+    "%MOD%\ekoh\migrations"
+    "%MOD%\ekoh\management\commands"
+    "%MOD%\ekoh\fixtures"
+    "%MOD%\ekoh\services"
+    "%MOD%\ekoh\serializers"
+    "%MOD%\ekoh\views"
+    "%MOD%\ekoh\tasks"
+    "%MOD%\ekoh\tests"
+    "%MOD%\smart_vote\migrations"
+    "%MOD%\smart_vote\services"
+    "%MOD%\smart_vote\serializers"
+    "%MOD%\smart_vote\views"
+    "%MOD%\smart_vote\tasks"
+    "%MOD%\smart_vote\tests"
+    "%MOD%\charts\ekoh-smartvote"
+    "%MOD%\fixtures"
+    "infra\db"
+    ".github\workflows"
+) do if not exist "%%~D" md "%%~D"
+
+REM ------------------------------------------------------------------
+REM 2. Empty root-level scaffold files
+REM ------------------------------------------------------------------
+for %%F in (pyproject.toml Makefile docker-compose.dev.yml ^
+            .pre-commit-config.yaml ruff.toml Dockerfile.dev README.md) do (
+  if not exist "%%F" type nul > "%%F"
+)
+
+REM ------------------------------------------------------------------
+REM 3. Ekoh app stubs
+REM ------------------------------------------------------------------
+copy nul "%MOD%\ekoh\__init__.py" >nul
+> "%MOD%\ekoh\apps.py" (
+  echo from django.apps import AppConfig
+  echo.
+  echo class EkohConfig(AppConfig^):
+  echo     default_auto_field = "django.db.models.BigAutoField"
+  echo     name = "konnaxion.ekoh"
+)
+copy nul "%MOD%\ekoh\models.py" >nul
+echo > "%MOD%\ekoh\urls.py"
+echo > "%MOD%\ekoh\services\__init__.py"
+echo > "%MOD%\ekoh\serializers\__init__.py"
+echo > "%MOD%\ekoh\views\__init__.py"
+echo > "%MOD%\ekoh\tasks\__init__.py"
+echo > "%MOD%\ekoh\tests\__init__.py"
+copy nul "%MOD%\ekoh\migrations\__init__.py" >nul
+echo > "%MOD%\ekoh\migrations\0001_initial.py"
+
+REM ------------------------------------------------------------------
+REM 4. Smart-Vote app stubs
+REM ------------------------------------------------------------------
+copy nul "%MOD%\smart_vote\__init__.py" >nul
+> "%MOD%\smart_vote\apps.py" (
+  echo from django.apps import AppConfig
+  echo.
+  echo class SmartVoteConfig(AppConfig^):
+  echo     default_auto_field = "django.db.models.BigAutoField"
+  echo     name = "konnaxion.smart_vote"
+)
+copy nul "%MOD%\smart_vote\models.py" >nul
+echo > "%MOD%\smart_vote\urls.py"
+echo > "%MOD%\smart_vote\services\__init__.py"
+echo > "%MOD%\smart_vote\serializers\__init__.py"
+echo > "%MOD%\smart_vote\views\__init__.py"
+echo > "%MOD%\smart_vote\tasks\__init__.py"
+echo > "%MOD%\smart_vote\tests\__init__.py"
+copy nul "%MOD%\smart_vote\migrations\__init__.py" >nul
+echo > "%MOD%\smart_vote\migrations\0001_initial.py"
+
+REM ------------------------------------------------------------------
+REM 5. Charts, fixtures, infra placeholders
+REM ------------------------------------------------------------------
+echo "# Helm sub-chart values" > "%MOD%\charts\ekoh-smartvote\values.yaml"
+echo "{}" > "%MOD%\fixtures\isced_f_2013.json"
+echo "-- monthly partition helper" > "infra\db\partition_helper.sql"
+
+REM ------------------------------------------------------------------
+REM 6. CI workflow placeholder
+REM ------------------------------------------------------------------
+> ".github\workflows\ekoh-smartvote.yml" (
+  echo name: ekoh-smartvote
+  echo on: [push]
+  echo jobs:
+  echo   noop:
+  echo     runs-on: ubuntu-latest
+  echo     steps:
+  echo       - run: echo CI skeleton
+)
+
+echo(
+echo EkoH-SmartVote EMPTY scaffold created successfully.
+echo Now open each placeholder file and paste in the real code.
+ENDLOCAL
+
+===== END create_ekoh_scaffold.bat (#0007) =====
+
+===== BEGIN docker-compose.dev.yml (#0008) =====
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ekoh
+      POSTGRES_PASSWORD: ekoh
+      POSTGRES_DB: ekoh
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  kafka:
+    image: vectorized/redpanda:v23.2.13
+    command: |
+      redpanda start --advertise-kafka-addr=localhost:9092 \
+                     --smp 1 --memory 512M --reserve-memory 0M
+    ports:
+      - "9092:9092"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/code
+    command: >
+      bash -c "
+        poetry run python manage.py migrate &&
+        poetry run python manage.py runserver 0.0.0.0:8000
+      "
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      CELERY_BROKER_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - db
+      - redis
+      - kafka
+    ports:
+      - "8000:8000"
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/code
+    command: >
+      bash -c "
+        poetry run celery -A config worker
+        --loglevel=info --concurrency=4
+      "
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      CELERY_BROKER_URL: redis://redis:6379/0
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - db
+      - redis
+      - kafka
+
+  beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/code
+    command: >
+      poetry run celery -A config beat
+      --loglevel=info
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      - worker
+
+volumes:
+  db_data:
+
+===== END docker-compose.dev.yml (#0008) =====
+
+===== BEGIN Dockerfile.dev (#0009) =====
+FROM python:3.12-slim
+
+# System packages for psycopg binary build
+RUN apt-get update && \
+    apt-get install -y build-essential libpq-dev git && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /code
+
+# Copy Python project metadata
+COPY pyproject.toml poetry.lock* /code/
+
+# Install Poetry + deps (no virtualenv inside container)
+RUN pip install --no-cache-dir poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-interaction --no-root
+
+# Copy source code last for layer caching
+COPY . /code
+
+===== END Dockerfile.dev (#0009) =====
+
+===== BEGIN docs/openapi.yaml (#0010) =====
+openapi: "3.0.3"
+info:
+  title: "EkoH & Smart Vote API"
+  description: "Auto-generated API spec. Run `drf-spectacular --file docs/openapi.yaml` to refresh."
+  version: "1.0.0"
+servers:
+  - url: "http://localhost:8000"
+paths:
+  /api/v1/ekoh/profile/{uid}/:
+    get:
+      summary: "Fetch a user’s expertise & ethics profile"
+      parameters:
+        - name: "uid"
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Profile"
+  /api/v1/smart-vote/cast/:
+    post:
+      summary: "Cast a ballot"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ballot"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BallotResponse"
+components:
+  schemas:
+    Profile:
+      type: object
+      properties:
+        user_id:
+          type: integer
+        display_name:
+          type: string
+        confidentiality_level:
+          type: string
+        ethics_score:
+          type: number
+          format: decimal
+        expertise:
+          type: array
+          items:
+            $ref: "#/components/schemas/ExpertiseScoreNested"
+    ExpertiseScoreNested:
+      type: object
+      properties:
+        domain_code:
+          type: string
+        domain_name:
+          type: string
+        weighted_score:
+          type: number
+          format: decimal
+    Ballot:
+      type: object
+      required: ["consultation", "target_id", "modality", "raw_value"]
+      properties:
+        consultation:
+          type: string
+          format: uuid
+        target_id:
+          type: string
+          format: uuid
+        modality:
+          type: string
+        raw_value:
+          type: number
+          format: decimal
+    BallotResponse:
+      allOf:
+        - $ref: "#/components/schemas/Ballot"
+      properties:
+        id:
+          type: integer
+        weighted_value:
+          type: number
+          format: decimal
+
+===== END docs/openapi.yaml (#0010) =====
+
+===== BEGIN infra/db/partition_helper.sql (#0011) =====
+/* --------------------------------------------------------------------
+   ekoh-smartvote  —  Monthly Partition Helper
+   --------------------------------------------------------------------
+   • Creates next-month partitions for high-volume tables.
+   • Detaches + optionally drops partitions older than RETENTION_MONTHS.
+   • Safe to run multiple times; existing partitions are skipped.
+   ------------------------------------------------------------------ */
+
+DO $$
+DECLARE
+    schema_name        CONSTANT text := 'ekoh_smartvote';
+    tables             CONSTANT text[] := ARRAY['vote', 'vote_ledger', 'score_history'];
+    retention_months   CONSTANT int   := 24;  -- keep 2 years of live data
+    today              date := current_date;
+    first_next         date := (date_trunc('month', today) + interval '1 month')::date;
+    first_old          date := (date_trunc('month', today) - (retention_months || ' months')::interval)::date;
+    tbl                text;
+    part_name_new      text;
+    part_name_old      text;
+BEGIN
+    ------------------------------------------------------------------
+    -- create partitions for NEXT month
+    ------------------------------------------------------------------
+    FOREACH tbl IN ARRAY tables LOOP
+        part_name_new := format('%I.%I_%s', schema_name, tbl,
+                                to_char(first_next, 'YYYY_MM'));
+        EXECUTE format(
+            'CREATE TABLE IF NOT EXISTS %s
+               PARTITION OF %I.%I
+               FOR VALUES FROM (%L) TO (%L);',
+            part_name_new, schema_name, tbl, first_next, first_next + interval '1 month'
+        );
+    END LOOP;
+
+    ------------------------------------------------------------------
+    -- detach (and optionally DROP) partitions older than retention
+    ------------------------------------------------------------------
+    FOREACH tbl IN ARRAY tables LOOP
+        part_name_old := format('%I_%s', tbl,
+                                to_char(first_old, 'YYYY_MM'));
+        IF EXISTS (
+            SELECT 1 FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relname = part_name_old
+              AND n.nspname = schema_name
+        ) THEN
+            RAISE NOTICE 'Detaching old partition %.%', schema_name, part_name_old;
+            EXECUTE format(
+                'ALTER TABLE %I.%I DETACH PARTITION %I.%I;',
+                schema_name, tbl, schema_name, part_name_old
+            );
+            -- uncomment next line to drop instead of detach:
+            -- EXECUTE format('DROP TABLE IF EXISTS %I.%I;', schema_name, part_name_old);
+        END IF;
+    END LOOP;
+END $$;
+
+===== END infra/db/partition_helper.sql (#0011) =====
+
+===== BEGIN Makefile (#0012) =====
+# ---------- Make targets for local dev ---------- #
+
+.PHONY: dev-up dev-down migrate shell lint test fmt \
+        load-fixtures pre-commit
+
+# spin up full stack
+dev-up:
+	docker compose -f docker-compose.dev.yml up --build -d
+
+# stop stack
+dev-down:
+	docker compose -f docker-compose.dev.yml down
+
+# Django helpers
+migrate:
+	docker compose exec app poetry run python manage.py migrate
+
+shell:
+	docker compose exec app poetry run python manage.py shell
+
+load-fixtures:
+	docker compose exec app poetry run python manage.py load_isced
+
+# quality
+lint:
+	ruff check modules --fix
+	black --check .
+
+fmt:
+	ruff check modules --fix
+	black .
+
+test:
+	docker compose exec app poetry run pytest -q
+
+# run pre-commit on all files (CI mirror)
+pre-commit:
+	pre-commit run --all-files
+
+===== END Makefile (#0012) =====
+
+===== BEGIN modules/ekoh-smartvote/charts/ekoh-smartvote/values.yaml (#0013) =====
+# Default values for ekoh-smartvote chart.
+
+# Image settings
+image:
+  repository: ghcr.io/konnaxion/ekoh-smartvote
+  tag: "v0.1.0"
+  pullPolicy: IfNotPresent
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 8000
+
+# Environment variables injected into both EkohSvc & VoteSvc
+env:
+  # EkoH multipliers & caps
+  EKOH_MULTIPLIER_CAP: "1.50"
+  RAW_WEIGHT_QUALITY:    "1.000"
+  RAW_WEIGHT_EXPERTISE:  "1.500"
+  RAW_WEIGHT_FREQUENCY:  "0.750"
+
+  # Smart Vote thresholds
+  SMARTVOTE_CONSENSUS_STRONG: "0.75"
+  SMARTVOTE_EMERGING_DELTA:   "0.15"
+
+  # Analytics & export
+  PROMETHEUS_BASE_URL:         "http://prometheus:9090"
+  EXPORT_MAX_ROWS:             "100000"
+
+# Resource requests & limits
+resources:
+  requests:
+    cpu:    250m
+    memory: 256Mi
+  limits:
+    cpu:    500m
+    memory: 512Mi
+
+# Horizontal Pod Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+===== END modules/ekoh-smartvote/charts/ekoh-smartvote/values.yaml (#0013) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/-models.py (#0014) =====
+
+===== END modules/ekoh-smartvote/ekoh/-models.py (#0014) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/__init__.py (#0015) =====
+
+===== END modules/ekoh-smartvote/ekoh/__init__.py (#0015) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/admin.py (#0016) =====
+from django.contrib import admin
+
+from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+from konnaxion.ekoh.models.scores import UserExpertiseScore, UserEthicsScore
+from konnaxion.ekoh.models.audit import ContextAnalysisLog, ScoreHistory
+from konnaxion.ekoh.models.config import ScoreConfiguration
+from konnaxion.ekoh.models.privacy import ConfidentialitySetting
+
+
+@admin.register(ExpertiseCategory)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("code", "name", "depth", "parent")
+    list_filter = ("depth",)
+    search_fields = ("code", "name")
+
+
+@admin.register(UserExpertiseScore)
+class ExpertiseScoreAdmin(admin.ModelAdmin):
+    list_display = ("user", "category", "weighted_score")
+    list_filter = ("category",)
+    search_fields = ("user__username", "category__code")
+
+
+@admin.register(UserEthicsScore)
+class EthicsAdmin(admin.ModelAdmin):
+    list_display = ("user", "ethical_score")
+
+
+@admin.register(ConfidentialitySetting)
+class PrivacyAdmin(admin.ModelAdmin):
+    list_display = ("user", "level")
+    list_filter = ("level",)
+
+
+@admin.register(ContextAnalysisLog)
+class AnalysisLogAdmin(admin.ModelAdmin):
+    list_display = ("entity_type", "entity_id", "created_at")
+    readonly_fields = ("input_metadata", "adjustments_applied")
+    list_filter = ("entity_type", "created_at")
+
+
+@admin.register(ScoreConfiguration)
+class ConfigAdmin(admin.ModelAdmin):
+    list_display = ("weight_name", "field", "weight_value")
+    list_filter = ("field",)
+    search_fields = ("weight_name",)
+
+===== END modules/ekoh-smartvote/ekoh/admin.py (#0016) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/admin_partition.py (#0017) =====
+"""
+Admin interface to inspect month-based partitions in ekoh_smartvote schema.
+"""
+
+from django.contrib import admin
+from django.db import connection
+
+
+class PartitionInfo:
+    """Dummy object representing one partition table."""
+    def __init__(self, name):
+        self.table_name = name
+
+
+@admin.register(PartitionInfo)
+class PartitionInfoAdmin(admin.ModelAdmin):
+    list_display = ("table_name",)
+
+    def get_queryset(self, request):
+        with connection.cursor() as cur:
+            cur.execute("""
+                SELECT tablename FROM pg_tables
+                WHERE schemaname = 'ekoh_smartvote'
+                  AND tablename ~ '^(vote_|vote_ledger_|score_history_)';
+            """)
+            names = [row[0] for row in cur.fetchall()]
+        return [PartitionInfo(name) for name in names]
+
+===== END modules/ekoh-smartvote/ekoh/admin_partition.py (#0017) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/apps.py (#0018) =====
+"""
+Ekoh Django-app configuration.
+
+• Sets the default `search_path` so all raw SQL and migrations operate
+  inside the `ekoh_smartvote` schema first, then fall back to `public`.
+• Declares the app label `konnaxion.ekoh` so cross-module imports remain
+  stable even if the module is moved to its own repo later.
+"""
+
+import logging
+from django.apps import AppConfig
+from django.db import connection
+
+LOGGER = logging.getLogger(__name__)
+
+EKOH_SCHEMA = "ekoh_smartvote"
+
+
+class EkohConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.ekoh"
+    verbose_name = "EkoH – Expertise & Ethics"
+
+    def ready(self) -> None:  # noqa: D401  (simple present)
+        """
+        Ensure the custom schema exists and set the session search_path.
+
+        Called once per Django process start-up.
+        """
+        with connection.cursor() as cur:
+            # 1) Create the schema if it doesn't exist.
+            cur.execute(
+                f"CREATE SCHEMA IF NOT EXISTS {EKOH_SCHEMA};"
+            )
+            # 2) Apply search_path for the current connection.
+            cur.execute(
+                f"SET search_path TO {EKOH_SCHEMA}, public;"
+            )
+            LOGGER.debug("search_path set to %s,public", EKOH_SCHEMA)
+
+===== END modules/ekoh-smartvote/ekoh/apps.py (#0018) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/fixtures/isced_f_2013.json (#0019) =====
+[
+  {
+    "code": "01",
+    "name": "Education",
+    "parent_code": null,
+    "depth": 0
+  },
+  {
+    "code": "011",
+    "name": "Education science",
+    "parent_code": "01",
+    "depth": 1
+  },
+  {
+    "code": "012",
+    "name": "Teacher training",
+    "parent_code": "01",
+    "depth": 1
+  },
+  {
+    "code": "02",
+    "name": "Arts and humanities",
+    "parent_code": null,
+    "depth": 0
+  },
+  {
+    "code": "021",
+    "name": "History and archeology",
+    "parent_code": "02",
+    "depth": 1
+  },
+  {
+    "code": "022",
+    "name": "Literature and linguistics",
+    "parent_code": "02",
+    "depth": 1
+  },
+  …
+  {
+    "code": "98",
+    "name": "Business and administration",
+    "parent_code": null,
+    "depth": 0
+  },
+  {
+    "code": "981",
+    "name": "Business administration",
+    "parent_code": "98",
+    "depth": 1
+  }
+]
+
+===== END modules/ekoh-smartvote/ekoh/fixtures/isced_f_2013.json (#0019) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/management/commands/load_isced.py (#0020) =====
+"""
+Django management command to load the ISCED-F taxonomy fixture
+into the expertise_category table.
+"""
+
+import json
+from pathlib import Path
+
+from django.core.management.base import BaseCommand
+from django.db import transaction
+
+from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+
+
+class Command(BaseCommand):
+    help = "Load UNESCO ISCED-F 2013 taxonomy from fixtures/isced_f_2013.json"
+
+    def handle(self, *args, **options):
+        fixture_path = Path(__file__).resolve().parents[2] / "fixtures" / "isced_f_2013.json"
+        if not fixture_path.exists():
+            self.stderr.write(self.style.ERROR(f"Fixture not found: {fixture_path}"))
+            return
+
+        data = json.loads(fixture_path.read_text(encoding="utf-8"))
+
+        self.stdout.write(f"Loading {len(data)} categories from {fixture_path}…")
+        with transaction.atomic():
+            # Clear existing table (idempotent)
+            ExpertiseCategory.objects.all().delete()
+
+            # Create in two passes: parents first, then children
+            # Assuming fixture entries include 'parent_code'
+            code_to_obj = {}
+            # Pass 1: create root and broad domains (parent_code == None)
+            for entry in data:
+                if entry.get("parent_code") in (None, "", "null"):
+                    obj = ExpertiseCategory.objects.create(
+                        code=entry["code"],
+                        name=entry["name"],
+                        depth=entry.get("depth", 0),
+                        path=entry["code"],
+                    )
+                    code_to_obj[entry["code"]] = obj
+
+            # Pass 2: create children
+            to_process = [e for e in data if e.get("parent_code")]
+            while to_process:
+                entry = to_process.pop(0)
+                parent = code_to_obj.get(entry["parent_code"])
+                if not parent:
+                    # parent not yet created—requeue
+                    to_process.append(entry)
+                    continue
+                path = f"{parent.path}.{entry['code']}"
+                obj = ExpertiseCategory.objects.create(
+                    code=entry["code"],
+                    name=entry["name"],
+                    parent=parent,
+                    depth=entry.get("depth", parent.depth + 1),
+                    path=path,
+                )
+                code_to_obj[entry["code"]] = obj
+
+        self.stdout.write(self.style.SUCCESS("ISCED-F taxonomy loaded successfully."))
+
+===== END modules/ekoh-smartvote/ekoh/management/commands/load_isced.py (#0020) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/migrations/0001_initial.py (#0021) =====
+# Generated by hand for ekoh-smartvote
+# Django 4.2 migration
+from django.db import migrations, connection
+from django.contrib.postgres.operations import CreateExtension
+
+
+SCHEMA_NAME = "ekoh_smartvote"
+
+
+def create_schema(apps, schema_editor):
+    """Ensure the ekoh_smartvote schema exists and is on search_path."""
+    with connection.cursor() as cur:
+        cur.execute(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA_NAME};")
+        cur.execute(f"SET search_path TO {SCHEMA_NAME}, public;")
+
+
+class Migration(migrations.Migration):
+    initial = True
+    dependencies = [
+        ("auth", "0012_alter_user_first_name_max_length"),  # latest core auth migration
+        ("contenttypes", "0002_remove_content_type_name"),
+    ]
+
+    operations = [
+        migrations.RunPython(create_schema, migrations.RunPython.noop),
+        # Enable required extensions (safe if already present)
+        CreateExtension("ltree"),
+        CreateExtension("pgcrypto"),
+        # The following CreateModel ops are auto-generated from models; list abbreviated here.
+        migrations.CreateModel(
+            name="ExpertiseCategory",
+            fields=[
+                ("id", migrations.fields.AutoField(primary_key=True, serialize=False)),
+                ("code", migrations.fields.CharField(max_length=16, unique=True)),
+                ("name", migrations.fields.CharField(max_length=128)),
+                (
+                    "parent",
+                    migrations.fields.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=migrations.models.CASCADE,
+                        related_name="children",
+                        to="ekoh.ExpertiseCategory",
+                    ),
+                ),
+                ("depth", migrations.fields.SmallIntegerField()),
+                ("path", migrations.contrib.postgres.fields.ltree.LTreeField()),
+            ],
+            options={
+                "db_table": "expertise_category",
+            },
+        ),
+        # … (Django will continue generating CreateModel operations for
+        #     UserExpertiseScore, UserEthicsScore, ScoreConfiguration,
+        #     ConfidentialitySetting, ContextAnalysisLog, ScoreHistory)
+    ]
+
+===== END modules/ekoh-smartvote/ekoh/migrations/0001_initial.py (#0021) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/migrations/__init__.py (#0022) =====
+
+===== END modules/ekoh-smartvote/ekoh/migrations/__init__.py (#0022) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/models/__init__.py (#0023) =====
+"""Expose public models for import convenience."""
+from .taxonomy import ExpertiseCategory  # noqa: F401
+from .scores import UserExpertiseScore, UserEthicsScore  # noqa: F401
+from .config import ScoreConfiguration  # noqa: F401
+from .privacy import ConfidentialitySetting  # noqa: F401
+from .audit import ContextAnalysisLog, ScoreHistory  # noqa: F401
+
+===== END modules/ekoh-smartvote/ekoh/models/__init__.py (#0023) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/models/audit.py (#0024) =====
+"""Context-analysis log & score history."""
+
+from django.db import models
+
+from .scores import UserExpertiseScore
+
+
+class ContextAnalysisLog(models.Model):
+    entity_type = models.CharField(max_length=64)
+    entity_id = models.UUIDField()
+    field = models.CharField(max_length=64, blank=True)
+    input_metadata = models.JSONField(null=True, blank=True)
+    adjustments_applied = models.JSONField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "context_analysis_log"
+        indexes = [models.Index(fields=["entity_type", "entity_id"])]
+
+
+class ScoreHistory(models.Model):
+    merit_score = models.ForeignKey(UserExpertiseScore, on_delete=models.CASCADE)
+    old_value = models.DecimalField(max_digits=12, decimal_places=4)
+    new_value = models.DecimalField(max_digits=12, decimal_places=4)
+    change_reason = models.TextField(blank=True)
+    changed_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "score_history"
+        indexes = [models.Index(fields=["changed_at"])]
+
+===== END modules/ekoh-smartvote/ekoh/models/audit.py (#0024) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/models/config.py (#0025) =====
+"""Runtime-tunable coefficients."""
+
+from django.db import models
+
+
+class ScoreConfiguration(models.Model):
+    weight_name = models.CharField(max_length=64)
+    weight_value = models.DecimalField(max_digits=6, decimal_places=3)
+    field = models.CharField(max_length=64, blank=True)
+
+    class Meta:
+        db_table = "score_configuration"
+        unique_together = ("weight_name", "field")
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.weight_name}={self.weight_value}"
+
+===== END modules/ekoh-smartvote/ekoh/models/config.py (#0025) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/models/privacy.py (#0026) =====
+"""User privacy / anonymity settings."""
+
+from django.db import models
+from django.conf import settings
+
+
+class ConfidentialitySetting(models.Model):
+    PUBLIC = "public"
+    PSEUDONYM = "pseudonym"
+    ANONYMOUS = "anonymous"
+
+    LEVEL_CHOICES = [
+        (PUBLIC, "Public"),
+        (PSEUDONYM, "Pseudonym"),
+        (ANONYMOUS, "Anonymous"),
+    ]
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, primary_key=True
+    )
+    level = models.CharField(
+        max_length=16,
+        choices=LEVEL_CHOICES,
+        default=PUBLIC,
+    )
+
+    class Meta:
+        db_table = "confidentiality_setting"
+
+===== END modules/ekoh-smartvote/ekoh/models/privacy.py (#0026) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/models/scores.py (#0027) =====
+"""Per-user merit and ethics scores."""
+
+from django.db import models
+from django.conf import settings
+
+from .taxonomy import ExpertiseCategory
+
+
+class UserExpertiseScore(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    category = models.ForeignKey(ExpertiseCategory, on_delete=models.CASCADE)
+    raw_score = models.DecimalField(max_digits=12, decimal_places=4)
+    weighted_score = models.DecimalField(max_digits=12, decimal_places=4)
+
+    class Meta:
+        db_table = "user_expertise_score"
+        unique_together = ("user", "category")
+        indexes = [
+            models.Index(
+                fields=["category", "-weighted_score"],
+                name="idx_score_top",
+                condition=models.Q(weighted_score__gt=0),
+            ),
+        ]
+
+
+class UserEthicsScore(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, primary_key=True, on_delete=models.CASCADE
+    )
+    ethical_score = models.DecimalField(max_digits=5, decimal_places=3)
+
+    class Meta:
+        db_table = "user_ethics_score"
+
+===== END modules/ekoh-smartvote/ekoh/models/scores.py (#0027) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/models/taxonomy.py (#0028) =====
+"""Expertise hierarchy (UNESCO ISCED-F)."""
+
+from django.db import models
+from django.contrib.postgres.fields import LTreeField
+
+
+class ExpertiseCategory(models.Model):
+    """
+    Hierarchical expertise domain.
+
+    * `code` – the official ISCED-F code (e.g. "0511").
+    * `path` – Postgres ltree (“01.04.11”) for fast descendant queries.
+    """
+
+    code = models.CharField(max_length=16, unique=True)
+    name = models.CharField(max_length=128)
+    parent = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="children",
+    )
+    depth = models.SmallIntegerField()
+    path = LTreeField()
+
+    class Meta:
+        db_table = "expertise_category"
+        indexes = [
+            models.Index(fields=["depth", "code"], name="idx_cat_depth"),
+            models.Index(fields=["path"], name="idx_cat_path", opclasses=["gist"]),
+        ]
+
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.code} • {self.name}"
+
+===== END modules/ekoh-smartvote/ekoh/models/taxonomy.py (#0028) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/serializers/__init__.py (#0029) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/ekoh/serializers/__init__.py (#0029) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/serializers/profile.py (#0030) =====
+"""
+Read-only profile serializer surfaced at GET /ekoh/profile/:uid
+Combines:
+  • basic user display name
+  • confidentiality level
+  • per-domain weighted expertise scores
+  • global ethics multiplier
+"""
+
+from typing import Any
+
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from konnaxion.ekoh.models.scores import (
+    UserExpertiseScore,
+    UserEthicsScore,
+)
+from konnaxion.ekoh.models.privacy import ConfidentialitySetting
+
+User = get_user_model()
+
+
+class ExpertiseScoreNested(serializers.Serializer):
+    domain_code = serializers.CharField()
+    domain_name = serializers.CharField()
+    weighted_score = serializers.DecimalField(max_digits=12, decimal_places=4)
+
+
+class ProfileSerializer(serializers.Serializer):
+    # top-level fields
+    user_id = serializers.IntegerField(source="pk")
+    display_name = serializers.CharField(source="get_full_name")
+    confidentiality_level = serializers.SerializerMethodField()
+    ethics_score = serializers.DecimalField(
+        max_digits=5, decimal_places=3, source="ethics.ethical_score"
+    )
+
+    expertise = serializers.SerializerMethodField()
+
+    # ------------------------------------------------------------------ #
+    #  helper methods                                                    #
+    # ------------------------------------------------------------------ #
+    def get_confidentiality_level(self, user: User) -> str:
+        setting = getattr(user, "confidentialitysetting", None)
+        return setting.level if setting else ConfidentialitySetting.PUBLIC
+
+    def get_expertise(self, user: User) -> list[dict[str, Any]]:
+        qs = (
+            UserExpertiseScore.objects.select_related("category")
+            .filter(user_id=user.pk)
+            .order_by("-weighted_score")[:20]  # top 20 for brevity
+        )
+        return [
+            {
+                "domain_code": row.category.code,
+                "domain_name": row.category.name,
+                "weighted_score": row.weighted_score,
+            }
+            for row in qs
+        ]
+
+    # ------------------------------------------------------------------ #
+    #  override to optimise query count                                  #
+    # ------------------------------------------------------------------ #
+    @classmethod
+    def setup_eager_loading(cls, queryset):
+        """Fetch confidentiality & ethics in one go."""
+        return queryset.select_related("confidentialitysetting", "ethics")
+
+===== END modules/ekoh-smartvote/ekoh/serializers/profile.py (#0030) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/services/__init__.py (#0031) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/ekoh/services/__init__.py (#0031) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/services/contextual_analysis.py (#0032) =====
+"""
+Contextual-analysis stub.
+
+Called by Celery task `contextual_analysis_batch` (future work)
+to scan new publications, answers, or comments and adjust the
+user’s domain scores.
+
+For now it simply records a log entry so we can test the end-to-end flow.
+"""
+
+from __future__ import annotations
+
+import logging
+import uuid
+from typing import Mapping, Any
+
+from django.db import transaction
+
+from konnaxion.ekoh.models.audit import ContextAnalysisLog
+from konnaxion.ekoh.models.scores import UserExpertiseScore
+
+LOGGER = logging.getLogger(__name__)
+
+
+def analyse_entity(
+    *,
+    user_id: int,
+    entity_type: str,
+    entity_id: uuid.UUID,
+    domain_code: str,
+    input_metadata: Mapping[str, Any] | None = None,
+) -> None:
+    """
+    Fake analysis:
+
+    • +0.5 raw_score boost on the matching domain
+    • Writes ContextAnalysisLog for explainability
+    """
+    with transaction.atomic():
+        # upgrade or create a minimal score row
+        score, _ = UserExpertiseScore.objects.get_or_create(
+            user_id=user_id,
+            category__code=domain_code,
+            defaults={"raw_score": 0, "weighted_score": 0},
+        )
+        old = score.raw_score
+        score.raw_score += 0.5
+        score.save(update_fields=["raw_score"])
+
+        ContextAnalysisLog.objects.create(
+            entity_type=entity_type,
+            entity_id=entity_id,
+            field="raw_score",
+            input_metadata=input_metadata or {},
+            adjustments_applied={"+raw_score": 0.5},
+        )
+
+    LOGGER.debug(
+        "Context analysis: user=%s %s %s %+0.5 raw (%.2f→%.2f)",
+        user_id,
+        entity_type,
+        entity_id,
+        old,
+        score.raw_score,
+    )
+
+===== END modules/ekoh-smartvote/ekoh/services/contextual_analysis.py (#0032) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/services/multidimensional_scoring.py (#0033) =====
+"""
+Multidimensional scoring engine.
+
+Converts raw activity metrics into a weighted EkoH merit score
+along three axes:
+
+    • quality      (peer review, up-votes, moderator marks…)
+    • expertise    (credentials, publications, citations…)
+    • frequency    (participation cadence)
+
+Final formula (from 03-technical_spec.md §2 .2 .1):
+
+    S_u,d  =  Σ_i  ( R_i  ·  N_i,u,d )
+
+        where:
+          R_i  =  runtime weight  (RAW_WEIGHT_QUALITY, etc.)
+          N_i  =  normalised metric on axis *i* for user *u* & domain *d*
+
+Normalisation is performed as **percent-rank** over the *domain* cohort
+(avoids cross-domain bias).
+"""
+
+from __future__ import annotations
+
+import logging
+from decimal import Decimal
+from typing import Iterable, Mapping
+
+from django.db.models import F, Window
+from django.db.models.functions import PercentRank
+
+from konnaxion.ekoh.models.config import ScoreConfiguration
+from konnaxion.ekoh.models.scores import (
+    UserExpertiseScore,
+)
+from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+
+LOGGER = logging.getLogger(__name__)
+
+# --------------------------------------------------------------------------- #
+# helper – fetch runtime weights (cached for 60 s with simple lru)            #
+# --------------------------------------------------------------------------- #
+from functools import lru_cache
+from time import time
+
+
+@lru_cache(maxsize=1)
+def _weights_cache() -> Mapping[str, Decimal]:
+    """Return RAW_WEIGHT coefficients as {name: Decimal}."""
+    rows = (
+        ScoreConfiguration.objects.filter(weight_name__startswith="RAW_WEIGHT_")
+        .values_list("weight_name", "weight_value")
+    )
+    return {name: Decimal(value) for name, value in rows}
+
+
+def get_raw_weights(force_refresh: bool = False) -> Mapping[str, Decimal]:
+    if force_refresh:
+        _weights_cache.cache_clear()
+    return _weights_cache()
+
+
+# --------------------------------------------------------------------------- #
+# main API                                                                    #
+# --------------------------------------------------------------------------- #
+AXES = ("quality", "expertise", "frequency")
+
+
+def compute_user_domain_score(
+    user_id: int,
+    domain: ExpertiseCategory,
+    metrics: Mapping[str, Decimal],
+    *,
+    flush: bool = True,
+) -> Decimal:
+    """
+    Compute weighted score **S_u,d** for one user in one domain.
+
+    Parameters
+    ----------
+    user_id : int
+        ID of auth_user
+    domain : ExpertiseCategory
+        Leaf or parent domain
+    metrics : dict
+        Raw axis metrics already gathered by callers:
+          {"quality": 87, "expertise": 66, "frequency": 12}
+    flush : bool
+        Persist result into UserExpertiseScore table if True.
+
+    Returns
+    -------
+    Decimal
+        Weighted score between 0 and 100 (rounded to 4 decimals)
+    """
+    raw_weights = get_raw_weights()
+    missing = [ax for ax in AXES if ax not in metrics]
+    if missing:  # pragma: no cover
+        raise ValueError(f"Missing metric(s): {', '.join(missing)}")
+
+    # Percent-rank normalisation within domain cohort
+    normalised = _percent_rank(metrics, domain)
+
+    weighted_sum = Decimal("0")
+    for axis in AXES:
+        weighted_sum += raw_weights[f"RAW_WEIGHT_{axis.upper()}"] * normalised[axis]
+
+    score = weighted_sum.quantize(Decimal("0.0001"))
+
+    if flush:
+        UserExpertiseScore.objects.update_or_create(
+            user_id=user_id,
+            category=domain,
+            defaults={
+                "raw_score": sum(metrics.values()),
+                "weighted_score": score,
+            },
+        )
+    return score
+
+
+# --------------------------------------------------------------------------- #
+# internal helpers                                                            #
+# --------------------------------------------------------------------------- #
+def _percent_rank(
+    metric_map: Mapping[str, Decimal], domain: ExpertiseCategory
+) -> Mapping[str, Decimal]:
+    """
+    Convert raw axis values to 0-1 scale using PercentRank over cohort.
+
+    Cohort = users who have any score row in this *domain* OR its descendants.
+    """
+    # Gather cohort scores in one ORM query per axis
+    cohort_qs = (
+        UserExpertiseScore.objects.filter(category__path__descendant=domain.path)
+        .values("user_id")
+        .annotate(raw_axis=F("raw_score"))
+    )
+
+    norm: dict[str, Decimal] = {}
+    for axis in AXES:
+        ranked = (
+            cohort_qs.annotate(
+                pct=Window(expression=PercentRank(), order_by=F("raw_axis").asc())
+            )
+            .filter(raw_axis=metric_map[axis])
+            .first()
+        )
+        norm[axis] = Decimal(ranked["pct"] if ranked else 0)
+    return norm
+
+===== END modules/ekoh-smartvote/ekoh/services/multidimensional_scoring.py (#0033) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/tasks/__init__.py (#0034) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/ekoh/tasks/__init__.py (#0034) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/tasks/contextual.py (#0035) =====
+"""
+Celery task: contextual_analysis_batch
+
+Placeholder that will scan entities (publications, answers, etc.)
+and call analyse_entity for each. For now, just logs invocation.
+"""
+
+import logging
+from celery import shared_task
+
+from konnaxion.ekoh.services.contextual_analysis import analyse_entity
+
+LOGGER = logging.getLogger(__name__)
+
+
+@shared_task(name="contextual_analysis_batch")
+def contextual_analysis_batch():
+    LOGGER.info("Contextual analysis batch started")
+    # TODO: Replace below with real query of new entities
+    # For now, simulate one call as proof-of-concept
+    dummy_user_id = 1
+    dummy_entity_id = None
+    analyse_entity(
+        user_id=dummy_user_id,
+        entity_type="example",
+        entity_id=dummy_entity_id,
+        domain_code="0000",  # replace with real code
+        input_metadata={"note": "stub run"},
+    )
+    LOGGER.info("Contextual analysis batch completed")
+
+===== END modules/ekoh-smartvote/ekoh/tasks/contextual.py (#0035) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/tasks/recalc.py (#0036) =====
+"""
+Celery task: ekoh_score_recalc
+
+* Runs nightly (see tasks_schedule.md).
+* Iterates through all users and relevant expertise domains.
+* Calls `compute_user_domain_score` to update weighted scores in DB.
+"""
+
+from __future__ import annotations
+
+import logging
+from itertools import islice
+from typing import Iterable, Iterator
+
+from celery import shared_task
+from django.contrib.auth import get_user_model
+from django.db.models import QuerySet
+
+from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+from konnaxion.ekoh.services.multidimensional_scoring import (
+    compute_user_domain_score,
+)
+
+LOGGER = logging.getLogger(__name__)
+User = get_user_model()
+
+CHUNK_SIZE = 1_000  # tune based on RAM
+
+
+def chunked(iterable: Iterable[int], size: int) -> Iterator[list[int]]:
+    """Yield lists of `size` items from iterable."""
+    it = iter(iterable)
+    while (chunk := list(islice(it, size))):
+        yield chunk
+
+
+def _collect_metrics(user_id: int, domain: ExpertiseCategory):
+    """
+    Placeholder metric collector.
+
+    Replace with real aggregation of quality / expertise / frequency.
+    For now just returns dummy 0s so task runs without error.
+    """
+    return {"quality": 0, "expertise": 0, "frequency": 0}
+
+
+@shared_task(name="ekoh_score_recalc")
+def recalc_all_scores() -> None:
+    LOGGER.info("EkoH score rebuild started")
+    domains: QuerySet[ExpertiseCategory] = ExpertiseCategory.objects.filter(depth__gte=1)
+
+    for user_chunk in chunked(
+        User.objects.values_list("id", flat=True).order_by("id"), CHUNK_SIZE
+    ):
+        for uid in user_chunk:
+            for domain in domains:
+                metrics = _collect_metrics(uid, domain)
+                compute_user_domain_score(uid, domain, metrics, flush=True)
+        LOGGER.debug("Processed %s users", len(user_chunk))
+
+    LOGGER.info("EkoH score rebuild completed")
+
+===== END modules/ekoh-smartvote/ekoh/tasks/recalc.py (#0036) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/tests/__init__.py (#0037) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/ekoh/tests/__init__.py (#0037) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/tests/test_models.py (#0038) =====
+import pytest
+from django.contrib.auth import get_user_model
+from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+from konnaxion.ekoh.models.scores import UserExpertiseScore
+
+User = get_user_model()
+
+
+@pytest.mark.django_db
+def test_expertise_category_str():
+    root = ExpertiseCategory.objects.create(
+        code="00",
+        name="Root Domain",
+        depth=0,
+        path="00",
+    )
+    assert str(root) == "00 • Root Domain"
+
+
+@pytest.mark.django_db
+def test_user_expertise_unique():
+    user = User.objects.create(username="alice")
+    domain = ExpertiseCategory.objects.create(code="01", name="Demo", depth=0, path="01")
+    UserExpertiseScore.objects.create(
+        user=user, category=domain, raw_score=10, weighted_score=5
+    )
+    with pytest.raises(Exception):
+        # should violate unique_together
+        UserExpertiseScore.objects.create(
+            user=user, category=domain, raw_score=1, weighted_score=1
+        )
+
+===== END modules/ekoh-smartvote/ekoh/tests/test_models.py (#0038) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/tests/test_services.py (#0039) =====
+import pytest
+from decimal import Decimal
+from django.contrib.auth import get_user_model
+
+from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+from konnaxion.ekoh.services.multidimensional_scoring import (
+    compute_user_domain_score,
+)
+
+User = get_user_model()
+
+
+@pytest.mark.django_db
+def test_compute_user_domain_score_stub():
+    """With stub metrics (all 0), weighted score should be 0."""
+    user = User.objects.create(username="bob")
+    domain = ExpertiseCategory.objects.create(code="02", name="Stub", depth=0, path="02")
+
+    score = compute_user_domain_score(
+        user_id=user.pk,
+        domain=domain,
+        metrics={"quality": 0, "expertise": 0, "frequency": 0},
+    )
+    assert score == Decimal("0.0000")
+
+    # DB persistence check
+    user_score = domain.userexpertisescore_set.get(user=user)
+    assert user_score.weighted_score == Decimal("0.0000")
+
+===== END modules/ekoh-smartvote/ekoh/tests/test_services.py (#0039) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/urls.py (#0040) =====
+"""
+URL router for the Ekoh app.
+Import this in the project-level urls:
+
+    path("api/v1/ekoh/", include("konnaxion.ekoh.urls"))
+"""
+
+from django.urls import path
+
+from konnaxion.ekoh.views.profile import ProfileView
+
+app_name = "ekoh"
+
+urlpatterns = [
+    path("profile/<int:uid>/", ProfileView.as_view(), name="profile"),
+]
+
+===== END modules/ekoh-smartvote/ekoh/urls.py (#0040) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/views/__init__.py (#0041) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/ekoh/views/__init__.py (#0041) =====
+
+===== BEGIN modules/ekoh-smartvote/ekoh/views/profile.py (#0042) =====
+"""
+GET /ekoh/profile/<uid>
+
+Returns the public expertise & ethics profile for a single user.
+"""
+
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from rest_framework.generics import RetrieveAPIView
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+
+from konnaxion.ekoh.serializers.profile import ProfileSerializer
+
+User = get_user_model()
+
+
+class ProfileView(RetrieveAPIView):
+    """
+    Public endpoint – no auth required if the target user’s
+    confidentiality level is `public` or `pseudonym`.
+    """
+
+    serializer_class = ProfileSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+    lookup_url_kwarg = "uid"
+
+    def get_queryset(self):
+        """
+        Optimise by pulling related privacy & ethics records
+        in one DB round-trip.
+        """
+        qs = User.objects.all()
+        return ProfileSerializer.setup_eager_loading(qs)
+
+    def get_object(self):
+        uid = self.kwargs.get(self.lookup_url_kwarg)
+        return get_object_or_404(self.get_queryset(), pk=uid)
+
+===== END modules/ekoh-smartvote/ekoh/views/profile.py (#0042) =====
+
+===== BEGIN modules/ekoh-smartvote/fixtures/isced_f_2013.json (#0043) =====
+"{}" 
+
+===== END modules/ekoh-smartvote/fixtures/isced_f_2013.json (#0043) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/__init__.py (#0044) =====
+
+===== END modules/ekoh-smartvote/smart_vote/__init__.py (#0044) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/admin.py (#0045) =====
+from django.contrib import admin
+
+from konnaxion.smart_vote.models.core import (
+    Vote,
+    VoteModality,
+    VoteResult,
+    VoteLedger,
+)
+
+
+@admin.register(VoteModality)
+class ModalityAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "target_type", "weighted_value", "created_at")
+    list_filter = ("target_type", "modality")
+    search_fields = ("user__username", "target_id")
+
+
+@admin.register(VoteResult)
+class VoteResultAdmin(admin.ModelAdmin):
+    list_display = ("target_type", "target_id", "sum_weighted_value", "vote_count")
+
+
+@admin.register(VoteLedger)
+class LedgerAdmin(admin.ModelAdmin):
+    list_display = ("ledger_id", "vote", "block_height", "logged_at")
+    readonly_fields = ("sha256_hash",)
+
+===== END modules/ekoh-smartvote/smart_vote/admin.py (#0045) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/apps.py (#0046) =====
+"""
+Smart-Vote Django-app configuration.
+
+• Shares the **same schema** (`ekoh_smartvote`) as the Ekoh app.
+• Ensures the schema and required extensions exist
+  (ltree & pgcrypto already installed by EkohConfig, but
+  we guard idempotently in case this app is run standalone).
+"""
+
+import logging
+from django.apps import AppConfig
+from django.db import connection
+
+LOGGER = logging.getLogger(__name__)
+SCHEMA = "ekoh_smartvote"
+
+
+class SmartVoteConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.smart_vote"
+    verbose_name = "Smart-Vote – Weighted Balloting"
+
+    def ready(self) -> None:  # noqa: D401  (simple present)
+        """
+        Ensure schema exists and search_path is set for this connection.
+        """
+        with connection.cursor() as cur:
+            cur.execute(f"CREATE SCHEMA IF NOT EXISTS {SCHEMA};")
+            cur.execute(f"SET search_path TO {SCHEMA}, public;")
+            # Extensions are no-ops if already installed
+            cur.execute("CREATE EXTENSION IF NOT EXISTS ltree;")
+            cur.execute("CREATE EXTENSION IF NOT EXISTS pgcrypto;")
+        LOGGER.debug("Smart-Vote search_path initialised (%s,public)", SCHEMA)
+
+===== END modules/ekoh-smartvote/smart_vote/apps.py (#0046) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/migrations/0001_initial.py (#0047) =====
+# Generated manually for smart_vote initial schema
+# Django 4.2 migration
+from django.db import migrations, connection, models
+from django.contrib.postgres.operations import CreateExtension
+
+SCHEMA = "ekoh_smartvote"
+
+
+DDL = f"""
+-- 1. schema guarantee
+CREATE SCHEMA IF NOT EXISTS {SCHEMA};
+
+-- 2. parent table: vote (range partitioned on created_at)
+CREATE TABLE IF NOT EXISTS {SCHEMA}.vote (
+    id              BIGSERIAL,
+    user_id         INT NOT NULL,
+    target_type     VARCHAR(64) NOT NULL,
+    target_id       UUID  NOT NULL,
+    modality_name   VARCHAR(32) NOT NULL,
+    raw_value       NUMERIC(12,4) NOT NULL,
+    weighted_value  NUMERIC(12,4) NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT now(),
+    PRIMARY KEY (id, created_at),
+    UNIQUE (user_id, target_type, target_id)
+) PARTITION BY RANGE (created_at);
+
+-- target index
+CREATE INDEX IF NOT EXISTS idx_vote_target
+    ON {SCHEMA}.vote (target_type, target_id);
+
+-- 3. vote_result (simple)
+CREATE TABLE IF NOT EXISTS {SCHEMA}.vote_result (
+    id                  BIGSERIAL PRIMARY KEY,
+    target_type         VARCHAR(64) NOT NULL,
+    target_id           UUID NOT NULL,
+    sum_weighted_value  NUMERIC(20,4) NOT NULL,
+    vote_count          INT NOT NULL,
+    UNIQUE (target_type, target_id)
+);
+
+-- 4. parent table: vote_ledger (range partitioned on logged_at)
+CREATE TABLE IF NOT EXISTS {SCHEMA}.vote_ledger (
+    ledger_id    BIGSERIAL,
+    vote_id      BIGINT NOT NULL,
+    sha256_hash  BYTEA  NOT NULL,
+    block_height BIGINT,
+    logged_at    TIMESTAMP NOT NULL DEFAULT now(),
+    PRIMARY KEY (ledger_id, logged_at)
+) PARTITION BY RANGE (logged_at);
+
+-- index for lookup
+CREATE INDEX IF NOT EXISTS idx_ledger_vote
+    ON {SCHEMA}.vote_ledger (vote_id);
+"""
+
+
+def create_parent_tables(apps, schema_editor):
+    with connection.cursor() as cur:
+        cur.execute(f"SET search_path TO {SCHEMA}, public;")
+        cur.execute(DDL)
+
+
+def make_current_month_partitions(apps, schema_editor):
+    """
+    Attach partitions for the current month to vote and vote_ledger.
+    This runs only once; infra/db/partition_helper.sql handles future months.
+    """
+    import datetime as _dt
+
+    today = _dt.date.today()
+    first = today.replace(day=1)
+    nxt = (first + _dt.timedelta(days=32)).replace(day=1)
+
+    month_suffix = first.strftime("%Y_%m")
+    with connection.cursor() as cur:
+        cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS {SCHEMA}.vote_{month_suffix}
+                PARTITION OF {SCHEMA}.vote
+                FOR VALUES FROM ('{first}') TO ('{nxt}');
+        """)
+        cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS {SCHEMA}.vote_ledger_{month_suffix}
+                PARTITION OF {SCHEMA}.vote_ledger
+                FOR VALUES FROM ('{first}') TO ('{nxt}');
+        """)
+
+
+class Migration(migrations.Migration):
+    initial = True
+    dependencies = [
+        ("ekoh", "0001_initial"),  # ensure schema + extensions exist
+    ]
+
+    operations = [
+        CreateExtension("ltree"),       # no-op if already installed
+        CreateExtension("pgcrypto"),
+        migrations.RunPython(create_parent_tables, migrations.RunPython.noop),
+        migrations.CreateModel(
+            name="VoteModality",
+            fields=[
+                (
+                    "name",
+                    models.CharField(
+                        max_length=32,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                ("parameters", models.JSONField(blank=True, null=True)),
+            ],
+            options={"db_table": "vote_modality"},
+        ),
+        migrations.RunPython(make_current_month_partitions, migrations.RunPython.noop),
+    ]
+
+===== END modules/ekoh-smartvote/smart_vote/migrations/0001_initial.py (#0047) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/migrations/0002_consultation.py (#0048) =====
+"""
+Adds consultation + consultation_relevance tables.
+
+* Parent FK → expertise_category (Ekoh schema)
+* Unique (consultation, category)
+* BRIN-style index (consultation_id) for fast relevance look-ups
+"""
+
+from django.db import migrations, models
+from decimal import Decimal
+
+
+class Migration(migrations.Migration):
+    dependencies = [
+        ("smart_vote", "0001_initial"),   # parent partition migration
+        ("ekoh", "0001_initial"),         # taxonomy table
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name="Consultation",
+            fields=[
+                (
+                    "id",
+                    models.UUIDField(
+                        primary_key=True,
+                        serialize=False,
+                        editable=False,
+                    ),
+                ),
+                ("title", models.CharField(max_length=256)),
+                ("opens_at", models.DateTimeField(blank=True, null=True)),
+                ("closes_at", models.DateTimeField(blank=True, null=True)),
+            ],
+            options={"db_table": "consultation"},
+        ),
+        migrations.CreateModel(
+            name="ConsultationRelevance",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                    ),
+                ),
+                (
+                    "weight",
+                    models.DecimalField(
+                        max_digits=5,
+                        decimal_places=4,
+                        default=Decimal("0.0"),
+                    ),
+                ),
+                ("criteria_json", models.JSONField(blank=True, null=True)),
+                (
+                    "category",
+                    models.ForeignKey(
+                        to="ekoh.expertisecategory",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "consultation",
+                    models.ForeignKey(
+                        to="smart_vote.consultation",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+            ],
+            options={
+                "db_table": "consultation_relevance",
+                "unique_together": {("consultation", "category")},
+                "indexes": [
+                    models.Index(
+                        fields=["consultation"],
+                        name="idx_consult_relevance",
+                    )
+                ],
+            },
+        ),
+    ]
+
+===== END modules/ekoh-smartvote/smart_vote/migrations/0002_consultation.py (#0048) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/migrations/__init__.py (#0049) =====
+
+===== END modules/ekoh-smartvote/smart_vote/migrations/__init__.py (#0049) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/models.py (#0050) =====
+
+===== END modules/ekoh-smartvote/smart_vote/models.py (#0050) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/models/consultation.py (#0051) =====
+@echo off
+REM =============================================================
+REM  create_missing_ekoh_files.bat
+REM  Creates EMPTY placeholder files still outstanding.
+REM  No content, no comments—just stub files Git can track.
+REM =============================================================
+
+SETLOCAL
+set MOD=modules\ekoh-smartvote
+
+REM ---------- 1. Directories ----------
+for %%D in (
+    "%MOD%\smart_vote\models"
+    "%MOD%\smart_vote\migrations"
+    "%MOD%\ekoh\tasks"
+    "%MOD%\ekoh"
+    "%MOD%\ekoh\fixtures"
+    ".github\workflows"
+    "docs"
+    "config"
+) do if not exist "%%~D" md "%%~D"
+
+REM ---------- 2. Empty files ----------
+for %%F in (
+    "%MOD%\smart_vote\models\consultation.py"
+    "%MOD%\smart_vote\models\consultation_relevance.py"
+    "%MOD%\smart_vote\migrations\0002_consultation.py"
+    "%MOD%\ekoh\tasks\contextual.py"
+    "%MOD%\ekoh\admin_partition.py"
+    "config\settings_addons.py"
+    "config\celery.py"
+    "docs\openapi.yaml"
+    ".github\workflows\secrets-example.yml"
+    "%MOD%\ekoh\fixtures\isced_f_2013.json"
+) do if not exist "%%~F" copy nul "%%~F" >nul
+
+echo.
+echo Empty placeholder files created.
+ENDLOCAL
+
+===== END modules/ekoh-smartvote/smart_vote/models/consultation.py (#0051) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/models/consultation_relevance.py (#0052) =====
+
+===== END modules/ekoh-smartvote/smart_vote/models/consultation_relevance.py (#0052) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/models/core.py (#0053) =====
+"""
+Core Smart-Vote tables.
+
+Partitioning ⬇︎
+-------------
+`vote`, `vote_ledger` are **monthly range-partitioned** on `created_at`
+and `logged_at`.  Native Django ORM can’t declare child tables, so
+partition DDL is emitted in the first migration.
+"""
+
+from __future__ import annotations
+
+import uuid
+from decimal import Decimal
+
+from django.db import models
+from django.conf import settings
+
+
+# ------------------------------------------------------------------ #
+# 1)  Vote modality lookup                                            #
+# ------------------------------------------------------------------ #
+class VoteModality(models.Model):
+    """Approval, ranking, rating, preferential, budget_split …"""
+
+    APPROVAL = "approval"
+    RANKING = "ranking"
+    RATING = "rating"
+    PREFERENTIAL = "preferential"
+    BUDGET = "budget_split"
+
+    name = models.CharField(
+        max_length=32,
+        primary_key=True,
+        choices=[
+            (APPROVAL, "Approval"),
+            (RANKING, "Ranking"),
+            (RATING, "Rating 1-5"),
+            (PREFERENTIAL, "Preferential"),
+            (BUDGET, "Budget split"),
+        ],
+    )
+    parameters = models.JSONField(blank=True, null=True)
+
+    class Meta:
+        db_table = "vote_modality"
+
+    def __str__(self) -> str:  # pragma: no cover
+        return self.name
+
+
+# ------------------------------------------------------------------ #
+# 2)  Raw vote (partitioned)                                          #
+# ------------------------------------------------------------------ #
+class Vote(models.Model):
+    """
+    One ballot cast by `user` on an arbitrary `target`.
+
+    Partitioned **monthly** on `created_at`.
+    """
+
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    # generic FK → any model (“consultation”, “idea”, “policy” …)
+    target_type = models.CharField(max_length=64)
+    target_id = models.UUIDField(default=uuid.uuid4)
+
+    modality = models.ForeignKey(VoteModality, on_delete=models.PROTECT)
+
+    raw_value = models.DecimalField(max_digits=12, decimal_places=4)
+    weighted_value = models.DecimalField(max_digits=12, decimal_places=4)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "vote"
+        unique_together = ("user", "target_type", "target_id")
+        indexes = [
+            models.Index(fields=["target_type", "target_id"], name="idx_vote_target")
+        ]
+
+    # convenience
+    def __str__(self) -> str:  # pragma: no cover
+        return f"{self.user_id}→{self.target_id} = {self.weighted_value}"
+
+
+# ------------------------------------------------------------------ #
+# 3)  Aggregated result (1 row per target)                            #
+# ------------------------------------------------------------------ #
+class VoteResult(models.Model):
+    target_type = models.CharField(max_length=64)
+    target_id = models.UUIDField()
+    sum_weighted_value = models.DecimalField(max_digits=20, decimal_places=4)
+    vote_count = models.IntegerField()
+
+    class Meta:
+        db_table = "vote_result"
+        unique_together = ("target_type", "target_id")
+
+    def __str__(self):  # pragma: no cover
+        return f"{self.target_id} ⟹ {self.sum_weighted_value}"
+
+
+# ------------------------------------------------------------------ #
+# 4)  Ledger                                                           #
+# ------------------------------------------------------------------ #
+class VoteLedger(models.Model):
+    """
+    Append-only log for on-chain anchoring.
+
+    Partitioned monthly on `logged_at`.
+    """
+
+    ledger_id = models.BigAutoField(primary_key=True)
+    vote = models.ForeignKey(Vote, on_delete=models.CASCADE)
+    sha256_hash = models.BinaryField()  # 32-byte SHA-256
+    block_height = models.BigIntegerField(null=True, blank=True)
+    logged_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "vote_ledger"
+        indexes = [models.Index(fields=["vote_id"], name="idx_ledger_vote")]
+
+    def __str__(self):  # pragma: no cover
+        return f"ledger {self.ledger_id} → vote {self.vote_id}"
+
+===== END modules/ekoh-smartvote/smart_vote/models/core.py (#0053) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/serializers/__init__.py (#0054) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/smart_vote/serializers/__init__.py (#0054) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/serializers/ballot.py (#0055) =====
+"""
+Ballot input / output schema.
+
+POST body example
+-----------------
+{
+  "consultation": "7077e77f-0a1e-4f8a-83b2-d12e2c68b4ec",
+  "target_id":     "7077e77f-0a1e-4f8a-83b2-d12e2c68b4ec",   # same as consultation for single-question
+  "modality":      "approval",
+  "raw_value":     1
+}
+"""
+
+from uuid import UUID
+from decimal import Decimal
+
+from rest_framework import serializers
+
+from konnaxion.smart_vote.models.core import Vote, VoteModality
+from konnaxion.smart_vote.services.weight_calculator import get_weight
+
+
+class BallotSerializer(serializers.Serializer):
+    consultation = serializers.UUIDField()
+    target_id = serializers.UUIDField()
+    modality = serializers.ChoiceField(choices=[m[0] for m in VoteModality._meta.get_field("name").choices])
+    raw_value = serializers.DecimalField(max_digits=12, decimal_places=4)
+
+    def validate(self, attrs):
+        user = self.context["request"].user
+        if Vote.objects.filter(
+            user=user,
+            target_type="consultation",
+            target_id=attrs["target_id"],
+        ).exists():
+            raise serializers.ValidationError("You have already voted on this target.")
+        return attrs
+
+    def create(self, validated_data):
+        user = self.context["request"].user
+        weighted = get_weight(user.id, validated_data["consultation"])
+        return Vote.objects.create(
+            user=user,
+            target_type="consultation",
+            target_id=validated_data["target_id"],
+            modality_id=validated_data["modality"],
+            raw_value=validated_data["raw_value"],
+            weighted_value=Decimal(validated_data["raw_value"]) * weighted,
+        )
+
+    # Response body
+    id = serializers.IntegerField(read_only=True)
+    weighted_value = serializers.DecimalField(max_digits=12, decimal_places=4, read_only=True)
+
+===== END modules/ekoh-smartvote/smart_vote/serializers/ballot.py (#0055) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/services/__init__.py (#0056) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/smart_vote/services/__init__.py (#0056) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/services/weight_calculator.py (#0057) =====
+"""
+Weight-calculator — core of Smart-Vote.
+
+Formula  (see 03-technical_spec.md §2.3):
+
+    W_u,c  =  min(
+                 Σ_d  ( R_c,d  ·  S_u,d )  ,  ethical_cap
+             )  ×  ethics_multiplier
+
+where
+    •  R_c,d          = relevance weight for consultation *c* & domain *d*
+    •  S_u,d          = user weighted expertise score for domain *d*
+    •  ethics_multiplier  = 1 + (ethical_score – 1) * α
+    •  ethical_cap    = EKOH_MULTIPLIER_CAP  (env / param)
+
+This module exposes the single public function:
+
+    get_weight(user_id: int, consultation_id: uuid) -> Decimal
+"""
+
+from __future__ import annotations
+
+import logging
+from decimal import Decimal
+from functools import lru_cache
+from typing import Dict
+
+from django.db.models import Sum
+from django.conf import settings
+
+from konnaxion.ekoh.models.scores import UserExpertiseScore, UserEthicsScore
+from konnaxion.ekoh.models.config import ScoreConfiguration
+from konnaxion.smart_vote.models.core import VoteModality
+from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
+from konnaxion.smart_vote.models.core import (
+    Consultation,  # assumed imported or created
+    ConsultationRelevance,
+)
+
+LOGGER = logging.getLogger(__name__)
+
+
+# --------------------------------------------------------------------------- #
+#  Runtime tunables                                                           #
+# --------------------------------------------------------------------------- #
+@lru_cache(maxsize=32)
+def _fetch_param(name: str) -> Decimal:
+    """Read a numeric param from score_configuration (cached)."""
+    obj = ScoreConfiguration.objects.filter(weight_name=name).first()
+    if obj is None:
+        raise RuntimeError(f"Missing parameter {name}")
+    return Decimal(obj.weight_value)
+
+
+def ethical_cap() -> Decimal:
+    return _fetch_param("EKOH_MULTIPLIER_CAP")
+
+
+# --------------------------------------------------------------------------- #
+#  Cached helpers                                                             #
+# --------------------------------------------------------------------------- #
+@lru_cache(maxsize=512)
+def _relevance_vector(consultation_id) -> Dict[int, Decimal]:
+    """Return {category_id: relevance_weight} for a consultation."""
+    rows = ConsultationRelevance.objects.filter(
+        consultation_id=consultation_id
+    ).values_list("category_id", "weight")
+    return {cid: Decimal(w) for cid, w in rows}
+
+
+@lru_cache(maxsize=5_000)
+def _expertise_vector(user_id: int) -> Dict[int, Decimal]:
+    """Return {category_id: weighted_score} for a user."""
+    rows = UserExpertiseScore.objects.filter(user_id=user_id).values_list(
+        "category_id", "weighted_score"
+    )
+    return {cid: Decimal(s) for cid, s in rows}
+
+
+def _ethics_multiplier(user_id: int) -> Decimal:
+    row = UserEthicsScore.objects.filter(user_id=user_id).first()
+    if not row:
+        return Decimal("1.0")
+    # α = 1 by default (linear); tweak if needed
+    return Decimal(row.ethical_score)
+
+
+# --------------------------------------------------------------------------- #
+#  Public API                                                                 #
+# --------------------------------------------------------------------------- #
+def get_weight(user_id: int, consultation_id) -> Decimal:
+    """
+    Calculate voting weight for user on a given consultation.
+
+    Steps
+    -----
+    1. Dot-product relevance vector with user expertise vector.
+    2. Cap result by EKOH_MULTIPLIER_CAP.
+    3. Multiply by ethics multiplier.
+    """
+    rel_vec = _relevance_vector(consultation_id)
+    exp_vec = _expertise_vector(user_id)
+
+    dot = sum(rel_vec.get(cid, 0) * exp_vec.get(cid, 0) for cid in rel_vec)
+
+    capped = min(dot, ethical_cap())
+    weight = (Decimal(capped) * _ethics_multiplier(user_id)).quantize(
+        Decimal("0.0001")
+    )
+
+    LOGGER.debug(
+        "Weight u=%s c=%s  dot=%s  capped=%s  ethics× => %s",
+        user_id,
+        consultation_id,
+        dot,
+        capped,
+        weight,
+    )
+    return weight
+
+===== END modules/ekoh-smartvote/smart_vote/services/weight_calculator.py (#0057) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/tasks/__init__.py (#0058) =====
+"""
+Celery discovers tasks in this package.
+"""
+
+===== END modules/ekoh-smartvote/smart_vote/tasks/__init__.py (#0058) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/tasks/aggregator.py (#0059) =====
+"""
+Aggregator task:
+
+1. Pulls Vote rows created since the last run (uses id > cursor).
+2. Sums their weighted values per (target_type, target_id) combination.
+3. UPSERTs into vote_result (sum_weighted_value, vote_count).
+
+Runs every minute by default (see tasks_schedule.md).
+"""
+
+from __future__ import annotations
+
+import logging
+from collections import defaultdict
+from decimal import Decimal
+
+from celery import shared_task
+from django.db import transaction, connection
+
+from konnaxion.smart_vote.models.core import Vote, VoteResult
+
+LOGGER = logging.getLogger(__name__)
+CURSOR_KEY = "ekoh_smartvote.last_vote_id"
+
+
+def _load_cursor() -> int:
+    """Fetch last processed vote id from pg_settings (simple key-value)."""
+    with connection.cursor() as cur:
+        cur.execute(
+            "SELECT current_setting(%s, true);",
+            (CURSOR_KEY,),
+        )
+        row = cur.fetchone()
+    return int(row[0]) if row and row[0] else 0
+
+
+def _save_cursor(vote_id: int) -> None:
+    with connection.cursor() as cur:
+        cur.execute("SELECT set_config(%s, %s, true);", (CURSOR_KEY, str(vote_id)))
+
+
+@shared_task(name="vote_aggregate")
+def aggregate_votes(batch_size: int = 5_000) -> None:
+    last_id = _load_cursor()
+    LOGGER.debug("Vote aggregate start (cursor=%s)", last_id)
+
+    qs = Vote.objects.filter(id__gt=last_id).order_by("id")[:batch_size]
+    if not qs.exists():
+        LOGGER.debug("No new votes")
+        return
+
+    # 1) group by target
+    totals: dict[tuple[str, str], dict[str, Decimal | int]] = defaultdict(
+        lambda: {"sum": Decimal(0), "count": 0}
+    )
+
+    highest_id = last_id
+    for v in qs:
+        key = (v.target_type, str(v.target_id))
+        totals[key]["sum"] += v.weighted_value
+        totals[key]["count"] += 1
+        highest_id = max(highest_id, v.id)
+
+    # 2) upsert
+    with transaction.atomic():
+        for (t_type, t_id), agg in totals.items():
+            VoteResult.objects.update_or_create(
+                target_type=t_type,
+                target_id=t_id,
+                defaults={
+                    "sum_weighted_value": agg["sum"],
+                    "vote_count": agg["count"],
+                },
+            )
+        _save_cursor(highest_id)
+
+    LOGGER.info("Aggregated %s votes up to id %s", len(qs), highest_id)
+
+===== END modules/ekoh-smartvote/smart_vote/tasks/aggregator.py (#0059) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/tests/__init__.py (#0060) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/smart_vote/tests/__init__.py (#0060) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/urls.py (#0061) =====
+"""
+Smart-Vote route entrypoint.
+
+Add to project urls.py:
+
+    path("api/v1/smart-vote/", include("konnaxion.smart_vote.urls"))
+"""
+
+from django.urls import path
+from konnaxion.smart_vote.views.cast import CastBallotView
+
+app_name = "smart_vote"
+
+urlpatterns = [
+    path("cast/", CastBallotView.as_view(), name="cast"),
+]
+
+===== END modules/ekoh-smartvote/smart_vote/urls.py (#0061) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/views/__init__.py (#0062) =====
+Commande ECHO d‚sactiv‚e.
+
+===== END modules/ekoh-smartvote/smart_vote/views/__init__.py (#0062) =====
+
+===== BEGIN modules/ekoh-smartvote/smart_vote/views/cast.py (#0063) =====
+"""
+POST /smart-vote/cast   → creates one Vote row
+"""
+
+from rest_framework.generics import CreateAPIView
+from rest_framework.permissions import IsAuthenticated
+
+from konnaxion.smart_vote.serializers.ballot import BallotSerializer
+
+
+class CastBallotView(CreateAPIView):
+    serializer_class = BallotSerializer
+    permission_classes = [IsAuthenticated]
+
+===== END modules/ekoh-smartvote/smart_vote/views/cast.py (#0063) =====
+
+===== BEGIN paths.txt (#0064) =====
+C:\MyCode\Konnaxionv14\TOMOVEINKONNAXION-EKOH
+.pre-commit-config.yaml
+Dockerfile.dev
+Makefile
+README.md
+ToDo (instructions).txt
+create_ekoh_scaffold - addition.bat
+create_ekoh_scaffold.bat
+docker-compose.dev.yml
+pyproject.toml
+ruff.toml
+.github
+.github/workflows
+.github/workflows/ekoh-smartvote.yml
+.github/workflows/secrets-example.yml
+config
+config/celery.py
+config/settings_addons.py
+docs
+docs/openapi.yaml
+infra
+infra/db
+infra/db/partition_helper.sql
+modules
+modules/ekoh-smartvote
+modules/ekoh-smartvote/charts
+modules/ekoh-smartvote/charts/ekoh-smartvote
+modules/ekoh-smartvote/charts/ekoh-smartvote/values.yaml
+modules/ekoh-smartvote/ekoh
+modules/ekoh-smartvote/ekoh/-models.py
+modules/ekoh-smartvote/ekoh/__init__.py
+modules/ekoh-smartvote/ekoh/admin.py
+modules/ekoh-smartvote/ekoh/admin_partition.py
+modules/ekoh-smartvote/ekoh/apps.py
+modules/ekoh-smartvote/ekoh/urls.py
+modules/ekoh-smartvote/ekoh/fixtures
+modules/ekoh-smartvote/ekoh/fixtures/isced_f_2013.json
+modules/ekoh-smartvote/ekoh/management
+modules/ekoh-smartvote/ekoh/management/commands
+modules/ekoh-smartvote/ekoh/management/commands/load_isced.py
+modules/ekoh-smartvote/ekoh/migrations
+modules/ekoh-smartvote/ekoh/migrations/0001_initial.py
+modules/ekoh-smartvote/ekoh/migrations/__init__.py
+modules/ekoh-smartvote/ekoh/models
+modules/ekoh-smartvote/ekoh/models/__init__.py
+modules/ekoh-smartvote/ekoh/models/audit.py
+modules/ekoh-smartvote/ekoh/models/config.py
+modules/ekoh-smartvote/ekoh/models/privacy.py
+modules/ekoh-smartvote/ekoh/models/scores.py
+modules/ekoh-smartvote/ekoh/models/taxonomy.py
+modules/ekoh-smartvote/ekoh/serializers
+modules/ekoh-smartvote/ekoh/serializers/__init__.py
+modules/ekoh-smartvote/ekoh/serializers/profile.py
+modules/ekoh-smartvote/ekoh/services
+modules/ekoh-smartvote/ekoh/services/__init__.py
+modules/ekoh-smartvote/ekoh/services/contextual_analysis.py
+modules/ekoh-smartvote/ekoh/services/multidimensional_scoring.py
+modules/ekoh-smartvote/ekoh/tasks
+modules/ekoh-smartvote/ekoh/tasks/__init__.py
+modules/ekoh-smartvote/ekoh/tasks/contextual.py
+modules/ekoh-smartvote/ekoh/tasks/recalc.py
+modules/ekoh-smartvote/ekoh/tests
+modules/ekoh-smartvote/ekoh/tests/__init__.py
+modules/ekoh-smartvote/ekoh/tests/test_models.py
+modules/ekoh-smartvote/ekoh/tests/test_services.py
+modules/ekoh-smartvote/ekoh/views
+modules/ekoh-smartvote/ekoh/views/__init__.py
+modules/ekoh-smartvote/ekoh/views/profile.py
+modules/ekoh-smartvote/fixtures
+modules/ekoh-smartvote/fixtures/isced_f_2013.json
+modules/ekoh-smartvote/smart_vote
+modules/ekoh-smartvote/smart_vote/__init__.py
+modules/ekoh-smartvote/smart_vote/admin.py
+modules/ekoh-smartvote/smart_vote/apps.py
+modules/ekoh-smartvote/smart_vote/models.py
+modules/ekoh-smartvote/smart_vote/urls.py
+modules/ekoh-smartvote/smart_vote/migrations
+modules/ekoh-smartvote/smart_vote/migrations/0001_initial.py
+modules/ekoh-smartvote/smart_vote/migrations/0002_consultation.py
+modules/ekoh-smartvote/smart_vote/migrations/__init__.py
+modules/ekoh-smartvote/smart_vote/models
+modules/ekoh-smartvote/smart_vote/models/consultation.py
+modules/ekoh-smartvote/smart_vote/models/consultation_relevance.py
+modules/ekoh-smartvote/smart_vote/models/core.py
+modules/ekoh-smartvote/smart_vote/serializers
+modules/ekoh-smartvote/smart_vote/serializers/__init__.py
+modules/ekoh-smartvote/smart_vote/serializers/ballot.py
+modules/ekoh-smartvote/smart_vote/services
+modules/ekoh-smartvote/smart_vote/services/__init__.py
+modules/ekoh-smartvote/smart_vote/services/weight_calculator.py
+modules/ekoh-smartvote/smart_vote/tasks
+modules/ekoh-smartvote/smart_vote/tasks/__init__.py
+modules/ekoh-smartvote/smart_vote/tasks/aggregator.py
+modules/ekoh-smartvote/smart_vote/tests
+modules/ekoh-smartvote/smart_vote/tests/__init__.py
+modules/ekoh-smartvote/smart_vote/views
+modules/ekoh-smartvote/smart_vote/views/__init__.py
+modules/ekoh-smartvote/smart_vote/views/cast.py
+
+===== END paths.txt (#0064) =====
+
+===== BEGIN pyproject.toml (#0065) =====
+[tool.poetry]
+name = "ekoh-smartvote"
+version = "0.1.0"
+description = "Modular expertise & weighted voting for the Konnaxion platform"
+authors = ["Konnaxion Team <team@konnaxion.org>"]
+packages = [
+  { include = "konnaxion", from = "modules/ekoh-smartvote" }
+]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+
+# Web framework & REST
+django = "^4.2"
+djangorestframework = "^3.15"
+drf-spectacular = "^0.27"
+
+# Async tasks & messaging
+celery = "^5.3"
+redis = "^5.0"
+aiokafka = "^0.10"
+
+# Database
+psycopg = { extras = ["binary", "pool"], version = "^3.1" }
+
+# Misc
+python-dotenv = "^1.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-django = "^4.8"
+pytest-asyncio = "^0.23"
+ruff = "^0.4"
+black = "^24.4"
+isort = "^5.13"
+pre-commit = "^3.6"
+
+[build-system]
+requires = ["poetry-core>=1.8.0"]
+build-backend = "poetry.core.masonry.api"
+
+===== END pyproject.toml (#0065) =====
+
+===== BEGIN README.md (#0066) =====
+### **23 / 24 `README.md` (module-level quick-start)**
+
+
+# EkoH + Smart Vote — Developer Quick-Start
+
+Welcome!  This repo now contains the **EkoH expertise engine** and the
+**Smart-Vote weighted ballot system** as a self-contained module under
+`modules/ekoh-smartvote/`.  Follow the steps below and you’ll have the full
+stack (Postgres 15 + Redis 7 + Kafka/Redpanda + Django 4.2 + Celery 5.3) running
+locally in minutes.
+
+---
+
+## 1 Prerequisites
+
+| Tool | Version | Why |
+|------|---------|-----|
+| **Docker** | 24 + | Containers for DB / Redis / Kafka |
+| **Docker Compose** | v2 plugin | orchestrates the dev stack |
+| **Poetry** | 1.8 + | Python dependency management |
+| **pre-commit** | 3.6 + | local lint hooks (optional) |
+
+---
+
+## 2 Getting the code
+
+```bash
+git clone https://github.com/Rejean-McCormick/Konnaxion.git
+cd Konnaxion
+````
+
+---
+
+## 3 Spin up the dev stack
+
+```bash
+make dev-up          # build images & start db/redis/kafka/django
+make migrate         # apply Ekoh & Smart-Vote migrations
+make load-fixtures   # load UNESCO ISCED-F taxonomy (≈ 2 s)
+```
+
+Visit [http://localhost:8000/](http://localhost:8000/) — the Django server is live.
+
+* API docs: [http://localhost:8000/api/schema/swagger/](http://localhost:8000/api/schema/swagger/)
+* Health check: [http://localhost:8000/healthz](http://localhost:8000/healthz)
+
+---
+
+## 4 Common tasks
+
+| Command         | What it does                         |
+| --------------- | ------------------------------------ |
+| `make lint`     | Ruff + Black in check-only mode      |
+| `make fmt`      | Auto-formats with Ruff-fix & Black   |
+| `make test`     | Runs pytest in the **app** container |
+| `make dev-down` | Stops the whole Compose stack        |
+
+---
+
+## 5 Celery workers
+
+Dev stack launches two extra containers:
+
+* **worker** — executes tasks `ekoh_score_recalc`, `vote_aggregate`, etc.
+* **beat**   — schedules periodic jobs (nightly score rebuild, minutely aggregator).
+
+Logs:
+
+```bash
+docker compose logs -f worker
+docker compose logs -f beat
+```
+
+---
+
+## 6 Environment variables (excerpt)
+
+| Name                   | Default                  | Doc                                       |
+| ---------------------- | ------------------------ | ----------------------------------------- |
+| `EKOH_MULTIPLIER_CAP`  | `1.50`                   | caps dot-product before ethics multiplier |
+| `RAW_WEIGHT_QUALITY`   | `1.000`                  | axis coefficient                          |
+| `RAW_WEIGHT_EXPERTISE` | `1.500`                  | axis coefficient                          |
+| `RAW_WEIGHT_FREQUENCY` | `0.750`                  | axis coefficient                          |
+| `PROMETHEUS_BASE_URL`  | `http://prometheus:9090` | metrics                                   |
+| `EXPORT_MAX_ROWS`      | `100000`                 | CSV guardrail                             |
+
+All env vars live in **`charts/ekoh-smartvote/values.yaml`** for staging/prod.
+
+---
+
+## 7 Database schema
+
+Schema objects are documented in **`docs/01-db_schema.md`** and created by
+migrations under:
+
+```
+modules/ekoh-smartvote/
+    ekoh/migrations/
+    smart_vote/migrations/
+```
+
+Partition helper SQL (`infra/db/partition_helper.sql`) runs nightly to keep
+`vote`, `vote_ledger`, and `score_history` rotated monthly.
+
+---
+
+## 8 Testing end-to-end
+
+```bash
+# cast a ballot
+http POST :8000/api/v1/smart-vote/cast \
+  consultation=7077e77f-... \
+  target_id=7077e77f-... \
+  modality=approval \
+  raw_value:=1  \
+  "Authorization: Bearer <token>"
+
+# aggregate votes immediately
+docker compose exec app poetry run \
+  python - <<'PY'
+from konnaxion.smart_vote.tasks.aggregator import aggregate_votes
+aggregate_votes()
+PY
+```
+
+---
+
+## 9 Deploy to Kubernetes (staging)
+
+```bash
+helm repo add konnaxion https://charts.konnaxion.org
+helm upgrade --install ekoh-smartvote \
+  ./modules/ekoh-smartvote/charts/ekoh-smartvote \
+  --values ./modules/ekoh-smartvote/charts/ekoh-smartvote/values.yaml \
+  --namespace konnaxion-intel
+```
+
+---
+
+===== END README.md (#0066) =====
+
+===== BEGIN ruff.toml (#0067) =====
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = ["migrations"]
+
+# Enable common linting rules, disable ones Black already covers
+select = ["E", "F", "I", "N", "W", "DJ"]
+ignore = [
+  "E501",  # line length handled by Black
+  "DJ001", # model-meta-verbose-name not required everywhere
+]
+
+[tool.ruff.isort]
+known-first-party = ["konnaxion"]
+combine-as-imports = true
+force-single-line = false
+
+===== END ruff.toml (#0067) =====
+
+===== BEGIN ToDo (instructions).txt (#0068) =====
+Here’s a concise, numbered **“Post-scaffold checklist”** you can keep handy. Once you’ve coded the 24 files, work through these to finish setup, validate, and harden before shipping:
+
+1. **Generate & apply migrations**
+
+   ```bash
+   python manage.py makemigrations ekoh smart_vote
+   python manage.py migrate
+   ```
+
+   Review each generated `0002_…` migration to ensure it matches the spec (indexes, constraints, schema name).
+
+2. **Load the taxonomy fixture**
+
+   ```bash
+   python manage.py load_isced
+   ```
+
+   Confirm `expertise_category` contains \~169 entries (26 broad + 143 detailed).
+
+3. **Run the initial test suite**
+
+   ```bash
+   pytest -q
+   ```
+
+   Flesh out any failing tests in `ekoh/tests/` and `smart_vote/tests/` to cover at least basic CRUD and service logic.
+
+4. **Wire up Celery & broker**
+
+   * Start Redis + `celery -A config worker --beat --loglevel=INFO`
+   * Trigger `ekoh_score_recalc` and `contextual_analysis_batch` manually (`celery call`).
+   * Verify entries in `score_history` and `context_analysis_log`.
+
+5. **Configure & test Kafka flow**
+
+   * Start Redpanda (`docker compose up kafka`).
+   * Publish a test `vote.cast` message via `aiokafka` script.
+   * Verify `vote_result` table updates and ledger entries.
+
+6. **Execute partition helper SQL**
+
+   ```bash
+   psql ekoh -f infra/db/partition_helper.sql
+   ```
+
+   Check that new monthly partitions for `vote`, `vote_ledger`, and `score_history` appear.
+
+7. **Smoke-test the REST APIs**
+
+   ```bash
+   curl http://localhost:8000/api/v1/ekoh/profile/<your-user-id>
+   curl -X POST http://localhost:8000/api/v1/smart-vote/cast … 
+   ```
+
+   Ensure you get valid JSON responses and correct error codes (400, 409, etc.).
+
+8. **Update & validate Docker-Compose**
+
+   * Confirm `make dev-up` still brings up all services and app logs show no errors.
+   * Verify fixture loader and migrations run on container start.
+
+9. **Finalize CI workflow**
+
+   * Commit `.github/workflows/ekoh-smartvote.yml` so every PR runs lint, tests, and a quick build.
+   * Merge to `main` only after green builds.
+
+10. **Deploy Helm chart to staging**
+
+    ```bash
+    helm upgrade --install ekoh-smartvote charts/ekoh-smartvote \
+      --values charts/ekoh-smartvote/values.yaml \
+      --namespace konnaxion-intel
+    ```
+
+    Verify pods, migrations, and provisional Ingress work.
+
+11. **Document & hand over**
+
+    * Update `README.md` with any new commands or caveats.
+    * Cross-link to `01-db_schema.md`, `03-technical_spec.md`, and Annex A for the final architecture.
+    * Tag release `v0.1.0-scaffold-complete`.
+
+12. **Plan the next sprint**
+    Tackle advanced features: contextual-analysis AI integration, partition pruning automation, real-time WebSocket updates, and front-end React pages.
+
+Keep this list open in your editor or Slack channel so nothing slips through the cracks once the code’s in place.
+
+===== END ToDo (instructions).txt (#0068) =====

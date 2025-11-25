@@ -1,4 +1,4 @@
-===== TOC (24 fichiers) =====
+===== TOC (27 fichiers) =====
 0001  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\sites\migrations\0001_initial.py
 0002  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\sites\migrations\0002_alter_domain_unique.py
 0003  C:\MyCode\Konnaxionv14\backend\konnaxion\contrib\sites\migrations\0003_set_site_domain_and_name.py
@@ -14,15 +14,18 @@
 0013  C:\MyCode\Konnaxionv14\backend\konnaxion\kollective_intelligence\migrations\__init__.py
 0014  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\0001_initial.py
 0015  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\0002_offline_packages.py
-0016  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\00xx_offline_packages.py
-0017  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\__init__.py
-0018  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0001_initial.py
-0019  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0002_archivedocument_culturalpartner_digitalarchive_and_more.py
-0020  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\__init__.py
-0021  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0001_initial.py
-0022  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0002_user_avatar.py
-0023  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0003_remove_user_avatar_user_profile_artwork.py
-0024  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\__init__.py
+0016  C:\MyCode\Konnaxionv14\backend\konnaxion\konnected\migrations\__init__.py
+0017  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0001_initial.py
+0018  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\0002_archivedocument_culturalpartner_digitalarchive_and_more.py
+0019  C:\MyCode\Konnaxionv14\backend\konnaxion\kreative\migrations\__init__.py
+0020  C:\MyCode\Konnaxionv14\backend\konnaxion\moderation\migrations\0001_initial.py
+0021  C:\MyCode\Konnaxionv14\backend\konnaxion\moderation\migrations\__init__.py
+0022  C:\MyCode\Konnaxionv14\backend\konnaxion\trust\migrations\0001_initial.py
+0023  C:\MyCode\Konnaxionv14\backend\konnaxion\trust\migrations\__init__.py
+0024  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0001_initial.py
+0025  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0002_user_avatar.py
+0026  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\0003_remove_user_avatar_user_profile_artwork.py
+0027  C:\MyCode\Konnaxionv14\backend\konnaxion\users\migrations\__init__.py
 ===== END TOC =====
 
 
@@ -1047,301 +1050,6 @@ class Migration(migrations.Migration):
 ===== END konnaxion/konnected/migrations/0002_offline_packages.py =====
 
 
-===== BEGIN konnaxion/konnected/migrations/00xx_offline_packages.py =====
-// frontend/modules/kontact/pages/ConnectCenter.tsx
-'use client';
-
-import React, { useMemo, useState } from 'react';
-import { PageContainer, ProCard } from '@ant-design/pro-components';
-import {
-  Alert,
-  Empty,
-  Input,
-  Segmented,
-  Space,
-  Tag,
-  Typography,
-} from 'antd';
-import { LinkOutlined, TeamOutlined } from '@ant-design/icons';
-
-import { useOpportunities, useProfiles } from '@/kontact/hooks';
-import {
-  OpportunityList as RawOpportunityList,
-  ProfileCard as RawProfileCard,
-} from '@/kontact/components';
-import usePageTitle from '@/hooks/usePageTitle';
-
-const { Title, Paragraph } = Typography;
-
-/* ------------------------------------------------------------------ */
-/*  Domain types                                                       */
-/* ------------------------------------------------------------------ */
-
-export interface KontactOpportunity {
-  id: string;
-  title: string;
-  summary?: string;
-  type?: string;
-  sourceModule?: string; // e.g. "KeenKonnect", "Ethikos", "Kreative"
-  url?: string;
-  tags?: string[];
-  matchScore?: number; // 0–100
-}
-
-export interface KontactProfile {
-  id: string;
-  name: string;
-  headline?: string;
-  location?: string;
-  roles?: string[];
-  skills?: string[];
-  url?: string;
-  avatarUrl?: string;
-  matchScore?: number; // 0–100
-}
-
-/**
- * Expected shape for the kontact hooks.
- * The current stub implementations can safely return `undefined` or partials;
- * this page defensively normalises everything.
- */
-interface UseOpportunitiesResult {
-  items?: KontactOpportunity[];
-  isLoading?: boolean;
-  isError?: boolean;
-  error?: Error | null;
-}
-
-interface UseProfilesResult {
-  items?: KontactProfile[];
-  isLoading?: boolean;
-  isError?: boolean;
-  error?: Error | null;
-}
-
-/**
- * Props used by the kontact presentational components.
- * We cast the current stubs to these shapes so this page can compile
- * before their implementations are written.
- */
-interface OpportunityListProps {
-  items: KontactOpportunity[];
-  loading?: boolean;
-  emptyMessage?: string;
-}
-
-interface ProfileCardProps {
-  profile: KontactProfile;
-}
-
-/* Cast stub components to the props we intend to support. */
-const OpportunityList =
-  RawOpportunityList as unknown as React.ComponentType<OpportunityListProps>;
-const ProfileCard =
-  RawProfileCard as unknown as React.ComponentType<ProfileCardProps>;
-
-type ViewMode = 'all' | 'opportunities' | 'people';
-
-/* ------------------------------------------------------------------ */
-/*  Main component                                                     */
-/* ------------------------------------------------------------------ */
-
-export default function ConnectCenter() {
-  usePageTitle('Kontact · Connect Center');
-
-  const [query, setQuery] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('all');
-
-  // Normalise hook return values so current stubs don't crash the page
-  const oppRaw =
-    ((useOpportunities as unknown as () => UseOpportunitiesResult | undefined)() ??
-      {}) as UseOpportunitiesResult;
-  const profRaw =
-    ((useProfiles as unknown as () => UseProfilesResult | undefined)() ??
-      {}) as UseProfilesResult;
-
-  const opportunities = oppRaw.items ?? [];
-  const profiles = profRaw.items ?? [];
-
-  const loading = Boolean(oppRaw.isLoading || profRaw.isLoading);
-  const oppError = oppRaw.isError ? oppRaw.error : null;
-  const profError = profRaw.isError ? profRaw.error : null;
-  const hasError = Boolean(oppError || profError);
-
-  const totalOpps = opportunities.length;
-  const totalProfiles = profiles.length;
-
-  const trimmedQuery = query.trim().toLowerCase();
-
-  const filteredOpps = useMemo(() => {
-    if (!trimmedQuery) return opportunities;
-    return opportunities.filter((item) => {
-      const haystack = [
-        item.title,
-        item.summary,
-        item.type,
-        item.sourceModule,
-        ...(item.tags ?? []),
-      ]
-        .join(' ')
-        .toLowerCase();
-      return haystack.includes(trimmedQuery);
-    });
-  }, [opportunities, trimmedQuery]);
-
-  const filteredProfiles = useMemo(() => {
-    if (!trimmedQuery) return profiles;
-    return profiles.filter((p) => {
-      const haystack = [
-        p.name,
-        p.headline,
-        p.location,
-        ...(p.roles ?? []),
-        ...(p.skills ?? []),
-      ]
-        .join(' ')
-        .toLowerCase();
-      return haystack.includes(trimmedQuery);
-    });
-  }, [profiles, trimmedQuery]);
-
-  const showOpps = viewMode === 'all' || viewMode === 'opportunities';
-  const showProfiles = viewMode === 'all' || viewMode === 'people';
-
-  return (
-    <PageContainer ghost loading={loading}>
-      <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        {/* Header copy */}
-        <div>
-          <Title level={3} style={{ marginBottom: 8 }}>
-            Connect Center
-          </Title>
-          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-            Discover collaboration opportunities and people across Konnaxion.
-            This view aggregates leads from teams, debates, workspaces and
-            consultations into a single stream you can act on.
-          </Paragraph>
-        </div>
-
-        {/* Search + mode toggle + status */}
-        <ProCard ghost>
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Space
-              style={{
-                width: '100%',
-                justifyContent: 'space-between',
-                flexWrap: 'wrap',
-              }}
-            >
-              <Input.Search
-                placeholder="Search by keyword, skill, topic, or organisation…"
-                allowClear
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                style={{ maxWidth: 420 }}
-              />
-
-              <Space size="middle" wrap>
-                <Segmented
-                  value={viewMode}
-                  onChange={(val) => setViewMode(val as ViewMode)}
-                  options={[
-                    { label: 'All', value: 'all' },
-                    { label: 'Opportunities', value: 'opportunities' },
-                    { label: 'People', value: 'people' },
-                  ]}
-                />
-                <Tag icon={<LinkOutlined />} color="blue">
-                  {totalOpps} opportunities · {totalProfiles} people
-                </Tag>
-              </Space>
-            </Space>
-
-            {hasError && (
-              <Alert
-                type="error"
-                showIcon
-                message="Some recommendations could not be loaded"
-                description={
-                  <>
-                    {oppError && (
-                      <>
-                        Opportunities: {oppError.message}
-                        <br />
-                      </>
-                    )}
-                    {profError && <>People: {profError.message}</>}
-                  </>
-                }
-              />
-            )}
-          </Space>
-        </ProCard>
-
-        {/* Two-column layout: opportunities + people */}
-        <ProCard gutter={16} wrap>
-          {showOpps && (
-            <ProCard
-              colSpan={{ xs: 24, lg: 14 }}
-              ghost
-              title={
-                <Space>
-                  <LinkOutlined />
-                  <span>Opportunities for you</span>
-                </Space>
-              }
-            >
-              {filteredOpps.length ? (
-                <OpportunityList
-                  items={filteredOpps}
-                  loading={loading && !opportunities.length}
-                  emptyMessage="No opportunities match your filters."
-                />
-              ) : trimmedQuery || totalOpps > 0 ? (
-                <Empty description="No opportunities match your filters." />
-              ) : (
-                <Empty description="No opportunities yet. Once teams, workspaces and consultations start publishing openings, they will appear here." />
-              )}
-            </ProCard>
-          )}
-
-          {showProfiles && (
-            <ProCard
-              colSpan={{ xs: 24, lg: 10 }}
-              ghost
-              title={
-                <Space>
-                  <TeamOutlined />
-                  <span>People to connect with</span>
-                </Space>
-              }
-            >
-              {filteredProfiles.length ? (
-                <Space
-                  direction="vertical"
-                  size="middle"
-                  style={{ width: '100%' }}
-                >
-                  {filteredProfiles.map((profile) => (
-                    <ProfileCard key={profile.id} profile={profile} />
-                  ))}
-                </Space>
-              ) : trimmedQuery || totalProfiles > 0 ? (
-                <Empty description="No people match your filters." />
-              ) : (
-                <Empty description="No recommendations yet. As you participate across the platform, suggested profiles will appear here." />
-              )}
-            </ProCard>
-          )}
-        </ProCard>
-      </Space>
-    </PageContainer>
-  );
-}
-
-===== END konnaxion/konnected/migrations/00xx_offline_packages.py =====
-
-
 ===== BEGIN konnaxion/konnected/migrations/__init__.py =====
 
 ===== END konnaxion/konnected/migrations/__init__.py =====
@@ -1580,6 +1288,202 @@ class Migration(migrations.Migration):
 ===== BEGIN konnaxion/kreative/migrations/__init__.py =====
 
 ===== END konnaxion/kreative/migrations/__init__.py =====
+
+
+===== BEGIN konnaxion/moderation/migrations/0001_initial.py =====
+# Generated by Django 5.1.9 on 2025-11-24 17:48
+
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        ('contenttypes', '0002_remove_content_type_name'),
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='AuditLogEntry',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('ts', models.DateTimeField(auto_now_add=True, db_index=True, help_text='Timestamp when the event occurred.')),
+                ('actor', models.CharField(blank=True, help_text='Denormalized actor label exposed in the API.', max_length=255)),
+                ('action', models.CharField(help_text="Logical action identifier, e.g. 'UPDATE_TOPIC'.", max_length=128)),
+                ('target', models.CharField(blank=True, help_text='Human-readable target used in the admin UI.', max_length=255)),
+                ('entity', models.CharField(blank=True, help_text="Machine-oriented entity type, e.g. 'topic', 'argument', 'user'.", max_length=64)),
+                ('entity_id', models.CharField(blank=True, help_text='Primary key of the entity in the source system, stored as text.', max_length=64)),
+                ('entity_object_id', models.CharField(blank=True, max_length=64)),
+                ('severity', models.CharField(choices=[('info', 'Info'), ('warn', 'Warning'), ('critical', 'Critical')], db_index=True, default='info', max_length=10)),
+                ('status', models.CharField(choices=[('ok', 'OK'), ('warn', 'Warning'), ('error', 'Error')], db_index=True, default='ok', max_length=10)),
+                ('ip', models.GenericIPAddressField(blank=True, help_text='Source IP address, if available.', null=True)),
+                ('meta', models.JSONField(blank=True, default=dict, help_text='Free-form JSON payload with extra context for the event.')),
+                ('actor_user', models.ForeignKey(blank=True, help_text='Optional link to the user that triggered the event.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='audit_entries', to=settings.AUTH_USER_MODEL)),
+                ('entity_content_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='audit_entries', to='contenttypes.contenttype')),
+            ],
+            options={
+                'verbose_name': 'Audit log entry',
+                'verbose_name_plural': 'Audit log entries',
+                'ordering': ('-ts',),
+            },
+        ),
+        migrations.CreateModel(
+            name='ModerationCase',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('target_object_id', models.CharField(blank=True, help_text='Primary key of the moderated object, stored as text.', max_length=64)),
+                ('target_type', models.CharField(choices=[('topic', 'Topic'), ('post', 'Post / argument'), ('user', 'User'), ('other', 'Other')], default='post', help_text='UI-level category of the moderated target (topic, post, user, …).', max_length=16)),
+                ('target_id', models.CharField(blank=True, help_text='External identifier exposed to frontends (argumentId, topicId, userId, …).', max_length=64)),
+                ('context_title', models.CharField(blank=True, help_text='Debate / consultation context, e.g. topic title.', max_length=255)),
+                ('content_preview', models.TextField(blank=True, help_text='Short snapshot of the offending content for quick review.')),
+                ('author_name', models.CharField(blank=True, help_text='Cached author label for admin views.', max_length=255)),
+                ('status', models.CharField(choices=[('Pending', 'Pending'), ('Resolved', 'Resolved'), ('Escalated', 'Escalated')], db_index=True, default='Pending', max_length=16)),
+                ('severity', models.CharField(choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')], db_index=True, default='medium', max_length=8)),
+                ('report_count', models.PositiveIntegerField(default=0, help_text='Denormalized number of merged user reports for this case.')),
+                ('source', models.CharField(blank=True, help_text="Originating app or module (e.g. 'ethikos', 'keenkonnect').", max_length=64)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('last_action_at', models.DateTimeField(auto_now=True)),
+                ('author', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='moderation_cases_authored', to=settings.AUTH_USER_MODEL)),
+                ('last_moderated_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='moderation_cases_moderated', to=settings.AUTH_USER_MODEL)),
+                ('target_content_type', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='moderation_cases', to='contenttypes.contenttype')),
+            ],
+            options={
+                'verbose_name': 'Moderation case',
+                'verbose_name_plural': 'Moderation cases',
+                'ordering': ('-created_at',),
+            },
+        ),
+        migrations.CreateModel(
+            name='ModerationAction',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('action', models.CharField(choices=[('approve', 'Approve content'), ('remove', 'Remove content'), ('escalate', 'Escalate / flag'), ('ignore', 'Ignore / keep pending')], max_length=16)),
+                ('notes', models.TextField(blank=True, help_text='Optional internal notes from the moderator.')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('audit_entry', models.ForeignKey(blank=True, help_text='Optional link to the audit log entry for this decision.', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='moderation_actions', to='moderation.auditlogentry')),
+                ('moderator', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='moderation_actions', to=settings.AUTH_USER_MODEL)),
+                ('case', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='actions', to='moderation.moderationcase')),
+            ],
+            options={
+                'verbose_name': 'Moderation action',
+                'verbose_name_plural': 'Moderation actions',
+                'ordering': ('-created_at',),
+            },
+        ),
+        migrations.CreateModel(
+            name='ModerationReport',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('reporter_name', models.CharField(blank=True, help_text='Cached reporter label for admin views.', max_length=255)),
+                ('type', models.CharField(choices=[('Spam', 'Spam'), ('Harassment', 'Harassment'), ('Misinformation', 'Misinformation'), ('Other', 'Other')], default='Spam', help_text='Primary moderation reason label.', max_length=32)),
+                ('message', models.TextField(blank=True, help_text='Optional free-text notes supplied by the reporter.')),
+                ('meta', models.JSONField(blank=True, default=dict, help_text='Arbitrary JSON payload with source-specific details.')),
+                ('ip_address', models.GenericIPAddressField(blank=True, help_text='Source IP address of the reporter, if tracked.', null=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('case', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='reports', to='moderation.moderationcase')),
+                ('reporter', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='moderation_reports', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'verbose_name': 'Moderation report',
+                'verbose_name_plural': 'Moderation reports',
+                'ordering': ('-created_at',),
+            },
+        ),
+        migrations.AddIndex(
+            model_name='auditlogentry',
+            index=models.Index(fields=['ts'], name='moderation__ts_083a34_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='auditlogentry',
+            index=models.Index(fields=['severity'], name='moderation__severit_95739a_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='auditlogentry',
+            index=models.Index(fields=['status'], name='moderation__status_8f4da0_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='auditlogentry',
+            index=models.Index(fields=['entity', 'entity_id'], name='moderation__entity_76cedd_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='moderationcase',
+            index=models.Index(fields=['status', 'severity'], name='moderation__status_3af731_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='moderationcase',
+            index=models.Index(fields=['target_type', 'target_id'], name='moderation__target__2376b2_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='moderationcase',
+            index=models.Index(fields=['created_at'], name='moderation__created_b76f35_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='moderationreport',
+            index=models.Index(fields=['type'], name='moderation__type_10cf49_idx'),
+        ),
+        migrations.AddIndex(
+            model_name='moderationreport',
+            index=models.Index(fields=['created_at'], name='moderation__created_ae337c_idx'),
+        ),
+    ]
+
+===== END konnaxion/moderation/migrations/0001_initial.py =====
+
+
+===== BEGIN konnaxion/moderation/migrations/__init__.py =====
+
+===== END konnaxion/moderation/migrations/__init__.py =====
+
+
+===== BEGIN konnaxion/trust/migrations/0001_initial.py =====
+# Generated by Django 5.1.9 on 2025-11-24 17:48
+
+import django.db.models.deletion
+from django.conf import settings
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+        migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Credential',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('title', models.CharField(help_text="Short title, e.g. 'MSc Climate Policy'.", max_length=255)),
+                ('issuer', models.CharField(blank=True, help_text='Issuing institution or body.', max_length=255)),
+                ('issued_at', models.DateTimeField(blank=True, help_text='When the credential was issued (if known).', null=True)),
+                ('file', models.FileField(blank=True, help_text='Binary document attached to this credential.', null=True, upload_to='trust/credentials/%Y/%m/%d')),
+                ('status', models.CharField(choices=[('Pending', 'Pending'), ('Verified', 'Verified'), ('Rejected', 'Rejected')], default='Pending', help_text='Review status in the trust workflow.', max_length=16)),
+                ('notes', models.TextField(blank=True, help_text='Optional reviewer notes shown read‑only in the UI.')),
+                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('user', models.ForeignKey(help_text='User who submitted this credential.', on_delete=django.db.models.deletion.CASCADE, related_name='trust_credentials', to=settings.AUTH_USER_MODEL)),
+            ],
+            options={
+                'ordering': ('-created_at',),
+                'indexes': [models.Index(fields=['user', 'status'], name='trust_crede_user_id_3fc81d_idx')],
+            },
+        ),
+    ]
+
+===== END konnaxion/trust/migrations/0001_initial.py =====
+
+
+===== BEGIN konnaxion/trust/migrations/__init__.py =====
+
+===== END konnaxion/trust/migrations/__init__.py =====
 
 
 ===== BEGIN konnaxion/users/migrations/0001_initial.py =====

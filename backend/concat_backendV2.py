@@ -2,14 +2,15 @@
 """
 concat_series.py
 Génère plusieurs .txt de code avec une TOC en tête de chaque fichier :
-  - Code_config_<stamp>.txt
-  - Code_core_<stamp>.txt
-  - Code_apps_<stamp>.txt
-  - Code_migrations_<stamp>.txt
-  - Code_tests_<stamp>.txt
-  - Code_templates_<stamp>.txt
-  - Code_celery_<stamp>.txt
-  - Code_deploy_<stamp>.txt
+  - Code_config_Konnaxion backend_<stamp>.txt
+  - Code_core_Konnaxion backend_<stamp>.txt
+  - Code_apps_Konnaxion backend_<stamp>.txt
+  - Code_migrations_Konnaxion backend_<stamp>.txt
+  - Code_tests_Konnaxion backend_<stamp>.txt
+  - Code_templates_Konnaxion backend_<stamp>.txt
+  - Code_celery_Konnaxion backend_<stamp>.txt
+  - Code_deploy_Konnaxion backend_<stamp>.txt
+  - INDEX_Konnaxion backend_<stamp>.txt
 
 Usage :
   python concat_series.py
@@ -54,7 +55,7 @@ EXCLUDE_DIRS: Set[str] = {
     ".venv", "venv", "__pycache__",
     "target", "bin", "obj",
 }
-# Bundles alignés avec l’arborescence fournie. :contentReference[oaicite:1]{index=1}
+# Bundles alignés avec l’arborescence fournie.
 BUNDLES = (
     ("Code_config", ["config/**"], []),
     ("Code_core",
@@ -85,8 +86,10 @@ def parse_args() -> argparse.Namespace:
     return ap.parse_args()
 
 def to_rel(base: Path, p: Path) -> str:
-    try: r = p.relative_to(base)
-    except Exception: r = p
+    try:
+        r = p.relative_to(base)
+    except Exception:
+        r = p
     return str(r).replace("\\", "/")
 
 def is_text_file(path: Path) -> bool:
@@ -100,7 +103,8 @@ def is_text_file(path: Path) -> bool:
     if b"\x00" in sample:
         return False
     try:
-        sample.decode("utf-8"); return True
+        sample.decode("utf-8")
+        return True
     except UnicodeDecodeError:
         ctrl = sum(1 for b in sample if b < 32 and b not in (9, 10, 13))
         return (ctrl / max(1, len(sample))) < 0.01
@@ -108,7 +112,8 @@ def is_text_file(path: Path) -> bool:
 def pick_encoding(path: Path) -> Optional[str]:
     for enc in ("utf-8", "utf-8-sig", "utf-16", "cp1252", "latin-1"):
         try:
-            with path.open("r", encoding=enc) as f: f.read(2048)
+            with path.open("r", encoding=enc) as f:
+                f.read(2048)
             return enc
         except Exception:
             continue
@@ -125,16 +130,22 @@ def select_files(base: Path, includes: List[str], excludes: List[str],
         rp = Path(root)
         for name in files:
             p = rp / name
-            if not p.is_file() or p.is_symlink(): continue
+            if not p.is_file() or p.is_symlink():
+                continue
             try:
-                if p.stat().st_size > max_size: continue
+                if p.stat().st_size > max_size:
+                    continue
             except Exception:
                 continue
             rel = to_rel(base, p)
-            if out_dir in p.parents: continue
-            if excludes and matches_any(rel, excludes): continue
-            if includes and not matches_any(rel, includes): continue
-            if not is_text_file(p): continue
+            if out_dir in p.parents:
+                continue
+            if excludes and matches_any(rel, excludes):
+                continue
+            if includes and not matches_any(rel, includes):
+                continue
+            if not is_text_file(p):
+                continue
             chosen.append(p)
     chosen.sort(key=lambda q: to_rel(base, q).lower())
     return chosen
@@ -184,13 +195,17 @@ def main() -> None:
     index_lines = []
     for name, includes, excludes in BUNDLES:
         files = select_files(base, includes, excludes, args.max_size, outdir)
-        out_path = outdir / f"{name}_{stamp}.txt"
+        # Ajout de "Konnaxion backend" dans le nom de chaque fichier bundle
+        out_path = outdir / f"{name}_Konnaxion backend_{stamp}.txt"
         n = write_bundle(base, files, out_path, args.no_headers)
         print(f"[+] {name}: {n} fichiers -> {out_path}")
         index_lines.append(f"{name}\t{n}\t{out_path.name}")
 
-    (outdir / f"INDEX_{stamp}.txt").write_text(
-        "bundle\tcount\tfile\n" + "\n".join(index_lines) + "\n", encoding="utf-8"
+    # Ajout de "Konnaxion backend" dans le nom du fichier d’index
+    index_filename = f"INDEX_Konnaxion backend_{stamp}.txt"
+    (outdir / index_filename).write_text(
+        "bundle\tcount\tfile\n" + "\n".join(index_lines) + "\n",
+        encoding="utf-8",
     )
 
 if __name__ == "__main__":

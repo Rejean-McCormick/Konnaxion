@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 
 /**
- * Shape of a single vote row returned by /api/votes/.
+ * Shape of a single vote row returned by the Smart‑Vote API.
  * Note: weighted_value may come back as a string (DecimalField).
  */
 export interface VoteRecord {
@@ -74,7 +74,7 @@ function aggregateVotes(votes: VoteRecord[]): {
 /**
  * Fetches a poll snapshot from the Smart‑Vote backend.
  *
- * - Hits /api/votes/ (real DRF endpoint).
+ * - Hits kollective/votes/ (real DRF endpoint, via baseURL /api).
  * - Filters by target_type + target_id for the selected poll.
  * - Aggregates into a simple yes/no PollData structure.
  */
@@ -86,7 +86,7 @@ export function usePoll(id: PollId = DEFAULT_POLL_ID) {
     staleTime: 30_000,
     retry: 1,
     queryFn: async () => {
-      const { data: payload } = await api.get<any>("/api/votes/", {
+      const { data: payload } = await api.get<any>("kollective/votes/", {
         params: {
           target_type: cfg.targetType,
           target_id: cfg.targetId,

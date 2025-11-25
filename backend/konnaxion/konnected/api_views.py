@@ -1,5 +1,6 @@
 # konnaxion/konnected/api_views.py
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
 
 from django.conf import settings
 from django.utils import timezone
@@ -31,7 +32,67 @@ CERT_PASS_PERCENT: int = getattr(settings, "CERT_PASS_PERCENT", 80)
 QUIZ_RETRY_COOLDOWN_MIN: int = getattr(settings, "QUIZ_RETRY_COOLDOWN_MIN", 30)
 
 
-def _generate_synthetic_exam_sessions(now=None):
+# ---------------------------------------------------------------------------
+# Helper functions to centralise score / pass / cooldown logic
+# ---------------------------------------------------------------------------
+
+
+def _compute_score_percent(evaluation: Evaluation) -> Optional[float]:
+    """
+    Resolve a numeric score percentage for an evaluation.
+
+    Prefers metadata["score_percent"] but falls back to raw_score when present.
+    """
+    metadata = evaluation.metadata or {}
+    score_percent = metadata.get("score_percent")
+
+    if score_percent is None and evaluation.raw_score is not None:
+        try:
+            score_percent = float(evaluation.raw_score)
+        except (TypeError, ValueError):
+            score_percent = None
+
+    return score_percent
+
+
+def _get_pass_threshold(metadata: Dict[str, Any]) -> int:
+    """
+    Resolve the pass percentage, falling back to the global default.
+    """
+    raw = metadata.get("pass_percent", CERT_PASS_PERCENT)
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        return CERT_PASS_PERCENT
+
+
+def _compute_retry_cooldown(
+    evaluation: Evaluation, now: Optional[datetime] = None
+) -> Tuple[bool, int, datetime]:
+    """
+    Compute cooldown for an evaluation.
+
+    Returns:
+        (is_cooldown_active, remaining_minutes, cooldown_ends_at)
+    """
+    if now is None:
+        now = timezone.now()
+
+    cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
+    cooldown_ends_at = evaluation.created_at + cooldown_delta
+
+    if now >= cooldown_ends_at:
+        return False, 0, cooldown_ends_at
+
+    remaining_minutes = int(
+        max(0, round((cooldown_ends_at - now).total_seconds() / 60.0))
+    )
+    return True, remaining_minutes, cooldown_ends_at
+
+
+def _generate_synthetic_exam_sessions(
+    now: Optional[datetime] = None,
+) -> List[Dict[str, Any]]:
     """
     Helper for generating a small synthetic exam schedule.
 
@@ -48,7 +109,7 @@ def _generate_synthetic_exam_sessions(now=None):
         now = timezone.now()
 
     base_start = now + timedelta(days=3)
-    sessions = []
+    sessions: List[Dict[str, Any]] = []
     for index in range(3):
         start = base_start + timedelta(days=7 * index)
         end = start + timedelta(hours=2)
@@ -76,6 +137,7 @@ class KnowledgeResourceViewSet(viewsets.ModelViewSet):
     The model follows v14 spec:
         id, title, type, url, author, created_at, updated_at
     """
+
     queryset = KnowledgeResource.objects.select_related("author")
     serializer_class = KnowledgeResourceSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -107,6 +169,7 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         GET /konnected/certifications/paths/{id}/sessions/
         GET /konnected/certifications/paths/{id}/preparation-plan/
     """
+
     queryset = CertificationPath.objects.all().order_by("name")
     serializer_class = CertificationPathSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -127,9 +190,8 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         path = self.get_object()
         user = request.user
 
-        evaluations = (
-            Evaluation.objects.filter(user=user, path=path)
-            .order_by("-created_at")
+        evaluations = Evaluation.objects.filter(user=user, path=path).order_by(
+            "-created_at"
         )
 
         already_passed = False
@@ -137,19 +199,19 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
 
         last_eval = evaluations.first()
         if last_eval is not None:
-            score = last_eval.raw_score
             metadata = last_eval.metadata or {}
-            pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+            score = _compute_score_percent(last_eval)
+            pass_threshold = _get_pass_threshold(metadata)
 
             if score is not None and score >= pass_threshold:
                 already_passed = True
             else:
                 # Respect retry cooldown from the last attempt
-                delta_minutes = (timezone.now() - last_eval.created_at).total_seconds() / 60.0
-                if delta_minutes < QUIZ_RETRY_COOLDOWN_MIN:
-                    cooldown_remaining = int(
-                        max(0, round(QUIZ_RETRY_COOLDOWN_MIN - delta_minutes))
-                    )
+                is_cooldown_active, remaining_minutes, _ = _compute_retry_cooldown(
+                    last_eval
+                )
+                if is_cooldown_active:
+                    cooldown_remaining = remaining_minutes
 
         return Response(
             {
@@ -177,20 +239,16 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
         path = self.get_object()
         user = request.user
 
-        evaluations = (
-            Evaluation.objects.filter(user=user, path=path)
-            .order_by("-created_at")
+        evaluations = Evaluation.objects.filter(user=user, path=path).order_by(
+            "-created_at"
         )
         last_eval = evaluations.first()
 
         if last_eval is not None:
             metadata = last_eval.metadata or {}
 
-            score_percent = metadata.get("score_percent")
-            if score_percent is None and last_eval.raw_score is not None:
-                score_percent = float(last_eval.raw_score)
-
-            pass_percent = metadata.get("pass_percent", CERT_PASS_PERCENT)
+            score_percent = _compute_score_percent(last_eval)
+            pass_percent = _get_pass_threshold(metadata)
 
             last_result = None
             if score_percent is not None:
@@ -199,10 +257,9 @@ class CertificationPathViewSet(viewsets.ModelViewSet):
             attempts_used = evaluations.count()
             attempts_allowed = metadata.get("attempts_allowed")
 
-            cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
-            cooldown_ends_at_dt = last_eval.created_at + cooldown_delta
-            now = timezone.now()
-            is_cooldown_active = now < cooldown_ends_at_dt
+            is_cooldown_active, _, cooldown_ends_at_dt = _compute_retry_cooldown(
+                last_eval, now=timezone.now()
+            )
             cooldown_ends_at = (
                 cooldown_ends_at_dt.isoformat() if is_cooldown_active else None
             )
@@ -289,6 +346,7 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
     The queryset is always scoped to the authenticated user.
     """
+
     serializer_class = EvaluationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -355,7 +413,7 @@ class EvaluationViewSet(viewsets.ModelViewSet):
                         target_date = session["start_at"]
                         break
 
-        metadata = {
+        metadata: Dict[str, Any] = {
             "session_id": session_id,
             "full_name": data.get("full_name"),
             "agreed_terms": data.get("agreed_terms"),
@@ -378,13 +436,16 @@ class EvaluationViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(evaluation)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(
+            serializer.data, status=status.HTTP_201_CREATED, headers=headers
+        )
 
 
 class PeerValidationViewSet(viewsets.ModelViewSet):
     """
     API for peer mentors to record validation decisions on evaluations.
     """
+
     serializer_class = PeerValidationSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -394,7 +455,9 @@ class PeerValidationViewSet(viewsets.ModelViewSet):
             return PeerValidation.objects.none()
         if user.is_staff:
             return PeerValidation.objects.all().select_related("evaluation", "peer")
-        return PeerValidation.objects.filter(peer=user).select_related("evaluation", "peer")
+        return PeerValidation.objects.filter(peer=user).select_related(
+            "evaluation", "peer"
+        )
 
     def perform_create(self, serializer):
         serializer.save(peer=self.request.user)
@@ -404,6 +467,7 @@ class PortfolioViewSet(viewsets.ModelViewSet):
     """
     CRUD endpoints for user skill portfolios (collections of KnowledgeResources).
     """
+
     serializer_class = PortfolioSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -433,22 +497,21 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         POST /konnected/certifications/exam-attempts/{id}/appeal/
         POST /konnected/certifications/exam-attempts/{id}/retry/
     """
+
     permission_classes = [permissions.IsAuthenticated]
 
-    def _build_attempt(self, evaluation: Evaluation, attempt_number: int) -> dict:
+    def _build_attempt(self, evaluation: Evaluation, attempt_number: int) -> Dict[str, Any]:
         metadata = evaluation.metadata or {}
         path = evaluation.path
 
-        score_percent = metadata.get("score_percent")
-        if score_percent is None and evaluation.raw_score is not None:
-            score_percent = float(evaluation.raw_score)
+        score_percent = _compute_score_percent(evaluation)
 
         max_score = metadata.get("max_score")
         delivery_mode = metadata.get("delivery_mode", "online")
         proctored = bool(metadata.get("proctored", False))
 
         # Use per-evaluation pass threshold if present
-        pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+        pass_threshold = _get_pass_threshold(metadata)
 
         status_value = metadata.get("status")
         if not status_value:
@@ -477,10 +540,10 @@ class ExamAttemptViewSet(viewsets.ViewSet):
 
         appeal_status = metadata.get("appeal_status", "none")
 
-        cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
-        next_retry_at = evaluation.created_at + cooldown_delta
-        now = timezone.now()
-        can_retry = status_value != "passed" and now >= next_retry_at
+        is_cooldown_active, _, next_retry_at = _compute_retry_cooldown(
+            evaluation, now=timezone.now()
+        )
+        can_retry = status_value != "passed" and not is_cooldown_active
 
         certificate_id = metadata.get("certificate_id")
         certificate_url = metadata.get("certificate_url")
@@ -531,12 +594,14 @@ class ExamAttemptViewSet(viewsets.ViewSet):
             .order_by("path_id", "created_at", "pk")
         )
 
-        attempts_payload = []
-        attempt_counter_by_path: dict[int, int] = {}
+        attempts_payload: List[Dict[str, Any]] = []
+        attempt_counter_by_path: Dict[int, int] = {}
 
         for evaluation in evaluations:
             path_id = evaluation.path_id
-            attempt_counter_by_path[path_id] = attempt_counter_by_path.get(path_id, 0) + 1
+            attempt_counter_by_path[path_id] = attempt_counter_by_path.get(
+                path_id, 0
+            ) + 1
             attempt_number = attempt_counter_by_path[path_id]
             attempts_payload.append(self._build_attempt(evaluation, attempt_number))
 
@@ -549,17 +614,15 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         """
         user = request.user
         try:
-            evaluation = (
-                Evaluation.objects.select_related("path")
-                .get(pk=pk, user=user)
+            evaluation = Evaluation.objects.select_related("path").get(
+                pk=pk, user=user
             )
         except Evaluation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         # Compute attempt number within this path
-        ordered = (
-            Evaluation.objects.filter(user=user, path=evaluation.path)
-            .order_by("created_at", "pk")
+        ordered = Evaluation.objects.filter(user=user, path=evaluation.path).order_by(
+            "created_at", "pk"
         )
         attempt_number = 1
         for idx, ev in enumerate(ordered, start=1):
@@ -601,9 +664,8 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         This is used by the Exam Dashboard "Retry" action.
         """
         try:
-            source_eval = (
-                Evaluation.objects.select_related("path")
-                .get(pk=pk, user=request.user)
+            source_eval = Evaluation.objects.select_related("path").get(
+                pk=pk, user=request.user
             )
         except Evaluation.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
@@ -611,10 +673,8 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         metadata = source_eval.metadata or {}
 
         # Compute score_percent and pass threshold to determine if the exam is already passed
-        score_percent = metadata.get("score_percent")
-        if score_percent is None and source_eval.raw_score is not None:
-            score_percent = float(source_eval.raw_score)
-        pass_threshold = metadata.get("pass_percent", CERT_PASS_PERCENT)
+        score_percent = _compute_score_percent(source_eval)
+        pass_threshold = _get_pass_threshold(metadata)
 
         if score_percent is not None and score_percent >= pass_threshold:
             return Response(
@@ -622,10 +682,15 @@ class ExamAttemptViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        cooldown_delta = timedelta(minutes=QUIZ_RETRY_COOLDOWN_MIN)
-        if timezone.now() < source_eval.created_at + cooldown_delta:
+        is_cooldown_active, remaining_minutes, _ = _compute_retry_cooldown(
+            source_eval, now=timezone.now()
+        )
+        if is_cooldown_active:
             return Response(
-                {"detail": "Retry cooldown is still active for this exam."},
+                {
+                    "detail": "Retry cooldown is still active for this exam.",
+                    "cooldown_remaining_minutes": remaining_minutes,
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -644,10 +709,9 @@ class ExamAttemptViewSet(viewsets.ViewSet):
         )
 
         # Compute attempt number for the newly created evaluation
-        ordered = (
-            Evaluation.objects.filter(user=request.user, path=source_eval.path)
-            .order_by("created_at", "pk")
-        )
+        ordered = Evaluation.objects.filter(
+            user=request.user, path=source_eval.path
+        ).order_by("created_at", "pk")
         attempt_number = 1
         for idx, ev in enumerate(ordered, start=1):
             if ev.pk == new_eval.pk:
