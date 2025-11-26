@@ -163,6 +163,11 @@ class OfflinePackage(TimeStampedModel):
         blank=True,
         help_text="When this package was last fully built.",
     )
+    bundle_path = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text="Filesystem path to the last generated manifest, if any.",
+    )
 
     target_device_type = models.CharField(
         max_length=16,
@@ -197,7 +202,10 @@ class OfflinePackage(TimeStampedModel):
     include_types = models.JSONField(
         null=True,
         blank=True,
-        help_text="Optional list of content types to include (article, video, lesson, quiz, dataset).",
+        help_text=(
+            "Optional list of content types to include "
+            "(article, video, lesson, quiz, dataset)."
+        ),
     )
     subject_filter = models.CharField(
         max_length=255,
@@ -215,6 +223,14 @@ class OfflinePackage(TimeStampedModel):
         help_text="Optional language filter (e.g. 'en', 'fr').",
     )
 
+    # Resources actually included in the last build (if relation is used)
+    resources = models.ManyToManyField(
+        KnowledgeResource,
+        blank=True,
+        related_name="offline_packages",
+        help_text="Resources currently included in this offline package.",
+    )
+
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -223,6 +239,9 @@ class OfflinePackage(TimeStampedModel):
         related_name="offline_packages",
         help_text="User who created this offline package definition.",
     )
+
+    class Meta:
+        ordering = ("name",)
 
     def __str__(self) -> str:
         return self.name

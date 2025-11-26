@@ -5,11 +5,10 @@ Central DRF router for every Konnaxion v14 API endpoint.
     path("api/", include("config.api_router"))
 """
 
-from typing import Optional, Type
+from typing import Any, Optional, Type
 
 from django.conf import settings
 from rest_framework.routers import DefaultRouter, SimpleRouter
-from rest_framework.viewsets import ViewSet
 
 # ── Core / Users ──────────────────────────────────────────
 from konnaxion.users.api.views import UserViewSet  # /api/users/...
@@ -23,7 +22,7 @@ StanceViewSet = ethikos_api.StanceViewSet
 ArgumentViewSet = ethikos_api.ArgumentViewSet
 
 # Optional category ViewSet (name can be CategoryViewSet or EthikosCategoryViewSet)
-EthikosCategoryViewSet: Optional[Type[ViewSet]] = getattr(
+EthikosCategoryViewSet: Optional[Type[Any]] = getattr(
     ethikos_api,
     "CategoryViewSet",
     getattr(ethikos_api, "EthikosCategoryViewSet", None),
@@ -34,14 +33,19 @@ from konnaxion.keenkonnect.api_views import ProjectViewSet
 
 # ── Kollective Intelligence ───────────────────────────────
 # Vote-related ViewSets are optional for now; the app's api_views module may be incomplete.
+VoteViewSet: Optional[Type[Any]]
+VoteResultViewSet: Optional[Type[Any]]
 try:
     from konnaxion.kollective_intelligence.api_views import (  # type: ignore[attr-defined]
-        VoteViewSet,
-        VoteResultViewSet,
+        VoteViewSet as _VoteViewSet,
+        VoteResultViewSet as _VoteResultViewSet,
     )
+
+    VoteViewSet = _VoteViewSet
+    VoteResultViewSet = _VoteResultViewSet
 except Exception:
-    VoteViewSet = None  # type: ignore[assignment]
-    VoteResultViewSet = None  # type: ignore[assignment]
+    VoteViewSet = None
+    VoteResultViewSet = None
 
 # ── KonnectED (Knowledge + CertifiKation) ─────────────────
 from konnaxion.konnected.api_views import (
@@ -55,10 +59,15 @@ from konnaxion.konnected.api_views import (
 
 # OfflinePackageViewSet is optional; it will be present once the offline-packages
 # feature is implemented in konnected.api_views.
+OfflinePackageViewSet: Optional[Type[Any]]
 try:
-    from konnaxion.konnected.api_views import OfflinePackageViewSet  # type: ignore[attr-defined]
+    from konnaxion.konnected.api_views import (  # type: ignore[attr-defined]
+        OfflinePackageViewSet as _OfflinePackageViewSet,
+    )
+
+    OfflinePackageViewSet = _OfflinePackageViewSet
 except Exception:
-    OfflinePackageViewSet = None  # type: ignore[assignment]
+    OfflinePackageViewSet = None
 
 # ── Kreative ──────────────────────────────────────────────
 from konnaxion.kreative.api_views import KreativeArtworkViewSet, GalleryViewSet
@@ -70,7 +79,7 @@ router = DefaultRouter() if settings.DEBUG else SimpleRouter()
 
 def register_optional(
     prefix: str,
-    viewset: Optional[Type[ViewSet]],
+    viewset: Optional[Type[Any]],
     basename: str,
 ) -> None:
     """

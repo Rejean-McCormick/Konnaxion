@@ -1,5 +1,7 @@
 # backend/konnaxion/ethikos/api_views.py
 
+from typing import Optional
+
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
@@ -55,7 +57,7 @@ class TopicViewSet(viewsets.ModelViewSet):
     serializer_class = EthikosTopicSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
-    def _resolve_category(self, request, required: bool) -> EthikosCategory | None:
+    def _resolve_category(self, request, required: bool) -> Optional[EthikosCategory]:
         cat_id = request.data.get("category") or request.data.get("category_id")
         if not cat_id:
             if required:
@@ -170,6 +172,10 @@ class ArgumentViewSet(viewsets.ModelViewSet):
             # Si 'topic' fourni et différent de celui du parent -> erreur
             topic_in = self.request.data.get("topic")
             if topic_in and int(topic_in) != parent.topic_id:
-                raise ValidationError({"parent": "Le parent doit appartenir au même topic."})
+                raise ValidationError(
+                    {"parent": "Le parent doit appartenir au même topic."}
+                )
+            # Forcer le topic à celui du parent pour les réponses threadées
             extra["parent"] = parent
+            extra["topic"] = parent.topic
         serializer.save(**extra)

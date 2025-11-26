@@ -38,6 +38,7 @@ class VoteViewSet(viewsets.ModelViewSet):
       raw_value, weighted_value, voted_at
     """
 
+    queryset = Vote.objects.select_related("user").all()
     serializer_class = VoteSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -51,8 +52,7 @@ class VoteViewSet(viewsets.ModelViewSet):
           - target_id
           - user (matches related User.username)
         """
-        qs = Vote.objects.select_related("user").all()
-
+        qs = self.queryset
         params = self.request.query_params
 
         target_type = params.get("target_type")
@@ -94,11 +94,12 @@ class VoteResultViewSet(viewsets.ReadOnlyModelViewSet):
     for easy registration later.
     """
 
+    queryset = VoteResult.objects.all()
     serializer_class = VoteResultSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        qs = VoteResult.objects.all()
+        qs = self.queryset
         params = self.request.query_params
 
         target_type = params.get("target_type")
@@ -110,6 +111,7 @@ class VoteResultViewSet(viewsets.ReadOnlyModelViewSet):
             try:
                 qs = qs.filter(target_id=int(target_id))
             except (TypeError, ValueError):
+                # Ignore invalid target_id; return unfiltered by id
                 pass
 
         return qs.order_by("target_type", "target_id")

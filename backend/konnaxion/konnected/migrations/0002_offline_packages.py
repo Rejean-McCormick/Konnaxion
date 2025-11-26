@@ -1,5 +1,13 @@
 # backend/konnaxion/konnected/migrations/0002_offline_packages.py
+
 from django.db import migrations, models
+
+try:
+    # Django 3.1+ (built‑in JSONField)
+    JSONField = models.JSONField
+except AttributeError:
+    # Older Django versions (PostgreSQL JSONField)
+    from django.contrib.postgres.fields import JSONField  # type: ignore
 
 
 class Migration(migrations.Migration):
@@ -70,7 +78,7 @@ class Migration(migrations.Migration):
                 ("max_size_mb", models.PositiveIntegerField(blank=True, null=True)),
                 (
                     "include_types",
-                    models.JSONField(
+                    JSONField(
                         blank=True,
                         default=list,
                         help_text=(
@@ -84,7 +92,10 @@ class Migration(migrations.Migration):
                     models.CharField(
                         max_length=255,
                         blank=True,
-                        help_text="Optional subject/topic filter applied when resolving resources.",
+                        help_text=(
+                            "Optional subject/topic filter applied when "
+                            "resolving resources."
+                        ),
                     ),
                 ),
                 (

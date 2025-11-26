@@ -1,8 +1,7 @@
-# backend/konnaxion/kollective_intelligence/migrations/00xx_expertise_tags_api.py
 from django.db import migrations
 
-# Baseline expertise “tags” that will be exposed via the expertise-tags API.
-# For now we only persist the human‑readable name on ExpertiseCategory.
+# Baseline expertise 'tags' that will be exposed via the expertise-tags API.
+# For now we only persist the human-readable name on ExpertiseCategory.
 EXPERTISE_TAGS = [
     # key, label, description
     (
@@ -33,7 +32,7 @@ EXPERTISE_TAGS = [
     (
         "mobile",
         "Mobile Development",
-        "Native & cross‑platform apps, performance and offline patterns.",
+        "Native & cross-platform apps, performance and offline patterns.",
     ),
     (
         "qa",
@@ -62,15 +61,15 @@ def forwards_create_expertise_tags(apps, schema_editor):
         "kollective_intelligence", "ExpertiseCategory"
     )
 
-    for key, label, _description in EXPERTISE_TAGS:
+    for _key, label, _description in EXPERTISE_TAGS:
         # Use label as the canonical category name for now.
         ExpertiseCategory.objects.get_or_create(name=label)
 
 
 def backwards_delete_expertise_tags(apps, schema_editor):
     """
-    Reverse operation: remove only the categories created by this migration,
-    leaving any user‑defined or later categories untouched.
+    Reverse operation: remove categories whose names match the labels defined
+    in this migration.
     """
     ExpertiseCategory = apps.get_model(
         "kollective_intelligence", "ExpertiseCategory"

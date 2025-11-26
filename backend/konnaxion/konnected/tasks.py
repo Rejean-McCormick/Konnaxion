@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import json
 import logging
+from datetime import datetime
 from pathlib import Path
-from typing import Iterable, Sequence
+from typing import Any, Dict, Iterable, List, Optional, Sequence, Union
 
 from celery import shared_task
 from django.conf import settings
@@ -44,7 +45,7 @@ def _offline_root() -> Path:
     return base
 
 
-def _serialize_resource(resource: object) -> dict:
+def _serialize_resource(resource: Any) -> Dict[str, Any]:
     """
     Minimal serialisation of a KnowledgeResource for inclusion in offline bundles.
 
@@ -65,7 +66,7 @@ def _serialize_resource(resource: object) -> dict:
     }
 
 
-def _estimate_resource_size_mb(resource: object) -> float:
+def _estimate_resource_size_mb(resource: Any) -> float:
     """
     Best-effort size estimation for a resource, in megabytes.
 
@@ -88,19 +89,19 @@ def _estimate_resource_size_mb(resource: object) -> float:
     return 0.0
 
 
-def _safe_slug(value: str, fallback: str) -> str:
+def _safe_slug(value: Optional[str], fallback: str) -> str:
     """
     Very small, dependency-free slugifier for filenames.
     """
-    value = (value or "").strip() or fallback
-    slug_chars: list[str] = []
-    for ch in value:
+    base = (value or "").strip() or fallback
+    slug_chars: List[str] = []
+    for ch in base:
         slug_chars.append(ch.lower() if ch.isalnum() else "-")
     slug = "".join(slug_chars).strip("-")
     return slug or fallback
 
 
-def _ensure_offline_package_model():
+def _ensure_offline_package_model() -> Any:
     """
     Return the OfflinePackage model or raise a clear error if it is missing.
     """
@@ -114,7 +115,34 @@ def _ensure_offline_package_model():
     return OfflinePackage
 
 
-def _select_resources_for_package(package: object) -> Iterable[object]:
+def _get_include_types(package: Any) -> List[str]:
+    """
+    Normalise the include_types/includeTypes field on a package into a list of strings.
+
+    Supports:
+    - None / empty -> []
+    - comma-separated string -> ["type1", "type2"]
+    - any iterable -> list(iterable)
+    """
+    raw = getattr(package, "include_types", None) or getattr(
+        package,
+        "includeTypes",
+        None,
+    )
+    if not raw:
+        return []
+
+    if isinstance(raw, str):
+        return [t.strip() for t in raw.split(",") if t.strip()]
+
+    try:
+        return list(raw)
+    except TypeError:
+        # Fallback: treat as a single value.
+        return [str(raw)]
+
+
+def _select_resources_for_package(package: Any) -> Iterable[Any]:
     """
     Return an iterable of KnowledgeResource objects to include in a package.
 
@@ -138,26 +166,17 @@ def _select_resources_for_package(package: object) -> Iterable[object]:
     qs = KnowledgeResource.objects.all().order_by("id")  # type: ignore[union-attr]
 
     # ---- Type filter -------------------------------------------------------
-    include_types = getattr(package, "include_types", None) or getattr(
-        package,
-        "includeTypes",
-        None,
-    )
-    if include_types:
-        if isinstance(include_types, str):
-            include_types_list = [t.strip() for t in include_types.split(",") if t.strip()]
-        else:
-            include_types_list = list(include_types)
-        if include_types_list:
-            try:
-                qs = qs.filter(type__in=include_types_list)
-            except Exception:
-                # If the filter fails for any reason, fall back to the unfiltered qs.
-                pass
+    include_types_list = _get_include_types(package)
+    if include_types_list:
+        try:
+            qs = qs.filter(type__in=include_types_list)
+        except Exception:
+            # If the filter fails for any reason, fall back to the unfiltered qs.
+            pass
 
     # ---- Subject / level / language filters (optional) --------------------
     # Only apply where both the package and model expose matching attributes.
-    filters: dict[str, str] = {}
+    filters: Dict[str, str] = {}
     for field, pkg_attr in (
         ("subject", "subject_filter"),
         ("level", "level_filter"),
@@ -166,8 +185,8 @@ def _select_resources_for_package(package: object) -> Iterable[object]:
         value = getattr(package, pkg_attr, None)
         if value in (None, ""):
             continue
-        if hasattr(KnowledgeResource, field):  # type: ignore[arg-type]
-            filters[field] = value
+        if KnowledgeResource is not None and hasattr(KnowledgeResource, field):
+            filters[field] = value  # type: ignore[assignment]
 
     if filters:
         try:
@@ -179,7 +198,10 @@ def _select_resources_for_package(package: object) -> Iterable[object]:
     return qs
 
 
-def _enforce_size_limit(resources: Sequence[object], max_size_mb: float | None) -> list[object]:
+def _enforce_size_limit(
+    resources: Sequence[Any],
+    max_size_mb: Optional[float],
+) -> List[Any]:
     """
     Apply an approximate max-size constraint to the given resources.
 
@@ -189,7 +211,7 @@ def _enforce_size_limit(resources: Sequence[object], max_size_mb: float | None) 
     if max_size_mb is None or max_size_mb <= 0:
         return list(resources)
 
-    selected: list[object] = []
+    selected: List[Any] = []
     total = 0.0
 
     for res in resources:
@@ -203,7 +225,7 @@ def _enforce_size_limit(resources: Sequence[object], max_size_mb: float | None) 
     return selected
 
 
-def _write_package_manifest(package: object, resources: Sequence[object]) -> Path:
+def _write_package_manifest(package: Any, resources: Sequence[Any]) -> Path:
     """
     Write a JSON manifest for an OfflinePackage and return the file path.
 
@@ -214,7 +236,7 @@ def _write_package_manifest(package: object, resources: Sequence[object]) -> Pat
     """
     base_dir = _offline_root()
     package_id = getattr(package, "pk", "unknown")
-    name = getattr(package, "name", "") or f"package-{package_id}"
+    name = getattr(package, "name", None) or f"package-{package_id}"
     slug = _safe_slug(name, f"package-{package_id}")
     timestamp = timezone.now().strftime("%Y%m%d-%H%M%S")
     filename = f"offline_pkg_{slug}_{timestamp}.json"
@@ -228,11 +250,7 @@ def _write_package_manifest(package: object, resources: Sequence[object]) -> Pat
         or getattr(package, "targetDeviceType", None),
         "max_size_mb": getattr(package, "max_size_mb", None)
         or getattr(package, "maxSizeMb", None),
-        "include_types": list(
-            getattr(package, "include_types", None)
-            or getattr(package, "includeTypes", None)
-            or [],
-        ),
+        "include_types": _get_include_types(package),
         "subject_filter": getattr(package, "subject_filter", None),
         "level_filter": getattr(package, "level_filter", None),
         "language_filter": getattr(package, "language_filter", None),
@@ -251,7 +269,7 @@ def _write_package_manifest(package: object, resources: Sequence[object]) -> Pat
     return path
 
 
-def _update_package_resources(package: object, resources: Sequence[object]) -> None:
+def _update_package_resources(package: Any, resources: Sequence[Any]) -> None:
     """
     Attach the selected resources to the package via a ManyToMany relation, if present.
 
@@ -273,15 +291,15 @@ def _update_package_resources(package: object, resources: Sequence[object]) -> N
 
 
 def _set_package_status(
-    package: object,
+    package: Any,
     *,
-    status: str | None = None,
-    progress: float | None = None,
-    error: str | None = None,
-    item_count: int | None = None,
-    total_size_mb: float | None = None,
-    last_built_at=None,
-    bundle_path: Path | str | None = None,
+    status: Optional[str] = None,
+    progress: Optional[float] = None,
+    error: Optional[str] = None,
+    item_count: Optional[int] = None,
+    total_size_mb: Optional[float] = None,
+    last_built_at: Optional[datetime] = None,
+    bundle_path: Optional[Union[Path, str]] = None,
 ) -> None:
     """
     Update common OfflinePackage fields in a defensive way.
@@ -345,7 +363,7 @@ def export_knowledge_resources_for_offline() -> str:
     timestamp = timezone.now().strftime("%Y%m%d-%H%M%S")
     out_path = base_dir / f"knowledge_resources_{timestamp}.json"
 
-    items: list[dict] = []
+    items: List[Dict[str, Any]] = []
     # Use iterator() to avoid loading everything into memory at once.
     qs = KnowledgeResource.objects.all().order_by("id")  # type: ignore[union-attr]
     for res in qs.iterator():
@@ -365,7 +383,7 @@ def export_knowledge_resources_for_offline() -> str:
 
 
 @shared_task()
-def build_offline_package(package_id: int | str) -> dict:
+def build_offline_package(package_id: Union[int, str]) -> Dict[str, Any]:
     """
     Build or rebuild a single OfflinePackage.
 
@@ -413,12 +431,12 @@ def build_offline_package(package_id: int | str) -> dict:
             None,
         )
         try:
-            max_size_value: float | None
+            max_size_value: Optional[float]
             max_size_value = float(max_size_raw) if max_size_raw is not None else None
         except (TypeError, ValueError):
             max_size_value = None
 
-        # Evaluate queryset and enforce size constraint (if any).
+        # Evaluate queryset (or iterable) and enforce size constraint (if any).
         resources = list(qs)
         resources = _enforce_size_limit(resources, max_size_value)
 
@@ -489,6 +507,7 @@ def build_offline_packages_for_auto_sync() -> int:
         return 0
 
     qs = model.objects.all()  # type: ignore[union-attr]
+
     # Prefer packages explicitly opted into automatic sync.
     try:
         qs = qs.filter(auto_sync=True)

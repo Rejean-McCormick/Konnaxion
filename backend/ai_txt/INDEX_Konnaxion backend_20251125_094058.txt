@@ -1,9 +1,0 @@
-bundle	count	file
-Code_config	13	Code_config_Konnaxion backend_20251125_094058.txt
-Code_core	11	Code_core_Konnaxion backend_20251125_094058.txt
-Code_apps	83	Code_apps_Konnaxion backend_20251125_094058.txt
-Code_migrations	27	Code_migrations_Konnaxion backend_20251125_094058.txt
-Code_tests	20	Code_tests_Konnaxion backend_20251125_094058.txt
-Code_templates	19	Code_templates_Konnaxion backend_20251125_094058.txt
-Code_celery	3	Code_celery_Konnaxion backend_20251125_094058.txt
-Code_deploy	5	Code_deploy_Konnaxion backend_20251125_094058.txt
