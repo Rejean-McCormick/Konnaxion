@@ -8,6 +8,10 @@
  * - Modules variant of the Trust profile page (layout & summary patterns).
  * - Trust services: ReputationProfile types, fetchUserProfile, fetchUserBadges.
  * - Combined reputation timeline hook (profile + badges → timeline).
+ *
+ * Avatar behavior:
+ * - Uses profile.avatarUrl when present (from backend /users/me/ avatar_url).
+ * - Falls back to initial derived from displayName → username → level.
  */
 
 import React, { useMemo } from 'react';
@@ -61,8 +65,10 @@ export default function TrustProfilePage() {
   const dimensions = profile?.dimensions ?? [];
   const recent = profile?.recent ?? [];
 
-  // Derive UI helpers
-  const initial = level.charAt(0).toUpperCase();
+  // Derive UI helpers (avatar + initial)
+  const avatarSrc = profile?.avatarUrl ?? undefined;
+  const nameSeed = profile?.displayName ?? profile?.username ?? level;
+  const initial = nameSeed.charAt(0).toUpperCase();
 
   const netRecentDelta = useMemo(
     () => recent.reduce((sum, r) => sum + (r.change ?? 0), 0),
@@ -238,10 +244,15 @@ export default function TrustProfilePage() {
                 <AntBadge.Ribbon text="Profile" color="purple">
                   <Avatar
                     size={64}
-                    style={{ background: 'var(--ant-color-warning-bg)' }}
-                    icon={<CrownOutlined />}
+                    src={avatarSrc}
+                    style={
+                      avatarSrc
+                        ? undefined
+                        : { background: 'var(--ant-color-warning-bg)' }
+                    }
+                    icon={!avatarSrc ? <CrownOutlined /> : undefined}
                   >
-                    {initial}
+                    {!avatarSrc && initial}
                   </Avatar>
                 </AntBadge.Ribbon>
                 <div>

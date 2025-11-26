@@ -1,4 +1,5 @@
-﻿'use client';
+﻿// app/keenkonnect/user-reputation/account-preferences/page.tsx
+'use client';
 
 import React, { useState } from 'react';
 import {
@@ -15,6 +16,7 @@ import {
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { UploadOutlined } from '@ant-design/icons';
+import { uploadUserAvatar } from '@/services/user';
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -72,7 +74,7 @@ const privacySharingOptions = [
   { label: 'Everyone on KeenKonnect', value: 'public' as const },
 ];
 
-// ✅ Fix: make sure this always returns UploadFile[]
+// ✅ Always return UploadFile[]
 const normFile = (e: any): UploadFile[] => {
   if (Array.isArray(e)) {
     return e as UploadFile[];
@@ -85,10 +87,29 @@ export default function AccountPreferencesPage(): JSX.Element {
 
   // === Submit handlers =======================================================
 
-  const onFinishProfile = (values: ProfileFormValues) => {
-    // eslint-disable-next-line no-console
-    console.log('Profile info submitted:', values);
-    antdMessage.success('Profile information updated successfully.');
+  const onFinishProfile = async (values: ProfileFormValues) => {
+    try {
+      const avatarFile = values.avatar?.[0]?.originFileObj as
+        | File
+        | undefined;
+
+      if (avatarFile) {
+        await uploadUserAvatar(avatarFile);
+      }
+
+      // TODO: wire name / headline / bio to a real profile endpoint
+      // when the backend fields are available.
+      // eslint-disable-next-line no-console
+      console.log('Profile info submitted:', values);
+
+      antdMessage.success('Profile information updated successfully.');
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to update profile', error);
+      antdMessage.error(
+        'Unable to update profile for now. Please try again later.',
+      );
+    }
   };
 
   const onFinishSecurity = (values: SecurityFormValues) => {
@@ -186,6 +207,7 @@ export default function AccountPreferencesPage(): JSX.Element {
                 name="avatar"
                 listType="picture-card"
                 maxCount={1}
+                // We handle the upload on form submit
                 beforeUpload={() => false}
               >
                 <div>

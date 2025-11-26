@@ -23,9 +23,18 @@ import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
 
-// Base URL for the backend API (used for media files)
-const API_BASE =
+// Resolve backend base and derive a separate media base.
+// This makes NEXT_PUBLIC_API_BASE=http://localhost:8000/api work
+// while media stays served from http://localhost:8000/media/…
+const RAW_API_BASE =
   process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+const API_BASE = RAW_API_BASE.replace(/\/+$/, ''); // trim trailing slashes
+
+// If API is at ".../api", media is at the host root.
+// Otherwise, media is served from the same base.
+const MEDIA_BASE = API_BASE.endsWith('/api')
+  ? API_BASE.slice(0, -4) // drop trailing "/api"
+  : API_BASE;
 
 type QuickLink = {
   title: string;
@@ -36,33 +45,33 @@ type QuickLink = {
 /** Featured Project */
 const featuredProject = {
   title: 'Dreamscape: A Visual Journey',
-  imageUrl: `${API_BASE}/media/kreative/artworks/artwork_0.png`,
+  imageUrl: `${MEDIA_BASE}/media/kreative/artworks/artwork_0.png`,
 };
 
 /** Inspiration Gallery (carousel) */
 const inspirationGallery = [
   {
     id: '1',
-    imageUrl: `${API_BASE}/media/kreative/artworks/artwork_0.png`,
+    imageUrl: `${MEDIA_BASE}/media/kreative/artworks/artwork_0.png`,
   },
   {
     id: '2',
-    imageUrl: `${API_BASE}/media/kreative/artworks/artwork_1.png`,
+    imageUrl: `${MEDIA_BASE}/media/kreative/artworks/artwork_1.png`,
   },
   {
     id: '3',
-    imageUrl: `${API_BASE}/media/kreative/artworks/artwork_2.png`,
+    imageUrl: `${MEDIA_BASE}/media/kreative/artworks/artwork_2.png`,
   },
   {
     id: '4',
-    imageUrl: `${API_BASE}/media/kreative/artworks/default_profile.png`,
+    imageUrl: `${MEDIA_BASE}/media/kreative/artworks/default_profile.png`,
   },
 ];
 
 /** Top Creator */
 const topCreator = {
   name: 'Sophia Rivera',
-  avatar: `${API_BASE}/media/kreative/artworks/default_profile.png`,
+  avatar: `${MEDIA_BASE}/media/kreative/artworks/default_profile.png`,
   stats: '48 Projects · 1200 Likes',
 };
 

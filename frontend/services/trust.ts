@@ -1,6 +1,7 @@
 // frontend/services/trust.ts
 import dayjs from 'dayjs';
 import { get } from './_request';
+import { resolveAvatarUrl, type CurrentUser } from './user';
 
 export interface ReputationDimension {
   key: string;
@@ -18,6 +19,7 @@ export interface ReputationProfile {
   /** Identity info derived from /users/me/ so UIs can show name + avatar */
   username?: string;
   displayName?: string;
+  /** Already normalized absolute URL (or default avatar) */
   avatarUrl?: string | null;
 }
 
@@ -40,12 +42,7 @@ export interface Credential {
  * Shape of /users/me/ coming from the backend.
  * avatar_url / picture are optional and can be wired later on the server.
  */
-interface UserMeApi {
-  username: string;
-  name: string | null;
-  email: string;
-  url: string;
-  avatar_url?: string | null;
+interface UserMeApi extends CurrentUser {
   picture?: string | null;
 }
 
@@ -97,7 +94,10 @@ export async function fetchUserProfile(): Promise<ReputationProfile> {
 
   const username = me.username;
   const displayName = me.name ?? me.username;
-  const avatarUrl = me.avatar_url ?? me.picture ?? null;
+
+  // Prefer explicit avatar_url; fall back to older "picture" if present.
+  const rawAvatar = me.avatar_url ?? me.picture ?? null;
+  const avatarUrl = resolveAvatarUrl({ avatar_url: rawAvatar });
 
   const myStances = stances.filter((s) => s.user === username);
   const myArguments = args.filter((a) => a.user === username);

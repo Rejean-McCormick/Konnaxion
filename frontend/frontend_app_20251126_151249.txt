@@ -5010,7 +5010,6 @@ import {
   Alert,
   Button,
   Card,
-  Comment,
   Divider,
   Empty,
   Input,
@@ -5527,14 +5526,10 @@ export default function TopicThreadPage() {
                               }}
                               renderItem={(s) => (
                                 <li key={s.id}>
-                                  <Comment
+                                  <StatementComment
                                     author={s.author}
                                     datetime={dayjs(s.createdAt).fromNow()}
-                                    content={
-                                      <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
-                                        {s.body}
-                                      </Paragraph>
-                                    }
+                                    body={s.body}
                                   />
                                 </li>
                               )}
@@ -5602,13 +5597,9 @@ export default function TopicThreadPage() {
                   dataSource={preview.latest}
                   renderItem={(s) => (
                     <li key={s.id}>
-                      <Comment
+                      <StatementComment
                         author={s.author}
-                        content={
-                          <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
-                            {s.body}
-                          </Paragraph>
-                        }
+                        body={s.body}
                       />
                     </li>
                   )}
@@ -5639,6 +5630,40 @@ function StatementTimelineItem({ statement }: { statement: Statement }) {
       </div>
       <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>
         {statement.body}
+      </Paragraph>
+    </div>
+  );
+}
+
+function StatementComment({
+  author,
+  datetime,
+  body,
+}: {
+  author: React.ReactNode;
+  datetime?: React.ReactNode;
+  body: React.ReactNode;
+}) {
+  return (
+    <div style={{ padding: '12px 0' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          marginBottom: 4,
+        }}
+      >
+        {author && <Text strong>{author}</Text>}
+        {datetime && (
+          <Text type="secondary" style={{ marginLeft: 'auto' }}>
+            {datetime}
+          </Text>
+        )}
+      </div>
+      <Paragraph style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>
+        {body}
       </Paragraph>
     </div>
   );
@@ -6731,7 +6756,6 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import {
-  Comment,
   Divider,
   Empty,
   Form,
@@ -6841,11 +6865,7 @@ export default function FeedbackLoops(): JSX.Element {
                 ),
               }}
             >
-              <Form.Item
-                label="Overall experience"
-                name="rating"
-                valuePropName="value"
-              >
+              <Form.Item label="Overall experience" name="rating" valuePropName="value">
                 <Rate />
               </Form.Item>
 
@@ -6887,14 +6907,22 @@ export default function FeedbackLoops(): JSX.Element {
           {items.length ? (
             <>
               <List
-                itemLayout="horizontal"
+                itemLayout="vertical"
                 dataSource={items}
                 renderItem={(f) => (
-                  <li key={f.id}>
-                    <Comment
-                      author={f.author}
-                      datetime={f.createdAt}
-                      content={
+                  <List.Item key={f.id}>
+                    <List.Item.Meta
+                      title={
+                        <Space direction="horizontal" size="small">
+                          {f.author && <Text strong>{f.author}</Text>}
+                          {f.createdAt && (
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {f.createdAt}
+                            </Text>
+                          )}
+                        </Space>
+                      }
+                      description={
                         <>
                           {typeof f.rating === 'number' && (
                             <div style={{ marginBottom: 4 }}>
@@ -6905,7 +6933,7 @@ export default function FeedbackLoops(): JSX.Element {
                         </>
                       }
                     />
-                  </li>
+                  </List.Item>
                 )}
               />
               <Divider style={{ marginTop: 16, marginBottom: 0 }} />
@@ -8206,7 +8234,12 @@ function EthikosShell({ children }: SegmentLayoutProps) {
   return (
     <MainLayout>
       {/* Subtle suite watermark; page-level PageContainer can still set ghost or override visuals */}
-      <WaterMark content="ethiKos" gap={[120, 120]} fontColor="rgba(0,0,0,0.04)">
+      <WaterMark
+        content="ethiKos"
+        gapX={120}
+        gapY={120}
+        fontColor="rgba(0,0,0,0.04)"
+      >
         {children}
       </WaterMark>
     </MainLayout>
@@ -8248,7 +8281,7 @@ export default function SegmentLayout({ children }: SegmentLayoutProps) {
 ===== BEGIN app/ethikos/learn/changelog/page.tsx =====
 'use client';
 
-// Updated from original implementation in app/ethikos/learn/changelog/page.tsx.
+// app/ethikos/learn/changelog/page.tsx.
 import React, { useMemo, useState } from 'react';
 import {
   PageContainer,
@@ -8416,9 +8449,11 @@ export default function Changelog() {
       .slice(0, 4); // top 4
   }, [filtered]);
 
-  const lastUpdated = useMemo(() => {
-    if (!sortedEntries.length) return null;
-    return dayjs(sortedEntries[0].date).format('YYYY-MM-DD');
+  // Safely compute lastUpdated without risking undefined access
+  const lastUpdated = useMemo<string | null>(() => {
+    const firstEntry = sortedEntries[0];
+    if (!firstEntry) return null;
+    return dayjs(firstEntry.date).format('YYYY-MM-DD');
   }, [sortedEntries]);
 
   // Utilities
@@ -9750,16 +9785,22 @@ export default function PulseLive(): JSX.Element {
         title: 'Status',
         dataIndex: 'status',
         width: 120,
-        render: (dom) =>
-          dom === 'open' ? <Tag color="green">Open</Tag> : <Tag>{String(dom)}</Tag>,
+        render: (_, row) =>
+          row.status === 'open' ? (
+            <Tag color="green">Open</Tag>
+          ) : (
+            <Tag>{row.status}</Tag>
+          ),
       },
       {
         title: 'Last activity',
         dataIndex: 'last_activity',
         width: 180,
-        render: (dom) => (
-          <Tooltip title={dayjs(dom).format('YYYY-MM-DD HH:mm')}>
-            {dayjs(dom).fromNow()}
+        render: (_, row) => (
+          <Tooltip
+            title={dayjs(row.last_activity).format('YYYY-MM-DD HH:mm')}
+          >
+            {dayjs(row.last_activity).fromNow()}
           </Tooltip>
         ),
       },
@@ -9767,9 +9808,9 @@ export default function PulseLive(): JSX.Element {
         title: 'Created',
         dataIndex: 'created_at',
         width: 160,
-        render: (dom) => (
-          <Tooltip title={dayjs(dom).format('YYYY-MM-DD HH:mm')}>
-            {dayjs(dom).fromNow()}
+        render: (_, row) => (
+          <Tooltip title={dayjs(row.created_at).format('YYYY-MM-DD HH:mm')}>
+            {dayjs(row.created_at).fromNow()}
           </Tooltip>
         ),
       },
@@ -9834,7 +9875,9 @@ export default function PulseLive(): JSX.Element {
                     <Space>
                       {c.label}
                       <Badge
-                        status={trend > 0 ? 'success' : trend < 0 ? 'error' : 'default'}
+                        status={
+                          trend > 0 ? 'success' : trend < 0 ? 'error' : 'default'
+                        }
                       />
                     </Space>
                   ),
@@ -9887,7 +9930,9 @@ export default function PulseLive(): JSX.Element {
                         item.kind === 'topic' ? (
                           <ProfileOutlined />
                         ) : item.kind === 'stance' ? (
-                          <Tag color={item.extra.value >= 0 ? 'green' : 'red'}>
+                          <Tag
+                            color={item.extra.value >= 0 ? 'green' : 'red'}
+                          >
                             {item.extra.value >= 0 ? '+' : ''}
                             {item.extra.value}
                           </Tag>
@@ -10255,7 +10300,6 @@ export default function PulseOverview() {
 
 
 ===== BEGIN app/ethikos/pulse/trends/page.tsx =====
-// app/ethikos/pulse/trends/page.tsx
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -10273,6 +10317,7 @@ import {
   Switch,
   message,
 } from 'antd';
+import type { TabsProps } from 'antd';
 import { Line, Area, Heatmap } from '@ant-design/plots';
 import {
   AreaChartOutlined,
@@ -10292,6 +10337,13 @@ import { fetchPulseTrends } from '@/services/pulse';
 type TimeRangeKey = '7d' | '30d' | '60d';
 
 const { Text } = Typography;
+
+type PulseChart = {
+  key: string;
+  type: 'line' | 'area' | 'heatmap' | string;
+  title: string;
+  config?: Record<string, any>;
+};
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -10384,13 +10436,16 @@ export default function PulseTrends(): JSX.Element {
     []
   >(fetchPulseTrends);
 
-  const charts = data?.charts ?? [];
+  const charts: PulseChart[] = (data?.charts ?? []) as PulseChart[];
   const [activeKey, setActiveKey] = useState<string | undefined>(undefined);
 
   // Ensure we select first tab once charts are available
   useEffect(() => {
-    if (!activeKey && charts.length) {
-      setActiveKey(charts[0].key);
+    if (!activeKey && charts.length > 0) {
+      const firstChart = charts[0];
+      if (firstChart) {
+        setActiveKey(firstChart.key);
+      }
     }
   }, [charts, activeKey]);
 
@@ -10401,7 +10456,7 @@ export default function PulseTrends(): JSX.Element {
         // Heatmap is an aggregate over hours/days, keep it mostly as-is
         if (chart.type === 'heatmap') {
           return {
-            ...chart.config,
+            ...(chart.config ?? {}),
           };
         }
 
@@ -10409,7 +10464,7 @@ export default function PulseTrends(): JSX.Element {
         const days = getDaysForRange(range);
 
         const cfg: any = {
-          ...chart.config,
+          ...(chart.config ?? {}),
           data: filterSeriesByDays(baseData, days),
           smooth: smoothLines,
           // Some nice defaults for readability
@@ -10421,7 +10476,11 @@ export default function PulseTrends(): JSX.Element {
             // G2Plot formatter shape
             formatter: (datum: any) => {
               const x = datum.date ?? datum.x ?? datum.ts;
-              return { name: datum.period ?? 'value', value: datum.value, title: dayjs(x).format('MMM D') };
+              return {
+                name: datum.period ?? 'value',
+                value: datum.value,
+                title: dayjs(x).format('MMM D'),
+              };
             },
           },
           xAxis: {
@@ -10477,7 +10536,7 @@ export default function PulseTrends(): JSX.Element {
     }
 
     const idx = charts.findIndex((c) => c.key === activeKey);
-    if (idx < 0) {
+    if (idx < 0 || idx >= charts.length || idx >= enhancedConfigs.length) {
       message.info('Nothing to export.');
       return;
     }
@@ -10485,13 +10544,24 @@ export default function PulseTrends(): JSX.Element {
     const chart = charts[idx];
     const cfg = enhancedConfigs[idx];
 
+    if (!chart || !cfg) {
+      message.info('Nothing to export.');
+      return;
+    }
+
     // Only export series‑based charts; heatmap becomes a wide matrix (skip for now)
     if (chart.type === 'heatmap') {
       message.warning('Heatmap export is not supported.');
       return;
     }
 
-    const rows = (cfg?.data ?? []) as Array<{ date?: string; x?: any; ts?: number; value: number; period?: string }>;
+    const rows = (cfg.data ?? []) as Array<{
+      date?: string;
+      x?: any;
+      ts?: number;
+      value: number;
+      period?: string;
+    }>;
 
     const header = comparePrev ? ['date', 'value', 'period'] : ['date', 'value'];
     const encodeCell = (value: unknown): string => {
@@ -10500,12 +10570,21 @@ export default function PulseTrends(): JSX.Element {
       return str;
     };
 
-    const toDate = (r: any) => {
+    const toDate = (r: {
+      date?: string;
+      x?: any;
+      ts?: number;
+    }): string => {
       const x = r.date ?? r.x ?? r.ts;
       return dayjs(x).format('YYYY-MM-DD');
     };
 
-    const csv = [header, ...rows.map((r) => (comparePrev ? [toDate(r), r.value, r.period ?? 'This period'] : [toDate(r), r.value]))]
+    const csv = [
+      header,
+      ...rows.map((r) =>
+        comparePrev ? [toDate(r), r.value, r.period ?? 'This period'] : [toDate(r), r.value],
+      ),
+    ]
       .map((row) => row.map(encodeCell).join(','))
       .join('\n');
 
@@ -10597,14 +10676,14 @@ export default function PulseTrends(): JSX.Element {
   /*  Build Tabs                                                         */
   /* ------------------------------------------------------------------ */
 
-  const tabItems = charts.map((chart, idx) => {
+  const tabItems: TabsProps['items'] = charts.map((chart, idx) => {
     let icon: React.ReactNode = <AreaChartOutlined />;
 
     if (chart.type === 'heatmap') icon = <HeatMapOutlined />;
     if (chart.type === 'area') icon = <BarChartOutlined />;
     if (chart.type === 'line') icon = <AreaChartOutlined />;
 
-    const cfg = enhancedConfigs[idx];
+    const cfg = enhancedConfigs[idx] ?? {};
 
     return {
       key: chart.key,
@@ -10681,7 +10760,11 @@ export default function PulseTrends(): JSX.Element {
       secondaryActions={secondaryActions}
     >
       <PageContainer ghost>
-        <Tabs items={tabItems} activeKey={activeKey} onChange={setActiveKey} />
+        <Tabs
+          items={tabItems}
+          activeKey={activeKey}
+          onChange={(key) => setActiveKey(key)}
+        />
       </PageContainer>
     </EthikosPageShell>
   );
@@ -10785,6 +10868,7 @@ export default function Badges() {
 
   // Detail modal for a selected badge
   const [detail, setDetail] = useState<TrustBadge | null>(null);
+  const detailMeta = detail ? BADGE_CATEGORY_META[detail.id] : undefined;
 
   // ---------- derived stats ----------
   const totalBadges = badges.length;
@@ -10795,13 +10879,12 @@ export default function Badges() {
   let firstEarned: string | undefined;
   let lastEarned: string | undefined;
   if (badges.length > 0) {
-    firstEarned = badges.reduce(
-      (min, b) => (dayjs(b.earnedAt).isBefore(min) ? b.earnedAt : min),
-      badges[0].earnedAt,
+    const dates = badges.map((b) => b.earnedAt);
+    firstEarned = dates.reduce((min, d) =>
+      dayjs(d).isBefore(min) ? d : min,
     );
-    lastEarned = badges.reduce(
-      (max, b) => (dayjs(b.earnedAt).isAfter(max) ? b.earnedAt : max),
-      badges[0].earnedAt,
+    lastEarned = dates.reduce((max, d) =>
+      dayjs(d).isAfter(max) ? d : max,
     );
   }
 
@@ -11052,7 +11135,10 @@ export default function Badges() {
                 dataIndex: 'label',
               },
               subTitle: {
-                render: (_, row) => {
+                render: (
+                  _: unknown,
+                  row: CatalogItem & { earned: boolean; earnedAt?: string },
+                ) => {
                   const meta = BADGE_CATEGORY_META[row.id];
                   return meta ? (
                     <Tag color={meta.color}>{meta.label}</Tag>
@@ -11060,7 +11146,10 @@ export default function Badges() {
                 },
               },
               description: {
-                render: (_, row) => (
+                render: (
+                  _: unknown,
+                  row: CatalogItem & { earned: boolean; earnedAt?: string },
+                ) => (
                   <Space direction="vertical" size={2}>
                     <Text type="secondary">{row.description}</Text>
                     <Text type="secondary">
@@ -11070,7 +11159,10 @@ export default function Badges() {
                 ),
               },
               extra: {
-                render: (_, row) =>
+                render: (
+                  _: unknown,
+                  row: CatalogItem & { earned: boolean; earnedAt?: string },
+                ) =>
                   row.earned ? (
                     <Tag color="green">
                       Earned{' '}
@@ -11092,10 +11184,8 @@ export default function Badges() {
             detail ? (
               <Space size={8}>
                 <span>{detail.label}</span>
-                {BADGE_CATEGORY_META[detail.id] && (
-                  <Tag color={BADGE_CATEGORY_META[detail.id].color}>
-                    {BADGE_CATEGORY_META[detail.id].label}
-                  </Tag>
+                {detailMeta && (
+                  <Tag color={detailMeta.color}>{detailMeta.label}</Tag>
                 )}
               </Space>
             ) : (
@@ -11147,6 +11237,7 @@ import {
   ProTable,
   ProDescriptions,
   type ProColumns,
+  type ProDescriptionsItemProps,
 } from '@ant-design/pro-components';
 import {
   Alert,
@@ -11305,39 +11396,40 @@ export default function Credentials() {
 
       return true;
     },
-    customRequest: async ({
-      file,
-      onSuccess,
-      onError,
-    }: {
-      file: File;
-      onSuccess?: (res: unknown) => void;
-      onError?: (err: unknown) => void;
-    }) => {
-      try {
-        setUploading(true);
-        setLastFileName(file.name);
-        await uploadCredential(file); // no-op until backend exists
-        onSuccess?.('ok');
+    // Match Ant Design's expected `(options) => void` signature
+    customRequest: (options: any) => {
+      const { file, onSuccess, onError } = options;
+      const uploadFile = file as File;
 
-        // Optimistic insert into the table list as "Pending"
-        const optimistic: CredentialRow = {
-          id: `tmp-${Date.now()}`,
-          title: toTitleFromFilename(file.name),
-          issuer: '—',
-          issuedAt: new Date().toISOString(),
-          status: 'Pending',
-          notes: 'Awaiting manual verification',
-        };
-        mutate([optimistic, ...rows]);
-        setDone(true);
-        antdMessage.success('Credential uploaded. It will be reviewed shortly.');
-      } catch (error) {
-        onError?.(error);
-        antdMessage.error('Upload failed. Please try again.');
-      } finally {
-        setUploading(false);
-      }
+      setUploading(true);
+      setLastFileName(uploadFile.name);
+
+      uploadCredential(uploadFile)
+        .then(() => {
+          onSuccess?.('ok');
+
+          // Optimistic insert into the table list as "Pending"
+          const optimistic: CredentialRow = {
+            id: `tmp-${Date.now()}`,
+            title: toTitleFromFilename(uploadFile.name),
+            issuer: '—',
+            issuedAt: new Date().toISOString(),
+            status: 'Pending',
+            notes: 'Awaiting manual verification',
+          };
+          mutate([optimistic, ...rows]);
+          setDone(true);
+          antdMessage.success(
+            'Credential uploaded. It will be reviewed shortly.',
+          );
+        })
+        .catch((error: unknown) => {
+          onError?.(error);
+          antdMessage.error('Upload failed. Please try again.');
+        })
+        .finally(() => {
+          setUploading(false);
+        });
     },
   };
 
@@ -11347,7 +11439,7 @@ export default function Credentials() {
       title: 'Title',
       dataIndex: 'title',
       ellipsis: true,
-      render: (_, row) => (
+      render: (_: any, row: CredentialRow) => (
         <Space size={6}>
           <FileTextOutlined />
           {row.url ? (
@@ -11366,7 +11458,7 @@ export default function Credentials() {
       dataIndex: 'issuedAt',
       width: 140,
       valueType: 'date',
-      renderText: (v) => dayjs(v).format('YYYY-MM-DD'),
+      renderText: (v: any) => dayjs(v).format('YYYY-MM-DD'),
     },
     {
       title: 'Status',
@@ -11377,7 +11469,7 @@ export default function Credentials() {
         Pending: { text: 'Pending', status: 'Processing' },
         Rejected: { text: 'Rejected', status: 'Error' },
       },
-      render: (_, row) => (
+      render: (_: any, row: CredentialRow) => (
         <Tag color={statusColor[row.status]}>{row.status}</Tag>
       ),
     },
@@ -11385,7 +11477,7 @@ export default function Credentials() {
       title: 'Actions',
       width: 260,
       valueType: 'option',
-      render: (_, row) => {
+      render: (_: any, row: CredentialRow) => {
         const canDownload = !!row.url;
         return [
           <Button size="small" key="view" onClick={() => setDetail(row)}>
@@ -11454,10 +11546,10 @@ export default function Credentials() {
         }
         description={
           <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
-            Upload real‑world credentials (certifications, professional memberships,
-            academic records) that help stewards understand why your voice carries
-            expertise in certain debates. These documents are reviewed manually and do
-            not replace community‑based reputation.
+            Upload real‑world credentials (certifications, professional
+            memberships, academic records) that help stewards understand why
+            your voice carries expertise in certain debates. These documents are
+            reviewed manually and do not replace community‑based reputation.
           </Paragraph>
         }
       />
@@ -11483,8 +11575,9 @@ export default function Credentials() {
                     </div>
                   )}
                   <Text>
-                    Your document is now queued for human review. If accepted, it will
-                    appear as a verified note in your Ethikos trust profile.
+                    Your document is now queued for human review. If accepted,
+                    it will appear as a verified note in your Ethikos trust
+                    profile.
                   </Text>
                 </>
               }
@@ -11512,8 +11605,8 @@ export default function Credentials() {
                   Click or drag a credential file to this area to upload
                 </p>
                 <p className="ant-upload-hint">
-                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at a
-                  time.
+                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at
+                  a time.
                 </p>
               </Upload.Dragger>
 
@@ -11525,13 +11618,14 @@ export default function Credentials() {
                 style={{ width: '100%' }}
               >
                 <Text type="secondary">
-                  Tip: upload focused evidence rather than full CVs. For example, a
-                  single certification for climate policy is more helpful than a long
-                  résumé.
+                  Tip: upload focused evidence rather than full CVs. For
+                  example, a single certification for climate policy is more
+                  helpful than a long résumé.
                 </Text>
                 <Text type="secondary">
-                  You can always complement these documents with activity‑based
-                  reputation earned through debates, voting and impact work.
+                  You can always complement these documents with
+                  activity‑based reputation earned through debates, voting and
+                  impact work.
                 </Text>
               </Space>
             </>
@@ -11638,40 +11732,46 @@ export default function Credentials() {
           <ProDescriptions<CredentialRow>
             column={1}
             dataSource={detail}
-            columns={[
-              { title: 'Title', dataIndex: 'title' },
-              { title: 'Issuer', dataIndex: 'issuer' },
-              {
-                title: 'Issued',
-                dataIndex: 'issuedAt',
-                render: (_, row) =>
-                  dayjs(row.issuedAt).format('YYYY-MM-DD'),
-              },
-              {
-                title: 'Status',
-                dataIndex: 'status',
-                render: (_, row) => (
-                  <Tag color={statusColor[row.status]}>{row.status}</Tag>
-                ),
-              },
-              detail.url
-                ? {
-                    title: 'Document',
-                    dataIndex: 'url',
-                    render: (_, row) => (
-                      <a href={row.url} target="_blank" rel="noreferrer">
-                        Open document
-                      </a>
-                    ),
-                  }
-                : undefined,
-              detail.notes
-                ? {
-                    title: 'Notes',
-                    dataIndex: 'notes',
-                  }
-                : undefined,
-            ].filter(Boolean) as ProColumns<CredentialRow>[]}
+            columns={
+              [
+                { title: 'Title', dataIndex: 'title' },
+                { title: 'Issuer', dataIndex: 'issuer' },
+                {
+                  title: 'Issued',
+                  dataIndex: 'issuedAt',
+                  render: (_: any, row: CredentialRow) =>
+                    dayjs(row.issuedAt).format('YYYY-MM-DD'),
+                },
+                {
+                  title: 'Status',
+                  dataIndex: 'status',
+                  render: (_: any, row: CredentialRow) => (
+                    <Tag color={statusColor[row.status]}>{row.status}</Tag>
+                  ),
+                },
+                detail.url
+                  ? {
+                      title: 'Document',
+                      dataIndex: 'url',
+                      render: (_: any, row: CredentialRow) => (
+                        <a
+                          href={row.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open document
+                        </a>
+                      ),
+                    }
+                  : undefined,
+                detail.notes
+                  ? {
+                      title: 'Notes',
+                      dataIndex: 'notes',
+                    }
+                  : undefined,
+              ].filter(Boolean) as ProDescriptionsItemProps<CredentialRow>[]
+            }
           />
         )}
       </Drawer>
@@ -11704,6 +11804,10 @@ export default function Credentials() {
  * - Modules variant of the Trust profile page (layout & summary patterns).
  * - Trust services: ReputationProfile types, fetchUserProfile, fetchUserBadges.
  * - Combined reputation timeline hook (profile + badges → timeline).
+ *
+ * Avatar behavior:
+ * - Uses profile.avatarUrl when present (from backend /users/me/ avatar_url).
+ * - Falls back to initial derived from displayName → username → level.
  */
 
 import React, { useMemo } from 'react';
@@ -11757,8 +11861,10 @@ export default function TrustProfilePage() {
   const dimensions = profile?.dimensions ?? [];
   const recent = profile?.recent ?? [];
 
-  // Derive UI helpers
-  const initial = level.charAt(0).toUpperCase();
+  // Derive UI helpers (avatar + initial)
+  const avatarSrc = profile?.avatarUrl ?? undefined;
+  const nameSeed = profile?.displayName ?? profile?.username ?? level;
+  const initial = nameSeed.charAt(0).toUpperCase();
 
   const netRecentDelta = useMemo(
     () => recent.reduce((sum, r) => sum + (r.change ?? 0), 0),
@@ -11934,10 +12040,15 @@ export default function TrustProfilePage() {
                 <AntBadge.Ribbon text="Profile" color="purple">
                   <Avatar
                     size={64}
-                    style={{ background: 'var(--ant-color-warning-bg)' }}
-                    icon={<CrownOutlined />}
+                    src={avatarSrc}
+                    style={
+                      avatarSrc
+                        ? undefined
+                        : { background: 'var(--ant-color-warning-bg)' }
+                    }
+                    icon={!avatarSrc ? <CrownOutlined /> : undefined}
                   >
-                    {initial}
+                    {!avatarSrc && initial}
                   </Avatar>
                 </AntBadge.Ribbon>
                 <div>
@@ -18703,7 +18814,8 @@ function Content(): JSX.Element {
 
 
 ===== BEGIN app/keenkonnect/user-reputation/account-preferences/page.tsx =====
-﻿'use client';
+﻿// app/keenkonnect/user-reputation/account-preferences/page.tsx
+'use client';
 
 import React, { useState } from 'react';
 import {
@@ -18720,6 +18832,7 @@ import {
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { UploadOutlined } from '@ant-design/icons';
+import { uploadUserAvatar } from '@/services/user';
 
 const { TabPane } = Tabs;
 const { TextArea } = Input;
@@ -18777,7 +18890,7 @@ const privacySharingOptions = [
   { label: 'Everyone on KeenKonnect', value: 'public' as const },
 ];
 
-// ✅ Fix: make sure this always returns UploadFile[]
+// ✅ Always return UploadFile[]
 const normFile = (e: any): UploadFile[] => {
   if (Array.isArray(e)) {
     return e as UploadFile[];
@@ -18790,10 +18903,29 @@ export default function AccountPreferencesPage(): JSX.Element {
 
   // === Submit handlers =======================================================
 
-  const onFinishProfile = (values: ProfileFormValues) => {
-    // eslint-disable-next-line no-console
-    console.log('Profile info submitted:', values);
-    antdMessage.success('Profile information updated successfully.');
+  const onFinishProfile = async (values: ProfileFormValues) => {
+    try {
+      const avatarFile = values.avatar?.[0]?.originFileObj as
+        | File
+        | undefined;
+
+      if (avatarFile) {
+        await uploadUserAvatar(avatarFile);
+      }
+
+      // TODO: wire name / headline / bio to a real profile endpoint
+      // when the backend fields are available.
+      // eslint-disable-next-line no-console
+      console.log('Profile info submitted:', values);
+
+      antdMessage.success('Profile information updated successfully.');
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to update profile', error);
+      antdMessage.error(
+        'Unable to update profile for now. Please try again later.',
+      );
+    }
   };
 
   const onFinishSecurity = (values: SecurityFormValues) => {
@@ -18891,6 +19023,7 @@ export default function AccountPreferencesPage(): JSX.Element {
                 name="avatar"
                 listType="picture-card"
                 maxCount={1}
+                // We handle the upload on form submit
                 beforeUpload={() => false}
               >
                 <div>

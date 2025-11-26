@@ -24,10 +24,20 @@ class UserAdmin(auth_admin.UserAdmin):
     def _avatar_url(self, obj: User) -> str:
         """
         Resolve the best available avatar URL for this user:
-        - If a file field exists (avatar_file / avatar / profile_image / image), use its .url.
-        - Else if an explicit avatar_url attribute or property exists, use it.
-        - Else fall back to the default image in MEDIA: /kreative/artworks/default_profile.png.
+        - If the user has a Kreative profile artwork, use its media_file.
+        - Else, if a file field exists (avatar_file / avatar / profile_image / image), use its .url.
+        - Else, if an explicit avatar_url attribute or property exists, use it.
+        - Else, fall back to the default image in MEDIA: /kreative/artworks/default_profile.png.
         """
+        # 0) Preferred: linked KreativeArtwork as profile picture
+        artwork = getattr(obj, "profile_artwork", None)
+        if artwork is not None:
+            media = getattr(artwork, "media_file", None)
+            if media:
+                url = getattr(media, "url", None) or str(media)
+                if url:
+                    return url
+
         # 1) Common file-field names we may add later
         for fname in ("avatar_file", "avatar", "profile_image", "image"):
             f = getattr(obj, fname, None)
@@ -55,7 +65,7 @@ class UserAdmin(auth_admin.UserAdmin):
         url = self._avatar_url(obj)
         return format_html(
             '<img src="{}" alt="avatar" style="height:32px;width:32px;'
-            "border-radius:50%;object-fit:cover;vertical-align:middle;\"/>",
+            'border-radius:50%;object-fit:cover;vertical-align:middle;"/>',
             url,
         )
 

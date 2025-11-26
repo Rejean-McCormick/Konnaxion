@@ -5112,11 +5112,13 @@ export default function PollPage() {
 ===== BEGIN modules/konsultations/components/ConsultationForm.tsx =====
 ﻿import React, { useState } from 'react';
 import { Form, Slider, Input, Button, message as antdMessage } from 'antd';
-// (Assume an axios-based helper or useRequest hook is available for API calls)
 import { useRequest } from 'ahooks';
+import axios from 'axios';
 
 interface ConsultationFormProps {
-  consultationId: string | number;
+  // Made optional so <ConsultationForm /> without props in ConsultationHub compiles;
+  // runtime guard below ensures we don't submit without an ID.
+  consultationId?: string | number;
   // Optionally, currentValue could be passed in to show existing stance
   initialValue?: number;
 }
@@ -5141,20 +5143,29 @@ const stanceLabels: Record<number, string> = {
   3: 'Strongly For',
 };
 
-const ConsultationForm: React.FC<ConsultationFormProps> = ({ consultationId, initialValue }) => {
+const ConsultationForm: React.FC<ConsultationFormProps> = ({
+  consultationId,
+  initialValue,
+}) => {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
 
   // Use ahooks useRequest for the submission API call (POST stance)
   const { run: submitStance } = useRequest(
     async (value: number, comment?: string) => {
+      if (consultationId == null) {
+        throw new Error('consultationId is required to submit a stance.');
+      }
+
       // Example API endpoint: POST /api/konsultations/consultations/{id}/vote/
       // Payload: { value: ..., comment: ... }
-      // (The exact endpoint may vary; adjust based on backend routes)
-      return await axios.post(`/api/konsultations/consultations/${consultationId}/vote/`, {
-        value,
-        comment,
-      });
+      return axios.post(
+        `/api/konsultations/consultations/${consultationId}/vote/`,
+        {
+          value,
+          comment,
+        },
+      );
     },
     {
       manual: true,
@@ -5167,33 +5178,45 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ consultationId, ini
         antdMessage.error('Failed to submit stance. Please try again.');
       },
       onFinally: () => setSubmitting(false),
-    }
+    },
   );
 
-  const onFinish = ({ value, comment }: { value: number; comment?: string }) => {
+  const onFinish = ({
+    value,
+    comment,
+  }: {
+    value: number;
+    comment?: string;
+  }) => {
     setSubmitting(true);
     submitStance(value, comment);
   };
 
   return (
-    <Form 
-      form={form} 
-      layout="vertical" 
-      initialValues={{ value: initialValue, comment: '' }} 
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{ value: initialValue, comment: '' }}
       onFinish={onFinish}
     >
-      <Form.Item 
-        label="Your stance" 
-        name="value" 
+      <Form.Item
+        label="Your stance"
+        name="value"
         rules={[{ required: true, message: 'Please select a stance.' }]}
       >
-        <Slider 
-          min={-3} max={3} step={1} marks={stanceMarks} 
-          tooltip={{ formatter: (val) => stanceLabels[val as number] }} 
+        <Slider
+          min={-3}
+          max={3}
+          step={1}
+          marks={stanceMarks}
+          tooltip={{ formatter: (val) => stanceLabels[val as number] }}
         />
       </Form.Item>
       <Form.Item label="Comment (optional)" name="comment">
-        <Input.TextArea rows={3} placeholder="Add an explanation or suggestion (optional)" />
+        <Input.TextArea
+          rows={3}
+          placeholder="Add an explanation or suggestion (optional)"
+        />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={submitting}>
@@ -5224,6 +5247,19 @@ interface Consultation {
   status: string;
 }
 
+type PaginatedConsultationResponse = {
+  items?: Consultation[];
+  results?: Consultation[];
+};
+
+function isPaginatedConsultationResponse(
+  value: unknown,
+): value is PaginatedConsultationResponse {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as PaginatedConsultationResponse;
+  return Array.isArray(candidate.items) || Array.isArray(candidate.results);
+}
+
 export default function ConsultationList(): JSX.Element {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -5231,18 +5267,30 @@ export default function ConsultationList(): JSX.Element {
 
   useEffect(() => {
     let isMounted = true;
+
     const fetchConsultations = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch('/api/konsultations/consultations', { method: 'GET' });
+
+        const res = await fetch('/api/konsultations/consultations', {
+          method: 'GET',
+        });
+
         if (!res.ok) {
           throw new Error(`Failed to load consultations (status ${res.status})`);
         }
-        const data = await res.json();
-        // Support both plain array and paginated response shapes
-        const items: unknown[] = Array.isArray(data) ? data : (data.items ?? data.results ?? []);
-        const list = items as Consultation[];
+
+        const data: unknown = await res.json();
+
+        let list: Consultation[] = [];
+
+        if (Array.isArray(data)) {
+          list = data as Consultation[];
+        } else if (isPaginatedConsultationResponse(data)) {
+          list = (data.items ?? data.results) ?? [];
+        }
+
         if (isMounted) {
           setConsultations(list);
         }
@@ -5257,18 +5305,20 @@ export default function ConsultationList(): JSX.Element {
         }
       }
     };
+
     fetchConsultations();
+
     return () => {
       isMounted = false;
     };
   }, []);
 
   // Split consultations by status
-  const openConsultations = consultations.filter((c) =>
-    c.status.toLowerCase() === 'open'
+  const openConsultations = consultations.filter(
+    (c) => c.status.toLowerCase() === 'open',
   );
-  const closedConsultations = consultations.filter((c) =>
-    c.status.toLowerCase() !== 'open'
+  const closedConsultations = consultations.filter(
+    (c) => c.status.toLowerCase() !== 'open',
   );
 
   // Formatting helper for dates
@@ -5294,13 +5344,14 @@ export default function ConsultationList(): JSX.Element {
   return (
     <>
       {error && (
-        <Alert 
-          message={error} 
-          type="error" 
-          showIcon 
-          style={{ marginBottom: 16 }} 
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
         />
       )}
+
       {openConsultations.length > 0 && (
         <List
           header={<h3 style={{ marginBottom: 8 }}>Open Consultations</h3>}
@@ -5310,12 +5361,16 @@ export default function ConsultationList(): JSX.Element {
             const statusLabel =
               item.status.charAt(0).toUpperCase() + item.status.slice(1);
             const closeDate = formatDate(item.close_date);
+
             return (
               <List.Item
                 actions={[
-                  <Link 
-                    key="participate" 
-                    href={{ pathname: '/konsultations/suggestion', query: { consultationId: String(item.id) } }}
+                  <Link
+                    key="participate"
+                    href={{
+                      pathname: '/konsultations/suggestion',
+                      query: { consultationId: String(item.id) },
+                    }}
                   >
                     Participate
                   </Link>,
@@ -5337,21 +5392,30 @@ export default function ConsultationList(): JSX.Element {
           }}
         />
       )}
+
       {closedConsultations.length > 0 && (
         <List
-          header={<h3 style={{ marginTop: 24, marginBottom: 8 }}>Closed Consultations</h3>}
+          header={
+            <h3 style={{ marginTop: 24, marginBottom: 8 }}>
+              Closed Consultations
+            </h3>
+          }
           itemLayout="vertical"
           dataSource={closedConsultations}
           renderItem={(item) => {
             const statusLabel =
               item.status.charAt(0).toUpperCase() + item.status.slice(1);
             const closeDate = formatDate(item.close_date);
+
             return (
               <List.Item
                 actions={[
-                  <Link 
-                    key="results" 
-                    href={{ pathname: '/konsultations/results', query: { consultationId: String(item.id) } }}
+                  <Link
+                    key="results"
+                    href={{
+                      pathname: '/konsultations/results',
+                      query: { consultationId: String(item.id) },
+                    }}
                   >
                     View Results
                   </Link>,
@@ -7741,24 +7805,28 @@ function buildTimeline(
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
 
-    events.push({
-      id: `stance-first-${topic.id}`,
-      date: first.timestamp,
-      label: 'First stance submitted',
-      description: 'The first participant expressed a position on this question.',
-    });
+    if (first) {
+      events.push({
+        id: `stance-first-${topic.id}`,
+        date: first.timestamp,
+        label: 'First stance submitted',
+        description: 'The first participant expressed a position on this question.',
+      });
+    }
 
-    events.push({
-      id: `stance-latest-${topic.id}`,
-      date: last.timestamp,
-      label: 'Latest stance activity',
-      description: [
-        `${stances.length} total stances recorded.`,
-        support != null ? `Approx. ${support}% agreement so far.` : undefined,
-      ]
-        .filter(Boolean)
-        .join(' '),
-    });
+    if (last) {
+      events.push({
+        id: `stance-latest-${topic.id}`,
+        date: last.timestamp,
+        label: 'Latest stance activity',
+        description: [
+          `${stances.length} total stances recorded.`,
+          support != null ? `Approx. ${support}% agreement so far.` : undefined,
+        ]
+          .filter(Boolean)
+          .join(' '),
+      });
+    }
   }
 
   // Argument activity
@@ -7769,19 +7837,23 @@ function buildTimeline(
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
 
-    events.push({
-      id: `argument-first-${topic.id}`,
-      date: first.created_at,
-      label: 'First argument posted',
-      description: `${first.user} started the written debate.`,
-    });
+    if (first) {
+      events.push({
+        id: `argument-first-${topic.id}`,
+        date: first.created_at,
+        label: 'First argument posted',
+        description: `${first.user} started the written debate.`,
+      });
+    }
 
-    events.push({
-      id: `argument-latest-${topic.id}`,
-      date: last.created_at,
-      label: 'Latest argument activity',
-      description: `${args.length} arguments exchanged so far.`,
-    });
+    if (last) {
+      events.push({
+        id: `argument-latest-${topic.id}`,
+        date: last.created_at,
+        label: 'Latest argument activity',
+        description: `${args.length} arguments exchanged so far.`,
+      });
+    }
   }
 
   // Sort chronologically
@@ -7867,7 +7939,9 @@ export default function useImpact(
   options?: UseImpactOptions,
 ) {
   const enabled =
-    (options?.enabled ?? true) && consultationId !== null && consultationId !== undefined;
+    (options?.enabled ?? true) &&
+    consultationId !== null &&
+    consultationId !== undefined;
 
   return useQuery<ConsultationImpactResult>({
     queryKey: ['konsultations-impact', consultationId],
@@ -8064,114 +8138,255 @@ export default function useSuggestions(
 
 
 ===== BEGIN modules/konsultations/pages/ConsultationDetailPage.tsx =====
-﻿import React from 'react';
+﻿'use client';
+
+import React from 'react';
 import { Space, Typography, Alert, Tag, Empty, Result } from 'antd';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
-import { ConsultationForm, ResultsChart, SuggestionBoard, ImpactTimeline } from '@/modules/konsultations/components';
-import { useConsultation, useConsultationResults, useSuggestions, useImpact } from '@/modules/konsultations/hooks';
+import {
+  ConsultationForm,
+  ResultsChart,
+  SuggestionBoard,
+  ImpactTimeline,
+} from '@/modules/konsultations/components';
+import {
+  useConsultationResults,
+  useSuggestions,
+  useImpact,
+} from '@/modules/konsultations/hooks';
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
-interface ConsultationDetailProps {
-  consultationId: string;  // likely passed via route params
+// Infer the ImpactTimeline event item type from the component props
+type ImpactEvent = NonNullable<
+  React.ComponentProps<typeof ImpactTimeline>['events']
+>[number];
+
+export interface ConsultationDetailProps {
+  consultationId: string | number;
 }
 
-const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({ consultationId }) => {
-  // Fetch consultation metadata (title, description, status, dates, etc.)
-  const { data: consultation, loading, error } = useConsultation(consultationId);
-  // Fetch aggregated results for this consultation (e.g., stance distribution)
-  const { data: results } = useConsultationResults(consultationId);
-  // Fetch citizen suggestions for this consultation
-  const { data: suggestions } = useSuggestions(consultationId);
-  // Fetch impact timeline entries for this consultation
-  const { data: impactItems } = useImpact(consultationId);
+const ConsultationDetailPage: React.FC<ConsultationDetailProps> = ({
+  consultationId,
+}) => {
+  // Primary source of consultation metadata (title, status, dates, etc.)
+  const {
+    data: impact,
+    isLoading: impactLoading,
+    isError: impactIsError,
+    error: impactError,
+  } = useImpact(consultationId);
 
-  if (error) {
-    // Show an error state if consultation failed to load (e.g., not found or server error)
+  // Aggregated stance results for this consultation
+  const {
+    data: results,
+    isLoading: resultsLoading,
+    isError: resultsIsError,
+    error: resultsError,
+  } = useConsultationResults(consultationId);
+
+  // Citizen suggestions for this consultation
+  const {
+    suggestions: rawSuggestions,
+    isLoading: suggestionsLoading,
+    isError: suggestionsIsError,
+    error: suggestionsError,
+    submit: submitSuggestion,
+    isSubmitting: suggestionsSubmitting,
+  } = useSuggestions(consultationId);
+
+  const loading = impactLoading || resultsLoading || suggestionsLoading;
+
+  const pageTitle =
+    impact?.summary?.title ?? `Consultation ${String(consultationId)}`;
+
+  if (impactIsError && impactError) {
     return (
-      <Result 
-        status="error" 
-        title="Failed to load consultation" 
-        subTitle={error.message || 'This consultation may not exist or an error occurred.'} 
-      />
+      <EthikosPageShell
+        title={pageTitle}
+        sectionLabel="Consultation"
+        metaTitle={`ethiKos · Consultation · ${pageTitle}`}
+      >
+        <Result
+          status="error"
+          title="Failed to load consultation"
+          subTitle={
+            impactError.message ||
+            'This consultation may not exist or an error occurred.'
+          }
+        />
+      </EthikosPageShell>
     );
   }
 
-  // Determine consultation status tag and date info
+  const summary = impact?.summary;
+
+  // Status + date info derived from impact summary
   let statusTag: React.ReactNode = null;
   let dateInfo: React.ReactNode = null;
-  if (consultation) {
-    const isOpen = consultation.status === 'open';
+
+  if (summary) {
+    const status = String(summary.status ?? '').toLowerCase();
+    const isOpen =
+      status === 'in-progress' ||
+      status === 'in_progress' ||
+      status === 'planned';
+
+    const statusLabel = summary.status ?? (isOpen ? 'Open' : 'Closed');
+
     statusTag = (
-      <Tag color={isOpen ? 'blue' : 'red'} style={{ marginRight: 8 }}>
-        {isOpen ? 'Open' : 'Closed'}
+      <Tag color={isOpen ? 'blue' : 'default'} style={{ marginRight: 8 }}>
+        {statusLabel}
       </Tag>
     );
-    if (isOpen && consultation.closeDate) {
-      dateInfo = <Text type="secondary">Closes on {dayjs(consultation.closeDate).format('YYYY-MM-DD')}</Text>;
-    } else if (!isOpen && consultation.closeDate) {
-      dateInfo = <Text type="secondary">Closed on {dayjs(consultation.closeDate).format('YYYY-MM-DD')}</Text>;
+
+    if (summary.closesAt) {
+      const closes = dayjs(summary.closesAt);
+      if (closes.isValid()) {
+        const prefix =
+          isOpen && closes.isAfter(dayjs())
+            ? 'Closes on '
+            : !isOpen
+            ? 'Closed on '
+            : 'Closes ';
+        dateInfo = (
+          <Text type="secondary">
+            {prefix}
+            {closes.format('YYYY-MM-DD')}
+          </Text>
+        );
+      }
     }
   }
 
+  // Map stance buckets → chart data for ResultsChart
+  const chartData =
+    results?.buckets.map((bucket) => ({
+      option: bucket.label,
+      votes: bucket.count,
+      // Represent share as a 0–100 weighted score
+      weightedScore: Math.round(bucket.share * 100),
+    })) ?? [];
+
+  // Map backend suggestions → SuggestionBoard's suggestion type
+  const boardSuggestions =
+    rawSuggestions?.map((s) => ({
+      id: s.id,
+      body: s.body,
+      createdAt: s.createdAt,
+      authorName: s.author,
+      upvotes: 0, // backend does not expose support counts yet
+    })) ?? [];
+
+  // Coerce impact timeline events to the shape expected by ImpactTimeline
+  const impactEvents: ImpactEvent[] =
+    ((impact?.timeline ?? []) as unknown as ImpactEvent[]);
+
+  const handleCreateSuggestion = async (body: string) => {
+    await submitSuggestion({ body });
+  };
+
   return (
-    <EthikosPageShell 
-      title={consultation ? consultation.title : 'Consultation'} 
+    <EthikosPageShell
+      title={pageTitle}
       sectionLabel="Consultation"
-      metaTitle={consultation ? `ethiKos · Consultation · ${consultation.title}` : undefined}
+      metaTitle={`ethiKos · Consultation · ${pageTitle}`}
     >
       <PageContainer ghost loading={loading}>
-        {consultation ? (
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            {/* Consultation metadata */}
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          {/* Consultation metadata */}
+          {summary && (
             <div>
-              {statusTag}
-              {dateInfo}
-              {consultation.description && (
-                <Paragraph style={{ marginTop: 4 }}>{consultation.description}</Paragraph>
-              )}
+              <Space direction="vertical" size={4}>
+                <Space size="small" wrap>
+                  {statusTag}
+                  {dateInfo}
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  {summary.category && (
+                    <Text>
+                      Category: <Text strong>{summary.category}</Text>
+                    </Text>
+                  )}
+                  {summary.scope && (
+                    <>
+                      {' · '}
+                      <Text>
+                        Scope: <Text strong>{summary.scope}</Text>
+                      </Text>
+                    </>
+                  )}
+                  {typeof summary.stances === 'number' && (
+                    <>
+                      {' · '}
+                      <Text type="secondary">
+                        {summary.stances} participant stances recorded
+                      </Text>
+                    </>
+                  )}
+                </Paragraph>
+              </Space>
             </div>
+          )}
 
-            {/* Stance submission form */}
-            <ProCard title="Your Stance" bordered>
-              <ConsultationForm consultationId={consultation.id} />
-            </ProCard>
+          {/* Stance submission form */}
+          <ProCard title="Your stance" bordered>
+            <ConsultationForm consultationId={consultationId} />
+          </ProCard>
 
-            {/* Results and Suggestions side by side (responsive) */}
-            <ProCard ghost gutter={16} wrap>
-              <ProCard colSpan={{ xs: 24, md: 12 }} title="Results">
-                {results ? (
-                  <ResultsChart data={results} />
-                ) : (
-                  <Empty description="No results yet" />
-                )}
-              </ProCard>
-              <ProCard colSpan={{ xs: 24, md: 12 }} title="Suggestions">
-                {suggestions ? (
-                  <SuggestionBoard items={suggestions} />
-                ) : (
-                  <Empty description="No suggestions yet" />
-                )}
-              </ProCard>
-            </ProCard>
-
-            {/* Impact timeline */}
-            <ProCard title="Impact Timeline" bordered>
-              {impactItems ? (
-                <ImpactTimeline items={impactItems} />
+          {/* Results and Suggestions side by side */}
+          <ProCard ghost gutter={16} wrap>
+            <ProCard colSpan={{ xs: 24, md: 12 }} title="Results">
+              {resultsIsError && resultsError ? (
+                <Alert
+                  type="error"
+                  showIcon
+                  message="Could not load results."
+                  description={resultsError.message}
+                />
               ) : (
-                <Empty description="No impact actions recorded yet." />
+                <ResultsChart data={chartData} />
               )}
             </ProCard>
-          </Space>
-        ) : (
-          // If consultation is not loaded yet (and not error), show nothing (loading spinner is handled by PageContainer)
-          <></>
-        )}
+
+            <ProCard colSpan={{ xs: 24, md: 12 }} title="Suggestions">
+              <SuggestionBoard
+                suggestions={boardSuggestions}
+                isLoading={suggestionsLoading || suggestionsSubmitting}
+                errorMessage={
+                  suggestionsIsError && suggestionsError
+                    ? suggestionsError.message
+                    : null
+                }
+                allowVoting={false}
+                allowNewSuggestions
+                onCreateSuggestion={handleCreateSuggestion}
+              />
+              {!suggestionsLoading &&
+                !suggestionsIsError &&
+                boardSuggestions.length === 0 && (
+                  <Empty
+                    description="No suggestions yet"
+                    style={{ marginTop: 16 }}
+                  />
+                )}
+            </ProCard>
+          </ProCard>
+
+          {/* Impact timeline */}
+          <ProCard title="Impact timeline" bordered>
+            {impactLoading ? (
+              <Empty description="Loading impact timeline…" />
+            ) : impactEvents.length === 0 ? (
+              <Empty description="No impact actions recorded yet." />
+            ) : (
+              <ImpactTimeline events={impactEvents} />
+            )}
+          </ProCard>
+        </Space>
       </PageContainer>
     </EthikosPageShell>
   );
@@ -8285,7 +8500,7 @@ export default function ConsultationHub(): JSX.Element {
           bordered
         >
           {/* Board for proposed improvements, comments, ideas */}
-          <SuggestionBoard />
+          <SuggestionBoard suggestions={[]} />
         </ProCard>
       </ProCard>
     </PageContainer>
@@ -8613,6 +8828,23 @@ import {
   Cell,
 } from 'recharts';
 
+interface ConsultationResponse {
+  title?: string | null;
+  // Extend with more fields if you need them later
+  [key: string]: unknown;
+}
+
+interface ResultResponse {
+  yes?: number;
+  no?: number;
+  approve?: number;
+  reject?: number;
+  up?: number;
+  down?: number;
+  // Extend with more fields if you need them later
+  [key: string]: unknown;
+}
+
 interface ResultsData {
   yes: number;
   no: number;
@@ -8623,8 +8855,14 @@ interface ResultsData {
 export default function ConsultationResultsPage(): JSX.Element {
   const router = useRouter();
   const { consultationId } = router.query;
+
   const [consultationTitle, setConsultationTitle] = useState<string>('');
-  const [results, setResults] = useState<ResultsData>({ yes: 0, no: 0, total: 0, supportPercent: 0 });
+  const [results, setResults] = useState<ResultsData>({
+    yes: 0,
+    no: 0,
+    total: 0,
+    supportPercent: 0,
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -8632,27 +8870,45 @@ export default function ConsultationResultsPage(): JSX.Element {
     if (!consultationId) {
       return;
     }
+
+    const id =
+      Array.isArray(consultationId) ? consultationId[0] : consultationId;
+
+    if (!id) {
+      return;
+    }
+
     const fetchResults = async () => {
       try {
         setLoading(true);
         setError(null);
-        // Fetch consultation details and results in parallel
+
         const [res1, res2] = await Promise.all([
-          fetch(`/api/konsultations/consultations/${consultationId}`),
-          fetch(`/api/konsultations/consultations/${consultationId}/results`),
+          fetch(`/api/konsultations/consultations/${id}`),
+          fetch(`/api/konsultations/consultations/${id}/results`),
         ]);
+
         if (!res1.ok || !res2.ok) {
-          throw new Error(`Failed to load results (status ${res1.status} / ${res2.status})`);
+          throw new Error(
+            `Failed to load results (status ${res1.status} / ${res2.status})`,
+          );
         }
-        const consultation = await res1.json();
-        const resultData = await res2.json();
+
+        const consultation = (await res1.json()) as ConsultationResponse;
+        const resultData = (await res2.json()) as ResultResponse;
+
         // Determine title and voting outcomes
         setConsultationTitle(consultation.title ?? 'Consultation');
-        // Assuming resultData contains yes/no counts (raw or aggregated)
-        const yesCount: number = resultData.yes ?? resultData.approve ?? resultData.up ?? 0;
-        const noCount: number = resultData.no ?? resultData.reject ?? resultData.down ?? 0;
+
+        const yesCount: number =
+          resultData.yes ?? resultData.approve ?? resultData.up ?? 0;
+        const noCount: number =
+          resultData.no ?? resultData.reject ?? resultData.down ?? 0;
+
         const totalVotes = yesCount + noCount;
-        const supportPct = totalVotes > 0 ? Math.round((yesCount / totalVotes) * 100) : 0;
+        const supportPct =
+          totalVotes > 0 ? Math.round((yesCount / totalVotes) * 100) : 0;
+
         setResults({
           yes: yesCount,
           no: noCount,
@@ -8666,23 +8922,24 @@ export default function ConsultationResultsPage(): JSX.Element {
         setLoading(false);
       }
     };
+
     fetchResults();
   }, [consultationId]);
 
-  // Prepare data for chart
   const chartData = useMemo(
     () => [
       { name: 'Yes', value: results.yes },
       { name: 'No', value: results.no },
     ],
-    [results.yes, results.no]
+    [results.yes, results.no],
   );
+
   const COLORS = ['#52c41a', '#ff4d4f']; // green for Yes, red for No
 
   return (
     <EkohPageShell
       title="Consultation Results"
-      subtitle={consultationTitle ? consultationTitle : undefined}
+      subtitle={consultationTitle || undefined}
     >
       {loading ? (
         <div style={{ textAlign: 'center', padding: 24 }}>
@@ -8692,14 +8949,13 @@ export default function ConsultationResultsPage(): JSX.Element {
         <Alert message={error} type="error" showIcon />
       ) : (
         <>
-          {/* Summary statistics */}
           <div className="mb-4 flex flex-wrap items-baseline gap-4">
             <span>Yes: {results.yes}</span>
             <span>No: {results.no}</span>
             <span>Total: {results.total}</span>
             <span>Support: {results.supportPercent}%</span>
           </div>
-          {/* Bar chart visualization */}
+
           <div className="mb-6 max-w-md">
             <ResponsiveContainer width="100%" height={320}>
               <BarChart data={chartData}>
@@ -8709,7 +8965,10 @@ export default function ConsultationResultsPage(): JSX.Element {
                 <Tooltip />
                 <Bar dataKey="value">
                   {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={COLORS[index % COLORS.length]}
+                    />
                   ))}
                 </Bar>
               </BarChart>
@@ -8736,10 +8995,89 @@ import {
   InfoCircleOutlined,
 } from "@ant-design/icons";
 import { SuggestionBoard } from "../components";
+import type { Suggestion as BoardSuggestion } from "../components/SuggestionBoard";
 
 const { Title, Paragraph, Text } = Typography;
 
+// Simple demo data so the board is not empty
+const INITIAL_SUGGESTIONS: BoardSuggestion[] = [
+  {
+    id: "demo-1",
+    body:
+      "Introduce a participatory budget line for small neighbourhood projects, " +
+      "with residents voting on proposals once per year.",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+    authorName: "Sofia R.",
+    upvotes: 24,
+    downvotes: 3,
+    status: "under_review",
+    tags: ["Budget", "Neighbourhoods"],
+  },
+  {
+    id: "demo-2",
+    body:
+      "Pilot car‑free Sundays in the city centre during summer months to test " +
+      "impacts on air quality and local commerce.",
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(), // 5 days ago
+    authorName: "Jules C.",
+    upvotes: 41,
+    downvotes: 5,
+    status: "accepted",
+    tags: ["Mobility", "Climate"],
+  },
+  {
+    id: "demo-3",
+    body:
+      "Publish an easy‑to‑read overview of how previous consultations influenced " +
+      "actual policy decisions, with concrete examples.",
+    createdAt: new Date().toISOString(),
+    authorName: "Anonymous",
+    upvotes: 7,
+    downvotes: 0,
+    status: "new",
+    tags: ["Transparency"],
+  },
+];
+
 export default function SuggestionPage() {
+  const [suggestions, setSuggestions] =
+    React.useState<BoardSuggestion[]>(INITIAL_SUGGESTIONS);
+
+  const handleCreateSuggestion = async (body: string) => {
+    const trimmed = body.trim();
+    if (!trimmed) return;
+
+    const newSuggestion: BoardSuggestion = {
+      id: `local-${Date.now()}`,
+      body: trimmed,
+      createdAt: new Date().toISOString(),
+      authorName: "You",
+      upvotes: 0,
+      downvotes: 0,
+      status: "new",
+    };
+
+    setSuggestions((prev) => [newSuggestion, ...prev]);
+  };
+
+  const handleUpvote = async (id: string) => {
+    setSuggestions((prev) =>
+      prev.map((s) =>
+        s.id === id ? { ...s, upvotes: s.upvotes + 1 } : s,
+      ),
+    );
+  };
+
+  const handleDownvote = async (id: string) => {
+    setSuggestions((prev) =>
+      prev.map((s) =>
+        s.id === id
+          ? { ...s, downvotes: (s.downvotes ?? 0) + 1 }
+          : s,
+      ),
+    );
+  };
+
   return (
     <div className="container mx-auto py-8">
       <header className="mb-6 space-y-2">
@@ -8786,8 +9124,13 @@ export default function SuggestionPage() {
         </Space>
       </section>
 
-      {/* Core suggestion workflow – data + interactions live inside SuggestionBoard */}
-      <SuggestionBoard />
+      {/* Core suggestion workflow – wired to SuggestionBoard via local state */}
+      <SuggestionBoard
+        suggestions={suggestions}
+        onCreateSuggestion={handleCreateSuggestion}
+        onUpvote={handleUpvote}
+        onDownvote={handleDownvote}
+      />
     </div>
   );
 }

@@ -48,23 +48,35 @@ class UserSerializer(serializers.ModelSerializer[User]):
 
     def get_avatar_url(self, obj: User) -> str:
         """
-        Rules:
-        - If the User model has an ImageField `avatar` with a URL, use it.
-          (If storage returns an absolute URL, return as-is.)
-        - Else fall back to DEFAULT_AVATAR_PATH under MEDIA_URL.
-        - If `request` is available, return an absolute URL for relative paths.
+        Resolution order:
+        1. If user.profile_artwork.media_file exists, use that.
+        2. Else, if a legacy ImageField `avatar` exists and has a URL, use it.
+        3. Else, fall back to DEFAULT_AVATAR_PATH under MEDIA_URL.
+
+        Always return an absolute URL when `request` is available.
         """
         request = self.context.get("request")
 
-        # Prefer a real uploaded avatar if present
-        avatar = getattr(obj, "avatar", None)
-        if avatar is not None and getattr(avatar, "url", None):
-            url = avatar.url  # may already be absolute (e.g. S3)
-            if _is_absolute(url):
-                return url
-            return request.build_absolute_uri(url) if request else url
+        # 1) New path: KreativeArtwork linked as profile picture
+        artwork = getattr(obj, "profile_artwork", None)
+        if artwork is not None:
+            media = getattr(artwork, "media_file", None)
+            url = getattr(media, "url", None) if media is not None else None
+            if url:
+                if _is_absolute(url):
+                    return url
+                return request.build_absolute_uri(url) if request else url
 
-        # Fallback: default image under MEDIA_URL
+        # 2) Backward‑compat: old direct ImageField `avatar` if it still exists
+        avatar = getattr(obj, "avatar", None)
+        if avatar is not None:
+            url = getattr(avatar, "url", None)
+            if url:
+                if _is_absolute(url):
+                    return url
+                return request.build_absolute_uri(url) if request else url
+
+        # 3) Default placeholder in MEDIA
         fallback_rel = _join_media_url(DEFAULT_AVATAR_PATH)
         if _is_absolute(fallback_rel):
             # MEDIA_URL might be absolute (CDN)
