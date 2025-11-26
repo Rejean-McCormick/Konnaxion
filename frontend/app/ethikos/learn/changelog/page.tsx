@@ -1,6 +1,6 @@
 'use client';
 
-// Updated from original implementation in app/ethikos/learn/changelog/page.tsx.
+// app/ethikos/learn/changelog/page.tsx.
 import React, { useMemo, useState } from 'react';
 import {
   PageContainer,
@@ -168,9 +168,11 @@ export default function Changelog() {
       .slice(0, 4); // top 4
   }, [filtered]);
 
-  const lastUpdated = useMemo(() => {
-    if (!sortedEntries.length) return null;
-    return dayjs(sortedEntries[0].date).format('YYYY-MM-DD');
+  // Safely compute lastUpdated without risking undefined access
+  const lastUpdated = useMemo<string | null>(() => {
+    const firstEntry = sortedEntries[0];
+    if (!firstEntry) return null;
+    return dayjs(firstEntry.date).format('YYYY-MM-DD');
   }, [sortedEntries]);
 
   // Utilities

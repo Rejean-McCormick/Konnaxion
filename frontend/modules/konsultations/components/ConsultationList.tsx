@@ -12,6 +12,19 @@ interface Consultation {
   status: string;
 }
 
+type PaginatedConsultationResponse = {
+  items?: Consultation[];
+  results?: Consultation[];
+};
+
+function isPaginatedConsultationResponse(
+  value: unknown,
+): value is PaginatedConsultationResponse {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as PaginatedConsultationResponse;
+  return Array.isArray(candidate.items) || Array.isArray(candidate.results);
+}
+
 export default function ConsultationList(): JSX.Element {
   const [consultations, setConsultations] = useState<Consultation[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -19,18 +32,30 @@ export default function ConsultationList(): JSX.Element {
 
   useEffect(() => {
     let isMounted = true;
+
     const fetchConsultations = async () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch('/api/konsultations/consultations', { method: 'GET' });
+
+        const res = await fetch('/api/konsultations/consultations', {
+          method: 'GET',
+        });
+
         if (!res.ok) {
           throw new Error(`Failed to load consultations (status ${res.status})`);
         }
-        const data = await res.json();
-        // Support both plain array and paginated response shapes
-        const items: unknown[] = Array.isArray(data) ? data : (data.items ?? data.results ?? []);
-        const list = items as Consultation[];
+
+        const data: unknown = await res.json();
+
+        let list: Consultation[] = [];
+
+        if (Array.isArray(data)) {
+          list = data as Consultation[];
+        } else if (isPaginatedConsultationResponse(data)) {
+          list = (data.items ?? data.results) ?? [];
+        }
+
         if (isMounted) {
           setConsultations(list);
         }
@@ -45,18 +70,20 @@ export default function ConsultationList(): JSX.Element {
         }
       }
     };
+
     fetchConsultations();
+
     return () => {
       isMounted = false;
     };
   }, []);
 
   // Split consultations by status
-  const openConsultations = consultations.filter((c) =>
-    c.status.toLowerCase() === 'open'
+  const openConsultations = consultations.filter(
+    (c) => c.status.toLowerCase() === 'open',
   );
-  const closedConsultations = consultations.filter((c) =>
-    c.status.toLowerCase() !== 'open'
+  const closedConsultations = consultations.filter(
+    (c) => c.status.toLowerCase() !== 'open',
   );
 
   // Formatting helper for dates
@@ -82,13 +109,14 @@ export default function ConsultationList(): JSX.Element {
   return (
     <>
       {error && (
-        <Alert 
-          message={error} 
-          type="error" 
-          showIcon 
-          style={{ marginBottom: 16 }} 
+        <Alert
+          message={error}
+          type="error"
+          showIcon
+          style={{ marginBottom: 16 }}
         />
       )}
+
       {openConsultations.length > 0 && (
         <List
           header={<h3 style={{ marginBottom: 8 }}>Open Consultations</h3>}
@@ -98,12 +126,16 @@ export default function ConsultationList(): JSX.Element {
             const statusLabel =
               item.status.charAt(0).toUpperCase() + item.status.slice(1);
             const closeDate = formatDate(item.close_date);
+
             return (
               <List.Item
                 actions={[
-                  <Link 
-                    key="participate" 
-                    href={{ pathname: '/konsultations/suggestion', query: { consultationId: String(item.id) } }}
+                  <Link
+                    key="participate"
+                    href={{
+                      pathname: '/konsultations/suggestion',
+                      query: { consultationId: String(item.id) },
+                    }}
                   >
                     Participate
                   </Link>,
@@ -125,21 +157,30 @@ export default function ConsultationList(): JSX.Element {
           }}
         />
       )}
+
       {closedConsultations.length > 0 && (
         <List
-          header={<h3 style={{ marginTop: 24, marginBottom: 8 }}>Closed Consultations</h3>}
+          header={
+            <h3 style={{ marginTop: 24, marginBottom: 8 }}>
+              Closed Consultations
+            </h3>
+          }
           itemLayout="vertical"
           dataSource={closedConsultations}
           renderItem={(item) => {
             const statusLabel =
               item.status.charAt(0).toUpperCase() + item.status.slice(1);
             const closeDate = formatDate(item.close_date);
+
             return (
               <List.Item
                 actions={[
-                  <Link 
-                    key="results" 
-                    href={{ pathname: '/konsultations/results', query: { consultationId: String(item.id) } }}
+                  <Link
+                    key="results"
+                    href={{
+                      pathname: '/konsultations/results',
+                      query: { consultationId: String(item.id) },
+                    }}
                   >
                     View Results
                   </Link>,

@@ -10,7 +10,6 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import {
-  Comment,
   Divider,
   Empty,
   Form,
@@ -120,11 +119,7 @@ export default function FeedbackLoops(): JSX.Element {
                 ),
               }}
             >
-              <Form.Item
-                label="Overall experience"
-                name="rating"
-                valuePropName="value"
-              >
+              <Form.Item label="Overall experience" name="rating" valuePropName="value">
                 <Rate />
               </Form.Item>
 
@@ -166,14 +161,22 @@ export default function FeedbackLoops(): JSX.Element {
           {items.length ? (
             <>
               <List
-                itemLayout="horizontal"
+                itemLayout="vertical"
                 dataSource={items}
                 renderItem={(f) => (
-                  <li key={f.id}>
-                    <Comment
-                      author={f.author}
-                      datetime={f.createdAt}
-                      content={
+                  <List.Item key={f.id}>
+                    <List.Item.Meta
+                      title={
+                        <Space direction="horizontal" size="small">
+                          {f.author && <Text strong>{f.author}</Text>}
+                          {f.createdAt && (
+                            <Text type="secondary" style={{ fontSize: 12 }}>
+                              {f.createdAt}
+                            </Text>
+                          )}
+                        </Space>
+                      }
+                      description={
                         <>
                           {typeof f.rating === 'number' && (
                             <div style={{ marginBottom: 4 }}>
@@ -184,7 +187,7 @@ export default function FeedbackLoops(): JSX.Element {
                         </>
                       }
                     />
-                  </li>
+                  </List.Item>
                 )}
               />
               <Divider style={{ marginTop: 16, marginBottom: 0 }} />

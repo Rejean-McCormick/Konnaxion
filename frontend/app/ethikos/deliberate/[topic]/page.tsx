@@ -7,7 +7,6 @@ import {
   Alert,
   Button,
   Card,
-  Comment,
   Divider,
   Empty,
   Input,
@@ -524,14 +523,10 @@ export default function TopicThreadPage() {
                               }}
                               renderItem={(s) => (
                                 <li key={s.id}>
-                                  <Comment
+                                  <StatementComment
                                     author={s.author}
                                     datetime={dayjs(s.createdAt).fromNow()}
-                                    content={
-                                      <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
-                                        {s.body}
-                                      </Paragraph>
-                                    }
+                                    body={s.body}
                                   />
                                 </li>
                               )}
@@ -599,13 +594,9 @@ export default function TopicThreadPage() {
                   dataSource={preview.latest}
                   renderItem={(s) => (
                     <li key={s.id}>
-                      <Comment
+                      <StatementComment
                         author={s.author}
-                        content={
-                          <Paragraph style={{ whiteSpace: 'pre-wrap' }}>
-                            {s.body}
-                          </Paragraph>
-                        }
+                        body={s.body}
                       />
                     </li>
                   )}
@@ -636,6 +627,40 @@ function StatementTimelineItem({ statement }: { statement: Statement }) {
       </div>
       <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>
         {statement.body}
+      </Paragraph>
+    </div>
+  );
+}
+
+function StatementComment({
+  author,
+  datetime,
+  body,
+}: {
+  author: React.ReactNode;
+  datetime?: React.ReactNode;
+  body: React.ReactNode;
+}) {
+  return (
+    <div style={{ padding: '12px 0' }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          marginBottom: 4,
+        }}
+      >
+        {author && <Text strong>{author}</Text>}
+        {datetime && (
+          <Text type="secondary" style={{ marginLeft: 'auto' }}>
+            {datetime}
+          </Text>
+        )}
+      </div>
+      <Paragraph style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>
+        {body}
       </Paragraph>
     </div>
   );

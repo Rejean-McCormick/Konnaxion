@@ -189,24 +189,28 @@ function buildTimeline(
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
 
-    events.push({
-      id: `stance-first-${topic.id}`,
-      date: first.timestamp,
-      label: 'First stance submitted',
-      description: 'The first participant expressed a position on this question.',
-    });
+    if (first) {
+      events.push({
+        id: `stance-first-${topic.id}`,
+        date: first.timestamp,
+        label: 'First stance submitted',
+        description: 'The first participant expressed a position on this question.',
+      });
+    }
 
-    events.push({
-      id: `stance-latest-${topic.id}`,
-      date: last.timestamp,
-      label: 'Latest stance activity',
-      description: [
-        `${stances.length} total stances recorded.`,
-        support != null ? `Approx. ${support}% agreement so far.` : undefined,
-      ]
-        .filter(Boolean)
-        .join(' '),
-    });
+    if (last) {
+      events.push({
+        id: `stance-latest-${topic.id}`,
+        date: last.timestamp,
+        label: 'Latest stance activity',
+        description: [
+          `${stances.length} total stances recorded.`,
+          support != null ? `Approx. ${support}% agreement so far.` : undefined,
+        ]
+          .filter(Boolean)
+          .join(' '),
+      });
+    }
   }
 
   // Argument activity
@@ -217,19 +221,23 @@ function buildTimeline(
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
 
-    events.push({
-      id: `argument-first-${topic.id}`,
-      date: first.created_at,
-      label: 'First argument posted',
-      description: `${first.user} started the written debate.`,
-    });
+    if (first) {
+      events.push({
+        id: `argument-first-${topic.id}`,
+        date: first.created_at,
+        label: 'First argument posted',
+        description: `${first.user} started the written debate.`,
+      });
+    }
 
-    events.push({
-      id: `argument-latest-${topic.id}`,
-      date: last.created_at,
-      label: 'Latest argument activity',
-      description: `${args.length} arguments exchanged so far.`,
-    });
+    if (last) {
+      events.push({
+        id: `argument-latest-${topic.id}`,
+        date: last.created_at,
+        label: 'Latest argument activity',
+        description: `${args.length} arguments exchanged so far.`,
+      });
+    }
   }
 
   // Sort chronologically
@@ -315,7 +323,9 @@ export default function useImpact(
   options?: UseImpactOptions,
 ) {
   const enabled =
-    (options?.enabled ?? true) && consultationId !== null && consultationId !== undefined;
+    (options?.enabled ?? true) &&
+    consultationId !== null &&
+    consultationId !== undefined;
 
   return useQuery<ConsultationImpactResult>({
     queryKey: ['konsultations-impact', consultationId],

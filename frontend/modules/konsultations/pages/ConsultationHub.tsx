@@ -100,7 +100,7 @@ export default function ConsultationHub(): JSX.Element {
           bordered
         >
           {/* Board for proposed improvements, comments, ideas */}
-          <SuggestionBoard />
+          <SuggestionBoard suggestions={[]} />
         </ProCard>
       </ProCard>
     </PageContainer>

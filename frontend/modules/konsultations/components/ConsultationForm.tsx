@@ -1,10 +1,12 @@
 ﻿import React, { useState } from 'react';
 import { Form, Slider, Input, Button, message as antdMessage } from 'antd';
-// (Assume an axios-based helper or useRequest hook is available for API calls)
 import { useRequest } from 'ahooks';
+import axios from 'axios';
 
 interface ConsultationFormProps {
-  consultationId: string | number;
+  // Made optional so <ConsultationForm /> without props in ConsultationHub compiles;
+  // runtime guard below ensures we don't submit without an ID.
+  consultationId?: string | number;
   // Optionally, currentValue could be passed in to show existing stance
   initialValue?: number;
 }
@@ -29,20 +31,29 @@ const stanceLabels: Record<number, string> = {
   3: 'Strongly For',
 };
 
-const ConsultationForm: React.FC<ConsultationFormProps> = ({ consultationId, initialValue }) => {
+const ConsultationForm: React.FC<ConsultationFormProps> = ({
+  consultationId,
+  initialValue,
+}) => {
   const [form] = Form.useForm();
   const [submitting, setSubmitting] = useState(false);
 
   // Use ahooks useRequest for the submission API call (POST stance)
   const { run: submitStance } = useRequest(
     async (value: number, comment?: string) => {
+      if (consultationId == null) {
+        throw new Error('consultationId is required to submit a stance.');
+      }
+
       // Example API endpoint: POST /api/konsultations/consultations/{id}/vote/
       // Payload: { value: ..., comment: ... }
-      // (The exact endpoint may vary; adjust based on backend routes)
-      return await axios.post(`/api/konsultations/consultations/${consultationId}/vote/`, {
-        value,
-        comment,
-      });
+      return axios.post(
+        `/api/konsultations/consultations/${consultationId}/vote/`,
+        {
+          value,
+          comment,
+        },
+      );
     },
     {
       manual: true,
@@ -55,33 +66,45 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({ consultationId, ini
         antdMessage.error('Failed to submit stance. Please try again.');
       },
       onFinally: () => setSubmitting(false),
-    }
+    },
   );
 
-  const onFinish = ({ value, comment }: { value: number; comment?: string }) => {
+  const onFinish = ({
+    value,
+    comment,
+  }: {
+    value: number;
+    comment?: string;
+  }) => {
     setSubmitting(true);
     submitStance(value, comment);
   };
 
   return (
-    <Form 
-      form={form} 
-      layout="vertical" 
-      initialValues={{ value: initialValue, comment: '' }} 
+    <Form
+      form={form}
+      layout="vertical"
+      initialValues={{ value: initialValue, comment: '' }}
       onFinish={onFinish}
     >
-      <Form.Item 
-        label="Your stance" 
-        name="value" 
+      <Form.Item
+        label="Your stance"
+        name="value"
         rules={[{ required: true, message: 'Please select a stance.' }]}
       >
-        <Slider 
-          min={-3} max={3} step={1} marks={stanceMarks} 
-          tooltip={{ formatter: (val) => stanceLabels[val as number] }} 
+        <Slider
+          min={-3}
+          max={3}
+          step={1}
+          marks={stanceMarks}
+          tooltip={{ formatter: (val) => stanceLabels[val as number] }}
         />
       </Form.Item>
       <Form.Item label="Comment (optional)" name="comment">
-        <Input.TextArea rows={3} placeholder="Add an explanation or suggestion (optional)" />
+        <Input.TextArea
+          rows={3}
+          placeholder="Add an explanation or suggestion (optional)"
+        />
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" loading={submitting}>

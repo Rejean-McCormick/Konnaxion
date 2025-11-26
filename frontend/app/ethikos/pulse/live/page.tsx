@@ -235,16 +235,22 @@ export default function PulseLive(): JSX.Element {
         title: 'Status',
         dataIndex: 'status',
         width: 120,
-        render: (dom) =>
-          dom === 'open' ? <Tag color="green">Open</Tag> : <Tag>{String(dom)}</Tag>,
+        render: (_, row) =>
+          row.status === 'open' ? (
+            <Tag color="green">Open</Tag>
+          ) : (
+            <Tag>{row.status}</Tag>
+          ),
       },
       {
         title: 'Last activity',
         dataIndex: 'last_activity',
         width: 180,
-        render: (dom) => (
-          <Tooltip title={dayjs(dom).format('YYYY-MM-DD HH:mm')}>
-            {dayjs(dom).fromNow()}
+        render: (_, row) => (
+          <Tooltip
+            title={dayjs(row.last_activity).format('YYYY-MM-DD HH:mm')}
+          >
+            {dayjs(row.last_activity).fromNow()}
           </Tooltip>
         ),
       },
@@ -252,9 +258,9 @@ export default function PulseLive(): JSX.Element {
         title: 'Created',
         dataIndex: 'created_at',
         width: 160,
-        render: (dom) => (
-          <Tooltip title={dayjs(dom).format('YYYY-MM-DD HH:mm')}>
-            {dayjs(dom).fromNow()}
+        render: (_, row) => (
+          <Tooltip title={dayjs(row.created_at).format('YYYY-MM-DD HH:mm')}>
+            {dayjs(row.created_at).fromNow()}
           </Tooltip>
         ),
       },
@@ -319,7 +325,9 @@ export default function PulseLive(): JSX.Element {
                     <Space>
                       {c.label}
                       <Badge
-                        status={trend > 0 ? 'success' : trend < 0 ? 'error' : 'default'}
+                        status={
+                          trend > 0 ? 'success' : trend < 0 ? 'error' : 'default'
+                        }
                       />
                     </Space>
                   ),
@@ -372,7 +380,9 @@ export default function PulseLive(): JSX.Element {
                         item.kind === 'topic' ? (
                           <ProfileOutlined />
                         ) : item.kind === 'stance' ? (
-                          <Tag color={item.extra.value >= 0 ? 'green' : 'red'}>
+                          <Tag
+                            color={item.extra.value >= 0 ? 'green' : 'red'}
+                          >
                             {item.extra.value >= 0 ? '+' : ''}
                             {item.extra.value}
                           </Tag>

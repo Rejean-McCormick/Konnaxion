@@ -16,6 +16,7 @@ import {
   ProTable,
   ProDescriptions,
   type ProColumns,
+  type ProDescriptionsItemProps,
 } from '@ant-design/pro-components';
 import {
   Alert,
@@ -174,39 +175,40 @@ export default function Credentials() {
 
       return true;
     },
-    customRequest: async ({
-      file,
-      onSuccess,
-      onError,
-    }: {
-      file: File;
-      onSuccess?: (res: unknown) => void;
-      onError?: (err: unknown) => void;
-    }) => {
-      try {
-        setUploading(true);
-        setLastFileName(file.name);
-        await uploadCredential(file); // no-op until backend exists
-        onSuccess?.('ok');
+    // Match Ant Design's expected `(options) => void` signature
+    customRequest: (options: any) => {
+      const { file, onSuccess, onError } = options;
+      const uploadFile = file as File;
 
-        // Optimistic insert into the table list as "Pending"
-        const optimistic: CredentialRow = {
-          id: `tmp-${Date.now()}`,
-          title: toTitleFromFilename(file.name),
-          issuer: '—',
-          issuedAt: new Date().toISOString(),
-          status: 'Pending',
-          notes: 'Awaiting manual verification',
-        };
-        mutate([optimistic, ...rows]);
-        setDone(true);
-        antdMessage.success('Credential uploaded. It will be reviewed shortly.');
-      } catch (error) {
-        onError?.(error);
-        antdMessage.error('Upload failed. Please try again.');
-      } finally {
-        setUploading(false);
-      }
+      setUploading(true);
+      setLastFileName(uploadFile.name);
+
+      uploadCredential(uploadFile)
+        .then(() => {
+          onSuccess?.('ok');
+
+          // Optimistic insert into the table list as "Pending"
+          const optimistic: CredentialRow = {
+            id: `tmp-${Date.now()}`,
+            title: toTitleFromFilename(uploadFile.name),
+            issuer: '—',
+            issuedAt: new Date().toISOString(),
+            status: 'Pending',
+            notes: 'Awaiting manual verification',
+          };
+          mutate([optimistic, ...rows]);
+          setDone(true);
+          antdMessage.success(
+            'Credential uploaded. It will be reviewed shortly.',
+          );
+        })
+        .catch((error: unknown) => {
+          onError?.(error);
+          antdMessage.error('Upload failed. Please try again.');
+        })
+        .finally(() => {
+          setUploading(false);
+        });
     },
   };
 
@@ -216,7 +218,7 @@ export default function Credentials() {
       title: 'Title',
       dataIndex: 'title',
       ellipsis: true,
-      render: (_, row) => (
+      render: (_: any, row: CredentialRow) => (
         <Space size={6}>
           <FileTextOutlined />
           {row.url ? (
@@ -235,7 +237,7 @@ export default function Credentials() {
       dataIndex: 'issuedAt',
       width: 140,
       valueType: 'date',
-      renderText: (v) => dayjs(v).format('YYYY-MM-DD'),
+      renderText: (v: any) => dayjs(v).format('YYYY-MM-DD'),
     },
     {
       title: 'Status',
@@ -246,7 +248,7 @@ export default function Credentials() {
         Pending: { text: 'Pending', status: 'Processing' },
         Rejected: { text: 'Rejected', status: 'Error' },
       },
-      render: (_, row) => (
+      render: (_: any, row: CredentialRow) => (
         <Tag color={statusColor[row.status]}>{row.status}</Tag>
       ),
     },
@@ -254,7 +256,7 @@ export default function Credentials() {
       title: 'Actions',
       width: 260,
       valueType: 'option',
-      render: (_, row) => {
+      render: (_: any, row: CredentialRow) => {
         const canDownload = !!row.url;
         return [
           <Button size="small" key="view" onClick={() => setDetail(row)}>
@@ -323,10 +325,10 @@ export default function Credentials() {
         }
         description={
           <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
-            Upload real‑world credentials (certifications, professional memberships,
-            academic records) that help stewards understand why your voice carries
-            expertise in certain debates. These documents are reviewed manually and do
-            not replace community‑based reputation.
+            Upload real‑world credentials (certifications, professional
+            memberships, academic records) that help stewards understand why
+            your voice carries expertise in certain debates. These documents are
+            reviewed manually and do not replace community‑based reputation.
           </Paragraph>
         }
       />
@@ -352,8 +354,9 @@ export default function Credentials() {
                     </div>
                   )}
                   <Text>
-                    Your document is now queued for human review. If accepted, it will
-                    appear as a verified note in your Ethikos trust profile.
+                    Your document is now queued for human review. If accepted,
+                    it will appear as a verified note in your Ethikos trust
+                    profile.
                   </Text>
                 </>
               }
@@ -381,8 +384,8 @@ export default function Credentials() {
                   Click or drag a credential file to this area to upload
                 </p>
                 <p className="ant-upload-hint">
-                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at a
-                  time.
+                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at
+                  a time.
                 </p>
               </Upload.Dragger>
 
@@ -394,13 +397,14 @@ export default function Credentials() {
                 style={{ width: '100%' }}
               >
                 <Text type="secondary">
-                  Tip: upload focused evidence rather than full CVs. For example, a
-                  single certification for climate policy is more helpful than a long
-                  résumé.
+                  Tip: upload focused evidence rather than full CVs. For
+                  example, a single certification for climate policy is more
+                  helpful than a long résumé.
                 </Text>
                 <Text type="secondary">
-                  You can always complement these documents with activity‑based
-                  reputation earned through debates, voting and impact work.
+                  You can always complement these documents with
+                  activity‑based reputation earned through debates, voting and
+                  impact work.
                 </Text>
               </Space>
             </>
@@ -507,40 +511,46 @@ export default function Credentials() {
           <ProDescriptions<CredentialRow>
             column={1}
             dataSource={detail}
-            columns={[
-              { title: 'Title', dataIndex: 'title' },
-              { title: 'Issuer', dataIndex: 'issuer' },
-              {
-                title: 'Issued',
-                dataIndex: 'issuedAt',
-                render: (_, row) =>
-                  dayjs(row.issuedAt).format('YYYY-MM-DD'),
-              },
-              {
-                title: 'Status',
-                dataIndex: 'status',
-                render: (_, row) => (
-                  <Tag color={statusColor[row.status]}>{row.status}</Tag>
-                ),
-              },
-              detail.url
-                ? {
-                    title: 'Document',
-                    dataIndex: 'url',
-                    render: (_, row) => (
-                      <a href={row.url} target="_blank" rel="noreferrer">
-                        Open document
-                      </a>
-                    ),
-                  }
-                : undefined,
-              detail.notes
-                ? {
-                    title: 'Notes',
-                    dataIndex: 'notes',
-                  }
-                : undefined,
-            ].filter(Boolean) as ProColumns<CredentialRow>[]}
+            columns={
+              [
+                { title: 'Title', dataIndex: 'title' },
+                { title: 'Issuer', dataIndex: 'issuer' },
+                {
+                  title: 'Issued',
+                  dataIndex: 'issuedAt',
+                  render: (_: any, row: CredentialRow) =>
+                    dayjs(row.issuedAt).format('YYYY-MM-DD'),
+                },
+                {
+                  title: 'Status',
+                  dataIndex: 'status',
+                  render: (_: any, row: CredentialRow) => (
+                    <Tag color={statusColor[row.status]}>{row.status}</Tag>
+                  ),
+                },
+                detail.url
+                  ? {
+                      title: 'Document',
+                      dataIndex: 'url',
+                      render: (_: any, row: CredentialRow) => (
+                        <a
+                          href={row.url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open document
+                        </a>
+                      ),
+                    }
+                  : undefined,
+                detail.notes
+                  ? {
+                      title: 'Notes',
+                      dataIndex: 'notes',
+                    }
+                  : undefined,
+              ].filter(Boolean) as ProDescriptionsItemProps<CredentialRow>[]
+            }
           />
         )}
       </Drawer>

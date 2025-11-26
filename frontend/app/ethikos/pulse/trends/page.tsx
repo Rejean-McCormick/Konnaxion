@@ -1,4 +1,3 @@
-// app/ethikos/pulse/trends/page.tsx
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
@@ -16,6 +15,7 @@ import {
   Switch,
   message,
 } from 'antd';
+import type { TabsProps } from 'antd';
 import { Line, Area, Heatmap } from '@ant-design/plots';
 import {
   AreaChartOutlined,
@@ -35,6 +35,13 @@ import { fetchPulseTrends } from '@/services/pulse';
 type TimeRangeKey = '7d' | '30d' | '60d';
 
 const { Text } = Typography;
+
+type PulseChart = {
+  key: string;
+  type: 'line' | 'area' | 'heatmap' | string;
+  title: string;
+  config?: Record<string, any>;
+};
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -127,13 +134,16 @@ export default function PulseTrends(): JSX.Element {
     []
   >(fetchPulseTrends);
 
-  const charts = data?.charts ?? [];
+  const charts: PulseChart[] = (data?.charts ?? []) as PulseChart[];
   const [activeKey, setActiveKey] = useState<string | undefined>(undefined);
 
   // Ensure we select first tab once charts are available
   useEffect(() => {
-    if (!activeKey && charts.length) {
-      setActiveKey(charts[0].key);
+    if (!activeKey && charts.length > 0) {
+      const firstChart = charts[0];
+      if (firstChart) {
+        setActiveKey(firstChart.key);
+      }
     }
   }, [charts, activeKey]);
 
@@ -144,7 +154,7 @@ export default function PulseTrends(): JSX.Element {
         // Heatmap is an aggregate over hours/days, keep it mostly as-is
         if (chart.type === 'heatmap') {
           return {
-            ...chart.config,
+            ...(chart.config ?? {}),
           };
         }
 
@@ -152,7 +162,7 @@ export default function PulseTrends(): JSX.Element {
         const days = getDaysForRange(range);
 
         const cfg: any = {
-          ...chart.config,
+          ...(chart.config ?? {}),
           data: filterSeriesByDays(baseData, days),
           smooth: smoothLines,
           // Some nice defaults for readability
@@ -164,7 +174,11 @@ export default function PulseTrends(): JSX.Element {
             // G2Plot formatter shape
             formatter: (datum: any) => {
               const x = datum.date ?? datum.x ?? datum.ts;
-              return { name: datum.period ?? 'value', value: datum.value, title: dayjs(x).format('MMM D') };
+              return {
+                name: datum.period ?? 'value',
+                value: datum.value,
+                title: dayjs(x).format('MMM D'),
+              };
             },
           },
           xAxis: {
@@ -220,7 +234,7 @@ export default function PulseTrends(): JSX.Element {
     }
 
     const idx = charts.findIndex((c) => c.key === activeKey);
-    if (idx < 0) {
+    if (idx < 0 || idx >= charts.length || idx >= enhancedConfigs.length) {
       message.info('Nothing to export.');
       return;
     }
@@ -228,13 +242,24 @@ export default function PulseTrends(): JSX.Element {
     const chart = charts[idx];
     const cfg = enhancedConfigs[idx];
 
+    if (!chart || !cfg) {
+      message.info('Nothing to export.');
+      return;
+    }
+
     // Only export series‑based charts; heatmap becomes a wide matrix (skip for now)
     if (chart.type === 'heatmap') {
       message.warning('Heatmap export is not supported.');
       return;
     }
 
-    const rows = (cfg?.data ?? []) as Array<{ date?: string; x?: any; ts?: number; value: number; period?: string }>;
+    const rows = (cfg.data ?? []) as Array<{
+      date?: string;
+      x?: any;
+      ts?: number;
+      value: number;
+      period?: string;
+    }>;
 
     const header = comparePrev ? ['date', 'value', 'period'] : ['date', 'value'];
     const encodeCell = (value: unknown): string => {
@@ -243,12 +268,21 @@ export default function PulseTrends(): JSX.Element {
       return str;
     };
 
-    const toDate = (r: any) => {
+    const toDate = (r: {
+      date?: string;
+      x?: any;
+      ts?: number;
+    }): string => {
       const x = r.date ?? r.x ?? r.ts;
       return dayjs(x).format('YYYY-MM-DD');
     };
 
-    const csv = [header, ...rows.map((r) => (comparePrev ? [toDate(r), r.value, r.period ?? 'This period'] : [toDate(r), r.value]))]
+    const csv = [
+      header,
+      ...rows.map((r) =>
+        comparePrev ? [toDate(r), r.value, r.period ?? 'This period'] : [toDate(r), r.value],
+      ),
+    ]
       .map((row) => row.map(encodeCell).join(','))
       .join('\n');
 
@@ -340,14 +374,14 @@ export default function PulseTrends(): JSX.Element {
   /*  Build Tabs                                                         */
   /* ------------------------------------------------------------------ */
 
-  const tabItems = charts.map((chart, idx) => {
+  const tabItems: TabsProps['items'] = charts.map((chart, idx) => {
     let icon: React.ReactNode = <AreaChartOutlined />;
 
     if (chart.type === 'heatmap') icon = <HeatMapOutlined />;
     if (chart.type === 'area') icon = <BarChartOutlined />;
     if (chart.type === 'line') icon = <AreaChartOutlined />;
 
-    const cfg = enhancedConfigs[idx];
+    const cfg = enhancedConfigs[idx] ?? {};
 
     return {
       key: chart.key,
@@ -424,7 +458,11 @@ export default function PulseTrends(): JSX.Element {
       secondaryActions={secondaryActions}
     >
       <PageContainer ghost>
-        <Tabs items={tabItems} activeKey={activeKey} onChange={setActiveKey} />
+        <Tabs
+          items={tabItems}
+          activeKey={activeKey}
+          onChange={(key) => setActiveKey(key)}
+        />
       </PageContainer>
     </EthikosPageShell>
   );

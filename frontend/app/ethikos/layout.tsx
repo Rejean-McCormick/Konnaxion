@@ -68,7 +68,12 @@ function EthikosShell({ children }: SegmentLayoutProps) {
   return (
     <MainLayout>
       {/* Subtle suite watermark; page-level PageContainer can still set ghost or override visuals */}
-      <WaterMark content="ethiKos" gap={[120, 120]} fontColor="rgba(0,0,0,0.04)">
+      <WaterMark
+        content="ethiKos"
+        gapX={120}
+        gapY={120}
+        fontColor="rgba(0,0,0,0.04)"
+      >
         {children}
       </WaterMark>
     </MainLayout>

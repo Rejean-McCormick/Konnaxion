@@ -92,6 +92,7 @@ export default function Badges() {
 
   // Detail modal for a selected badge
   const [detail, setDetail] = useState<TrustBadge | null>(null);
+  const detailMeta = detail ? BADGE_CATEGORY_META[detail.id] : undefined;
 
   // ---------- derived stats ----------
   const totalBadges = badges.length;
@@ -102,13 +103,12 @@ export default function Badges() {
   let firstEarned: string | undefined;
   let lastEarned: string | undefined;
   if (badges.length > 0) {
-    firstEarned = badges.reduce(
-      (min, b) => (dayjs(b.earnedAt).isBefore(min) ? b.earnedAt : min),
-      badges[0].earnedAt,
+    const dates = badges.map((b) => b.earnedAt);
+    firstEarned = dates.reduce((min, d) =>
+      dayjs(d).isBefore(min) ? d : min,
     );
-    lastEarned = badges.reduce(
-      (max, b) => (dayjs(b.earnedAt).isAfter(max) ? b.earnedAt : max),
-      badges[0].earnedAt,
+    lastEarned = dates.reduce((max, d) =>
+      dayjs(d).isAfter(max) ? d : max,
     );
   }
 
@@ -359,7 +359,10 @@ export default function Badges() {
                 dataIndex: 'label',
               },
               subTitle: {
-                render: (_, row) => {
+                render: (
+                  _: unknown,
+                  row: CatalogItem & { earned: boolean; earnedAt?: string },
+                ) => {
                   const meta = BADGE_CATEGORY_META[row.id];
                   return meta ? (
                     <Tag color={meta.color}>{meta.label}</Tag>
@@ -367,7 +370,10 @@ export default function Badges() {
                 },
               },
               description: {
-                render: (_, row) => (
+                render: (
+                  _: unknown,
+                  row: CatalogItem & { earned: boolean; earnedAt?: string },
+                ) => (
                   <Space direction="vertical" size={2}>
                     <Text type="secondary">{row.description}</Text>
                     <Text type="secondary">
@@ -377,7 +383,10 @@ export default function Badges() {
                 ),
               },
               extra: {
-                render: (_, row) =>
+                render: (
+                  _: unknown,
+                  row: CatalogItem & { earned: boolean; earnedAt?: string },
+                ) =>
                   row.earned ? (
                     <Tag color="green">
                       Earned{' '}
@@ -399,10 +408,8 @@ export default function Badges() {
             detail ? (
               <Space size={8}>
                 <span>{detail.label}</span>
-                {BADGE_CATEGORY_META[detail.id] && (
-                  <Tag color={BADGE_CATEGORY_META[detail.id].color}>
-                    {BADGE_CATEGORY_META[detail.id].label}
-                  </Tag>
+                {detailMeta && (
+                  <Tag color={detailMeta.color}>{detailMeta.label}</Tag>
                 )}
               </Space>
             ) : (
