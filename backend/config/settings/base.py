@@ -116,10 +116,14 @@ AUTHENTICATION_BACKENDS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
-# https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
-# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+
+# After successful login, send the user to the frontend Ekoh dashboard
+LOGIN_REDIRECT_URL = "http://localhost:3000/ekoh/dashboard"
+
+# This is the backend login view (/accounts/login/)
 LOGIN_URL = "account_login"
+
+
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -316,6 +320,8 @@ CELERY_WORKER_SEND_TASK_EVENTS = True
 CELERY_TASK_SEND_SENT_EVENT = True
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-hijack-root-logger
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
+
+
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
@@ -325,6 +331,13 @@ ACCOUNT_LOGIN_METHODS = {"username"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+
+# Do NOT auto-redirect authenticated users away from login/signup pages
+ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
+
+# After logout, go back to the backend login page
+ACCOUNT_LOGOUT_REDIRECT_URL = "/accounts/login/"
+
 # https://docs.allauth.org/en/latest/account/configuration.html
 ACCOUNT_ADAPTER = "konnaxion.users.adapters.AccountAdapter"
 # https://docs.allauth.org/en/latest/account/forms.html
@@ -333,6 +346,8 @@ ACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSignupForm"}
 SOCIALACCOUNT_ADAPTER = "konnaxion.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSocialSignupForm"}
+
+
 
 # django-rest-framework
 # -------------------------------------------------------------------------------

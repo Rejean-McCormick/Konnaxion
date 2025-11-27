@@ -10,7 +10,11 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Konnaxion',
   description:
-    'Konnaxion · Ekoh, Ethikos, KeenKonnect, KonnectED, Kreative – orchestration and collaboration suites.',
+    'Konnaxion · EkoH, ethiKos, keenKonnect, KonnectED, Kreative – orchestration and collaboration suites.',
+  icons: {
+    icon: '/LogoK.svg',
+    shortcut: '/LogoK.svg',
+  },
 };
 
 export default function RootLayout({

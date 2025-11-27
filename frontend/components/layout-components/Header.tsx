@@ -18,6 +18,7 @@ import ThemeSwitcher from '@/components/ThemeSwitcher'
 import { GlobalSearchBar } from '@/global/components'
 import api from '@/api'
 import type { Route } from '@/components/layout-components/Menu'
+import ActiveHeaderWidget from '@/widgets/header/ActiveHeaderWidget'
 
 const { Header } = Layout
 
@@ -91,6 +92,25 @@ const CenterRegion = styled.div`
 const SearchWrapper = styled.div`
   flex: 1;
   min-width: 0;
+  display: flex;
+  justify-content: center;
+`
+
+// Fixed-width widget slot (~14 characters)
+const WidgetSlot = styled.div`
+  flex: 0 0 auto;
+  width: 14ch;
+  max-width: 14ch;
+  min-width: 14ch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+  font-size: 12px;
+  color: var(--ant-color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 /* ------------ mapping du label par sidebar (aligné sur LogoTitle) ------------ */
@@ -108,7 +128,6 @@ type CurrentUser = {
   name: string | null
 }
 
-// Derive the click event type from MenuProps['onClick']
 type AccountMenuClickEvent = Parameters<NonNullable<MenuProps['onClick']>>[0]
 
 const trail = (rs: Route[], cur: string): Route[] => {
@@ -143,7 +162,6 @@ export default function HeaderBar({
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
   const [loadingUser, setLoadingUser] = useState(true)
 
-  // Detect auth state via users/me/ endpoint (cookie-based, aligned with backend)
   useEffect(() => {
     let canceled = false
 
@@ -200,19 +218,19 @@ export default function HeaderBar({
   const handleAccountMenuClick: MenuProps['onClick'] = useCallback(
     ({ key }: AccountMenuClickEvent) => {
       if (key === 'profile') {
-        // Canonical entry for "my profile" in v14 (Trust · Profile)
-        router.push('/ethikos/trust/profile')
+        router.push({
+          pathname: '/reputation',
+          query: { sidebar: 'ethikos' },
+        })
         return
       }
 
       if (key === 'logout') {
-        // Delegate logout to backend (Allauth) with a full reload
         window.location.href = backendUrl('/accounts/logout/')
         return
       }
 
       if (key === 'signin') {
-        // Login page served by Django + Allauth
         window.location.href = backendUrl('/accounts/login/')
       }
     },
@@ -289,16 +307,21 @@ export default function HeaderBar({
           )}
         </div>
 
-        {/* Fil d’Ariane + recherche globale */}
-        <CenterRegion>
-          <Crumb items={breadcrumbItems} />
+        {/* Breadcrumb (left) */}
+        <Crumb items={breadcrumbItems} />
 
+        {/* Center: search + pluggable widget slot */}
+        <CenterRegion>
           <SearchWrapper>
             <GlobalSearchBar />
           </SearchWrapper>
+
+          <WidgetSlot aria-label="Header widget">
+            <ActiveHeaderWidget />
+          </WidgetSlot>
         </CenterRegion>
 
-        {/* Zone droite : thème + compte */}
+        {/* Right side: theme + account */}
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <ThemeSwitcher />
 

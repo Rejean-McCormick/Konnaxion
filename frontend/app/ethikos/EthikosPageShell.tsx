@@ -4,10 +4,10 @@
 import React, { type ReactNode } from 'react';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
-import { Typography, Space, Tag, Grid } from 'antd';
+import { Typography, Space, Grid } from 'antd';
 import usePageTitle from '@/hooks/usePageTitle';
 
-const { Title, Paragraph, Text } = Typography;
+const { Title, Paragraph } = Typography;
 const { useBreakpoint } = Grid;
 
 export type EthikosPageShellProps = {
@@ -18,14 +18,13 @@ export type EthikosPageShellProps = {
   /**
    * Optional browser <title>.
    * If omitted, the shell generates:
-   *  - "ethiKos · {sectionLabel} · {title}" when sectionLabel is set
-   *  - "ethiKos · {title}" otherwise
+   *  - "EthiKos · {sectionLabel} · {title}" when sectionLabel is set
+   *  - "EthiKos · {title}" otherwise
    */
   metaTitle?: string;
   /**
-   * Optional section label for the header row
-   * Examples: "Debate Hub", "Consultation Hub", "Opinion Analytics",
-   *           "Decide", "Deliberate", "Pulse", "Trust", "Impact", "Admin", "Learn"
+   * Optional section label for meta-title only.
+   * Examples: "Decide", "Deliberate", "Pulse", "Trust", "Impact", "Admin", "Learn"
    *
    * If omitted, the shell will try to infer it from the current /ethikos/* route.
    */
@@ -42,8 +41,7 @@ export type EthikosPageShellProps = {
 
 /**
  * Best-effort inference of the Ethikos section label from the current pathname.
- * This lets /ethikos/* pages get a reasonable default section label without
- * having to pass it explicitly from each page component.
+ * This is now used only for the <title>, not for any visible breadcrumb/badge.
  */
 function inferSectionLabel(pathname: string | null | undefined): string | undefined {
   if (!pathname) return undefined;
@@ -76,13 +74,7 @@ function inferSectionLabel(pathname: string | null | undefined): string | undefi
 }
 
 /**
- * Central layout wrapper for ethiKos pages.
- *
- * Usage rules:
- * - All Ethikos suite screens (Decide, Deliberate, Pulse, Trust, Impact, Learn, Admin, Insights)
- *   should use this shell for consistent padding, heading and browser <title>.
- * - No extra big <h1> / Title outside of this shell in your pages.
- * - Do not repeat the "ethiKos" module branding in each page; the shell already handles it.
+ * Central layout wrapper for EthiKos pages.
  */
 function EthikosPageShell({
   title,
@@ -105,8 +97,8 @@ function EthikosPageShell({
   const finalMetaTitle =
     metaTitle ??
     (effectiveSectionLabel
-      ? `ethiKos · ${effectiveSectionLabel} · ${title}`
-      : `ethiKos · ${title}`);
+      ? `EthiKos · ${effectiveSectionLabel} · ${title}`
+      : `EthiKos · ${title}`);
 
   // Keep browser/tab title in sync with the shell meta title
   usePageTitle(finalMetaTitle);
@@ -126,19 +118,9 @@ function EthikosPageShell({
             direction={isMobile ? 'vertical' : 'horizontal'}
             align={isMobile ? 'start' : 'center'}
             size={isMobile ? 12 : 16}
-            style={{ width: '100%', justifyContent: 'space-between', gap: 16 }}
+            style={{ width: '100%', justifyContent: 'space-between' }}
           >
             <Space direction="vertical" size={4} style={{ flex: 1, minWidth: 0 }}>
-              {/* Module badge + optional section label */}
-              <Space align="center" size={8} wrap>
-                <Tag color="purple">ethiKos</Tag>
-                {effectiveSectionLabel && (
-                  <Text type="secondary" style={{ fontSize: 12 }}>
-                    {effectiveSectionLabel}
-                  </Text>
-                )}
-              </Space>
-
               <Title
                 level={2}
                 style={{
