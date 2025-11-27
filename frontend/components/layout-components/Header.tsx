@@ -21,6 +21,26 @@ import type { Route } from '@/components/layout-components/Menu'
 
 const { Header } = Layout
 
+// --- Backend URL helpers (Django + Allauth) ------------------------------
+
+const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? ''
+
+// If NEXT_PUBLIC_API_BASE is e.g. "http://localhost:8000/api",
+// this yields "http://localhost:8000"
+const BACKEND_ROOT =
+  RAW_API_BASE.replace(/\/+$/, '').replace(/\/api$/, '') || ''
+
+function backendUrl(path: string): string {
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+
+  // Fallback: same origin as the frontend (e.g. when Django and Next are
+  // served on the same host behind a reverse proxy)
+  if (!BACKEND_ROOT) {
+    return normalizedPath
+  }
+  return `${BACKEND_ROOT}${normalizedPath}`
+}
+
 /* -------- styled -------- */
 const NavBar = styled.div`
   display: flex;
@@ -187,12 +207,13 @@ export default function HeaderBar({
 
       if (key === 'logout') {
         // Delegate logout to backend (Allauth) with a full reload
-        window.location.href = '/accounts/logout/'
+        window.location.href = backendUrl('/accounts/logout/')
         return
       }
 
       if (key === 'signin') {
-        window.location.href = '/accounts/login/'
+        // Login page served by Django + Allauth
+        window.location.href = backendUrl('/accounts/login/')
       }
     },
     [router],

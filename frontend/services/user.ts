@@ -125,14 +125,13 @@ export async function uploadUserAvatar(file: File): Promise<CurrentUser> {
   const formData = new FormData();
   formData.append('avatar', file);
 
-  const updated = await post<FormData, CurrentUser>(
+  // Note the flipped generic parameters: <CurrentUser, FormData>
+  const updated = await post<CurrentUser, FormData>(
     'users/me/avatar/',
     formData,
-    {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    },
+    // Let axios/browser set the proper multipart boundary automatically.
+    // You can add headers here if needed, but usually you should NOT
+    // set Content-Type manually for FormData.
   );
 
   return updated;

@@ -1,0 +1,184 @@
+{% extends "allauth/layouts/entrance.html" %}
+{% load i18n account socialaccount crispy_forms_tags %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock head_title %}
+
+{% block css %}
+  {{ block.super }}
+  <style>
+    /* Arrière‑plan type “app” sombre + dégradés */
+    body.bg-light {
+      background:
+        radial-gradient(120% 150% at 0% 0%, #f97316 0, rgba(249,115,22,0) 40%),
+        radial-gradient(120% 150% at 100% 100%, #0ea5e9 0, rgba(14,165,233,0) 40%),
+        #020617;
+    }
+
+    .kx-auth-card.card {
+      border-radius: 1rem;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      box-shadow: 0 22px 45px rgba(15, 23, 42, 0.6);
+      background: rgba(15, 23, 42, 0.94);
+      color: #e5e7eb;
+    }
+
+    .kx-auth-title {
+      font-weight: 600;
+    }
+
+    .kx-auth-subtitle {
+      color: #9ca3af;
+    }
+
+    .kx-auth-logo-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #f97316, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #020617;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .kx-auth-link {
+      color: #38bdf8;
+    }
+
+    .kx-auth-link:hover {
+      color: #0ea5e9;
+      text-decoration: underline;
+    }
+
+    .kx-auth-divider-line {
+      height: 1px;
+      background: linear-gradient(to right,
+        transparent,
+        rgba(148, 163, 184, 0.7),
+        transparent
+      );
+    }
+
+    .kx-auth-divider-label {
+      color: #9ca3af;
+    }
+
+    .kx-auth-muted {
+      color: #9ca3af;
+    }
+
+    .kx-auth-form .form-control {
+      background-color: #020617;
+      border-color: rgba(148, 163, 184, 0.6);
+      color: #e5e7eb;
+    }
+
+    .kx-auth-form .form-control:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 .25rem rgba(37, 99, 235, .35);
+    }
+
+    .btn-primary.kx-auth-submit {
+      border-radius: 999px;
+      font-weight: 600;
+      box-shadow: 0 14px 30px rgba(37, 99, 235, 0.7);
+    }
+
+    /* Boutons providers (Google, etc.) */
+    .socialaccount_providers {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    .socialaccount_providers li {
+      margin-bottom: 0.5rem;
+    }
+
+    .socialaccount_providers .btn {
+      width: 100%;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      border-color: rgba(148, 163, 184, 0.7);
+      color: #e5e7eb;
+      background-color: rgba(15, 23, 42, 0.95);
+    }
+
+    .socialaccount_providers .btn:hover {
+      background-color: rgba(30, 64, 175, 0.95);
+      border-color: #60a5fa;
+    }
+  </style>
+{% endblock css %}
+
+{% block content %}
+  <div class="kx-auth-card card">
+    <div class="card-body p-4 p-md-5 kx-auth-form">
+      <div class="d-flex align-items-center mb-4">
+        <div class="kx-auth-logo-circle me-3">
+          K
+        </div>
+        <div>
+          <h1 class="kx-auth-title h4 mb-1">
+            {% trans "Welcome back" %}
+          </h1>
+          <p class="kx-auth-subtitle small mb-0">
+            {% trans "Sign in to continue to Konnaxion." %}
+          </p>
+        </div>
+      </div>
+
+      {# Boutons Google & co si un provider social est configuré #}
+      {% get_providers as socialaccount_providers %}
+      {% if socialaccount_providers %}
+        <div class="mb-3">
+          {% include "socialaccount/snippets/provider_list.html" with process="login" %}
+        </div>
+
+        <div class="d-flex align-items-center my-3">
+          <div class="flex-grow-1 kx-auth-divider-line"></div>
+          <span class="kx-auth-divider-label small px-2">
+            {% trans "or continue with e‑mail" %}
+          </span>
+          <div class="flex-grow-1 kx-auth-divider-line"></div>
+        </div>
+      {% endif %}
+
+      <form method="post" action="{% url 'account_login' %}">
+        {% csrf_token %}
+        {% if redirect_field_value %}
+          <input type="hidden"
+                 name="{{ redirect_field_name }}"
+                 value="{{ redirect_field_value }}">
+        {% endif %}
+
+        {{ form|crispy }}
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <a href="{% url 'account_reset_password' %}"
+             class="small kx-auth-link text-decoration-none">
+            {% trans "Forgot Password?" %}
+          </a>
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary kx-auth-submit w-100 mt-3">
+          {% trans "Sign In" %}
+        </button>
+      </form>
+
+      <p class="text-center mt-3 mb-0 small kx-auth-muted">
+        {% trans "Don't have an account yet?" %}
+        <a href="{% url 'account_signup' %}" class="kx-auth-link">
+          {% trans "Sign Up" %}
+        </a>
+      </p>
+    </div>
+  </div>
+{% endblock content %}
