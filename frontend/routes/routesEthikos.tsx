@@ -3,8 +3,13 @@
 import React from 'react'
 import { DashboardOutlined } from '@ant-design/icons'
 
-// Type local minimal pour éviter toute dépendance
-type Route = { path?: string; name: string; icon?: React.ReactNode; views?: Route[] }
+// Minimal local type to avoid external coupling
+type Route = {
+  path?: string
+  name: string
+  icon?: React.ReactNode
+  views?: Route[]
+}
 
 const directDashboard: Route = {
   path: '/ethikos/insights',
@@ -54,7 +59,8 @@ const deliberateGroup: Route = {
   views: [
     { path: '/ethikos/deliberate/elite', name: 'Elite' },
     { path: '/ethikos/deliberate/guidelines', name: 'Guidelines' },
-    { path: '/ethikos/deliberate/[topic]', name: 'Topic' },
+    // Important: no dynamic placeholder like "/ethikos/deliberate/[topic]"
+    // so that Next.js <Link> never receives a dynamic pattern as href.
   ],
 }
 

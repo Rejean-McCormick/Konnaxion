@@ -144,7 +144,7 @@ function toNumberId(id: string | number): number {
 }
 
 /**
- * Build a small, human‑friendly event timeline from topic + activity.
+ * Build a small, human-friendly event timeline from topic + activity.
  */
 function buildTimeline(
   topic: EthikosTopicApi,
@@ -256,14 +256,13 @@ async function loadConsultationImpact(
 ): Promise<ConsultationImpactResult> {
   const topicId = toNumberId(consultationId);
 
+  // Build query string once for stance/argument endpoints
+  const topicQuery = new URLSearchParams({ topic: String(topicId) }).toString();
+
   const [topic, stancesRaw, argsRaw] = await Promise.all([
     api.get<EthikosTopicApi>(`ethikos/topics/${topicId}/`),
-    api.get<EthikosStanceApi[]>('ethikos/stances/', {
-      params: { topic: topicId },
-    }),
-    api.get<EthikosArgumentApi[]>('ethikos/arguments/', {
-      params: { topic: topicId },
-    }),
+    api.get<EthikosStanceApi[]>(`ethikos/stances/?${topicQuery}`),
+    api.get<EthikosArgumentApi[]>(`ethikos/arguments/?${topicQuery}`),
   ]);
 
   const stances = stancesRaw.filter((s) => s.topic === topicId);

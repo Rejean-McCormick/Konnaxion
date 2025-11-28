@@ -1,5 +1,3 @@
-# konnaxion/kollective_intelligence/api_views.py
-
 from rest_framework import permissions, viewsets
 
 from .models import Vote, VoteResult
@@ -14,7 +12,7 @@ __all__ = [
 
 class VoteViewSet(viewsets.ModelViewSet):
     """
-    Smart‑Vote endpoint for raw + weighted ballots.
+    Smart-Vote endpoint for raw + weighted ballots.
 
     Mounted via `config/api_router.py` as:
 
@@ -40,7 +38,8 @@ class VoteViewSet(viewsets.ModelViewSet):
 
     queryset = Vote.objects.select_related("user").all()
     serializer_class = VoteSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # Allow unauthenticated GET for analytics; keep auth for writes
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
         """
@@ -83,7 +82,7 @@ class VoteViewSet(viewsets.ModelViewSet):
 
 class VoteResultViewSet(viewsets.ReadOnlyModelViewSet):
     """
-    Read‑only access to aggregated vote results, if you choose
+    Read-only access to aggregated vote results, if you choose
     to expose them via the same app.
 
     Typical usage (future/optional):

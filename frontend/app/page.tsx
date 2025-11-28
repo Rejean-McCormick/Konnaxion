@@ -1,7 +1,8 @@
 // app/page.tsx
 import { cookies } from 'next/headers';
+import type { Metadata } from 'next';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Home',
   description: 'Konnaxion entry point – choose your space or sign in.',
 };
@@ -57,8 +58,9 @@ const BACKEND_SIGNUP_URL = BACKEND_ROOT
   ? `${BACKEND_ROOT}/accounts/signup/`
   : '/accounts/signup/';
 
-export default function Page() {
-  const store = cookies();
+export default async function Page() {
+  // In newer Next/TypeScript typings, cookies() is async and returns a Promise<ReadonlyRequestCookies>
+  const store = await cookies();
   const rawPref = store.get(HOME_SUITE_COOKIE)?.value ?? null;
 
   const suite = normalizeSuite(rawPref);

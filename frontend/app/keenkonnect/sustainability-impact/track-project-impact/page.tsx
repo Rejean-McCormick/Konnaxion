@@ -67,15 +67,22 @@ function Content(): JSX.Element {
     const load = async () => {
       setLoading(true)
       try {
-        const res = await api.get<ImpactItem[]>('/impact/sustainability/track', {
-          params: {
-            fromDate: filters.from,
-            toDate: filters.to,
-            team: filters.team,
-          },
+        const params = new URLSearchParams({
+          fromDate: filters.from,
+          toDate: filters.to,
         })
+
+        if (filters.team) {
+          params.set('team', filters.team)
+        }
+
+        const res = await api.get<ImpactItem[]>(
+          `/impact/sustainability/track?${params.toString()}`,
+        )
+
         setImpactData(res ?? [])
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error('Track impact load error:', err)
       } finally {
         setLoading(false)
@@ -102,7 +109,6 @@ function Content(): JSX.Element {
   const topCategory = useMemo(() => {
     if (!impactData || impactData.length === 0) return undefined
 
-    // ImpactItem is guaranteed by the length check; use non-null assertion on index 0
     return impactData.reduce<ImpactItem>(
       (max, item) => (item.value > max.value ? item : max),
       impactData[0]!,
@@ -129,7 +135,7 @@ function Content(): JSX.Element {
         Track Project Impact
       </h1>
 
-      {/* Filtres principaux */}
+      {/* Main filters */}
       <Card style={{ marginBottom: 24 }}>
         <Row gutter={24}>
           <Col xs={24} md={12}>
@@ -176,7 +182,7 @@ function Content(): JSX.Element {
         </Card>
       ) : (
         <Tabs defaultActiveKey="overview">
-          {/* === Onglet OVERVIEW : pie chart + Descriptions === */}
+          {/* OVERVIEW tab: pie chart + summary */}
           <TabPane tab="Overview" key="overview">
             <Row gutter={[24, 24]}>
               <Col xs={24} md={14}>
@@ -222,7 +228,7 @@ function Content(): JSX.Element {
             </Row>
           </TabPane>
 
-          {/* === Onglet TIMELINE : visualisation séquentielle === */}
+          {/* TIMELINE tab */}
           <TabPane tab="Timeline" key="timeline">
             <Card title="Impact Timeline">
               <Timeline>
@@ -238,7 +244,7 @@ function Content(): JSX.Element {
             </Card>
           </TabPane>
 
-          {/* === Onglet BREAKDOWN : bar chart + détails complémentaires === */}
+          {/* BREAKDOWN tab: bar chart + details */}
           <TabPane tab="Category Breakdown" key="breakdown">
             <Row gutter={[24, 24]}>
               <Col xs={24} md={16}>

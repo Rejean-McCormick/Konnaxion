@@ -1,5 +1,3 @@
-# backend/konnaxion/ethikos/api_views.py
-
 from typing import Optional
 
 from django.shortcuts import get_object_or_404
@@ -117,7 +115,8 @@ class StanceViewSet(viewsets.ModelViewSet):
     """
     queryset = EthikosStance.objects.select_related("topic", "user")
     serializer_class = EthikosStanceSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwnerOrReadOnly]
+    # Allow read for all; writes restricted to owner/authenticated
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
     def get_queryset(self):
         qs = super().get_queryset()

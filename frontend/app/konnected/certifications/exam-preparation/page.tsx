@@ -19,6 +19,7 @@ import {
   Skeleton,
   Space,
 } from 'antd';
+import type { TabsProps } from 'antd';
 import {
   ArrowRightOutlined,
   CalendarOutlined,
@@ -185,7 +186,7 @@ export default function ExamPreparationPage(): JSX.Element {
   };
 
   const handleStartPracticeExam = () => {
-    // Future: plug into automated_evaluation “practice mode” endpoint / route
+    // Future: plug into automated_evaluation "practice mode" endpoint / route
     router.push('/konnected/certifications/exam-dashboard-results');
   };
 
@@ -343,7 +344,7 @@ export default function ExamPreparationPage(): JSX.Element {
     );
   };
 
-  const mainTabsItems = [
+  const mainTabsItems: TabsProps['items'] = [
     {
       key: 'plan',
       label: 'Study plan & progress',
@@ -379,7 +380,7 @@ export default function ExamPreparationPage(): JSX.Element {
                 />
                 <Step
                   title="Attempt a practice evaluation"
-                  description={`Use automated_evaluation in “practice mode” to benchmark against ${passPercent}%.`}
+                  description={`Use automated_evaluation in "practice mode" to benchmark against ${passPercent}%.`}
                 />
                 <Step
                   title="Review feedback & focus areas"

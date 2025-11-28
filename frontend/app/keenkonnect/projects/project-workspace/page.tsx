@@ -126,7 +126,7 @@ function Content(): JSX.Element {
     void fetchWorkspace();
   }, [projectId]);
 
-  // Update document title (App Router replacement for next/head here)
+  // Update document title
   useEffect(() => {
     if (workspace?.name) {
       document.title = `KeenKonnect – ${workspace.name}`;
@@ -215,7 +215,7 @@ function Content(): JSX.Element {
     setDrawerOpen(true);
   };
 
-  // New Tabs API (items) instead of deprecated Tabs.TabPane
+  // Tabs items (new API)
   const tabsItems: TabsProps['items'] = [
     {
       key: 'overview',

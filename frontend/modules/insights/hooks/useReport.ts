@@ -19,7 +19,26 @@ export function useReport<E extends keyof EndpointMap>(
   return useQuery<EndpointMap[E]>({
     queryKey: [endpoint, params],
     staleTime: 300_000,
-    queryFn: async () =>
-      api.get<EndpointMap[E]>(`/reports/${endpoint}`, { params }),
+    queryFn: async () => {
+      // Manually build query string because api.get uses fetch(RequestInit), not axios-style params
+      let query = "";
+
+      if (params && Object.keys(params).length > 0) {
+        const searchParams = new URLSearchParams();
+
+        Object.entries(params).forEach(([key, value]) => {
+          if (value === undefined || value === null) return;
+          // Flatten basic scalar values to strings; callers should pre-serialise complex types
+          searchParams.set(key, String(value));
+        });
+
+        const qs = searchParams.toString();
+        if (qs) {
+          query = `?${qs}`;
+        }
+      }
+
+      return api.get<EndpointMap[E]>(`/reports/${endpoint}${query}`);
+    },
   });
 }

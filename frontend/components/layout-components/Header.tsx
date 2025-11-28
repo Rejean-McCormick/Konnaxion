@@ -218,10 +218,8 @@ export default function HeaderBar({
   const handleAccountMenuClick: MenuProps['onClick'] = useCallback(
     ({ key }: AccountMenuClickEvent) => {
       if (key === 'profile') {
-        router.push({
-          pathname: '/reputation',
-          query: { sidebar: 'ethikos' },
-        })
+        // App Router's useRouter().push expects a string or URL, not an object
+        router.push('/reputation?sidebar=ethikos')
         return
       }
 

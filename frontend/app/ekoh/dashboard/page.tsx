@@ -1,13 +1,12 @@
-'use client'
+'use client';
 
 // app/ekoh/dashboard/page.tsx
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { Card, Statistic, Row, Col, Tabs } from 'antd';
+import type { TabsProps } from 'antd';
 import LineChart from '@/components/dashboard-components/LineChart';
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
-
-const { TabPane } = Tabs;
 
 type TrendPoint = { time: string; score: number };
 
@@ -56,6 +55,38 @@ const EkohDashboard = (): JSX.Element => {
     return () => clearInterval(interval);
   }, []);
 
+  const tabItems: TabsProps['items'] = [
+    {
+      key: 'overview',
+      label: 'Overview',
+      children: (
+        <p>
+          This section provides an overall summary of your reputation, voting influence, expertise,
+          and badges.
+        </p>
+      ),
+    },
+    {
+      key: 'votingInfluence',
+      label: 'Voting Influence',
+      children: (
+        <p>
+          Detailed view on your Smart Vote weight and how it affects overall decisions.
+        </p>
+      ),
+    },
+    {
+      key: 'expertise',
+      label: 'Expertise',
+      children: <p>Breakdown of your expertise areas and performance therein.</p>,
+    },
+    {
+      key: 'badges',
+      label: 'Badges',
+      children: <p>Review your earned badges and achievements in detail.</p>,
+    },
+  ];
+
   return (
     <>
       <Head>
@@ -100,25 +131,9 @@ const EkohDashboard = (): JSX.Element => {
           />
         </Card>
 
-        {/* Detailed views tabs */}
+        {/* Detailed views tabs (Ant Design `items` API) */}
         <Card className="mb-6">
-          <Tabs defaultActiveKey="overview">
-            <TabPane tab="Overview" key="overview">
-              <p>
-                This section provides an overall summary of your reputation, voting influence,
-                expertise, and badges.
-              </p>
-            </TabPane>
-            <TabPane tab="Voting Influence" key="votingInfluence">
-              <p>Detailed view on your Smart Vote weight and how it affects overall decisions.</p>
-            </TabPane>
-            <TabPane tab="Expertise" key="expertise">
-              <p>Breakdown of your expertise areas and performance therein.</p>
-            </TabPane>
-            <TabPane tab="Badges" key="badges">
-              <p>Review your earned badges and achievements in detail.</p>
-            </TabPane>
-          </Tabs>
+          <Tabs defaultActiveKey="overview" items={tabItems} />
         </Card>
 
         {/* Achievements & Recent Contributions */}
