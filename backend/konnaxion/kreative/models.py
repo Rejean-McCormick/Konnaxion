@@ -1,6 +1,42 @@
+import os
+
 from django.conf import settings
 from django.db import models
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+
+
+def kreative_artwork_upload_to(instance, filename: str) -> str:
+    """
+    Storage path for KreativeArtwork media files.
+
+    Pattern:
+        kreative/artworks/<artist_id>/<artwork_id-or-new>/<slugified-filename><ext>
+    """
+    artist = getattr(instance, "artist", None)
+    artist_id = getattr(artist, "id", "anon")
+
+    name_part, ext = os.path.splitext(filename)
+    safe_name = slugify(name_part) or "artwork"
+
+    return f"kreative/artworks/{artist_id}/{instance.pk or 'new'}/{safe_name}{ext}"
+
+
+def tradition_media_upload_to(instance, filename: str) -> str:
+    """
+    Storage path for TraditionEntry media files.
+
+    Pattern:
+        kreative/traditions/<region-or-id>/<slugified-filename><ext>
+    """
+    region = getattr(instance, "region", "") or f"id-{instance.pk or 'new'}"
+    safe_region = slugify(region)
+
+    name_part, ext = os.path.splitext(filename)
+    safe_name = slugify(name_part) or "media"
+
+    return f"kreative/traditions/{safe_region}/{safe_name}{ext}"
+
 
 # -- Simple reusable tag --
 class Tag(models.Model):
@@ -15,6 +51,7 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
 
 # -- Artwork and curation --
 class KreativeArtwork(models.Model):
@@ -34,7 +71,7 @@ class KreativeArtwork(models.Model):
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    media_file = models.FileField(upload_to="kreative/artworks/")
+    media_file = models.FileField(upload_to=kreative_artwork_upload_to)
     media_type = models.CharField(
         max_length=10, choices=MediaType.choices, default=MediaType.IMAGE
     )
@@ -52,6 +89,7 @@ class KreativeArtwork(models.Model):
     def __str__(self):
         return self.title
 
+
 class ArtworkTag(models.Model):
     """
     Through-table for artwork <-> tag, for ManyToMany.
@@ -61,6 +99,7 @@ class ArtworkTag(models.Model):
 
     class Meta:
         unique_together = ("artwork", "tag")
+
 
 # -- Gallery and ordering --
 class Gallery(models.Model):
@@ -89,6 +128,7 @@ class Gallery(models.Model):
     def __str__(self):
         return self.title
 
+
 class GalleryArtwork(models.Model):
     """
     Through-table giving order inside a gallery.
@@ -100,6 +140,7 @@ class GalleryArtwork(models.Model):
     class Meta:
         unique_together = ("gallery", "artwork")
         ordering = ["order"]
+
 
 # -- Co-creation room --
 class CollabSession(models.Model):
@@ -134,6 +175,7 @@ class CollabSession(models.Model):
         verbose_name_plural = _("Collaboration Sessions")
         ordering = ["-started_at"]
 
+
 # -- Cultural heritage/tradition entry --
 class TraditionEntry(models.Model):
     """
@@ -144,7 +186,7 @@ class TraditionEntry(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     region = models.CharField(max_length=REGION_MAX_LENGTH)  # could be ref-table later
-    media_file = models.FileField(upload_to="kreative/traditions/")
+    media_file = models.FileField(upload_to=tradition_media_upload_to)
     submitted_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -170,6 +212,7 @@ class TraditionEntry(models.Model):
     def __str__(self):
         return self.title
 
+
 # -- NEW: VirtualExhibition, DigitalArchive, ArchiveDocument, AICatalogueEntry, CulturalPartner --
 class VirtualExhibition(models.Model):
     """
@@ -185,6 +228,7 @@ class VirtualExhibition(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class DigitalArchive(models.Model):
     """
@@ -202,6 +246,7 @@ class DigitalArchive(models.Model):
     def __str__(self):
         return self.title
 
+
 class ArchiveDocument(models.Model):
     """
     Documents linked to archives (e.g., image, PDF, scan).
@@ -215,6 +260,7 @@ class ArchiveDocument(models.Model):
         verbose_name = _("Archive Document")
         verbose_name_plural = _("Archive Documents")
 
+
 class AICatalogueEntry(models.Model):
     """
     AI-generated tags/classification for an archive document.
@@ -226,6 +272,7 @@ class AICatalogueEntry(models.Model):
     class Meta:
         verbose_name = _("AI Catalogue Entry")
         verbose_name_plural = _("AI Catalogue Entries")
+
 
 class CulturalPartner(models.Model):
     """

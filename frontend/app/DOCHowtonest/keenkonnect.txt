@@ -1,10 +1,20 @@
-Voici un modèle central que tu peux réutiliser comme **référence de layout KeenKonnect** et donner tel quel à une autre IA quand tu lui demandes de refactor des pages.
-
-Je vais d’abord te donner **le composant central**, puis **la structure de page de référence**, puis **les règles pour corriger les autres pages**.
+Voici une version mise à jour du doc, alignée avec **Doc v14** et **l’état réel du code** (un shell par module, KeenKonnect compris).
 
 ---
 
-## 1. Composant central : `<KeenPage>` (à créer une fois)
+Voici un modèle central que tu peux réutiliser comme **référence de layout KeenKonnect** et donner tel quel à une autre IA quand tu lui demandes de refactor des pages.
+
+Je vais d’abord te donner **le composant central** (déjà implémenté), puis **la structure de page de référence**, puis **les règles pour corriger les autres pages**.
+
+> 💡 Important :
+>
+> * **NE PAS** recréer un deuxième composant dans `components/keenkonnect/KeenPage.tsx`.
+> * Le wrapper KeenKonnect existe déjà sous forme de shell de module :
+>   `app/keenkonnect/KeenPageShell.tsx` et c’est lui qu’il faut utiliser.
+
+---
+
+## 1. Composant central : `<KeenPage>` (déjà implémenté comme shell KeenKonnect)
 
 > Objectif : toutes les pages KeenKonnect passent par ce wrapper, pour aligner :
 >
@@ -15,7 +25,8 @@ Je vais d’abord te donner **le composant central**, puis **la structure de pag
 > * toolbar à droite
 > * pas de breadcrumb local (on laisse le layout global le gérer)
 
-**Fichier suggéré** : `components/keenkonnect/KeenPage.tsx`
+**Fichier réel** : `app/keenkonnect/KeenPageShell.tsx`
+**Usage** : on importe son export par défaut sous le nom `KeenPage` dans les pages KeenKonnect.
 
 ```tsx
 'use client';
@@ -89,19 +100,23 @@ export default function KeenPage({
 
 **Règles associées :**
 
-* ✅ **Toujours** utiliser `<KeenPage>` pour les pages KeenKonnect (sauf cas ultra-spéciaux).
+* ✅ **Toujours** utiliser ce `KeenPage` (importé depuis `app/keenkonnect/KeenPageShell`) pour les pages KeenKonnect (sauf cas ultra-spéciaux).
 * ✅ Titre **toujours** en `text-2xl font-bold`, pas de `Typography.Title level={1}` ou `level={2}` différents selon les pages.
 * ✅ Padding global **toujours** `className="container mx-auto p-5"`.
 * ✅ Toolbar (boutons à droite du titre) passe par la prop `toolbar`.
-* 🚫 **Pas** de breadcrumb local dans les pages (le layout du haut s’en charge).
+* 🚫 **Pas** de breadcrumb local dans les pages (le layout global s’en charge).
 * 🚫 **Pas** de `margin-top` énorme ou de `padding` custom sur le container : tout doit se faire à l’intérieur du contenu via des `Card`, `Row`, etc.
+
+> 🔎 Contexte Doc v14 :
+> KeenKonnect a son shell de module (`KeenPageShell`), comme Ekoh (`EkohPageShell`), Ethikos (`EthikosPageShell`), Konnected, Kreative, etc.
+> Ce doc décrit **le shell KeenKonnect** déjà présent, il ne faut pas créer un second wrapper parallèle.
 
 ---
 
 ## 2. Page de référence (modèle à recopier)
 
 Ta page `search-filter-documents` est globalement le bon « look ».
-Voici la version **référencée** qui l’utilise via `<KeenPage>` :
+Voici la version **référencée** qui l’utilise via `KeenPage` venant du shell existant :
 
 ```tsx
 'use client';
@@ -116,7 +131,7 @@ import {
   ProFormSelect,
   ProFormDateRangePicker,
 } from '@ant-design/pro-components';
-import KeenPage from '@/components/keenkonnect/KeenPage';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 // ... types + données (DocumentResource, sampleDocuments, etc.)
 
@@ -165,7 +180,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
 
 ### 3.1. Ce qui se corrige **de manière centrale**
 
-En créant / imposant `<KeenPage>` tu centralises :
+En imposant ce shell KeenKonnect (`KeenPage` depuis `KeenPageShell`), tu centralises :
 
 1. **Taille & style du titre**
 
@@ -187,7 +202,7 @@ En créant / imposant `<KeenPage>` tu centralises :
    * **Jamais** en local dans la page.
    * Si un jour on veut ajouter un breadcrumb global, on le fait dans le layout `app/keenkonnect/layout.tsx` uniquement.
 
-Résultat : 80% des différences visuelles disparaissent juste en passant par `<KeenPage>`.
+Résultat : 80% des différences visuelles disparaissent juste en passant par ce shell.
 
 ---
 
@@ -227,10 +242,10 @@ ou
 </PageContainer>
 ```
 
-**Après (modèle unique) :**
+**Après (modèle unique, basé sur le shell existant) :**
 
 ```tsx
-import KeenPage from '@/components/keenkonnect/KeenPage';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 export default function SomePage() {
   return (
@@ -249,10 +264,10 @@ export default function SomePage() {
 
 > 🔁 **Important** :
 >
-> * Supprimer le `h1` local, `Typography.Title` principal, et les gros marges hautes — c’est géré par KeenPage.
+> * Supprimer le `h1` local, `Typography.Title` principal, et les gros marges hautes — c’est géré par `KeenPage`.
 > * Si la page utilisait `PageContainer`, garder le contenu mais le mettre dans des `Card` ou `ProCard` à l’intérieur de `<KeenPage>`.
 
-#### 2. Supprimer les breadcumbs locaux
+#### 2. Supprimer les breadcrumbs locaux
 
 Tout ce qui ressemble à :
 
@@ -329,7 +344,7 @@ Ex : `create-new-project`, `submit-impact-reports`, `match-preferences`, etc.
 
 * Pas de marge/padding custom autour du `Card`.
 * StepForm toujours dans un `Card` (ou deux si besoin).
-* Titre principal géré par `<KeenPage>`.
+* Titre principal géré par `KeenPage`.
 
 ---
 
@@ -385,13 +400,13 @@ Même base, mais tu joues avec `Row`/`Col` + `Card`/`ProCard` :
 
 ---
 
-## 5. Réponse directe à tes questions
+## 5. Réponse directe à tes questions (version à jour)
 
 > **“what fix is needed for each page? is this a central fix, or a fix per page?”**
 
 * **Central** :
 
-  * Créer `<KeenPage>` et l’adopter comme **obligatoire** pour toutes les pages KeenKonnect.
+  * Utiliser le shell existant `KeenPage` (depuis `app/keenkonnect/KeenPageShell.tsx`) comme **obligatoire** pour toutes les pages KeenKonnect.
   * Imposer les règles :
 
     * `container mx-auto p-5`
@@ -402,7 +417,7 @@ Même base, mais tu joues avec `Row`/`Col` + `Card`/`ProCard` :
 
 * **Par page (mais mécanique)** :
 
-  * Remplacer le wrapper racine par `<KeenPage>`.
+  * Remplacer le wrapper racine par `<KeenPage>` (depuis `KeenPageShell`).
   * Supprimer les `h1` / `Title` custom.
   * Supprimer les breadcrumbs locaux.
   * Remettre les contenus dans des `Card` / `Row` / `Col` avec marges cohérentes (`mb-4`, etc.).
@@ -410,13 +425,11 @@ Même base, mais tu joues avec `Row`/`Col` + `Card`/`ProCard` :
 
 > **“which page are ok (like search-filter-documents)”**
 
-À partir de ce qu’on a vu ensemble :
-
 * ✅ `knowledge/search-filter-documents`
-  → déjà très proche du modèle. Il suffit juste éventuellement de le faire passer par `<KeenPage>` mais visuellement tu es déjà dans le bon style.
+  → déjà très proche du modèle. Il suffit juste de s’assurer qu’elle passe par `KeenPage` depuis `KeenPageShell`, mais visuellement tu es déjà dans le bon style.
 
-* ⚠️ Les autres pages qu’on a modifiées (projects, workspaces, sustainability, etc.)
-  → doivent être **alignées** sur ce modèle en les enveloppant dans `<KeenPage>` et en supprimant :
+* ⚠️ Les autres pages (projects, workspaces, sustainability, etc.)
+  → doivent être **alignées** sur ce modèle en les enveloppant dans `KeenPage` (shell), et en supprimant :
 
   * leurs wrappers custom (`div` avec padding/margin),
   * leurs gros `Title` Ant Design,
@@ -425,10 +438,9 @@ Même base, mais tu joues avec `Row`/`Col` + `Card`/`ProCard` :
 
 ---
 
-### TL;DR à copier dans ton repo / Notion
+### TL;DR à copier dans ton repo / Notion (version corrigée)
 
-* Créer `components/keenkonnect/KeenPage.tsx` (code ci-dessus).
-* Toute nouvelle page KeenKonnect = **obligatoirement** basée sur `<KeenPage>`.
-* Toute page existante = refactor pour utiliser `<KeenPage>` et supprimer les layouts locaux.
-
-Si tu veux, ensuite, tu peux me coller le code d’une page “moche” et on la réécrit ensemble 100% alignée sur ce template.
+* Ne **pas** créer `components/keenkonnect/KeenPage.tsx`.
+* Utiliser le shell existant : `app/keenkonnect/KeenPageShell.tsx` qui exporte `KeenPage`.
+* Toute nouvelle page KeenKonnect = **obligatoirement** basée sur ce `KeenPage`.
+* Toute page existante = refactor pour utiliser `KeenPage` (shell) et supprimer les layouts locaux.

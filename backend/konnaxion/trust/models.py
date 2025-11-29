@@ -1,15 +1,39 @@
 # konnaxion/trust/models.py
 from __future__ import annotations
 
+import os
+
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 __all__ = ["Credential"]
 
 
+def credential_upload_to(instance, filename: str) -> str:
+    """
+    Storage path for user-submitted credentials.
+
+    Pattern (UTC date):
+        trust/credentials/<year>/<month>/user-<user_id>/<slugified-filename><ext>
+    """
+    from django.utils.text import slugify  # local import to avoid unused at module level
+
+    now = timezone.now()
+    user_id = getattr(getattr(instance, "user", None), "id", "anon")
+
+    name, ext = os.path.splitext(filename)
+    safe_name = slugify(name) or "credential"
+
+    return (
+        f"trust/credentials/{now.year:04d}/{now.month:02d}/"
+        f"user-{user_id}/{safe_name}{ext}"
+    )
+
+
 class Credential(models.Model):
     """
-    Real‑world credential uploaded by a user for the Trust module.
+    Real-world credential uploaded by a user for the Trust module.
 
     This model backs:
       - The Trust credentials UI (Ethikos > Trust > Credentials).
@@ -49,7 +73,7 @@ class Credential(models.Model):
 
     # Uploaded document (PDF / JPG / PNG, etc.)
     file = models.FileField(
-        upload_to="trust/credentials/%Y/%m/%d",
+        upload_to=credential_upload_to,
         blank=True,
         null=True,
         help_text="Binary document attached to this credential.",
@@ -64,7 +88,7 @@ class Credential(models.Model):
     )
     notes = models.TextField(
         blank=True,
-        help_text="Optional reviewer notes shown read‑only in the UI.",
+        help_text="Optional reviewer notes shown read-only in the UI.",
     )
 
     # Timestamps
