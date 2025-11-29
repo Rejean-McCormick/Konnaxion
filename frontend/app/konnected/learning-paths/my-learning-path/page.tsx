@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/learning-paths/my-learning-path/page.tsx
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';

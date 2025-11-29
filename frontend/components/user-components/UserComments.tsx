@@ -1,3 +1,4 @@
+// FILE: frontend/components/user-components/UserComments.tsx
 'use client';
 
 /**

@@ -1,9 +1,10 @@
+// FILE: frontend/app/keenkonnect/ai-team-matching/my-matches/page.tsx
 'use client';
 
 import React from 'react';
-import Head from 'next/head';
 import { ProTable, ProCard, type ProColumns } from '@ant-design/pro-components';
 import { Badge, Button, Drawer, Progress, Space, Tag, Typography } from 'antd';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -33,7 +34,7 @@ const teamMatches: MatchRow[] = [
     name: 'Alpha Team',
     matchScore: 92,
     commonInterests: 'UI/UX, Backend, DevOps',
-    roleOrNeed: 'Recherche un·e full‑stack pour stabiliser le MVP.',
+    roleOrNeed: 'Recherche un·e full-stack pour stabiliser le MVP.',
     location: 'Remote / Europe-friendly',
     availability: '3–5 h / semaine',
     membersCount: 4,
@@ -73,7 +74,7 @@ const partnerMatches: MatchRow[] = [
     name: 'Jane Doe',
     matchScore: 88,
     commonInterests: 'Product Management, Design Thinking, Strategy',
-    roleOrNeed: 'Veut co‑lead un produit AI early‑stage.',
+    roleOrNeed: 'Veut co-lead un produit AI early-stage.',
     location: 'Montréal / Hybrid',
     availability: 'Soirs de semaine',
     new: true,
@@ -207,18 +208,12 @@ export default function MyMatchesPage(): JSX.Element {
   ];
 
   return (
-    <>
-      <Head>
-        <title>KeenKonnect – Mes correspondances</title>
-      </Head>
-
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Mes correspondances</h1>
-        <p className="text-gray-500 mb-6">
-          Résumé de tes matches générés par l’AI Team Matching&nbsp;: équipes, partenaires
-          potentiels et niveau de compatibilité.
-        </p>
-
+    <KeenPage
+      title="Mes correspondances"
+      description="Résumé de tes matches générés par l’AI Team Matching : équipes, partenaires potentiels et niveau de compatibilité."
+      metaTitle="KeenKonnect · Mes correspondances"
+    >
+      <>
         <Space direction="vertical" size="large" style={{ width: '100%' }}>
           {/* Bandeau de KPIs / résumé */}
           <ProCard ghost gutter={[16, 16]} wrap>
@@ -347,9 +342,7 @@ export default function MyMatchesPage(): JSX.Element {
 
               {selectedMatch.availability && (
                 <Paragraph>
-                  <Text strong>Disponibilité :</Text>{' '}
-                  {selectedMatch.availability}
-                </Paragraph>
+                  <Text strong>Disponibilité :</Text> {selectedMatch.availability}</Paragraph>
               )}
 
               {selectedMatch.membersCount != null && (
@@ -366,7 +359,7 @@ export default function MyMatchesPage(): JSX.Element {
             </Space>
           )}
         </Drawer>
-      </div>
-    </>
+      </>
+    </KeenPage>
   );
 }

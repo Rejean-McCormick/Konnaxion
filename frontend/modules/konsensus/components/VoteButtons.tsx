@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsensus/components/VoteButtons.tsx
 ﻿"use client";
 import React from "react";
 import { Button } from "antd";

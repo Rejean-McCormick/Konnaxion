@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/kreative/serializers.py
 from rest_framework import serializers
 from .models import KreativeArtwork, Gallery, CollabSession, TraditionEntry, Tag
 

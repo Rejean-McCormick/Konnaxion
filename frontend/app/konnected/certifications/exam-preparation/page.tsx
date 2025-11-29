@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/certifications/exam-preparation/page.tsx
 ﻿// app/konnected/certifications/exam-preparation/page.tsx
 'use client';
 

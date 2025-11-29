@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/deliberate/guidelines/page.tsx
 'use client';
 
 import { PageContainer } from '@ant-design/pro-components';

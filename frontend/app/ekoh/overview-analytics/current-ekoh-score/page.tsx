@@ -1,3 +1,4 @@
+// FILE: frontend/app/ekoh/overview-analytics/current-ekoh-score/page.tsx
 // app/ekoh/overview-analytics/current-ekoh-score/page.tsx
 'use client';
 

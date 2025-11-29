@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/community-showcases/featured-projects/page.tsx
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
 'use client';
 
@@ -17,7 +18,7 @@ import {
   Button,
 } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -84,9 +85,11 @@ export default function FeaturedProjectsPage(): JSX.Element {
   // Filters
   const filteredProjects = useMemo(() => {
     let projects = dummyProjects;
+
     if (selectedCategory !== 'All') {
       projects = projects.filter((project) => project.category === selectedCategory);
     }
+
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
       projects = projects.filter(
@@ -95,6 +98,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
           project.description.toLowerCase().includes(q),
       );
     }
+
     return projects;
   }, [searchQuery, selectedCategory]);
 
@@ -114,7 +118,10 @@ export default function FeaturedProjectsPage(): JSX.Element {
   };
 
   return (
-    <PageContainer title="Featured Projects">
+    <KreativePageShell
+      title="Featured projects"
+      description="Discover highlighted creative projects from the Kreative community."
+    >
       {/* Filters */}
       <Space wrap style={{ marginBottom: 24 }}>
         <Input
@@ -225,6 +232,6 @@ export default function FeaturedProjectsPage(): JSX.Element {
           overflow: hidden;
         }
       `}</style>
-    </PageContainer>
+    </KreativePageShell>
   );
 }

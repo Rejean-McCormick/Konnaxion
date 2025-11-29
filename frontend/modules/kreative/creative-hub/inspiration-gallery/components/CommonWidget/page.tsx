@@ -1,3 +1,4 @@
+// FILE: frontend/modules/kreative/creative-hub/inspiration-gallery/components/CommonWidget/page.tsx
 // pages/pageTemplate/components/CommonWidget.tsx
 import React from 'react';
 import styles from './CommonWidget.module.css';

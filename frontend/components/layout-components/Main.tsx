@@ -1,3 +1,4 @@
+// FILE: frontend/components/layout-components/Main.tsx
 // components/layout-components/Main.tsx
 'use client'
 

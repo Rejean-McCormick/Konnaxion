@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/theme05.ts
 import type { Theme } from "./types";
 import { BRAND_HEX, sharedStatusColors } from "./types";
 

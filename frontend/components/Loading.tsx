@@ -1,3 +1,4 @@
+// FILE: frontend/components/Loading.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\Loading.tsx
 'use client';
 

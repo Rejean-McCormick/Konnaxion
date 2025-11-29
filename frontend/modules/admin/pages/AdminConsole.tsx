@@ -1,3 +1,4 @@
+// FILE: frontend/modules/admin/pages/AdminConsole.tsx
 "use client";
 import React from "react";
 import AppShell from "@/global/components/AppShell";

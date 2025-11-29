@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/ethikos/serializers.py
 # backend/konnaxion/ethikos/serializers.py
 
 from rest_framework import serializers

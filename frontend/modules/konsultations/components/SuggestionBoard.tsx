@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/components/SuggestionBoard.tsx
 ﻿// frontend/modules/konsultations/components/SuggestionBoard.tsx
 'use client';
 

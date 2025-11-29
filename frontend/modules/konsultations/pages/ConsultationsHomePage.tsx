@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/pages/ConsultationsHomePage.tsx
 ﻿'use client';
 
 import Link from 'next/link';

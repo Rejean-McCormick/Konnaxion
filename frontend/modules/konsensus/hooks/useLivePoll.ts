@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsensus/hooks/useLivePoll.ts
 // modules/konsensus/hooks/useLivePoll.ts
 "use client";
 

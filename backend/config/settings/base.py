@@ -1,3 +1,4 @@
+# FILE: backend/config/settings/base.py
 # ruff: noqa: ERA001, E501
 """Base settings to build other settings files upon."""
 

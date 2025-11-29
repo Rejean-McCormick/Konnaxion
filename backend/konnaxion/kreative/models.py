@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/kreative/models.py
 import os
 
 from django.conf import settings
@@ -11,15 +12,16 @@ def kreative_artwork_upload_to(instance, filename: str) -> str:
     Storage path for KreativeArtwork media files.
 
     Pattern:
-        kreative/artworks/<artist_id>/<artwork_id-or-new>/<slugified-filename><ext>
+        kreative/artworks/<artist_id-or-anon>/<artwork_id-or-new>/<slugified-filename><ext>
     """
-    artist = getattr(instance, "artist", None)
-    artist_id = getattr(artist, "id", "anon")
+    # Use artist_id FK field directly; it is present even if the related object is not loaded.
+    artist_id = getattr(instance, "artist_id", None) or "anon"
 
     name_part, ext = os.path.splitext(filename)
     safe_name = slugify(name_part) or "artwork"
 
-    return f"kreative/artworks/{artist_id}/{instance.pk or 'new'}/{safe_name}{ext}"
+    pk_part = instance.pk or "new"
+    return f"kreative/artworks/{artist_id}/{pk_part}/{safe_name}{ext}"
 
 
 def tradition_media_upload_to(instance, filename: str) -> str:
@@ -29,8 +31,9 @@ def tradition_media_upload_to(instance, filename: str) -> str:
     Pattern:
         kreative/traditions/<region-or-id>/<slugified-filename><ext>
     """
-    region = getattr(instance, "region", "") or f"id-{instance.pk or 'new'}"
-    safe_region = slugify(region)
+    # Prefer the human-readable region; fall back to a stable id-based segment.
+    raw_region = getattr(instance, "region", "") or f"id-{instance.pk or 'new'}"
+    safe_region = slugify(raw_region) or f"id-{instance.pk or 'new'}"
 
     name_part, ext = os.path.splitext(filename)
     safe_name = slugify(name_part) or "media"
@@ -251,7 +254,11 @@ class ArchiveDocument(models.Model):
     """
     Documents linked to archives (e.g., image, PDF, scan).
     """
-    archive = models.ForeignKey(DigitalArchive, on_delete=models.CASCADE, related_name="documents")
+    archive = models.ForeignKey(
+        DigitalArchive,
+        on_delete=models.CASCADE,
+        related_name="documents",
+    )
     document_type = models.CharField(max_length=64)
     url = models.URLField()
     metadata = models.JSONField(blank=True, default=dict)
@@ -265,7 +272,11 @@ class AICatalogueEntry(models.Model):
     """
     AI-generated tags/classification for an archive document.
     """
-    archive_document = models.ForeignKey(ArchiveDocument, on_delete=models.CASCADE, related_name="ai_entries")
+    archive_document = models.ForeignKey(
+        ArchiveDocument,
+        on_delete=models.CASCADE,
+        related_name="ai_entries",
+    )
     tags = models.JSONField(blank=True, default=list)
     classification = models.CharField(max_length=120, blank=True)
 

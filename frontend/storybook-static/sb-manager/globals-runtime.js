@@ -1,3 +1,4 @@
+// FILE: frontend/storybook-static/sb-manager/globals-runtime.js
 var fB = Object.create;
 var m0 = Object.defineProperty;
 var dB = Object.getOwnPropertyDescriptor;

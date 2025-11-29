@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/dashboard/page.tsx
 ﻿"use client";
 
 import React from "react";

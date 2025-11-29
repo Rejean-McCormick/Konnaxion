@@ -1,3 +1,4 @@
+// FILE: frontend/components/charts/ChartCard.tsx
 // components/charts/ChartCard.tsx
 'use client';
 

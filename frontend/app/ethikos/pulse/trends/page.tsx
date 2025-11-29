@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/pulse/trends/page.tsx
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';

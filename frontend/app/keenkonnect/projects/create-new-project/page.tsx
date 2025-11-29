@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/projects/create-new-project/page.tsx
 // app/keenkonnect/projects/create-new-project/page.tsx
 'use client';
 
@@ -15,6 +16,7 @@ import {
 } from '@ant-design/pro-components';
 import type { UploadFile } from 'antd/es/upload/interface';
 import api from '@/api';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Paragraph } = Typography;
 
@@ -33,11 +35,11 @@ type CreateProjectFormValues = {
 };
 
 export default function PageWrapper() {
-  return (
-    <Suspense fallback={null}>
-      <Content />
-    </Suspense>
-  );
+  return <KeenPage title="Page" description="">(
+      <Suspense fallback={null}>
+        <Content />
+      </Suspense>
+    )</KeenPage>;
 }
 
 function Content() {

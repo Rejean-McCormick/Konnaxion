@@ -1,3 +1,4 @@
+// FILE: frontend/components/layout-components/LogoTitle.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\layout-components\LogoTitle.tsx
 'use client'
 

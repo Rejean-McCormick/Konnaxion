@@ -1,3 +1,4 @@
+// FILE: frontend/components/PageContainer.tsx
 'use client'
 
 import React, { ReactNode } from 'react'

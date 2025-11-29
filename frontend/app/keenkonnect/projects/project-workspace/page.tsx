@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/projects/project-workspace/page.tsx
 // app/keenkonnect/projects/project-workspace/page.tsx
 'use client';
 
@@ -22,6 +23,7 @@ import {
   Space,
 } from 'antd';
 import api from '@/api';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -57,11 +59,11 @@ interface WorkspaceViewModel {
 }
 
 export default function PageWrapper() {
-  return (
-    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
-      <Content />
-    </Suspense>
-  );
+  return <KeenPage title="Page" description="">(
+      <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+        <Content />
+      </Suspense>
+    )</KeenPage>;
 }
 
 function Content(): JSX.Element {

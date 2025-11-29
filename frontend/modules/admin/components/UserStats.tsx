@@ -1,3 +1,4 @@
+// FILE: frontend/modules/admin/components/UserStats.tsx
 "use client";
 import React from "react";
 import { Card, Descriptions, Spin, Alert } from "antd";

@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsensus/hooks/usePoll.ts
 ﻿// modules/konsensus/hooks/usePoll.ts
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/shared/api";

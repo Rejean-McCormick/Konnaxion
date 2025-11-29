@@ -1,3 +1,4 @@
+// FILE: frontend/components/map-components/Map.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\map-components\Map.tsx
 'use client'
 

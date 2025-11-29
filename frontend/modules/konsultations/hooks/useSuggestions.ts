@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/hooks/useSuggestions.ts
 ﻿// modules/konsultations/hooks/useSuggestions.ts
 'use client';
 

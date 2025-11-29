@@ -1,3 +1,4 @@
+// FILE: frontend/modules/admin/components/ModerationQueue.tsx
 ﻿"use client";
 import React from "react";
 import { Card, List, Spin, Alert, Tag } from "antd";

@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsensus/components/PollBarChart.tsx
 "use client";
 import {
   Chart as ChartJS,

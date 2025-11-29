@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# FILE: frontend/scanpathv1-frontend.py
 # -*- coding: utf-8 -*-
 
 import os

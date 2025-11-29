@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/obsolete/cyberTheme.ts
 import { BRAND_HEX, Theme } from './types';
 
 export const cyberTheme: Theme = {

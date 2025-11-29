@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/layout.tsx
 // app/keenkonnect/layout.tsx
 'use client'
 

@@ -1,3 +1,4 @@
+// FILE: frontend/.storybook/main.ts
 import type { StorybookConfig } from '@storybook/nextjs'
 
 const config: StorybookConfig = {

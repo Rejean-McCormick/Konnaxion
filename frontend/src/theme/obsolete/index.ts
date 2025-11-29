@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/obsolete/index.ts
 import type { Theme, ThemeId } from './types';
 
 import lightTheme from './lightTheme';

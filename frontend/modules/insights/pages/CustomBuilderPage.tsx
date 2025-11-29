@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/pages/CustomBuilderPage.tsx
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";

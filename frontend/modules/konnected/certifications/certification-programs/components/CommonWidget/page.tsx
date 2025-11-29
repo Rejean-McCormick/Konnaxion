@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konnected/certifications/certification-programs/components/CommonWidget/page.tsx
 // pages/pageTemplate/components/CommonWidget.tsx
 import React from 'react';
 import styles from './CommonWidget.module.css';

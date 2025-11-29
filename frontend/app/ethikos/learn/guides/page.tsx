@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/learn/guides/page.tsx
 'use client'
 
 /**

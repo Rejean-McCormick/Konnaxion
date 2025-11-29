@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/contrib/sites/migrations/__init__.py
 """
 To understand why this file is here, please read:
 

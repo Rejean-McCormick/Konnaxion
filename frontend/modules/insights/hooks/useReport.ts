@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/hooks/useReport.ts
 // modules/insights/hooks/useReport.ts
 import { useQuery } from "@tanstack/react-query";
 import api from "@/api";

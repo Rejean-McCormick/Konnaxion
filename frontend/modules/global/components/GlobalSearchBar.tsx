@@ -1,3 +1,4 @@
+// FILE: frontend/modules/global/components/GlobalSearchBar.tsx
 // File: modules/global/components/GlobalSearchBar.tsx
 'use client'
 

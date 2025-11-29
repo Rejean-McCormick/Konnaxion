@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/decide/elite/page.tsx
 // C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\elite\page.tsx
 // Code d’origine récupéré depuis le dump (File #22). :contentReference[oaicite:0]{index=0}
 

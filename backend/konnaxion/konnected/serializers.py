@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/konnected/serializers.py
 # konnaxion/konnected/serializers.py
 from rest_framework import serializers
 

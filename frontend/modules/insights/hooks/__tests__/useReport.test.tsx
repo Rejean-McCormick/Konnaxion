@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/hooks/__tests__/useReport.test.tsx
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useReport } from '../useReport';

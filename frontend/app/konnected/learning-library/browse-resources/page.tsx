@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/learning-library/browse-resources/page.tsx
 // app/konnected/learning-library/browse-resources/page.tsx
 'use client';
 

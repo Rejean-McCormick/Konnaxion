@@ -1,3 +1,4 @@
+// FILE: frontend/src/types/index.ts
 // Alias: "@/types"
 export type ID = string
 

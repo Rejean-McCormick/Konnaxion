@@ -1,3 +1,4 @@
+// FILE: frontend/widgets/header/ClockWidget.tsx
 // C:\MyCode\Konnaxionv14\frontend\widgets\header\ClockWidget.tsx
 'use client'
 

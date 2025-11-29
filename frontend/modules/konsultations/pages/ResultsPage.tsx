@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/pages/ResultsPage.tsx
 ﻿'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';

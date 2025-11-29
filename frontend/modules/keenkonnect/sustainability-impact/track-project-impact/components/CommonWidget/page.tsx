@@ -1,3 +1,4 @@
+// FILE: frontend/modules/keenkonnect/sustainability-impact/track-project-impact/components/CommonWidget/page.tsx
 // pages/pageTemplate/components/CommonWidget.tsx
 import React from 'react';
 import styles from './CommonWidget.module.css';

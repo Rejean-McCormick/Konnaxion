@@ -1,3 +1,4 @@
+// FILE: frontend/storybook-static/sb-manager/globals.js
 import ESM_COMPAT_Module from "node:module";
 import { fileURLToPath as ESM_COMPAT_fileURLToPath } from 'node:url';
 import { dirname as ESM_COMPAT_dirname } from 'node:path';

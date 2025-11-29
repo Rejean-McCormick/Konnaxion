@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/types/liveReportState.ts
 // modules/insights/types/liveReportState.ts
 
 /**

@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/decide/elite/page.tsx
 // app/ethikos/decide/elite/page.tsx
 // Updated implementation for the Elite ballots page.
 // Source (original dump): app/ethikos/decide/elite/page.tsx 

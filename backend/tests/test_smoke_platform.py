@@ -1,3 +1,4 @@
+# FILE: backend/tests/test_smoke_platform.py
 # tests/test_smoke_platform.py
 import json
 import pytest

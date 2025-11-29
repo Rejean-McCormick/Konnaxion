@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/obsolete/kktheme.ts
 import { theme } from 'antd';
 const { defaultAlgorithm } = theme;
 

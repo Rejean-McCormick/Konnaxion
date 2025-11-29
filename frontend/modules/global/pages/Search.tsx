@@ -1,3 +1,4 @@
+// FILE: frontend/modules/global/pages/Search.tsx
 "use client";
 import { useSearchParams } from "next/navigation";
 import { Alert, List, Spin } from "antd";

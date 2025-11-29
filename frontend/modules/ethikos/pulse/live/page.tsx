@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/pulse/live/page.tsx
 'use client'
 
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';

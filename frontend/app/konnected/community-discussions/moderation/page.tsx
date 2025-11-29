@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/community-discussions/moderation/page.tsx
 ﻿'use client';
 
 import React, { useMemo, useState } from 'react';

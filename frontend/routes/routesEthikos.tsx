@@ -1,3 +1,4 @@
+// FILE: frontend/routes/routesEthikos.tsx
 'use client'
 
 import React from 'react'

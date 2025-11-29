@@ -1,3 +1,4 @@
+// FILE: frontend/components/map-components/MapMarker.tsx
 /**
  * Description: Marker custom icon
  * Author: Hieu Chu

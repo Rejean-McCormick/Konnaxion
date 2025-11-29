@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/contrib/sites/migrations/0001_initial.py
 import django.contrib.sites.models
 from django.contrib.sites.models import _simple_domain_name_validator
 from django.db import migrations

@@ -1,3 +1,4 @@
+# FILE: backend/scripts/populate_all_models.py
 # -*- coding: utf-8 -*-
 """
 Populate the Konnaxion v14 database with a small demo dataset.

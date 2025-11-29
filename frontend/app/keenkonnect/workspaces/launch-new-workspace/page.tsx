@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/workspaces/launch-new-workspace/page.tsx
 'use client';
 
 import React, { Suspense, useState } from 'react';
@@ -11,6 +12,7 @@ import {
   ProFormSwitch,
 } from '@ant-design/pro-components';
 import api from '@/api';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 type LaunchWorkspaceFormValues = {
   name: string;
@@ -158,9 +160,9 @@ function Content() {
 }
 
 export default function PageWrapper() {
-  return (
-    <Suspense fallback={null}>
-      <Content />
-    </Suspense>
-  );
+  return <KeenPage title="Page" description="">(
+      <Suspense fallback={null}>
+        <Content />
+      </Suspense>
+    )</KeenPage>;
 }

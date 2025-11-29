@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/ReputationProfile.tsx
 // frontend/modules/ethikos/ReputationProfile.tsx
 'use client';
 

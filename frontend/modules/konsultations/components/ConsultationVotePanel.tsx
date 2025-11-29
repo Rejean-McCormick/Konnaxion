@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/components/ConsultationVotePanel.tsx
 ﻿// frontend/modules/konsultations/components/ConsultationVotePanel.tsx
 
 import React, { useEffect, useMemo, useState } from 'react';

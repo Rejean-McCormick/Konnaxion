@@ -1,3 +1,4 @@
+// FILE: frontend/services/projects.ts
 // services/projects.ts
 // Thin service layer around the backend /api/projects/ endpoints.
 

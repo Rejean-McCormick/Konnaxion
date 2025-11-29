@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/pages/ConsultationHub.tsx
 ﻿'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';

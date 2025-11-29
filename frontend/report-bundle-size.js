@@ -1,3 +1,4 @@
+// FILE: frontend/report-bundle-size.js
 #!/usr/bin/env node
 /* eslint-disable no-console */
 /**

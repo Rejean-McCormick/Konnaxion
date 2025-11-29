@@ -1,3 +1,4 @@
+// FILE: frontend/components/auth0-components/index.tsx
 'use client';
 
 /**

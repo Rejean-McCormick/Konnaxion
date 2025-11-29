@@ -1,3 +1,4 @@
+// FILE: frontend/playwright.ct.config.ts
 // playwright.ct.config.ts
 import { defineConfig, devices } from '@playwright/experimental-ct-react';
 

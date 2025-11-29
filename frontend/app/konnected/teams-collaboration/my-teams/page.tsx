@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/teams-collaboration/my-teams/page.tsx
 ﻿// app/konnected/teams-collaboration/my-teams/page.tsx
 'use client';
 

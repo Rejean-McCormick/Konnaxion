@@ -1,3 +1,4 @@
+// FILE: frontend/shared/errors.ts
 export type ErrorState = { message: string; statusCode?: number };
 
 export class HttpError extends Error {

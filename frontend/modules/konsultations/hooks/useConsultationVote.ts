@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/hooks/useConsultationVote.ts
 ﻿// modules/konsultations/hooks/useConsultationVote.ts
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { submitPublicVote } from "@/services/decide";

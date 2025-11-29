@@ -1,3 +1,4 @@
+// FILE: frontend/components/user-components/index.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\user-components\index.tsx
 'use client'
 

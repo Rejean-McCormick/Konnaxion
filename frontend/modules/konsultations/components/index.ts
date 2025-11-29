@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/components/index.ts
 ﻿export { default as ConsultationForm }   from './ConsultationForm';
 export { default as ConsultationList }   from './ConsultationList';
 export { default as ConsultationVotePanel } from './ConsultationVotePanel';

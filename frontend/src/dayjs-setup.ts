@@ -1,3 +1,4 @@
+// FILE: frontend/src/dayjs-setup.ts
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import utc from 'dayjs/plugin/utc';

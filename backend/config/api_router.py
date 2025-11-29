@@ -1,3 +1,4 @@
+# FILE: backend/config/api_router.py
 # config/api_router.py
 """
 Central DRF router for every Konnaxion v14 API endpoint.

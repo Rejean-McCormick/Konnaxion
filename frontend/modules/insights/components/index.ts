@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/components/index.ts
 ﻿// C:\MyCode\Konnaxionv14\frontend\modules\insights\components\index.ts
 export { default as SmartVoteChart }     from './SmartVoteChart';
 export { default as DomainHeatMap }      from './DomainHeatMap';

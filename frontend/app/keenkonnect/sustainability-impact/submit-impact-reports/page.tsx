@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx
 'use client';
 
 import React, { Suspense, useState } from 'react';
@@ -21,6 +22,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { InboxOutlined } from '@ant-design/icons';
 import api from '@/api';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -39,11 +41,11 @@ type SustainabilityReportFormValues = {
 };
 
 export default function PageWrapper() {
-  return (
-    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
-      <Content />
-    </Suspense>
-  );
+  return <KeenPage title="Page" description="">(
+      <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+        <Content />
+      </Suspense>
+    )</KeenPage>;
 }
 
 function Content(): JSX.Element {

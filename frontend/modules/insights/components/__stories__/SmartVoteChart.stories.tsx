@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/components/__stories__/SmartVoteChart.stories.tsx
 import SmartVoteChart from '../SmartVoteChart';
 
 export default {

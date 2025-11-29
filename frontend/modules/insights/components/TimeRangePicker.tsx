@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/components/TimeRangePicker.tsx
 "use client";
 import { DatePicker } from "antd";
 import dayjs from "dayjs";

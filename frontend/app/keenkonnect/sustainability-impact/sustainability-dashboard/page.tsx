@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -6,6 +7,7 @@ import { Card, Select, Space, Tag, Table, Row, Col, Statistic, Typography } from
 import type { ColumnsType } from 'antd/es/table';
 import { Line, Area, Column } from '@ant-design/plots';
 import usePageTitle from '@/hooks/usePageTitle';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Paragraph } = Typography;
 
@@ -112,7 +114,7 @@ export default function SustainabilityDashboardPage(): JSX.Element {
   const [timeRange, setTimeRange] = useState<TimeRange>('6m');
 
   const filteredCo2Trend = useMemo(() => {
-    if (timeRange === '3m') return co2TrendBase.slice(-3);
+    if (timeRange === '3m') return <KeenPage title="Page" description="">co2TrendBase.slice(-3)</KeenPage>;
     if (timeRange === '6m') return co2TrendBase.slice(-6);
     return co2TrendBase;
   }, [timeRange]);

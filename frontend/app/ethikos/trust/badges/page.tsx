@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/trust/badges/page.tsx
 // app/ethikos/trust/badges/page.tsx
 'use client';
 

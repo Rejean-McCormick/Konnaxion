@@ -1,3 +1,4 @@
+// FILE: frontend/app/layout.tsx
 // app/layout.tsx
 import '@/styles/tailwind.css';
 import { ThemeProvider } from '@/context/ThemeContext';

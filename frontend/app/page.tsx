@@ -1,3 +1,4 @@
+// FILE: frontend/app/page.tsx
 // app/page.tsx
 import { cookies } from 'next/headers';
 import type { Metadata } from 'next';

@@ -1,3 +1,4 @@
+// FILE: frontend/services/user.ts
 // frontend/services/user.ts
 // Wrapper around /api/users/me/ + helpers for avatar_url
 

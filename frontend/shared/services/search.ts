@@ -1,3 +1,4 @@
+// FILE: frontend/shared/services/search.ts
 // File: shared/services/search.ts
 
 /**

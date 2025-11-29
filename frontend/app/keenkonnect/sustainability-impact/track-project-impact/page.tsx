@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/sustainability-impact/track-project-impact/page.tsx
 'use client'
 
 import React, { Suspense, useState, useEffect, useMemo } from 'react'
@@ -28,6 +29,7 @@ import {
 } from 'recharts'
 import api from '@/api'
 import dayjs from 'dayjs'
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { RangePicker } = DatePicker
 const { TabPane } = Tabs
@@ -46,11 +48,11 @@ type Filters = {
 const COLORS = ['#4e91ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de']
 
 export default function PageWrapper() {
-  return (
-    <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
-      <Content />
-    </Suspense>
-  )
+  return <KeenPage title="Page" description="">(
+      <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
+        <Content />
+      </Suspense>
+    )</KeenPage>
 }
 
 function Content(): JSX.Element {

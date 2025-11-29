@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/trust/credentials/page.tsx
 // app/ethikos/trust/credentials/page.tsx
 'use client';
 

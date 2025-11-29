@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/components/ImpactTimeline.tsx
 ﻿'use client';
 
 import { Timeline, Typography, Empty, Tag, Space } from 'antd';

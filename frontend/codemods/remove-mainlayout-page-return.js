@@ -1,3 +1,4 @@
+// FILE: frontend/codemods/remove-mainlayout-page-return.js
 // Supprime le dernier "return <MainLayout>{page}</MainLayout>;" OU "return page;"
 // UNIQUEMENT s'il existe déjà un return avant (sécurité) et que 'page' n'est pas déclarée.
 module.exports = function (file, api) {

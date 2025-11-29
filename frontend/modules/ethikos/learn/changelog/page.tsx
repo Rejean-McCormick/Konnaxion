@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/learn/changelog/page.tsx
 'use client'
 
 import { PageContainer } from '@ant-design/pro-components';

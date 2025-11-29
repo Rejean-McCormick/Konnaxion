@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/impact/feedback/page.tsx
 'use client';
 
 import { useMemo } from 'react';

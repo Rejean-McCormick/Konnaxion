@@ -1,3 +1,4 @@
+// FILE: frontend/components/layout-components/Sider.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\layout-components\Sider.tsx
 'use client'
 

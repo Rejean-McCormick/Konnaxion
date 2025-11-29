@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/keenkonnect/admin.py
 # template for konnaxion/<app>/admin.py
 from django.contrib import admin
 from django.apps import apps

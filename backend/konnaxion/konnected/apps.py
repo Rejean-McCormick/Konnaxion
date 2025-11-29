@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/konnected/apps.py
 from django.apps import AppConfig
 
 

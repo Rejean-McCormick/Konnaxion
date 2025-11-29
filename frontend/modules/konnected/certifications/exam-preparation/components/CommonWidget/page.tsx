@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konnected/certifications/exam-preparation/components/CommonWidget/page.tsx
 'use client'
 
 import React from 'react'

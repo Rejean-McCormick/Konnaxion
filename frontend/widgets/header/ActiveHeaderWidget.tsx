@@ -1,3 +1,4 @@
+// FILE: frontend/widgets/header/ActiveHeaderWidget.tsx
 // \Konnaxionv14\frontend\widgets\header\ActiveHeaderWidget.tsx
 'use client'
 

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# FILE: frontend/components/concatv3.py
 """
 Concatène tous les fichiers texte du dossier du script et de ses sous-dossiers.
 Par défaut, écrit le résultat dans "Code_<nom_dossier>_<YYYYMMDD_HHMMSS>.txt" à la racine du script.

@@ -1,3 +1,4 @@
+// FILE: frontend/components/map-components/ControlPanel.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\map-components\ControlPanel.tsx
 /**
  * Map control panel shown on top of the interactive map.

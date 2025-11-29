@@ -1,3 +1,4 @@
+// FILE: frontend/app/_api/admin/stats/route.ts
 import { NextResponse } from 'next/server';
 
 interface AdminStats {

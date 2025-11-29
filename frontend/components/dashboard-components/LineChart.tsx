@@ -1,3 +1,4 @@
+// FILE: frontend/components/dashboard-components/LineChart.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LineChart.tsx
 'use client';
 

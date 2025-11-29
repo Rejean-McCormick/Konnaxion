@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/users/admin.py
 # konnaxion/users/admin.py
 from allauth.account.decorators import secure_admin_login
 from django.conf import settings

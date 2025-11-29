@@ -1,3 +1,4 @@
+// FILE: frontend/app/_api/admin/moderation/route.ts
 import { NextResponse } from 'next/server'
 
 type ReportType = 'Spam' | 'Harassment' | 'Misinformation'

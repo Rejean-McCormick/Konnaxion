@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/kollective_intelligence/migrations/00xx_expertise_tags_api.py
 from django.db import migrations
 
 # Baseline expertise 'tags' that will be exposed via the expertise-tags API.

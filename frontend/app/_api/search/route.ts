@@ -1,3 +1,4 @@
+// FILE: frontend/app/_api/search/route.ts
 // app/_api/search/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'

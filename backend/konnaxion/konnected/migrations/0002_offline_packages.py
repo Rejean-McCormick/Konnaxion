@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/konnected/migrations/0002_offline_packages.py
 # backend/konnaxion/konnected/migrations/0002_offline_packages.py
 
 from django.db import migrations, models

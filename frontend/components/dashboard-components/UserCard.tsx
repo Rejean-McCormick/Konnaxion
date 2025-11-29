@@ -1,3 +1,4 @@
+// FILE: frontend/components/dashboard-components/UserCard.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
 'use client';
 

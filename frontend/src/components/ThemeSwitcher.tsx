@@ -1,3 +1,4 @@
+// FILE: frontend/src/components/ThemeSwitcher.tsx
 import React from 'react';
 import { Button } from 'antd';
 import { useTheme } from '@/context/ThemeContext';

@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/obsolete/types.ts
 export type ThemeId =
   | 'light'
   | 'modern'

@@ -1,3 +1,4 @@
+// FILE: frontend/modules/kontact/pages/PublicProfile.tsx
 ﻿// frontend/modules/kontact/pages/PublicProfile.tsx
 
 import MainLayout from '@/shared/layout/MainLayout';

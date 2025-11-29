@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/ai-team-matching/match-preferences/page.tsx
 'use client';
 
 import React from 'react';
@@ -9,6 +10,7 @@ import {
   ProFormSwitch,
   ProFormTextArea,
 } from '@ant-design/pro-components';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Paragraph } = Typography;
 

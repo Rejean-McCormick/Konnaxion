@@ -1,3 +1,4 @@
+// FILE: frontend/modules/kontact/hooks/useOpportunities.ts
 ﻿// modules/kontact/hooks/useOpportunities.ts
 
 import { useQuery } from '@tanstack/react-query';

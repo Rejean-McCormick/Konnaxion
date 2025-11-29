@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# FILE: backend/end-points-scanner.py
 """
 next_auto_scanner.py
 Run with no parameters from the Next.js project root (the backend folder).

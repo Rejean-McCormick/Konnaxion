@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/projects/my-projects/page.tsx
 // app/keenkonnect/projects/my-projects/page.tsx
 'use client';
 
@@ -24,6 +25,7 @@ import { ProTable } from '@ant-design/pro-components';
 import { useRouter } from 'next/navigation';
 import usePageTitle from '@/hooks/usePageTitle';
 import api from '@/api';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -95,7 +97,7 @@ export default function MyProjectsPage(): JSX.Element {
   }, []);
 
   const filtered: Project[] = useMemo(() => {
-    if (statusFilter === 'all') return projects;
+    if (statusFilter === 'all') return <KeenPage title="Page" description="">projects</KeenPage>;
     return projects.filter((p) => p.status === statusFilter);
   }, [projects, statusFilter]);
 

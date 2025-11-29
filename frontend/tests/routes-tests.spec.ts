@@ -1,3 +1,4 @@
+// FILE: frontend/tests/routes-tests.spec.ts
 // tests/routes-tests.spec.ts
 import { test } from '@playwright/test';
 import fs from 'fs';

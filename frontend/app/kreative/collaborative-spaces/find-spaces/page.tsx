@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/collaborative-spaces/find-spaces/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -16,7 +17,7 @@ import {
 } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -100,7 +101,7 @@ export default function FindSpacesPage(): JSX.Element {
 
   // Filtre + tri
   const filteredSpaces = useMemo(() => {
-    let spaces = dummySpaces;
+    let spaces: CollaborativeSpace[] = dummySpaces;
 
     if (selectedDiscipline !== 'All') {
       spaces = spaces.filter((s) => s.discipline === selectedDiscipline);
@@ -117,15 +118,19 @@ export default function FindSpacesPage(): JSX.Element {
       );
     }
 
+    const sorted = [...spaces];
+
     if (sortOption === 'newest') {
-      // copie pour éviter la mutation
-      return [...spaces].sort(
+      sorted.sort(
         (a, b) =>
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
       );
+    } else {
+      // proxy d’activité = memberCount
+      sorted.sort((a, b) => b.memberCount - a.memberCount);
     }
-    // proxy d’activité = memberCount
-    return [...spaces].sort((a, b) => b.memberCount - a.memberCount);
+
+    return sorted;
   }, [searchQuery, selectedDiscipline, selectedJoinType, sortOption]);
 
   // Pagination
@@ -156,8 +161,15 @@ export default function FindSpacesPage(): JSX.Element {
   }
 
   return (
-    <PageContainer title="Find Spaces">
-      <Space direction="vertical" style={{ width: '100%', marginBottom: 24 }} size="large">
+    <KreativePageShell
+      title="Find Spaces"
+      subtitle="Browse and join collaborative creative spaces."
+    >
+      <Space
+        direction="vertical"
+        style={{ width: '100%', marginBottom: 24 }}
+        size="large"
+      >
         <Space wrap>
           <Input
             placeholder="Search spaces..."
@@ -241,7 +253,9 @@ export default function FindSpacesPage(): JSX.Element {
                 <Text strong>Discipline:</Text> <Text>{space.discipline}</Text>
                 <br />
                 <Text strong>Status:</Text>{' '}
-                <Text>{space.joinType === 'open' ? 'Open' : 'Invite-Only'}</Text>
+                <Text>
+                  {space.joinType === 'open' ? 'Open' : 'Invite-Only'}
+                </Text>
               </div>
             </Card>
           </Col>
@@ -272,6 +286,6 @@ export default function FindSpacesPage(): JSX.Element {
           </p>
         )}
       </Modal>
-    </PageContainer>
+    </KreativePageShell>
   );
 }

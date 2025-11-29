@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/kollective_intelligence/apps.py
 from django.apps import AppConfig
 
 

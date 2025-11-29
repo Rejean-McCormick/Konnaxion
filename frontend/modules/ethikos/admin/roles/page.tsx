@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/admin/roles/page.tsx
 'use client'
 
 import type { ReactNode } from 'react'

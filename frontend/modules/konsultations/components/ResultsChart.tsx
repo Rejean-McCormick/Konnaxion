@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/components/ResultsChart.tsx
 ﻿'use client';
 
 import React, { useMemo } from 'react';

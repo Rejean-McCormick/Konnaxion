@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/components/DomainHeatMap.tsx
 export default function DomainHeatMap() {
   return (
     <div style={{ minHeight: 300, display: "flex", alignItems: "center", justifyContent: "center", color: "#bbb" }}>

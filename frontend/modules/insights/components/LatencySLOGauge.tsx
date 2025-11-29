@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/components/LatencySLOGauge.tsx
 "use client";
 import {
   Chart as ChartJS,

@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/layout.tsx
 import React, { Suspense } from 'react'
 import MainLayout from '@/components/layout-components/MainLayout'
 

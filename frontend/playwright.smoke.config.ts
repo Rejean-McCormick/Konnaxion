@@ -1,3 +1,4 @@
+// FILE: frontend/playwright.smoke.config.ts
 // playwright.smoke.config.ts
 import { defineConfig, devices } from '@playwright/test'
 

@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/contrib/sites/migrations/0002_alter_domain_unique.py
 import django.contrib.sites.models
 from django.db import migrations
 from django.db import models

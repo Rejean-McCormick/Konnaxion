@@ -1,3 +1,4 @@
+// FILE: frontend/modules/kontact/components/OpportunityList.tsx
 ﻿// frontend/modules/kontact/components/OpportunityList.tsx
 'use client';
 

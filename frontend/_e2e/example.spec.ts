@@ -1,3 +1,4 @@
+// FILE: frontend/_e2e/example.spec.ts
 import { expect, test } from "@playwright/test"
 
 test("has title", async ({ page }) => {

@@ -1,3 +1,4 @@
+// FILE: frontend/modules/kontact/components/ProfileCard.tsx
 ﻿'use client';
 
 import React from 'react';

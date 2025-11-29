@@ -1,3 +1,4 @@
+// FILE: frontend/types/index.ts
 // types/index.ts
 export type Id = string | number
 

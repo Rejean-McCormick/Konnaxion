@@ -1,3 +1,4 @@
+// FILE: frontend/app/ekoh/achievements-badges/earned-badges-display/page.tsx
 'use client';
 
 import React, { useState, useMemo } from 'react';

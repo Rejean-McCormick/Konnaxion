@@ -1,3 +1,4 @@
+// FILE: frontend/modules/kontact/pages/ConnectCenter.tsx
 ﻿// frontend/modules/kontact/pages/ConnectCenter.tsx
 'use client';
 

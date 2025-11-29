@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/trust/profile/page.tsx
 'use client';
 
 /**

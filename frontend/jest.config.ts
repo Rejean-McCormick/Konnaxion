@@ -1,3 +1,4 @@
+// FILE: frontend/jest.config.ts
 // jest.config.ts
 import nextJest from 'next/jest'
 import type { Config } from 'jest'

@@ -1,3 +1,4 @@
+// FILE: frontend/lib/auth0.ts
 // lib/auth0.ts
 import { Auth0Client } from '@auth0/nextjs-auth0/server';
 

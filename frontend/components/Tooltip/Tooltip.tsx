@@ -1,3 +1,4 @@
+// FILE: frontend/components/Tooltip/Tooltip.tsx
 "use client"
 
 import * as RadixTooltip from "@radix-ui/react-tooltip"

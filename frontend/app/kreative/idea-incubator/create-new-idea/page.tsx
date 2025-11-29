@@ -1,9 +1,12 @@
+// FILE: frontend/app/kreative/idea-incubator/create-new-idea/page.tsx
 'use client';
 
 import React from 'react';
 import { Form, Input, Select, Button, message as antdMessage } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
+
 // Note: MainLayout import removed because the /kreative layout handles the layout wrapper.
 
 const { TextArea } = Input;

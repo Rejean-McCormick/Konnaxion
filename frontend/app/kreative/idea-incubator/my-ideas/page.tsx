@@ -1,10 +1,11 @@
+// FILE: frontend/app/kreative/idea-incubator/my-ideas/page.tsx
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
 import { Badge, Button, Input, List, Select, Space, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
 
@@ -62,8 +63,15 @@ export default function MyIdeasPage(): JSX.Element {
   }, [searchQuery, selectedStatus]);
 
   return (
-    <PageContainer title="My Ideas">
-      <Space direction="vertical" size="middle" style={{ width: '100%', marginBottom: 24 }}>
+    <KreativePageShell
+      title="My Ideas"
+      description="Browse and manage your creative ideas in the incubator."
+    >
+      <Space
+        direction="vertical"
+        size="middle"
+        style={{ width: '100%', marginBottom: 24 }}
+      >
         <Space>
           <Input
             placeholder="Search by title."
@@ -95,13 +103,17 @@ export default function MyIdeasPage(): JSX.Element {
               <Button
                 key="edit"
                 type="primary"
-                onClick={() => router.push(`/kreative/idea-incubator/edit/${idea.id}`)}
+                onClick={() =>
+                  router.push(`/kreative/idea-incubator/edit/${idea.id}`)
+                }
               >
                 Edit
               </Button>,
               <Button
                 key="view"
-                onClick={() => router.push(`/kreative/idea-incubator/view/${idea.id}`)}
+                onClick={() =>
+                  router.push(`/kreative/idea-incubator/view/${idea.id}`)
+                }
               >
                 View
               </Button>,
@@ -111,7 +123,10 @@ export default function MyIdeasPage(): JSX.Element {
               title={
                 <Space>
                   {idea.newActivity && (
-                    <Badge count="New" style={{ backgroundColor: '#52c41a' }} />
+                    <Badge
+                      count="New"
+                      style={{ backgroundColor: '#52c41a' }}
+                    />
                   )}
                   <Title level={4} style={{ margin: 0 }}>
                     {idea.title}
@@ -122,13 +137,15 @@ export default function MyIdeasPage(): JSX.Element {
                 <>
                   <Text type="secondary">Status: {idea.status}</Text>
                   <br />
-                  <Text type="secondary">Created on: {idea.dateCreated}</Text>
+                  <Text type="secondary">
+                    Created on: {idea.dateCreated}
+                  </Text>
                 </>
               }
             />
           </List.Item>
         )}
       />
-    </PageContainer>
+    </KreativePageShell>
   );
 }

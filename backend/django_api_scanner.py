@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# FILE: backend/django_api_scanner.py
 """
 django_api_scanner.py
 - Run from backend root. No parameters.

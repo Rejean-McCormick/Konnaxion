@@ -1,3 +1,4 @@
+// FILE: frontend/components/shared/utils.tsx
 /**
  * Shared utility functions
  * - AntD v5 validators: return Promise<void>, no callback

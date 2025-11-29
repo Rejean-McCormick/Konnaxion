@@ -1,3 +1,4 @@
+// FILE: frontend/app/konsensus/page.tsx
 // app/konsensus/page.tsx
 import { Suspense } from 'react';
 import MainLayout from '@/components/layout-components/MainLayout';

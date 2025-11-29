@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx
 // app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx
 'use client';
 
@@ -25,6 +26,7 @@ import {
 } from '@ant-design/icons';
 import usePageTitle from '@/hooks/usePageTitle';
 import useReputationEvents from '@/hooks/useReputationEvents';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text } = Typography;
 
@@ -129,7 +131,7 @@ export default function ViewReputationEkohPage(): JSX.Element {
         color: 'default',
         category: 'Reputation',
       };
-    return { ...b, ...meta };
+    return <KeenPage title="Page" description="">{ ...b, ...meta }</KeenPage>;
   });
 
   return (

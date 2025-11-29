@@ -1,3 +1,4 @@
+// FILE: frontend/tools/codemod_protable_render.ts
 #!/usr/bin/env ts-node
 // Codemod ProTable: normalize render(...) -> render(dom, entity, index, action, schema)
 // Safe-by-default. Rebind "v" -> row[dataIndex] uniquement si dataIndex est littéral.

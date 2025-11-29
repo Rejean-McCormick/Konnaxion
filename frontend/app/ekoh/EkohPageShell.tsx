@@ -1,3 +1,4 @@
+// FILE: frontend/app/ekoh/EkohPageShell.tsx
 // app/ekoh/EkohPageShell.tsx
 'use client';
 

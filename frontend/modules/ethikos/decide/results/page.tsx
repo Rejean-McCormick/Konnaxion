@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/decide/results/page.tsx
 // C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\results\page.tsx
 'use client'
 

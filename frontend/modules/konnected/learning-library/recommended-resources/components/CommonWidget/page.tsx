@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konnected/learning-library/recommended-resources/components/CommonWidget/page.tsx
 // pages/pageTemplate/components/CommonWidget.tsx
 import React from 'react';
 import styles from './CommonWidget.module.css';

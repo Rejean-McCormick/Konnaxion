@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/admin/roles/page.tsx
 // app/ethikos/admin/roles/page.tsx
 'use client';
 

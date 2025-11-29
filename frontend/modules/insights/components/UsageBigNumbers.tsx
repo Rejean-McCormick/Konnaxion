@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/components/UsageBigNumbers.tsx
 
 type Item = { label: string; value: number };
 

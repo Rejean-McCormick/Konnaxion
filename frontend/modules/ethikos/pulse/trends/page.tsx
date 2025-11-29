@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/pulse/trends/page.tsx
 'use client'
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';

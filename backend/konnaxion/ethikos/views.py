@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/ethikos/views.py
 
 # Create your views here.
 # konnaxion/ethikos/api_views.py

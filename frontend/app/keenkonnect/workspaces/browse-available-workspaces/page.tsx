@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/workspaces/browse-available-workspaces/page.tsx
 // File: app/keenkonnect/workspaces/browse-available-workspaces/page.tsx
 'use client';
 
@@ -21,6 +22,7 @@ import {
 } from 'antd';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -123,21 +125,21 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
   const filteredWorkspaces = useMemo(() => {
     const lowerSearch = searchText.toLowerCase();
 
-    return sampleWorkspaces.filter((workspace) => {
-      const matchesTab =
-        activeTab === 'all' ||
-        workspace.category === (activeTab as WorkspaceCategory);
+    return <KeenPage title="Page" description="">sampleWorkspaces.filter((workspace) => {
+          const matchesTab =
+            activeTab === 'all' ||
+            workspace.category === (activeTab as WorkspaceCategory);
 
-      const matchesSearch =
-        !lowerSearch ||
-        workspace.name.toLowerCase().includes(lowerSearch) ||
-        workspace.purpose.toLowerCase().includes(lowerSearch);
+          const matchesSearch =
+            !lowerSearch ||
+            workspace.name.toLowerCase().includes(lowerSearch) ||
+            workspace.purpose.toLowerCase().includes(lowerSearch);
 
-      const matchesTool =
-        selectedTool === 'All' || workspace.tools.includes(selectedTool);
+          const matchesTool =
+            selectedTool === 'All' || workspace.tools.includes(selectedTool);
 
-      return matchesTab && matchesSearch && matchesTool;
-    });
+          return matchesTab && matchesSearch && matchesTool;
+        })</KeenPage>;
   }, [searchText, selectedTool, activeTab]);
 
   const paginatedWorkspaces = useMemo(() => {

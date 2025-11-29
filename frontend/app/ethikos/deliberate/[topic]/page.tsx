@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/deliberate/[topic]/page.tsx
 // C:\MyCode\Konnaxionv14\frontend\app\ethikos\deliberate\[topic]\page.tsx
 'use client';
 

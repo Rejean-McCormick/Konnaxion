@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/contrib/sites/migrations/0003_set_site_domain_and_name.py
 """
 To understand why this file is here, please read:
 

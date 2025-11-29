@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/ethikos/admin.py
 # konnaxion/ethikos/admin.py
 from __future__ import annotations
 from typing import Sequence

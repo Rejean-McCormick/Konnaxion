@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/admin/moderation/page.tsx
 'use client'
 
 import { PageContainer, ProTable } from '@ant-design/pro-components'

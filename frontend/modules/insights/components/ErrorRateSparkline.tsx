@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/components/ErrorRateSparkline.tsx
 "use client";
 import {
   Chart as ChartJS,

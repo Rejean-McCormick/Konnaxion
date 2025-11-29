@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/pulse/health/page.tsx
 'use client';
 
 /**

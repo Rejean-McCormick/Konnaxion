@@ -1,3 +1,4 @@
+// FILE: frontend/services/trust.ts
 // frontend/services/trust.ts
 import dayjs from 'dayjs';
 import { get } from './_request';

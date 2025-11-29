@@ -1,3 +1,4 @@
+# FILE: backend/docs/conf.py
 # ruff: noqa: ERA001, PTH100
 # Configuration file for the Sphinx documentation builder.
 #

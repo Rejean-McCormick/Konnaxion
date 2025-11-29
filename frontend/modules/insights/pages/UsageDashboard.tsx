@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/pages/UsageDashboard.tsx
 "use client"; 
 import MainLayout from "@/shared/layout/MainLayout";
 import { useReport } from "../hooks/useReport";

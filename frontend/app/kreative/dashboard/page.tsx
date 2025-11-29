@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/dashboard/page.tsx
 // app/kreative/dashboard/page.tsx
 'use client';
 

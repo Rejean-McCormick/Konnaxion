@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/hooks/useConsultationResults.ts
 ﻿// modules/konsultations/hooks/useConsultationResults.ts
 
 import { useQuery } from '@tanstack/react-query';

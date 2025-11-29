@@ -1,3 +1,4 @@
+// FILE: frontend/types/activity.ts
 // types/activity.ts
 import type React from 'react';
 

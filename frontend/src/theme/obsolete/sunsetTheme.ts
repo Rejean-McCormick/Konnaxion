@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/obsolete/sunsetTheme.ts
 import { BRAND_HEX, Theme } from './types';
 
 export const sunsetTheme: Theme = {

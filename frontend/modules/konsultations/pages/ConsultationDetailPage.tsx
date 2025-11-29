@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/pages/ConsultationDetailPage.tsx
 ﻿'use client';
 
 import React from 'react';

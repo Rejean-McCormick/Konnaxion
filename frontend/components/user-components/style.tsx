@@ -1,3 +1,4 @@
+// FILE: frontend/components/user-components/style.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\user-components\style.tsx  :contentReference[oaicite:0]{index=0}
 /**
  * Description: Stylesheet for user components

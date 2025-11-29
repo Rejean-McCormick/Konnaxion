@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/workspaces/my-workspaces/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -17,6 +18,7 @@ import {
 import type { MenuProps } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 import { ProTable, type ProColumns } from '@ant-design/pro-components';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text } = Typography;
 
@@ -75,7 +77,7 @@ export default function MyWorkspaces() {
 
   const filteredWorkspaces = useMemo(() => {
     const base = visibleWorkspaces;
-    if (selectedProject === 'All') return base;
+    if (selectedProject === 'All') return <KeenPage title="Page" description="">base</KeenPage>;
     return base.filter((ws) => ws.project === selectedProject);
   }, [selectedProject, visibleWorkspaces]);
 

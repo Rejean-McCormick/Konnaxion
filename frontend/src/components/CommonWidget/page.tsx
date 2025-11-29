@@ -1,3 +1,4 @@
+// FILE: frontend/src/components/CommonWidget/page.tsx
 import React from 'react';
 import styles from '@/shared/CommonWidget.module.css';
 

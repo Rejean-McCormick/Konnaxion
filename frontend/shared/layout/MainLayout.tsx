@@ -1,3 +1,4 @@
+// FILE: frontend/shared/layout/MainLayout.tsx
 "use client";
 import Link from "next/link";
 import { Layout, Menu } from "antd";

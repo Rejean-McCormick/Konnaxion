@@ -1,3 +1,4 @@
+// FILE: frontend/app/ekoh/dashboard/page.tsx
 'use client';
 
 // app/ekoh/dashboard/page.tsx

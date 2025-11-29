@@ -1,3 +1,4 @@
+# FILE: backend/scripts/populate_demo_data.py
 import os
 import django
 import random

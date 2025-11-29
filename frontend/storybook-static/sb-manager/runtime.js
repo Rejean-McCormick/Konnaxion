@@ -1,3 +1,4 @@
+// FILE: frontend/storybook-static/sb-manager/runtime.js
 var Nd = Object.create;
 var tn = Object.defineProperty;
 var Rd = Object.getOwnPropertyDescriptor;

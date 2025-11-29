@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/kreativePageShell.tsx
 'use client';
 
 import React, { ReactNode } from 'react';

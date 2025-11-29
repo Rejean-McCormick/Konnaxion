@@ -1,9 +1,11 @@
+// FILE: frontend/app/keenkonnect/user-reputation/manage-expertise-areas/page.tsx
 ﻿'use client';
 
 import React, { useMemo, useState } from 'react';
 import { Form, Alert, Divider, Typography, List, Tag, Rate, Space } from 'antd';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
 import PageContainer from '@/components/PageContainer';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Text, Paragraph } = Typography;
 const { CheckableTag } = Tag;
@@ -131,7 +133,7 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
     // Stub : à brancher sur l’API de profil / Ekoh plus tard
     // eslint-disable-next-line no-console
     console.log('Manage Expertise Areas – submit:', values);
-    return true;
+    return <KeenPage title="Page" description="">true</KeenPage>;
   };
 
   return (

@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/deliberate/elite/page.tsx
 'use client';
 
 import React from 'react';

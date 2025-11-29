@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/trust/models.py
 # konnaxion/trust/models.py
 from __future__ import annotations
 
@@ -6,6 +7,7 @@ import os
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 __all__ = ["Credential"]
 
@@ -15,12 +17,11 @@ def credential_upload_to(instance, filename: str) -> str:
     Storage path for user-submitted credentials.
 
     Pattern (UTC date):
-        trust/credentials/<year>/<month>/user-<user_id>/<slugified-filename><ext>
+        trust/credentials/<year>/<month>/user-<user_id-or-anon>/<slugified-filename><ext>
     """
-    from django.utils.text import slugify  # local import to avoid unused at module level
-
     now = timezone.now()
-    user_id = getattr(getattr(instance, "user", None), "id", "anon")
+    # Use FK id directly; falls back to "anon" if no user is attached yet.
+    user_id = getattr(instance, "user_id", None) or "anon"
 
     name, ext = os.path.splitext(filename)
     safe_name = slugify(name) or "credential"

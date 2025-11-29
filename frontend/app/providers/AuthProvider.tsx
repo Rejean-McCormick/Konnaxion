@@ -1,3 +1,4 @@
+// FILE: frontend/app/providers/AuthProvider.tsx
 // app/providers/AuthProvider.tsx
 'use client';
 

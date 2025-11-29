@@ -1,3 +1,4 @@
+// FILE: frontend/components/TagsList.tsx
 'use client';
 
 import React from 'react';

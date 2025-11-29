@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/community-discussions/active-threads/page.tsx
 ﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
 'use client';
 

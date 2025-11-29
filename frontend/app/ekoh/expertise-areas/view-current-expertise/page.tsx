@@ -1,3 +1,4 @@
+// FILE: frontend/app/ekoh/expertise-areas/view-current-expertise/page.tsx
 'use client'
 
 // app/ekoh/expertise-areas/view-current-expertise/page.tsx

@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/types.ts
 export type ThemeId =
   | "sandstone"
   | "blueCanvas"

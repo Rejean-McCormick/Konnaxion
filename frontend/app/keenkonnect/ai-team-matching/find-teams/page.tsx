@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/ai-team-matching/find-teams/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -30,6 +31,7 @@ import {
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import PageContainer from '@/components/PageContainer';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;

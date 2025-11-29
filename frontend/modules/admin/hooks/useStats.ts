@@ -1,3 +1,4 @@
+// FILE: frontend/modules/admin/hooks/useStats.ts
 ﻿import { useQuery } from "@tanstack/react-query";
 import { api } from "@/shared/api";
 

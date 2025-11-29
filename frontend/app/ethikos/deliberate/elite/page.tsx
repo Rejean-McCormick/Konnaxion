@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/deliberate/elite/page.tsx
 // app/ethikos/deliberate/elite/page.tsx
 'use client';
 

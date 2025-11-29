@@ -1,3 +1,4 @@
+// FILE: frontend/shared/services/admin.ts
 // shared/services/admin.ts
 
 import { HttpError } from "../errors";

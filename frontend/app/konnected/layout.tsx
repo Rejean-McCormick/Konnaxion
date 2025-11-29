@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/layout.tsx
 // app/konnected/layout.tsx
 'use client'
 

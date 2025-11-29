@@ -1,3 +1,4 @@
+// FILE: frontend/shared/downloadCsv.ts
 'use client'
 
 export async function downloadCsv(endpoint: string, params?: Record<string, unknown>) {

@@ -1,3 +1,4 @@
+// FILE: frontend/smoke/smoke.spec.ts
 // smoke/smoke.spec.ts
 import { test, expect } from '@playwright/test';
 

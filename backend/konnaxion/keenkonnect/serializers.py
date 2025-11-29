@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/keenkonnect/serializers.py
 from rest_framework import serializers
 from .models import Project, ProjectResource, ProjectTask, ProjectMessage, ProjectTeam, ProjectRating, Tag
 

@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/konnected/admin.py
 # backend/konnaxion/konnected/admin.py
 from __future__ import annotations
 

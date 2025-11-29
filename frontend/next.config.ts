@@ -1,3 +1,4 @@
+// FILE: frontend/next.config.ts
 // next.config.ts
 import withBundleAnalyzer from "@next/bundle-analyzer"
 import type { NextConfig } from "next"

@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/collaborative-spaces/my-spaces/page.tsx
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
 'use client';
 

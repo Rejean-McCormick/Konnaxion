@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/users/tests/api/test_openapi.py
 from http import HTTPStatus
 
 import pytest

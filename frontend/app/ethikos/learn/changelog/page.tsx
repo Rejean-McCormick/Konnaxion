@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/learn/changelog/page.tsx
 'use client';
 
 // app/ethikos/learn/changelog/page.tsx.

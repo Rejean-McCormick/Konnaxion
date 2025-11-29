@@ -1,3 +1,4 @@
+// FILE: frontend/tests/auth.setup.ts
 // tests/auth.setup.ts
 import { test as setup } from '@playwright/test';
 

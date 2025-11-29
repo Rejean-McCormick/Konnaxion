@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/KonnectedPageShell.tsx
 // app/konnected/KonnectedPageShell.tsx
 'use client';
 

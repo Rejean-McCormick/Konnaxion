@@ -1,3 +1,4 @@
+// FILE: frontend/storybook-static/sb-preview/runtime.js
 var tl = Object.create;
 var et = Object.defineProperty;
 var ol = Object.getOwnPropertyDescriptor;

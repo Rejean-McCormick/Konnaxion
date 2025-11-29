@@ -1,3 +1,4 @@
+// FILE: frontend/api.ts
 // C:\MyCode\Konnaxionv14\frontend\api.ts
 
 // Keep all named exports from the generated request layer

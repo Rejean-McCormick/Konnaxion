@@ -1,3 +1,4 @@
+// FILE: frontend/services/decide.mock.ts
 // src/services/decide.mock.ts
 import dayjs from 'dayjs';
 

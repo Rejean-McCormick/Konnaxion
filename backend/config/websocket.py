@@ -1,3 +1,4 @@
+# FILE: backend/config/websocket.py
 async def websocket_application(scope, receive, send):
     while True:
         event = await receive()

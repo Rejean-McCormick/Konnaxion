@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/obsolete/funkyTheme.ts
 import { BRAND_HEX, Theme } from './types';
 
 export const funkyTheme: Theme = {

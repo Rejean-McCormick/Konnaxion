@@ -1,3 +1,4 @@
+// FILE: frontend/hooks/useReputationEvents.ts
 // hooks/useReputationEvents.ts
 
 import { useQuery } from '@tanstack/react-query';

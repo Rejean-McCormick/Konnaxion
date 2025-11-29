@@ -1,9 +1,10 @@
+// FILE: frontend/app/kreative/idea-incubator/collaborate-on-ideas/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
 import { List, Button, Badge, Input, Select, Space, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
 
@@ -49,19 +50,29 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
 
   const filteredIdeas = useMemo<Idea[]>(() => {
     let ideas = dummyIdeas;
+
     if (selectedStatus !== 'All') {
       ideas = ideas.filter((idea) => idea.status === selectedStatus);
     }
+
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
       ideas = ideas.filter((idea) => idea.title.toLowerCase().includes(q));
     }
+
     return ideas;
   }, [searchQuery, selectedStatus]);
 
   return (
-    <PageContainer title="Collaborate on Ideas">
-      <Space direction="vertical" size="middle" style={{ width: '100%', marginBottom: 24 }}>
+    <KreativePageShell
+      title="Collaborate on Ideas"
+      description="Discover community ideas and join as a collaborator."
+    >
+      <Space
+        direction="vertical"
+        size="middle"
+        style={{ width: '100%', marginBottom: 24 }}
+      >
         <Space>
           <Input
             placeholder="Search by title..."
@@ -93,13 +104,17 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
               <Button
                 key="edit"
                 type="primary"
-                onClick={() => router.push(`/kreative/idea-incubator/edit/${idea.id}`)}
+                onClick={() =>
+                  router.push(`/kreative/idea-incubator/edit/${idea.id}`)
+                }
               >
                 Edit
               </Button>,
               <Button
                 key="view"
-                onClick={() => router.push(`/kreative/idea-incubator/view/${idea.id}`)}
+                onClick={() =>
+                  router.push(`/kreative/idea-incubator/view/${idea.id}`)
+                }
               >
                 View
               </Button>,
@@ -120,13 +135,15 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
                 <>
                   <Text type="secondary">Status: {idea.status}</Text>
                   <br />
-                  <Text type="secondary">Created on: {idea.dateCreated}</Text>
+                  <Text type="secondary">
+                    Created on: {idea.dateCreated}
+                  </Text>
                 </>
               }
             />
           </List.Item>
         )}
       />
-    </PageContainer>
+    </KreativePageShell>
   );
 }

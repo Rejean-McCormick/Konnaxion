@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/ethikos/apps.py
 from django.apps import AppConfig
 
 

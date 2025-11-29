@@ -1,3 +1,4 @@
+// FILE: frontend/lib/api-client.ts
 // lib/api-client.ts
 const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '';
 

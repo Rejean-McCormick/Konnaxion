@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/user-reputation/account-preferences/page.tsx
 ﻿// app/keenkonnect/user-reputation/account-preferences/page.tsx
 'use client';
 
@@ -18,6 +19,7 @@ import type { TabsProps } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import { UploadOutlined } from '@ant-design/icons';
 import { uploadUserAvatar } from '@/services/user';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { TextArea } = Input;
 
@@ -274,7 +276,7 @@ export default function AccountPreferencesPage(): JSX.Element {
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('newPassword') === value) {
-                    return Promise.resolve();
+                    return <KeenPage title="Page" description="">Promise.resolve()</KeenPage>;
                   }
                   return Promise.reject(
                     new Error('The new password and confirmation do not match.'),

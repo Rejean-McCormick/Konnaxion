@@ -1,3 +1,4 @@
+// FILE: frontend/hooks/usePageTitle.ts
 'use client'
 
 // hooks/usePageTitle.ts

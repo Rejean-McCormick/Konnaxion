@@ -1,3 +1,4 @@
+// FILE: frontend/app/_api/health/route.ts
 import { NextResponse } from 'next/server'
 
 export async function GET() {

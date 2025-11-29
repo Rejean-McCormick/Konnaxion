@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/admin/audit/page.tsx
 // app/ethikos/admin/audit/page.tsx
 'use client';
 

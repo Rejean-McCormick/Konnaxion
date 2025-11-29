@@ -1,3 +1,4 @@
+// FILE: frontend/components/dashboard-components/index.tsx
 // components/dashboard-components/index.tsx
 import UserCard from './UserCard'
 import VisitCard from './VisitCard'

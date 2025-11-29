@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/users/models.py
 import os
 
 from django.contrib.auth.models import AbstractUser

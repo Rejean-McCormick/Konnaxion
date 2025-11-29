@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/learning-library/search-filters/page.tsx
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';

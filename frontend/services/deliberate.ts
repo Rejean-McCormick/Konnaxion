@@ -1,3 +1,4 @@
+// FILE: frontend/services/deliberate.ts
 // services/deliberate.ts
 import { get, post } from './_request'
 import type { Topic } from '@/types'

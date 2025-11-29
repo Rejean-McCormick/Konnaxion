@@ -1,3 +1,4 @@
+// FILE: frontend/components/CustomComment.tsx
 'use client'
 
 import { Typography } from 'antd'

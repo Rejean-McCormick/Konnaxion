@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/admin/moderation/page.tsx
 // app/ethikos/admin/moderation/page.tsx
 'use client';
 

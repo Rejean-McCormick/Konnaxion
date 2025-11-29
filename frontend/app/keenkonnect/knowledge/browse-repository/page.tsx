@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/knowledge/browse-repository/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -7,6 +8,7 @@ import type { DataNode, TreeProps } from 'antd/es/tree';
 import { ProTable, type ProColumns } from '@ant-design/pro-components';
 import { FolderOpenOutlined, FileTextOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Search } = Input;
 const { Title, Text } = Typography;

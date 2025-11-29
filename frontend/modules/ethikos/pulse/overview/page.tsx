@@ -1,3 +1,4 @@
+// FILE: frontend/modules/ethikos/pulse/overview/page.tsx
 'use client'
 
 // pages/ethikos/pulse/overview.tsx

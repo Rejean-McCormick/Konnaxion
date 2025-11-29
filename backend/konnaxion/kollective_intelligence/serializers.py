@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/kollective_intelligence/serializers.py
 # konnaxion/kollective_intelligence/serializers.py
 from rest_framework import serializers
 

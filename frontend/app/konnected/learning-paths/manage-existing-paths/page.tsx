@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/learning-paths/manage-existing-paths/page.tsx
 ﻿'use client';
 
 import React, { useRef, useState } from 'react';

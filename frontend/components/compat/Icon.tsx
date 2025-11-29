@@ -1,3 +1,4 @@
+// FILE: frontend/components/compat/Icon.tsx
 // components/compat/Icon.tsx
 import React from 'react'
 import {

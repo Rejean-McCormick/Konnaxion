@@ -1,3 +1,4 @@
+// FILE: frontend/modules/account/UserSettings.tsx
 // frontend/modules/account/UserSettings.tsx
 'use client';
 

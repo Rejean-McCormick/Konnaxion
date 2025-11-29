@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/obsolete/minimalTheme.ts
 import { theme } from 'antd';
 const { defaultAlgorithm } = theme;
 

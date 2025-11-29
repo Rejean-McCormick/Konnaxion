@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/components/ResultsDashboard.tsx
 ﻿'use client';
 
 import {

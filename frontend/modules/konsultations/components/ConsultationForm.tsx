@@ -1,3 +1,4 @@
+// FILE: frontend/modules/konsultations/components/ConsultationForm.tsx
 ﻿import React, { useState } from 'react';
 import { Form, Slider, Input, Button, message as antdMessage } from 'antd';
 import { useRequest } from 'ahooks';

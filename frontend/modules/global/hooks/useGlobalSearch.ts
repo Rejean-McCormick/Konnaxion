@@ -1,3 +1,4 @@
+// FILE: frontend/modules/global/hooks/useGlobalSearch.ts
 ﻿// modules/global/hooks/useGlobalSearch.ts
 "use client";
 

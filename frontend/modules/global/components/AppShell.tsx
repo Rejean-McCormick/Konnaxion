@@ -1,3 +1,4 @@
+// FILE: frontend/modules/global/components/AppShell.tsx
 ﻿"use client";
 import React, { PropsWithChildren } from "react";
 import { Layout } from "antd";

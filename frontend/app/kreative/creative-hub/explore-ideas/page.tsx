@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/creative-hub/explore-ideas/page.tsx
 'use client';
 
 // File: C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx

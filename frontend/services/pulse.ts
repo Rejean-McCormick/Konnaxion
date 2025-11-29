@@ -1,3 +1,4 @@
+// FILE: frontend/services/pulse.ts
 // frontend/services/pulse.ts
 import dayjs from 'dayjs'
 import { get } from './_request'

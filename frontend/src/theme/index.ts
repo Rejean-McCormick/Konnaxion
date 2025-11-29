@@ -1,3 +1,4 @@
+// FILE: frontend/src/theme/index.ts
 import type { Theme, ThemeId } from "./types";
 
 import sandstoneTheme from "./theme01";

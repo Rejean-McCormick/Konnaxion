@@ -1,3 +1,4 @@
+// FILE: frontend/services/admin.ts
 // services/admin.ts
 import { get, post, patch } from './_request'
 import type { AuditPayload as AuditPayloadBase, LogRow as AuditLogRow } from './audit'

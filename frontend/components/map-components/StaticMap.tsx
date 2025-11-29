@@ -1,3 +1,4 @@
+// FILE: frontend/components/map-components/StaticMap.tsx
 'use client';
 
 /**

@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/pages/SmartVoteDashboard.tsx
 "use client"; 
 import { useState } from "react";
 import dayjs from "dayjs";

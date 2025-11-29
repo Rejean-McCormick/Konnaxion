@@ -1,3 +1,4 @@
+// FILE: frontend/modules/insights/hooks/useReportStream.ts
 "use client";
 
 import { useEffect, useRef, useState } from "react";

@@ -1,3 +1,4 @@
+// FILE: frontend/components/user-components/UserProfile.tsx
 // C:\MyCode\Konnaxionv14\frontend\components\user-components\UserProfile.tsx
 // Référence dump: :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1}
 

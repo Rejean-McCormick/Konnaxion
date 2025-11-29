@@ -1,3 +1,4 @@
+// FILE: frontend/app/kreative/creative-hub/inspiration-gallery/page.tsx
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
 'use client';
 
@@ -14,7 +15,7 @@ import {
   Space,
 } from 'antd';
 import { HeartOutlined, HeartFilled } from '@ant-design/icons';
-import PageContainer from '@/components/PageContainer';
+import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -131,7 +132,13 @@ export default function InspirationGalleryPage(): JSX.Element {
   const toggleLike = (id: string): void => {
     setWorks((prev) =>
       prev.map((w) =>
-        w.id === id ? { ...w, liked: !w.liked, likes: w.liked ? w.likes - 1 : w.likes + 1 } : w,
+        w.id === id
+          ? {
+              ...w,
+              liked: !w.liked,
+              likes: w.liked ? w.likes - 1 : w.likes + 1,
+            }
+          : w,
       ),
     );
   };
@@ -149,7 +156,10 @@ export default function InspirationGalleryPage(): JSX.Element {
   };
 
   return (
-    <PageContainer title="Inspiration Gallery">
+    <KreativePageShell
+      title="Inspiration Gallery"
+      subtitle="Explore highlighted creative works from the Kreative community."
+    >
       {/* Category Filter (AntD v5 Tabs API) */}
       <Tabs
         activeKey={selectedCategory}
@@ -260,6 +270,6 @@ export default function InspirationGalleryPage(): JSX.Element {
           overflow: hidden;
         }
       `}</style>
-    </PageContainer>
+    </KreativePageShell>
   );
 }

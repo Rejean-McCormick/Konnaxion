@@ -1,3 +1,4 @@
+// FILE: frontend/.storybook/preview.ts
 // .storybook/preview.ts
 import '../styles/globals.css'
 import type { Preview } from '@storybook/nextjs'

@@ -1,3 +1,4 @@
+// FILE: frontend/components/compat/Comment.tsx
 // components/compat/Comment.tsx
 import React from 'react'
 import { Avatar, List, Typography } from 'antd'

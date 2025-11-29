@@ -1,3 +1,4 @@
+// FILE: frontend/app/konnected/teams-collaboration/activity-planner/page.tsx
 // app/konnected/teams-collaboration/activity-planner/page.tsx
 'use client';
 

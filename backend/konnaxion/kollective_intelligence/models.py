@@ -1,3 +1,4 @@
+# FILE: backend/konnaxion/kollective_intelligence/models.py
 
 # kollective_intelligence/models.py
 from django.conf import settings

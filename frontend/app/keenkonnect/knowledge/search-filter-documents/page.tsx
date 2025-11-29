@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/knowledge/search-filter-documents/page.tsx
 // app/keenkonnect/knowledge/search-filter-documents/page.tsx
 'use client'
 

@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/knowledge/document-management/page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -35,6 +36,7 @@ import {
 } from '@ant-design/pro-components';
 import { Comment } from '@ant-design/compatible';
 import usePageTitle from '@/hooks/usePageTitle';
+import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { TextArea } = Input;
 
