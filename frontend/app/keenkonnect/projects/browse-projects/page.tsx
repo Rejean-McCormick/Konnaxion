@@ -30,7 +30,7 @@ import {
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import api from '@/api';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Search } = Input;
 const { Option } = Select;
@@ -185,7 +185,7 @@ export default function BrowseProjectsPage(): JSX.Element {
   };
 
   return (
-    <KeenPage
+    <KeenPageShell
       title="Browse Projects"
       description="Discover projects and collaborate through KeenKonnect. Data is loaded from the Django backend."
       metaTitle="KeenKonnect · Browse Projects"
@@ -327,7 +327,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                       </Space>
                     }
                     onClick={() => handleOpenDrawer(project)}
-                    extra={
+                    extra={(
                       <Space size={8}>
                         <Tooltip title="Open workspace">
                           <Button
@@ -353,7 +353,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                           </Button>
                         </Tooltip>
                       </Space>
-                    }
+                    )}
                   >
                     <Space
                       direction="vertical"
@@ -545,6 +545,6 @@ export default function BrowseProjectsPage(): JSX.Element {
           )}
         </Drawer>
       </ProCard>
-    </KeenPage>
+    </KeenPageShell>
   );
 }

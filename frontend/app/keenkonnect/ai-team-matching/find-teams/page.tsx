@@ -6,7 +6,6 @@ import {
   Badge,
   Button,
   Card,
-  Divider,
   Drawer,
   Empty,
   Input,
@@ -30,7 +29,6 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text, Paragraph } = Typography;
@@ -173,7 +171,11 @@ const FindTeamsPage: React.FC = () => {
   };
 
   return (
-    <PageContainer title="Find AI‑recommended teams">
+    <KeenPage
+      title="Find AI-recommended teams"
+      description="Discover teams recommended based on your profile and AI matching preferences."
+      metaTitle="KeenKonnect · AI Team Matching · Find teams"
+    >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Intro / CTA */}
         <Card>
@@ -185,8 +187,8 @@ const FindTeamsPage: React.FC = () => {
                 </Title>
                 <Text type="secondary">
                   KeenKonnect uses your skills, experience, and preferences to
-                  suggest teams where you’re likely to thrive. Refine the filters
-                  or adjust your preferences to tune the recommendations.
+                  suggest teams where you’re likely to thrive. Refine the
+                  filters or adjust your preferences to tune the recommendations.
                 </Text>
               </Space>
             </Col>
@@ -416,8 +418,6 @@ const FindTeamsPage: React.FC = () => {
                           <Tag>{team.members.join(', ')}</Tag>
                         </Space>
 
-                        <Divider style={{ margin: '8px 0' }} />
-
                         <Space direction="vertical" size={4}>
                           <Text strong>Why this is a good match</Text>
                           <Paragraph
@@ -551,7 +551,7 @@ const FindTeamsPage: React.FC = () => {
           </Space>
         )}
       </Drawer>
-    </PageContainer>
+    </KeenPage>
   );
 };
 

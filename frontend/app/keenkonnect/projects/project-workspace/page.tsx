@@ -1,5 +1,4 @@
 // FILE: frontend/app/keenkonnect/projects/project-workspace/page.tsx
-// app/keenkonnect/projects/project-workspace/page.tsx
 'use client';
 
 import React, { Suspense, useEffect, useState } from 'react';
@@ -23,7 +22,7 @@ import {
   Space,
 } from 'antd';
 import api from '@/api';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -58,12 +57,17 @@ interface WorkspaceViewModel {
   timeline?: any[];
 }
 
-export default function PageWrapper() {
-  return <KeenPage title="Page" description="">(
+export default function ProjectWorkspacePage() {
+  return (
+    <KeenPageShell
+      title="Project Workspace"
+      description="Central hub for coordinating your project, tracking tasks, and collaborating with your team in KeenKonnect."
+    >
       <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
         <Content />
       </Suspense>
-    )</KeenPage>;
+    </KeenPageShell>
+  );
 }
 
 function Content(): JSX.Element {
@@ -127,15 +131,6 @@ function Content(): JSX.Element {
 
     void fetchWorkspace();
   }, [projectId]);
-
-  // Update document title
-  useEffect(() => {
-    if (workspace?.name) {
-      document.title = `KeenKonnect – ${workspace.name}`;
-    } else {
-      document.title = 'KeenKonnect – Project Workspace';
-    }
-  }, [workspace?.name]);
 
   // Safely derive arrays from the workspace payload
   const tasks: any[] = Array.isArray(workspace?.tasks)
@@ -434,8 +429,8 @@ function Content(): JSX.Element {
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      <Title level={2} style={{ marginBottom: 8 }}>
+    <>
+      <Title level={3} style={{ marginBottom: 8 }}>
         {workspace?.name || 'Project Workspace'}
       </Title>
 
@@ -607,6 +602,6 @@ function Content(): JSX.Element {
           <Empty description="No task selected." />
         )}
       </Drawer>
-    </div>
+    </>
   );
 }

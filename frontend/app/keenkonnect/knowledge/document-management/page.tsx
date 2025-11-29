@@ -1,4 +1,4 @@
-// FILE: frontend/app/keenkonnect/knowledge/document-management/page.tsx
+// C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx
 'use client';
 
 import React, { useState } from 'react';
@@ -35,7 +35,6 @@ import {
   type ProColumns,
 } from '@ant-design/pro-components';
 import { Comment } from '@ant-design/compatible';
-import usePageTitle from '@/hooks/usePageTitle';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { TextArea } = Input;
@@ -113,7 +112,7 @@ const initialDocuments: ManagedDocument[] = [
     updatedAt: '2025-04-30',
     tags: ['safety', 'protocol'],
     summary:
-      'Draft revision of robotics safety guidelines, including new proximity sensor checks and human-in-the-loop overrides for high‑risk procedures.',
+      'Draft revision of robotics safety guidelines, including new proximity sensor checks and human-in-the-loop overrides for high-risk procedures.',
   },
   {
     id: 'doc-3',
@@ -128,7 +127,7 @@ const initialDocuments: ManagedDocument[] = [
     updatedAt: '2025-03-18',
     tags: ['template', 'phase-II'],
     summary:
-      'Standardized template for Phase II clinical trials, ready for localization and site‑specific amendments.',
+      'Standardized template for Phase II clinical trials, ready for localization and site-specific amendments.',
   },
   {
     id: 'doc-4',
@@ -143,7 +142,7 @@ const initialDocuments: ManagedDocument[] = [
     updatedAt: '2024-12-02',
     tags: ['legacy', 'integration'],
     summary:
-      'Historical notes on integrating first‑generation devices with the current control stack. Kept for traceability.',
+      'Historical notes on integrating first-generation devices with the current control stack. Kept for traceability.',
   },
   {
     id: 'doc-5',
@@ -172,7 +171,7 @@ const versionHistory: VersionItem[] = [
   {
     version: '1.3',
     timestamp: '2025-03-28 16:42',
-    author: 'Dr. Omar El‑Sayed',
+    author: 'Dr. Omar El-Sayed',
     changeSummary: 'Added cross-site comparison metrics and monitoring hooks.',
   },
   {
@@ -185,7 +184,7 @@ const versionHistory: VersionItem[] = [
     version: '1.1',
     timestamp: '2024-07-18 14:55',
     author: 'Dr. Alice Chen',
-    changeSummary: 'Initial roll‑out for robotics–clinical protocol harmonization.',
+    changeSummary: 'Initial roll-out for robotics–clinical protocol harmonization.',
   },
 ];
 
@@ -200,10 +199,10 @@ const commentsData: CommentItem[] = [
   },
   {
     id: 2,
-    author: 'Dr. Omar El‑Sayed',
+    author: 'Dr. Omar El-Sayed',
     avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
     content:
-      'Agreed. I’d also like to add one more metric around post‑op mobility for the robotics‑assisted procedures.',
+      'Agreed. I’d also like to add one more metric around post-op mobility for the robotics-assisted procedures.',
     datetime: '1 hour ago',
   },
   {
@@ -229,7 +228,6 @@ const getStatusColor = (status: DocumentStatus): string => {
 };
 
 export default function DocumentManagementPage() {
-  usePageTitle('KeenKonnect · Knowledge · Document Management');
   const router = useRouter();
 
   const [dataSource, setDataSource] = useState<ManagedDocument[]>(initialDocuments);
@@ -355,7 +353,7 @@ export default function DocumentManagementPage() {
           title={
             record.aiIndexed
               ? 'Document is used by assistants and semantic search.'
-              : 'Document is excluded from AI‑powered features.'
+              : 'Document is excluded from AI-powered features.'
           }
         >
           <Switch
@@ -436,15 +434,10 @@ export default function DocumentManagementPage() {
   ];
 
   return (
-    <div className="container mx-auto p-5">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Document Management</h1>
-          <p className="text-gray-500">
-            Manage your knowledge documents, control AI indexing and visibility, and
-            inspect versions and comments from one place.
-          </p>
-        </div>
+    <KeenPage
+      title="Document Management"
+      description="Manage your knowledge documents, control AI indexing and visibility, and inspect versions and comments from one place."
+      toolbar={
         <Space>
           <Button
             onClick={() =>
@@ -454,8 +447,8 @@ export default function DocumentManagementPage() {
             Go to library view
           </Button>
         </Space>
-      </div>
-
+      }
+    >
       <EditableProTable<ManagedDocument>
         rowKey="id"
         bordered
@@ -594,7 +587,7 @@ export default function DocumentManagementPage() {
       >
         {selectedDocument && (
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap items=center justify-between gap-3">
               <div>
                 <h2 className="mb-1 text-xl font-semibold">
                   {selectedDocument.title}
@@ -617,7 +610,7 @@ export default function DocumentManagementPage() {
             <Row gutter={16}>
               <Col xs={24} md={14}>
                 <Card
-                  title="Real‑time editing (simulated)"
+                  title="Real-time editing (simulated)"
                   extra={
                     <Tooltip title="Open full editor in Konstruct (future integration)">
                       <Button type="link" icon={<EyeOutlined />}>
@@ -751,6 +744,6 @@ export default function DocumentManagementPage() {
           </Space>
         )}
       </Drawer>
-    </div>
+    </KeenPage>
   );
 }

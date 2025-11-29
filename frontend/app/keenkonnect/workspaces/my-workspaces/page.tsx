@@ -77,7 +77,7 @@ export default function MyWorkspaces() {
 
   const filteredWorkspaces = useMemo(() => {
     const base = visibleWorkspaces;
-    if (selectedProject === 'All') return <KeenPage title="Page" description="">base</KeenPage>;
+    if (selectedProject === 'All') return base;
     return base.filter((ws) => ws.project === selectedProject);
   }, [selectedProject, visibleWorkspaces]);
 
@@ -130,7 +130,6 @@ export default function MyWorkspaces() {
       title: 'Environment',
       dataIndex: 'environment',
       key: 'environment',
-      // IMPORTANT : on respecte la signature (dom, entity, index, action, schema)
       render: (_dom, record) => <Tag>{record.environment}</Tag>,
     },
     {
@@ -195,10 +194,10 @@ export default function MyWorkspaces() {
   ];
 
   return (
-    <div className="container mx-auto p-5">
-      <Title level={2}>My Workspaces</Title>
-      <Divider />
-
+    <KeenPage
+      title="My Workspaces"
+      description="Manage and organize your KeenKonnect workspaces."
+    >
       <Row gutter={[16, 16]} className="mb-4">
         <Col xs={24} sm={12}>
           <Text strong>Total Active Workspaces: {activeCount}</Text>
@@ -253,6 +252,6 @@ export default function MyWorkspaces() {
         }}
         options={false}
       />
-    </div>
+    </KeenPage>
   );
 }

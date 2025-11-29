@@ -276,7 +276,7 @@ export default function AccountPreferencesPage(): JSX.Element {
               ({ getFieldValue }) => ({
                 validator(_, value) {
                   if (!value || getFieldValue('newPassword') === value) {
-                    return <KeenPage title="Page" description="">Promise.resolve()</KeenPage>;
+                    return Promise.resolve();
                   }
                   return Promise.reject(
                     new Error('The new password and confirmation do not match.'),
@@ -474,10 +474,11 @@ export default function AccountPreferencesPage(): JSX.Element {
   ];
 
   return (
-    <div className="container mx-auto p-5">
-      <h1 className="text-2xl font-bold mb-4">Account &amp; Preferences</h1>
-
+    <KeenPage
+      title="Account & Preferences"
+      description="Manage your profile information, security, notifications, and privacy settings for KeenKonnect."
+    >
       <Tabs defaultActiveKey="profile" items={items} />
-    </div>
+    </KeenPage>
   );
 }

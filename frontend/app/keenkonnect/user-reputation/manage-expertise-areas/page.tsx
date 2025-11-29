@@ -4,8 +4,7 @@
 import React, { useMemo, useState } from 'react';
 import { Form, Alert, Divider, Typography, List, Tag, Rate, Space } from 'antd';
 import { ProForm, ProFormSelect } from '@ant-design/pro-components';
-import PageContainer from '@/components/PageContainer';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Text, Paragraph } = Typography;
 const { CheckableTag } = Tag;
@@ -66,7 +65,7 @@ const EXPERTISE_CATALOG: ExpertiseItem[] = [
     key: 'mobile',
     label: 'Mobile Development',
     description:
-      'Native & cross‑platform apps, performance and offline patterns.',
+      'Native & cross-platform apps, performance and offline patterns.',
     defaultLevel: 3,
   },
   {
@@ -133,14 +132,17 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
     // Stub : à brancher sur l’API de profil / Ekoh plus tard
     // eslint-disable-next-line no-console
     console.log('Manage Expertise Areas – submit:', values);
-    return <KeenPage title="Page" description="">true</KeenPage>;
+    return true;
   };
 
   return (
-    <PageContainer title="Manage Expertise Areas">
-      {/* ✅ description moved inside instead of using a PageContainer prop */}
+    <KeenPageShell
+      title="Manage Expertise Areas"
+      description="Declare and fine-tune the expertise areas used by Ekoh, KeenKonnect matching, and Smart Vote."
+      metaTitle="KeenKonnect · Manage Expertise Areas"
+    >
       <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-        Declare and fine‑tune the expertise areas used by Ekoh, KeenKonnect
+        Declare and fine-tune the expertise areas used by Ekoh, KeenKonnect
         matching, and Smart Vote.
       </Paragraph>
 
@@ -262,6 +264,6 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
           </List.Item>
         )}
       />
-    </PageContainer>
+    </KeenPageShell>
   );
 }

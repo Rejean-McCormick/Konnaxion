@@ -1,8 +1,6 @@
-// FILE: frontend/app/keenkonnect/knowledge/browse-repository/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import Head from 'next/head';
 import { Card, Row, Col, Tree, Input, Select, Tag, Space, Typography } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
 import { ProTable, type ProColumns } from '@ant-design/pro-components';
@@ -354,7 +352,9 @@ function BrowseRepositoryPage(): JSX.Element {
           <a
             key="open"
             onClick={() =>
-              router.push(`/keenkonnect/knowledge/document/${encodeURIComponent(row.id)}`)
+              router.push(
+                `/keenkonnect/knowledge/document/${encodeURIComponent(row.id)}`,
+              )
             }
           >
             Ouvrir
@@ -366,117 +366,109 @@ function BrowseRepositoryPage(): JSX.Element {
   );
 
   return (
-    <>
-      <Head>
-        <title>KeenKonnect – Parcourir le dépôt de connaissances</title>
-        <meta
-          name="description"
-          content="Parcourir le dépôt de connaissances KeenKonnect par domaine, type de ressource et filtres avancés."
-        />
-      </Head>
+    <KeenPage
+      title="Parcourir le dépôt de connaissances"
+      description="Parcourez et filtrez les ressources KeenKonnect par domaine, type, niveau d’accès et statut."
+    >
+      <Row gutter={[24, 24]}>
+        {/* Panneau de gauche : arbre de navigation */}
+        <Col xs={24} lg={6}>
+          <Card
+            size="small"
+            bordered={false}
+            title="Arborescence du dépôt"
+            headStyle={{ fontWeight: 600 }}
+          >
+            <Text type="secondary">
+              Naviguez par domaine et type de ressource pour filtrer la liste à
+              droite.
+            </Text>
 
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-4">Parcourir le dépôt de connaissances</h1>
+            <div style={{ marginTop: 16 }}>
+              <Tree
+                showIcon
+                blockNode
+                defaultExpandAll
+                selectedKeys={[selectedKey]}
+                onSelect={handleTreeSelect}
+                treeData={treeData}
+              />
+            </div>
+          </Card>
+        </Col>
 
-        <Row gutter={[24, 24]}>
-          {/* Panneau de gauche : arbre de navigation */}
-          <Col xs={24} lg={6}>
-            <Card
-              size="small"
-              bordered={false}
-              title="Arborescence du dépôt"
-              headStyle={{ fontWeight: 600 }}
-            >
-              <Text type="secondary">
-                Naviguez par domaine et type de ressource pour filtrer la liste à droite.
-              </Text>
-
-              <div style={{ marginTop: 16 }}>
-                <Tree
-                  showIcon
-                  blockNode
-                  defaultExpandAll
-                  selectedKeys={[selectedKey]}
-                  onSelect={handleTreeSelect}
-                  treeData={treeData}
-                />
-              </div>
-            </Card>
-          </Col>
-
-          {/* Panneau de droite : recherche + ProTable */}
-          <Col xs={24} lg={18}>
-            <Card
-              size="small"
-              bordered={false}
-              title={
-                <Space direction="vertical" size={0}>
-                  <Title level={4} style={{ margin: 0 }}>
-                    Parcourir les ressources
-                  </Title>
-                  <Text type="secondary">
-                    Combinez l’arborescence, la recherche et les filtres pour trouver
-                    rapidement les ressources KeenKonnect.
-                  </Text>
-                </Space>
-              }
-            >
-              <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                <Space
-                  wrap
-                  style={{
-                    width: '100%',
-                    justifyContent: 'space-between',
-                    rowGap: 16,
-                  }}
-                >
-                  <Search
-                    placeholder="Rechercher par titre, tag, propriétaire…"
-                    allowClear
-                    style={{ maxWidth: 360 }}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onSearch={(value) => setSearchTerm(value.trim())}
-                  />
-
-                  <Space wrap>
-                    <Select<AccessFilter>
-                      allowClear
-                      placeholder="Niveau d'accès"
-                      style={{ minWidth: 160 }}
-                      value={accessFilter === 'all' ? undefined : accessFilter}
-                      onChange={(value) => setAccessFilter(value ?? 'all')}
-                      options={ACCESS_FILTER_OPTIONS}
-                    />
-                    <Select<StatusFilter>
-                      allowClear
-                      placeholder="Statut"
-                      style={{ minWidth: 160 }}
-                      value={statusFilter === 'all' ? undefined : statusFilter}
-                      onChange={(value) => setStatusFilter(value ?? 'all')}
-                      options={STATUS_FILTER_OPTIONS}
-                    />
-                  </Space>
-                </Space>
-
-                <ProTable<KnowledgeDocument>
-                  rowKey="id"
-                  search={false}
-                  options={false}
-                  toolBarRender={false}
-                  size="small"
-                  dataSource={filteredData}
-                  columns={columns}
-                  pagination={{
-                    pageSize: 10,
-                    showSizeChanger: false,
-                  }}
-                />
+        {/* Panneau de droite : recherche + ProTable */}
+        <Col xs={24} lg={18}>
+          <Card
+            size="small"
+            bordered={false}
+            title={
+              <Space direction="vertical" size={0}>
+                <Title level={4} style={{ margin: 0 }}>
+                  Parcourir les ressources
+                </Title>
+                <Text type="secondary">
+                  Combinez l’arborescence, la recherche et les filtres pour
+                  trouver rapidement les ressources KeenKonnect.
+                </Text>
               </Space>
-            </Card>
-          </Col>
-        </Row>
-      </div>
-    </>
+            }
+          >
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              <Space
+                wrap
+                style={{
+                  width: '100%',
+                  justifyContent: 'space-between',
+                  rowGap: 16,
+                }}
+              >
+                <Search
+                  placeholder="Rechercher par titre, tag, propriétaire…"
+                  allowClear
+                  style={{ maxWidth: 360 }}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onSearch={(value) => setSearchTerm(value.trim())}
+                />
+
+                <Space wrap>
+                  <Select<AccessFilter>
+                    allowClear
+                    placeholder="Niveau d'accès"
+                    style={{ minWidth: 160 }}
+                    value={accessFilter === 'all' ? undefined : accessFilter}
+                    onChange={(value) => setAccessFilter(value ?? 'all')}
+                    options={ACCESS_FILTER_OPTIONS}
+                  />
+                  <Select<StatusFilter>
+                    allowClear
+                    placeholder="Statut"
+                    style={{ minWidth: 160 }}
+                    value={statusFilter === 'all' ? undefined : statusFilter}
+                    onChange={(value) => setStatusFilter(value ?? 'all')}
+                    options={STATUS_FILTER_OPTIONS}
+                  />
+                </Space>
+              </Space>
+
+              <ProTable<KnowledgeDocument>
+                rowKey="id"
+                search={false}
+                options={false}
+                toolBarRender={false}
+                size="small"
+                dataSource={filteredData}
+                columns={columns}
+                pagination={{
+                  pageSize: 10,
+                  showSizeChanger: false,
+                }}
+              />
+            </Space>
+          </Card>
+        </Col>
+      </Row>
+    </KeenPage>
   );
 }
 

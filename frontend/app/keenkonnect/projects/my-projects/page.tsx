@@ -1,4 +1,3 @@
-// FILE: frontend/app/keenkonnect/projects/my-projects/page.tsx
 // app/keenkonnect/projects/my-projects/page.tsx
 'use client';
 
@@ -23,7 +22,6 @@ import {
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { useRouter } from 'next/navigation';
-import usePageTitle from '@/hooks/usePageTitle';
 import api from '@/api';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
@@ -59,7 +57,6 @@ interface Project {
 
 export default function MyProjectsPage(): JSX.Element {
   const router = useRouter();
-  usePageTitle('KeenKonnect – My Projects');
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [statusFilter, setStatusFilter] = useState<ProjectStatus | 'all'>('all');
@@ -97,7 +94,7 @@ export default function MyProjectsPage(): JSX.Element {
   }, []);
 
   const filtered: Project[] = useMemo(() => {
-    if (statusFilter === 'all') return <KeenPage title="Page" description="">projects</KeenPage>;
+    if (statusFilter === 'all') return projects;
     return projects.filter((p) => p.status === statusFilter);
   }, [projects, statusFilter]);
 
@@ -233,50 +230,56 @@ export default function MyProjectsPage(): JSX.Element {
   ];
 
   return (
-    <div>
-      {loading && (
-        <div style={{ textAlign: 'center', marginBottom: 16 }}>
-          <Spin />
-        </div>
-      )}
+    <KeenPage
+      title="My Projects"
+      description="Browse and manage your KeenKonnect projects."
+      metaTitle="KeenKonnect · My Projects"
+    >
+      <>
+        {loading && (
+          <div style={{ textAlign: 'center', marginBottom: 16 }}>
+            <Spin />
+          </div>
+        )}
 
-      <ProTable<Project>
-        rowKey="id"
-        headerTitle="My Projects"
-        columns={columns}
-        dataSource={filtered}
-        pagination={{ pageSize: 10 }}
-        search={false}
-        options={false}
-        loading={loading}
-        cardBordered
-        toolBarRender={() => [
-          <Space key="filters" align="center">
-            <Text>Status:</Text>
-            <Select<ProjectStatus | 'all'>
-              value={statusFilter}
-              onChange={(value) => setStatusFilter(value)}
-              style={{ width: 220 }}
+        <ProTable<Project>
+          rowKey="id"
+          headerTitle="My Projects"
+          columns={columns}
+          dataSource={filtered}
+          pagination={{ pageSize: 10 }}
+          search={false}
+          options={false}
+          loading={loading}
+          cardBordered
+          toolBarRender={() => [
+            <Space key="filters" align="center">
+              <Text>Status:</Text>
+              <Select<ProjectStatus | 'all'>
+                value={statusFilter}
+                onChange={(value) => setStatusFilter(value)}
+                style={{ width: 220 }}
+              >
+                <Option value="all">All</Option>
+                <Option value="idea">Idea</Option>
+                <Option value="progress">In progress</Option>
+                <Option value="completed">Completed</Option>
+                <Option value="validated">Validated</Option>
+              </Select>
+            </Space>,
+            <Button
+              key="create"
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() =>
+                router.push('/keenkonnect/projects/create-new-project')
+              }
             >
-              <Option value="all">All</Option>
-              <Option value="idea">Idea</Option>
-              <Option value="progress">In progress</Option>
-              <Option value="completed">Completed</Option>
-              <Option value="validated">Validated</Option>
-            </Select>
-          </Space>,
-          <Button
-            key="create"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() =>
-              router.push('/keenkonnect/projects/create-new-project')
-            }
-          >
-            Create New Project
-          </Button>,
-        ]}
-      />
-    </div>
+              Create New Project
+            </Button>,
+          ]}
+        />
+      </>
+    </KeenPage>
   );
 }

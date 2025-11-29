@@ -1,8 +1,7 @@
 // FILE: frontend/app/keenkonnect/sustainability-impact/track-project-impact/page.tsx
-'use client'
+'use client';
 
-import React, { Suspense, useState, useEffect, useMemo } from 'react'
-import Head from 'next/head'
+import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import {
   Row,
   Col,
@@ -14,7 +13,7 @@ import {
   Timeline,
   Descriptions,
   Empty,
-} from 'antd'
+} from 'antd';
 import {
   PieChart,
   Pie,
@@ -26,73 +25,78 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-} from 'recharts'
-import api from '@/api'
-import dayjs from 'dayjs'
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+} from 'recharts';
+import api from '@/api';
+import dayjs from 'dayjs';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
-const { RangePicker } = DatePicker
-const { TabPane } = Tabs
+const { RangePicker } = DatePicker;
+const { TabPane } = Tabs;
 
 type ImpactItem = {
-  category: string
-  value: number
-}
+  category: string;
+  value: number;
+};
 
 type Filters = {
-  from: string
-  to: string
-  team?: string
-}
+  from: string;
+  to: string;
+  team?: string;
+};
 
-const COLORS = ['#4e91ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de']
+const COLORS = ['#4e91ff', '#34c759', '#ff9f0a', '#ff375f', '#af52de'];
 
-export default function PageWrapper() {
-  return <KeenPage title="Page" description="">(
+export default function TrackProjectImpactPage(): JSX.Element {
+  return (
+    <KeenPageShell
+      title="Track Project Impact"
+      description="Monitor sustainability impact across projects over time."
+    >
       <Suspense fallback={<Spin style={{ marginTop: 40 }} />}>
         <Content />
       </Suspense>
-    )</KeenPage>
+    </KeenPageShell>
+  );
 }
 
 function Content(): JSX.Element {
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({
     from: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
     to: dayjs().format('YYYY-MM-DD'),
     team: undefined,
-  })
+  });
 
-  const [impactData, setImpactData] = useState<ImpactItem[]>([])
+  const [impactData, setImpactData] = useState<ImpactItem[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
         const params = new URLSearchParams({
           fromDate: filters.from,
           toDate: filters.to,
-        })
+        });
 
         if (filters.team) {
-          params.set('team', filters.team)
+          params.set('team', filters.team);
         }
 
         const res = await api.get<ImpactItem[]>(
           `/impact/sustainability/track?${params.toString()}`,
-        )
+        );
 
-        setImpactData(res ?? [])
+        setImpactData(res ?? []);
       } catch (err) {
         // eslint-disable-next-line no-console
-        console.error('Track impact load error:', err)
+        console.error('Track impact load error:', err);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    void load()
-  }, [filters])
+    void load();
+  }, [filters]);
 
   const chartData = useMemo(
     () =>
@@ -101,42 +105,34 @@ function Content(): JSX.Element {
         value: item.value,
       })),
     [impactData],
-  )
+  );
 
   const totalImpact = useMemo(
     () => (impactData ?? []).reduce((sum, item) => sum + (item.value ?? 0), 0),
     [impactData],
-  )
+  );
 
   const topCategory = useMemo(() => {
-    if (!impactData || impactData.length === 0) return undefined
+    if (!impactData || impactData.length === 0) return undefined;
 
     return impactData.reduce<ImpactItem>(
       (max, item) => (item.value > max.value ? item : max),
       impactData[0]!,
-    )
-  }, [impactData])
+    );
+  }, [impactData]);
 
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: 40 }}>
         <Spin size="large" />
       </div>
-    )
+    );
   }
 
-  const hasData = chartData.length > 0
+  const hasData = chartData.length > 0;
 
   return (
     <>
-      <Head>
-        <title>KeenKonnect – Track Project Impact</title>
-      </Head>
-
-      <h1 style={{ fontSize: 24, fontWeight: 600, marginBottom: 24 }}>
-        Track Project Impact
-      </h1>
-
       {/* Main filters */}
       <Card style={{ marginBottom: 24 }}>
         <Row gutter={24}>
@@ -145,13 +141,13 @@ function Content(): JSX.Element {
               defaultValue={[dayjs(filters.from), dayjs(filters.to)]}
               style={{ width: '100%' }}
               onChange={(range) => {
-                if (!range || !range[0] || !range[1]) return
-                const [start, end] = range
+                if (!range || !range[0] || !range[1]) return;
+                const [start, end] = range;
                 setFilters((f) => ({
                   ...f,
                   from: start.format('YYYY-MM-DD'),
                   to: end.format('YYYY-MM-DD'),
-                }))
+                }));
               }}
             />
           </Col>
@@ -289,5 +285,5 @@ function Content(): JSX.Element {
         </Tabs>
       )}
     </>
-  )
+  );
 }

@@ -1,10 +1,9 @@
-// FILE: frontend/app/kreative/idea-incubator/create-new-idea/page.tsx
+// C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
 'use client';
 
 import React from 'react';
 import { Form, Input, Select, Button, message as antdMessage } from 'antd';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 // Note: MainLayout import removed because the /kreative layout handles the layout wrapper.
@@ -19,19 +18,27 @@ const CreateNewIdea: React.FC = () => {
   // Handler for form submission.
   const onFinish = (values: any) => {
     console.log('Submitted Idea:', values);
-    antdMessage.success('Votre idée a été soumise avec succès !');
+    antdMessage.success('Votre idée a été soumise avec succès !');
     // Redirect to the "My Ideas" page after submitting.
     router.push('/kreative/idea-incubator/my-ideas');
   };
 
   return (
-    <PageContainer title="Create New Idea">
+    <KreativePageShell
+      title="Create New Idea"
+      description="Start a new idea in the incubator and capture its key details."
+    >
       <Form form={form} layout="vertical" onFinish={onFinish}>
         {/* Title Field */}
         <Form.Item
           label="Title of Idea"
           name="title"
-          rules={[{ required: true, message: 'Veuillez saisir le titre de votre idée.' }]}
+          rules={[
+            {
+              required: true,
+              message: 'Veuillez saisir le titre de votre idée.',
+            },
+          ]}
         >
           <Input placeholder="Enter title of your idea" />
         </Form.Item>
@@ -40,7 +47,12 @@ const CreateNewIdea: React.FC = () => {
         <Form.Item
           label="Detailed Description"
           name="description"
-          rules={[{ required: true, message: 'Veuillez saisir une description détaillée de votre idée.' }]}
+          rules={[
+            {
+              required: true,
+              message: 'Veuillez saisir une description détaillée de votre idée.',
+            },
+          ]}
         >
           <TextArea
             rows={6}
@@ -52,7 +64,12 @@ const CreateNewIdea: React.FC = () => {
         <Form.Item
           label="Category / Field"
           name="category"
-          rules={[{ required: true, message: 'Veuillez sélectionner une catégorie.' }]}
+          rules={[
+            {
+              required: true,
+              message: 'Veuillez sélectionner une catégorie.',
+            },
+          ]}
         >
           <Select placeholder="Select a category">
             <Option value="Technology">Technology</Option>
@@ -63,8 +80,6 @@ const CreateNewIdea: React.FC = () => {
           </Select>
         </Form.Item>
 
-        {/* (Optional) Resources Needed / Skills Required - omitted for now */}
-
         {/* Submit Button */}
         <Form.Item>
           <Button type="primary" htmlType="submit">
@@ -72,7 +87,7 @@ const CreateNewIdea: React.FC = () => {
           </Button>
         </Form.Item>
       </Form>
-    </PageContainer>
+    </KreativePageShell>
   );
 };
 

@@ -1,9 +1,7 @@
 // FILE: frontend/app/keenkonnect/projects/create-new-project/page.tsx
-// app/keenkonnect/projects/create-new-project/page.tsx
 'use client';
 
 import React, { Suspense, useState } from 'react';
-import Head from 'next/head';
 import { useRouter } from 'next/navigation';
 import { Row, Col, Card, Typography, message } from 'antd';
 import {
@@ -16,7 +14,7 @@ import {
 } from '@ant-design/pro-components';
 import type { UploadFile } from 'antd/es/upload/interface';
 import api from '@/api';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Paragraph } = Typography;
 
@@ -34,12 +32,17 @@ type CreateProjectFormValues = {
   notes?: string;
 };
 
-export default function PageWrapper() {
-  return <KeenPage title="Page" description="">(
+export default function CreateNewProjectPage() {
+  return (
+    <KeenPageShell
+      title="Create New Project"
+      description="Use this guided wizard to describe your project, configure the team and timeline, and attach any supporting files."
+    >
       <Suspense fallback={null}>
         <Content />
       </Suspense>
-    )</KeenPage>;
+    </KeenPageShell>
+  );
 }
 
 function Content() {
@@ -75,130 +78,122 @@ function Content() {
 
   return (
     <>
-      <Head>
-        <title>Create New Project – KeenKonnect</title>
-      </Head>
+      <Paragraph type="secondary" className="mb-4">
+        The core project record is created in the Django backend. You can refine
+        team, timeline and attachments in the steps below.
+      </Paragraph>
 
-      <div className="container mx-auto p-5">
-        <h1 className="text-2xl font-bold mb-2">Create New Project</h1>
-        <Paragraph type="secondary" className="mb-4">
-          Use this guided wizard to describe your project, configure the team and
-          timeline, and attach any supporting files. The core project record is
-          created in the Django backend.
-        </Paragraph>
+      <Row justify="center">
+        <Col xs={24} lg={18} xl={16}>
+          <Card>
+            <StepsForm<CreateProjectFormValues>
+              onFinish={handleFinish}
+              formProps={{
+                layout: 'vertical',
+              }}
+              submitter={{
+                searchConfig: {
+                  submitText: 'Create Project',
+                },
+                submitButtonProps: {
+                  loading: submitting,
+                },
+              }}
+            >
+              {/* Step 1 – Basic Info */}
+              <StepsForm.StepForm name="basic" title="Basic Info">
+                <ProFormText
+                  name="name"
+                  label="Project Name"
+                  placeholder="Enter project name"
+                  rules={[
+                    { required: true, message: 'Please enter a project name' },
+                  ]}
+                />
 
-        <Row justify="center">
-          <Col xs={24} lg={18} xl={16}>
-            <Card>
-              <StepsForm<CreateProjectFormValues>
-                onFinish={handleFinish}
-                formProps={{
-                  layout: 'vertical',
-                }}
-                submitter={{
-                  searchConfig: {
-                    submitText: 'Create Project',
-                  },
-                  submitButtonProps: {
-                    loading: submitting,
-                  },
-                }}
+                <ProFormTextArea
+                  name="description"
+                  label="Description"
+                  placeholder="Describe your project goals, context, and expected outcomes"
+                  fieldProps={{ rows: 4 }}
+                />
+
+                <ProFormSelect
+                  name="category"
+                  label="Category"
+                  placeholder="Choose a domain or focus area"
+                  options={[
+                    { label: 'Civic', value: 'Civic' },
+                    { label: 'Arts', value: 'Arts' },
+                    { label: 'Education', value: 'Education' },
+                    { label: 'Environment', value: 'Environment' },
+                    { label: 'Other', value: 'Other' },
+                  ]}
+                />
+              </StepsForm.StepForm>
+
+              {/* Step 2 – Team & Timeline */}
+              <StepsForm.StepForm
+                name="team-settings"
+                title="Team & Timeline"
               >
-                {/* Step 1 – Basic Info */}
-                <StepsForm.StepForm name="basic" title="Basic Info">
-                  <ProFormText
-                    name="name"
-                    label="Project Name"
-                    placeholder="Enter project name"
-                    rules={[
-                      { required: true, message: 'Please enter a project name' },
-                    ]}
-                  />
+                <ProFormSelect
+                  name="team"
+                  label="Team"
+                  placeholder="Select team (optional for now)"
+                  options={[
+                    { label: 'Team Alpha', value: 'alpha' },
+                    { label: 'Team Beta', value: 'beta' },
+                  ]}
+                />
 
-                  <ProFormTextArea
-                    name="description"
-                    label="Description"
-                    placeholder="Describe your project goals, context, and expected outcomes"
-                    fieldProps={{ rows: 4 }}
-                  />
+                <Row gutter={16}>
+                  <Col xs={24} md={12}>
+                    <ProFormDatePicker
+                      name="startDate"
+                      label="Start Date"
+                      fieldProps={{ style: { width: '100%' } }}
+                    />
+                  </Col>
+                  <Col xs={24} md={12}>
+                    <ProFormDatePicker
+                      name="endDate"
+                      label="End Date"
+                      fieldProps={{ style: { width: '100%' } }}
+                    />
+                  </Col>
+                </Row>
+              </StepsForm.StepForm>
 
-                  <ProFormSelect
-                    name="category"
-                    label="Category"
-                    placeholder="Choose a domain or focus area"
-                    options={[
-                      { label: 'Civic', value: 'Civic' },
-                      { label: 'Arts', value: 'Arts' },
-                      { label: 'Education', value: 'Education' },
-                      { label: 'Environment', value: 'Environment' },
-                      { label: 'Other', value: 'Other' },
-                    ]}
-                  />
-                </StepsForm.StepForm>
-
-                {/* Step 2 – Team & Timeline */}
-                <StepsForm.StepForm
-                  name="team-settings"
-                  title="Team & Timeline"
-                >
-                  <ProFormSelect
-                    name="team"
-                    label="Team"
-                    placeholder="Select team (optional for now)"
-                    options={[
-                      { label: 'Team Alpha', value: 'alpha' },
-                      { label: 'Team Beta', value: 'beta' },
-                    ]}
-                  />
-
-                  <Row gutter={16}>
-                    <Col xs={24} md={12}>
-                      <ProFormDatePicker
-                        name="startDate"
-                        label="Start Date"
-                        fieldProps={{ style: { width: '100%' } }}
-                      />
-                    </Col>
-                    <Col xs={24} md={12}>
-                      <ProFormDatePicker
-                        name="endDate"
-                        label="End Date"
-                        fieldProps={{ style: { width: '100%' } }}
-                      />
-                    </Col>
-                  </Row>
-                </StepsForm.StepForm>
-
-                {/* Step 3 – Attachments & Notes */}
-                <StepsForm.StepForm
+              {/* Step 3 – Attachments & Notes */}
+              <StepsForm.StepForm
+                name="attachments"
+                title="Attachments & Notes"
+              >
+                <ProFormUploadButton
                   name="attachments"
-                  title="Attachments & Notes"
-                >
-                  <ProFormUploadButton
-                    name="attachments"
-                    label="Attachments"
-                    max={5}
-                    fieldProps={{
-                      multiple: true,
-                      // No automatic upload; files are kept in form state
-                      beforeUpload: () => false,
-                      listType: 'text',
-                    }}
-                    extra="Optional: upload briefs, specs, or reference documents."
-                  />
+                  label="Attachments"
+                  max={5}
+                  fieldProps={{
+                    multiple: true,
+                    // No automatic upload; files are kept in form state
+                    beforeUpload: () => false,
+                    listType: 'text',
+                  }}
+                  extra="Optional: upload briefs, specs, or reference documents."
+                />
 
-                  <ProFormTextArea
-                    name="notes"
-                    label="Additional Notes"
-                    placeholder="Anything else your collaborators should know?"
-                    fieldProps={{ rows: 4 }}
-                  />
-                </StepsForm.StepForm>
-              </StepsForm>
-            </Card>
-          </Col>
-        </Row>
-      </div>
+                <ProFormTextArea
+                  name="notes"
+                  label="Additional Notes"
+                  placeholder="Anything else your collaborators should know?"
+                  fieldProps={{ rows: 4 }}
+                />
+              </StepsForm.StepForm>
+            </StepsForm>
+          </Card>
+        </Col>
+      </Row>
     </>
   );
 }

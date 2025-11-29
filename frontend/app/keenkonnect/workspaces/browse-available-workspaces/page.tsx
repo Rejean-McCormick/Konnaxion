@@ -1,5 +1,4 @@
 // FILE: frontend/app/keenkonnect/workspaces/browse-available-workspaces/page.tsx
-// File: app/keenkonnect/workspaces/browse-available-workspaces/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -21,8 +20,7 @@ import {
   Badge,
 } from 'antd';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Search } = Input;
 const { Text } = Typography;
@@ -122,24 +120,24 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 4;
 
-  const filteredWorkspaces = useMemo(() => {
+  const filteredWorkspaces = useMemo<Workspace[]>(() => {
     const lowerSearch = searchText.toLowerCase();
 
-    return <KeenPage title="Page" description="">sampleWorkspaces.filter((workspace) => {
-          const matchesTab =
-            activeTab === 'all' ||
-            workspace.category === (activeTab as WorkspaceCategory);
+    return sampleWorkspaces.filter((workspace) => {
+      const matchesTab =
+        activeTab === 'all' ||
+        workspace.category === (activeTab as WorkspaceCategory);
 
-          const matchesSearch =
-            !lowerSearch ||
-            workspace.name.toLowerCase().includes(lowerSearch) ||
-            workspace.purpose.toLowerCase().includes(lowerSearch);
+      const matchesSearch =
+        !lowerSearch ||
+        workspace.name.toLowerCase().includes(lowerSearch) ||
+        workspace.purpose.toLowerCase().includes(lowerSearch);
 
-          const matchesTool =
-            selectedTool === 'All' || workspace.tools.includes(selectedTool);
+      const matchesTool =
+        selectedTool === 'All' || workspace.tools.includes(selectedTool);
 
-          return matchesTab && matchesSearch && matchesTool;
-        })</KeenPage>;
+      return matchesTab && matchesSearch && matchesTool;
+    });
   }, [searchText, selectedTool, activeTab]);
 
   const paginatedWorkspaces = useMemo(() => {
@@ -161,15 +159,10 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
   };
 
   return (
-    <PageContainer title="Browse Available Workspaces">
-      {/* Top-right CTA (inside page content for consistency) */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          marginBottom: 16,
-        }}
-      >
+    <KeenPageShell
+      title="Browse Available Workspaces"
+      description="Discover active collaboration spaces you can join across KeenKonnect."
+      toolbar={
         <Button
           type="primary"
           onClick={() =>
@@ -178,8 +171,8 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
         >
           Launch New Workspace
         </Button>
-      </div>
-
+      }
+    >
       {/* Search & filters */}
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={12}>
@@ -313,6 +306,6 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
           onChange={(page) => setCurrentPage(page)}
         />
       </Row>
-    </PageContainer>
+    </KeenPageShell>
   );
 }

@@ -3,7 +3,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
+import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import {
   Badge,
   Button,
@@ -28,8 +28,7 @@ import {
   ClockCircleOutlined,
   ArrowRightOutlined,
 } from '@ant-design/icons';
-import usePageTitle from '@/hooks/usePageTitle';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Text, Paragraph } = Typography;
 
@@ -298,193 +297,93 @@ const quickActions: QuickAction[] = [
 ];
 
 export default function KeenKonnectDashboard(): JSX.Element {
-  usePageTitle('KeenKonnect · Dashboard');
+  return (
+    <KeenPageShell
+      title="KeenKonnect Dashboard"
+      description="Orchestrate projects, workspaces, and knowledge across your ecosystems — and keep an eye on AI matches, impact, and your Ethikos profile."
+      toolbar={
+        <Space>
+          <Link href="/keenkonnect/projects/my-projects">
+            <Button>View projects</Button>
+          </Link>
+          <Link href="/keenkonnect/ai-team-matching/match-preferences">
+            <Button type="primary" icon={<TeamOutlined />}>
+              AI team matching
+            </Button>
+          </Link>
+        </Space>
+      }
+    >
+      {/* KPI band */}
+      <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+        {summaryMetrics.map((metric) => (
+          <StatisticCard
+            key={metric.key}
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: metric.title,
+              value: metric.value,
+              suffix: metric.suffix,
+              description: metric.description,
+            }}
+          />
+        ))}
+      </ProCard>
 
-  return <KeenPage title="Page" description="">(
-      <PageContainer
-        ghost
-        header={{
-          title: 'KeenKonnect Dashboard',
-          subTitle:
-            'Orchestrate projects, workspaces, and knowledge across your ecosystems — and keep an eye on AI matches, impact, and your Ethikos profile.',
-          extra: (
-            <Space>
-              <Link href="/keenkonnect/projects/my-projects">
-                <Button>View projects</Button>
-              </Link>
-              <Link href="/keenkonnect/ai-team-matching/match-preferences">
-                <Button type="primary" icon={<TeamOutlined />}>
-                  AI team matching
-                </Button>
-              </Link>
-            </Space>
-          ),
-        }}
-      >
-        {/* KPI band */}
-        <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
-          {summaryMetrics.map((metric) => (
-            <StatisticCard
-              key={metric.key}
-              colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-              statistic={{
-                title: metric.title,
-                value: metric.value,
-                suffix: metric.suffix,
-                description: metric.description,
-              }}
-            />
-          ))}
-        </ProCard>
-
-        {/* Main columns: projects/workspaces vs today-at-a-glance */}
-        <ProCard split="vertical" gutter={16} style={{ marginBottom: 16 }}>
-          {/* Projects & Workspaces */}
-          <ProCard
-            colSpan={{ xs: 24, xl: 16 }}
-            title="Projects & Workspaces"
-            subTitle="Where collaboration actually happens"
-          >
-            <ProCard split="horizontal" ghost>
-              {/* My Projects */}
-              <ProCard
-                title="My Projects"
-                bordered={false}
-                extra={
-                  <Link href="/keenkonnect/projects/my-projects">
-                    <Space size={4}>
-                      <span>View all</span>
-                      <ArrowRightOutlined />
-                    </Space>
-                  </Link>
-                }
-              >
-                <List
-                  itemLayout="horizontal"
-                  dataSource={myProjects}
-                  renderItem={(project) => (
-                    <List.Item
-                      key={project.id}
-                      actions={[
-                        <Link key="open" href="/keenkonnect/projects/my-projects">
-                          Open
-                        </Link>,
-                      ]}
-                    >
-                      <List.Item.Meta
-                        title={
-                          <Space>
-                            <Text strong>{project.name}</Text>
-                            <Tag color="blue">{project.role}</Tag>
-                          </Space>
-                        }
-                        description={
-                          <Space size="small">
-                            <Badge
-                              status={
-                                project.status === 'In Progress'
-                                  ? 'processing'
-                                  : project.status === 'Planning'
-                                  ? 'warning'
-                                  : 'success'
-                              }
-                            />
-                            <Text type="secondary">{project.status}</Text>
-                          </Space>
-                        }
-                      />
-                    </List.Item>
-                  )}
-                />
-              </ProCard>
-
-              <Divider style={{ margin: '12px 0' }} />
-
-              {/* Active Workspaces */}
-              <ProCard
-                title="Active Workspaces"
-                bordered={false}
-                extra={
-                  <Link href="/keenkonnect/workspaces/my-workspaces">
-                    <Space size={4}>
-                      <span>View all</span>
-                      <ArrowRightOutlined />
-                    </Space>
-                  </Link>
-                }
-              >
-                <List
-                  itemLayout="horizontal"
-                  dataSource={activeWorkspaces}
-                  renderItem={(workspace) => (
-                    <List.Item
-                      key={workspace.id}
-                      actions={[
-                        <Link key="open" href="/keenkonnect/workspaces/my-workspaces">
-                          Open
-                        </Link>,
-                      ]}
-                    >
-                      <List.Item.Meta
-                        title={
-                          <Space>
-                            <Text strong>{workspace.name}</Text>
-                            <Tag color="geekblue">{workspace.focus}</Tag>
-                          </Space>
-                        }
-                        description={
-                          <Text type="secondary">
-                            {workspace.participants} participants currently active
-                          </Text>
-                        }
-                      />
-                    </List.Item>
-                  )}
-                />
-              </ProCard>
-            </ProCard>
-          </ProCard>
-
-          {/* Today at a Glance */}
-          <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
-            title="Today at a Glance"
-            extra={<Badge count={notifications.length} offset={[8, 0]} />}
-          >
-            {/* My Tasks */}
+      {/* Main columns: projects/workspaces vs today-at-a-glance */}
+      <ProCard split="vertical" gutter={16} style={{ marginBottom: 16 }}>
+        {/* Projects & Workspaces */}
+        <ProCard
+          colSpan={{ xs: 24, xl: 16 }}
+          title="Projects & Workspaces"
+          subTitle="Where collaboration actually happens"
+        >
+          <ProCard split="horizontal" ghost>
+            {/* My Projects */}
             <ProCard
-              title="My Tasks"
+              title="My Projects"
               bordered={false}
-              size="small"
-              // moved from "extra" to "subTitle" to avoid vertical, super-tall header
-              subTitle={<Text type="secondary">Focus on impact-critical items</Text>}
+              extra={
+                <Link href="/keenkonnect/projects/my-projects">
+                  <Space size={4}>
+                    <span>View all</span>
+                    <ArrowRightOutlined />
+                  </Space>
+                </Link>
+              }
             >
               <List
-                size="small"
-                dataSource={myTasks}
-                renderItem={(task) => (
-                  <List.Item key={task.id}>
+                itemLayout="horizontal"
+                dataSource={myProjects}
+                renderItem={(project) => (
+                  <List.Item
+                    key={project.id}
+                    actions={[
+                      <Link key="open" href="/keenkonnect/projects/my-projects">
+                        Open
+                      </Link>,
+                    ]}
+                  >
                     <List.Item.Meta
                       title={
                         <Space>
-                          <Text>{task.title}</Text>
-                          <Tag
-                            color={
-                              task.priority === 'High'
-                                ? 'red'
-                                : task.priority === 'Medium'
-                                ? 'orange'
-                                : 'default'
-                            }
-                          >
-                            {task.priority}
-                          </Tag>
+                          <Text strong>{project.name}</Text>
+                          <Tag color="blue">{project.role}</Tag>
                         </Space>
                       }
                       description={
-                        <Text type="secondary">
-                          Due: <strong>{task.due}</strong>
-                        </Text>
+                        <Space size="small">
+                          <Badge
+                            status={
+                              project.status === 'In Progress'
+                                ? 'processing'
+                                : project.status === 'Planning'
+                                ? 'warning'
+                                : 'success'
+                            }
+                          />
+                          <Text type="secondary">{project.status}</Text>
+                        </Space>
                       }
                     />
                   </List.Item>
@@ -494,28 +393,47 @@ export default function KeenKonnectDashboard(): JSX.Element {
 
             <Divider style={{ margin: '12px 0' }} />
 
-            {/* Notifications */}
+            {/* Active Workspaces */}
             <ProCard
-              title={
-                <Space>
-                  <BellOutlined />
-                  <span>Notifications</span>
-                </Space>
-              }
+              title="Active Workspaces"
               bordered={false}
-              size="small"
+              extra={
+                <Link href="/keenkonnect/workspaces/my-workspaces">
+                  <Space size={4}>
+                    <span>View all</span>
+                    <ArrowRightOutlined />
+                  </Space>
+                </Link>
+              }
             >
               <List
-                size="small"
-                dataSource={notifications}
-                renderItem={(item) => (
-                  <List.Item key={item.id}>
-                    <Space direction="vertical" size={0} style={{ width: '100%' }}>
-                      <Text>{item.message}</Text>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {item.time}
-                      </Text>
-                    </Space>
+                itemLayout="horizontal"
+                dataSource={activeWorkspaces}
+                renderItem={(workspace) => (
+                  <List.Item
+                    key={workspace.id}
+                    actions={[
+                      <Link
+                        key="open"
+                        href="/keenkonnect/workspaces/my-workspaces"
+                      >
+                        Open
+                      </Link>,
+                    ]}
+                  >
+                    <List.Item.Meta
+                      title={
+                        <Space>
+                          <Text strong>{workspace.name}</Text>
+                          <Tag color="geekblue">{workspace.focus}</Tag>
+                        </Space>
+                      }
+                      description={
+                        <Text type="secondary">
+                          {workspace.participants} participants currently active
+                        </Text>
+                      }
+                    />
                   </List.Item>
                 )}
               />
@@ -523,49 +441,47 @@ export default function KeenKonnectDashboard(): JSX.Element {
           </ProCard>
         </ProCard>
 
-        {/* Knowledge Hub & Recent Activity */}
-        <ProCard gutter={16} split="vertical" style={{ marginBottom: 16 }}>
-          {/* Knowledge Hub */}
+        {/* Today at a Glance */}
+        <ProCard
+          colSpan={{ xs: 24, xl: 8 }}
+          title="Today at a Glance"
+          extra={<Badge count={notifications.length} offset={[8, 0]} />}
+        >
+          {/* My Tasks */}
           <ProCard
-            colSpan={{ xs: 24, md: 12 }}
-            title="Knowledge Hub"
-            subTitle="Methods, playbooks, and shared assets"
-            extra={
-              <Link href="/keenkonnect/knowledge/browse-repository">
-                <Space size={4}>
-                  <span>Open knowledge hub</span>
-                  <ArrowRightOutlined />
-                </Space>
-              </Link>
+            title="My Tasks"
+            bordered={false}
+            size="small"
+            subTitle={
+              <Text type="secondary">Focus on impact-critical items</Text>
             }
           >
             <List
-              itemLayout="horizontal"
-              dataSource={knowledgeItems}
-              renderItem={(item) => (
-                <List.Item
-                  key={item.id}
-                  actions={[
-                    <Link key="open" href={item.link}>
-                      View
-                    </Link>,
-                  ]}
-                >
+              size="small"
+              dataSource={myTasks}
+              renderItem={(task) => (
+                <List.Item key={task.id}>
                   <List.Item.Meta
-                    avatar={
-                      <Avatar
-                        style={{ backgroundColor: '#f5f5f5', color: '#555' }}
-                        icon={<FileTextOutlined />}
-                      />
-                    }
                     title={
                       <Space>
-                        <Text strong>{item.title}</Text>
-                        <Tag>{item.type}</Tag>
+                        <Text>{task.title}</Text>
+                        <Tag
+                          color={
+                            task.priority === 'High'
+                              ? 'red'
+                              : task.priority === 'Medium'
+                              ? 'orange'
+                              : 'default'
+                          }
+                        >
+                          {task.priority}
+                        </Tag>
                       </Space>
                     }
                     description={
-                      <Text type="secondary">Recently used in your workspaces</Text>
+                      <Text type="secondary">
+                        Due: <strong>{task.due}</strong>
+                      </Text>
                     }
                   />
                 </List.Item>
@@ -573,140 +489,223 @@ export default function KeenKonnectDashboard(): JSX.Element {
             />
           </ProCard>
 
-          {/* Recent Activity */}
-          <ProCard
-            colSpan={{ xs: 24, md: 12 }}
-            title="Recent Activity"
-            subTitle="What changed in your ecosystem"
-          >
-            <Timeline
-              mode="left"
-              items={activityTimeline.map((event) => ({
-                key: event.id,
-                dot: <ClockCircleOutlined />,
-                children: (
-                  <Space direction="vertical" size={0}>
-                    <Text strong>{event.time}</Text>
-                    <Text type="secondary">{event.description}</Text>
-                  </Space>
-                ),
-              }))}
-            />
-          </ProCard>
-        </ProCard>
+          <Divider style={{ margin: '12px 0' }} />
 
-        {/* AI matching + Ethikos Profile & Quick Actions */}
-        <ProCard gutter={16} split="vertical">
-          {/* AI Team Matching */}
+          {/* Notifications */}
           <ProCard
-            colSpan={{ xs: 24, md: 12 }}
-            title="AI Team Matching"
-            subTitle="Smart suggestions for project teams"
-            extra={
+            title={
               <Space>
-                <Link href="/keenkonnect/ai-team-matching/my-matches">
-                  <Button type="link" size="small">
-                    View matches
-                  </Button>
-                </Link>
-                <Link href="/keenkonnect/ai-team-matching/match-preferences">
-                  <Button type="primary" size="small" icon={<TeamOutlined />}>
-                    New matching run
-                  </Button>
-                </Link>
+                <BellOutlined />
+                <span>Notifications</span>
               </Space>
             }
+            bordered={false}
+            size="small"
           >
-            <Paragraph>
-              AI matching analyses expertise, diversity, and collaboration patterns across
-              your ecosystem to propose high‑impact teams.
-            </Paragraph>
             <List
               size="small"
-              header={<Text strong>Highlights</Text>}
-              dataSource={[
-                '4 new suggested teams for climate resilience projects',
-                '2 under‑utilised experts flagged for upcoming workspaces',
-                '1 cross‑ecosystem collaboration opportunity linking Montreal & Nairobi labs',
-              ]}
-              renderItem={(text, idx) => (
-                <List.Item key={idx}>
-                  <Text>{text}</Text>
+              dataSource={notifications}
+              renderItem={(item) => (
+                <List.Item key={item.id}>
+                  <Space direction="vertical" size={0} style={{ width: '100%' }}>
+                    <Text>{item.message}</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {item.time}
+                    </Text>
+                  </Space>
                 </List.Item>
               )}
             />
           </ProCard>
-
-          {/* Ethikos Profile & Quick Actions */}
-          <ProCard
-            colSpan={{ xs: 24, md: 12 }}
-            title="Ethikos Profile & Impact"
-            subTitle="How your orchestration shows up across the network"
-          >
-            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-              <Space align="center">
-                <Badge.Ribbon text="Beta">
-                  <Avatar
-                    size={56}
-                    style={{ backgroundColor: '#faad14', marginRight: 12 }}
-                    icon={<CrownOutlined />}
-                  />
-                </Badge.Ribbon>
-                <div>
-                  <Text strong>Ethikos Orchestrator Profile</Text>
-                  <br />
-                  <Text type="secondary">
-                    Reputation, trust and ethical alignment — integrated with KeenKonnect.
-                  </Text>
-                </div>
-              </Space>
-
-              <div>
-                <Text type="secondary">Profile completeness</Text>
-                <Progress percent={68} size="small" />
-              </div>
-
-              <div>
-                <Text type="secondary">Impact coverage across SDGs</Text>
-                <Progress
-                  percent={72}
-                  size="small"
-                  success={{ percent: 40 }}
-                  format={(percent) => `${percent}% of mapped initiatives`}
-                />
-              </div>
-
-              <Divider style={{ margin: '8px 0' }} />
-
-              <ProCard
-                title="Quick actions"
-                bordered={false}
-                size="small"
-                ghost
-                style={{ padding: 0 }}
-              >
-                <List
-                  grid={{ gutter: 16, xs: 1, sm: 2 }}
-                  dataSource={quickActions}
-                  renderItem={(action) => (
-                    <List.Item key={action.key}>
-                      <Space direction="vertical" size={4} style={{ width: '100%' }}>
-                        <Link href={action.href}>
-                          <Button block icon={action.icon}>
-                            {action.title}
-                          </Button>
-                        </Link>
-                        <Text type="secondary" style={{ fontSize: 12 }}>
-                          {action.description}
-                        </Text>
-                      </Space>
-                    </List.Item>
-                  )}
-                />
-              </ProCard>
-            </Space>
-          </ProCard>
         </ProCard>
-      </PageContainer>
-    )</KeenPage>;
+      </ProCard>
+
+      {/* Knowledge Hub & Recent Activity */}
+      <ProCard gutter={16} split="vertical" style={{ marginBottom: 16 }}>
+        {/* Knowledge Hub */}
+        <ProCard
+          colSpan={{ xs: 24, md: 12 }}
+          title="Knowledge Hub"
+          subTitle="Methods, playbooks, and shared assets"
+          extra={
+            <Link href="/keenkonnect/knowledge/browse-repository">
+              <Space size={4}>
+                <span>Open knowledge hub</span>
+                <ArrowRightOutlined />
+              </Space>
+            </Link>
+          }
+        >
+          <List
+            itemLayout="horizontal"
+            dataSource={knowledgeItems}
+            renderItem={(item) => (
+              <List.Item
+                key={item.id}
+                actions={[
+                  <Link key="open" href={item.link}>
+                    View
+                  </Link>,
+                ]}
+              >
+                <List.Item.Meta
+                  avatar={
+                    <Avatar
+                      style={{ backgroundColor: '#f5f5f5', color: '#555' }}
+                      icon={<FileTextOutlined />}
+                    />
+                  }
+                  title={
+                    <Space>
+                      <Text strong>{item.title}</Text>
+                      <Tag>{item.type}</Tag>
+                    </Space>
+                  }
+                  description={
+                    <Text type="secondary">
+                      Recently used in your workspaces
+                    </Text>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        </ProCard>
+
+        {/* Recent Activity */}
+        <ProCard
+          colSpan={{ xs: 24, md: 12 }}
+          title="Recent Activity"
+          subTitle="What changed in your ecosystem"
+        >
+          <Timeline
+            mode="left"
+            items={activityTimeline.map((event) => ({
+              key: event.id,
+              dot: <ClockCircleOutlined />,
+              children: (
+                <Space direction="vertical" size={0}>
+                  <Text strong>{event.time}</Text>
+                  <Text type="secondary">{event.description}</Text>
+                </Space>
+              ),
+            }))}
+          />
+        </ProCard>
+      </ProCard>
+
+      {/* AI matching + Ethikos Profile & Quick Actions */}
+      <ProCard gutter={16} split="vertical">
+        {/* AI Team Matching */}
+        <ProCard
+          colSpan={{ xs: 24, md: 12 }}
+          title="AI Team Matching"
+          subTitle="Smart suggestions for project teams"
+          extra={
+            <Space>
+              <Link href="/keenkonnect/ai-team-matching/my-matches">
+                <Button type="link" size="small">
+                  View matches
+                </Button>
+              </Link>
+              <Link href="/keenkonnect/ai-team-matching/match-preferences">
+                <Button type="primary" size="small" icon={<TeamOutlined />}>
+                  New matching run
+                </Button>
+              </Link>
+            </Space>
+          }
+        >
+          <Paragraph>
+            AI matching analyses expertise, diversity, and collaboration patterns across
+            your ecosystem to propose high-impact teams.
+          </Paragraph>
+          <List
+            size="small"
+            header={<Text strong>Highlights</Text>}
+            dataSource={[
+              '4 new suggested teams for climate resilience projects',
+              '2 under-utilised experts flagged for upcoming workspaces',
+              '1 cross-ecosystem collaboration opportunity linking Montreal & Nairobi labs',
+            ]}
+            renderItem={(text, idx) => (
+              <List.Item key={idx}>
+                <Text>{text}</Text>
+              </List.Item>
+            )}
+          />
+        </ProCard>
+
+        {/* Ethikos Profile & Quick Actions */}
+        <ProCard
+          colSpan={{ xs: 24, md: 12 }}
+          title="Ethikos Profile & Impact"
+          subTitle="How your orchestration shows up across the network"
+        >
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space align="center">
+              <Badge.Ribbon text="Beta">
+                <Avatar
+                  size={56}
+                  style={{ backgroundColor: '#faad14', marginRight: 12 }}
+                  icon={<CrownOutlined />}
+                />
+              </Badge.Ribbon>
+              <div>
+                <Text strong>Ethikos Orchestrator Profile</Text>
+                <br />
+                <Text type="secondary">
+                  Reputation, trust and ethical alignment — integrated with KeenKonnect.
+                </Text>
+              </div>
+            </Space>
+
+            <div>
+              <Text type="secondary">Profile completeness</Text>
+              <Progress percent={68} size="small" />
+            </div>
+
+            <div>
+              <Text type="secondary">Impact coverage across SDGs</Text>
+              <Progress
+                percent={72}
+                size="small"
+                success={{ percent: 40 }}
+                format={(percent) => `${percent}% of mapped initiatives`}
+              />
+            </div>
+
+            <Divider style={{ margin: '8px 0' }} />
+
+            <ProCard
+              title="Quick actions"
+              bordered={false}
+              size="small"
+              ghost
+              style={{ padding: 0 }}
+            >
+              <List
+                grid={{ gutter: 16, xs: 1, sm: 2 }}
+                dataSource={quickActions}
+                renderItem={(action) => (
+                  <List.Item key={action.key}>
+                    <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                      <Link href={action.href}>
+                        <Button block icon={action.icon}>
+                          {action.title}
+                        </Button>
+                      </Link>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {action.description}
+                      </Text>
+                    </Space>
+                  </List.Item>
+                )}
+              />
+            </ProCard>
+          </Space>
+        </ProCard>
+      </ProCard>
+    </KeenPageShell>
+  );
 }

@@ -179,11 +179,7 @@ export default function MyMatchesPage(): JSX.Element {
       dataIndex: 'location',
       width: 180,
       render: (_, row) =>
-        row.location ? (
-          <Text>{row.location}</Text>
-        ) : (
-          <Text type="secondary">—</Text>
-        ),
+        row.location ? <Text>{row.location}</Text> : <Text type="secondary">—</Text>,
     },
     {
       title: 'Actions',
@@ -213,71 +209,69 @@ export default function MyMatchesPage(): JSX.Element {
       description="Résumé de tes matches générés par l’AI Team Matching : équipes, partenaires potentiels et niveau de compatibilité."
       metaTitle="KeenKonnect · Mes correspondances"
     >
-      <>
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          {/* Bandeau de KPIs / résumé */}
-          <ProCard ghost gutter={[16, 16]} wrap>
-            <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-              <Text type="secondary">Total de matches</Text>
-              <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
-                {total}
-              </Title>
-            </ProCard>
-
-            <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-              <Text type="secondary">Nouveaux matches</Text>
-              <Space align="baseline">
-                <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
-                  {newCount}
-                </Title>
-                {newCount > 0 && (
-                  <Badge
-                    count="Nouveau"
-                    style={{ backgroundColor: '#52c41a', marginLeft: 8 }}
-                  />
-                )}
-              </Space>
-            </ProCard>
-
-            <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-              <Text type="secondary">Compatibilité moyenne</Text>
-              <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
-                {avgScore}%
-              </Title>
-              <Progress
-                percent={avgScore}
-                size="small"
-                style={{ marginTop: 8 }}
-                status={
-                  avgScore >= 85 ? 'success' : avgScore >= 70 ? 'active' : 'normal'
-                }
-              />
-            </ProCard>
-
-            <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
-              <Text type="secondary">Matches forts (≥ 80%)</Text>
-              <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
-                {strongMatches}
-              </Title>
-            </ProCard>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        {/* Bandeau de KPIs / résumé */}
+        <ProCard ghost gutter={[16, 16]} wrap>
+          <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
+            <Text type="secondary">Total de matches</Text>
+            <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
+              {total}
+            </Title>
           </ProCard>
 
-          {/* Tableau principal */}
-          <ProTable<MatchRow>
-            rowKey="id"
-            columns={columns}
-            dataSource={allMatches}
-            search={false}
-            pagination={{ pageSize: 6 }}
-            options={false}
-            onRow={(record) => ({
-              onClick: () => {
-                setSelectedMatch(record);
-                setDrawerOpen(true);
-              },
-            })}
-          />
-        </Space>
+          <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
+            <Text type="secondary">Nouveaux matches</Text>
+            <Space align="baseline">
+              <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
+                {newCount}
+              </Title>
+              {newCount > 0 && (
+                <Badge
+                  count="Nouveau"
+                  style={{ backgroundColor: '#52c41a', marginLeft: 8 }}
+                />
+              )}
+            </Space>
+          </ProCard>
+
+          <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
+            <Text type="secondary">Compatibilité moyenne</Text>
+            <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
+              {avgScore}%
+            </Title>
+            <Progress
+              percent={avgScore}
+              size="small"
+              style={{ marginTop: 8 }}
+              status={
+                avgScore >= 85 ? 'success' : avgScore >= 70 ? 'active' : 'normal'
+              }
+            />
+          </ProCard>
+
+          <ProCard colSpan={{ xs: 24, sm: 12, md: 6 }} bordered>
+            <Text type="secondary">Matches forts (≥ 80%)</Text>
+            <Title level={3} style={{ marginTop: 8, marginBottom: 0 }}>
+              {strongMatches}
+            </Title>
+          </ProCard>
+        </ProCard>
+
+        {/* Tableau principal */}
+        <ProTable<MatchRow>
+          rowKey="id"
+          columns={columns}
+          dataSource={allMatches}
+          search={false}
+          pagination={{ pageSize: 6 }}
+          options={false}
+          onRow={(record) => ({
+            onClick: () => {
+              setSelectedMatch(record);
+              setDrawerOpen(true);
+            },
+          })}
+        />
 
         {/* Drawer de détail d’un match */}
         <Drawer
@@ -342,7 +336,8 @@ export default function MyMatchesPage(): JSX.Element {
 
               {selectedMatch.availability && (
                 <Paragraph>
-                  <Text strong>Disponibilité :</Text> {selectedMatch.availability}</Paragraph>
+                  <Text strong>Disponibilité :</Text> {selectedMatch.availability}
+                </Paragraph>
               )}
 
               {selectedMatch.membersCount != null && (
@@ -359,7 +354,7 @@ export default function MyMatchesPage(): JSX.Element {
             </Space>
           )}
         </Drawer>
-      </>
+      </Space>
     </KeenPage>
   );
 }

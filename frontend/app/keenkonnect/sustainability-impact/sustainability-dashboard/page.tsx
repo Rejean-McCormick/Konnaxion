@@ -2,14 +2,10 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import Head from 'next/head';
-import { Card, Select, Space, Tag, Table, Row, Col, Statistic, Typography } from 'antd';
+import { Card, Select, Space, Tag, Table, Row, Col, Statistic } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { Line, Area, Column } from '@ant-design/plots';
-import usePageTitle from '@/hooks/usePageTitle';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
-
-const { Title, Paragraph } = Typography;
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 type TimeRange = '3m' | '6m' | '12m';
 
@@ -109,12 +105,10 @@ const projectLeaderboard: ProjectRow[] = [
 ];
 
 export default function SustainabilityDashboardPage(): JSX.Element {
-  usePageTitle('KeenKonnect · Sustainability Impact Dashboard');
-
   const [timeRange, setTimeRange] = useState<TimeRange>('6m');
 
   const filteredCo2Trend = useMemo(() => {
-    if (timeRange === '3m') return <KeenPage title="Page" description="">co2TrendBase.slice(-3)</KeenPage>;
+    if (timeRange === '3m') return co2TrendBase.slice(-3);
     if (timeRange === '6m') return co2TrendBase.slice(-6);
     return co2TrendBase;
   }, [timeRange]);
@@ -245,109 +239,95 @@ export default function SustainabilityDashboardPage(): JSX.Element {
   ];
 
   return (
-    <>
-      <Head>
-        <title>KeenKonnect – Sustainability Impact Dashboard</title>
-      </Head>
-
-      <div className="container mx-auto p-5">
-        {/* Header aligné sur search-filter-documents */}
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <Title level={2} style={{ marginBottom: 4 }}>
-              Sustainability Impact Dashboard
-            </Title>
-            <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-              High-level dashboard aggregating sustainability impact across KeenKonnect
-              projects.
-            </Paragraph>
-          </div>
-
-          <Space>
-            <span>Time range:</span>
-            <Select<TimeRange>
-              size="small"
-              value={timeRange}
-              onChange={setTimeRange}
-              options={[
-                { label: 'Last 3 months', value: '3m' },
-                { label: 'Last 6 months', value: '6m' },
-                { label: 'Last 12 months', value: '12m' },
-              ]}
-              style={{ minWidth: 140 }}
-            />
-          </Space>
-        </div>
-
-        {/* KPIs principaux (4 stats) */}
-        <Card className="mb-4">
-          <Row gutter={[16, 16]}>
-            <Col xs={12} md={6}>
-              <Statistic
-                title="Total CO₂ saved"
-                value={overviewStats.totalCo2SavedKg}
-                suffix="kg"
-              />
-            </Col>
-            <Col xs={12} md={6}>
-              <Statistic
-                title="Total energy saved"
-                value={overviewStats.totalEnergySavedKwh}
-                suffix="kWh"
-              />
-            </Col>
-            <Col xs={12} md={6}>
-              <Statistic
-                title="Waste diverted"
-                value={overviewStats.wasteDivertedKg}
-                suffix="kg"
-              />
-            </Col>
-            <Col xs={12} md={6}>
-              <Statistic
-                title="Active projects"
-                value={overviewStats.activeProjects}
-              />
-            </Col>
-          </Row>
-        </Card>
-
-        {/* Lignes / Colonnes principales */}
-        <Row gutter={[16, 16]} className="mb-4">
-          <Col xs={24} xl={16}>
-            <Card title="Timeline of CO₂ saved (kg)">
-              <Line {...co2LineConfig} />
-            </Card>
-          </Col>
-
-          <Col xs={24} xl={8}>
-            <Card title="Impact category distribution">
-              <Column {...categoryColumnConfig} />
-            </Card>
-          </Col>
-        </Row>
-
-        {/* Area + Leaderboard */}
+    <KeenPageShell
+      title="Sustainability Impact Dashboard"
+      description="High-level dashboard aggregating sustainability impact across KeenKonnect projects."
+      metaTitle="KeenKonnect · Sustainability Impact Dashboard"
+      toolbar={
+        <Space>
+          <span>Time range:</span>
+          <Select<TimeRange>
+            size="small"
+            value={timeRange}
+            onChange={setTimeRange}
+            options={[
+              { label: 'Last 3 months', value: '3m' },
+              { label: 'Last 6 months', value: '6m' },
+              { label: 'Last 12 months', value: '12m' },
+            ]}
+            style={{ minWidth: 140 }}
+          />
+        </Space>
+      }
+    >
+      {/* KPIs principaux (4 stats) */}
+      <Card className="mb-4">
         <Row gutter={[16, 16]}>
-          <Col xs={24} xl={12}>
-            <Card title="Energy savings trend (kWh)">
-              <Area {...energyAreaConfig} />
-            </Card>
+          <Col xs={12} md={6}>
+            <Statistic
+              title="Total CO₂ saved"
+              value={overviewStats.totalCo2SavedKg}
+              suffix="kg"
+            />
           </Col>
-
-          <Col xs={24} xl={12}>
-            <Card title="Top projects by impact">
-              <Table<ProjectRow>
-                size="small"
-                rowKey="key"
-                columns={columns}
-                dataSource={projectLeaderboard}
-                pagination={false}
-              />
-            </Card>
+          <Col xs={12} md={6}>
+            <Statistic
+              title="Total energy saved"
+              value={overviewStats.totalEnergySavedKwh}
+              suffix="kWh"
+            />
+          </Col>
+          <Col xs={12} md={6}>
+            <Statistic
+              title="Waste diverted"
+              value={overviewStats.wasteDivertedKg}
+              suffix="kg"
+            />
+          </Col>
+          <Col xs={12} md={6}>
+            <Statistic
+              title="Active projects"
+              value={overviewStats.activeProjects}
+            />
           </Col>
         </Row>
-      </div>
-    </>
+      </Card>
+
+      {/* Lignes / Colonnes principales */}
+      <Row gutter={[16, 16]} className="mb-4">
+        <Col xs={24} xl={16}>
+          <Card title="Timeline of CO₂ saved (kg)">
+            <Line {...co2LineConfig} />
+          </Card>
+        </Col>
+
+        <Col xs={24} xl={8}>
+          <Card title="Impact category distribution">
+            <Column {...categoryColumnConfig} />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Area + Leaderboard */}
+      <Row gutter={[16, 16]}>
+        <Col xs={24} xl={12}>
+          <Card title="Energy savings trend (kWh)">
+            <Area {...energyAreaConfig} />
+          </Card>
+        </Col>
+
+        <Col xs={24} xl={12}>
+          <Card title="Top projects by impact">
+            <Table<ProjectRow>
+              size="small"
+              rowKey="key"
+              columns={columns}
+              dataSource={projectLeaderboard}
+              pagination={false}
+            />
+          </Card>
+        </Col>
+      </Row>
+    </KeenPageShell>
   );
 }

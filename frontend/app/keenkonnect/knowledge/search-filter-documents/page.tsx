@@ -1,5 +1,4 @@
 // FILE: frontend/app/keenkonnect/knowledge/search-filter-documents/page.tsx
-// app/keenkonnect/knowledge/search-filter-documents/page.tsx
 'use client'
 
 import React, { useMemo, useState } from 'react'
@@ -40,7 +39,7 @@ interface FilterState {
   sort: SortOption
 }
 
-// Demo data (same content as the previous version)
+// Demo data
 const sampleDocuments: DocumentResource[] = [
   {
     key: '1',
@@ -410,7 +409,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
           dataSource={paginatedDocuments}
           search={false}
           options={false}
-          pagination={false} // Manual pagination below
+          pagination={false}
           rowSelection={false}
           toolBarRender={false}
         />

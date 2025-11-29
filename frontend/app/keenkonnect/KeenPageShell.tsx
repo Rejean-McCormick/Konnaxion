@@ -1,7 +1,7 @@
 // FILE: frontend/app/keenkonnect/KeenPageShell.tsx
 'use client';
 
-import React from 'react';
+import React, { type ReactNode } from 'react';
 import Head from 'next/head';
 import usePageTitle from '@/hooks/usePageTitle';
 
@@ -16,13 +16,13 @@ type KeenPageProps = {
   metaTitle?: string;
 
   /** Contenu principal de la page */
-  children: React.ReactNode;
+  children: ReactNode;
 
   /**
    * Élément(s) à droite du titre (boutons d’action, filtres, etc.)
    * ex: <Button type="primary">New</Button>
    */
-  toolbar?: React.ReactNode;
+  toolbar?: ReactNode;
 
   /** Largeur max de la zone centrale */
   maxWidth?: number | string;
@@ -35,7 +35,7 @@ export default function KeenPage({
   children,
   toolbar,
   maxWidth = 1200,
-}: KeenPageProps) {
+}: KeenPageProps): JSX.Element {
   const finalMetaTitle = metaTitle ?? `KeenKonnect · ${title}`;
 
   // Synchronise le titre de l’onglet (hook existant dans ton codebase)
