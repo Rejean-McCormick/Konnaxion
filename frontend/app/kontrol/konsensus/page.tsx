@@ -5,9 +5,9 @@ import React, { useState } from 'react';
 import { message, Space, Typography, Alert, Row, Col, Statistic, Progress, List, Tag } from 'antd';
 import { 
   ExperimentOutlined, 
-  SafetyCertificateOutlined,
-  ThunderboltOutlined,
-  HistoryOutlined,
+  SafetyCertificateOutlined, 
+  ThunderboltOutlined, 
+  HistoryOutlined, 
   WarningOutlined
 } from '@ant-design/icons';
 import { 
@@ -20,7 +20,7 @@ import {
   ProFormDigit 
 } from '@ant-design/pro-components';
 
-const { Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 export default function KonsensusSettingsPage() {
   // State for live simulation feedback
@@ -31,31 +31,34 @@ export default function KonsensusSettingsPage() {
     retroFailures: 2,
   });
 
-  // Mock simulation logic: Updates metrics as user drags sliders
+  // Calculate simulation metrics based on form values
+  const runSimulation = (quorum: number, threshold: number) => {
+    // Arbitrary formula to calculate "Governance Stiffness"
+    // Higher quorum + higher threshold = harder to pass votes
+    const score = Math.min(100, Math.round((quorum * 1.2) + (threshold * 0.5)));
+    
+    let label = 'Fluid';
+    let color = 'cyan';
+    let fails = 0;
+
+    if (score > 40) { label = 'Balanced'; color = 'green'; fails = 2; }
+    if (score > 65) { label = 'Rigid'; color = 'orange'; fails = 5; }
+    if (score > 85) { label = 'Gridlock Risk'; color = 'red'; fails = 12; }
+
+    setSimulation({
+      stiffness: score,
+      riskLabel: label,
+      riskColor: color,
+      retroFailures: fails,
+    });
+  };
+
   const handleValuesChange = (_: any, values: any) => {
     // Only recalculate if relevant fields change
     if (values.quorum !== undefined || values.pass_threshold !== undefined) {
-      const q = values.quorum ?? 15; // Default fallback matches initialValue
+      const q = values.quorum ?? 15;
       const t = values.pass_threshold ?? 66;
-
-      // Arbitrary formula to calculate "Governance Stiffness"
-      // Higher quorum + higher threshold = harder to pass votes
-      const score = Math.min(100, Math.round((q * 1.2) + (t * 0.5)));
-      
-      let label = 'Fluid';
-      let color = 'cyan';
-      let fails = 0;
-
-      if (score > 40) { label = 'Balanced'; color = 'green'; fails = 2; }
-      if (score > 65) { label = 'Rigid'; color = 'orange'; fails = 5; }
-      if (score > 85) { label = 'Gridlock Risk'; color = 'red'; fails = 12; }
-
-      setSimulation({
-        stiffness: score,
-        riskLabel: label,
-        riskColor: color,
-        retroFailures: fails,
-      });
+      runSimulation(q, t);
     }
   };
 
@@ -78,13 +81,86 @@ export default function KonsensusSettingsPage() {
 
           <ProForm
             onValuesChange={handleValuesChange}
-            onFinish={async (values) => {
-              // In a real app, this would be: await api.post('/admin/konsensus/config', values);
-              console.log('Submitted Config:', values);
-              message.loading('Applying consensus parameters...', 1)
-                .then(() => message.success('Configuration updated successfully'));
-              return true;
+            
+            // 1. FETCH INITIAL CONFIGURATION (GET)
+            request={async () => {
+              try {
+                const res = await fetch('/api/admin/konsensus-config/');
+                if (!res.ok) return {}; 
+                const data = await res.json();
+                
+                // Get the latest config (first item in list)
+                const latest = data.results && data.results.length > 0 ? data.results[0] : null;
+
+                if (latest) {
+                  // Run sim based on fetched data
+                  runSimulation(latest.quorum_percentage, latest.passing_threshold);
+
+                  // Map Backend Model -> Frontend Form
+                  return {
+                    quorum: parseFloat(latest.quorum_percentage),
+                    pass_threshold: parseFloat(latest.passing_threshold),
+                    min_duration_days: latest.default_voting_duration_days,
+                    anonymous_voting: latest.allow_anonymous_voting,
+                    // Map generic fields from extra_settings JSON
+                    algorithm: latest.extra_settings?.algorithm || 'weighted',
+                    allow_delegation: latest.extra_settings?.allow_delegation ?? true,
+                    network: latest.extra_settings?.network || 'local_ganache',
+                    auto_execute: latest.extra_settings?.auto_execute ?? false
+                  };
+                }
+                return { 
+                    // Defaults if no DB record exists yet
+                    quorum: 15, 
+                    pass_threshold: 66,
+                    min_duration_days: 3,
+                    algorithm: 'weighted'
+                };
+              } catch (error) {
+                console.error("Failed to load config", error);
+                message.error("Could not load current configuration");
+                return {};
+              }
             }}
+
+            // 2. SAVE CONFIGURATION (POST)
+            onFinish={async (values) => {
+              try {
+                message.loading('Applying consensus parameters...', 0.5);
+                
+                // Construct Payload matching backend Serializer
+                const payload = {
+                    quorum_percentage: values.quorum,
+                    passing_threshold: values.pass_threshold,
+                    default_voting_duration_days: values.min_duration_days,
+                    allow_anonymous_voting: values.anonymous_voting,
+                    auto_close_votes: true, // Defaulting to true for now
+                    // Store non-column UI fields in JSON
+                    extra_settings: {
+                        algorithm: values.algorithm,
+                        allow_delegation: values.allow_delegation,
+                        network: values.network,
+                        auto_execute: values.auto_execute
+                    }
+                };
+
+                const res = await fetch('/api/admin/konsensus-config/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) throw new Error('Failed to save');
+
+                message.success('Configuration updated successfully');
+                return true;
+              } catch (error) {
+                  console.error(error);
+                  message.error('Failed to save configuration');
+                  return false;
+              }
+            }}
+
             submitter={{
               searchConfig: {
                 submitText: 'Save Configuration',
@@ -92,9 +168,9 @@ export default function KonsensusSettingsPage() {
               render: (props, doms) => {
                 return (
                   <ProCard bordered style={{ marginTop: 16 }}>
-                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 16 }}>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 16 }}>
                        {doms}
-                     </div>
+                      </div>
                   </ProCard>
                 );
               },
@@ -185,7 +261,7 @@ export default function KonsensusSettingsPage() {
                       initialValue={false} 
                       tooltip="Hides voter identities on the blockchain/public record."
                     />
-                     <Text type="secondary" style={{ fontSize: 12 }}>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
                       Prevents social pressure but limits accountability.
                     </Text>
                   </ProCard>

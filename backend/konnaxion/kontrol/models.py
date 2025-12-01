@@ -2,7 +2,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from konnaxion.utils.models import TimeStampedModel  # Assuming a common utility
+from konnaxion.utils.models import TimeStampedModel  # Assuming this exists in your project
 
 
 class AuditLog(TimeStampedModel):
@@ -116,7 +116,7 @@ class ModerationTicket(TimeStampedModel):
     content_snippet = models.TextField(help_text=_("Short preview of the flagged content"))
     full_content = models.TextField(blank=True, help_text=_("Complete content for review"))
     
-    # Related entities (Generic foreign keys could be used here, but keeping it simple for v14)
+    # Related entities
     target_id = models.CharField(max_length=255, help_text=_("ID of the reported object"))
     target_type = models.CharField(max_length=50, choices=TYPE_CHOICES)
     
@@ -160,3 +160,57 @@ class ModerationTicket(TimeStampedModel):
 
     def __str__(self):
         return f"Ticket #{self.pk} - {self.report_reason} ({self.status})"
+
+
+class KonsensusConfig(TimeStampedModel):
+    """
+    Configuration settings for the Konsensus module.
+    Stores voting thresholds, durations, and global switches.
+    """
+    # General Settings
+    allow_anonymous_voting = models.BooleanField(
+        default=False, 
+        help_text=_("Allow users to vote without public identity")
+    )
+    auto_close_votes = models.BooleanField(
+        default=True, 
+        help_text=_("Automatically close votes when time expires")
+    )
+    
+    # Voting Mechanics
+    quorum_percentage = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        default=33.00,
+        help_text=_("Minimum participation % required for a vote to be valid")
+    )
+    passing_threshold = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        default=51.00, 
+        help_text=_("Percentage of 'Yes' votes needed to pass")
+    )
+    
+    # Timing defaults
+    default_voting_duration_days = models.PositiveIntegerField(
+        default=7,
+        help_text=_("Default duration for new votes in days")
+    )
+
+    # Extensibility
+    extra_settings = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text=_("Store additional dynamic settings here (e.g. UI themes, experimental flags)")
+    )
+
+    class Meta:
+        verbose_name = _("Konsensus Configuration")
+        verbose_name_plural = _("Konsensus Configurations")
+
+    def __str__(self):
+        return f"Konsensus Config (Quorum: {self.quorum_percentage}%)"
+    
+    def save(self, *args, **kwargs):
+        # Logic can be added here to ensure only one active config exists if needed.
+        super().save(*args, **kwargs)

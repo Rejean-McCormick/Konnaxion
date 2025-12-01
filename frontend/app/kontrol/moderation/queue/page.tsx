@@ -1,3 +1,4 @@
+// FILE: frontend/app/kontrol/moderation/queue/page.tsx
 'use client';
 
 import React, { useRef, useState } from 'react';
@@ -17,7 +18,6 @@ import {
 } from 'antd';
 import { 
   CheckCircleOutlined, 
-  CloseCircleOutlined, 
   FlagOutlined, 
   EyeOutlined,
   StopOutlined,
@@ -53,66 +53,6 @@ type ModerationItem = {
   reporters: string[]; // List of users who flagged this
 };
 
-// --- Mock Data ---
-const MOCK_DATA: ModerationItem[] = [
-  { 
-    id: 1, 
-    contentSnippet: "This is a spam message...", 
-    fullContent: "This is a spam message with a shady link: http://buy-crypto-now.fake. Buy now! Limited time offer!",
-    author: "@spambot99", 
-    authorReputation: 12,
-    reportReason: "Spam / Advertising", 
-    timestamp: "2025-12-01 09:30", 
-    status: 'pending', 
-    severity: 'medium', 
-    type: 'comment',
-    reportCount: 3,
-    reporters: ['@user1', '@user2', '@mod_alice']
-  },
-  { 
-    id: 2, 
-    contentSnippet: "I hate everyone here!", 
-    fullContent: "I hate everyone here! You are all wrong and stupid. Go away.",
-    author: "@angry_user", 
-    authorReputation: 450,
-    reportReason: "Harassment", 
-    timestamp: "2025-12-01 10:15", 
-    status: 'pending', 
-    severity: 'high', 
-    type: 'comment',
-    reportCount: 5,
-    reporters: ['@victim1', '@bystander']
-  },
-  { 
-    id: 3, 
-    contentSnippet: "Check out my shady link", 
-    fullContent: "Check out my shady link. It definitely won't steal your password.",
-    author: "@hacker", 
-    authorReputation: -5,
-    reportReason: "Phishing Risk", 
-    timestamp: "2025-11-30 22:00", 
-    status: 'pending', 
-    severity: 'critical', 
-    type: 'post',
-    reportCount: 12,
-    reporters: ['@system_guard', '@admin_bob']
-  },
-  { 
-    id: 4, 
-    contentSnippet: "Just a normal profile", 
-    fullContent: "Bio: I am just a normal user. nothing to see here.",
-    author: "@innocent", 
-    authorReputation: 1200,
-    reportReason: "False Report", 
-    timestamp: "2025-12-01 08:00", 
-    status: 'resolved', 
-    severity: 'low', 
-    type: 'user_profile',
-    reportCount: 1,
-    reporters: ['@troll_user']
-  },
-];
-
 export default function ModerationQueuePage() {
   const actionRef = useRef<ActionType>();
   
@@ -130,10 +70,31 @@ export default function ModerationQueuePage() {
     setCurrentRow(undefined);
   };
 
-  const handleAction = (action: string, id: number) => {
-    message.success(`${action} applied to ticket #${id}`);
-    actionRef.current?.reload(); 
-    if (drawerOpen) handleCloseDrawer();
+  // Wired Action Handler
+  const handleAction = async (action: string, id: number, newStatus: string = 'resolved') => {
+    try {
+        // Optimistic UI update
+        message.loading('Processing action...', 0.5);
+        
+        // Real API Call to update status
+        const response = await fetch(`/api/admin/moderation/${id}/`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+
+        if (!response.ok) throw new Error('Failed to update ticket');
+
+        message.success(`${action} applied successfully`);
+        actionRef.current?.reload(); 
+        if (drawerOpen) handleCloseDrawer();
+
+    } catch (error) {
+        console.error(error);
+        message.error('Failed to apply action.');
+    }
   };
 
   // Column Definitions
@@ -223,11 +184,11 @@ export default function ModerationQueuePage() {
             onClick={() => handleOpenDrawer(record)}
           />
         </Tooltip>,
-        <Tooltip title="Dismiss (Keep)" key="dismiss">
+        <Tooltip title="Dismiss (Resolve)" key="dismiss">
           <Popconfirm
             title="Dismiss report?"
-            description="The content will remain visible."
-            onConfirm={() => handleAction('Report dismissed', record.id)}
+            description="The content will remain visible and ticket marked resolved."
+            onConfirm={() => handleAction('Report dismissed', record.id, 'resolved')}
           >
             <Button type="text" icon={<CheckCircleOutlined style={{ color: 'green' }} />} />
           </Popconfirm>
@@ -236,7 +197,7 @@ export default function ModerationQueuePage() {
           <Popconfirm
             title="Remove content & Ban user?"
             description="This is a severe action."
-            onConfirm={() => handleAction('User banned & content removed', record.id)}
+            onConfirm={() => handleAction('User banned & content removed', record.id, 'resolved')}
             okText="Ban & Remove"
             okButtonProps={{ danger: true }}
           >
@@ -260,15 +221,49 @@ export default function ModerationQueuePage() {
         columns={columns}
         actionRef={actionRef}
         cardBordered
+        
+        // 1. DYNAMIC REQUEST TO REAL BACKEND
         request={async (params) => {
-          // In real app: await fetch('/api/admin/moderation', { params })
-          console.log('Fetching with params', params);
-          return {
-            data: MOCK_DATA,
-            success: true,
-            total: MOCK_DATA.length,
-          };
+          try {
+              // Construct query params
+              const searchParams = new URLSearchParams();
+              if (params.status) searchParams.append('status', params.status);
+              if (params.type) searchParams.append('search', params.type); // Using generic search for simplified filtering
+
+              const res = await fetch(`/api/admin/moderation/?${searchParams.toString()}`);
+              if (!res.ok) throw new Error('Failed to fetch tickets');
+
+              const data = await res.json();
+
+              // Map Django Serializer (Snake Case) -> Frontend Item (Camel Case)
+              const mappedData: ModerationItem[] = data.results.map((item: any) => ({
+                id: item.id,
+                contentSnippet: item.content_snippet,
+                fullContent: item.full_content || item.content_snippet,
+                author: item.author_username || 'Unknown',
+                authorReputation: item.author_reputation_score || 0,
+                reportReason: item.report_reason,
+                timestamp: item.created,
+                status: item.status,
+                severity: item.severity,
+                type: item.target_type,
+                reportCount: item.report_count || 1,
+                reporters: [] // Serializer v1.0 doesn't send this list yet, defaulting to empty
+              }));
+
+              return {
+                data: mappedData,
+                success: true,
+                total: data.count
+              };
+
+          } catch (e) {
+              console.error(e);
+              message.error("Error loading moderation queue");
+              return { data: [], success: false };
+          }
         }}
+        
         rowKey="id"
         search={{
           labelWidth: 'auto',
@@ -318,9 +313,9 @@ export default function ModerationQueuePage() {
                     {/* Key Metrics */}
                     <ProCard split="vertical" bordered headerBordered>
                       <ProCard title="Reporters" colSpan="50%">
-                         <List
+                          <List
                             size="small"
-                            dataSource={currentRow.reporters}
+                            dataSource={currentRow.reporters.length > 0 ? currentRow.reporters : ["Anonymous Reports"]}
                             renderItem={item => <List.Item><UserOutlined /> {item}</List.Item>}
                           />
                       </ProCard>

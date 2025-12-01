@@ -24,8 +24,6 @@ import {
   StopOutlined,
   HistoryOutlined,
   SafetyCertificateOutlined,
-  CheckCircleOutlined,
-  WarningOutlined,
   LockOutlined
 } from '@ant-design/icons';
 import { 
@@ -50,60 +48,6 @@ type UserItem = {
   reputationScore: number;
 };
 
-// --- Mock Data ---
-const MOCK_USERS: UserItem[] = [
-  { 
-    id: 1, 
-    username: 'admin_jane', 
-    email: 'jane@konnaxion.io', 
-    role: 'admin', 
-    status: 'active', 
-    joinedAt: '2024-01-15', 
-    lastLogin: '2025-12-01 09:00',
-    reputationScore: 1200
-  },
-  { 
-    id: 2, 
-    username: 'mod_tom', 
-    email: 'tom@konnaxion.io', 
-    role: 'moderator', 
-    status: 'active', 
-    joinedAt: '2024-03-10', 
-    lastLogin: '2025-12-01 10:15',
-    reputationScore: 850
-  },
-  { 
-    id: 3, 
-    username: 'bad_actor', 
-    email: 'spam@fake.com', 
-    role: 'user', 
-    status: 'banned', 
-    joinedAt: '2025-11-20', 
-    lastLogin: '2025-11-25 14:00',
-    reputationScore: -50
-  },
-  { 
-    id: 4, 
-    username: 'new_guy', 
-    email: 'guy@gmail.com', 
-    role: 'user', 
-    status: 'pending', 
-    joinedAt: '2025-12-01', 
-    lastLogin: 'Never',
-    reputationScore: 10
-  },
-  { 
-    id: 5, 
-    username: 'contributor_alice', 
-    email: 'alice@web.com', 
-    role: 'user', 
-    status: 'active', 
-    joinedAt: '2025-05-15', 
-    lastLogin: '2025-11-30 18:30',
-    reputationScore: 320
-  },
-];
-
 export default function AllUsersPage() {
   const actionRef = useRef<ActionType>();
   
@@ -118,6 +62,7 @@ export default function AllUsersPage() {
       setDrawerOpen(true);
     } else if (key === 'ban') {
       message.success(`User ${record.username} has been banned.`);
+      // In a real app, you would make a POST/PATCH call here
       actionRef.current?.reload();
     } else if (key === 'reset') {
       message.info(`Password reset email sent to ${record.email}`);
@@ -193,7 +138,8 @@ export default function AllUsersPage() {
           banned: { status: 'error', text: 'Banned' },
           pending: { status: 'warning', text: 'Pending' },
         };
-        const s = statusMap[entity.status];
+        // @ts-ignore
+        const s = statusMap[entity.status] || statusMap.active;
         // @ts-ignore
         return <Badge status={s.status} text={s.text} />;
       }
@@ -251,22 +197,61 @@ export default function AllUsersPage() {
         actionRef={actionRef}
         cardBordered
         
-        // 1. DYNAMIC REQUEST BASED ON TABS
+        // 1. DYNAMIC REQUEST TO REAL BACKEND
         request={async (params) => {
-          // Simulate filtering logic on "server" side
-          let filtered = [...MOCK_USERS];
+          // Construct Query Params
+          const searchParams = new URLSearchParams();
+          if (params.username) searchParams.append('search', params.username);
+          if (params.email) searchParams.append('search', params.email);
           
-          if (activeTab === 'banned') {
-            filtered = filtered.filter(u => u.status === 'banned');
-          } else if (activeTab === 'admin') {
-            filtered = filtered.filter(u => u.role === 'admin' || u.role === 'moderator');
-          }
+          try {
+            const response = await fetch(`/api/admin/users/?${searchParams.toString()}`);
+            if (!response.ok) throw new Error('Failed to fetch users');
+            
+            const data = await response.json();
+            
+            // Map Django Serializer Data -> Frontend UserItem
+            // Backend sends: is_active, is_staff, is_superuser, date_joined
+            // Frontend expects: status, role, joinedAt
+            const mappedData: UserItem[] = (data.results || []).map((u: any) => {
+                // Determine Role
+                let role: UserItem['role'] = 'user';
+                if (u.is_superuser) role = 'admin';
+                else if (u.is_staff) role = 'moderator';
 
-          return { 
-            data: filtered, 
-            success: true,
-            total: filtered.length 
-          };
+                // Determine Status
+                let status: UserItem['status'] = 'active';
+                if (!u.is_active) status = 'banned'; 
+                // Note: 'pending' isn't standard in default Django User, 
+                // so we default to active/banned for now.
+
+                // Filter based on Tab selection (Client-side filtering for specific logic)
+                if (activeTab === 'banned' && status !== 'banned') return null;
+                if (activeTab === 'admin' && role === 'user') return null;
+
+                return {
+                    id: u.id,
+                    username: u.username,
+                    email: u.email,
+                    role: role,
+                    status: status,
+                    joinedAt: u.joined_at, // mapped in serializer
+                    lastLogin: u.last_login || 'Never',
+                    reputationScore: u.reputation_score || 0
+                };
+            }).filter(Boolean); // Remove nulls from filtering
+
+            return { 
+              data: mappedData, 
+              success: true,
+              total: mappedData.length 
+            };
+
+          } catch (error) {
+            console.error(error);
+            message.error('Error loading users list');
+            return { data: [], success: false };
+          }
         }}
         
         rowKey="id"
@@ -327,7 +312,7 @@ export default function AllUsersPage() {
                         <Tag color="blue">{currentRow.role.toUpperCase()}</Tag>
                       </Descriptions.Item>
                       <Descriptions.Item label="Status">
-                         <Tag color={currentRow.status === 'active' ? 'green' : 'red'}>{currentRow.status.toUpperCase()}</Tag>
+                          <Tag color={currentRow.status === 'active' ? 'green' : 'red'}>{currentRow.status.toUpperCase()}</Tag>
                       </Descriptions.Item>
                       <Descriptions.Item label="Joined Date">{currentRow.joinedAt}</Descriptions.Item>
                       <Descriptions.Item label="Last Login">{currentRow.lastLogin}</Descriptions.Item>

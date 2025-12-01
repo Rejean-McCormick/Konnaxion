@@ -1,3 +1,4 @@
+// FILE: frontend/app/reports/usage/page.tsx
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -71,117 +72,6 @@ type UsageReport = {
   points: UsagePoint[];
   modules: ModuleUsageRow[];
 };
-
-/* ------------------------------------------------------------------ */
-/* Mock data generator                                               */
-/* ------------------------------------------------------------------ */
-
-function generateMockPoints(days: number): UsagePoint[] {
-  const today = new Date();
-  const result: UsagePoint[] = [];
-
-  for (let i = days - 1; i >= 0; i -= 1) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-
-    const base = 200 + (i % 10) * 15;
-    const activeUsers = base + Math.round(Math.random() * 80);
-    const newUsers = 20 + Math.round(Math.random() * 15);
-    const sessions = activeUsers * (1.2 + Math.random() * 0.8);
-
-    const label = d.toISOString().slice(0, 10); // YYYY-MM-DD
-
-    result.push({
-      label,
-      activeUsers,
-      newUsers,
-      sessions: Math.round(sessions),
-    });
-  }
-
-  return result;
-}
-
-function getDaysForRange(range: TimeRangeKey): number {
-  switch (range) {
-    case '7d':
-      return 7;
-    case '90d':
-      return 90;
-    case '30d':
-    default:
-      return 30;
-  }
-}
-
-function buildMockReport(range: TimeRangeKey): UsageReport {
-  const days = getDaysForRange(range);
-  const points = generateMockPoints(days);
-
-  const last = points[points.length - 1];
-
-  const baseModules: ModuleUsageRow[] = [
-    {
-      key: 'ekoh',
-      module: 'Ekoh · Collective reputation',
-      activeUsers: Math.round(last.activeUsers * 0.65),
-      avgSessionMinutes: 9.4,
-      retentionRate: 82,
-      lastActive: last.label,
-    },
-    {
-      key: 'ethikos',
-      module: 'Ethikos · Deliberation & ethics',
-      activeUsers: Math.round(last.activeUsers * 0.54),
-      avgSessionMinutes: 12.1,
-      retentionRate: 76,
-      lastActive: last.label,
-    },
-    {
-      key: 'keenkonnect',
-      module: 'KeenKonnect · Teams & projects',
-      activeUsers: Math.round(last.activeUsers * 0.38),
-      avgSessionMinutes: 14.7,
-      retentionRate: 71,
-      lastActive: last.label,
-    },
-    {
-      key: 'konnected',
-      module: 'Konnected · Learning & community',
-      activeUsers: Math.round(last.activeUsers * 0.42),
-      avgSessionMinutes: 16.3,
-      retentionRate: 79,
-      lastActive: last.label,
-    },
-    {
-      key: 'kreative',
-      module: 'Kreative · Ideas & showcases',
-      activeUsers: Math.round(last.activeUsers * 0.29),
-      avgSessionMinutes: 11.2,
-      retentionRate: 68,
-      lastActive: last.label,
-    },
-  ];
-
-  // Slightly scale module numbers so they don’t exceed totals too much
-  const scale = last.activeUsers / baseModules.reduce(
-    (sum, m) => sum + m.activeUsers,
-    0,
-  );
-
-  const modules = baseModules.map((m) => ({
-    ...m,
-    activeUsers: Math.round(m.activeUsers * scale * 1.1),
-  }));
-
-  const generatedAt = new Date().toISOString();
-
-  return {
-    generatedAt,
-    points,
-    modules,
-  };
-}
 
 /* ------------------------------------------------------------------ */
 /* Helpers for derived aggregates                                    */
@@ -291,20 +181,23 @@ const moduleColumns: ColumnsType<ModuleRow> = [
 export default function ReportsUsagePage() {
   const [range, setRange] = useState<TimeRangeKey>('30d');
   
-  // Standard React state instead of ahooks for simplicity/compatibility
   const [data, setData] = useState<UsageReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // REAL API FETCH
   const fetchData = async (r: TimeRangeKey) => {
     setLoading(true);
     setError(false);
     try {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 600)); 
-      const report = buildMockReport(r);
+      const response = await fetch(`/api/reports/usage/?range=${r}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch usage data');
+      }
+      const report: UsageReport = await response.json();
       setData(report);
     } catch (err) {
+      console.error(err);
       setError(true);
     } finally {
       setLoading(false);
@@ -590,7 +483,7 @@ export default function ReportsUsagePage() {
             </Space>
           }
           extra={
-            <Tooltip title="Per-module usage is approximate in this mock implementation.">
+            <Tooltip title="Per-module usage is aggregated from backend logs.">
               <InfoCircleOutlined />
             </Tooltip>
           }

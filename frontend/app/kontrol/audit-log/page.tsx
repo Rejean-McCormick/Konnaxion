@@ -30,15 +30,6 @@ type LogItem = {
   status: 'success' | 'failure';
 };
 
-// --- Mock Data ---
-const MOCK_LOGS: LogItem[] = [
-  { id: 'LOG-8821', actor: 'admin_jane', role: 'admin', action: 'DELETE_COMMENT', module: 'Moderation', target: 'Comment #992', ip: '192.168.1.12', timestamp: '2025-12-01 10:45:00', status: 'success' },
-  { id: 'LOG-8820', actor: 'mod_tom', role: 'moderator', action: 'BAN_USER', module: 'User Mgmt', target: 'User @spammer', ip: '10.0.0.55', timestamp: '2025-12-01 10:05:22', status: 'success' },
-  { id: 'LOG-8819', actor: 'system', role: 'system', action: 'AUTO_ARCHIVE', module: 'System', target: 'Thread #404', ip: '127.0.0.1', timestamp: '2025-12-01 02:00:00', status: 'success' },
-  { id: 'LOG-8818', actor: 'unknown', role: 'system', action: 'LOGIN_ATTEMPT', module: 'Auth', target: 'admin_jane', ip: '45.22.11.90', timestamp: '2025-11-30 23:55:10', status: 'failure' },
-  { id: 'LOG-8817', actor: 'admin_jane', role: 'admin', action: 'UPDATE_CONFIG', module: 'Konsensus', target: 'Global Thresholds', ip: '192.168.1.12', timestamp: '2025-11-30 14:30:00', status: 'success' },
-];
-
 export default function AuditLogPage() {
   const actionRef = useRef<ActionType>();
 
@@ -122,7 +113,7 @@ export default function AuditLogPage() {
       valueType: 'text',
       width: 120,
       copyable: true,
-      search: false, // In real app, enable search if backend supports it
+      search: false, 
     },
     {
       title: 'Timestamp',
@@ -134,8 +125,9 @@ export default function AuditLogPage() {
   ];
 
   const handleExport = () => {
+    // In a real implementation, this would trigger a backend CSV download endpoint
     message.loading('Generating audit report...', 1.5)
-      .then(() => message.success('Audit_Log_2025-12-01.csv downloaded'));
+      .then(() => message.success('Audit_Log_Export.csv downloaded'));
   };
 
   return (
@@ -145,7 +137,8 @@ export default function AuditLogPage() {
       extra={[
         <Button key="refresh" icon={<ReloadOutlined />} onClick={() => actionRef.current?.reload()}>
           Refresh
-        </Button>,
+        </Button>
+        ,
         <Button key="export" type="primary" icon={<CloudDownloadOutlined />} onClick={handleExport}>
           Export CSV
         </Button>
@@ -155,14 +148,57 @@ export default function AuditLogPage() {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        request={async (params) => {
-          // Mock API call
-          return {
-            data: MOCK_LOGS,
-            success: true,
-            total: MOCK_LOGS.length,
-          };
+        
+        // WIRED: Fetch from Django API
+        request={async (params, sort, filter) => {
+            try {
+                const searchParams = new URLSearchParams();
+                
+                // Pagination
+                const current = params.current || 1;
+                const pageSize = params.pageSize || 20;
+                searchParams.append('page', current.toString());
+                searchParams.append('page_size', pageSize.toString());
+
+                // Filtering / Searching
+                if (params.module) searchParams.append('search', params.module);
+                if (params.action) searchParams.append('search', params.action);
+                
+                // Sorting
+                // (Assuming backend supports ?ordering=-created or similar)
+                // Default to newest first
+                searchParams.append('ordering', '-created'); 
+
+                const response = await fetch(`/api/admin/audit-log/?${searchParams.toString()}`);
+                if (!response.ok) throw new Error('Failed to fetch logs');
+                
+                const data = await response.json();
+
+                // Map Backend Response to Table Data
+                const mappedData: LogItem[] = (data.results || []).map((item: any) => ({
+                    id: item.id.toString(), // Ensure ID is string if UUID or Int
+                    actor: item.actor_name || item.actor_username || 'System',
+                    role: item.role || 'system',
+                    action: item.action,
+                    module: item.module,
+                    target: item.target,
+                    ip: item.ip_address || '-',
+                    timestamp: item.created,
+                    status: item.status
+                }));
+
+                return {
+                    data: mappedData,
+                    success: true,
+                    total: data.count
+                };
+            } catch (error) {
+                console.error("Audit log fetch error:", error);
+                message.error("Failed to load audit logs");
+                return { data: [], success: false };
+            }
         }}
+        
         rowKey="id"
         search={{
           labelWidth: 'auto',

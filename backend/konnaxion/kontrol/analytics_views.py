@@ -65,7 +65,22 @@ class UsageReportView(APIView):
                 "retentionRate": 76,
                 "lastActive": points[-1]["label"],
             },
-            # Add other modules similarly...
+            {
+                "key": "konnected",
+                "module": "KonnectED · Knowledge Graph",
+                "activeUsers": int(last_active * 0.30),
+                "avgSessionMinutes": 15.5,
+                "retentionRate": 68,
+                "lastActive": points[-1]["label"],
+            },
+            {
+                "key": "kollective",
+                "module": "Kollective · Decision Making",
+                "activeUsers": int(last_active * 0.42),
+                "avgSessionMinutes": 5.2,
+                "retentionRate": 88,
+                "lastActive": points[-1]["label"],
+            },
         ]
 
         data = {
@@ -88,6 +103,25 @@ class PerformanceReportView(APIView):
         
         # Mock Data Structure for Perf
         # In reality, query Prometheus or a time-series DB
+        
+        # Generate some series data
+        hours = 24
+        series = []
+        now = timezone.now()
+        
+        for i in range(hours):
+            t = now - timedelta(hours=(hours - i))
+            # Latency spike simulation
+            latency_base = 120 if i != 14 else 450 
+            latency = latency_base + random.randint(-20, 50)
+            errors = 0 if random.random() > 0.1 else random.randint(1, 5)
+            
+            series.append({
+                "time": t.isoformat(),
+                "latency": latency,
+                "errors": errors
+            })
+
         data = {
             "summary": {
                 "p95LatencyMs": 320,
@@ -97,9 +131,60 @@ class PerformanceReportView(APIView):
                 "apdex": 0.93,
                 "uptimePct": 99.85,
             },
-            # Mock series data would be generated based on range_key here
-            "latencySeries": [], 
-            "errorSeries": []
+            "series": series
         }
         
+        return Response(data, status=status.HTTP_200_OK)
+
+
+class SmartVoteReportView(APIView):
+    """
+    Returns analytics specifically for the Konsensus/Smart Vote module.
+    Tracks participation rates, consensus achievement, and polarization.
+    Endpoint: /api/reports/smart-vote?range=30d
+    """
+    permission_classes = [IsAdminOrModerator]
+
+    def get(self, request):
+        range_key = request.query_params.get("range", "30d")
+        days = 30
+        if range_key == "90d":
+            days = 90
+        
+        points = []
+        today = timezone.now().date()
+
+        # Generate trend data
+        for i in range(days - 1, -1, -1):
+            date = today - timedelta(days=i)
+            
+            # Participation: Random fluctuation around 65%
+            participation = 65 + (random.random() * 15 - 5)
+            
+            # Consensus: Trend slightly upwards
+            consensus = 50 + (i * 0.5) + (random.random() * 10 - 5)
+            if consensus > 95: consensus = 95
+            
+            # Polarization: Inverse to consensus roughly
+            polarization = 100 - consensus - (random.random() * 10)
+            if polarization < 0: polarization = 0
+
+            points.append({
+                "label": date.isoformat(),
+                "participation": round(participation, 1),
+                "consensus": round(consensus, 1),
+                "polarization": round(polarization, 1),
+            })
+
+        data = {
+            "generatedAt": timezone.now().isoformat(),
+            "summary": {
+                "activeVotes": 12,
+                "avgParticipationPct": 68.4,
+                "avgConsensusTimeDays": 3.2,
+                "totalVotesCast": 14502
+            },
+            "points": points
+        }
+
         return Response(data, status=status.HTTP_200_OK)

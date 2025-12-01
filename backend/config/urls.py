@@ -9,10 +9,12 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
-from konnaxion.moderation.api_views import (
-    ModerationQueueView,
-    ModerationDecisionView,
-    AuditLogListView,
+# [CHANGED] Import Analytics Views from the new Kontrol app
+# Note: SmartVoteReportView needs to be added to analytics_views.py next.
+from konnaxion.kontrol.analytics_views import (
+    UsageReportView,
+    PerformanceReportView,
+    SmartVoteReportView, 
 )
 
 urlpatterns = [
@@ -34,6 +36,10 @@ if settings.DEBUG:
 # API URLS
 urlpatterns += [
     # Base API (DRF routers)
+    # [NOTE] This router handles:
+    # - /api/admin/users (UserAdminViewSet)
+    # - /api/admin/moderation (ModerationTicketViewSet)
+    # - /api/admin/audit-log (AuditLogViewSet)
     path("api/", include("config.api_router")),
 
     # Auth token (DRF)
@@ -44,31 +50,17 @@ urlpatterns += [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
 
     # ------------------------------------------------------------------
-    # Admin moderation & audit endpoints (konnaxion.moderation.api_views)
-    #   GET  /api/admin/moderation
-    #   POST /api/admin/moderation/<id>
-    #   GET  /api/admin/audit/logs
+    # Analytics / Reports Endpoints (Custom APIViews)
+    # These connect the Frontend Charts to the Backend Data
     # ------------------------------------------------------------------
-    path(
-        "api/admin/moderation",
-        ModerationQueueView.as_view(),
-        name="admin-moderation-queue",
-    ),
-    path(
-        "api/admin/moderation/<int:pk>",
-        ModerationDecisionView.as_view(),
-        name="admin-moderation-decision",
-    ),
-    path(
-        "api/admin/audit/logs",
-        AuditLogListView.as_view(),
-        name="admin-audit-log-list",
-    ),
+    path("api/reports/usage/", UsageReportView.as_view(), name="report-usage"),
+    path("api/reports/perf/", PerformanceReportView.as_view(), name="report-perf"),
+    path("api/reports/smart-vote/", SmartVoteReportView.as_view(), name="report-smart-vote"),
 
     # ------------------------------------------------------------------
     # Compat FE aliases: map "deliberate" to existing Ethikos endpoints.
     # Gives /api/deliberate/topics|stances|arguments and
-    #      /api/deliberate/elite/topics|stances|arguments
+    #       /api/deliberate/elite/topics|stances|arguments
     # ------------------------------------------------------------------
     path(
         "api/deliberate/",
@@ -93,5 +85,4 @@ if settings.DEBUG:
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
-
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]

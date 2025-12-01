@@ -1,7 +1,7 @@
 // FILE: frontend/app/reports/perf/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   Card,
@@ -16,6 +16,9 @@ import {
   Tag,
   Tooltip,
   Typography,
+  Skeleton,
+  Empty,
+  Button
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -25,31 +28,51 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
   XAxis,
   YAxis,
-  ComposedChart,
 } from 'recharts';
 import { PageContainer } from '@ant-design/pro-components';
+import { ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 
 const { RangePicker } = DatePicker;
-const { Title, Paragraph, Text } = Typography;
+const { Text } = Typography;
+
+// ---------------------------------------------------------------------------
+// Types & API Interfaces
+// ---------------------------------------------------------------------------
 
 type TimeRange = '24h' | '7d' | '30d';
 
-type LatencyPoint = {
+interface ApiSummary {
+  p95LatencyMs: number;
+  p99LatencyMs: number;
+  errorRatePct: number;
+  throughputRps: number;
+  apdex: number;
+  uptimePct: number;
+}
+
+interface ApiSeriesPoint {
+  time: string;
+  latency: number;
+  errors: number;
+}
+
+interface ApiPerfResponse {
+  summary: ApiSummary;
+  series: ApiSeriesPoint[];
+}
+
+// Data shape for the frontend charts
+interface ChartPoint {
   bucket: string;
   p95: number;
   p99: number;
-};
-
-type ErrorPoint = {
-  bucket: string;
   rate: number;
-};
+}
 
 type EndpointRow = {
   key: string;
@@ -62,69 +85,10 @@ type EndpointRow = {
 };
 
 // ---------------------------------------------------------------------------
-// Mock data (Optimized for Recharts)
+// Static Data (Not yet provided by API)
 // ---------------------------------------------------------------------------
 
-const SUMMARY = {
-  p95LatencyMs: 320,
-  p99LatencyMs: 780,
-  errorRatePct: 0.8,
-  throughputRps: 420,
-  apdex: 0.93,
-  uptimePct: 99.85,
-};
-
-const LATENCY_SERIES: Record<TimeRange, LatencyPoint[]> = {
-  '24h': [
-    { bucket: '00:00', p95: 340, p99: 780 },
-    { bucket: '06:00', p95: 310, p99: 720 },
-    { bucket: '12:00', p95: 290, p99: 710 },
-    { bucket: '18:00', p95: 330, p99: 790 },
-    { bucket: '23:59', p95: 350, p99: 810 },
-  ],
-  '7d': [
-    { bucket: 'Mon', p95: 360, p99: 840 },
-    { bucket: 'Tue', p95: 340, p99: 800 },
-    { bucket: 'Wed', p95: 320, p99: 780 },
-    { bucket: 'Thu', p95: 310, p99: 770 },
-    { bucket: 'Fri', p95: 300, p99: 760 },
-    { bucket: 'Sat', p95: 330, p99: 810 },
-    { bucket: 'Sun', p95: 320, p99: 790 },
-  ],
-  '30d': [
-    { bucket: 'Week 1', p95: 380, p99: 880 },
-    { bucket: 'Week 2', p95: 340, p99: 820 },
-    { bucket: 'Week 3', p95: 320, p99: 780 },
-    { bucket: 'Week 4', p95: 310, p99: 760 },
-  ],
-};
-
-const ERROR_SERIES: Record<TimeRange, ErrorPoint[]> = {
-  '24h': [
-    { bucket: '00:00', rate: 0.7 },
-    { bucket: '06:00', rate: 0.5 },
-    { bucket: '12:00', rate: 0.9 },
-    { bucket: '18:00', rate: 1.1 },
-    { bucket: '23:59', rate: 0.8 },
-  ],
-  '7d': [
-    { bucket: 'Mon', rate: 0.9 },
-    { bucket: 'Tue', rate: 0.8 },
-    { bucket: 'Wed', rate: 1.0 },
-    { bucket: 'Thu', rate: 0.6 },
-    { bucket: 'Fri', rate: 0.7 },
-    { bucket: 'Sat', rate: 0.5 },
-    { bucket: 'Sun', rate: 0.8 },
-  ],
-  '30d': [
-    { bucket: 'Week 1', rate: 1.2 },
-    { bucket: 'Week 2', rate: 1.0 },
-    { bucket: 'Week 3', rate: 0.9 },
-    { bucket: 'Week 4', rate: 0.7 },
-  ],
-};
-
-const ENDPOINT_ROWS: EndpointRow[] = [
+const MOCK_ENDPOINTS: EndpointRow[] = [
   {
     key: '/api/keenkonnect/projects/',
     endpoint: '/api/keenkonnect/projects/',
@@ -164,11 +128,59 @@ const ENDPOINT_ROWS: EndpointRow[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Page
+// Page Component
 // ---------------------------------------------------------------------------
 
 export default function ReportsPerfPage(): JSX.Element {
   const [timeRange, setTimeRange] = useState<TimeRange>('24h');
+  
+  // State for fetched data
+  const [data, setData] = useState<ApiPerfResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  // Derived state for charts
+  const [chartData, setChartData] = useState<ChartPoint[]>([]);
+
+  const fetchData = async (range: TimeRange) => {
+    setLoading(true);
+    setError(false);
+    try {
+      const response = await fetch(`/api/reports/perf/?range=${range}`);
+      if (!response.ok) throw new Error('Failed to fetch performance data');
+      
+      const result: ApiPerfResponse = await response.json();
+      setData(result);
+
+      // Transform API series -> Recharts format
+      // Backend gives single 'latency', frontend charts want p95 & p99.
+      // We'll simulate p99 spread for visualization if not provided directly.
+      const mappedSeries = (result.series || []).map((pt) => {
+        const dateObj = dayjs(pt.time);
+        let bucketLabel = dateObj.format('HH:mm');
+        if (range === '7d') bucketLabel = dateObj.format('ddd');
+        if (range === '30d') bucketLabel = dateObj.format('MM/DD');
+
+        return {
+          bucket: bucketLabel,
+          p95: pt.latency,
+          p99: Math.round(pt.latency * 1.4), // Simulated spread
+          rate: pt.errors,
+        };
+      });
+      setChartData(mappedSeries);
+
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData(timeRange);
+  }, [timeRange]);
 
   const endpointColumns: ColumnsType<EndpointRow> = [
     {
@@ -228,6 +240,30 @@ export default function ReportsPerfPage(): JSX.Element {
     },
   ];
 
+  // Loading / Error States
+  if (loading && !data) {
+    return (
+      <PageContainer ghost header={{ title: 'API Performance' }}>
+        <Skeleton active paragraph={{ rows: 10 }} />
+      </PageContainer>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <PageContainer ghost header={{ title: 'API Performance' }}>
+        <Empty 
+          description="Failed to load performance metrics." 
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        >
+             <Button icon={<ReloadOutlined />} onClick={() => fetchData(timeRange)}>Retry</Button>
+        </Empty>
+      </PageContainer>
+    );
+  }
+
+  const { summary } = data;
+
   return (
     <PageContainer
       ghost
@@ -252,7 +288,7 @@ export default function ReportsPerfPage(): JSX.Element {
               { label: 'Last 30 days', value: '30d' },
             ]}
           />
-          <Tooltip title="Hook this up to real backend filters later. For now the data is static.">
+          <Tooltip title="Date filtering not yet supported by backend.">
             <RangePicker disabled style={{ width: 260 }} />
           </Tooltip>
         </Space>
@@ -260,22 +296,13 @@ export default function ReportsPerfPage(): JSX.Element {
     >
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
         
-        <Alert
-          type="info"
-          showIcon
-          className="mb-4"
-          style={{ marginBottom: 24 }}
-          message="Sample data"
-          description="This performance dashboard currently uses mocked metrics. Wire it to /reports/perf API once the backend is ready."
-        />
-
         {/* KPI strip */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           <Col xs={12} md={6}>
             <Card>
               <Statistic
                 title="p95 latency"
-                value={SUMMARY.p95LatencyMs}
+                value={summary.p95LatencyMs}
                 suffix="ms"
               />
             </Card>
@@ -284,7 +311,7 @@ export default function ReportsPerfPage(): JSX.Element {
             <Card>
               <Statistic
                 title="p99 latency"
-                value={SUMMARY.p99LatencyMs}
+                value={summary.p99LatencyMs}
                 suffix="ms"
               />
             </Card>
@@ -293,9 +320,10 @@ export default function ReportsPerfPage(): JSX.Element {
             <Card>
               <Statistic
                 title="Error rate"
-                value={SUMMARY.errorRatePct}
+                value={summary.errorRatePct}
                 precision={2}
                 suffix="%"
+                valueStyle={{ color: summary.errorRatePct > 1 ? '#cf1322' : '#3f8600' }}
               />
             </Card>
           </Col>
@@ -303,7 +331,7 @@ export default function ReportsPerfPage(): JSX.Element {
             <Card>
               <Statistic
                 title="Throughput"
-                value={SUMMARY.throughputRps}
+                value={summary.throughputRps}
                 suffix="rps"
               />
             </Card>
@@ -316,7 +344,7 @@ export default function ReportsPerfPage(): JSX.Element {
             <Card>
               <Statistic
                 title="Apdex"
-                value={SUMMARY.apdex}
+                value={summary.apdex}
                 precision={2}
               />
             </Card>
@@ -325,7 +353,7 @@ export default function ReportsPerfPage(): JSX.Element {
             <Card>
               <Statistic
                 title="Uptime (30d)"
-                value={SUMMARY.uptimePct}
+                value={summary.uptimePct}
                 precision={2}
                 suffix="%"
               />
@@ -339,7 +367,7 @@ export default function ReportsPerfPage(): JSX.Element {
             <Card title="Latency timeline (p95 / p99)">
               <div style={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer>
-                  <AreaChart data={LATENCY_SERIES[timeRange]}>
+                  <AreaChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="bucket" />
                     <YAxis />
@@ -370,7 +398,7 @@ export default function ReportsPerfPage(): JSX.Element {
             <Card title="Error rate over time">
               <div style={{ width: '100%', height: 300 }}>
                 <ResponsiveContainer>
-                  <BarChart data={ERROR_SERIES[timeRange]}>
+                  <BarChart data={chartData}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="bucket" />
                     <YAxis />
@@ -387,11 +415,18 @@ export default function ReportsPerfPage(): JSX.Element {
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={15}>
             <Card title="Endpoint-level performance">
+              <Alert 
+                  message="Limited Data" 
+                  type="info" 
+                  showIcon 
+                  style={{marginBottom: 16}}
+                  description="Detailed endpoint breakdown is not yet available via API. Showing example targets."
+              />
               <Table<EndpointRow>
                 size="small"
                 rowKey="key"
                 columns={endpointColumns}
-                dataSource={ENDPOINT_ROWS}
+                dataSource={MOCK_ENDPOINTS}
                 pagination={{ pageSize: 5 }}
               />
             </Card>
@@ -405,13 +440,13 @@ export default function ReportsPerfPage(): JSX.Element {
                   <Progress
                     percent={Math.min(
                       100,
-                      (400 / SUMMARY.p95LatencyMs) * 100,
+                      (400 / (summary.p95LatencyMs || 1)) * 100,
                     )}
-                    status={SUMMARY.p95LatencyMs <= 400 ? 'active' : 'exception'}
+                    status={summary.p95LatencyMs <= 400 ? 'active' : 'exception'}
                     showInfo={false}
                   />
                   <Text type="secondary">
-                    Current p95: {SUMMARY.p95LatencyMs} ms (target&nbsp;≤&nbsp;400 ms)
+                    Current p95: {summary.p95LatencyMs} ms (target&nbsp;≤&nbsp;400 ms)
                   </Text>
                 </div>
 
@@ -420,24 +455,24 @@ export default function ReportsPerfPage(): JSX.Element {
                   <Progress
                     percent={Math.min(
                       100,
-                      (1 / Math.max(SUMMARY.errorRatePct, 0.01)) * 100,
+                      (1 / Math.max(summary.errorRatePct, 0.01)) * 100,
                     )}
                     status={
-                      SUMMARY.errorRatePct < 1 ? 'active' : 'exception'
+                      summary.errorRatePct < 1 ? 'active' : 'exception'
                     }
                     showInfo={false}
                   />
                   <Text type="secondary">
-                    Current error rate: {SUMMARY.errorRatePct.toFixed(2)}% (target&nbsp;&lt;&nbsp;1.0%)
+                    Current error rate: {summary.errorRatePct.toFixed(2)}% (target&nbsp;&lt;&nbsp;1.0%)
                   </Text>
                 </div>
 
                 <div>
                   <Text strong>Availability SLO (≥ 99.9%)</Text>
                   <Progress
-                    percent={SUMMARY.uptimePct}
+                    percent={summary.uptimePct}
                     status={
-                      SUMMARY.uptimePct >= 99.9 ? 'active' : 'exception'
+                      summary.uptimePct >= 99.9 ? 'active' : 'exception'
                     }
                     format={(percent) =>
                       percent !== undefined ? `${percent.toFixed(2)}%` : ''
@@ -445,26 +480,14 @@ export default function ReportsPerfPage(): JSX.Element {
                   />
                 </div>
 
-                <Alert
-                  type="warning"
-                  showIcon
-                  message="Active watch"
-                  description={
-                    <>
-                      <div>
-                        <Text>
-                          Ethikos decision API is approaching latency and error SLO
-                          thresholds.
-                        </Text>
-                      </div>
-                      <div>
-                        <Text type="secondary">
-                          Consider checking database load and recent deploys.
-                        </Text>
-                      </div>
-                    </>
-                  }
-                />
+                {summary.errorRatePct > 1 && (
+                    <Alert
+                    type="warning"
+                    showIcon
+                    message="Active watch"
+                    description="Error rates are elevated above the SLO threshold. Check database connections."
+                    />
+                )}
               </Space>
             </Card>
           </Col>

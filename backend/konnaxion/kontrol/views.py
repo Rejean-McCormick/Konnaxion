@@ -1,11 +1,12 @@
 # FILE: backend/konnaxion/kontrol/views.py
 from rest_framework import viewsets, permissions, filters
 from django.contrib.auth import get_user_model
-from .models import AuditLog, ModerationTicket
+from .models import AuditLog, ModerationTicket, KonsensusConfig
 from .serializers import (
     AuditLogSerializer, 
     ModerationTicketSerializer, 
-    UserAdminSerializer
+    UserAdminSerializer,
+    KonsensusConfigSerializer
 )
 
 User = get_user_model()
@@ -56,3 +57,18 @@ class UserAdminViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAdminOrModerator]
     filter_backends = [filters.SearchFilter]
     search_fields = ["username", "email"]
+
+
+class KonsensusConfigViewSet(viewsets.ModelViewSet):
+    """
+    CRUD viewset for the global Konsensus voting configuration.
+    Generally, there should only be one active configuration record.
+    """
+    queryset = KonsensusConfig.objects.all().order_by("-created")
+    serializer_class = KonsensusConfigSerializer
+    permission_classes = [IsAdminOrModerator]
+    
+    # Since this is a settings object, we usually don't need search/filter,
+    # but ordering ensures the latest config is at the top.
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ["created", "modified"]

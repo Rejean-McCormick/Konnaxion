@@ -1,7 +1,7 @@
 // FILE: frontend/app/reports/smart-vote/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   PageContainer,
   ProCard,
@@ -17,6 +17,9 @@ import {
   Space,
   Table,
   Typography,
+  Skeleton,
+  Button,
+  Empty
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -30,19 +33,39 @@ import {
   YAxis,
 } from 'recharts';
 import dayjs, { Dayjs } from 'dayjs';
+import { ReloadOutlined } from '@ant-design/icons';
 
 const { RangePicker } = DatePicker;
 const { Title, Paragraph, Text } = Typography;
 
+// ---------------------------------------------------------------------------
+// Types & API Interfaces
+// ---------------------------------------------------------------------------
+
 type RangeKey = '7d' | '30d' | '90d';
 
-type TrendPoint = {
-  date: string;
-  all: number;
-  expert: number;
-  public: number;
-};
+// Backend Response Shape
+interface ApiSmartVotePoint {
+    label: string;
+    participation: number;
+    consensus: number;
+    polarization: number;
+}
 
+interface ApiSmartVoteSummary {
+    activeVotes: number;
+    avgParticipationPct: number;
+    avgConsensusTimeDays: number;
+    totalVotesCast: number;
+}
+
+interface ApiSmartVoteResponse {
+    generatedAt: string;
+    summary: ApiSmartVoteSummary;
+    points: ApiSmartVotePoint[];
+}
+
+// Frontend Table Row (Simulated for now)
 type DomainRow = {
   key: string;
   domain: string;
@@ -51,160 +74,83 @@ type DomainRow = {
   consensus: number;
 };
 
+// ---------------------------------------------------------------------------
+// Mock Data (For parts not yet in API)
+// ---------------------------------------------------------------------------
+
+const MOCK_DOMAIN_ROWS: DomainRow[] = [
+  {
+    key: 'economy',
+    domain: 'Economy',
+    questions: 12,
+    participation: 68,
+    consensus: 62,
+  },
+  {
+    key: 'climate',
+    domain: 'Climate & environment',
+    questions: 9,
+    participation: 72,
+    consensus: 58,
+  },
+  {
+    key: 'health',
+    domain: 'Health & wellbeing',
+    questions: 7,
+    participation: 64,
+    consensus: 66,
+  },
+  {
+    key: 'education',
+    domain: 'Education',
+    questions: 6,
+    participation: 59,
+    consensus: 61,
+  },
+];
+
 const computePresetRange = (rangeKey: RangeKey): [Dayjs, Dayjs] => {
   const end = dayjs();
-  const days =
-    rangeKey === '7d' ? 7 : rangeKey === '30d' ? 30 : 90;
+  const days = rangeKey === '7d' ? 7 : rangeKey === '30d' ? 30 : 90;
   const start = end.subtract(days - 1, 'day');
   return [start, end];
 };
 
-/**
- * Simple mock generator so the chart looks realistic-ish
- * without touching the real reports-api yet.
- */
-const buildMockTrendData = (rangeKey: RangeKey): TrendPoint[] => {
-  const [start, end] = computePresetRange(rangeKey);
-  const days = end.diff(start, 'day') + 1;
-
-  // Ensure we don't generate too many points for long ranges if simulating API aggregation
-  // For this mock, one point per day is fine up to 90 days.
-  const baseLen = Math.max(7, Math.min(days, 90));
-  const points: TrendPoint[] = [];
-
-  for (let i = 0; i < baseLen; i += 1) {
-    const date = start.add(i, 'day');
-    // Create a bit of a wave pattern
-    const phase = i / baseLen;
-
-    const all = Math.round(200 + 80 * Math.sin(phase * Math.PI * 2));
-    const expert = Math.round(70 + 30 * Math.sin(phase * Math.PI * 2 + 0.4));
-    const pub = Math.max(0, all - expert);
-
-    points.push({
-      date: date.format('MM-DD'),
-      all,
-      expert,
-      public: pub,
-    });
-  }
-
-  return points;
-};
-
-const buildMockDomainRows = (rangeKey: RangeKey): DomainRow[] => {
-  // Just vary the numbers slightly based on range so it feels dynamic
-  const scale =
-    rangeKey === '7d' ? 0.5 : rangeKey === '30d' ? 1 : 2;
-
-  return [
-    {
-      key: 'economy',
-      domain: 'Economy',
-      questions: Math.round(12 * scale),
-      participation: Math.round(68 + 4 * scale),
-      consensus: Math.round(62 + 3 * scale),
-    },
-    {
-      key: 'climate',
-      domain: 'Climate & environment',
-      questions: Math.round(9 * scale),
-      participation: Math.round(72 + 2 * scale),
-      consensus: Math.round(58 + 2 * scale),
-    },
-    {
-      key: 'health',
-      domain: 'Health & wellbeing',
-      questions: Math.round(7 * scale),
-      participation: Math.round(64 + 3 * scale),
-      consensus: Math.round(66 + 2 * scale),
-    },
-    {
-      key: 'education',
-      domain: 'Education',
-      questions: Math.round(6 * scale),
-      participation: Math.round(59 + 2 * scale),
-      consensus: Math.round(61 + 2 * scale),
-    },
-  ];
-};
+// ---------------------------------------------------------------------------
+// Page Component
+// ---------------------------------------------------------------------------
 
 export default function SmartVoteReportPage(): JSX.Element {
   const [rangeKey, setRangeKey] = useState<RangeKey>('30d');
   const [[start, end], setRange] = useState<[Dayjs, Dayjs]>(
     () => computePresetRange('30d'),
   );
-  const [cohort, setCohort] = useState<'all' | 'expert' | 'public'>('all');
+  
+  // Data State
+  const [data, setData] = useState<ApiSmartVoteResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const trendData = useMemo(
-    () => buildMockTrendData(rangeKey),
-    [rangeKey],
-  );
+  // Fetch Data
+  const fetchData = async (key: RangeKey) => {
+    setLoading(true);
+    setError(false);
+    try {
+        const res = await fetch(`/api/reports/smart-vote/?range=${key}`);
+        if (!res.ok) throw new Error("Failed to fetch smart vote report");
+        const result: ApiSmartVoteResponse = await res.json();
+        setData(result);
+    } catch (err) {
+        console.error(err);
+        setError(true);
+    } finally {
+        setLoading(false);
+    }
+  };
 
-  const domainRows = useMemo(
-    () => buildMockDomainRows(rangeKey),
-    [rangeKey],
-  );
-
-  const summary = useMemo(() => {
-    const totalVotes = trendData.reduce((sum, p) => sum + p.all, 0);
-    const days = trendData.length || 1;
-    const avgPerDay = Math.round(totalVotes / days);
-
-    const avgExpertShare =
-      trendData.length === 0
-        ? 0
-        : Math.round(
-            (trendData.reduce((sum, p) => sum + p.expert, 0) /
-              totalVotes) *
-              100,
-          );
-
-    const avgConsensus =
-      domainRows.length === 0
-        ? 0
-        : Math.round(
-            domainRows.reduce((sum, row) => sum + row.consensus, 0) /
-              domainRows.length,
-          );
-
-    return {
-      totalVotes,
-      avgPerDay,
-      avgExpertShare,
-      avgConsensus,
-      domains: domainRows.length,
-    };
-  }, [trendData, domainRows]);
-
-  const domainColumns: ColumnsType<DomainRow> = [
-    {
-      title: 'Domain',
-      dataIndex: 'domain',
-      key: 'domain',
-      width: '32%',
-    },
-    {
-      title: 'Questions in range',
-      dataIndex: 'questions',
-      key: 'questions',
-      width: '20%',
-    },
-    {
-      title: 'Avg participation',
-      dataIndex: 'participation',
-      key: 'participation',
-      width: '24%',
-      render: (value: number) => `${value}%`,
-    },
-    {
-      title: 'Weighted consensus',
-      dataIndex: 'consensus',
-      key: 'consensus',
-      width: '24%',
-      render: (value: number) => `${value}%`,
-    },
-  ];
+  useEffect(() => {
+    fetchData(rangeKey);
+  }, [rangeKey]);
 
   const handleRangePresetChange = (value: RangeKey | string) => {
     const key = (value as RangeKey) ?? '30d';
@@ -212,21 +158,38 @@ export default function SmartVoteReportPage(): JSX.Element {
     setRange(computePresetRange(key));
   };
 
-  const handleRangePickerChange = (
-    values: null | [Dayjs, Dayjs],
-  ) => {
-    if (!values) return;
-    setRange(values);
-    // basic inference for the segmented control
-    const days = values[1].diff(values[0], 'day') + 1;
-    if (days <= 8) setRangeKey('7d');
-    else if (days <= 35) setRangeKey('30d');
-    else setRangeKey('90d');
-  };
+  const domainColumns: ColumnsType<DomainRow> = [
+    { title: 'Domain', dataIndex: 'domain', key: 'domain', width: '32%' },
+    { title: 'Questions in range', dataIndex: 'questions', key: 'questions', width: '20%' },
+    { title: 'Avg participation', dataIndex: 'participation', key: 'participation', width: '24%', render: (v) => `${v}%` },
+    { title: 'Weighted consensus', dataIndex: 'consensus', key: 'consensus', width: '24%', render: (v) => `${v}%` },
+  ];
 
   // IDs for accessibility
   const headingId = 'smart-vote-trend-heading';
   const domainHeadingId = 'smart-vote-domain-heading';
+
+  // Loading State
+  if (loading && !data) {
+    return (
+        <PageContainer header={{ title: 'Smart Vote Analytics', ghost: true }}>
+            <Skeleton active paragraph={{ rows: 8 }} />
+        </PageContainer>
+    );
+  }
+
+  // Error State
+  if (error || !data) {
+    return (
+        <PageContainer header={{ title: 'Smart Vote Analytics', ghost: true }}>
+            <Empty description="Failed to load analytics">
+                <Button icon={<ReloadOutlined />} onClick={() => fetchData(rangeKey)}>Retry</Button>
+            </Empty>
+        </PageContainer>
+    );
+  }
+
+  const { summary, points } = data;
 
   return (
     <PageContainer
@@ -250,7 +213,7 @@ export default function SmartVoteReportPage(): JSX.Element {
         {/* Filters and controls */}
         <ProCard ghost>
           <Row gutter={[16, 16]} align="middle">
-            <Col xs={24} md={12} lg={8}>
+            <Col xs={24} md={12} lg={12}>
               <Space direction="vertical" size={4}>
                 <Text strong>Time range</Text>
                 <Segmented
@@ -267,36 +230,11 @@ export default function SmartVoteReportPage(): JSX.Element {
               </Space>
             </Col>
 
-            <Col xs={24} md={12} lg={8}>
-              <Space direction="vertical" size={4}>
-                <Text strong>Custom dates</Text>
-                <RangePicker
-                  allowClear={false}
-                  value={[start, end]}
-                  onChange={(vals) =>
-                    handleRangePickerChange(
-                      vals as [Dayjs, Dayjs] | null,
-                    )
-                  }
-                />
-              </Space>
-            </Col>
-
-            <Col xs={24} lg={8}>
-              <Space direction="vertical" size={4}>
-                <Text strong>Cohort view</Text>
-                <Segmented
-                  value={cohort}
-                  options={[
-                    { label: 'All voters', value: 'all' },
-                    { label: 'Experts only', value: 'expert' },
-                    { label: 'Public only', value: 'public' },
-                  ]}
-                  onChange={(val) =>
-                    setCohort(val as 'all' | 'expert' | 'public')
-                  }
-                />
-              </Space>
+            <Col xs={24} md={12} lg={12} style={{ textAlign: 'right' }}>
+               <Space>
+                 <Text type="secondary">Custom dates disabled (API limitation)</Text>
+                 <RangePicker value={[start, end]} disabled />
+               </Space>
             </Col>
           </Row>
         </ProCard>
@@ -306,32 +244,34 @@ export default function SmartVoteReportPage(): JSX.Element {
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
             statistic={{
-              title: 'Votes in range',
-              value: summary.totalVotes,
+              title: 'Active Votes',
+              value: summary.activeVotes,
             }}
           />
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
             statistic={{
-              title: 'Avg votes per day',
-              value: summary.avgPerDay,
+              title: 'Total Votes Cast',
+              value: summary.totalVotesCast,
+              groupSeparator: ',',
             }}
           />
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
             statistic={{
-              title: 'Expert share of votes',
-              value: summary.avgExpertShare,
+              title: 'Avg Participation',
+              value: summary.avgParticipationPct,
               suffix: '%',
+              precision: 1,
             }}
           />
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, lg: 6 }}
             statistic={{
-              title: 'Avg weighted consensus',
-              value: summary.avgConsensus,
-              suffix: '%',
-              description: `${summary.domains} domains`,
+              title: 'Avg Time to Consensus',
+              value: summary.avgConsensusTimeDays,
+              suffix: 'days',
+              precision: 1,
             }}
           />
         </ProCard>
@@ -345,68 +285,52 @@ export default function SmartVoteReportPage(): JSX.Element {
                 level={4}
                 style={{ marginBottom: 8 }}
               >
-                Smart Vote activity over time
+                Governance Health Trends
               </Title>
               <Paragraph type="secondary" style={{ marginBottom: 24 }}>
-                Daily aggregated votes for the selected time range and
-                cohort. Use this chart to see spikes in participation
-                around major consultations.
+                Tracking the quality of decision making over time. High consensus with low polarization is the ideal state.
               </Paragraph>
 
               <div style={{ width: '100%', height: 320 }}>
                 <ResponsiveContainer>
-                  <LineChart data={trendData}>
+                  <LineChart data={points}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
+                    <XAxis 
+                        dataKey="label" 
+                        tickFormatter={(val) => dayjs(val).format('MM-DD')} 
+                    />
                     <YAxis />
-                    <Tooltip />
+                    <Tooltip labelFormatter={(val) => dayjs(val).format('MMM D, YYYY')} />
                     <Legend />
-                    {(cohort === 'all' || cohort === 'public') && (
-                      <Line
+                    
+                    <Line
                         type="monotone"
-                        dataKey="public"
-                        name="Public voters"
-                        dot={false}
+                        dataKey="consensus"
+                        name="Consensus %"
+                        stroke="#52c41a" // Green
                         strokeWidth={2}
-                      />
-                    )}
-                    {(cohort === 'all' || cohort === 'expert') && (
-                      <Line
+                        dot={false}
+                    />
+                     <Line
                         type="monotone"
-                        dataKey="expert"
-                        name="Expert voters"
-                        dot={false}
+                        dataKey="polarization"
+                        name="Polarization %"
+                        stroke="#ff4d4f" // Red
                         strokeWidth={2}
-                      />
-                    )}
-                    {cohort === 'all' && (
-                      <Line
+                        dot={false}
+                    />
+                    <Line
                         type="monotone"
-                        dataKey="all"
-                        name="All voters (total)"
-                        dot={false}
+                        dataKey="participation"
+                        name="Participation"
+                        stroke="#1890ff" // Blue
                         strokeWidth={2}
-                      />
-                    )}
+                        strokeDasharray="5 5"
+                        dot={false}
+                    />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-
-              <Alert
-                style={{ marginTop: 24 }}
-                type="info"
-                showIcon
-                message="Placeholder data"
-                description={
-                  <span>
-                    This screen currently uses simulated Smart Vote
-                    metrics. Once the reports-api is wired in, this
-                    chart will be driven by{' '}
-                    <code>/reports/smart-vote</code> with the selected
-                    time range.
-                  </span>
-                }
-              />
             </Card>
           </Col>
 
@@ -414,7 +338,7 @@ export default function SmartVoteReportPage(): JSX.Element {
           <Col xs={24} lg={8}>
             <Card>
               <Title level={4} style={{ marginBottom: 12 }}>
-                How to read this dashboard
+                Metric Definitions
               </Title>
               <Space
                 direction="vertical"
@@ -422,24 +346,20 @@ export default function SmartVoteReportPage(): JSX.Element {
                 style={{ width: '100%' }}
               >
                 <Paragraph>
-                  <Text strong>Votes in range</Text> counts all Smart
-                  Vote stances recorded in the selected period. Use it
-                  to gauge overall activity.
+                  <Text strong>Consensus %</Text> measures the alignment of weighted votes. 
+                  A score of 100% means perfect agreement among all cohorts.
                 </Paragraph>
                 <Paragraph>
-                  <Text strong>Expert share</Text> shows what portion of
-                  votes come from users above the Ekoh expert
-                  threshold in each relevant domain.
+                  <Text strong>Polarization %</Text> tracks the divergence between 
+                  opposing voting blocks. High polarization indicates a divided community.
                 </Paragraph>
                 <Paragraph>
-                  <Text strong>Weighted consensus</Text> aggregates
-                  Ekoh-weighted stances into a percentage agreement
-                  score per domain, then averages across domains.
+                  <Text strong>Participation</Text> indicates the relative volume of 
+                  votes cast compared to the active user base.
                 </Paragraph>
                 <Paragraph type="secondary">
-                  All definitions and thresholds follow the Konnaxion
-                  v14 Smart Vote specification. Exact formulas live in
-                  the reports-api and ETL layers.
+                   Data is aggregated daily. Sudden spikes in polarization may trigger 
+                   automatic moderation alerts.
                 </Paragraph>
               </Space>
             </Card>
@@ -455,16 +375,18 @@ export default function SmartVoteReportPage(): JSX.Element {
           >
             Domain breakdown (Ekoh-weighted Smart Vote)
           </Title>
-          <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-            Aggregated participation and consensus per domain for the
-            selected time range. This table mirrors the chart data for
-            screen readers.
-          </Paragraph>
+          <Alert 
+            message="Data Simulated" 
+            type="info" 
+            showIcon 
+            style={{marginBottom: 16}}
+            description="Per-domain breakdown is not yet supported by the v14 Reporting API. This table displays sample data structure." 
+          />
           <Table<DomainRow>
             size="small"
             rowKey="key"
             columns={domainColumns}
-            dataSource={domainRows}
+            dataSource={MOCK_DOMAIN_ROWS}
             pagination={false}
             aria-labelledby={domainHeadingId}
           />

@@ -1,7 +1,7 @@
 # FILE: backend/konnaxion/kontrol/serializers.py
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import AuditLog, ModerationTicket
+from .models import AuditLog, ModerationTicket, KonsensusConfig
 
 User = get_user_model()
 
@@ -90,3 +90,23 @@ class UserAdminSerializer(serializers.ModelSerializer):
     def get_reputation_score(self, obj) -> int:
         # logic to fetch score from Ekoh or Trust module would go here
         return 0
+
+
+class KonsensusConfigSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the global voting configuration settings.
+    """
+    class Meta:
+        model = KonsensusConfig
+        fields = [
+            "id",
+            "allow_anonymous_voting",
+            "auto_close_votes",
+            "quorum_percentage",
+            "passing_threshold",
+            "default_voting_duration_days",
+            "extra_settings",
+            "created",
+            "modified",
+        ]
+        read_only_fields = ["id", "created", "modified"]
