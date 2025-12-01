@@ -249,6 +249,154 @@ class OfflinePackage(TimeStampedModel):
 
 
 # ──────────────────────────────
+#  Mentorship sub-module
+# ──────────────────────────────
+class MentorProfile(TimeStampedModel):
+    """
+    Mentor profile for KonnectED mentorship.
+
+    Matches the v14 spec and the mentorship UI needs:
+    - basic bio and focus areas
+    - languages and target learner level
+    - simple capacity/availability fields
+    """
+
+    class MentorLevel(models.TextChoices):
+        PRIMARY = "primary", "Primary"
+        SECONDARY = "secondary", "Secondary"
+        ADULT = "adult", "Adult / educator"
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="mentor_profile",
+    )
+    display_name = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Optional public display name; falls back to user if blank.",
+    )
+    bio = models.TextField(
+        blank=True,
+        help_text="Short biography shown on the mentorship page.",
+    )
+    expertise_areas = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="List of expertise/subject tags (e.g. ['Math', 'Physics']).",
+    )
+    languages = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="List of language names or codes (e.g. ['English', 'French']).",
+    )
+    level = models.CharField(
+        max_length=16,
+        choices=MentorLevel.choices,
+        blank=True,
+        help_text="Primary learner level this mentor supports.",
+    )
+    focus_areas = models.JSONField(
+        null=True,
+        blank=True,
+        help_text="Optional list of focus areas for mentoring.",
+    )
+
+    max_mentees = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Optional cap on active mentees this mentor will take.",
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Controls whether the mentor appears in discovery lists.",
+    )
+    is_accepting_mentees = models.BooleanField(
+        default=True,
+        help_text="Quick toggle for whether new requests are allowed.",
+    )
+
+    # Lightweight metrics (can be updated by services)
+    rating = models.DecimalField(
+        max_digits=3,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Optional average feedback rating (e.g. 4.8).",
+    )
+    sessions_completed = models.PositiveIntegerField(
+        default=0,
+        help_text="Approximate count of completed mentorship sessions.",
+    )
+
+    def __str__(self) -> str:
+        return self.display_name or str(self.user)
+
+
+class MentorshipRequest(TimeStampedModel):
+    """
+    A mentee asking a mentor for support.
+
+    Mirrors the v14 spec + frontend form fields:
+    - learningGoal, preferredLanguage, ageGroup, contactChannel, additionalNotes
+    """
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        ACCEPTED = "accepted", "Accepted"
+        DECLINED = "declined", "Declined"
+        CANCELLED = "cancelled", "Cancelled"
+
+    mentor = models.ForeignKey(
+        MentorProfile,
+        on_delete=models.CASCADE,
+        related_name="requests_received",
+    )
+    mentee = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="mentorship_requests_sent",
+    )
+
+    status = models.CharField(
+        max_length=16,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+    learning_goal = models.TextField(
+        help_text="Learner's main goal or topic for mentorship.",
+    )
+    preferred_language = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Optional preferred language for sessions.",
+    )
+    age_group = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Optional age group descriptor (e.g. '12–14').",
+    )
+    contact_channel = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Preferred communication channel (e.g. email, chat, video).",
+    )
+    additional_notes = models.TextField(
+        blank=True,
+        help_text="Any extra context the learner wants to share.",
+    )
+
+    responded_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when the mentor accepted/declined the request.",
+    )
+
+    def __str__(self) -> str:
+        return f"{self.mentee} → {self.mentor} [{self.status}]"
+
+
+# ──────────────────────────────
 #  Co-Creation sub-module
 # ──────────────────────────────
 class CoCreationProject(TimeStampedModel):

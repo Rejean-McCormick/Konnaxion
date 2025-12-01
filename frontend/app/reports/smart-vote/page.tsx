@@ -67,11 +67,14 @@ const buildMockTrendData = (rangeKey: RangeKey): TrendPoint[] => {
   const [start, end] = computePresetRange(rangeKey);
   const days = end.diff(start, 'day') + 1;
 
+  // Ensure we don't generate too many points for long ranges if simulating API aggregation
+  // For this mock, one point per day is fine up to 90 days.
   const baseLen = Math.max(7, Math.min(days, 90));
   const points: TrendPoint[] = [];
 
   for (let i = 0; i < baseLen; i += 1) {
     const date = start.add(i, 'day');
+    // Create a bit of a wave pattern
     const phase = i / baseLen;
 
     const all = Math.round(200 + 80 * Math.sin(phase * Math.PI * 2));
@@ -90,6 +93,7 @@ const buildMockTrendData = (rangeKey: RangeKey): TrendPoint[] => {
 };
 
 const buildMockDomainRows = (rangeKey: RangeKey): DomainRow[] => {
+  // Just vary the numbers slightly based on range so it feels dynamic
   const scale =
     rangeKey === '7d' ? 0.5 : rangeKey === '30d' ? 1 : 2;
 
@@ -213,12 +217,14 @@ export default function SmartVoteReportPage(): JSX.Element {
   ) => {
     if (!values) return;
     setRange(values);
+    // basic inference for the segmented control
     const days = values[1].diff(values[0], 'day') + 1;
     if (days <= 8) setRangeKey('7d');
     else if (days <= 35) setRangeKey('30d');
     else setRangeKey('90d');
   };
 
+  // IDs for accessibility
   const headingId = 'smart-vote-trend-heading';
   const domainHeadingId = 'smart-vote-domain-heading';
 

@@ -41,6 +41,10 @@ class Credential(models.Model):
       - The `CredentialSerializer` in `konnaxion/trust/serializers.py`.
     """
 
+    # Default review message used when a credential is first created.
+    # `CredentialSerializer` will read this via `Credential.DEFAULT_PENDING_NOTES`.
+    DEFAULT_PENDING_NOTES: str = "Awaiting manual verification"
+
     class Status(models.TextChoices):
         # Values and labels are kept identical so the API can safely expose
         # "Pending" | "Verified" | "Rejected" to the frontend.

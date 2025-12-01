@@ -94,43 +94,46 @@ class ModerationCase(models.Model):
     )
     target_object = GenericForeignKey("target_content_type", "target_object_id")
 
-    # High-level identifiers expected by the frontend adapters
+    # Loose target type/id mirrors what the frontend expects
     target_type = models.CharField(
         max_length=16,
         choices=ModerationTargetType.choices,
         default=ModerationTargetType.POST,
-        help_text=_("UI-level category of the moderated target (topic, post, user, …)."),
+        help_text=_("High-level target bucket for the queue UI."),
     )
     target_id = models.CharField(
         max_length=64,
         blank=True,
-        help_text=_("External identifier exposed to frontends (argumentId, topicId, userId, …)."),
+        help_text=_("External target identifier used by the frontend."),
     )
+
+    # Cached, human-readable context for display
     context_title = models.CharField(
         max_length=255,
         blank=True,
-        help_text=_("Debate / consultation context, e.g. topic title."),
+        help_text=_("Title or short label providing context in the queue."),
     )
     content_preview = models.TextField(
         blank=True,
-        help_text=_("Short snapshot of the offending content for quick review."),
-    )
-
-    # Offender metadata
-    author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="moderation_cases_authored",
+        help_text=_("Short excerpt of the offending content, for quick triage."),
     )
     author_name = models.CharField(
         max_length=255,
         blank=True,
-        help_text=_("Cached author label for admin views."),
+        help_text=_("Cached name of the content author."),
+    )
+    author_id = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text=_("External identifier of the content author."),
     )
 
-    # Queue state
+    # Aggregated signal
+    report_count = models.PositiveIntegerField(
+        default=0,
+        help_text=_("Number of individual reports associated with this case."),
+    )
+
     status = models.CharField(
         max_length=16,
         choices=ModerationStatus.choices,
@@ -138,31 +141,17 @@ class ModerationCase(models.Model):
         db_index=True,
     )
     severity = models.CharField(
-        max_length=8,
+        max_length=16,
         choices=ModerationSeverity.choices,
         default=ModerationSeverity.MEDIUM,
         db_index=True,
     )
-    report_count = models.PositiveIntegerField(
-        default=0,
-        help_text=_("Denormalized number of merged user reports for this case."),
-    )
 
-    # Governance metadata
-    source = models.CharField(
-        max_length=64,
-        blank=True,
-        help_text=_("Originating app or module (e.g. 'ethikos', 'keenkonnect')."),
-    )
     created_at = models.DateTimeField(auto_now_add=True)
-    last_action_at = models.DateTimeField(auto_now=True)
-
-    last_moderated_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
+    last_action_at = models.DateTimeField(
         null=True,
         blank=True,
-        on_delete=models.SET_NULL,
-        related_name="moderation_cases_moderated",
+        help_text=_("Timestamp of the last moderation action."),
     )
 
     class Meta:
@@ -176,9 +165,7 @@ class ModerationCase(models.Model):
         verbose_name_plural = _("Moderation cases")
 
     def __str__(self) -> str:
-        snippet = (self.content_preview[:40] + "…") if self.content_preview else f"#{self.pk}"
-        ctx = self.context_title or snippet
-        return f"[{self.status}] {ctx}"
+        return f"Case #{self.pk} ({self.get_status_display()})"
 
     def recalculate_report_count(self, *, commit: bool = True) -> int:
         """
@@ -368,20 +355,6 @@ class AuditLogEntry(models.Model):
         help_text=_("Primary key of the entity in the source system, stored as text."),
     )
 
-    # Optional generic FK to the underlying object
-    entity_content_type = models.ForeignKey(
-        ContentType,
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name="audit_entries",
-    )
-    entity_object_id = models.CharField(
-        max_length=64,
-        blank=True,
-    )
-    entity_object = GenericForeignKey("entity_content_type", "entity_object_id")
-
     severity = models.CharField(
         max_length=10,
         choices=AuditSeverity.choices,
@@ -477,3 +450,5 @@ class AuditLogEntry(models.Model):
         )
         entry.save()
         return entry
+``` :contentReference[oaicite:0]{index=0}
+::contentReference[oaicite:1]{index=1}

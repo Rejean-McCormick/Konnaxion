@@ -12,6 +12,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 from konnaxion.moderation.api_views import (
     ModerationQueueView,
     ModerationDecisionView,
+    AuditLogListView,
 )
 
 urlpatterns = [
@@ -43,9 +44,10 @@ urlpatterns += [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
 
     # ------------------------------------------------------------------
-    # Admin moderation endpoints (backed by konnaxion.moderation.api_views)
+    # Admin moderation & audit endpoints (konnaxion.moderation.api_views)
     #   GET  /api/admin/moderation
     #   POST /api/admin/moderation/<id>
+    #   GET  /api/admin/audit/logs
     # ------------------------------------------------------------------
     path(
         "api/admin/moderation",
@@ -56,6 +58,11 @@ urlpatterns += [
         "api/admin/moderation/<int:pk>",
         ModerationDecisionView.as_view(),
         name="admin-moderation-decision",
+    ),
+    path(
+        "api/admin/audit/logs",
+        AuditLogListView.as_view(),
+        name="admin-audit-log-list",
     ),
 
     # ------------------------------------------------------------------

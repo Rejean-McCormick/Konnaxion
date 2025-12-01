@@ -1,7 +1,7 @@
 // FILE: frontend/app/reports/custom/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   PageContainer,
   ProCard,
@@ -28,7 +28,19 @@ import {
   PlayCircleOutlined,
   SaveOutlined,
   SettingOutlined,
+  BarChartOutlined,
+  LineChartOutlined
 } from '@ant-design/icons';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend
+} from 'recharts';
 
 const { Text } = Typography;
 
@@ -42,14 +54,47 @@ type ReportConfig = {
   isPublic?: boolean;
 };
 
+// Mock data generator for the preview chart
+const generatePreviewData = (metric: string | undefined) => {
+  const data = [];
+  const baseValue = metric === 'api_error_rate' ? 2 : 1200;
+  
+  for (let i = 1; i <= 14; i++) {
+    const val = baseValue + (Math.random() * baseValue * 0.2);
+    data.push({
+      date: `Nov ${i}`,
+      value: Math.round(val),
+      prevValue: Math.round(val * 0.9) // Simulated previous period
+    });
+  }
+  return data;
+};
+
 export default function CustomReportBuilderPage(): JSX.Element {
   const [config, setConfig] = useState<ReportConfig | null>(null);
   const [hasPreview, setHasPreview] = useState(false);
+
+  // Generate preview data when config changes
+  const previewData = useMemo(() => {
+    if (!hasPreview) return [];
+    return generatePreviewData(config?.primaryMetric);
+  }, [config, hasPreview]);
 
   const handleFinish = async (values: ReportConfig) => {
     setConfig(values);
     setHasPreview(true);
     return true;
+  };
+
+  const getMetricLabel = (key?: string) => {
+    const map: Record<string, string> = {
+      smart_vote: 'Smart Vote Score',
+      mau: 'Active Users',
+      session_duration: 'Avg Session (min)',
+      api_latency_p95: 'Latency P95 (ms)',
+      api_error_rate: 'Error Rate (%)'
+    };
+    return map[key || ''] || 'Metric';
   };
 
   return (
@@ -190,7 +235,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
           title="Live preview"
           extra={
             config?.name ? (
-              <Tag color="default">{config.name}</Tag>
+              <Tag color="geekblue">{config.name}</Tag>
             ) : (
               <Text type="secondary">No configuration yet</Text>
             )
@@ -224,8 +269,8 @@ export default function CustomReportBuilderPage(): JSX.Element {
                 style={{ width: '100%', justifyContent: 'space-between' }}
               >
                 <Statistic
-                  title="Sample primary metric"
-                  value={12840}
+                  title={getMetricLabel(config?.primaryMetric)}
+                  value={previewData[previewData.length - 1]?.value || 0}
                   suffix={
                     config?.primaryMetric === 'api_latency_p95'
                       ? ' ms'
@@ -236,11 +281,13 @@ export default function CustomReportBuilderPage(): JSX.Element {
                 />
                 <Statistic
                   title="Compared to previous period"
-                  value={-4.3}
+                  value={4.3}
                   precision={1}
+                  valueStyle={{ color: '#3f8600' }}
+                  prefix="+"
                   suffix="%"
                 />
-                <Statistic title="Sample segments" value={5} />
+                <Statistic title="Segments" value={config?.dimensions?.length || 0} />
               </Space>
 
               <Divider />
@@ -250,14 +297,13 @@ export default function CustomReportBuilderPage(): JSX.Element {
                 size="small"
                 header={
                   <Text strong>
-                    Example breakdown by segment (placeholder data)
+                    Example breakdown by {config?.dimensions?.[0] || 'Segment'} (placeholder)
                   </Text>
                 }
                 dataSource={[
-                  { label: 'EkoH · Economy', value: '↑ +8.2 % vs last period' },
-                  { label: 'KonnectED · Learners', value: '↑ +3.5 %' },
-                  { label: 'Kreative · Showcases', value: '↓ −1.2 %' },
-                  { label: 'Ethikos · Public votes', value: '↑ +11.0 %' },
+                  { label: 'Top Segment A', value: '↑ +8.2 %' },
+                  { label: 'Top Segment B', value: '↑ +3.5 %' },
+                  { label: 'Top Segment C', value: '↓ −1.2 %' },
                 ]}
                 renderItem={(item) => (
                   <List.Item>
@@ -271,20 +317,42 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
               <Divider />
 
-              {/* Chart placeholder */}
+              {/* Functional Chart Preview */}
               <ProCard
                 ghost
-                title="Charts"
-                extra={
-                  <Text type="secondary">
-                    Placeholder – plug in Chart.js 4 time series & bar charts.
-                  </Text>
-                }
+                title="Trend Visualization"
+                extra={<Tag icon={<LineChartOutlined />}>Mock Data</Tag>}
               >
-                <Empty
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="Time-series and comparison charts will appear here once wired to the Insights datasets."
-                />
+                <div style={{ width: '100%', height: 300 }}>
+                  <ResponsiveContainer>
+                    <AreaChart data={previewData}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Legend />
+                      <Area 
+                        type="monotone" 
+                        dataKey="value" 
+                        name="Current Period" 
+                        stroke="#1890ff" 
+                        fill="#1890ff" 
+                        fillOpacity={0.1} 
+                      />
+                      {config?.breakdowns?.includes('compare_prev') && (
+                        <Area 
+                          type="monotone" 
+                          dataKey="prevValue" 
+                          name="Previous Period" 
+                          stroke="#faad14" 
+                          fill="#faad14" 
+                          fillOpacity={0.1} 
+                          strokeDasharray="5 5"
+                        />
+                      )}
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </ProCard>
             </Space>
           )}

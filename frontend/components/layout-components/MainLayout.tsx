@@ -16,30 +16,35 @@ import type { Route } from '@/components/layout-components/Menu';
 
 const { Content } = Layout;
 
+// 1. ADDED: 'kontrol' to the RoutesConfig interface
 interface RoutesConfig {
   ekoh: Route[];
   ethikos: Route[];
   keenkonnect: Route[];
   konnected: Route[];
+  kontrol: Route[]; // <-- NEW
   kreative: Route[];
 }
 
 type SuiteKey = keyof RoutesConfig;
 
+// 2. ADDED: 'kontrol' to the list of known suites
 const SUITES: SuiteKey[] = [
   'ekoh',
   'ethikos',
   'keenkonnect',
   'konnected',
+  'kontrol', // <-- NEW
   'kreative',
 ];
 
-// Default entry route per module – aligned with v14 routes config
+// 3. UPDATED: Added the default entry route for 'kontrol'
 const DEFAULT_ENTRY: Record<SuiteKey, string> = {
   ekoh: '/ekoh/dashboard',
   ethikos: '/ethikos/insights',
   keenkonnect: '/keenkonnect/dashboard',
   konnected: '/konnected/dashboard',
+  kontrol: '/kontrol/dashboard', // <-- NEW
   kreative: '/kreative/dashboard',
 };
 
@@ -91,6 +96,7 @@ export default function MainLayout({
     ethikos: [],
     keenkonnect: [],
     konnected: [],
+    kontrol: [], // <-- NEW
     kreative: [],
   });
 
@@ -103,27 +109,33 @@ export default function MainLayout({
   useEffect(() => {
     let isMounted = true;
 
+    // 4a. ADDED: Dynamic import for routesKontrol
     Promise.all([
       import('@/routes/routesEkoh'),
       import('@/routes/routesEthikos'),
       import('@/routes/routesKeenkonnect'),
       import('@/routes/routesKonnected'),
       import('@/routes/routesKreative'),
+      import('@/routes/routesKontrol'), // <-- NEW IMPORT
     ])
       .then(
+        // 4b. ADDED: Destructuring assignment for the imported module
         ([
           { default: ekoh },
           { default: ethikos },
           { default: keen },
           { default: konnected },
           { default: kreative },
+          { default: kontrol }, // <-- NEW DESTRUCTURING
         ]) => {
           if (!isMounted) return;
+          // 4c. ADDED: Mapping the routes to the 'kontrol' key
           setRoutes({
             ekoh,
             ethikos,
             keenkonnect: keen,
             konnected,
+            kontrol, // <-- NEW MAPPING
             kreative,
           });
         },

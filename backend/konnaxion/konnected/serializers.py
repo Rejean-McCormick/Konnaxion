@@ -1,5 +1,4 @@
 # FILE: backend/konnaxion/konnected/serializers.py
-# konnaxion/konnected/serializers.py
 from rest_framework import serializers
 
 from .models import (
@@ -8,6 +7,9 @@ from .models import (
     PeerValidation,
     Portfolio,
     KnowledgeResource,
+    KnowledgeRecommendation,
+    LearningProgress,
+    OfflinePackage,
 )
 
 __all__ = [
@@ -16,6 +18,9 @@ __all__ = [
     "EvaluationSerializer",
     "PeerValidationSerializer",
     "PortfolioSerializer",
+    "KnowledgeRecommendationSerializer",
+    "LearningProgressSerializer",
+    "OfflinePackageSerializer",
     "ExamAttemptSerializer",
 ]
 
@@ -97,6 +102,151 @@ class PortfolioSerializer(serializers.ModelSerializer):
         model = Portfolio
         fields = "__all__"
         read_only_fields = ("id", "user", "created_at", "updated_at")
+
+
+class KnowledgeRecommendationSerializer(serializers.ModelSerializer):
+    """
+    Minimal serializer for KnowledgeRecommendation.
+
+    Used by the recommendations API; the frontend can either consume the
+    nested resource or fall back to treating the recommendation row
+    itself as a resource-ish object.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    resource = serializers.PrimaryKeyRelatedField(
+        queryset=KnowledgeResource.objects.all(),
+    )
+
+    class Meta:
+        model = KnowledgeRecommendation
+        fields = "__all__"
+        read_only_fields = ("id", "user", "created_at", "updated_at")
+
+
+class LearningProgressSerializer(serializers.ModelSerializer):
+    """
+    Tracks per-user progress on individual knowledge resources.
+
+    Exposes progress_percent as a numeric value (not a JSON string) so
+    the dashboard widgets can use it directly.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    resource = serializers.PrimaryKeyRelatedField(
+        queryset=KnowledgeResource.objects.all(),
+    )
+    # Force numeric JSON instead of DRF's default Decimal->string.
+    progress_percent = serializers.FloatField()
+
+    class Meta:
+        model = LearningProgress
+        fields = "__all__"
+        read_only_fields = ("id", "user", "created_at", "updated_at")
+
+
+class OfflinePackageSerializer(serializers.ModelSerializer):
+    """
+    Serializer for OfflinePackage with camelCase field names matching
+    the OfflinePackage type used in the KonnectED offline-content UI.
+
+    Backed fields on the model:
+      - item_count, total_size_mb, last_built_at
+      - target_device_type, auto_sync
+      - build_progress_percent, last_error_message
+      - max_size_mb, include_types, subject_filter, level_filter, language_filter
+    """
+
+    # Read-only build / status metrics (camelCase in JSON)
+    itemCount = serializers.IntegerField(source="item_count", read_only=True)
+    totalSizeMb = serializers.FloatField(source="total_size_mb", read_only=True)
+    lastBuiltAt = serializers.DateTimeField(source="last_built_at", read_only=True)
+    buildProgressPercent = serializers.FloatField(
+        source="build_progress_percent",
+        read_only=True,
+        allow_null=True,
+    )
+    lastErrorMessage = serializers.CharField(
+        source="last_error_message",
+        read_only=True,
+        allow_blank=True,
+        allow_null=True,
+    )
+
+    # Editable config fields used by CreateOfflinePackagePayload
+    targetDeviceType = serializers.CharField(
+        source="target_device_type",
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+    )
+    autoSync = serializers.BooleanField(
+        source="auto_sync",
+        required=False,
+    )
+    maxSizeMb = serializers.FloatField(
+        source="max_size_mb",
+        required=False,
+        allow_null=True,
+    )
+    includeTypes = serializers.ListField(
+        source="include_types",
+        child=serializers.CharField(),
+        required=False,
+        allow_null=True,
+    )
+    subjectFilter = serializers.CharField(
+        source="subject_filter",
+        required=False,
+        allow_blank=True,
+    )
+    levelFilter = serializers.CharField(
+        source="level_filter",
+        required=False,
+        allow_blank=True,
+    )
+    languageFilter = serializers.CharField(
+        source="language_filter",
+        required=False,
+        allow_blank=True,
+    )
+
+    class Meta:
+        model = OfflinePackage
+        fields = [
+            "id",
+            "name",
+            "description",
+            "status",
+            # Build / status metrics
+            "itemCount",
+            "totalSizeMb",
+            "lastBuiltAt",
+            "buildProgressPercent",
+            "lastErrorMessage",
+            # User-configurable fields
+            "targetDeviceType",
+            "autoSync",
+            "maxSizeMb",
+            "includeTypes",
+            "subjectFilter",
+            "levelFilter",
+            "languageFilter",
+            # Timestamps for debugging / ops (snake_case is fine here)
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = (
+            "id",
+            "status",
+            "itemCount",
+            "totalSizeMb",
+            "lastBuiltAt",
+            "buildProgressPercent",
+            "lastErrorMessage",
+            "created_at",
+            "updated_at",
+        )
 
 
 class ExamAttemptSerializer(serializers.Serializer):

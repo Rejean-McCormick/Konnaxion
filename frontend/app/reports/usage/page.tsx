@@ -1,13 +1,11 @@
-// FILE: frontend/app/reports/usage/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   PageContainer,
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components';
-import { Line } from '@ant-design/plots';
 import {
   Badge,
   Button,
@@ -33,12 +31,21 @@ import {
   UserAddOutlined,
   UserOutlined,
 } from '@ant-design/icons';
-import { useRequest } from 'ahooks';
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip as RechartsTooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 
 const { Text, Title } = Typography;
 
 /* ------------------------------------------------------------------ */
-/*  Types                                                             */
+/* Types                                                             */
 /* ------------------------------------------------------------------ */
 
 type TimeRangeKey = '7d' | '30d' | '90d';
@@ -66,7 +73,7 @@ type UsageReport = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Mock data generator (until real /reports/usage API is wired)      */
+/* Mock data generator                                               */
 /* ------------------------------------------------------------------ */
 
 function generateMockPoints(days: number): UsagePoint[] {
@@ -112,8 +119,6 @@ function buildMockReport(range: TimeRangeKey): UsageReport {
   const points = generateMockPoints(days);
 
   const last = points[points.length - 1];
-  const peakActive = Math.max(...points.map((p) => p.activeUsers));
-  const totalNew = points.reduce((sum, p) => sum + p.newUsers, 0);
 
   const baseModules: ModuleUsageRow[] = [
     {
@@ -169,11 +174,8 @@ function buildMockReport(range: TimeRangeKey): UsageReport {
     activeUsers: Math.round(m.activeUsers * scale * 1.1),
   }));
 
-  // Use the derived totals for headline KPIs (still mock, but coherent)
   const generatedAt = new Date().toISOString();
 
-  // Attach some derived info back into the report if needed later via hooks.
-  // For now, we just keep the raw points + modules + generatedAt.
   return {
     generatedAt,
     points,
@@ -182,29 +184,7 @@ function buildMockReport(range: TimeRangeKey): UsageReport {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Data-fetching hook                                                */
-/*  (swap implementation when wiring real /reports/usage backend)     */
-/* ------------------------------------------------------------------ */
-
-function useUsageReport(range: TimeRangeKey) {
-  return useRequest<UsageReport, [TimeRangeKey]>(
-    async (r) => {
-      // Placeholder: replace with real fetch when backend endpoint is ready.
-      // Example:
-      // const res = await fetch(buildUsageUrl(r), { credentials: 'include' });
-      // if (!res.ok) throw new Error('Failed to load usage report');
-      // return res.json() as Promise<UsageReport>;
-      return buildMockReport(r);
-    },
-    {
-      defaultParams: [range],
-      refreshDeps: [range],
-    },
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Helpers for derived aggregates                                    */
+/* Helpers for derived aggregates                                    */
 /* ------------------------------------------------------------------ */
 
 function getAggregates(report: UsageReport | undefined) {
@@ -231,7 +211,7 @@ function getAggregates(report: UsageReport | undefined) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Table columns                                                     */
+/* Table columns                                                     */
 /* ------------------------------------------------------------------ */
 
 type ModuleRow = ModuleUsageRow;
@@ -305,50 +285,37 @@ const moduleColumns: ColumnsType<ModuleRow> = [
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Main page                                                         */
+/* Main page                                                         */
 /* ------------------------------------------------------------------ */
 
 export default function ReportsUsagePage() {
   const [range, setRange] = useState<TimeRangeKey>('30d');
-  const { data, loading, error, refresh } = useUsageReport(range);
+  
+  // Standard React state instead of ahooks for simplicity/compatibility
+  const [data, setData] = useState<UsageReport | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const aggregates = useMemo(() => getAggregates(data), [data]);
-
-  const timeSeries = useMemo(
-    () =>
-      (data?.points ?? []).map((p) => ({
-        date: p.label,
-        value: p.activeUsers,
-        category: 'Active users',
-      })),
-    [data],
-  );
-
-  const newUsersSeries = useMemo(
-    () =>
-      (data?.points ?? []).map((p) => ({
-        date: p.label,
-        value: p.newUsers,
-        category: 'New users',
-      })),
-    [data],
-  );
-
-  const lineConfig = {
-    data: [...timeSeries, ...newUsersSeries],
-    xField: 'date',
-    yField: 'value',
-    seriesField: 'category',
-    smooth: true,
-    height: 280,
-    autoFit: true,
-    tooltip: {
-      showMarkers: true,
-    },
-    legend: {
-      position: 'top',
-    },
+  const fetchData = async (r: TimeRangeKey) => {
+    setLoading(true);
+    setError(false);
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 600)); 
+      const report = buildMockReport(r);
+      setData(report);
+    } catch (err) {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    fetchData(range);
+  }, [range]);
+
+  const aggregates = useMemo(() => getAggregates(data || undefined), [data]);
 
   const lastUpdatedLabel = data
     ? new Date(data.generatedAt).toLocaleTimeString()
@@ -380,7 +347,7 @@ export default function ReportsUsagePage() {
       <Tooltip title="Reload usage snapshot">
         <Button
           icon={<ReloadOutlined />}
-          onClick={() => refresh()}
+          onClick={() => fetchData(range)}
           type="default"
           size="small"
         >
@@ -394,12 +361,15 @@ export default function ReportsUsagePage() {
     return (
       <PageContainer
         ghost
-        title={
-          <Space>
-            <BarChartOutlined />
-            <span>Usage analytics</span>
-          </Space>
-        }
+        header={{
+          title: 'Usage Analytics',
+          breadcrumb: {
+            routes: [
+              { path: '/reports', breadcrumbName: 'Reports' },
+              { path: '', breadcrumbName: 'Usage' },
+            ],
+          },
+        }}
         extra={headerExtra}
       >
         <Skeleton active />
@@ -411,12 +381,7 @@ export default function ReportsUsagePage() {
     return (
       <PageContainer
         ghost
-        title={
-          <Space>
-            <BarChartOutlined />
-            <span>Usage analytics</span>
-          </Space>
-        }
+        header={{ title: 'Usage Analytics' }}
         extra={headerExtra}
       >
         <ProCard>
@@ -429,7 +394,7 @@ export default function ReportsUsagePage() {
             </Space>
             <Button
               icon={<ReloadOutlined />}
-              onClick={() => refresh()}
+              onClick={() => fetchData(range)}
               type="primary"
             >
               Retry
@@ -444,12 +409,7 @@ export default function ReportsUsagePage() {
     return (
       <PageContainer
         ghost
-        title={
-          <Space>
-            <BarChartOutlined />
-            <span>Usage analytics</span>
-          </Space>
-        }
+        header={{ title: 'Usage Analytics' }}
         extra={headerExtra}
       >
         <Empty description="No usage data available yet" />
@@ -463,12 +423,15 @@ export default function ReportsUsagePage() {
   return (
     <PageContainer
       ghost
-      title={
-        <Space>
-          <BarChartOutlined />
-          <span>Usage analytics</span>
-        </Space>
-      }
+      header={{
+        title: 'Usage Analytics',
+        breadcrumb: {
+          routes: [
+            { path: '/reports', breadcrumbName: 'Reports' },
+            { path: '', breadcrumbName: 'Usage' },
+          ],
+        },
+      }}
       extra={headerExtra}
     >
       <Space
@@ -548,11 +511,37 @@ export default function ReportsUsagePage() {
 
         {/* Time series + quick notes */}
         <ProCard gutter={16} wrap>
-          <ProCard colSpan={{ xs: 24, sm: 24, md: 16 }} title="Active users over time">
-            <Line {...lineConfig} />
+          <ProCard colSpan={{ xs: 24, lg: 16 }} title="Active vs New Users">
+            <div style={{ height: 300, width: '100%' }}>
+              <ResponsiveContainer>
+                <LineChart data={data.points}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="label" />
+                  <YAxis />
+                  <RechartsTooltip />
+                  <Legend />
+                  <Line 
+                    type="monotone" 
+                    dataKey="activeUsers" 
+                    name="Active Users" 
+                    stroke="#1890ff" 
+                    strokeWidth={2} 
+                    dot={false}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="newUsers" 
+                    name="New Signups" 
+                    stroke="#52c41a" 
+                    strokeWidth={2} 
+                    dot={false}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
           </ProCard>
 
-          <ProCard colSpan={{ xs: 24, sm: 24, md: 8 }} title="Highlights">
+          <ProCard colSpan={{ xs: 24, lg: 8 }} title="Highlights">
             <Space
               direction="vertical"
               size="middle"
@@ -565,7 +554,7 @@ export default function ReportsUsagePage() {
                 <Text type="secondary">
                   Most activity is concentrated in the last few days of the
                   selected range. Use shorter windows (7 days) to monitor
-                  spikes after launches or campaigns.
+                  spikes after launches.
                 </Text>
               </Space>
               <Space align="start">

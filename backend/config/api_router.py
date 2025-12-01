@@ -30,7 +30,15 @@ EthikosCategoryViewSet: Optional[Type[Any]] = getattr(
 )
 
 # ── keenKonnect ───────────────────────────────────────────
-from konnaxion.keenkonnect.api_views import ProjectViewSet
+from konnaxion.keenkonnect.api_views import (
+    ProjectViewSet,
+    ProjectResourceViewSet,
+    ProjectTaskViewSet,
+    ProjectMessageViewSet,
+    ProjectTeamViewSet,
+    ProjectRatingViewSet,
+    TagViewSet as KeenKonnectTagViewSet,
+)
 
 # ── Kollective Intelligence ───────────────────────────────
 # Vote-related ViewSets are optional for now; the app's api_views module may be incomplete.
@@ -71,7 +79,36 @@ except Exception:
     OfflinePackageViewSet = None
 
 # ── Kreative ──────────────────────────────────────────────
-from konnaxion.kreative.api_views import KreativeArtworkViewSet, GalleryViewSet
+from konnaxion.kreative.api_views import (
+    KreativeArtworkViewSet,
+    GalleryViewSet,
+    CollabSessionViewSet,
+    TraditionEntryViewSet,
+    KreativeTagViewSet,
+)
+
+# ── Kontrol (Admin & Moderation) ──────────────────────────
+# Wiring the new admin module endpoints
+AuditLogViewSet: Optional[Type[Any]]
+ModerationQueueViewSet: Optional[Type[Any]]
+UserAdminViewSet: Optional[Type[Any]]
+
+try:
+    # We use a try-import block so the router doesn't crash if the kontrol app
+    # isn't fully migrated yet.
+    from konnaxion.kontrol.views import (
+        AuditLogViewSet as _AuditLogViewSet,
+        ModerationQueueViewSet as _ModerationQueueViewSet,
+        UserAdminViewSet as _UserAdminViewSet,
+    )
+    AuditLogViewSet = _AuditLogViewSet
+    ModerationQueueViewSet = _ModerationQueueViewSet
+    UserAdminViewSet = _UserAdminViewSet
+except ImportError:
+    AuditLogViewSet = None
+    ModerationQueueViewSet = None
+    UserAdminViewSet = None
+
 
 # ---------------------------------------------------------------------------
 
@@ -106,7 +143,41 @@ register_optional(
 )
 
 # keenKonnect
+# Canonical v14 path
 router.register("keenkonnect/projects", ProjectViewSet, basename="keenkonnect-project")
+# Backwards-compat for older services expecting /api/projects/
+router.register("projects", ProjectViewSet, basename="project")
+
+router.register(
+    "keenkonnect/resources",
+    ProjectResourceViewSet,
+    basename="keenkonnect-resource",
+)
+router.register(
+    "keenkonnect/tasks",
+    ProjectTaskViewSet,
+    basename="keenkonnect-task",
+)
+router.register(
+    "keenkonnect/messages",
+    ProjectMessageViewSet,
+    basename="keenkonnect-message",
+)
+router.register(
+    "keenkonnect/teams",
+    ProjectTeamViewSet,
+    basename="keenkonnect-team",
+)
+router.register(
+    "keenkonnect/ratings",
+    ProjectRatingViewSet,
+    basename="keenkonnect-rating",
+)
+router.register(
+    "keenkonnect/tags",
+    KeenKonnectTagViewSet,
+    basename="keenkonnect-tag",
+)
 
 # Kollective Intelligence (optional until Vote* ViewSets are implemented)
 register_optional(
@@ -128,8 +199,10 @@ router.register(
 )
 
 # KonnectED – Offline packages (optional; only if ViewSet exists)
+# NOTE: path aligned with frontend OFFLINE_PACKAGE_* endpoints:
+#   konnected/offline-packages/
 register_optional(
-    "konnected/knowledge/offline-packages",
+    "konnected/offline-packages",
     OfflinePackageViewSet,
     basename="konnected-offline-package",
 )
@@ -171,6 +244,38 @@ router.register(
     "kreative/galleries",
     GalleryViewSet,
     basename="kreative-gallery",
+)
+router.register(
+    "kreative/collab-sessions",
+    CollabSessionViewSet,
+    basename="kreative-collab-session",
+)
+router.register(
+    "kreative/traditions",
+    TraditionEntryViewSet,
+    basename="kreative-tradition",
+)
+router.register(
+    "kreative/tags",
+    KreativeTagViewSet,
+    basename="kreative-tag",
+)
+
+# Kontrol (Admin)
+register_optional(
+    "admin/audit-log",
+    AuditLogViewSet,
+    basename="kontrol-audit-log",
+)
+register_optional(
+    "admin/moderation",
+    ModerationQueueViewSet,
+    basename="kontrol-moderation",
+)
+register_optional(
+    "admin/users",
+    UserAdminViewSet,
+    basename="kontrol-user-admin",
 )
 
 # ---------------------------------------------------------------------------

@@ -1,4 +1,3 @@
-# FILE: backend/konnaxion/konnected/api_views.py
 # konnaxion/konnected/api_views.py
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional, Tuple
@@ -13,6 +12,7 @@ from .models import (
     CertificationPath,
     Evaluation,
     KnowledgeResource,
+    OfflinePackage,
     PeerValidation,
     Portfolio,
 )
@@ -23,7 +23,10 @@ from .serializers import (
     KnowledgeResourceSerializer,
     PeerValidationSerializer,
     PortfolioSerializer,
+    # NOTE: needs to be implemented in konnected/serializers.py
+    OfflinePackageSerializer,
 )
+from .tasks import build_offline_package
 
 # ---------------------------------------------------------------------------
 # Global parameters – aligned with v14 Global Parameter Reference
@@ -146,6 +149,76 @@ class KnowledgeResourceViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Record the authenticated user as the author
         serializer.save(author=self.request.user)
+
+
+# ---------------------------------------------------------------------------
+#  Offline content packaging – OfflinePackage CRUD + sync
+# ---------------------------------------------------------------------------
+
+
+class OfflinePackageViewSet(viewsets.ModelViewSet):
+    """
+    CRUD + sync endpoints for offline content packages.
+
+    Mounted under /api/ via config.api_router (prefix may be
+    "konnected/knowledge/offline-packages" or similar depending on router).
+
+    Frontend expectations (see Offline Content page helpers):
+        GET    /.../offline-packages/          → list of OfflinePackage
+        POST   /.../offline-packages/          → create definition
+        GET    /.../offline-packages/{id}/     → retrieve
+        PATCH  /.../offline-packages/{id}/     → partial update (e.g. autoSync)
+        DELETE /.../offline-packages/{id}/     → delete
+        POST   /.../offline-packages/{id}/sync/ → trigger build_offline_package()
+    """
+
+    serializer_class = OfflinePackageSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Restrict visibility by default to packages created by the user,
+        while allowing staff to see all packages.
+        """
+        user = self.request.user
+        base_qs = OfflinePackage.objects.all().select_related("created_by")
+        if not user.is_authenticated:
+            return OfflinePackage.objects.none()
+        if user.is_staff:
+            return base_qs
+        return base_qs.filter(created_by=user)
+
+    def perform_create(self, serializer):
+        """
+        Ensure created_by is always set to the requesting user.
+        """
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=["post"], url_path="sync")
+    def sync(self, request, pk=None):
+        """
+        Trigger an asynchronous build of this offline package.
+
+        The heavy lifting is done by konnected.tasks.build_offline_package,
+        executed by Celery workers. This endpoint simply enqueues the task.
+        """
+        package = self.get_object()
+        build_offline_package.delay(package.pk)
+
+        # Optionally, we can mark the package as scheduled here; the task
+        # itself will update status/progress as it runs.
+        metadata_update: Dict[str, Any] = {}
+        if getattr(package, "status", None) != "building":
+            setattr(package, "status", "scheduled")
+            metadata_update["status"] = "scheduled"
+
+        if metadata_update:
+            package.save(update_fields=["status", "updated_at"])
+
+        return Response(
+            {"detail": "Offline package sync scheduled."},
+            status=status.HTTP_202_ACCEPTED,
+        )
 
 
 # ---------------------------------------------------------------------------

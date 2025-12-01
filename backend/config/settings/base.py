@@ -99,6 +99,7 @@ LOCAL_APPS = [
     "konnaxion.kreative",
     "konnaxion.moderation",
     "konnaxion.trust",
+    "konnaxion.kontrol",  # <-- Added new admin/control module
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

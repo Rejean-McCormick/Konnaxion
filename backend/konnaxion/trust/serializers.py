@@ -1,4 +1,3 @@
-# FILE: backend/konnaxion/trust/serializers.py
 # backend/konnaxion/trust/serializers.py
 
 from __future__ import annotations
@@ -14,7 +13,7 @@ __all__ = ["CredentialSerializer"]
 
 class CredentialSerializer(serializers.ModelSerializer):
     """
-    Serializer for user-submitted real‑world credentials used in the Trust module.
+    Serializer for user-submitted real-world credentials used in the Trust module.
 
     It matches the `Credential` / `CredentialRow` shape used on the frontend:
       - services/trust.ts  → interface Credential
@@ -30,8 +29,8 @@ class CredentialSerializer(serializers.ModelSerializer):
     )
 
     # Upload field: the raw file coming from the client, mapped to the model's
-    # FileField (assumed to be named `document`).
-    # This is write‑only and is not exposed in responses.
+    # FileField via the `document` alias on the model.
+    # This is write-only and is not exposed in responses.
     file = serializers.FileField(
         write_only=True,
         required=True,
@@ -116,7 +115,6 @@ class CredentialSerializer(serializers.ModelSerializer):
             title = base or "Untitled credential"
 
         # Resolve an appropriate "pending" status value.
-        status_value = None
         status_enum = getattr(Credential, "Status", None)
         if status_enum is not None and hasattr(status_enum, "PENDING"):
             status_value = status_enum.PENDING
@@ -132,12 +130,13 @@ class CredentialSerializer(serializers.ModelSerializer):
             "Awaiting manual verification",
         )
 
+        # IMPORTANT: the real storage field is `file`, not `document`.
         credential = Credential.objects.create(
             user=user,
             title=title or "Untitled credential",
             issuer=issuer,
             issued_at=issued_at,
-            document=document,
+            file=document,
             status=status_value,
             notes=default_notes,
         )
@@ -151,8 +150,8 @@ class CredentialSerializer(serializers.ModelSerializer):
         """
         Returns an absolute URL to the uploaded document, if available.
 
-        Prefers a FileField named `document`, but will also fall back to `file`
-        if present on the model.
+        Prefers a FileField named `document` (property on the model),
+        but will also fall back to `file` if present.
         """
         file_field = getattr(obj, "document", None) or getattr(obj, "file", None)
         if not file_field:
@@ -171,10 +170,10 @@ class CredentialSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj: Credential) -> Optional[str]:
         """
-        Returns a human‑friendly review status string for the UI.
+        Returns a human-friendly review status string for the UI.
 
         If the model defines `get_status_display()` (e.g. via Django `choices`),
-        that label is used; otherwise, the raw value is title‑cased.
+        that label is used; otherwise, the raw value is title-cased.
         """
         display = getattr(obj, "get_status_display", None)
         if callable(display):

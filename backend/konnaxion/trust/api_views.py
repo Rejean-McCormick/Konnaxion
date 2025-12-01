@@ -1,31 +1,25 @@
+# FILE: backend/konnaxion/moderation/api_views.py
 # backend/konnaxion/moderation/api_views.py
-"""
-REST API for moderation, role toggles and audit-log admin endpoints.
+"""REST API for moderation and audit-log admin endpoints.
 
-This module exposes the following endpoints (to be wired in ``konnaxion/urls.py``):
+This module exposes three endpoints (to be wired in ``config/urls.py``):
 
-    GET   /api/admin/moderation
-    POST  /api/admin/moderation/<id>
-    GET   /api/admin/roles
-    PATCH /api/admin/roles/<id>
-    GET   /api/admin/audit/logs
+    GET  /admin/moderation
+    POST /admin/moderation/<id>
+    GET  /admin/audit/logs
 
 They are consumed by:
 
   - services/admin.fetchModerationQueue
   - services/admin.actOnReport
-  - services/admin.fetchRoles
-  - services/admin.toggleRole
   - services/audit.fetchAuditLogs
-  - the Ethikos / KonnectED admin moderation, roles & audit UIs.
+  - the Ethikos / KonnectED admin moderation & audit UIs.
 """
 
 from __future__ import annotations
 
 from typing import Any
 
-from django.contrib.auth.models import Group, Permission
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -37,17 +31,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import AuditLogEntry, ModerationReport
-from .serializers import ModerationReportSerializer, AuditLogEntrySerializer
-
-
-# ---------------------------------------------------------------------------
-# Permission used by all admin endpoints in this module
-# ---------------------------------------------------------------------------
+from .serializers import ModerationReportSerializer
 
 
 class IsModerationAdmin(permissions.BasePermission):
     """
-    Permission class for moderation, roles and audit endpoints.
+    Permission class for moderation and audit endpoints.
 
     Default behaviour:
       - requires an authenticated user
@@ -63,11 +52,6 @@ class IsModerationAdmin(permissions.BasePermission):
             return False
         # Keep it simple and predictable: staff/superusers only by default
         return bool(getattr(user, "is_staff", False) or getattr(user, "is_superuser", False))
-
-
-# ---------------------------------------------------------------------------
-# Moderation queue API
-# ---------------------------------------------------------------------------
 
 
 class ModerationQueueView(generics.ListAPIView):
@@ -187,145 +171,40 @@ class ModerationDecisionView(APIView):
 
 
 # ---------------------------------------------------------------------------
-# Role-management API (admin/roles)
-# ---------------------------------------------------------------------------
-
-# Permission used to flag a Group as "enabled" for Ethikos admin.
-# This does not add any new tables; it simply leverages Django's
-# built-in auth_permission / contenttypes tables.
-ADMIN_ROLE_PERMISSION_CODENAME = "can_access_ethikos_admin"
-ADMIN_ROLE_PERMISSION_NAME = "Can access Ethikos admin & moderation UIs"
-
-
-def _get_admin_role_permission() -> Permission:
-    """
-    Ensure the dedicated permission used for role toggles exists.
-
-    Groups that include this permission are considered "enabled" by
-    the Ethikos role management screens.
-    """
-    ct = ContentType.objects.get_for_model(Group)
-    perm, _ = Permission.objects.get_or_create(
-        content_type=ct,
-        codename=ADMIN_ROLE_PERMISSION_CODENAME,
-        defaults={"name": ADMIN_ROLE_PERMISSION_NAME},
-    )
-    return perm
-
-
-class AdminRoleSerializer(drf_serializers.Serializer):
-    """
-    Serializer matching services/admin.RoleRow on the frontend.
-
-    It is intentionally decoupled from any particular DB model so that
-    you can later change the underlying implementation (e.g. limit to
-    a subset of groups, expose descriptions) without breaking the API
-    contract.
-    """
-
-    id = drf_serializers.CharField()
-    name = drf_serializers.CharField()
-    userCount = drf_serializers.IntegerField()
-    enabled = drf_serializers.BooleanField()
-
-
-class AdminRoleListView(APIView):
-    """
-    GET /admin/roles
-
-    Returns a flat list of role rows consumed by the Ethikos admin UIs.
-
-    For the initial implementation, each Django auth.Group is treated
-    as a role:
-
-      - id        → Group.pk (stringified)
-      - name      → Group.name
-      - userCount → number of users in the group
-      - enabled   → whether the group has the dedicated "admin role"
-                    permission attached
-
-    This design reuses the existing groups/permissions RBAC model and
-    does not introduce new tables.
-    """
-
-    permission_classes = [IsModerationAdmin]
-
-    def get(self, request, *args: Any, **kwargs: Any) -> Response:
-        perm = _get_admin_role_permission()
-        groups = Group.objects.all().order_by("name")
-
-        items: list[dict[str, Any]] = []
-        for group in groups:
-            items.append(
-                {
-                    "id": str(group.pk),
-                    "name": group.name,
-                    "userCount": group.user_set.count(),
-                    "enabled": group.permissions.filter(pk=perm.pk).exists(),
-                }
-            )
-
-        serializer = AdminRoleSerializer(items, many=True)
-        return Response({"items": serializer.data})
-
-
-class AdminRoleToggleView(APIView):
-    """
-    PATCH /admin/roles/<id>
-
-    Body::
-
-        { "enabled": true | false }
-
-    Semantics:
-
-      - enabled = true  → attach the dedicated Ethikos admin permission
-                          to the corresponding Django Group.
-      - enabled = false → remove that permission from the group.
-
-    This affects all users that belong to the group, without modifying
-    group membership itself. You can later wire actual access control
-    checks to this permission (e.g. user.has_perm("auth.can_access_ethikos_admin")).
-    """
-
-    permission_classes = [IsModerationAdmin]
-
-    def patch(self, request, pk: int, *args: Any, **kwargs: Any) -> Response:
-        group = get_object_or_404(Group, pk=pk)
-
-        if "enabled" not in request.data:
-            raise ValidationError({"enabled": "This field is required."})
-
-        enabled = bool(request.data.get("enabled"))
-        perm = _get_admin_role_permission()
-
-        if enabled:
-            group.permissions.add(perm)
-        else:
-            group.permissions.remove(perm)
-
-        # Optional: log the change in the audit stream. Fail silently
-        # if anything goes wrong to avoid breaking the admin UI.
-        try:
-            AuditLogEntry.log(
-                actor_user=request.user if request.user.is_authenticated else None,
-                action="TOGGLE_ROLE",
-                target=group.name,
-                entity="role",
-                entity_id=group.pk,
-                severity="info",
-                status="ok",
-                meta={"enabled": enabled},
-            )
-        except Exception:
-            pass
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-# ---------------------------------------------------------------------------
 # Audit-log API
 # ---------------------------------------------------------------------------
+
+
+class AuditLogEntrySerializer(drf_serializers.ModelSerializer):
+    """
+    Serializer aligned with services/audit.ts::LogRow.
+
+    The only difference is that ``entityId`` is backed by the ``entity_id``
+    model field.
+    """
+
+    entityId = drf_serializers.CharField(
+        source="entity_id",
+        required=False,
+        allow_blank=True,
+    )
+
+    class Meta:
+        model = AuditLogEntry
+        fields = (
+            "id",
+            "ts",
+            "actor",
+            "action",
+            "target",
+            "severity",
+            "entity",
+            "entityId",
+            "ip",
+            "status",
+            "meta",
+        )
+        read_only_fields = fields
 
 
 class AuditLogPagination(PageNumberPagination):

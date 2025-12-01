@@ -10,23 +10,35 @@ import { DownOutlined } from '@ant-design/icons'
 
 /* ------------ module keys & mappings ------------ */
 
-const SUITE_KEYS = ['ekoh', 'ethikos', 'keenkonnect', 'konnected', 'kreative'] as const
+// 1. UPDATED: Added 'kontrol' to the list of known module keys
+const SUITE_KEYS = [
+  'ekoh',
+  'ethikos',
+  'keenkonnect',
+  'konnected',
+  'kontrol', // <-- NEW MODULE KEY
+  'kreative',
+] as const
 type SuiteKey = (typeof SUITE_KEYS)[number]
 
+// 2. UPDATED: Added the display title for 'kontrol'
 const TITLE_BY_SUITE: Record<SuiteKey, string> = {
-  ekoh       : 'EkoH',
-  ethikos    : 'EthiKos',
+  ekoh: 'EkoH',
+  ethikos: 'EthiKos',
   keenkonnect: 'keenKonnect',
-  konnected  : 'KonnectED',
-  kreative   : 'Kreative',
+  konnected: 'KonnectED',
+  kontrol: 'KonTrol', // <-- NEW MODULE TITLE
+  kreative: 'Kreative',
 }
 
+// 3. UPDATED: Added the default dashboard route for 'kontrol'
 const DEFAULT_ENTRY: Record<SuiteKey, string> = {
-  ekoh       : '/ekoh/dashboard',
-  ethikos    : '/ethikos/pulse/overview',
+  ekoh: '/ekoh/dashboard',
+  ethikos: '/ethikos/pulse/overview',
   keenkonnect: '/keenkonnect/dashboard',
-  konnected  : '/konnected/dashboard',
-  kreative   : '/kreative/dashboard',
+  konnected: '/konnected/dashboard',
+  kontrol: '/kontrol/dashboard', // <-- NEW DEFAULT ROUTE
+  kreative: '/kreative/dashboard',
 }
 
 /* ------------ styled ------------ */
@@ -84,6 +96,8 @@ interface LogoTitleProps {
 
 /* ------------ helpers ------------ */
 
+// NOTE: This array dynamically includes the new 'kontrol' entry now
+// that it has been added to SUITE_KEYS.
 const menuItems: MenuProps['items'] = SUITE_KEYS.map(key => ({
   key,
   label: TITLE_BY_SUITE[key],
@@ -124,9 +138,9 @@ export default function LogoTitle({
         href={{ pathname: homeHref, query: { sidebar: suite } }}
         aria-label="Go to module dashboard"
         style={{
-          display        : 'inline-flex',
-          alignItems     : 'center',
-          textDecoration : 'none',
+          display: 'inline-flex',
+          alignItems: 'center',
+          textDecoration: 'none',
         }}
       >
         <Logo src="/LogoK.svg" alt="Konnaxion logo" />
@@ -136,11 +150,11 @@ export default function LogoTitle({
       <Dropdown
         trigger={['click']}
         menu={{
-          items : menuItems,
+          items: menuItems,
           onClick: handleMenuClick,
-          style : {
+          style: {
             background: 'var(--ant-color-bg-container)',
-            boxShadow : 'var(--ant-box-shadow-secondary)',
+            boxShadow: 'var(--ant-box-shadow-secondary)',
           },
         }}
       >

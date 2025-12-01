@@ -1,4 +1,3 @@
-# FILE: backend/konnaxion/konnected/tasks.py
 # konnaxion/konnected/tasks.py
 from __future__ import annotations
 
@@ -46,6 +45,34 @@ def _offline_root() -> Path:
     return base
 
 
+def _normalize_manifest_type(raw_type: Any) -> Optional[str]:
+    """
+    Map internal KnowledgeResource.type values to the v14 CONTENT_TYPES_ALLOWED enum.
+
+    Frontend expects one of: "article", "video", "lesson", "quiz", "dataset".
+    Current backend choices are: "video", "doc", "course", "other".
+    """
+    if raw_type is None:
+        return None
+
+    value = str(raw_type).lower()
+
+    # Direct mapping
+    if value == "video":
+        return "video"
+
+    # Our "doc" is treated as a textual/article-like resource.
+    if value in ("doc", "document", "file"):
+        return "article"
+
+    # Courses/modules are treated as lessons in the offline UI.
+    if value in ("course", "module"):
+        return "lesson"
+
+    # Fallback: treat unknown/other as a generic article.
+    return "article"
+
+
 def _serialize_resource(resource: Any) -> Dict[str, Any]:
     """
     Minimal serialisation of a KnowledgeResource for inclusion in offline bundles.
@@ -56,10 +83,14 @@ def _serialize_resource(resource: Any) -> Dict[str, Any]:
     created_at = getattr(resource, "created_at", None)
     updated_at = getattr(resource, "updated_at", None)
 
+    raw_type = getattr(resource, "type", None)
+    manifest_type = _normalize_manifest_type(raw_type)
+
     return {
         "id": getattr(resource, "pk", None),
         "title": getattr(resource, "title", None),
-        "type": getattr(resource, "type", None),
+        # Normalised to the v14 enum expected by the offline-facing UIs.
+        "type": manifest_type,
         "url": getattr(resource, "url", None),
         "author_id": getattr(resource, "author_id", None),
         "created_at": created_at.isoformat() if hasattr(created_at, "isoformat") else None,
@@ -143,6 +174,56 @@ def _get_include_types(package: Any) -> List[str]:
         return [str(raw)]
 
 
+def _map_frontend_types_to_backend(include_types_list: List[str]) -> Optional[List[str]]:
+    """
+    Map frontend offline types (article, video, lesson, quiz, dataset)
+    to backend KnowledgeResource.ResourceType values (video, doc, course, other).
+
+    Returns a list of backend type strings suitable for a type__in filter,
+    or None if mapping cannot be determined (in which case we skip type filtering).
+    """
+    if KnowledgeResource is None or not include_types_list:
+        return None
+
+    backend_types: List[str] = []
+
+    # Try to use the defined TextChoices enum if present.
+    resource_type_enum = getattr(KnowledgeResource, "ResourceType", None)
+
+    def _enum_value(name: str, default: str) -> str:
+        if resource_type_enum is not None and hasattr(resource_type_enum, name):
+            return getattr(resource_type_enum, name)
+        return default
+
+    for raw in include_types_list:
+        t = str(raw).lower()
+
+        if t == "video":
+            backend_types.append(_enum_value("VIDEO", "video"))
+        elif t in ("article", "dataset"):
+            # Text/content-like resources → DOC
+            backend_types.append(_enum_value("DOC", "doc"))
+        elif t in ("lesson", "course", "module"):
+            backend_types.append(_enum_value("COURSE", "course"))
+        elif t == "quiz":
+            # No dedicated quiz type yet – treat as OTHER.
+            backend_types.append(_enum_value("OTHER", "other"))
+        else:
+            # Unknown type – ignore rather than fail hard.
+            logger.debug("Unknown includeTypes value for offline package: %r", t)
+
+    # De-duplicate while preserving order.
+    seen = set()
+    deduped: List[str] = []
+    for t in backend_types:
+        if t in seen:
+            continue
+        seen.add(t)
+        deduped.append(t)
+
+    return deduped or None
+
+
 def _select_resources_for_package(package: Any) -> Iterable[Any]:
     """
     Return an iterable of KnowledgeResource objects to include in a package.
@@ -153,7 +234,8 @@ def _select_resources_for_package(package: Any) -> Iterable[Any]:
     - If KnowledgeResource is not available, returns an empty list.
     - Otherwise, starts from all resources ordered by id.
     - Optionally applies filters based on fields present on the OfflinePackage:
-        * include_types / includeTypes  -> KnowledgeResource.type
+        * include_types / includeTypes  -> mapped onto KnowledgeResource.type
+          according to v14 content type mapping.
         * subject_filter                -> KnowledgeResource.subject (if present)
         * level_filter                  -> KnowledgeResource.level (if present)
         * language_filter               -> KnowledgeResource.language (if present)
@@ -168,12 +250,16 @@ def _select_resources_for_package(package: Any) -> Iterable[Any]:
 
     # ---- Type filter -------------------------------------------------------
     include_types_list = _get_include_types(package)
-    if include_types_list:
+    backend_types = _map_frontend_types_to_backend(include_types_list)
+    if backend_types:
         try:
-            qs = qs.filter(type__in=include_types_list)
+            qs = qs.filter(type__in=backend_types)
         except Exception:
             # If the filter fails for any reason, fall back to the unfiltered qs.
-            pass
+            logger.exception(
+                "Failed to apply type filter for OfflinePackage #%s",
+                getattr(package, "pk", "?"),
+            )
 
     # ---- Subject / level / language filters (optional) --------------------
     # Only apply where both the package and model expose matching attributes.
@@ -194,7 +280,10 @@ def _select_resources_for_package(package: Any) -> Iterable[Any]:
             qs = qs.filter(**filters)
         except Exception:
             # Ignore filter errors and return the broader queryset.
-            pass
+            logger.exception(
+                "Failed to apply subject/level/language filters for OfflinePackage #%s",
+                getattr(package, "pk", "?"),
+            )
 
     return qs
 
@@ -274,7 +363,7 @@ def _update_package_resources(package: Any, resources: Sequence[Any]) -> None:
     """
     Attach the selected resources to the package via a ManyToMany relation, if present.
 
-    Expected future schema: OfflinePackage.resources -> KnowledgeResource.m2m.
+    Expected schema: OfflinePackage.resources -> KnowledgeResource.m2m.
     If the relation does not exist yet, this is a no-op.
     """
     rel = getattr(package, "resources", None)
@@ -334,7 +423,7 @@ def _set_package_status(
         setattr(package, "bundle_path", str(bundle_path))
 
     try:
-        package.save()  # type: ignore[call-arg]
+        package.save()  # type: ignore[call-attr]
     except Exception:
         logger.exception(
             "Failed to save OfflinePackage #%s",

@@ -1,9 +1,7 @@
-// FILE: frontend/app/reports/page.tsx
 'use client';
 
 import React from 'react';
-import Head from 'next/head';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   PageContainer,
   ProCard,
@@ -26,6 +24,7 @@ import {
   ThunderboltOutlined,
   InfoCircleOutlined,
   CalendarOutlined,
+  ArrowRightOutlined
 } from '@ant-design/icons';
 
 const { RangePicker } = DatePicker;
@@ -43,304 +42,256 @@ const shortcuts = [
   {
     key: 'smart-vote',
     title: 'Smart Vote · Impact overview',
-    description:
-      'See weighted participation, consensus patterns, and expert vs public deltas.',
+    description: 'See weighted participation, consensus patterns, and expert vs public deltas.',
     href: '/reports/smart-vote',
-    icon: <LineChartOutlined />,
+    icon: <LineChartOutlined style={{ fontSize: 24, color: '#1890ff' }} />,
     tags: ['Ekoh', 'Ethikos', 'Smart Vote'],
   },
   {
     key: 'usage',
     title: 'Usage · Adoption & activity',
-    description:
-      'Track monthly active users, active projects, and document growth across the platform.',
+    description: 'Track monthly active users, active projects, and document growth across the platform.',
     href: '/reports/usage',
-    icon: <BarChartOutlined />,
+    icon: <BarChartOutlined style={{ fontSize: 24, color: '#52c41a' }} />,
     tags: ['Usage', 'MAU', 'Projects'],
   },
   {
     key: 'perf',
     title: 'API performance · Reliability',
-    description:
-      'Monitor API latency, error rates, and SLO compliance for the core services.',
+    description: 'Monitor API latency, error rates, and SLO compliance for the core services.',
     href: '/reports/perf',
-    icon: <ThunderboltOutlined />,
+    icon: <ThunderboltOutlined style={{ fontSize: 24, color: '#faad14' }} />,
     tags: ['API', 'SLO', 'Reliability'],
   },
 ];
 
+// Simple Chart Skeleton Component for visuals
+const MiniChartSkeleton = ({ color = '#eee' }: { color?: string }) => (
+  <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%', gap: 4, paddingBottom: 8 }}>
+    {[40, 60, 45, 70, 50, 80, 65, 85, 55, 75, 90, 60].map((h, i) => (
+      <div 
+        key={i} 
+        style={{ 
+          width: '6%', 
+          height: `${h}%`, 
+          background: color, 
+          borderRadius: '2px 2px 0 0',
+          opacity: 0.6 
+        }} 
+      />
+    ))}
+  </div>
+);
+
 export default function ReportsHomePage(): JSX.Element {
   const [quickRange, setQuickRange] = React.useState<QuickRange>('30d');
+  const router = useRouter();
 
   return (
-    <>
-      <Head>
-        <title>Insights · Reports overview</title>
-      </Head>
-
-      <PageContainer
-        header={{
-          title: 'Insights',
-          subTitle: 'Cross-module analytics for Smart Vote, usage, and performance.',
-          breadcrumb: undefined,
-        }}
+    <PageContainer
+      header={{
+        title: 'Insights',
+        subTitle: 'Cross-module analytics for Smart Vote, usage, and performance.',
+        breadcrumb: undefined,
+      }}
+    >
+      <Space
+        direction="vertical"
+        size="large"
+        style={{ width: '100%' }}
       >
-        <Space
-          direction="vertical"
-          size="large"
-          style={{ width: '100%' }}
-        >
-          {/* Filters / context */}
-          <Card>
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ width: '100%' }}
-            >
-              <Space align="start" style={{ width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
-                <Space direction="vertical" size={4}>
-                  <Space>
-                    <CalendarOutlined />
-                    <Text strong>Time range</Text>
-                  </Space>
-                  <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                    Choose a time window. Detailed dashboards can override this
-                    range if needed.
-                  </Paragraph>
+        {/* Filters / context */}
+        <Card>
+          <Space
+            direction="vertical"
+            size="middle"
+            style={{ width: '100%' }}
+          >
+            <Space align="start" style={{ width: '100%', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16 }}>
+              <Space direction="vertical" size={4}>
+                <Space>
+                  <CalendarOutlined />
+                  <Text strong>Time range</Text>
                 </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Choose a time window. Detailed dashboards can override this range.
+                </Paragraph>
+              </Space>
 
-                <Space direction="vertical" size={4}>
-                  <Text strong>Quick ranges</Text>
-                  <Segmented
-                    options={QUICK_RANGES.map((r) => ({
-                      label: r.label,
-                      value: r.value,
-                    }))}
-                    value={quickRange}
-                    onChange={(value) =>
-                      setQuickRange(value as QuickRange)
+              <Space direction="vertical" size={4}>
+                <Text strong>Quick ranges</Text>
+                <Segmented
+                  options={QUICK_RANGES.map((r) => ({
+                    label: r.label,
+                    value: r.value,
+                  }))}
+                  value={quickRange}
+                  onChange={(value) => setQuickRange(value as QuickRange)}
+                />
+              </Space>
+
+              <Space direction="vertical" size={4}>
+                <Text strong>Custom range</Text>
+                <RangePicker allowClear />
+              </Space>
+            </Space>
+
+            <Space>
+              <InfoCircleOutlined style={{ color: '#1890ff' }} />
+              <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                This overview is read-only. Detailed charts on each dashboard will use the same time range where possible.
+              </Paragraph>
+            </Space>
+          </Space>
+        </Card>
+
+        {/* High-level tiles */}
+        <ProCard
+          ghost
+          gutter={[16, 16]}
+          wrap
+        >
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 24, md: 8 }}
+            statistic={{
+              title: 'Smart Vote',
+              value: 1245,
+              suffix: 'votes',
+              description: 'Weighted decisions in the selected range.',
+            }}
+            chart={
+              <div style={{ height: 80, width: '100%' }}>
+                 <MiniChartSkeleton color="#1890ff" />
+              </div>
+            }
+            footer={
+              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <Text type="secondary">Last {quickRange}</Text>
+                <Button type="link" size="small" onClick={() => router.push('/reports/smart-vote')}>
+                  View Report <ArrowRightOutlined />
+                </Button>
+              </Space>
+            }
+          />
+
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 24, md: 8 }}
+            statistic={{
+              title: 'Usage',
+              value: 567,
+              suffix: 'MAU',
+              description: 'Approximate monthly active users.',
+            }}
+            chart={
+              <div style={{ height: 80, width: '100%' }}>
+                 <MiniChartSkeleton color="#52c41a" />
+              </div>
+            }
+            footer={
+              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <Text type="secondary">Includes projects & docs</Text>
+                <Button type="link" size="small" onClick={() => router.push('/reports/usage')}>
+                  View Usage <ArrowRightOutlined />
+                </Button>
+              </Space>
+            }
+          />
+
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 24, md: 8 }}
+            statistic={{
+              title: 'API Performance',
+              value: 240,
+              suffix: 'ms p95',
+              description: 'Aggregated latency for public endpoints.',
+            }}
+            chart={
+              <div style={{ height: 80, width: '100%' }}>
+                 <MiniChartSkeleton color="#faad14" />
+              </div>
+            }
+            footer={
+              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <Text type="secondary">Target p95 &lt; 300 ms</Text>
+                <Button type="link" size="small" onClick={() => router.push('/reports/perf')}>
+                  Check Reliability <ArrowRightOutlined />
+                </Button>
+              </Space>
+            }
+          />
+        </ProCard>
+
+        {/* Shortcuts / entry points */}
+        <Card>
+          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space direction="vertical" size={4}>
+              <Title level={4} style={{ marginBottom: 0 }}>
+                Dashboards
+              </Title>
+              <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                Jump directly to a dedicated Insights dashboard. These pages provide charts, tables, and export options.
+              </Paragraph>
+            </Space>
+
+            <List
+              itemLayout="horizontal"
+              dataSource={shortcuts}
+              renderItem={(item) => (
+                <List.Item
+                  actions={[
+                    <Button key="open" type="default" onClick={() => router.push(item.href)}>
+                      Open
+                    </Button>,
+                  ]}
+                >
+                  <List.Item.Meta
+                    avatar={item.icon}
+                    title={
+                      <a onClick={() => router.push(item.href)} style={{ cursor: 'pointer' }}>
+                        {item.title}
+                      </a>
+                    }
+                    description={
+                      <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                        <Paragraph style={{ marginBottom: 0 }}>
+                          {item.description}
+                        </Paragraph>
+                        <Space size={[4, 0]} wrap>
+                          {item.tags.map((tag) => (
+                            <Tag key={tag} color="blue">{tag}</Tag>
+                          ))}
+                        </Space>
+                      </Space>
                     }
                   />
-                </Space>
-
-                <Space direction="vertical" size={4}>
-                  <Text strong>Custom range</Text>
-                  <RangePicker allowClear />
-                </Space>
-              </Space>
-
-              <Space>
-                <InfoCircleOutlined />
-                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  This overview is read-only. Detailed charts on each dashboard
-                  will use the same time range where possible.
-                </Paragraph>
-              </Space>
-            </Space>
-          </Card>
-
-          {/* High-level tiles */}
-          <ProCard
-            ghost
-            gutter={[16, 16]}
-            wrap
-          >
-            <StatisticCard
-              colSpan={{ xs: 24, sm: 24, md: 8 }}
-              statistic={{
-                title: 'Smart Vote',
-                value: 1245,
-                suffix: 'votes',
-                description:
-                  'Weighted decisions in the selected range across Ekoh and Ethikos.',
-              }}
-              chart={
-                <div
-                  style={{
-                    height: 80,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                  }}
-                >
-                  Mini-chart placeholder (Smart Vote)
-                </div>
-              }
-              footer={
-                <Space
-                  style={{ width: '100%', justifyContent: 'space-between' }}
-                >
-                  <Text type="secondary">Last {quickRange}</Text>
-                  <Link href="/reports/smart-vote">
-                    <Button type="link" size="small">
-                      Open Smart Vote report
-                    </Button>
-                  </Link>
-                </Space>
-              }
+                </List.Item>
+              )}
             />
+          </Space>
+        </Card>
 
-            <StatisticCard
-              colSpan={{ xs: 24, sm: 24, md: 8 }}
-              statistic={{
-                title: 'Usage',
-                value: 567,
-                suffix: 'MAU',
-                description:
-                  'Approximate monthly active users across all modules.',
-              }}
-              chart={
-                <div
-                  style={{
-                    height: 80,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                  }}
-                >
-                  Mini-chart placeholder (Usage)
-                </div>
-              }
-              footer={
-                <Space
-                  style={{ width: '100%', justifyContent: 'space-between' }}
-                >
-                  <Text type="secondary">Projects & docs growth included</Text>
-                  <Link href="/reports/usage">
-                    <Button type="link" size="small">
-                      Open Usage report
-                    </Button>
-                  </Link>
-                </Space>
-              }
-            />
-
-            <StatisticCard
-              colSpan={{ xs: 24, sm: 24, md: 8 }}
-              statistic={{
-                title: 'API performance',
-                value: 240,
-                suffix: 'ms p95',
-                description:
-                  'Aggregated latency for public API endpoints over the window.',
-              }}
-              chart={
-                <div
-                  style={{
-                    height: 80,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: 12,
-                  }}
-                >
-                  Mini-chart placeholder (Perf)
-                </div>
-              }
-              footer={
-                <Space
-                  style={{ width: '100%', justifyContent: 'space-between' }}
-                >
-                  <Text type="secondary">Target p95 &lt; 300 ms</Text>
-                  <Link href="/reports/perf">
-                    <Button type="link" size="small">
-                      Open API performance
-                    </Button>
-                  </Link>
-                </Space>
-              }
-            />
-          </ProCard>
-
-          {/* Shortcuts / entry points */}
-          <Card>
-            <Space
-              direction="vertical"
-              size="large"
-              style={{ width: '100%' }}
-            >
-              <Space direction="vertical" size={4}>
-                <Title level={4} style={{ marginBottom: 0 }}>
-                  Dashboards
-                </Title>
-                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  Jump directly to a dedicated Insights dashboard. These pages
-                  provide charts, tables, and export options.
-                </Paragraph>
-              </Space>
-
-              <List
-                itemLayout="horizontal"
-                dataSource={shortcuts}
-                renderItem={(item) => (
-                  <List.Item
-                    actions={[
-                      <Link key="open" href={item.href}>
-                        <Button type="link" size="small">
-                          Open
-                        </Button>
-                      </Link>,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      avatar={item.icon}
-                      title={
-                        <Link href={item.href}>
-                          {item.title}
-                        </Link>
-                      }
-                      description={
-                        <Space
-                          direction="vertical"
-                          size={4}
-                          style={{ width: '100%' }}
-                        >
-                          <Paragraph style={{ marginBottom: 0 }}>
-                            {item.description}
-                          </Paragraph>
-                          <Space size={[4, 0]} wrap>
-                            {item.tags.map((tag) => (
-                              <Tag key={tag}>{tag}</Tag>
-                            ))}
-                          </Space>
-                        </Space>
-                      }
-                    />
-                  </List.Item>
-                )}
-              />
+        {/* Helper / explanation */}
+        <Card>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Space>
+              <InfoCircleOutlined />
+              <Text strong>How to use Insights</Text>
             </Space>
-          </Card>
-
-          {/* Helper / explanation */}
-          <Card>
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ width: '100%' }}
-            >
-              <Space>
-                <InfoCircleOutlined />
-                <Text strong>How to use Insights</Text>
-              </Space>
-              <Paragraph>
-                Start from this overview to pick the dashboard that matches your
-                question: Smart Vote for collective decisions, Usage for
-                adoption, and API performance for reliability. Each dashboard
-                lets you refine the time range, inspect detailed metrics, and
-                export data where permitted.
-              </Paragraph>
-              <Tooltip title="Exports are limited to aggregated datasets; raw personal data never leaves the analytics service.">
-                <Button type="default" icon={<InfoCircleOutlined />}>
-                  Learn more about data safeguards
-                </Button>
-              </Tooltip>
-            </Space>
-          </Card>
-        </Space>
-      </PageContainer>
-    </>
+            <Paragraph>
+              Start from this overview to pick the dashboard that matches your
+              question: Smart Vote for collective decisions, Usage for
+              adoption, and API performance for reliability. Each dashboard
+              lets you refine the time range, inspect detailed metrics, and
+              export data where permitted.
+            </Paragraph>
+            <Tooltip title="Exports are limited to aggregated datasets; raw personal data never leaves the analytics service.">
+              <Button type="default" icon={<InfoCircleOutlined />}>
+                Learn more about data safeguards
+              </Button>
+            </Tooltip>
+          </Space>
+        </Card>
+      </Space>
+    </PageContainer>
   );
 }

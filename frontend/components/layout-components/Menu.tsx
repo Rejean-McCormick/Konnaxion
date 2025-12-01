@@ -1,5 +1,4 @@
 // FILE: frontend/components/layout-components/Menu.tsx
-// C:\MyCode\Konnaxionv14\frontend\components\layout-components\Menu.tsx
 'use client';
 
 import React from 'react';
