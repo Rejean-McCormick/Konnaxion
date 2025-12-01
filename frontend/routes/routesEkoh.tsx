@@ -1,41 +1,78 @@
 // FILE: frontend/routes/routesEkoh.tsx
-'use client'
+'use client';
 
-import React from 'react'
-import { DashboardOutlined } from '@ant-design/icons'
+import React from 'react';
+import {
+  DashboardOutlined,
+  StarOutlined,
+  LineChartOutlined,
+  DeploymentUnitOutlined,
+  BorderOutlined,
+  UsergroupAddOutlined,
+  HistoryOutlined,
+} from '@ant-design/icons';
 
 // Type local minimal pour éviter toute dépendance
-type Route = { path?: string; name: string; icon?: React.ReactNode; views?: Route[] }
+type Route = {
+  path?: string;
+  name: string;
+  icon?: React.ReactNode;
+  views?: Route[];
+};
 
-// NOTE: test routes '/index.test' supprimées à la source
-const directDashboard: Route = { path: '/ekoh/dashboard', name: 'Dashboard', icon: <DashboardOutlined /> }
+// Route principale : vue d’ensemble Ekoh
+const ekohDashboard: Route = {
+  path: '/ekoh/dashboard',
+  name: 'Ekoh – Overview',
+  icon: <DashboardOutlined />,
+};
 
-const achievements_badgesGroup: Route = {
-  name: 'Achievements Badges',
-  views: [{ path: '/ekoh/achievements-badges/earned-badges-display', name: 'Earned Badges Display' }]
-}
+// Bloc EkoH : réputation, expertise, badges
+const ekohGroup: Route = {
+  name: 'EkoH',
+  // section header: no icon
+  views: [
+    {
+      path: '/ekoh/overview-analytics/current-ekoh-score',
+      name: 'Score & analytics',
+      icon: <LineChartOutlined />,
+    },
+    {
+      path: '/ekoh/expertise-areas/view-current-expertise',
+      name: 'Expertise & domains',
+      icon: <DeploymentUnitOutlined />,
+    },
+    {
+      path: '/ekoh/achievements-badges/earned-badges-display',
+      name: 'Achievements & badges',
+      icon: <StarOutlined />,
+    },
+  ],
+};
 
-const overview_analyticsGroup: Route = {
-  name: 'Overview Analytics',
-  views: [{ path: '/ekoh/overview-analytics/current-ekoh-score', name: 'Current Ekoh Score' }]
-}
+// Bloc Smart Vote : poids de vote + centre Konsensus + flux d’activité
+const smartVoteGroup: Route = {
+  name: 'Smart Vote',
+  // section header: no icon
+  views: [
+    {
+      path: '/ekoh/voting-influence/current-voting-weight',
+      name: 'Voting weight',
+      icon: <BorderOutlined />,
+    },
+    {
+      path: '/konsensus',
+      name: 'Konsensus',
+      icon: <UsergroupAddOutlined />,
+    },
+    {
+      path: '/konsensus/activity-feed',
+      name: 'Activity feed',
+      icon: <HistoryOutlined />,
+    },
+  ],
+};
 
-const voting_influenceGroup: Route = {
-  name: 'Voting Influence',
-  views: [{ path: '/ekoh/voting-influence/current-voting-weight', name: 'Current Voting Weight' }]
-}
+const routes: Route[] = [ekohDashboard, ekohGroup, smartVoteGroup];
 
-const expertise_areasGroup: Route = {
-  name: 'Expertise Areas',
-  views: [{ path: '/ekoh/expertise-areas/view-current-expertise', name: 'View Current Expertise' }]
-}
-
-const routes: Route[] = [
-  directDashboard,
-  achievements_badgesGroup,
-  expertise_areasGroup,
-  overview_analyticsGroup,
-  voting_influenceGroup
-]
-
-export default routes
+export default routes;

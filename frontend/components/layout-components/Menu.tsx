@@ -9,6 +9,8 @@ import type { MenuProps } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import './Menu.css';
+
 export interface Route {
   path?: string;
   name: string;
@@ -27,45 +29,90 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 const flattenRoutes = (routes: Route[]): Route[] =>
   routes.flatMap((route) =>
-    route.views && route.views.length > 0
-      ? flattenRoutes(route.views)
-      : [route],
+    route.views && route.views.length > 0 ? flattenRoutes(route.views) : [route],
   );
 
+/**
+ * Build AntD Menu items.
+ * - Simple routes -> normal clickable items
+ * - Group routes (with views) -> non-clickable header row with optional icon
+ *   + child items rendered as first-level clickable entries.
+ */
 const toMenuItems = (
   routes: Route[],
   selectedSidebar: string,
   closeDrawer: () => void,
-): MenuItem[] =>
-  routes
-    .map<MenuItem | null>((route) => {
-      if (route.views && route.views.length > 0) {
-        return {
-          key: route.name,
-          icon: route.icon,
-          label: route.name,
-          children: toMenuItems(route.views, selectedSidebar, closeDrawer),
-        };
-      }
+): MenuItem[] => {
+  const items: MenuItem[] = [];
 
-      if (!route.path) {
-        return null;
-      }
+  routes.forEach((route) => {
+    // Group / section
+    if (route.views && route.views.length > 0) {
+      const sectionKey = `section-${route.name}`;
 
-      return {
-        key: route.path,
-        icon: route.icon,
+      // Non-clickable section header (with optional icon)
+      items.push({
+        key: sectionKey,
+        disabled: true,
         label: (
-          <Link
-            href={{ pathname: route.path, query: { sidebar: selectedSidebar } }}
-            onClick={closeDrawer}
-          >
-            {route.name}
-          </Link>
+          <div className="k-sidebar-section-header">
+            {route.icon && (
+              <span className="k-sidebar-section-header-icon">
+                {route.icon}
+              </span>
+            )}
+            <span className="k-sidebar-section-header-text">
+              {route.name}
+            </span>
+          </div>
         ),
-      };
-    })
-    .filter((item): item is MenuItem => item !== null);
+        className: 'k-sidebar-section-header',
+      } as MenuItem);
+
+      // Child items rendered as regular first-level entries
+      route.views.forEach((child) => {
+        if (!child.path) return;
+
+        items.push({
+          key: child.path,
+          icon: child.icon,
+          className: 'k-sidebar-section-item',
+          label: (
+            <Link
+              href={{
+                pathname: child.path,
+                query: { sidebar: selectedSidebar },
+              }}
+              onClick={closeDrawer}
+            >
+              {child.name}
+            </Link>
+          ),
+        } as MenuItem);
+      });
+
+      return;
+    }
+
+    // Simple route
+    if (!route.path) return;
+
+    items.push({
+      key: route.path,
+      icon: route.icon,
+      label: (
+        <Link
+          href={{ pathname: route.path, query: { sidebar: selectedSidebar } }}
+          onClick={closeDrawer}
+        >
+          {route.name}
+        </Link>
+      ),
+    } as MenuItem);
+  });
+
+  return items;
+};
 
 const MenuComponent: React.FC<MenuComponentProps> = ({
   routes,
@@ -90,9 +137,7 @@ const MenuComponent: React.FC<MenuComponentProps> = ({
     const best = matches.reduce((currentBest, route) => {
       if (!currentBest.path) return route;
       if (!route.path) return currentBest;
-      return route.path.length > currentBest.path.length
-        ? route
-        : currentBest;
+      return route.path.length > currentBest.path.length ? route : currentBest;
     });
 
     return best.path;

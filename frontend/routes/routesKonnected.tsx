@@ -1,70 +1,171 @@
 // FILE: frontend/routes/routesKonnected.tsx
-'use client'
+'use client';
 
-import React from 'react'
-import { DashboardOutlined } from '@ant-design/icons'
+import React from 'react';
+import {
+  DashboardOutlined,
+  BookOutlined,
+  DownloadOutlined,
+  LikeOutlined,
+  SearchOutlined,
+  EditOutlined,
+  BranchesOutlined,
+  PullRequestOutlined,
+  MergeOutlined,
+  CommentOutlined,
+  AlertOutlined,
+  MessageOutlined,
+  TeamOutlined,
+  BuildOutlined,
+  UsergroupAddOutlined,
+  CalendarOutlined,
+  VideoCameraOutlined,
+  AppstoreOutlined,
+  FormOutlined,
+  BulbOutlined,
+  UserSwitchOutlined,
+} from '@ant-design/icons';
 
 // Type local minimal pour éviter toute dépendance
-type Route = { path?: string; name: string; icon?: React.ReactNode; views?: Route[] }
+type Route = {
+  path?: string;
+  name: string;
+  icon?: React.ReactNode;
+  views?: Route[];
+};
 
-// NOTE: test routes '/index.test' supprimées à la source
-const directDashboard: Route = { path: '/konnected/dashboard', name: 'Dashboard', icon: <DashboardOutlined /> }
+// KonnectED – vue d’ensemble
+const konnectedDashboard: Route = {
+  path: '/konnected/dashboard',
+  name: 'KonnectED – Overview',
+  icon: <DashboardOutlined />,
+};
 
-const learning_libraryGroup: Route = {
-  name: 'Learning Library',
+// Knowledge : bibliothèque, parcours, discussions, collaboration
+const knowledgeGroup: Route = {
+  name: 'Knowledge',
+  // section header: pas d’icône
   views: [
-    { path: '/konnected/learning-library/browse-resources', name: 'Browse Resources' },
-    { path: '/konnected/learning-library/offline-content', name: 'Offline Content' },
-    { path: '/konnected/learning-library/recommended-resources', name: 'Recommended Resources' },
-    { path: '/konnected/learning-library/search-filters', name: 'Search Filters' }
-  ]
-}
+    // Learning Library
+    {
+      path: '/konnected/learning-library/browse-resources',
+      name: 'Browse',
+      icon: <BookOutlined />,
+    },
+    {
+      path: '/konnected/learning-library/offline-content',
+      name: 'Offline',
+      icon: <DownloadOutlined />,
+    },
+    {
+      path: '/konnected/learning-library/recommended-resources',
+      name: 'Recommended',
+      icon: <LikeOutlined />,
+    },
+    {
+      path: '/konnected/learning-library/search-filters',
+      name: 'Search & filters',
+      icon: <SearchOutlined />,
+    },
+    {
+      path: '/konnected/knowledge/contribute',
+      name: 'Contribute knowledge',
+      icon: <EditOutlined />,
+    },
+    // NOTE: content viewer route (/konnected/learning-library/[resourceId])
+    // is dynamic and intentionally not exposed directly in the sidebar.
 
-const community_discussionsGroup: Route = {
-  name: 'Community Discussions',
+    // Learning Paths
+    {
+      path: '/konnected/learning-paths/create-learning-path',
+      name: 'Create path',
+      icon: <BranchesOutlined />,
+    },
+    {
+      path: '/konnected/learning-paths/manage-existing-paths',
+      name: 'Manage paths',
+      icon: <PullRequestOutlined />,
+    },
+    {
+      path: '/konnected/learning-paths/my-learning-path',
+      name: 'My path',
+      icon: <MergeOutlined />,
+    },
+
+    // Community Discussions
+    {
+      path: '/konnected/community-discussions/active-threads',
+      name: 'Active threads',
+      icon: <CommentOutlined />,
+    },
+    {
+      path: '/konnected/community-discussions/moderation',
+      name: 'Moderation',
+      icon: <AlertOutlined />,
+    },
+    {
+      path: '/konnected/community-discussions/start-new-discussion',
+      name: 'Start discussion',
+      icon: <MessageOutlined />,
+    },
+
+    // Teams Collaboration
+    {
+      path: '/konnected/teams-collaboration/my-teams',
+      name: 'My teams',
+      icon: <TeamOutlined />,
+    },
+    {
+      path: '/konnected/teams-collaboration/project-workspaces',
+      name: 'Project workspaces',
+      icon: <BuildOutlined />,
+    },
+    {
+      path: '/konnected/teams-collaboration/team-builder',
+      name: 'Team builder',
+      icon: <UsergroupAddOutlined />,
+    },
+    {
+      path: '/konnected/teams-collaboration/activity-planner',
+      name: 'Activity planner',
+      icon: <CalendarOutlined />,
+    },
+  ],
+};
+
+// CertifiKation : examens, programmes, préparation
+const certifikationGroup: Route = {
+  name: 'CertifiKation',
   views: [
-    { path: '/konnected/community-discussions/active-threads', name: 'Active Threads' },
-    { path: '/konnected/community-discussions/moderation', name: 'Moderation' },
-    { path: '/konnected/community-discussions/start-new-discussion', name: 'Start New Discussion' }
-  ]
-}
+    {
+      path: '/konnected/certifications/exam-dashboard-results',
+      name: 'Exam dashboard',
+      icon: <VideoCameraOutlined />,
+    },
+    {
+      path: '/konnected/certifications/certification-programs',
+      name: 'Programs',
+      icon: <AppstoreOutlined />,
+    },
+    {
+      path: '/konnected/certifications/exam-registration',
+      name: 'Registration',
+      icon: <FormOutlined />,
+    },
+    {
+      path: '/konnected/certifications/exam-preparation',
+      name: 'Preparation',
+      icon: <BulbOutlined />,
+    },
+    {
+      path: '/konnected/mentorship',
+      name: 'Mentorship',
+      icon: <UserSwitchOutlined />,
+    },
+  ],
+};
 
-const learning_pathsGroup: Route = {
-  name: 'Learning Paths',
-  views: [
-    { path: '/konnected/learning-paths/create-learning-path', name: 'Create Learning Path' },
-    { path: '/konnected/learning-paths/manage-existing-paths', name: 'Manage Existing Paths' },
-    { path: '/konnected/learning-paths/my-learning-path', name: 'My Learning Path' }
-  ]
-}
+const routes: Route[] = [konnectedDashboard, knowledgeGroup, certifikationGroup];
 
-const teams_collaborationGroup: Route = {
-  name: 'Teams Collaboration',
-  views: [
-    { path: '/konnected/teams-collaboration/my-teams', name: 'My Teams' },
-    { path: '/konnected/teams-collaboration/project-workspaces', name: 'Project Workspaces' },
-    { path: '/konnected/teams-collaboration/team-builder', name: 'Team Builder' },
-    { path: '/konnected/teams-collaboration/activity-planner', name: 'Activity Planner' }
-  ]
-}
+export default routes;
 
-const certificationsGroup: Route = {
-  name: 'Certifications',
-  views: [
-    { path: '/konnected/certifications/exam-dashboard-results', name: 'Exam Dashboard Results' },
-    { path: '/konnected/certifications/certification-programs', name: 'Certification Programs' },
-    { path: '/konnected/certifications/exam-registration', name: 'Exam Registration' },
-    { path: '/konnected/certifications/exam-preparation', name: 'Exam Preparation' }
-  ]
-}
-
-const routes: Route[] = [
-  directDashboard,
-  certificationsGroup,
-  community_discussionsGroup,
-  learning_libraryGroup,
-  learning_pathsGroup,
-  teams_collaborationGroup
-]
-
-export default routes

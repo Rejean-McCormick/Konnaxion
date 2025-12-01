@@ -1,98 +1,199 @@
 // FILE: frontend/routes/routesEthikos.tsx
-'use client'
+'use client';
 
-import React from 'react'
-import { DashboardOutlined } from '@ant-design/icons'
+import React from 'react';
+import {
+  DashboardOutlined,
+  ApartmentOutlined,
+  SafetyCertificateOutlined,
+  ProfileOutlined,
+  CrownOutlined,
+  StarOutlined,
+  NodeIndexOutlined,
+  BellOutlined,
+  SendOutlined,
+  RadarChartOutlined,
+  ColumnWidthOutlined,
+  ColumnHeightOutlined,
+  DragOutlined,
+  ExpandAltOutlined,
+  HistoryOutlined,
+  BranchesOutlined,
+  TrophyOutlined,
+  SmileOutlined,
+  SearchOutlined,
+  ExperimentOutlined,
+  ContactsOutlined,
+  MehOutlined,
+} from '@ant-design/icons';
 
 // Minimal local type to avoid external coupling
 type Route = {
-  path?: string
-  name: string
-  icon?: React.ReactNode
-  views?: Route[]
-}
+  path?: string;
+  name: string;
+  icon?: React.ReactNode;
+  views?: Route[];
+};
 
-const directDashboard: Route = {
+// Ethikos – overview (dashboard)
+const ethikosDashboard: Route = {
   path: '/ethikos/insights',
-  name: 'Dashboard',
+  name: 'Ethikos – Overview',
   icon: <DashboardOutlined />,
-}
+};
 
-const learnGroup: Route = {
-  name: 'Learn',
+// Korum: structured debates & decisions + Konsensus leaderboards
+const korumGroup: Route = {
+  name: 'Korum',
   views: [
-    { path: '/ethikos/learn/changelog', name: 'Changelog' },
-    { path: '/ethikos/learn/glossary', name: 'Glossary' },
-    { path: '/ethikos/learn/guides', name: 'Guides' },
-  ],
-}
+    // Decide
+    {
+      path: '/ethikos/decide/elite',
+      name: 'Elite',
+      icon: <ApartmentOutlined />,
+    },
+    {
+      path: '/ethikos/decide/public',
+      name: 'Public',
+      icon: <SafetyCertificateOutlined />,
+    },
+    {
+      path: '/ethikos/decide/methodology',
+      name: 'Methodology',
+      icon: <ProfileOutlined />,
+    },
+    {
+      path: '/ethikos/decide/results',
+      name: 'Results',
+      icon: <CrownOutlined />,
+    },
 
-const adminGroup: Route = {
-  name: 'Admin',
-  views: [
-    { path: '/ethikos/admin/audit', name: 'Audit' },
-    { path: '/ethikos/admin/roles', name: 'Roles' },
-    { path: '/ethikos/admin/moderation', name: 'Moderation' },
-  ],
-}
-
-const decideGroup: Route = {
-  name: 'Decide',
-  views: [
-    { path: '/ethikos/decide/elite', name: 'Elite' },
-    { path: '/ethikos/decide/public', name: 'Public' },
-    { path: '/ethikos/decide/methodology', name: 'Methodology' },
-    { path: '/ethikos/decide/results', name: 'Results' },
-  ],
-}
-
-const impactGroup: Route = {
-  name: 'Impact',
-  views: [
-    { path: '/ethikos/impact/feedback', name: 'Feedback' },
-    { path: '/ethikos/impact/outcomes', name: 'Outcomes' },
-    { path: '/ethikos/impact/tracker', name: 'Tracker' },
-  ],
-}
-
-const deliberateGroup: Route = {
-  name: 'Deliberate',
-  views: [
-    { path: '/ethikos/deliberate/elite', name: 'Elite' },
-    { path: '/ethikos/deliberate/guidelines', name: 'Guidelines' },
+    // Deliberate
+    {
+      path: '/ethikos/deliberate/elite',
+      name: 'Elite deliberation',
+      icon: <StarOutlined />,
+    },
+    {
+      path: '/ethikos/deliberate/guidelines',
+      name: 'Guidelines',
+      icon: <NodeIndexOutlined />,
+    },
     // Important: no dynamic placeholder like "/ethikos/deliberate/[topic]"
     // so that Next.js <Link> never receives a dynamic pattern as href.
-  ],
-}
 
-const pulseGroup: Route = {
-  name: 'Pulse',
+    // Cross-module consensus views
+    {
+      path: '/konsensus/leaderboards',
+      name: 'Leaderboards',
+      icon: <CrownOutlined />,
+    },
+  ],
+};
+
+// Konsultations: consultations, pulse, learning, trust
+const konsultationsGroup: Route = {
+  name: 'Konsultations',
+  // no group icon (as requested)
   views: [
-    { path: '/ethikos/pulse/live', name: 'Live' },
-    { path: '/ethikos/pulse/health', name: 'Health' },
-    { path: '/ethikos/pulse/overview', name: 'Overview' },
-    { path: '/ethikos/pulse/trends', name: 'Trends' },
-  ],
-}
+    // Impact
+    {
+      path: '/ethikos/impact/feedback',
+      name: 'Feedback',
+      icon: <BellOutlined />,
+    },
+    {
+      path: '/ethikos/impact/outcomes',
+      name: 'Outcomes',
+      icon: <SendOutlined />,
+    },
+    {
+      path: '/ethikos/impact/tracker',
+      name: 'Impact tracker',
+      icon: <RadarChartOutlined />,
+    },
 
-const trustGroup: Route = {
-  name: 'Trust',
+    // Pulse
+    {
+      path: '/ethikos/pulse/live',
+      name: 'Live',
+      icon: <ColumnWidthOutlined />,
+    },
+    {
+      path: '/ethikos/pulse/health',
+      name: 'Health',
+      icon: <ColumnHeightOutlined />,
+    },
+    {
+      path: '/ethikos/pulse/overview',
+      name: 'Overview',
+      icon: <DragOutlined />,
+    },
+    {
+      path: '/ethikos/pulse/trends',
+      name: 'Trends',
+      icon: <ExpandAltOutlined />,
+    },
+
+    // Learn
+    {
+      path: '/ethikos/learn/changelog',
+      name: 'Changelog',
+      icon: <HistoryOutlined />,
+    },
+    {
+      path: '/ethikos/learn/glossary',
+      name: 'Glossary',
+      icon: <ProfileOutlined />,
+    },
+    {
+      path: '/ethikos/learn/guides',
+      name: 'Guides',
+      icon: <BranchesOutlined />,
+    },
+
+    // Trust
+    {
+      path: '/ethikos/trust/badges',
+      name: 'Badges',
+      icon: <TrophyOutlined />,
+    },
+    {
+      path: '/ethikos/trust/profile',
+      name: 'Profile',
+      icon: <SmileOutlined />,
+    },
+    {
+      path: '/ethikos/trust/credentials',
+      name: 'Credentials',
+      icon: <SearchOutlined />,
+    },
+  ],
+};
+
+// Admin: moderation & roles (kept separate; can later be role-gated)
+const adminGroup: Route = {
+  name: 'Admin',
+  // no group icon (as requested)
   views: [
-    { path: '/ethikos/trust/badges', name: 'Badges' },
-    { path: '/ethikos/trust/profile', name: 'Profile' },
-    { path: '/ethikos/trust/credentials', name: 'Credentials' },
+    {
+      path: '/ethikos/admin/audit',
+      name: 'Audit',
+      icon: <ExperimentOutlined />,
+    },
+    {
+      path: '/ethikos/admin/roles',
+      name: 'Roles',
+      icon: <ContactsOutlined />,
+    },
+    {
+      path: '/ethikos/admin/moderation',
+      name: 'Moderation',
+      icon: <MehOutlined />,
+    },
   ],
-}
+};
 
-const routes: Route[] = [
-  directDashboard,
-  adminGroup,
-  decideGroup,
-  deliberateGroup,
-  impactGroup,
-  learnGroup,
-  pulseGroup,
-  trustGroup,
-]
+const routes: Route[] = [ethikosDashboard, korumGroup, konsultationsGroup, adminGroup];
 
-export default routes
+export default routes;

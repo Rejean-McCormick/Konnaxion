@@ -1,57 +1,134 @@
 // FILE: frontend/routes/routesKreative.tsx
-'use client'
+'use client';
 
-import React from 'react'
-import { DashboardOutlined } from '@ant-design/icons'
+import React from 'react';
+import {
+  DashboardOutlined,
+  StarOutlined,
+  CloudUploadOutlined,
+  CompassOutlined,
+  HighlightOutlined,
+  EyeOutlined,
+  UsergroupAddOutlined,
+  PlusCircleOutlined,
+  BulbOutlined,
+  BankOutlined,
+  UserSwitchOutlined,
+  ContactsOutlined,
+  AimOutlined,
+  PlusSquareOutlined,
+  HomeOutlined,
+  CrownOutlined,
+} from '@ant-design/icons';
 
 // Type local minimal pour éviter toute dépendance
-type Route = { path?: string; name: string; icon?: React.ReactNode; views?: Route[] }
+type Route = {
+  path?: string;
+  name: string;
+  icon?: React.ReactNode;
+  views?: Route[];
+};
 
-// NOTE: test routes '/index.test' supprimées à la source
-const directDashboard: Route = { path: '/kreative/dashboard', name: 'Dashboard', icon: <DashboardOutlined /> }
+// Kreative – vue d’ensemble
+const kreativeDashboard: Route = {
+  path: '/kreative/dashboard',
+  name: 'Kreative – Overview',
+  icon: <DashboardOutlined />,
+};
 
-const collaborative_spacesGroup: Route = {
-  name: 'Collaborative Spaces',
+// Konservation : showcases, hub créatif, incubateur d’idées, traditions & mentorat
+const konservationGroup: Route = {
+  name: 'Konservation',
+  // section header: no icon (per chosen mapping)
   views: [
-    { path: '/kreative/collaborative-spaces/find-spaces', name: 'Find Spaces' },
-    { path: '/kreative/collaborative-spaces/start-new-space', name: 'Start New Space' },
-    { path: '/kreative/collaborative-spaces/my-spaces', name: 'My Spaces' }
-  ]
-}
+    // Community Showcases
+    {
+      path: '/kreative/community-showcases/featured-projects',
+      name: 'Featured projects',
+      icon: <StarOutlined />,
+    },
+    {
+      path: '/kreative/community-showcases/top-creators',
+      name: 'Top creators',
+      icon: <CrownOutlined />,
+    },
+    {
+      path: '/kreative/community-showcases/submit-to-showcase',
+      name: 'Submit to showcase',
+      icon: <CloudUploadOutlined />,
+    },
 
-const community_showcasesGroup: Route = {
-  name: 'Community Showcases',
+    // Creative Hub
+    {
+      path: '/kreative/creative-hub/explore-ideas',
+      name: 'Explore ideas',
+      icon: <CompassOutlined />,
+    },
+    {
+      path: '/kreative/creative-hub/submit-creative-work',
+      name: 'Submit creative work',
+      icon: <HighlightOutlined />,
+    },
+    {
+      path: '/kreative/creative-hub/inspiration-gallery',
+      name: 'Inspiration gallery',
+      icon: <EyeOutlined />,
+    },
+
+    // Idea Incubator
+    {
+      path: '/kreative/idea-incubator/collaborate-on-ideas',
+      name: 'Collaborate on ideas',
+      icon: <UsergroupAddOutlined />,
+    },
+    {
+      path: '/kreative/idea-incubator/create-new-idea',
+      name: 'Create new idea',
+      icon: <PlusCircleOutlined />,
+    },
+    {
+      path: '/kreative/idea-incubator/my-ideas',
+      name: 'My ideas',
+      icon: <BulbOutlined />,
+    },
+
+    // Traditions & mentorship
+    {
+      path: '/kreative/traditions-archive',
+      name: 'Traditions & heritage',
+      icon: <BankOutlined />,
+    },
+    {
+      path: '/kreative/mentorship',
+      name: 'Mentorship & projects',
+      icon: <UserSwitchOutlined />,
+    },
+  ],
+};
+
+// Kontact : espaces collaboratifs
+const kontactGroup: Route = {
+  name: 'Kontact',
+
   views: [
-    { path: '/kreative/community-showcases/featured-projects', name: 'Featured Projects' },
-    { path: '/kreative/community-showcases/top-creators', name: 'Top Creators' },
-    { path: '/kreative/community-showcases/submit-to-showcase', name: 'Submit To Showcase' }
-  ]
-}
+    {
+      path: '/kreative/collaborative-spaces/find-spaces',
+      name: 'Find spaces',
+      icon: <AimOutlined />,
+    },
+    {
+      path: '/kreative/collaborative-spaces/start-new-space',
+      name: 'Start new space',
+      icon: <PlusSquareOutlined />,
+    },
+    {
+      path: '/kreative/collaborative-spaces/my-spaces',
+      name: 'My spaces',
+      icon: <HomeOutlined />,
+    },
+  ],
+};
 
-const creative_hubGroup: Route = {
-  name: 'Creative Hub',
-  views: [
-    { path: '/kreative/creative-hub/explore-ideas', name: 'Explore Ideas' },
-    { path: '/kreative/creative-hub/submit-creative-work', name: 'Submit Creative Work' },
-    { path: '/kreative/creative-hub/inspiration-gallery', name: 'Inspiration Gallery' }
-  ]
-}
+const routes: Route[] = [kreativeDashboard, konservationGroup, kontactGroup];
 
-const idea_incubatorGroup: Route = {
-  name: 'Idea Incubator',
-  views: [
-    { path: '/kreative/idea-incubator/collaborate-on-ideas', name: 'Collaborate On Ideas' },
-    { path: '/kreative/idea-incubator/create-new-idea', name: 'Create New Idea' },
-    { path: '/kreative/idea-incubator/my-ideas', name: 'My Ideas' }
-  ]
-}
-
-const routes: Route[] = [
-  directDashboard,
-  collaborative_spacesGroup,
-  community_showcasesGroup,
-  creative_hubGroup,
-  idea_incubatorGroup
-]
-
-export default routes
+export default routes;
