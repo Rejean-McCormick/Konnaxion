@@ -1,4 +1,3 @@
-// FILE: frontend/app/keenkonnect/dashboard/page.tsx
 'use client';
 
 import React from 'react';
@@ -452,9 +451,7 @@ export default function KeenKonnectDashboard(): JSX.Element {
             title="My Tasks"
             bordered={false}
             size="small"
-            subTitle={
-              <Text type="secondary">Focus on impact-critical items</Text>
-            }
+            subTitle={<Text type="secondary">Focus on impact-critical items</Text>}
           >
             <List
               size="small"
