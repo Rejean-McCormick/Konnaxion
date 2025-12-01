@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/workspaces/browse-available-workspaces/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';

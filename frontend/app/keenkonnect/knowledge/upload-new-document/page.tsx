@@ -16,7 +16,7 @@ import {
 } from '@ant-design/pro-components';
 import { InboxOutlined } from '@ant-design/icons';
 import api from '@/api';
-import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 type CategoryOption = 'Robotics' | 'Healthcare' | 'Technology' | 'Energy' | 'Education';
 type LanguageOption = 'English' | 'French';
@@ -84,7 +84,7 @@ export default function UploadNewDocumentPage(): JSX.Element {
   };
 
   return (
-    <KeenPage
+    <KeenPageShell
       title="Upload New Document"
       description="Add a new knowledge asset to KeenKonnect."
       metaTitle="KeenKonnect · Knowledge · Upload document"
@@ -197,6 +197,6 @@ export default function UploadNewDocumentPage(): JSX.Element {
           />
         </ProForm>
       </ProCard>
-    </KeenPage>
+    </KeenPageShell>
   );
 }

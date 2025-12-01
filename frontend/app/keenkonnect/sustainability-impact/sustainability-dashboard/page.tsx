@@ -1,3 +1,4 @@
+// FILE: frontend/app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -242,6 +243,22 @@ export default function SustainabilityDashboardPage(): JSX.Element {
       title="Sustainability Impact Dashboard"
       description="High-level dashboard aggregating sustainability impact across KeenKonnect projects."
       metaTitle="KeenKonnect · Sustainability Impact Dashboard"
+      toolbar={
+        <Space>
+          <span>Time range:</span>
+          <Select<TimeRange>
+            size="small"
+            value={timeRange}
+            onChange={setTimeRange}
+            options={[
+              { label: 'Last 3 months', value: '3m' },
+              { label: 'Last 6 months', value: '6m' },
+              { label: 'Last 12 months', value: '12m' },
+            ]}
+            style={{ minWidth: 140 }}
+          />
+        </Space>
+      }
     >
       {/* KPIs principaux (4 stats) */}
       <Card className="mb-4">
