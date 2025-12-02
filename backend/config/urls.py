@@ -9,14 +9,6 @@ from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from rest_framework.authtoken.views import obtain_auth_token
 
-# [CHANGED] Import Analytics Views from the new Kontrol app
-# Note: SmartVoteReportView needs to be added to analytics_views.py next.
-from konnaxion.kontrol.analytics_views import (
-    UsageReportView,
-    PerformanceReportView,
-    SmartVoteReportView, 
-)
-
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
@@ -50,12 +42,11 @@ urlpatterns += [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
 
     # ------------------------------------------------------------------
-    # Analytics / Reports Endpoints (Custom APIViews)
-    # These connect the Frontend Charts to the Backend Data
+    # Analytics / Reports Endpoints
+    # [UPDATED] Delegated to konnaxion.kontrol.urls
+    # Handles: /api/reports/usage, /api/reports/perf, /api/reports/smart-vote
     # ------------------------------------------------------------------
-    path("api/reports/usage/", UsageReportView.as_view(), name="report-usage"),
-    path("api/reports/perf/", PerformanceReportView.as_view(), name="report-perf"),
-    path("api/reports/smart-vote/", SmartVoteReportView.as_view(), name="report-smart-vote"),
+    path("api/", include("konnaxion.kontrol.urls", namespace="kontrol")),
 
     # ------------------------------------------------------------------
     # Compat FE aliases: map "deliberate" to existing Ethikos endpoints.

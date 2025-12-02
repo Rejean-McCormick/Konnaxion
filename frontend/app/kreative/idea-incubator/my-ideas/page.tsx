@@ -65,7 +65,7 @@ export default function MyIdeasPage(): JSX.Element {
   return (
     <KreativePageShell
       title="My Ideas"
-      description="Browse and manage your creative ideas in the incubator."
+      subtitle="Browse and manage your creative ideas in the incubator."
     >
       <Space
         direction="vertical"

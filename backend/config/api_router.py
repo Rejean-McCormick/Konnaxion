@@ -90,24 +90,28 @@ from konnaxion.kreative.api_views import (
 # ── Kontrol (Admin & Moderation) ──────────────────────────
 # Wiring the new admin module endpoints
 AuditLogViewSet: Optional[Type[Any]]
-ModerationQueueViewSet: Optional[Type[Any]]
+ModerationTicketViewSet: Optional[Type[Any]]
 UserAdminViewSet: Optional[Type[Any]]
+KonsensusConfigViewSet: Optional[Type[Any]] # [NEW] Added this
 
 try:
     # We use a try-import block so the router doesn't crash if the kontrol app
     # isn't fully migrated yet.
     from konnaxion.kontrol.views import (
         AuditLogViewSet as _AuditLogViewSet,
-        ModerationQueueViewSet as _ModerationQueueViewSet,
+        ModerationTicketViewSet as _ModerationTicketViewSet, # [FIXED] Was ModerationQueueViewSet
         UserAdminViewSet as _UserAdminViewSet,
+        KonsensusConfigViewSet as _KonsensusConfigViewSet, # [FIXED] Added this
     )
     AuditLogViewSet = _AuditLogViewSet
-    ModerationQueueViewSet = _ModerationQueueViewSet
+    ModerationTicketViewSet = _ModerationTicketViewSet
     UserAdminViewSet = _UserAdminViewSet
+    KonsensusConfigViewSet = _KonsensusConfigViewSet
 except ImportError:
     AuditLogViewSet = None
-    ModerationQueueViewSet = None
+    ModerationTicketViewSet = None
     UserAdminViewSet = None
+    KonsensusConfigViewSet = None
 
 
 # ---------------------------------------------------------------------------
@@ -269,13 +273,19 @@ register_optional(
 )
 register_optional(
     "admin/moderation",
-    ModerationQueueViewSet,
+    ModerationTicketViewSet,
     basename="kontrol-moderation",
 )
 register_optional(
     "admin/users",
     UserAdminViewSet,
     basename="kontrol-user-admin",
+)
+# [FIXED] Added KonsensusConfigViewSet to the router
+register_optional(
+    "admin/konsensus-config",
+    KonsensusConfigViewSet,
+    basename="kontrol-konsensus-config",
 )
 
 # ---------------------------------------------------------------------------

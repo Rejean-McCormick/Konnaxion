@@ -1,7 +1,7 @@
 // FILE: frontend/app/reports/smart-vote/page.tsx
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   PageContainer,
   ProCard,
@@ -19,7 +19,7 @@ import {
   Typography,
   Skeleton,
   Button,
-  Empty
+  Empty,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -46,23 +46,23 @@ type RangeKey = '7d' | '30d' | '90d';
 
 // Backend Response Shape
 interface ApiSmartVotePoint {
-    label: string;
-    participation: number;
-    consensus: number;
-    polarization: number;
+  label: string;
+  participation: number;
+  consensus: number;
+  polarization: number;
 }
 
 interface ApiSmartVoteSummary {
-    activeVotes: number;
-    avgParticipationPct: number;
-    avgConsensusTimeDays: number;
-    totalVotesCast: number;
+  activeVotes: number;
+  avgParticipationPct: number;
+  avgConsensusTimeDays: number;
+  totalVotesCast: number;
 }
 
 interface ApiSmartVoteResponse {
-    generatedAt: string;
-    summary: ApiSmartVoteSummary;
-    points: ApiSmartVotePoint[];
+  generatedAt: string;
+  summary: ApiSmartVoteSummary;
+  points: ApiSmartVotePoint[];
 }
 
 // Frontend Table Row (Simulated for now)
@@ -122,10 +122,10 @@ const computePresetRange = (rangeKey: RangeKey): [Dayjs, Dayjs] => {
 
 export default function SmartVoteReportPage(): JSX.Element {
   const [rangeKey, setRangeKey] = useState<RangeKey>('30d');
-  const [[start, end], setRange] = useState<[Dayjs, Dayjs]>(
-    () => computePresetRange('30d'),
+  const [[start, end], setRange] = useState<[Dayjs, Dayjs]>(() =>
+    computePresetRange('30d'),
   );
-  
+
   // Data State
   const [data, setData] = useState<ApiSmartVoteResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -136,20 +136,21 @@ export default function SmartVoteReportPage(): JSX.Element {
     setLoading(true);
     setError(false);
     try {
-        const res = await fetch(`/api/reports/smart-vote/?range=${key}`);
-        if (!res.ok) throw new Error("Failed to fetch smart vote report");
-        const result: ApiSmartVoteResponse = await res.json();
-        setData(result);
+      const res = await fetch(`/api/reports/smart-vote/?range=${key}`);
+      if (!res.ok) throw new Error('Failed to fetch smart vote report');
+
+      const result = (await res.json()) as ApiSmartVoteResponse;
+      setData(result);
     } catch (err) {
-        console.error(err);
-        setError(true);
+      console.error(err);
+      setError(true);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData(rangeKey);
+    void fetchData(rangeKey);
   }, [rangeKey]);
 
   const handleRangePresetChange = (value: RangeKey | string) => {
@@ -159,10 +160,32 @@ export default function SmartVoteReportPage(): JSX.Element {
   };
 
   const domainColumns: ColumnsType<DomainRow> = [
-    { title: 'Domain', dataIndex: 'domain', key: 'domain', width: '32%' },
-    { title: 'Questions in range', dataIndex: 'questions', key: 'questions', width: '20%' },
-    { title: 'Avg participation', dataIndex: 'participation', key: 'participation', width: '24%', render: (v) => `${v}%` },
-    { title: 'Weighted consensus', dataIndex: 'consensus', key: 'consensus', width: '24%', render: (v) => `${v}%` },
+    {
+      title: 'Domain',
+      dataIndex: 'domain',
+      key: 'domain',
+      width: '32%',
+    },
+    {
+      title: 'Questions in range',
+      dataIndex: 'questions',
+      key: 'questions',
+      width: '20%',
+    },
+    {
+      title: 'Avg participation',
+      dataIndex: 'participation',
+      key: 'participation',
+      width: '24%',
+      render: (v: number) => `${v}%`,
+    },
+    {
+      title: 'Weighted consensus',
+      dataIndex: 'consensus',
+      key: 'consensus',
+      width: '24%',
+      render: (v: number) => `${v}%`,
+    },
   ];
 
   // IDs for accessibility
@@ -172,20 +195,25 @@ export default function SmartVoteReportPage(): JSX.Element {
   // Loading State
   if (loading && !data) {
     return (
-        <PageContainer header={{ title: 'Smart Vote Analytics', ghost: true }}>
-            <Skeleton active paragraph={{ rows: 8 }} />
-        </PageContainer>
+      <PageContainer header={{ title: 'Smart Vote Analytics', ghost: true }}>
+        <Skeleton active paragraph={{ rows: 8 }} />
+      </PageContainer>
     );
   }
 
   // Error State
   if (error || !data) {
     return (
-        <PageContainer header={{ title: 'Smart Vote Analytics', ghost: true }}>
-            <Empty description="Failed to load analytics">
-                <Button icon={<ReloadOutlined />} onClick={() => fetchData(rangeKey)}>Retry</Button>
-            </Empty>
-        </PageContainer>
+      <PageContainer header={{ title: 'Smart Vote Analytics', ghost: true }}>
+        <Empty description="Failed to load analytics">
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={() => fetchData(rangeKey)}
+          >
+            Retry
+          </Button>
+        </Empty>
+      </PageContainer>
     );
   }
 
@@ -205,11 +233,7 @@ export default function SmartVoteReportPage(): JSX.Element {
         },
       }}
     >
-      <Space
-        direction="vertical"
-        size="large"
-        style={{ width: '100%' }}
-      >
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Filters and controls */}
         <ProCard ghost>
           <Row gutter={[16, 16]} align="middle">
@@ -230,11 +254,18 @@ export default function SmartVoteReportPage(): JSX.Element {
               </Space>
             </Col>
 
-            <Col xs={24} md={12} lg={12} style={{ textAlign: 'right' }}>
-               <Space>
-                 <Text type="secondary">Custom dates disabled (API limitation)</Text>
-                 <RangePicker value={[start, end]} disabled />
-               </Space>
+            <Col
+              xs={24}
+              md={12}
+              lg={12}
+              style={{ textAlign: 'right' }}
+            >
+              <Space>
+                <Text type="secondary">
+                  Custom dates disabled (API limitation)
+                </Text>
+                <RangePicker value={[start, end]} disabled />
+              </Space>
             </Col>
           </Row>
         </ProCard>
@@ -287,46 +318,56 @@ export default function SmartVoteReportPage(): JSX.Element {
               >
                 Governance Health Trends
               </Title>
-              <Paragraph type="secondary" style={{ marginBottom: 24 }}>
-                Tracking the quality of decision making over time. High consensus with low polarization is the ideal state.
+              <Paragraph
+                type="secondary"
+                style={{ marginBottom: 24 }}
+              >
+                Tracking the quality of decision making over time. High
+                consensus with low polarization is the ideal state.
               </Paragraph>
 
               <div style={{ width: '100%', height: 320 }}>
                 <ResponsiveContainer>
                   <LineChart data={points}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis 
-                        dataKey="label" 
-                        tickFormatter={(val) => dayjs(val).format('MM-DD')} 
+                    <XAxis
+                      dataKey="label"
+                      tickFormatter={(val) =>
+                        dayjs(val as string).format('MM-DD')
+                      }
                     />
                     <YAxis />
-                    <Tooltip labelFormatter={(val) => dayjs(val).format('MMM D, YYYY')} />
+                    <Tooltip
+                      labelFormatter={(val) =>
+                        dayjs(val as string).format('MMM D, YYYY')
+                      }
+                    />
                     <Legend />
-                    
+
                     <Line
-                        type="monotone"
-                        dataKey="consensus"
-                        name="Consensus %"
-                        stroke="#52c41a" // Green
-                        strokeWidth={2}
-                        dot={false}
-                    />
-                     <Line
-                        type="monotone"
-                        dataKey="polarization"
-                        name="Polarization %"
-                        stroke="#ff4d4f" // Red
-                        strokeWidth={2}
-                        dot={false}
+                      type="monotone"
+                      dataKey="consensus"
+                      name="Consensus %"
+                      stroke="#52c41a"
+                      strokeWidth={2}
+                      dot={false}
                     />
                     <Line
-                        type="monotone"
-                        dataKey="participation"
-                        name="Participation"
-                        stroke="#1890ff" // Blue
-                        strokeWidth={2}
-                        strokeDasharray="5 5"
-                        dot={false}
+                      type="monotone"
+                      dataKey="polarization"
+                      name="Polarization %"
+                      stroke="#ff4d4f"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="participation"
+                      name="Participation"
+                      stroke="#1890ff"
+                      strokeWidth={2}
+                      strokeDasharray="5 5"
+                      dot={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -346,20 +387,22 @@ export default function SmartVoteReportPage(): JSX.Element {
                 style={{ width: '100%' }}
               >
                 <Paragraph>
-                  <Text strong>Consensus %</Text> measures the alignment of weighted votes. 
-                  A score of 100% means perfect agreement among all cohorts.
+                  <Text strong>Consensus %</Text> measures the alignment of
+                  weighted votes. A score of 100% means perfect agreement
+                  among all cohorts.
                 </Paragraph>
                 <Paragraph>
-                  <Text strong>Polarization %</Text> tracks the divergence between 
-                  opposing voting blocks. High polarization indicates a divided community.
+                  <Text strong>Polarization %</Text> tracks the divergence
+                  between opposing voting blocks. High polarization
+                  indicates a divided community.
                 </Paragraph>
                 <Paragraph>
-                  <Text strong>Participation</Text> indicates the relative volume of 
-                  votes cast compared to the active user base.
+                  <Text strong>Participation</Text> indicates the relative
+                  volume of votes cast compared to the active user base.
                 </Paragraph>
                 <Paragraph type="secondary">
-                   Data is aggregated daily. Sudden spikes in polarization may trigger 
-                   automatic moderation alerts.
+                  Data is aggregated daily. Sudden spikes in
+                  polarization may trigger automatic moderation alerts.
                 </Paragraph>
               </Space>
             </Card>
@@ -375,12 +418,12 @@ export default function SmartVoteReportPage(): JSX.Element {
           >
             Domain breakdown (Ekoh-weighted Smart Vote)
           </Title>
-          <Alert 
-            message="Data Simulated" 
-            type="info" 
-            showIcon 
-            style={{marginBottom: 16}}
-            description="Per-domain breakdown is not yet supported by the v14 Reporting API. This table displays sample data structure." 
+          <Alert
+            message="Data Simulated"
+            type="info"
+            showIcon
+            style={{ marginBottom: 16 }}
+            description="Per-domain breakdown is not yet supported by the v14 Reporting API. This table displays sample data structure."
           />
           <Table<DomainRow>
             size="small"

@@ -74,20 +74,23 @@ export default function FeaturedProjectsPage(): JSX.Element {
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>('All');
+  const [modalVisible, setModalVisible] =
+    useState<boolean>(false);
+  const [selectedProject, setSelectedProject] =
+    useState<Project | null>(null);
 
-  // Pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const pageSize = 4;
 
-  // Filters
   const filteredProjects = useMemo(() => {
     let projects = dummyProjects;
 
     if (selectedCategory !== 'All') {
-      projects = projects.filter((project) => project.category === selectedCategory);
+      projects = projects.filter(
+        (project) => project.category === selectedCategory,
+      );
     }
 
     if (searchQuery.trim() !== '') {
@@ -120,7 +123,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
   return (
     <KreativePageShell
       title="Featured projects"
-      description="Discover highlighted creative projects from the Kreative community."
+      subtitle="Discover highlighted creative projects from the Kreative community."
     >
       {/* Filters */}
       <Space wrap style={{ marginBottom: 24 }}>
@@ -163,7 +166,10 @@ export default function FeaturedProjectsPage(): JSX.Element {
                   <img
                     alt={project.title}
                     src={project.coverImage}
-                    style={{ height: 200, objectFit: 'cover' }}
+                    style={{
+                      height: 200,
+                      objectFit: 'cover',
+                    }}
                   />
                 }
                 onClick={() => openModal(project)}
@@ -172,10 +178,15 @@ export default function FeaturedProjectsPage(): JSX.Element {
                   title={project.title}
                   description={
                     <>
-                      <Paragraph className="line-clamp-2" style={{ marginBottom: 8 }}>
+                      <Paragraph
+                        className="line-clamp-2"
+                        style={{ marginBottom: 8 }}
+                      >
                         {project.description}
                       </Paragraph>
-                      <Text type="secondary">By {project.creator}</Text>
+                      <Text type="secondary">
+                        By {project.creator}
+                      </Text>
                     </>
                   }
                 />
@@ -186,7 +197,12 @@ export default function FeaturedProjectsPage(): JSX.Element {
       </Row>
 
       {/* Pagination */}
-      <div style={{ textAlign: 'center', marginTop: 24 }}>
+      <div
+        style={{
+          textAlign: 'center',
+          marginTop: 24,
+        }}
+      >
         <Pagination
           current={currentPage}
           pageSize={pageSize}
@@ -196,18 +212,31 @@ export default function FeaturedProjectsPage(): JSX.Element {
       </div>
 
       {/* Modal */}
-      <Modal open={modalVisible} onCancel={closeModal} footer={null} width={800}>
+      <Modal
+        open={modalVisible}
+        onCancel={closeModal}
+        footer={null}
+        width={800}
+      >
         {selectedProject && (
           <div>
             <img
               alt={selectedProject.title}
               src={selectedProject.coverImage}
-              style={{ width: '100%', maxHeight: 400, objectFit: 'cover' }}
+              style={{
+                width: '100%',
+                maxHeight: 400,
+                objectFit: 'cover',
+              }}
             />
             <div style={{ marginTop: 16 }}>
               <Title level={3}>{selectedProject.title}</Title>
-              <Text type="secondary">By {selectedProject.creator}</Text>
-              <p style={{ marginTop: 12 }}>{selectedProject.description}</p>
+              <Text type="secondary">
+                By {selectedProject.creator}
+              </Text>
+              <p style={{ marginTop: 12 }}>
+                {selectedProject.description}
+              </p>
               <Button
                 type="primary"
                 onClick={() =>

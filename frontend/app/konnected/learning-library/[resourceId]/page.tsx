@@ -198,8 +198,8 @@ function normalizeProgress(resource: KnowledgeResourceDetail | null): number {
 
 export default function LearningResourceViewerPage() {
   const router = useRouter();
-  const params = useParams<{ resourceId?: string }>();
-  const resourceId = params?.resourceId;
+  const params = useParams<{ resourceId: string }>();
+  const resourceId = params.resourceId;
 
   const [resource, setResource] = useState<KnowledgeResourceDetail | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -255,11 +255,6 @@ export default function LearningResourceViewerPage() {
 
   const inlineHtml = useMemo(() => pickContentHtml(resource), [resource]);
 
-  const metaTitle = useMemo(() => {
-    if (resource?.title) return `KonnectED · ${resource.title}`;
-    return 'KonnectED · Learning Resource';
-  }, [resource]);
-
   const shellTitle = resource?.title ?? 'Learning Resource';
   const shellDescription =
     (resource?.description &&
@@ -287,22 +282,21 @@ export default function LearningResourceViewerPage() {
   return (
     <KonnectedPageShell
       title={shellTitle}
-      description={shellDescription}
-      metaTitle={metaTitle}
-      toolbar={
-        <Space>
-          <Button icon={<ArrowLeftOutlined />} onClick={handleBackClick}>
-            Back to library
-          </Button>
-          <Button
-            type="primary"
-            icon={<PlayCircleOutlined />}
-            disabled={!resource?.url}
-            onClick={handleOpenResource}
-          >
-            Open resource
-          </Button>
-        </Space>
+      subtitle={shellDescription}
+      primaryAction={
+        <Button
+          type="primary"
+          icon={<PlayCircleOutlined />}
+          disabled={!resource?.url}
+          onClick={handleOpenResource}
+        >
+          Open resource
+        </Button>
+      }
+      secondaryActions={
+        <Button icon={<ArrowLeftOutlined />} onClick={handleBackClick}>
+          Back to library
+        </Button>
       }
     >
       <Row gutter={24}>
@@ -386,7 +380,11 @@ export default function LearningResourceViewerPage() {
                       key: 'details',
                       label: 'Details',
                       children: (
-                        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                        <Space
+                          direction="vertical"
+                          size="middle"
+                          style={{ width: '100%' }}
+                        >
                           <div>
                             <Title level={5} style={{ marginBottom: 8 }}>
                               Key information
@@ -510,11 +508,7 @@ export default function LearningResourceViewerPage() {
               >
                 Open resource
               </Button>
-              <Button
-                icon={<DownloadOutlined />}
-                block
-                disabled={!resource}
-              >
+              <Button icon={<DownloadOutlined />} block disabled={!resource}>
                 Save for offline
               </Button>
               <Button

@@ -397,9 +397,12 @@ export default function KonnectedMentorshipPage() {
             )}
           </Card>
 
-          <Divider id="learning-circles" />
+          {/* Divider does not receive id – keep it purely presentational */}
+          <Divider />
 
+          {/* Anchor target lives on the Card, which is valid HTML and TS-safe */}
           <Card
+            id="learning-circles"
             title={
               <Space>
                 <TeamOutlined />
@@ -444,7 +447,9 @@ export default function KonnectedMentorshipPage() {
 
       <Modal
         title={
-          selectedMentor ? `Request mentorship with ${selectedMentor.name}` : 'Request mentorship'
+          selectedMentor
+            ? `Request mentorship with ${selectedMentor.name}`
+            : 'Request mentorship'
         }
         open={requestModalOpen}
         onCancel={handleCloseRequest}
@@ -466,7 +471,10 @@ export default function KonnectedMentorshipPage() {
               },
             ]}
           >
-            <TextArea rows={3} placeholder="Example: I need help preparing for my science exam." />
+            <TextArea
+              rows={3}
+              placeholder="Example: I need help preparing for my science exam."
+            />
           </Form.Item>
 
           <Form.Item label="Preferred language" name="preferredLanguage">

@@ -2,37 +2,37 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { 
-  Button, 
-  Tag, 
-  Space, 
-  Popconfirm, 
-  message, 
-  Tooltip, 
-  Drawer, 
-  Badge, 
-  Tabs, 
+import {
+  Button,
+  Tag,
+  Space,
+  Popconfirm,
+  message,
+  Tooltip,
+  Drawer,
+  Badge,
+  Tabs,
   Typography,
   Avatar,
-  List
+  List,
 } from 'antd';
-import { 
-  CheckCircleOutlined, 
-  FlagOutlined, 
+import {
+  CheckCircleOutlined,
+  FlagOutlined,
   EyeOutlined,
   StopOutlined,
   UserOutlined,
   HistoryOutlined,
   WarningOutlined,
-  InfoCircleOutlined
+  InfoCircleOutlined,
 } from '@ant-design/icons';
-import { 
-  ProTable, 
-  type ProColumns, 
-  type ActionType, 
+import {
+  ProTable,
+  type ProColumns,
+  type ActionType,
   PageContainer,
   ProDescriptions,
-  ProCard
+  ProCard,
 } from '@ant-design/pro-components';
 
 const { Paragraph, Text } = Typography;
@@ -50,15 +50,29 @@ type ModerationItem = {
   severity: 'critical' | 'high' | 'medium' | 'low';
   type: 'comment' | 'post' | 'user_profile';
   reportCount: number;
-  reporters: string[]; // List of users who flagged this
+  reporters: string[];
 };
+
+type ModerationApiResponse = {
+  count?: number;
+  results?: unknown[];
+};
+
+function isModerationApiResponse(data: unknown): data is ModerationApiResponse {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    ('results' in data || 'count' in data)
+  );
+}
 
 export default function ModerationQueuePage() {
   const actionRef = useRef<ActionType>();
-  
-  // State for the Details Drawer
+
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [currentRow, setCurrentRow] = useState<ModerationItem | undefined>(undefined);
+  const [currentRow, setCurrentRow] = useState<ModerationItem | undefined>(
+    undefined,
+  );
 
   const handleOpenDrawer = (record: ModerationItem) => {
     setCurrentRow(record);
@@ -70,34 +84,34 @@ export default function ModerationQueuePage() {
     setCurrentRow(undefined);
   };
 
-  // Wired Action Handler
-  const handleAction = async (action: string, id: number, newStatus: string = 'resolved') => {
+  const handleAction = async (
+    action: string,
+    id: number,
+    newStatus: string = 'resolved',
+  ) => {
     try {
-        // Optimistic UI update
-        message.loading('Processing action...', 0.5);
-        
-        // Real API Call to update status
-        const response = await fetch(`/api/admin/moderation/${id}/`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ status: newStatus })
-        });
+      message.loading('Processing action...', 0.5);
 
-        if (!response.ok) throw new Error('Failed to update ticket');
+      const response = await fetch(`/api/admin/moderation/${id}/`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-        message.success(`${action} applied successfully`);
-        actionRef.current?.reload(); 
-        if (drawerOpen) handleCloseDrawer();
+      if (!response.ok) throw new Error('Failed to update ticket');
 
+      message.success(`${action} applied successfully`);
+      actionRef.current?.reload();
+      if (drawerOpen) handleCloseDrawer();
     } catch (error) {
-        console.error(error);
-        message.error('Failed to apply action.');
+      // eslint-disable-next-line no-console
+      console.error(error);
+      message.error('Failed to apply action.');
     }
   };
 
-  // Column Definitions
   const columns: ProColumns<ModerationItem>[] = [
     {
       title: 'Severity',
@@ -132,10 +146,24 @@ export default function ModerationQueuePage() {
       render: (dom, entity) => (
         <Space direction="vertical" size={0}>
           <Space>
-            <Tag color="volcano" icon={<FlagOutlined />}>{entity.reportReason}</Tag>
-            {entity.reportCount > 1 && <Badge count={entity.reportCount} style={{ backgroundColor: '#f5222d' }} />}
+            <Tag color="volcano" icon={<FlagOutlined />}>
+              {entity.reportReason}
+            </Tag>
+            {entity.reportCount > 1 && (
+              <Badge
+                count={entity.reportCount}
+                style={{ backgroundColor: '#f5222d' }}
+              />
+            )}
           </Space>
-          <span style={{ color: '#666', fontSize: '13px', marginTop: 4, display: 'block' }}>
+          <span
+            style={{
+              color: '#666',
+              fontSize: '13px',
+              marginTop: 4,
+              display: 'block',
+            }}
+          >
             "{dom}"
           </span>
         </Space>
@@ -148,7 +176,14 @@ export default function ModerationQueuePage() {
       copyable: true,
       render: (text, entity) => (
         <Space>
-          <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: entity.authorReputation < 0 ? '#ff4d4f' : '#87d068' }} />
+          <Avatar
+            size="small"
+            icon={<UserOutlined />}
+            style={{
+              backgroundColor:
+                entity.authorReputation < 0 ? '#ff4d4f' : '#87d068',
+            }}
+          />
           <a>{text}</a>
         </Space>
       ),
@@ -176,11 +211,11 @@ export default function ModerationQueuePage() {
       title: 'Actions',
       valueType: 'option',
       width: 160,
-      render: (text, record) => [
+      render: (_, record) => [
         <Tooltip title="View Details" key="view">
-          <Button 
-            type="text" 
-            icon={<EyeOutlined />} 
+          <Button
+            type="text"
+            icon={<EyeOutlined />}
             onClick={() => handleOpenDrawer(record)}
           />
         </Tooltip>,
@@ -188,20 +223,34 @@ export default function ModerationQueuePage() {
           <Popconfirm
             title="Dismiss report?"
             description="The content will remain visible and ticket marked resolved."
-            onConfirm={() => handleAction('Report dismissed', record.id, 'resolved')}
+            onConfirm={() =>
+              handleAction('Report dismissed', record.id, 'resolved')
+            }
           >
-            <Button type="text" icon={<CheckCircleOutlined style={{ color: 'green' }} />} />
+            <Button
+              type="text"
+              icon={<CheckCircleOutlined style={{ color: 'green' }} />}
+            />
           </Popconfirm>
         </Tooltip>,
         <Tooltip title="Remove & Ban" key="ban">
           <Popconfirm
             title="Remove content & Ban user?"
             description="This is a severe action."
-            onConfirm={() => handleAction('User banned & content removed', record.id, 'resolved')}
+            onConfirm={() =>
+              handleAction(
+                'User banned & content removed',
+                record.id,
+                'resolved',
+              )
+            }
             okText="Ban & Remove"
             okButtonProps={{ danger: true }}
           >
-            <Button type="text" icon={<StopOutlined style={{ color: 'red' }} />} />
+            <Button
+              type="text"
+              icon={<StopOutlined style={{ color: 'red' }} />}
+            />
           </Popconfirm>
         </Tooltip>,
       ],
@@ -209,61 +258,86 @@ export default function ModerationQueuePage() {
   ];
 
   return (
-    <PageContainer 
-      title="Moderation Queue" 
+    <PageContainer
+      title="Moderation Queue"
       subTitle="Review and act on reported content from across the platform."
       extra={[
-        <Button key="refresh" onClick={() => actionRef.current?.reload()}>Refresh Queue</Button>,
-        <Button key="export" type="default">Export Logs</Button>
+        <Button
+          key="refresh"
+          onClick={() => actionRef.current?.reload()}
+        >
+          Refresh Queue
+        </Button>,
+        <Button key="export" type="default">
+          Export Logs
+        </Button>,
       ]}
     >
       <ProTable<ModerationItem>
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        
-        // 1. DYNAMIC REQUEST TO REAL BACKEND
         request={async (params) => {
           try {
-              // Construct query params
-              const searchParams = new URLSearchParams();
-              if (params.status) searchParams.append('status', params.status);
-              if (params.type) searchParams.append('search', params.type); // Using generic search for simplified filtering
+            const searchParams = new URLSearchParams();
+            if (params.status)
+              searchParams.append('status', params.status as string);
+            if (params.type)
+              searchParams.append(
+                'search',
+                params.type as string,
+              );
 
-              const res = await fetch(`/api/admin/moderation/?${searchParams.toString()}`);
-              if (!res.ok) throw new Error('Failed to fetch tickets');
+            const res = await fetch(
+              `/api/admin/moderation/?${searchParams.toString()}`,
+            );
+            if (!res.ok) throw new Error('Failed to fetch tickets');
 
-              const data = await res.json();
+            const data: unknown = await res.json();
 
-              // Map Django Serializer (Snake Case) -> Frontend Item (Camel Case)
-              const mappedData: ModerationItem[] = data.results.map((item: any) => ({
-                id: item.id,
-                contentSnippet: item.content_snippet,
-                fullContent: item.full_content || item.content_snippet,
-                author: item.author_username || 'Unknown',
-                authorReputation: item.author_reputation_score || 0,
-                reportReason: item.report_reason,
-                timestamp: item.created,
-                status: item.status,
-                severity: item.severity,
-                type: item.target_type,
-                reportCount: item.report_count || 1,
-                reporters: [] // Serializer v1.0 doesn't send this list yet, defaulting to empty
-              }));
+            let results: unknown[] = [];
+            let total = 0;
 
-              return {
-                data: mappedData,
-                success: true,
-                total: data.count
-              };
+            if (isModerationApiResponse(data)) {
+              results = data.results ?? [];
+              total = data.count ?? results.length;
+            } else if (Array.isArray(data)) {
+              results = data;
+              total = data.length;
+            }
 
+            const mappedData: ModerationItem[] = results.map(
+              (item) => {
+                const it = item as any;
+                return {
+                  id: it.id,
+                  contentSnippet: it.content_snippet,
+                  fullContent: it.full_content || it.content_snippet,
+                  author: it.author_username || 'Unknown',
+                  authorReputation: it.author_reputation_score || 0,
+                  reportReason: it.report_reason,
+                  timestamp: it.created,
+                  status: it.status,
+                  severity: it.severity,
+                  type: it.target_type,
+                  reportCount: it.report_count || 1,
+                  reporters: it.reporters || [],
+                } as ModerationItem;
+              },
+            );
+
+            return {
+              data: mappedData,
+              success: true,
+              total,
+            };
           } catch (e) {
-              console.error(e);
-              message.error("Error loading moderation queue");
-              return { data: [], success: false };
+            // eslint-disable-next-line no-console
+            console.error(e);
+            message.error('Error loading moderation queue');
+            return { data: [], success: false };
           }
         }}
-        
         rowKey="id"
         search={{
           labelWidth: 'auto',
@@ -273,12 +347,15 @@ export default function ModerationQueuePage() {
         }}
         headerTitle="Active Flags"
         toolBarRender={() => [
-          <Button key="bulk-approve" type="primary">Batch Dismiss</Button>,
-          <Button key="bulk-ban" danger>Batch Remove</Button>
+          <Button key="bulk-approve" type="primary">
+            Batch Dismiss
+          </Button>,
+          <Button key="bulk-ban" danger>
+            Batch Remove
+          </Button>,
         ]}
       />
 
-      {/* --- Detail Drawer --- */}
       <Drawer
         width={720}
         open={drawerOpen}
@@ -287,15 +364,32 @@ export default function ModerationQueuePage() {
           <Space>
             <WarningOutlined style={{ color: '#faad14' }} />
             <span>Moderation Ticket #{currentRow?.id}</span>
-            <Tag color={currentRow?.severity === 'critical' ? 'red' : 'blue'}>
-              {currentRow?.severity.toUpperCase()}
-            </Tag>
+            {currentRow?.severity && (
+              <Tag
+                color={
+                  currentRow.severity === 'critical' ? 'red' : 'blue'
+                }
+              >
+                {currentRow.severity.toUpperCase()}
+              </Tag>
+            )}
           </Space>
         }
         extra={
           <Space>
             <Button onClick={handleCloseDrawer}>Cancel</Button>
-            <Button type="primary" danger onClick={() => handleAction('Content Removed', currentRow?.id || 0)}>
+            <Button
+              type="primary"
+              danger
+              onClick={() =>
+                currentRow &&
+                handleAction(
+                  'Content Removed',
+                  currentRow.id,
+                  'resolved',
+                )
+              }
+            >
               Remove Content
             </Button>
           </Space>
@@ -309,57 +403,126 @@ export default function ModerationQueuePage() {
                 key: '1',
                 label: 'Report Details',
                 children: (
-                  <Space direction="vertical" size="middle" style={{ width: '100%' }}>
-                    {/* Key Metrics */}
-                    <ProCard split="vertical" bordered headerBordered>
+                  <Space
+                    direction="vertical"
+                    size="middle"
+                    style={{ width: '100%' }}
+                  >
+                    <ProCard
+                      split="vertical"
+                      bordered
+                      headerBordered
+                    >
                       <ProCard title="Reporters" colSpan="50%">
-                          <List
-                            size="small"
-                            dataSource={currentRow.reporters.length > 0 ? currentRow.reporters : ["Anonymous Reports"]}
-                            renderItem={item => <List.Item><UserOutlined /> {item}</List.Item>}
-                          />
+                        <List
+                          size="small"
+                          dataSource={
+                            currentRow.reporters &&
+                            currentRow.reporters.length > 0
+                              ? currentRow.reporters
+                              : ['Anonymous Reports']
+                          }
+                          renderItem={(item) => (
+                            <List.Item>
+                              <UserOutlined /> {item}
+                            </List.Item>
+                          )}
+                        />
                       </ProCard>
                       <ProCard title="Metadata" colSpan="50%">
-                         <ProDescriptions column={1} size="small">
-                            <ProDescriptions.Item label="Reason" valueType="text"><Text strong>{currentRow.reportReason}</Text></ProDescriptions.Item>
-                            <ProDescriptions.Item label="Timestamp" valueType="dateTime">{currentRow.timestamp}</ProDescriptions.Item>
-                            <ProDescriptions.Item label="Type">{currentRow.type}</ProDescriptions.Item>
-                         </ProDescriptions>
+                        <ProDescriptions
+                          column={1}
+                          size="small"
+                        >
+                          <ProDescriptions.Item
+                            label="Reason"
+                            valueType="text"
+                          >
+                            <Text strong>
+                              {currentRow.reportReason}
+                            </Text>
+                          </ProDescriptions.Item>
+                          <ProDescriptions.Item
+                            label="Timestamp"
+                            valueType="dateTime"
+                          >
+                            {currentRow.timestamp}
+                          </ProDescriptions.Item>
+                          <ProDescriptions.Item label="Type">
+                            {currentRow.type}
+                          </ProDescriptions.Item>
+                        </ProDescriptions>
                       </ProCard>
                     </ProCard>
 
-                    {/* The Content */}
-                    <ProCard title="Flagged Content" bordered headerBordered type="inner" title={<Space><InfoCircleOutlined /> Content Preview</Space>}>
-                      <div style={{ 
-                        padding: '16px', 
-                        background: '#f9f9f9', 
-                        borderRadius: '6px', 
-                        border: '1px solid #eee',
-                        minHeight: '100px'
-                      }}>
+                    <ProCard
+                      bordered
+                      headerBordered
+                      type="inner"
+                      title={
+                        <Space>
+                          <InfoCircleOutlined /> Content Preview
+                        </Space>
+                      }
+                    >
+                      <div
+                        style={{
+                          padding: '16px',
+                          background: '#f9f9f9',
+                          borderRadius: '6px',
+                          border: '1px solid #eee',
+                          minHeight: '100px',
+                        }}
+                      >
                         <Paragraph style={{ marginBottom: 0 }}>
                           {currentRow.fullContent}
                         </Paragraph>
                       </div>
                     </ProCard>
                   </Space>
-                )
+                ),
               },
               {
                 key: '2',
                 label: 'Author Context',
                 children: (
-                   <ProCard title={`Author: ${currentRow.author}`} bordered headerBordered>
-                      <ProDescriptions column={2}>
-                         <ProDescriptions.Item label="Reputation Score" valueType="digit">{currentRow.authorReputation}</ProDescriptions.Item>
-                         <ProDescriptions.Item label="Account Age" valueType="text">2.5 Years</ProDescriptions.Item>
-                         <ProDescriptions.Item label="Previous Violations" valueType="digit">0</ProDescriptions.Item>
-                         <ProDescriptions.Item label="Role">User</ProDescriptions.Item>
-                      </ProDescriptions>
-                      <Button type="link" icon={<HistoryOutlined />}>View Full Activity Log</Button>
-                   </ProCard>
-                )
-              }
+                  <ProCard
+                    title={`Author: ${currentRow.author}`}
+                    bordered
+                    headerBordered
+                  >
+                    <ProDescriptions column={2}>
+                      <ProDescriptions.Item
+                        label="Reputation Score"
+                        valueType="digit"
+                      >
+                        {currentRow.authorReputation}
+                      </ProDescriptions.Item>
+                      <ProDescriptions.Item
+                        label="Account Age"
+                        valueType="text"
+                      >
+                        2.5 Years
+                      </ProDescriptions.Item>
+                      <ProDescriptions.Item
+                        label="Previous Violations"
+                        valueType="digit"
+                      >
+                        0
+                      </ProDescriptions.Item>
+                      <ProDescriptions.Item label="Role">
+                        User
+                      </ProDescriptions.Item>
+                    </ProDescriptions>
+                    <Button
+                      type="link"
+                      icon={<HistoryOutlined />}
+                    >
+                      View Full Activity Log
+                    </Button>
+                  </ProCard>
+                ),
+              },
             ]}
           />
         )}

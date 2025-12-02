@@ -18,7 +18,7 @@ import {
   Typography,
   Skeleton,
   Empty,
-  Button
+  Button,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -133,7 +133,7 @@ const MOCK_ENDPOINTS: EndpointRow[] = [
 
 export default function ReportsPerfPage(): JSX.Element {
   const [timeRange, setTimeRange] = useState<TimeRange>('24h');
-  
+
   // State for fetched data
   const [data, setData] = useState<ApiPerfResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -148,8 +148,8 @@ export default function ReportsPerfPage(): JSX.Element {
     try {
       const response = await fetch(`/api/reports/perf/?range=${range}`);
       if (!response.ok) throw new Error('Failed to fetch performance data');
-      
-      const result: ApiPerfResponse = await response.json();
+
+      const result = (await response.json()) as ApiPerfResponse;
       setData(result);
 
       // Transform API series -> Recharts format
@@ -169,7 +169,6 @@ export default function ReportsPerfPage(): JSX.Element {
         };
       });
       setChartData(mappedSeries);
-
     } catch (err) {
       console.error(err);
       setError(true);
@@ -179,7 +178,7 @@ export default function ReportsPerfPage(): JSX.Element {
   };
 
   useEffect(() => {
-    fetchData(timeRange);
+    void fetchData(timeRange);
   }, [timeRange]);
 
   const endpointColumns: ColumnsType<EndpointRow> = [
@@ -252,11 +251,13 @@ export default function ReportsPerfPage(): JSX.Element {
   if (error || !data) {
     return (
       <PageContainer ghost header={{ title: 'API Performance' }}>
-        <Empty 
-          description="Failed to load performance metrics." 
+        <Empty
+          description="Failed to load performance metrics."
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
-             <Button icon={<ReloadOutlined />} onClick={() => fetchData(timeRange)}>Retry</Button>
+          <Button icon={<ReloadOutlined />} onClick={() => fetchData(timeRange)}>
+            Retry
+          </Button>
         </Empty>
       </PageContainer>
     );
@@ -269,7 +270,8 @@ export default function ReportsPerfPage(): JSX.Element {
       ghost
       header={{
         title: 'API Performance',
-        subTitle: 'High-level latency, error-rate and availability metrics across all Konnaxion services.',
+        subTitle:
+          'High-level latency, error-rate and availability metrics across all Konnaxion services.',
         breadcrumb: {
           routes: [
             { path: '/reports', breadcrumbName: 'Reports' },
@@ -278,7 +280,12 @@ export default function ReportsPerfPage(): JSX.Element {
         },
       }}
       extra={[
-        <Space key="controls" direction="vertical" size={8} style={{ alignItems: 'flex-end' }}>
+        <Space
+          key="controls"
+          direction="vertical"
+          size={8}
+          style={{ alignItems: 'flex-end' }}
+        >
           <Segmented<TimeRange>
             value={timeRange}
             onChange={(value) => setTimeRange(value as TimeRange)}
@@ -291,11 +298,10 @@ export default function ReportsPerfPage(): JSX.Element {
           <Tooltip title="Date filtering not yet supported by backend.">
             <RangePicker disabled style={{ width: 260 }} />
           </Tooltip>
-        </Space>
+        </Space>,
       ]}
     >
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
-        
         {/* KPI strip */}
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           <Col xs={12} md={6}>
@@ -323,7 +329,9 @@ export default function ReportsPerfPage(): JSX.Element {
                 value={summary.errorRatePct}
                 precision={2}
                 suffix="%"
-                valueStyle={{ color: summary.errorRatePct > 1 ? '#cf1322' : '#3f8600' }}
+                valueStyle={{
+                  color: summary.errorRatePct > 1 ? '#cf1322' : '#3f8600',
+                }}
               />
             </Card>
           </Col>
@@ -342,11 +350,7 @@ export default function ReportsPerfPage(): JSX.Element {
         <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
           <Col xs={12} md={6}>
             <Card>
-              <Statistic
-                title="Apdex"
-                value={summary.apdex}
-                precision={2}
-              />
+              <Statistic title="Apdex" value={summary.apdex} precision={2} />
             </Card>
           </Col>
           <Col xs={12} md={6}>
@@ -372,21 +376,21 @@ export default function ReportsPerfPage(): JSX.Element {
                     <XAxis dataKey="bucket" />
                     <YAxis />
                     <RechartsTooltip />
-                    <Legend verticalAlign="top" height={36}/>
-                    <Area 
-                      type="monotone" 
-                      dataKey="p99" 
-                      stroke="#82ca9d" 
-                      fill="#82ca9d" 
+                    <Legend verticalAlign="top" height={36} />
+                    <Area
+                      type="monotone"
+                      dataKey="p99"
+                      stroke="#82ca9d"
+                      fill="#82ca9d"
                       fillOpacity={0.1}
                       name="p99"
                     />
-                    <Area 
-                      type="monotone" 
-                      dataKey="p95" 
-                      stroke="#8884d8" 
-                      fill="#8884d8" 
-                      fillOpacity={0.3} 
+                    <Area
+                      type="monotone"
+                      dataKey="p95"
+                      stroke="#8884d8"
+                      fill="#8884d8"
+                      fillOpacity={0.3}
                       name="p95"
                     />
                   </AreaChart>
@@ -403,7 +407,12 @@ export default function ReportsPerfPage(): JSX.Element {
                     <XAxis dataKey="bucket" />
                     <YAxis />
                     <RechartsTooltip />
-                    <Bar dataKey="rate" fill="#ff4d4f" name="Error %" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="rate"
+                      fill="#ff4d4f"
+                      name="Error %"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -415,12 +424,12 @@ export default function ReportsPerfPage(): JSX.Element {
         <Row gutter={[16, 16]}>
           <Col xs={24} lg={15}>
             <Card title="Endpoint-level performance">
-              <Alert 
-                  message="Limited Data" 
-                  type="info" 
-                  showIcon 
-                  style={{marginBottom: 16}}
-                  description="Detailed endpoint breakdown is not yet available via API. Showing example targets."
+              <Alert
+                message="Limited Data"
+                type="info"
+                showIcon
+                style={{ marginBottom: 16 }}
+                description="Detailed endpoint breakdown is not yet available via API. Showing example targets."
               />
               <Table<EndpointRow>
                 size="small"
@@ -442,11 +451,14 @@ export default function ReportsPerfPage(): JSX.Element {
                       100,
                       (400 / (summary.p95LatencyMs || 1)) * 100,
                     )}
-                    status={summary.p95LatencyMs <= 400 ? 'active' : 'exception'}
+                    status={
+                      summary.p95LatencyMs <= 400 ? 'active' : 'exception'
+                    }
                     showInfo={false}
                   />
                   <Text type="secondary">
-                    Current p95: {summary.p95LatencyMs} ms (target&nbsp;≤&nbsp;400 ms)
+                    Current p95: {summary.p95LatencyMs} ms (target&nbsp;≤&nbsp;400
+                    ms)
                   </Text>
                 </div>
 
@@ -463,7 +475,8 @@ export default function ReportsPerfPage(): JSX.Element {
                     showInfo={false}
                   />
                   <Text type="secondary">
-                    Current error rate: {summary.errorRatePct.toFixed(2)}% (target&nbsp;&lt;&nbsp;1.0%)
+                    Current error rate: {summary.errorRatePct.toFixed(2)}% (target
+                    &lt;&nbsp;1.0%)
                   </Text>
                 </div>
 
@@ -481,12 +494,12 @@ export default function ReportsPerfPage(): JSX.Element {
                 </div>
 
                 {summary.errorRatePct > 1 && (
-                    <Alert
+                  <Alert
                     type="warning"
                     showIcon
                     message="Active watch"
                     description="Error rates are elevated above the SLO threshold. Check database connections."
-                    />
+                  />
                 )}
               </Space>
             </Card>

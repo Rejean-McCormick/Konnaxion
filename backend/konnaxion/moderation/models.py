@@ -450,5 +450,4 @@ class AuditLogEntry(models.Model):
         )
         entry.save()
         return entry
-``` :contentReference[oaicite:0]{index=0}
-::contentReference[oaicite:1]{index=1}
+

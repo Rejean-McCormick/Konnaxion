@@ -1,8 +1,8 @@
-# FILE: backend/konnaxion/kontrol/models.py
+# backend/konnaxion/kontrol/models.py
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
-from konnaxion.utils.models import TimeStampedModel  # Assuming this exists in your project
+from konnaxion.utils.models import TimeStampedModel # Assuming this exists in your project
 
 
 class AuditLog(TimeStampedModel):
@@ -68,7 +68,7 @@ class AuditLog(TimeStampedModel):
     )
 
     class Meta:
-        ordering = ["-created"]
+        ordering = ["-created_at"] 
         verbose_name = _("Audit Log")
         verbose_name_plural = _("Audit Logs")
 
@@ -154,7 +154,7 @@ class ModerationTicket(TimeStampedModel):
     resolution_note = models.TextField(blank=True)
 
     class Meta:
-        ordering = ["-severity", "-created"]
+        ordering = ["-severity", "-created_at"] 
         verbose_name = _("Moderation Ticket")
         verbose_name_plural = _("Moderation Tickets")
 

@@ -1,4 +1,5 @@
 // FILE: frontend/app/kreative/idea-incubator/collaborate-on-ideas/page.tsx
+// app/kreative/idea-incubator/collaborate-on-ideas/page.tsx
 'use client';
 
 import React, { useMemo, useState } from 'react';
@@ -66,7 +67,7 @@ export default function CollaborateOnIdeasPage(): JSX.Element {
   return (
     <KreativePageShell
       title="Collaborate on Ideas"
-      description="Discover community ideas and join as a collaborator."
+      subtitle="Discover community ideas and join as a collaborator."
     >
       <Space
         direction="vertical"

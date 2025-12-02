@@ -2,38 +2,38 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { 
-  Button, 
-  Tag, 
-  Space, 
-  Avatar, 
-  Progress, 
-  Dropdown, 
-  message, 
-  Drawer, 
-  Descriptions, 
-  Switch, 
-  Typography, 
+import {
+  Button,
+  Tag,
+  Space,
+  Avatar,
+  Progress,
+  Dropdown,
+  message,
+  Drawer,
+  Descriptions,
+  Switch,
+  Typography,
   List,
-  Alert
+  Alert,
 } from 'antd';
-import { 
-  TeamOutlined, 
-  EllipsisOutlined, 
-  StopOutlined, 
-  LockOutlined, 
+import {
+  TeamOutlined,
+  EllipsisOutlined,
+  StopOutlined,
+  LockOutlined,
   SafetyCertificateOutlined,
   CommentOutlined,
   FireOutlined,
   ClockCircleOutlined,
-  WarningOutlined
+  WarningOutlined,
 } from '@ant-design/icons';
-import { 
-  PageContainer, 
-  ProTable, 
-  type ProColumns, 
+import {
+  PageContainer,
+  ProTable,
+  type ProColumns,
   type ActionType,
-  ProCard
+  ProCard,
 } from '@ant-design/pro-components';
 
 const { Text, Title } = Typography;
@@ -106,10 +106,11 @@ const MOCK_COMMUNITIES: CommunityContext[] = [
 
 export default function CommunityModerationPage() {
   const actionRef = useRef<ActionType>();
-  
-  // Drawer State
+
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [currentContext, setCurrentContext] = useState<CommunityContext | undefined>(undefined);
+  const [currentContext, setCurrentContext] = useState<
+    CommunityContext | undefined
+  >(undefined);
 
   const handleOpenDrawer = (record: CommunityContext) => {
     setCurrentContext(record);
@@ -132,15 +133,28 @@ export default function CommunityModerationPage() {
       copyable: true,
       render: (dom, entity) => (
         <Space>
-          <Avatar 
-            shape="square" 
-            style={{ backgroundColor: entity.module === 'Ethikos' ? '#722ed1' : '#1890ff' }}
+          <Avatar
+            shape="square"
+            style={{
+              backgroundColor:
+                entity.module === 'Ethikos' ? '#722ed1' : '#1890ff',
+            }}
           >
             {entity.module[0]}
           </Avatar>
           <Space direction="vertical" size={0}>
             <Text strong>{dom}</Text>
-            <Tag size="small">{entity.type}</Tag>
+            {/* Ant Design Tag does not support `size`; emulate a compact tag via style */}
+            <Tag
+              style={{
+                fontSize: 12,
+                paddingInline: 8,
+                lineHeight: '18px',
+                height: 'auto',
+              }}
+            >
+              {entity.type}
+            </Tag>
           </Space>
         </Space>
       ),
@@ -164,15 +178,29 @@ export default function CommunityModerationPage() {
       width: 180,
       render: (_, entity) => (
         <Space>
-          <Progress 
-            type="circle" 
-            percent={entity.toxicityScore} 
-            width={32} 
-            strokeColor={entity.toxicityScore > 80 ? '#ff4d4f' : entity.toxicityScore > 50 ? '#faad14' : '#52c41a'} 
+          <Progress
+            type="circle"
+            percent={entity.toxicityScore}
+            width={32}
+            strokeColor={
+              entity.toxicityScore > 80
+                ? '#ff4d4f'
+                : entity.toxicityScore > 50
+                ? '#faad14'
+                : '#52c41a'
+            }
             format={() => ''}
           />
-          <Text type={entity.toxicityScore > 80 ? 'danger' : 'secondary'}>
-            {entity.toxicityScore > 80 ? 'Critical' : entity.toxicityScore > 50 ? 'Heated' : 'Healthy'}
+          <Text
+            type={
+              entity.toxicityScore > 80 ? 'danger' : 'secondary'
+            }
+          >
+            {entity.toxicityScore > 80
+              ? 'Critical'
+              : entity.toxicityScore > 50
+              ? 'Heated'
+              : 'Healthy'}
           </Text>
         </Space>
       ),
@@ -182,10 +210,13 @@ export default function CommunityModerationPage() {
       dataIndex: 'openFlags',
       sorter: (a, b) => a.openFlags - b.openFlags,
       render: (val) => (
-        <Tag color={Number(val) > 10 ? 'red' : 'default'} icon={<WarningOutlined />}>
+        <Tag
+          color={Number(val) > 10 ? 'red' : 'default'}
+          icon={<WarningOutlined />}
+        >
           {val} Open
         </Tag>
-      )
+      ),
     },
     {
       title: 'Status',
@@ -204,15 +235,37 @@ export default function CommunityModerationPage() {
         <Dropdown
           menu={{
             items: [
-              { key: 'manage', label: 'Manage Context', icon: <SafetyCertificateOutlined />, onClick: () => handleOpenDrawer(record) },
-              { key: 'history', label: 'View Logs', icon: <ClockCircleOutlined /> },
-              { type: 'divider' },
-              { key: 'lock', label: record.status === 'locked' ? 'Unlock' : 'Lock Thread', icon: <LockOutlined />, danger: record.status !== 'locked' },
+              {
+                key: 'manage',
+                label: 'Manage Context',
+                icon: <SafetyCertificateOutlined />,
+                onClick: () => handleOpenDrawer(record),
+              },
+              {
+                key: 'history',
+                label: 'View Logs',
+                icon: <ClockCircleOutlined />,
+              },
+              { type: 'divider' as const },
+              {
+                key: 'lock',
+                label:
+                  record.status === 'locked'
+                    ? 'Unlock'
+                    : 'Lock Thread',
+                icon: <LockOutlined />,
+                danger: record.status !== 'locked',
+              },
             ],
-            onClick: ({ key }) => { if(key === 'lock') handleAction('lock', record) }
+            onClick: ({ key }) => {
+              if (key === 'lock') handleAction('lock', record);
+            },
           }}
         >
-          <Button type="text" icon={<EllipsisOutlined style={{ fontSize: 18 }} />} />
+          <Button
+            type="text"
+            icon={<EllipsisOutlined style={{ fontSize: 18 }} />}
+          />
         </Dropdown>
       ),
     },
@@ -223,8 +276,15 @@ export default function CommunityModerationPage() {
       title="Community Moderation"
       subTitle="Manage discussion spaces, groups, and debates at the container level."
       extra={[
-        <Button key="refresh" onClick={() => actionRef.current?.reload()}>Refresh Metrics</Button>,
-        <Button key="create" type="primary">New Report</Button>
+        <Button
+          key="refresh"
+          onClick={() => actionRef.current?.reload()}
+        >
+          Refresh Metrics
+        </Button>,
+        <Button key="create" type="primary">
+          New Report
+        </Button>,
       ]}
     >
       <ProTable<CommunityContext>
@@ -237,7 +297,9 @@ export default function CommunityModerationPage() {
         pagination={{ pageSize: 10 }}
         headerTitle="Context Health Monitor"
         toolBarRender={() => [
-          <Button key="filter" icon={<FireOutlined />}>High Toxicity Only</Button>
+          <Button key="filter" icon={<FireOutlined />}>
+            High Toxicity Only
+          </Button>,
         ]}
       />
 
@@ -245,16 +307,26 @@ export default function CommunityModerationPage() {
       <Drawer
         width={600}
         open={drawerOpen}
-        onClose={() => { setDrawerOpen(false); setCurrentContext(undefined); }}
-        title={currentContext ? `Manage: ${currentContext.name}` : 'Context Manager'}
+        onClose={() => {
+          setDrawerOpen(false);
+          setCurrentContext(undefined);
+        }}
+        title={
+          currentContext
+            ? `Manage: ${currentContext.name}`
+            : 'Context Manager'
+        }
       >
         {currentContext && (
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            
+          <Space
+            direction="vertical"
+            size="large"
+            style={{ width: '100%' }}
+          >
             {/* Health Banner */}
             {currentContext.toxicityScore > 70 && (
-              <Alert 
-                message="High Toxicity Detected" 
+              <Alert
+                message="High Toxicity Detected"
                 description="This context has an unusually high rate of reported content. Consider enabling Slow Mode or assigning temporary moderators."
                 type="error"
                 showIcon
@@ -262,29 +334,75 @@ export default function CommunityModerationPage() {
             )}
 
             {/* Quick Controls */}
-            <ProCard title="Governance Controls" bordered headerBordered>
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Text><LockOutlined /> Lock Context (Read-only)</Text>
-                  <Switch checked={currentContext.status === 'locked'} onChange={() => message.info('Toggle Lock')} />
+            <ProCard
+              title="Governance Controls"
+              bordered
+              headerBordered
+            >
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Text>
+                    <LockOutlined /> Lock Context (Read-only)
+                  </Text>
+                  <Switch
+                    checked={currentContext.status === 'locked'}
+                    onChange={() =>
+                      message.info('Toggle Lock (not wired)')
+                    }
+                  />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Text><ClockCircleOutlined /> Slow Mode (1 post/10m)</Text>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Text>
+                    <ClockCircleOutlined /> Slow Mode (1 post/10m)
+                  </Text>
                   <Switch />
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Text><StopOutlined /> Require Approval for New Users</Text>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}
+                >
+                  <Text>
+                    <StopOutlined /> Require Approval for New Users
+                  </Text>
                   <Switch defaultChecked />
                 </div>
               </Space>
             </ProCard>
 
             {/* Metrics */}
-            <Descriptions title="Live Metrics" bordered size="small" column={2}>
-              <Descriptions.Item label="Active Users">{currentContext.activeUsers}</Descriptions.Item>
-              <Descriptions.Item label="Open Flags">{currentContext.openFlags}</Descriptions.Item>
-              <Descriptions.Item label="Last Activity">{currentContext.lastActivity}</Descriptions.Item>
-              <Descriptions.Item label="Total Comments">8,921</Descriptions.Item>
+            <Descriptions
+              title="Live Metrics"
+              bordered
+              size="small"
+              column={2}
+            >
+              <Descriptions.Item label="Active Users">
+                {currentContext.activeUsers}
+              </Descriptions.Item>
+              <Descriptions.Item label="Open Flags">
+                {currentContext.openFlags}
+              </Descriptions.Item>
+              <Descriptions.Item label="Last Activity">
+                {currentContext.lastActivity}
+              </Descriptions.Item>
+              <Descriptions.Item label="Total Comments">
+                8,921
+              </Descriptions.Item>
             </Descriptions>
 
             {/* Moderators List */}
@@ -292,18 +410,34 @@ export default function CommunityModerationPage() {
               header={<Text strong>Assigned Moderators</Text>}
               bordered
               dataSource={currentContext.moderators}
-              renderItem={item => (
-                <List.Item actions={[<a key="remove">Remove</a>]}>
+              renderItem={(item) => (
+                <List.Item
+                  actions={[<a key="remove">Remove</a>]}
+                >
                   <Space>
                     <Avatar size="small" icon={<TeamOutlined />} />
                     {item}
                   </Space>
                 </List.Item>
               )}
-              footer={<Button type="dashed" block icon={<TeamOutlined />}>Assign New Moderator</Button>}
+              footer={
+                <Button
+                  type="dashed"
+                  block
+                  icon={<TeamOutlined />}
+                >
+                  Assign New Moderator
+                </Button>
+              }
             />
 
-            <Button type="primary" danger block size="large" icon={<StopOutlined />}>
+            <Button
+              type="primary"
+              danger
+              block
+              size="large"
+              icon={<StopOutlined />}
+            >
               Emergency Freeze (Suspend Context)
             </Button>
           </Space>

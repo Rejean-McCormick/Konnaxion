@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import {
-  // Standard Antd components used in the layout and logic
-  Card, // Kept for the final section which is simpler
+  Card,
   Row,
   Col,
   Statistic,
@@ -29,7 +28,6 @@ import {
   AuditOutlined,
   RocketOutlined,
 } from '@ant-design/icons';
-// FIX: Import all ProComponents from the unified entry point
 import {
   ProCard,
   ProTable,
@@ -53,15 +51,32 @@ const USER_ACTIVITY_MOCK_DATA = [
   { key: '1', date: '2025-11-28', user: 'Admin Jane', action: 'Banned User @spam_bot', module: 'Auth' },
   { key: '2', date: '2025-11-28', user: 'System', action: 'Archived 120-day old content', module: 'KonnectED' },
   { key: '3', date: '2025-11-27', user: 'Moderator Tom', action: 'Approved Comment #103', module: 'EthiKos' },
-  { key: '4', 'date': '2025-11-26', user: 'Admin Jane', action: 'Updated Site Configuration', module: 'Kontrol' },
+  { key: '4', date: '2025-11-26', user: 'Admin Jane', action: 'Updated Site Configuration', module: 'Kontrol' },
 ];
 
 // Uses ProColumns for typing
 const PRO_TABLE_COLUMNS: ProColumns<(typeof MODERATION_MOCK_DATA)[0]>[] = [
   { title: 'ID', dataIndex: 'id', key: 'id', valueType: 'digit' },
-  { title: 'Type', dataIndex: 'type', key: 'type', valueType: 'select', valueEnum: { Comment: { text: 'Comment' }, 'User Report': { text: 'User Report' }, Document: { text: 'Document' }, Image: { text: 'Image' } } },
+  {
+    title: 'Type',
+    dataIndex: 'type',
+    key: 'type',
+    valueType: 'select',
+    valueEnum: {
+      Comment: { text: 'Comment' },
+      'User Report': { text: 'User Report' },
+      Document: { text: 'Document' },
+      Image: { text: 'Image' },
+    },
+  },
   { title: 'Target', dataIndex: 'target', key: 'target', ellipsis: true },
-  { title: 'Flags', dataIndex: 'flags', key: 'flags', valueType: 'statistic', sorter: (a, b) => a.flags - b.flags },
+  {
+    title: 'Flags',
+    dataIndex: 'flags',
+    key: 'flags',
+    valueType: 'digit', // changed from 'statistic'
+    sorter: (a, b) => a.flags - b.flags,
+  },
   {
     title: 'Severity',
     dataIndex: 'severity',
@@ -78,9 +93,23 @@ const PRO_TABLE_COLUMNS: ProColumns<(typeof MODERATION_MOCK_DATA)[0]>[] = [
     title: 'Action',
     valueType: 'option',
     key: 'option',
-    render: (text, record, _, action) => [
-      <a key="view" onClick={() => notification.info({ message: `Viewing ${record.type} ${record.id}` })}>View</a>,
-      <a key="process" onClick={() => notification.success({ message: `Processing ${record.id}` })}>Process</a>,
+    render: (text, record) => [
+      <a
+        key="view"
+        onClick={() =>
+          notification.info({ message: `Viewing ${record.type} ${record.id}` })
+        }
+      >
+        View
+      </a>,
+      <a
+        key="process"
+        onClick={() =>
+          notification.success({ message: `Processing ${record.id}` })
+        }
+      >
+        Process
+      </a>,
     ],
   },
 ];
@@ -118,184 +147,253 @@ export default function KontrolDashboard() {
 
   return (
     <PageContainer ghost>
-    <div style={{ padding: 20 }}>
-      {/* 1. HIGH-LEVEL KPI & SYSTEM HEALTH - Uses StatisticCard */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{ title: "Active Users (24h)", value: 4520, prefix: <UserOutlined /> }}
-            loading={loading}
-            extra={<Tag color="green">+12% vs. yesterday</Tag>}
-            hoverable
-            onClick={() => router.push('/kontrol/users/all')}
-          />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{ title: "Pending Moderation", value: 15, prefix: <WarningOutlined /> }}
-            loading={loading}
-            extra={<Tag color="red">1 Critical</Tag>}
-            hoverable
-            onClick={() => router.push('/kontrol/moderation/queue')}
-          />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{ title: "New Content (7d)", value: 892, prefix: <LineChartOutlined /> }}
-            loading={loading}
-            extra={<Tag color="blue">KonnectED +500</Tag>}
-            hoverable
-          />
-        </Col>
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{ title: "API Latency (P95)", value: 145, suffix: "ms" }}
-            loading={loading}
-            extra={<Tag color="green">Good</Tag>}
-            hoverable
-            onClick={() => router.push('/reports/perf')}
-          />
-        </Col>
-      </Row>
-
-      {/* 2. MODERATION QUEUE & SYSTEM ACTIVITY - Uses ProCard and ProTable */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        <Col xs={24} lg={16}>
-          <ProCard
-            title={<Space><AuditOutlined /> Critical Moderation Queue</Space>}
-            headerBordered
-            extra={<Button type="link" onClick={() => router.push('/kontrol/moderation/queue')}>View All</Button>}
-          >
-            <ProTable
-              columns={PRO_TABLE_COLUMNS}
-              dataSource={MODERATION_MOCK_DATA}
-              rowKey="id"
-              search={false}
-              options={false}
-              pagination={{ pageSize: 4, hideOnSinglePage: true }}
-              dateFormatter="string"
-              toolBarRender={false}
+      <div style={{ padding: 20 }}>
+        {/* 1. HIGH-LEVEL KPI & SYSTEM HEALTH - Uses StatisticCard */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+          <Col xs={24} sm={12} lg={6}>
+            <StatisticCard
+              statistic={{ title: 'Active Users (24h)', value: 4520, prefix: <UserOutlined /> }}
+              loading={loading}
+              extra={<Tag color="green">+12% vs. yesterday</Tag>}
+              hoverable
+              onClick={() => router.push('/kontrol/users/all')}
             />
-          </ProCard>
-        </Col>
-        <Col xs={24} lg={8}>
-          <ProCard
-            title={<Space><ClockCircleOutlined /> Recent Admin Activity</Space>}
-            headerBordered
-            loading={loading}
-            style={{ minHeight: 400 }}
-            extra={<Button type="link" onClick={() => router.push('/kontrol/audit-log')}>View Log</Button>}
-          >
-            {/* Simple List for a quick feed */}
-            <List
-              itemLayout="horizontal"
-              dataSource={USER_ACTIVITY_MOCK_DATA}
-              renderItem={(item) => (
-                <List.Item>
-                  <List.Item.Meta
-                    title={<a href={`#`}>{item.action}</a>}
-                    description={`by ${item.user} in ${item.module} (${item.date})`}
-                  />
-                </List.Item>
-              )}
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatisticCard
+              statistic={{ title: 'Pending Moderation', value: 15, prefix: <WarningOutlined /> }}
+              loading={loading}
+              extra={<Tag color="red">1 Critical</Tag>}
+              hoverable
+              onClick={() => router.push('/kontrol/moderation/queue')}
             />
-          </ProCard>
-        </Col>
-      </Row>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatisticCard
+              statistic={{ title: 'New Content (7d)', value: 892, prefix: <LineChartOutlined /> }}
+              loading={loading}
+              extra={<Tag color="blue">KonnectED +500</Tag>}
+              hoverable
+            />
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <StatisticCard
+              statistic={{ title: 'API Latency (P95)', value: 145, suffix: 'ms' }}
+              loading={loading}
+              extra={<Tag color="green">Good</Tag>}
+              hoverable
+              onClick={() => router.push('/reports/perf')}
+            />
+          </Col>
+        </Row>
 
-      {/* 3. PLATFORM HEALTH & CONFIGURATION - Uses ProCard and ProDescriptions */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
-        <Col xs={24} lg={12}>
-          <ProCard
-            title={<Space><GlobalOutlined /> Platform Health Overview</Space>}
-            headerBordered
-            loading={loading}
-            actions={[
-              <Button
-                key="run"
-                type="primary"
-                onClick={handleRunSystemCheck}
-                loading={loading}
-                icon={<CheckCircleOutlined />}
-              >
-                Run Diagnostics
-              </Button>,
-              <Button key="logs" icon={<SettingOutlined />} onClick={() => router.push('/kontrol/audit-log')}>View Logs</Button>
-            ]}
-          >
-            <Space direction="vertical" style={{ width: '100%', padding: '10px 0' }}>
-              <Row gutter={16} align="middle">
-                <Col span={10}>**Database Connections:**</Col>
-                <Col span={14}><Progress percent={85} status="exception" format={percent => `${percent}% (High)`} /></Col>
-              </Row>
-              <Row gutter={16} align="middle">
-                <Col span={10}>**Cache Hit Rate:**</Col>
-                <Col span={14}><Progress percent={98} status="success" /></Col>
-              </Row>
-              <Row gutter={16} align="middle">
-                <Col span={10}>**Disk Usage (Analytics DB):**</Col>
-                <Col span={14}><Progress percent={65} status="normal" /></Col>
-              </Row>
-              <Row gutter={16} align="middle">
-                <Col span={10}>**Queue Depth (ETL):**</Col>
-                <Col span={14}><Progress percent={20} status="normal" /></Col>
-              </Row>
-            </Space>
-          </ProCard>
-        </Col>
-        <Col xs={24} lg={12}>
-          <ProCard
-            title={<Space><DeploymentUnitOutlined /> System Configuration</Space>}
-            headerBordered
-            loading={loading}
-            extra={<Button type="link" icon={<SettingOutlined />} onClick={() => router.push('/kontrol/konsensus')}>Edit</Button>}
-          >
-            <ProDescriptions
-              column={2}
-              dataSource={SYSTEM_CONFIG_DATA}
-              columns={[
-                { title: 'Version', dataIndex: 'version', span: 1 },
-                { title: 'Deployment', dataIndex: 'deployment', span: 1 },
-                { title: 'Last Update', dataIndex: 'lastUpdate', span: 2 },
-                { title: 'Mode', dataIndex: 'mode', span: 1 },
-                { title: 'CDN Status', dataIndex: 'cdn', span: 1 },
-                { title: 'Metrics Service', dataIndex: 'metrics', span: 2 },
+        {/* 2. MODERATION QUEUE & SYSTEM ACTIVITY - Uses ProCard and ProTable */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+          <Col xs={24} lg={16}>
+            <ProCard
+              title={
+                <Space>
+                  <AuditOutlined /> Critical Moderation Queue
+                </Space>
+              }
+              headerBordered
+              extra={
+                <Button type="link" onClick={() => router.push('/kontrol/moderation/queue')}>
+                  View All
+                </Button>
+              }
+            >
+              <ProTable
+                columns={PRO_TABLE_COLUMNS}
+                dataSource={MODERATION_MOCK_DATA}
+                rowKey="id"
+                search={false}
+                options={false}
+                pagination={{ pageSize: 4, hideOnSinglePage: true }}
+                dateFormatter="string"
+                toolBarRender={false}
+              />
+            </ProCard>
+          </Col>
+          <Col xs={24} lg={8}>
+            <ProCard
+              title={
+                <Space>
+                  <ClockCircleOutlined /> Recent Admin Activity
+                </Space>
+              }
+              headerBordered
+              loading={loading}
+              style={{ minHeight: 400 }}
+              extra={
+                <Button type="link" onClick={() => router.push('/kontrol/audit-log')}>
+                  View Log
+                </Button>
+              }
+            >
+              <List
+                itemLayout="horizontal"
+                dataSource={USER_ACTIVITY_MOCK_DATA}
+                renderItem={(item) => (
+                  <List.Item>
+                    <List.Item.Meta
+                      title={<a href="#">{item.action}</a>}
+                      description={`by ${item.user} in ${item.module} (${item.date})`}
+                    />
+                  </List.Item>
+                )}
+              />
+            </ProCard>
+          </Col>
+        </Row>
+
+        {/* 3. PLATFORM HEALTH & CONFIGURATION - Uses ProCard and ProDescriptions */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
+          <Col xs={24} lg={12}>
+            <ProCard
+              title={
+                <Space>
+                  <GlobalOutlined /> Platform Health Overview
+                </Space>
+              }
+              headerBordered
+              loading={loading}
+              actions={[
+                <Button
+                  key="run"
+                  type="primary"
+                  onClick={handleRunSystemCheck}
+                  loading={loading}
+                  icon={<CheckCircleOutlined />}
+                >
+                  Run Diagnostics
+                </Button>,
+                <Button
+                  key="logs"
+                  icon={<SettingOutlined />}
+                  onClick={() => router.push('/kontrol/audit-log')}
+                >
+                  View Logs
+                </Button>,
               ]}
-            />
-          </ProCard>
-        </Col>
-      </Row>
+            >
+              <Space direction="vertical" style={{ width: '100%', padding: '10px 0' }}>
+                <Row gutter={16} align="middle">
+                  <Col span={10}>**Database Connections:**</Col>
+                  <Col span={14}>
+                    <Progress
+                      percent={85}
+                      status="exception"
+                      format={(percent) => `${percent}% (High)`}
+                    />
+                  </Col>
+                </Row>
+                <Row gutter={16} align="middle">
+                  <Col span={10}>**Cache Hit Rate:**</Col>
+                  <Col span={14}>
+                    <Progress percent={98} status="success" />
+                  </Col>
+                </Row>
+                <Row gutter={16} align="middle">
+                  <Col span={10}>**Disk Usage (Analytics DB):**</Col>
+                  <Col span={14}>
+                    <Progress percent={65} status="normal" />
+                  </Col>
+                </Row>
+                <Row gutter={16} align="middle">
+                  <Col span={10}>**Queue Depth (ETL):**</Col>
+                  <Col span={14}>
+                    <Progress percent={20} status="normal" />
+                  </Col>
+                </Row>
+              </Space>
+            </ProCard>
+          </Col>
+          <Col xs={24} lg={12}>
+            <ProCard
+              title={
+                <Space>
+                  <DeploymentUnitOutlined /> System Configuration
+                </Space>
+              }
+              headerBordered
+              loading={loading}
+              extra={
+                <Button
+                  type="link"
+                  icon={<SettingOutlined />}
+                  onClick={() => router.push('/kontrol/konsensus')}
+                >
+                  Edit
+                </Button>
+              }
+            >
+              <ProDescriptions
+                column={2}
+                dataSource={SYSTEM_CONFIG_DATA}
+                columns={[
+                  { title: 'Version', dataIndex: 'version', span: 1 },
+                  { title: 'Deployment', dataIndex: 'deployment', span: 1 },
+                  { title: 'Last Update', dataIndex: 'lastUpdate', span: 2 },
+                  { title: 'Mode', dataIndex: 'mode', span: 1 },
+                  { title: 'CDN Status', dataIndex: 'cdn', span: 1 },
+                  { title: 'Metrics Service', dataIndex: 'metrics', span: 2 },
+                ]}
+              />
+            </ProCard>
+          </Col>
+        </Row>
 
-      {/* 4. USER/ROLE MANAGEMENT SUMMARY - Uses standard Antd Card here */}
-      <Row gutter={[16, 16]}>
-        <Col span={24}>
-          <Card
-            title={<Space><UserOutlined /> User Management Summary</Space>}
-            extra={<Button type="link" icon={<RocketOutlined />} onClick={() => router.push('/kontrol/users/all')}>Go to User List</Button>}
-          >
-            <Row gutter={16}>
-              <Col xs={24} sm={12} md={8}>
-                <Statistic title="Total Registered Users" value={10567} />
-                <Progress percent={100} showInfo={false} />
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Statistic title="New Signups (Last 7d)" value={45} valueStyle={{ color: '#3f8600' }} />
-                <Progress percent={45 / 100 * 100} status="active" showInfo={false} />
-              </Col>
-              <Col xs={24} sm={12} md={8}>
-                <Statistic title="Admins & Moderators" value={22} valueStyle={{ color: '#faad14' }} />
-                <Progress percent={22 / 10000 * 100} showInfo={false} />
-              </Col>
-            </Row>
-            <div style={{ marginTop: 20 }}>
-              <Tag color="magenta">Roles: 5</Tag>
-              <Tag color="volcano">Pending Approvals: 3</Tag>
-              <Tag color="cyan">Permissions Checked: 95%</Tag>
-            </div>
-          </Card>
-        </Col>
-      </Row>
-    </div>
+        {/* 4. USER/ROLE MANAGEMENT SUMMARY - Uses standard Antd Card here */}
+        <Row gutter={[16, 16]}>
+          <Col span={24}>
+            <Card
+              title={
+                <Space>
+                  <UserOutlined /> User Management Summary
+                </Space>
+              }
+              extra={
+                <Button
+                  type="link"
+                  icon={<RocketOutlined />}
+                  onClick={() => router.push('/kontrol/users/all')}
+                >
+                  Go to User List
+                </Button>
+              }
+            >
+              <Row gutter={16}>
+                <Col xs={24} sm={12} md={8}>
+                  <Statistic title="Total Registered Users" value={10567} />
+                  <Progress percent={100} showInfo={false} />
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <Statistic
+                    title="New Signups (Last 7d)"
+                    value={45}
+                    valueStyle={{ color: '#3f8600' }}
+                  />
+                  <Progress percent={(45 / 100) * 100} status="active" showInfo={false} />
+                </Col>
+                <Col xs={24} sm={12} md={8}>
+                  <Statistic
+                    title="Admins & Moderators"
+                    value={22}
+                    valueStyle={{ color: '#faad14' }}
+                  />
+                  <Progress percent={(22 / 10000) * 100} showInfo={false} />
+                </Col>
+              </Row>
+              <div style={{ marginTop: 20 }}>
+                <Tag color="magenta">Roles: 5</Tag>
+                <Tag color="volcano">Pending Approvals: 3</Tag>
+                <Tag color="cyan">Permissions Checked: 95%</Tag>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </div>
     </PageContainer>
   );
 }

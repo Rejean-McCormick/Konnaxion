@@ -2,25 +2,90 @@
 'use client';
 
 import React, { useState } from 'react';
-import { message, Space, Typography, Alert, Row, Col, Statistic, Progress, List, Tag } from 'antd';
-import { 
-  ExperimentOutlined, 
-  SafetyCertificateOutlined, 
-  ThunderboltOutlined, 
-  HistoryOutlined, 
-  WarningOutlined
+import {
+  message,
+  Space,
+  Typography,
+  Alert,
+  Row,
+  Col,
+  Statistic,
+  Progress,
+  List,
+  Tag,
+} from 'antd';
+import {
+  ExperimentOutlined,
+  SafetyCertificateOutlined,
+  ThunderboltOutlined,
+  HistoryOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
-import { 
-  PageContainer, 
-  ProCard, 
-  ProForm, 
-  ProFormSwitch, 
-  ProFormSlider, 
-  ProFormSelect, 
-  ProFormDigit 
+import {
+  PageContainer,
+  ProCard,
+  ProForm,
+  ProFormSwitch,
+  ProFormSlider,
+  ProFormSelect,
+  ProFormDigit,
 } from '@ant-design/pro-components';
 
 const { Text } = Typography;
+
+// ---- Types for backend config so `data` is not `unknown` ----
+
+type KonsensusConfigExtraSettings = {
+  algorithm?: string;
+  allow_delegation?: boolean;
+  network?: string;
+  auto_execute?: boolean;
+  [key: string]: unknown;
+};
+
+interface KonsensusConfigRecord {
+  quorum_percentage: number | string;
+  passing_threshold: number | string;
+  default_voting_duration_days: number;
+  allow_anonymous_voting: boolean;
+  auto_close_votes?: boolean;
+  extra_settings?: KonsensusConfigExtraSettings;
+  [key: string]: unknown;
+}
+
+/**
+ * Normalise any backend response shape into "latest config or null".
+ * Handles:
+ *  - { results: [...] }
+ *  - [...]
+ *  - single object
+ */
+function extractLatestConfig(data: unknown): KonsensusConfigRecord | null {
+  if (!data) return null;
+
+  // Case 1: list response { results: [...] }
+  if (
+    typeof data === 'object' &&
+    data !== null &&
+    'results' in data &&
+    Array.isArray((data as { results?: unknown }).results)
+  ) {
+    const arr = (data as { results: unknown[] }).results;
+    if (arr.length > 0) return arr[0] as KonsensusConfigRecord;
+  }
+
+  // Case 2: bare list response [...]
+  if (Array.isArray(data) && data.length > 0) {
+    return data[0] as KonsensusConfigRecord;
+  }
+
+  // Case 3: single object
+  if (typeof data === 'object' && data !== null) {
+    return data as KonsensusConfigRecord;
+  }
+
+  return null;
+}
 
 export default function KonsensusSettingsPage() {
   // State for live simulation feedback
@@ -33,17 +98,31 @@ export default function KonsensusSettingsPage() {
 
   // Calculate simulation metrics based on form values
   const runSimulation = (quorum: number, threshold: number) => {
-    // Arbitrary formula to calculate "Governance Stiffness"
     // Higher quorum + higher threshold = harder to pass votes
-    const score = Math.min(100, Math.round((quorum * 1.2) + (threshold * 0.5)));
-    
+    const score = Math.min(
+      100,
+      Math.round(quorum * 1.2 + threshold * 0.5),
+    );
+
     let label = 'Fluid';
     let color = 'cyan';
     let fails = 0;
 
-    if (score > 40) { label = 'Balanced'; color = 'green'; fails = 2; }
-    if (score > 65) { label = 'Rigid'; color = 'orange'; fails = 5; }
-    if (score > 85) { label = 'Gridlock Risk'; color = 'red'; fails = 12; }
+    if (score > 40) {
+      label = 'Balanced';
+      color = 'green';
+      fails = 2;
+    }
+    if (score > 65) {
+      label = 'Rigid';
+      color = 'orange';
+      fails = 5;
+    }
+    if (score > 85) {
+      label = 'Gridlock Risk';
+      color = 'red';
+      fails = 12;
+    }
 
     setSimulation({
       stiffness: score,
@@ -54,25 +133,24 @@ export default function KonsensusSettingsPage() {
   };
 
   const handleValuesChange = (_: any, values: any) => {
-    // Only recalculate if relevant fields change
     if (values.quorum !== undefined || values.pass_threshold !== undefined) {
       const q = values.quorum ?? 15;
       const t = values.pass_threshold ?? 66;
-      runSimulation(q, t);
+      runSimulation(Number(q), Number(t));
     }
   };
 
   return (
-    <PageContainer 
-      title="Konsensus Configuration" 
+    <PageContainer
+      title="Konsensus Configuration"
       subTitle="Manage global consensus algorithms, voting thresholds, and governance parameters."
     >
       <Row gutter={24}>
         {/* LEFT COLUMN: The Configuration Form */}
         <Col xs={24} lg={16}>
           {/* Informational Banner */}
-          <Alert 
-            message="Critical Configuration" 
+          <Alert
+            message="Critical Configuration"
             description="Changes made here affect the active voting logic for the entire platform immediately. Proceed with caution."
             type="warning"
             showIcon
@@ -81,73 +159,89 @@ export default function KonsensusSettingsPage() {
 
           <ProForm
             onValuesChange={handleValuesChange}
-            
             // 1. FETCH INITIAL CONFIGURATION (GET)
             request={async () => {
               try {
                 const res = await fetch('/api/admin/konsensus-config/');
-                if (!res.ok) return {}; 
-                const data = await res.json();
-                
-                // Get the latest config (first item in list)
-                const latest = data.results && data.results.length > 0 ? data.results[0] : null;
+                if (!res.ok) return {};
+
+                const data: unknown = await res.json();
+                const latest = extractLatestConfig(data);
 
                 if (latest) {
-                  // Run sim based on fetched data
-                  runSimulation(latest.quorum_percentage, latest.passing_threshold);
+                  const quorumNum = Number(latest.quorum_percentage);
+                  const thresholdNum = Number(latest.passing_threshold);
+
+                  if (
+                    Number.isFinite(quorumNum) &&
+                    Number.isFinite(thresholdNum)
+                  ) {
+                    runSimulation(quorumNum, thresholdNum);
+                  }
 
                   // Map Backend Model -> Frontend Form
                   return {
-                    quorum: parseFloat(latest.quorum_percentage),
-                    pass_threshold: parseFloat(latest.passing_threshold),
-                    min_duration_days: latest.default_voting_duration_days,
-                    anonymous_voting: latest.allow_anonymous_voting,
+                    quorum: Number.isFinite(quorumNum) ? quorumNum : 15,
+                    pass_threshold: Number.isFinite(thresholdNum)
+                      ? thresholdNum
+                      : 66,
+                    min_duration_days:
+                      latest.default_voting_duration_days ?? 3,
+                    anonymous_voting:
+                      latest.allow_anonymous_voting ?? false,
                     // Map generic fields from extra_settings JSON
-                    algorithm: latest.extra_settings?.algorithm || 'weighted',
-                    allow_delegation: latest.extra_settings?.allow_delegation ?? true,
-                    network: latest.extra_settings?.network || 'local_ganache',
-                    auto_execute: latest.extra_settings?.auto_execute ?? false
+                    algorithm:
+                      latest.extra_settings?.algorithm ?? 'weighted',
+                    allow_delegation:
+                      latest.extra_settings?.allow_delegation ?? true,
+                    network:
+                      latest.extra_settings?.network ?? 'local_ganache',
+                    auto_execute:
+                      latest.extra_settings?.auto_execute ?? false,
                   };
                 }
-                return { 
-                    // Defaults if no DB record exists yet
-                    quorum: 15, 
-                    pass_threshold: 66,
-                    min_duration_days: 3,
-                    algorithm: 'weighted'
+
+                // Defaults if no DB record exists yet
+                return {
+                  quorum: 15,
+                  pass_threshold: 66,
+                  min_duration_days: 3,
+                  algorithm: 'weighted',
                 };
               } catch (error) {
-                console.error("Failed to load config", error);
-                message.error("Could not load current configuration");
+                // eslint-disable-next-line no-console
+                console.error('Failed to load config', error);
+                message.error('Could not load current configuration');
                 return {};
               }
             }}
-
             // 2. SAVE CONFIGURATION (POST)
             onFinish={async (values) => {
               try {
-                message.loading('Applying consensus parameters...', 0.5);
-                
-                // Construct Payload matching backend Serializer
+                message.loading(
+                  'Applying consensus parameters...',
+                  0.5,
+                );
+
                 const payload = {
-                    quorum_percentage: values.quorum,
-                    passing_threshold: values.pass_threshold,
-                    default_voting_duration_days: values.min_duration_days,
-                    allow_anonymous_voting: values.anonymous_voting,
-                    auto_close_votes: true, // Defaulting to true for now
-                    // Store non-column UI fields in JSON
-                    extra_settings: {
-                        algorithm: values.algorithm,
-                        allow_delegation: values.allow_delegation,
-                        network: values.network,
-                        auto_execute: values.auto_execute
-                    }
+                  quorum_percentage: values.quorum,
+                  passing_threshold: values.pass_threshold,
+                  default_voting_duration_days:
+                    values.min_duration_days,
+                  allow_anonymous_voting: values.anonymous_voting,
+                  auto_close_votes: true,
+                  extra_settings: {
+                    algorithm: values.algorithm,
+                    allow_delegation: values.allow_delegation,
+                    network: values.network,
+                    auto_execute: values.auto_execute,
+                  },
                 };
 
                 const res = await fetch('/api/admin/konsensus-config/', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(payload),
                 });
 
                 if (!res.ok) throw new Error('Failed to save');
@@ -155,36 +249,49 @@ export default function KonsensusSettingsPage() {
                 message.success('Configuration updated successfully');
                 return true;
               } catch (error) {
-                  console.error(error);
-                  message.error('Failed to save configuration');
-                  return false;
+                // eslint-disable-next-line no-console
+                console.error(error);
+                message.error('Failed to save configuration');
+                return false;
               }
             }}
-
             submitter={{
               searchConfig: {
                 submitText: 'Save Configuration',
               },
-              render: (props, doms) => {
+              render: (_props, doms) => {
                 return (
                   <ProCard bordered style={{ marginTop: 16 }}>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 16 }}>
-                       {doms}
-                      </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        gap: 16,
+                      }}
+                    >
+                      {doms}
+                    </div>
                   </ProCard>
                 );
               },
             }}
           >
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
-              
+            <Space
+              direction="vertical"
+              size="large"
+              style={{ width: '100%' }}
+            >
               {/* Section 1: Voting Thresholds */}
-              <ProCard 
-                title="Global Thresholds" 
-                headerBordered 
-                collapsible 
+              <ProCard
+                title="Global Thresholds"
+                headerBordered
+                collapsible
                 defaultCollapsed={false}
-                extra={<SafetyCertificateOutlined style={{ color: '#52c41a' }} />}
+                extra={
+                  <SafetyCertificateOutlined
+                    style={{ color: '#52c41a' }}
+                  />
+                }
               >
                 <ProFormSlider
                   name="quorum"
@@ -194,10 +301,15 @@ export default function KonsensusSettingsPage() {
                   max={100}
                   step={1}
                   initialValue={15}
-                  marks={{ 0: '0%', 15: '15%', 50: '50%', 100: '100%' }}
+                  marks={{
+                    0: '0%',
+                    15: '15%',
+                    50: '50%',
+                    100: '100%',
+                  }}
                   help="Minimum percentage of eligible voters required for a vote to be valid."
                 />
-                
+
                 <ProFormSlider
                   name="pass_threshold"
                   label="Pass Threshold (%)"
@@ -206,7 +318,11 @@ export default function KonsensusSettingsPage() {
                   max={100}
                   step={1}
                   initialValue={66}
-                  marks={{ 50: 'Majority', 66: 'Super', 100: 'Unanimous' }}
+                  marks={{
+                    50: 'Majority',
+                    66: 'Super',
+                    100: 'Unanimous',
+                  }}
                   help="Percentage of 'For' votes required to pass a proposal."
                 />
 
@@ -222,21 +338,37 @@ export default function KonsensusSettingsPage() {
               </ProCard>
 
               {/* Section 2: Algorithm & Logic */}
-              <ProCard 
-                title="Consensus Algorithm" 
-                headerBordered 
+              <ProCard
+                title="Consensus Algorithm"
+                headerBordered
                 collapsible
-                extra={<ExperimentOutlined style={{ color: '#1890ff' }} />}
+                extra={
+                  <ExperimentOutlined
+                    style={{ color: '#1890ff' }}
+                  />
+                }
               >
                 <ProFormSelect
                   name="algorithm"
                   label="Active Calculation Method"
                   width="md"
                   options={[
-                    { value: 'quadratic', label: 'Quadratic Voting (Cost = Votes²)' },
-                    { value: 'linear', label: 'Linear (1 Person = 1 Vote)' },
-                    { value: 'weighted', label: 'Weighted (Reputation Based)' },
-                    { value: 'hybrid', label: 'Hybrid (Linear + Reputation Boost)' },
+                    {
+                      value: 'quadratic',
+                      label: 'Quadratic Voting (Cost = Votes²)',
+                    },
+                    {
+                      value: 'linear',
+                      label: 'Linear (1 Person = 1 Vote)',
+                    },
+                    {
+                      value: 'weighted',
+                      label: 'Weighted (Reputation Based)',
+                    },
+                    {
+                      value: 'hybrid',
+                      label: 'Hybrid (Linear + Reputation Boost)',
+                    },
                   ]}
                   initialValue="weighted"
                   tooltip="Quadratic voting helps protect minorities; Weighted empowers experts."
@@ -244,46 +376,65 @@ export default function KonsensusSettingsPage() {
 
                 <ProCard split="vertical" bordered>
                   <ProCard>
-                    <ProFormSwitch 
-                      name="allow_delegation" 
-                      label="Allow Vote Delegation" 
-                      initialValue={true}
+                    <ProFormSwitch
+                      name="allow_delegation"
+                      label="Allow Vote Delegation"
+                      initialValue
                       tooltip="Users can delegate their voting power to trusted experts."
                     />
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      Liquid democracy features will be enabled if checked.
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 12 }}
+                    >
+                      Liquid democracy features will be enabled if
+                      checked.
                     </Text>
                   </ProCard>
                   <ProCard>
-                    <ProFormSwitch 
-                      name="anonymous_voting" 
-                      label="Force Anonymous Voting" 
-                      initialValue={false} 
+                    <ProFormSwitch
+                      name="anonymous_voting"
+                      label="Force Anonymous Voting"
+                      initialValue={false}
                       tooltip="Hides voter identities on the blockchain/public record."
                     />
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                      Prevents social pressure but limits accountability.
+                    <Text
+                      type="secondary"
+                      style={{ fontSize: 12 }}
+                    >
+                      Prevents social pressure but limits
+                      accountability.
                     </Text>
                   </ProCard>
                 </ProCard>
               </ProCard>
 
               {/* Section 3: Smart Contract Sync */}
-              <ProCard title="Blockchain Synchronization" headerBordered collapsible defaultCollapsed>
+              <ProCard
+                title="Blockchain Synchronization"
+                headerBordered
+                collapsible
+                defaultCollapsed
+              >
                 <ProFormSelect
                   name="network"
                   label="Target Network"
                   width="md"
                   options={[
-                    { value: 'eth_mainnet', label: 'Ethereum Mainnet' },
+                    {
+                      value: 'eth_mainnet',
+                      label: 'Ethereum Mainnet',
+                    },
                     { value: 'polygon', label: 'Polygon (Matic)' },
-                    { value: 'local_ganache', label: 'Local Ganache (Dev)' },
+                    {
+                      value: 'local_ganache',
+                      label: 'Local Ganache (Dev)',
+                    },
                   ]}
                   initialValue="local_ganache"
                 />
-                <ProFormSwitch 
-                  name="auto_execute" 
-                  label="Auto-Execute Passed Proposals" 
+                <ProFormSwitch
+                  name="auto_execute"
+                  label="Auto-Execute Passed Proposals"
                   initialValue={false}
                   tooltip="If enabled, the system will attempt to call the smart contract immediately upon vote closure."
                 />
@@ -294,31 +445,61 @@ export default function KonsensusSettingsPage() {
 
         {/* RIGHT COLUMN: Live Simulation & Feedback */}
         <Col xs={24} lg={8}>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
-            
+          <Space
+            direction="vertical"
+            size="large"
+            style={{ width: '100%' }}
+          >
             {/* Simulation Card */}
-            <ProCard 
-              title={<Space><ThunderboltOutlined /> Live Impact Analysis</Space>} 
-              headerBordered 
+            <ProCard
+              title={
+                <Space>
+                  <ThunderboltOutlined /> Live Impact Analysis
+                </Space>
+              }
+              headerBordered
               style={{ background: '#fafafa' }}
             >
-              <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="middle"
+              >
                 <div>
-                  <Text type="secondary">Governance Stiffness</Text>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <Statistic value={simulation.stiffness} suffix="/ 100" valueStyle={{ fontSize: 24 }} />
-                    <Tag color={simulation.riskColor}>{simulation.riskLabel}</Tag>
+                  <Text type="secondary">
+                    Governance Stiffness
+                  </Text>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'baseline',
+                    }}
+                  >
+                    <Statistic
+                      value={simulation.stiffness}
+                      suffix="/ 100"
+                      valueStyle={{ fontSize: 24 }}
+                    />
+                    <Tag color={simulation.riskColor}>
+                      {simulation.riskLabel}
+                    </Tag>
                   </div>
-                  <Progress 
-                    percent={simulation.stiffness} 
-                    showInfo={false} 
-                    strokeColor={simulation.riskColor === 'red' ? '#ff4d4f' : simulation.riskColor === 'orange' ? '#faad14' : '#52c41a'} 
+                  <Progress
+                    percent={simulation.stiffness}
+                    showInfo={false}
+                    strokeColor={
+                      simulation.riskColor === 'red'
+                        ? '#ff4d4f'
+                        : simulation.riskColor === 'orange'
+                        ? '#faad14'
+                        : '#52c41a'
+                    }
                   />
                 </div>
 
-                <Alert 
-                  message="Historical Replay" 
+                <Alert
+                  message="Historical Replay"
                   description={`Under these rules, ${simulation.retroFailures} passed proposals from last year would have failed.`}
                   type="info"
                   showIcon
@@ -328,16 +509,24 @@ export default function KonsensusSettingsPage() {
             </ProCard>
 
             {/* Quick Tips */}
-            <ProCard title="Governance Tips" headerBordered collapsible>
+            <ProCard
+              title="Governance Tips"
+              headerBordered
+              collapsible
+            >
               <List size="small" split={false}>
                 <List.Item>
                   <Text type="secondary">
-                    <WarningOutlined /> <strong>Quorum {'>'} 30%</strong> often leads to gridlock in decentralized communities.
+                    <WarningOutlined />{' '}
+                    <strong>Quorum {'>'} 30%</strong> often leads to
+                    gridlock in decentralized communities.
                   </Text>
                 </List.Item>
                 <List.Item>
                   <Text type="secondary">
-                    <SafetyCertificateOutlined /> <strong>Quadratic Voting</strong> is best used for resource allocation, not binary decisions.
+                    <SafetyCertificateOutlined />{' '}
+                    <strong>Quadratic Voting</strong> is best used for
+                    resource allocation, not binary decisions.
                   </Text>
                 </List.Item>
               </List>

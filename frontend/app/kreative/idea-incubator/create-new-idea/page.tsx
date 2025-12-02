@@ -11,12 +11,18 @@ import KreativePageShell from '@/app/kreative/kreativePageShell';
 const { TextArea } = Input;
 const { Option } = Select;
 
+type IdeaFormValues = {
+  title: string;
+  description: string;
+  category: string;
+};
+
 const CreateNewIdea: React.FC = () => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<IdeaFormValues>();
   const router = useRouter();
 
   // Handler for form submission.
-  const onFinish = (values: any) => {
+  const onFinish = (values: IdeaFormValues) => {
     console.log('Submitted Idea:', values);
     antdMessage.success('Votre idée a été soumise avec succès !');
     // Redirect to the "My Ideas" page after submitting.
@@ -26,9 +32,9 @@ const CreateNewIdea: React.FC = () => {
   return (
     <KreativePageShell
       title="Create New Idea"
-      description="Start a new idea in the incubator and capture its key details."
+      subtitle="Start a new idea in the incubator and capture its key details."
     >
-      <Form form={form} layout="vertical" onFinish={onFinish}>
+      <Form<IdeaFormValues> form={form} layout="vertical" onFinish={onFinish}>
         {/* Title Field */}
         <Form.Item
           label="Title of Idea"

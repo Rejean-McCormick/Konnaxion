@@ -78,7 +78,7 @@ type UsageReport = {
 /* ------------------------------------------------------------------ */
 
 function getAggregates(report: UsageReport | undefined) {
-  if (!report || !report.points.length) {
+  if (!report || report.points.length === 0) {
     return {
       totalUniqueUsers: 0,
       activeToday: 0,
@@ -87,14 +87,18 @@ function getAggregates(report: UsageReport | undefined) {
     };
   }
 
-  const { points, modules } = report;
-  const last = points[points.length - 1];
+  const points = report.points;
+  const modules = report.modules;
+
+  // points.length > 0 is guaranteed by the guard above
+  const lastPoint = points[points.length - 1] as UsagePoint;
+
   const uniqueUsers = Math.max(...points.map((p) => p.activeUsers));
   const newInPeriod = points.reduce((sum, p) => sum + p.newUsers, 0);
 
   return {
     totalUniqueUsers: uniqueUsers,
-    activeToday: last.activeUsers,
+    activeToday: lastPoint.activeUsers,
     newInPeriod,
     modulesTouched: modules.filter((m) => m.activeUsers > 0).length,
   };
@@ -180,7 +184,7 @@ const moduleColumns: ColumnsType<ModuleRow> = [
 
 export default function ReportsUsagePage() {
   const [range, setRange] = useState<TimeRangeKey>('30d');
-  
+
   const [data, setData] = useState<UsageReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -194,9 +198,11 @@ export default function ReportsUsagePage() {
       if (!response.ok) {
         throw new Error('Failed to fetch usage data');
       }
-      const report: UsageReport = await response.json();
+      const raw: unknown = await response.json();
+      const report = raw as UsageReport;
       setData(report);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error(err);
       setError(true);
     } finally {
@@ -205,10 +211,13 @@ export default function ReportsUsagePage() {
   };
 
   useEffect(() => {
-    fetchData(range);
+    void fetchData(range);
   }, [range]);
 
-  const aggregates = useMemo(() => getAggregates(data || undefined), [data]);
+  const aggregates = useMemo(
+    () => getAggregates(data || undefined),
+    [data],
+  );
 
   const lastUpdatedLabel = data
     ? new Date(data.generatedAt).toLocaleTimeString()
@@ -278,7 +287,11 @@ export default function ReportsUsagePage() {
         extra={headerExtra}
       >
         <ProCard>
-          <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Space
+            direction="vertical"
+            size="large"
+            style={{ width: '100%' }}
+          >
             <Space size="small">
               <InfoCircleOutlined />
               <Text type="danger">
@@ -344,8 +357,9 @@ export default function ReportsUsagePage() {
             </Title>
             <Text type="secondary">
               Snapshot of how many people are actively using Konnaxion,
-              which modules they touch, and how this evolves over time. Data
-              is aggregated from sign-ins, page views and workspace events.
+              which modules they touch, and how this evolves over time.
+              Data is aggregated from sign-ins, page views and workspace
+              events.
             </Text>
           </Space>
         </ProCard>
@@ -404,7 +418,10 @@ export default function ReportsUsagePage() {
 
         {/* Time series + quick notes */}
         <ProCard gutter={16} wrap>
-          <ProCard colSpan={{ xs: 24, lg: 16 }} title="Active vs New Users">
+          <ProCard
+            colSpan={{ xs: 24, lg: 16 }}
+            title="Active vs New Users"
+          >
             <div style={{ height: 300, width: '100%' }}>
               <ResponsiveContainer>
                 <LineChart data={data.points}>
@@ -413,20 +430,20 @@ export default function ReportsUsagePage() {
                   <YAxis />
                   <RechartsTooltip />
                   <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="activeUsers" 
-                    name="Active Users" 
-                    stroke="#1890ff" 
-                    strokeWidth={2} 
+                  <Line
+                    type="monotone"
+                    dataKey="activeUsers"
+                    name="Active Users"
+                    stroke="#1890ff"
+                    strokeWidth={2}
                     dot={false}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="newUsers" 
-                    name="New Signups" 
-                    stroke="#52c41a" 
-                    strokeWidth={2} 
+                  <Line
+                    type="monotone"
+                    dataKey="newUsers"
+                    name="New Signups"
+                    stroke="#52c41a"
+                    strokeWidth={2}
                     dot={false}
                   />
                 </LineChart>
@@ -434,7 +451,10 @@ export default function ReportsUsagePage() {
             </div>
           </ProCard>
 
-          <ProCard colSpan={{ xs: 24, lg: 8 }} title="Highlights">
+          <ProCard
+            colSpan={{ xs: 24, lg: 8 }}
+            title="Highlights"
+          >
             <Space
               direction="vertical"
               size="middle"
@@ -445,9 +465,9 @@ export default function ReportsUsagePage() {
                   Concentration
                 </Tag>
                 <Text type="secondary">
-                  Most activity is concentrated in the last few days of the
-                  selected range. Use shorter windows (7 days) to monitor
-                  spikes after launches.
+                  Most activity is concentrated in the last few days of
+                  the selected range. Use shorter windows (7 days) to
+                  monitor spikes after launches.
                 </Text>
               </Space>
               <Space align="start">
@@ -455,8 +475,9 @@ export default function ReportsUsagePage() {
                   Engagement
                 </Tag>
                 <Text type="secondary">
-                  Combine active users with retention per module to identify
-                  where people stay engaged vs. where they churn quickly.
+                  Combine active users with retention per module to
+                  identify where people stay engaged vs. where they
+                  churn quickly.
                 </Text>
               </Space>
               <Space align="start">
@@ -464,8 +485,8 @@ export default function ReportsUsagePage() {
                   Seasonality
                 </Tag>
                 <Text type="secondary">
-                  Expand to 90 days to detect weekly patterns (e.g. higher
-                  usage around events or recurring workshops).
+                  Expand to 90 days to detect weekly patterns (e.g.
+                  higher usage around events or recurring workshops).
                 </Text>
               </Space>
             </Space>

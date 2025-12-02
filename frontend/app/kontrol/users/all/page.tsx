@@ -2,35 +2,35 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { 
-  Tag, 
-  Button, 
-  Dropdown, 
-  message, 
-  Drawer, 
-  Descriptions, 
-  Space, 
-  Avatar, 
+import {
+  Tag,
+  Button,
+  Dropdown,
+  message,
+  Drawer,
+  Descriptions,
+  Space,
+  Avatar,
   Typography,
   Badge,
   Tabs,
   List,
-  Empty
+  Empty,
 } from 'antd';
-import { 
-  EllipsisOutlined, 
-  UserAddOutlined, 
+import {
+  EllipsisOutlined,
+  UserAddOutlined,
   UserOutlined,
   StopOutlined,
   HistoryOutlined,
   SafetyCertificateOutlined,
-  LockOutlined
+  LockOutlined,
 } from '@ant-design/icons';
-import { 
-  PageContainer, 
-  ProTable, 
-  type ProColumns, 
-  type ActionType 
+import {
+  PageContainer,
+  ProTable,
+  type ProColumns,
+  type ActionType,
 } from '@ant-design/pro-components';
 
 const { Text } = Typography;
@@ -48,13 +48,27 @@ type UserItem = {
   reputationScore: number;
 };
 
+type UsersApiResponse = {
+  results?: unknown[];
+  count?: number;
+};
+
+function isUsersApiResponse(data: unknown): data is UsersApiResponse {
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    ('results' in data || 'count' in data)
+  );
+}
+
 export default function AllUsersPage() {
   const actionRef = useRef<ActionType>();
-  
-  // State for Drawer & Active Filter Tab
-  const [currentRow, setCurrentRow] = useState<UserItem | undefined>(undefined);
+
+  const [currentRow, setCurrentRow] = useState<UserItem | undefined>(
+    undefined,
+  );
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<React.Key>('all');
+  const [activeTab, setActiveTab] = useState<string>('all');
 
   const handleAction = (key: string, record: UserItem) => {
     if (key === 'view') {
@@ -62,7 +76,6 @@ export default function AllUsersPage() {
       setDrawerOpen(true);
     } else if (key === 'ban') {
       message.success(`User ${record.username} has been banned.`);
-      // In a real app, you would make a POST/PATCH call here
       actionRef.current?.reload();
     } else if (key === 'reset') {
       message.info(`Password reset email sent to ${record.email}`);
@@ -77,16 +90,22 @@ export default function AllUsersPage() {
       width: 200,
       render: (dom, entity) => (
         <Space>
-          <Avatar 
-            icon={<UserOutlined />} 
-            style={{ 
-              backgroundColor: entity.role === 'admin' ? '#f56a00' : 
-                               entity.status === 'banned' ? '#ff4d4f' : '#87d068' 
-            }} 
+          <Avatar
+            icon={<UserOutlined />}
+            style={{
+              backgroundColor:
+                entity.role === 'admin'
+                  ? '#f56a00'
+                  : entity.status === 'banned'
+                  ? '#ff4d4f'
+                  : '#87d068',
+            }}
           />
           <Space direction="vertical" size={0}>
             <Text strong>{entity.username}</Text>
-            <Text type="secondary" style={{ fontSize: 12 }}>ID: {entity.id}</Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              ID: {entity.id}
+            </Text>
           </Space>
         </Space>
       ),
@@ -106,11 +125,11 @@ export default function AllUsersPage() {
         user: { text: 'User', status: 'Default' },
       },
       render: (_, entity) => {
-        let color = 'default';
+        let color: string = 'default';
         if (entity.role === 'admin') color = 'gold';
         if (entity.role === 'moderator') color = 'cyan';
         return <Tag color={color}>{entity.role.toUpperCase()}</Tag>;
-      }
+      },
     },
     {
       title: 'Reputation',
@@ -119,10 +138,15 @@ export default function AllUsersPage() {
       search: false,
       render: (dom, entity) => (
         <Space>
-          <SafetyCertificateOutlined style={{ color: entity.reputationScore > 0 ? '#52c41a' : '#ff4d4f' }} />
+          <SafetyCertificateOutlined
+            style={{
+              color:
+                entity.reputationScore > 0 ? '#52c41a' : '#ff4d4f',
+            }}
+          />
           {dom}
         </Space>
-      )
+      ),
     },
     {
       title: 'Status',
@@ -133,16 +157,17 @@ export default function AllUsersPage() {
         pending: { text: 'Pending', status: 'Processing' },
       },
       render: (_, entity) => {
-        const statusMap = {
+        const statusMap: Record<
+          UserItem['status'],
+          { status: 'success' | 'error' | 'warning'; text: string }
+        > = {
           active: { status: 'success', text: 'Active' },
           banned: { status: 'error', text: 'Banned' },
           pending: { status: 'warning', text: 'Pending' },
         };
-        // @ts-ignore
-        const s = statusMap[entity.status] || statusMap.active;
-        // @ts-ignore
+        const s = statusMap[entity.status] ?? statusMap.active;
         return <Badge status={s.status} text={s.text} />;
-      }
+      },
     },
     {
       title: 'Joined',
@@ -158,29 +183,31 @@ export default function AllUsersPage() {
         <Dropdown
           menu={{
             items: [
-              { 
-                key: 'view', 
-                label: 'View Details', 
+              {
+                key: 'view',
+                label: 'View Details',
                 icon: <HistoryOutlined />,
-                onClick: () => handleAction('view', record) 
+                onClick: () => handleAction('view', record),
               },
-              { 
-                key: 'reset', 
+              {
+                key: 'reset',
                 label: 'Reset Password',
-                onClick: () => handleAction('reset', record)
+                onClick: () => handleAction('reset', record),
               },
               { type: 'divider' },
-              { 
-                key: 'ban', 
-                label: 'Ban User', 
-                danger: true, 
+              {
+                key: 'ban',
+                label: 'Ban User',
+                danger: true,
                 icon: <StopOutlined />,
-                onClick: () => handleAction('ban', record) 
+                onClick: () => handleAction('ban', record),
               },
             ],
           }}
         >
-          <a key="action"><EllipsisOutlined style={{ fontSize: 18 }} /></a>
+          <a key="action">
+            <EllipsisOutlined style={{ fontSize: 18 }} />
+          </a>
         </Dropdown>
       ),
     },
@@ -190,77 +217,97 @@ export default function AllUsersPage() {
     <PageContainer
       title="User Management"
       subTitle="Manage user access, roles, and account status."
-      extra={<Button type="primary" icon={<UserAddOutlined />}>Add User</Button>}
+      extra={
+        <Button type="primary" icon={<UserAddOutlined />}>
+          Add User
+        </Button>
+      }
     >
       <ProTable<UserItem>
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        
-        // 1. DYNAMIC REQUEST TO REAL BACKEND
         request={async (params) => {
-          // Construct Query Params
           const searchParams = new URLSearchParams();
-          if (params.username) searchParams.append('search', params.username);
-          if (params.email) searchParams.append('search', params.email);
-          
+          if (params.username)
+            searchParams.append(
+              'search',
+              params.username as string,
+            );
+          if (params.email)
+            searchParams.append(
+              'search',
+              params.email as string,
+            );
+
           try {
-            const response = await fetch(`/api/admin/users/?${searchParams.toString()}`);
-            if (!response.ok) throw new Error('Failed to fetch users');
-            
-            const data = await response.json();
-            
-            // Map Django Serializer Data -> Frontend UserItem
-            // Backend sends: is_active, is_staff, is_superuser, date_joined
-            // Frontend expects: status, role, joinedAt
-            const mappedData: UserItem[] = (data.results || []).map((u: any) => {
-                // Determine Role
+            const response = await fetch(
+              `/api/admin/users/?${searchParams.toString()}`,
+            );
+            if (!response.ok)
+              throw new Error('Failed to fetch users');
+
+            const raw: unknown = await response.json();
+
+            let results: unknown[] = [];
+
+            if (isUsersApiResponse(raw)) {
+              results = raw.results ?? [];
+            } else if (Array.isArray(raw)) {
+              results = raw;
+            }
+
+            const mappedData: UserItem[] = results
+              .map((u) => {
+                const user = u as any;
+
                 let role: UserItem['role'] = 'user';
-                if (u.is_superuser) role = 'admin';
-                else if (u.is_staff) role = 'moderator';
+                if (user.is_superuser) role = 'admin';
+                else if (user.is_staff) role = 'moderator';
 
-                // Determine Status
                 let status: UserItem['status'] = 'active';
-                if (!u.is_active) status = 'banned'; 
-                // Note: 'pending' isn't standard in default Django User, 
-                // so we default to active/banned for now.
+                if (!user.is_active) status = 'banned';
 
-                // Filter based on Tab selection (Client-side filtering for specific logic)
-                if (activeTab === 'banned' && status !== 'banned') return null;
-                if (activeTab === 'admin' && role === 'user') return null;
+                if (activeTab === 'banned' && status !== 'banned') {
+                  return null;
+                }
+                if (
+                  activeTab === 'admin' &&
+                  role === 'user'
+                ) {
+                  return null;
+                }
 
                 return {
-                    id: u.id,
-                    username: u.username,
-                    email: u.email,
-                    role: role,
-                    status: status,
-                    joinedAt: u.joined_at, // mapped in serializer
-                    lastLogin: u.last_login || 'Never',
-                    reputationScore: u.reputation_score || 0
-                };
-            }).filter(Boolean); // Remove nulls from filtering
+                  id: user.id,
+                  username: user.username,
+                  email: user.email,
+                  role,
+                  status,
+                  joinedAt: user.joined_at,
+                  lastLogin: user.last_login || 'Never',
+                  reputationScore: user.reputation_score || 0,
+                } as UserItem;
+              })
+              .filter((u): u is UserItem => u !== null);
 
-            return { 
-              data: mappedData, 
+            return {
+              data: mappedData,
               success: true,
-              total: mappedData.length 
+              total: mappedData.length,
             };
-
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error(error);
             message.error('Error loading users list');
             return { data: [], success: false };
           }
         }}
-        
         rowKey="id"
         search={{
           labelWidth: 'auto',
           defaultCollapsed: false,
         }}
-        
-        // 2. TOOLBAR TABS
         toolbar={{
           menu: {
             type: 'tab',
@@ -270,30 +317,38 @@ export default function AllUsersPage() {
               { key: 'banned', label: 'Banned Only' },
               { key: 'admin', label: 'Staff (Admins)' },
             ],
+            // Fix: accept Key | undefined and normalise to string
             onChange: (key) => {
-              setActiveTab(key);
-              actionRef.current?.reload(); // Trigger re-fetch
-            }
-          }
+              const k = key ?? 'all';
+              setActiveTab(String(k));
+              actionRef.current?.reload();
+            },
+          },
         }}
         pagination={{
           pageSize: 10,
         }}
       />
 
-      {/* 3. PROFILE DRAWER */}
+      {/* Profile Drawer */}
       <Drawer
         width={700}
         open={drawerOpen}
-        onClose={() => { setDrawerOpen(false); setCurrentRow(undefined); }}
+        onClose={() => {
+          setDrawerOpen(false);
+          setCurrentRow(undefined);
+        }}
         title={
           <Space>
-             <Avatar icon={<UserOutlined />} src={currentRow?.avatar} />
-             <span>Profile: {currentRow?.username}</span>
+            <Avatar
+              icon={<UserOutlined />}
+              src={currentRow?.avatar}
+            />
+            <span>Profile: {currentRow?.username}</span>
           </Space>
         }
         extra={
-            <Button onClick={() => setDrawerOpen(false)}>Close</Button>
+          <Button onClick={() => setDrawerOpen(false)}>Close</Button>
         }
       >
         {currentRow && (
@@ -304,73 +359,150 @@ export default function AllUsersPage() {
                 key: '1',
                 label: 'Overview',
                 children: (
-                  <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                    <Descriptions title="Account Info" column={2} bordered size="small">
-                      <Descriptions.Item label="User ID">{currentRow.id}</Descriptions.Item>
-                      <Descriptions.Item label="Email">{currentRow.email}</Descriptions.Item>
+                  <Space
+                    direction="vertical"
+                    size="large"
+                    style={{ width: '100%' }}
+                  >
+                    <Descriptions
+                      title="Account Info"
+                      column={2}
+                      bordered
+                      size="small"
+                    >
+                      <Descriptions.Item label="User ID">
+                        {currentRow.id}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Email">
+                        {currentRow.email}
+                      </Descriptions.Item>
                       <Descriptions.Item label="Role">
-                        <Tag color="blue">{currentRow.role.toUpperCase()}</Tag>
+                        <Tag color="blue">
+                          {currentRow.role.toUpperCase()}
+                        </Tag>
                       </Descriptions.Item>
                       <Descriptions.Item label="Status">
-                          <Tag color={currentRow.status === 'active' ? 'green' : 'red'}>{currentRow.status.toUpperCase()}</Tag>
+                        <Tag
+                          color={
+                            currentRow.status === 'active'
+                              ? 'green'
+                              : 'red'
+                          }
+                        >
+                          {currentRow.status.toUpperCase()}
+                        </Tag>
                       </Descriptions.Item>
-                      <Descriptions.Item label="Joined Date">{currentRow.joinedAt}</Descriptions.Item>
-                      <Descriptions.Item label="Last Login">{currentRow.lastLogin}</Descriptions.Item>
+                      <Descriptions.Item label="Joined Date">
+                        {currentRow.joinedAt}
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Last Login">
+                        {currentRow.lastLogin}
+                      </Descriptions.Item>
                     </Descriptions>
 
-                    <Descriptions title="Reputation & Trust" column={1} bordered size="small">
+                    <Descriptions
+                      title="Reputation & Trust"
+                      column={1}
+                      bordered
+                      size="small"
+                    >
                       <Descriptions.Item label="Reputation Score">
-                         <Space>
-                            <Text strong style={{ color: currentRow.reputationScore > 0 ? '#52c41a' : '#ff4d4f' }}>
-                                {currentRow.reputationScore}
-                            </Text>
-                            <Text type="secondary">(Top 15%)</Text>
-                         </Space>
+                        <Space>
+                          <Text
+                            strong
+                            style={{
+                              color:
+                                currentRow.reputationScore > 0
+                                  ? '#52c41a'
+                                  : '#ff4d4f',
+                            }}
+                          >
+                            {currentRow.reputationScore}
+                          </Text>
+                          <Text type="secondary">
+                            (Top 15%)
+                          </Text>
+                        </Space>
                       </Descriptions.Item>
                       <Descriptions.Item label="Trust Level">
-                         <Badge status="success" text="Verified Human" />
+                        <Badge
+                          status="success"
+                          text="Verified Human"
+                        />
                       </Descriptions.Item>
                     </Descriptions>
 
-                    <div style={{ background: '#f5f5f5', padding: 16, borderRadius: 8 }}>
-                        <Text type="secondary"><SafetyCertificateOutlined /> Admin Notes:</Text>
-                        <p style={{ marginTop: 8, marginBottom: 0 }}>
-                            User has been flagged 2 times in the last month for minor spam. Monitoring recommended.
-                        </p>
+                    <div
+                      style={{
+                        background: '#f5f5f5',
+                        padding: 16,
+                        borderRadius: 8,
+                      }}
+                    >
+                      <Text type="secondary">
+                        <SafetyCertificateOutlined /> Admin
+                        Notes:
+                      </Text>
+                      <p
+                        style={{
+                          marginTop: 8,
+                          marginBottom: 0,
+                        }}
+                      >
+                        User has been flagged 2 times in the last
+                        month for minor spam. Monitoring
+                        recommended.
+                      </p>
                     </div>
                   </Space>
-                )
+                ),
               },
               {
                 key: '2',
                 label: 'Activity Log',
                 children: (
-                   <List
-                     dataSource={[
-                       { title: 'Posted a comment', time: '2 hours ago' },
-                       { title: 'Voted on Proposal #42', time: '1 day ago' },
-                       { title: 'Logged in from new IP', time: '3 days ago' },
-                       { title: 'Password changed', time: '1 month ago', icon: <LockOutlined /> }
-                     ]}
-                     renderItem={item => (
-                        <List.Item>
-                           <List.Item.Meta
-                              avatar={item.icon || <HistoryOutlined />}
-                              title={item.title}
-                              description={item.time}
-                           />
-                        </List.Item>
-                     )}
-                   />
-                )
+                  <List
+                    dataSource={[
+                      {
+                        title: 'Posted a comment',
+                        time: '2 hours ago',
+                      },
+                      {
+                        title: 'Voted on Proposal #42',
+                        time: '1 day ago',
+                      },
+                      {
+                        title: 'Logged in from new IP',
+                        time: '3 days ago',
+                      },
+                      {
+                        title: 'Password changed',
+                        time: '1 month ago',
+                        icon: <LockOutlined />,
+                      },
+                    ]}
+                    renderItem={(item) => (
+                      <List.Item>
+                        <List.Item.Meta
+                          avatar={item.icon || <HistoryOutlined />}
+                          title={item.title}
+                          description={item.time}
+                        />
+                      </List.Item>
+                    )}
+                  />
+                ),
               },
               {
                 key: '3',
                 label: 'Permissions',
                 children: (
-                  <Empty description="No custom permissions overrides set for this user." image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                )
-              }
+                  <Empty
+                    description="No custom permissions overrides set for this user."
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  />
+                ),
+              },
             ]}
           />
         )}

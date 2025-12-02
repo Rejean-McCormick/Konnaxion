@@ -68,7 +68,11 @@ export default function StartNewSpacePage(): JSX.Element {
     router.push('/kreative/collaborative-spaces/my-spaces');
   };
 
-  return <KreativePageShell title="Page" description="">(
+  return (
+    <KreativePageShell
+      title="Start a New Space"
+      subtitle="Define your collaborative space so others can discover and join the right context."
+    >
       <PageContainer title="Start a New Space">
         <Paragraph type="secondary" style={{ marginBottom: 24 }}>
           Define your collaborative space so others can discover and join the right context.
@@ -93,9 +97,17 @@ export default function StartNewSpacePage(): JSX.Element {
           <Form.Item
             label="Description / Purpose"
             name="description"
-            rules={[{ required: true, message: 'Please provide a description for your space.' }]}
+            rules={[
+              {
+                required: true,
+                message: 'Please provide a description for your space.',
+              },
+            ]}
           >
-            <TextArea rows={5} placeholder="Describe the purpose and vision of your space" />
+            <TextArea
+              rows={5}
+              placeholder="Describe the purpose and vision of your space"
+            />
           </Form.Item>
 
           {/* Category / Type */}
@@ -107,8 +119,12 @@ export default function StartNewSpacePage(): JSX.Element {
             <Select placeholder="Select a category">
               <Option value="Art Study Group">Art Study Group</Option>
               <Option value="Music Jam Session">Music Jam Session</Option>
-              <Option value="Creative Writing Circle">Creative Writing Circle</Option>
-              <Option value="Digital Innovation Hub">Digital Innovation Hub</Option>
+              <Option value="Creative Writing Circle">
+                Creative Writing Circle
+              </Option>
+              <Option value="Digital Innovation Hub">
+                Digital Innovation Hub
+              </Option>
             </Select>
           </Form.Item>
 
@@ -130,32 +146,46 @@ export default function StartNewSpacePage(): JSX.Element {
               getFieldValue('privacy') === 'Private' ? (
                 <Form.List name="invitedMembers">
                   {(fields, { add, remove }) => (
-                    <>
-                      <Space direction="vertical" style={{ width: '100%' }}>
-                        {fields.map((field) => (
-                          <Space key={field.key} align="baseline">
-                            <Form.Item
-                              {...field}
-                              name={[field.name, 'email']}
-                              rules={[
-                                { required: true, message: 'Please enter an email address.' },
-                                { type: 'email', message: 'Please enter a valid email address.' },
-                              ]}
-                            >
-                              <Input placeholder="Enter member email" />
-                            </Form.Item>
-                            <Button type="link" onClick={() => remove(field.name)}>
-                              Remove
-                            </Button>
-                          </Space>
-                        ))}
-                        <Form.Item>
-                          <Button type="dashed" onClick={() => add()} icon={<PlusOutlined />}>
-                            Invite Member
+                    <Space
+                      direction="vertical"
+                      style={{ width: '100%' }}
+                    >
+                      {fields.map((field) => (
+                        <Space key={field.key} align="baseline">
+                          <Form.Item
+                            {...field}
+                            name={[field.name, 'email']}
+                            rules={[
+                              {
+                                required: true,
+                                message: 'Please enter an email address.',
+                              },
+                              {
+                                type: 'email',
+                                message: 'Please enter a valid email address.',
+                              },
+                            ]}
+                          >
+                            <Input placeholder="Enter member email" />
+                          </Form.Item>
+                          <Button
+                            type="link"
+                            onClick={() => remove(field.name)}
+                          >
+                            Remove
                           </Button>
-                        </Form.Item>
-                      </Space>
-                    </>
+                        </Space>
+                      ))}
+                      <Form.Item>
+                        <Button
+                          type="dashed"
+                          onClick={() => add()}
+                          icon={<PlusOutlined />}
+                        >
+                          Invite Member
+                        </Button>
+                      </Form.Item>
+                    </Space>
                   )}
                 </Form.List>
               ) : null
@@ -182,5 +212,6 @@ export default function StartNewSpacePage(): JSX.Element {
           </Form.Item>
         </Form>
       </PageContainer>
-    )</KreativePageShell>;
+    </KreativePageShell>
+  );
 }
