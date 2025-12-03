@@ -42,6 +42,18 @@ urlpatterns += [
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
 
     # ------------------------------------------------------------------
+    # Ekoh – expertise & ethics profiles
+    #   /api/v1/ekoh/profile/<uid>/
+    # ------------------------------------------------------------------
+    path("api/v1/ekoh/", include("konnaxion.ekoh.urls")),
+
+    # ------------------------------------------------------------------
+    # Smart-Vote – weighted balloting
+    #   /api/v1/smart-vote/cast/
+    # ------------------------------------------------------------------
+    path("api/v1/smart-vote/", include("konnaxion.smart_vote.urls")),
+
+    # ------------------------------------------------------------------
     # Analytics / Reports Endpoints
     # [UPDATED] Delegated to konnaxion.kontrol.urls
     # Handles: /api/reports/usage, /api/reports/perf, /api/reports/smart-vote
@@ -76,4 +88,5 @@ if settings.DEBUG:
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
+
         urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]

@@ -99,8 +99,11 @@ LOCAL_APPS = [
     "konnaxion.kreative",
     "konnaxion.moderation",
     "konnaxion.trust",
-    "konnaxion.kontrol",  # <-- Added new admin/control module
+    "konnaxion.kontrol",
+    # NOTE:
+    # EkoH & Smart-Vote are registered via config/settings/settings_addons.py
 ]
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
@@ -124,7 +127,6 @@ LOGIN_REDIRECT_URL = "http://localhost:3000/ekoh/dashboard"
 
 # This is the backend login view (/accounts/login/)
 LOGIN_URL = "account_login"
-
 
 
 # PASSWORDS
@@ -309,10 +311,8 @@ CELERY_TASK_SERIALIZER = "json"
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#std:setting-result_serializer
 CELERY_RESULT_SERIALIZER = "json"
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-time-limit
-# TODO: set to whatever value is adequate in your circumstances
 CELERY_TASK_TIME_LIMIT = 5 * 60
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#task-soft-time-limit
-# TODO: set to whatever value is adequate in your circumstances
 CELERY_TASK_SOFT_TIME_LIMIT = 60
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
@@ -350,7 +350,6 @@ SOCIALACCOUNT_ADAPTER = "konnaxion.users.adapters.SocialAccountAdapter"
 SOCIALACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSocialSignupForm"}
 
 
-
 # django-rest-framework
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
@@ -378,5 +377,19 @@ SPECTACULAR_SETTINGS = {
 # Your stuff...
 # ------------------------------------------------------------------------------
 
-# --- EkoH & Smart-Vote additions ---
-from .settings_addons import *
+# EkoH & Smart-Vote integration
+# Import the addons defined in the separate file
+from .settings_addons import (
+    EKOH_INSTALLED_APPS,
+    EKOH_CELERY_BEAT_SCHEDULE,
+    KAFKA_BOOTSTRAP_SERVERS,
+)
+
+# Merge Apps
+INSTALLED_APPS += EKOH_INSTALLED_APPS
+
+# Merge Celery Schedule
+if "CELERY_BEAT_SCHEDULE" not in locals():
+    CELERY_BEAT_SCHEDULE = {}
+
+CELERY_BEAT_SCHEDULE.update(EKOH_CELERY_BEAT_SCHEDULE)

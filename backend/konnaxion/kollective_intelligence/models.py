@@ -1,6 +1,4 @@
 # FILE: backend/konnaxion/kollective_intelligence/models.py
-
-# kollective_intelligence/models.py
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
@@ -11,7 +9,7 @@ from django.utils import timezone
 # ────────────────────────────────
 
 class ExpertiseCategory(models.Model):
-    """Catalog of knowledge domains.”"""
+    """Catalog of knowledge domains."""
     name = models.CharField(max_length=120, unique=True)
 
     def __str__(self):
@@ -19,10 +17,10 @@ class ExpertiseCategory(models.Model):
 
 
 class UserExpertiseScore(models.Model):
-    """Current domain-specific expertise weight per user.”"""
+    """Current domain-specific expertise weight per user."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE,
-                             related_name="expertise_scores")
+                             related_name="kollective_expertise_scores") # Changed related_name
     category = models.ForeignKey(ExpertiseCategory,
                                  on_delete=models.CASCADE,
                                  related_name="user_scores")
@@ -38,10 +36,11 @@ class UserExpertiseScore(models.Model):
 
 
 class UserEthicsScore(models.Model):
-    """Ethical multiplier influencing all expertise weights.”"""
+    """Ethical multiplier influencing all expertise weights."""
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
                                 on_delete=models.CASCADE,
-                                primary_key=True)
+                                primary_key=True,
+                                related_name="kollective_userethicsscore") # Changed related_name
     ethical_score = models.DecimalField(max_digits=5, decimal_places=2)
 
     def __str__(self):
@@ -49,7 +48,7 @@ class UserEthicsScore(models.Model):
 
 
 class ScoreConfiguration(models.Model):
-    """Stores named weight configurations (global or field-specific).”"""
+    """Stores named weight configurations (global or field-specific)."""
     weight_name = models.CharField(max_length=64)
     weight_value = models.DecimalField(max_digits=6, decimal_places=3)
     field = models.CharField(max_length=64, blank=True, null=True)
@@ -59,7 +58,7 @@ class ScoreConfiguration(models.Model):
 
 
 class ContextAnalysisLog(models.Model):
-    """Logs every AI adjustment applied to scores.”"""
+    """Logs every AI adjustment applied to scores."""
     entity_type = models.CharField(max_length=40)
     entity_id = models.PositiveBigIntegerField()
     field = models.CharField(max_length=64)
@@ -69,7 +68,7 @@ class ContextAnalysisLog(models.Model):
 
 
 class ConfidentialitySetting(models.Model):
-    """Per-user anonymity preferences.”"""
+    """Per-user anonymity preferences."""
     PUBLIC = "public"
     PSEUDONYM = "pseudonym"
     ANONYMOUS = "anonymous"
@@ -81,13 +80,14 @@ class ConfidentialitySetting(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL,
                                 on_delete=models.CASCADE,
-                                primary_key=True)
+                                primary_key=True,
+                                related_name="kollective_confidentialitysetting") # Changed related_name
     level = models.CharField(max_length=10, choices=LEVEL_CHOICES,
                              default=PUBLIC)
 
 
 class ScoreHistory(models.Model):
-    """Keeps an audit trail of every score change.”"""
+    """Keeps an audit trail of every score change."""
     merit_score = models.ForeignKey(UserExpertiseScore,
                                     on_delete=models.CASCADE,
                                     related_name="history")
@@ -102,10 +102,10 @@ class ScoreHistory(models.Model):
 # ────────────────────────────────
 
 class Vote(models.Model):
-    """Stores each raw and weighted vote.”"""
+    """Stores each raw and weighted vote."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE,
-                             related_name="votes")
+                             related_name="kollective_votes") # Changed related_name just in case
     target_type = models.CharField(max_length=40)
     target_id = models.PositiveBigIntegerField()
     raw_value = models.DecimalField(max_digits=6, decimal_places=3)
@@ -117,22 +117,22 @@ class Vote(models.Model):
 
 
 class VoteModality(models.Model):
-    """Parameters for approval / ranking / rating, etc.”"""
+    """Parameters for approval / ranking / rating, etc."""
     name = models.CharField(max_length=40, unique=True)
     parameters = models.JSONField()
 
 
 class EmergingExpert(models.Model):
-    """Flags fast-rising contributors.”"""
+    """Flags fast-rising contributors."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE,
-                             related_name="emerging_expert_flags")
+                             related_name="kollective_emerging_expert_flags") # Changed related_name
     detection_date = models.DateField(default=timezone.now)
     score_delta = models.DecimalField(max_digits=7, decimal_places=3)
 
 
 class VoteResult(models.Model):
-    """Aggregated weighted totals per target.”"""
+    """Aggregated weighted totals per target."""
     target_type = models.CharField(max_length=40)
     target_id = models.PositiveBigIntegerField()
     sum_weighted_value = models.DecimalField(max_digits=12, decimal_places=3)
@@ -143,7 +143,7 @@ class VoteResult(models.Model):
 
 
 class IntegrationMapping(models.Model):
-    """Links Smart Vote to other modules / domain objects.”"""
+    """Links Smart Vote / Ekoh context to other modules' objects."""
     module_name = models.CharField(max_length=40)
     context_type = models.CharField(max_length=40)
     mapping_details = models.JSONField()
