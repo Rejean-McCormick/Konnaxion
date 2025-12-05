@@ -13,7 +13,7 @@ from .aggregator import aggregate_votes as _aggregate_votes
 
 
 @shared_task(name="vote_aggregate")
-def vote_aggregate():
+def vote_aggregate(batch_size: int = 5_000) -> None:
     """
     Periodic Smart-Vote aggregation task.
 
@@ -21,5 +21,10 @@ def vote_aggregate():
       1. Reads new votes since last cursor.
       2. Aggregates weighted scores per (target_type, target_id).
       3. Upserts into `vote_result`.
+
+    Parameters
+    ----------
+    batch_size : int
+        Maximum number of votes to process per run.
     """
-    _aggregate_votes()
+    _aggregate_votes(batch_size=batch_size)

@@ -61,6 +61,17 @@ urlpatterns += [
     path("api/", include("konnaxion.kontrol.urls", namespace="kontrol")),
 
     # ------------------------------------------------------------------
+    # Team Builder – sessions, teams, problems
+    #   /api/teambuilder/sessions/
+    #   /api/teambuilder/teams/
+    #   /api/teambuilder/problems/
+    # ------------------------------------------------------------------
+    path(
+        "api/teambuilder/",
+        include(("konnaxion.teambuilder.urls", "teambuilder"), namespace="teambuilder"),
+    ),
+
+    # ------------------------------------------------------------------
     # Compat FE aliases: map "deliberate" to existing Ethikos endpoints.
     # Gives /api/deliberate/topics|stances|arguments and
     #       /api/deliberate/elite/topics|stances|arguments

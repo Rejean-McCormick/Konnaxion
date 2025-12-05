@@ -1,11 +1,13 @@
+# konnaxion/smart_vote/tasks/aggregator.py
 """
-Aggregator task:
+Aggregator logic:
 
 1. Pulls Vote rows created since the last run (uses id > cursor).
 2. Sums their weighted values per (target_type, target_id) combination.
 3. UPSERTs into vote_result (sum_weighted_value, vote_count).
 
-Runs every minute by default (see tasks_schedule.md).
+This module contains plain Python logic (no Celery task here).
+The Celery task wrapper lives in konnaxion.smart_vote.tasks.__init__.
 """
 
 from __future__ import annotations
@@ -14,7 +16,6 @@ import logging
 from collections import defaultdict
 from decimal import Decimal
 
-from celery import shared_task
 from django.db import transaction, connection
 
 from konnaxion.smart_vote.models.core import Vote, VoteResult
@@ -39,8 +40,13 @@ def _save_cursor(vote_id: int) -> None:
         cur.execute("SELECT set_config(%s, %s, true);", (CURSOR_KEY, str(vote_id)))
 
 
-@shared_task(name="vote_aggregate")
 def aggregate_votes(batch_size: int = 5_000) -> None:
+    """
+    Core aggregation routine.
+
+    This is NOT a Celery task. It is invoked by the Celery task
+    `vote_aggregate` defined in konnaxion.smart_vote.tasks.__init__.
+    """
     last_id = _load_cursor()
     LOGGER.debug("Vote aggregate start (cursor=%s)", last_id)
 

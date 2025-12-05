@@ -1,0 +1,1486 @@
+===== TOC (11 files) =====
+0001  admin.py
+0002  apps.py
+0003  factories.py
+0004  logic.py
+0005  migrations/__init__.py
+0006  models.py
+0007  problem_logic.py
+0008  serializers.py
+0009  tests/test_problems_api.py
+0010  urls.py
+0011  views.py
+===== END TOC =====
+
+
+===== BEGIN admin.py (#0001) =====
+# backend/konnaxion/teambuilder/admin.py
+from django.contrib import admin
+
+from .models import (
+    BuilderSession,
+    Team,
+    TeamMember,
+    Problem,
+    ProblemChangeEvent,
+)
+
+
+class TeamMemberInline(admin.TabularInline):
+    model = TeamMember
+    extra = 0
+    readonly_fields = ["match_reason", "suggested_role"]
+    autocomplete_fields = ["user"]
+
+
+class TeamInline(admin.TabularInline):
+    model = Team
+    extra = 0
+    show_change_link = True
+    fields = ["name", "metrics"]
+    readonly_fields = ["metrics"]
+
+
+class ProblemChangeEventInline(admin.TabularInline):
+    model = ProblemChangeEvent
+    extra = 0
+    readonly_fields = ["type", "title", "description", "timestamp", "changed_by"]
+    can_delete = False
+
+    def has_add_permission(self, request, obj=None):
+        # History entries are created programmatically, not manually
+        return False
+
+
+@admin.register(Problem)
+class ProblemAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "status",
+        "risk_level",
+        "created_by",
+        "created_at",
+        "session_count",
+    ]
+    list_filter = ["status", "risk_level", "created_at"]
+    search_fields = ["name", "description", "categories", "unesco_codes"]
+    readonly_fields = ["created_at", "updated_at"]
+    inlines = [ProblemChangeEventInline]
+
+    def session_count(self, obj):
+        return obj.sessions.count()
+
+    session_count.short_description = "Sessions"
+
+
+@admin.register(BuilderSession)
+class BuilderSessionAdmin(admin.ModelAdmin):
+    list_display = [
+        "name",
+        "status",
+        "problem",
+        "created_by",
+        "created_at",
+        "candidate_count",
+    ]
+    list_filter = ["status", "created_at", "problem"]
+    search_fields = ["name", "description"]
+    readonly_fields = ["created_at", "updated_at"]
+    filter_horizontal = ["candidates"]
+    autocomplete_fields = ["problem", "created_by"]
+    inlines = [TeamInline]
+
+    def candidate_count(self, obj):
+        return obj.candidates.count()
+
+    candidate_count.short_description = "Candidates"
+
+
+@admin.register(Team)
+class TeamAdmin(admin.ModelAdmin):
+    list_display = ["name", "session", "member_count", "created_at"]
+    list_filter = ["session", "created_at"]
+    search_fields = ["name", "session__name"]
+    inlines = [TeamMemberInline]
+
+    def member_count(self, obj):
+        return obj.members.count()
+
+    member_count.short_description = "Members"
+
+
+@admin.register(TeamMember)
+class TeamMemberAdmin(admin.ModelAdmin):
+    list_display = ["user", "team", "suggested_role"]
+    list_filter = ["team__session", "suggested_role"]
+    search_fields = ["user__username", "user__email", "team__name"]
+    autocomplete_fields = ["user", "team"]
+
+
+@admin.register(ProblemChangeEvent)
+class ProblemChangeEventAdmin(admin.ModelAdmin):
+    list_display = ["problem", "type", "title", "timestamp", "changed_by"]
+    list_filter = ["type", "timestamp", "problem"]
+    search_fields = ["title", "description", "problem__name"]
+    readonly_fields = ["timestamp"]
+    autocomplete_fields = ["problem", "changed_by"]
+
+===== END admin.py (#0001) =====
+
+===== BEGIN apps.py (#0002) =====
+# backend/konnaxion/teambuilder/apps.py
+from django.apps import AppConfig
+from django.utils.translation import gettext_lazy as _
+
+class TeamBuilderConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.teambuilder"
+    verbose_name = _("Team Builder")
+
+    def ready(self):
+        try:
+            import konnaxion.teambuilder.signals  # noqa: F401
+        except ImportError:
+            pass
+===== END apps.py (#0002) =====
+
+===== BEGIN factories.py (#0003) =====
+# FILE: backend/konnaxion/teambuilder/factories.py
+from __future__ import annotations
+
+from collections.abc import Sequence
+from typing import Any
+
+from django.contrib.auth import get_user_model
+from factory import Faker, LazyAttribute, SubFactory, post_generation
+from factory.django import DjangoModelFactory
+
+from konnaxion.teambuilder.models import (
+    Problem,
+    ProblemChangeEvent,
+    BuilderSession,
+    Team,
+    TeamMember,
+)
+
+User = get_user_model()
+
+
+# ---------------------------------------------------------------------------
+# Generic user factory (local, so teambuilder tests don't depend on users/tests)
+# ---------------------------------------------------------------------------
+
+
+class UserFactory(DjangoModelFactory[User]):
+    username = Faker("user_name")
+    email = Faker("email")
+    first_name = Faker("first_name")
+    last_name = Faker("last_name")
+
+    @post_generation
+    def password(self, create: bool, extracted: Sequence[Any], **kwargs):  # noqa: FBT001
+        password = (
+            extracted
+            if extracted
+            else Faker(
+                "password",
+                length=24,
+                special_chars=True,
+                digits=True,
+                upper_case=True,
+                lower_case=True,
+            ).evaluate(None, None, extra={"locale": None})
+        )
+        self.set_password(password)
+
+    @classmethod
+    def _after_postgeneration(cls, instance, create, results=None):
+        """Save again the instance if creating and at least one hook ran."""
+        if create and results and not cls._meta.skip_postgeneration_save:
+            instance.save()
+
+    class Meta:
+        model = User
+        django_get_or_create = ["username"]
+
+
+# ---------------------------------------------------------------------------
+# Problem domain factories
+# ---------------------------------------------------------------------------
+
+
+class ProblemFactory(DjangoModelFactory[Problem]):
+    name = Faker("sentence", nb_words=4)
+    description = Faker("paragraph", nb_sentences=3)
+
+    status = Problem.Status.ACTIVE
+    risk_level = Problem.RiskLevel.MEDIUM
+
+    min_team_size = 3
+    max_team_size = 5
+
+    unesco_codes = LazyAttribute(lambda _: ["13.01"])
+    categories = LazyAttribute(lambda _: ["Education"])
+    recommended_modes = LazyAttribute(lambda _: ["Elite", "Learning"])
+
+    facilitator_notes = Faker("sentence")
+
+    created_by = SubFactory(UserFactory)
+
+    class Meta:
+        model = Problem
+
+
+class ProblemChangeEventFactory(DjangoModelFactory[ProblemChangeEvent]):
+    problem = SubFactory(ProblemFactory)
+    type = ProblemChangeEvent.EventType.EDIT
+    title = Faker("sentence", nb_words=6)
+    description = Faker("paragraph", nb_sentences=2)
+    changed_by = SubFactory(UserFactory)
+
+    class Meta:
+        model = ProblemChangeEvent
+
+
+# ---------------------------------------------------------------------------
+# BuilderSession / Team / TeamMember factories
+# ---------------------------------------------------------------------------
+
+
+class BuilderSessionFactory(DjangoModelFactory[BuilderSession]):
+    name = Faker("sentence", nb_words=4)
+    description = Faker("paragraph", nb_sentences=2)
+
+    status = BuilderSession.Status.DRAFT
+
+    algorithm_config = LazyAttribute(
+        lambda _: {
+            "target_team_size": 4,
+            "strategy": "BALANCED",
+        }
+    )
+
+    created_by = SubFactory(UserFactory)
+
+    # Link to a problem (optional but present by default in tests)
+    problem = SubFactory(ProblemFactory)
+
+    @post_generation
+    def candidates(self, create: bool, extracted: Sequence[Any], **kwargs):  # noqa: FBT001
+        """
+        Optionally attach candidates:
+        - If `extracted` is provided, it should be an iterable of User instances.
+        - If not provided, we add a few generated users by default.
+        """
+        if not create:
+            return
+
+        if extracted:
+            for user in extracted:
+                self.candidates.add(user)
+        else:
+            # Default: attach 3 users so tests have some data
+            for _ in range(3):
+                self.candidates.add(UserFactory())
+
+    class Meta:
+        model = BuilderSession
+
+
+class TeamFactory(DjangoModelFactory[Team]):
+    session = SubFactory(BuilderSessionFactory)
+    name = LazyAttribute(lambda o: f"Team for {o.session.name}")
+
+    metrics = LazyAttribute(
+        lambda _:
+        {
+            "avg_skill": 0.8,
+            "diversity_score": 0.9,
+        }
+    )
+
+    class Meta:
+        model = Team
+
+
+class TeamMemberFactory(DjangoModelFactory[TeamMember]):
+    team = SubFactory(TeamFactory)
+    user = SubFactory(UserFactory)
+
+    suggested_role = Faker("job")
+    match_reason = Faker("sentence")
+
+    class Meta:
+        model = TeamMember
+        django_get_or_create = ["team", "user"]
+
+===== END factories.py (#0003) =====
+
+===== BEGIN logic.py (#0004) =====
+import random
+import math
+from django.db import transaction
+from django.utils import timezone
+from .models import BuilderSession, Team, TeamMember
+
+# -----------------------------------------------------------------------------
+# Public Entry Point
+# -----------------------------------------------------------------------------
+
+def generate_teams_for_session(session_id: str):
+    """
+    Main logic function to organize candidates into teams based on session config.
+    """
+    with transaction.atomic():
+        # 1. Fetch Session
+        try:
+            session = BuilderSession.objects.get(pk=session_id)
+        except BuilderSession.DoesNotExist:
+            return {"error": "Session not found"}
+
+        # 2. Update Status
+        session.status = BuilderSession.Status.PROCESSING
+        session.save()
+
+        # 3. Clean up previous runs (Idempotency)
+        session.teams.all().delete()
+
+        # 4. Get Configuration
+        candidates = list(session.candidates.all())
+        if not candidates:
+            session.status = BuilderSession.Status.DRAFT
+            session.save()
+            return {"error": "No candidates selected"}
+
+        config = session.algorithm_config or {}
+        target_size = int(config.get("target_team_size", 4))
+        strategy = config.get("strategy", "balanced_expertise")  # 'random' or 'balanced_expertise'
+
+        # 5. Execute Algorithm
+        # Calculate how many teams we need
+        total_candidates = len(candidates)
+        num_teams = math.ceil(total_candidates / target_size)
+        
+        # Determine algorithm
+        if strategy == "random":
+            teams_structure = _strategy_random(candidates, num_teams)
+        else:
+            teams_structure = _strategy_balanced_expertise(candidates, num_teams)
+
+        # 6. Save Results to DB
+        _persist_teams(session, teams_structure)
+
+        # 7. Finalize
+        session.status = BuilderSession.Status.COMPLETED
+        session.save()
+
+    return {"success": True, "teams_generated": len(teams_structure)}
+
+
+# -----------------------------------------------------------------------------
+# Strategies
+# -----------------------------------------------------------------------------
+
+def _strategy_random(candidates, num_teams):
+    """
+    Shuffles candidates and deals them like cards into N teams.
+    """
+    random.shuffle(candidates)
+    
+    # Initialize empty buckets
+    teams = [[] for _ in range(num_teams)]
+    
+    # Distribute round-robin
+    for i, user in enumerate(candidates):
+        team_index = i % num_teams
+        teams[team_index].append({
+            "user": user,
+            "role": "Member",
+            "reason": "Random assignment"
+        })
+    
+    return teams
+
+
+def _strategy_balanced_expertise(candidates, num_teams):
+    """
+    Sorts candidates by 'score' (Expertise) and distributes them using a 
+    Snake Draft method (1, 2, 3, 3, 2, 1) to ensure balanced total team strength.
+    """
+    # 1. Annotate candidates with scores
+    scored_candidates = []
+    for user in candidates:
+        score = _get_user_score(user)
+        scored_candidates.append((score, user))
+
+    # 2. Sort by score descending (Strongest first)
+    scored_candidates.sort(key=lambda x: x[0], reverse=True)
+
+    # 3. Initialize buckets
+    teams = [[] for _ in range(num_teams)]
+
+    # 4. Snake Distribution
+    # This prevents Team 1 from getting all the best people if we just did simple round-robin.
+    # Pattern: 0,1,2, 2,1,0, 0,1,2...
+    for i, (score, user) in enumerate(scored_candidates):
+        # Calculate index logic for snake draft
+        cycle = i // num_teams
+        remainder = i % num_teams
+        
+        if cycle % 2 == 0:
+            # Forward pass (0 -> N)
+            team_index = remainder
+        else:
+            # Backward pass (N -> 0)
+            team_index = (num_teams - 1) - remainder
+
+        teams[team_index].append({
+            "user": user,
+            "role": "Specialist" if score > 80 else "Member",
+            "reason": f"Balanced fit (Score: {score})"
+        })
+
+    return teams
+
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
+
+def _get_user_score(user):
+    """
+    Retrieves the 'Ekoh Score' (Expertise).
+    """
+    # TODO: Connect this to the actual Ekoh module models.
+    # For now, we simulate a score or grab a profile field if it exists.
+    # In a real integration: return user.ekoh_profile.total_score
+    try:
+        # Checking if the user object has a cached property or related profile
+        if hasattr(user, 'ekoh_score'):
+            return user.ekoh_score
+        return random.randint(40, 99) # Placeholder for development
+    except Exception:
+        return 50
+
+def _persist_teams(session, teams_structure):
+    """
+    Writes the logical team structure into actual DB rows.
+    """
+    for i, members_data in enumerate(teams_structure):
+        team_name = f"Team {i + 1}"
+        
+        # Create Team
+        team = Team.objects.create(
+            session=session,
+            name=team_name,
+            metrics={"member_count": len(members_data)}
+        )
+
+        # Add Members
+        for member_info in members_data:
+            TeamMember.objects.create(
+                team=team,
+                user=member_info['user'],
+                suggested_role=member_info['role'],
+                match_reason=member_info['reason']
+            )
+
+        # Update Team metrics with actual averages (Post-creation calculation)
+        # (Optional: Add logic here to sum up scores and save to team.metrics)
+===== END logic.py (#0004) =====
+
+===== BEGIN migrations/__init__.py (#0005) =====
+
+===== END migrations/__init__.py (#0005) =====
+
+===== BEGIN models.py (#0006) =====
+# backend/konnaxion/teambuilder/models.py
+import uuid
+
+from django.conf import settings
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+
+class Problem(models.Model):
+  """
+  Reusable problem template that Team Builder sessions can reference.
+  Includes risk level, UNESCO codes, categories and recommended modes.
+  """
+
+  class Status(models.TextChoices):
+    ACTIVE = "ACTIVE", _("Active")
+    DRAFT = "DRAFT", _("Draft")
+    DEPRECATED = "DEPRECATED", _("Deprecated")
+
+  class RiskLevel(models.TextChoices):
+    LOW = "LOW", _("Low")
+    MEDIUM = "MEDIUM", _("Medium")
+    HIGH = "HIGH", _("High")
+    CRITICAL = "CRITICAL", _("Critical")
+
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  name = models.CharField(_("Problem Name"), max_length=255)
+  description = models.TextField(_("Description"), blank=True)
+
+  status = models.CharField(
+    max_length=20,
+    choices=Status.choices,
+    default=Status.DRAFT,
+  )
+
+  risk_level = models.CharField(
+    max_length=20,
+    choices=RiskLevel.choices,
+    default=RiskLevel.MEDIUM,
+  )
+
+  # Team size guidance for this problem
+  min_team_size = models.PositiveIntegerField(
+    _("Minimum team size"),
+    null=True,
+    blank=True,
+  )
+  max_team_size = models.PositiveIntegerField(
+    _("Maximum team size"),
+    null=True,
+    blank=True,
+  )
+
+  # Classification / routing
+  unesco_codes = models.JSONField(
+    _("UNESCO codes"),
+    default=list,
+    blank=True,
+    help_text=_("List of UNESCO taxonomy codes, e.g. ['13.01', '05.03']."),
+  )
+  categories = models.JSONField(
+    _("Categories"),
+    default=list,
+    blank=True,
+    help_text=_("Additional free-form categories or tags."),
+  )
+
+  # Mode presets (e.g. ['Elite', 'Learning'])
+  recommended_modes = models.JSONField(
+    _("Recommended modes"),
+    default=list,
+    blank=True,
+    help_text=_("Recommended team modes for this problem."),
+  )
+
+  facilitator_notes = models.TextField(
+    _("Notes for facilitators"),
+    blank=True,
+  )
+
+  created_by = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="teambuilder_problems",
+  )
+
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+
+  def __str__(self) -> str:
+    return f"{self.name} ({self.get_status_display()})"
+
+
+class ProblemChangeEvent(models.Model):
+  """
+  Audit trail / history for changes made to a Problem.
+  Used to populate the 'History of changes' timeline.
+  """
+
+  class EventType(models.TextChoices):
+    STATUS_CHANGE = "STATUS_CHANGE", _("Status change")
+    EDIT = "EDIT", _("Edit")
+    CREATED = "CREATED", _("Created")
+    OTHER = "OTHER", _("Other")
+
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  problem = models.ForeignKey(
+    Problem,
+    on_delete=models.CASCADE,
+    related_name="change_events",
+  )
+
+  type = models.CharField(
+    max_length=32,
+    choices=EventType.choices,
+    default=EventType.OTHER,
+  )
+
+  title = models.CharField(max_length=255)
+  description = models.TextField(blank=True)
+
+  timestamp = models.DateTimeField(auto_now_add=True)
+
+  changed_by = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="teambuilder_problem_events",
+  )
+
+  def __str__(self) -> str:
+    return f"[{self.type}] {self.title} ({self.problem.name})"
+
+
+class BuilderSession(models.Model):
+  """
+  Represents a team-building event/session where an admin configures
+  parameters to generate teams from a pool of candidates.
+  """
+
+  class Status(models.TextChoices):
+    DRAFT = "DRAFT", _("Draft")
+    PROCESSING = "PROCESSING", _("Processing")
+    COMPLETED = "COMPLETED", _("Completed")
+    ARCHIVED = "ARCHIVED", _("Archived")
+
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  name = models.CharField(_("Session Name"), max_length=255)
+  description = models.TextField(_("Description"), blank=True)
+
+  # Link to a reusable Problem template (optional)
+  problem = models.ForeignKey(
+    Problem,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="sessions",
+  )
+
+  created_by = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    related_name="teambuilder_sessions",
+  )
+
+  # The pool of users available to be sorted into teams
+  candidates = models.ManyToManyField(
+    settings.AUTH_USER_MODEL,
+    related_name="teambuilder_candidate_sessions",
+    blank=True,
+  )
+
+  # Configuration for the algorithm
+  # (e.g., {"target_team_size": 4, "diversity_weight": 0.5})
+  algorithm_config = models.JSONField(default=dict, blank=True)
+
+  status = models.CharField(
+    max_length=20,
+    choices=Status.choices,
+    default=Status.DRAFT,
+  )
+
+  created_at = models.DateTimeField(auto_now_add=True)
+  updated_at = models.DateTimeField(auto_now=True)
+
+  def __str__(self) -> str:
+    return f"{self.name} ({self.status})"
+
+
+class Team(models.Model):
+  """
+  A specific group generated within a BuilderSession.
+  """
+
+  id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+  session = models.ForeignKey(
+    BuilderSession,
+    on_delete=models.CASCADE,
+    related_name="teams",
+  )
+  name = models.CharField(_("Team Name"), max_length=255)
+
+  # Stores calculated stats for this specific team
+  # (e.g., {"avg_skill": 85, "diversity_score": 0.9})
+  metrics = models.JSONField(default=dict, blank=True)
+
+  created_at = models.DateTimeField(auto_now_add=True)
+
+  def __str__(self) -> str:
+    return f"{self.name} - {self.session.name}"
+
+
+class TeamMember(models.Model):
+  """
+  The assignment of a specific user to a specific team.
+  """
+
+  team = models.ForeignKey(
+    Team,
+    on_delete=models.CASCADE,
+    related_name="members",
+  )
+  user = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    related_name="teambuilder_assignments",
+  )
+
+  # Optional: If the algorithm assigns a specific role (e.g., "Leader", "Scribe")
+  suggested_role = models.CharField(max_length=100, blank=True)
+
+  # Why this user was placed here (debug/transparency info)
+  match_reason = models.TextField(blank=True)
+
+  class Meta:
+    unique_together = ["team", "user"]
+
+  def __str__(self) -> str:
+    return f"{self.user} in {self.team}"
+
+===== END models.py (#0006) =====
+
+===== BEGIN problem_logic.py (#0007) =====
+# FILE: backend/konnaxion/teambuilder/problem_logic.py
+"""
+Helper functions for the Team Builder "Problem" domain.
+
+This module centralises reusable logic around:
+- Fetching sessions linked to a given Problem
+- Fetching change history for a Problem
+- Recording change events (created / edited / status changes)
+- Computing simple usage statistics
+
+You can call these helpers from views, signals or management commands.
+"""
+
+from __future__ import annotations
+
+from typing import Dict, Optional, Tuple
+
+from django.db.models import QuerySet
+
+from .models import (
+    BuilderSession,
+    Problem,
+    ProblemChangeEvent,
+)
+
+
+# ---------------------------------------------------------------------------
+# Query helpers
+# ---------------------------------------------------------------------------
+
+
+def get_problem_sessions(problem: Problem) -> QuerySet[BuilderSession]:
+    """
+    Return the queryset of BuilderSession instances that reference this Problem.
+
+    Used for:
+    - Problem detail "Sessions" tab
+    - Usage statistics (usage_count, etc.)
+    """
+    return (
+        BuilderSession.objects.filter(problem=problem)
+        .select_related("created_by", "problem")
+        .order_by("-created_at")
+    )
+
+
+def get_problem_history(problem: Problem) -> QuerySet[ProblemChangeEvent]:
+    """
+    Return the queryset of history events for a Problem, newest first.
+
+    Used for:
+    - Problem detail "History of changes" timeline.
+    """
+    return problem.change_events.select_related("changed_by").order_by("-timestamp")
+
+
+def get_problem_usage_stats(problem: Problem) -> Dict[str, Optional[float]]:
+    """
+    Compute simple usage statistics for a Problem.
+
+    Currently returns:
+        {
+            "usage_count": int,
+            "average_outcome": Optional[float],
+        }
+
+    NOTE:
+    - `average_outcome` is returned as None for now, because the backend
+      does not yet persist an `outcome_score` on sessions.
+    - When you later add such a metric, update this function to compute the
+      real average.
+    """
+    sessions_qs = get_problem_sessions(problem)
+    usage_count = sessions_qs.count()
+
+    # Placeholder: no persisted outcome_score yet.
+    average_outcome: Optional[float] = None
+
+    return {
+        "usage_count": float(usage_count),
+        "average_outcome": average_outcome,
+    }
+
+
+# ---------------------------------------------------------------------------
+# Logging helpers (ProblemChangeEvent)
+# ---------------------------------------------------------------------------
+
+
+def log_problem_created(problem: Problem, user) -> ProblemChangeEvent:
+    """
+    Create a 'CREATED' event for the given Problem.
+    """
+    return ProblemChangeEvent.objects.create(
+        problem=problem,
+        type=ProblemChangeEvent.EventType.CREATED,
+        title="Problem created",
+        description=f"Problem '{problem.name}' was created.",
+        changed_by=user,
+    )
+
+
+def log_problem_edited(
+    problem: Problem,
+    user,
+    title: str = "Problem updated",
+    description: Optional[str] = None,
+) -> ProblemChangeEvent:
+    """
+    Create a generic 'EDIT' event for the given Problem.
+
+    You can supply a custom title/description when calling this helper
+    to make the timeline more informative.
+    """
+    if description is None:
+        description = f"Problem '{problem.name}' was updated."
+
+    return ProblemChangeEvent.objects.create(
+        problem=problem,
+        type=ProblemChangeEvent.EventType.EDIT,
+        title=title,
+        description=description,
+        changed_by=user,
+    )
+
+
+def log_problem_status_change(
+    problem: Problem,
+    user,
+    old_status: Optional[str],
+    new_status: str,
+) -> ProblemChangeEvent:
+    """
+    Create a 'STATUS_CHANGE' event when the Problem's status changes.
+
+    Call this from your update logic after detecting a status transition.
+    """
+    if old_status == new_status:
+        # No-op: don't create redundant events
+        return ProblemChangeEvent.objects.create(
+            problem=problem,
+            type=ProblemChangeEvent.EventType.OTHER,
+            title="Status change attempted with same status",
+            description=f"Status remained '{new_status}'.",
+            changed_by=user,
+        )
+
+    title = "Problem status changed"
+    description = f"Status changed from '{old_status}' to '{new_status}'."
+
+    return ProblemChangeEvent.objects.create(
+        problem=problem,
+        type=ProblemChangeEvent.EventType.STATUS_CHANGE,
+        title=title,
+        description=description,
+        changed_by=user,
+    )
+
+
+def log_problem_deleted(problem: Problem, user) -> ProblemChangeEvent:
+    """
+    Create an 'OTHER' event to note that a Problem is being deleted.
+
+    This is only useful if you keep events around for auditing or if
+    deletion is soft-deletion. If you hard-delete both Problem and its
+    events, this will not be visible later.
+    """
+    return ProblemChangeEvent.objects.create(
+        problem=problem,
+        type=ProblemChangeEvent.EventType.OTHER,
+        title="Problem deleted",
+        description=f"Problem '{problem.name}' was deleted.",
+        changed_by=user,
+    )
+
+===== END problem_logic.py (#0007) =====
+
+===== BEGIN serializers.py (#0008) =====
+# backend/konnaxion/teambuilder/serializers.py
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from konnaxion.users.api.serializers import UserSerializer
+from .models import (
+    BuilderSession,
+    Team,
+    TeamMember,
+    Problem,
+    ProblemChangeEvent,
+)
+
+User = get_user_model()
+
+
+# ---------------------------------------------------------------------------
+# Team / session serializers (existing, extended with optional Problem link)
+# ---------------------------------------------------------------------------
+
+
+class TeamMemberSerializer(serializers.ModelSerializer):
+    """
+    Serializes a member within a team, expanding the User details.
+    """
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = TeamMember
+        fields = ["id", "user", "suggested_role", "match_reason"]
+
+
+class TeamSerializer(serializers.ModelSerializer):
+    """
+    Serializes a generated team and its members.
+    """
+    members = TeamMemberSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Team
+        fields = ["id", "name", "metrics", "members", "created_at"]
+
+
+class BuilderSessionSerializer(serializers.ModelSerializer):
+    """
+    Serializes the session configuration and the resulting teams.
+    """
+    teams = TeamSerializer(many=True, read_only=True)
+
+    # Helper to see how many people are in the pool without loading all User objects
+    candidates_count = serializers.IntegerField(
+        source="candidates.count",
+        read_only=True,
+    )
+
+    # Field to accept a list of User IDs when creating/updating the session
+    candidate_ids = serializers.PrimaryKeyRelatedField(
+        many=True,
+        queryset=User.objects.all(),
+        write_only=True,
+        source="candidates",
+    )
+
+    # Optional link to a reusable Problem template
+    problem = serializers.PrimaryKeyRelatedField(
+        read_only=True,
+    )
+    problem_id = serializers.PrimaryKeyRelatedField(
+        queryset=Problem.objects.all(),
+        source="problem",
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = BuilderSession
+        fields = [
+            "id",
+            "name",
+            "description",
+            "status",
+            "algorithm_config",
+            "created_by",
+            "created_at",
+            "updated_at",
+            "teams",
+            "candidates_count",
+            "candidate_ids",
+            "problem",      # read-only: problem UUID
+            "problem_id",   # write-only: for create/update
+        ]
+        read_only_fields = ["created_by", "created_at", "updated_at", "status"]
+
+
+# ---------------------------------------------------------------------------
+# Problem serializers (for problems library / detail pages)
+# ---------------------------------------------------------------------------
+
+
+class ProblemSerializer(serializers.ModelSerializer):
+    """
+    Basic serializer for Problem used in list & detail views.
+    Adds usage_count and average_outcome as optional read-only fields
+    that a view can populate via annotation or custom logic.
+    """
+
+    usage_count = serializers.IntegerField(
+        read_only=True,
+        help_text="Number of sessions referencing this problem.",
+    )
+    average_outcome = serializers.FloatField(
+        read_only=True,
+        help_text="Average outcome score across sessions (if available).",
+    )
+
+    class Meta:
+        model = Problem
+        fields = [
+            "id",
+            "name",
+            "description",
+            "status",
+            "risk_level",
+            "min_team_size",
+            "max_team_size",
+            "unesco_codes",
+            "categories",
+            "recommended_modes",
+            "facilitator_notes",
+            "created_by",
+            "created_at",
+            "updated_at",
+            "usage_count",
+            "average_outcome",
+        ]
+        read_only_fields = ["created_by", "created_at", "updated_at"]
+
+
+class ProblemChangeEventSerializer(serializers.ModelSerializer):
+    """
+    Serializer for Problem change history entries, used to populate
+    the timeline in the problem detail view.
+    """
+
+    changed_by = UserSerializer(read_only=True)
+
+    class Meta:
+        model = ProblemChangeEvent
+        fields = [
+            "id",
+            "type",
+            "title",
+            "description",
+            "timestamp",
+            "changed_by",
+        ]
+
+
+class ProblemSessionSummarySerializer(serializers.ModelSerializer):
+    """
+    Lightweight summary of a BuilderSession for inclusion in
+    Problem detail (sessions tab).
+    """
+
+    class Meta:
+        model = BuilderSession
+        fields = [
+            "id",
+            "name",
+            "status",
+            "algorithm_config",
+            "created_at",
+        ]
+
+===== END serializers.py (#0008) =====
+
+===== BEGIN tests/test_problems_api.py (#0009) =====
+# FILE: backend/konnaxion/teambuilder/tests/test_problems_api.py
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+from django.utils import timezone
+from rest_framework import status
+from rest_framework.test import APITestCase
+
+from konnaxion.teambuilder.models import (
+    Problem,
+    ProblemChangeEvent,
+    BuilderSession,
+)
+
+User = get_user_model()
+
+
+class ProblemAPITests(APITestCase):
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="tester",
+            email="tester@example.com",
+            password="testpass123",
+        )
+        self.client.force_authenticate(self.user)
+
+        self.problem_list_url = reverse("teambuilder:problem-list")
+
+    # --------------------------------------------------------------------- #
+    # Helpers
+    # --------------------------------------------------------------------- #
+
+    def _create_problem(self, **overrides) -> Problem:
+        data = {
+            "name": "Test problem",
+            "description": "A test problem for Team Builder.",
+            "status": "ACTIVE",
+            "risk_level": "MEDIUM",
+            "min_team_size": 3,
+            "max_team_size": 5,
+            "unesco_codes": ["13.01", "05.03"],
+            "categories": ["Education", "Pilot"],
+            "recommended_modes": ["Elite", "Learning"],
+            "facilitator_notes": "Some notes for facilitators.",
+        }
+        data.update(overrides)
+
+        return Problem.objects.create(
+            created_by=self.user,
+            **data,
+        )
+
+    def _create_session_for_problem(self, problem: Problem, **overrides) -> BuilderSession:
+        session_data = {
+            "name": "Session for problem",
+            "description": "Session description",
+            "status": BuilderSession.Status.DRAFT,
+            "algorithm_config": {},
+            "created_by": self.user,
+            "problem": problem,
+            "created_at": timezone.now(),
+        }
+        session_data.update(overrides)
+        return BuilderSession.objects.create(**session_data)
+
+    # --------------------------------------------------------------------- #
+    # Tests
+    # --------------------------------------------------------------------- #
+
+    def test_create_problem_minimal(self):
+        """
+        POST /api/teambuilder/problems/ should create a Problem and record
+        a corresponding ProblemChangeEvent (CREATED).
+        """
+        payload = {
+            "name": "Minimal problem",
+        }
+
+        response = self.client.post(self.problem_list_url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+        self.assertEqual(Problem.objects.count(), 1)
+        problem = Problem.objects.first()
+        self.assertIsNotNone(problem)
+        self.assertEqual(problem.name, "Minimal problem")
+        self.assertEqual(problem.created_by, self.user)
+
+        # One "created" event should have been recorded
+        events = ProblemChangeEvent.objects.filter(problem=problem)
+        self.assertEqual(events.count(), 1)
+        self.assertEqual(events.first().type, ProblemChangeEvent.EventType.CREATED)
+
+    def test_list_problems_includes_usage_count(self):
+        """
+        GET /api/teambuilder/problems/ should include annotated usage_count.
+        """
+        problem = self._create_problem(name="Usage test problem")
+
+        # Two sessions referencing this problem
+        self._create_session_for_problem(problem, name="Session A")
+        self._create_session_for_problem(problem, name="Session B")
+
+        response = self.client.get(self.problem_list_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        results = response.data
+        # DRF DefaultRouter list view returns a plain list or a "results" key
+        if isinstance(results, dict) and "results" in results:
+            items = results["results"]
+        else:
+            items = results
+
+        self.assertGreaterEqual(len(items), 1)
+
+        found = next((item for item in items if item["id"] == str(problem.id)), None)
+        self.assertIsNotNone(found, "Problem not found in list response")
+
+        # usage_count is annotated as number of sessions
+        self.assertIn("usage_count", found)
+        self.assertEqual(int(found["usage_count"]), 2)
+
+    def test_retrieve_problem_detail_shape(self):
+        """
+        GET /api/teambuilder/problems/{id}/ should return composite payload:
+        {
+          "problem": {...},
+          "sessions": [...],
+          "history": [...]
+        }
+        """
+        problem = self._create_problem(name="Detail test problem")
+
+        # Create some sessions
+        s1 = self._create_session_for_problem(problem, name="Session X")
+        s2 = self._create_session_for_problem(problem, name="Session Y")
+
+        # Create a manual history event
+        ProblemChangeEvent.objects.create(
+            problem=problem,
+            type=ProblemChangeEvent.EventType.EDIT,
+            title="Manual change",
+            description="Edited in test.",
+            changed_by=self.user,
+        )
+
+        detail_url = reverse("teambuilder:problem-detail", args=[problem.id])
+        response = self.client.get(detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertIsInstance(response.data, dict)
+        self.assertIn("problem", response.data)
+        self.assertIn("sessions", response.data)
+        self.assertIn("history", response.data)
+
+        problem_data = response.data["problem"]
+        sessions_data = response.data["sessions"]
+        history_data = response.data["history"]
+
+        # Problem block
+        self.assertEqual(problem_data["id"], str(problem.id))
+        self.assertEqual(problem_data["name"], "Detail test problem")
+
+        # Sessions block
+        session_ids = {s["id"] for s in sessions_data}
+        self.assertSetEqual(session_ids, {str(s1.id), str(s2.id)})
+
+        # History block: at least one event (created) + our manual edit
+        self.assertGreaterEqual(len(history_data), 1)
+        titles = {e["title"] for e in history_data}
+        self.assertIn("Problem created", titles)
+        self.assertIn("Manual change", titles)
+
+    def test_update_problem_creates_history_event(self):
+        """
+        PATCH /api/teambuilder/problems/{id}/ should record an EDIT event.
+        """
+        problem = self._create_problem(name="Updatable problem")
+
+        detail_url = reverse("teambuilder:problem-detail", args=[problem.id])
+        payload = {"description": "Updated description"}
+        response = self.client.patch(detail_url, payload, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        problem.refresh_from_db()
+        self.assertEqual(problem.description, "Updated description")
+
+        events = ProblemChangeEvent.objects.filter(problem=problem)
+        # We should have at least 2 events: created + edit
+        self.assertGreaterEqual(events.count(), 2)
+        self.assertTrue(events.filter(type=ProblemChangeEvent.EventType.EDIT).exists())
+
+===== END tests/test_problems_api.py (#0009) =====
+
+===== BEGIN urls.py (#0010) =====
+# backend/konnaxion/teambuilder/urls.py
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from . import views
+
+app_name = "teambuilder"
+
+router = DefaultRouter()
+# Endpoints: /api/teambuilder/sessions/
+# Includes action: /api/teambuilder/sessions/{id}/generate/
+router.register("sessions", views.BuilderSessionViewSet, basename="session")
+
+# Endpoints: /api/teambuilder/teams/
+router.register("teams", views.TeamViewSet, basename="team")
+
+# Endpoints: /api/teambuilder/problems/
+# - GET /api/teambuilder/problems/          (list)
+# - POST /api/teambuilder/problems/         (create)
+# - GET /api/teambuilder/problems/{id}/     (detail: problem + sessions + history)
+# - PATCH /api/teambuilder/problems/{id}/   (update)
+# - DELETE /api/teambuilder/problems/{id}/  (delete)
+router.register("problems", views.ProblemViewSet, basename="problem")
+
+urlpatterns = [
+    path("", include(router.urls)),
+]
+
+===== END urls.py (#0010) =====
+
+===== BEGIN views.py (#0011) =====
+# backend/konnaxion/teambuilder/views.py
+from django.db.models import Count
+from rest_framework import viewsets, permissions, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+from .models import (
+    BuilderSession,
+    Team,
+    Problem,
+    ProblemChangeEvent,
+)
+from .serializers import (
+    BuilderSessionSerializer,
+    TeamSerializer,
+    ProblemSerializer,
+    ProblemChangeEventSerializer,
+    ProblemSessionSummarySerializer,
+)
+from .logic import generate_teams_for_session
+
+
+class BuilderSessionViewSet(viewsets.ModelViewSet):
+    """
+    CRUD for Team Builder Sessions.
+    Includes a custom action to trigger the team generation algorithm.
+    """
+    queryset = (
+        BuilderSession.objects.all()
+        .select_related("problem", "created_by")
+        .prefetch_related("candidates", "teams__members")
+        .order_by("-created_at")
+    )
+    serializer_class = BuilderSessionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        # Automatically assign the logged-in user as the creator
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=["post"])
+    def generate(self, request, pk=None):
+        """
+        Triggers the algorithmic distribution of candidates into teams.
+        POST /api/teambuilder/sessions/{id}/generate/
+        """
+        # Call the logic engine
+        result = generate_teams_for_session(session_id=str(pk))
+
+        if "error" in result:
+            return Response(result, status=status.HTTP_400_BAD_REQUEST)
+
+        # Re-fetch the session to return the updated status and new teams
+        session = self.get_object()
+        serializer = self.get_serializer(session)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class TeamViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Read-only view for generated teams.
+    Useful if we need to fetch a specific team's details without loading the whole session.
+    """
+    queryset = Team.objects.all().select_related("session").order_by("name")
+    serializer_class = TeamSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_fields = ["session"]
+
+
+class ProblemViewSet(viewsets.ModelViewSet):
+    """
+    CRUD for reusable Problem templates used by Team Builder sessions.
+    - List: used by the Problem library (/teambuilder/problems).
+    - Retrieve: returns problem + sessions + history for detail page.
+    """
+
+    serializer_class = ProblemSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Annotate usage_count from linked sessions; average_outcome can be
+        # added later via additional aggregates if you store outcome scores.
+        return (
+            Problem.objects.all()
+            .annotate(usage_count=Count("sessions"))
+            .order_by("-created_at")
+        )
+
+    def perform_create(self, serializer):
+        problem = serializer.save(created_by=self.request.user)
+        # Record a basic "created" event for history
+        ProblemChangeEvent.objects.create(
+            problem=problem,
+            type=ProblemChangeEvent.EventType.CREATED,
+            title="Problem created",
+            description=f"Problem '{problem.name}' was created.",
+            changed_by=self.request.user,
+        )
+
+    def perform_update(self, serializer):
+        problem = serializer.save()
+        # Simple generic edit event; you can refine this later to log diffs
+        ProblemChangeEvent.objects.create(
+            problem=problem,
+            type=ProblemChangeEvent.EventType.EDIT,
+            title="Problem updated",
+            description=f"Problem '{problem.name}' was updated.",
+            changed_by=self.request.user,
+        )
+
+    def perform_destroy(self, instance):
+        name = instance.name
+        ProblemChangeEvent.objects.create(
+            problem=instance,
+            type=ProblemChangeEvent.EventType.OTHER,
+            title="Problem deleted",
+            description=f"Problem '{name}' was deleted.",
+            changed_by=self.request.user,
+        )
+        super().perform_destroy(instance)
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Return composite payload expected by the frontend:
+
+        {
+          "problem": { ...ProblemSerializer... },
+          "sessions": [ ...ProblemSessionSummarySerializer... ],
+          "history": [ ...ProblemChangeEventSerializer... ]
+        }
+        """
+        problem = self.get_object()
+
+        # Base problem data (includes annotated usage_count)
+        problem_data = self.get_serializer(problem).data
+
+        # Sessions that reference this problem
+        sessions_qs = (
+            BuilderSession.objects.filter(problem=problem)
+            .order_by("-created_at")
+        )
+        sessions_data = ProblemSessionSummarySerializer(
+            sessions_qs,
+            many=True,
+        ).data
+
+        # Change history / timeline
+        history_qs = problem.change_events.order_by("-timestamp")
+        history_data = ProblemChangeEventSerializer(
+            history_qs,
+            many=True,
+        ).data
+
+        return Response(
+            {
+                "problem": problem_data,
+                "sessions": sessions_data,
+                "history": history_data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+===== END views.py (#0011) =====
