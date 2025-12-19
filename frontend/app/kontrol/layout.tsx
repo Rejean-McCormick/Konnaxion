@@ -1,18 +1,17 @@
 // FILE: frontend/app/kontrol/layout.tsx
-// app/kontrol/layout.tsx
-'use client'
+'use client';
 
-import type { ReactNode } from 'react'
-import React, { Suspense, useEffect } from 'react'
-import { Layout, Spin } from 'antd'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import type { ReactNode } from 'react';
+import React, { Suspense, useEffect } from 'react';
+import { Layout, Spin } from 'antd';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import MainLayout from '@/components/layout-components/MainLayout'
+import MainLayout from '@/components/layout-components/MainLayout';
 
-const { Content } = Layout
+const { Content } = Layout;
 
 interface SegmentLayoutProps {
-  children: ReactNode
+  children: ReactNode;
 }
 
 /**
@@ -20,29 +19,34 @@ interface SegmentLayoutProps {
  * when the query param is missing.
  *
  * Important:
- * - If ?sidebar is already set (ekoh, ethikos, keenkonnect, konnected, kreative, …),
+ * - If ?sidebar is already set (ekoh, ethikos, keenkonnect, konnected, kreative, teambuilder, kontrol, …),
  *   it is respected. This lets the module switcher (LogoTitle) change suites even
  *   while you are on a /kontrol/* URL.
+ * - Scope (platform vs module-specific) is handled at page level (KontrolPageShell),
+ *   using the route metadata defined in routesKontrol.
  */
 function KontrolShell({ children }: SegmentLayoutProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const searchParams = useSearchParams()
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Normalise search params for a stable effect dependency
+  const sidebarParam = searchParams.get('sidebar');
+  const searchParamsString = searchParams.toString();
 
   useEffect(() => {
-    const currentSidebar = searchParams.get('sidebar')
-
     // Only inject the default if the param is absent.
     // Do NOT override if the user explicitly chose another suite.
-    if (currentSidebar !== null) return
+    if (sidebarParam !== null) return;
 
-    const params = new URLSearchParams(Array.from(searchParams.entries()))
-    params.set('sidebar', 'kontrol')
+    const params = new URLSearchParams(searchParamsString);
+    params.set('sidebar', 'kontrol');
 
-    router.replace(`${pathname}?${params.toString()}`)
-  }, [router, pathname, searchParams])
+    const next = `${pathname}?${params.toString()}`;
+    router.replace(next);
+  }, [router, pathname, sidebarParam, searchParamsString]);
 
-  return <MainLayout>{children}</MainLayout>
+  return <MainLayout>{children}</MainLayout>;
 }
 
 /**
@@ -50,9 +54,12 @@ function KontrolShell({ children }: SegmentLayoutProps) {
  *
  * - Wraps content in MainLayout (global Ant Design layout + navigation).
  * - Provides an Ant Design–based Suspense fallback while children load.
- * - Keeps page-level layout concerns in KontrolPageShell (used by pages themselves).
+ * - Keeps page-level layout and scope display in KontrolPageShell
+ *   (used by individual pages).
  */
-export default function SegmentLayout({ children }: SegmentLayoutProps) {
+export default function SegmentLayout({
+  children,
+}: SegmentLayoutProps): JSX.Element {
   return (
     <Suspense
       fallback={
@@ -71,5 +78,5 @@ export default function SegmentLayout({ children }: SegmentLayoutProps) {
     >
       <KontrolShell>{children}</KontrolShell>
     </Suspense>
-  )
+  );
 }

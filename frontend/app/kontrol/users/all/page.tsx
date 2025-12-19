@@ -27,11 +27,11 @@ import {
   LockOutlined,
 } from '@ant-design/icons';
 import {
-  PageContainer,
   ProTable,
   type ProColumns,
   type ActionType,
 } from '@ant-design/pro-components';
+import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 const { Text } = Typography;
 
@@ -61,7 +61,7 @@ function isUsersApiResponse(data: unknown): data is UsersApiResponse {
   );
 }
 
-export default function AllUsersPage() {
+export default function AllUsersPage(): JSX.Element {
   const actionRef = useRef<ActionType>();
 
   const [currentRow, setCurrentRow] = useState<UserItem | undefined>(
@@ -185,19 +185,19 @@ export default function AllUsersPage() {
             items: [
               {
                 key: 'view',
-                label: 'View Details',
+                label: 'View details',
                 icon: <HistoryOutlined />,
                 onClick: () => handleAction('view', record),
               },
               {
                 key: 'reset',
-                label: 'Reset Password',
+                label: 'Reset password',
                 onClick: () => handleAction('reset', record),
               },
               { type: 'divider' },
               {
                 key: 'ban',
-                label: 'Ban User',
+                label: 'Ban user',
                 danger: true,
                 icon: <StopOutlined />,
                 onClick: () => handleAction('ban', record),
@@ -213,15 +213,28 @@ export default function AllUsersPage() {
     },
   ];
 
+  const title = 'User management';
+  const subtitle = (
+    <>
+      Platform-wide view of all users and their access levels across
+      Konnaxion modules.
+    </>
+  );
+
+  const primaryAction = (
+    <Button type="primary" icon={<UserAddOutlined />}>
+      Add user
+    </Button>
+  );
+
   return (
-    <PageContainer
-      title="User Management"
-      subTitle="Manage user access, roles, and account status."
-      extra={
-        <Button type="primary" icon={<UserAddOutlined />}>
-          Add User
-        </Button>
-      }
+    <KontrolPageShell
+      title={title}
+      subtitle={subtitle}
+      scope="platform"
+      moduleKey="kontrol"
+      primaryAction={primaryAction}
+      maxWidth={1200}
     >
       <ProTable<UserItem>
         columns={columns}
@@ -229,16 +242,18 @@ export default function AllUsersPage() {
         cardBordered
         request={async (params) => {
           const searchParams = new URLSearchParams();
-          if (params.username)
+          if (params.username) {
             searchParams.append(
               'search',
               params.username as string,
             );
-          if (params.email)
+          }
+          if (params.email) {
             searchParams.append(
               'search',
               params.email as string,
             );
+          }
 
           try {
             const response = await fetch(
@@ -313,11 +328,10 @@ export default function AllUsersPage() {
             type: 'tab',
             activeKey: activeTab,
             items: [
-              { key: 'all', label: 'All Users' },
-              { key: 'banned', label: 'Banned Only' },
-              { key: 'admin', label: 'Staff (Admins)' },
+              { key: 'all', label: 'All users' },
+              { key: 'banned', label: 'Banned only' },
+              { key: 'admin', label: 'Staff (admins)' },
             ],
-            // Fix: accept Key | undefined and normalise to string
             onChange: (key) => {
               const k = key ?? 'all';
               setActiveTab(String(k));
@@ -365,7 +379,7 @@ export default function AllUsersPage() {
                     style={{ width: '100%' }}
                   >
                     <Descriptions
-                      title="Account Info"
+                      title="Account info"
                       column={2}
                       bordered
                       size="small"
@@ -392,21 +406,21 @@ export default function AllUsersPage() {
                           {currentRow.status.toUpperCase()}
                         </Tag>
                       </Descriptions.Item>
-                      <Descriptions.Item label="Joined Date">
+                      <Descriptions.Item label="Joined date">
                         {currentRow.joinedAt}
                       </Descriptions.Item>
-                      <Descriptions.Item label="Last Login">
+                      <Descriptions.Item label="Last login">
                         {currentRow.lastLogin}
                       </Descriptions.Item>
                     </Descriptions>
 
                     <Descriptions
-                      title="Reputation & Trust"
+                      title="Reputation & trust"
                       column={1}
                       bordered
                       size="small"
                     >
-                      <Descriptions.Item label="Reputation Score">
+                      <Descriptions.Item label="Reputation score">
                         <Space>
                           <Text
                             strong
@@ -424,10 +438,10 @@ export default function AllUsersPage() {
                           </Text>
                         </Space>
                       </Descriptions.Item>
-                      <Descriptions.Item label="Trust Level">
+                      <Descriptions.Item label="Trust level">
                         <Badge
                           status="success"
-                          text="Verified Human"
+                          text="Verified human"
                         />
                       </Descriptions.Item>
                     </Descriptions>
@@ -440,8 +454,7 @@ export default function AllUsersPage() {
                       }}
                     >
                       <Text type="secondary">
-                        <SafetyCertificateOutlined /> Admin
-                        Notes:
+                        <SafetyCertificateOutlined /> Admin notes:
                       </Text>
                       <p
                         style={{
@@ -459,7 +472,7 @@ export default function AllUsersPage() {
               },
               {
                 key: '2',
-                label: 'Activity Log',
+                label: 'Activity log',
                 children: (
                   <List
                     dataSource={[
@@ -507,6 +520,6 @@ export default function AllUsersPage() {
           />
         )}
       </Drawer>
-    </PageContainer>
+    </KontrolPageShell>
   );
 }

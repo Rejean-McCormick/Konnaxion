@@ -23,18 +23,17 @@ import {
   StopOutlined,
   LockOutlined,
   SafetyCertificateOutlined,
-  CommentOutlined,
   FireOutlined,
   ClockCircleOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
 import {
-  PageContainer,
   ProTable,
   type ProColumns,
   type ActionType,
   ProCard,
 } from '@ant-design/pro-components';
+import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 const { Text, Title } = Typography;
 
@@ -104,7 +103,7 @@ const MOCK_COMMUNITIES: CommunityContext[] = [
   },
 ];
 
-export default function CommunityModerationPage() {
+export default function CommunityModerationPage(): JSX.Element {
   const actionRef = useRef<ActionType>();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -128,7 +127,7 @@ export default function CommunityModerationPage() {
 
   const columns: ProColumns<CommunityContext>[] = [
     {
-      title: 'Context Name',
+      title: 'Context name',
       dataIndex: 'name',
       copyable: true,
       render: (dom, entity) => (
@@ -144,7 +143,6 @@ export default function CommunityModerationPage() {
           </Avatar>
           <Space direction="vertical" size={0}>
             <Text strong>{dom}</Text>
-            {/* Ant Design Tag does not support `size`; emulate a compact tag via style */}
             <Tag
               style={{
                 fontSize: 12,
@@ -169,13 +167,13 @@ export default function CommunityModerationPage() {
         Konnected: { text: 'Konnected' },
         Kreative: { text: 'Kreative' },
       },
-      width: 120,
+      width: 140,
     },
     {
-      title: 'Health (Toxicity)',
+      title: 'Health (toxicity)',
       dataIndex: 'toxicityScore',
       sorter: (a, b) => a.toxicityScore - b.toxicityScore,
-      width: 180,
+      width: 200,
       render: (_, entity) => (
         <Space>
           <Progress
@@ -191,22 +189,27 @@ export default function CommunityModerationPage() {
             }
             format={() => ''}
           />
-          <Text
-            type={
-              entity.toxicityScore > 80 ? 'danger' : 'secondary'
-            }
-          >
-            {entity.toxicityScore > 80
-              ? 'Critical'
-              : entity.toxicityScore > 50
-              ? 'Heated'
-              : 'Healthy'}
-          </Text>
+          <Space direction="vertical" size={0}>
+            <Text
+              type={
+                entity.toxicityScore > 80 ? 'danger' : 'secondary'
+              }
+            >
+              {entity.toxicityScore > 80
+                ? 'Critical'
+                : entity.toxicityScore > 50
+                ? 'Heated'
+                : 'Healthy'}
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Higher score = more reported toxicity
+            </Text>
+          </Space>
         </Space>
       ),
     },
     {
-      title: 'Active Flags',
+      title: 'Active flags',
       dataIndex: 'openFlags',
       sorter: (a, b) => a.openFlags - b.openFlags,
       render: (val) => (
@@ -214,7 +217,7 @@ export default function CommunityModerationPage() {
           color={Number(val) > 10 ? 'red' : 'default'}
           icon={<WarningOutlined />}
         >
-          {val} Open
+          {val} open
         </Tag>
       ),
     },
@@ -237,13 +240,13 @@ export default function CommunityModerationPage() {
             items: [
               {
                 key: 'manage',
-                label: 'Manage Context',
+                label: 'Manage context',
                 icon: <SafetyCertificateOutlined />,
                 onClick: () => handleOpenDrawer(record),
               },
               {
                 key: 'history',
-                label: 'View Logs',
+                label: 'View logs',
                 icon: <ClockCircleOutlined />,
               },
               { type: 'divider' as const },
@@ -252,7 +255,7 @@ export default function CommunityModerationPage() {
                 label:
                   record.status === 'locked'
                     ? 'Unlock'
-                    : 'Lock Thread',
+                    : 'Lock thread',
                 icon: <LockOutlined />,
                 danger: record.status !== 'locked',
               },
@@ -271,178 +274,234 @@ export default function CommunityModerationPage() {
     },
   ];
 
-  return (
-    <PageContainer
-      title="Community Moderation"
-      subTitle="Manage discussion spaces, groups, and debates at the container level."
-      extra={[
-        <Button
-          key="refresh"
-          onClick={() => actionRef.current?.reload()}
-        >
-          Refresh Metrics
-        </Button>,
-        <Button key="create" type="primary">
-          New Report
-        </Button>,
-      ]}
-    >
-      <ProTable<CommunityContext>
-        columns={columns}
-        actionRef={actionRef}
-        cardBordered
-        request={async () => ({ data: MOCK_COMMUNITIES, success: true })}
-        rowKey="id"
-        search={{ labelWidth: 'auto' }}
-        pagination={{ pageSize: 10 }}
-        headerTitle="Context Health Monitor"
-        toolBarRender={() => [
-          <Button key="filter" icon={<FireOutlined />}>
-            High Toxicity Only
-          </Button>,
-        ]}
-      />
+  const title = 'Community moderation';
+  const subtitle = (
+    <>
+      Cross-module view of communities (Ethikos, Ekoh, Konnected,
+      Kreative) managed from Kontrol.
+    </>
+  );
 
-      {/* --- Context Management Drawer --- */}
-      <Drawer
-        width={600}
-        open={drawerOpen}
-        onClose={() => {
-          setDrawerOpen(false);
-          setCurrentContext(undefined);
-        }}
-        title={
-          currentContext
-            ? `Manage: ${currentContext.name}`
-            : 'Context Manager'
-        }
+  const primaryAction = (
+    <Button key="create" type="primary">
+      New report
+    </Button>
+  );
+
+  const secondaryActions = (
+    <Space wrap>
+      <Tag key="scope-platform" color="blue">
+        Moderation · cross-module
+      </Tag>
+      <Tag key="scope-impact" color="geekblue">
+        Actions apply per context
+      </Tag>
+      <Button
+        key="refresh"
+        onClick={() => actionRef.current?.reload()}
       >
-        {currentContext && (
-          <Space
-            direction="vertical"
-            size="large"
-            style={{ width: '100%' }}
-          >
-            {/* Health Banner */}
-            {currentContext.toxicityScore > 70 && (
-              <Alert
-                message="High Toxicity Detected"
-                description="This context has an unusually high rate of reported content. Consider enabling Slow Mode or assigning temporary moderators."
-                type="error"
-                showIcon
-              />
-            )}
+        Refresh metrics
+      </Button>
+    </Space>
+  );
 
-            {/* Quick Controls */}
-            <ProCard
-              title="Governance Controls"
-              bordered
-              headerBordered
-            >
-              <Space
-                direction="vertical"
-                style={{ width: '100%' }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Text>
-                    <LockOutlined /> Lock Context (Read-only)
-                  </Text>
-                  <Switch
-                    checked={currentContext.status === 'locked'}
-                    onChange={() =>
-                      message.info('Toggle Lock (not wired)')
-                    }
-                  />
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Text>
-                    <ClockCircleOutlined /> Slow Mode (1 post/10m)
-                  </Text>
-                  <Switch />
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}
-                >
-                  <Text>
-                    <StopOutlined /> Require Approval for New Users
-                  </Text>
-                  <Switch defaultChecked />
-                </div>
-              </Space>
-            </ProCard>
+  return (
+    <KontrolPageShell
+      title={title}
+      subtitle={subtitle}
+      scope="platform"
+      metaTitle="Kontrol · Platform · Community moderation"
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+      maxWidth={1200}
+    >
+      <>
+        <ProTable<CommunityContext>
+          columns={columns}
+          actionRef={actionRef}
+          cardBordered
+          request={async () => ({
+            data: MOCK_COMMUNITIES,
+            success: true,
+          })}
+          rowKey="id"
+          search={{
+            labelWidth: 'auto',
+            span: {
+              xs: 24,
+              sm: 12,
+              md: 8,
+              lg: 6,
+              xl: 6,
+              xxl: 6, // added to satisfy SpanConfig
+            },
+          }}
+          pagination={{ pageSize: 10 }}
+          headerTitle="Context health monitor"
+          toolBarRender={() => [
+            <Button key="filter" icon={<FireOutlined />}>
+              High toxicity only
+            </Button>,
+          ]}
+        />
 
-            {/* Metrics */}
-            <Descriptions
-              title="Live Metrics"
-              bordered
-              size="small"
-              column={2}
-            >
-              <Descriptions.Item label="Active Users">
-                {currentContext.activeUsers}
-              </Descriptions.Item>
-              <Descriptions.Item label="Open Flags">
-                {currentContext.openFlags}
-              </Descriptions.Item>
-              <Descriptions.Item label="Last Activity">
-                {currentContext.lastActivity}
-              </Descriptions.Item>
-              <Descriptions.Item label="Total Comments">
-                8,921
-              </Descriptions.Item>
-            </Descriptions>
-
-            {/* Moderators List */}
-            <List
-              header={<Text strong>Assigned Moderators</Text>}
-              bordered
-              dataSource={currentContext.moderators}
-              renderItem={(item) => (
-                <List.Item
-                  actions={[<a key="remove">Remove</a>]}
-                >
-                  <Space>
-                    <Avatar size="small" icon={<TeamOutlined />} />
-                    {item}
-                  </Space>
-                </List.Item>
-              )}
-              footer={
-                <Button
-                  type="dashed"
-                  block
-                  icon={<TeamOutlined />}
-                >
-                  Assign New Moderator
-                </Button>
-              }
-            />
-
-            <Button
-              type="primary"
-              danger
-              block
+        {/* --- Context Management Drawer --- */}
+        <Drawer
+          width={600}
+          open={drawerOpen}
+          onClose={() => {
+            setDrawerOpen(false);
+            setCurrentContext(undefined);
+          }}
+          title={
+            currentContext
+              ? `Manage: ${currentContext.name}`
+              : 'Context manager'
+          }
+        >
+          {currentContext && (
+            <Space
+              direction="vertical"
               size="large"
-              icon={<StopOutlined />}
+              style={{ width: '100%' }}
             >
-              Emergency Freeze (Suspend Context)
-            </Button>
-          </Space>
-        )}
-      </Drawer>
-    </PageContainer>
+              {/* Scope / module context */}
+              <Space>
+                <Tag color="blue">
+                  Module: {currentContext.module}
+                </Tag>
+                <Tag>{currentContext.type}</Tag>
+                <Tag color="geekblue">
+                  Scope: this community only
+                </Tag>
+              </Space>
+
+              {/* Health Banner */}
+              {currentContext.toxicityScore > 70 && (
+                <Alert
+                  message="High toxicity detected"
+                  description="This context has an unusually high rate of reported content. Consider enabling Slow Mode or assigning temporary moderators."
+                  type="error"
+                  showIcon
+                />
+              )}
+
+              {/* Quick Controls */}
+              <ProCard
+                title="Governance controls"
+                bordered
+                headerBordered
+              >
+                <Space
+                  direction="vertical"
+                  style={{ width: '100%' }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text>
+                      <LockOutlined /> Lock context (read-only)
+                    </Text>
+                    <Switch
+                      checked={currentContext.status === 'locked'}
+                      onChange={() =>
+                        message.info('Toggle lock (not wired)')
+                      }
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text>
+                      <ClockCircleOutlined /> Slow mode (1
+                      post/10m)
+                    </Text>
+                    <Switch />
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text>
+                      <StopOutlined /> Require approval for new
+                      users
+                    </Text>
+                    <Switch defaultChecked />
+                  </div>
+                </Space>
+              </ProCard>
+
+              {/* Metrics */}
+              <Descriptions
+                title="Live metrics"
+                bordered
+                size="small"
+                column={2}
+              >
+                <Descriptions.Item label="Active users">
+                  {currentContext.activeUsers}
+                </Descriptions.Item>
+                <Descriptions.Item label="Open flags">
+                  {currentContext.openFlags}
+                </Descriptions.Item>
+                <Descriptions.Item label="Last activity">
+                  {currentContext.lastActivity}
+                </Descriptions.Item>
+                <Descriptions.Item label="Total comments">
+                  8,921
+                </Descriptions.Item>
+              </Descriptions>
+
+              {/* Moderators List */}
+              <List
+                header={<Text strong>Assigned moderators</Text>}
+                bordered
+                dataSource={currentContext.moderators}
+                renderItem={(item) => (
+                  <List.Item
+                    actions={[<a key="remove">Remove</a>]}
+                  >
+                    <Space>
+                      <Avatar
+                        size="small"
+                        icon={<TeamOutlined />}
+                      />
+                      {item}
+                    </Space>
+                  </List.Item>
+                )}
+                footer={
+                  <Button
+                    type="dashed"
+                    block
+                    icon={<TeamOutlined />}
+                  >
+                    Assign new moderator
+                  </Button>
+                }
+              />
+
+              <Button
+                type="primary"
+                danger
+                block
+                size="large"
+                icon={<StopOutlined />}
+              >
+                Emergency freeze (suspend context)
+              </Button>
+            </Space>
+          )}
+        </Drawer>
+      </>
+    </KontrolPageShell>
   );
 }

@@ -1,131 +1,134 @@
+##############################################################################
+# ROOT .gitignore (common folder holding backend + frontend)
+# Goal: avoid duplicates; keep repo-wide rules only
+##############################################################################
+
+# Backups / local junk
 Backups/
+*.bak
+*.orig
+*.tmp
+*.swp
+
 ##############################################################################
-#  0.  GLOBAL – OS, éditeurs, logs
+# 0) OS / Editors
 ##############################################################################
-# Windows & macOS
 .DS_Store
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# Éditeurs
 .idea/
 .vscode/
 *.sublime-workspace
 *.sublime-project
 
-# Logs & rapports
+##############################################################################
+# 1) Logs / Reports / Caches (generic)
+##############################################################################
 *.log
 logs/
-*.tmp
-*.swp
-*.bak
-*.orig
 coverage/
 htmlcov/
 .cache/
+.nyc_output/
+reports/
+artifacts/
+playwright-report/
+test-results/
+routes-tests.json
+use_client_report.csv
+use_client_report.json
 
 ##############################################################################
-#  1.  PYTHON / DJANGO
+# 2) Secrets / Environment
 ##############################################################################
-# Environnements virtuels
+.env
+.env.*
+.envs/
+!.env.example
+
+##############################################################################
+# 3) Python (generic)
+##############################################################################
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.so
+
+# virtualenvs
 venv/
 .venv/
 env/
 ENV/
 
-# Compilés Python
-__pycache__/
-*.py[cod]
-*.pyd
-*.pyo
-
-# Outils de test / typage
+# tooling caches
 .pytest_cache/
 .mypy_cache/
 .tox/
 .dmypy.json
 .pyre/
+.pyright/
+.ruff_cache/
 
-# Secrets
-*.env
-.env
-.env.*
-.envs/          # dossiers créés par cookiecutter-django
-!.env.example   # conserver le template si vous en avez un
-
-# Base de données locale
+# local dbs
 *.sqlite3
 *.db
 
 ##############################################################################
-#  2.  COOKIECUTTER-DJANGO (konnaxion)
+# 4) Node / Front tooling (generic)
 ##############################################################################
-# Builds statiques collectés
+node_modules/
+.pnpm/
+.pnp/
+.pnp.js
+.pnpm-store/
+.ignored_node_modules/
+
+# builds
+.next/
+out/
+dist/
+build/
+
+# caches
+.eslintcache
+.prettiercache
+*.tsbuildinfo
+.turbo/
+.swc/
+.parcel-cache/
+.cache/
+
+# package manager debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tgz
+
+##############################################################################
+# 5) Django / Next generated assets (repo-wide safe defaults)
+##############################################################################
 staticfiles/
 media/
 
-# Artefacts Sphinx docs
-docs/_build/
-
-# Docker
+##############################################################################
+# 6) Docker / local data (common)
+##############################################################################
 **/local_postgres_data/
 **/local_postgres_data_backups/
 **/local_pgdata/
 **/local_pgadmin/
-
-##############################################################################
-#  3.  CELERY & FLOWER
-##############################################################################
-celerybeat-schedule
-celerybeat.pid
-flower.pid
-
-##############################################################################
-#  4.  NODE / NEXT.JS (next-enterprise)
-##############################################################################
-# Dépendances
-next-enterprise/node_modules/
-.next/
-.pnpm-store/
-npm-debug.log*
-pnpm-debug.log*
-
-# Build / caches
-.next/
-.out/
-dist/
-coverage/
-playwright-report/
-playwright/.cache/
-
-# Storybook
-.storybook-static/
-
-##############################################################################
-#  5.  TYPESCRIPT & FRONT TOOLING
-##############################################################################
-*.tsbuildinfo
-.eslintcache
-.prettiercache
-
-##############################################################################
-#  6.  CONTAINERS & CI
-##############################################################################
-# Docker
 **/.docker/
 .dockerignore
 docker-compose.override.yml
-
-# Traefik / Nginx certs (générées)
 compose/**/traefik/acme.json
 compose/**/nginx/certs/
 
-# GitHub Actions runners
-.github/workflows/*.log
-
 ##############################################################################
-#  7.  EXCEPTIONS (on **ne** veut **pas** ignorer !)
+# 7) EXCEPTIONS (do not ignore these)
 ##############################################################################
 !konnaxion/**/migrations/
 !konnaxion/requirements/
@@ -133,9 +136,3 @@ compose/**/nginx/certs/
 !next-enterprise/package.json
 !next-enterprise/tsconfig.json
 !*.md
-
-###
-
-node_modules/
-.pnpm/
-.ignored_node_modules/

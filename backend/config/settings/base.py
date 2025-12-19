@@ -15,6 +15,12 @@ env = environ.Env()
 
 env.read_env(str(BASE_DIR / ".env"))
 
+# ---------------------------------------------------------------------------
+# FRONTEND BASE URL (used for post-login redirects)
+# ---------------------------------------------------------------------------
+# In local dev, FRONTEND_BASE_URL defaults to http://localhost:3000
+# In production, set FRONTEND_BASE_URL=https://konnaxion.com in .env
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000").rstrip("/")
 
 # GENERAL
 # ------------------------------------------------------------------------------
@@ -123,12 +129,15 @@ AUTHENTICATION_BACKENDS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 
+# Base URL of the frontend (used for login redirects)
+# Local default stays http://localhost:3000 so dev remains easy.
+FRONTEND_BASE_URL = env("FRONTEND_BASE_URL", default="http://localhost:3000")
+
 # After successful login, send the user to the frontend Ekoh dashboard
-LOGIN_REDIRECT_URL = "http://localhost:3000/ekoh/dashboard"
+LOGIN_REDIRECT_URL = f"{FRONTEND_BASE_URL.rstrip('/')}/ekoh/dashboard"
 
 # This is the backend login view (/accounts/login/)
 LOGIN_URL = "account_login"
-
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -324,7 +333,6 @@ CELERY_TASK_SEND_SENT_EVENT = True
 # https://docs.celeryq.dev/en/stable/userguide/configuration.html#worker-hijack-root-logger
 CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
-
 # django-allauth
 # ------------------------------------------------------------------------------
 ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", True)
@@ -349,7 +357,6 @@ ACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSignupForm"}
 SOCIALACCOUNT_ADAPTER = "konnaxion.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSocialSignupForm"}
-
 
 # django-rest-framework
 # -------------------------------------------------------------------------------

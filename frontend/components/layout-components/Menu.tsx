@@ -15,6 +15,42 @@ export interface Route {
   name: string;
   icon?: ReactNode;
   views?: Route[];
+
+  /**
+   * Optional scope metadata, mainly used in Kontrol to distinguish
+   * platform-wide vs module-specific vs org-level sections.
+   *
+   * Example values:
+   *  - 'platform' → affects the whole Konnaxion platform
+   *  - 'module'   → governance / admin for a single module
+   *  - 'org'      → organisation / workspace-level
+   */
+  scope?: 'platform' | 'module' | 'org';
+
+  /**
+   * Optional module identifier when scope === 'module'.
+   * Example: 'ethikos', 'konnected', 'keenkonnect', 'teambuilder', etc.
+   * Used only for labelling / CSS, not for routing logic.
+   */
+  moduleKey?: string;
+
+  /**
+   * Marks routes that are part of governance / admin (typically under Kontrol).
+   * Filtering of these routes by user role should happen upstream, not here.
+   */
+  isAdmin?: boolean;
+
+  /**
+   * Marks routes that jump into another module (e.g. Ekoh → Konsensus,
+   * Konnected → Teambuilder). Can be used for analytics or special styling.
+   */
+  isCrossModule?: boolean;
+
+  /**
+   * Optional ordering hint if you ever want to override the natural array order.
+   * If omitted, items are rendered in the order they appear in the routes array.
+   */
+  order?: number;
 }
 
 export interface MenuComponentProps {
@@ -34,8 +70,13 @@ const flattenRoutes = (routes: Route[]): Route[] =>
 /**
  * Build AntD Menu items.
  * - Simple routes -> normal clickable items
- * - Group routes (with views) -> non-clickable header row with optional icon
+ * - Group routes (with views) -> non-clickable header row
  *   + child items rendered as first-level clickable entries.
+ *
+ * For Kontrol, optional `scope` / `moduleKey` on group routes can be used
+ * to style or annotate section headers (via CSS classes). `isAdmin` and
+ * `isCrossModule` are metadata flags consumed upstream or in CSS; the menu
+ * itself stays generic.
  */
 const toMenuItems = (
   routes: Route[],
@@ -49,12 +90,13 @@ const toMenuItems = (
     if (route.views && route.views.length > 0) {
       const sectionKey = `section-${route.name}`;
 
-      // Non-clickable section header (with optional icon)
+      // Non-clickable section header (optional icon + scope metadata)
       items.push({
         key: sectionKey,
         disabled: true,
         label: (
           <div className="k-sidebar-section-header">
+            {/* Design rule: groups can have an icon, but leaves are primary visual anchors */}
             {route.icon && (
               <span className="k-sidebar-section-header-icon">
                 {route.icon}
@@ -63,6 +105,22 @@ const toMenuItems = (
             <span className="k-sidebar-section-header-text">
               {route.name}
             </span>
+            {route.scope && (
+              <span
+                className={`k-sidebar-section-scope k-sidebar-section-scope-${route.scope}`}
+              >
+                {route.scope === 'platform'
+                  ? 'Platform'
+                  : route.scope === 'module'
+                  ? 'Module'
+                  : 'Org'}
+              </span>
+            )}
+            {route.moduleKey && (
+              <span className="k-sidebar-section-module">
+                {route.moduleKey}
+              </span>
+            )}
           </div>
         ),
         className: 'k-sidebar-section-header',

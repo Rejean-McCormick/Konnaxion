@@ -23,7 +23,6 @@ import {
   DatabaseOutlined,
   FilterOutlined,
   UploadOutlined,
-  SnippetsOutlined,
   GlobalOutlined,
 } from '@ant-design/icons';
 
@@ -120,7 +119,7 @@ const konstructGroup: Route = {
       icon: <HistoryOutlined />,
     },
 
-    // User reputation (keenkonnect side)
+    // User reputation (keenkonnect side) – user-level settings
     {
       path: '/keenkonnect/user-reputation/account-preferences',
       name: 'Account preferences',
@@ -151,7 +150,7 @@ const konstructGroup: Route = {
   ],
 };
 
-// Stockage : dépôt de connaissances
+// Stockage : dépôt de connaissances (user-facing repository actions)
 const stockageGroup: Route = {
   name: 'Stockage',
   // section header: no icon
@@ -171,11 +170,9 @@ const stockageGroup: Route = {
       name: 'Upload document',
       icon: <UploadOutlined />,
     },
-    {
-      path: '/keenkonnect/knowledge/document-management',
-      name: 'Document management',
-      icon: <SnippetsOutlined />,
-    },
+    // NOTE:
+    // Former "Document management" (platform-level governance)
+    // is now intended to be centralised under Kontrol's admin views.
   ],
 };
 

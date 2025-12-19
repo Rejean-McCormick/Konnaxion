@@ -2,43 +2,40 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
-import { 
-  Button, 
-  Tag, 
-  Space, 
-  Avatar, 
-  Dropdown, 
-  message, 
-  Drawer, 
-  Typography, 
-  Switch,
+import {
+  Button,
+  Tag,
+  Space,
+  Dropdown,
+  message,
+  Drawer,
+  Typography,
   Tree,
-  Alert
+  Alert,
 } from 'antd';
-import { 
-  PlusOutlined, 
-  EllipsisOutlined, 
-  TeamOutlined, 
+import {
+  PlusOutlined,
+  EllipsisOutlined,
+  TeamOutlined,
   SafetyCertificateOutlined,
   CopyOutlined,
   DeleteOutlined,
   EditOutlined,
   LockOutlined,
-  InfoCircleOutlined
 } from '@ant-design/icons';
-import { 
-  PageContainer, 
-  ProTable, 
-  type ProColumns, 
+import {
+  ProTable,
+  type ProColumns,
   type ActionType,
   ProCard,
   ProForm,
   ProFormText,
   ProFormTextArea,
-  ProFormSelect
+  ProFormSelect,
 } from '@ant-design/pro-components';
+import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
-const { Text, Title, Paragraph } = Typography;
+const { Text } = Typography;
 
 // --- Types ---
 type RoleItem = {
@@ -62,7 +59,7 @@ const MOCK_ROLES: RoleItem[] = [
     userCount: 3,
     permissionsCount: 142,
     updatedAt: '2024-01-01',
-    baseRole: 'admin'
+    baseRole: 'admin',
   },
   {
     id: 'ROLE_MODERATOR',
@@ -72,7 +69,7 @@ const MOCK_ROLES: RoleItem[] = [
     userCount: 8,
     permissionsCount: 45,
     updatedAt: '2024-03-15',
-    baseRole: 'moderator'
+    baseRole: 'moderator',
   },
   {
     id: 'ROLE_CUST_1',
@@ -82,7 +79,7 @@ const MOCK_ROLES: RoleItem[] = [
     userCount: 12,
     permissionsCount: 18,
     updatedAt: '2025-11-20',
-    baseRole: 'user'
+    baseRole: 'user',
   },
   {
     id: 'ROLE_CUST_2',
@@ -92,8 +89,8 @@ const MOCK_ROLES: RoleItem[] = [
     userCount: 156,
     permissionsCount: 12,
     updatedAt: '2025-10-05',
-    baseRole: 'user'
-  }
+    baseRole: 'user',
+  },
 ];
 
 // Mock Permission Tree Data
@@ -127,12 +124,14 @@ const PERMISSION_TREE = [
   },
 ];
 
-export default function RolesPermissionsPage() {
+export default function RolesPermissionsPage(): JSX.Element {
   const actionRef = useRef<ActionType>();
-  
+
   // Drawer State
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [currentRole, setCurrentRole] = useState<RoleItem | undefined>(undefined);
+  const [currentRole, setCurrentRole] = useState<RoleItem | undefined>(
+    undefined,
+  );
   const [isEditing, setIsEditing] = useState(false);
 
   const handleOpenDrawer = (record?: RoleItem) => {
@@ -148,15 +147,31 @@ export default function RolesPermissionsPage() {
 
   const columns: ProColumns<RoleItem>[] = [
     {
-      title: 'Role Name',
+      title: 'Role name',
       dataIndex: 'name',
       copyable: true,
       render: (dom, entity) => (
         <Space>
-          <SafetyCertificateOutlined style={{ color: entity.type === 'system' ? '#faad14' : '#1890ff' }} />
+          <SafetyCertificateOutlined
+            style={{
+              color: entity.type === 'system' ? '#faad14' : '#1890ff',
+            }}
+          />
           <Space direction="vertical" size={0}>
             <Text strong>{dom}</Text>
-            {entity.type === 'system' && <Tag bordered={false} color="orange" style={{fontSize: 10, lineHeight: '14px', padding: '0 4px'}}>SYSTEM</Tag>}
+            {entity.type === 'system' && (
+              <Tag
+                bordered={false}
+                color="orange"
+                style={{
+                  fontSize: 10,
+                  lineHeight: '14px',
+                  padding: '0 4px',
+                }}
+              >
+                SYSTEM
+              </Tag>
+            )}
           </Space>
         </Space>
       ),
@@ -171,17 +186,23 @@ export default function RolesPermissionsPage() {
       title: 'Users',
       dataIndex: 'userCount',
       sorter: (a, b) => a.userCount - b.userCount,
-      render: (val) => (
-        <Tag icon={<TeamOutlined />}>{val}</Tag>
-      )
+      render: val => (
+        <Tag icon={<TeamOutlined />}>
+          {val}
+        </Tag>
+      ),
     },
     {
       title: 'Permissions',
       dataIndex: 'permissionsCount',
-      render: (val) => <Tag color="blue">{val} capabilities</Tag>
+      render: val => (
+        <Tag color="blue">
+          {val} capabilities
+        </Tag>
+      ),
     },
     {
-      title: 'Last Updated',
+      title: 'Last updated',
       dataIndex: 'updatedAt',
       valueType: 'date',
       sorter: true,
@@ -195,68 +216,142 @@ export default function RolesPermissionsPage() {
         <Dropdown
           menu={{
             items: [
-              { key: 'edit', label: 'Edit Permissions', icon: <EditOutlined />, onClick: () => handleOpenDrawer(record) },
-              { key: 'clone', label: 'Clone Role', icon: <CopyOutlined /> },
+              {
+                key: 'edit',
+                label: 'Edit permissions',
+                icon: <EditOutlined />,
+                onClick: () => handleOpenDrawer(record),
+              },
+              {
+                key: 'clone',
+                label: 'Clone role',
+                icon: <CopyOutlined />,
+              },
               { type: 'divider' },
-              { 
-                key: 'delete', 
-                label: 'Delete Role', 
-                icon: <DeleteOutlined />, 
-                danger: true, 
+              {
+                key: 'delete',
+                label: 'Delete role',
+                icon: <DeleteOutlined />,
+                danger: true,
                 disabled: record.type === 'system',
-                onClick: () => handleDelete(record)
+                onClick: () => handleDelete(record),
               },
             ],
           }}
         >
-          <Button type="text" icon={<EllipsisOutlined style={{ fontSize: 18 }} />} />
+          <Button
+            type="text"
+            icon={<EllipsisOutlined style={{ fontSize: 18 }} />}
+          />
         </Dropdown>
       ),
     },
   ];
 
-  return (
-    <PageContainer
-      title="Roles & Permissions"
-      subTitle="Define access levels and capabilities for platform administrators and users."
-      extra={[
-        <Button key="create" type="primary" icon={<PlusOutlined />} onClick={() => handleOpenDrawer()}>
-          Create New Role
-        </Button>
-      ]}
+  const title = 'Roles & permissions';
+  const subtitle = (
+    <>
+      Define platform-wide access levels and capabilities across all
+      Konnaxion modules.
+    </>
+  );
+
+  const primaryAction = (
+    <Button
+      key="create"
+      type="primary"
+      icon={<PlusOutlined />}
+      onClick={() => handleOpenDrawer()}
     >
-      <ProTable<RoleItem>
-        columns={columns}
-        actionRef={actionRef}
-        cardBordered
-        request={async () => ({ data: MOCK_ROLES, success: true })}
-        rowKey="id"
-        search={{ labelWidth: 'auto' }}
-        pagination={{ pageSize: 10 }}
-        headerTitle="Active Roles"
-      />
+      Create new role
+    </Button>
+  );
+
+  return (
+    <KontrolPageShell
+      title={title}
+      subtitle={subtitle}
+      scope="platform"
+      metaTitle="Kontrol · Platform · Roles & permissions"
+      primaryAction={primaryAction}
+      maxWidth={1200}
+    >
+      <Space
+        direction="vertical"
+        size="large"
+        style={{ width: '100%' }}
+      >
+        {/* Scope / impact info for clarity inside Kontrol */}
+        <Alert
+          type="info"
+          showIcon
+          message="Platform-level roles"
+          description={
+            <>
+              <Text>
+                Changes here apply to the entire Konnaxion platform
+                (EkoH, EthiKos, KonnectED, keenKonnect, Kreative, Team
+                Builder, etc.).
+              </Text>
+              <br />
+              <Text type="secondary">
+                Use module-specific controls in other sections of Kontrol
+                (e.g. Moderation by module) when you need to scope access
+                to a single module.
+              </Text>
+            </>
+          }
+        />
+
+        <ProTable<RoleItem>
+          columns={columns}
+          actionRef={actionRef}
+          cardBordered
+          request={async () => ({ data: MOCK_ROLES, success: true })}
+          rowKey="id"
+          search={{ labelWidth: 'auto' }}
+          pagination={{ pageSize: 10 }}
+          headerTitle="Active roles"
+        />
+      </Space>
 
       {/* --- Role Editor Drawer --- */}
       <Drawer
         width={720}
         open={drawerOpen}
-        onClose={() => { setDrawerOpen(false); setCurrentRole(undefined); }}
-        title={isEditing ? `Edit Role: ${currentRole?.name}` : 'Create New Role'}
+        onClose={() => {
+          setDrawerOpen(false);
+          setCurrentRole(undefined);
+        }}
+        title={
+          isEditing
+            ? `Edit role: ${currentRole?.name}`
+            : 'Create new role'
+        }
         extra={
           <Space>
             <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
-            <Button type="primary" onClick={() => { message.success('Role saved successfully'); setDrawerOpen(false); }}>
-              Save Changes
+            <Button
+              type="primary"
+              onClick={() => {
+                message.success('Role saved successfully');
+                setDrawerOpen(false);
+              }}
+            >
+              Save changes
             </Button>
           </Space>
         }
       >
-        <Space direction="vertical" size="large" style={{ width: '100%' }}>
-          
+        <Space
+          direction="vertical"
+          size="large"
+          style={{ width: '100%' }}
+        >
           {/* Warning for System Roles */}
           {currentRole?.type === 'system' && (
-            <Alert 
-              message="System Role" 
+            <Alert
+              message="System role"
               description="This is a core system role. Some permissions cannot be removed to prevent system lockout."
               type="warning"
               showIcon
@@ -265,25 +360,32 @@ export default function RolesPermissionsPage() {
           )}
 
           {/* Basic Info Form */}
-          <ProCard title="Role Details" bordered headerBordered>
-            <ProForm submitter={false} initialValues={currentRole}>
+          <ProCard
+            title="Role details"
+            bordered
+            headerBordered
+          >
+            <ProForm
+              submitter={false}
+              initialValues={currentRole}
+            >
               <ProForm.Group>
                 <ProFormText
                   width="md"
                   name="name"
-                  label="Role Name"
-                  placeholder="e.g. Content Moderator"
+                  label="Role name"
+                  placeholder="e.g. Content moderator"
                   rules={[{ required: true }]}
                   disabled={currentRole?.type === 'system'}
                 />
                 <ProFormSelect
                   width="sm"
                   name="baseRole"
-                  label="Base Access Level"
+                  label="Base access level"
                   options={[
                     { label: 'Administrator', value: 'admin' },
                     { label: 'Moderator', value: 'moderator' },
-                    { label: 'Standard User', value: 'user' },
+                    { label: 'Standard user', value: 'user' },
                   ]}
                   rules={[{ required: true }]}
                   tooltip="Determines the baseline access level before granular permissions are applied."
@@ -298,37 +400,60 @@ export default function RolesPermissionsPage() {
           </ProCard>
 
           {/* Permission Matrix */}
-          <ProCard 
-            title="Capabilities Matrix" 
-            bordered 
-            headerBordered 
-            extra={<Button size="small">Select All</Button>}
+          <ProCard
+            title="Capabilities matrix"
+            bordered
+            headerBordered
+            extra={<Button size="small">Select all</Button>}
           >
-            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+            <div
+              style={{
+                maxHeight: '400px',
+                overflowY: 'auto',
+              }}
+            >
               <Tree
                 checkable
                 defaultExpandAll
                 treeData={PERMISSION_TREE}
-                defaultCheckedKeys={isEditing ? ['core.view_dashboard', 'ethikos.create_topic'] : []}
+                defaultCheckedKeys={
+                  isEditing
+                    ? ['core.view_dashboard', 'ethikos.create_topic']
+                    : []
+                }
               />
             </div>
           </ProCard>
 
           {/* Danger Zone (only for custom roles) */}
           {currentRole?.type !== 'system' && isEditing && (
-            <ProCard title="Danger Zone" bordered headerBordered style={{ borderColor: '#ffa39e' }} headStyle={{ backgroundColor: '#fff1f0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <ProCard
+              title="Danger zone"
+              bordered
+              headerBordered
+              style={{ borderColor: '#ffa39e' }}
+              headStyle={{ backgroundColor: '#fff1f0' }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                }}
+              >
                 <Space direction="vertical" size={2}>
-                  <Text strong>Delete this Role</Text>
-                  <Text type="secondary">Once deleted, users with this role will revert to the default 'User' role.</Text>
+                  <Text strong>Delete this role</Text>
+                  <Text type="secondary">
+                    Once deleted, users with this role will revert to
+                    the default &apos;User&apos; role.
+                  </Text>
                 </Space>
-                <Button danger>Delete Role</Button>
+                <Button danger>Delete role</Button>
               </div>
             </ProCard>
           )}
-
         </Space>
       </Drawer>
-    </PageContainer>
+    </KontrolPageShell>
   );
 }

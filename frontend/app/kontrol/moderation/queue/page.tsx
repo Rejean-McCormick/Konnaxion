@@ -30,10 +30,11 @@ import {
   ProTable,
   type ProColumns,
   type ActionType,
-  PageContainer,
   ProDescriptions,
   ProCard,
 } from '@ant-design/pro-components';
+
+import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 const { Paragraph, Text } = Typography;
 
@@ -66,7 +67,7 @@ function isModerationApiResponse(data: unknown): data is ModerationApiResponse {
   );
 }
 
-export default function ModerationQueuePage() {
+export default function ModerationQueuePage(): JSX.Element {
   const actionRef = useRef<ActionType>();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -212,14 +213,14 @@ export default function ModerationQueuePage() {
       valueType: 'option',
       width: 160,
       render: (_, record) => [
-        <Tooltip title="View Details" key="view">
+        <Tooltip title="View details" key="view">
           <Button
             type="text"
             icon={<EyeOutlined />}
             onClick={() => handleOpenDrawer(record)}
           />
         </Tooltip>,
-        <Tooltip title="Dismiss (Resolve)" key="dismiss">
+        <Tooltip title="Dismiss (resolve)" key="dismiss">
           <Popconfirm
             title="Dismiss report?"
             description="The content will remain visible and ticket marked resolved."
@@ -233,9 +234,9 @@ export default function ModerationQueuePage() {
             />
           </Popconfirm>
         </Tooltip>,
-        <Tooltip title="Remove & Ban" key="ban">
+        <Tooltip title="Remove & ban" key="ban">
           <Popconfirm
-            title="Remove content & Ban user?"
+            title="Remove content & ban user?"
             description="This is a severe action."
             onConfirm={() =>
               handleAction(
@@ -244,7 +245,7 @@ export default function ModerationQueuePage() {
                 'resolved',
               )
             }
-            okText="Ban & Remove"
+            okText="Ban & remove"
             okButtonProps={{ danger: true }}
           >
             <Button
@@ -257,21 +258,43 @@ export default function ModerationQueuePage() {
     },
   ];
 
+  const title = 'Moderation queue';
+  const subtitle = (
+    <>
+      Central queue for reported content across all modules (EkoH, EthiKos,
+      KonnectED, keenKonnect, Kreative, Team Builder).
+    </>
+  );
+
+  const primaryAction = (
+    <Button
+      key="refresh"
+      onClick={() => actionRef.current?.reload()}
+    >
+      Refresh queue
+    </Button>
+  );
+
+  const secondaryActions = (
+    <Space>
+      <Tooltip
+        title="This view aggregates moderation tickets from every module. Use module-specific pages only for content context; governance lives here in Kontrol."
+      >
+        <Button icon={<InfoCircleOutlined />} />
+      </Tooltip>
+      <Button type="default">Export logs</Button>
+    </Space>
+  );
+
   return (
-    <PageContainer
-      title="Moderation Queue"
-      subTitle="Review and act on reported content from across the platform."
-      extra={[
-        <Button
-          key="refresh"
-          onClick={() => actionRef.current?.reload()}
-        >
-          Refresh Queue
-        </Button>,
-        <Button key="export" type="default">
-          Export Logs
-        </Button>,
-      ]}
+    <KontrolPageShell
+      title={title}
+      subtitle={subtitle}
+      scope="platform"
+      metaTitle="Kontrol · Platform · Moderation queue"
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+      maxWidth={1200}
     >
       <ProTable<ModerationItem>
         columns={columns}
@@ -283,10 +306,7 @@ export default function ModerationQueuePage() {
             if (params.status)
               searchParams.append('status', params.status as string);
             if (params.type)
-              searchParams.append(
-                'search',
-                params.type as string,
-              );
+              searchParams.append('search', params.type as string);
 
             const res = await fetch(
               `/api/admin/moderation/?${searchParams.toString()}`,
@@ -306,25 +326,23 @@ export default function ModerationQueuePage() {
               total = data.length;
             }
 
-            const mappedData: ModerationItem[] = results.map(
-              (item) => {
-                const it = item as any;
-                return {
-                  id: it.id,
-                  contentSnippet: it.content_snippet,
-                  fullContent: it.full_content || it.content_snippet,
-                  author: it.author_username || 'Unknown',
-                  authorReputation: it.author_reputation_score || 0,
-                  reportReason: it.report_reason,
-                  timestamp: it.created,
-                  status: it.status,
-                  severity: it.severity,
-                  type: it.target_type,
-                  reportCount: it.report_count || 1,
-                  reporters: it.reporters || [],
-                } as ModerationItem;
-              },
-            );
+            const mappedData: ModerationItem[] = results.map((item) => {
+              const it = item as any;
+              return {
+                id: it.id,
+                contentSnippet: it.content_snippet,
+                fullContent: it.full_content || it.content_snippet,
+                author: it.author_username || 'Unknown',
+                authorReputation: it.author_reputation_score || 0,
+                reportReason: it.report_reason,
+                timestamp: it.created,
+                status: it.status,
+                severity: it.severity,
+                type: it.target_type,
+                reportCount: it.report_count || 1,
+                reporters: it.reporters || [],
+              } as ModerationItem;
+            });
 
             return {
               data: mappedData,
@@ -345,13 +363,13 @@ export default function ModerationQueuePage() {
         pagination={{
           pageSize: 10,
         }}
-        headerTitle="Active Flags"
+        headerTitle="Active flags"
         toolBarRender={() => [
           <Button key="bulk-approve" type="primary">
-            Batch Dismiss
+            Batch dismiss
           </Button>,
           <Button key="bulk-ban" danger>
-            Batch Remove
+            Batch remove
           </Button>,
         ]}
       />
@@ -363,7 +381,7 @@ export default function ModerationQueuePage() {
         title={
           <Space>
             <WarningOutlined style={{ color: '#faad14' }} />
-            <span>Moderation Ticket #{currentRow?.id}</span>
+            <span>Moderation ticket #{currentRow?.id}</span>
             {currentRow?.severity && (
               <Tag
                 color={
@@ -384,13 +402,13 @@ export default function ModerationQueuePage() {
               onClick={() =>
                 currentRow &&
                 handleAction(
-                  'Content Removed',
+                  'Content removed',
                   currentRow.id,
                   'resolved',
                 )
               }
             >
-              Remove Content
+              Remove content
             </Button>
           </Space>
         }
@@ -401,7 +419,7 @@ export default function ModerationQueuePage() {
             items={[
               {
                 key: '1',
-                label: 'Report Details',
+                label: 'Report details',
                 children: (
                   <Space
                     direction="vertical"
@@ -420,7 +438,7 @@ export default function ModerationQueuePage() {
                             currentRow.reporters &&
                             currentRow.reporters.length > 0
                               ? currentRow.reporters
-                              : ['Anonymous Reports']
+                              : ['Anonymous reports']
                           }
                           renderItem={(item) => (
                             <List.Item>
@@ -461,7 +479,7 @@ export default function ModerationQueuePage() {
                       type="inner"
                       title={
                         <Space>
-                          <InfoCircleOutlined /> Content Preview
+                          <InfoCircleOutlined /> Content preview
                         </Space>
                       }
                     >
@@ -484,7 +502,7 @@ export default function ModerationQueuePage() {
               },
               {
                 key: '2',
-                label: 'Author Context',
+                label: 'Author context',
                 children: (
                   <ProCard
                     title={`Author: ${currentRow.author}`}
@@ -493,19 +511,19 @@ export default function ModerationQueuePage() {
                   >
                     <ProDescriptions column={2}>
                       <ProDescriptions.Item
-                        label="Reputation Score"
+                        label="Reputation score"
                         valueType="digit"
                       >
                         {currentRow.authorReputation}
                       </ProDescriptions.Item>
                       <ProDescriptions.Item
-                        label="Account Age"
+                        label="Account age"
                         valueType="text"
                       >
-                        2.5 Years
+                        2.5 years
                       </ProDescriptions.Item>
                       <ProDescriptions.Item
-                        label="Previous Violations"
+                        label="Previous violations"
                         valueType="digit"
                       >
                         0
@@ -518,7 +536,7 @@ export default function ModerationQueuePage() {
                       type="link"
                       icon={<HistoryOutlined />}
                     >
-                      View Full Activity Log
+                      View full activity log
                     </Button>
                   </ProCard>
                 ),
@@ -527,6 +545,6 @@ export default function ModerationQueuePage() {
           />
         )}
       </Drawer>
-    </PageContainer>
+    </KontrolPageShell>
   );
 }

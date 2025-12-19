@@ -1,5 +1,4 @@
 // FILE: frontend/app/page.tsx
-// app/page.tsx
 import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
 
@@ -46,9 +45,32 @@ function normalizeSuite(raw: string | undefined | null): SuiteKey {
   return 'ekoh'; // default fallback
 }
 
-// Rebuild backend root from NEXT_PUBLIC_API_BASE
-const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '';
+/**
+ * Backend URL logic
+ *
+ * En développement:
+ *   - on lit NEXT_PUBLIC_API_BASE (typiquement http://localhost:8000/api)
+ *
+ * En production (NODE_ENV=production):
+ *   - on force l’URL publique officielle, même si un ancien .env contient encore localhost
+ */
+const PROD_API_BASE = 'https://api.konnaxion.com/api';
+
+const RAW_API_BASE =
+  process.env.NODE_ENV === 'production'
+    ? PROD_API_BASE
+    : process.env.NEXT_PUBLIC_API_BASE ?? PROD_API_BASE;
+
+// Strip trailing slash and optional /api
 const BACKEND_ROOT = RAW_API_BASE.replace(/\/+$/, '').replace(/\/api$/, '');
+
+// Log serveur pour diagnostiquer en prod (visible dans journalctl -u konnaxion-frontend)
+if (process.env.NODE_ENV === 'production') {
+  console.log(
+    '[Konnaxion] Home page BACKEND_ROOT (prod) =',
+    BACKEND_ROOT || '(empty)',
+  );
+}
 
 // Full backend login/signup URLs
 const BACKEND_LOGIN_URL = BACKEND_ROOT

@@ -26,7 +26,7 @@ import {
   UserSwitchOutlined,
 } from '@ant-design/icons';
 
-// Type local minimal pour éviter toute dépendance
+// Minimal local Route type to avoid cross-dependencies
 type Route = {
   path?: string;
   name: string;
@@ -34,17 +34,17 @@ type Route = {
   views?: Route[];
 };
 
-// KonnectED – vue d’ensemble
+// KonnectED – overview
 const konnectedDashboard: Route = {
   path: '/konnected/dashboard',
   name: 'KonnectED – Overview',
   icon: <DashboardOutlined />,
 };
 
-// Knowledge : bibliothèque, parcours, discussions, collaboration
+// Knowledge: library, paths, discussions, collaboration
 const knowledgeGroup: Route = {
   name: 'Knowledge',
-  // section header: pas d’icône
+  // section header: no icon
   views: [
     // Learning Library
     {
@@ -98,9 +98,11 @@ const knowledgeGroup: Route = {
       name: 'Active threads',
       icon: <CommentOutlined />,
     },
+    // ADMIN CENTRALIZED IN KONTROL:
+    // This entry now points to Kontrol's moderation queue instead of a local KonnectED page.
     {
-      path: '/konnected/community-discussions/moderation',
-      name: 'Moderation',
+      path: '/kontrol/moderation/queue',
+      name: 'Moderation (Kontrol)',
       icon: <AlertOutlined />,
     },
     {
@@ -133,7 +135,7 @@ const knowledgeGroup: Route = {
   ],
 };
 
-// CertifiKation : examens, programmes, préparation
+// CertifiKation: exams, programs, preparation
 const certifikationGroup: Route = {
   name: 'CertifiKation',
   views: [
@@ -168,4 +170,3 @@ const certifikationGroup: Route = {
 const routes: Route[] = [konnectedDashboard, knowledgeGroup, certifikationGroup];
 
 export default routes;
-

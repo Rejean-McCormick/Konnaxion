@@ -12,25 +12,26 @@ import {
   HistoryOutlined,
 } from '@ant-design/icons';
 
-// Type local minimal pour éviter toute dépendance
-type Route = {
-  path?: string;
-  name: string;
-  icon?: React.ReactNode;
-  views?: Route[];
-};
+import type { Route } from '@/components/layout-components/Menu';
 
-// Route principale : vue d’ensemble Ekoh
+/**
+ * Ekoh module navigation:
+ * - User-facing identity / reputation features stay here.
+ * - Smart Vote surface entry points (voting weight, Konsensus) also stay here.
+ * - Admin / platform-wide controls are centralised under /kontrol.
+ */
+
+// Main route: Ekoh overview
 const ekohDashboard: Route = {
   path: '/ekoh/dashboard',
   name: 'Ekoh – Overview',
   icon: <DashboardOutlined />,
 };
 
-// Bloc EkoH : réputation, expertise, badges
+// EkoH: reputation, expertise, badges
 const ekohGroup: Route = {
   name: 'EkoH',
-  // section header: no icon
+  // section header: no icon (non-clickable group)
   views: [
     {
       path: '/ekoh/overview-analytics/current-ekoh-score',
@@ -50,10 +51,10 @@ const ekohGroup: Route = {
   ],
 };
 
-// Bloc Smart Vote : poids de vote + centre Konsensus + flux d’activité
+// Smart Vote: voting weight + Konsensus center + activity feed
 const smartVoteGroup: Route = {
   name: 'Smart Vote',
-  // section header: no icon
+  // section header: no icon (non-clickable group)
   views: [
     {
       path: '/ekoh/voting-influence/current-voting-weight',

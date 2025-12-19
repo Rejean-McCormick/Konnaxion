@@ -22,9 +22,6 @@ import {
   TrophyOutlined,
   SmileOutlined,
   SearchOutlined,
-  ExperimentOutlined,
-  ContactsOutlined,
-  MehOutlined,
 } from '@ant-design/icons';
 
 // Minimal local type to avoid external coupling
@@ -92,6 +89,7 @@ const korumGroup: Route = {
 };
 
 // Konsultations: consultations, pulse, learning, trust
+// (All admin / platform-control items are now centralised under /kontrol)
 const konsultationsGroup: Route = {
   name: 'Konsultations',
   // no group icon (as requested)
@@ -171,29 +169,6 @@ const konsultationsGroup: Route = {
   ],
 };
 
-// Admin: moderation & roles (kept separate; can later be role-gated)
-const adminGroup: Route = {
-  name: 'Admin',
-  // no group icon (as requested)
-  views: [
-    {
-      path: '/ethikos/admin/audit',
-      name: 'Audit',
-      icon: <ExperimentOutlined />,
-    },
-    {
-      path: '/ethikos/admin/roles',
-      name: 'Roles',
-      icon: <ContactsOutlined />,
-    },
-    {
-      path: '/ethikos/admin/moderation',
-      name: 'Moderation',
-      icon: <MehOutlined />,
-    },
-  ],
-};
-
-const routes: Route[] = [ethikosDashboard, korumGroup, konsultationsGroup, adminGroup];
+const routes: Route[] = [ethikosDashboard, korumGroup, konsultationsGroup];
 
 export default routes;

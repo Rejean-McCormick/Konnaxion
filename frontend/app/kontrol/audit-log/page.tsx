@@ -11,11 +11,11 @@ import {
   RobotOutlined,
 } from '@ant-design/icons';
 import {
-  PageContainer,
   ProTable,
   type ProColumns,
   type ActionType,
 } from '@ant-design/pro-components';
+import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 // --- Domain types for the table ---
 export type LogItemRole = 'admin' | 'moderator' | 'system';
@@ -52,7 +52,7 @@ type AuditLogApiResponse = {
   count: number;
 };
 
-export default function AuditLogPage() {
+export default function AuditLogPage(): JSX.Element {
   const actionRef = useRef<ActionType>();
 
   // Helper for Actor Icons
@@ -99,14 +99,20 @@ export default function AuditLogPage() {
     {
       title: 'Module',
       dataIndex: 'module',
-      width: 120,
+      width: 160,
       valueType: 'select',
       valueEnum: {
-        Moderation: { text: 'Moderation' },
-        'User Mgmt': { text: 'User Mgmt' },
-        System: { text: 'System' },
-        Auth: { text: 'Auth' },
-        Konsensus: { text: 'Konsensus' },
+        all: { text: 'All modules' },
+        Ekoh: { text: 'EkoH' },
+        Ethikos: { text: 'EthiKos' },
+        KeenKonnect: { text: 'keenKonnect' },
+        KonnectED: { text: 'KonnectED' },
+        Kreative: { text: 'Kreative' },
+        TeamBuilder: { text: 'Team Builder' },
+        System: { text: 'System / Platform' },
+      },
+      fieldProps: {
+        placeholder: 'Filter by module',
       },
     },
     {
@@ -157,134 +163,158 @@ export default function AuditLogPage() {
       .then(() => message.success('Audit_Log_Export.csv downloaded'));
   };
 
-  return (
-    <PageContainer
-      title="System Audit Log"
-      subTitle="Immutable record of all administrative and system actions."
-      extra={[
-        <Button
-          key="refresh"
-          icon={<ReloadOutlined />}
-          onClick={() => actionRef.current?.reload()}
-        >
-          Refresh
-        </Button>,
-        <Button
-          key="export"
-          type="primary"
-          icon={<CloudDownloadOutlined />}
-          onClick={handleExport}
-        >
-          Export CSV
-        </Button>,
-      ]}
+  const title = 'System audit log';
+  const subtitle =
+    'Platform-wide record of administrative and system actions. Use the Module filter to focus on a specific module (Ethikos, KonnectED, etc.).';
+
+  const secondaryActions = (
+    <Button
+      icon={<ReloadOutlined />}
+      onClick={() => actionRef.current?.reload()}
     >
-      <ProTable<LogItem>
-        columns={columns}
-        actionRef={actionRef}
-        cardBordered
-        rowKey="id"
-        search={{
-          labelWidth: 'auto',
-        }}
-        pagination={{
-          pageSize: 20,
-          showSizeChanger: true,
-        }}
-        options={{
-          density: true,
-          fullScreen: true,
-          setting: true,
-        }}
-        dateFormatter="string"
-        headerTitle="Recent Activity"
-        /**
-         * WIRED: Fetch from Django API
-         * The return type is fully annotated to keep TypeScript happy.
-         */
-        request={async (params): Promise<{
-          data: LogItem[];
-          success: boolean;
-          total?: number;
-        }> => {
-          try {
-            const searchParams = new URLSearchParams();
+      Refresh
+    </Button>
+  );
 
-            // Pagination
-            const current = params.current ?? 1;
-            const pageSize = params.pageSize ?? 20;
-            searchParams.append('page', String(current));
-            searchParams.append('page_size', String(pageSize));
+  const primaryAction = (
+    <Button
+      type="primary"
+      icon={<CloudDownloadOutlined />}
+      onClick={handleExport}
+    >
+      Export CSV
+    </Button>
+  );
 
-            // Filtering / Searching
-            if (params.module) {
-              searchParams.append('search', String(params.module));
-            }
-            if (params.action) {
-              searchParams.append('search', String(params.action));
-            }
+  return (
+    <KontrolPageShell
+      title={title}
+      subtitle={subtitle}
+      metaTitle="Kontrol · Platform · System audit log"
+      scope="platform"
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+      maxWidth={1200}
+    >
+      <Space
+        direction="vertical"
+        size="middle"
+        style={{ width: '100%' }}
+      >
+        <Tag>
+          Modules: EkoH · EthiKos · KonnectED · keenKonnect · Kreative · Team
+          Builder
+        </Tag>
 
-            // Sorting: default to newest first
-            // (Assuming backend supports ?ordering=-created)
-            searchParams.append('ordering', '-created');
+        <ProTable<LogItem>
+          columns={columns}
+          actionRef={actionRef}
+          cardBordered
+          rowKey="id"
+          search={{
+            labelWidth: 'auto',
+          }}
+          pagination={{
+            pageSize: 20,
+            showSizeChanger: true,
+          }}
+          options={{
+            density: true,
+            fullScreen: true,
+            setting: true,
+          }}
+          dateFormatter="string"
+          headerTitle="Recent activity"
+          /**
+           * WIRED: Fetch from Django API
+           * The return type is fully annotated to keep TypeScript happy.
+           */
+          request={async (params): Promise<{
+            data: LogItem[];
+            success: boolean;
+            total?: number;
+          }> => {
+            try {
+              const searchParams = new URLSearchParams();
 
-            const response = await fetch(
-              `/api/admin/audit-log/?${searchParams.toString()}`,
-            );
+              // Pagination
+              const current = params.current ?? 1;
+              const pageSize = params.pageSize ?? 20;
+              searchParams.append('page', String(current));
+              searchParams.append('page_size', String(pageSize));
 
-            if (!response.ok) {
-              throw new Error('Failed to fetch logs');
-            }
+              // Filtering / Searching
+              if (params.module && params.module !== 'all') {
+                // For now, reuse the generic ?search=... param to hint module
+                searchParams.append('search', String(params.module));
+              }
+              if (params.action) {
+                searchParams.append('search', String(params.action));
+              }
 
-            const data = (await response.json()) as AuditLogApiResponse;
+              // Sorting: default to newest first
+              // (Assuming backend supports ?ordering=-created)
+              searchParams.append('ordering', '-created');
 
-            const rawResults = Array.isArray(data.results)
-              ? data.results
-              : [];
+              const response = await fetch(
+                `/api/admin/audit-log/?${searchParams.toString()}`,
+              );
 
-            const mappedData: LogItem[] = rawResults.map((item) => {
-              const actorName =
-                item.actor_name ??
-                item.actor_username ??
-                'System';
+              if (!response.ok) {
+                throw new Error('Failed to fetch logs');
+              }
 
-              const role: LogItemRole =
-                item.role && ['admin', 'moderator', 'system'].includes(item.role)
-                  ? item.role
-                  : 'system';
+              const data = (await response.json()) as AuditLogApiResponse;
 
-              const status: LogItemStatus =
-                item.status === 'failure' ? 'failure' : 'success';
+              const rawResults = Array.isArray(data.results)
+                ? data.results
+                : [];
+
+              const mappedData: LogItem[] = rawResults.map((item) => {
+                const actorName =
+                  item.actor_name ??
+                  item.actor_username ??
+                  'System';
+
+                const role: LogItemRole =
+                  item.role &&
+                  ['admin', 'moderator', 'system'].includes(item.role)
+                    ? item.role
+                    : 'system';
+
+                const status: LogItemStatus =
+                  item.status === 'failure' ? 'failure' : 'success';
+
+                return {
+                  id: String(item.id),
+                  actor: actorName,
+                  role,
+                  action: item.action,
+                  module: item.module,
+                  target: item.target,
+                  ip: item.ip_address ?? '-',
+                  timestamp: item.created,
+                  status,
+                };
+              });
 
               return {
-                id: String(item.id),
-                actor: actorName,
-                role,
-                action: item.action,
-                module: item.module,
-                target: item.target,
-                ip: item.ip_address ?? '-',
-                timestamp: item.created,
-                status,
+                data: mappedData,
+                success: true,
+                total: data.count,
               };
-            });
-
-            return {
-              data: mappedData,
-              success: true,
-              total: data.count,
-            };
-          } catch (error) {
-            // eslint-disable-next-line no-console
-            console.error('Audit log fetch error:', error);
-            message.error('Failed to load audit logs');
-            return {
-              data: [],
-              success: false,
-            };
-          }
-        }}
-      />
-    </PageContainer>
+            } catch (error) {
+              // eslint-disable-next-line no-console
+              console.error('Audit log fetch error:', error);
+              message.error('Failed to load audit logs');
+              return {
+                data: [],
+                success: false,
+              };
+            }
+          }}
+        />
+      </Space>
+    </KontrolPageShell>
   );
 }

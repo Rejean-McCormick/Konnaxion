@@ -14,7 +14,6 @@ import {
   BulbOutlined,
   BankOutlined,
   UserSwitchOutlined,
-  ContactsOutlined,
   AimOutlined,
   PlusSquareOutlined,
   HomeOutlined,
@@ -109,7 +108,6 @@ const konservationGroup: Route = {
 // Kontact : espaces collaboratifs
 const kontactGroup: Route = {
   name: 'Kontact',
-
   views: [
     {
       path: '/kreative/collaborative-spaces/find-spaces',

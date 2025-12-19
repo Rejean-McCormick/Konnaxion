@@ -1,5 +1,4 @@
 // FILE: frontend/components/layout-components/LogoTitle.tsx
-// C:\MyCode\Konnaxionv14\frontend\components\layout-components\LogoTitle.tsx
 'use client'
 
 import styled from 'styled-components'
@@ -10,35 +9,36 @@ import { DownOutlined } from '@ant-design/icons'
 
 /* ------------ module keys & mappings ------------ */
 
-// 1. UPDATED: Added 'kontrol' to the list of known module keys
 const SUITE_KEYS = [
   'ekoh',
   'ethikos',
   'keenkonnect',
   'konnected',
-  'kontrol', // <-- NEW MODULE KEY
   'kreative',
+  'kontrol',
+  'teambuilder',
 ] as const
+
 type SuiteKey = (typeof SUITE_KEYS)[number]
 
-// 2. UPDATED: Added the display title for 'kontrol'
 const TITLE_BY_SUITE: Record<SuiteKey, string> = {
   ekoh: 'EkoH',
   ethikos: 'EthiKos',
   keenkonnect: 'keenKonnect',
   konnected: 'KonnectED',
-  kontrol: 'KonTrol', // <-- NEW MODULE TITLE
   kreative: 'Kreative',
+  kontrol: 'KonTrol',
+  teambuilder: 'Team Builder',
 }
 
-// 3. UPDATED: Added the default dashboard route for 'kontrol'
 const DEFAULT_ENTRY: Record<SuiteKey, string> = {
   ekoh: '/ekoh/dashboard',
   ethikos: '/ethikos/pulse/overview',
   keenkonnect: '/keenkonnect/dashboard',
   konnected: '/konnected/dashboard',
-  kontrol: '/kontrol/dashboard', // <-- NEW DEFAULT ROUTE
   kreative: '/kreative/dashboard',
+  kontrol: '/kontrol/dashboard',
+  teambuilder: '/teambuilder',
 }
 
 /* ------------ styled ------------ */
@@ -84,24 +84,31 @@ const ModuleToggle = styled.button`
 /* ------------ types ------------ */
 
 interface LogoTitleProps {
-  /** Callback when the user selects another module from the dropdown */
   onSidebarChange: (key: SuiteKey) => void
-  /** Current active module key (e.g. "ekoh", "ethikos", …) */
   selectedSidebar?: string | SuiteKey
-  /** Visual variant for use in the top header vs. the sider */
   variant?: 'sider' | 'header'
-  /** Optional passthrough className for external styling */
   className?: string
 }
 
 /* ------------ helpers ------------ */
 
-// NOTE: This array dynamically includes the new 'kontrol' entry now
-// that it has been added to SUITE_KEYS.
-const menuItems: MenuProps['items'] = SUITE_KEYS.map(key => ({
-  key,
-  label: TITLE_BY_SUITE[key],
-}))
+// Dropdown menu with separators:
+// ekoh
+// ---
+// ethikos, keenkonnect, konnected, kreative
+// ---
+// kontrol, teambuilder
+const menuItems: MenuProps['items'] = [
+  { key: 'ekoh', label: TITLE_BY_SUITE.ekoh },
+  { type: 'divider' },
+  { key: 'ethikos', label: TITLE_BY_SUITE.ethikos },
+  { key: 'keenkonnect', label: TITLE_BY_SUITE.keenkonnect },
+  { key: 'konnected', label: TITLE_BY_SUITE.konnected },
+  { key: 'kreative', label: TITLE_BY_SUITE.kreative },
+  { type: 'divider' },
+  { key: 'kontrol', label: TITLE_BY_SUITE.kontrol },
+  { key: 'teambuilder', label: TITLE_BY_SUITE.teambuilder },
+]
 
 function normalizeSuite(raw: string | SuiteKey | null | undefined): SuiteKey {
   if (!raw) return 'ekoh'
@@ -146,7 +153,7 @@ export default function LogoTitle({
         <Logo src="/LogoK.svg" alt="Konnaxion logo" />
       </Link>
 
-      {/* Module switcher dropdown (EkoH, ethiKos, keenKonnect, …) */}
+      {/* Module switcher dropdown */}
       <Dropdown
         trigger={['click']}
         menu={{
