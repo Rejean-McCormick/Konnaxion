@@ -1,0 +1,808 @@
+Below is a **reference guide for AI** about this codebase, focused on technical specificities and “non‑guess” rules.
+
+Use this as ground truth when reasoning about or generating code for Konnaxion.
+
+---
+
+# 1. High‑level facts (do not guess otherwise)
+
+1. The project is called **Konnaxion**.
+2. Stack:
+
+   * **Backend**: Django 5.1 + Django REST Framework + Celery + Redis, Cookiecutter‑Django layout.
+   * **Frontend**: Next.js/React (App Router) with modular feature folders (Ethikos, KeenKonnect, KonnectED, Kreative, etc.).
+3. Persistence:
+
+   * Single relational DB (PostgreSQL in production). 
+4. Infrastructure:
+
+   * Redis is used for Celery broker + result backend, not as a cache only.
+5. Styling:
+
+   * The backend HTML uses **Bootstrap 5 from CDN** and a project CSS file (`static/css/project.css`).
+   * There is **no Tailwind** in the Django layer.
+
+If a suggestion contradicts any of the above, it is incorrect.
+
+---
+
+# 2. Frontend specifics
+
+## 2.1 Global shell / layout
+
+Facts from the file index:
+
+* There is a **global layout system**:
+
+  * Components named like `MainLayout`, `Header`, `Sider`, `PageContainer` live in the frontend components bundle (layout-related).
+* There is a **`modules/global`** area that contains navigation and a global shell for the app.
+
+Guidance for AI:
+
+* When generating **new pages or module UIs**, assume:
+
+  * Pages are wrapped inside the existing **global layout**, not a new layout.
+  * Use the existing `MainLayout` + `PageContainer` + navbar/side components rather than inventing new top-level wrappers.
+* Do not:
+
+  * Introduce a new root layout component unless explicitly requested.
+  * Assume each module has its own independent root layout; instead, it is composed inside the global shell.
+
+If exact props or usage of `MainLayout` / `PageContainer` are unknown, refer back to their source rather than fabricating.
+
+## 2.2 Module shell (wrap) per feature
+
+From earlier file lists:
+
+* Frontend has per-domain modules:
+
+  * `modules/ethikos`, `modules/keenkonnect`, `modules/konnected`, `modules/kreative`, `modules/admin`, `modules/insights`, `modules/konsensus`, `modules/konsultations`, etc.
+* Routes are centralized in files like:
+
+  * `routesEkoh.tsx`, `routesEthikos.tsx`, `routesKeenkonnect.tsx`, `routesKonnected.tsx`, `routesKreative.tsx`.
+* There is a generated `routes.json` and `routes-tests.json`.
+
+Guidance:
+
+* Each module’s pages are **plugged into** the global shell via these route configs.
+* When adding a new screen (for example, a new Ethikos dashboard), the correct pattern is:
+
+  1. Implement the screen within the corresponding `modules/<module>` folder.
+  2. Register it in the appropriate `routes*.tsx` file (and/or whatever central routing config is used).
+* Do not assume every module has its own independent `App` or router; routing is centralized.
+
+## 2.3 Theme system and ThemeSwitcher
+
+From frontend file index:
+
+* There is a distinct **theme layer**:
+
+  * A `ThemeSwitcher` component (in components).
+  * Shared theme context/tokens in the `shared` bundle (e.g., a theme context/provider and token definitions).
+  * Global theme styles aggregated in the `frontend_theme_styles_...` file.
+
+Constraints for AI:
+
+* Treat **ThemeSwitcher** as the **single canonical UI element** for changing themes.
+* Treat the **shared theme context/tokens** as the source of truth for theming state.
+* When generating code:
+
+  * Do not create additional theme globals or second theme toggles.
+  * If you need to respond to theme changes, subscribe to whatever shared theme context exists, not to ad‑hoc local state.
+* Do not assume:
+
+  * Tailwind dark mode.
+  * Arbitrary CSS variable names.
+  * Browser `localStorage` usage for theme persistence, unless confirmed in the code.
+
+If unsure how ThemeSwitcher persists or propagates theme (e.g., context vs CSS class toggling), say so explicitly rather than inventing implementation details.
+
+## 2.4 Frontend services and API access
+
+From structure and backend router:
+
+* There is a **services** layer that wraps HTTP access to backend DRF endpoints (e.g. `services/ethikos`, `services/keenkonnect`, etc.).
+* Backend API prefixes (from `config/api_router.py` and `config/urls.py`): 
+
+  * Base: `/api/`
+  * Users: `/api/users/…`
+  * Ethikos:
+
+    * `/api/ethikos/topics/`
+    * `/api/ethikos/stances/`
+    * `/api/ethikos/arguments/`
+    * `/api/ethikos/categories/` (only if `EthikosCategoryViewSet` exists)
+  * KeenKonnect: `/api/keenkonnect/projects/`
+  * Kollective Intelligence: `/api/kollective/votes/`
+  * KonnectED:
+
+    * `/api/konnected/resources/`
+    * `/api/konnected/certifications/paths/`
+    * `/api/konnected/certifications/evaluations/`
+    * `/api/konnected/certifications/peer-validations/`
+    * `/api/konnected/portfolios/`
+    * `/api/konnected/certifications/exam-attempts/`
+  * Kreative:
+
+    * `/api/kreative/artworks/`
+    * `/api/kreative/galleries/`
+* There are **compatibility URLs**: 
+
+  * `/api/deliberate/...` → includes `konnaxion.ethikos.urls`
+  * `/api/deliberate/elite/...` → includes the same Ethikos URLs under a second namespace.
+
+Guidance:
+
+* When generating frontend API calls:
+
+  * Use the **services layer** (`services/*`) and base `/api/...` routes above.
+  * Respect the existing path prefixes exactly; do not invent new ones.
+* Do not:
+
+  * Rename `/api/ethikos/...` to `/api/deliberation/...` or similar.
+  * Use GraphQL or websockets for CRUD actions unless the codebase explicitly does so; the default is REST over HTTP.
+
+---
+
+# 3. Backend specifics
+
+## 3.1 Project layout and settings
+
+Key files: `manage.py`, `config/settings/*.py`, `config/asgi.py`, `config/wsgi.py`.
+
+Facts:
+
+* Settings modules:
+
+  * `config.settings.base` – common base.
+  * `config.settings.local` – development.
+  * `config.settings.production` – production.
+  * `config.settings.test` – tests.
+* `DEBUG` is controlled via `DJANGO_DEBUG` (in base) and overridden in `local`. 
+* Installed apps include:
+
+  * Core Django apps.
+  * `allauth`, `allauth.account`, `allauth.mfa`, `allauth.socialaccount`.
+  * `django_celery_beat`, `rest_framework`, `corsheaders`, `drf_spectacular`.
+  * Local apps: `konnaxion.users`, `konnaxion.kollective_intelligence`, `konnaxion.ethikos`, `konnaxion.keenkonnect`, `konnaxion.konnected`, `konnaxion.kreative`. 
+
+Guidance:
+
+* When generating Django code, always assume:
+
+  * `AUTH_USER_MODEL = "users.User"`.
+  * Root URLConf is `config.urls`.
+  * WSGI application is `config.wsgi.application`, ASGI app is defined in `config.asgi.application`.
+* Do not:
+
+  * Refer to the default `auth.User`.
+  * Change settings module names or import paths in examples.
+
+## 3.2 Domain apps and models
+
+High‑level semantics (from migrations): 
+
+* **Users**: custom user, standard Django-ish fields.
+* **Ethikos**:
+
+  * `EthikosTopic`, `EthikosStance`, `EthikosArgument`, `EthikosCategory`.
+  * Stance value ∈ [-3, 3] (DB constraint).
+  * Unique `(user, topic)` for stances.
+* **KeenKonnect**:
+
+  * `Project` (+ tags, team, messages, resources, ratings, tasks).
+  * Task statuses: todo/doing/done.
+* **Kollective Intelligence**:
+
+  * Expertise categories & scores.
+  * Generic votes and aggregated vote results.
+  * Confidentiality settings; context logs; scoring configuration.
+* **KonnectED**:
+
+  * Certification paths, evaluations, peer validations, portfolios.
+  * Knowledge resources, recommendations, learning progress, forums, co‑creation.
+* **Kreative**:
+
+  * Artworks, galleries, tags, collaboration sessions.
+  * Cultural traditions and submissions.
+  * Digital archives, archive documents, cultural partners, virtual exhibitions, AI catalogue entries.
+
+Guidance:
+
+* These apps are **real, separate domains**. When asked to “put everything in one model”, that contradicts the architecture.
+* When adding features, prefer **new models in the appropriate app** rather than overloading existing ones.
+
+## 3.3 Celery
+
+Files: `config/celery_app.py`, `konnaxion/users/tasks.py`, docker compose files.
+
+Facts:
+
+* Celery app name: `"konnaxion"`.
+* Django settings module for Celery: `"config.settings.local"` by default.
+* Broker and result backend: `REDIS_URL` from environment, shared with Django.
+* Celery beat uses `django_celery_beat.schedulers:DatabaseScheduler`.
+
+Guidance:
+
+* When generating Celery tasks:
+
+  * Use `from celery import shared_task` and rely on `app.autodiscover_tasks()`.
+  * Do not define a second Celery app.
+* When writing docker commands:
+
+  * Workers are started via `/start-celeryworker`.
+  * Beat via `/start-celerybeat`.
+  * Flower via `/start-flower`.
+
+## 3.4 Websocket handling
+
+Files: `config/asgi.py`, `config/websocket.py`. 
+
+Facts:
+
+* `application(scope, receive, send)` dispatches by `scope["type"]`:
+
+  * `"http"` → standard Django ASGI app.
+  * `"websocket"` → `config.websocket.websocket_application`.
+* `websocket_application` implements a simple ping/pong protocol:
+
+  * On `"websocket.connect"`: accepts.
+  * On `"websocket.receive"` with text `"ping"`: responds `"pong!"`.
+  * On `"websocket.disconnect"`: exits.
+
+Guidance:
+
+* AI should not assume:
+
+  * A full-featured websocket framework (e.g. Channels) is in use; this is a custom minimal handler.
+  * That business logic is already implemented over websockets.
+
+---
+
+# 4. Docker / environment specifics
+
+Files: `docker-compose.local.yml`, `docker-compose.production.yml`, `merge_production_dotenvs_in_dotenv.py`, `requirements/*.txt`. 
+
+## 4.1 Local environment (docker-compose.local.yml)
+
+Facts:
+
+* Services:
+
+  * `django`: `konnaxion_local_django`
+  * `redis`
+  * `mailpit`
+  * `celeryworker`
+  * `celerybeat`
+  * `flower`
+* Volumes:
+
+  * `konnaxion_local_redis_data` for Redis.
+* There is **no local Postgres container**:
+
+  * Comment explicitly says: `# ❌ REMOVED local postgres — you now use NEON`.
+  * Database is provided via `.envs/.local/.postgres` with a `DATABASE_URL` to Neon. 
+
+Guidance:
+
+* Do not suggest creating a local Postgres container in `docker-compose.local.yml`; this was intentionally removed.
+* If giving “how to run locally” commands, respect:
+
+  * Remote DB (Neon) + local Django/Redis/Mailpit/Celery/Flower.
+
+## 4.2 Production environment (docker-compose.production.yml)
+
+Facts:
+
+* Services:
+
+  * `django` (Django app).
+  * `postgres`.
+  * `redis`.
+  * `traefik` (reverse proxy, also exposing Flower port 5555).
+  * `celeryworker`, `celerybeat`, `flower`.
+  * `nginx` for static/media. 
+* Volumes:
+
+  * `production_postgres_data`, `production_postgres_data_backups`.
+  * `production_django_media`.
+  * `production_traefik`.
+  * `production_redis_data`.
+
+Guidance:
+
+* When describing deployment:
+
+  * Mention **Docker with Traefik + Nginx** around Django/Gunicorn, Postgres, Redis, Celery, Flower.
+* Do not:
+
+  * Claim deployment is on serverless / PaaS by default.
+  * Replace Traefik with something else in examples unless explicitly asked.
+
+## 4.3 Requirements / tooling
+
+Files: `requirements/base.txt`, `requirements/local.txt`, `requirements/production.txt`, `.pre-commit-config.yaml`, `pyproject.toml`. 
+
+Facts:
+
+* Uses `ruff` for linting + formatting, `djlint` for templates, `pre-commit` configured.
+* Testing: `pytest`, `pytest-django`, `coverage`, `django-stubs`, `djangorestframework-stubs`.
+* Production: `gunicorn`, `sentry-sdk`, `django-anymail`.
+
+Guidance:
+
+* AI should:
+
+  * Prefer **Ruff** over flake8/black in examples and config suggestions.
+  * Use `pytest` conventions, not `unittest`, when suggesting test patterns for this codebase.
+* Any suggestion to add “new linting tool” must be justified; most common tools are already present.
+
+---
+
+# 5. Django templates vs React app
+
+Files: `konnaxion/templates/*` and frontend bundles.
+
+Facts:
+
+* Django templates provide:
+
+  * `base.html` with navbar and Bootstrap 5.
+  * `pages/home.html`, `pages/about.html` (very minimal).
+  * Allauth layouts and user profile/edit pages.
+* The React app (Next.js) handles:
+
+  * Rich module UIs (Ethikos, KeenKonnect, KonnectED, Kreative, insights, etc.).
+
+Guidance:
+
+* When asked “Where does the main UI live?”:
+
+  * The heavy product UI is in the **React frontend**, not Django templates.
+* When generating examples for simple server-rendered pages (e.g. extra marketing page), use:
+
+  * Django templates extending `base.html`.
+* Do not:
+
+  * Assume the Next.js app is rendered via Django templates; they are separate concerns.
+
+---
+
+# 6. Behaviour rules for AI working on this project
+
+To specifically “remove guesses”, follow these rules:
+
+1. **Use the existing modules and names**
+
+   * Always refer to backend apps and frontend modules by their real names:
+
+     * `ethikos`, `keenkonnect`, `kollective_intelligence`, `konnected`, `kreative`, `users`.
+   * Do not rename them to different English words (e.g. “DecisionEngine”) unless the human explicitly asks.
+
+2. **Respect existing wrappers and shells**
+
+   * Use `MainLayout` / global shell / `PageContainer` and `ThemeSwitcher` instead of inventing new “root” wrappers.
+   * Assume modules plug into this shell; do not design module-specific top-level apps.
+
+3. **Use the documented API routes**
+
+   * Use `/api/...` paths exactly as registered in `config/api_router.py` and `config/urls.py`.
+   * For “deliberate”/“deliberate elite”, remember they are just aliases for Ethikos endpoints, not separate backends.
+
+4. **Do not add tailwind or alternate CSS stacks**
+
+   * The current styling solutions are Bootstrap + project CSS (server side) and the existing React theme system.
+   * Adding Tailwind or Material UI unprompted is inconsistent with the codebase.
+
+5. **Do not introduce new infrastructure layers casually**
+
+   * There is already Docker, Redis, Celery, Traefik, Sentry.
+   * Do not suggest “let’s add Kubernetes” or “let’s switch to serverless” as standard answers for local or production deployment questions.
+
+6. **Be explicit when something is unknown**
+
+   * For any behaviour not visible from the code (e.g., how ThemeSwitcher persists state, exact props of layout components), respond with:
+
+     * What is known (e.g. file names and roles), and
+     * A statement that further details are not visible, rather than improvising.
+
+---
+
+
+Here is a concise “contract” for each main frontend module.
+
+For each one:
+
+* Which backend endpoints it uses (or should use).
+* What entities it visualizes.
+* How it plugs into the global shell and services layer.
+
+---
+
+## 1. Ethikos (Deliberation module)
+
+### 1.1 Backend endpoints
+
+Backend app: `konnaxion.ethikos`.
+
+Registered DRF viewsets (in `config/api_router.py`):
+
+* `GET/POST /api/ethikos/topics/` → `TopicViewSet`
+* `GET/POST /api/ethikos/stances/` → `StanceViewSet`
+* `GET/POST /api/ethikos/arguments/` → `ArgumentViewSet`
+* `GET/POST /api/ethikos/categories/` → `EthikosCategoryViewSet` (only if present in `ethikos.api_views`)
+
+Compat aliases (same functionality, different paths):
+
+* `/api/deliberate/...`
+* `/api/deliberate/elite/...`
+
+These include `konnaxion.ethikos.urls` under different namespaces.
+
+### 1.2 Entities visualized
+
+From the migrations:
+
+* `EthikosTopic`
+
+  * `title`, `description`, `status` (`open`/`closed`/`archived`), `category`, `created_by`, `total_votes`, `last_activity`, timestamps.
+* `EthikosStance`
+
+  * `user`, `topic`, `value` (small integer with a DB constraint enforcing **between -3 and 3**), `timestamp`. Unique per `(user, topic)`.
+* `EthikosArgument`
+
+  * `topic`, `user`, `content`, `side` (`pro`/`con`/null), `parent` (replies), visibility flags, timestamps.
+* `EthikosCategory`
+
+  * `name`, `description`.
+
+The Ethikos frontend should expose:
+
+* Topic listing, filtering, and detail pages.
+* Per-topic stance controls (single stance per user, value ∈ [-3, 3]).
+* Argument threads with pro/con labels and nesting.
+* Category filters.
+
+### 1.3 Plugging into shell and services
+
+Frontend:
+
+* Module folder: `modules/ethikos`.
+* Routes file: `routesEthikos.tsx` (and branding-level `routesEkoh.tsx` if used).
+
+Contract:
+
+* **Layout**
+
+  * All Ethikos screens are rendered inside the **global app shell** (main layout, global navbar/side menu). Ethikos must not define its own root layout.
+* **Navigation**
+
+  * Ethikos navigation items come from `routesEthikos.tsx` (and any central `routes.json`), not from hardcoded menu arrays scattered around.
+* **Data access**
+
+  * A dedicated Ethikos service module (e.g. `services/ethikos`) should wrap calls to:
+
+    * `/api/ethikos/topics/`
+    * `/api/ethikos/stances/`
+    * `/api/ethikos/arguments/`
+    * `/api/ethikos/categories/`
+  * Components should not directly `fetch('/api/ethikos/...')` unless they are themselves part of the service layer.
+
+If AI needs a new Ethikos view (say, “topic health dashboard”), it should:
+
+1. Implement the UI in `modules/ethikos`.
+2. Use the Ethikos service to talk to DRF endpoints.
+3. Register the route in `routesEthikos.tsx` so it appears inside the global shell.
+
+---
+
+## 2. KeenKonnect (Projects & collaboration)
+
+### 2.1 Backend endpoints
+
+Backend app: `konnaxion.keenkonnect`.
+
+Registered DRF viewset:
+
+* `GET/POST /api/keenkonnect/projects/` → `ProjectViewSet`
+
+`ProjectViewSet` may expose extra actions for tasks/messages/resources via DRF patterns; those live under the same prefix.
+
+### 2.2 Entities visualized
+
+From migrations:
+
+* `Project`
+
+  * `title`, `description`, `category`, `status` (`idea`, `progress`, `completed`, `validated`), timestamps, `creator`, `tags`. Indexed on `(status, category)`.
+* `Tag`
+
+  * `name`, many-to-many with `Project`.
+* `ProjectTask`
+
+  * `title`, `description`, `status` (`todo`, `doing`, `done`), `order`, `due_date`, `assignee`.
+* `ProjectTeam`
+
+  * `project`, `user`, `role` (`owner`, `collaborator`, `mentor`), `joined_at`.
+* `ProjectMessage`
+
+  * Text content, `project`, `author`, `created_at`.
+* `ProjectResource`
+
+  * File upload and/or URL, `file_type` (`image`, `document`, `3d_model`, `other`), `version`, timestamps, `uploaded_by`. Includes optional `converted_path`.
+* `ProjectRating`
+
+  * `value` in `{+1, -1}`, unique per `(project, user)`.
+
+KeenKonnect UI should cover:
+
+* Project lists (with filters: status, category, tag).
+* Project detail pages with:
+
+  * Tasks in columns/boards.
+  * Team composition and roles.
+  * Discussions (messages).
+  * Resource gallery (files, links, 3D models).
+  * Voting/like/dislike via `ProjectRating`.
+
+### 2.3 Plugging into shell and services
+
+Frontend:
+
+* Module folder: `modules/keenkonnect`.
+* Routes file: `routesKeenkonnect.tsx`.
+
+Contract:
+
+* **Layout**
+
+  * KeenKonnect views use the global layout and shared components (cards, tables, charts). No separate “project app shell.”
+* **Navigation**
+
+  * All project-related routes are defined via `routesKeenkonnect.tsx` and merged into global navigation.
+* **Data access**
+
+  * A KeenKonnect service module should wrap calls to `/api/keenkonnect/projects/` and any nested endpoints.
+  * Components depend on that service, not on ad‑hoc HTTP calls.
+
+If AI is asked to add a new “project timeline” view:
+
+1. Put the UI in `modules/keenkonnect`.
+2. Extend the KeenKonnect service for any new backend endpoints.
+3. Wire the route in `routesKeenkonnect.tsx`.
+
+---
+
+## 3. KonnectED (Knowledge, learning, certification)
+
+### 3.1 Backend endpoints
+
+Backend app: `konnaxion.konnected`.
+
+Registered DRF viewsets:
+
+* `/api/konnected/resources/` → `KnowledgeResourceViewSet`
+* `/api/konnected/certifications/paths/` → `CertificationPathViewSet`
+* `/api/konnected/certifications/evaluations/` → `EvaluationViewSet`
+* `/api/konnected/certifications/peer-validations/` → `PeerValidationViewSet`
+* `/api/konnected/portfolios/` → `PortfolioViewSet`
+* `/api/konnected/certifications/exam-attempts/` → `ExamAttemptViewSet`
+
+Other models (forum, co-creation, learning progress) may be added to the API via additional viewsets, but the above are canonical.
+
+### 3.2 Entities visualized
+
+From migrations:
+
+* `KnowledgeResource`
+
+  * `title`, `type` (`video`, `doc`, `course`, `other`), `url`, optional `author`.
+* `KnowledgeRecommendation`
+
+  * `user`, `resource`, `recommended_at`.
+* `LearningProgress`
+
+  * `user`, `resource`, `progress_percent`.
+* `CertificationPath`
+
+  * `name`, `description`.
+* `Evaluation`
+
+  * `user`, `path`, `raw_score`, `metadata`.
+* `PeerValidation`
+
+  * `peer`, `evaluation`, `decision` (`approved`/`rejected`).
+* `Portfolio`
+
+  * `user`, `title`, `description`, many-to-many `items` (`KnowledgeResource`).
+* `ForumTopic` / `ForumPost`
+* `CoCreationProject` / `CoCreationContribution`
+* `InteropMapping`
+
+  * External system ↔ `CertificationPath`.
+
+KonnectED UI should represent:
+
+* A knowledge content catalog (with filtering by type).
+* Recommended content lists.
+* Learning dashboards (individual progress).
+* Certification flows:
+
+  * Paths, evaluations, peer approvals/rejections.
+* Portfolios aggregating achievements and curated resources.
+* Discussion and co‑creation spaces.
+
+### 3.3 Plugging into shell and services
+
+Frontend:
+
+* Module folder: `modules/konnected`.
+* Routes file: `routesKonnected.tsx`.
+
+Contract:
+
+* **Layout**
+
+  * All KonnectED peers share the global shell and design system.
+* **Navigation**
+
+  * Use `routesKonnected.tsx` (and central route metadata) to add menu entries.
+* **Data access**
+
+  * Use a KonnectED service module for `/api/konnected/...` endpoints.
+  * When integrating external systems, leverage/extend `InteropMapping` instead of inventing new “mapping” models.
+
+If AI adds a “My Learning Overview” screen:
+
+1. Implement it in `modules/konnected`.
+2. Aggregate data via the KonnectED service (resources, progress, evaluations).
+3. Add a route entry in `routesKonnected.tsx`.
+
+---
+
+## 4. Kreative (Creativity, heritage, archives)
+
+### 4.1 Backend endpoints
+
+Backend app: `konnaxion.kreative`.
+
+Registered DRF viewsets:
+
+* `/api/kreative/artworks/` → `KreativeArtworkViewSet`
+* `/api/kreative/galleries/` → `GalleryViewSet`
+
+Additional models (archives, partners, AI catalogue) can be made available via viewsets, but those are not wired by default in `api_router.py`.
+
+### 4.2 Entities visualized
+
+From migrations:
+
+* `KreativeArtwork`
+
+  * `title`, `description`, `media_file`, `media_type` (`image`, `video`, `audio`, `other`), year, medium, style, artist, created_at.
+* `Gallery` / `GalleryArtwork`
+
+  * Galleries with curated artwork lists and ordering.
+* `Tag` / `ArtworkTag`
+
+  * Tagging for artworks.
+* `CollabSession`
+
+  * Collaborative sessions with host and (optional) resulting artwork.
+* `TraditionEntry`
+
+  * Cultural traditions with region, media, submission/approval state.
+* `DigitalArchive`, `ArchiveDocument`, `CulturalPartner`, `VirtualExhibition`, `AICatalogueEntry`
+
+  * Structured archive, documents, partners, exhibitions, and AI‑generated tags/classifications.
+
+Kreative UI should cover:
+
+* Artworks grid/list and detail views.
+* Galleries (curated presentations).
+* Tag-based exploration.
+* Cultural tradition submission and review.
+* Archive/exhibition exploration; possibly AI‑powered filtering via `AICatalogueEntry`.
+
+### 4.3 Plugging into shell and services
+
+Frontend:
+
+* Module folder: `modules/kreative`.
+* Routes file: `routesKreative.tsx`.
+
+Contract:
+
+* **Layout**
+
+  * Visual and media‑heavy but still within shared layout and theme.
+* **Navigation**
+
+  * All Kreative routes come from `routesKreative.tsx` + central route configuration.
+* **Data access**
+
+  * Use a Kreative service module wrapping `/api/kreative/artworks/`, `/api/kreative/galleries/`, and any added archive endpoints.
+  * Do not introduce separate, generic “gallery APIs” outside the existing `kreative` namespace.
+
+If AI adds a “Virtual Exhibition Explorer”:
+
+1. Implement screen(s) under `modules/kreative`.
+2. Expose or extend backend viewsets for `DigitalArchive`, `VirtualExhibition`, `ArchiveDocument`, `AICatalogueEntry`.
+3. Use the Kreative service module; register routes in `routesKreative.tsx`.
+
+---
+
+## 5. Insights (Kollective intelligence / analytics)
+
+### 5.1 Backend endpoints
+
+Backend app: `konnaxion.kollective_intelligence`.
+
+Registered DRF viewset (in `config/api_router.py`):
+
+* `/api/kollective/votes/` → `VoteViewSet`
+
+Analytics endpoints (aggregated metrics, dashboards) would typically be implemented in this app and registered in `api_router.py` as additional routes if/when added.
+
+### 5.2 Entities visualized
+
+From migrations:
+
+* `Vote` / `VoteResult`
+
+  * Raw & weighted votes on (`target_type`, `target_id`), and their aggregation.
+* `ExpertiseCategory`, `UserExpertiseScore`, `UserEthicsScore`
+
+  * Domain expertise and ethics scoring per user.
+* `VoteModality`
+
+  * Defines voting modes and parameters.
+* `ConfidentialitySetting`
+
+  * Visibility level (`public`, `pseudonym`, `anonymous`) per user.
+* `ScoreConfiguration`, `ScoreHistory`
+
+  * How scores are weighted and how they evolved.
+* `ContextAnalysisLog`, `IntegrationMapping`, `EmergingExpert`.
+
+Insights UI should visualize:
+
+* Weighted vote outcomes across different targets (e.g. Ethikos topics, projects).
+* Expertise and ethics scores distribution.
+* Historical score changes and emerging experts.
+* Modality and configuration.
+
+### 5.3 Plugging into shell and services
+
+Frontend:
+
+* Module folder: `modules/insights` (analytics dashboards).
+* Routes: dedicated insights routes (e.g. `routesInsights.tsx` or equivalent) integrated into the global nav.
+
+Contract:
+
+* **Layout**
+
+  * Insights is “just another module” but uses **shared chart components** (line charts, cards) from the components bundle.
+* **Navigation**
+
+  * Add analytics routes in the insights routes file and include them in the global shell’s menu.
+* **Data access**
+
+  * An Insights or analytics service module should:
+
+    * Call `/api/kollective/votes/` and any additional analytics endpoints.
+    * Also combine data from domain APIs (`/api/ethikos/topics/`, `/api/keenkonnect/projects/`, etc.) for labels and context.
+  * Components should not directly orchestrate multiple HTTP calls; that belongs in the service layer.
+
+If AI adds a “Smart Vote Overview” dashboard:
+
+1. Build it under `modules/insights`.
+2. Use the shared chart components.
+3. Fetch data via an Insights service hitting both kollective endpoints and domain APIs.
+4. Register an insights route so it appears under an appropriate “Insights” / “Analytics” section in global nav.
+
+---
+
+
