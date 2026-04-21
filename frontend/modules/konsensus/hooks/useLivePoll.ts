@@ -1,5 +1,3 @@
-// FILE: frontend/modules/konsensus/hooks/useLivePoll.ts
-// modules/konsensus/hooks/useLivePoll.ts
 "use client";
 
 import { useEffect } from "react";
@@ -9,26 +7,52 @@ import type { PollId } from "./usePoll";
 /**
  * Lightweight "live" layer for Konsensus polls.
  *
- * Instead of a dedicated WebSocket endpoint (/api/poll/:id),
- * this hook periodically invalidates the React Query cache
- * so `usePoll` refetches fresh data from the Smart‑Vote API
- * (kollective/votes/).
+ * Uses a self-scheduling timeout instead of a permanent interval so cleanup
+ * is simpler and background work can be paused when the tab is hidden.
  */
 export default function useLivePoll(
   id: PollId,
-  intervalMs = 5000,
+  intervalMs = 15_000,
 ): void {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || intervalMs <= 0) return;
 
-    const timer = window.setInterval(() => {
+    let timeoutId: number | undefined;
+    let cancelled = false;
+
+    const invalidate = () => {
       queryClient.invalidateQueries({ queryKey: ["poll", id] });
-    }, intervalMs);
+    };
+
+    const scheduleNext = () => {
+      timeoutId = window.setTimeout(() => {
+        if (cancelled) return;
+
+        if (document.visibilityState === "visible") {
+          invalidate();
+        }
+
+        scheduleNext();
+      }, intervalMs);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        invalidate();
+      }
+    };
+
+    scheduleNext();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
-      window.clearInterval(timer);
+      cancelled = true;
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [id, intervalMs, queryClient]);
 }

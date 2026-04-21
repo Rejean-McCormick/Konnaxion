@@ -1,5 +1,3 @@
-// FILE: frontend/modules/konsensus/pages/PollPage.tsx
-// modules/konsensus/pages/PollPage.tsx
 "use client";
 
 import React from "react";
@@ -11,10 +9,12 @@ import useLivePoll from "../hooks/useLivePoll";
 import VoteButtons from "../components/VoteButtons";
 import PollBarChart from "../components/PollBarChart";
 
+const LIVE_POLL_INTERVAL_MS = 15_000;
+
 /**
- * Konsensus Center – Smart‑Vote yes/no poll.
+ * Konsensus Center – Smart-Vote yes/no poll.
  *
- * Reads aggregated results from the Smart‑Vote API
+ * Reads aggregated results from the Smart-Vote API
  * (kollective/votes/) via usePoll, and posts new votes
  * back to the same endpoint.
  */
@@ -30,8 +30,8 @@ export default function PollPage() {
     error,
   } = usePoll(pollId);
 
-  // Periodically refresh the poll snapshot
-  useLivePoll(pollId, 5000);
+  // Lower-frequency live refresh. The hook also pauses while hidden.
+  useLivePoll(pollId, LIVE_POLL_INTERVAL_MS);
 
   const handleVote = async (option: string) => {
     if (!cfg) return;
@@ -44,12 +44,9 @@ export default function PollPage() {
         target_type: cfg.targetType,
         target_id: cfg.targetId,
         raw_value: rawValue,
-        // For now, weighted_value mirrors raw_value.
-        // A more advanced Ekoh/EcKo engine can later adjust it server‑side.
         weighted_value: rawValue,
       });
 
-      // Refresh local snapshot
       queryClient.invalidateQueries({ queryKey: ["poll", pollId] });
       message.success("Your vote has been recorded.");
     } catch (e) {

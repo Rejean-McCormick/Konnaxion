@@ -1,27 +1,37 @@
-// FILE: frontend/modules/ethikos/pulse/live/page.tsx
 'use client'
 
+import { useEffect } from 'react';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import { Badge, Space } from 'antd';
-import { useInterval, useRequest } from 'ahooks';
+import { useRequest } from 'ahooks';
 import ChartCard from '@/components/charts/ChartCard';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchPulseLiveData } from '@/services/pulse';   // correct import
+import { fetchPulseLiveData } from '@/services/pulse';
 
 export default function PulseLive() {
   usePageTitle('Pulse · Live Metrics');
 
-  // custom hook (polls every 20 s)
+  // Single polling source only.
   const { data, loading, refresh } = usePulseLive(true);
 
-  // manual refresh safety-net
-  useInterval(refresh, 20_000);
+  // Refresh once when the tab becomes visible again.
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        void refresh();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [refresh]);
 
   return (
     <PageContainer ghost loading={loading}>
       <ProCard gutter={16} wrap>
         {data?.counters.map((c) => {
-          // trend is optional, so normalise to 0 for TS safety
           const trend = c.trend ?? 0;
 
           return (
@@ -61,7 +71,7 @@ export default function PulseLive() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Local data-fetching hook                                           */
+/*  Local data-fetching hook                                          */
 /* ------------------------------------------------------------------ */
 function usePulseLive(polling = false) {
   return useRequest(fetchPulseLiveData, {
