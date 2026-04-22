@@ -1,14 +1,8 @@
-// FILE: frontend/app/_api/search/route.ts
-// app/_api/search/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import fs from 'fs/promises'
 import path from 'path'
 
 export const runtime = 'nodejs'
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
 
 export interface SearchResult {
   id: string
@@ -46,30 +40,21 @@ interface SearchResponseBody {
   results: SearchResult[]
 }
 
-// ---------------------------------------------------------------------------
-// Config
-// ---------------------------------------------------------------------------
+const ROUTES_JSON_CANDIDATES = [
+  path.join(process.cwd(), 'routes.json'),
+  path.join(process.cwd(), 'frontend', 'routes.json'),
+] as const
 
-const ROUTES_JSON_PATH = path.join(process.cwd(), 'routes.json')
-
-// Keep this small – it’s just a quick “jump” helper in the UI.
 const MAX_RESULTS_PER_SECTION = 5
 const MIN_QUERY_LENGTH = 2
 
-// Preferred order for the Knowledge / KonnectED search endpoint.
-// These mirror the other Knowledge-related pages in the app.
 const KNOWLEDGE_SEARCH_ENDPOINTS = [
-  '/api/konnected/resources/',
-  '/api/knowledge-resources/',
-  '/api/knowledge/resources/',
+  '/konnected/resources/',
+  '/knowledge-resources/',
+  '/knowledge/resources/',
 ] as const
 
-// Use the same base URL convention as services/_request.ts
 const API_BASE = (process.env.NEXT_PUBLIC_API_BASE ?? '').replace(/\/+$/, '')
-
-// ---------------------------------------------------------------------------
-// Helpers – generic
-// ---------------------------------------------------------------------------
 
 function toTitleCase(segment: string): string {
   return segment
@@ -86,15 +71,21 @@ function pathToTitle(p: string): string {
   return segments.map(toTitleCase).join(' · ')
 }
 
-function buildBackendUrl(endpoint: string): string {
+function buildBackendUrl(endpoint: string, request: NextRequest): string {
   const trimmed = endpoint.trim()
+  if (!trimmed) return request.nextUrl.origin
   if (/^https?:\/\//i.test(trimmed)) return trimmed
-  if (!API_BASE) return trimmed
-  if (trimmed.startsWith('/')) return `${API_BASE}${trimmed}`
-  return `${API_BASE}/${trimmed}`
+
+  const base = API_BASE || `${request.nextUrl.origin}/api`
+  const normalizedBase = base.replace(/\/+$/, '')
+  const normalizedEndpoint = trimmed.startsWith('/') ? trimmed : `/${trimmed}`
+
+  return `${normalizedBase}${normalizedEndpoint}`
 }
 
-function normalizeKnowledgeResults(raw: RawKnowledgeSearchResponse | null | undefined): KnowledgeResource[] {
+function normalizeKnowledgeResults(
+  raw: RawKnowledgeSearchResponse | null | undefined,
+): KnowledgeResource[] {
   if (!raw) return []
 
   if (Array.isArray(raw)) {
@@ -130,19 +121,23 @@ function buildKnowledgeSnippet(resource: KnowledgeResource): string {
   return 'Learning resource'
 }
 
-// ---------------------------------------------------------------------------
-// Routes.json search (navigation hints)
-// ---------------------------------------------------------------------------
-
 async function loadRoutes(): Promise<RoutesJsonEntry[]> {
-  try {
-    const content = await fs.readFile(ROUTES_JSON_PATH, 'utf8')
-    const urls = JSON.parse(content) as string[]
-    return urls.map((p) => ({ path: p }))
-  } catch {
-    // If routes.json is missing or invalid we simply return no route results.
-    return []
+  for (const filePath of ROUTES_JSON_CANDIDATES) {
+    try {
+      const content = await fs.readFile(filePath, 'utf8')
+      const parsed = JSON.parse(content) as unknown
+
+      if (!Array.isArray(parsed)) continue
+
+      const urls = parsed.filter((value): value is string => typeof value === 'string')
+
+      return urls.map((p) => ({ path: p }))
+    } catch {
+      continue
+    }
   }
+
+  return []
 }
 
 async function searchRoutes(q: string): Promise<SearchResult[]> {
@@ -163,9 +158,6 @@ async function searchRoutes(q: string): Promise<SearchResult[]> {
     const idx = haystack.indexOf(needle)
     if (idx === -1) continue
 
-    // Simple scoring:
-    // - match at beginning is better
-    // - shorter paths win for ties
     const score = (idx === 0 ? 2 : 1) + 1 / (p.length + 1)
     scored.push({ entry, score })
   }
@@ -185,17 +177,12 @@ async function searchRoutes(q: string): Promise<SearchResult[]> {
   })
 }
 
-// ---------------------------------------------------------------------------
-// Knowledge search (KonnectED / learning resources)
-// ---------------------------------------------------------------------------
-
 async function searchKnowledge(q: string, request: NextRequest): Promise<SearchResult[]> {
   const trimmed = q.trim()
   if (!trimmed) return []
 
   const params = new URLSearchParams()
   params.set('q', trimmed)
-  // Keep it small – this is just one section of global search.
   params.set('page', '1')
   params.set('page_size', String(MAX_RESULTS_PER_SECTION))
 
@@ -204,26 +191,26 @@ async function searchKnowledge(q: string, request: NextRequest): Promise<SearchR
   }
 
   const auth = request.headers.get('authorization')
-  if (auth) headers['Authorization'] = auth
+  if (auth) headers.Authorization = auth
 
   const cookie = request.headers.get('cookie')
-  if (cookie) headers['Cookie'] = cookie
+  if (cookie) headers.Cookie = cookie
 
   for (const endpoint of KNOWLEDGE_SEARCH_ENDPOINTS) {
-    const baseUrl = buildBackendUrl(endpoint)
-    const url = `${baseUrl}${baseUrl.includes('?') ? '&' : '?'}${params.toString()}`
+    const url = new URL(buildBackendUrl(endpoint, request))
+    params.forEach((value, key) => {
+      url.searchParams.set(key, value)
+    })
 
     try {
-      const res = await fetch(url, {
+      const res = await fetch(url.toString(), {
         method: 'GET',
         headers,
+        cache: 'no-store',
       })
 
       if (!res.ok) {
-        // Try the next candidate for 404/405; ignore others silently.
-        if (res.status === 404 || res.status === 405) {
-          continue
-        }
+        if (res.status === 404 || res.status === 405) continue
         continue
       }
 
@@ -243,17 +230,12 @@ async function searchKnowledge(q: string, request: NextRequest): Promise<SearchR
               )}`,
       }))
     } catch {
-      // Move on to the next endpoint.
       continue
     }
   }
 
   return []
 }
-
-// ---------------------------------------------------------------------------
-// Route handler
-// ---------------------------------------------------------------------------
 
 export async function GET(request: NextRequest) {
   const q = request.nextUrl.searchParams.get('q')?.trim() ?? ''
@@ -269,7 +251,6 @@ export async function GET(request: NextRequest) {
   }
 
   if (q.length < MIN_QUERY_LENGTH) {
-    // Too short – avoid hammering the backend for single-character queries.
     const body: SearchResponseBody = { results: [] }
     return NextResponse.json(body, {
       status: 200,
@@ -283,16 +264,15 @@ export async function GET(request: NextRequest) {
       searchKnowledge(q, request),
     ])
 
-    const results: SearchResult[] = [...routeResults, ...knowledgeResults]
-
-    const body: SearchResponseBody = { results }
+    const body: SearchResponseBody = {
+      results: [...routeResults, ...knowledgeResults],
+    }
 
     return NextResponse.json(body, {
       status: 200,
       headers: { 'Cache-Control': 'no-store' },
     })
-  } catch (err) {
-    // In case of any unexpected failure, return a safe, empty payload.
+  } catch {
     const body: SearchResponseBody = { results: [] }
 
     return NextResponse.json(body, {

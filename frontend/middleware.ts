@@ -1,9 +1,12 @@
-// FILE: frontend/middleware.ts
 // middleware.ts
-import type { NextRequest } from 'next/server';
-import { auth0 } from './lib/auth0';
+import { NextResponse, type NextRequest } from 'next/server';
+import { AUTH0_ENABLED, auth0 } from './lib/auth0';
 
 export async function middleware(request: NextRequest) {
+  if (!AUTH0_ENABLED || !auth0) {
+    return NextResponse.next();
+  }
+
   return auth0.middleware(request);
 }
 

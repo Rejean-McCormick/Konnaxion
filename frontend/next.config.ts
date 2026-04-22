@@ -1,8 +1,9 @@
-// FILE: frontend/next.config.ts
 // next.config.ts
-import withBundleAnalyzer from "@next/bundle-analyzer"
-import type { NextConfig } from "next"
-import { env } from "./env.mjs"
+import withBundleAnalyzer from '@next/bundle-analyzer';
+import type { NextConfig } from 'next';
+import { env } from './env.mjs';
+
+const API_PROXY_BASE = env.NEXT_PUBLIC_API_BASE.replace(/\/+$/, '');
 
 const baseConfig: NextConfig = {
   reactStrictMode: true,
@@ -13,22 +14,23 @@ const baseConfig: NextConfig = {
   // (remets à false quand le lint sera corrigé)
   eslint: { ignoreDuringBuilds: true },
 
-  // Important : pas d'optimizePackageImports sur "antd"
-  // (c'est ce qui déclenchait les erreurs __barrel_optimize__)
-  // experimental: { optimizePackageImports: undefined },
-
   async rewrites() {
     return [
-      { source: "/api/:path*", destination: "http://localhost:8000/:path*" },
-      { source: "/healthz", destination: "/api/health" },
-      { source: "/api/healthz", destination: "/api/health" },
-      { source: "/health", destination: "/api/health" },
-      { source: "/ping", destination: "/api/health" },
-    ]
+      { source: '/healthz', destination: '/_api/health' },
+      { source: '/api/healthz', destination: '/_api/health' },
+      { source: '/health', destination: '/_api/health' },
+      { source: '/ping', destination: '/_api/health' },
+
+      // Proxy relative /api/* requests to the configured backend base.
+      // Example:
+      //   NEXT_PUBLIC_API_BASE=https://api.konnaxion.com/api
+      // becomes:
+      //   /api/foo -> https://api.konnaxion.com/api/foo
+      { source: '/api/:path*', destination: `${API_PROXY_BASE}/:path*` },
+    ];
   },
-}
+};
 
-// env.ANALYZE est déjà un booléen grâce à env.mjs
-const withAnalyzer = withBundleAnalyzer({ enabled: env.ANALYZE })
+const withAnalyzer = withBundleAnalyzer({ enabled: env.ANALYZE });
 
-export default env.ANALYZE ? withAnalyzer(baseConfig) : baseConfig
+export default env.ANALYZE ? withAnalyzer(baseConfig) : baseConfig;
