@@ -391,10 +391,22 @@ from .settings_addons import (
     EKOH_INSTALLED_APPS,
     EKOH_CELERY_BEAT_SCHEDULE,
     KAFKA_BOOTSTRAP_SERVERS,
+    EKOH_DB_SEARCH_PATH,
 )
 
 # Merge Apps
 INSTALLED_APPS += EKOH_INSTALLED_APPS
+
+# Apply DB search_path for EkoH / Smart-Vote schema
+DATABASES["default"].setdefault("OPTIONS", {})
+
+existing_options = DATABASES["default"]["OPTIONS"].get("options", "").strip()
+search_path_option = f"-c search_path={EKOH_DB_SEARCH_PATH}"
+
+if search_path_option not in existing_options:
+    DATABASES["default"]["OPTIONS"]["options"] = (
+        f"{existing_options} {search_path_option}".strip()
+    )
 
 # Merge Celery Schedule
 if "CELERY_BEAT_SCHEDULE" not in locals():

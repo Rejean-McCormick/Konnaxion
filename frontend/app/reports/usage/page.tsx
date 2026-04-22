@@ -263,7 +263,7 @@ export default function ReportsUsagePage() {
     return (
       <ReportsPageShell
         title="Usage Analytics"
-        description={shellDescription}
+        subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
         <Skeleton active />
@@ -275,7 +275,7 @@ export default function ReportsUsagePage() {
     return (
       <ReportsPageShell
         title="Usage Analytics"
-        description={shellDescription}
+        subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
         <ProCard>
@@ -308,7 +308,7 @@ export default function ReportsUsagePage() {
     return (
       <ReportsPageShell
         title="Usage Analytics"
-        description={shellDescription}
+        subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
         <Empty description="No usage data available yet" />
@@ -322,7 +322,7 @@ export default function ReportsUsagePage() {
   return (
     <ReportsPageShell
       title="Usage Analytics"
-      description={shellDescription}
+      subtitle={shellDescription}
       secondaryActions={headerExtra}
     >
       <PageContainer ghost>
@@ -331,7 +331,6 @@ export default function ReportsUsagePage() {
           size="large"
           style={{ width: '100%' }}
         >
-          {/* Intro / context */}
           <ProCard ghost>
             <Space
               direction="vertical"
@@ -350,7 +349,6 @@ export default function ReportsUsagePage() {
             </Space>
           </ProCard>
 
-          {/* KPI strip */}
           <ProCard ghost gutter={16} wrap>
             <StatisticCard
               statistic={{
@@ -402,7 +400,6 @@ export default function ReportsUsagePage() {
             />
           </ProCard>
 
-          {/* Time series + quick notes */}
           <ProCard gutter={16} wrap>
             <ProCard
               colSpan={{ xs: 24, lg: 16 }}
@@ -483,7 +480,6 @@ export default function ReportsUsagePage() {
 
           <Divider />
 
-          {/* Usage by module */}
           <ProCard
             title={
               <Space>

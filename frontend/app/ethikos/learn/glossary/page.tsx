@@ -1,18 +1,12 @@
 // FILE: frontend/app/ethikos/learn/glossary/page.tsx
 // app/ethikos/learn/glossary/page.tsx
 // Sources: current implementation and related services in the dump
-// :contentReference[oaicite:0]{index=0} :contentReference[oaicite:1]{index=1} :contentReference[oaicite:2]{index=2}
 
 'use client';
 
 import { useMemo, useState } from 'react';
-import {
-  PageContainer,
-  ProTable,
-} from '@ant-design/pro-components';
-import type {
-  ProColumns,
-} from '@ant-design/pro-components';
+import { PageContainer, ProTable } from '@ant-design/pro-components';
+import type { ProColumns } from '@ant-design/pro-components';
 import {
   Empty,
   Input,
@@ -44,27 +38,37 @@ export default function Glossary() {
       const isAZ = ch >= 'A' && ch <= 'Z';
       set.add(isAZ ? ch : '#');
     }
-    // ensure predictable order (All, #, A..Z filtered to present ones)
-    const result: { label: string; value: string }[] = [{ label: 'All', value: 'all' }];
+
+    const result: { label: string; value: string }[] = [
+      { label: 'All', value: 'all' },
+    ];
+
     if (set.has('#')) result.push({ label: '#', value: '#' });
+
     for (let c = 65; c <= 90; c++) {
       const l = String.fromCharCode(c);
       if (set.has(l)) result.push({ label: l, value: l });
     }
+
     return result;
   }, [items]);
 
   const filteredByQuery = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return items;
+
     return items.filter((t) => {
       const def = t.definition ?? '';
-      return t.term.toLowerCase().includes(q) || def.toLowerCase().includes(q);
+      return (
+        t.term.toLowerCase().includes(q) ||
+        def.toLowerCase().includes(q)
+      );
     });
   }, [items, query]);
 
   const filtered = useMemo(() => {
     if (letter === 'all') return filteredByQuery;
+
     return filteredByQuery.filter((t) => {
       const ch = (t.term?.[0] ?? '').toUpperCase();
       const isAZ = ch >= 'A' && ch <= 'Z';
@@ -96,19 +100,24 @@ export default function Glossary() {
 
   function exportCsv(rows: GlossaryItem[]) {
     const header = ['Term', 'Definition', 'Initial'];
+
     const lines = rows.map((r) => {
       const term = (r.term ?? '').replace(/"/g, '""');
       const def = (r.definition ?? '').replace(/"/g, '""');
       const initial = (r.term?.[0] ?? '#').toUpperCase();
+
       return [`"${term}"`, `"${def}"`, `"${initial}"`].join(',');
     });
+
     const csv = [header.join(','), ...lines].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
+
     a.href = url;
     a.download = 'ethikos_glossary.csv';
     a.click();
+
     URL.revokeObjectURL(url);
   }
 
@@ -169,7 +178,11 @@ export default function Glossary() {
           columns={columns}
           dataSource={filtered}
           search={false}
-          pagination={{ pageSize: 20, showSizeChanger: true, showQuickJumper: true }}
+          pagination={{
+            pageSize: 20,
+            showSizeChanger: true,
+            showQuickJumper: true,
+          }}
           options={{ fullScreen: true, density: true, setting: true }}
           toolBarRender={() => [
             <Typography.Text key="count" type="secondary">

@@ -25,7 +25,7 @@ import {
   TeamOutlined,
 } from '@ant-design/icons';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 
 const { Title, Paragraph, Text } = Typography;
 

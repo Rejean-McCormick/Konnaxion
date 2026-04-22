@@ -35,7 +35,7 @@ import {
 import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchPublicBallots,
   submitPublicVote,

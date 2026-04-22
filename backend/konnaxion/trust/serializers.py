@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 from rest_framework import serializers
 
@@ -15,35 +15,42 @@ class CredentialSerializer(serializers.ModelSerializer):
     """
     Serializer for user-submitted real-world credentials used in the Trust module.
 
-    It matches the `Credential` / `CredentialRow` shape used on the frontend:
-      - services/trust.ts  → interface Credential
-      - app/ethikos/trust/credentials/page.tsx → type CredentialRow
+    It matches the frontend credential shape used by:
+      - frontend/services/trust.ts
+      - frontend/app/ethikos/trust/credentials/page.tsx
+
+    Response shape:
+      - id
+      - title
+      - issuer
+      - issuedAt
+      - url
+      - status
+      - notes
+
+    Write-only input:
+      - file
     """
 
-    # Frontend expects `issuedAt` (camelCase), mapped to model field `issued_at`.
+    # Frontend expects camelCase `issuedAt`, mapped to model field `issued_at`.
     issuedAt = serializers.DateTimeField(
         source="issued_at",
         required=False,
         allow_null=True,
-        format=None,  # ISO 8601
+        format=None,  # keep ISO 8601 output
     )
 
-    # Upload field: the raw file coming from the client, mapped to the model's
-    # FileField via the `document` alias on the model.
-    # This is write-only and is not exposed in responses.
+    # Frontend uploads under `file`; internally we map it to the model alias
+    # `document`, which resolves to the real FileField (`file`) during create().
     file = serializers.FileField(
         write_only=True,
-        required=True,
+        required=False,
         source="document",
     )
 
-    # Public URL to the stored document (built from FileField).
+    # Read-only computed fields for the frontend table / drawer.
     url = serializers.SerializerMethodField()
-
-    # Human-readable review status ("Verified" | "Pending" | "Rejected").
     status = serializers.SerializerMethodField()
-
-    # Optional reviewer notes; exposed read-only to the end-user.
     notes = serializers.CharField(
         read_only=True,
         allow_blank=True,
@@ -60,7 +67,7 @@ class CredentialSerializer(serializers.ModelSerializer):
             "url",
             "status",
             "notes",
-            "file",  # write-only input for uploads
+            "file",
         )
         read_only_fields = (
             "id",
@@ -74,55 +81,74 @@ class CredentialSerializer(serializers.ModelSerializer):
         }
 
     # ------------------------------------------------------------------
+    # Validation
+    # ------------------------------------------------------------------
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Enforce upload requirements on create while remaining permissive for updates.
+        """
+        if self.instance is None and not attrs.get("document"):
+            raise serializers.ValidationError(
+                {"file": ["This field is required."]}
+            )
+        return attrs
+
+    # ------------------------------------------------------------------
     # Creation
     # ------------------------------------------------------------------
 
-    def create(self, validated_data: dict) -> Credential:
+    def create(self, validated_data: dict[str, Any]) -> Credential:
         """
-        Create a new Credential attached to the current user.
+        Create a new Credential attached to the authenticated user.
 
         Behaviour:
-        - `file` (document) is required.
-        - `title` defaults to a cleaned-up version of the filename if omitted.
-        - `issuer` is optional, defaults to empty string.
+        - `file` is required on create.
+        - `title` defaults to a cleaned-up filename when omitted.
+        - `issuer` is optional.
         - `issued_at` is optional and may be null.
-        - `status` is initialised as a "pending" value.
-        - `notes` is set to a default review message.
+        - `status` starts as Pending.
+        - `notes` starts with the model's default pending-review message.
         """
         request = self.context.get("request")
         user = getattr(request, "user", None)
 
         if user is None or not getattr(user, "is_authenticated", False):
             raise serializers.ValidationError(
-                {"non_field_errors": ["Authentication required to upload credentials."]}
+                {
+                    "non_field_errors": [
+                        "Authentication required to upload credentials."
+                    ]
+                }
             )
 
         # Because `file` is declared with source="document",
-        # the validated key here is "document".
+        # the validated key here is `document`.
         document = validated_data.pop("document", None)
         if document is None:
-            raise serializers.ValidationError({"file": ["This field is required."]})
+            raise serializers.ValidationError(
+                {"file": ["This field is required."]}
+            )
 
-        title: Optional[str] = validated_data.get("title") or None
-        issuer: str = (validated_data.get("issuer") or "").strip()
-        issued_at = validated_data.get("issued_at")
-
-        # Derive title from filename if not provided
-        if not title and getattr(document, "name", None):
-            fname = document.name
-            base = fname.rsplit(".", 1)[0]
+        raw_title = validated_data.get("title")
+        title: Optional[str] = raw_title.strip() if isinstance(raw_title, str) else None
+        if not title:
+            filename = getattr(document, "name", "") or ""
+            base = filename.rsplit(".", 1)[0]
             base = base.replace("_", " ").replace("-", " ").strip()
             title = base or "Untitled credential"
 
-        # Resolve an appropriate "pending" status value.
+        raw_issuer = validated_data.get("issuer")
+        issuer = raw_issuer.strip() if isinstance(raw_issuer, str) else ""
+        issued_at = validated_data.get("issued_at")
+
         status_enum = getattr(Credential, "Status", None)
         if status_enum is not None and hasattr(status_enum, "PENDING"):
             status_value = status_enum.PENDING
         elif hasattr(Credential, "STATUS_PENDING"):
             status_value = getattr(Credential, "STATUS_PENDING")
         else:
-            # Fallback string; the display label will be normalised by get_status()
-            status_value = "pending"
+            status_value = "Pending"
 
         default_notes = getattr(
             Credential,
@@ -130,17 +156,15 @@ class CredentialSerializer(serializers.ModelSerializer):
             "Awaiting manual verification",
         )
 
-        # IMPORTANT: the real storage field is `file`, not `document`.
-        credential = Credential.objects.create(
+        return Credential.objects.create(
             user=user,
-            title=title or "Untitled credential",
+            title=title,
             issuer=issuer,
             issued_at=issued_at,
             file=document,
             status=status_value,
             notes=default_notes,
         )
-        return credential
 
     # ------------------------------------------------------------------
     # Computed fields
@@ -148,10 +172,7 @@ class CredentialSerializer(serializers.ModelSerializer):
 
     def get_url(self, obj: Credential) -> Optional[str]:
         """
-        Returns an absolute URL to the uploaded document, if available.
-
-        Prefers a FileField named `document` (property on the model),
-        but will also fall back to `file` if present.
+        Return an absolute URL to the uploaded document, if available.
         """
         file_field = getattr(obj, "document", None) or getattr(obj, "file", None)
         if not file_field:
@@ -160,7 +181,6 @@ class CredentialSerializer(serializers.ModelSerializer):
         try:
             relative_url = file_field.url
         except Exception:
-            # File may not exist in storage yet
             return None
 
         request = self.context.get("request")
@@ -170,10 +190,7 @@ class CredentialSerializer(serializers.ModelSerializer):
 
     def get_status(self, obj: Credential) -> Optional[str]:
         """
-        Returns a human-friendly review status string for the UI.
-
-        If the model defines `get_status_display()` (e.g. via Django `choices`),
-        that label is used; otherwise, the raw value is title-cased.
+        Return a human-friendly review status string for the UI.
         """
         display = getattr(obj, "get_status_display", None)
         if callable(display):

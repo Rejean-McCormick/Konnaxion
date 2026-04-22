@@ -15,7 +15,7 @@ import { BarChartOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useRequest } from 'ahooks';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { fetchImpactOutcomes } from '@/services/impact';
 import {
   fetchDecisionResults,
@@ -29,7 +29,7 @@ type DecisionResultsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
 
 type DecisionRow = DecisionResult & { key: string };
 
-export default function Outcomes() {
+export default function Outcomes(): JSX.Element {
   const { data: outcomesData, loading: loadingOutcomes } =
     useRequest<OutcomesData, []>(fetchImpactOutcomes);
 
@@ -48,7 +48,6 @@ export default function Outcomes() {
     key: d.id,
   }));
 
-  // Aggregate decision outcomes by region (passed vs rejected)
   const decisionRegionMap = new Map<
     string,
     { region: string; passed: number; rejected: number }
@@ -61,11 +60,13 @@ export default function Outcomes() {
       passed: 0,
       rejected: 0,
     };
+
     if (d.passed) {
       bucket.passed += 1;
     } else {
       bucket.rejected += 1;
     }
+
     decisionRegionMap.set(region, bucket);
   }
 
@@ -141,11 +142,11 @@ export default function Outcomes() {
   return (
     <EthikosPageShell
       title="Impact · Outcomes"
+      sectionLabel="Impact"
       subtitle="Aggregated decision outcomes, agreement levels and regional distribution across Ethikos debates."
     >
       <PageContainer ghost loading={loading}>
         <ProCard gutter={[16, 16]} wrap>
-          {/* Outcome KPIs */}
           <ProCard
             colSpan={{ xs: 24, xl: 8 }}
             title={
@@ -230,7 +231,6 @@ export default function Outcomes() {
             )}
           </ProCard>
 
-          {/* Outcome charts */}
           <ProCard
             colSpan={{ xs: 24, xl: 8 }}
             title={
@@ -261,7 +261,6 @@ export default function Outcomes() {
             )}
           </ProCard>
 
-          {/* Closed decisions summary */}
           <ProCard
             colSpan={{ xs: 24, xl: 8 }}
             title="Closed decisions · outcomes vs engagement"

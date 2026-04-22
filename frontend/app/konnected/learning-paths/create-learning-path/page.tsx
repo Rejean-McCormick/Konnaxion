@@ -30,9 +30,9 @@ import {
   ProFormTextArea,
   StepsForm,
 } from "@ant-design/pro-components";
-import KonnectedPageShell from "../../KonnectedPageShell";
+import KonnectedPageShell from "@/app/konnected/KonnectedPageShell";
 
-const { Title, Paragraph } = Typography;
+const { Paragraph } = Typography;
 const { Search } = Input;
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "";
@@ -113,7 +113,6 @@ async function createLearningPath(
     try {
       const data = (await response.json()) as ErrorResponse;
       if (typeof data.detail === "string") detail = data.detail;
-      // If backend returns field-level errors, you could handle them here as well.
     } catch {
       // ignore JSON parse errors
     }
@@ -175,9 +174,7 @@ const CreateLearningPathPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const [resourceDrawerOpen, setResourceDrawerOpen] = useState(false);
-  const [resourceDrawerStepIndex, setResourceDrawerStepIndex] = useState<
-    number | null
-  >(null);
+  const [resourceDrawerStepIndex, setResourceDrawerStepIndex] = useState<number | null>(null);
   const [resourceSearchParams, setResourceSearchParams] =
     useState<ResourceSearchParams>({});
   const [resourcesLoading, setResourcesLoading] = useState(false);
@@ -197,7 +194,6 @@ const CreateLearningPathPage: React.FC = () => {
       setSelectedResourceIds([]);
     }
 
-    // Initial fetch
     setResourcesLoading(true);
     fetchKnowledgeResources({})
       .then(setResources)
@@ -235,9 +231,7 @@ const CreateLearningPathPage: React.FC = () => {
     [resourceSearchParams]
   );
 
-  const handleResourceTypeChange = (
-    type: ResourceSearchParams["type"]
-  ): void => {
+  const handleResourceTypeChange = (type: ResourceSearchParams["type"]): void => {
     const nextParams: ResourceSearchParams = {
       ...resourceSearchParams,
       type,
@@ -309,7 +303,6 @@ const CreateLearningPathPage: React.FC = () => {
   );
 
   const handleFinish = async (values: LearningPathFormValues) => {
-    // Additional client-side publish-time rules:
     if (submitMode === "published") {
       if (!values.steps || values.steps.length === 0) {
         message.error("You must add at least one step before publishing.");
@@ -427,8 +420,7 @@ const CreateLearningPathPage: React.FC = () => {
                   },
                   {
                     min: 20,
-                    message:
-                      "Description should be at least 20 characters long.",
+                    message: "Description should be at least 20 characters long.",
                   },
                 ]}
               />
@@ -534,10 +526,10 @@ const CreateLearningPathPage: React.FC = () => {
                   return (
                     <>
                       <Paragraph>
-                        Attach one or more library resources to each step. You
-                        can still save as a draft without completing all
-                        attachments, but every step must have at least one
-                        resource before publishing.
+                        Attach one or more library resources to each step. You can
+                        still save as a draft without completing all attachments,
+                        but every step must have at least one resource before
+                        publishing.
                       </Paragraph>
 
                       <Space direction="vertical" style={{ width: "100%" }}>
@@ -649,8 +641,7 @@ const CreateLearningPathPage: React.FC = () => {
                                 </Paragraph>
                                 {step.objective && (
                                   <Paragraph>
-                                    <strong>Objective:</strong>{" "}
-                                    {step.objective}
+                                    <strong>Objective:</strong> {step.objective}
                                   </Paragraph>
                                 )}
                                 <Paragraph>

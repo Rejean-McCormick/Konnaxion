@@ -1,10 +1,3 @@
-// FILE: frontend/app/ethikos/decide/elite/page.tsx
-// app/ethikos/decide/elite/page.tsx
-// Updated implementation for the Elite ballots page.
-// Source (original dump): app/ethikos/decide/elite/page.tsx 
-// Services: fetchEliteBallots (services/decide.ts) 
-// Services: fetchTopicPreview / types (services/deliberate.ts)
-
 'use client';
 
 import React from 'react';
@@ -33,55 +26,87 @@ import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import { useRequest, useInterval } from 'ahooks';
 import dayjs from 'dayjs';
 
-import EthikosPageShell from '../../EthikosPageShell';
-import { fetchEliteBallots } from '@/services/decide';
-import { fetchTopicPreview, type TopicPreviewResponse } from '@/services/deliberate';
-import type { Ballot } from '@/types';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchEliteBallots,
+  type EliteBallot,
+  type EliteBallotResponse,
+} from '@/services/decide';
+import {
+  fetchTopicPreview,
+  type TopicPreviewResponse,
+} from '@/services/deliberate';
 
-type Row = Ballot & { turnout: number };
+type Row = EliteBallot;
 type ViewMode = 'all' | 'closingSoon' | 'highTurnout' | 'lowTurnout';
 type Preview = TopicPreviewResponse;
 
-const { Paragraph, Title } = Typography;
+const { Paragraph, Title, Text } = Typography;
+
+function isClosingSoon(closesAt?: string): boolean {
+  if (!closesAt) return false;
+  const closes = dayjs(closesAt);
+  if (!closes.isValid() || closes.isBefore(dayjs())) return false;
+  return closes.diff(dayjs(), 'hour') <= 24;
+}
+
+function clampPercent(value?: number): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) return 0;
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
 
 export default function EliteBallots(): JSX.Element {
-  // Data: open elite ballots
-  const { data, loading, refresh } = useRequest<{ ballots: Row[] }, []>(fetchEliteBallots);
-  useInterval(refresh, 60_000); // auto-refresh every 60s
+  const { data, loading, refresh } = useRequest<EliteBallotResponse, []>(
+    fetchEliteBallots,
+  );
 
-  const ballots = data?.ballots ?? [];
+  useInterval(refresh, 60_000);
 
-  /* ---------- local view filters ---------- */
+  const ballots = React.useMemo<Row[]>(
+    () =>
+      (data?.ballots ?? []).map((ballot) => ({
+        ...ballot,
+        turnout: clampPercent(ballot.turnout),
+      })),
+    [data],
+  );
 
   const [viewMode, setViewMode] = React.useState<ViewMode>('all');
+  const [activeBallot, setActiveBallot] = React.useState<Row | null>(null);
+
+  const {
+    data: preview,
+    loading: previewLoading,
+    run: loadPreview,
+    mutate: setPreview,
+  } = useRequest<Preview, [string]>(fetchTopicPreview, {
+    manual: true,
+  });
 
   const filteredBallots = React.useMemo(() => {
-    if (!ballots.length) return ballots;
-
-    const now = dayjs();
-
     switch (viewMode) {
       case 'closingSoon':
-        return ballots.filter((b) => dayjs(b.closesAt).diff(now, 'hour') <= 24);
+        return ballots.filter((b) => isClosingSoon(b.closesAt));
       case 'highTurnout':
-        return ballots.filter((b) => (b.turnout ?? 0) >= 60);
+        return ballots.filter((b) => clampPercent(b.turnout) >= 60);
       case 'lowTurnout':
-        return ballots.filter((b) => (b.turnout ?? 0) < 20);
+        return ballots.filter((b) => clampPercent(b.turnout) < 20);
       case 'all':
       default:
         return ballots;
     }
   }, [ballots, viewMode]);
 
-  /* ---------- KPI header ---------- */
-
   const headerStats = React.useMemo(() => {
     const total = ballots.length;
     const avgTurnout =
       total > 0
-        ? Math.round(ballots.reduce((sum, b) => sum + (b.turnout ?? 0), 0) / total)
+        ? Math.round(
+            ballots.reduce((sum, b) => sum + clampPercent(b.turnout), 0) / total,
+          )
         : 0;
-    const closingSoon = ballots.filter((b) => dayjs(b.closesAt).diff(dayjs(), 'hour') <= 24).length;
+
+    const closingSoon = ballots.filter((b) => isClosingSoon(b.closesAt)).length;
 
     return [
       { label: 'Active elite ballots', value: total },
@@ -90,24 +115,19 @@ export default function EliteBallots(): JSX.Element {
     ];
   }, [ballots]);
 
-  /* ---------- debate preview drawer ---------- */
-
-  const [activeBallot, setActiveBallot] = React.useState<Row | null>(null);
-  const {
-    data: preview,
-    loading: previewLoading,
-    run: loadPreview,
-  } = useRequest<Preview, [string]>(fetchTopicPreview, { manual: true });
-
   const openPreview = React.useCallback(
-    (row: Row) => {
+    async (row: Row) => {
       setActiveBallot(row);
-      loadPreview(row.id);
+      setPreview(undefined);
+      await loadPreview(String(row.id));
     },
-    [loadPreview],
+    [loadPreview, setPreview],
   );
 
-  /* ---------- table columns ---------- */
+  const closePreview = React.useCallback(() => {
+    setActiveBallot(null);
+    setPreview(undefined);
+  }, [setPreview]);
 
   const columns: ProColumns<Row>[] = React.useMemo(
     () => [
@@ -117,7 +137,7 @@ export default function EliteBallots(): JSX.Element {
         width: 320,
         ellipsis: true,
         render: (_dom, row) => (
-          <Button type="link" onClick={() => openPreview(row)} style={{ padding: 0 }}>
+          <Button type="link" onClick={() => void openPreview(row)} style={{ padding: 0 }}>
             {row.title}
           </Button>
         ),
@@ -127,13 +147,10 @@ export default function EliteBallots(): JSX.Element {
         dataIndex: 'closesAt',
         width: 140,
         render: (_dom, row) => {
-          const now = dayjs();
           const closes = dayjs(row.closesAt);
-          const hoursLeft = closes.diff(now, 'hour');
-          const isClosed = closes.isBefore(now);
-
-          if (isClosed) return <Tag>Closed</Tag>;
-          if (hoursLeft <= 24) return <Tag color="red">Closing soon</Tag>;
+          if (!closes.isValid()) return <Tag>Unknown</Tag>;
+          if (closes.isBefore(dayjs())) return <Tag>Closed</Tag>;
+          if (isClosingSoon(row.closesAt)) return <Tag color="red">Closing soon</Tag>;
           return <Tag color="green">Open</Tag>;
         },
       },
@@ -141,24 +158,34 @@ export default function EliteBallots(): JSX.Element {
         title: 'Closes In',
         dataIndex: 'closesAt',
         width: 200,
-        render: (_dom, row) =>
-          dayjs(row.closesAt).isBefore(dayjs()) ? (
-            <span>—</span>
-          ) : (
-            <Statistic.Countdown value={dayjs(row.closesAt).valueOf()} format="D[d] HH:mm:ss" />
-          ),
+        render: (_dom, row) => {
+          const closes = dayjs(row.closesAt);
+          if (!closes.isValid() || closes.isBefore(dayjs())) {
+            return <span>—</span>;
+          }
+
+          return (
+            <Statistic.Countdown
+              value={closes.valueOf()}
+              format="D[d] HH:mm:ss"
+            />
+          );
+        },
       },
       {
         title: 'Turnout',
         dataIndex: 'turnout',
         width: 220,
-        sorter: (a, b) => (a.turnout ?? 0) - (b.turnout ?? 0),
-        render: (_dom, row) => (
-          <Space>
-            <Progress type="circle" percent={row.turnout} width={52} />
-            <span>{row.turnout}%</span>
-          </Space>
-        ),
+        sorter: (a, b) => clampPercent(a.turnout) - clampPercent(b.turnout),
+        render: (_dom, row) => {
+          const percent = clampPercent(row.turnout);
+          return (
+            <Space>
+              <Progress type="circle" percent={percent} width={52} />
+              <span>{percent}%</span>
+            </Space>
+          );
+        },
       },
       {
         title: 'Scope',
@@ -168,7 +195,7 @@ export default function EliteBallots(): JSX.Element {
       },
       {
         title: 'Actions',
-        dataIndex: 'actions',
+        key: 'actions',
         width: 240,
         render: (_dom, row) => (
           <Space>
@@ -177,11 +204,10 @@ export default function EliteBallots(): JSX.Element {
                 <Button size="small">View debate</Button>
               </Link>
             </Tooltip>
+
             <Tooltip title="View historical decisions">
               <Link href="/ethikos/decide/results" prefetch={false}>
-                <Button size="small" type="default">
-                  Results archive
-                </Button>
+                <Button size="small">Results archive</Button>
               </Link>
             </Tooltip>
           </Space>
@@ -191,15 +217,13 @@ export default function EliteBallots(): JSX.Element {
     [openPreview],
   );
 
-  /* ---------- render ---------- */
-
   return (
     <EthikosPageShell
       title="Decide · Elite Ballots"
       subtitle={
         <span>
-          Expert-only advisory ballots built on Korum debates, using a −3…+3 stance scale and
-          EkoH-weighted SmartVote aggregation.
+          Expert-only advisory ballots built on Ethikos debates, using a −3…+3
+          stance scale and EkoH-weighted aggregation.
         </span>
       }
       primaryAction={
@@ -218,7 +242,6 @@ export default function EliteBallots(): JSX.Element {
       }
     >
       <PageContainer ghost loading={loading}>
-        {/* Context banner */}
         <Alert
           type="info"
           showIcon
@@ -226,14 +249,13 @@ export default function EliteBallots(): JSX.Element {
           message="How elite ballots work"
           description={
             <span>
-              Each elite ballot aggregates expert stances from its Korum thread, maps them onto the
-              −3…+3 scale, and applies EkoH reputation weights before determining whether the
-              proposal passes.
+              Each elite ballot aggregates expert stances from its debate thread,
+              maps them onto the −3…+3 scale, and applies reputation weighting
+              before surfacing a decision signal.
             </span>
           }
         />
 
-        {/* KPI summary */}
         <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
           {headerStats.map((s) => (
             <StatisticCard
@@ -248,7 +270,6 @@ export default function EliteBallots(): JSX.Element {
           ))}
         </ProCard>
 
-        {/* Main table */}
         {filteredBallots.length === 0 && !loading ? (
           <Empty description="No elite ballots are open right now." />
         ) : (
@@ -272,47 +293,62 @@ export default function EliteBallots(): JSX.Element {
                   { label: 'Low turnout', value: 'lowTurnout' },
                 ]}
               />,
-              <Button key="refresh" icon={<ReloadOutlined />} onClick={() => refresh()}>
+              <Button
+                key="refresh"
+                icon={<ReloadOutlined />}
+                onClick={() => void refresh()}
+              >
                 Refresh
               </Button>,
             ]}
           />
         )}
 
-        {/* Debate preview drawer */}
         <Drawer
           width={520}
           open={!!activeBallot}
-          onClose={() => setActiveBallot(null)}
+          onClose={closePreview}
+          destroyOnClose
           title={preview?.title || activeBallot?.title || 'Ballot details'}
         >
           {previewLoading ? (
-            <Empty description="Loading…" />
+            <Empty description="Loading preview…" />
           ) : preview ? (
-            <>
-              <Paragraph type="secondary">
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Paragraph type="secondary" style={{ marginBottom: 0 }}>
                 {preview.category ? `${preview.category} · ` : ''}
-                {preview.createdAt ? dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm') : null}
+                {preview.createdAt
+                  ? dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')
+                  : ''}
               </Paragraph>
-              <Title level={4} style={{ marginTop: 0 }}>
-                Latest statements
-              </Title>
-              <ul style={{ paddingLeft: 16 }}>
-                {preview.latest.map((s) => (
-                  <li key={s.id} style={{ marginBottom: 8 }}>
-                    <strong>{s.author}</strong> — {s.body}
-                  </li>
-                ))}
-              </ul>
-              <Button
-                type="primary"
-                onClick={() => window.location.assign(`/ethikos/deliberate/${preview.id}`)}
-              >
-                Go to full thread →
-              </Button>
-            </>
+
+              <div>
+                <Title level={4} style={{ marginTop: 0 }}>
+                  Latest statements
+                </Title>
+
+                {preview.latest.length > 0 ? (
+                  <ul style={{ paddingLeft: 16, marginBottom: 0 }}>
+                    {preview.latest.map((s) => (
+                      <li key={s.id} style={{ marginBottom: 8 }}>
+                        <Text strong>{s.author}</Text> — {s.body}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No statements yet."
+                  />
+                )}
+              </div>
+
+              <Link href={`/ethikos/deliberate/${preview.id}`} prefetch={false}>
+                <Button type="primary">Go to full thread</Button>
+              </Link>
+            </Space>
           ) : (
-            <Empty />
+            <Empty description="No preview available." />
           )}
         </Drawer>
       </PageContainer>

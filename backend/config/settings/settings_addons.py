@@ -7,6 +7,7 @@ It:
 - Defines the EkoH and Smart-Vote Django apps to be added.
 - Defines Celery beat schedules for their maintenance tasks.
 - Exposes Kafka bootstrap configuration for Smart-Vote.
+- Exposes the DB schema search path used by EkoH / Smart-Vote tables.
 """
 
 from datetime import timedelta
@@ -44,6 +45,15 @@ EKOH_CELERY_BEAT_SCHEDULE = {
         "schedule": timedelta(minutes=1),
     },
 }
+
+# ---------------------------------------------------------------------------
+# Database
+# ---------------------------------------------------------------------------
+
+# Smart-Vote migrations create tables in the `ekoh_smartvote` schema.
+# base.py should apply this value to DATABASES["default"]["OPTIONS"]["options"]
+# as: -c search_path=ekoh_smartvote,public
+EKOH_DB_SEARCH_PATH = "ekoh_smartvote,public"
 
 # ---------------------------------------------------------------------------
 # Kafka (for Smart-Vote streaming / ledger flows)

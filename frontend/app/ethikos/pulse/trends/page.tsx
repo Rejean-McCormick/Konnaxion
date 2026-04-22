@@ -30,7 +30,7 @@ import {
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { fetchPulseTrends } from '@/services/pulse';
 
 type TimeRangeKey = '7d' | '30d' | '60d';
@@ -45,7 +45,7 @@ type PulseChart = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
+/*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
 
 function getDaysForRange(range: TimeRangeKey): number {
@@ -82,7 +82,7 @@ function filterSeriesByDays(data: any[], days: number): any[] {
 /**
  * Build a comparison dataset that overlays the previous period onto
  * the current period. The previous period is time-shifted so that
- * day indices align (D‑1 prev maps to D‑1 current).
+ * day indices align (D-1 prev maps to D-1 current).
  */
 function buildComparisonDataset(baseData: any[], days: number) {
   const now = dayjs().endOf('day');
@@ -112,6 +112,7 @@ function buildComparisonDataset(baseData: any[], days: number) {
     const d = dayjs(getTs(r)).startOf('day');
     const dayIndex = d.diff(startPrev, 'day'); // 0..days-1
     const alignedDate = startCurrent.add(dayIndex, 'day').format('YYYY-MM-DD');
+
     return {
       ...(r as any),
       date: alignedDate,
@@ -123,13 +124,14 @@ function buildComparisonDataset(baseData: any[], days: number) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Page                                                               */
+/*  Page                                                              */
 /* ------------------------------------------------------------------ */
 
 export default function PulseTrends(): JSX.Element {
   const [range, setRange] = useState<TimeRangeKey>('30d');
   const [smoothLines, setSmoothLines] = useState<boolean>(true);
   const [comparePrev, setComparePrev] = useState<boolean>(false);
+
   const { data, loading, error, refresh } = useRequest<
     Awaited<ReturnType<typeof fetchPulseTrends>>,
     []
@@ -138,7 +140,6 @@ export default function PulseTrends(): JSX.Element {
   const charts: PulseChart[] = (data?.charts ?? []) as PulseChart[];
   const [activeKey, setActiveKey] = useState<string | undefined>(undefined);
 
-  // Ensure we select first tab once charts are available
   useEffect(() => {
     if (!activeKey && charts.length > 0) {
       const firstChart = charts[0];
@@ -148,11 +149,9 @@ export default function PulseTrends(): JSX.Element {
     }
   }, [charts, activeKey]);
 
-  // Build per-tab configs with time-range filter, smoothing and comparison overlay.
   const enhancedConfigs = useMemo(
     () =>
       charts.map((chart) => {
-        // Heatmap is an aggregate over hours/days, keep it mostly as-is
         if (chart.type === 'heatmap') {
           return {
             ...(chart.config ?? {}),
@@ -166,13 +165,11 @@ export default function PulseTrends(): JSX.Element {
           ...(chart.config ?? {}),
           data: filterSeriesByDays(baseData, days),
           smooth: smoothLines,
-          // Some nice defaults for readability
           xField: chart.config?.xField ?? 'date',
           yField: chart.config?.yField ?? 'value',
           appendPadding: [8, 8, 8, 8],
           tooltip: {
             ...(chart.config?.tooltip ?? {}),
-            // G2Plot formatter shape
             formatter: (datum: any) => {
               const x = datum.date ?? datum.x ?? datum.ts;
               return {
@@ -184,7 +181,10 @@ export default function PulseTrends(): JSX.Element {
           },
           xAxis: {
             ...(chart.config?.xAxis ?? {}),
-            label: { ...(chart.config?.xAxis?.label ?? {}), autoHide: true },
+            label: {
+              ...(chart.config?.xAxis?.label ?? {}),
+              autoHide: true,
+            },
           },
         };
 
@@ -192,7 +192,7 @@ export default function PulseTrends(): JSX.Element {
           const comp = buildComparisonDataset(baseData, days);
           cfg.data = comp;
           cfg.seriesField = 'period';
-          // When comparing, area charts look better unstacked so trends are comparable
+
           if (chart.type === 'area') {
             cfg.isStack = false;
           }
@@ -206,11 +206,9 @@ export default function PulseTrends(): JSX.Element {
   const lastUpdatedLabel = useMemo(() => {
     if (!charts.length) return null;
 
-    // Use the last date from the last non-heatmap series as a simple "data up to" marker
     for (let i = charts.length - 1; i >= 0; i -= 1) {
       const chart = charts[i];
-      if (!chart) continue;
-      if (chart.type === 'heatmap') continue;
+      if (!chart || chart.type === 'heatmap') continue;
 
       const series = (chart.config?.data ?? []) as any[];
       if (!series.length) continue;
@@ -221,12 +219,9 @@ export default function PulseTrends(): JSX.Element {
 
       return dayjs(lastDate).format('MMM D');
     }
+
     return null;
   }, [charts]);
-
-  /* ------------------------------------------------------------------ */
-  /*  Export current tab to CSV                                         */
-  /* ------------------------------------------------------------------ */
 
   async function exportCurrentChartCsv() {
     if (!charts.length || !activeKey) {
@@ -248,7 +243,6 @@ export default function PulseTrends(): JSX.Element {
       return;
     }
 
-    // Only export series‑based charts; heatmap becomes a wide matrix (skip for now)
     if (chart.type === 'heatmap') {
       message.warning('Heatmap export is not supported.');
       return;
@@ -262,18 +256,17 @@ export default function PulseTrends(): JSX.Element {
       period?: string;
     }>;
 
-    const header = comparePrev ? ['date', 'value', 'period'] : ['date', 'value'];
+    const header = comparePrev
+      ? ['date', 'value', 'period']
+      : ['date', 'value'];
+
     const encodeCell = (value: unknown): string => {
       const str = value === null || value === undefined ? '' : String(value);
       if (/[",\n]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
       return str;
     };
 
-    const toDate = (r: {
-      date?: string;
-      x?: any;
-      ts?: number;
-    }): string => {
+    const toDate = (r: { date?: string; x?: any; ts?: number }): string => {
       const x = r.date ?? r.x ?? r.ts;
       return dayjs(x).format('YYYY-MM-DD');
     };
@@ -281,7 +274,9 @@ export default function PulseTrends(): JSX.Element {
     const csv = [
       header,
       ...rows.map((r) =>
-        comparePrev ? [toDate(r), r.value, r.period ?? 'This period'] : [toDate(r), r.value],
+        comparePrev
+          ? [toDate(r), r.value, r.period ?? 'This period']
+          : [toDate(r), r.value],
       ),
     ]
       .map((row) => row.map(encodeCell).join(','))
@@ -303,18 +298,18 @@ export default function PulseTrends(): JSX.Element {
     message.success('Exported current chart as CSV.');
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Loading / error / empty states                                    */
-  /* ------------------------------------------------------------------ */
-
   if (loading && !data) {
     return (
       <EthikosPageShell
         title="Pulse · Trends"
         sectionLabel="Pulse"
-        subtitle="Topic creation, stances and deliberation activity over time, with optional previous‑period comparison."
+        subtitle="Topic creation, stances and deliberation activity over time, with optional previous-period comparison."
         primaryAction={
-          <Button type="primary" href="/ethikos/insights" icon={<InsightsIcon />}>
+          <Button
+            type="primary"
+            href="/ethikos/insights"
+            icon={<InsightsIcon />}
+          >
             Open opinion analytics
           </Button>
         }
@@ -331,22 +326,23 @@ export default function PulseTrends(): JSX.Element {
       <EthikosPageShell
         title="Pulse · Trends"
         sectionLabel="Pulse"
-        subtitle="Topic creation, stances and deliberation activity over time, with optional previous‑period comparison."
+        subtitle="Topic creation, stances and deliberation activity over time, with optional previous-period comparison."
         primaryAction={
-          <Button type="primary" href="/ethikos/insights" icon={<InsightsIcon />}>
+          <Button
+            type="primary"
+            href="/ethikos/insights"
+            icon={<InsightsIcon />}
+          >
             Open opinion analytics
           </Button>
         }
       >
         <PageContainer ghost>
-          <ProCard ghost>
-            <Space direction="vertical" size="large" style={{ width: '100%', textAlign: 'center' }}>
-              <Empty description="Unable to load trend data" />
-              <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
-                Retry
-              </Button>
-            </Space>
-          </ProCard>
+          <Empty description="Failed to load trend data">
+            <Button icon={<SyncOutlined />} onClick={() => refresh()} type="primary">
+              Retry
+            </Button>
+          </Empty>
         </PageContainer>
       </EthikosPageShell>
     );
@@ -357,9 +353,13 @@ export default function PulseTrends(): JSX.Element {
       <EthikosPageShell
         title="Pulse · Trends"
         sectionLabel="Pulse"
-        subtitle="Topic creation, stances and deliberation activity over time, with optional previous‑period comparison."
+        subtitle="Topic creation, stances and deliberation activity over time, with optional previous-period comparison."
         primaryAction={
-          <Button type="primary" href="/ethikos/insights" icon={<InsightsIcon />}>
+          <Button
+            type="primary"
+            href="/ethikos/insights"
+            icon={<InsightsIcon />}
+          >
             Open opinion analytics
           </Button>
         }
@@ -370,10 +370,6 @@ export default function PulseTrends(): JSX.Element {
       </EthikosPageShell>
     );
   }
-
-  /* ------------------------------------------------------------------ */
-  /*  Build Tabs                                                         */
-  /* ------------------------------------------------------------------ */
 
   const tabItems: TabsProps['items'] = charts.map((chart, idx) => {
     let icon: React.ReactNode = <AreaChartOutlined />;
@@ -401,10 +397,6 @@ export default function PulseTrends(): JSX.Element {
       ),
     };
   });
-
-  /* ------------------------------------------------------------------ */
-  /*  Secondary actions (top‑right in shell)                             */
-  /* ------------------------------------------------------------------ */
 
   const secondaryActions = (
     <Space wrap>
@@ -435,16 +427,16 @@ export default function PulseTrends(): JSX.Element {
           style={{ backgroundColor: '#f0f0f0' }}
         />
       </Tooltip>
-      <Button icon={<DownloadOutlined />} size="small" onClick={exportCurrentChartCsv}>
+      <Button
+        icon={<DownloadOutlined />}
+        size="small"
+        onClick={exportCurrentChartCsv}
+      >
         Export CSV
       </Button>
-      <Button icon={<SyncOutlined />} size="small" onClick={refresh} />
+      <Button icon={<SyncOutlined />} size="small" onClick={() => refresh()} />
     </Space>
   );
-
-  /* ------------------------------------------------------------------ */
-  /*  Render                                                             */
-  /* ------------------------------------------------------------------ */
 
   return (
     <EthikosPageShell
@@ -452,7 +444,11 @@ export default function PulseTrends(): JSX.Element {
       sectionLabel="Pulse"
       subtitle="Topic creation, stances, and deliberation activity over time. Filter by range, smooth lines, and optionally overlay the previous period."
       primaryAction={
-        <Button type="primary" href="/ethikos/insights" icon={<InsightsIcon />}>
+        <Button
+          type="primary"
+          href="/ethikos/insights"
+          icon={<InsightsIcon />}
+        >
           Open opinion analytics
         </Button>
       }

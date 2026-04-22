@@ -56,7 +56,11 @@ interface EthikosTopicApi {
   created_by: string
   last_activity: string
   created_at: string
-  category: { id: number; name: string; description?: string }
+  category?: {
+    id: number
+    name: string
+    description?: string
+  } | null
   total_votes?: number | null
 }
 
@@ -119,12 +123,15 @@ function buildDailySeries<T>(
   const counts: number[] = new Array<number>(days).fill(0)
 
   for (const item of items) {
-    const d = dayjs(getDate(item))
-    if (d.isBefore(start) || d.isAfter(now)) continue
+    const rawDate = getDate(item)
+    if (!rawDate) continue
+
+    const d = dayjs(rawDate)
+    if (!d.isValid() || d.isBefore(start) || d.isAfter(now)) continue
+
     const offset = d.startOf('day').diff(start, 'day')
     if (offset >= 0 && offset < days) {
-      const current = counts[offset] ?? 0
-      counts[offset] = current + 1
+      counts[offset] = (counts[offset] ?? 0) + 1
     }
   }
 
@@ -151,6 +158,43 @@ function percentDelta(series: DailyPoint[]): number | undefined {
   return Math.round(((latest - previous) / previous) * 100)
 }
 
+// Feedback rating is persisted inside EthikosArgument.content because the
+// current backend contract exposes `content` but no dedicated `rating` field.
+const FEEDBACK_RATING_PREFIX = /^\[rating:([1-5])\]\s*/i
+
+function encodeFeedbackBody(body: string, rating?: number): string {
+  const normalized = body.trim()
+  if (!normalized) return normalized
+
+  if (typeof rating === 'number' && Number.isFinite(rating)) {
+    const safeRating = Math.max(1, Math.min(5, Math.round(rating)))
+    return `[rating:${safeRating}] ${normalized}`
+  }
+
+  return normalized
+}
+
+function decodeFeedbackContent(content: string): {
+  body: string
+  rating?: number
+} {
+  const raw = content ?? ''
+  const match = raw.match(FEEDBACK_RATING_PREFIX)
+  const ratingRaw = match?.[1]
+  const rating = ratingRaw ? Number(ratingRaw) : undefined
+  const body = raw.replace(FEEDBACK_RATING_PREFIX, '').trim()
+
+  return {
+    body,
+    rating:
+      typeof rating === 'number' && Number.isFinite(rating) ? rating : undefined,
+  }
+}
+
+function compareDescByDate(a: string, b: string): number {
+  return dayjs(b).valueOf() - dayjs(a).valueOf()
+}
+
 // ──────────────────────────────────────────────────────────
 // Tracker: maps Ethikos topics → impact items
 // ──────────────────────────────────────────────────────────
@@ -158,13 +202,15 @@ function percentDelta(series: DailyPoint[]): number | undefined {
 export async function fetchImpactTracker(): Promise<{ items: TrackerItem[] }> {
   const topics = await get<EthikosTopicApi[]>('ethikos/topics/')
 
-  const items: TrackerItem[] = topics.map((topic) => ({
-    id: String(topic.id),
-    title: topic.title,
-    owner: topic.created_by,
-    status: topicStatusToImpactStatus(topic.status),
-    updatedAt: topic.last_activity,
-  }))
+  const items: TrackerItem[] = [...topics]
+    .sort((a, b) => compareDescByDate(a.last_activity, b.last_activity))
+    .map((topic) => ({
+      id: String(topic.id),
+      title: topic.title,
+      owner: topic.created_by || 'Unknown',
+      status: topicStatusToImpactStatus(topic.status),
+      updatedAt: topic.last_activity,
+    }))
 
   return { items }
 }
@@ -201,14 +247,18 @@ export async function fetchImpactOutcomes(): Promise<{
     votesByTopic.set(stance.topic, bucket)
   }
 
-  const closedWithStats = closedTopics.map((t) => votesByTopic.get(t.id))
-  const avgAgreement =
-    closedWithStats.length > 0
-      ? closedWithStats.reduce((acc, s) => {
-          if (!s || s.count === 0) return acc
-          return acc + s.sum / (s.count * 3)
-        }, 0) / closedWithStats.length
-      : 0
+  let agreementSum = 0
+  let agreementCount = 0
+
+  for (const topic of closedTopics) {
+    const stats = votesByTopic.get(topic.id)
+    if (!stats || stats.count === 0) continue
+
+    agreementSum += stats.sum / (stats.count * 3)
+    agreementCount += 1
+  }
+
+  const avgAgreement = agreementCount > 0 ? agreementSum / agreementCount : 0
 
   const topicsSeries = buildDailySeries(topics, (t) => t.created_at)
   const stancesSeries = buildDailySeries(stances, (s) => s.timestamp)
@@ -239,16 +289,15 @@ export async function fetchImpactOutcomes(): Promise<{
     },
   ]
 
-  const topicStatusByCategory: { category: string; value: number }[] = []
   const bucketByCategory = new Map<string, number>()
   for (const topic of topics) {
-    const name = topic.category?.name ?? 'Uncategorised'
-    const current = bucketByCategory.get(name) ?? 0
-    bucketByCategory.set(name, current + 1)
+    const name = topic.category?.name?.trim() || 'Uncategorised'
+    bucketByCategory.set(name, (bucketByCategory.get(name) ?? 0) + 1)
   }
-  bucketByCategory.forEach((value, category) => {
-    topicStatusByCategory.push({ category, value })
-  })
+
+  const topicStatusByCategory = Array.from(bucketByCategory.entries())
+    .map(([category, value]) => ({ category, value }))
+    .sort((a, b) => b.value - a.value || a.category.localeCompare(b.category))
 
   const charts: OutcomeChart[] = [
     {
@@ -282,11 +331,14 @@ export async function fetchImpactOutcomes(): Promise<{
 // Feedback loop = arguments on a dedicated Ethikos topic
 // ──────────────────────────────────────────────────────────
 
-const FEEDBACK_TOPIC_ID = process.env.NEXT_PUBLIC_ETHIKOS_FEEDBACK_TOPIC_ID
+const FEEDBACK_TOPIC_ID_RAW = process.env.NEXT_PUBLIC_ETHIKOS_FEEDBACK_TOPIC_ID
+const FEEDBACK_TOPIC_ID =
+  FEEDBACK_TOPIC_ID_RAW && !Number.isNaN(Number(FEEDBACK_TOPIC_ID_RAW))
+    ? Number(FEEDBACK_TOPIC_ID_RAW)
+    : null
 
 export async function fetchFeedback(): Promise<{ items: FeedbackItem[] }> {
   if (!FEEDBACK_TOPIC_ID) {
-    // No dedicated topic configured yet – return an empty list.
     return { items: [] }
   }
 
@@ -294,12 +346,19 @@ export async function fetchFeedback(): Promise<{ items: FeedbackItem[] }> {
     params: { topic: FEEDBACK_TOPIC_ID },
   })
 
-  const items: FeedbackItem[] = argumentsForTopic.map((arg) => ({
-    id: String(arg.id),
-    author: arg.user,
-    body: arg.content,
-    createdAt: arg.created_at,
-  }))
+  const items: FeedbackItem[] = argumentsForTopic
+    .map((arg) => {
+      const parsed = decodeFeedbackContent(arg.content)
+
+      return {
+        id: String(arg.id),
+        author: arg.user,
+        body: parsed.body,
+        rating: parsed.rating,
+        createdAt: arg.created_at,
+      }
+    })
+    .sort((a, b) => compareDescByDate(a.createdAt, b.createdAt))
 
   return { items }
 }
@@ -314,8 +373,14 @@ export async function submitFeedback(payload: {
     )
   }
 
+  const content = encodeFeedbackBody(payload.body, payload.rating)
+
+  if (!content) {
+    throw new Error('Feedback body cannot be empty.')
+  }
+
   await post('ethikos/arguments/', {
-    topic: Number(FEEDBACK_TOPIC_ID),
-    content: payload.body,
+    topic: FEEDBACK_TOPIC_ID,
+    content,
   })
 }

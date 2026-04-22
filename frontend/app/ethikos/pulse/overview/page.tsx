@@ -1,12 +1,5 @@
 // FILE: frontend/app/ethikos/pulse/overview/page.tsx
-// app/ethikos/pulse/overview/page.tsx
 'use client';
-
-/* Sources:
-   - Current page implementation in dump: app/ethikos/pulse/overview/page.tsx  :contentReference[oaicite:0]{index=0}
-   - Data service used here: services/pulse.ts                                  :contentReference[oaicite:1]{index=1}
-   - Shared page shell wrapper: app/ethikos/EthikosPageShell.tsx                :contentReference[oaicite:2]{index=2}
-*/
 
 import type { ReactNode } from 'react';
 import {
@@ -38,26 +31,30 @@ import dayjs from 'dayjs';
 
 import ChartCard from '@/components/charts/ChartCard';
 import { fetchPulseOverview } from '@/services/pulse';
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 
 const { Text } = Typography;
 
 type OverviewData = Awaited<ReturnType<typeof fetchPulseOverview>>;
 
-const KPI_DEFINITIONS: Record<string, { description: string; color: string }> = {
+type KpiMeta = {
+  description: string;
+  color: string;
+};
+
+const KPI_DEFINITIONS: Record<string, KpiMeta> = {
   topics: {
-    description:
-      'New debate topics created across Ethikos over the last 30 days.',
+    description: 'New debate topics created across Ethikos over the last 30 days.',
     color: 'blue',
   },
   stances: {
     description:
-      'Individual stance submissions (positions / votes) linked to debates in the last 30 days.',
+      'Individual stance submissions linked to debates in the last 30 days.',
     color: 'green',
   },
   arguments: {
     description:
-      'Arguments, comments and replies added to debates over the last 30 days.',
+      'Arguments, comments, and replies added to debates over the last 30 days.',
     color: 'purple',
   },
   votes: {
@@ -67,21 +64,35 @@ const KPI_DEFINITIONS: Record<string, { description: string; color: string }> = 
   },
 };
 
-/* ------------------------------------------------------------------ */
-/*  Data-fetching hook                                                 */
-/* ------------------------------------------------------------------ */
-
 function usePulseOverview() {
-  return useRequest<OverviewData, []>(fetchPulseOverview, { refreshDeps: [] });
+  return useRequest<OverviewData, []>(fetchPulseOverview, {
+    refreshDeps: [],
+  });
 }
 
-/* ------------------------------------------------------------------ */
-/*  Main component                                                     */
-/* ------------------------------------------------------------------ */
+function renderDelta(delta?: number): ReactNode {
+  if (typeof delta !== 'number') {
+    return null;
+  }
+
+  const positive = delta >= 0;
+
+  return (
+    <span
+      style={{
+        color: positive ? '#3f8600' : '#cf1322',
+      }}
+    >
+      {positive ? '▲' : '▼'} {Math.abs(delta)}%
+    </span>
+  );
+}
 
 export default function PulseOverview() {
   const { data, loading, error, refresh } = usePulseOverview();
-  const lastUpdated = data ? dayjs(data.refreshedAt).format('HH:mm:ss') : null;
+  const lastUpdated = data?.refreshedAt
+    ? dayjs(data.refreshedAt).format('HH:mm:ss')
+    : null;
 
   const secondaryActions = (
     <Space>
@@ -95,8 +106,10 @@ export default function PulseOverview() {
         />
       )}
       <Button
-        icon={<SyncOutlined />}
-        onClick={refresh}
+        aria-label="Refresh pulse overview"
+        disabled={loading}
+        icon={<SyncOutlined spin={loading} />}
+        onClick={() => void refresh()}
         size="small"
         type="text"
       />
@@ -105,7 +118,6 @@ export default function PulseOverview() {
 
   let body: ReactNode;
 
-  /* ---------- loading skeleton ---------- */
   if (loading && !data) {
     body = (
       <PageContainer ghost>
@@ -113,45 +125,41 @@ export default function PulseOverview() {
       </PageContainer>
     );
   } else if (error) {
-    /* ---------- error state ---------- */
     body = (
       <PageContainer ghost>
         <Empty
           description="Failed to load metrics"
           image={Empty.PRESENTED_IMAGE_SIMPLE}
         >
-          <Button icon={<SyncOutlined />} onClick={refresh}>
+          <Button icon={<SyncOutlined />} onClick={() => void refresh()}>
             Retry
           </Button>
         </Empty>
       </PageContainer>
     );
   } else if (data && data.kpis.length === 0) {
-    /* ---------- empty state ---------- */
     body = (
       <PageContainer ghost>
         <Empty description="No KPI data yet" />
       </PageContainer>
     );
   } else if (data) {
-    /* ---------- happy path ---------- */
     body = (
       <PageContainer ghost>
         <Alert
-          type="info"
-          showIcon
+          description="Debates, stances, arguments, and votes aggregated daily across all Ethikos topics. Use this view as a quick pulse before drilling into trends or live participation."
           message="Aggregated participation metrics (last 30 days)"
-          description="Debates, stances, arguments and votes aggregated daily across all Ethikos topics. Use this view as a quick pulse before drilling into trends or live participation."
+          showIcon
           style={{ marginBottom: 16 }}
+          type="info"
         />
 
         <ProCard gutter={16} wrap>
-          {/* KPI grid with sparkline charts */}
           <ProCard colSpan={{ xs: 24, xl: 16 }} ghost>
             <ProCard gutter={[16, 16]} wrap>
               {data.kpis.map((kpi) => (
                 <StatisticCard
-                  key={kpi.label}
+                  key={kpi.key ?? kpi.label}
                   colSpan={{
                     xs: 24,
                     sm: 12,
@@ -162,27 +170,18 @@ export default function PulseOverview() {
                     title: kpi.label,
                     value: kpi.value,
                     suffix: kpi.delta !== undefined ? '%' : undefined,
-                    description:
-                      kpi.delta !== undefined ? (
-                        <span
-                          style={{
-                            color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
-                          }}
-                        >
-                          {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
-                        </span>
-                      ) : null,
+                    description: renderDelta(kpi.delta),
                   }}
                   chart={
                     <ChartCard
                       type="area"
                       height={60}
-                      data={kpi.history.map((h) => ({
-                        x: h.date,
-                        y: h.value,
+                      data={kpi.history.map((point) => ({
+                        x: point.date,
+                        y: point.value,
                       }))}
                       tooltip={{
-                        formatter: (datum: any) =>
+                        formatter: (datum: { x: string; y: number }) =>
                           `${dayjs(datum.x).format('MMM D')}: ${datum.y}`,
                       }}
                     />
@@ -192,7 +191,6 @@ export default function PulseOverview() {
             </ProCard>
           </ProCard>
 
-          {/* Interpretation / metric dictionary */}
           <ProCard
             colSpan={{ xs: 24, xl: 8 }}
             title={
@@ -203,13 +201,13 @@ export default function PulseOverview() {
             }
           >
             <List
-              size="small"
               dataSource={data.kpis}
               renderItem={(kpi) => {
                 const meta = KPI_DEFINITIONS[kpi.key] ?? {
                   description: 'Activity metric in the Ethikos opinion layer.',
                   color: 'default',
                 };
+
                 return (
                   <List.Item key={kpi.key}>
                     <List.Item.Meta
@@ -218,25 +216,21 @@ export default function PulseOverview() {
                           <Tag color={meta.color}>{kpi.label}</Tag>
                           {typeof kpi.delta === 'number' && (
                             <Text type={kpi.delta >= 0 ? 'success' : 'danger'}>
-                              {kpi.delta >= 0
-                                ? `+${kpi.delta}%`
-                                : `${kpi.delta}%`}
+                              {kpi.delta >= 0 ? `+${kpi.delta}%` : `${kpi.delta}%`}
                             </Text>
                           )}
                         </Space>
                       }
-                      description={
-                        <Text type="secondary">{meta.description}</Text>
-                      }
+                      description={<Text type="secondary">{meta.description}</Text>}
                     />
                   </List.Item>
                 );
               }}
+              size="small"
             />
           </ProCard>
         </ProCard>
 
-        {/* Navigation to deeper analytics views */}
         <ProCard
           ghost
           style={{ marginTop: 16 }}
@@ -259,7 +253,6 @@ export default function PulseOverview() {
       </PageContainer>
     );
   } else {
-    // Fallback: no data and not loading/error
     body = (
       <PageContainer ghost>
         <Empty description="No data available" />
@@ -270,7 +263,7 @@ export default function PulseOverview() {
   return (
     <EthikosPageShell
       title="Pulse · Overview"
-      subtitle="30-day snapshot of debates, stances, arguments and votes across Ethikos."
+      subtitle="30-day snapshot of debates, stances, arguments, and votes across Ethikos."
       primaryAction={
         <Button
           type="primary"

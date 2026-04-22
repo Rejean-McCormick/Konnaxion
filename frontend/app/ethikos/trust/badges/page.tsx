@@ -23,7 +23,7 @@ import {
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { fetchUserBadges, type Badge as TrustBadge } from '@/services/trust';
 
 const { Text, Paragraph } = Typography;

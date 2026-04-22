@@ -26,7 +26,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useRequest } from 'ahooks';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchDecisionResults,
   type DecisionResult,

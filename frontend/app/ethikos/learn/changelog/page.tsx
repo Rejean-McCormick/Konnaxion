@@ -37,7 +37,7 @@ import { useRequest } from 'ahooks';
 import dayjs, { Dayjs } from 'dayjs';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchChangelog, type ChangelogEntry } from '@/services/learn';
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 
 const { RangePicker } = DatePicker;
 const { Text, Title } = Typography;

@@ -24,7 +24,7 @@ import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchImpactTracker,
   patchImpactStatus,
@@ -162,7 +162,7 @@ export default function ImpactTracker(): JSX.Element {
       title="Impact tracker"
       sectionLabel="Impact"
       metaTitle="Impact · Tracker"
-      subtitle="Track the implementation status and follow‑up of Ethikos debates and decisions."
+      subtitle="Track the implementation status and follow-up of Ethikos debates and decisions."
     >
       <PageContainer ghost loading={loading}>
         <Space
@@ -178,7 +178,7 @@ export default function ImpactTracker(): JSX.Element {
               <Text type="secondary">
                 Each row represents an Ethikos decision topic. Use the status to
                 indicate whether a debate is still planned, currently in progress,
-                completed, or blocked awaiting follow‑up.
+                completed, or blocked awaiting follow-up.
               </Text>
             }
           />

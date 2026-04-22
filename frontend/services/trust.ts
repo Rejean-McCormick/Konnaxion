@@ -1,7 +1,7 @@
 // FILE: frontend/services/trust.ts
 // frontend/services/trust.ts
 import dayjs from 'dayjs';
-import { get } from './_request';
+import { get, post } from './_request';
 import { resolveAvatarUrl, type CurrentUser } from './user';
 
 export interface ReputationDimension {
@@ -37,6 +37,12 @@ export interface Credential {
   issuer: string;
   issuedAt: string;
   url?: string;
+}
+
+export interface UploadCredentialInput {
+  title?: string;
+  issuer?: string;
+  issuedAt?: string | Date | null;
 }
 
 /**
@@ -79,6 +85,24 @@ function countLastDays(dates: string[], days: number): number {
   const now = dayjs();
   const cut = now.subtract(days, 'day');
   return dates.filter((d) => dayjs(d).isAfter(cut)).length;
+}
+
+function titleFromFilename(name?: string): string {
+  if (!name) return 'Untitled credential';
+  return name.replace(/\.[a-zA-Z0-9]+$/, '').replace(/[_\-]+/g, ' ').trim();
+}
+
+function toIsoOrUndefined(
+  value: string | Date | null | undefined,
+): string | undefined {
+  if (!value) return undefined;
+
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? undefined : value.toISOString();
+  }
+
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed.toISOString() : undefined;
 }
 
 // ──────────────────────────────────────────────────────────
@@ -165,16 +189,49 @@ export async function fetchUserProfile(): Promise<ReputationProfile> {
 }
 
 // ──────────────────────────────────────────────────────────
-// Credentials (no real backend endpoint yet)
+// Credentials
 // ──────────────────────────────────────────────────────────
 
 /**
- * There is currently no dedicated credential storage API.
- * This helper resolves immediately so the UI flow can be wired.
- * When a backend exists, the upload call should be wired here.
+ * Upload a real-world credential for trust review.
+ *
+ * Backend serializer expects:
+ *   file     (required, multipart)
+ *   title    (optional; defaults from filename server-side)
+ *   issuer   (optional)
+ *   issuedAt (optional ISO-8601 string)
+ *
+ * Response shape matches the public Credential serializer fields:
+ *   { id, title, issuer, issuedAt, url, status, notes }
+ *
+ * We return `Credential` here because that is the stable subset already
+ * consumed by the frontend. Callers that need `status` / `notes` can
+ * extend the type locally.
  */
-export async function uploadCredential(_file: File): Promise<void> {
-  return;
+export async function uploadCredential(
+  file: File,
+  meta: UploadCredentialInput = {},
+): Promise<Credential> {
+  const formData = new FormData();
+
+  formData.append('file', file);
+
+  const title = (meta.title ?? '').trim() || titleFromFilename(file.name);
+  if (title) {
+    formData.append('title', title);
+  }
+
+  const issuer = (meta.issuer ?? '').trim();
+  if (issuer) {
+    formData.append('issuer', issuer);
+  }
+
+  const issuedAt = toIsoOrUndefined(meta.issuedAt);
+  if (issuedAt) {
+    formData.append('issuedAt', issuedAt);
+  }
+
+  return post<Credential, FormData>('trust/credentials/', formData);
 }
 
 // ──────────────────────────────────────────────────────────

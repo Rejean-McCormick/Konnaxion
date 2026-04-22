@@ -1,5 +1,6 @@
 // FILE: frontend/services/learn.ts
 // frontend/services/learn.ts
+
 import { get } from './_request'
 
 export interface ChangelogEntry {
@@ -24,18 +25,35 @@ export interface GlossaryItem {
 interface EthikosCategoryApi {
   id: number
   name: string
-  description?: string
+  description?: string | null
 }
 
-// Static content you can adjust directly in this file
+/**
+ * Canonical local content for Ethikos Learn.
+ *
+ * Rationale:
+ * - Current Learn consumers expect synchronous, stable shapes from this service.
+ * - The glossary page explicitly states terms are synced from Ethikos categories.
+ * - The backend categories endpoint may be optional, so glossary fetching must degrade safely.
+ */
+
 const CHANGELOG: ChangelogEntry[] = [
   {
     version: 'v0.1',
     date: '2025-01-01',
-    tags: ['initial'],
+    tags: ['INITIAL'],
     notes: [
-      'First deploy of Ethikos kernel (topics, stances, arguments).',
-      'Elite / public debates wired on top of the Ethikos models.',
+      'First deploy of the Ethikos kernel: topics, stances, arguments, and categories.',
+      'Elite and public debate flows were wired on top of the Ethikos core models.',
+    ],
+  },
+  {
+    version: 'v0.2',
+    date: '2025-02-01',
+    tags: ['IMPROVE', 'LEARN'],
+    notes: [
+      'Added the first Learn-layer content for onboarding, glossary, and usage guidance.',
+      'Clarified how DECIDE, DELIBERATE, and Trust signals relate to debate participation.',
     ],
   },
 ]
@@ -51,26 +69,68 @@ const GUIDES: GuideSection[] = [
     id: 'elite-vs-public',
     title: 'Elite vs public consultations',
     content:
-      'Elite debates are linked to an expertise category; public debates are open to all. This is defined on the Ethikos topic (expertise_category).',
+      'Elite debates are linked to an expertise category; public debates are open to all. This distinction is defined on the Ethikos topic and related expertise metadata.',
+  },
+  {
+    id: 'reading-results',
+    title: 'How to read results and participation',
+    content:
+      'Use DECIDE to review closed decisions, Pulse to inspect participation patterns, and Trust to understand contributor reputation signals around the debate space.',
   },
 ]
 
+function cloneChangelog(entries: ChangelogEntry[]): ChangelogEntry[] {
+  return entries.map((entry) => ({
+    ...entry,
+    tags: entry.tags.map((tag) => tag.trim().toUpperCase()),
+    notes: [...entry.notes],
+  }))
+}
+
+function cloneGuides(sections: GuideSection[]): GuideSection[] {
+  return sections.map((section) => ({
+    ...section,
+  }))
+}
+
+function normalizeDefinition(value?: string | null): string {
+  return (value ?? '').trim()
+}
+
+function sortGlossary(items: GlossaryItem[]): GlossaryItem[] {
+  return [...items].sort((a, b) =>
+    a.term.localeCompare(b.term, undefined, { sensitivity: 'base' }),
+  )
+}
+
 export async function fetchChangelog(): Promise<{ entries: ChangelogEntry[] }> {
-  return { entries: CHANGELOG }
+  const entries = cloneChangelog(CHANGELOG).sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+  )
+
+  return { entries }
 }
 
 export async function fetchGuides(): Promise<{ sections: GuideSection[] }> {
-  return { sections: GUIDES }
+  return { sections: cloneGuides(GUIDES) }
 }
 
 export async function fetchGlossary(): Promise<{ items: GlossaryItem[] }> {
-  const categories = await get<EthikosCategoryApi[]>('ethikos/categories/')
+  try {
+    const categories = await get<EthikosCategoryApi[]>('ethikos/categories/')
 
-  const items: GlossaryItem[] = categories.map((c) => ({
-    id: String(c.id),
-    term: c.name,
-    definition: c.description ?? '',
-  }))
+    const items: GlossaryItem[] = (categories ?? [])
+      .filter((category) => Boolean(category?.name?.trim()))
+      .map((category) => ({
+        id: String(category.id),
+        term: category.name.trim(),
+        definition: normalizeDefinition(category.description),
+      }))
 
-  return { items }
+    return { items: sortGlossary(items) }
+  } catch {
+    // The categories endpoint is optional in this codebase.
+    // Keep the Learn UI usable even when that endpoint is not registered yet.
+    return { items: [] }
+  }
 }

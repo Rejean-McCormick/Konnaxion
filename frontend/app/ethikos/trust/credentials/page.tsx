@@ -44,7 +44,7 @@ import {
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { uploadCredential, type Credential } from '@/services/trust';
 
 /* ---------------------------------------------
@@ -289,19 +289,19 @@ export default function Credentials() {
           ) : (
             <Tooltip
               key="resubmit"
-              title="Attach additional documents and re‑submit"
+              title="Attach additional documents and re-submit"
             >
               <Button
                 size="small"
                 type="dashed"
                 onClick={() => {
                   antdMessage.info(
-                    'Re‑submit by uploading an updated document below.',
+                    'Re-submit by uploading an updated document below.',
                   );
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
               >
-                Re‑submit
+                Re-submit
               </Button>
             </Tooltip>
           ),
@@ -312,7 +312,6 @@ export default function Credentials() {
 
   const pageBody = (
     <PageContainer ghost>
-      {/* Intro & guidance */}
       <Alert
         type="info"
         showIcon
@@ -326,16 +325,15 @@ export default function Credentials() {
         }
         description={
           <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
-            Upload real‑world credentials (certifications, professional
+            Upload real-world credentials (certifications, professional
             memberships, academic records) that help stewards understand why
             your voice carries expertise in certain debates. These documents are
-            reviewed manually and do not replace community‑based reputation.
+            reviewed manually and do not replace community-based reputation.
           </Paragraph>
         }
       />
 
       <ProCard gutter={16} wrap>
-        {/* Left column: upload flow */}
         <ProCard
           colSpan={{ xs: 24, lg: 14 }}
           title="Upload a new credential"
@@ -403,16 +401,14 @@ export default function Credentials() {
                   helpful than a long résumé.
                 </Text>
                 <Text type="secondary">
-                  You can always complement these documents with
-                  activity‑based reputation earned through debates, voting and
-                  impact work.
+                  You can always complement these documents with activity-based
+                  reputation earned through debates, voting and impact work.
                 </Text>
               </Space>
             </>
           )}
         </ProCard>
 
-        {/* Right column: how it works + examples */}
         <ProCard
           colSpan={{ xs: 24, lg: 10 }}
           title="How credentials fit into Ethikos trust"
@@ -426,7 +422,7 @@ export default function Credentials() {
               {
                 title: 'Upload',
                 description:
-                  'You submit a credential associated with your real‑world expertise.',
+                  'You submit a credential associated with your real-world expertise.',
               },
               {
                 title: 'Review',
@@ -451,7 +447,7 @@ export default function Credentials() {
               'Professional licensure (e.g. bar membership, medical board certification).',
               'Academic degrees in fields relevant to debates you join.',
               'Official appointments or advisory roles in public institutions.',
-              'Peer‑reviewed publications or major reports where you are a named author.',
+              'Peer-reviewed publications or major reports where you are a named author.',
             ]}
             renderItem={(item) => (
               <List.Item>
@@ -483,7 +479,6 @@ export default function Credentials() {
           />
         </ProCard>
 
-        {/* Full-width: My credentials */}
         <ProCard colSpan={24} title="My credentials" ghost>
           <ProTable<CredentialRow>
             rowKey="id"
@@ -501,7 +496,6 @@ export default function Credentials() {
         </ProCard>
       </ProCard>
 
-      {/* Drawer: credential details */}
       <Drawer
         open={!!detail}
         width={520}
@@ -534,11 +528,7 @@ export default function Credentials() {
                       title: 'Document',
                       dataIndex: 'url',
                       render: (_: any, row: CredentialRow) => (
-                        <a
-                          href={row.url}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
+                        <a href={row.url} target="_blank" rel="noreferrer">
                           Open document
                         </a>
                       ),
@@ -562,7 +552,7 @@ export default function Credentials() {
     <EthikosPageShell
       title="Credentials"
       sectionLabel="Trust"
-      subtitle="Upload and manage real‑world credentials that help stewards understand your expertise in Ethikos debates."
+      subtitle="Upload and manage real-world credentials that help stewards understand your expertise in Ethikos debates."
       secondaryActions={summaryTags}
     >
       {pageBody}

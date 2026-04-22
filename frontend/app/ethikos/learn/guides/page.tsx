@@ -5,7 +5,7 @@
  * Ethikos · Learn · Guides
  *
  * References:
- * - Baseline page implementation from the app dump.
+ * - Current page structure from the uploaded file.
  * - Data service: services/learn.ts (fetchGuides).
  */
 
@@ -25,65 +25,85 @@ import {
   Space,
   Tag,
   FloatButton,
+  message,
 } from 'antd'
 import { LinkOutlined, SyncOutlined, ReadOutlined } from '@ant-design/icons'
 import { useRequest } from 'ahooks'
-import EthikosPageShell from '../../EthikosPageShell'
-import { fetchGuides } from '@/services/learn'
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
+import { fetchGuides, type GuideSection } from '@/services/learn'
 
-type GuideSection = {
-  id: string
-  title: string
-  content: string
+type EnrichedGuideSection = GuideSection & {
+  wc: number
+  minutes: number
 }
 
-function wordsOf(text: string) {
+function wordsOf(text: string): number {
   if (!text) return 0
-  const m = text.trim().match(/\S+/g)
-  return m ? m.length : 0
+  const matches = text.trim().match(/\S+/g)
+  return matches ? matches.length : 0
 }
 
-export default function Guides() {
+async function copySectionLink(id: string): Promise<void> {
+  const hash = `#${id}`
+  const absoluteUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}${window.location.pathname}${hash}`
+      : hash
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(absoluteUrl)
+      message.success('Section link copied')
+      return
+    }
+
+    message.info('Clipboard is not available in this browser context')
+  } catch {
+    message.error('Unable to copy the section link')
+  }
+}
+
+export default function Guides(): JSX.Element {
   const { data, loading, error, refresh } = useRequest(fetchGuides)
   const [query, setQuery] = useState('')
 
-  const sections: GuideSection[] = (data?.sections ?? []) as GuideSection[]
+  const sections: GuideSection[] = data?.sections ?? []
 
   const computed = useMemo(() => {
-    const q = query.trim().toLowerCase()
+    const normalizedQuery = query.trim().toLowerCase()
 
-    const enriched = sections.map((s) => {
-      const wc = wordsOf(s.content)
+    const enriched: EnrichedGuideSection[] = sections.map((section) => {
+      const wc = wordsOf(section.content)
       const minutes = Math.max(1, Math.round(wc / 220)) // ~220 wpm
-      return { ...s, wc, minutes }
+      return { ...section, wc, minutes }
     })
 
-    const filtered = q
+    const filtered = normalizedQuery
       ? enriched.filter(
-          (s) =>
-            s.title.toLowerCase().includes(q) ||
-            s.content.toLowerCase().includes(q),
+          (section) =>
+            section.title.toLowerCase().includes(normalizedQuery) ||
+            section.content.toLowerCase().includes(normalizedQuery),
         )
       : enriched
 
     const totals = filtered.reduce(
-      (acc, s) => {
-        acc.words += s.wc
-        acc.minutes += s.minutes
+      (acc, section) => {
+        acc.words += section.wc
+        acc.minutes += section.minutes
         return acc
       },
       { words: 0, minutes: 0 },
     )
 
-    const pieData = filtered.map((s) => ({
-      type: s.title,
-      value: s.wc || 1,
+    const pieData = filtered.map((section) => ({
+      type: section.title,
+      value: section.wc || 1,
     }))
 
-    const anchorItems = filtered.map((s) => ({
-      key: s.id,
-      href: `#${s.id}`,
-      title: s.title,
+    const anchorItems = filtered.map((section) => ({
+      key: section.id,
+      href: `#${section.id}`,
+      title: section.title,
     }))
 
     return { filtered, totals, pieData, anchorItems }
@@ -92,9 +112,10 @@ export default function Guides() {
   const shellProps = {
     title: 'Guides',
     sectionLabel: 'Learn',
+    subtitle:
+      'Practical walkthroughs for using ethiKos: when to launch a debate, choosing Elite vs Public, and how outcomes flow into impact.',
   } as const
 
-  /* ---------- error state ---------- */
   if (error) {
     return (
       <EthikosPageShell {...shellProps}>
@@ -133,8 +154,11 @@ export default function Guides() {
               <Typography.Text type="secondary">Guides</Typography.Text>
               <Typography.Text strong>{sections.length}</Typography.Text>
             </Space>
+
             <Space direction="vertical" size={0}>
-              <Typography.Text type="secondary">Est. reading</Typography.Text>
+              <Typography.Text type="secondary">
+                Est. reading
+              </Typography.Text>
               <Typography.Text strong>
                 {computed.totals.minutes} min
               </Typography.Text>
@@ -142,7 +166,6 @@ export default function Guides() {
           </Space>
         }
       >
-        {/* Overview stats */}
         <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
           <StatisticCard
             statistic={{
@@ -151,12 +174,14 @@ export default function Guides() {
               icon: <ReadOutlined />,
             }}
           />
+
           <StatisticCard
             statistic={{
               title: 'Words (filtered)',
               value: computed.totals.words,
             }}
           />
+
           <StatisticCard
             statistic={{
               title: 'Est. read time',
@@ -164,20 +189,15 @@ export default function Guides() {
               suffix: 'min',
             }}
           />
+
           <ProCard colSpan="100%" ghost />
         </ProCard>
 
         <ProCard split="vertical" ghost>
-          {/* Left: Navigation & search */}
           <ProCard
             colSpan={{ xs: 24, sm: 24, md: 7, lg: 6, xl: 6 }}
             title="Navigate guides"
           >
-            <Typography.Paragraph type="secondary">
-              Practical walkthroughs for using ethiKos: when to launch a debate,
-              choosing Elite vs Public, and how outcomes flow into impact.
-            </Typography.Paragraph>
-
             <Input.Search
               placeholder="Filter guides…"
               allowClear
@@ -201,16 +221,16 @@ export default function Guides() {
             </Typography.Paragraph>
           </ProCard>
 
-          {/* Right: Content + mini chart */}
           <ProCard
             colSpan={{ xs: 24, sm: 24, md: 17, lg: 18, xl: 18 }}
             title="Guided flows"
           >
-            {computed.filtered.length === 0 ? (
+            {sections.length === 0 && !loading ? (
+              <Empty description="No guides available yet." />
+            ) : computed.filtered.length === 0 ? (
               <Empty description="No guides match your query." />
             ) : (
               <>
-                {/* Mini chart to visualize section sizes */}
                 <ProCard
                   ghost
                   style={{ marginBottom: 16 }}
@@ -219,27 +239,31 @@ export default function Guides() {
                   <Pie {...pieConfig} />
                 </ProCard>
 
-                {computed.filtered.map((s) => (
-                  <section key={s.id} id={s.id} style={{ marginBottom: 32 }}>
-                    <Space align="baseline" size="middle">
+                {computed.filtered.map((section) => (
+                  <section
+                    key={section.id}
+                    id={section.id}
+                    style={{ marginBottom: 32 }}
+                  >
+                    <Space align="baseline" size="middle" wrap>
                       <Typography.Title level={3} style={{ marginTop: 0 }}>
-                        {s.title}
+                        {section.title}
                       </Typography.Title>
-                      <Tag>{s.minutes} min</Tag>
+
+                      <Tag>{section.minutes} min</Tag>
+
                       <Button
                         type="text"
                         size="small"
                         icon={<LinkOutlined />}
-                        onClick={() => {
-                          const url = `${location.pathname}#${s.id}`
-                          navigator.clipboard?.writeText(url)
-                        }}
+                        onClick={() => void copySectionLink(section.id)}
                       >
                         Copy link
                       </Button>
                     </Space>
+
                     <Typography.Paragraph style={{ whiteSpace: 'pre-line' }}>
-                      {s.content}
+                      {section.content}
                     </Typography.Paragraph>
                   </section>
                 ))}

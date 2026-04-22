@@ -179,7 +179,7 @@ export default function SmartVoteReportPage(): JSX.Element {
     return (
       <ReportsPageShell
         title="Smart Vote"
-        description="Voting trends, consensus patterns, and participation signals."
+        subtitle="Voting trends, consensus patterns, and participation signals."
         metaTitle="Reports · Smart Vote"
       >
         <Skeleton active paragraph={{ rows: 10 }} />
@@ -191,7 +191,7 @@ export default function SmartVoteReportPage(): JSX.Element {
     return (
       <ReportsPageShell
         title="Smart Vote"
-        description="Voting trends, consensus patterns, and participation signals."
+        subtitle="Voting trends, consensus patterns, and participation signals."
         metaTitle="Reports · Smart Vote"
       >
         <Empty description="Failed to load analytics">
@@ -208,7 +208,7 @@ export default function SmartVoteReportPage(): JSX.Element {
   return (
     <ReportsPageShell
       title="Smart Vote"
-      description="Track participation, weighted consensus, and polarization over time."
+      subtitle="Track participation, weighted consensus, and polarization over time."
       metaTitle="Reports · Smart Vote"
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>

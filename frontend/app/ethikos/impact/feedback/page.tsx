@@ -22,7 +22,7 @@ import {
   message,
 } from 'antd';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchFeedback, submitFeedback, type FeedbackItem } from '@/services/impact';
 

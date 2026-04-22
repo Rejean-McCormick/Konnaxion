@@ -1,14 +1,5 @@
 // FILE: frontend/app/ethikos/pulse/live/page.tsx
-// app/ethikos/pulse/live/page.tsx
 'use client';
-
-/**
- * Updated implementation based on Ant Design / ProComponents plan:
- * - Keep KPI counters with sparkline charts
- * - Add live activity feed (topics, stances, arguments)
- * - Add "Open debates" table with last activity
- * - Wire into existing services/hooks and axios helper
- */
 
 import React from 'react';
 import dayjs from 'dayjs';
@@ -40,9 +31,9 @@ import {
   MessageOutlined,
   ProfileOutlined,
 } from '@ant-design/icons';
-import { useInterval, useRequest } from 'ahooks';
+import { useRequest } from 'ahooks';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import ChartCard from '@/components/charts/ChartCard';
 import { fetchPulseLiveData, type LiveCounter } from '@/services/pulse';
 import { get } from '@/services/_request';
@@ -79,71 +70,6 @@ type EthikosArgumentApi = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Local data loaders                                                 */
-/* ------------------------------------------------------------------ */
-
-async function fetchRecentActivity(): Promise<FeedItem[]> {
-  const [topics, stances, args] = await Promise.all([
-    get<EthikosTopicApi[]>('ethikos/topics/'),
-    get<EthikosStanceApi[]>('ethikos/stances/'),
-    get<EthikosArgumentApi[]>('ethikos/arguments/'),
-  ]);
-
-  const topicById = new Map<number, EthikosTopicApi>(
-    topics.map((t) => [t.id, t]),
-  );
-
-  const items: FeedItem[] = [
-    // New or updated debates (use created + last_activity as signals)
-    ...topics.map<FeedItem>((t) => ({
-      id: `topic-${t.id}-${t.created_at}`,
-      ts: t.created_at,
-      kind: 'topic',
-      topicId: t.id,
-      title: t.title,
-      summary:
-        t.status === 'open'
-          ? 'New debate created'
-          : `Debate status changed to ${t.status}`,
-    })),
-    // Stances
-    ...stances.map<FeedItem>((s) => ({
-      id: `stance-${s.id}`,
-      ts: s.timestamp,
-      kind: 'stance',
-      topicId: s.topic,
-      title: topicById.get(s.topic)?.title ?? `Topic #${s.topic}`,
-      summary: `New stance submitted: ${s.value >= 0 ? '+' : ''}${s.value}`,
-      extra: { value: s.value },
-    })),
-    // Arguments
-    ...args.map<FeedItem>((a) => ({
-      id: `arg-${a.id}`,
-      ts: a.created_at,
-      kind: 'argument',
-      topicId: a.topic,
-      title: topicById.get(a.topic)?.title ?? `Topic #${a.topic}`,
-      summary: `${a.user} commented: ${truncate(a.content, 120)}`,
-    })),
-  ];
-
-  // Sort newest first and take a reasonable slice
-  return items
-    .sort((a, b) => dayjs(b.ts).valueOf() - dayjs(a.ts).valueOf())
-    .slice(0, 20);
-}
-
-async function fetchOpenTopics(): Promise<EthikosTopicApi[]> {
-  const topics = await get<EthikosTopicApi[]>('ethikos/topics/');
-  return topics
-    .filter((t) => t.status === 'open')
-    .sort(
-      (a, b) =>
-        dayjs(b.last_activity).valueOf() - dayjs(a.last_activity).valueOf(),
-    );
-}
-
-/* ------------------------------------------------------------------ */
 /*  Types & helpers                                                    */
 /* ------------------------------------------------------------------ */
 
@@ -174,8 +100,70 @@ type FeedItem =
       summary: string;
     };
 
-function truncate(s: string, n = 100) {
-  return s.length > n ? `${s.slice(0, n - 1)}…` : s;
+function truncate(value: string, max = 100): string {
+  return value.length > max ? `${value.slice(0, max - 1)}…` : value;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Local data loaders                                                 */
+/* ------------------------------------------------------------------ */
+
+async function fetchRecentActivity(): Promise<FeedItem[]> {
+  const [topics, stances, args] = await Promise.all([
+    get<EthikosTopicApi[]>('ethikos/topics/'),
+    get<EthikosStanceApi[]>('ethikos/stances/'),
+    get<EthikosArgumentApi[]>('ethikos/arguments/'),
+  ]);
+
+  const topicById = new Map<number, EthikosTopicApi>(
+    topics.map((topic) => [topic.id, topic]),
+  );
+
+  const items: FeedItem[] = [
+    ...topics.map<FeedItem>((topic) => ({
+      id: `topic-${topic.id}-${topic.created_at}`,
+      ts: topic.created_at,
+      kind: 'topic',
+      topicId: topic.id,
+      title: topic.title,
+      summary:
+        topic.status === 'open'
+          ? 'New debate created'
+          : `Debate status changed to ${topic.status}`,
+    })),
+    ...stances.map<FeedItem>((stance) => ({
+      id: `stance-${stance.id}`,
+      ts: stance.timestamp,
+      kind: 'stance',
+      topicId: stance.topic,
+      title: topicById.get(stance.topic)?.title ?? `Topic #${stance.topic}`,
+      summary: `New stance submitted: ${stance.value >= 0 ? '+' : ''}${stance.value}`,
+      extra: { value: stance.value },
+    })),
+    ...args.map<FeedItem>((argument) => ({
+      id: `arg-${argument.id}`,
+      ts: argument.created_at,
+      kind: 'argument',
+      topicId: argument.topic,
+      title: topicById.get(argument.topic)?.title ?? `Topic #${argument.topic}`,
+      summary: `${argument.user} commented: ${truncate(argument.content, 120)}`,
+    })),
+  ];
+
+  return items
+    .sort((a, b) => dayjs(b.ts).valueOf() - dayjs(a.ts).valueOf())
+    .slice(0, 20);
+}
+
+async function fetchOpenTopics(): Promise<EthikosTopicApi[]> {
+  const topics = await get<EthikosTopicApi[]>('ethikos/topics/');
+
+  return topics
+    .filter((topic) => topic.status === 'open')
+    .sort(
+      (a, b) =>
+        dayjs(b.last_activity).valueOf() - dayjs(a.last_activity).valueOf(),
+    );
 }
 
 /* ------------------------------------------------------------------ */
@@ -186,35 +174,23 @@ export default function PulseLive(): JSX.Element {
   const [autoRefresh, setAutoRefresh] = React.useState(true);
   const [lastUpdated, setLastUpdated] = React.useState<string | null>(null);
 
-  // Counters (with 20s polling by default)
-  const liveReq = useRequest<{ counters: LiveCounter[] }, []>(
-    fetchPulseLiveData,
-    {
-      pollingInterval: autoRefresh ? 20_000 : undefined,
-      onSuccess: () => setLastUpdated(dayjs().format('HH:mm:ss')),
-    },
-  );
+  const liveReq = useRequest<{ counters: LiveCounter[] }, []>(fetchPulseLiveData, {
+    pollingInterval: autoRefresh ? 20_000 : undefined,
+    onSuccess: () => setLastUpdated(dayjs().format('HH:mm:ss')),
+  });
 
-  // Live activity feed (stances, arguments, topics)
   const feedReq = useRequest<FeedItem[], []>(fetchRecentActivity, {
     pollingInterval: autoRefresh ? 20_000 : undefined,
   });
 
-  // Open debates table
   const openReq = useRequest<EthikosTopicApi[], []>(fetchOpenTopics, {
     pollingInterval: autoRefresh ? 30_000 : undefined,
   });
 
-  // Manual refresh safety-net (kept from original)
-  useInterval(() => {
-    if (!autoRefresh) return;
-    liveReq.refresh();
-  }, 20_000);
-
   const refreshAll = React.useCallback(() => {
-    liveReq.refresh();
-    feedReq.refresh();
-    openReq.refresh();
+    void liveReq.refresh();
+    void feedReq.refresh();
+    void openReq.refresh();
   }, [liveReq, feedReq, openReq]);
 
   const counters = liveReq.data?.counters ?? [];
@@ -248,9 +224,7 @@ export default function PulseLive(): JSX.Element {
         dataIndex: 'last_activity',
         width: 180,
         render: (_, row) => (
-          <Tooltip
-            title={dayjs(row.last_activity).format('YYYY-MM-DD HH:mm')}
-          >
+          <Tooltip title={dayjs(row.last_activity).format('YYYY-MM-DD HH:mm')}>
             {dayjs(row.last_activity).fromNow()}
           </Tooltip>
         ),
@@ -281,7 +255,7 @@ export default function PulseLive(): JSX.Element {
       )}
       <Space size="small" align="center">
         <ThunderboltOutlined />
-        <span>Auto‑refresh</span>
+        <span>Auto-refresh</span>
         <Switch checked={autoRefresh} onChange={setAutoRefresh} size="small" />
       </Space>
       <Button icon={<SyncOutlined />} onClick={refreshAll} size="small">
@@ -300,7 +274,7 @@ export default function PulseLive(): JSX.Element {
     <EthikosPageShell
       title="Pulse · Live participation"
       sectionLabel="Pulse"
-      subtitle="Real‑time counters, latest activity, and currently open debates."
+      subtitle="Real-time counters, latest activity, and currently open debates."
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
     >
@@ -310,21 +284,21 @@ export default function PulseLive(): JSX.Element {
           showIcon
           style={{ marginBottom: 16 }}
           message="Live view"
-          description="This page auto‑refreshes every 20 seconds while enabled. Use manual Refresh if needed."
+          description="This page auto-refreshes every 20 seconds while enabled. Use manual Refresh if needed."
         />
 
-        {/* KPI counters with sparkline charts */}
         <ProCard gutter={16} wrap>
-          {counters.map((c) => {
-            const trend = c.trend ?? 0;
+          {counters.map((counter) => {
+            const trend = counter.trend ?? 0;
+
             return (
               <StatisticCard
-                key={c.label}
+                key={counter.label}
                 colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
                 statistic={{
                   title: (
                     <Space>
-                      {c.label}
+                      {counter.label}
                       <Badge
                         status={
                           trend > 0 ? 'success' : trend < 0 ? 'error' : 'default'
@@ -332,14 +306,14 @@ export default function PulseLive(): JSX.Element {
                       />
                     </Space>
                   ),
-                  value: c.value,
+                  value: counter.value,
                   precision: 0,
                 }}
                 chart={
                   <ChartCard
                     type="line"
                     height={50}
-                    data={c.history.map(({ ts, value }) => ({
+                    data={counter.history.map(({ ts, value }) => ({
                       x: ts,
                       y: value,
                     }))}
@@ -350,9 +324,7 @@ export default function PulseLive(): JSX.Element {
           })}
         </ProCard>
 
-        {/* Live activity feed + Open debates */}
         <ProCard gutter={[16, 16]} wrap style={{ marginTop: 16 }}>
-          {/* Live activity feed */}
           <ProCard
             colSpan={{ xs: 24, xl: 16 }}
             title={
@@ -381,9 +353,7 @@ export default function PulseLive(): JSX.Element {
                         item.kind === 'topic' ? (
                           <ProfileOutlined />
                         ) : item.kind === 'stance' ? (
-                          <Tag
-                            color={item.extra.value >= 0 ? 'green' : 'red'}
-                          >
+                          <Tag color={item.extra.value >= 0 ? 'green' : 'red'}>
                             {item.extra.value >= 0 ? '+' : ''}
                             {item.extra.value}
                           </Tag>
@@ -401,8 +371,8 @@ export default function PulseLive(): JSX.Element {
                               item.kind === 'topic'
                                 ? 'blue'
                                 : item.kind === 'stance'
-                                ? 'purple'
-                                : 'cyan'
+                                  ? 'purple'
+                                  : 'cyan'
                             }
                           >
                             {item.kind}
@@ -424,7 +394,6 @@ export default function PulseLive(): JSX.Element {
             )}
           </ProCard>
 
-          {/* Open debates table */}
           <ProCard
             colSpan={{ xs: 24, xl: 8 }}
             title={

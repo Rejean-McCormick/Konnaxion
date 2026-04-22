@@ -17,6 +17,7 @@ import {
   Button,
   Tooltip,
 } from 'antd';
+import type { ListProps } from 'antd';
 import {
   LineChartOutlined,
   BarChartOutlined,
@@ -33,13 +34,22 @@ const { Paragraph, Text } = Typography;
 
 type QuickRange = '7d' | '30d' | '90d';
 
+type Shortcut = {
+  key: string;
+  title: string;
+  description: string;
+  href: string;
+  icon: React.ReactNode;
+  tags: string[];
+};
+
 const QUICK_RANGES: { label: string; value: QuickRange }[] = [
   { label: '7 days', value: '7d' },
   { label: '30 days', value: '30d' },
   { label: '90 days', value: '90d' },
 ];
 
-const shortcuts = [
+const shortcuts: Shortcut[] = [
   {
     key: 'smart-vote',
     title: 'Smart Vote · Impact overview',
@@ -67,7 +77,7 @@ const shortcuts = [
     icon: <ThunderboltOutlined style={{ fontSize: 24, color: '#faad14' }} />,
     tags: ['API', 'SLO', 'Reliability'],
   },
-] as const;
+];
 
 const MiniChartSkeleton = ({ color = '#eee' }: { color?: string }) => (
   <div
@@ -101,7 +111,7 @@ export default function ReportsHomePage(): JSX.Element {
   return (
     <ReportsPageShell
       title="Insights"
-      description="Cross-module analytics for Smart Vote, usage, and performance."
+      subtitle="Cross-module analytics for Smart Vote, usage, and performance."
       metaTitle="Insights · Reports"
     >
       <Space
@@ -262,7 +272,7 @@ export default function ReportsHomePage(): JSX.Element {
               </Paragraph>
             </Space>
 
-            <List
+            <List<Shortcut>
               itemLayout="horizontal"
               dataSource={shortcuts}
               renderItem={(item) => (
@@ -297,7 +307,7 @@ export default function ReportsHomePage(): JSX.Element {
                           {item.description}
                         </Paragraph>
                         <Space size={[4, 0]} wrap>
-                          {item.tags.map((tag) => (
+                          {item.tags.map((tag: string) => (
                             <Tag key={tag} color="blue">
                               {tag}
                             </Tag>

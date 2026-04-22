@@ -30,7 +30,7 @@ import {
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
 
-import EthikosPageShell from '../../EthikosPageShell';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchModerationQueue,
   actOnReport,

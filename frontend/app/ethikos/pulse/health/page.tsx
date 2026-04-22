@@ -1,13 +1,6 @@
 // FILE: frontend/app/ethikos/pulse/health/page.tsx
 'use client';
 
-/**
- * Updated from app dump and aligned with existing service API.
- * Baseline reference: app/ethikos/pulse/health/page.tsx in the dump. :contentReference[oaicite:0]{index=0}
- * Service contract & data shape: services/pulse.ts (fetchPulseHealth, HealthSummary). :contentReference[oaicite:1]{index=1}
- * Header/refresh pattern mirrored from Pulse Overview page implementation. :contentReference[oaicite:2]{index=2}
- */
-
 import {
   PageContainer,
   ProCard,
@@ -28,14 +21,14 @@ import { SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
-import EthikosPageShell from '../../EthikosPageShell';
-import usePageTitle from '@/hooks/usePageTitle';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { fetchPulseHealth, type HealthSummary } from '@/services/pulse';
 
 const { Text } = Typography;
 
 type RadarPoint = { metric: string; score: number };
 type PiePoint = { type: string; value: number };
+type PlotConfig = { data?: unknown[]; [key: string]: unknown };
 
 function computeHealthStatus(
   constructiveness?: number,
@@ -49,17 +42,45 @@ function computeHealthStatus(
   return { status: 'error', label: 'At risk' };
 }
 
+function asRadarPoints(value: unknown): RadarPoint[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(
+    (item): item is RadarPoint =>
+      !!item &&
+      typeof item === 'object' &&
+      typeof (item as RadarPoint).metric === 'string' &&
+      typeof (item as RadarPoint).score === 'number',
+  );
+}
+
+function asPiePoints(value: unknown): PiePoint[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(
+    (item): item is PiePoint =>
+      !!item &&
+      typeof item === 'object' &&
+      typeof (item as PiePoint).type === 'string' &&
+      typeof (item as PiePoint).value === 'number',
+  );
+}
+
+function formatRefreshTime(refreshedAt?: string): string | null {
+  if (!refreshedAt) return null;
+  const parsed = dayjs(refreshedAt);
+  return parsed.isValid() ? parsed.format('HH:mm:ss') : null;
+}
+
 export default function PulseHealth(): JSX.Element {
-  usePageTitle('Pulse · Participation Health');
+  const shellTitle = 'Pulse · Participation Health';
 
   const { data, loading, error, refresh } = useRequest<HealthSummary, []>(
     fetchPulseHealth,
   );
 
-  const lastUpdated = data ? dayjs(data.refreshedAt).format('HH:mm:ss') : null;
-  const shellTitle = 'Pulse · Participation Health';
+  const lastUpdated = formatRefreshTime(data?.refreshedAt);
 
-  /* ---------- loading skeleton ---------- */
   if (loading && !data) {
     return (
       <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
@@ -70,7 +91,6 @@ export default function PulseHealth(): JSX.Element {
     );
   }
 
-  /* ---------- error state ---------- */
   if (error) {
     return (
       <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
@@ -79,7 +99,11 @@ export default function PulseHealth(): JSX.Element {
             description="Failed to load participation health"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
-            <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
+            <Button
+              icon={<SyncOutlined />}
+              onClick={() => void refresh()}
+              type="primary"
+            >
               Retry
             </Button>
           </Empty>
@@ -88,7 +112,6 @@ export default function PulseHealth(): JSX.Element {
     );
   }
 
-  /* ---------- empty safeguard ---------- */
   if (!data) {
     return (
       <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
@@ -99,35 +122,42 @@ export default function PulseHealth(): JSX.Element {
     );
   }
 
-  /* ---------- derive metrics from configs ---------- */
-  const radarPoints = (data.radarConfig?.data as RadarPoint[]) ?? [];
-  const metricMap = new Map<string, number>();
-  radarPoints.forEach((p) => {
-    if (p && typeof p.metric === 'string') metricMap.set(p.metric, p.score);
-  });
+  const radarConfig = (data.radarConfig ?? {}) as PlotConfig;
+  const pieConfig = (data.pieConfig ?? {}) as PlotConfig;
 
-  const participation = metricMap.get('Participation');
-  const engagement = metricMap.get('Engagement');
-  const balance = metricMap.get('Balance');
-  const constructiveness = metricMap.get('Constructiveness');
+  const radarPoints = asRadarPoints(radarConfig.data);
+  const piePoints = asPiePoints(pieConfig.data);
+
+  const metricMap = new Map<string, number>();
+  for (const point of radarPoints) {
+    metricMap.set(point.metric, point.score);
+  }
+
+  const participation = metricMap.get('Participation') ?? 0;
+  const engagement = metricMap.get('Engagement') ?? 0;
+  const balance = metricMap.get('Balance') ?? 0;
+  const constructiveness = metricMap.get('Constructiveness') ?? 0;
 
   const { status: healthStatus, label: healthLabel } = computeHealthStatus(
     constructiveness,
     engagement,
   );
 
-  const piePoints = (data.pieConfig?.data as PiePoint[]) ?? [];
-  const totalSentiment =
-    piePoints.reduce(
-      (sum, p) => (typeof p.value === 'number' ? sum + p.value : sum),
-      0,
-    ) || 0;
+  const totalSentiment = piePoints.reduce((sum, point) => sum + point.value, 0);
 
-  const sentimentDetails = piePoints.map((p) => {
+  const sentimentDetails = piePoints.map((point) => {
     const percent =
-      totalSentiment > 0 ? Math.round((p.value / totalSentiment) * 100) : 0;
-    return { label: p.type, count: p.value, percent };
+      totalSentiment > 0 ? Math.round((point.value / totalSentiment) * 100) : 0;
+
+    return {
+      label: point.type,
+      count: point.value,
+      percent,
+    };
   });
+
+  const hasRadarData = radarPoints.length > 0;
+  const hasPieData = piePoints.length > 0;
 
   const secondaryActions = (
     <Space>
@@ -136,14 +166,14 @@ export default function PulseHealth(): JSX.Element {
         <Badge
           count={
             <Tooltip title={`Last refreshed at ${lastUpdated}`}>
-              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+              <ClockCircleOutlined />
             </Tooltip>
           }
         />
       )}
       <Button
         icon={<SyncOutlined />}
-        onClick={refresh}
+        onClick={() => void refresh()}
         size="small"
         type="text"
       />
@@ -157,13 +187,12 @@ export default function PulseHealth(): JSX.Element {
       secondaryActions={secondaryActions}
     >
       <PageContainer ghost>
-        {/* KPI summary */}
         <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
               title: 'Participation',
-              value: participation ?? 0,
+              value: participation,
               suffix: '%',
               description: (
                 <Text type="secondary">
@@ -176,7 +205,7 @@ export default function PulseHealth(): JSX.Element {
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
               title: 'Engagement',
-              value: engagement ?? 0,
+              value: engagement,
               suffix: '%',
               description: (
                 <Text type="secondary">
@@ -189,7 +218,7 @@ export default function PulseHealth(): JSX.Element {
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
               title: 'Balance',
-              value: balance ?? 0,
+              value: balance,
               suffix: '%',
               description: (
                 <Text type="secondary">
@@ -203,7 +232,7 @@ export default function PulseHealth(): JSX.Element {
             colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
             statistic={{
               title: 'Constructiveness',
-              value: constructiveness ?? 0,
+              value: constructiveness,
               suffix: '%',
               description: (
                 <Text type="secondary">
@@ -214,14 +243,20 @@ export default function PulseHealth(): JSX.Element {
           />
         </ProCard>
 
-        {/* Radar + sentiment breakdown */}
         <ProCard gutter={[16, 16]} wrap>
           <ProCard
             colSpan={{ xs: 24, xl: 14 }}
             title="Participation health radar"
             extra={<Text type="secondary">Each axis normalised to 0–100.</Text>}
           >
-            <Radar {...data.radarConfig} />
+            {hasRadarData ? (
+              <Radar {...(radarConfig as any)} />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No participation health data yet"
+              />
+            )}
           </ProCard>
 
           <ProCard
@@ -230,24 +265,38 @@ export default function PulseHealth(): JSX.Element {
             split="horizontal"
           >
             <ProCard ghost>
-              <Pie {...data.pieConfig} />
+              {hasPieData ? (
+                <Pie {...(pieConfig as any)} />
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No sentiment data yet"
+                />
+              )}
             </ProCard>
 
             <ProCard ghost>
-              <List
-                size="small"
-                dataSource={sentimentDetails}
-                renderItem={(item) => (
-                  <List.Item>
-                    <Space>
-                      <Text strong>{item.label}</Text>
-                      <Text type="secondary">
-                        {item.count} stances ({item.percent}%)
-                      </Text>
-                    </Space>
-                  </List.Item>
-                )}
-              />
+              {sentimentDetails.length ? (
+                <List
+                  size="small"
+                  dataSource={sentimentDetails}
+                  renderItem={(item) => (
+                    <List.Item key={item.label}>
+                      <Space>
+                        <Text strong>{item.label}</Text>
+                        <Text type="secondary">
+                          {item.count} stances ({item.percent}%)
+                        </Text>
+                      </Space>
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No sentiment breakdown available"
+                />
+              )}
             </ProCard>
           </ProCard>
         </ProCard>

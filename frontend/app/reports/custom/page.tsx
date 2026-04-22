@@ -98,7 +98,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
   return (
     <ReportsPageShell
       title="Custom report builder"
-      description="Compose your own Insights view by picking metrics, dimensions, filters, and layout."
+      subtitle="Compose your own Insights view by picking metrics, dimensions, filters, and layout."
       metaTitle="Reports · Custom report builder"
       primaryAction={
         <Button type="primary" icon={<PlayCircleOutlined />}>

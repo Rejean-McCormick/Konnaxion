@@ -310,7 +310,7 @@ export default function PerfReportPage(): JSX.Element {
     return (
       <ReportsPageShell
         title="API performance"
-        description="Monitor latency, reliability, and endpoint health across the platform."
+        subtitle="Monitor latency, reliability, and endpoint health across the platform."
         secondaryActions={toolbar}
       >
         <Skeleton active paragraph={{ rows: 10 }} />
@@ -321,7 +321,7 @@ export default function PerfReportPage(): JSX.Element {
   return (
     <ReportsPageShell
       title="API performance"
-      description="Monitor API latency, reliability, throughput, and SLO compliance for the core services."
+      subtitle="Monitor API latency, reliability, throughput, and SLO compliance for the core services."
       secondaryActions={toolbar}
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>

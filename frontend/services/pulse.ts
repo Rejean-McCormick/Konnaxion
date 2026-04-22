@@ -1,5 +1,4 @@
 // FILE: frontend/services/pulse.ts
-// frontend/services/pulse.ts
 import dayjs from 'dayjs'
 import { get } from './_request'
 import type { KPI } from '@/types'
@@ -19,13 +18,13 @@ export interface TrendChart {
   key: string
   title: string
   type: 'line' | 'area' | 'heatmap'
-  config: any
+  config: Record<string, unknown>
 }
 
 export interface HealthSummary {
   refreshedAt: string
-  radarConfig: any
-  pieConfig: any
+  radarConfig: Record<string, unknown>
+  pieConfig: Record<string, unknown>
 }
 
 // ──────────────────────────────────────────────────────────
@@ -68,6 +67,12 @@ interface VoteApi {
   voted_at: string
 }
 
+type ListResponse<T> =
+  | T[]
+  | {
+      results?: T[]
+    }
+
 // ──────────────────────────────────────────────────────────
 // Helpers
 // ──────────────────────────────────────────────────────────
@@ -75,6 +80,34 @@ interface VoteApi {
 interface DailyPoint {
   date: string
   value: number
+}
+
+function unwrapList<T>(payload: ListResponse<T> | null | undefined): T[] {
+  if (Array.isArray(payload)) return payload
+  if (payload && Array.isArray(payload.results)) return payload.results
+  return []
+}
+
+async function getList<T>(url: string): Promise<T[]> {
+  const payload = await get<ListResponse<T>>(url)
+  return unwrapList(payload)
+}
+
+async function getOptionalList<T>(url: string): Promise<T[]> {
+  try {
+    return await getList<T>(url)
+  } catch {
+    return []
+  }
+}
+
+function toFiniteNumber(value: string | number | null | undefined): number {
+  const n = typeof value === 'number' ? value : Number(value)
+  return Number.isFinite(n) ? n : 0
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.max(min, Math.min(max, value))
 }
 
 function buildDailySeries<T>(
@@ -87,12 +120,14 @@ function buildDailySeries<T>(
   const counts: number[] = new Array<number>(days).fill(0)
 
   for (const item of items) {
-    const d = dayjs(getDate(item))
+    const raw = getDate(item)
+    const d = dayjs(raw)
+    if (!d.isValid()) continue
     if (d.isBefore(start) || d.isAfter(now)) continue
+
     const offset = d.startOf('day').diff(start, 'day')
     if (offset >= 0 && offset < days) {
-      const current = counts[offset] ?? 0
-      counts[offset] = current + 1
+      counts[offset] = (counts[offset] ?? 0) + 1
     }
   }
 
@@ -103,37 +138,59 @@ function buildDailySeries<T>(
       value: counts[i] ?? 0,
     })
   }
+
   return series
 }
 
 function percentDelta(series: DailyPoint[]): number | undefined {
   if (series.length < 2) return undefined
 
-  const latestPoint = series[series.length - 1]
-  const previousPoint = series[series.length - 2]
-  if (!latestPoint || !previousPoint) return undefined
+  const latest = series[series.length - 1]?.value ?? 0
+  const previous = series[series.length - 2]?.value ?? 0
 
-  const latest = latestPoint.value
-  const previous = previousPoint.value
-  if (previous === 0) return undefined
+  if (previous === 0) {
+    if (latest === 0) return 0
+    return undefined
+  }
 
   return Math.round(((latest - previous) / previous) * 100)
 }
 
 function buildStanceHeatmap(stances: EthikosStanceApi[]) {
   const bucket = new Map<string, number>()
+
   for (const stance of stances) {
     const d = dayjs(stance.timestamp)
+    if (!d.isValid()) continue
+
     const key = `${d.format('ddd')}-${d.hour()}`
     bucket.set(key, (bucket.get(key) ?? 0) + 1)
   }
+
   const result: { day: string; hour: number; value: number }[] = []
   bucket.forEach((value, key) => {
     const [day, hourStr] = key.split('-')
     if (!day || !hourStr) return
-    result.push({ day, hour: Number(hourStr), value })
+
+    result.push({
+      day,
+      hour: Number(hourStr),
+      value,
+    })
   })
+
   return result
+}
+
+function sumSeries(series: DailyPoint[]): number {
+  return series.reduce((acc, point) => acc + point.value, 0)
+}
+
+function averageAbsoluteStance(stances: EthikosStanceApi[]): number {
+  if (stances.length === 0) return 0
+
+  const total = stances.reduce((acc, stance) => acc + Math.abs(stance.value), 0)
+  return total / stances.length
 }
 
 // ──────────────────────────────────────────────────────────
@@ -145,46 +202,43 @@ export async function fetchPulseOverview(): Promise<{
   kpis: KPIWithHistory[]
 }> {
   const [topics, stances, args, votes] = await Promise.all([
-    get<EthikosTopicApi[]>('ethikos/topics/'),
-    get<EthikosStanceApi[]>('ethikos/stances/'),
-    get<EthikosArgumentApi[]>('ethikos/arguments/'),
-    get<VoteApi[]>('kollective/votes/'),
+    getList<EthikosTopicApi>('ethikos/topics/'),
+    getList<EthikosStanceApi>('ethikos/stances/'),
+    getList<EthikosArgumentApi>('ethikos/arguments/'),
+    getOptionalList<VoteApi>('kollective/votes/'),
   ])
 
-  const topicsSeries = buildDailySeries(topics, (t) => t.created_at)
-  const stancesSeries = buildDailySeries(stances, (s) => s.timestamp)
-  const argsSeries = buildDailySeries(args, (a) => a.created_at)
-  const votesSeries = buildDailySeries(votes, (v) => v.voted_at)
-
-  const sum = (series: DailyPoint[]) =>
-    series.reduce((acc, p) => acc + p.value, 0)
+  const topicsSeries = buildDailySeries(topics, (t) => t.created_at, 30)
+  const stancesSeries = buildDailySeries(stances, (s) => s.timestamp, 30)
+  const argsSeries = buildDailySeries(args, (a) => a.created_at, 30)
+  const votesSeries = buildDailySeries(votes, (v) => v.voted_at, 30)
 
   const kpis: KPIWithHistory[] = [
     {
       key: 'topics',
       label: 'Debates created (30d)',
-      value: sum(topicsSeries),
+      value: sumSeries(topicsSeries),
       delta: percentDelta(topicsSeries),
       history: topicsSeries,
     },
     {
       key: 'stances',
       label: 'Stances recorded (30d)',
-      value: sum(stancesSeries),
+      value: sumSeries(stancesSeries),
       delta: percentDelta(stancesSeries),
       history: stancesSeries,
     },
     {
       key: 'arguments',
       label: 'Arguments posted (30d)',
-      value: sum(argsSeries),
+      value: sumSeries(argsSeries),
       delta: percentDelta(argsSeries),
       history: argsSeries,
     },
     {
       key: 'votes',
       label: 'Weighted votes (30d)',
-      value: sum(votesSeries),
+      value: sumSeries(votesSeries),
       delta: percentDelta(votesSeries),
       history: votesSeries,
     },
@@ -203,32 +257,46 @@ export async function fetchPulseOverview(): Promise<{
 export async function fetchPulseLiveData(): Promise<{
   counters: LiveCounter[]
 }> {
-  const [topics, stances] = await Promise.all([
-    get<EthikosTopicApi[]>('ethikos/topics/'),
-    get<EthikosStanceApi[]>('ethikos/stances/'),
+  const [topics, stances, args] = await Promise.all([
+    getList<EthikosTopicApi>('ethikos/topics/'),
+    getList<EthikosStanceApi>('ethikos/stances/'),
+    getList<EthikosArgumentApi>('ethikos/arguments/'),
   ])
 
-  const topicsSeries = buildDailySeries(topics, (t) => t.created_at, 7)
-  const stancesSeries = buildDailySeries(stances, (s) => s.timestamp, 7)
+  const openTopics = topics.filter((topic) => topic.status === 'open')
+
+  const topicsSeries = buildDailySeries(
+    openTopics,
+    (topic) => topic.last_activity || topic.created_at,
+    7,
+  )
+  const stancesSeries = buildDailySeries(stances, (stance) => stance.timestamp, 7)
+  const argsSeries = buildDailySeries(args, (arg) => arg.created_at, 7)
 
   const toHistory = (series: DailyPoint[]) =>
-    series.map((p) => ({
-      ts: new Date(p.date).getTime(),
-      value: p.value,
+    series.map((point) => ({
+      ts: new Date(point.date).getTime(),
+      value: point.value,
     }))
 
   const counters: LiveCounter[] = [
     {
       label: 'Open debates',
-      value: topics.filter((t) => t.status === 'open').length,
+      value: openTopics.length,
       trend: percentDelta(topicsSeries),
       history: toHistory(topicsSeries),
     },
     {
       label: 'New stances (7d)',
-      value: stancesSeries.reduce((acc, p) => acc + p.value, 0),
+      value: sumSeries(stancesSeries),
       trend: percentDelta(stancesSeries),
       history: toHistory(stancesSeries),
+    },
+    {
+      label: 'New arguments (7d)',
+      value: sumSeries(argsSeries),
+      trend: percentDelta(argsSeries),
+      history: toHistory(argsSeries),
     },
   ]
 
@@ -243,15 +311,14 @@ export async function fetchPulseTrends(): Promise<{
   charts: TrendChart[]
 }> {
   const [topics, stances, args] = await Promise.all([
-    get<EthikosTopicApi[]>('ethikos/topics/'),
-    get<EthikosStanceApi[]>('ethikos/stances/'),
-    get<EthikosArgumentApi[]>('ethikos/arguments/'),
+    getList<EthikosTopicApi>('ethikos/topics/'),
+    getList<EthikosStanceApi>('ethikos/stances/'),
+    getList<EthikosArgumentApi>('ethikos/arguments/'),
   ])
 
   const topicsSeries = buildDailySeries(topics, (t) => t.created_at, 60)
   const stancesSeries = buildDailySeries(stances, (s) => s.timestamp, 60)
   const argsSeries = buildDailySeries(args, (a) => a.created_at, 60)
-
   const heatmapData = buildStanceHeatmap(stances)
 
   const charts: TrendChart[] = [
@@ -277,6 +344,17 @@ export async function fetchPulseTrends(): Promise<{
       },
     },
     {
+      key: 'arguments-timeline',
+      title: 'Arguments over time',
+      type: 'line',
+      config: {
+        data: argsSeries,
+        xField: 'date',
+        yField: 'value',
+        smooth: true,
+      },
+    },
+    {
       key: 'activity-heatmap',
       title: 'Deliberation activity heatmap',
       type: 'heatmap',
@@ -297,36 +375,54 @@ export async function fetchPulseTrends(): Promise<{
 // ──────────────────────────────────────────────────────────
 
 export async function fetchPulseHealth(): Promise<HealthSummary> {
-  const [stances, votes] = await Promise.all([
-    get<EthikosStanceApi[]>('ethikos/stances/'),
-    get<VoteApi[]>('kollective/votes/'),
+  const [topics, stances, args, votes] = await Promise.all([
+    getList<EthikosTopicApi>('ethikos/topics/'),
+    getList<EthikosStanceApi>('ethikos/stances/'),
+    getList<EthikosArgumentApi>('ethikos/arguments/'),
+    getOptionalList<VoteApi>('kollective/votes/'),
   ])
 
   let positive = 0
   let neutral = 0
   let negative = 0
 
-  for (const s of stances) {
-    if (s.value > 0) positive += 1
-    else if (s.value < 0) negative += 1
+  for (const stance of stances) {
+    if (stance.value > 0) positive += 1
+    else if (stance.value < 0) negative += 1
     else neutral += 1
   }
 
-  const participation = Math.min(100, stances.length)
-  const engagement = Math.min(100, votes.length)
+  const participation = clamp(stances.length, 0, 100)
+  const engagement = clamp(votes.length, 0, 100)
+
   const balance =
     stances.length > 0
-      ? Math.round(
-          (1 - Math.abs(positive - negative) / stances.length) * 100,
-        )
+      ? Math.round((1 - Math.abs(positive - negative) / stances.length) * 100)
       : 100
-  const constructiveness = Math.round((participation + balance) / 2)
+
+  const argumentDensity =
+    topics.length > 0 ? Math.round((args.length / topics.length) * 10) : 0
+
+  const constructiveness = clamp(
+    Math.round(
+      (participation + balance + clamp(argumentDensity, 0, 100)) / 3,
+    ),
+    0,
+    100,
+  )
+
+  const conviction = clamp(
+    Math.round((averageAbsoluteStance(stances) / 3) * 100),
+    0,
+    100,
+  )
 
   const radarData = [
     { metric: 'Participation', score: participation },
     { metric: 'Engagement', score: engagement },
     { metric: 'Balance', score: balance },
     { metric: 'Constructiveness', score: constructiveness },
+    { metric: 'Conviction', score: conviction },
   ]
 
   const pieData = [
@@ -334,6 +430,11 @@ export async function fetchPulseHealth(): Promise<HealthSummary> {
     { type: 'Neutral', value: neutral },
     { type: 'Negative', value: negative },
   ]
+
+  const totalWeightedVotes = votes.reduce(
+    (acc, vote) => acc + Math.abs(toFiniteNumber(vote.weighted_value)),
+    0,
+  )
 
   return {
     refreshedAt: new Date().toISOString(),
@@ -349,6 +450,9 @@ export async function fetchPulseHealth(): Promise<HealthSummary> {
       data: pieData,
       angleField: 'value',
       colorField: 'type',
+      meta: {
+        totalWeightedVotes,
+      },
     },
   }
 }
