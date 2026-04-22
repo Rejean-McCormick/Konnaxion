@@ -1,8 +1,3 @@
-Voici une version unifiée du doc **How to nest**, couvrant les **5 modules** et déjà adaptée au renommage en `KeenPageShell` (au lieu de `KeenPage`).
-Tu peux la coller telle quelle dans ton repo et l’utiliser comme référence pour corriger les 20 fichiers KeenKonnect et les autres modules.
-
----
-
 # Layout shells – How to nest (5 modules)
 
 Objectif :

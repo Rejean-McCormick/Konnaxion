@@ -1,17 +1,15 @@
-// FILE: frontend/app/reports/custom/page.tsx
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
-  PageContainer,
   ProCard,
   ProForm,
-  ProFormText,
-  ProFormSelect,
-  ProFormDateRangePicker,
   ProFormCheckbox,
-  ProFormSwitch,
+  ProFormDateRangePicker,
+  ProFormSelect,
   ProFormSlider,
+  ProFormSwitch,
+  ProFormText,
 } from '@ant-design/pro-components';
 import {
   Alert,
@@ -25,22 +23,23 @@ import {
   Typography,
 } from 'antd';
 import {
+  LineChartOutlined,
   PlayCircleOutlined,
   SaveOutlined,
   SettingOutlined,
-  BarChartOutlined,
-  LineChartOutlined
 } from '@ant-design/icons';
 import {
-  AreaChart,
   Area,
+  AreaChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend
 } from 'recharts';
+
+import ReportsPageShell from '../ReportsPageShell';
 
 const { Text } = Typography;
 
@@ -54,19 +53,19 @@ type ReportConfig = {
   isPublic?: boolean;
 };
 
-// Mock data generator for the preview chart
 const generatePreviewData = (metric: string | undefined) => {
   const data = [];
   const baseValue = metric === 'api_error_rate' ? 2 : 1200;
-  
+
   for (let i = 1; i <= 14; i++) {
-    const val = baseValue + (Math.random() * baseValue * 0.2);
+    const val = baseValue + Math.random() * baseValue * 0.2;
     data.push({
       date: `Nov ${i}`,
       value: Math.round(val),
-      prevValue: Math.round(val * 0.9) // Simulated previous period
+      prevValue: Math.round(val * 0.9),
     });
   }
+
   return data;
 };
 
@@ -74,7 +73,6 @@ export default function CustomReportBuilderPage(): JSX.Element {
   const [config, setConfig] = useState<ReportConfig | null>(null);
   const [hasPreview, setHasPreview] = useState(false);
 
-  // Generate preview data when config changes
   const previewData = useMemo(() => {
     if (!hasPreview) return [];
     return generatePreviewData(config?.primaryMetric);
@@ -92,33 +90,29 @@ export default function CustomReportBuilderPage(): JSX.Element {
       mau: 'Active Users',
       session_duration: 'Avg Session (min)',
       api_latency_p95: 'Latency P95 (ms)',
-      api_error_rate: 'Error Rate (%)'
+      api_error_rate: 'Error Rate (%)',
     };
     return map[key || ''] || 'Metric';
   };
 
   return (
-    <PageContainer
-      header={{
-        title: 'Custom report builder',
-        subTitle:
-          'Compose your own Insights view by picking metrics, dimensions, filters, and layout.',
-        extra: [
-          <Button key="run" type="primary" icon={<PlayCircleOutlined />}>
-            Run once
-          </Button>,
-          <Button key="save" icon={<SaveOutlined />}>
-            Save as preset
-          </Button>,
-          <Button key="settings" icon={<SettingOutlined />}>
-            Manage presets
-          </Button>,
-        ],
-      }}
-      ghost
+    <ReportsPageShell
+      title="Custom report builder"
+      description="Compose your own Insights view by picking metrics, dimensions, filters, and layout."
+      metaTitle="Reports · Custom report builder"
+      primaryAction={
+        <Button type="primary" icon={<PlayCircleOutlined />}>
+          Run once
+        </Button>
+      }
+      secondaryActions={
+        <Space wrap>
+          <Button icon={<SaveOutlined />}>Save as preset</Button>
+          <Button icon={<SettingOutlined />}>Manage presets</Button>
+        </Space>
+      }
     >
       <ProCard gutter={[16, 16]} split="vertical">
-        {/* Left: configuration form */}
         <ProCard
           colSpan={{ xs: 24, lg: 11, xxl: 10 }}
           title="Configure report"
@@ -229,7 +223,6 @@ export default function CustomReportBuilderPage(): JSX.Element {
           </ProForm>
         </ProCard>
 
-        {/* Right: live preview */}
         <ProCard
           colSpan="auto"
           title="Live preview"
@@ -244,11 +237,7 @@ export default function CustomReportBuilderPage(): JSX.Element {
           {!hasPreview ? (
             <Empty description="Configure your report on the left, then click “Update preview” to see a mock preview." />
           ) : (
-            <Space
-              direction="vertical"
-              size="large"
-              style={{ width: '100%' }}
-            >
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
               <Alert
                 type="info"
                 showIcon
@@ -262,7 +251,6 @@ export default function CustomReportBuilderPage(): JSX.Element {
                 }
               />
 
-              {/* High level numbers */}
               <Space
                 size={16}
                 wrap
@@ -275,8 +263,8 @@ export default function CustomReportBuilderPage(): JSX.Element {
                     config?.primaryMetric === 'api_latency_p95'
                       ? ' ms'
                       : config?.primaryMetric === 'api_error_rate'
-                      ? ' %'
-                      : ''
+                        ? ' %'
+                        : ''
                   }
                 />
                 <Statistic
@@ -287,17 +275,20 @@ export default function CustomReportBuilderPage(): JSX.Element {
                   prefix="+"
                   suffix="%"
                 />
-                <Statistic title="Segments" value={config?.dimensions?.length || 0} />
+                <Statistic
+                  title="Segments"
+                  value={config?.dimensions?.length || 0}
+                />
               </Space>
 
               <Divider />
 
-              {/* Mocked breakdown list */}
               <List
                 size="small"
                 header={
                   <Text strong>
-                    Example breakdown by {config?.dimensions?.[0] || 'Segment'} (placeholder)
+                    Example breakdown by{' '}
+                    {config?.dimensions?.[0] || 'Segment'} (placeholder)
                   </Text>
                 }
                 dataSource={[
@@ -317,11 +308,10 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
               <Divider />
 
-              {/* Functional Chart Preview */}
               <ProCard
                 ghost
-                title="Trend Visualization"
-                extra={<Tag icon={<LineChartOutlined />}>Mock Data</Tag>}
+                title="Trend visualization"
+                extra={<Tag icon={<LineChartOutlined />}>Mock data</Tag>}
               >
                 <div style={{ width: '100%', height: 300 }}>
                   <ResponsiveContainer>
@@ -331,22 +321,22 @@ export default function CustomReportBuilderPage(): JSX.Element {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Area 
-                        type="monotone" 
-                        dataKey="value" 
-                        name="Current Period" 
-                        stroke="#1890ff" 
-                        fill="#1890ff" 
-                        fillOpacity={0.1} 
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        name="Current Period"
+                        stroke="#1890ff"
+                        fill="#1890ff"
+                        fillOpacity={0.1}
                       />
                       {config?.breakdowns?.includes('compare_prev') && (
-                        <Area 
-                          type="monotone" 
-                          dataKey="prevValue" 
-                          name="Previous Period" 
-                          stroke="#faad14" 
-                          fill="#faad14" 
-                          fillOpacity={0.1} 
+                        <Area
+                          type="monotone"
+                          dataKey="prevValue"
+                          name="Previous Period"
+                          stroke="#faad14"
+                          fill="#faad14"
+                          fillOpacity={0.1}
                           strokeDasharray="5 5"
                         />
                       )}
@@ -358,6 +348,6 @@ export default function CustomReportBuilderPage(): JSX.Element {
           )}
         </ProCard>
       </ProCard>
-    </PageContainer>
+    </ReportsPageShell>
   );
 }

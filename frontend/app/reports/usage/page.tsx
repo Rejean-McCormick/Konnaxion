@@ -1,4 +1,3 @@
-// FILE: frontend/app/reports/usage/page.tsx
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -42,6 +41,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+
+import ReportsPageShell from '../ReportsPageShell';
 
 const { Text, Title } = Typography;
 
@@ -90,7 +91,6 @@ function getAggregates(report: UsageReport | undefined) {
   const points = report.points;
   const modules = report.modules;
 
-  // points.length > 0 is guaranteed by the guard above
   const lastPoint = points[points.length - 1] as UsagePoint;
 
   const uniqueUsers = Math.max(...points.map((p) => p.activeUsers));
@@ -156,11 +156,7 @@ const moduleColumns: ColumnsType<ModuleRow> = [
           format={(p) => `${p}%`}
         />
         <Tag color={value >= 80 ? 'green' : value >= 70 ? 'blue' : 'gold'}>
-          {value >= 80
-            ? 'Strong'
-            : value >= 70
-            ? 'Healthy'
-            : 'Watch'}
+          {value >= 80 ? 'Strong' : value >= 70 ? 'Healthy' : 'Watch'}
         </Tag>
       </Space>
     ),
@@ -184,25 +180,24 @@ const moduleColumns: ColumnsType<ModuleRow> = [
 
 export default function ReportsUsagePage() {
   const [range, setRange] = useState<TimeRangeKey>('30d');
-
   const [data, setData] = useState<UsageReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  // REAL API FETCH
   const fetchData = async (r: TimeRangeKey) => {
     setLoading(true);
     setError(false);
+
     try {
       const response = await fetch(`/api/reports/usage/?range=${r}`);
       if (!response.ok) {
         throw new Error('Failed to fetch usage data');
       }
+
       const raw: unknown = await response.json();
       const report = raw as UsageReport;
       setData(report);
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error(err);
       setError(true);
     } finally {
@@ -223,6 +218,9 @@ export default function ReportsUsagePage() {
     ? new Date(data.generatedAt).toLocaleTimeString()
     : null;
 
+  const shellDescription =
+    'Track adoption, active usage, and module-level activity across the platform.';
+
   const headerExtra = (
     <Space wrap>
       {lastUpdatedLabel && (
@@ -237,6 +235,7 @@ export default function ReportsUsagePage() {
           />
         </Tooltip>
       )}
+
       <Segmented<TimeRangeKey>
         value={range}
         onChange={(val) => setRange(val as TimeRangeKey)}
@@ -246,6 +245,7 @@ export default function ReportsUsagePage() {
           { label: '90 days', value: '90d' },
         ]}
       />
+
       <Tooltip title="Reload usage snapshot">
         <Button
           icon={<ReloadOutlined />}
@@ -261,30 +261,22 @@ export default function ReportsUsagePage() {
 
   if (loading && !data) {
     return (
-      <PageContainer
-        ghost
-        header={{
-          title: 'Usage Analytics',
-          breadcrumb: {
-            routes: [
-              { path: '/reports', breadcrumbName: 'Reports' },
-              { path: '', breadcrumbName: 'Usage' },
-            ],
-          },
-        }}
-        extra={headerExtra}
+      <ReportsPageShell
+        title="Usage Analytics"
+        description={shellDescription}
+        secondaryActions={headerExtra}
       >
         <Skeleton active />
-      </PageContainer>
+      </ReportsPageShell>
     );
   }
 
   if (error) {
     return (
-      <PageContainer
-        ghost
-        header={{ title: 'Usage Analytics' }}
-        extra={headerExtra}
+      <ReportsPageShell
+        title="Usage Analytics"
+        description={shellDescription}
+        secondaryActions={headerExtra}
       >
         <ProCard>
           <Space
@@ -298,6 +290,7 @@ export default function ReportsUsagePage() {
                 Unable to load usage data right now.
               </Text>
             </Space>
+
             <Button
               icon={<ReloadOutlined />}
               onClick={() => fetchData(range)}
@@ -307,19 +300,19 @@ export default function ReportsUsagePage() {
             </Button>
           </Space>
         </ProCard>
-      </PageContainer>
+      </ReportsPageShell>
     );
   }
 
   if (!data) {
     return (
-      <PageContainer
-        ghost
-        header={{ title: 'Usage Analytics' }}
-        extra={headerExtra}
+      <ReportsPageShell
+        title="Usage Analytics"
+        description={shellDescription}
+        secondaryActions={headerExtra}
       >
         <Empty description="No usage data available yet" />
-      </PageContainer>
+      </ReportsPageShell>
     );
   }
 
@@ -327,197 +320,193 @@ export default function ReportsUsagePage() {
     aggregates;
 
   return (
-    <PageContainer
-      ghost
-      header={{
-        title: 'Usage Analytics',
-        breadcrumb: {
-          routes: [
-            { path: '/reports', breadcrumbName: 'Reports' },
-            { path: '', breadcrumbName: 'Usage' },
-          ],
-        },
-      }}
-      extra={headerExtra}
+    <ReportsPageShell
+      title="Usage Analytics"
+      description={shellDescription}
+      secondaryActions={headerExtra}
     >
-      <Space
-        direction="vertical"
-        size="large"
-        style={{ width: '100%' }}
-      >
-        {/* Intro / context */}
-        <ProCard ghost>
-          <Space
-            direction="vertical"
-            size={4}
-            style={{ width: '100%' }}
-          >
-            <Title level={4} style={{ marginBottom: 0 }}>
-              Platform usage overview
-            </Title>
-            <Text type="secondary">
-              Snapshot of how many people are actively using Konnaxion,
-              which modules they touch, and how this evolves over time.
-              Data is aggregated from sign-ins, page views and workspace
-              events.
-            </Text>
-          </Space>
-        </ProCard>
-
-        {/* KPI strip */}
-        <ProCard ghost gutter={16} wrap>
-          <StatisticCard
-            statistic={{
-              title: (
-                <Space size={4}>
-                  <TeamOutlined />
-                  <span>Total unique users</span>
-                </Space>
-              ),
-              value: totalUniqueUsers,
-              suffix: 'users',
-            }}
-          />
-          <StatisticCard
-            statistic={{
-              title: (
-                <Space size={4}>
-                  <UserOutlined />
-                  <span>Active today</span>
-                </Space>
-              ),
-              value: activeToday,
-              suffix: 'users',
-            }}
-          />
-          <StatisticCard
-            statistic={{
-              title: (
-                <Space size={4}>
-                  <UserAddOutlined />
-                  <span>New in period</span>
-                </Space>
-              ),
-              value: newInPeriod,
-              suffix: 'signups',
-            }}
-          />
-          <StatisticCard
-            statistic={{
-              title: (
-                <Space size={4}>
-                  <ProjectOutlined />
-                  <span>Modules touched</span>
-                </Space>
-              ),
-              value: modulesTouched,
-              suffix: '/ 5',
-            }}
-          />
-        </ProCard>
-
-        {/* Time series + quick notes */}
-        <ProCard gutter={16} wrap>
-          <ProCard
-            colSpan={{ xs: 24, lg: 16 }}
-            title="Active vs New Users"
-          >
-            <div style={{ height: 300, width: '100%' }}>
-              <ResponsiveContainer>
-                <LineChart data={data.points}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="label" />
-                  <YAxis />
-                  <RechartsTooltip />
-                  <Legend />
-                  <Line
-                    type="monotone"
-                    dataKey="activeUsers"
-                    name="Active Users"
-                    stroke="#1890ff"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="newUsers"
-                    name="New Signups"
-                    stroke="#52c41a"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </ProCard>
-
-          <ProCard
-            colSpan={{ xs: 24, lg: 8 }}
-            title="Highlights"
-          >
+      <PageContainer ghost>
+        <Space
+          direction="vertical"
+          size="large"
+          style={{ width: '100%' }}
+        >
+          {/* Intro / context */}
+          <ProCard ghost>
             <Space
               direction="vertical"
-              size="middle"
+              size={4}
               style={{ width: '100%' }}
             >
-              <Space align="start">
-                <Tag icon={<BarChartOutlined />} color="blue">
-                  Concentration
-                </Tag>
-                <Text type="secondary">
-                  Most activity is concentrated in the last few days of
-                  the selected range. Use shorter windows (7 days) to
-                  monitor spikes after launches.
-                </Text>
-              </Space>
-              <Space align="start">
-                <Tag icon={<UserOutlined />} color="green">
-                  Engagement
-                </Tag>
-                <Text type="secondary">
-                  Combine active users with retention per module to
-                  identify where people stay engaged vs. where they
-                  churn quickly.
-                </Text>
-              </Space>
-              <Space align="start">
-                <Tag icon={<CalendarOutlined />} color="gold">
-                  Seasonality
-                </Tag>
-                <Text type="secondary">
-                  Expand to 90 days to detect weekly patterns (e.g.
-                  higher usage around events or recurring workshops).
-                </Text>
-              </Space>
+              <Title level={5} style={{ marginBottom: 0 }}>
+                Overview
+              </Title>
+              <Text type="secondary">
+                Snapshot of how many people are actively using Konnaxion,
+                which modules they touch, and how this evolves over time.
+                Data is aggregated from sign-ins, page views and workspace
+                events.
+              </Text>
             </Space>
           </ProCard>
-        </ProCard>
 
-        <Divider />
+          {/* KPI strip */}
+          <ProCard ghost gutter={16} wrap>
+            <StatisticCard
+              statistic={{
+                title: (
+                  <Space size={4}>
+                    <TeamOutlined />
+                    <span>Total unique users</span>
+                  </Space>
+                ),
+                value: totalUniqueUsers,
+                suffix: 'users',
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: (
+                  <Space size={4}>
+                    <UserOutlined />
+                    <span>Active today</span>
+                  </Space>
+                ),
+                value: activeToday,
+                suffix: 'users',
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: (
+                  <Space size={4}>
+                    <UserAddOutlined />
+                    <span>New in period</span>
+                  </Space>
+                ),
+                value: newInPeriod,
+                suffix: 'signups',
+              }}
+            />
+            <StatisticCard
+              statistic={{
+                title: (
+                  <Space size={4}>
+                    <ProjectOutlined />
+                    <span>Modules touched</span>
+                  </Space>
+                ),
+                value: modulesTouched,
+                suffix: '/ 5',
+              }}
+            />
+          </ProCard>
 
-        {/* Usage by module */}
-        <ProCard
-          title={
-            <Space>
-              <ProjectOutlined />
-              <span>Usage by module</span>
-            </Space>
-          }
-          extra={
-            <Tooltip title="Per-module usage is aggregated from backend logs.">
-              <InfoCircleOutlined />
-            </Tooltip>
-          }
-        >
-          <Table<ModuleRow>
-            size="middle"
-            rowKey="key"
-            columns={moduleColumns}
-            dataSource={data.modules}
-            pagination={{ pageSize: 8 }}
-          />
-        </ProCard>
-      </Space>
-    </PageContainer>
+          {/* Time series + quick notes */}
+          <ProCard gutter={16} wrap>
+            <ProCard
+              colSpan={{ xs: 24, lg: 16 }}
+              title="Active vs New Users"
+            >
+              <div style={{ height: 300, width: '100%' }}>
+                <ResponsiveContainer>
+                  <LineChart data={data.points}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="label" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Line
+                      type="monotone"
+                      dataKey="activeUsers"
+                      name="Active Users"
+                      stroke="#1890ff"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="newUsers"
+                      name="New Signups"
+                      stroke="#52c41a"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </ProCard>
+
+            <ProCard
+              colSpan={{ xs: 24, lg: 8 }}
+              title="Highlights"
+            >
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <Space align="start">
+                  <Tag icon={<BarChartOutlined />} color="blue">
+                    Concentration
+                  </Tag>
+                  <Text type="secondary">
+                    Most activity is concentrated in the last few days of
+                    the selected range. Use shorter windows (7 days) to
+                    monitor spikes after launches.
+                  </Text>
+                </Space>
+
+                <Space align="start">
+                  <Tag icon={<UserOutlined />} color="green">
+                    Engagement
+                  </Tag>
+                  <Text type="secondary">
+                    Combine active users with retention per module to
+                    identify where people stay engaged vs. where they
+                    churn quickly.
+                  </Text>
+                </Space>
+
+                <Space align="start">
+                  <Tag icon={<CalendarOutlined />} color="gold">
+                    Seasonality
+                  </Tag>
+                  <Text type="secondary">
+                    Expand to 90 days to detect weekly patterns (e.g.
+                    higher usage around events or recurring workshops).
+                  </Text>
+                </Space>
+              </Space>
+            </ProCard>
+          </ProCard>
+
+          <Divider />
+
+          {/* Usage by module */}
+          <ProCard
+            title={
+              <Space>
+                <ProjectOutlined />
+                <span>Usage by module</span>
+              </Space>
+            }
+            extra={
+              <Tooltip title="Per-module usage is aggregated from backend logs.">
+                <InfoCircleOutlined />
+              </Tooltip>
+            }
+          >
+            <Table<ModuleRow>
+              size="middle"
+              rowKey="key"
+              columns={moduleColumns}
+              dataSource={data.modules}
+              pagination={{ pageSize: 8 }}
+            />
+          </ProCard>
+        </Space>
+      </PageContainer>
+    </ReportsPageShell>
   );
 }

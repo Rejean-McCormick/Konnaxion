@@ -1,13 +1,7 @@
-// middleware.ts
 import { NextResponse, type NextRequest } from 'next/server';
-import { AUTH0_ENABLED, auth0 } from './lib/auth0';
 
-export async function middleware(request: NextRequest) {
-  if (!AUTH0_ENABLED || !auth0) {
-    return NextResponse.next();
-  }
-
-  return auth0.middleware(request);
+export function middleware(_request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
