@@ -20,10 +20,7 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import {
-  ReloadOutlined,
-  InfoCircleOutlined,
-} from '@ant-design/icons';
+import { ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import {
   Area,
   AreaChart,
@@ -141,14 +138,34 @@ function buildMockSeries(range: TimeRange): ApiSeriesPoint[] {
     range === '24h'
       ? ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00']
       : range === '7d'
-      ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-      : ['W1', 'W2', 'W3', 'W4'];
+        ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        : ['W1', 'W2', 'W3', 'W4'];
 
   return points.map((label, index) => ({
     time: label,
     latency: [260, 280, 310, 295, 340, 320, 300][index] ?? 300,
     errors: [0.3, 0.4, 0.5, 0.35, 0.8, 0.6, 0.45][index] ?? 0.5,
   }));
+}
+
+function normalizePerfResponse(
+  data: Partial<ApiPerfResponse> | null | undefined,
+  range: TimeRange,
+): { summary: ApiSummary; series: ApiSeriesPoint[] } {
+  return {
+    summary: {
+      p95LatencyMs: data?.summary?.p95LatencyMs ?? 320,
+      p99LatencyMs: data?.summary?.p99LatencyMs ?? 780,
+      errorRatePct: data?.summary?.errorRatePct ?? 0.8,
+      throughputRps: data?.summary?.throughputRps ?? 420,
+      apdex: data?.summary?.apdex ?? 0.93,
+      uptimePct: data?.summary?.uptimePct ?? 99.85,
+    },
+    series:
+      Array.isArray(data?.series) && data!.series.length > 0
+        ? data!.series
+        : buildMockSeries(range),
+  };
 }
 
 export default function PerfReportPage(): JSX.Element {
@@ -163,59 +180,28 @@ export default function PerfReportPage(): JSX.Element {
     setError(null);
 
     try {
-      const res = await fetch(`/_api/admin/stats`, {
+      const perfRes = await fetch(`/api/reports/perf/?range=${nextRange}`, {
         cache: 'no-store',
+        credentials: 'include',
       });
 
-      if (!res.ok) {
-        throw new Error(`Request failed with status ${res.status}`);
+      if (!perfRes.ok) {
+        throw new Error(`Request failed with status ${perfRes.status}`);
       }
 
-      const perfRes = await fetch(`/reports/perf?range=${nextRange}`, {
-        cache: 'no-store',
-      });
+      const data = (await perfRes.json()) as Partial<ApiPerfResponse>;
+      const normalized = normalizePerfResponse(data, nextRange);
 
-      if (perfRes.ok) {
-        const data = (await perfRes.json()) as Partial<ApiPerfResponse>;
-
-        setSummary({
-          p95LatencyMs: data.summary?.p95LatencyMs ?? 320,
-          p99LatencyMs: data.summary?.p99LatencyMs ?? 760,
-          errorRatePct: data.summary?.errorRatePct ?? 0.7,
-          throughputRps: data.summary?.throughputRps ?? 82,
-          apdex: data.summary?.apdex ?? 0.94,
-          uptimePct: data.summary?.uptimePct ?? 99.95,
-        });
-
-        setSeries(
-          Array.isArray(data.series) && data.series.length > 0
-            ? data.series
-            : buildMockSeries(nextRange),
-        );
-      } else {
-        setSummary({
-          p95LatencyMs: 320,
-          p99LatencyMs: 760,
-          errorRatePct: 0.7,
-          throughputRps: 82,
-          apdex: 0.94,
-          uptimePct: 99.95,
-        });
-        setSeries(buildMockSeries(nextRange));
-      }
+      setSummary(normalized.summary);
+      setSeries(normalized.series);
     } catch {
       setError(
         'Performance data is temporarily unavailable. Showing fallback sample metrics.',
       );
-      setSummary({
-        p95LatencyMs: 320,
-        p99LatencyMs: 760,
-        errorRatePct: 0.7,
-        throughputRps: 82,
-        apdex: 0.94,
-        uptimePct: 99.95,
-      });
-      setSeries(buildMockSeries(nextRange));
+
+      const normalized = normalizePerfResponse(undefined, nextRange);
+      setSummary(normalized.summary);
+      setSeries(normalized.series);
     } finally {
       setLoading(false);
     }
@@ -294,12 +280,12 @@ export default function PerfReportPage(): JSX.Element {
         options={TIME_RANGE_OPTIONS}
         onChange={(value) => setRange(value)}
       />
-      <RangePicker allowClear={false} value={[dayjs().subtract(7, 'day'), dayjs()]} />
+      <RangePicker
+        allowClear={false}
+        value={[dayjs().subtract(7, 'day'), dayjs()]}
+      />
       <Tooltip title="Refresh performance metrics">
-        <Button
-          icon={<ReloadOutlined />}
-          onClick={() => void loadReport(range)}
-        >
+        <Button icon={<ReloadOutlined />} onClick={() => void loadReport(range)}>
           Refresh
         </Button>
       </Tooltip>
@@ -345,12 +331,20 @@ export default function PerfReportPage(): JSX.Element {
         <Row gutter={[16, 16]}>
           <Col xs={24} md={12} xl={6}>
             <Card>
-              <Statistic title="P95 latency" value={summary.p95LatencyMs} suffix="ms" />
+              <Statistic
+                title="P95 latency"
+                value={summary.p95LatencyMs}
+                suffix="ms"
+              />
             </Card>
           </Col>
           <Col xs={24} md={12} xl={6}>
             <Card>
-              <Statistic title="P99 latency" value={summary.p99LatencyMs} suffix="ms" />
+              <Statistic
+                title="P99 latency"
+                value={summary.p99LatencyMs}
+                suffix="ms"
+              />
             </Card>
           </Col>
           <Col xs={24} md={12} xl={6}>
@@ -458,11 +452,18 @@ export default function PerfReportPage(): JSX.Element {
 
           <Col xs={24} lg={9}>
             <Card title="SLO overview">
-              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
                 <div>
                   <Text strong>Latency SLO (p95 &lt; 400ms)</Text>
                   <Progress
-                    percent={Math.min(100, (400 / Math.max(summary.p95LatencyMs, 1)) * 100)}
+                    percent={Math.min(
+                      100,
+                      (400 / Math.max(summary.p95LatencyMs, 1)) * 100,
+                    )}
                     status={summary.p95LatencyMs <= 400 ? 'active' : 'exception'}
                     showInfo={false}
                   />
@@ -474,12 +475,16 @@ export default function PerfReportPage(): JSX.Element {
                 <div>
                   <Text strong>Error SLO (rate &lt; 1.0%)</Text>
                   <Progress
-                    percent={Math.min(100, (1 / Math.max(summary.errorRatePct, 0.01)) * 100)}
+                    percent={Math.min(
+                      100,
+                      (1 / Math.max(summary.errorRatePct, 0.01)) * 100,
+                    )}
                     status={summary.errorRatePct < 1 ? 'active' : 'exception'}
                     showInfo={false}
                   />
                   <Text type="secondary">
-                    Current error rate: {summary.errorRatePct.toFixed(2)}% (target &lt; 1.0%)
+                    Current error rate: {summary.errorRatePct.toFixed(2)}% (target
+                    &lt; 1.0%)
                   </Text>
                 </div>
 

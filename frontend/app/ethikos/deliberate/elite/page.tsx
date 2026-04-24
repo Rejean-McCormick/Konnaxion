@@ -1,4 +1,3 @@
-// FILE: frontend/app/ethikos/deliberate/elite/page.tsx
 'use client';
 
 import React from 'react';
@@ -16,6 +15,7 @@ import {
 } from '@ant-design/pro-components';
 import {
   Alert,
+  App,
   Button,
   Drawer,
   Empty,
@@ -23,7 +23,6 @@ import {
   Tag,
   Tooltip,
   Typography,
-  message as antdMessage,
 } from 'antd';
 import {
   PlusOutlined,
@@ -135,8 +134,8 @@ function normalizeTopic(raw: RawEliteTopic): TopicRow {
     typeof raw.stanceCount === 'number'
       ? raw.stanceCount
       : typeof raw.total_votes === 'number'
-      ? raw.total_votes
-      : 0;
+        ? raw.total_votes
+        : 0;
 
   const hot =
     typeof raw.hot === 'boolean'
@@ -172,6 +171,7 @@ const useEliteService = () =>
 
 export default function EliteAgora(): JSX.Element {
   const router = useRouter();
+  const { message } = App.useApp();
 
   const eliteService = useEliteService();
   const { data, loading, refresh } = useRequest<{ list: TopicRow[] }, []>(
@@ -180,7 +180,8 @@ export default function EliteAgora(): JSX.Element {
 
   useInterval(refresh, 60_000);
 
-  const [previewId, setPreviewId] = React.useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = React.useState(false);
+  const [previewTopicId, setPreviewTopicId] = React.useState<string | null>(null);
 
   const {
     data: preview,
@@ -188,15 +189,25 @@ export default function EliteAgora(): JSX.Element {
     run: loadPreview,
   } = useRequest<TopicPreview, [string]>(fetchTopicPreview, {
     manual: true,
+    onError: (error) => {
+      console.error('Failed to load topic preview', error);
+      message.error('Could not load topic preview.');
+    },
   });
 
   const openPreview = React.useCallback(
     (row: TopicRow) => {
-      setPreviewId(row.id);
+      setPreviewTopicId(row.id);
+      setPreviewOpen(true);
       loadPreview(row.id);
     },
     [loadPreview],
   );
+
+  const closePreview = React.useCallback(() => {
+    setPreviewOpen(false);
+    setPreviewTopicId(null);
+  }, []);
 
   const rows = data?.list ?? [];
 
@@ -293,6 +304,11 @@ export default function EliteAgora(): JSX.Element {
     preview?.lastActivity ??
     preview?.last_activity;
 
+  const resolvedPreviewId =
+    typeof preview?.id !== 'undefined'
+      ? String(preview.id)
+      : previewTopicId ?? '';
+
   return (
     <EthikosPageShell
       title="Deliberate · Elite Agora"
@@ -364,8 +380,8 @@ export default function EliteAgora(): JSX.Element {
 
         <Drawer
           width={520}
-          open={!!previewId}
-          onClose={() => setPreviewId(null)}
+          open={previewOpen}
+          onClose={closePreview}
           title={preview?.title || 'Preview'}
         >
           {previewLoading ? (
@@ -409,13 +425,16 @@ export default function EliteAgora(): JSX.Element {
 
               <Button
                 type="primary"
-                onClick={() => router.push(`/ethikos/deliberate/${preview.id}`)}
+                disabled={!resolvedPreviewId}
+                onClick={() =>
+                  router.push(`/ethikos/deliberate/${resolvedPreviewId}`)
+                }
               >
                 Go to thread →
               </Button>
             </>
           ) : (
-            <Empty />
+            <Empty description="No preview data available." />
           )}
         </Drawer>
       </PageContainer>
@@ -425,6 +444,7 @@ export default function EliteAgora(): JSX.Element {
 
 function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   const [visible, setVisible] = React.useState(false);
+  const { message } = App.useApp();
 
   const { data: categories, loading: loadingCategories } = useRequest<
     EthikosCategoryOption[],
@@ -437,9 +457,13 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }) {
   >(createEliteTopic, {
     manual: true,
     onSuccess: () => {
-      antdMessage.success('Topic created');
+      message.success('Topic created');
       setVisible(false);
       onCreated();
+    },
+    onError: (error) => {
+      console.error('Failed to create topic', error);
+      message.error('Could not create topic.');
     },
   });
 

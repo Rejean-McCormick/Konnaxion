@@ -36,6 +36,19 @@ def _join_media_url(path: str) -> str:
     return f"{base}/{rel}"
 
 
+def _safe_file_url(file_field) -> str | None:
+    """
+    Safely read `.url` from a Django FileField/ImageField-like object.
+    Returns None when no file is associated.
+    """
+    if not file_field:
+        return None
+    try:
+        return file_field.url
+    except (ValueError, AttributeError):
+        return None
+
+
 class UserSerializer(serializers.ModelSerializer[User]):
     # Exposed to the frontend: absolute URL for the user's avatar (or default)
     avatar_url = serializers.SerializerMethodField()
@@ -62,20 +75,19 @@ class UserSerializer(serializers.ModelSerializer[User]):
         artwork = getattr(obj, "profile_artwork", None)
         if artwork is not None:
             media = getattr(artwork, "media_file", None)
-            url = getattr(media, "url", None) if media is not None else None
+            url = _safe_file_url(media)
             if url:
                 if _is_absolute(url):
                     return url
                 return request.build_absolute_uri(url) if request else url
 
-        # 2) Backward‑compat: old direct ImageField `avatar` if it still exists
+        # 2) Backward-compat: old direct ImageField `avatar` if it still exists
         avatar = getattr(obj, "avatar", None)
-        if avatar is not None:
-            url = getattr(avatar, "url", None)
-            if url:
-                if _is_absolute(url):
-                    return url
-                return request.build_absolute_uri(url) if request else url
+        url = _safe_file_url(avatar)
+        if url:
+            if _is_absolute(url):
+                return url
+            return request.build_absolute_uri(url) if request else url
 
         # 3) Default placeholder in MEDIA
         fallback_rel = _join_media_url(DEFAULT_AVATAR_PATH)

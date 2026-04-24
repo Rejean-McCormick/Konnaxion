@@ -1,8 +1,6 @@
-// FILE: frontend/app/ethikos/decide/public/page.tsx
-// app/ethikos/decide/public/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import {
   PageContainer,
@@ -13,6 +11,7 @@ import {
 import type { ProColumns } from '@ant-design/pro-components';
 import {
   Alert,
+  App,
   Button,
   Empty,
   Input,
@@ -23,16 +22,15 @@ import {
   Tag,
   Tooltip,
   Typography,
-  message,
 } from 'antd';
 import type { RadioChangeEvent } from 'antd';
 import {
   BarChartOutlined,
   InfoCircleOutlined,
-  ThunderboltOutlined,
   SyncOutlined,
+  ThunderboltOutlined,
 } from '@ant-design/icons';
-import { useRequest, useInterval } from 'ahooks';
+import { useInterval, useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
@@ -47,7 +45,6 @@ const { Paragraph } = Typography;
 
 type BallotRow = PublicBallot;
 type QuickFilter = 'all' | 'closing-soon' | 'high-turnout';
-
 type SelectionMap = Record<string, string | undefined>;
 
 const DEFAULT_SCALE_OPTIONS = [
@@ -56,18 +53,52 @@ const DEFAULT_SCALE_OPTIONS = [
   'Neutral',
   'Agree',
   'Strongly agree',
-];
+] as const;
 
 const PAGE_SIZE = 8;
+const CLOSING_SOON_HOURS = 48;
+const HIGH_TURNOUT_THRESHOLD = 50;
 
 function resolveOptions(ballot: BallotRow): string[] {
   if (Array.isArray(ballot.options) && ballot.options.length > 0) {
     return ballot.options;
   }
-  return DEFAULT_SCALE_OPTIONS;
+  return [...DEFAULT_SCALE_OPTIONS];
+}
+
+function isClosingSoon(closesAt?: string | null): boolean {
+  if (!closesAt) return false;
+
+  const closes = dayjs(closesAt);
+  if (!closes.isValid()) return false;
+
+  return closes.diff(dayjs(), 'hour') <= CLOSING_SOON_HOURS;
+}
+
+function getCurrentIndex(
+  selected: string | undefined,
+  options: string[],
+): number {
+  const defaultIndex = Math.floor(options.length / 2);
+  if (!selected) return defaultIndex;
+
+  const idx = options.findIndex(
+    (opt) => opt.toLowerCase() === selected.toLowerCase(),
+  );
+
+  return idx >= 0 ? idx : defaultIndex;
+}
+
+function buildSliderMarks(options: string[]): Record<number, React.ReactNode> {
+  return options.reduce<Record<number, React.ReactNode>>((acc, label, idx) => {
+    acc[idx] = <span style={{ fontSize: 11 }}>{label}</span>;
+    return acc;
+  }, {});
 }
 
 export default function PublicVotingPage(): JSX.Element {
+  const { message } = App.useApp();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
   const [selectedOptions, setSelectedOptions] = useState<SelectionMap>({});
@@ -81,33 +112,28 @@ export default function PublicVotingPage(): JSX.Element {
 
   const ballots = data?.ballots ?? [];
 
-  const headerStats = useMemo(
-    () => {
-      const total = ballots.length;
-      const avgTurnout = total
-        ? Math.round(
-            ballots.reduce((sum, b) => sum + (b.turnout ?? 0), 0) / total,
-          )
-        : 0;
+  const headerStats = useMemo(() => {
+    const total = ballots.length;
 
-      const closingSoon = ballots.filter((ballot) => {
-        const closes = dayjs(ballot.closesAt);
-        if (!closes.isValid()) return false;
-        return closes.diff(dayjs(), 'hour') <= 48;
-      }).length;
+    const avgTurnout = total
+      ? Math.round(
+          ballots.reduce((sum, ballot) => sum + (ballot.turnout ?? 0), 0) / total,
+        )
+      : 0;
 
-      return [
-        { label: 'Active consultations', value: total },
-        { label: 'Avg participation', value: avgTurnout, suffix: '%' },
-        { label: 'Closing ≤ 48h', value: closingSoon },
-      ];
-    },
-    [ballots],
-  );
+    const closingSoon = ballots.filter((ballot) =>
+      isClosingSoon(ballot.closesAt),
+    ).length;
+
+    return [
+      { label: 'Active consultations', value: total },
+      { label: 'Avg participation', value: avgTurnout, suffix: '%' },
+      { label: 'Closing ≤ 48h', value: closingSoon },
+    ];
+  }, [ballots]);
 
   const filteredBallots = useMemo(() => {
     const normalizedSearch = searchTerm.trim().toLowerCase();
-    const now = dayjs();
 
     return ballots.filter((ballot) => {
       if (
@@ -118,172 +144,179 @@ export default function PublicVotingPage(): JSX.Element {
       }
 
       if (quickFilter === 'closing-soon') {
-        const closes = dayjs(ballot.closesAt);
-        if (!closes.isValid()) return false;
-        return closes.diff(now, 'hour') <= 48;
+        return isClosingSoon(ballot.closesAt);
       }
 
       if (quickFilter === 'high-turnout') {
-        return (ballot.turnout ?? 0) >= 50;
+        return (ballot.turnout ?? 0) >= HIGH_TURNOUT_THRESHOLD;
       }
 
       return true;
     });
   }, [ballots, quickFilter, searchTerm]);
 
-  const handleRadioChange = (id: string, e: RadioChangeEvent) => {
+  const handleRadioChange = useCallback((id: string, e: RadioChangeEvent) => {
     const value = e.target.value as string;
     setSelectedOptions((prev) => ({ ...prev, [id]: value }));
-  };
+  }, []);
 
-  const handleSliderChange = (
-    id: string,
-    value: number | [number, number],
-    options: string[],
-  ) => {
-    const rawIndex = Array.isArray(value) ? value[0] : value;
-    if (!options.length) return;
+  const handleSliderChange = useCallback(
+    (id: string, value: number | [number, number], options: string[]) => {
+      if (!options.length) return;
 
-    const safeIndex = Math.min(options.length - 1, Math.max(0, rawIndex));
-    const option = options[safeIndex];
+      const rawIndex = Array.isArray(value) ? value[0] : value;
+      const safeIndex = Math.min(
+        options.length - 1,
+        Math.max(0, Number(rawIndex) || 0),
+      );
 
-    setSelectedOptions((prev) => ({ ...prev, [id]: option }));
-  };
-
-  const handleSubmitVote = async (id: string) => {
-    const option = selectedOptions[id];
-    if (!option) {
-      message.warning('Select a stance before casting your vote.');
-      return;
-    }
-
-    try {
-      setSubmittingId(id);
-      await submitPublicVote(id, option);
-      message.success('Your vote has been recorded.');
-      await refresh();
-    } catch {
-      message.error('Failed to submit your vote. Please try again.');
-    } finally {
-      setSubmittingId(null);
-    }
-  };
-
-  const columns: ProColumns<BallotRow>[] = [
-    {
-      title: 'Question',
-      dataIndex: 'title',
-      width: 320,
-      ellipsis: true,
+      setSelectedOptions((prev) => ({
+        ...prev,
+        [id]: options[safeIndex],
+      }));
     },
-    {
-      title: 'Your stance',
-      dataIndex: 'id',
-      width: 440,
-      render: (_, row) => {
-        const id = String(row.id);
-        const options = resolveOptions(row);
+    [],
+  );
 
-        if (!options.length) {
-          return <Tag color="default">No voting options configured</Tag>;
-        }
+  const handleSubmitVote = useCallback(
+    async (id: string) => {
+      const option = selectedOptions[id];
 
-        const selected = selectedOptions[id];
-        const defaultIndex = Math.floor(options.length / 2);
-        const currentIndex = (() => {
-          if (!selected) return defaultIndex;
-          const idx = options.findIndex(
-            (opt) => opt.toLowerCase() === selected.toLowerCase(),
-          );
-          return idx >= 0 ? idx : defaultIndex;
-        })();
+      if (!option) {
+        message.warning('Select a stance before casting your vote.');
+        return;
+      }
 
-        const marks = options.reduce<Record<number, React.ReactNode>>(
-          (acc, label, idx) => {
-            acc[idx] = <span style={{ fontSize: 11 }}>{label}</span>;
-            return acc;
-          },
-          {},
-        );
+      try {
+        setSubmittingId(id);
+        await submitPublicVote(id, option);
+        message.success('Your vote has been recorded.');
+        await refresh();
+      } catch {
+        message.error('Failed to submit your vote. Please try again.');
+      } finally {
+        setSubmittingId(null);
+      }
+    },
+    [message, refresh, selectedOptions],
+  );
 
-        return (
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Slider
-              min={0}
-              max={options.length - 1}
-              value={currentIndex}
-              marks={marks}
-              tooltip={{ formatter: (val) => options[val ?? defaultIndex] }}
-              onChange={(val) => handleSliderChange(id, val, options)}
-            />
+  const columns = useMemo<ProColumns<BallotRow>[]>(
+    () => [
+      {
+        title: 'Question',
+        dataIndex: 'title',
+        width: 320,
+        ellipsis: true,
+      },
+      {
+        title: 'Your stance',
+        dataIndex: 'id',
+        width: 440,
+        render: (_, row) => {
+          const id = String(row.id);
+          const options = resolveOptions(row);
 
-            <Radio.Group
-              size="small"
-              value={selected}
-              onChange={(e) => handleRadioChange(id, e)}
-            >
-              {options.map((opt) => (
-                <Radio.Button key={opt} value={opt}>
-                  {opt}
-                </Radio.Button>
-              ))}
-            </Radio.Group>
+          if (!options.length) {
+            return <Tag color="default">No voting options configured</Tag>;
+          }
 
-            <Space size="small">
-              <Tag color={selected ? 'geekblue' : 'default'}>
-                {selected ? `Selected: ${selected}` : 'No vote yet'}
-              </Tag>
-              <Button
-                type="primary"
+          const selected = selectedOptions[id];
+          const currentIndex = getCurrentIndex(selected, options);
+          const marks = buildSliderMarks(options);
+
+          return (
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <Slider
+                min={0}
+                max={options.length - 1}
+                value={currentIndex}
+                marks={marks}
+                tooltip={{
+                  formatter: (val) =>
+                    options[val ?? Math.floor(options.length / 2)],
+                }}
+                onChange={(val) => handleSliderChange(id, val, options)}
+              />
+
+              <Radio.Group
                 size="small"
-                icon={<ThunderboltOutlined />}
-                loading={submittingId === id}
-                disabled={!selected || submittingId === id}
-                onClick={() => handleSubmitVote(id)}
+                value={selected}
+                onChange={(e) => handleRadioChange(id, e)}
               >
-                Cast vote
-              </Button>
-            </Space>
-          </Space>
-        );
-      },
-    },
-    {
-      title: 'Closes',
-      dataIndex: 'closesAt',
-      width: 180,
-      valueType: 'dateTime',
-      render: (_, row) => {
-        const closes = dayjs(row.closesAt);
-        const now = dayjs();
-        const diffHours = closes.diff(now, 'hour');
-        const closingSoon = diffHours <= 48;
+                {options.map((opt) => (
+                  <Radio.Button key={opt} value={opt}>
+                    {opt}
+                  </Radio.Button>
+                ))}
+              </Radio.Group>
 
-        return (
-          <Space direction="vertical" size={2}>
-            <span>{closes.format('YYYY-MM-DD HH:mm')}</span>
-            {closingSoon && <Tag color="volcano">Closing soon</Tag>}
-          </Space>
-        );
+              <Space size="small" wrap>
+                <Tag color={selected ? 'geekblue' : 'default'}>
+                  {selected ? `Selected: ${selected}` : 'No vote yet'}
+                </Tag>
+
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<ThunderboltOutlined />}
+                  loading={submittingId === id}
+                  disabled={!selected || submittingId === id}
+                  onClick={() => handleSubmitVote(id)}
+                >
+                  Cast vote
+                </Button>
+              </Space>
+            </Space>
+          );
+        },
       },
-    },
-    {
-      title: 'Turnout',
-      dataIndex: 'turnout',
-      width: 160,
-      render: (_, row) => {
-        const turnout = Math.round(row.turnout ?? 0);
-        const status = turnout >= 50 ? 'active' : 'normal';
-        return (
-          <Progress
-            percent={turnout}
-            size="small"
-            status={status as any}
-          />
-        );
+      {
+        title: 'Closes',
+        dataIndex: 'closesAt',
+        width: 180,
+        valueType: 'dateTime',
+        render: (_, row) => {
+          const closes = dayjs(row.closesAt);
+          const closingSoon = isClosingSoon(row.closesAt);
+
+          return (
+            <Space direction="vertical" size={2}>
+              <span>
+                {closes.isValid()
+                  ? closes.format('YYYY-MM-DD HH:mm')
+                  : 'Date unavailable'}
+              </span>
+              {closingSoon ? <Tag color="volcano">Closing soon</Tag> : null}
+            </Space>
+          );
+        },
       },
-    },
-  ];
+      {
+        title: 'Turnout',
+        dataIndex: 'turnout',
+        width: 160,
+        render: (_, row) => {
+          const turnout = Math.round(row.turnout ?? 0);
+
+          return (
+            <Progress
+              percent={turnout}
+              size="small"
+              status={turnout >= HIGH_TURNOUT_THRESHOLD ? 'success' : 'normal'}
+            />
+          );
+        },
+      },
+    ],
+    [
+      handleRadioChange,
+      handleSliderChange,
+      handleSubmitVote,
+      selectedOptions,
+      submittingId,
+    ],
+  );
 
   return (
     <EthikosPageShell
@@ -291,8 +324,9 @@ export default function PublicVotingPage(): JSX.Element {
       title="Public consultations"
       subtitle={
         <span>
-          Open consultations where any verified participant can express a nuanced stance on
-          Korum debates. Votes use a −3…+3 stance scale and feed into the Ethikos opinion layer.
+          Open consultations where any verified participant can express a nuanced
+          stance on Korum debates. Votes use a −3…+3 stance scale and feed into
+          the Ethikos opinion layer.
         </span>
       }
       primaryAction={
@@ -322,9 +356,9 @@ export default function PublicVotingPage(): JSX.Element {
               <Space>
                 <InfoCircleOutlined />
                 <span>
-                  You can adjust your stance at any time while a consultation is open.
-                  Results feed into the Decide · Results Archive and Ethikos · Opinion
-                  Analytics.
+                  You can adjust your stance at any time while a consultation is
+                  open. Results feed into the Decide · Results Archive and
+                  Ethikos · Opinion Analytics.
                 </span>
               </Space>
             }
@@ -350,8 +384,8 @@ export default function PublicVotingPage(): JSX.Element {
             title="Find an open consultation"
             extra={
               <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                Search by title, or focus on consultations that are closing soon or have
-                high participation.
+                Search by title, or focus on consultations that are closing soon
+                or have high participation.
               </Paragraph>
             }
           >
@@ -367,13 +401,13 @@ export default function PublicVotingPage(): JSX.Element {
               <Radio.Group
                 size="small"
                 value={quickFilter}
-                onChange={(e) =>
-                  setQuickFilter(e.target.value as QuickFilter)
-                }
+                onChange={(e) => setQuickFilter(e.target.value as QuickFilter)}
               >
                 <Radio.Button value="all">All</Radio.Button>
                 <Radio.Button value="closing-soon">Closing soon</Radio.Button>
-                <Radio.Button value="high-turnout">High participation</Radio.Button>
+                <Radio.Button value="high-turnout">
+                  High participation
+                </Radio.Button>
               </Radio.Group>
 
               <Tooltip title="Refresh open consultations">
@@ -381,6 +415,7 @@ export default function PublicVotingPage(): JSX.Element {
                   size="small"
                   icon={<SyncOutlined />}
                   onClick={() => refresh()}
+                  loading={loading}
                 >
                   Refresh
                 </Button>
@@ -409,21 +444,17 @@ export default function PublicVotingPage(): JSX.Element {
             />
           )}
 
-          <ProCard
-            ghost
-            style={{ marginTop: 16 }}
-            title="Where to go next"
-          >
+          <ProCard ghost style={{ marginTop: 16 }} title="Where to go next">
             <Space wrap>
-              <Button href="/ethikos/decide/elite">
-                View elite ballots
-              </Button>
-              <Button href="/ethikos/decide/results" icon={<BarChartOutlined />}>
-                Results archive
-              </Button>
-              <Button href="/ethikos/insights">
-                Opinion analytics
-              </Button>
+              <Link href="/ethikos/decide/elite" prefetch={false}>
+                <Button>View elite ballots</Button>
+              </Link>
+              <Link href="/ethikos/decide/results" prefetch={false}>
+                <Button icon={<BarChartOutlined />}>Results archive</Button>
+              </Link>
+              <Link href="/ethikos/insights" prefetch={false}>
+                <Button>Opinion analytics</Button>
+              </Link>
             </Space>
           </ProCard>
         </Space>

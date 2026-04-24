@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
 import {
   Alert,
+  App,
   Button,
   Card,
   Divider,
@@ -18,7 +19,6 @@ import {
   Tag,
   Timeline,
   Typography,
-  message,
 } from 'antd';
 import { useParams } from 'next/navigation';
 import { useRequest } from 'ahooks';
@@ -69,7 +69,7 @@ interface EthikosArgumentApi {
 interface EthikosStancePoint {
   id: number;
   topic: number;
-  value: number; // -3 … +3
+  value: number;
   timestamp: string;
   user?: string;
 }
@@ -81,11 +81,22 @@ interface UserMeApi {
   url: string;
 }
 
-type Preview = {
+type Statement = {
+  id: string;
+  author: string;
+  body: string;
+  createdAt: string;
+  parentId: string | null;
+};
+
+type TopicPageData = {
   id: string;
   title: string;
+  description: string;
   category: string;
   createdAt: string;
+  status: TopicStatus;
+  statements: Statement[];
   latest: Array<{
     id: string;
     author: string;
@@ -93,20 +104,6 @@ type Preview = {
     createdAt: string;
   }>;
 };
-
-type TopicDetail = {
-  id: string;
-  title: string;
-  statements: Array<{
-    id: string;
-    author: string;
-    body: string;
-    createdAt: string;
-    parentId: string | null;
-  }>;
-};
-
-type Statement = TopicDetail['statements'][number];
 
 interface StanceStats {
   total: number;
@@ -125,10 +122,21 @@ function toTopicId(topicId: string): number {
   return numericId;
 }
 
+function clampStance(value: number): number {
+  return Math.max(-3, Math.min(3, value));
+}
+
 function sortByCreatedDesc<T extends { created_at: string }>(items: T[]): T[] {
   return [...items].sort(
     (a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+  );
+}
+
+function sortByCreatedAsc<T extends { created_at: string }>(items: T[]): T[] {
+  return [...items].sort(
+    (a, b) =>
+      new Date(a.created_at).getTime() - new Date(b.created_at).getTime(),
   );
 }
 
@@ -149,22 +157,20 @@ function computeStanceStats(stances: EthikosStancePoint[]): StanceStats {
   let neutral = 0;
   let negative = 0;
 
-  for (const s of stances) {
-    const v = Math.max(-3, Math.min(3, s.value));
-    counts[v] = (counts[v] ?? 0) + 1;
+  for (const stance of stances) {
+    const value = clampStance(stance.value);
+    counts[value] = (counts[value] ?? 0) + 1;
     total += 1;
-    sum += v;
+    sum += value;
 
-    if (v > 0) positive += 1;
-    else if (v < 0) negative += 1;
+    if (value > 0) positive += 1;
+    else if (value < 0) negative += 1;
     else neutral += 1;
   }
 
-  const average = total > 0 ? sum / total : 0;
-
   return {
     total,
-    average,
+    average: total > 0 ? sum / total : 0,
     positive,
     neutral,
     negative,
@@ -193,27 +199,30 @@ function stanceLabel(value: number): string {
   }
 }
 
-async function loadTopicBundle(topicId: string): Promise<{
-  topic: EthikosTopicApi;
-  argumentsList: EthikosArgumentApi[];
-}> {
+async function fetchTopicPageData(topicId: string): Promise<TopicPageData> {
   const numericId = toTopicId(topicId);
 
-  const [topic, argumentsList] = await Promise.all([
+  const [topic, rawArguments] = await Promise.all([
     get<EthikosTopicApi>(`ethikos/topics/${numericId}/`),
     get<EthikosArgumentApi[]>('ethikos/arguments/', {
       params: { topic: numericId },
     }),
   ]);
 
-  return {
-    topic,
-    argumentsList: (argumentsList ?? []).filter((arg) => !arg.is_hidden),
-  };
-}
+  const argumentsList = (rawArguments ?? []).filter((arg) => !arg.is_hidden);
 
-async function fetchTopicPreview(topicId: string): Promise<Preview> {
-  const { topic, argumentsList } = await loadTopicBundle(topicId);
+  const statements = sortByCreatedAsc(argumentsList).map((arg) => ({
+    id: String(arg.id),
+    author: arg.user,
+    body: arg.content,
+    createdAt: arg.created_at,
+    parentId:
+      arg.parent != null
+        ? String(arg.parent)
+        : arg.parent_id != null
+          ? String(arg.parent_id)
+          : null,
+  }));
 
   const latest = sortByCreatedDesc(argumentsList)
     .slice(0, 5)
@@ -227,57 +236,36 @@ async function fetchTopicPreview(topicId: string): Promise<Preview> {
   return {
     id: String(topic.id),
     title: topic.title,
+    description: topic.description,
     category: topic.category?.name ?? '',
     createdAt: topic.created_at,
+    status: topic.status,
+    statements,
     latest,
-  };
-}
-
-async function fetchTopicDetail(topicId: string): Promise<TopicDetail> {
-  const { topic, argumentsList } = await loadTopicBundle(topicId);
-
-  return {
-    id: String(topic.id),
-    title: topic.title,
-    statements: argumentsList.map((arg) => ({
-      id: String(arg.id),
-      author: arg.user,
-      body: arg.content,
-      createdAt: arg.created_at,
-      parentId:
-        arg.parent != null
-          ? String(arg.parent)
-          : arg.parent_id != null
-          ? String(arg.parent_id)
-          : null,
-    })),
   };
 }
 
 async function fetchTopicStances(topicId: string): Promise<EthikosStancePoint[]> {
   const numericId = Number(topicId);
   if (!Number.isFinite(numericId)) return [];
+
   return get<EthikosStancePoint[]>('ethikos/stances/', {
     params: { topic: numericId },
   });
 }
 
 async function submitTopicStance(topicId: string, value: number): Promise<void> {
-  const numericId = Number(topicId);
-  if (!Number.isFinite(numericId)) {
-    throw new Error(`Invalid topic id: ${topicId}`);
-  }
+  const numericId = toTopicId(topicId);
+
   await post('ethikos/stances/', {
     topic: numericId,
-    value,
+    value: clampStance(value),
   });
 }
 
 async function submitTopicArgument(topicId: string, content: string): Promise<void> {
-  const numericId = Number(topicId);
-  if (!Number.isFinite(numericId)) {
-    throw new Error(`Invalid topic id: ${topicId}`);
-  }
+  const numericId = toTopicId(topicId);
+
   await post('ethikos/arguments/', {
     topic: numericId,
     content,
@@ -285,28 +273,21 @@ async function submitTopicArgument(topicId: string, content: string): Promise<vo
 }
 
 export default function TopicThreadPage(): JSX.Element {
+  const { message } = App.useApp();
+
   const params = useParams<{ topic: string }>();
-  const topicParam = params?.topic;
-  const topicId =
-    typeof topicParam === 'string'
-      ? topicParam
-      : Array.isArray(topicParam)
-      ? topicParam[0]
-      : undefined;
+  const topicId = useMemo(() => {
+    const raw = params?.topic;
+    if (typeof raw === 'string') return raw;
+    if (Array.isArray(raw)) return raw[0];
+    return undefined;
+  }, [params]);
 
   const {
-    data: preview,
-    loading: loadingPreview,
-  } = useRequest<Preview, []>(() => fetchTopicPreview(topicId!), {
-    ready: !!topicId,
-    refreshDeps: [topicId],
-  });
-
-  const {
-    data: detail,
-    loading: loadingDetail,
-    refresh: refreshDetail,
-  } = useRequest<TopicDetail, []>(() => fetchTopicDetail(topicId!), {
+    data: pageData,
+    loading: loadingPageData,
+    refresh: refreshPageData,
+  } = useRequest<TopicPageData, []>(() => fetchTopicPageData(topicId!), {
     ready: !!topicId,
     refreshDeps: [topicId],
   });
@@ -322,33 +303,37 @@ export default function TopicThreadPage(): JSX.Element {
 
   const { data: me } = useRequest<UserMeApi, []>(
     () => get<UserMeApi>('users/me/'),
-    {},
+    {
+      ready: !!topicId,
+    },
   );
 
   const [stanceValue, setStanceValue] = useState<number>(0);
-  const [stanceHydrated, setStanceHydrated] = useState(false);
+  const [hydratedTopicId, setHydratedTopicId] = useState<string | null>(null);
   const [savingStance, setSavingStance] = useState(false);
 
   const [newArgument, setNewArgument] = useState('');
   const [savingArgument, setSavingArgument] = useState(false);
 
   useEffect(() => {
-    if (stanceHydrated) return;
-    if (!me || !stances) return;
+    setHydratedTopicId(null);
+    setStanceValue(0);
+  }, [topicId]);
 
-    const my = stances.find((s) => s.user === me.username);
-    if (my) {
-      setStanceValue(Math.max(-3, Math.min(3, my.value)));
-    }
-    setStanceHydrated(true);
-  }, [me, stances, stanceHydrated]);
+  useEffect(() => {
+    if (!topicId || hydratedTopicId === topicId || !me || !stances) return;
+
+    const mine = stances.find((stance) => stance.user === me.username);
+    setStanceValue(mine ? clampStance(mine.value) : 0);
+    setHydratedTopicId(topicId);
+  }, [topicId, hydratedTopicId, me, stances]);
 
   const stats = useMemo<StanceStats>(
     () => computeStanceStats(stances ?? []),
     [stances],
   );
 
-  const loading = loadingPreview || loadingDetail || loadingStances;
+  const loading = loadingPageData || loadingStances;
 
   const handleSaveStance = async (): Promise<void> => {
     if (!topicId) return;
@@ -359,11 +344,11 @@ export default function TopicThreadPage(): JSX.Element {
       await refreshStances();
       message.success('Your stance has been recorded.');
     } catch (error) {
-      const msg =
+      message.error(
         error instanceof Error
           ? error.message
-          : 'Unable to save your stance right now.';
-      message.error(msg);
+          : 'Unable to save your stance right now.',
+      );
     } finally {
       setSavingStance(false);
     }
@@ -382,14 +367,14 @@ export default function TopicThreadPage(): JSX.Element {
     try {
       await submitTopicArgument(topicId, trimmed);
       setNewArgument('');
-      await Promise.all([refreshDetail(), refreshStances()]);
+      await refreshPageData();
       message.success('Your argument has been added.');
     } catch (error) {
-      const msg =
+      message.error(
         error instanceof Error
           ? error.message
-          : 'Unable to post your argument right now.';
-      message.error(msg);
+          : 'Unable to post your argument right now.',
+      );
     } finally {
       setSavingArgument(false);
     }
@@ -397,10 +382,7 @@ export default function TopicThreadPage(): JSX.Element {
 
   if (!topicId) {
     return (
-      <EthikosPageShell
-        title="Deliberate · Topic"
-        sectionLabel="Deliberate"
-      >
+      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
         <PageContainer ghost>
           <Empty description="Missing topic id" />
         </PageContainer>
@@ -408,12 +390,9 @@ export default function TopicThreadPage(): JSX.Element {
     );
   }
 
-  if (!loading && !preview && !detail) {
+  if (!loading && !pageData) {
     return (
-      <EthikosPageShell
-        title="Deliberate · Topic"
-        sectionLabel="Deliberate"
-      >
+      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
         <PageContainer ghost>
           <Empty description="Topic not found" />
         </PageContainer>
@@ -423,11 +402,11 @@ export default function TopicThreadPage(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title={preview?.title ?? detail?.title ?? 'Deliberate · Topic'}
+      title={pageData?.title ?? 'Deliberate · Topic'}
       sectionLabel="Deliberate"
       subtitle={
-        preview?.category
-          ? `Category: ${preview.category}`
+        pageData?.category
+          ? `Category: ${pageData.category}`
           : 'Threaded debate with stance tracking on the −3…+3 scale.'
       }
     >
@@ -445,7 +424,7 @@ export default function TopicThreadPage(): JSX.Element {
           <ProCard colSpan={{ xs: 24, md: 8 }}>
             <Statistic
               title="Arguments"
-              value={detail?.statements?.length ?? 0}
+              value={pageData?.statements.length ?? 0}
             />
           </ProCard>
         </ProCard>
@@ -457,10 +436,10 @@ export default function TopicThreadPage(): JSX.Element {
               label: 'Thread',
               children: (
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
-                  {detail?.statements?.length ? (
+                  {pageData?.statements.length ? (
                     <ProCard title="Statements thread" ghost>
                       <Timeline
-                        items={detail.statements.map((statement) => ({
+                        items={pageData.statements.map((statement) => ({
                           key: statement.id,
                           children: (
                             <StatementTimelineItem statement={statement} />
@@ -478,12 +457,14 @@ export default function TopicThreadPage(): JSX.Element {
                         Keep your contribution concrete, evidence-based, and relevant
                         to the topic.
                       </Paragraph>
+
                       <TextArea
                         rows={5}
                         value={newArgument}
                         onChange={(e) => setNewArgument(e.target.value)}
                         placeholder="Write your argument here…"
                       />
+
                       <Space>
                         <Button
                           type="primary"
@@ -536,7 +517,11 @@ export default function TopicThreadPage(): JSX.Element {
                           3: '3',
                         }}
                         value={stanceValue}
-                        onChange={(value) => setStanceValue(value)}
+                        onChange={(value) => {
+                          if (typeof value === 'number') {
+                            setStanceValue(value);
+                          }
+                        }}
                       />
 
                       <Space>
@@ -558,7 +543,10 @@ export default function TopicThreadPage(): JSX.Element {
                         stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
 
                       return (
-                        <ProCard key={value} colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}>
+                        <ProCard
+                          key={value}
+                          colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
+                        >
                           <Space
                             direction="vertical"
                             size="small"
@@ -582,32 +570,32 @@ export default function TopicThreadPage(): JSX.Element {
             {
               key: 'preview',
               label: 'Preview',
-              children: preview ? (
+              children: pageData ? (
                 <Space direction="vertical" size="large" style={{ width: '100%' }}>
                   <Card>
                     <Space direction="vertical" size="small">
                       <Title level={4} style={{ marginBottom: 0 }}>
-                        {preview.title}
+                        {pageData.title}
                       </Title>
                       <Space wrap>
-                        {preview.category && <Tag>{preview.category}</Tag>}
+                        {pageData.category && <Tag>{pageData.category}</Tag>}
                         <Text type="secondary">
-                          Opened {dayjs(preview.createdAt).format('YYYY-MM-DD HH:mm')}
+                          Opened {dayjs(pageData.createdAt).format('YYYY-MM-DD HH:mm')}
                         </Text>
                       </Space>
                     </Space>
                   </Card>
 
                   <Card title="Latest highlights" bodyStyle={{ padding: 0 }}>
-                    {preview.latest.length ? (
+                    {pageData.latest.length ? (
                       <List
-                        dataSource={preview.latest}
-                        renderItem={(s) => (
-                          <List.Item key={s.id}>
+                        dataSource={pageData.latest}
+                        renderItem={(statement) => (
+                          <List.Item key={statement.id}>
                             <StatementComment
-                              author={s.author}
-                              datetime={dayjs(s.createdAt).fromNow()}
-                              body={s.body}
+                              author={statement.author}
+                              datetime={dayjs(statement.createdAt).fromNow()}
+                              body={statement.body}
                             />
                           </List.Item>
                         )}
@@ -648,9 +636,11 @@ function StatementTimelineItem({
           {dayjs(statement.createdAt).format('YYYY-MM-DD HH:mm')}
         </Text>
       </div>
-      <Paragraph style={{ marginTop: 4, marginBottom: 0 }}>
+
+      <Paragraph style={{ marginTop: 4, marginBottom: 0, whiteSpace: 'pre-wrap' }}>
         {statement.body}
       </Paragraph>
+
       {statement.parentId && (
         <Text type="secondary">Reply to #{statement.parentId}</Text>
       )}
@@ -685,6 +675,7 @@ function StatementComment({
           </Text>
         )}
       </div>
+
       <Paragraph style={{ marginBottom: 0, whiteSpace: 'pre-wrap' }}>
         {body}
       </Paragraph>

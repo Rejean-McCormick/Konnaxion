@@ -1,6 +1,13 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import type { Dayjs } from 'dayjs';
 import {
   ProCard,
   ProForm,
@@ -10,6 +17,7 @@ import {
   ProFormSlider,
   ProFormSwitch,
   ProFormText,
+  type ProFormInstance,
 } from '@ant-design/pro-components';
 import {
   Alert,
@@ -43,56 +51,291 @@ import ReportsPageShell from '../ReportsPageShell';
 
 const { Text } = Typography;
 
+type BackendMetric = 'smart-vote' | 'usage' | 'perf';
+type GroupBy = 'day' | 'week';
+
 type ReportConfig = {
   name?: string;
-  primaryMetric?: string;
+  primaryMetric?: BackendMetric;
+  timeGrain?: GroupBy;
   dimensions?: string[];
-  range?: [string, string];
-  breakdowns?: string[];
+  range?: [Dayjs, Dayjs];
+  includeRawSamples?: boolean;
   autoRefreshSeconds?: number;
   isPublic?: boolean;
 };
 
-const generatePreviewData = (metric: string | undefined) => {
-  const data = [];
-  const baseValue = metric === 'api_error_rate' ? 2 : 1200;
+type StreamStatus = 'idle' | 'connecting' | 'open' | 'error' | 'closed';
 
-  for (let i = 1; i <= 14; i++) {
-    const val = baseValue + Math.random() * baseValue * 0.2;
-    data.push({
-      date: `Nov ${i}`,
-      value: Math.round(val),
-      prevValue: Math.round(val * 0.9),
-    });
-  }
+type StreamMessage =
+  | { kind: 'connected'; at?: string; path?: string }
+  | { kind: 'keepalive'; at?: string; payload?: unknown }
+  | {
+      kind: 'summary';
+      at?: string;
+      summary?: {
+        queryId?: string;
+        sampleCount?: number;
+        durationMs?: number;
+        aggregates?: Record<string, number>;
+        meta?: {
+          metric?: BackendMetric;
+          group_by?: GroupBy;
+          range?: { from?: string | null; to?: string | null };
+          preview?: boolean;
+        };
+      };
+    }
+  | {
+      kind: 'sample';
+      at?: string;
+      sample?: {
+        ts?: string;
+        label?: string;
+        metrics?: Record<string, number>;
+        raw?: unknown;
+      };
+    }
+  | {
+      kind: 'error';
+      at?: string;
+      error?: {
+        code?: string;
+        message?: string;
+      };
+    };
 
-  return data;
+type ChartPoint = {
+  date: string;
+  value: number;
 };
 
-export default function CustomReportBuilderPage(): JSX.Element {
-  const [config, setConfig] = useState<ReportConfig | null>(null);
-  const [hasPreview, setHasPreview] = useState(false);
+const DIMENSION_OPTIONS = [
+  { label: 'Module (Ekoh / Ethikos / …)', value: 'module' },
+  { label: 'Country / region', value: 'region' },
+  { label: 'Ekoh domain', value: 'ekoh_domain' },
+  { label: 'User segment (role)', value: 'segment' },
+  { label: 'Device type', value: 'device' },
+] as const;
 
-  const previewData = useMemo(() => {
-    if (!hasPreview) return [];
-    return generatePreviewData(config?.primaryMetric);
-  }, [config, hasPreview]);
+function getMetricLabel(metric?: BackendMetric): string {
+  switch (metric) {
+    case 'smart-vote':
+      return 'Smart Vote score';
+    case 'usage':
+      return 'Active users';
+    case 'perf':
+      return 'Latency P95 (ms)';
+    default:
+      return 'Metric';
+  }
+}
+
+function metricValueKey(metric?: BackendMetric): string {
+  switch (metric) {
+    case 'smart-vote':
+      return 'avg_score';
+    case 'usage':
+      return 'active_users';
+    case 'perf':
+      return 'p95_latency_ms';
+    default:
+      return 'value';
+  }
+}
+
+function buildWsUrl(): string {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const host = window.location.host;
+  const wsPath = '/ws/reports/custom';
+
+  const baseFromEnv = process.env.NEXT_PUBLIC_REPORTS_WS_BASE;
+  return baseFromEnv && baseFromEnv.length > 0
+    ? `${baseFromEnv.replace(/\/$/, '')}${wsPath}`
+    : `${protocol}//${host}${wsPath}`;
+}
+
+function toIsoRange(range?: [Dayjs, Dayjs]): { from?: string; to?: string } {
+  if (!range || !range[0] || !range[1]) {
+    return {};
+  }
+
+  return {
+    from: range[0].toISOString(),
+    to: range[1].toISOString(),
+  };
+}
+
+function statusColor(status: StreamStatus): string {
+  switch (status) {
+    case 'open':
+      return 'green';
+    case 'connecting':
+      return 'gold';
+    case 'error':
+      return 'red';
+    case 'closed':
+      return 'default';
+    case 'idle':
+    default:
+      return 'blue';
+  }
+}
+
+export default function CustomReportBuilderPage(): JSX.Element {
+  const formRef = useRef<ProFormInstance<ReportConfig>>();
+  const wsRef = useRef<WebSocket | null>(null);
+  const pendingPayloadRef = useRef<string | null>(null);
+
+  const [config, setConfig] = useState<ReportConfig | null>(null);
+  const [streamStatus, setStreamStatus] = useState<StreamStatus>('idle');
+  const [streamError, setStreamError] = useState<string | undefined>(undefined);
+  const [lastMessage, setLastMessage] = useState<StreamMessage | string | null>(
+    null,
+  );
+  const [summary, setSummary] = useState<
+    Extract<StreamMessage, { kind: 'summary' }>['summary'] | null
+  >(null);
+  const [samples, setSamples] = useState<
+    Array<Extract<StreamMessage, { kind: 'sample' }>['sample']>
+  >([]);
+
+  const sendCurrentRequest = useCallback((values: ReportConfig) => {
+    const payload = {
+      metric: values.primaryMetric ?? 'smart-vote',
+      group_by: values.timeGrain ?? 'day',
+      include_raw_samples: !!values.includeRawSamples,
+      range: toIsoRange(values.range),
+    };
+
+    const serialized = JSON.stringify(payload);
+
+    setSummary(null);
+    setSamples([]);
+    setStreamError(undefined);
+
+    if (wsRef.current?.readyState === WebSocket.OPEN) {
+      wsRef.current.send(serialized);
+      return;
+    }
+
+    pendingPayloadRef.current = serialized;
+  }, []);
+
+  useEffect(() => {
+    if (wsRef.current) return;
+    if (typeof window === 'undefined') return;
+
+    const url = buildWsUrl();
+    if (!url) return;
+
+    setStreamStatus('connecting');
+
+    const socket = new WebSocket(url);
+    wsRef.current = socket;
+
+    socket.onopen = () => {
+      setStreamStatus('open');
+      setStreamError(undefined);
+
+      try {
+        socket.send('ping');
+      } catch {
+        // ignore ping failures
+      }
+
+      if (pendingPayloadRef.current) {
+        socket.send(pendingPayloadRef.current);
+        pendingPayloadRef.current = null;
+      }
+    };
+
+    socket.onmessage = (event: MessageEvent) => {
+      let payload: StreamMessage | string = event.data;
+
+      if (typeof event.data === 'string') {
+        try {
+          payload = JSON.parse(event.data) as StreamMessage;
+        } catch {
+          payload = event.data;
+        }
+      }
+
+      setLastMessage(payload);
+
+      if (typeof payload === 'string') {
+        return;
+      }
+
+      if (payload.kind === 'error') {
+        setStreamStatus('error');
+        setStreamError(payload.error?.message ?? 'WebSocket error');
+        return;
+      }
+
+      if (payload.kind === 'summary') {
+        setSummary(payload.summary ?? null);
+        return;
+      }
+
+      if (payload.kind === 'sample' && payload.sample) {
+        setSamples((prev) => [...prev, payload.sample]);
+      }
+    };
+
+    socket.onerror = () => {
+      setStreamStatus('error');
+      setStreamError('WebSocket error');
+    };
+
+    socket.onclose = () => {
+      setStreamStatus('closed');
+      wsRef.current = null;
+    };
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!config?.autoRefreshSeconds) return;
+    if (config.autoRefreshSeconds <= 0) return;
+
+    const timer = window.setInterval(() => {
+      sendCurrentRequest(config);
+    }, config.autoRefreshSeconds * 1000);
+
+    return () => window.clearInterval(timer);
+  }, [config, sendCurrentRequest]);
+
+  const chartData = useMemo<ChartPoint[]>(() => {
+    const key = metricValueKey(config?.primaryMetric);
+    return samples.map((sample) => ({
+      date: sample?.label || sample?.ts || '',
+      value:
+        typeof sample?.metrics?.[key] === 'number' ? sample.metrics[key] : 0,
+    }));
+  }, [samples, config?.primaryMetric]);
+
+  const latestValue = chartData[chartData.length - 1]?.value ?? 0;
+
+  const aggregateEntries = useMemo(
+    () => Object.entries(summary?.aggregates ?? {}),
+    [summary],
+  );
 
   const handleFinish = async (values: ReportConfig) => {
     setConfig(values);
-    setHasPreview(true);
+    sendCurrentRequest(values);
     return true;
-  };
-
-  const getMetricLabel = (key?: string) => {
-    const map: Record<string, string> = {
-      smart_vote: 'Smart Vote Score',
-      mau: 'Active Users',
-      session_duration: 'Avg Session (min)',
-      api_latency_p95: 'Latency P95 (ms)',
-      api_error_rate: 'Error Rate (%)',
-    };
-    return map[key || ''] || 'Metric';
   };
 
   return (
@@ -101,7 +344,11 @@ export default function CustomReportBuilderPage(): JSX.Element {
       subtitle="Compose your own Insights view by picking metrics, dimensions, filters, and layout."
       metaTitle="Reports · Custom report builder"
       primaryAction={
-        <Button type="primary" icon={<PlayCircleOutlined />}>
+        <Button
+          type="primary"
+          icon={<PlayCircleOutlined />}
+          onClick={() => formRef.current?.submit?.()}
+        >
           Run once
         </Button>
       }
@@ -118,12 +365,21 @@ export default function CustomReportBuilderPage(): JSX.Element {
           title="Configure report"
           extra={
             <Text type="secondary">
-              Choose metrics, groupings, and filters. Then update the preview.
+              Choose metrics, groupings, and filters. Then stream a backend
+              preview.
             </Text>
           }
         >
           <ProForm<ReportConfig>
+            formRef={formRef}
             layout="vertical"
+            initialValues={{
+              primaryMetric: 'smart-vote',
+              timeGrain: 'day',
+              autoRefreshSeconds: 0,
+              includeRawSamples: false,
+              isPublic: false,
+            }}
             submitter={{
               searchConfig: {
                 submitText: 'Update preview',
@@ -151,30 +407,32 @@ export default function CustomReportBuilderPage(): JSX.Element {
                 { required: true, message: 'Please choose a primary metric' },
               ]}
               options={[
-                { label: 'Smart Vote score (global)', value: 'smart_vote' },
-                { label: 'Monthly active users (MAU)', value: 'mau' },
-                {
-                  label: 'Average session duration',
-                  value: 'session_duration',
-                },
-                { label: 'API latency (P95)', value: 'api_latency_p95' },
-                { label: 'API error rate', value: 'api_error_rate' },
+                { label: 'Smart Vote score', value: 'smart-vote' },
+                { label: 'Usage / active users', value: 'usage' },
+                { label: 'API latency (P95)', value: 'perf' },
+              ]}
+            />
+
+            <ProFormSelect
+              name="timeGrain"
+              label="Time grain"
+              placeholder="Select the aggregation grain"
+              options={[
+                { label: 'Day', value: 'day' },
+                { label: 'Week', value: 'week' },
               ]}
             />
 
             <ProFormSelect
               name="dimensions"
-              label="Group by"
+              label="Context dimensions"
               placeholder="Select dimensions"
               mode="multiple"
               allowClear
-              options={[
-                { label: 'Module (Ekoh / Ethikos / …)', value: 'module' },
-                { label: 'Country / region', value: 'region' },
-                { label: 'Ekoh domain', value: 'ekoh_domain' },
-                { label: 'User segment (role)', value: 'segment' },
-                { label: 'Device type', value: 'device' },
-              ]}
+              options={DIMENSION_OPTIONS.map((item) => ({
+                label: item.label,
+                value: item.value,
+              }))}
             />
 
             <ProFormDateRangePicker
@@ -186,14 +444,22 @@ export default function CustomReportBuilderPage(): JSX.Element {
             />
 
             <ProFormCheckbox.Group
-              name="breakdowns"
-              label="Breakdowns"
+              name="dimensions"
+              label="Highlight dimensions"
               options={[
-                { label: 'Show daily trend', value: 'daily_trend' },
-                { label: 'Compare vs previous period', value: 'compare_prev' },
-                { label: 'Show top 5 segments', value: 'top_segments' },
-                { label: 'Show bottom 5 segments', value: 'bottom_segments' },
+                { label: 'Module', value: 'module' },
+                { label: 'Region', value: 'region' },
+                { label: 'Segment', value: 'segment' },
               ]}
+            />
+
+            <ProFormSwitch
+              name="includeRawSamples"
+              label="Include raw samples"
+              fieldProps={{
+                checkedChildren: 'Raw on',
+                unCheckedChildren: 'Raw off',
+              }}
             />
 
             <ProFormSlider
@@ -227,27 +493,36 @@ export default function CustomReportBuilderPage(): JSX.Element {
           colSpan="auto"
           title="Live preview"
           extra={
-            config?.name ? (
-              <Tag color="geekblue">{config.name}</Tag>
-            ) : (
-              <Text type="secondary">No configuration yet</Text>
-            )
+            <Space>
+              <Tag color={statusColor(streamStatus)}>
+                WS: {streamStatus.toUpperCase()}
+              </Tag>
+              {config?.name ? (
+                <Tag color="geekblue">{config.name}</Tag>
+              ) : (
+                <Text type="secondary">No configuration yet</Text>
+              )}
+            </Space>
           }
         >
-          {!hasPreview ? (
-            <Empty description="Configure your report on the left, then click “Update preview” to see a mock preview." />
+          {!config ? (
+            <Empty description="Configure your report on the left, then click “Update preview” to stream a backend preview." />
           ) : (
             <Space direction="vertical" size="large" style={{ width: '100%' }}>
               <Alert
-                type="info"
+                type={streamError ? 'error' : 'info'}
                 showIcon
-                message="Preview only"
+                message={streamError ? 'Preview stream error' : 'Backend preview'}
                 description={
-                  <Text>
-                    This is a mocked preview to validate layout and filters.
-                    Wire this panel to <code>/reports/custom</code> once the
-                    Insights API is connected.
-                  </Text>
+                  streamError ? (
+                    <Text>{streamError}</Text>
+                  ) : (
+                    <Text>
+                      This panel is now wired to the backend websocket at{' '}
+                      <code>/ws/reports/custom</code>. Current data is still a
+                      preview stream, not final analytics.
+                    </Text>
+                  )
                 }
               />
 
@@ -257,27 +532,18 @@ export default function CustomReportBuilderPage(): JSX.Element {
                 style={{ width: '100%', justifyContent: 'space-between' }}
               >
                 <Statistic
-                  title={getMetricLabel(config?.primaryMetric)}
-                  value={previewData[previewData.length - 1]?.value || 0}
-                  suffix={
-                    config?.primaryMetric === 'api_latency_p95'
-                      ? ' ms'
-                      : config?.primaryMetric === 'api_error_rate'
-                        ? ' %'
-                        : ''
-                  }
+                  title={getMetricLabel(config.primaryMetric)}
+                  value={latestValue}
+                  suffix={config.primaryMetric === 'perf' ? ' ms' : ''}
                 />
                 <Statistic
-                  title="Compared to previous period"
-                  value={4.3}
-                  precision={1}
-                  valueStyle={{ color: '#3f8600' }}
-                  prefix="+"
-                  suffix="%"
+                  title="Samples"
+                  value={summary?.sampleCount ?? samples.length}
                 />
                 <Statistic
-                  title="Segments"
-                  value={config?.dimensions?.length || 0}
+                  title="Duration"
+                  value={summary?.durationMs ?? 0}
+                  suffix="ms"
                 />
               </Space>
 
@@ -285,22 +551,14 @@ export default function CustomReportBuilderPage(): JSX.Element {
 
               <List
                 size="small"
-                header={
-                  <Text strong>
-                    Example breakdown by{' '}
-                    {config?.dimensions?.[0] || 'Segment'} (placeholder)
-                  </Text>
-                }
-                dataSource={[
-                  { label: 'Top Segment A', value: '↑ +8.2 %' },
-                  { label: 'Top Segment B', value: '↑ +3.5 %' },
-                  { label: 'Top Segment C', value: '↓ −1.2 %' },
-                ]}
-                renderItem={(item) => (
+                header={<Text strong>Aggregates</Text>}
+                locale={{ emptyText: 'No summary yet' }}
+                dataSource={aggregateEntries}
+                renderItem={([key, value]) => (
                   <List.Item>
                     <Space split={<Divider type="vertical" />} wrap>
-                      <Text>{item.label}</Text>
-                      <Text type="secondary">{item.value}</Text>
+                      <Text>{key}</Text>
+                      <Text type="secondary">{String(value)}</Text>
                     </Space>
                   </List.Item>
                 )}
@@ -311,39 +569,76 @@ export default function CustomReportBuilderPage(): JSX.Element {
               <ProCard
                 ghost
                 title="Trend visualization"
-                extra={<Tag icon={<LineChartOutlined />}>Mock data</Tag>}
+                extra={<Tag icon={<LineChartOutlined />}>WS stream</Tag>}
               >
-                <div style={{ width: '100%', height: 300 }}>
-                  <ResponsiveContainer>
-                    <AreaChart data={previewData}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                      <XAxis dataKey="date" />
-                      <YAxis />
-                      <Tooltip />
-                      <Legend />
-                      <Area
-                        type="monotone"
-                        dataKey="value"
-                        name="Current Period"
-                        stroke="#1890ff"
-                        fill="#1890ff"
-                        fillOpacity={0.1}
-                      />
-                      {config?.breakdowns?.includes('compare_prev') && (
+                {chartData.length === 0 ? (
+                  <Empty description="No sample points received yet." />
+                ) : (
+                  <div style={{ width: '100%', height: 300 }}>
+                    <ResponsiveContainer>
+                      <AreaChart data={chartData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="date" />
+                        <YAxis />
+                        <Tooltip />
+                        <Legend />
                         <Area
                           type="monotone"
-                          dataKey="prevValue"
-                          name="Previous Period"
-                          stroke="#faad14"
-                          fill="#faad14"
+                          dataKey="value"
+                          name="Current preview"
+                          stroke="#1890ff"
+                          fill="#1890ff"
                           fillOpacity={0.1}
-                          strokeDasharray="5 5"
                         />
-                      )}
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                )}
               </ProCard>
+
+              <Divider />
+
+              <List
+                size="small"
+                header={<Text strong>Last samples</Text>}
+                locale={{ emptyText: 'No streamed samples yet' }}
+                dataSource={samples.slice(-5).reverse()}
+                renderItem={(item, index) => (
+                  <List.Item key={`${item?.ts ?? 'sample'}-${index}`}>
+                    <Space split={<Divider type="vertical" />} wrap>
+                      <Text>{item?.label ?? item?.ts ?? 'sample'}</Text>
+                      <Text type="secondary">
+                        {String(
+                          item?.metrics?.[metricValueKey(config.primaryMetric)] ??
+                            0,
+                        )}
+                      </Text>
+                    </Space>
+                  </List.Item>
+                )}
+              />
+
+              {lastMessage ? (
+                <>
+                  <Divider />
+                  <Alert
+                    type="success"
+                    showIcon
+                    message="Last backend message received"
+                    description={
+                      <pre
+                        style={{
+                          margin: 0,
+                          whiteSpace: 'pre-wrap',
+                          wordBreak: 'break-word',
+                        }}
+                      >
+                        {JSON.stringify(lastMessage, null, 2)}
+                      </pre>
+                    }
+                  />
+                </>
+              ) : null}
             </Space>
           )}
         </ProCard>

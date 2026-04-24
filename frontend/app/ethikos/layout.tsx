@@ -2,80 +2,66 @@
 // app/ethikos/layout.tsx
 'use client'
 
-/**
- * Updated Ethikos segment layout.
- *
- * Changes:
- *  - Keep existing defaulting to ?sidebar=ethikos (preserves URL hash on replace).
- *  - Use shared <MainLayout /> container for global nav + header.
- *  - Improve Suspense fallback with reusable <Loading fullscreen />.
- *  - Wrap children with ProComponents <WaterMark> to subtly brand the suite.
- *
- * Source references:
- *  - Original layout baseline: :contentReference[oaicite:0]{index=0}
- *  - MainLayout (global AntD shell): :contentReference[oaicite:1]{index=1}
- *  - Loading component used in fallback: :contentReference[oaicite:2]{index=2}
- */
-
 import type { ReactNode } from 'react'
-import React, { Suspense, useEffect } from 'react'
-import { Layout } from 'antd'
+import React, { Suspense, useEffect, useMemo } from 'react'
+import { App as AntdApp } from 'antd'
 import { WaterMark } from '@ant-design/pro-components'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import MainLayout from '@/components/layout-components/MainLayout'
 import Loading from '@/components/Loading'
 
-const { Content } = Layout
-
 interface SegmentLayoutProps {
   children: ReactNode
 }
 
 /**
- * Inner shell that *defaults* the sidebar to "ethikos" via ?sidebar=ethikos
- * when the query param is missing.
+ * Inner shell that defaults the active suite to Ethikos via ?sidebar=ethikos
+ * only when the query param is absent.
  *
  * Important:
- * - If ?sidebar is already set (ekoh, keenkonnect, kreative, …), it is respected.
- *   This lets the module switcher (LogoTitle) change suites even while you are
- *   on a /ethikos/* URL.
+ * - If ?sidebar is already set, it is respected.
+ * - The current URL hash is preserved.
+ * - The Ant Design <App /> provider is mounted here so page-level
+ *   App.useApp() hooks can safely use message / modal / notification.
  */
-function EthikosShell({ children }: SegmentLayoutProps) {
+function EthikosShell({ children }: SegmentLayoutProps): JSX.Element {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
-  useEffect(() => {
-    const currentSidebar = searchParams.get('sidebar')
+  const searchString = searchParams.toString()
+  const currentSidebar = searchParams.get('sidebar')
 
-    // Only inject the default if the param is absent.
-    // Do NOT override if the user explicitly chose another suite.
-    if (currentSidebar !== null) return
+  const nextUrl = useMemo(() => {
+    if (currentSidebar !== null) return null
 
-    const params = new URLSearchParams(Array.from(searchParams.entries()))
+    const params = new URLSearchParams(searchString)
     params.set('sidebar', 'ethikos')
 
-    // Preserve current hash if present (client-only)
+    const query = params.toString()
     const hash =
-      typeof window !== 'undefined' && window.location?.hash
+      typeof window !== 'undefined' && window.location.hash
         ? window.location.hash
         : ''
 
-    router.replace(`${pathname}?${params.toString()}${hash}`)
-    // We intentionally depend on the stable searchParams object + router + pathname.
-  }, [router, pathname, searchParams])
+    return query ? `${pathname}?${query}${hash}` : `${pathname}${hash}`
+  }, [currentSidebar, pathname, searchString])
+
+  useEffect(() => {
+    if (!nextUrl) return
+    router.replace(nextUrl)
+  }, [nextUrl, router])
 
   return (
     <MainLayout>
-      {/* Subtle suite watermark; page-level PageContainer can still set ghost or override visuals */}
       <WaterMark
         content="ethiKos"
         gapX={120}
         gapY={120}
         fontColor="rgba(0,0,0,0.04)"
       >
-        {children}
+        <AntdApp>{children}</AntdApp>
       </WaterMark>
     </MainLayout>
   )
@@ -84,27 +70,16 @@ function EthikosShell({ children }: SegmentLayoutProps) {
 /**
  * Segment layout for all /ethikos/* pages.
  *
- * - Wraps content in MainLayout (global Ant Design layout + navigation).
- * - Ensures the Ethikos suite is active by default in the sidebar.
- * - Provides an Ant Design–based Suspense fallback while children load.
+ * - Wraps content in MainLayout (global shell + navigation)
+ * - Defaults the Ethikos suite in the sidebar when missing
+ * - Provides Ant Design App context for message/modal/notification APIs
+ * - Uses a lightweight fullscreen Suspense fallback
  */
-export default function SegmentLayout({ children }: SegmentLayoutProps) {
+export default function SegmentLayout({
+  children,
+}: SegmentLayoutProps): JSX.Element {
   return (
-    <Suspense
-      fallback={
-        <Layout style={{ minHeight: '100vh' }}>
-          <Content
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <Loading fullscreen message="Loading ethiKos…" />
-          </Content>
-        </Layout>
-      }
-    >
+    <Suspense fallback={<Loading fullscreen message="Loading ethiKos…" />}>
       <EthikosShell>{children}</EthikosShell>
     </Suspense>
   )

@@ -96,12 +96,12 @@ const MOCK_DOMAIN_ROWS: DomainRow[] = [
   },
 ];
 
-const computePresetRange = (rangeKey: RangeKey): [Dayjs, Dayjs] => {
+function computePresetRange(rangeKey: RangeKey): [Dayjs, Dayjs] {
   const end = dayjs();
   const days = rangeKey === '7d' ? 7 : rangeKey === '30d' ? 30 : 90;
   const start = end.subtract(days - 1, 'day');
   return [start, end];
-};
+}
 
 export default function SmartVoteReportPage(): JSX.Element {
   const [rangeKey, setRangeKey] = useState<RangeKey>('30d');
@@ -113,7 +113,7 @@ export default function SmartVoteReportPage(): JSX.Element {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const fetchData = async (key: RangeKey) => {
+  const fetchData = async (key: RangeKey): Promise<void> => {
     setLoading(true);
     setError(false);
 
@@ -137,7 +137,7 @@ export default function SmartVoteReportPage(): JSX.Element {
     void fetchData(rangeKey);
   }, [rangeKey]);
 
-  const handleRangePresetChange = (value: RangeKey | string) => {
+  const handleRangePresetChange = (value: RangeKey | string): void => {
     const key = (value as RangeKey) ?? '30d';
     setRangeKey(key);
     setRange(computePresetRange(key));
@@ -195,7 +195,7 @@ export default function SmartVoteReportPage(): JSX.Element {
         metaTitle="Reports · Smart Vote"
       >
         <Empty description="Failed to load analytics">
-          <Button icon={<ReloadOutlined />} onClick={() => fetchData(rangeKey)}>
+          <Button icon={<ReloadOutlined />} onClick={() => void fetchData(rangeKey)}>
             Retry
           </Button>
         </Empty>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   PageContainer,
   ProCard,
@@ -42,18 +42,19 @@ import {
   YAxis,
 } from 'recharts';
 
+import api from '@/api';
 import ReportsPageShell from '../ReportsPageShell';
 
 const { Text, Title } = Typography;
 
 /* ------------------------------------------------------------------ */
-/* Types                                                             */
+/* Types                                                              */
 /* ------------------------------------------------------------------ */
 
 type TimeRangeKey = '7d' | '30d' | '90d';
 
 type UsagePoint = {
-  label: string; // e.g. "2025-11-01"
+  label: string;
   activeUsers: number;
   newUsers: number;
   sessions: number;
@@ -64,7 +65,7 @@ type ModuleUsageRow = {
   module: string;
   activeUsers: number;
   avgSessionMinutes: number;
-  retentionRate: number; // 0-100
+  retentionRate: number;
   lastActive: string;
 };
 
@@ -74,11 +75,18 @@ type UsageReport = {
   modules: ModuleUsageRow[];
 };
 
+type UsageAggregates = {
+  totalUniqueUsers: number;
+  activeToday: number;
+  newInPeriod: number;
+  modulesTouched: number;
+};
+
 /* ------------------------------------------------------------------ */
-/* Helpers for derived aggregates                                    */
+/* Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-function getAggregates(report: UsageReport | undefined) {
+function getAggregates(report: UsageReport | undefined): UsageAggregates {
   if (!report || report.points.length === 0) {
     return {
       totalUniqueUsers: 0,
@@ -90,23 +98,19 @@ function getAggregates(report: UsageReport | undefined) {
 
   const points = report.points;
   const modules = report.modules;
+  const lastPoint = points[points.length - 1];
 
-  const lastPoint = points[points.length - 1] as UsagePoint;
-
-  const uniqueUsers = Math.max(...points.map((p) => p.activeUsers));
+  const totalUniqueUsers = Math.max(...points.map((p) => p.activeUsers));
   const newInPeriod = points.reduce((sum, p) => sum + p.newUsers, 0);
+  const modulesTouched = modules.filter((m) => m.activeUsers > 0).length;
 
   return {
-    totalUniqueUsers: uniqueUsers,
-    activeToday: lastPoint.activeUsers,
+    totalUniqueUsers,
+    activeToday: lastPoint?.activeUsers ?? 0,
     newInPeriod,
-    modulesTouched: modules.filter((m) => m.activeUsers > 0).length,
+    modulesTouched,
   };
 }
-
-/* ------------------------------------------------------------------ */
-/* Table columns                                                     */
-/* ------------------------------------------------------------------ */
 
 type ModuleRow = ModuleUsageRow;
 
@@ -175,42 +179,40 @@ const moduleColumns: ColumnsType<ModuleRow> = [
 ];
 
 /* ------------------------------------------------------------------ */
-/* Main page                                                         */
+/* Main page                                                          */
 /* ------------------------------------------------------------------ */
 
-export default function ReportsUsagePage() {
+export default function ReportsUsagePage(): JSX.Element {
   const [range, setRange] = useState<TimeRangeKey>('30d');
   const [data, setData] = useState<UsageReport | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchData = async (r: TimeRangeKey) => {
+  const fetchData = useCallback(async (nextRange: TimeRangeKey) => {
     setLoading(true);
-    setError(false);
+    setError(null);
 
     try {
-      const response = await fetch(`/api/reports/usage/?range=${r}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch usage data');
-      }
-
-      const raw: unknown = await response.json();
-      const report = raw as UsageReport;
+      const report = await api.get<UsageReport>(`reports/usage/?range=${nextRange}`);
       setData(report);
     } catch (err) {
       console.error(err);
-      setError(true);
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Failed to load usage analytics.',
+      );
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void fetchData(range);
-  }, [range]);
+  }, [fetchData, range]);
 
   const aggregates = useMemo(
-    () => getAggregates(data || undefined),
+    () => getAggregates(data ?? undefined),
     [data],
   );
 
@@ -227,11 +229,7 @@ export default function ReportsUsagePage() {
         <Tooltip title={`Last generated at ${lastUpdatedLabel}`}>
           <Badge
             status="processing"
-            text={
-              <Text type="secondary">
-                Updated {lastUpdatedLabel}
-              </Text>
-            }
+            text={<Text type="secondary">Updated {lastUpdatedLabel}</Text>}
           />
         </Tooltip>
       )}
@@ -249,7 +247,7 @@ export default function ReportsUsagePage() {
       <Tooltip title="Reload usage snapshot">
         <Button
           icon={<ReloadOutlined />}
-          onClick={() => fetchData(range)}
+          onClick={() => void fetchData(range)}
           type="default"
           size="small"
         >
@@ -266,40 +264,40 @@ export default function ReportsUsagePage() {
         subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
-        <Skeleton active />
+        <PageContainer ghost>
+          <Skeleton active />
+        </PageContainer>
       </ReportsPageShell>
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <ReportsPageShell
         title="Usage Analytics"
         subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
-        <ProCard>
-          <Space
-            direction="vertical"
-            size="large"
-            style={{ width: '100%' }}
-          >
-            <Space size="small">
-              <InfoCircleOutlined />
-              <Text type="danger">
-                Unable to load usage data right now.
-              </Text>
-            </Space>
+        <PageContainer ghost>
+          <ProCard>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              <Space size="small">
+                <InfoCircleOutlined />
+                <Text type="danger">Unable to load usage data right now.</Text>
+              </Space>
 
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => fetchData(range)}
-              type="primary"
-            >
-              Retry
-            </Button>
-          </Space>
-        </ProCard>
+              <Text type="secondary">{error}</Text>
+
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => void fetchData(range)}
+                type="primary"
+              >
+                Retry
+              </Button>
+            </Space>
+          </ProCard>
+        </PageContainer>
       </ReportsPageShell>
     );
   }
@@ -311,7 +309,9 @@ export default function ReportsUsagePage() {
         subtitle={shellDescription}
         secondaryActions={headerExtra}
       >
-        <Empty description="No usage data available yet" />
+        <PageContainer ghost>
+          <Empty description="No usage data available yet" />
+        </PageContainer>
       </ReportsPageShell>
     );
   }
@@ -326,25 +326,24 @@ export default function ReportsUsagePage() {
       secondaryActions={headerExtra}
     >
       <PageContainer ghost>
-        <Space
-          direction="vertical"
-          size="large"
-          style={{ width: '100%' }}
-        >
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          {!!error && (
+            <ProCard ghost>
+              <Text type="warning">
+                Using the last available payload. Latest refresh failed: {error}
+              </Text>
+            </ProCard>
+          )}
+
           <ProCard ghost>
-            <Space
-              direction="vertical"
-              size={4}
-              style={{ width: '100%' }}
-            >
+            <Space direction="vertical" size={4} style={{ width: '100%' }}>
               <Title level={5} style={{ marginBottom: 0 }}>
                 Overview
               </Title>
               <Text type="secondary">
-                Snapshot of how many people are actively using Konnaxion,
-                which modules they touch, and how this evolves over time.
-                Data is aggregated from sign-ins, page views and workspace
-                events.
+                Snapshot of how many people are actively using Konnaxion, which
+                modules they touch, and how this evolves over time. Data is
+                aggregated from sign-ins, page views, and workspace events.
               </Text>
             </Space>
           </ProCard>
@@ -401,10 +400,7 @@ export default function ReportsUsagePage() {
           </ProCard>
 
           <ProCard gutter={16} wrap>
-            <ProCard
-              colSpan={{ xs: 24, lg: 16 }}
-              title="Active vs New Users"
-            >
+            <ProCard colSpan={{ xs: 24, lg: 16 }} title="Active vs New Users">
               <div style={{ height: 300, width: '100%' }}>
                 <ResponsiveContainer>
                   <LineChart data={data.points}>
@@ -434,23 +430,16 @@ export default function ReportsUsagePage() {
               </div>
             </ProCard>
 
-            <ProCard
-              colSpan={{ xs: 24, lg: 8 }}
-              title="Highlights"
-            >
-              <Space
-                direction="vertical"
-                size="middle"
-                style={{ width: '100%' }}
-              >
+            <ProCard colSpan={{ xs: 24, lg: 8 }} title="Highlights">
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                 <Space align="start">
                   <Tag icon={<BarChartOutlined />} color="blue">
                     Concentration
                   </Tag>
                   <Text type="secondary">
-                    Most activity is concentrated in the last few days of
-                    the selected range. Use shorter windows (7 days) to
-                    monitor spikes after launches.
+                    Most activity is concentrated in the last few days of the
+                    selected range. Use shorter windows (7 days) to monitor
+                    spikes after launches.
                   </Text>
                 </Space>
 
@@ -459,9 +448,8 @@ export default function ReportsUsagePage() {
                     Engagement
                   </Tag>
                   <Text type="secondary">
-                    Combine active users with retention per module to
-                    identify where people stay engaged vs. where they
-                    churn quickly.
+                    Combine active users with retention per module to identify
+                    where people stay engaged vs. where they churn quickly.
                   </Text>
                 </Space>
 
@@ -470,8 +458,8 @@ export default function ReportsUsagePage() {
                     Seasonality
                   </Tag>
                   <Text type="secondary">
-                    Expand to 90 days to detect weekly patterns (e.g.
-                    higher usage around events or recurring workshops).
+                    Expand to 90 days to detect weekly patterns, such as higher
+                    usage around events or recurring workshops.
                   </Text>
                 </Space>
               </Space>

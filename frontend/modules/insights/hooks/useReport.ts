@@ -1,45 +1,71 @@
 // FILE: frontend/modules/insights/hooks/useReport.ts
 // modules/insights/hooks/useReport.ts
-import { useQuery } from "@tanstack/react-query";
-import api from "@/api";
+import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import api from '@/api'
 
-type SmartVoteResp = { labels: string[]; votes: number[]; avg_score: number[] };
-type UsageResp = { labels: string[]; mau: number[]; projects: number[]; docs: number[] };
-type PerfResp = { labels: string[]; p95_latency: number[]; error_rate: number[] };
+type SmartVoteResp = {
+  labels: string[]
+  votes: number[]
+  avg_score: number[]
+}
+
+type UsageResp = {
+  labels: string[]
+  mau: number[]
+  projects: number[]
+  docs: number[]
+}
+
+type PerfResp = {
+  labels: string[]
+  p95_latency: number[]
+  error_rate: number[]
+}
 
 type EndpointMap = {
-  "smart-vote": SmartVoteResp;
-  usage: UsageResp;
-  perf: PerfResp;
-};
+  'smart-vote': SmartVoteResp
+  usage: UsageResp
+  perf: PerfResp
+}
+
+type ReportParamValue = string | number | boolean | null | undefined
+type ReportParams = Record<string, ReportParamValue>
+
+function buildQueryString(params?: ReportParams): string {
+  if (!params) return ''
+
+  const entries = Object.entries(params)
+    .filter(([, value]) => value !== undefined && value !== null)
+    .map(([key, value]) => [key, String(value)] as const)
+    .sort(([a], [b]) => a.localeCompare(b))
+
+  if (entries.length === 0) return ''
+
+  const search = new URLSearchParams()
+  for (const [key, value] of entries) {
+    search.set(key, value)
+  }
+
+  const qs = search.toString()
+  return qs ? `?${qs}` : ''
+}
 
 export function useReport<E extends keyof EndpointMap>(
   endpoint: E,
-  params?: Record<string, unknown>,
+  params?: ReportParams,
 ) {
+  const query = useMemo(() => buildQueryString(params), [params])
+
   return useQuery<EndpointMap[E]>({
-    queryKey: [endpoint, params],
+    queryKey: ['reports', endpoint, query],
     staleTime: 300_000,
     queryFn: async () => {
-      // Manually build query string because api.get uses fetch(RequestInit), not axios-style params
-      let query = "";
+      const path = query
+        ? `/reports/${endpoint}/${query}`
+        : `/reports/${endpoint}/`
 
-      if (params && Object.keys(params).length > 0) {
-        const searchParams = new URLSearchParams();
-
-        Object.entries(params).forEach(([key, value]) => {
-          if (value === undefined || value === null) return;
-          // Flatten basic scalar values to strings; callers should pre-serialise complex types
-          searchParams.set(key, String(value));
-        });
-
-        const qs = searchParams.toString();
-        if (qs) {
-          query = `?${qs}`;
-        }
-      }
-
-      return api.get<EndpointMap[E]>(`/reports/${endpoint}${query}`);
+      return api.get<EndpointMap[E]>(path)
     },
-  });
+  })
 }

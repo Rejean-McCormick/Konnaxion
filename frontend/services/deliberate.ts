@@ -41,11 +41,12 @@ interface EthikosArgumentApi {
   content: string
   parent?: number | null
   side?: 'pro' | 'con' | null
+  is_hidden?: boolean
   created_at: string
 }
 
 /* ------------------------------------------------------------------ */
-/*  Exported types (reused by pages/modules)                           */
+/*  Exported types (reused by pages/modules)                          */
 /* ------------------------------------------------------------------ */
 
 export type EliteTopic = Topic & {
@@ -65,6 +66,7 @@ export type TopicPreviewResponse = {
   title: string
   category: string
   createdAt: string
+  description?: string
   latest: { id: string; author: string; body: string }[]
 }
 
@@ -94,10 +96,10 @@ export type CreateEliteTopicPayload = {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
+/*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
 
-function assertTopicId(id: string): number {
+function toTopicId(id: string): number {
   const numericId = Number(id)
   if (!Number.isFinite(numericId)) {
     throw new Error(`Invalid topic id: ${id}`)
@@ -128,10 +130,7 @@ function isHot(lastActivity: string, stanceCount: number): boolean {
   return within72h || stanceCount >= 5
 }
 
-function toEliteTopic(
-  topic: EthikosTopicApi,
-  stanceCount: number,
-): EliteTopic {
+function toEliteTopic(topic: EthikosTopicApi, stanceCount: number): EliteTopic {
   return {
     id: String(topic.id),
     title: topic.title,
@@ -141,6 +140,19 @@ function toEliteTopic(
     hot: isHot(topic.last_activity, stanceCount),
     stanceCount,
   } as EliteTopic
+}
+
+function toPreviewStatements(args: EthikosArgumentApi[]): TopicPreviewResponse['latest'] {
+  return byDateDesc(
+    (args ?? []).filter((arg) => !arg.is_hidden),
+    (arg) => arg.created_at,
+  )
+    .slice(0, 5)
+    .map((arg) => ({
+      id: String(arg.id),
+      author: arg.user,
+      body: arg.content,
+    }))
 }
 
 async function resolveCategoryId(category: string | number): Promise<number> {
@@ -167,7 +179,7 @@ async function resolveCategoryId(category: string | number): Promise<number> {
 }
 
 /* ------------------------------------------------------------------ */
-/*  API calls                                                          */
+/*  API calls                                                         */
 /* ------------------------------------------------------------------ */
 
 /**
@@ -188,7 +200,7 @@ export async function fetchEliteTopics(): Promise<EliteTopicsResponse> {
     )
   }
 
-  const list = byDateDesc(topics, (t) => t.last_activity).map((topic) =>
+  const list = byDateDesc(topics, (topic) => topic.last_activity).map((topic) =>
     toEliteTopic(topic, stanceCountByTopic.get(topic.id) ?? 0),
   )
 
@@ -197,33 +209,32 @@ export async function fetchEliteTopics(): Promise<EliteTopicsResponse> {
 
 /**
  * Preview = topic metadata + a short "latest statements" slice.
+ * This is intentionally resilient: if arguments fail to load, we still return
+ * the topic metadata so the drawer never opens with a total empty state.
  */
 export async function fetchTopicPreview(
   id: string,
 ): Promise<TopicPreviewResponse> {
-  const topicId = assertTopicId(id)
+  const topicId = toTopicId(id)
 
-  const [topic, args] = await Promise.all([
-    get<EthikosTopicApi>(`ethikos/topics/${topicId}/`),
-    get<EthikosArgumentApi[]>('ethikos/arguments/', {
+  const topic = await get<EthikosTopicApi>(`ethikos/topics/${topicId}/`)
+
+  let args: EthikosArgumentApi[] = []
+  try {
+    args = await get<EthikosArgumentApi[]>('ethikos/arguments/', {
       params: { topic: topicId },
-    }),
-  ])
-
-  const latest = byDateDesc(args, (a) => a.created_at)
-    .slice(0, 3)
-    .map((arg) => ({
-      id: String(arg.id),
-      author: arg.user,
-      body: arg.content,
-    }))
+    })
+  } catch {
+    args = []
+  }
 
   return {
     id: String(topic.id),
     title: topic.title,
     category: categoryName(topic),
     createdAt: topic.created_at,
-    latest,
+    description: topic.description,
+    latest: toPreviewStatements(args),
   }
 }
 
@@ -259,7 +270,7 @@ export async function createEliteTopic(
 export async function fetchTopicDetail(
   id: string,
 ): Promise<TopicDetailResponse> {
-  const topicId = assertTopicId(id)
+  const topicId = toTopicId(id)
 
   const [topic, args] = await Promise.all([
     get<EthikosTopicApi>(`ethikos/topics/${topicId}/`),
@@ -268,7 +279,10 @@ export async function fetchTopicDetail(
     }),
   ])
 
-  const statements = byDateAsc(args, (a) => a.created_at).map((arg) => ({
+  const statements = byDateAsc(
+    (args ?? []).filter((arg) => !arg.is_hidden),
+    (arg) => arg.created_at,
+  ).map((arg) => ({
     id: String(arg.id),
     author: arg.user,
     body: arg.content,
