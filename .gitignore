@@ -1,6 +1,5 @@
 ##############################################################################
-# ROOT .gitignore (common folder holding backend + frontend)
-# Goal: avoid duplicates; keep repo-wide rules only
+# ROOT .gitignore (backend + frontend)
 ##############################################################################
 
 # Backups / local junk
@@ -24,7 +23,7 @@ Desktop.ini
 *.sublime-project
 
 ##############################################################################
-# 1) Logs / Reports / Caches (generic)
+# 1) Logs / Reports / Caches
 ##############################################################################
 *.log
 logs/
@@ -32,8 +31,6 @@ coverage/
 htmlcov/
 .cache/
 .nyc_output/
-reports/
-artifacts/
 playwright-report/
 test-results/
 routes-tests.json
@@ -47,9 +44,11 @@ use_client_report.json
 .env.*
 .envs/
 !.env.example
+!env.example
+!*.example
 
 ##############################################################################
-# 3) Python (generic)
+# 3) Python
 ##############################################################################
 __pycache__/
 *.py[cod]
@@ -57,13 +56,11 @@ __pycache__/
 *.pyo
 *.so
 
-# virtualenvs
 venv/
 .venv/
 env/
 ENV/
 
-# tooling caches
 .pytest_cache/
 .mypy_cache/
 .tox/
@@ -72,12 +69,11 @@ ENV/
 .pyright/
 .ruff_cache/
 
-# local dbs
 *.sqlite3
 *.db
 
 ##############################################################################
-# 4) Node / Front tooling (generic)
+# 4) Node / Frontend
 ##############################################################################
 node_modules/
 .pnpm/
@@ -86,22 +82,18 @@ node_modules/
 .pnpm-store/
 .ignored_node_modules/
 
-# builds
 .next/
 out/
 dist/
 build/
 
-# caches
 .eslintcache
 .prettiercache
 *.tsbuildinfo
 .turbo/
 .swc/
 .parcel-cache/
-.cache/
 
-# package manager debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -109,30 +101,36 @@ pnpm-debug.log*
 *.tgz
 
 ##############################################################################
-# 5) Django / Next generated assets (repo-wide safe defaults)
+# 5) Django / generated assets
 ##############################################################################
 staticfiles/
 media/
 
 ##############################################################################
-# 6) Docker / local data (common)
+# 6) Docker / local data
 ##############################################################################
 **/local_postgres_data/
 **/local_postgres_data_backups/
 **/local_pgdata/
 **/local_pgadmin/
 **/.docker/
-.dockerignore
 docker-compose.override.yml
 compose/**/traefik/acme.json
 compose/**/nginx/certs/
 
 ##############################################################################
-# 7) EXCEPTIONS (do not ignore these)
+# 7) Keep important project files
 ##############################################################################
-!konnaxion/**/migrations/
-!konnaxion/requirements/
-!konnaxion/config/
-!next-enterprise/package.json
-!next-enterprise/tsconfig.json
+!**/.dockerignore
+!**/Dockerfile
+!**/docker-compose*.yml
+!**/compose*.yml
+!**/requirements/
+!**/requirements/*.txt
+!**/migrations/
+!**/migrations/*.py
+!**/package.json
+!**/pnpm-lock.yaml
+!**/next.config.*
+!**/tsconfig.json
 !*.md
