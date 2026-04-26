@@ -134,3 +134,6 @@ compose/**/nginx/certs/
 !**/next.config.*
 !**/tsconfig.json
 !*.md
+
+*.tar.gz
+*.zip
