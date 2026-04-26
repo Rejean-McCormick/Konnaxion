@@ -4,6 +4,7 @@
 node_modules/
 .pnp/
 .pnp.js
+.pnpm-store/
 
 # =========================
 # Next.js / React builds
@@ -21,6 +22,8 @@ build/
 .env
 .env.*
 !.env.example
+!env.example
+!env.*.example
 
 # =========================
 # Logs
@@ -32,17 +35,20 @@ pnpm-debug.log*
 *.log
 
 # =========================
-# Testing / Coverage / Reports
+# Testing / Coverage / Generated Reports
 # =========================
 coverage/
 .nyc_output/
 playwright-report/
 test-results/
 artifacts/
-reports/
 routes-tests.json
 use_client_report.csv
 use_client_report.json
+
+# IMPORTANT:
+# Do NOT ignore reports/ because frontend/app/reports contains real Next.js routes.
+# reports/
 
 # =========================
 # Tooling caches

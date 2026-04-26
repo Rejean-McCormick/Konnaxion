@@ -37,7 +37,7 @@ services:
   traefik:
     build:
       context: .
-    dockerfile: ./compose/production/traefik/Dockerfile
+      dockerfile: ./compose/production/traefik/Dockerfile
     image: konnaxion_production_traefik
     depends_on:
       - django

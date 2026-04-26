@@ -1,1 +1,68 @@
-TOMOVEINKONNAXION-EKOH.zip
+# Secrets
+.env
+.env.*
+.envs/
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
+# Generated / build
+.next/
+node_modules/
+staticfiles/
+media/
+dist/
+build/
+out/
+coverage/
+htmlcov/
+test-results/
+playwright-report/
+artifacts/
+
+# Lockfiles usually not useful for AI code review
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+uv.lock
+
+# Large/static assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.ico
+*.mp4
+*.mov
+*.avi
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.pdf
+*.docx
+*.xlsx
+
+# Logs / reports / manifests generated
+*.log
+routes-tests.json
+use_client_report.csv
+use_client_report.json
+schema-endpoints.json
+combined_manifest.yml
+manifest_*.yml
+
+# Caches
+.cache/
+.turbo/
+.swc/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+__pycache__/
