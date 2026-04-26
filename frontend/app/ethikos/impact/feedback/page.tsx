@@ -186,7 +186,7 @@ export default function FeedbackLoops(): JSX.Element {
                     message: 'Please enter your feedback.',
                   },
                   {
-                    validator: async (_, value) => {
+                    validator: async (_: unknown, value: string | undefined) => {
                       if (!value || value.trim().length > 0) return;
                       throw new Error(
                         'Please enter your feedback.',
