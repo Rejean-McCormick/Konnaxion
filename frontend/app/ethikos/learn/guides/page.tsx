@@ -1,14 +1,6 @@
 // FILE: frontend/app/ethikos/learn/guides/page.tsx
 'use client'
 
-/**
- * Ethikos · Learn · Guides
- *
- * References:
- * - Current page structure from the uploaded file.
- * - Data service: services/learn.ts (fetchGuides).
- */
-
 import { useMemo, useState } from 'react'
 import {
   PageContainer,
@@ -29,17 +21,31 @@ import {
 } from 'antd'
 import { LinkOutlined, SyncOutlined, ReadOutlined } from '@ant-design/icons'
 import { useRequest } from 'ahooks'
+
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
 import { fetchGuides, type GuideSection } from '@/services/learn'
+
+type GuidesPayload = {
+  sections: GuideSection[]
+}
 
 type EnrichedGuideSection = GuideSection & {
   wc: number
   minutes: number
 }
 
+type PieDatum = {
+  type: string
+  value: number
+}
+
 function wordsOf(text: string): number {
-  if (!text) return 0
+  if (!text) {
+    return 0
+  }
+
   const matches = text.trim().match(/\S+/g)
+
   return matches ? matches.length : 0
 }
 
@@ -64,26 +70,38 @@ async function copySectionLink(id: string): Promise<void> {
 }
 
 export default function Guides(): JSX.Element {
-  const { data, loading, error, refresh } = useRequest(fetchGuides)
   const [query, setQuery] = useState('')
 
-  const sections: GuideSection[] = data?.sections ?? []
+  const { data, loading, error, refresh } = useRequest<GuidesPayload, []>(
+    fetchGuides,
+  )
+
+  const sections = data?.sections ?? []
 
   const computed = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
 
     const enriched: EnrichedGuideSection[] = sections.map((section) => {
       const wc = wordsOf(section.content)
-      const minutes = Math.max(1, Math.round(wc / 220)) // ~220 wpm
-      return { ...section, wc, minutes }
+      const minutes = Math.max(1, Math.round(wc / 220))
+
+      return {
+        ...section,
+        wc,
+        minutes,
+      }
     })
 
     const filtered = normalizedQuery
-      ? enriched.filter(
-          (section) =>
-            section.title.toLowerCase().includes(normalizedQuery) ||
-            section.content.toLowerCase().includes(normalizedQuery),
-        )
+      ? enriched.filter((section) => {
+          const title = section.title.toLowerCase()
+          const content = section.content.toLowerCase()
+
+          return (
+            title.includes(normalizedQuery) ||
+            content.includes(normalizedQuery)
+          )
+        })
       : enriched
 
     const totals = filtered.reduce(
@@ -95,7 +113,7 @@ export default function Guides(): JSX.Element {
       { words: 0, minutes: 0 },
     )
 
-    const pieData = filtered.map((section) => ({
+    const pieData: PieDatum[] = filtered.map((section) => ({
       type: section.title,
       value: section.wc || 1,
     }))
@@ -106,8 +124,32 @@ export default function Guides(): JSX.Element {
       title: section.title,
     }))
 
-    return { filtered, totals, pieData, anchorItems }
+    return {
+      filtered,
+      totals,
+      pieData,
+      anchorItems,
+    }
   }, [sections, query])
+
+  const pieConfig = useMemo(
+    () => ({
+      data: computed.pieData,
+      angleField: 'value',
+      colorField: 'type',
+      radius: 0.8,
+      label: {
+        text: 'type',
+        position: 'outside' as const,
+      },
+      legend: {
+        color: {
+          position: 'bottom' as const,
+        },
+      },
+    }),
+    [computed.pieData],
+  )
 
   const shellProps = {
     title: 'Guides',
@@ -124,7 +166,11 @@ export default function Guides(): JSX.Element {
             description="Failed to load guides"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
-            <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
+            <Button
+              type="primary"
+              icon={<SyncOutlined />}
+              onClick={() => refresh()}
+            >
               Retry
             </Button>
           </Empty>
@@ -133,67 +179,18 @@ export default function Guides(): JSX.Element {
     )
   }
 
-  const pieConfig = {
-    data: computed.pieData,
-    angleField: 'value',
-    colorField: 'type',
-    radius: 0.9,
-    legend: false as const,
-    label: { type: 'inner', offset: '-30%', content: '' },
-    interactions: [{ type: 'element-active' }],
-  }
+  const headerStats = (
+    <Space wrap>
+      <Tag icon={<ReadOutlined />}>{sections.length} sections</Tag>
+      <Tag>{computed.totals.words} words</Tag>
+      <Tag>{computed.totals.minutes} min reading</Tag>
+    </Space>
+  )
 
   return (
-    <EthikosPageShell {...shellProps}>
-      <PageContainer
-        ghost
-        loading={loading}
-        extra={
-          <Space size="large">
-            <Space direction="vertical" size={0}>
-              <Typography.Text type="secondary">Guides</Typography.Text>
-              <Typography.Text strong>{sections.length}</Typography.Text>
-            </Space>
-
-            <Space direction="vertical" size={0}>
-              <Typography.Text type="secondary">
-                Est. reading
-              </Typography.Text>
-              <Typography.Text strong>
-                {computed.totals.minutes} min
-              </Typography.Text>
-            </Space>
-          </Space>
-        }
-      >
-        <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
-          <StatisticCard
-            statistic={{
-              title: 'Total guides',
-              value: sections.length,
-              icon: <ReadOutlined />,
-            }}
-          />
-
-          <StatisticCard
-            statistic={{
-              title: 'Words (filtered)',
-              value: computed.totals.words,
-            }}
-          />
-
-          <StatisticCard
-            statistic={{
-              title: 'Est. read time',
-              value: computed.totals.minutes,
-              suffix: 'min',
-            }}
-          />
-
-          <ProCard colSpan="100%" ghost />
-        </ProCard>
-
-        <ProCard split="vertical" ghost>
+    <EthikosPageShell {...shellProps} secondaryActions={headerStats}>
+      <PageContainer ghost loading={loading}>
+        <ProCard gutter={16} wrap>
           <ProCard
             colSpan={{ xs: 24, sm: 24, md: 7, lg: 6, xl: 6 }}
             title="Navigate guides"
@@ -202,7 +199,7 @@ export default function Guides(): JSX.Element {
               placeholder="Filter guides…"
               allowClear
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(event) => setQuery(event.target.value)}
               style={{ marginBottom: 16 }}
             />
 
@@ -225,6 +222,28 @@ export default function Guides(): JSX.Element {
             colSpan={{ xs: 24, sm: 24, md: 17, lg: 18, xl: 18 }}
             title="Guided flows"
           >
+            <StatisticCard.Group style={{ marginBottom: 16 }}>
+              <StatisticCard
+                statistic={{
+                  title: 'Sections',
+                  value: computed.filtered.length,
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: 'Words',
+                  value: computed.totals.words,
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: 'Estimated reading time',
+                  value: computed.totals.minutes,
+                  suffix: 'min',
+                }}
+              />
+            </StatisticCard.Group>
+
             {sections.length === 0 && !loading ? (
               <Empty description="No guides available yet." />
             ) : computed.filtered.length === 0 ? (

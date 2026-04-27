@@ -1,5 +1,4 @@
 // FILE: frontend/app/ethikos/impact/tracker/page.tsx
-// app/ethikos/impact/tracker/page.tsx
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -39,6 +38,13 @@ const { Text } = Typography;
 type TrackerPayload = { items: TrackerItem[] };
 type StatusFilter = 'all' | 'active' | ImpactStatus;
 
+const STATUS_VALUES: ImpactStatus[] = [
+  'Planned',
+  'In-Progress',
+  'Completed',
+  'Blocked',
+];
+
 const STATUS_LABELS: Record<ImpactStatus, string> = {
   Planned: 'Planned',
   'In-Progress': 'In progress',
@@ -53,6 +59,15 @@ const STATUS_COLORS: Record<ImpactStatus, string> = {
   Blocked: 'error',
 };
 
+const FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
+  { label: 'Active', value: 'active' },
+  { label: 'All', value: 'all' },
+  { label: 'Planned', value: 'Planned' },
+  { label: 'In progress', value: 'In-Progress' },
+  { label: 'Completed', value: 'Completed' },
+  { label: 'Blocked', value: 'Blocked' },
+];
+
 export default function ImpactTracker(): JSX.Element {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('active');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -65,48 +80,77 @@ export default function ImpactTracker(): JSX.Element {
 
   const stats = useMemo(() => {
     const total = items.length;
-    const planned = items.filter((i) => i.status === 'Planned').length;
-    const inProgress = items.filter((i) => i.status === 'In-Progress').length;
-    const completed = items.filter((i) => i.status === 'Completed').length;
-    const blocked = items.filter((i) => i.status === 'Blocked').length;
+    const planned = items.filter((item) => item.status === 'Planned').length;
+    const inProgress = items.filter(
+      (item) => item.status === 'In-Progress',
+    ).length;
+    const completed = items.filter(
+      (item) => item.status === 'Completed',
+    ).length;
+    const blocked = items.filter((item) => item.status === 'Blocked').length;
     const active = planned + inProgress;
-    return { total, planned, inProgress, completed, blocked, active };
+
+    return {
+      total,
+      planned,
+      inProgress,
+      completed,
+      blocked,
+      active,
+    };
   }, [items]);
 
   const filteredItems = useMemo(() => {
-    if (!items.length) return items;
-    if (statusFilter === 'all') return items;
+    if (statusFilter === 'all') {
+      return items;
+    }
+
     if (statusFilter === 'active') {
       return items.filter(
-        (i) => i.status === 'Planned' || i.status === 'In-Progress',
+        (item) =>
+          item.status === 'Planned' || item.status === 'In-Progress',
       );
     }
-    return items.filter((i) => i.status === statusFilter);
+
+    return items.filter((item) => item.status === statusFilter);
   }, [items, statusFilter]);
 
-  const statusOptions = (
-    ['Planned', 'In-Progress', 'Completed', 'Blocked'] as ImpactStatus[]
-  ).map((value) => ({
-    value,
-    label: STATUS_LABELS[value],
-  }));
+  const statusOptions = useMemo(
+    () =>
+      STATUS_VALUES.map((value) => ({
+        value,
+        label: STATUS_LABELS[value],
+      })),
+    [],
+  );
 
-  const handleStatusChange = async (id: string, status: ImpactStatus) => {
+  const handleStatusChange = async (
+    id: string,
+    status: ImpactStatus,
+  ): Promise<void> => {
     setUpdatingId(id);
+
     try {
       await patchImpactStatus(id, status);
+
       if (data) {
         const next: TrackerPayload = {
           items: data.items.map((item) =>
             item.id === id
-              ? { ...item, status, updatedAt: new Date().toISOString() }
+              ? {
+                  ...item,
+                  status,
+                  updatedAt: new Date().toISOString(),
+                }
               : item,
           ),
         };
+
         mutate(next);
-      } else {
-        refresh();
+        return;
       }
+
+      refresh();
     } finally {
       setUpdatingId(null);
     }
@@ -123,24 +167,38 @@ export default function ImpactTracker(): JSX.Element {
       title: 'Owner',
       dataIndex: 'owner',
       width: 180,
+      ellipsis: true,
+      render: (_dom, row) =>
+        row.owner ? row.owner : <Text type="secondary">Unknown</Text>,
     },
     {
       title: 'Status',
       dataIndex: 'status',
       width: 260,
-      render: (_, row) => (
-        <Space>
-          <Tag color={STATUS_COLORS[row.status]}>{STATUS_LABELS[row.status]}</Tag>
-          <Select<ImpactStatus>
-            size="small"
-            style={{ minWidth: 140 }}
-            value={row.status}
-            options={statusOptions}
-            loading={updatingId === row.id}
-            onChange={(value) => handleStatusChange(row.id, value)}
-          />
-        </Space>
-      ),
+      render: (_dom, row) => {
+        const isUpdating = updatingId === row.id;
+        const isDisabled = updatingId !== null && !isUpdating;
+
+        return (
+          <Space wrap>
+            <Tag color={STATUS_COLORS[row.status]}>
+              {STATUS_LABELS[row.status]}
+            </Tag>
+
+            <Select<ImpactStatus>
+              size="small"
+              style={{ minWidth: 140 }}
+              value={row.status}
+              options={statusOptions}
+              loading={isUpdating}
+              disabled={isDisabled}
+              onChange={(value) => {
+                void handleStatusChange(row.id, value);
+              }}
+            />
+          </Space>
+        );
+      },
     },
     {
       title: 'Last activity',
@@ -148,9 +206,9 @@ export default function ImpactTracker(): JSX.Element {
       width: 200,
       sorter: (a, b) =>
         dayjs(a.updatedAt).valueOf() - dayjs(b.updatedAt).valueOf(),
-      render: (_, row) =>
+      render: (_dom, row) =>
         row.updatedAt ? (
-          dayjs(row.updatedAt).fromNow()
+          <Text>{dayjs(row.updatedAt).fromNow()}</Text>
         ) : (
           <Text type="secondary">—</Text>
         ),
@@ -177,8 +235,8 @@ export default function ImpactTracker(): JSX.Element {
             description={
               <Text type="secondary">
                 Each row represents an Ethikos decision topic. Use the status to
-                indicate whether a debate is still planned, currently in progress,
-                completed, or blocked awaiting follow-up.
+                indicate whether a debate is still planned, currently in
+                progress, completed, or blocked awaiting follow-up.
               </Text>
             }
           />
@@ -201,23 +259,19 @@ export default function ImpactTracker(): JSX.Element {
               <Statistic title="Blocked" value={stats.blocked} />
             </Space>
 
-            <Space>
-              <Segmented
+            <Space wrap>
+              <Segmented<StatusFilter>
                 value={statusFilter}
-                onChange={(value) => setStatusFilter(value as StatusFilter)}
-                options={[
-                  { label: 'Active', value: 'active' },
-                  { label: 'All', value: 'all' },
-                  { label: 'Planned', value: 'Planned' },
-                  { label: 'In progress', value: 'In-Progress' },
-                  { label: 'Completed', value: 'Completed' },
-                  { label: 'Blocked', value: 'Blocked' },
-                ]}
+                options={FILTER_OPTIONS}
+                onChange={(value) => setStatusFilter(value)}
               />
+
               <Button
                 icon={<ReloadOutlined />}
                 onClick={() => refresh()}
                 type="default"
+                loading={loading}
+                disabled={updatingId !== null}
               >
                 Refresh
               </Button>
@@ -234,10 +288,12 @@ export default function ImpactTracker(): JSX.Element {
             dataSource={filteredItems}
             pagination={{ pageSize: 12 }}
             search={false}
+            options={false}
+            loading={loading}
             toolBarRender={() => [
               <Text key="hint" type="secondary">
-                Adjust the status when a debate moves from planning to active work
-                or when a decision is finalised.
+                Adjust the status when a debate moves from planning to active
+                work or when a decision is finalised.
               </Text>,
             ]}
           />
@@ -246,3 +302,7 @@ export default function ImpactTracker(): JSX.Element {
     </EthikosPageShell>
   );
 }
+
+
+
+

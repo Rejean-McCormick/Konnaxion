@@ -1,9 +1,8 @@
 // FILE: frontend/app/ethikos/admin/moderation/page.tsx
-// app/ethikos/admin/moderation/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
+import type { Key, ReactNode } from 'react';
 import {
   PageContainer,
   ProTable,
@@ -31,114 +30,310 @@ import {
 import { useRequest } from 'ahooks';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
-import {
-  fetchModerationQueue,
-  actOnReport,
-  type ModerationPayload,
-} from '@/services/admin';
+import { actOnReport, fetchModerationQueue } from '@/services/admin';
 
 const { Text, Paragraph } = Typography;
 
 type ModerationStatus = 'Pending' | 'Resolved' | 'Escalated';
 type ModerationTargetType = 'topic' | 'post' | 'user';
-type Severity = 'low' | 'medium' | 'high';
+type ModerationSeverity = 'low' | 'medium' | 'high';
+type ModerationAction = 'approve' | 'remove';
 
 interface ModerationQueueItem {
   id: string;
-  /** Debate topic / argument / participant */
   targetType: ModerationTargetType;
-  /** ID of the target (argumentId, topicId, userId, etc.) */
   targetId: string;
-  /** Debate / consultation context (topic title) */
   contextTitle?: string;
-  /** Short preview of the argument or message */
   contentPreview?: string;
-  /** Who authored the offending content */
   authorName?: string;
   authorId?: string;
-  /** Who reported */
   reporterName?: string;
   reporterId?: string;
-  /** Primary reason label (Spam, Harassment, etc.) */
   reason?: string;
-  /** Free-text notes / message from reporter */
   reporterMessage?: string;
-  /** Number of merged reports for same target */
   reportCount?: number;
-  /** When the first report was created (ISO) */
   createdAt?: string;
-  /** When last moderation action happened (ISO) */
   lastActionAt?: string;
-  /** Queue status */
   status: ModerationStatus;
-  /** Heuristic severity classification */
-  severity?: Severity;
+  severity?: ModerationSeverity;
 }
 
-/**
- * Normalizes whatever the backend returns from admin/moderation
- * into a richer, Ethikos‑specific moderation item.
- */
-function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
-  if (!raw) return [];
+type UnknownRecord = Record<string, unknown>;
 
-  let items: any[] = [];
-  if (Array.isArray(raw)) {
-    items = raw;
-  } else if ((raw as any)?.items && Array.isArray((raw as any).items)) {
-    items = (raw as any).items;
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function unwrapPayload(raw: unknown): unknown {
+  if (!isRecord(raw)) {
+    return raw;
   }
 
-  return items.map((item: any): ModerationQueueItem => {
-    const status: ModerationStatus =
-      item.status === 'Resolved' || item.status === 'Escalated'
-        ? item.status
-        : 'Pending';
+  if ('data' in raw && raw.data !== undefined) {
+    return raw.data;
+  }
 
-    const targetType: ModerationTargetType =
-      (item.targetType as ModerationTargetType) ??
-      (item.entityType as ModerationTargetType) ??
-      'post';
+  return raw;
+}
 
-    const severity: Severity =
-      (item.severity as Severity) ??
-      (item.priority as Severity) ??
-      'medium';
+function extractItems(raw: unknown): unknown[] {
+  const payload = unwrapPayload(raw);
 
-    return {
-      id: String(item.id),
-      targetType,
-      targetId: String(
-        item.targetId ??
-          item.argumentId ??
-          item.postId ??
-          item.topicId ??
-          item.userId ??
-          item.id,
-      ),
-      contextTitle:
-        item.contextTitle ??
-        item.threadTitle ??
-        item.topicTitle ??
-        item.debateTitle,
-      contentPreview: item.content ?? item.contentSnippet ?? item.preview,
-      authorName: item.authorName ?? item.offenderName ?? item.user,
-      authorId: item.authorId ?? item.offenderId,
-      reporterName: item.reporterName ?? item.reporter,
-      reporterId: item.reporterId,
-      reason: item.type ?? item.reason,
-      reporterMessage: item.message ?? item.notes,
-      reportCount: item.reportCount ?? item.count ?? 1,
-      createdAt: item.createdAt ?? item.created_at ?? item.timestamp,
-      lastActionAt: item.lastActionAt ?? item.updated_at,
-      status,
-      severity,
-    };
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!isRecord(payload)) {
+    return [];
+  }
+
+  if (Array.isArray(payload.items)) {
+    return payload.items;
+  }
+
+  if (Array.isArray(payload.results)) {
+    return payload.results;
+  }
+
+  if (Array.isArray(payload.data)) {
+    return payload.data;
+  }
+
+  if (isRecord(payload.data)) {
+    if (Array.isArray(payload.data.items)) {
+      return payload.data.items;
+    }
+
+    if (Array.isArray(payload.data.results)) {
+      return payload.data.results;
+    }
+  }
+
+  return [];
+}
+
+function readString(record: UnknownRecord, keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+  }
+
+  return undefined;
+}
+
+function readNumber(record: UnknownRecord, keys: string[]): number | undefined {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function coerceStatus(value: unknown): ModerationStatus {
+  if (typeof value !== 'string') {
+    return 'Pending';
+  }
+
+  const normalized = value.toLowerCase();
+
+  if (normalized === 'resolved' || normalized === 'reviewed') {
+    return 'Resolved';
+  }
+
+  if (normalized === 'escalated') {
+    return 'Escalated';
+  }
+
+  return 'Pending';
+}
+
+function coerceTargetType(value: unknown): ModerationTargetType {
+  if (value === 'topic' || value === 'post' || value === 'user') {
+    return value;
+  }
+
+  if (
+    value === 'argument' ||
+    value === 'comment' ||
+    value === 'message' ||
+    value === 'reply'
+  ) {
+    return 'post';
+  }
+
+  return 'post';
+}
+
+function coerceSeverity(value: unknown): ModerationSeverity {
+  if (value === 'low' || value === 'medium' || value === 'high') {
+    return value;
+  }
+
+  if (value === 'critical') {
+    return 'high';
+  }
+
+  return 'medium';
+}
+
+function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
+  return extractItems(raw)
+    .filter(isRecord)
+    .map((item, index): ModerationQueueItem => {
+      const id =
+        readString(item, ['id', 'reportId', 'report_id']) ??
+        `moderation-report-${index}`;
+
+      return {
+        id,
+        targetType: coerceTargetType(
+          item.targetType ??
+            item.target_type ??
+            item.entityType ??
+            item.entity_type ??
+            item.type,
+        ),
+        targetId:
+          readString(item, [
+            'targetId',
+            'target_id',
+            'argumentId',
+            'argument_id',
+            'postId',
+            'post_id',
+            'topicId',
+            'topic_id',
+            'userId',
+            'user_id',
+            'id',
+          ]) ?? id,
+        contextTitle: readString(item, [
+          'contextTitle',
+          'context_title',
+          'threadTitle',
+          'thread_title',
+          'topicTitle',
+          'topic_title',
+          'debateTitle',
+          'debate_title',
+        ]),
+        contentPreview: readString(item, [
+          'contentPreview',
+          'content_preview',
+          'contentSnippet',
+          'content_snippet',
+          'content',
+          'preview',
+        ]),
+        authorName: readString(item, [
+          'authorName',
+          'author_name',
+          'offenderName',
+          'offender_name',
+          'user',
+          'username',
+          'author',
+        ]),
+        authorId: readString(item, [
+          'authorId',
+          'author_id',
+          'offenderId',
+          'offender_id',
+          'userId',
+          'user_id',
+        ]),
+        reporterName: readString(item, [
+          'reporterName',
+          'reporter_name',
+          'reporter',
+        ]),
+        reporterId: readString(item, ['reporterId', 'reporter_id']),
+        reason: readString(item, [
+          'reason',
+          'reportReason',
+          'report_reason',
+          'category',
+          'type',
+        ]),
+        reporterMessage: readString(item, [
+          'reporterMessage',
+          'reporter_message',
+          'message',
+          'notes',
+        ]),
+        reportCount:
+          readNumber(item, ['reportCount', 'report_count', 'count']) ?? 1,
+        createdAt: readString(item, [
+          'createdAt',
+          'created_at',
+          'timestamp',
+          'reportedAt',
+          'reported_at',
+        ]),
+        lastActionAt: readString(item, [
+          'lastActionAt',
+          'last_action_at',
+          'updatedAt',
+          'updated_at',
+        ]),
+        status: coerceStatus(item.status),
+        severity: coerceSeverity(item.severity ?? item.priority),
+      };
+    });
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  if (!isRecord(error)) {
+    return false;
+  }
+
+  if (error.status === 403) {
+    return true;
+  }
+
+  const response = error.response;
+
+  return isRecord(response) && response.status === 403;
+}
+
+function formatDate(value?: string): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
   });
 }
 
 export default function EthikosModerationPage(): JSX.Element {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
   const [activeStatusFilter, setActiveStatusFilter] = useState<
     ModerationStatus | 'all'
   >('Pending');
@@ -148,41 +343,44 @@ export default function EthikosModerationPage(): JSX.Element {
 
   const { message } = AntdApp.useApp();
 
-  // ahooks generics: <Data, Params>
   const {
     data: rawData,
     loading,
     error,
     refresh,
-  } = useRequest<ModerationPayload, []>(fetchModerationQueue);
+  } = useRequest(fetchModerationQueue);
 
-  const items: ModerationQueueItem[] = useMemo(
-    () => adaptModerationItems(rawData),
-    [rawData],
-  );
+  const items = useMemo(() => adaptModerationItems(rawData), [rawData]);
 
   const filteredItems = useMemo(() => {
-    if (activeStatusFilter === 'all') return items;
-    return items.filter((item) => item.status === activeStatusFilter);
-  }, [items, activeStatusFilter]);
+    if (activeStatusFilter === 'all') {
+      return items;
+    }
 
-  const unauthorized =
-    (error as any)?.response?.status === 403 || (error as any)?.status === 403;
+    return items.filter((item) => item.status === activeStatusFilter);
+  }, [activeStatusFilter, items]);
+
+  const unauthorized = isUnauthorizedError(error);
+  const selectedCount = selectedRowKeys.length;
 
   const onSingleAction = async (
     record: ModerationQueueItem,
-    action: 'approve' | 'remove',
-  ) => {
+    action: ModerationAction,
+  ): Promise<void> => {
     try {
       setGlobalActionLoading(true);
+
       const remove = action === 'remove';
+
       await actOnReport(record.id, remove);
+
       message.success(
         remove
           ? 'Debate content removed and report resolved.'
           : 'Content approved and report resolved.',
       );
-      await refresh();
+
+      refresh();
     } catch {
       message.error('Unable to process moderation action. Please try again.');
     } finally {
@@ -190,33 +388,39 @@ export default function EthikosModerationPage(): JSX.Element {
     }
   };
 
-  const onBulkAction = async (action: 'approve' | 'remove') => {
-    if (!selectedRowKeys.length) {
+  const onBulkAction = async (action: ModerationAction): Promise<void> => {
+    if (selectedRowKeys.length === 0) {
       message.info('Select at least one report to apply a bulk action.');
       return;
     }
 
     setGlobalActionLoading(true);
+
     try {
       const remove = action === 'remove';
 
-      const promises = selectedRowKeys.map((id) =>
-        actOnReport(String(id), remove).catch((err) => err),
+      const results = await Promise.allSettled(
+        selectedRowKeys.map((id) => actOnReport(String(id), remove)),
       );
 
-      const results = await Promise.all(promises);
-      const failures = results.filter((r) => r instanceof Error);
+      const failures = results.filter((result) => result.status === 'rejected');
 
-      if (failures.length) {
-        message.warning(
-          `${failures.length} report(s) could not be processed. They may have been updated by another moderator.`,
+      if (failures.length === 0) {
+        message.success(
+          remove
+            ? 'Selected content removed and reports resolved.'
+            : 'Selected content approved and reports resolved.',
         );
+      } else if (failures.length === selectedRowKeys.length) {
+        message.error('Bulk action failed for all selected reports.');
       } else {
-        message.success('Bulk action completed successfully.');
+        message.warning(
+          `${failures.length} report(s) could not be processed. The others were resolved.`,
+        );
       }
 
       setSelectedRowKeys([]);
-      await refresh();
+      refresh();
     } catch {
       message.error('Unable to complete bulk action. Please try again.');
     } finally {
@@ -224,8 +428,63 @@ export default function EthikosModerationPage(): JSX.Element {
     }
   };
 
+  const severityTag = (severity?: ModerationSeverity): ReactNode => {
+    if (!severity) {
+      return null;
+    }
+
+    const color =
+      severity === 'high' ? 'red' : severity === 'medium' ? 'orange' : 'blue';
+
+    const text =
+      severity === 'high'
+        ? 'High severity'
+        : severity === 'medium'
+          ? 'Medium'
+          : 'Low';
+
+    return (
+      <Tag color={color}>
+        <ExclamationCircleOutlined /> {text}
+      </Tag>
+    );
+  };
+
+  const targetTag = (record: ModerationQueueItem): ReactNode => {
+    const label =
+      record.targetType === 'topic'
+        ? 'Debate topic'
+        : record.targetType === 'user'
+          ? 'Participant'
+          : 'Argument / post';
+
+    return <Tag>{label}</Tag>;
+  };
+
+  const statusBadge = (status: ModerationStatus): ReactNode => {
+    if (status === 'Resolved') {
+      return (
+        <Badge
+          status="success"
+          text={
+            <Space size={4}>
+              <CheckCircleOutlined />
+              Resolved
+            </Space>
+          }
+        />
+      );
+    }
+
+    if (status === 'Escalated') {
+      return <Badge status="warning" text="Escalated" />;
+    }
+
+    return <Badge status="processing" text="Pending review" />;
+  };
+
   const statusFilterButtons = (
-    <Space>
+    <Space wrap>
       <Button
         size="small"
         onClick={() => setActiveStatusFilter('Pending')}
@@ -258,76 +517,25 @@ export default function EthikosModerationPage(): JSX.Element {
   );
 
   const headerActions = (
-    <Space>
+    <Space wrap>
       {statusFilterButtons}
       <Button
         icon={<ReloadOutlined />}
         onClick={() => refresh()}
         loading={loading || globalActionLoading}
-        disabled={!!unauthorized}
+        disabled={unauthorized}
       >
         Refresh queue
       </Button>
     </Space>
   );
 
-  const severityTag = (severity?: Severity): ReactNode => {
-    if (!severity) return null;
-    const color =
-      severity === 'high' ? 'red' : severity === 'medium' ? 'orange' : 'blue';
-    const text =
-      severity === 'high'
-        ? 'High severity'
-        : severity === 'medium'
-        ? 'Medium'
-        : 'Low';
-
-    return (
-      <Tag color={color}>
-        <ExclamationCircleOutlined /> {text}
-      </Tag>
-    );
-  };
-
-  const targetTag = (record: ModerationQueueItem): ReactNode => {
-    const label =
-      record.targetType === 'topic'
-        ? 'Debate topic'
-        : record.targetType === 'user'
-        ? 'Participant'
-        : 'Argument / post';
-
-    return <Tag>{label}</Tag>;
-  };
-
-  const statusBadge = (status: ModerationStatus): ReactNode => {
-    if (status === 'Resolved') {
-      return (
-        <Badge
-          status="success"
-          text={
-            <Space size={4}>
-              <CheckCircleOutlined />
-              Resolved
-            </Space>
-          }
-        />
-      );
-    }
-
-    if (status === 'Escalated') {
-      return <Badge status="warning" text="Escalated" />;
-    }
-
-    return <Badge status="processing" text="Pending review" />;
-  };
-
   const columns: ProColumns<ModerationQueueItem>[] = [
     {
       title: 'Content',
       dataIndex: 'contentPreview',
       ellipsis: true,
-      render: (_dom: ReactNode, record: ModerationQueueItem) => (
+      render: (_dom, record) => (
         <Space direction="vertical" size={2}>
           {record.contextTitle && (
             <Text strong ellipsis>
@@ -343,8 +551,8 @@ export default function EthikosModerationPage(): JSX.Element {
     {
       title: 'People',
       dataIndex: 'authorName',
-      width: 200,
-      render: (_dom: ReactNode, record: ModerationQueueItem) => (
+      width: 220,
+      render: (_dom, record) => (
         <Space direction="vertical" size={2}>
           {record.authorName && (
             <Text ellipsis>
@@ -362,9 +570,9 @@ export default function EthikosModerationPage(): JSX.Element {
     {
       title: 'Reason',
       dataIndex: 'reason',
-      width: 160,
-      render: (_dom: ReactNode, record: ModerationQueueItem) => (
-        <Space size={4}>
+      width: 210,
+      render: (_dom, record) => (
+        <Space size={4} wrap>
           {severityTag(record.severity)}
           {record.reason && <Tag>{record.reason}</Tag>}
           {typeof record.reportCount === 'number' && record.reportCount > 1 && (
@@ -376,55 +584,48 @@ export default function EthikosModerationPage(): JSX.Element {
     {
       title: 'Status',
       dataIndex: 'status',
-      width: 160,
+      width: 170,
       filters: [
         { text: 'Pending', value: 'Pending' },
         { text: 'Escalated', value: 'Escalated' },
         { text: 'Resolved', value: 'Resolved' },
       ],
-      onFilter: (value, record) =>
-        record.status === (String(value) as ModerationStatus),
-      render: (_dom: ReactNode, record: ModerationQueueItem) =>
-        statusBadge(record.status),
+      onFilter: (value, record) => record.status === String(value),
+      render: (_dom, record) => statusBadge(record.status),
     },
     {
       title: 'Timeline',
       dataIndex: 'createdAt',
       width: 220,
-      render: (_dom: ReactNode, record: ModerationQueueItem) => (
-        <Text type="secondary">
-          {record.createdAt && (
-            <>
-              Reported:{' '}
-              {new Date(record.createdAt).toLocaleString(undefined, {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-              })}
-              <br />
-            </>
-          )}
-          {record.lastActionAt && (
-            <>
-              Last action:{' '}
-              {new Date(record.lastActionAt).toLocaleString(undefined, {
-                dateStyle: 'medium',
-                timeStyle: 'short',
-              })}
-            </>
-          )}
-        </Text>
-      ),
+      render: (_dom, record) => {
+        const createdAt = formatDate(record.createdAt);
+        const lastActionAt = formatDate(record.lastActionAt);
+
+        return (
+          <Text type="secondary">
+            {createdAt && (
+              <>
+                Reported: {createdAt}
+                <br />
+              </>
+            )}
+            {lastActionAt && <>Last action: {lastActionAt}</>}
+            {!createdAt && !lastActionAt && 'No timestamp'}
+          </Text>
+        );
+      },
     },
     {
       title: 'Actions',
       key: 'actions',
-      width: 220,
+      width: 240,
       fixed: 'right',
-      render: (_dom: ReactNode, record: ModerationQueueItem) => {
-        const disabled = unauthorized || record.status === 'Resolved';
+      render: (_dom, record) => {
+        const disabled =
+          unauthorized || globalActionLoading || record.status === 'Resolved';
 
         return (
-          <Space size="small">
+          <Space size="small" wrap>
             <Tooltip title="View details">
               <Button
                 size="small"
@@ -470,88 +671,94 @@ export default function EthikosModerationPage(): JSX.Element {
     },
   ];
 
-  const pageBody = (
-    <PageContainer ghost loading={loading}>
-      <Space direction="vertical" style={{ width: '100%' }} size="large">
-        {unauthorized && (
-          <Alert
-            type="error"
-            showIcon
-            message="You do not have permission to moderate Ethikos debates."
-            description="If you believe this is an error, ask an administrator to grant you an Ethikos moderator or admin role."
-          />
-        )}
-
-        {!unauthorized && (
-          <Alert
-            type="info"
-            showIcon
-            message="Ethikos moderation guidelines"
-            description={
-              <>
-                Arguments that receive three or more independent reports are
-                automatically hidden until a moderator reviews them. Approve
-                content that fits the Ethikos charter (respect, evidence‑based
-                reasoning, and inclusion), remove content that clearly violates
-                it, and escalate borderline or sensitive cases.
-              </>
-            }
-          />
-        )}
-
-        {error && !unauthorized && (
-          <Alert
-            type="error"
-            showIcon
-            message="Unable to load the moderation queue."
-            description="Check your connection or try again. If the problem persists, the Ethikos moderation service may be temporarily unavailable."
-          />
-        )}
-
-        {items.length === 0 && !loading && !error && !unauthorized && (
-          <Alert
-            type="success"
-            showIcon
-            message="No open reports."
-            description="There are currently no unresolved reports on Ethikos debates. New reports will appear here in real time."
-          />
-        )}
-
-        <ProTable<ModerationQueueItem>
-          rowKey="id"
-          search={false}
-          options={false}
-          loading={loading || globalActionLoading}
-          columns={columns}
-          dataSource={filteredItems}
-          pagination={{
-            pageSize: 10,
-            showSizeChanger: true,
-            showTotal: (total) => `${total} reports`,
-          }}
-          rowSelection={{
-            selectedRowKeys,
-            onChange: (keys) => setSelectedRowKeys(keys),
-          }}
-          tableAlertRender={({ selectedRowKeys: keys }) => (
-            <Space size={8}>
-              <Text strong>{keys.length}</Text>
-              <Text>selected</Text>
-            </Space>
+  return (
+    <EthikosPageShell
+      title="Moderation queue"
+      sectionLabel="Admin"
+      subtitle="Review and act on reports for debate arguments, topics, and participant behaviour."
+      secondaryActions={headerActions}
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" style={{ width: '100%' }} size="large">
+          {unauthorized && (
+            <Alert
+              type="error"
+              showIcon
+              message="You do not have permission to moderate Ethikos debates."
+              description="If you believe this is an error, ask an administrator to grant you an Ethikos moderator or admin role."
+            />
           )}
-          tableAlertOptionRender={() => (
-            <Space>
-              <Tooltip title="Content is acceptable, resolve reports and keep the debate visible.">
-                <Button
-                  size="small"
-                  icon={<CheckCircleOutlined />}
-                  onClick={() => onBulkAction('approve')}
-                  disabled={!!unauthorized || !selectedRowKeys.length}
-                >
-                  Bulk approve
-                </Button>
-              </Tooltip>
-              <Tooltip title="Remove content and resolve selected reports">
+
+          {!unauthorized && (
+            <Alert
+              type="info"
+              showIcon
+              message="Ethikos moderation guidelines"
+              description="Arguments that receive multiple independent reports may be hidden until review. Approve content that fits the Ethikos charter, remove content that clearly violates it, and escalate borderline or sensitive cases."
+            />
+          )}
+
+          {error && !unauthorized && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load the moderation queue."
+              description="Check your connection or try again. If the problem persists, the Ethikos moderation service may be temporarily unavailable."
+            />
+          )}
+
+          {items.length === 0 && !loading && !error && !unauthorized && (
+            <Alert
+              type="success"
+              showIcon
+              message="No open reports."
+              description="There are currently no unresolved reports on Ethikos debates."
+            />
+          )}
+
+          <ProTable<ModerationQueueItem>
+            rowKey="id"
+            search={false}
+            options={false}
+            loading={loading || globalActionLoading}
+            columns={columns}
+            dataSource={filteredItems}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} reports`,
+            }}
+            rowSelection={{
+              selectedRowKeys,
+              onChange: (keys) => setSelectedRowKeys([...keys]),
+              getCheckboxProps: (record) => ({
+                disabled:
+                  unauthorized ||
+                  globalActionLoading ||
+                  record.status === 'Resolved',
+              }),
+            }}
+            tableAlertRender={({ selectedRowKeys: keys }) => (
+              <Space size={8}>
+                <Text strong>{keys.length}</Text>
+                <Text>selected</Text>
+              </Space>
+            )}
+            tableAlertOptionRender={() => (
+              <Space wrap>
+                <Tooltip title="Content is acceptable; resolve reports and keep the debate visible.">
+                  <Button
+                    size="small"
+                    icon={<CheckCircleOutlined />}
+                    onClick={() => onBulkAction('approve')}
+                    disabled={
+                      unauthorized || globalActionLoading || selectedCount === 0
+                    }
+                  >
+                    Bulk approve
+                  </Button>
+                </Tooltip>
+
                 <Popconfirm
                   title="Remove selected content?"
                   description="This will remove content for all selected reports and resolve them."
@@ -560,138 +767,127 @@ export default function EthikosModerationPage(): JSX.Element {
                   icon={
                     <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
                   }
-                  disabled={!!unauthorized || !selectedRowKeys.length}
+                  disabled={
+                    unauthorized || globalActionLoading || selectedCount === 0
+                  }
                   onConfirm={() => onBulkAction('remove')}
                 >
-                  <Button
-                    size="small"
-                    danger
-                    icon={<StopOutlined />}
-                    disabled={!!unauthorized || !selectedRowKeys.length}
-                  >
-                    Bulk remove
-                  </Button>
+                  <Tooltip title="Remove content and resolve selected reports">
+                    <Button
+                      size="small"
+                      danger
+                      icon={<StopOutlined />}
+                      disabled={
+                        unauthorized ||
+                        globalActionLoading ||
+                        selectedCount === 0
+                      }
+                    >
+                      Bulk remove
+                    </Button>
+                  </Tooltip>
                 </Popconfirm>
-              </Tooltip>
-            </Space>
-          )}
-          scroll={{ x: 1100 }}
-        />
-
-        <Drawer
-          title="Report details"
-          width={480}
-          open={!!detailDrawerItem}
-          onClose={() => setDetailDrawerItem(null)}
-        >
-          {detailDrawerItem && (
-            <Space
-              direction="vertical"
-              style={{ width: '100%' }}
-              size="middle"
-            >
-              <Space>
-                {targetTag(detailDrawerItem)}
-                {severityTag(detailDrawerItem.severity)}
-                {statusBadge(detailDrawerItem.status)}
-                {detailDrawerItem.reason && (
-                  <Tag>{detailDrawerItem.reason}</Tag>
-                )}
               </Space>
+            )}
+            scroll={{ x: 1100 }}
+          />
 
-              {detailDrawerItem.contextTitle && (
+          <Drawer
+            title="Report details"
+            width={480}
+            open={!!detailDrawerItem}
+            onClose={() => setDetailDrawerItem(null)}
+          >
+            {detailDrawerItem && (
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="middle"
+              >
+                <Space wrap>
+                  {targetTag(detailDrawerItem)}
+                  {severityTag(detailDrawerItem.severity)}
+                  {statusBadge(detailDrawerItem.status)}
+                  {detailDrawerItem.reason && (
+                    <Tag>{detailDrawerItem.reason}</Tag>
+                  )}
+                </Space>
+
+                {detailDrawerItem.contextTitle && (
+                  <div>
+                    <Text strong>Debate / topic</Text>
+                    <Paragraph>{detailDrawerItem.contextTitle}</Paragraph>
+                  </div>
+                )}
+
+                {detailDrawerItem.contentPreview && (
+                  <div>
+                    <Text strong>Argument / message</Text>
+                    <Paragraph>{detailDrawerItem.contentPreview}</Paragraph>
+                  </div>
+                )}
+
                 <div>
-                  <Text strong>Debate / topic</Text>
-                  <Paragraph>{detailDrawerItem.contextTitle}</Paragraph>
+                  <Text strong>People</Text>
+                  <Paragraph>
+                    {detailDrawerItem.authorName && (
+                      <>
+                        Author:{' '}
+                        <Text strong>{detailDrawerItem.authorName}</Text>
+                        <br />
+                      </>
+                    )}
+                    {detailDrawerItem.reporterName && (
+                      <>
+                        Reporter: <Text>{detailDrawerItem.reporterName}</Text>
+                        <br />
+                      </>
+                    )}
+                    {detailDrawerItem.reportCount && (
+                      <>Reports merged: {detailDrawerItem.reportCount}</>
+                    )}
+                  </Paragraph>
                 </div>
-              )}
 
-              {detailDrawerItem.contentPreview && (
+                {detailDrawerItem.reporterMessage && (
+                  <div>
+                    <Text strong>Reporter note</Text>
+                    <Paragraph>{detailDrawerItem.reporterMessage}</Paragraph>
+                  </div>
+                )}
+
                 <div>
-                  <Text strong>Argument / message</Text>
-                  <Paragraph>{detailDrawerItem.contentPreview}</Paragraph>
+                  <Text strong>Timeline</Text>
+                  <Paragraph type="secondary">
+                    {formatDate(detailDrawerItem.createdAt) && (
+                      <>
+                        Reported: {formatDate(detailDrawerItem.createdAt)}
+                        <br />
+                      </>
+                    )}
+                    {formatDate(detailDrawerItem.lastActionAt) && (
+                      <>
+                        Last action:{' '}
+                        {formatDate(detailDrawerItem.lastActionAt)}
+                      </>
+                    )}
+                    {!formatDate(detailDrawerItem.createdAt) &&
+                      !formatDate(detailDrawerItem.lastActionAt) &&
+                      'No timestamp available.'}
+                  </Paragraph>
                 </div>
-              )}
 
-              <div>
-                <Text strong>People</Text>
-                <Paragraph>
-                  {detailDrawerItem.authorName && (
-                    <>
-                      Author:{' '}
-                      <Text strong>{detailDrawerItem.authorName}</Text>
-                      <br />
-                    </>
-                  )}
-                  {detailDrawerItem.reporterName && (
-                    <>
-                      Reporter: <Text>{detailDrawerItem.reporterName}</Text>
-                      <br />
-                    </>
-                  )}
-                  {detailDrawerItem.reportCount && (
-                    <>Reports merged: {detailDrawerItem.reportCount}</>
-                  )}
-                </Paragraph>
-              </div>
-
-              {detailDrawerItem.reporterMessage && (
-                <div>
-                  <Text strong>Reporter note</Text>
-                  <Paragraph>{detailDrawerItem.reporterMessage}</Paragraph>
-                </div>
-              )}
-
-              <div>
-                <Text strong>Timeline</Text>
-                <Paragraph type="secondary">
-                  {detailDrawerItem.createdAt && (
-                    <>
-                      Reported:{' '}
-                      {new Date(
-                        detailDrawerItem.createdAt,
-                      ).toLocaleString(undefined, {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      })}
-                      <br />
-                    </>
-                  )}
-                  {detailDrawerItem.lastActionAt && (
-                    <>
-                      Last action:{' '}
-                      {new Date(
-                        detailDrawerItem.lastActionAt,
-                      ).toLocaleString(undefined, {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      })}
-                    </>
-                  )}
-                </Paragraph>
-              </div>
-
-              <Alert
-                type="info"
-                showIcon
-                message="Next steps"
-                description="Use the actions in the table to approve or remove this content. For borderline arguments or repeat offenders, escalate via your internal Ethikos governance process."
-              />
-            </Space>
-          )}
-        </Drawer>
-      </Space>
-    </PageContainer>
-  );
-
-  return (
-    <EthikosPageShell
-      title="Moderation queue"
-      sectionLabel="Admin"
-      subtitle="Review and act on reports for debate arguments, topics, and participant behaviour."
-      secondaryActions={headerActions}
-    >
-      {pageBody}
+                <Alert
+                  type="info"
+                  showIcon
+                  message="Next steps"
+                  description="Use the actions in the table to approve or remove this content. For borderline arguments or repeat offenders, escalate via your internal Ethikos governance process."
+                />
+              </Space>
+            )}
+          </Drawer>
+        </Space>
+      </PageContainer>
     </EthikosPageShell>
   );
 }

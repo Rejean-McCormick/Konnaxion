@@ -1,59 +1,41 @@
 // FILE: frontend/services/deliberate.ts
-import { get, post } from './_request'
+import { get } from './_request'
+import {
+  ETHIKOS_PATHS,
+  createEthikosTopic,
+  createTopicArgument,
+  fetchEthikosTopic,
+  fetchEthikosTopics,
+  fetchTopicArguments as fetchEthikosTopicArguments,
+  fetchTopicDetail as fetchEthikosTopicDetail,
+  fetchTopicPreview as fetchEthikosTopicPreview,
+  fetchTopicStances as fetchEthikosTopicStances,
+  normalizeList,
+  resolveEthikosCategoryId,
+  submitTopicStance as submitEthikosTopicStance,
+} from './ethikos'
+import type {
+  ApiMaybeList,
+  ArgumentSide,
+  EthikosArgumentApi,
+  EthikosStanceApi,
+  EthikosTopicApi,
+  StanceValue,
+  TopicPreviewResponse,
+} from './ethikos'
 import type { Topic } from '@/types'
 
 /* ------------------------------------------------------------------ */
-/*  Backend DTOs (canonical Ethikos API)                              */
+/*  Exported Deliberate compatibility types                           */
 /* ------------------------------------------------------------------ */
 
-type TopicStatus = 'open' | 'closed' | 'archived'
-
-interface EthikosCategoryApi {
-  id: number
-  name: string
-  description?: string | null
-}
-
-interface EthikosTopicApi {
-  id: number
-  title: string
-  description: string
-  category: EthikosCategoryApi | null
-  expertise_category?: number | null
-  status: TopicStatus
-  total_votes?: number | null
-  created_by?: string
-  last_activity: string
-  created_at: string
-}
-
-interface EthikosStanceApi {
-  id: number
-  topic: number
-  value: number
-  timestamp: string
-}
-
-interface EthikosArgumentApi {
-  id: number
-  topic: number
-  user: string
-  content: string
-  parent?: number | null
-  side?: 'pro' | 'con' | null
-  is_hidden?: boolean
-  created_at: string
-}
-
-/* ------------------------------------------------------------------ */
-/*  Exported types (reused by pages/modules)                          */
-/* ------------------------------------------------------------------ */
+export type TopicStanceValue = StanceValue
 
 export type EliteTopic = Topic & {
   createdAt: string
   lastActivity: string
   hot: boolean
-  /** Normalized locally from stances */
+  /** Normalized locally from stances until the topic serializer exposes it. */
   stanceCount?: number
 }
 
@@ -61,60 +43,114 @@ export type EliteTopicsResponse = {
   list: EliteTopic[]
 }
 
-export type TopicPreviewResponse = {
+export type TopicPreviewStatement = TopicPreviewResponse['latest'][number]
+
+export type TopicDetailStatement = {
   id: string
-  title: string
-  category: string
+  author: string
+  body: string
+  side?: ArgumentSide | null
+  parent?: string | null
   createdAt: string
-  description?: string
-  latest: { id: string; author: string; body: string }[]
 }
 
 export type TopicDetailResponse = {
   id: string
   title: string
-  statements: { id: string; author: string; body: string; createdAt: string }[]
+  description: string
+  category: string
+  createdAt: string
+  lastActivity: string
+  statements: TopicDetailStatement[]
+}
+
+export type TopicStance = {
+  id: string
+  topicId: string
+  user?: string
+  value: TopicStanceValue
+  timestamp: string
 }
 
 export type CreateEliteTopicPayload = {
   title: string
   /**
-   * Current UI still sends a category name string.
-   * Accepting number too makes the service future-proof for category_id.
+   * Current UI may still send a category name string.
+   * This service resolves it to category_id before POST.
    */
   category: string | number
-  /**
-   * TODO: the UI should collect a real description.
-   * For now we fall back to the title so the current modal can still create topics.
-   */
   description?: string
-  /**
-   * Optional future hook for expert-only topics.
-   * Not wired by the current page yet.
-   */
   expertiseCategoryId?: number | null
+}
+
+export type SubmitTopicStancePayload = {
+  topicId: string | number
+  value: TopicStanceValue
+}
+
+export type SubmitTopicArgumentPayload = {
+  topicId: string | number
+  body: string
+  parentId?: string | number | null
+  side?: ArgumentSide | null
 }
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
 /* ------------------------------------------------------------------ */
 
-function toTopicId(id: string): number {
-  const numericId = Number(id)
-  if (!Number.isFinite(numericId)) {
-    throw new Error(`Invalid topic id: ${id}`)
+function toTopicId(id: string | number): number {
+  const value = Number(id)
+
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`Invalid Ethikos topic id: ${String(id)}`)
   }
-  return numericId
+
+  return value
+}
+
+function optionalNumericId(id: string | number | null | undefined): number | null {
+  if (id == null || id === '') {
+    return null
+  }
+
+  const value = Number(id)
+
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error(`Invalid Ethikos id: ${String(id)}`)
+  }
+
+  return value
+}
+
+function assertStanceValue(value: number): asserts value is TopicStanceValue {
+  if (!Number.isInteger(value) || value < -3 || value > 3) {
+    throw new Error('Ethikos stance value must be an integer from -3 to 3.')
+  }
+}
+
+function assertArgumentSide(
+  side: ArgumentSide | null | undefined,
+): asserts side is ArgumentSide | null | undefined {
+  if (side == null) {
+    return
+  }
+
+  if (side !== 'pro' && side !== 'con') {
+    throw new Error('Ethikos argument side must be "pro" or "con".')
+  }
+}
+
+function displayUser(value: string | number | null | undefined): string {
+  if (value == null || value === '') {
+    return 'Anonymous'
+  }
+
+  return String(value)
 }
 
 function categoryName(topic: EthikosTopicApi): string {
-  return topic.category?.name ?? 'Uncategorised'
-}
-
-function byDateDesc<T>(items: T[], getDate: (item: T) => string): T[] {
-  return [...items].sort(
-    (a, b) => Date.parse(getDate(b)) - Date.parse(getDate(a)),
-  )
+  return topic.category?.name ?? topic.category_name ?? 'Uncategorized'
 }
 
 function byDateAsc<T>(items: T[], getDate: (item: T) => string): T[] {
@@ -123,59 +159,110 @@ function byDateAsc<T>(items: T[], getDate: (item: T) => string): T[] {
   )
 }
 
-function isHot(lastActivity: string, stanceCount: number): boolean {
-  const last = Date.parse(lastActivity)
-  const ageMs = Number.isNaN(last) ? Number.POSITIVE_INFINITY : Date.now() - last
-  const within72h = ageMs <= 72 * 60 * 60 * 1000
-  return within72h || stanceCount >= 5
+function byDateDesc<T>(items: T[], getDate: (item: T) => string): T[] {
+  return [...items].sort(
+    (a, b) => Date.parse(getDate(b)) - Date.parse(getDate(a)),
+  )
 }
 
 function toEliteTopic(topic: EthikosTopicApi, stanceCount: number): EliteTopic {
+  const totalVotes =
+    typeof topic.total_votes === 'number' ? topic.total_votes : stanceCount
+
   return {
     id: String(topic.id),
     title: topic.title,
     category: categoryName(topic),
     createdAt: topic.created_at,
     lastActivity: topic.last_activity,
-    hot: isHot(topic.last_activity, stanceCount),
+    hot: totalVotes >= 10,
     stanceCount,
   } as EliteTopic
 }
 
-function toPreviewStatements(args: EthikosArgumentApi[]): TopicPreviewResponse['latest'] {
-  return byDateDesc(
+function toTopicStance(row: EthikosStanceApi): TopicStance {
+  const value = Number(row.value)
+  assertStanceValue(value)
+
+  return {
+    id: String(row.id),
+    topicId: String(row.topic),
+    user: row.user != null ? String(row.user) : undefined,
+    value,
+    timestamp: row.timestamp,
+  }
+}
+
+function toDetailStatement(arg: EthikosArgumentApi): TopicDetailStatement {
+  return {
+    id: String(arg.id),
+    author: displayUser(arg.user),
+    body: arg.content,
+    side: arg.side ?? null,
+    parent: arg.parent != null ? String(arg.parent) : null,
+    createdAt: arg.created_at,
+  }
+}
+
+function toPreviewStatement(arg: EthikosArgumentApi): TopicPreviewStatement {
+  return {
+    id: String(arg.id),
+    author: displayUser(arg.user_display ?? arg.user),
+    body: arg.content,
+    createdAt: arg.created_at,
+  }
+}
+
+function normalizePreviewStatement(
+  statement: TopicPreviewStatement,
+): TopicPreviewStatement {
+  return {
+    id: String(statement.id),
+    author: displayUser(statement.author),
+    body: statement.body ?? '',
+    createdAt: statement.createdAt,
+  }
+}
+
+async function buildTopicPreviewFallback(
+  topicId: number,
+): Promise<TopicPreviewResponse> {
+  const topic = await fetchEthikosTopic(topicId)
+
+  let args: EthikosArgumentApi[] = []
+
+  try {
+    args = await fetchEthikosTopicArguments(topicId)
+  } catch {
+    args = []
+  }
+
+  const latest = byDateDesc(
     (args ?? []).filter((arg) => !arg.is_hidden),
     (arg) => arg.created_at,
   )
     .slice(0, 5)
-    .map((arg) => ({
-      id: String(arg.id),
-      author: arg.user,
-      body: arg.content,
-    }))
+    .map(toPreviewStatement)
+
+  return {
+    id: String(topic.id),
+    title: topic.title,
+    category: categoryName(topic),
+    createdAt: topic.created_at,
+    description: topic.description ?? '',
+    latest,
+  }
 }
 
-async function resolveCategoryId(category: string | number): Promise<number> {
-  if (typeof category === 'number' && Number.isFinite(category)) {
-    return category
-  }
+function hasUsablePreview(
+  preview: TopicPreviewResponse | null | undefined,
+): preview is TopicPreviewResponse {
+  return Boolean(preview?.id && preview?.title)
+}
 
-  const raw = String(category).trim()
-  const numeric = Number(raw)
-  if (Number.isFinite(numeric) && raw !== '') {
-    return numeric
-  }
-
-  const categories = await get<EthikosCategoryApi[]>('ethikos/categories/')
-  const match = categories.find(
-    (c) => c.name.trim().toLowerCase() === raw.toLowerCase(),
-  )
-
-  if (!match) {
-    throw new Error(`Unknown Ethikos category: ${raw}`)
-  }
-
-  return match.id
+async function fetchAllTopicStances(): Promise<EthikosStanceApi[]> {
+  const payload = await get<ApiMaybeList<EthikosStanceApi>>(ETHIKOS_PATHS.stances)
+  return normalizeList(payload)
 }
 
 /* ------------------------------------------------------------------ */
@@ -184,15 +271,16 @@ async function resolveCategoryId(category: string | number): Promise<number> {
 
 /**
  * Lists Ethikos topics and adapts them to the Elite UI shape.
- * We derive stanceCount locally because the topic serializer does not expose it.
+ * We derive stanceCount locally until the topic serializer exposes it.
  */
 export async function fetchEliteTopics(): Promise<EliteTopicsResponse> {
   const [topics, stances] = await Promise.all([
-    get<EthikosTopicApi[]>('ethikos/topics/'),
-    get<EthikosStanceApi[]>('ethikos/stances/'),
+    fetchEthikosTopics(),
+    fetchAllTopicStances(),
   ])
 
   const stanceCountByTopic = new Map<number, number>()
+
   for (const stance of stances) {
     stanceCountByTopic.set(
       stance.topic,
@@ -208,51 +296,59 @@ export async function fetchEliteTopics(): Promise<EliteTopicsResponse> {
 }
 
 /**
- * Preview = topic metadata + a short "latest statements" slice.
- * This is intentionally resilient: if arguments fail to load, we still return
- * the topic metadata so the drawer never opens with a total empty state.
+ * Preview = topic metadata + a short latest-statements slice.
+ *
+ * Preferred path:
+ *   GET /api/ethikos/topics/{id}/preview/
+ *
+ * Adapter rule:
+ * - never return an empty preview shape for an existing topic;
+ * - keep Deliberate/Korum routed through canonical ethiKos service calls;
+ * - do not create /api/kialo/*, /api/kintsugi/*, /api/korum/*, or /api/home/*.
  */
 export async function fetchTopicPreview(
-  id: string,
+  id: string | number,
 ): Promise<TopicPreviewResponse> {
   const topicId = toTopicId(id)
 
-  const topic = await get<EthikosTopicApi>(`ethikos/topics/${topicId}/`)
-
-  let args: EthikosArgumentApi[] = []
   try {
-    args = await get<EthikosArgumentApi[]>('ethikos/arguments/', {
-      params: { topic: topicId },
-    })
+    const preview = await fetchEthikosTopicPreview(topicId)
+
+    if (hasUsablePreview(preview)) {
+      return {
+        id: String(preview.id),
+        title: preview.title,
+        category: preview.category || 'Uncategorized',
+        createdAt: preview.createdAt,
+        description: preview.description ?? '',
+        latest: (preview.latest ?? []).map(normalizePreviewStatement),
+      }
+    }
   } catch {
-    args = []
+    // Fall through to topic + arguments fallback.
+    // This keeps the preview drawer usable when the preview action is absent
+    // or when argument aggregation fails.
   }
 
-  return {
-    id: String(topic.id),
-    title: topic.title,
-    category: categoryName(topic),
-    createdAt: topic.created_at,
-    description: topic.description,
-    latest: toPreviewStatements(args),
-  }
+  return buildTopicPreviewFallback(topicId)
 }
 
 /**
  * Topic creation must go through the canonical Ethikos topic endpoint.
- * Backend accepts category/category_id, not a category label string.
+ * Backend accepts category_id, not arbitrary category labels.
  */
 export async function createEliteTopic(
   payload: CreateEliteTopicPayload,
 ): Promise<{ id: string }> {
   const title = payload.title.trim()
+
   if (!title) {
-    throw new Error('Title is required')
+    throw new Error('Title is required.')
   }
 
-  const categoryId = await resolveCategoryId(payload.category)
+  const categoryId = await resolveEthikosCategoryId(payload.category)
 
-  const created = await post<EthikosTopicApi>('ethikos/topics/', {
+  const created = await createEthikosTopic({
     title,
     description: payload.description?.trim() || title,
     category_id: categoryId,
@@ -265,33 +361,120 @@ export async function createEliteTopic(
 }
 
 /**
- * Detail = topic metadata + full statements thread.
+ * Fetches normalized topic-level stances.
+ * These are EthikosStance rows, not Smart Vote readings and not claim-level
+ * impact votes.
+ */
+export async function fetchTopicStances(
+  id: string | number,
+): Promise<TopicStance[]> {
+  const topicId = toTopicId(id)
+  const stances = await fetchEthikosTopicStances(topicId)
+
+  return stances.map(toTopicStance)
+}
+
+/**
+ * Creates or updates the current user's topic-level stance.
+ */
+export async function submitTopicStance(
+  payload: SubmitTopicStancePayload,
+): Promise<TopicStance> {
+  const topicId = toTopicId(payload.topicId)
+  const value = Number(payload.value)
+
+  assertStanceValue(value)
+
+  const stance = await submitEthikosTopicStance(topicId, value)
+
+  return toTopicStance(stance)
+}
+
+/**
+ * Fetches visible arguments for a topic and normalizes them for UI rendering.
+ */
+export async function fetchTopicArguments(
+  id: string | number,
+): Promise<TopicDetailStatement[]> {
+  const topicId = toTopicId(id)
+  const args = await fetchEthikosTopicArguments(topicId)
+
+  return byDateAsc(
+    (args ?? []).filter((arg) => !arg.is_hidden),
+    (arg) => arg.created_at,
+  ).map(toDetailStatement)
+}
+
+/**
+ * Creates a top-level argument or threaded reply.
+ *
+ * Uses parent_id because the current EthikosArgument serializer accepts parent
+ * and parent_id, with parent_id kept as the explicit write field.
+ */
+export async function submitTopicArgument(
+  payload: SubmitTopicArgumentPayload,
+): Promise<TopicDetailStatement> {
+  const topicId = toTopicId(payload.topicId)
+  const content = payload.body.trim()
+  const parentId = optionalNumericId(payload.parentId)
+
+  if (!content) {
+    throw new Error('Argument body cannot be empty.')
+  }
+
+  assertArgumentSide(payload.side)
+
+  const created = await createTopicArgument({
+    topic: topicId,
+    content,
+    ...(parentId != null ? { parent_id: parentId } : {}),
+    ...(payload.side != null ? { side: payload.side } : {}),
+  })
+
+  return toDetailStatement(created)
+}
+
+/**
+ * Detail = topic metadata + full visible statements thread.
  */
 export async function fetchTopicDetail(
-  id: string,
+  id: string | number,
 ): Promise<TopicDetailResponse> {
   const topicId = toTopicId(id)
 
-  const [topic, args] = await Promise.all([
-    get<EthikosTopicApi>(`ethikos/topics/${topicId}/`),
-    get<EthikosArgumentApi[]>('ethikos/arguments/', {
-      params: { topic: topicId },
-    }),
-  ])
+  try {
+    const detail = await fetchEthikosTopicDetail(topicId)
 
-  const statements = byDateAsc(
-    (args ?? []).filter((arg) => !arg.is_hidden),
-    (arg) => arg.created_at,
-  ).map((arg) => ({
-    id: String(arg.id),
-    author: arg.user,
-    body: arg.content,
-    createdAt: arg.created_at,
-  }))
+    return {
+      id: detail.id,
+      title: detail.title,
+      description: detail.description ?? '',
+      category: detail.category ?? 'Uncategorized',
+      createdAt: detail.createdAt,
+      lastActivity: detail.lastActivity,
+      statements: detail.statements.map((statement) => ({
+        id: statement.id,
+        author: statement.author,
+        body: statement.body,
+        side: statement.side ?? null,
+        parent: statement.parent ?? null,
+        createdAt: statement.createdAt,
+      })),
+    }
+  } catch {
+    const [topic, statements] = await Promise.all([
+      fetchEthikosTopic(topicId),
+      fetchTopicArguments(topicId),
+    ])
 
-  return {
-    id: String(topic.id),
-    title: topic.title,
-    statements,
+    return {
+      id: String(topic.id),
+      title: topic.title,
+      description: topic.description ?? '',
+      category: categoryName(topic),
+      createdAt: topic.created_at,
+      lastActivity: topic.last_activity,
+      statements,
+    }
   }
 }

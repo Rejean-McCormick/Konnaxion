@@ -1,8 +1,6 @@
 // FILE: frontend/app/ethikos/admin/roles/page.tsx
-// app/ethikos/admin/roles/page.tsx
 'use client';
 
-import type { ReactNode } from 'react';
 import { useMemo, useState } from 'react';
 import {
   PageContainer,
@@ -11,6 +9,7 @@ import {
 } from '@ant-design/pro-components';
 import {
   Alert,
+  App as AntdApp,
   Button,
   Segmented,
   Space,
@@ -26,63 +25,125 @@ import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchRoles,
   toggleRole,
-  type RoleRow,
   type RolePayload,
+  type RoleRow,
 } from '@/services/admin';
 
 const { Text } = Typography;
 
 type StatusFilter = 'all' | 'enabled' | 'disabled';
 
-export default function RoleManagement() {
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+const STATUS_FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Enabled', value: 'enabled' },
+  { label: 'Disabled', value: 'disabled' },
+];
 
-  // ahooks v3 generics: <Data, ParamsTuple>. No params → []
-  const { data, loading, refresh } = useRequest<RolePayload, []>(fetchRoles);
+export default function RoleManagement(): JSX.Element {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null);
+
+  const { message } = AntdApp.useApp();
+
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useRequest<RolePayload, []>(() => fetchRoles());
+
+  const items = useMemo(() => data?.items ?? [], [data]);
 
   const stats = useMemo(() => {
-    const items = data?.items ?? [];
     const totalRoles = items.length;
-    const enabledRoles = items.filter((r) => r.enabled).length;
+    const enabledRoles = items.filter((role) => role.enabled).length;
     const totalUsers = items.reduce(
-      (sum, r) => sum + (r.userCount ?? 0),
+      (sum, role) => sum + (role.userCount ?? 0),
       0,
     );
-    return { totalRoles, enabledRoles, totalUsers };
-  }, [data]);
+
+    return {
+      totalRoles,
+      enabledRoles,
+      totalUsers,
+    };
+  }, [items]);
 
   const filteredItems = useMemo(() => {
-    const items = data?.items ?? [];
-    if (statusFilter === 'enabled') return items.filter((r) => r.enabled);
-    if (statusFilter === 'disabled') return items.filter((r) => !r.enabled);
+    if (statusFilter === 'enabled') {
+      return items.filter((role) => role.enabled);
+    }
+
+    if (statusFilter === 'disabled') {
+      return items.filter((role) => !role.enabled);
+    }
+
     return items;
-  }, [data, statusFilter]);
+  }, [items, statusFilter]);
+
+  const onToggleRole = async (
+    role: RoleRow,
+    checked: boolean,
+  ): Promise<void> => {
+    try {
+      setUpdatingRoleId(role.id);
+
+      await toggleRole(role.id, checked);
+
+      message.success(
+        checked ? `${role.name} enabled.` : `${role.name} disabled.`,
+      );
+
+      refresh();
+    } catch {
+      message.error('Unable to update this role. Please try again.');
+    } finally {
+      setUpdatingRoleId(null);
+    }
+  };
 
   const columns: ProColumns<RoleRow>[] = [
     {
       title: 'Role',
       dataIndex: 'name',
-      width: 220,
+      width: 260,
       ellipsis: true,
+      render: (_dom, row) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{row.name}</Text>
+
+          {row.role && (
+            <Text type="secondary" ellipsis>
+              Permission role: {row.role}
+            </Text>
+          )}
+
+          {row.topicTitle && (
+            <Text type="secondary" ellipsis>
+              Topic: {row.topicTitle}
+            </Text>
+          )}
+        </Space>
+      ),
     },
     {
       title: 'Users',
       dataIndex: 'userCount',
       width: 120,
       align: 'right',
-      render: (dom: ReactNode) => <Tag>{dom}</Tag>,
+      render: (_dom, row) => <Tag>{row.userCount ?? 0}</Tag>,
     },
     {
       title: 'Enabled',
       dataIndex: 'enabled',
       width: 140,
-      valueType: 'switch',
-      render: (_: ReactNode, row: RoleRow) => (
+      render: (_dom, row) => (
         <Switch
-          checked={row.enabled}
-          onChange={async (checked: boolean) => {
-            await toggleRole(row.id, checked);
-            refresh();
+          checked={Boolean(row.enabled)}
+          loading={updatingRoleId === row.id}
+          disabled={loading || updatingRoleId !== null}
+          onChange={(checked) => {
+            void onToggleRole(row, checked);
           }}
         />
       ),
@@ -108,11 +169,20 @@ export default function RoleManagement() {
             description={
               <Text type="secondary">
                 Use roles to control who can moderate debates, manage
-                consultations, or access sensitive impact dashboards.
-                Toggling a role updates access for all users in that group.
+                consultations, or access sensitive impact dashboards. Toggling a
+                role updates access for all users in that group.
               </Text>
             }
           />
+
+          {error && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load Ethikos roles."
+              description="Check your connection or try again. If the problem persists, the Ethikos admin service may be temporarily unavailable."
+            />
+          )}
 
           <Space
             align="center"
@@ -128,22 +198,19 @@ export default function RoleManagement() {
               <Statistic title="Assigned users" value={stats.totalUsers} />
             </Space>
 
-            <Space>
-              <Segmented
+            <Space wrap>
+              <Segmented<StatusFilter>
                 value={statusFilter}
-                onChange={(value) =>
-                  setStatusFilter(value as StatusFilter)
-                }
-                options={[
-                  { label: 'All', value: 'all' },
-                  { label: 'Enabled', value: 'enabled' },
-                  { label: 'Disabled', value: 'disabled' },
-                ]}
+                onChange={(value) => setStatusFilter(value)}
+                options={STATUS_FILTER_OPTIONS}
               />
+
               <Button
                 icon={<ReloadOutlined />}
                 onClick={() => refresh()}
                 type="default"
+                loading={loading}
+                disabled={updatingRoleId !== null}
               >
                 Refresh
               </Button>
@@ -157,6 +224,8 @@ export default function RoleManagement() {
           dataSource={filteredItems}
           pagination={false}
           search={false}
+          loading={loading}
+          options={false}
           toolBarRender={() => [
             <Text key="hint" type="secondary">
               Toggle a role to enable or disable its permissions

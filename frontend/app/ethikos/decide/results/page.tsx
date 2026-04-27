@@ -30,7 +30,6 @@ import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchDecisionResults,
   type DecisionResult,
-  type DecisionResultsResponse,
   type DecisionScope,
 } from '@/services/decide';
 
@@ -41,8 +40,100 @@ type ScopeFilter = 'all' | DecisionScope;
 type ResultFilter = 'all' | 'passed' | 'rejected';
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
+type DecisionResultsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function isDecisionScope(value: unknown): value is DecisionScope {
+  return value === 'Elite' || value === 'Public';
+}
+
+function normalizeDecisionScope(value: unknown): DecisionScope {
+  return isDecisionScope(value) ? value : 'Public';
+}
+
+function normalizeDecisionResult(value: unknown): DecisionResult | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  const id = value.id;
+  const title = value.title;
+  const passed = value.passed;
+  const closesAt = value.closesAt ?? value.closes_at ?? value.closedAt;
+
+  if (
+    (typeof id !== 'string' && typeof id !== 'number') ||
+    typeof title !== 'string' ||
+    typeof passed !== 'boolean' ||
+    typeof closesAt !== 'string'
+  ) {
+    return null;
+  }
+
+  const region = value.region;
+
+  return {
+    id: String(id),
+    title,
+    scope: normalizeDecisionScope(value.scope),
+    passed,
+    closesAt,
+    region: typeof region === 'string' && region.trim() ? region : undefined,
+  };
+}
+
+function extractDecisionItems(raw: unknown): DecisionResult[] {
+  if (!raw) {
+    return [];
+  }
+
+  if (Array.isArray(raw)) {
+    return raw.map(normalizeDecisionResult).filter(Boolean);
+  }
+
+  if (!isRecord(raw)) {
+    return [];
+  }
+
+  const payload = isRecord(raw.data) ? raw.data : raw;
+
+  if (Array.isArray(payload.items)) {
+    return payload.items.map(normalizeDecisionResult).filter(Boolean);
+  }
+
+  if (Array.isArray(payload.results)) {
+    return payload.results.map(normalizeDecisionResult).filter(Boolean);
+  }
+
+  if (Array.isArray(payload.data)) {
+    return payload.data.map(normalizeDecisionResult).filter(Boolean);
+  }
+
+  return [];
+}
+
+function formatDate(value: string): string {
+  const parsed = dayjs(value);
+
+  if (!parsed.isValid()) {
+    return value;
+  }
+
+  return parsed.format('YYYY-MM-DD HH:mm');
+}
+
+function toTimestamp(value: string): number {
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.valueOf() : 0;
+}
+
 export default function ResultsArchive(): JSX.Element {
-  const { data, loading, refresh } = useRequest<DecisionResultsResponse, []>(
+  const { data, loading, error, refresh } = useRequest<DecisionResultsData, []>(
     fetchDecisionResults,
   );
 
@@ -51,34 +142,48 @@ export default function ResultsArchive(): JSX.Element {
   const [regionFilter, setRegionFilter] = useState<string | 'all'>('all');
   const [range, setRange] = useState<RangeValue>(null);
 
-  const items = data?.items ?? [];
+  const items = useMemo(() => extractDecisionItems(data), [data]);
 
   const allRegions = useMemo(
     () =>
       Array.from(
         new Set(
           items
-            .map((d) => d.region)
-            .filter((r): r is string => !!r),
+            .map((item) => item.region)
+            .filter((region): region is string => Boolean(region)),
         ),
-      ),
+      ).sort((a, b) => a.localeCompare(b)),
     [items],
   );
 
   const filteredItems = useMemo(
     () =>
       items.filter((item) => {
-        if (scopeFilter !== 'all' && item.scope !== scopeFilter) return false;
-        if (resultFilter === 'passed' && !item.passed) return false;
-        if (resultFilter === 'rejected' && item.passed) return false;
-        if (regionFilter !== 'all' && item.region !== regionFilter) return false;
+        if (scopeFilter !== 'all' && item.scope !== scopeFilter) {
+          return false;
+        }
 
-        if (range && range[0] && range[1]) {
-          const [start, end] = range as [Dayjs, Dayjs];
-          const closedTs = dayjs(item.closesAt).valueOf();
+        if (resultFilter === 'passed' && !item.passed) {
+          return false;
+        }
+
+        if (resultFilter === 'rejected' && item.passed) {
+          return false;
+        }
+
+        if (regionFilter !== 'all' && item.region !== regionFilter) {
+          return false;
+        }
+
+        if (range?.[0] && range?.[1]) {
+          const [start, end] = range;
+          const closedTs = toTimestamp(item.closesAt);
           const startTs = start.startOf('day').valueOf();
           const endTs = end.endOf('day').valueOf();
-          if (closedTs < startTs || closedTs > endTs) return false;
+
+          if (closedTs < startTs || closedTs > endTs) {
+            return false;
+          }
         }
 
         return true;
@@ -87,7 +192,8 @@ export default function ResultsArchive(): JSX.Element {
   );
 
   const totalDecisions = items.length;
-  const passedCount = items.filter((i) => i.passed).length;
+  const filteredDecisionCount = filteredItems.length;
+  const passedCount = items.filter((item) => item.passed).length;
   const rejectedCount = totalDecisions - passedCount;
   const passRate = totalDecisions
     ? Math.round((passedCount / totalDecisions) * 100)
@@ -100,11 +206,18 @@ export default function ResultsArchive(): JSX.Element {
       dataIndex: 'title',
       width: 320,
       ellipsis: true,
+      sorter: (a, b) => a.title.localeCompare(b.title),
     },
     {
       title: 'Result',
       dataIndex: 'passed',
       width: 140,
+      filters: [
+        { text: 'Passed', value: 'passed' },
+        { text: 'Rejected', value: 'rejected' },
+      ],
+      onFilter: (value, record) =>
+        String(value) === 'passed' ? record.passed : !record.passed,
       render: (_dom, row) => (
         <Tag color={row.passed ? 'green' : 'red'}>
           {row.passed ? 'PASSED' : 'REJECTED'}
@@ -115,32 +228,41 @@ export default function ResultsArchive(): JSX.Element {
       title: 'Scope',
       dataIndex: 'scope',
       width: 120,
+      filters: [
+        { text: 'Elite', value: 'Elite' },
+        { text: 'Public', value: 'Public' },
+      ],
+      onFilter: (value, record) => record.scope === String(value),
       render: (_dom, row) => <Tag>{row.scope}</Tag>,
     },
     {
       title: 'Region',
       dataIndex: 'region',
-      width: 160,
+      width: 180,
+      ellipsis: true,
       render: (_dom, row) => row.region ?? '—',
     },
     {
       title: 'Closed',
       dataIndex: 'closesAt',
-      valueType: 'dateTime',
       width: 200,
-      sorter: (a, b) =>
-        dayjs(a.closesAt).valueOf() - dayjs(b.closesAt).valueOf(),
+      sorter: (a, b) => toTimestamp(a.closesAt) - toTimestamp(b.closesAt),
       defaultSortOrder: 'descend',
+      render: (_dom, row) => (
+        <Text type="secondary">{formatDate(row.closesAt)}</Text>
+      ),
     },
   ];
 
   return (
     <EthikosPageShell
       title="Decide · Results Archive"
+      sectionLabel="Decide"
       subtitle={
         <span>
-          Historical record of closed Ethikos decisions across elite and public scopes. Filter by
-          outcome, region and closing period, or jump to open ballots.
+          Historical record of closed Ethikos decisions across elite and public
+          scopes. Filter by outcome, region and closing period, or jump to open
+          ballots.
         </span>
       }
       primaryAction={
@@ -151,7 +273,7 @@ export default function ResultsArchive(): JSX.Element {
         </Link>
       }
       secondaryActions={
-        <Space>
+        <Space wrap>
           <Link href="/ethikos/decide/elite" prefetch={false}>
             <Button>Elite ballots</Button>
           </Link>
@@ -163,6 +285,7 @@ export default function ResultsArchive(): JSX.Element {
             onClick={() => refresh()}
             type="default"
             size="small"
+            loading={loading}
           >
             Refresh
           </Button>
@@ -170,112 +293,133 @@ export default function ResultsArchive(): JSX.Element {
       }
     >
       <PageContainer ghost loading={loading}>
-        <Alert
-          type="info"
-          showIcon
-          style={{ marginBottom: 16 }}
-          message="How to read this archive"
-          description={
-            <span>
-              Each row is a closed Ethikos decision with its final outcome and scope. Pass/fail is
-              derived from the aggregated stance direction at the time the vote closed. For details,
-              see the voting methodology.
-            </span>
-          }
-        />
-
-        {/* Summary / KPIs */}
-        <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
-          <StatisticCard
-            colSpan={{ xs: 24, sm: 8 }}
-            statistic={{
-              title: 'Closed decisions',
-              value: totalDecisions,
-            }}
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            message="How to read this archive"
+            description={
+              <span>
+                Each row is a closed Ethikos decision with its final outcome and
+                scope. Pass/fail is derived from the aggregated stance direction
+                at the time the vote closed. For details, see the voting
+                methodology.
+              </span>
+            }
           />
-          <StatisticCard
-            colSpan={{ xs: 24, sm: 8 }}
-            statistic={{
-              title: 'Pass rate',
-              value: `${passRate}%`,
-              description:
-                totalDecisions > 0
-                  ? `${passedCount} passed · ${rejectedCount} rejected`
-                  : 'No decisions yet',
-            }}
-          />
-          <StatisticCard
-            colSpan={{ xs: 24, sm: 8 }}
-            statistic={{
-              title: 'Regions covered',
-              value: coveredRegions,
-              description:
-                coveredRegions > 0
-                  ? 'Distinct policy domains'
-                  : 'No regional data',
-            }}
-          />
-        </ProCard>
 
-        {/* Filters */}
-        <ProCard
-          ghost
-          style={{ marginBottom: 16 }}
-          title="Filters"
-          extra={
-            <Text type="secondary">
-              Scope, outcome, region and closing period
-            </Text>
-          }
-        >
-          <Space wrap>
-            <Segmented
-              value={scopeFilter}
-              onChange={(val) => setScopeFilter(val as ScopeFilter)}
-              options={[
-                { label: 'All scopes', value: 'all' },
-                { label: 'Elite only', value: 'Elite' },
-                { label: 'Public only', value: 'Public' },
-              ]}
+          {error && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load decision results."
+              description="Check the Decide service or refresh this page."
             />
-            <Segmented
-              value={resultFilter}
-              onChange={(val) => setResultFilter(val as ResultFilter)}
-              options={[
-                { label: 'All outcomes', value: 'all' },
-                { label: 'Passed', value: 'passed' },
-                { label: 'Rejected', value: 'rejected' },
-              ]}
-            />
-            <Select
-              placeholder="Region (all)"
-              style={{ minWidth: 200 }}
-              allowClear
-              value={regionFilter === 'all' ? undefined : regionFilter}
-              onChange={(val) =>
-                setRegionFilter((val as string | undefined) ?? 'all')
-              }
-              options={allRegions.map((r) => ({ label: r, value: r }))}
-              disabled={allRegions.length === 0}
-            />
-            <RangePicker
-              value={range}
-              onChange={(value) => setRange(value as RangeValue)}
-              allowEmpty={[true, true]}
-            />
-          </Space>
-        </ProCard>
+          )}
 
-        {/* Archive table */}
-        <ProTable<DecisionResult>
-          rowKey="id"
-          columns={columns}
-          dataSource={filteredItems}
-          pagination={{ pageSize: 12 }}
-          search={false}
-          options={false}
-          toolBarRender={false}
-        />
+          <ProCard gutter={16} wrap>
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 8 }}
+              statistic={{
+                title: 'Closed decisions',
+                value: totalDecisions,
+                description:
+                  filteredDecisionCount === totalDecisions
+                    ? 'All archived decisions'
+                    : `${filteredDecisionCount} currently visible`,
+              }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 8 }}
+              statistic={{
+                title: 'Pass rate',
+                value: `${passRate}%`,
+                description:
+                  totalDecisions > 0
+                    ? `${passedCount} passed · ${rejectedCount} rejected`
+                    : 'No decisions yet',
+              }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 8 }}
+              statistic={{
+                title: 'Regions covered',
+                value: coveredRegions,
+                description:
+                  coveredRegions > 0
+                    ? 'Distinct policy domains'
+                    : 'No regional data',
+              }}
+            />
+          </ProCard>
+
+          <ProCard
+            ghost
+            title="Filters"
+            extra={
+              <Text type="secondary">
+                Scope, outcome, region and closing period
+              </Text>
+            }
+          >
+            <Space wrap>
+              <Segmented
+                value={scopeFilter}
+                onChange={(value) => setScopeFilter(value as ScopeFilter)}
+                options={[
+                  { label: 'All scopes', value: 'all' },
+                  { label: 'Elite only', value: 'Elite' },
+                  { label: 'Public only', value: 'Public' },
+                ]}
+              />
+
+              <Segmented
+                value={resultFilter}
+                onChange={(value) => setResultFilter(value as ResultFilter)}
+                options={[
+                  { label: 'All outcomes', value: 'all' },
+                  { label: 'Passed', value: 'passed' },
+                  { label: 'Rejected', value: 'rejected' },
+                ]}
+              />
+
+              <Select
+                placeholder="Region (all)"
+                style={{ minWidth: 200 }}
+                allowClear
+                value={regionFilter === 'all' ? undefined : regionFilter}
+                onChange={(value) =>
+                  setRegionFilter((value as string | undefined) ?? 'all')
+                }
+                options={allRegions.map((region) => ({
+                  label: region,
+                  value: region,
+                }))}
+                disabled={allRegions.length === 0}
+              />
+
+              <RangePicker
+                value={range}
+                onChange={(value) => setRange(value as RangeValue)}
+                allowEmpty={[true, true]}
+              />
+            </Space>
+          </ProCard>
+
+          <ProTable<DecisionResult>
+            rowKey="id"
+            columns={columns}
+            dataSource={filteredItems}
+            pagination={{
+              pageSize: 12,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} decisions`,
+            }}
+            search={false}
+            options={false}
+            toolBarRender={false}
+          />
+        </Space>
       </PageContainer>
     </EthikosPageShell>
   );

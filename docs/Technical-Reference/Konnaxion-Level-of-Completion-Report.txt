@@ -1,169 +1,0 @@
-**Konnaxion v14 \- Level of Completion (In-Depth)**
-
-*Scope: Konnaxion-v14 (backend \+ frontend). Evidence-based assessment from repository snapshots provided as JSON dumps.*
-
-# **1\. Executive Summary (Completion Verdict)**
-
-Overall maturity: ALPHA.
-
-Konnaxion is beyond "spec". The backend shows a real multi-app Django/DRF platform with API routing, docker-compose dev/prod scaffolding, Celery integration points, and smoke tests. The frontend shows a real Next.js App Router product surface with module-based UI, an API client layer, internal API routes, and test/dev tooling.
-
-Why this is not "Beta" yet (from explicit code signals):  
-\- Some backend features are explicitly optional or staged (vote-related endpoints; offline packages).  
-\- Some frontend endpoints include explicit mock fallbacks (moderation internal API route returns stub payload and labels response as mock mode).  
-\- At least one screen is a placeholder that requires wiring to real backend endpoints.
-
-# **2\. Maturity Scale Used**
-
-Concept: vision only  
-Spec/Architecture: detailed design, incomplete implementation  
-Prototype/Pre-alpha: partial demo / partial flows  
-Alpha: integrated, runnable, incomplete and/or not hardened  
-Beta: stable for external users, docs/ops/testing mature, minimal stubs  
-Production: hardened operations, reliability discipline, observability, load testing
-
-# **3\. Completion Summary (High-Level)**
-
-| Area | State | Notes (evidence from snapshot) |
-| :---- | :---- | :---- |
-| Backend platform (Django/DRF) | Alpha | Central API router; multiple domain apps; Celery \+ docker-compose; tests present. |
-| Frontend platform (Next.js) | Alpha | App Router; service client layer; internal API routes; Storybook \+ Playwright scaffolding. |
-| Cross-module integration | Alpha | Backend registers modules; frontend route map and API proxies exist; some mocks/stubs remain. |
-
-# **4\. Evidence Highlights (Direct Excerpts)**
-
-## **4.1 Backend: Optional / staged modules are explicitly marked**
-
-Optional vote endpoints (Kollective Intelligence):
-
-| \# \-- Kollective Intelligence \-------------------------------\# Vote-related ViewSets are optional for now; the app's api\_views module may be incomplete.VoteViewSet: Optional\[Type\[Any\]\]VoteResultViewSet: Optional\[Type\[Any\]\]try:    from konnaxion.kollective\_intelligence.api\_views import (  \# type: ignore\[attr-defined\]        VoteViewSet as \_VoteViewSet,        VoteResultViewSet as \_VoteResultViewSet,    )    VoteViewSet \= \_VoteViewSet    VoteResultViewSet \= \_VoteResultViewSetexcept Exception:    VoteViewSet \= None    VoteResultViewSet \= None\# \-- KonnectED (Knowledge \+ CertifiKation) \-----------------from konnaxion.konnected.api\_views import (    KnowledgeResourceViewSet,    CertificationPathViewSet,    EvaluationViewSet,    PeerValidationViewSet,    P |
-| :---- |
-
-Optional offline packages (KonnectED):
-
-| \# OfflinePackageViewSet is optional; it will be present once the offline-packages\# feature is implemented in konnected.api\_views.OfflinePackageViewSet: Optional\[Type\[Any\]\]try:    from konnaxion.konnected.api\_views import (  \# type: ignore\[attr-defined\]        OfflinePackageViewSet as \_OfflinePackageViewSet,    )    OfflinePackageViewSet \= \_OfflinePackageViewSetexcept Exception:    OfflinePackageViewSet \= None\# \-- Kreative \----------------------------------------------from konnaxion.kreative.api\_views import (    KreativeArtworkViewSet,    GalleryViewSet,    CollabSessionViewSet,    TraditionEntry |
-| :---- |
-
-## **4.2 Backend: Smoke test indicates real endpoints \+ ORM \+ permissions**
-
-| \# FILE: backend/tests/test\_smoke\_platform.py\# tests/test\_smoke\_platform.pyimport jsonimport pytestfrom django.urls import reversefrom konnaxion.users.models import Userfrom konnaxion.ethikos.models import EthikosCategory, EthikosTopicfrom konnaxion.users.tasks import get\_users\_count@pytest.mark.django\_dbdef test\_platform\_smoke(client, admin\_client, settings):    \# 0\) Admin and anonymous access to API docs    assert client.get(reverse("api-docs")).status\_code \== 403  \# anonymous    assert admin\_client.get(reverse("api-docs")).status\_code \== 200  \# admin    \# 1\) Users: /api/users/me/    r \= admin\_client.get(reverse("api:user-me"))    assert r.status\_code \== 200    me \= r.json()    assert "username" in me and me\["username"\]    \# 2\) Ethikos: create fixtures via ORM, then read via API    admin \= User.objects.get(username="admin")    cat \= EthikosCategory.objects.create... |
-| :---- |
-
-## **4.3 Frontend: Explicit mock fallback in moderation route**
-
-| reporter: 'moderation-bot',          type: 'Spam',          status: 'Resolved',        },      \],    }    return NextResponse.json\<ModerationPayload\>(fallback, {      status: 200,      headers: {        'Cache-Control': 'no-store',        'X-Konnaxion-Moderation-Mode': 'mock',      },    })  }} |
-| :---- |
-
-## **4.4 Frontend: Service client layer exists (Axios \+ credentials)**
-
-| const client: AxiosInstance \= axios.create({  baseURL: process.env.NEXT\_PUBLIC\_API\_BASE ?? '/api',  withCredentials: true,  xsrfCookieName: 'csrftoken',  xsrfHeaderName: 'X-CSRFToken',  timeout: 15000,})client.interceptors.request.use((cfg: InternalAxiosRequestConfig) \=\> {  // Example:  // const t \= typeof window \!== 'undefined' ? localStorage.getItem('token') : null  // if (t) cfg.headers.Authorization \= \`Bearer ${t}\`  return cfg})client.interceptors.response.use(  (res) \=\> res,  (err) \=\> Promise. |
-| :---- |
-
-## **4.5 Frontend: Auth middleware present (Auth0 wrapper referenced)**
-
-| // FILE: frontend/middleware.ts// middleware.tsimport type { NextRequest } from 'next/server';import { auth0 } from './lib/auth0';export async function middleware(request: NextRequest) {  return auth0.middleware(request);}export const config \= {  matcher: \[    '/((?\!\_next/static|\_next/image|favicon.ico|sitemap.xml|robots.txt).\*)',  \],}; |
-| :---- |
-
-Note: The lib/auth0 implementation file is not present in the uploaded snapshot pages, so completeness of auth flows cannot be confirmed from these splits alone.
-
-# **5\. Backend Completion (Django/DRF)**
-
-## **5.1 Platform-level status: Alpha**
-
-Evidence-based capabilities:  
-\- Central DRF router aggregates multiple domain modules into /api/\*.  
-\- Docker-compose supports local/dev and production configurations.  
-\- Celery integration is present (compose \+ config/celery\_app.py).  
-\- CI workflow exists (GitHub Actions in .github/workflows).  
-\- Smoke tests cover basic permissions and at least one domain module read path.
-
-## **5.2 Structural completeness (signal-based)**
-
-This section estimates structural completeness by checking whether each module appears to include:  
-\- models.py  
-\- migrations/  
-\- api\_views.py or api/views.py  
-\- tests/ or test\_\*.py
-
-Important: test files may be centralized outside each module folder; this check only counts tests located under the module path.
-
-| Backend module | Models | Migrations | API layer | Tests (local) | Surface score |
-| :---- | :---- | :---- | :---- | :---- | :---- |
-| ekoh | Yes | Yes | No | Yes | 75% |
-| ethikos | Yes | Yes | Yes | No | 75% |
-| keenkonnect | Yes | Yes | Yes | No | 75% |
-| kollective\_intelligence | Yes | Yes | Yes | No | 75% |
-| konnected | Yes | Yes | Yes | No | 75% |
-| kontrol | Yes | Yes | No | No | 50% |
-| kreative | Yes | Yes | Yes | No | 75% |
-| moderation | Yes | Yes | Yes | No | 75% |
-| smart\_vote | No | Yes | No | Yes | 50% |
-| teambuilder | Yes | Yes | Yes | Yes | 100% |
-| trust | Yes | Yes | Yes | No | 75% |
-| users | Yes | Yes | Yes | Yes | 100% |
-
-## **5.3 Backend incompleteness / gating signals**
-
-\- Vote endpoints are explicitly optional and imported under try/except in the central router.  
-\- Offline packages are explicitly noted as "once implemented".  
-\- Any module with missing API layer or missing migrations should be treated as in-progress until verified.
-
-# **6\. Frontend Completion (Next.js App Router)**
-
-## **6.1 Platform-level status: Alpha**
-
-Evidence-based capabilities:  
-\- App Router contains internal API routes for admin stats, moderation, search, health.  
-\- A service client layer exists for authenticated API calls (credentials, CSRF hints).  
-\- Tooling exists: Storybook, Playwright scaffolding, typecheck scripts.
-
-## **6.2 Frontend module surface (file-count signal)**
-
-| Frontend module | Files in snapshot |
-| :---- | :---- |
-| account | 1 |
-| admin | 8 |
-| ekoh | 5 |
-| ethikos | 24 |
-| global | 8 |
-| insights | 20 |
-| keenkonnect | 21 |
-| konnected | 19 |
-| konsensus | 8 |
-| konsultations | 22 |
-| kontact | 9 |
-| kreative | 13 |
-
-## **6.3 Frontend incompleteness / gating signals**
-
-\- Moderation internal API route returns deterministic stub payload when backend fails and labels response as mock mode.  
-\- Some UI screens are placeholders that log or fake-submit rather than calling real endpoints.  
-\- Auth middleware references Auth0 wrapper; full implementation cannot be confirmed from the provided split.
-
-# **7\. Readiness Checklist to Move from Alpha to Beta**
-
-Priority A (must do):
-
-\- Eliminate or hard-gate all mocks/stubs in production paths (e.g., moderation route mock mode).
-
-\- Decide fate of optional backend modules: finish, feature-flag, or remove from public surface until ready.
-
-\- Add integration tests for critical flows: auth \-\> profile \-\> core module read/write; Ethikos CRUD \+ permissions; keenKonnect project/task/message flows.
-
-\- Standardize frontend API access pattern (one client convention, consistent error model).
-
-\- Operational minimums: environment matrix, structured logging, migration discipline checks, basic observability hooks.
-
-Priority B (high value):
-
-\- Create a feature matrix (screens \+ endpoints) labeling: live and verified, live but limited, planned/disabled.
-
-\- Add basic load testing for key endpoints and baseline UI perf checks.
-
-\- Document deployment, secrets management approach, and backup/restore procedures.
-
-# **8\. Appendix \- Artifacts Reviewed**
-
-\- Backend: backend\_20251219\_1043\_01\_ROOT.json, backend\_20251219\_1043\_04\_config.json, backend\_20251219\_1043\_02\_konnaxion.json, backend\_20251219\_1043\_09\_.github.json, backend\_20251219\_1043\_99\_OTHERS.json
-
-\- Frontend: frontend\_20251219\_1044\_01\_ROOT.json, frontend\_20251219\_1044\_03\_app.json, frontend\_20251219\_1044\_04\_modules.json, frontend\_20251219\_1044\_06\_services.json, frontend\_20251219\_1044\_08\_routes.json, frontend\_20251219\_1044\_99\_OTHERS.json

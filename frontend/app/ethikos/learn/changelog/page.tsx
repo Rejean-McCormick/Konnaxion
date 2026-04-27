@@ -1,7 +1,6 @@
 // FILE: frontend/app/ethikos/learn/changelog/page.tsx
 'use client';
 
-// app/ethikos/learn/changelog/page.tsx.
 import React, { useMemo, useState } from 'react';
 import {
   PageContainer,
@@ -23,28 +22,31 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
+import type { GetProps } from 'antd';
 import {
+  ApartmentOutlined,
   CalendarOutlined,
   ClockCircleOutlined,
   CopyOutlined,
-  ReloadOutlined,
-  UnorderedListOutlined,
-  ApartmentOutlined,
   DownloadOutlined,
   FilterOutlined,
+  ReloadOutlined,
+  UnorderedListOutlined,
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchChangelog, type ChangelogEntry } from '@/services/learn';
-import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 
 const { RangePicker } = DatePicker;
 const { Text, Title } = Typography;
 
-type RangeValue = [Dayjs | null, Dayjs | null] | null;
+type RangePickerProps = GetProps<typeof RangePicker>;
+type RangeValue = RangePickerProps['value'];
+type ViewMode = 'timeline' | 'list';
 
-// Local response type matching services/learn.ts
 type ChangelogResponse = {
   entries: ChangelogEntry[];
 };
@@ -54,187 +56,197 @@ const TAG_COLOR: Record<string, string> = {
   FIX: 'blue',
   IMPROVE: 'geekblue',
   DOCS: 'gold',
+  LEARN: 'cyan',
   CHORE: 'default',
   BREAKING: 'red',
   DEPRECATE: 'volcano',
   INITIAL: 'purple',
 };
 
-function normalizeTag(t: string): string {
-  return t.trim().toUpperCase();
+function normalizeTag(tag: string): string {
+  return tag.trim().toUpperCase();
 }
 
-export default function Changelog() {
-  // Kept for compatibility; EthikosPageShell will set the final <title>.
+function formatDate(value: string): string {
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.format('YYYY-MM-DD') : value;
+}
+
+function entryKey(entry: ChangelogEntry): string {
+  return `${entry.version}-${entry.date}`;
+}
+
+export default function Changelog(): JSX.Element {
   usePageTitle('Learn · Changelog');
 
   const { data, loading, error, refresh } = useRequest<ChangelogResponse, []>(
     fetchChangelog,
   );
 
-  // Raw entries
+  const [query, setQuery] = useState('');
+  const [range, setRange] = useState<RangeValue>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [view, setView] = useState<ViewMode>('timeline');
+
   const entries: ChangelogEntry[] = data?.entries ?? [];
 
-  // Sort newest → oldest
   const sortedEntries = useMemo<ChangelogEntry[]>(
     () =>
       [...entries].sort(
-        (a, b) => dayjs(b.date).valueOf() - dayjs(a.date).valueOf(),
+        (left, right) =>
+          dayjs(right.date).valueOf() - dayjs(left.date).valueOf(),
       ),
     [entries],
   );
 
-  // Derive available tags (normalized)
   const allTags = useMemo<string[]>(
     () =>
       Array.from(
         new Set(
-          sortedEntries.flatMap((e: ChangelogEntry) =>
-            e.tags.map((t: string) => normalizeTag(t)),
+          sortedEntries.flatMap((entry) =>
+            entry.tags.map((tag) => normalizeTag(tag)),
           ),
         ),
       ).sort(),
     [sortedEntries],
   );
 
-  // Derive versions (keep order of first appearance in sorted list)
-  const allVersions = useMemo<string[]>(() => {
-    const seen = new Set<string>();
-    const out: string[] = [];
-    for (const e of sortedEntries) {
-      if (!seen.has(e.version)) {
-        seen.add(e.version);
-        out.push(e.version);
-      }
-    }
-    return out;
-  }, [sortedEntries]);
-
-  // UI state
-  const [query, setQuery] = useState('');
-  const [range, setRange] = useState<RangeValue>(null);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [view, setView] = useState<'timeline' | 'list'>('timeline');
-
-  // Filtered list
   const filtered = useMemo<ChangelogEntry[]>(() => {
-    let list: ChangelogEntry[] = sortedEntries;
+    let next = sortedEntries;
 
-    // text search (version or notes)
-    const q = query.trim().toLowerCase();
-    if (q) {
-      list = list.filter((e: ChangelogEntry) => {
-        if (e.version.toLowerCase().includes(q)) return true;
-        return e.notes.some((n: string) => n.toLowerCase().includes(q));
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (normalizedQuery) {
+      next = next.filter((entry) => {
+        if (entry.version.toLowerCase().includes(normalizedQuery)) {
+          return true;
+        }
+
+        return entry.notes.some((note) =>
+          note.toLowerCase().includes(normalizedQuery),
+        );
       });
     }
 
-    // tag filter (OR)
     if (selectedTags.length > 0) {
-      const allow = new Set(selectedTags.map(normalizeTag));
-      list = list.filter((e: ChangelogEntry) =>
-        e.tags.map(normalizeTag).some((t: string) => allow.has(t)),
+      const allowedTags = new Set(selectedTags.map(normalizeTag));
+
+      next = next.filter((entry) =>
+        entry.tags
+          .map((tag) => normalizeTag(tag))
+          .some((tag) => allowedTags.has(tag)),
       );
     }
 
-    // date range (inclusive)
-    if (range && range[0] && range[1]) {
+    if (range?.[0] && range?.[1]) {
       const start = range[0].startOf('day').valueOf();
       const end = range[1].endOf('day').valueOf();
-      list = list.filter((e: ChangelogEntry) => {
-        const t = dayjs(e.date).valueOf();
-        return t >= start && t <= end;
+
+      next = next.filter((entry) => {
+        const timestamp = dayjs(entry.date).valueOf();
+
+        return timestamp >= start && timestamp <= end;
       });
     }
 
-    return list;
+    return next;
   }, [sortedEntries, query, selectedTags, range]);
 
-  // Stats
   const totalEntries = filtered.length;
+
   const versionCount = useMemo(
-    () => new Set(filtered.map((e) => e.version)).size,
+    () => new Set(filtered.map((entry) => entry.version)).size,
     [filtered],
   );
+
   const tagCounts = useMemo<[string, number][]>(() => {
-    const m = new Map<string, number>();
-    for (const e of filtered) {
-      for (const t of e.tags) {
-        const k = normalizeTag(t);
-        m.set(k, (m.get(k) ?? 0) + 1);
+    const counts = new Map<string, number>();
+
+    for (const entry of filtered) {
+      for (const tag of entry.tags) {
+        const normalized = normalizeTag(tag);
+        counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
       }
     }
-    return Array.from(m.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 4); // top 4
+
+    return Array.from(counts.entries())
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 4);
   }, [filtered]);
 
-  // Safely compute lastUpdated without risking undefined access
   const lastUpdated = useMemo<string | null>(() => {
     const firstEntry = sortedEntries[0];
-    if (!firstEntry) return null;
-    return dayjs(firstEntry.date).format('YYYY-MM-DD');
+
+    if (!firstEntry) {
+      return null;
+    }
+
+    return formatDate(firstEntry.date);
   }, [sortedEntries]);
 
-  // Utilities
-  function exportJSON() {
+  const anchorItems = useMemo(
+    () =>
+      Array.from(new Set(filtered.map((entry) => entry.version))).map(
+        (version) => ({
+          key: version,
+          href: `#ver-${version}`,
+          title: version,
+        }),
+      ),
+    [filtered],
+  );
+
+  const exportJSON = (): void => {
     const blob = new Blob([JSON.stringify(filtered, null, 2)], {
       type: 'application/json',
     });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'ethikos-changelog.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  }
 
-  async function copyMarkdown() {
-    const md = filtered
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'ethikos-changelog.json';
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  const copyMarkdown = async (): Promise<void> => {
+    const markdown = filtered
       .map(
-        (e: ChangelogEntry) =>
-          `### ${e.version} — ${dayjs(e.date).format('YYYY-MM-DD')}\n` +
-          e.notes.map((n: string) => `- ${n}`).join('\n'),
+        (entry) =>
+          `### ${entry.version} — ${formatDate(entry.date)}\n` +
+          entry.notes.map((note) => `- ${note}`).join('\n'),
       )
       .join('\n\n');
+
     try {
-      await navigator.clipboard.writeText(md);
+      await navigator.clipboard.writeText(markdown);
     } catch {
-      // no-op
+      // Clipboard can fail in insecure contexts; no user-blocking action needed.
     }
-  }
+  };
 
-  // Render helpers
-  function renderTags(tags: string[]) {
-    return (
-      <Space size={[4, 4]} wrap>
-        {tags.map((t: string) => {
-          const key = normalizeTag(t);
-          const color = TAG_COLOR[key] ?? 'default';
-          return (
-            <Tag key={key} color={color}>
-              {key}
-            </Tag>
-          );
-        })}
-      </Space>
-    );
-  }
+  const renderTags = (tags: string[]): JSX.Element => (
+    <Space size={[4, 4]} wrap>
+      {tags.map((tag) => {
+        const normalized = normalizeTag(tag);
+        const color = TAG_COLOR[normalized] ?? 'default';
 
-  // Anchor for versions (filtered)
-  const anchorItems =
-    filtered.length > 0
-      ? Array.from(new Set(filtered.map((e) => e.version))).map((v) => ({
-          key: v,
-          href: `#ver-${v}`,
-          title: v,
-        }))
-      : [];
+        return (
+          <Tag key={normalized} color={color}>
+            {normalized}
+          </Tag>
+        );
+      })}
+    </Space>
+  );
 
   const shellTitle = 'Learn · Changelog';
+  const shellSectionLabel = 'Learn';
   const shellSubtitle =
     'Versioned changes, fixes and improvements across the Ethikos layer.';
-  const shellSectionLabel = 'Learn';
 
   const compactActions = (
     <Space>
@@ -247,7 +259,12 @@ export default function Changelog() {
           }
         />
       )}
-      <Button icon={<ReloadOutlined />} onClick={refresh} type="text" />
+
+      <Button
+        icon={<ReloadOutlined />}
+        onClick={() => refresh()}
+        type="text"
+      />
     </Space>
   );
 
@@ -263,9 +280,9 @@ export default function Changelog() {
         />
       )}
 
-      <Segmented
+      <Segmented<ViewMode>
         value={view}
-        onChange={(val) => setView(val as typeof view)}
+        onChange={(value) => setView(value)}
         options={[
           { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
           { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
@@ -277,16 +294,23 @@ export default function Changelog() {
       </Tooltip>
 
       <Tooltip title="Copy Markdown">
-        <Button icon={<CopyOutlined />} onClick={copyMarkdown} size="small" />
+        <Button
+          icon={<CopyOutlined />}
+          onClick={() => void copyMarkdown()}
+          size="small"
+        />
       </Tooltip>
 
       <Tooltip title="Refresh">
-        <Button icon={<ReloadOutlined />} onClick={refresh} size="small" />
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={() => refresh()}
+          size="small"
+        />
       </Tooltip>
     </Space>
   );
 
-  // Loading / error / empty
   if (loading && !data) {
     return (
       <EthikosPageShell
@@ -341,7 +365,6 @@ export default function Changelog() {
       secondaryActions={fullActions}
     >
       <PageContainer ghost loading={loading}>
-        {/* KPI / stats */}
         <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
@@ -351,6 +374,7 @@ export default function Changelog() {
               description: <Text type="secondary">After filters</Text>,
             }}
           />
+
           <StatisticCard
             colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
             statistic={{
@@ -359,6 +383,7 @@ export default function Changelog() {
               description: <Text type="secondary">In current view</Text>,
             }}
           />
+
           {tagCounts.map(([tag, count]) => (
             <StatisticCard
               key={tag}
@@ -376,9 +401,7 @@ export default function Changelog() {
           ))}
         </ProCard>
 
-        {/* Filters + content */}
         <ProCard split="vertical" ghost>
-          {/* Left: filters + anchors */}
           <ProCard
             colSpan={{ xs: 24, md: 8, lg: 7, xl: 6 }}
             title={
@@ -395,7 +418,7 @@ export default function Changelog() {
                   placeholder="Version or note text…"
                   allowClear
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(event) => setQuery(event.target.value)}
                   style={{ marginTop: 8 }}
                 />
               </div>
@@ -405,8 +428,8 @@ export default function Changelog() {
                 <div style={{ marginTop: 8 }}>
                   <RangePicker
                     allowEmpty={[true, true]}
-                    value={range as any}
-                    onChange={(val) => setRange(val as RangeValue)}
+                    value={range}
+                    onChange={(value) => setRange(value)}
                     style={{ width: '100%' }}
                   />
                 </div>
@@ -419,23 +442,23 @@ export default function Changelog() {
                     {allTags.length === 0 ? (
                       <Text type="secondary">No tags</Text>
                     ) : (
-                      allTags.map((t: string) => (
+                      allTags.map((tag) => (
                         <Tag.CheckableTag
-                          key={t}
-                          checked={selectedTags.includes(t)}
+                          key={tag}
+                          checked={selectedTags.includes(tag)}
                           onChange={(checked) => {
-                            setSelectedTags((prev) =>
+                            setSelectedTags((previous) =>
                               checked
-                                ? [...prev, t]
-                                : prev.filter((p) => p !== t),
+                                ? [...previous, tag]
+                                : previous.filter((item) => item !== tag),
                             );
                           }}
                         >
                           <Tag
-                            color={TAG_COLOR[t] ?? 'default'}
+                            color={TAG_COLOR[tag] ?? 'default'}
                             style={{ marginRight: 0 }}
                           >
-                            {t}
+                            {tag}
                           </Tag>
                         </Tag.CheckableTag>
                       ))
@@ -455,7 +478,6 @@ export default function Changelog() {
             </Space>
           </ProCard>
 
-          {/* Right: content */}
           <ProCard
             colSpan={{ xs: 24, md: 16, lg: 17, xl: 18 }}
             title={
@@ -470,43 +492,44 @@ export default function Changelog() {
             }
           >
             {view === 'timeline' ? (
-              <Timeline mode="left">
-                {filtered.map((e: ChangelogEntry, idx: number) => {
-                  const id = `ver-${e.version}`;
-                  return (
-                    <Timeline.Item
-                      key={`${e.version}-${e.date}-${idx}`}
-                      label={dayjs(e.date).format('YYYY-MM-DD')}
-                      dot={<CalendarOutlined />}
+              <Timeline
+                mode="left"
+                items={filtered.map((entry, index) => ({
+                  key: `${entryKey(entry)}-${index}`,
+                  label: formatDate(entry.date),
+                  dot: <CalendarOutlined />,
+                  children: (
+                    <div
+                      id={`ver-${entry.version}`}
+                      style={{ scrollMarginTop: 72 }}
                     >
-                      <div id={id} style={{ scrollMarginTop: 72 }}>
-                        <Space
-                          direction="vertical"
-                          size="small"
-                          style={{ width: '100%' }}
-                        >
-                          <Space size="small" align="center" wrap>
-                            <Title level={5} style={{ margin: 0 }}>
-                              {e.version}
-                            </Title>
-                            {renderTags(e.tags)}
-                          </Space>
-                          <ul style={{ marginTop: 4 }}>
-                            {e.notes.map((n: string, i: number) => (
-                              <li key={i}>
-                                <Text>{n}</Text>
-                              </li>
-                            ))}
-                          </ul>
+                      <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: '100%' }}
+                      >
+                        <Space size="small" align="center" wrap>
+                          <Title level={5} style={{ margin: 0 }}>
+                            {entry.version}
+                          </Title>
+                          {renderTags(entry.tags)}
                         </Space>
-                      </div>
-                    </Timeline.Item>
-                  );
-                })}
-              </Timeline>
+
+                        <ul style={{ marginTop: 4 }}>
+                          {entry.notes.map((note, noteIndex) => (
+                            <li key={`${entryKey(entry)}-note-${noteIndex}`}>
+                              <Text>{note}</Text>
+                            </li>
+                          ))}
+                        </ul>
+                      </Space>
+                    </div>
+                  ),
+                }))}
+              />
             ) : (
               <ProList<ChangelogEntry>
-                rowKey={(row, idx) => `${row.version}-${row.date}-${idx}`}
+                rowKey={(row) => entryKey(row)}
                 dataSource={filtered}
                 split
                 pagination={{ pageSize: 10, showSizeChanger: false }}
@@ -516,7 +539,7 @@ export default function Changelog() {
                       <Space size="small" wrap>
                         <Text strong>{row.version}</Text>
                         <Tag icon={<CalendarOutlined />}>
-                          {dayjs(row.date).format('YYYY-MM-DD')}
+                          {formatDate(row.date)}
                         </Tag>
                       </Space>
                     ),
@@ -527,9 +550,9 @@ export default function Changelog() {
                   description: {
                     render: (_dom, row) => (
                       <ul style={{ marginTop: 4 }}>
-                        {row.notes.map((n: string, i: number) => (
-                          <li key={i}>
-                            <Text>{n}</Text>
+                        {row.notes.map((note, index) => (
+                          <li key={`${entryKey(row)}-list-note-${index}`}>
+                            <Text>{note}</Text>
                           </li>
                         ))}
                       </ul>

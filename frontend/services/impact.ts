@@ -1,7 +1,12 @@
 // FILE: frontend/services/impact.ts
-// frontend/services/impact.ts
 import dayjs from 'dayjs'
 import { get, patch, post } from './_request'
+import type { ApiMaybeList, EthikosId, TopicStatus } from './ethikos'
+import { normalizeList } from './ethikos'
+
+/* ------------------------------------------------------------------ */
+/*  Impact service contract                                            */
+/* ------------------------------------------------------------------ */
 
 export type ImpactStatus = 'Planned' | 'In-Progress' | 'Completed' | 'Blocked'
 
@@ -20,12 +25,18 @@ export interface OutcomeKPI {
   delta?: number
 }
 
+export interface ChartPoint {
+  date?: string
+  category?: string
+  value: number
+}
+
 export interface ChartConfig {
-  data: any[]
+  data: ChartPoint[]
   xField: string
   yField: string
   seriesField?: string
-  [key: string]: any
+  smooth?: boolean
 }
 
 export interface OutcomeChart {
@@ -43,45 +54,74 @@ export interface FeedbackItem {
   createdAt: string
 }
 
-// ──────────────────────────────────────────────────────────
-// Backend DTOs (Ethikos)
-// ──────────────────────────────────────────────────────────
+export interface ImpactTrackerPayload {
+  items: TrackerItem[]
+}
 
-type TopicStatus = 'open' | 'closed' | 'archived'
+export interface ImpactOutcomesPayload {
+  kpis: OutcomeKPI[]
+  charts: OutcomeChart[]
+}
+
+export interface ImpactFeedbackPayload {
+  items: FeedbackItem[]
+}
+
+export interface SubmitFeedbackPayload {
+  body: string
+  rating?: number
+}
+
+/* ------------------------------------------------------------------ */
+/*  Backend DTOs                                                       */
+/* ------------------------------------------------------------------ */
+
+interface EthikosCategoryApi {
+  id: EthikosId
+  name: string
+  description?: string | null
+}
 
 interface EthikosTopicApi {
-  id: number
+  id: EthikosId
   title: string
+  description?: string | null
   status: TopicStatus
-  created_by: string
-  last_activity: string
+  created_by?: string | EthikosId | null
+  created_by_id?: EthikosId | null
+  last_activity?: string | null
   created_at: string
-  category?: {
-    id: number
-    name: string
-    description?: string
-  } | null
+  updated_at?: string | null
+  category?: EthikosCategoryApi | null
+  category_name?: string | null
   total_votes?: number | null
 }
 
 interface EthikosStanceApi {
-  id: number
-  topic: number
+  id: EthikosId
+  topic: EthikosId
   value: number
   timestamp: string
 }
 
 interface EthikosArgumentApi {
-  id: number
-  topic: number
-  user: string
+  id: EthikosId
+  topic: EthikosId
+  user?: string | EthikosId | null
+  user_id?: EthikosId | null
+  user_display?: string | null
   content: string
   created_at: string
 }
 
-// ──────────────────────────────────────────────────────────
-// Helpers
-// ──────────────────────────────────────────────────────────
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+type DailyPoint = {
+  date: string
+  value: number
+}
 
 function topicStatusToImpactStatus(status: TopicStatus): ImpactStatus {
   switch (status) {
@@ -108,50 +148,112 @@ function impactStatusToTopicStatus(status: ImpactStatus): TopicStatus {
   }
 }
 
-interface DailyPoint {
-  date: string
-  value: number
+function compareDescByDate(a: string, b: string): number {
+  return dayjs(b).valueOf() - dayjs(a).valueOf()
+}
+
+function topicActivityDate(topic: EthikosTopicApi): string {
+  return (
+    topic.updated_at ??
+    topic.last_activity ??
+    topic.created_at ??
+    new Date(0).toISOString()
+  )
+}
+
+function displayOwner(topic: EthikosTopicApi): string {
+  if (
+    typeof topic.created_by === 'string' &&
+    topic.created_by.trim().length > 0
+  ) {
+    return topic.created_by
+  }
+
+  if (
+    typeof topic.created_by === 'number' ||
+    typeof topic.created_by === 'string'
+  ) {
+    return String(topic.created_by)
+  }
+
+  if (topic.created_by_id !== undefined && topic.created_by_id !== null) {
+    return String(topic.created_by_id)
+  }
+
+  return 'Unknown'
+}
+
+function displayAuthor(argument: EthikosArgumentApi): string {
+  if (
+    typeof argument.user_display === 'string' &&
+    argument.user_display.trim().length > 0
+  ) {
+    return argument.user_display
+  }
+
+  if (typeof argument.user === 'string' && argument.user.trim().length > 0) {
+    return argument.user
+  }
+
+  if (typeof argument.user === 'number' || typeof argument.user === 'string') {
+    return String(argument.user)
+  }
+
+  if (argument.user_id !== undefined && argument.user_id !== null) {
+    return String(argument.user_id)
+  }
+
+  return 'Anonymous'
 }
 
 function buildDailySeries<T>(
   items: T[],
-  getDate: (item: T) => string,
+  getDate: (item: T) => string | null | undefined,
   days = 30,
 ): DailyPoint[] {
   const now = dayjs()
   const start = now.startOf('day').subtract(days - 1, 'day')
-  const counts: number[] = new Array<number>(days).fill(0)
+  const counts = new Array<number>(days).fill(0)
 
   for (const item of items) {
     const rawDate = getDate(item)
-    if (!rawDate) continue
 
-    const d = dayjs(rawDate)
-    if (!d.isValid() || d.isBefore(start) || d.isAfter(now)) continue
+    if (!rawDate) {
+      continue
+    }
 
-    const offset = d.startOf('day').diff(start, 'day')
+    const date = dayjs(rawDate)
+
+    if (!date.isValid() || date.isBefore(start) || date.isAfter(now)) {
+      continue
+    }
+
+    const offset = date.startOf('day').diff(start, 'day')
+
     if (offset >= 0 && offset < days) {
       counts[offset] = (counts[offset] ?? 0) + 1
     }
   }
 
-  const series: DailyPoint[] = []
-  for (let i = 0; i < days; i += 1) {
-    series.push({
-      date: start.add(i, 'day').toISOString(),
-      value: counts[i] ?? 0,
-    })
-  }
-  return series
+  return counts.map((value, index) => ({
+    date: start.add(index, 'day').toISOString(),
+    value,
+  }))
 }
 
 function percentDelta(series: DailyPoint[]): number | undefined {
-  if (series.length < 2) return undefined
+  if (series.length < 2) {
+    return undefined
+  }
 
   const latest = series[series.length - 1]?.value
   const previous = series[series.length - 2]?.value
 
-  if (latest === undefined || previous === undefined || previous === 0) {
+  if (
+    latest === undefined ||
+    previous === undefined ||
+    previous === 0
+  ) {
     return undefined
   }
 
@@ -164,7 +266,10 @@ const FEEDBACK_RATING_PREFIX = /^\[rating:([1-5])\]\s*/i
 
 function encodeFeedbackBody(body: string, rating?: number): string {
   const normalized = body.trim()
-  if (!normalized) return normalized
+
+  if (!normalized) {
+    return normalized
+  }
 
   if (typeof rating === 'number' && Number.isFinite(rating)) {
     const safeRating = Math.max(1, Math.min(5, Math.round(rating)))
@@ -187,29 +292,46 @@ function decodeFeedbackContent(content: string): {
   return {
     body,
     rating:
-      typeof rating === 'number' && Number.isFinite(rating) ? rating : undefined,
+      typeof rating === 'number' && Number.isFinite(rating)
+        ? rating
+        : undefined,
   }
 }
 
-function compareDescByDate(a: string, b: string): number {
-  return dayjs(b).valueOf() - dayjs(a).valueOf()
+function feedbackTopicId(): EthikosId | null {
+  const raw = process.env.NEXT_PUBLIC_ETHIKOS_FEEDBACK_TOPIC_ID
+
+  if (!raw || raw.trim().length === 0) {
+    return null
+  }
+
+  const numeric = Number(raw)
+
+  if (Number.isFinite(numeric)) {
+    return numeric
+  }
+
+  return raw
 }
 
-// ──────────────────────────────────────────────────────────
-// Tracker: maps Ethikos topics → impact items
-// ──────────────────────────────────────────────────────────
+/* ------------------------------------------------------------------ */
+/*  Tracker: maps Ethikos topics → impact items                        */
+/* ------------------------------------------------------------------ */
 
-export async function fetchImpactTracker(): Promise<{ items: TrackerItem[] }> {
-  const topics = await get<EthikosTopicApi[]>('ethikos/topics/')
+export async function fetchImpactTracker(): Promise<ImpactTrackerPayload> {
+  const payload = await get<ApiMaybeList<EthikosTopicApi>>('ethikos/topics/')
+  const topics = normalizeList(payload)
 
   const items: TrackerItem[] = [...topics]
-    .sort((a, b) => compareDescByDate(a.last_activity, b.last_activity))
+    .sort((a, b) =>
+      compareDescByDate(topicActivityDate(a), topicActivityDate(b)),
+    )
     .map((topic) => ({
       id: String(topic.id),
       title: topic.title,
-      owner: topic.created_by || 'Unknown',
+      owner: displayOwner(topic),
       status: topicStatusToImpactStatus(topic.status),
-      updatedAt: topic.last_activity,
+      updatedAt: topicActivityDate(topic),
     }))
 
   return { items }
@@ -220,58 +342,70 @@ export async function patchImpactStatus(
   status: ImpactStatus,
 ): Promise<void> {
   const topicStatus = impactStatusToTopicStatus(status)
-  await patch(`ethikos/topics/${id}/`, { status: topicStatus })
+
+  await patch(`ethikos/topics/${encodeURIComponent(id)}/`, {
+    status: topicStatus,
+  })
 }
 
-// ──────────────────────────────────────────────────────────
-// Outcomes: KPIs + charts from Ethikos topics + stances
-// ──────────────────────────────────────────────────────────
+/* ------------------------------------------------------------------ */
+/*  Outcomes: KPIs + charts from Ethikos topics + stances              */
+/* ------------------------------------------------------------------ */
 
-export async function fetchImpactOutcomes(): Promise<{
-  kpis: OutcomeKPI[]
-  charts: OutcomeChart[]
-}> {
-  const [topics, stances] = await Promise.all([
-    get<EthikosTopicApi[]>('ethikos/topics/'),
-    get<EthikosStanceApi[]>('ethikos/stances/'),
+export async function fetchImpactOutcomes(): Promise<ImpactOutcomesPayload> {
+  const [topicsPayload, stancesPayload] = await Promise.all([
+    get<ApiMaybeList<EthikosTopicApi>>('ethikos/topics/'),
+    get<ApiMaybeList<EthikosStanceApi>>('ethikos/stances/'),
   ])
 
-  const closedTopics = topics.filter((t) => t.status === 'closed')
-  const openTopics = topics.filter((t) => t.status === 'open')
+  const topics = normalizeList(topicsPayload)
+  const stances = normalizeList(stancesPayload)
 
-  const votesByTopic = new Map<number, { sum: number; count: number }>()
+  const closedTopics = topics.filter((topic) => topic.status === 'closed')
+  const openTopics = topics.filter((topic) => topic.status === 'open')
+
+  const votesByTopic = new Map<string, { sum: number; count: number }>()
+
   for (const stance of stances) {
-    const bucket = votesByTopic.get(stance.topic) ?? { sum: 0, count: 0 }
+    const topicKey = String(stance.topic)
+    const bucket = votesByTopic.get(topicKey) ?? { sum: 0, count: 0 }
+
     bucket.sum += stance.value
     bucket.count += 1
-    votesByTopic.set(stance.topic, bucket)
+
+    votesByTopic.set(topicKey, bucket)
   }
 
   let agreementSum = 0
   let agreementCount = 0
 
   for (const topic of closedTopics) {
-    const stats = votesByTopic.get(topic.id)
-    if (!stats || stats.count === 0) continue
+    const stats = votesByTopic.get(String(topic.id))
 
+    if (!stats || stats.count === 0) {
+      continue
+    }
+
+    // EthikosStance values are topic-level values in [-3, 3].
     agreementSum += stats.sum / (stats.count * 3)
     agreementCount += 1
   }
 
-  const avgAgreement = agreementCount > 0 ? agreementSum / agreementCount : 0
+  const averageAgreement =
+    agreementCount > 0 ? agreementSum / agreementCount : 0
 
-  const topicsSeries = buildDailySeries(topics, (t) => t.created_at)
-  const stancesSeries = buildDailySeries(stances, (s) => s.timestamp)
+  const topicsSeries = buildDailySeries(topics, (topic) => topic.created_at)
+  const stancesSeries = buildDailySeries(stances, (stance) => stance.timestamp)
 
   const kpis: OutcomeKPI[] = [
     {
-      key: 'resolved',
-      label: 'Decisions resolved',
-      value: closedTopics.length,
+      key: 'topics',
+      label: 'Total topics',
+      value: topics.length,
       delta: percentDelta(topicsSeries),
     },
     {
-      key: 'participation',
+      key: 'stances',
       label: 'Total stances',
       value: stances.length,
       delta: percentDelta(stancesSeries),
@@ -279,8 +413,8 @@ export async function fetchImpactOutcomes(): Promise<{
     {
       key: 'agreement',
       label: 'Average agreement',
-      // avgAgreement ∈ [-1, 1] → [0, 100]
-      value: Math.round((avgAgreement + 1) * 50),
+      // averageAgreement ∈ [-1, 1] → [0, 100]
+      value: Math.round((averageAgreement + 1) * 50),
     },
     {
       key: 'open',
@@ -290,14 +424,26 @@ export async function fetchImpactOutcomes(): Promise<{
   ]
 
   const bucketByCategory = new Map<string, number>()
+
   for (const topic of topics) {
-    const name = topic.category?.name?.trim() || 'Uncategorised'
-    bucketByCategory.set(name, (bucketByCategory.get(name) ?? 0) + 1)
+    const categoryName =
+      topic.category?.name?.trim() ||
+      topic.category_name?.trim() ||
+      'Uncategorised'
+
+    bucketByCategory.set(
+      categoryName,
+      (bucketByCategory.get(categoryName) ?? 0) + 1,
+    )
   }
 
-  const topicStatusByCategory = Array.from(bucketByCategory.entries())
+  const topicsByCategory: ChartPoint[] = Array.from(bucketByCategory.entries())
     .map(([category, value]) => ({ category, value }))
-    .sort((a, b) => b.value - a.value || a.category.localeCompare(b.category))
+    .sort(
+      (a, b) =>
+        b.value - a.value ||
+        String(a.category).localeCompare(String(b.category)),
+    )
 
   const charts: OutcomeChart[] = [
     {
@@ -316,7 +462,7 @@ export async function fetchImpactOutcomes(): Promise<{
       title: 'Topics by category',
       type: 'bar',
       config: {
-        data: topicStatusByCategory,
+        data: topicsByCategory,
         xField: 'category',
         yField: 'value',
         seriesField: 'category',
@@ -327,35 +473,36 @@ export async function fetchImpactOutcomes(): Promise<{
   return { kpis, charts }
 }
 
-// ──────────────────────────────────────────────────────────
-// Feedback loop = arguments on a dedicated Ethikos topic
-// ──────────────────────────────────────────────────────────
+/* ------------------------------------------------------------------ */
+/*  Feedback loop = arguments on a dedicated Ethikos topic             */
+/* ------------------------------------------------------------------ */
 
-const FEEDBACK_TOPIC_ID_RAW = process.env.NEXT_PUBLIC_ETHIKOS_FEEDBACK_TOPIC_ID
-const FEEDBACK_TOPIC_ID =
-  FEEDBACK_TOPIC_ID_RAW && !Number.isNaN(Number(FEEDBACK_TOPIC_ID_RAW))
-    ? Number(FEEDBACK_TOPIC_ID_RAW)
-    : null
+export async function fetchFeedback(): Promise<ImpactFeedbackPayload> {
+  const topicId = feedbackTopicId()
 
-export async function fetchFeedback(): Promise<{ items: FeedbackItem[] }> {
-  if (!FEEDBACK_TOPIC_ID) {
+  if (!topicId) {
     return { items: [] }
   }
 
-  const argumentsForTopic = await get<EthikosArgumentApi[]>('ethikos/arguments/', {
-    params: { topic: FEEDBACK_TOPIC_ID },
-  })
+  const payload = await get<ApiMaybeList<EthikosArgumentApi>>(
+    'ethikos/arguments/',
+    {
+      params: { topic: topicId },
+    },
+  )
+
+  const argumentsForTopic = normalizeList(payload)
 
   const items: FeedbackItem[] = argumentsForTopic
-    .map((arg) => {
-      const parsed = decodeFeedbackContent(arg.content)
+    .map((argument) => {
+      const parsed = decodeFeedbackContent(argument.content)
 
       return {
-        id: String(arg.id),
-        author: arg.user,
+        id: String(argument.id),
+        author: displayAuthor(argument),
         body: parsed.body,
         rating: parsed.rating,
-        createdAt: arg.created_at,
+        createdAt: argument.created_at,
       }
     })
     .sort((a, b) => compareDescByDate(a.createdAt, b.createdAt))
@@ -363,11 +510,12 @@ export async function fetchFeedback(): Promise<{ items: FeedbackItem[] }> {
   return { items }
 }
 
-export async function submitFeedback(payload: {
-  body: string
-  rating?: number
-}): Promise<void> {
-  if (!FEEDBACK_TOPIC_ID) {
+export async function submitFeedback(
+  payload: SubmitFeedbackPayload,
+): Promise<void> {
+  const topicId = feedbackTopicId()
+
+  if (!topicId) {
     throw new Error(
       'NEXT_PUBLIC_ETHIKOS_FEEDBACK_TOPIC_ID is not set; cannot store feedback.',
     )
@@ -380,7 +528,7 @@ export async function submitFeedback(payload: {
   }
 
   await post('ethikos/arguments/', {
-    topic: FEEDBACK_TOPIC_ID,
+    topic: topicId,
     content,
   })
 }

@@ -35,42 +35,66 @@ import { useRequest } from 'ahooks';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import ChartCard from '@/components/charts/ChartCard';
-import { fetchPulseLiveData, type LiveCounter } from '@/services/pulse';
 import { get } from '@/services/_request';
+import { fetchPulseLiveData, type LiveCounter } from '@/services/pulse';
+import type { EthikosId, StanceValue, TopicStatus } from '@/services/ethikos';
 
 dayjs.extend(relativeTime);
 
+const { Text } = Typography;
+
 /* ------------------------------------------------------------------ */
-/*  Minimal API DTOs (aligned with services/pulse.ts)                  */
+/*  Minimal API DTOs                                                   */
 /* ------------------------------------------------------------------ */
 
-type TopicStatus = 'open' | 'closed' | 'archived';
+type UnknownRecord = Record<string, unknown>;
+
+type ApiListResponse<T> = {
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+  results?: T[];
+  items?: T[];
+  data?: T[] | ApiListResponse<T>;
+};
+
+type ApiMaybeList<T> = T[] | ApiListResponse<T>;
 
 type EthikosTopicApi = {
-  id: number;
+  id: EthikosId;
   title: string;
   status: TopicStatus;
   created_at: string;
-  last_activity: string;
+  last_activity?: string | null;
 };
 
 type EthikosStanceApi = {
-  id: number;
-  topic: number;
-  value: number; // −3…+3
+  id: EthikosId;
+  topic: EthikosId;
+  value: StanceValue;
   timestamp: string;
 };
 
 type EthikosArgumentApi = {
-  id: number;
-  topic: number;
-  user: string;
+  id: EthikosId;
+  topic: EthikosId;
+  user?: string | EthikosId | null;
+  user_display?: string | null;
   content: string;
   created_at: string;
 };
 
+type PulseLivePayload = {
+  counters: LiveCounter[];
+};
+
+type PulseChartPoint = {
+  x: string | number;
+  y: number;
+};
+
 /* ------------------------------------------------------------------ */
-/*  Types & helpers                                                    */
+/*  Feed types                                                         */
 /* ------------------------------------------------------------------ */
 
 type FeedItem =
@@ -78,7 +102,7 @@ type FeedItem =
       id: string;
       ts: string;
       kind: 'topic';
-      topicId: number;
+      topicId: EthikosId;
       title: string;
       summary: string;
     }
@@ -86,22 +110,113 @@ type FeedItem =
       id: string;
       ts: string;
       kind: 'stance';
-      topicId: number;
+      topicId: EthikosId;
       title: string;
       summary: string;
-      extra: { value: number };
+      extra: { value: StanceValue };
     }
   | {
       id: string;
       ts: string;
       kind: 'argument';
-      topicId: number;
+      topicId: EthikosId;
       title: string;
       summary: string;
     };
 
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
 function truncate(value: string, max = 100): string {
   return value.length > max ? `${value.slice(0, max - 1)}…` : value;
+}
+
+function normalizeList<T>(raw: ApiMaybeList<T> | undefined | null): T[] {
+  if (!raw) {
+    return [];
+  }
+
+  if (Array.isArray(raw)) {
+    return raw;
+  }
+
+  if (Array.isArray(raw.results)) {
+    return raw.results;
+  }
+
+  if (Array.isArray(raw.items)) {
+    return raw.items;
+  }
+
+  if (Array.isArray(raw.data)) {
+    return raw.data;
+  }
+
+  if (raw.data && !Array.isArray(raw.data)) {
+    return normalizeList(raw.data);
+  }
+
+  return [];
+}
+
+function toMapKey(value: EthikosId): string {
+  return String(value);
+}
+
+function toDateValue(value?: string | null): number {
+  if (!value) {
+    return 0;
+  }
+
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.valueOf() : 0;
+}
+
+function formatAuthor(argument: EthikosArgumentApi): string {
+  if (argument.user_display) {
+    return argument.user_display;
+  }
+
+  if (typeof argument.user === 'string' && argument.user.trim().length > 0) {
+    return argument.user;
+  }
+
+  if (typeof argument.user === 'number') {
+    return `User #${argument.user}`;
+  }
+
+  return 'Someone';
+}
+
+function normalizeCounterHistory(counter: LiveCounter): PulseChartPoint[] {
+  return (counter.history ?? []).map((point, index) => {
+    if (isRecord(point)) {
+      const x = point.x ?? point.ts ?? point.date ?? index;
+      const rawY = point.y ?? point.value ?? point.count ?? 0;
+      const y =
+        typeof rawY === 'number'
+          ? rawY
+          : typeof rawY === 'string'
+            ? Number(rawY)
+            : 0;
+
+      return {
+        x: typeof x === 'string' || typeof x === 'number' ? x : index,
+        y: Number.isFinite(y) ? y : 0,
+      };
+    }
+
+    return {
+      x: index,
+      y: 0,
+    };
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -109,60 +224,75 @@ function truncate(value: string, max = 100): string {
 /* ------------------------------------------------------------------ */
 
 async function fetchRecentActivity(): Promise<FeedItem[]> {
-  const [topics, stances, args] = await Promise.all([
-    get<EthikosTopicApi[]>('ethikos/topics/'),
-    get<EthikosStanceApi[]>('ethikos/stances/'),
-    get<EthikosArgumentApi[]>('ethikos/arguments/'),
+  const [topicsRaw, stancesRaw, argsRaw] = await Promise.all([
+    get<ApiMaybeList<EthikosTopicApi>>('ethikos/topics/'),
+    get<ApiMaybeList<EthikosStanceApi>>('ethikos/stances/'),
+    get<ApiMaybeList<EthikosArgumentApi>>('ethikos/arguments/'),
   ]);
 
-  const topicById = new Map<number, EthikosTopicApi>(
-    topics.map((topic) => [topic.id, topic]),
+  const topics = normalizeList(topicsRaw);
+  const stances = normalizeList(stancesRaw);
+  const args = normalizeList(argsRaw);
+
+  const topicById = new Map<string, EthikosTopicApi>(
+    topics.map((topic) => [toMapKey(topic.id), topic]),
   );
 
-  const items: FeedItem[] = [
-    ...topics.map<FeedItem>((topic) => ({
-      id: `topic-${topic.id}-${topic.created_at}`,
-      ts: topic.created_at,
-      kind: 'topic',
-      topicId: topic.id,
-      title: topic.title,
-      summary:
-        topic.status === 'open'
-          ? 'New debate created'
-          : `Debate status changed to ${topic.status}`,
-    })),
-    ...stances.map<FeedItem>((stance) => ({
-      id: `stance-${stance.id}`,
-      ts: stance.timestamp,
-      kind: 'stance',
-      topicId: stance.topic,
-      title: topicById.get(stance.topic)?.title ?? `Topic #${stance.topic}`,
-      summary: `New stance submitted: ${stance.value >= 0 ? '+' : ''}${stance.value}`,
-      extra: { value: stance.value },
-    })),
-    ...args.map<FeedItem>((argument) => ({
-      id: `arg-${argument.id}`,
-      ts: argument.created_at,
-      kind: 'argument',
-      topicId: argument.topic,
-      title: topicById.get(argument.topic)?.title ?? `Topic #${argument.topic}`,
-      summary: `${argument.user} commented: ${truncate(argument.content, 120)}`,
-    })),
-  ];
+  const topicItems: FeedItem[] = topics.map((topic) => ({
+    id: `topic-${topic.id}-${topic.created_at}`,
+    ts: topic.created_at,
+    kind: 'topic',
+    topicId: topic.id,
+    title: topic.title,
+    summary:
+      topic.status === 'open'
+        ? 'New debate created'
+        : `Debate status changed to ${topic.status}`,
+  }));
 
-  return items
-    .sort((a, b) => dayjs(b.ts).valueOf() - dayjs(a.ts).valueOf())
+  const stanceItems: FeedItem[] = stances.map((stance) => ({
+    id: `stance-${stance.id}`,
+    ts: stance.timestamp,
+    kind: 'stance',
+    topicId: stance.topic,
+    title:
+      topicById.get(toMapKey(stance.topic))?.title ??
+      `Topic #${String(stance.topic)}`,
+    summary: `New stance submitted: ${stance.value >= 0 ? '+' : ''}${
+      stance.value
+    }`,
+    extra: { value: stance.value },
+  }));
+
+  const argumentItems: FeedItem[] = args.map((argument) => ({
+    id: `arg-${argument.id}`,
+    ts: argument.created_at,
+    kind: 'argument',
+    topicId: argument.topic,
+    title:
+      topicById.get(toMapKey(argument.topic))?.title ??
+      `Topic #${String(argument.topic)}`,
+    summary: `${formatAuthor(argument)} commented: ${truncate(
+      argument.content,
+      120,
+    )}`,
+  }));
+
+  return [...topicItems, ...stanceItems, ...argumentItems]
+    .sort((a, b) => toDateValue(b.ts) - toDateValue(a.ts))
     .slice(0, 20);
 }
 
 async function fetchOpenTopics(): Promise<EthikosTopicApi[]> {
-  const topics = await get<EthikosTopicApi[]>('ethikos/topics/');
+  const topicsRaw = await get<ApiMaybeList<EthikosTopicApi>>('ethikos/topics/');
+  const topics = normalizeList(topicsRaw);
 
   return topics
     .filter((topic) => topic.status === 'open')
     .sort(
       (a, b) =>
-        dayjs(b.last_activity).valueOf() - dayjs(a.last_activity).valueOf(),
+        toDateValue(b.last_activity ?? b.created_at) -
+        toDateValue(a.last_activity ?? a.created_at),
     );
 }
 
@@ -174,7 +304,7 @@ export default function PulseLive(): JSX.Element {
   const [autoRefresh, setAutoRefresh] = React.useState(true);
   const [lastUpdated, setLastUpdated] = React.useState<string | null>(null);
 
-  const liveReq = useRequest<{ counters: LiveCounter[] }, []>(fetchPulseLiveData, {
+  const liveReq = useRequest<PulseLivePayload, []>(fetchPulseLiveData, {
     pollingInterval: autoRefresh ? 20_000 : undefined,
     onSuccess: () => setLastUpdated(dayjs().format('HH:mm:ss')),
   });
@@ -191,7 +321,7 @@ export default function PulseLive(): JSX.Element {
     void liveReq.refresh();
     void feedReq.refresh();
     void openReq.refresh();
-  }, [liveReq, feedReq, openReq]);
+  }, [feedReq, liveReq, openReq]);
 
   const counters = liveReq.data?.counters ?? [];
 
@@ -201,10 +331,10 @@ export default function PulseLive(): JSX.Element {
         title: 'Debate',
         dataIndex: 'title',
         ellipsis: true,
-        render: (dom, row) => (
+        render: (_dom, row) => (
           <Space size="small">
             <FireOutlined />
-            <a href={`/ethikos/deliberate/${row.id}`}>{dom}</a>
+            <a href={`/ethikos/deliberate/${row.id}`}>{row.title}</a>
           </Space>
         ),
       },
@@ -212,7 +342,7 @@ export default function PulseLive(): JSX.Element {
         title: 'Status',
         dataIndex: 'status',
         width: 120,
-        render: (_, row) =>
+        render: (_dom, row) =>
           row.status === 'open' ? (
             <Tag color="green">Open</Tag>
           ) : (
@@ -223,17 +353,21 @@ export default function PulseLive(): JSX.Element {
         title: 'Last activity',
         dataIndex: 'last_activity',
         width: 180,
-        render: (_, row) => (
-          <Tooltip title={dayjs(row.last_activity).format('YYYY-MM-DD HH:mm')}>
-            {dayjs(row.last_activity).fromNow()}
-          </Tooltip>
-        ),
+        render: (_dom, row) => {
+          const value = row.last_activity ?? row.created_at;
+
+          return (
+            <Tooltip title={dayjs(value).format('YYYY-MM-DD HH:mm')}>
+              {dayjs(value).fromNow()}
+            </Tooltip>
+          );
+        },
       },
       {
         title: 'Created',
         dataIndex: 'created_at',
         width: 160,
-        render: (_, row) => (
+        render: (_dom, row) => (
           <Tooltip title={dayjs(row.created_at).format('YYYY-MM-DD HH:mm')}>
             {dayjs(row.created_at).fromNow()}
           </Tooltip>
@@ -243,7 +377,7 @@ export default function PulseLive(): JSX.Element {
   }, []);
 
   const secondaryActions = (
-    <Space>
+    <Space wrap>
       {lastUpdated && (
         <Badge
           count={
@@ -253,12 +387,23 @@ export default function PulseLive(): JSX.Element {
           }
         />
       )}
+
       <Space size="small" align="center">
         <ThunderboltOutlined />
-        <span>Auto-refresh</span>
-        <Switch checked={autoRefresh} onChange={setAutoRefresh} size="small" />
+        <Text>Auto-refresh</Text>
+        <Switch
+          checked={autoRefresh}
+          onChange={(checked) => setAutoRefresh(checked)}
+          size="small"
+        />
       </Space>
-      <Button icon={<SyncOutlined />} onClick={refreshAll} size="small">
+
+      <Button
+        icon={<SyncOutlined />}
+        onClick={refreshAll}
+        size="small"
+        loading={liveReq.loading || feedReq.loading || openReq.loading}
+      >
         Refresh
       </Button>
     </Space>
@@ -278,7 +423,7 @@ export default function PulseLive(): JSX.Element {
       primaryAction={primaryAction}
       secondaryActions={secondaryActions}
     >
-      <PageContainer ghost loading={liveReq.loading && !counters.length}>
+      <PageContainer ghost loading={liveReq.loading && counters.length === 0}>
         <Alert
           type="info"
           showIcon
@@ -287,41 +432,55 @@ export default function PulseLive(): JSX.Element {
           description="This page auto-refreshes every 20 seconds while enabled. Use manual Refresh if needed."
         />
 
-        <ProCard gutter={16} wrap>
-          {counters.map((counter) => {
-            const trend = counter.trend ?? 0;
+        {liveReq.error && (
+          <Alert
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="Unable to load live Pulse counters."
+            description="The live Pulse service may be temporarily unavailable. Try refreshing the page."
+          />
+        )}
 
-            return (
-              <StatisticCard
-                key={counter.label}
-                colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-                statistic={{
-                  title: (
-                    <Space>
-                      {counter.label}
-                      <Badge
-                        status={
-                          trend > 0 ? 'success' : trend < 0 ? 'error' : 'default'
-                        }
-                      />
-                    </Space>
-                  ),
-                  value: counter.value,
-                  precision: 0,
-                }}
-                chart={
-                  <ChartCard
-                    type="line"
-                    height={50}
-                    data={counter.history.map(({ ts, value }) => ({
-                      x: ts,
-                      y: value,
-                    }))}
-                  />
-                }
-              />
-            );
-          })}
+        <ProCard gutter={16} wrap>
+          {counters.length === 0 && !liveReq.loading ? (
+            <ProCard>
+              <Empty description="No live counters available yet" />
+            </ProCard>
+          ) : (
+            counters.map((counter) => {
+              const trend = counter.trend ?? 0;
+              const chartData = normalizeCounterHistory(counter);
+
+              return (
+                <StatisticCard
+                  key={counter.label}
+                  colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+                  statistic={{
+                    title: (
+                      <Space>
+                        {counter.label}
+                        <Badge
+                          status={
+                            trend > 0
+                              ? 'success'
+                              : trend < 0
+                                ? 'error'
+                                : 'default'
+                          }
+                        />
+                      </Space>
+                    ),
+                    value: counter.value,
+                    precision: 0,
+                  }}
+                  chart={
+                    <ChartCard type="line" height={50} data={chartData} />
+                  }
+                />
+              );
+            })
+          )}
         </ProCard>
 
         <ProCard gutter={[16, 16]} wrap style={{ marginTop: 16 }}>
@@ -334,12 +493,21 @@ export default function PulseLive(): JSX.Element {
               </Space>
             }
             extra={
-              <Typography.Text type="secondary">
+              <Text type="secondary">
                 Latest 20 items across debates, stances, and comments
-              </Typography.Text>
+              </Text>
             }
             loading={feedReq.loading && !feedReq.data}
           >
+            {feedReq.error && (
+              <Alert
+                type="error"
+                showIcon
+                style={{ marginBottom: 16 }}
+                message="Unable to load recent activity."
+              />
+            )}
+
             {feedReq.data && feedReq.data.length === 0 ? (
               <Empty description="No recent activity yet" />
             ) : (
@@ -382,9 +550,9 @@ export default function PulseLive(): JSX.Element {
                       description={
                         <Space size="small" wrap>
                           <span>{item.summary}</span>
-                          <Typography.Text type="secondary">
+                          <Text type="secondary">
                             · {dayjs(item.ts).fromNow()}
-                          </Typography.Text>
+                          </Text>
                         </Space>
                       }
                     />
@@ -404,11 +572,20 @@ export default function PulseLive(): JSX.Element {
             }
             loading={openReq.loading && !openReq.data}
           >
+            {openReq.error && (
+              <Alert
+                type="error"
+                showIcon
+                style={{ marginBottom: 16 }}
+                message="Unable to load open debates."
+              />
+            )}
+
             {openReq.data && openReq.data.length === 0 ? (
               <Empty description="No open debates at the moment" />
             ) : (
               <ProTable<EthikosTopicApi>
-                rowKey="id"
+                rowKey={(row) => String(row.id)}
                 columns={openColumns}
                 dataSource={openReq.data ?? []}
                 pagination={{ pageSize: 6 }}

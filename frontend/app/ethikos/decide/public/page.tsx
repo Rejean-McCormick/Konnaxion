@@ -1,3 +1,4 @@
+// FILE: frontend/app/ethikos/decide/public/page.tsx
 'use client';
 
 import React, { useCallback, useMemo, useState } from 'react';
@@ -61,16 +62,48 @@ const HIGH_TURNOUT_THRESHOLD = 50;
 
 function resolveOptions(ballot: BallotRow): string[] {
   if (Array.isArray(ballot.options) && ballot.options.length > 0) {
-    return ballot.options;
+    const cleaned = ballot.options
+      .map((option) => option.trim())
+      .filter((option) => option.length > 0);
+
+    if (cleaned.length > 0) {
+      return cleaned;
+    }
   }
+
   return [...DEFAULT_SCALE_OPTIONS];
 }
 
+function clampIndex(index: number, options: string[]): number {
+  if (options.length <= 0) {
+    return 0;
+  }
+
+  return Math.min(options.length - 1, Math.max(0, index));
+}
+
+function optionAt(options: string[], index: number | null | undefined): string {
+  const fallbackIndex = Math.floor(options.length / 2);
+  const safeIndex = clampIndex(
+    typeof index === 'number' && Number.isFinite(index)
+      ? Math.round(index)
+      : fallbackIndex,
+    options,
+  );
+
+  return options[safeIndex] ?? options[fallbackIndex] ?? DEFAULT_SCALE_OPTIONS[2];
+}
+
 function isClosingSoon(closesAt?: string | null): boolean {
-  if (!closesAt) return false;
+  if (!closesAt) {
+    return false;
+  }
 
   const closes = dayjs(closesAt);
-  if (!closes.isValid()) return false;
+
+  if (!closes.isValid() || closes.isBefore(dayjs())) {
+    return false;
+  }
 
   return closes.diff(dayjs(), 'hour') <= CLOSING_SOON_HOURS;
 }
@@ -80,20 +113,26 @@ function getCurrentIndex(
   options: string[],
 ): number {
   const defaultIndex = Math.floor(options.length / 2);
-  if (!selected) return defaultIndex;
 
-  const idx = options.findIndex(
-    (opt) => opt.toLowerCase() === selected.toLowerCase(),
+  if (!selected) {
+    return defaultIndex;
+  }
+
+  const index = options.findIndex(
+    (option) => option.toLowerCase() === selected.toLowerCase(),
   );
 
-  return idx >= 0 ? idx : defaultIndex;
+  return index >= 0 ? index : defaultIndex;
 }
 
 function buildSliderMarks(options: string[]): Record<number, React.ReactNode> {
-  return options.reduce<Record<number, React.ReactNode>>((acc, label, idx) => {
-    acc[idx] = <span style={{ fontSize: 11 }}>{label}</span>;
-    return acc;
-  }, {});
+  return options.reduce<Record<number, React.ReactNode>>(
+    (accumulator, label, index) => {
+      accumulator[index] = <span style={{ fontSize: 11 }}>{label}</span>;
+      return accumulator;
+    },
+    {},
+  );
 }
 
 export default function PublicVotingPage(): JSX.Element {
@@ -110,16 +149,20 @@ export default function PublicVotingPage(): JSX.Element {
 
   useInterval(refresh, 60_000);
 
-  const ballots = data?.ballots ?? [];
+  const ballots = useMemo<BallotRow[]>(() => data?.ballots ?? [], [data]);
 
   const headerStats = useMemo(() => {
     const total = ballots.length;
 
-    const avgTurnout = total
-      ? Math.round(
-          ballots.reduce((sum, ballot) => sum + (ballot.turnout ?? 0), 0) / total,
-        )
-      : 0;
+    const avgTurnout =
+      total > 0
+        ? Math.round(
+            ballots.reduce(
+              (sum, ballot) => sum + Math.round(ballot.turnout ?? 0),
+              0,
+            ) / total,
+          )
+        : 0;
 
     const closingSoon = ballots.filter((ballot) =>
       isClosingSoon(ballot.closesAt),
@@ -136,9 +179,11 @@ export default function PublicVotingPage(): JSX.Element {
     const normalizedSearch = searchTerm.trim().toLowerCase();
 
     return ballots.filter((ballot) => {
+      const title = ballot.title ?? '';
+
       if (
         normalizedSearch &&
-        !ballot.title.toLowerCase().includes(normalizedSearch)
+        !title.toLowerCase().includes(normalizedSearch)
       ) {
         return false;
       }
@@ -155,24 +200,27 @@ export default function PublicVotingPage(): JSX.Element {
     });
   }, [ballots, quickFilter, searchTerm]);
 
-  const handleRadioChange = useCallback((id: string, e: RadioChangeEvent) => {
-    const value = e.target.value as string;
-    setSelectedOptions((prev) => ({ ...prev, [id]: value }));
+  const handleRadioChange = useCallback((id: string, event: RadioChangeEvent) => {
+    const value = String(event.target.value);
+
+    setSelectedOptions((previous) => ({
+      ...previous,
+      [id]: value,
+    }));
   }, []);
 
   const handleSliderChange = useCallback(
-    (id: string, value: number | [number, number], options: string[]) => {
-      if (!options.length) return;
+    (id: string, value: number | number[], options: string[]) => {
+      if (options.length === 0) {
+        return;
+      }
 
       const rawIndex = Array.isArray(value) ? value[0] : value;
-      const safeIndex = Math.min(
-        options.length - 1,
-        Math.max(0, Number(rawIndex) || 0),
-      );
+      const selectedOption = optionAt(options, rawIndex);
 
-      setSelectedOptions((prev) => ({
-        ...prev,
-        [id]: options[safeIndex],
+      setSelectedOptions((previous) => ({
+        ...previous,
+        [id]: selectedOption,
       }));
     },
     [],
@@ -189,9 +237,11 @@ export default function PublicVotingPage(): JSX.Element {
 
       try {
         setSubmittingId(id);
+
         await submitPublicVote(id, option);
+
         message.success('Your vote has been recorded.');
-        await refresh();
+        refresh();
       } catch {
         message.error('Failed to submit your vote. Please try again.');
       } finally {
@@ -213,11 +263,11 @@ export default function PublicVotingPage(): JSX.Element {
         title: 'Your stance',
         dataIndex: 'id',
         width: 440,
-        render: (_, row) => {
+        render: (_dom, row) => {
           const id = String(row.id);
           const options = resolveOptions(row);
 
-          if (!options.length) {
+          if (options.length === 0) {
             return <Tag color="default">No voting options configured</Tag>;
           }
 
@@ -233,20 +283,19 @@ export default function PublicVotingPage(): JSX.Element {
                 value={currentIndex}
                 marks={marks}
                 tooltip={{
-                  formatter: (val) =>
-                    options[val ?? Math.floor(options.length / 2)],
+                  formatter: (value) => optionAt(options, value),
                 }}
-                onChange={(val) => handleSliderChange(id, val, options)}
+                onChange={(value) => handleSliderChange(id, value, options)}
               />
 
               <Radio.Group
                 size="small"
                 value={selected}
-                onChange={(e) => handleRadioChange(id, e)}
+                onChange={(event) => handleRadioChange(id, event)}
               >
-                {options.map((opt) => (
-                  <Radio.Button key={opt} value={opt}>
-                    {opt}
+                {options.map((option) => (
+                  <Radio.Button key={option} value={option}>
+                    {option}
                   </Radio.Button>
                 ))}
               </Radio.Group>
@@ -276,7 +325,7 @@ export default function PublicVotingPage(): JSX.Element {
         dataIndex: 'closesAt',
         width: 180,
         valueType: 'dateTime',
-        render: (_, row) => {
+        render: (_dom, row) => {
           const closes = dayjs(row.closesAt);
           const closingSoon = isClosingSoon(row.closesAt);
 
@@ -296,7 +345,7 @@ export default function PublicVotingPage(): JSX.Element {
         title: 'Turnout',
         dataIndex: 'turnout',
         width: 160,
-        render: (_, row) => {
+        render: (_dom, row) => {
           const turnout = Math.round(row.turnout ?? 0);
 
           return (
@@ -395,13 +444,15 @@ export default function PublicVotingPage(): JSX.Element {
                 allowClear
                 style={{ width: 280 }}
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(event) => setSearchTerm(event.target.value)}
               />
 
               <Radio.Group
                 size="small"
                 value={quickFilter}
-                onChange={(e) => setQuickFilter(e.target.value as QuickFilter)}
+                onChange={(event) =>
+                  setQuickFilter(event.target.value as QuickFilter)
+                }
               >
                 <Radio.Button value="all">All</Radio.Button>
                 <Radio.Button value="closing-soon">Closing soon</Radio.Button>
