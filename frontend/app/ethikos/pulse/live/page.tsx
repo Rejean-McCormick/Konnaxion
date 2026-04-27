@@ -36,7 +36,11 @@ import { useRequest } from 'ahooks';
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import ChartCard from '@/components/charts/ChartCard';
 import { get } from '@/services/_request';
-import { fetchPulseLiveData, type LiveCounter } from '@/services/pulse';
+import {
+  fetchPulseLiveData,
+  type LiveCounter,
+  type PulseChartPoint,
+} from '@/services/pulse';
 import type { EthikosId, StanceValue, TopicStatus } from '@/services/ethikos';
 
 dayjs.extend(relativeTime);
@@ -88,9 +92,11 @@ type PulseLivePayload = {
   counters: LiveCounter[];
 };
 
-type PulseChartPoint = {
-  x: string | number;
-  y: number;
+type LoosePulseChartPoint = PulseChartPoint & {
+  ts?: string | number | Date;
+  date?: string | number | Date;
+  value?: string | number;
+  count?: string | number;
 };
 
 /* ------------------------------------------------------------------ */
@@ -194,27 +200,51 @@ function formatAuthor(argument: EthikosArgumentApi): string {
   return 'Someone';
 }
 
+function normalizeChartX(
+  value: string | number | Date | undefined,
+  fallback: number,
+): string | number {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  return fallback;
+}
+
+function normalizeChartY(value: string | number | undefined): number {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  return 0;
+}
+
 function normalizeCounterHistory(counter: LiveCounter): PulseChartPoint[] {
   return (counter.history ?? []).map((point, index) => {
-    if (isRecord(point)) {
-      const x = point.x ?? point.ts ?? point.date ?? index;
-      const rawY = point.y ?? point.value ?? point.count ?? 0;
-      const y =
-        typeof rawY === 'number'
-          ? rawY
-          : typeof rawY === 'string'
-            ? Number(rawY)
-            : 0;
-
+    if (!isRecord(point)) {
       return {
-        x: typeof x === 'string' || typeof x === 'number' ? x : index,
-        y: Number.isFinite(y) ? y : 0,
+        x: index,
+        y: 0,
       };
     }
 
+    const loosePoint = point as LoosePulseChartPoint;
+
     return {
-      x: index,
-      y: 0,
+      x: normalizeChartX(
+        loosePoint.x ?? loosePoint.ts ?? loosePoint.date,
+        index,
+      ),
+      y: normalizeChartY(loosePoint.y ?? loosePoint.value ?? loosePoint.count),
     };
   });
 }

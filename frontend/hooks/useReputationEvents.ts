@@ -7,11 +7,12 @@ import {
   fetchUserBadges,
   type ReputationProfile,
   type Badge,
+  type TrustBadgePayload,
 } from '@/services/trust';
 
 export interface ReputationEvent {
   id: string;
-  when: string;   // ISO date or YYYY-MM-DD
+  when: string; // ISO date or YYYY-MM-DD
   title: string;
   detail: string;
 }
@@ -25,35 +26,37 @@ export interface ReputationEventsResult {
 /**
  * Builds a synthetic "reputation timeline" from:
  * - recent activity deltas in the reputation profile
- * - earned badges from Ekoh activity
+ * - earned badges from EkoH / Ethikos activity
  *
  * There is no dedicated backend endpoint yet; this hook
  * composes existing trust services so the UI can be wired.
  */
 async function loadReputationEvents(): Promise<ReputationEventsResult> {
-  const [profile, badges] = await Promise.all([
-    fetchUserProfile(),
-    fetchUserBadges(),
-  ]);
+  const [profile, badgePayload]: [ReputationProfile, TrustBadgePayload] =
+    await Promise.all([fetchUserProfile(), fetchUserBadges()]);
 
+  const badges = badgePayload.earned ?? [];
   const timeline: ReputationEvent[] = [];
 
-  // 1) Recent activity deltas (e.g. "Stances last 30 days +3")
+  // 1) Recent activity deltas, e.g. "Stances last 30 days +3"
   const recentItems = profile.recent ?? [];
+
   for (const item of recentItems) {
     const change = item.change ?? 0;
 
     timeline.push({
       id: `recent-${item.label.replace(/\s+/g, '-').toLowerCase()}`,
-      // No per-item date in the API yet; we stamp "now"
+      // No per-item date in the API yet; we stamp "now".
       when: new Date().toISOString(),
       title: item.label,
       detail:
         change === 0
           ? 'No significant change compared to the previous period.'
           : change > 0
-          ? `Increased by ${change} compared to the previous period.`
-          : `Decreased by ${Math.abs(change)} compared to the previous period.`,
+            ? `Increased by ${change} compared to the previous period.`
+            : `Decreased by ${Math.abs(
+                change,
+              )} compared to the previous period.`,
     });
   }
 
@@ -61,23 +64,29 @@ async function loadReputationEvents(): Promise<ReputationEventsResult> {
   for (const badge of badges) {
     timeline.push({
       id: `badge-${badge.id}`,
-      when: badge.earnedAt,
+      when: badge.earnedAt ?? new Date().toISOString(),
       title: `Badge earned · ${badge.label}`,
-      detail: badge.description,
+      detail: badge.description ?? 'Badge earned from Ethikos activity.',
     });
   }
 
-  // Sort most recent first (fall back to string compare if needed)
+  // Sort most recent first.
   timeline.sort((a, b) => {
     const ta = Date.parse(a.when);
     const tb = Date.parse(b.when);
+
     if (Number.isNaN(ta) || Number.isNaN(tb)) {
       return b.when.localeCompare(a.when);
     }
+
     return tb - ta;
   });
 
-  return { profile, badges, timeline };
+  return {
+    profile,
+    badges,
+    timeline,
+  };
 }
 
 export default function useReputationEvents() {

@@ -64,15 +64,7 @@ export type ArgumentTreeNode = Omit<
 }
 
 export type ArgumentTreeProps = {
-  /**
-   * Preferred normalized input for callers that already adapted the API payload.
-   */
   items?: ArgumentTreeItem[]
-
-  /**
-   * Raw API input from services/ethikos.ts.
-   * Used when callers do not want to pre-normalize.
-   */
   arguments?: EthikosArgumentApi[]
 
   loading?: boolean
@@ -240,7 +232,7 @@ function buildTree(
     })
   }
 
-  for (const node of nodeById.values()) {
+  for (const node of Array.from(nodeById.values())) {
     const parentId = node.parent
 
     if (!parentId || parentId === node.id) {

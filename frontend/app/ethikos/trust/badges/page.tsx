@@ -21,7 +21,7 @@ import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
-import { fetchUserBadges } from '@/services/trust';
+import { fetchTrustBadges } from '@/services/trust';
 import type {
   Badge as TrustBadge,
   TrustBadgePayload,
@@ -167,7 +167,7 @@ export default function TrustBadgesPage(): JSX.Element {
     loading,
     error,
     refresh,
-  } = useRequest<TrustBadgePayload, []>(fetchUserBadges);
+  } = useRequest<TrustBadgePayload, []>(fetchTrustBadges);
 
   const earnedBadges = useMemo<TrustBadge[]>(
     () => data?.earned ?? [],
@@ -272,7 +272,11 @@ export default function TrustBadgesPage(): JSX.Element {
             </ProCard>
 
             <ProCard colSpan={{ xs: 24, md: 8 }}>
-              <Statistic suffix="%" title="Catalog completion" value={completionRate} />
+              <Statistic
+                suffix="%"
+                title="Catalog completion"
+                value={completionRate}
+              />
             </ProCard>
           </ProCard>
 
@@ -432,7 +436,9 @@ export default function TrustBadgesPage(): JSX.Element {
                     render: (_dom, row) => (
                       <Space wrap>
                         <Text strong>{row.label}</Text>
-                        <Tag color={BADGE_CATEGORY_META[row.id]?.color ?? 'default'}>
+                        <Tag
+                          color={BADGE_CATEGORY_META[row.id]?.color ?? 'default'}
+                        >
                           {row.category}
                         </Tag>
                         {row.earned ? (
@@ -445,7 +451,11 @@ export default function TrustBadgesPage(): JSX.Element {
                   },
                   description: {
                     render: (_dom, row) => (
-                      <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                      <Space
+                        direction="vertical"
+                        size={4}
+                        style={{ width: '100%' }}
+                      >
                         <Text type="secondary">{row.description}</Text>
                         <Text>{row.requirement}</Text>
 

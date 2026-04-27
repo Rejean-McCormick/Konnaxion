@@ -3,7 +3,7 @@
 import dayjs from 'dayjs';
 
 import { get, post } from './_request';
-import { resolveAvatarUrl, type CurrentUser } from './user';
+import { resolveAvatarUrl } from './user';
 
 type EthikosId = string | number;
 type UnknownRecord = Record<string, unknown>;
@@ -85,15 +85,20 @@ export interface UploadCredentialInput {
 
 /**
  * Shape of /users/me/ coming from the backend.
- * avatar_url / picture are optional and can be wired later on the server.
+ *
+ * This intentionally does not extend CurrentUser. The canonical CurrentUser
+ * type requires fields such as `url` and `username`, while /users/me/ can be
+ * incomplete or unavailable in local/test contexts.
  */
-interface UserMeApi extends CurrentUser {
+interface UserMeApi {
   id?: EthikosId;
+  url?: string;
   name?: string | null;
   display_name?: string | null;
   full_name?: string | null;
   username?: string;
   email?: string | null;
+  avatar?: string | null;
   avatar_url?: string | null;
   picture?: string | null;
   date_joined?: string | null;
@@ -277,7 +282,7 @@ function getCurrentUserIdentity(me: UserMeApi): {
   joined?: string;
   avatarUrl: string | null;
 } {
-  const userRecord = me as UnknownRecord;
+  const userRecord = me as unknown as UnknownRecord;
 
   const id = readString(userRecord, ['id']);
   const username =
@@ -386,10 +391,9 @@ async function fetchTrustInputs(): Promise<{
   };
 }
 
-function filterForCurrentUser<T extends { user?: EthikosId | null; user_id?: EthikosId | null }>(
-  items: T[],
-  user: { id?: string; username: string },
-): T[] {
+function filterForCurrentUser<
+  T extends { user?: EthikosId | null; user_id?: EthikosId | null },
+>(items: T[], user: { id?: string; username: string }): T[] {
   return items.filter(
     (item) =>
       matchesCurrentUser(item.user, user) ||
@@ -598,22 +602,19 @@ export async function fetchTrustBadges(): Promise<TrustBadgePayload> {
 }
 
 /**
- * Backward-compatible helper for pages/hooks that expect a flat badge array.
- *
- * Current app pages and useReputationEvents call `fetchUserBadges()` as:
- *   Promise<Badge[]>
+ * Primary helper for pages that consume earned/progress badge buckets.
  */
-export async function fetchUserBadges(): Promise<Badge[]> {
-  const payload = await fetchTrustBadges();
-
-  return [...payload.earned, ...payload.progress];
+export async function fetchUserBadges(): Promise<TrustBadgePayload> {
+  return fetchTrustBadges();
 }
 
 /**
- * Compatibility helper for older screens that still expect a flat array.
+ * Compatibility helper for older screens/hooks that still expect a flat array.
  */
 export async function fetchUserBadgeList(): Promise<Badge[]> {
-  return fetchUserBadges();
+  const payload = await fetchTrustBadges();
+
+  return [...payload.earned, ...payload.progress];
 }
 
 /* ------------------------------------------------------------------ */

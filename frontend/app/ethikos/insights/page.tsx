@@ -76,37 +76,37 @@ function toChartData(data: unknown): ChartDatum[] {
 }
 
 function asLineConfig(
-  config: Record<string, unknown>,
+  config: unknown,
 ): React.ComponentProps<typeof Line> {
   return config as React.ComponentProps<typeof Line>;
 }
 
 function asAreaConfig(
-  config: Record<string, unknown>,
+  config: unknown,
 ): React.ComponentProps<typeof Area> {
   return config as React.ComponentProps<typeof Area>;
 }
 
 function asHeatmapConfig(
-  config: Record<string, unknown>,
+  config: unknown,
 ): React.ComponentProps<typeof Heatmap> {
   return config as React.ComponentProps<typeof Heatmap>;
 }
 
 function asPieConfig(
-  config: Record<string, unknown>,
+  config: unknown,
 ): React.ComponentProps<typeof Pie> {
   return config as React.ComponentProps<typeof Pie>;
 }
 
 function asRadarConfig(
-  config: Record<string, unknown>,
+  config: unknown,
 ): React.ComponentProps<typeof Radar> {
   return config as React.ComponentProps<typeof Radar>;
 }
 
 function asBarConfig(
-  config: Record<string, unknown>,
+  config: unknown,
 ): React.ComponentProps<typeof Bar> {
   return config as React.ComponentProps<typeof Bar>;
 }

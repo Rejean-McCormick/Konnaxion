@@ -18,6 +18,7 @@ import type {
   ApiMaybeList,
   ArgumentSide,
   EthikosArgumentApi,
+  EthikosId,
   EthikosStanceApi,
   EthikosTopicApi,
   StanceValue,
@@ -123,6 +124,10 @@ function optionalNumericId(id: string | number | null | undefined): number | nul
   return value
 }
 
+function toIdKey(id: EthikosId | null | undefined): string {
+  return String(id ?? '')
+}
+
 function assertStanceValue(value: number): asserts value is TopicStanceValue {
   if (!Number.isInteger(value) || value < -3 || value > 3) {
     throw new Error('Ethikos stance value must be an integer from -3 to 3.')
@@ -153,19 +158,65 @@ function categoryName(topic: EthikosTopicApi): string {
   return topic.category?.name ?? topic.category_name ?? 'Uncategorized'
 }
 
-function byDateAsc<T>(items: T[], getDate: (item: T) => string): T[] {
-  return [...items].sort(
-    (a, b) => Date.parse(getDate(a)) - Date.parse(getDate(b)),
+function normalizeDateString(
+  value: string | null | undefined,
+  fallback?: string,
+): string {
+  if (typeof value === 'string' && value.trim().length > 0) {
+    return value
+  }
+
+  if (typeof fallback === 'string' && fallback.trim().length > 0) {
+    return fallback
+  }
+
+  return new Date().toISOString()
+}
+
+function topicCreatedAt(topic: EthikosTopicApi): string {
+  return normalizeDateString(topic.created_at)
+}
+
+function topicLastActivity(topic: EthikosTopicApi): string {
+  const createdAt = topicCreatedAt(topic)
+
+  return normalizeDateString(
+    topic.last_activity ?? topic.updated_at,
+    createdAt,
   )
 }
 
-function byDateDesc<T>(items: T[], getDate: (item: T) => string): T[] {
+function toDateValue(value: string | null | undefined): number {
+  if (!value) {
+    return 0
+  }
+
+  const parsed = Date.parse(value)
+
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
+function byDateAsc<T>(
+  items: T[],
+  getDate: (item: T) => string | null | undefined,
+): T[] {
   return [...items].sort(
-    (a, b) => Date.parse(getDate(b)) - Date.parse(getDate(a)),
+    (a, b) => toDateValue(getDate(a)) - toDateValue(getDate(b)),
+  )
+}
+
+function byDateDesc<T>(
+  items: T[],
+  getDate: (item: T) => string | null | undefined,
+): T[] {
+  return [...items].sort(
+    (a, b) => toDateValue(getDate(b)) - toDateValue(getDate(a)),
   )
 }
 
 function toEliteTopic(topic: EthikosTopicApi, stanceCount: number): EliteTopic {
+  const createdAt = topicCreatedAt(topic)
+  const lastActivity = topicLastActivity(topic)
   const totalVotes =
     typeof topic.total_votes === 'number' ? topic.total_votes : stanceCount
 
@@ -173,8 +224,8 @@ function toEliteTopic(topic: EthikosTopicApi, stanceCount: number): EliteTopic {
     id: String(topic.id),
     title: topic.title,
     category: categoryName(topic),
-    createdAt: topic.created_at,
-    lastActivity: topic.last_activity,
+    createdAt,
+    lastActivity,
     hot: totalVotes >= 10,
     stanceCount,
   } as EliteTopic
@@ -189,18 +240,18 @@ function toTopicStance(row: EthikosStanceApi): TopicStance {
     topicId: String(row.topic),
     user: row.user != null ? String(row.user) : undefined,
     value,
-    timestamp: row.timestamp,
+    timestamp: normalizeDateString(row.timestamp),
   }
 }
 
 function toDetailStatement(arg: EthikosArgumentApi): TopicDetailStatement {
   return {
     id: String(arg.id),
-    author: displayUser(arg.user),
+    author: displayUser(arg.user_display ?? arg.user),
     body: arg.content,
     side: arg.side ?? null,
     parent: arg.parent != null ? String(arg.parent) : null,
-    createdAt: arg.created_at,
+    createdAt: normalizeDateString(arg.created_at),
   }
 }
 
@@ -209,7 +260,9 @@ function toPreviewStatement(arg: EthikosArgumentApi): TopicPreviewStatement {
     id: String(arg.id),
     author: displayUser(arg.user_display ?? arg.user),
     body: arg.content,
-    createdAt: arg.created_at,
+    side: arg.side ?? null,
+    parent: arg.parent != null ? String(arg.parent) : null,
+    createdAt: normalizeDateString(arg.created_at),
   }
 }
 
@@ -220,7 +273,9 @@ function normalizePreviewStatement(
     id: String(statement.id),
     author: displayUser(statement.author),
     body: statement.body ?? '',
-    createdAt: statement.createdAt,
+    side: statement.side ?? null,
+    parent: statement.parent ?? null,
+    createdAt: normalizeDateString(statement.createdAt),
   }
 }
 
@@ -248,8 +303,10 @@ async function buildTopicPreviewFallback(
     id: String(topic.id),
     title: topic.title,
     category: categoryName(topic),
-    createdAt: topic.created_at,
+    createdAt: topicCreatedAt(topic),
     description: topic.description ?? '',
+    status: topic.status,
+    lastActivity: topicLastActivity(topic),
     latest,
   }
 }
@@ -279,17 +336,23 @@ export async function fetchEliteTopics(): Promise<EliteTopicsResponse> {
     fetchAllTopicStances(),
   ])
 
-  const stanceCountByTopic = new Map<number, number>()
+  const stanceCountByTopic = new Map<string, number>()
 
   for (const stance of stances) {
+    const topicKey = toIdKey(stance.topic)
+
+    if (!topicKey) {
+      continue
+    }
+
     stanceCountByTopic.set(
-      stance.topic,
-      (stanceCountByTopic.get(stance.topic) ?? 0) + 1,
+      topicKey,
+      (stanceCountByTopic.get(topicKey) ?? 0) + 1,
     )
   }
 
-  const list = byDateDesc(topics, (topic) => topic.last_activity).map((topic) =>
-    toEliteTopic(topic, stanceCountByTopic.get(topic.id) ?? 0),
+  const list = byDateDesc(topics, topicLastActivity).map((topic) =>
+    toEliteTopic(topic, stanceCountByTopic.get(toIdKey(topic.id)) ?? 0),
   )
 
   return { list }
@@ -319,8 +382,14 @@ export async function fetchTopicPreview(
         id: String(preview.id),
         title: preview.title,
         category: preview.category || 'Uncategorized',
-        createdAt: preview.createdAt,
+        createdAt: normalizeDateString(preview.createdAt),
         description: preview.description ?? '',
+        status: preview.status,
+        lastActivity: normalizeDateString(
+          preview.lastActivity,
+          preview.createdAt,
+        ),
+        stats: preview.stats,
         latest: (preview.latest ?? []).map(normalizePreviewStatement),
       }
     }
@@ -446,19 +515,22 @@ export async function fetchTopicDetail(
     const detail = await fetchEthikosTopicDetail(topicId)
 
     return {
-      id: detail.id,
+      id: String(detail.id),
       title: detail.title,
       description: detail.description ?? '',
       category: detail.category ?? 'Uncategorized',
-      createdAt: detail.createdAt,
-      lastActivity: detail.lastActivity,
+      createdAt: normalizeDateString(detail.createdAt),
+      lastActivity: normalizeDateString(
+        detail.lastActivity,
+        detail.createdAt,
+      ),
       statements: detail.statements.map((statement) => ({
-        id: statement.id,
-        author: statement.author,
+        id: String(statement.id),
+        author: displayUser(statement.author),
         body: statement.body,
         side: statement.side ?? null,
         parent: statement.parent ?? null,
-        createdAt: statement.createdAt,
+        createdAt: normalizeDateString(statement.createdAt),
       })),
     }
   } catch {
@@ -472,8 +544,8 @@ export async function fetchTopicDetail(
       title: topic.title,
       description: topic.description ?? '',
       category: categoryName(topic),
-      createdAt: topic.created_at,
-      lastActivity: topic.last_activity,
+      createdAt: topicCreatedAt(topic),
+      lastActivity: topicLastActivity(topic),
       statements,
     }
   }

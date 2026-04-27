@@ -1,106 +1,115 @@
 # FILE: backend/konnaxion/kreative/api_views.py
 # kreative/api_views.py
 
-from rest_framework import viewsets, permissions, filters
+from rest_framework import filters, permissions, viewsets
 
-from .models import KreativeArtwork, Gallery, CollabSession, TraditionEntry, Tag
+from .models import CollabSession, Gallery, KreativeArtwork, Tag, TraditionEntry
 from .serializers import (
-    KreativeArtworkSerializer,
-    GallerySerializer,
     CollabSessionSerializer,
-    TraditionEntrySerializer,
+    GallerySerializer,
+    KreativeArtworkSerializer,
     TagSerializer,
+    TraditionEntrySerializer,
 )
 
 
 class KreativeArtworkViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for KreativeArtwork (creative artworks uploaded by users).
-    Users must be authenticated to list or create artworks (art content is members-only).
+    ViewSet for KreativeArtwork.
+
+    Users must be authenticated to list or create artworks because art content
+    is members-only.
     """
+
     queryset = (
-        KreativeArtwork.objects
-        .select_related("artist")
+        KreativeArtwork.objects.select_related("artist")
         .prefetch_related("tags")
         .all()
     )
     serializer_class = KreativeArtworkSerializer
-    permission_classes = [permissions.IsAuthenticated]  # Only logged-in users can view or upload artworks
+    permission_classes = [permissions.IsAuthenticated]
     filterset_fields = ["artist", "media_type", "year"]
 
     def perform_create(self, serializer):
-        # Set the artist (uploader) to current user
         serializer.save(artist=self.request.user)
 
 
 class GalleryViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Gallery (collections of artworks).
-    Galleries can be viewed by anyone; only authenticated users can create (curate) galleries.
+    ViewSet for Gallery.
+
+    Galleries can be viewed by anyone. Only authenticated users can create or
+    curate galleries.
     """
-    queryset = (
-        Gallery.objects
-        .select_related("created_by")
-        .prefetch_related("artworks")
-        .all()
+
+    queryset = Gallery.objects.select_related("created_by").prefetch_related(
+        "artworks",
     )
     serializer_class = GallerySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filterset_fields = ["created_by", "theme"]
 
     def perform_create(self, serializer):
-        # Set the curator/creator of the gallery to current user
         serializer.save(created_by=self.request.user)
 
 
 class CollabSessionViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for CollabSession (live collaboration sessions for artists).
+    ViewSet for CollabSession.
+
     Allows listing ongoing or past sessions and starting new sessions.
-    Auth required to create a session; reading sessions is allowed to all (to discover sessions).
+    Authentication is required to create a session; reading sessions is public.
     """
-    queryset = (
-        CollabSession.objects
-        .select_related("host", "final_artwork")
-        .all()
-    )
+
+    queryset = CollabSession.objects.select_related(
+        "host",
+        "final_artwork",
+    ).all()
     serializer_class = CollabSessionSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filterset_fields = ["session_type", "host", "ended_at"]
 
     def perform_create(self, serializer):
-        # Set the session host to the current user
         serializer.save(host=self.request.user)
 
 
 class TraditionEntryViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for TraditionEntry (submissions of cultural traditions for preservation).
-    Anyone can view approved tradition entries; authenticated users can submit new entries.
+    ViewSet for TraditionEntry.
+
+    Anyone can view approved tradition entries. Authenticated users can submit
+    new entries. Approval is handled separately by admins.
     """
-    queryset = (
-        TraditionEntry.objects
-        .select_related("submitted_by", "approved_by")
-        .all()
-    )
+
+    queryset = TraditionEntry.objects.select_related(
+        "submitted_by",
+        "approved_by",
+    ).all()
     serializer_class = TraditionEntrySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filterset_fields = ["approved", "region", "submitted_by"]
 
     def perform_create(self, serializer):
-        # Set the submitter to current user
         serializer.save(submitted_by=self.request.user)
-        # Note: Approval fields are read-only. Approval is handled by admins separately.
 
 
-class KreativeTagViewSet(viewsets.ModelViewSet):
+class TagViewSet(viewsets.ModelViewSet):
     """
-    ViewSet for Tag in Kreative app (tags for artworks).
-    Allows listing and creating tags for categorizing artworks.
+    ViewSet for Kreative tags.
+
+    Tags are used to categorize artworks. Reading is public; writes require
+    authentication so the central API router can safely expose kreative/tags.
     """
+
     queryset = Tag.objects.all().order_by("name")
     serializer_class = TagSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ["name"]
     search_fields = ["name"]
+    ordering_fields = ["name"]
+    ordering = ["name"]
+
+
+# Compatibility alias for older imports/usages.
+KreativeTagViewSet = TagViewSet

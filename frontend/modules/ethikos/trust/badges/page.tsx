@@ -5,16 +5,30 @@ import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Badge as AntBadge, Card, Empty } from 'antd';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
-import usePageTitle from '@/hooks/usePageTitle';
-import { fetchUserBadges } from '@/services/trust';
-import type { Badge as UserBadge } from '@/services/trust';
 
-export default function Badges() {
+import usePageTitle from '@/hooks/usePageTitle';
+import {
+  fetchUserBadges,
+  type Badge as UserBadge,
+  type TrustBadgePayload,
+} from '@/services/trust';
+
+function formatEarnedDate(value?: string): string {
+  if (!value) {
+    return 'Unknown date';
+  }
+
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.format('MMM D, YYYY') : value;
+}
+
+export default function Badges(): JSX.Element {
   usePageTitle('Trust · Badges');
 
-  // ✅ FIX: add second generic argument `[]`
-  const { data, loading } = useRequest<UserBadge[], []>(fetchUserBadges);
-  const badges = data ?? [];
+  const { data, loading } = useRequest<TrustBadgePayload, []>(fetchUserBadges);
+
+  const badges: UserBadge[] = data?.earned ?? [];
 
   return (
     <PageContainer ghost loading={loading}>
@@ -23,23 +37,27 @@ export default function Badges() {
           <Empty description="No badges earned yet" />
         )}
 
-        {badges.map((badge) => (
-          <AntBadge.Ribbon
-            text={dayjs(badge.earnedAt).format('MMM D, YYYY')}
-            color="green"
-            key={badge.id}
-          >
-            <Card
-              title={badge.label}
-              style={{ width: 260, marginBottom: 16 }}
+        {badges.map((badge) => {
+          const earnedDate = formatEarnedDate(badge.earnedAt);
+
+          return (
+            <AntBadge.Ribbon
+              text={earnedDate}
+              color="green"
+              key={badge.id}
             >
-              <p>{badge.description}</p>
-              <p style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
-                Earned on {dayjs(badge.earnedAt).format('MMM D, YYYY')}
-              </p>
-            </Card>
-          </AntBadge.Ribbon>
-        ))}
+              <Card
+                title={badge.label}
+                style={{ width: 260, marginBottom: 16 }}
+              >
+                <p>{badge.description}</p>
+                <p style={{ marginTop: 8, fontSize: 12, opacity: 0.7 }}>
+                  Earned on {earnedDate}
+                </p>
+              </Card>
+            </AntBadge.Ribbon>
+          );
+        })}
       </ProCard>
     </PageContainer>
   );

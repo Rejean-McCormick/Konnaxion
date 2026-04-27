@@ -244,7 +244,7 @@ export default function ImpactVoteControl({
       }
     }
 
-    const total = validVotes.reduce((sum, value) => sum + value, 0)
+    const total = validVotes.reduce<number>((sum, value) => sum + value, 0)
     const average = total / count
     const rounded = Math.round(average)
     const roundedLabelValue = isImpactValue(rounded) ? rounded : 0

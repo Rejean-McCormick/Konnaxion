@@ -351,15 +351,27 @@ function actionPath(resource: string, id: EthikosId, action: string): string {
   return `${resource}${encodeId(id)}/${action.replace(/^\/+|\/+$/g, '')}/`
 }
 
-function cleanParams(
-  params?: Record<string, EthikosId | boolean | null | undefined>,
-): Record<string, EthikosId | boolean> | undefined {
-  if (!params) return undefined
+type CleanParamValue = EthikosId | boolean
 
-  const cleaned: Record<string, EthikosId | boolean> = {}
+function cleanParams<T extends object>(
+  params?: T | null,
+): Record<string, CleanParamValue> | undefined {
+  if (!params) {
+    return undefined
+  }
+
+  const cleaned: Record<string, CleanParamValue> = {}
 
   for (const [key, value] of Object.entries(params)) {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value === undefined || value === null || value === '') {
+      continue
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
       cleaned[key] = value
     }
   }

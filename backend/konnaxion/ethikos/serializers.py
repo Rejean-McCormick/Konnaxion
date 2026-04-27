@@ -5,6 +5,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
 from .constants import (
@@ -527,12 +528,24 @@ class DiscussionParticipantRoleSerializer(serializers.ModelSerializer):
     Per-topic participant role serializer.
 
     These are Kialo-style discussion roles, not Django permission group names.
+
+    Read shape:
+    - user: display string
+    - user_id: raw participant user id
+    - assigned_by / assigned_by_id: assignment actor
+
+    Write shape:
+    - target_user_id: explicit participant user id mapped to model field `user`
     """
 
     user = serializers.StringRelatedField(read_only=True)
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=serializers.empty,
-        read_only=True,
+    user_id = serializers.IntegerField(read_only=True)
+
+    target_user_id = serializers.PrimaryKeyRelatedField(
+        queryset=get_user_model().objects.all(),
+        source="user",
+        write_only=True,
+        required=False,
     )
 
     assigned_by = serializers.StringRelatedField(read_only=True)
@@ -545,6 +558,7 @@ class DiscussionParticipantRoleSerializer(serializers.ModelSerializer):
             "topic",
             "user",
             "user_id",
+            "target_user_id",
             "role",
             "assigned_by",
             "assigned_by_id",
@@ -553,14 +567,21 @@ class DiscussionParticipantRoleSerializer(serializers.ModelSerializer):
         )
         read_only_fields = (
             "id",
+            "user",
+            "user_id",
             "assigned_by",
             "assigned_by_id",
             "created_at",
             "updated_at",
         )
-        extra_kwargs = {
-            "user": {"write_only": False},
-        }
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        if self.instance is None and attrs.get("user") is None:
+            raise serializers.ValidationError(
+                {"target_user_id": "Participant user is required."}
+            )
+
+        return attrs
 
 
 class DiscussionVisibilitySettingSerializer(serializers.ModelSerializer):
