@@ -281,7 +281,7 @@ class TopicViewSet(viewsets.ModelViewSet):
                 .annotate(
                     source_count=Count("sources", distinct=True),
                     impact_vote_count=Count("impact_votes", distinct=True),
-                    suggestion_count=Count("suggestions", distinct=True),
+                    suggestion_count=Count("suggested_replies", distinct=True),
                 )
                 .order_by("-created_at")[:5]
             ]
@@ -412,7 +412,7 @@ class ArgumentViewSet(viewsets.ModelViewSet):
             .annotate(
                 source_count=Count("sources", distinct=True),
                 impact_vote_count=Count("impact_votes", distinct=True),
-                suggestion_count=Count("suggestions", distinct=True),
+                suggestion_count=Count("suggested_replies", distinct=True),
             )
         )
 

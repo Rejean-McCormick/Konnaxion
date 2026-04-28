@@ -16,11 +16,15 @@ export default defineConfig({
    *
    * ethikos-wave1-demo.spec.ts:
    *   Focused Kintsugi Wave 1 demo smoke.
+   *
+   * ethikos-wave1-workflow.spec.ts:
+   *   Real UI workflow for the Kintsugi Wave 1 demo slice.
    */
   testMatch: [
     '**/routes.spec.ts',
     '**/routes-tests.spec.ts',
-    '**/ethikos-wave1-demo.spec.ts'
+    '**/ethikos-wave1-demo.spec.ts',
+    '**/ethikos-wave1-workflow.spec.ts'
   ],
 
   testIgnore: [
