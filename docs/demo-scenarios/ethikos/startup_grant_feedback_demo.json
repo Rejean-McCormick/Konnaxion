@@ -1,0 +1,183 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "startup_grant_feedback_demo",
+  "scenario_title": "Startup Grant Feedback Demo",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A business-development demo where founders, mentors, and community members evaluate grant proposals.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Business + mentorship + weighted review"
+  },
+  "actors": [
+    {
+      "key": "leo_founder",
+      "username": "demo_leo_founder",
+      "display_name": "Léo",
+      "email": "demo_leo_founder@example.test",
+      "role": "founder",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "priya_mentor",
+      "username": "demo_priya_mentor",
+      "display_name": "Priya",
+      "email": "demo_priya_mentor@example.test",
+      "role": "startup_mentor",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "ana_finance",
+      "username": "demo_ana_finance",
+      "display_name": "Ana",
+      "email": "demo_ana_finance@example.test",
+      "role": "finance_reviewer",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "mika_user",
+      "username": "demo_mika_user",
+      "display_name": "Mika",
+      "email": "demo_mika_user@example.test",
+      "role": "early_user",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [
+    {
+      "key": "entrepreneurship",
+      "name": "Entrepreneurship",
+      "description": "Startup ideas, grant proposals, mentorship, and sustainable growth."
+    }
+  ],
+  "topics": [
+    {
+      "key": "grant_selection",
+      "title": "[DEMO] Which startup proposal should receive the pilot grant?",
+      "description": "The panel is comparing feasibility, social value, financial discipline, and user need.",
+      "status": "open",
+      "category": "entrepreneurship",
+      "start_date": "2026-05-01",
+      "end_date": "2026-06-15"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "grant_selection",
+      "actor": "leo_founder",
+      "value": 3
+    },
+    {
+      "topic": "grant_selection",
+      "actor": "priya_mentor",
+      "value": 2
+    },
+    {
+      "topic": "grant_selection",
+      "actor": "ana_finance",
+      "value": 1
+    },
+    {
+      "topic": "grant_selection",
+      "actor": "mika_user",
+      "value": 2
+    }
+  ],
+  "arguments": [
+    {
+      "key": "mentor_market",
+      "topic": "grant_selection",
+      "actor": "priya_mentor",
+      "side": "pro",
+      "content": "The proposal has a focused target user and a clear first pilot milestone."
+    },
+    {
+      "key": "finance_risk",
+      "topic": "grant_selection",
+      "actor": "ana_finance",
+      "side": "neutral",
+      "content": "The budget is plausible, but the team should reduce dependency on one supplier."
+    },
+    {
+      "key": "user_need",
+      "topic": "grant_selection",
+      "actor": "mika_user",
+      "side": "pro",
+      "content": "The prototype addresses a real user pain point that current tools ignore."
+    },
+    {
+      "key": "founder_commitment",
+      "topic": "grant_selection",
+      "actor": "leo_founder",
+      "side": "pro",
+      "content": "The team can deliver the first pilot using existing community partners."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "grant_award_vote",
+      "title": "[DEMO] Pilot grant recommendation",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-06-15",
+      "options": [
+        {
+          "key": "fund_now",
+          "label": "Fund the pilot now"
+        },
+        {
+          "key": "revise_budget",
+          "label": "Request a revised budget first"
+        },
+        {
+          "key": "mentor_only",
+          "label": "Offer mentorship but no funding yet"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "grant_award_vote",
+      "actor": "leo_founder",
+      "option": "fund_now",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "grant_award_vote",
+      "actor": "priya_mentor",
+      "option": "fund_now",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "grant_award_vote",
+      "actor": "ana_finance",
+      "option": "revise_budget",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "grant_award_vote",
+      "actor": "mika_user",
+      "option": "fund_now",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "grant_award_vote",
+      "action": "Publish grant panel feedback summary",
+      "status": "planned",
+      "date": "2026-06-07"
+    },
+    {
+      "consultation": "grant_award_vote",
+      "action": "Request final pilot budget and milestone plan",
+      "status": "planned",
+      "date": "2026-06-14"
+    }
+  ]
+}

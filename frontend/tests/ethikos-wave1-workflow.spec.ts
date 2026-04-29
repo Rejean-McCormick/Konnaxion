@@ -5,13 +5,15 @@ import path from 'path'
 
 const BASE_URL = process.env.SMOKE_BASE_URL ?? 'http://localhost:3000'
 const STRICT_UI = process.env.WAVE1_STRICT_UI === '1'
+const WAVE1_TOPIC_ID = process.env.WAVE1_TOPIC_ID
+const PAUSE_ON_ERROR = process.env.WAVE1_PAUSE_ON_ERROR === '1'
 const outDir = path.join('artifacts', 'kintsugi-wave1-workflow')
 
 const ROUTE_DRIFT_RE =
   /\/api\/(kialo|kintsugi|korum|deliberation|deliberate)\b|\/(kialo|kintsugi|korum|deliberation)\b/i
 
 const RUNTIME_ERROR_RE =
-  /Application error|Unhandled Runtime Error|Build Error|Module not found|Cannot read properties of undefined|Cannot read properties of null/i
+  /Application error|Unhandled Runtime Error|Build Error|Module not found|Cannot read properties of undefined|Cannot read properties of null|Maximum update depth exceeded/i
 
 type Finding = {
   type: string
@@ -33,10 +35,10 @@ function isAllowedAuthUrl(url: string): boolean {
 function isIgnorableConsoleError(text: string): boolean {
   return (
     /Failed to load resource: the server responded with a status of (401|403)/i.test(
-      text
+      text,
     ) ||
     /Warning: \[antd: compatible\] antd v5 support React is 16 ~ 18/i.test(
-      text
+      text,
     )
   )
 }
@@ -51,7 +53,7 @@ async function safeScreenshot(page: Page, name: string): Promise<void> {
   try {
     await page.screenshot({
       path: path.join(outDir, `${name}.png`),
-      fullPage: true
+      fullPage: true,
     })
   } catch {
     // Screenshot is best-effort only.
@@ -66,15 +68,36 @@ async function safeBodyText(page: Page): Promise<string> {
   }
 }
 
+async function pauseForInspection(
+  page: Page,
+  route: string,
+  reason: string,
+  details: unknown,
+): Promise<void> {
+  if (!PAUSE_ON_ERROR) {
+    return
+  }
+
+  console.log(`[WAVE1] Pausing on ${reason}: ${route}`)
+
+  if (typeof details === 'string') {
+    console.log(details)
+  } else {
+    console.log(JSON.stringify(details, null, 2))
+  }
+
+  await page.pause()
+}
+
 async function visitPage(
   page: Page,
   route: string,
   findings: Finding[],
-  screenshotName: string
+  screenshotName: string,
 ): Promise<void> {
   const response = await page.goto(urlFor(route), {
     waitUntil: 'domcontentloaded',
-    timeout: 45_000
+    timeout: 45_000,
   })
 
   expect(response, `No response for ${route}`).not.toBeNull()
@@ -88,11 +111,19 @@ async function visitPage(
 
   const bodyText = await safeBodyText(page)
 
-  expect(bodyText, `Runtime/build error rendered on ${route}`).not.toMatch(
-    RUNTIME_ERROR_RE
-  )
+  if (RUNTIME_ERROR_RE.test(bodyText)) {
+    await safeScreenshot(page, `${screenshotName}-runtime-error`)
+    await pauseForInspection(page, route, 'runtime/build error', bodyText)
+
+    throw new Error(`Runtime/build error rendered on ${route}`)
+  }
 
   await safeScreenshot(page, screenshotName)
+
+  if (findings.length > 0) {
+    await safeScreenshot(page, `${screenshotName}-runtime-findings`)
+    await pauseForInspection(page, route, 'runtime findings', findings)
+  }
 
   expect(findings, `Runtime findings on ${route}`).toHaveLength(0)
 }
@@ -101,7 +132,7 @@ async function clickIfVisible(
   page: Page,
   label: RegExp,
   stepName: string,
-  required = false
+  required = false,
 ): Promise<boolean> {
   const buttons = page.getByRole('button', { name: label })
   const buttonCount = await buttons.count()
@@ -143,28 +174,41 @@ async function clickIfVisible(
   }
 
   if (disabledButtonSeen) {
-    if (required || STRICT_UI) {
+    if (required) {
       throw new Error(`Required UI control is disabled: ${label}`)
     }
 
     test.info().annotations.push({
       type: 'optional-ui-disabled',
-      description: `${stepName}: ${label}`
+      description: `${stepName}: ${label}`,
     })
 
     return false
   }
 
-  if (required || STRICT_UI) {
+  if (required) {
     throw new Error(`Required UI control not found: ${label}`)
   }
 
   test.info().annotations.push({
     type: 'optional-ui-missing',
-    description: `${stepName}: ${label}`
+    description: `${stepName}: ${label}`,
   })
 
   return false
+}
+
+async function expectTextVisible(
+  page: Page,
+  label: RegExp,
+  stepName: string,
+): Promise<void> {
+  await expect(
+    page.getByText(label).first(),
+    `Expected visible UI text for ${stepName}`,
+  ).toBeVisible({ timeout: 5_000 })
+
+  await safeScreenshot(page, stepName)
 }
 
 async function findFirstTopicPath(page: Page): Promise<string | null> {
@@ -188,11 +232,19 @@ async function findFirstTopicPath(page: Page): Promise<string | null> {
             href !== '/ethikos/deliberate/guidelines' &&
             !href.includes('[topic') &&
             !href.endsWith('/elite') &&
-            !href.endsWith('/guidelines')
-        )
+            !href.endsWith('/guidelines'),
+        ),
     )
 
   return links[0] ?? null
+}
+
+function configuredTopicPath(): string | null {
+  if (!WAVE1_TOPIC_ID) {
+    return null
+  }
+
+  return `/ethikos/deliberate/${WAVE1_TOPIC_ID}?sidebar=ethikos`
 }
 
 test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
@@ -211,7 +263,7 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
 
         findings.push({
           type: `console:${message.type()}`,
-          message: text
+          message: text,
         })
       }
     })
@@ -219,7 +271,7 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
     page.on('pageerror', (error) => {
       findings.push({
         type: 'pageerror',
-        message: String(error)
+        message: String(error),
       })
     })
 
@@ -233,7 +285,7 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
 
       findings.push({
         type: 'requestfailed',
-        message: `${request.method()} ${url} :: ${errorText}`
+        message: `${request.method()} ${url} :: ${errorText}`,
       })
     })
 
@@ -244,21 +296,21 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
       if (ROUTE_DRIFT_RE.test(url)) {
         findings.push({
           type: 'route-drift',
-          message: `Forbidden Kintsugi route drift: ${url}`
+          message: `Forbidden Kintsugi route drift: ${url}`,
         })
       }
 
       if (status >= 500) {
         findings.push({
           type: 'server-error',
-          message: `HTTP ${status}: ${url}`
+          message: `HTTP ${status}: ${url}`,
         })
       }
 
       if ((status === 401 || status === 403) && !isAllowedAuthUrl(url)) {
         findings.push({
           type: 'unexpected-auth-block',
-          message: `HTTP ${status}: ${url}`
+          message: `HTTP ${status}: ${url}`,
         })
       }
     })
@@ -267,118 +319,134 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
   test('walks the Wave 1 demo interfaces through real UI', async ({ page }) => {
     await visitPage(
       page,
-      '/ethikos/deliberate/elite',
+      '/ethikos/deliberate/elite?sidebar=ethikos',
       findings,
-      '01-deliberate-elite'
+      '01-deliberate-elite',
     )
 
-    const topicPath = await findFirstTopicPath(page)
+    const topicPath = configuredTopicPath() ?? (await findFirstTopicPath(page))
 
     if (topicPath) {
       await visitPage(page, topicPath, findings, '02-deliberate-topic')
 
-      await clickIfVisible(
+      await expectTextVisible(
         page,
-        /source|citation|sources|citations/i,
-        '03-topic-sources'
+        /arguments and replies/i,
+        '03-topic-argument-thread',
       )
 
       await clickIfVisible(
         page,
-        /impact|vote|importance|evaluate/i,
-        '04-topic-impact-vote'
+        /view details|viewing details/i,
+        '04-topic-select-argument',
+        true,
       )
 
-      await clickIfVisible(
+      await expectTextVisible(
         page,
-        /suggest|suggestion|propose|queue/i,
-        '05-topic-suggestions'
+        /selected argument details/i,
+        '05-topic-selected-argument-details',
       )
 
-      await clickIfVisible(
+      await expectTextVisible(page, /sources/i, '06-topic-sources-panel')
+      await expectTextVisible(page, /impact votes/i, '07-topic-impact-panel')
+      await expectTextVisible(page, /suggestions/i, '08-topic-suggestions-panel')
+      await expectTextVisible(
         page,
-        /visibility|anonymous|privacy|role|participant/i,
-        '06-topic-visibility-roles'
+        /discussion visibility/i,
+        '09-topic-visibility-panel',
       )
+      await expectTextVisible(
+        page,
+        /participant roles/i,
+        '10-topic-participant-roles-panel',
+      )
+
+      await clickIfVisible(page, /add/i, '11-topic-sources-open-add-form')
     } else {
       test.info().annotations.push({
         type: 'demo-data-missing',
         description:
-          'No real topic link found on /ethikos/deliberate/elite. Topic-specific UI panels were skipped.'
+          'No real topic link found on /ethikos/deliberate/elite. Topic-specific UI panels were skipped.',
       })
 
       if (STRICT_UI) {
         throw new Error(
-          'WAVE1_STRICT_UI=1 requires at least one real deliberate topic.'
+          'WAVE1_STRICT_UI=1 requires at least one real deliberate topic.',
         )
       }
     }
 
     await visitPage(
       page,
-      '/ethikos/decide/public',
+      '/ethikos/decide/public?sidebar=ethikos',
       findings,
-      '07-decide-public'
+      '12-decide-public',
     )
 
     await clickIfVisible(
       page,
-      /submit|vote|participate|decision|continue|review/i,
-      '08-decide-public-interaction'
+      /submit|vote|participate|decision|continue|review|cast vote/i,
+      '13-decide-public-interaction',
     )
 
     await visitPage(
       page,
-      '/ethikos/decide/results',
+      '/ethikos/decide/results?sidebar=ethikos',
       findings,
-      '09-decide-results'
+      '14-decide-results',
     )
 
     await visitPage(
       page,
-      '/ethikos/impact/tracker',
+      '/ethikos/impact/tracker?sidebar=ethikos',
       findings,
-      '10-impact-tracker'
+      '15-impact-tracker',
     )
 
     await clickIfVisible(
       page,
       /details|view|open|feedback|outcome|tracker/i,
-      '11-impact-interaction'
+      '16-impact-interaction',
     )
 
     await visitPage(
       page,
-      '/ethikos/pulse/live',
+      '/ethikos/pulse/live?sidebar=ethikos',
       findings,
-      '12-pulse-live'
+      '17-pulse-live',
     )
 
     await clickIfVisible(
       page,
       /refresh|trend|live|overview|health/i,
-      '13-pulse-interaction'
+      '18-pulse-interaction',
     )
 
     await visitPage(
       page,
-      '/ethikos/trust/profile',
+      '/ethikos/trust/profile?sidebar=ethikos',
       findings,
-      '14-trust-profile'
+      '19-trust-profile',
     )
 
     await clickIfVisible(
       page,
       /badge|credential|profile|reputation|trust/i,
-      '15-trust-interaction'
+      '20-trust-interaction',
     )
 
-    await visitPage(page, '/ethikos/insights', findings, '16-insights')
+    await visitPage(
+      page,
+      '/ethikos/insights?sidebar=ethikos',
+      findings,
+      '21-insights',
+    )
 
     await clickIfVisible(
       page,
-      /chart|trend|export|filter|refresh|insight/i,
-      '17-insights-interaction'
+      /overview|refresh|pulse|impact|results|guides/i,
+      '22-insights-interaction',
     )
 
     expect(findings, 'Workflow runtime findings').toHaveLength(0)

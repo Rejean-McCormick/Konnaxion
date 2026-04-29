@@ -1,4 +1,5 @@
 # FILE: backend/config/urls.py
+
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
@@ -33,6 +34,14 @@ urlpatterns += [
     # - /api/admin/moderation (ModerationTicketViewSet)
     # - /api/admin/audit-log (AuditLogViewSet)
     path("api/", include("config.api_router")),
+
+    # ------------------------------------------------------------------
+    # ethiKos Demo Importer
+    #   /api/ethikos/demo-scenarios/preview/
+    #   /api/ethikos/demo-scenarios/import/
+    #   /api/ethikos/demo-scenarios/reset/
+    # ------------------------------------------------------------------
+    path("api/ethikos/", include("konnaxion.ethikos.demo_import.urls")),
 
     # Auth token (DRF)
     path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),

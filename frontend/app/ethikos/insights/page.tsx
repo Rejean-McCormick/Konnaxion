@@ -8,8 +8,8 @@ import {
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components';
-import { Line, Area, Heatmap, Pie, Radar, Bar } from '@ant-design/plots';
 import {
+  Alert,
   Badge,
   Button,
   DatePicker,
@@ -18,7 +18,6 @@ import {
   Select,
   Skeleton,
   Space,
-  Tabs,
   Table,
   Tag,
   Tooltip,
@@ -26,12 +25,21 @@ import {
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
-  SyncOutlined,
+  ArrowRightOutlined,
+  BranchesOutlined,
+  CheckCircleOutlined,
   ClockCircleOutlined,
+  ColumnWidthOutlined,
+  DashboardOutlined,
   FilterOutlined,
-  AreaChartOutlined,
-  BarChartOutlined,
-  PieChartOutlined,
+  LineChartOutlined,
+  ProfileOutlined,
+  RadarChartOutlined,
+  SafetyCertificateOutlined,
+  StarOutlined,
+  SyncOutlined,
+  TrophyOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
@@ -41,7 +49,6 @@ import ChartCard from '@/components/charts/ChartCard';
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchPulseOverview,
-  fetchPulseTrends,
   fetchPulseHealth,
   fetchPulseLiveData,
 } from '@/services/pulse';
@@ -54,61 +61,78 @@ import {
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
-type OpinionAnalyticsData = {
-  overview: Awaited<ReturnType<typeof fetchPulseOverview>>;
-  trends: Awaited<ReturnType<typeof fetchPulseTrends>>;
-  health: Awaited<ReturnType<typeof fetchPulseHealth>>;
-  live: Awaited<ReturnType<typeof fetchPulseLiveData>>;
-  outcomes: Awaited<ReturnType<typeof fetchImpactOutcomes>>;
-  decisions: Awaited<ReturnType<typeof fetchDecisionResults>>;
+type PulseOverviewData = Awaited<ReturnType<typeof fetchPulseOverview>>;
+type PulseHealthData = Awaited<ReturnType<typeof fetchPulseHealth>>;
+type PulseLiveData = Awaited<ReturnType<typeof fetchPulseLiveData>>;
+type ImpactOutcomesData = Awaited<ReturnType<typeof fetchImpactOutcomes>>;
+type DecisionsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
+
+type EthikosOverviewData = {
+  overview?: PulseOverviewData;
+  health?: PulseHealthData;
+  live?: PulseLiveData;
+  outcomes?: ImpactOutcomesData;
+  decisions?: DecisionsData;
+  errors: string[];
+};
+
+type SafeLoadResult<T> = {
+  data?: T;
+  error?: string;
 };
 
 type DecisionRow = DecisionResult & { key: string };
 
-type ChartDatum = Record<string, unknown>;
+type WorkflowCard = {
+  title: string;
+  description: string;
+  href: string;
+  action: string;
+  icon: React.ReactNode;
+};
 
-function toChartData(data: unknown): ChartDatum[] {
-  return Array.isArray(data) ? (data as ChartDatum[]) : [];
+async function safeLoad<T>(
+  label: string,
+  loader: () => Promise<T>,
+): Promise<SafeLoadResult<T>> {
+  try {
+    return {
+      data: await loader(),
+    };
+  } catch (error) {
+    return {
+      error: `${label}: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
 }
 
-function asLineConfig(
-  config: unknown,
-): React.ComponentProps<typeof Line> {
-  return config as React.ComponentProps<typeof Line>;
-}
+async function fetchEthikosOverview(): Promise<EthikosOverviewData> {
+  const [overview, health, live, outcomes, decisions] = await Promise.all([
+    safeLoad('Pulse overview', fetchPulseOverview),
+    safeLoad('Pulse health', fetchPulseHealth),
+    safeLoad('Live activity', fetchPulseLiveData),
+    safeLoad('Impact outcomes', fetchImpactOutcomes),
+    safeLoad('Decision results', fetchDecisionResults),
+  ]);
 
-function asAreaConfig(
-  config: unknown,
-): React.ComponentProps<typeof Area> {
-  return config as React.ComponentProps<typeof Area>;
-}
-
-function asHeatmapConfig(
-  config: unknown,
-): React.ComponentProps<typeof Heatmap> {
-  return config as React.ComponentProps<typeof Heatmap>;
-}
-
-function asPieConfig(
-  config: unknown,
-): React.ComponentProps<typeof Pie> {
-  return config as React.ComponentProps<typeof Pie>;
-}
-
-function asRadarConfig(
-  config: unknown,
-): React.ComponentProps<typeof Radar> {
-  return config as React.ComponentProps<typeof Radar>;
-}
-
-function asBarConfig(
-  config: unknown,
-): React.ComponentProps<typeof Bar> {
-  return config as React.ComponentProps<typeof Bar>;
+  return {
+    overview: overview.data,
+    health: health.data,
+    live: live.data,
+    outcomes: outcomes.data,
+    decisions: decisions.data,
+    errors: [
+      overview.error,
+      health.error,
+      live.error,
+      outcomes.error,
+      decisions.error,
+    ].filter((message): message is string => Boolean(message)),
+  };
 }
 
 function formatTrendStatus(trend?: number): 'success' | 'error' | 'default' {
@@ -137,36 +161,11 @@ function formatDate(value?: string): string {
   return parsed.isValid() ? parsed.format('YYYY-MM-DD') : 'Unknown';
 }
 
-/* ------------------------------------------------------------------ */
-/*  Aggregate loader                                                   */
-/* ------------------------------------------------------------------ */
-
-async function fetchOpinionAnalytics(): Promise<OpinionAnalyticsData> {
-  const [overview, trends, health, live, outcomes, decisions] =
-    await Promise.all([
-      fetchPulseOverview(),
-      fetchPulseTrends(),
-      fetchPulseHealth(),
-      fetchPulseLiveData(),
-      fetchImpactOutcomes(),
-      fetchDecisionResults(),
-    ]);
-
-  return {
-    overview,
-    trends,
-    health,
-    live,
-    outcomes,
-    decisions,
-  };
+function route(path: string): string {
+  return `${path}${path.includes('?') ? '&' : '?'}sidebar=ethikos`;
 }
 
-/* ------------------------------------------------------------------ */
-/*  Page                                                               */
-/* ------------------------------------------------------------------ */
-
-export default function EthikosOpinionAnalytics(): JSX.Element {
+export default function EthikosOverviewPage(): JSX.Element {
   const [timeRange, setTimeRange] = useState<RangeValue>(() => [
     dayjs().subtract(30, 'day'),
     dayjs(),
@@ -175,25 +174,33 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
   const [regionFilter, setRegionFilter] = useState<string | 'all'>('all');
 
   const { data, loading, error, refresh } =
-    useRequest<OpinionAnalyticsData, []>(fetchOpinionAnalytics);
+    useRequest<EthikosOverviewData, []>(fetchEthikosOverview);
 
   const overview = data?.overview;
-  const trends = data?.trends;
   const health = data?.health;
   const live = data?.live;
   const outcomes = data?.outcomes;
   const decisions = data?.decisions;
 
   const decisionItems = decisions?.items ?? [];
+  const liveCounters = live?.counters ?? [];
+  const outcomeKpis = outcomes?.kpis ?? [];
+  const overviewKpis = overview?.kpis ?? [];
+
   const [start, end] = timeRange ?? [];
 
   const lastUpdated = data
     ? dayjs(
-        data.overview.refreshedAt ??
-          data.health.refreshedAt ??
+        overview?.refreshedAt ??
+          health?.refreshedAt ??
           new Date().toISOString(),
       ).format('HH:mm:ss')
     : null;
+
+  const agreementKpi = outcomeKpis.find((kpi) => kpi.key === 'agreement');
+  const topicsKpi = outcomeKpis.find((kpi) => kpi.key === 'topics');
+  const stancesKpi = outcomeKpis.find((kpi) => kpi.key === 'stances');
+  const openKpi = outcomeKpis.find((kpi) => kpi.key === 'open');
 
   const allRegions = useMemo(
     () =>
@@ -245,60 +252,38 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
     [decisionItems, end, regionFilter, scopeFilter, start],
   );
 
-  const decisionOutcomeData = useMemo(() => {
-    const buckets = new Map<
-      string,
-      { region: string; passed: number; rejected: number }
-    >();
+  const recentDecisions = filteredDecisions.slice(0, 6);
 
-    for (const decision of filteredDecisions) {
-      const region = decision.region ?? 'Unspecified';
-      const bucket = buckets.get(region) ?? {
-        region,
-        passed: 0,
-        rejected: 0,
-      };
-
-      if (decision.passed) {
-        bucket.passed += 1;
-      } else {
-        bucket.rejected += 1;
-      }
-
-      buckets.set(region, bucket);
-    }
-
-    return Array.from(buckets.values()).flatMap((bucket) => [
-      {
-        region: bucket.region,
-        outcome: 'Passed',
-        value: bucket.passed,
-      },
-      {
-        region: bucket.region,
-        outcome: 'Rejected',
-        value: bucket.rejected,
-      },
-    ]);
-  }, [filteredDecisions]);
-
-  const decisionOutcomeConfig = useMemo(
-    () =>
-      asBarConfig({
-        data: decisionOutcomeData,
-        isGroup: true,
-        xField: 'region',
-        yField: 'value',
-        seriesField: 'outcome',
-        autoFit: true,
-      }),
-    [decisionOutcomeData],
-  );
-
-  const agreementKpi = outcomes?.kpis.find((kpi) => kpi.key === 'agreement');
-  const topicsKpi = outcomes?.kpis.find((kpi) => kpi.key === 'topics');
-  const stancesKpi = outcomes?.kpis.find((kpi) => kpi.key === 'stances');
-  const openKpi = outcomes?.kpis.find((kpi) => kpi.key === 'open');
+  const workflowCards: WorkflowCard[] = [
+    {
+      title: 'Deliberate',
+      description: 'Open a topic, inspect the argument thread, and contribute a position.',
+      href: route('/ethikos/deliberate/elite'),
+      action: 'Open topics',
+      icon: <StarOutlined />,
+    },
+    {
+      title: 'Decide',
+      description: 'Review public consultations or expert decisions and cast a vote.',
+      href: route('/ethikos/decide/public'),
+      action: 'Vote now',
+      icon: <SafetyCertificateOutlined />,
+    },
+    {
+      title: 'Track impact',
+      description: 'Follow outcomes and implementation progress after decisions.',
+      href: route('/ethikos/impact/tracker'),
+      action: 'Track impact',
+      icon: <RadarChartOutlined />,
+    },
+    {
+      title: 'Monitor pulse',
+      description: 'Check live participation, debate health, and trend signals.',
+      href: route('/ethikos/pulse/live'),
+      action: 'View pulse',
+      icon: <ColumnWidthOutlined />,
+    },
+  ];
 
   const decisionsColumns: ColumnsType<DecisionRow> = [
     {
@@ -306,13 +291,12 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       dataIndex: 'title',
       key: 'title',
       ellipsis: true,
-      width: 260,
     },
     {
       title: 'Result',
       dataIndex: 'passed',
       key: 'passed',
-      width: 120,
+      width: 110,
       render: (_passed: boolean, row) => (
         <Tag color={row.passed ? 'green' : 'red'}>
           {row.passed ? 'PASSED' : 'REJECTED'}
@@ -323,7 +307,7 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       title: 'Scope',
       dataIndex: 'scope',
       key: 'scope',
-      width: 120,
+      width: 110,
       render: (_scope: DecisionScope, row) => (
         <Tag color={row.scope === 'Elite' ? 'geekblue' : 'default'}>
           {row.scope}
@@ -331,18 +315,10 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       ),
     },
     {
-      title: 'Region',
-      dataIndex: 'region',
-      key: 'region',
-      ellipsis: true,
-      render: (_region: string | undefined, row) =>
-        row.region ?? <Text type="secondary">Unspecified</Text>,
-    },
-    {
-      title: 'Closed at',
+      title: 'Closed',
       dataIndex: 'closesAt',
       key: 'closesAt',
-      width: 180,
+      width: 130,
       render: (_value: string, row) => formatDate(row.closesAt),
     },
   ];
@@ -370,10 +346,10 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
   );
 
   const shellProps = {
-    title: 'Opinion analytics',
+    title: 'Ethikos overview',
     subtitle:
-      'Cross-cutting analytics across debates, participation and decision outcomes in ethiKos.',
-    sectionLabel: 'Insights',
+      'Your current deliberation, decision, trust, pulse, and impact snapshot.',
+    sectionLabel: 'Overview',
     secondaryActions,
   } as const;
 
@@ -392,7 +368,7 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
       <EthikosPageShell {...shellProps}>
         <PageContainer ghost>
           <Empty
-            description="Failed to load opinion analytics"
+            description="Failed to load Ethikos overview"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           >
             <Button
@@ -408,11 +384,17 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
     );
   }
 
-  if (!overview || !trends || !health || !live || !outcomes || !decisions) {
+  const hasAnyData =
+    overviewKpis.length > 0 ||
+    liveCounters.length > 0 ||
+    outcomeKpis.length > 0 ||
+    decisionItems.length > 0;
+
+  if (!hasAnyData) {
     return (
       <EthikosPageShell {...shellProps}>
         <PageContainer ghost>
-          <Empty description="No analytics data available yet" />
+          <Empty description="No Ethikos overview data available yet" />
         </PageContainer>
       </EthikosPageShell>
     );
@@ -421,15 +403,241 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
   return (
     <EthikosPageShell {...shellProps}>
       <PageContainer ghost>
-        <ProCard ghost style={{ marginBottom: 16 }}>
-          <Space wrap align="center">
+        {data?.errors.length ? (
+          <Alert
+            showIcon
+            type="warning"
+            style={{ marginBottom: 16 }}
+            message="Some overview sections could not be refreshed"
+            description={
+              <Space direction="vertical" size={2}>
+                {data.errors.map((message) => (
+                  <Text key={message} type="secondary">
+                    {message}
+                  </Text>
+                ))}
+              </Space>
+            }
+          />
+        ) : null}
+
+        <ProCard
+          title={
+            <Space>
+              <DashboardOutlined />
+              <span>Where to start</span>
+            </Space>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <ProCard gutter={[16, 16]} wrap ghost>
+            {workflowCards.map((item) => (
+              <ProCard
+                key={item.title}
+                colSpan={{ xs: 24, md: 12, xl: 6 }}
+                bordered
+              >
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                  <Space>
+                    {item.icon}
+                    <Text strong>{item.title}</Text>
+                  </Space>
+
+                  <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                    {item.description}
+                  </Paragraph>
+
+                  <Button href={item.href} type="primary" icon={<ArrowRightOutlined />}>
+                    {item.action}
+                  </Button>
+                </Space>
+              </ProCard>
+            ))}
+          </ProCard>
+        </ProCard>
+
+        <ProCard
+          title="Current snapshot"
+          gutter={[16, 16]}
+          wrap
+          style={{ marginBottom: 16 }}
+        >
+          {overviewKpis.length > 0 ? (
+            overviewKpis.slice(0, 4).map((kpi) => (
+              <StatisticCard
+                key={kpi.key ?? kpi.label}
+                colSpan={{ xs: 24, sm: 12, lg: 6 }}
+                statistic={{
+                  title: kpi.label,
+                  value: kpi.value,
+                  description:
+                    typeof kpi.delta === 'number' ? (
+                      <span
+                        style={{
+                          color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                        }}
+                      >
+                        {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
+                      </span>
+                    ) : null,
+                }}
+                chart={
+                  <ChartCard
+                    type="area"
+                    height={52}
+                    data={kpi.history.map((point) => ({
+                      x: point.x,
+                      y: point.y,
+                    }))}
+                    tooltip={{
+                      formatter: (datum: { x?: string | number; y?: number }) =>
+                        `${dayjs(datum.x).format('MMM D')}: ${datum.y ?? 0}`,
+                    }}
+                  />
+                }
+              />
+            ))
+          ) : (
+            <ProCard>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No KPI snapshot available yet"
+              />
+            </ProCard>
+          )}
+        </ProCard>
+
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <WarningOutlined />
+                <span>Needs attention</span>
+              </Space>
+            }
+          >
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <StatisticCard
+                statistic={{
+                  title: 'Open debates',
+                  value: openKpi?.value ?? 0,
+                  description: 'Topics still available for participation',
+                }}
+              />
+
+              <StatisticCard
+                statistic={{
+                  title: 'Total stances',
+                  value: stancesKpi?.value ?? 0,
+                  description: 'Participation volume across Ethikos',
+                }}
+              />
+
+              <Button href={route('/ethikos/deliberate/elite')} block>
+                Review open topics
+              </Button>
+            </Space>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <CheckCircleOutlined />
+                <span>Decision health</span>
+              </Space>
+            }
+          >
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <StatisticCard
+                statistic={{
+                  title: 'Tracked topics',
+                  value: topicsKpi?.value ?? 0,
+                  description: 'Topics included in outcome tracking',
+                }}
+              />
+
+              <StatisticCard
+                statistic={{
+                  title: 'Average agreement',
+                  value: agreementKpi?.value ?? 0,
+                  suffix: '%',
+                  description: 'Derived from topic-level Ethikos stances',
+                }}
+              />
+
+              <Button href={route('/ethikos/decide/results')} block>
+                Review results
+              </Button>
+            </Space>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <LineChartOutlined />
+                <span>Live activity</span>
+              </Space>
+            }
+          >
+            {liveCounters.length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No live counters available yet"
+              />
+            ) : (
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                {liveCounters.slice(0, 3).map((counter) => (
+                  <StatisticCard
+                    key={counter.label}
+                    statistic={{
+                      title: (
+                        <Space>
+                          {counter.label}
+                          <Badge status={formatTrendStatus(counter.trend)} />
+                        </Space>
+                      ),
+                      value: counter.value,
+                      precision: 0,
+                    }}
+                    chart={
+                      <ChartCard
+                        type="line"
+                        data={counter.history.map((point) => ({
+                          x: point.x,
+                          y: point.y,
+                        }))}
+                        height={44}
+                      />
+                    }
+                  />
+                ))}
+
+                <Button href={route('/ethikos/pulse/live')} block>
+                  Open live pulse
+                </Button>
+              </Space>
+            )}
+          </ProCard>
+        </ProCard>
+
+        <ProCard
+          title={
             <Space>
               <FilterOutlined />
-              <Text strong>Filters</Text>
+              <span>Recent decisions</span>
             </Space>
-
-            <Divider type="vertical" />
-
+          }
+          extra={
+            <Text type="secondary">
+              Showing {recentDecisions.length} / {decisionItems.length}
+            </Text>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <Space wrap align="center" style={{ marginBottom: 16 }}>
             <Space size="small">
               <Text type="secondary">Time window</Text>
               <RangePicker
@@ -442,12 +650,12 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
             <Space size="small">
               <Text type="secondary">Scope</Text>
               <Select<'all' | DecisionScope>
-                style={{ minWidth: 120 }}
+                style={{ minWidth: 140 }}
                 value={scopeFilter}
                 onChange={(value) => setScopeFilter(value)}
               >
                 <Option value="all">All</Option>
-                <Option value="Elite">Elite</Option>
+                <Option value="Elite">Expert</Option>
                 <Option value="Public">Public</Option>
               </Select>
             </Space>
@@ -468,292 +676,112 @@ export default function EthikosOpinionAnalytics(): JSX.Element {
               </Select>
             </Space>
           </Space>
-        </ProCard>
 
-        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
-          {overview.kpis.map((kpi) => (
-            <StatisticCard
-              key={kpi.key ?? kpi.label}
-              colSpan={{
-                xs: 24,
-                sm: 12,
-                md: 12,
-                lg: 6,
-              }}
-              statistic={{
-                title: kpi.label,
-                value: kpi.value,
-                description:
-                  typeof kpi.delta === 'number' ? (
-                    <span
-                      style={{
-                        color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
-                      }}
-                    >
-                      {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
-                    </span>
-                  ) : null,
-              }}
-              chart={
-                <ChartCard
-                  type="area"
-                  height={60}
-                  data={kpi.history.map((point) => ({
-                    x: point.x,
-                    y: point.y,
-                  }))}
-                  tooltip={{
-                    formatter: (datum: { x?: string | number; y?: number }) =>
-                      `${dayjs(datum.x).format('MMM D')}: ${datum.y ?? 0}`,
-                  }}
-                />
-              }
+          {recentDecisions.length === 0 ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No decisions match the current filters"
             />
-          ))}
+          ) : (
+            <Table<DecisionRow>
+              size="small"
+              columns={decisionsColumns}
+              dataSource={recentDecisions}
+              pagination={false}
+              rowKey="key"
+            />
+          )}
+
+          <Divider />
+
+          <Space wrap>
+            <Button href={route('/ethikos/decide/results')}>
+              Open full results
+            </Button>
+            <Button href={route('/ethikos/impact/outcomes')}>
+              View outcomes
+            </Button>
+            <Button href={route('/ethikos/impact/tracker')}>
+              Track implementation
+            </Button>
+          </Space>
         </ProCard>
 
         <ProCard
-          title={
-            <Space>
-              <AreaChartOutlined />
-              <span>Live participation</span>
-            </Space>
-          }
+          title="Deep-dive areas"
           gutter={[16, 16]}
           wrap
-          style={{ marginBottom: 16 }}
         >
-          {live.counters.length === 0 ? (
-            <ProCard>
-              <Empty description="No live counters available yet" />
-            </ProCard>
-          ) : (
-            live.counters.map((counter) => (
-              <StatisticCard
-                key={counter.label}
-                colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
-                statistic={{
-                  title: (
-                    <Space>
-                      {counter.label}
-                      <Badge status={formatTrendStatus(counter.trend)} />
-                    </Space>
-                  ),
-                  value: counter.value,
-                  precision: 0,
-                }}
-                chart={
-                  <ChartCard
-                    type="line"
-                    data={counter.history.map((point) => ({
-                      x: point.x,
-                      y: point.y,
-                    }))}
-                    height={50}
-                  />
-                }
-              />
-            ))
-          )}
-        </ProCard>
-
-        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
           <ProCard
-            colSpan={{ xs: 24, xl: 16 }}
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
             title={
               <Space>
-                <AreaChartOutlined />
-                <span>Opinion trends</span>
+                <ColumnWidthOutlined />
+                <span>Pulse</span>
               </Space>
             }
           >
-            {trends.charts.length === 0 ? (
-              <Empty description="No trend charts available yet" />
-            ) : (
-              <Tabs
-                items={trends.charts.map((chart) => ({
-                  key: chart.key,
-                  label: chart.title,
-                  children: (
-                    <ProCard ghost>
-                      {chart.type === 'line' && (
-                        <Line {...asLineConfig(chart.config)} />
-                      )}
-                      {chart.type === 'area' && (
-                        <Area {...asAreaConfig(chart.config)} />
-                      )}
-                      {chart.type === 'heatmap' && (
-                        <Heatmap {...asHeatmapConfig(chart.config)} />
-                      )}
-                    </ProCard>
-                  ),
-                }))}
-              />
-            )}
+            <Paragraph type="secondary">
+              Live activity, debate health, trends, and participation monitoring.
+            </Paragraph>
+            <Button href={route('/ethikos/pulse/overview')}>
+              Open pulse overview
+            </Button>
           </ProCard>
 
           <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
             title={
               <Space>
-                <PieChartOutlined />
-                <span>Participation health</span>
+                <RadarChartOutlined />
+                <span>Impact</span>
               </Space>
             }
           >
-            <ProCard split="horizontal" ghost>
-              <ProCard title="Diversity radar">
-                {toChartData(health.radarConfig.data).length === 0 ? (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="No radar data available yet"
-                  />
-                ) : (
-                  <Radar {...asRadarConfig(health.radarConfig)} />
-                )}
-              </ProCard>
-
-              <ProCard title="Ethics score breakdown">
-                {toChartData(health.pieConfig.data).length === 0 ? (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="No breakdown data available yet"
-                  />
-                ) : (
-                  <Pie {...asPieConfig(health.pieConfig)} />
-                )}
-              </ProCard>
-            </ProCard>
-          </ProCard>
-        </ProCard>
-
-        <ProCard gutter={[16, 16]} wrap>
-          <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
-            title={
-              <Space>
-                <BarChartOutlined />
-                <span>Impact · Outcomes</span>
-              </Space>
-            }
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size="large">
-              <Space size="large" wrap>
-                {outcomes.kpis.map((kpi) => (
-                  <StatisticCard
-                    key={kpi.key}
-                    statistic={{
-                      title: kpi.label,
-                      value: kpi.value,
-                      suffix: kpi.key === 'agreement' ? '%' : undefined,
-                      description:
-                        typeof kpi.delta === 'number' ? (
-                          <span
-                            style={{
-                              color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
-                            }}
-                          >
-                            {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
-                          </span>
-                        ) : null,
-                    }}
-                  />
-                ))}
-              </Space>
-
-              <Divider />
-
-              <Space direction="vertical" size={8}>
-                <Text type="secondary">Highlights</Text>
-                <ul style={{ paddingLeft: 20, margin: 0 }}>
-                  <li>
-                    <Text>
-                      <Text strong>{topicsKpi?.value ?? 0}</Text> total topics
-                      are tracked across ethiKos.
-                    </Text>
-                  </li>
-                  <li>
-                    <Text>
-                      Average agreement is{' '}
-                      <Text strong>{agreementKpi?.value ?? 0}%</Text>, derived
-                      from topic-level Ethikos stances.
-                    </Text>
-                  </li>
-                  <li>
-                    <Text>
-                      Participation volume is{' '}
-                      <Text strong>{stancesKpi?.value ?? 0}</Text> total
-                      stances, with <Text strong>{openKpi?.value ?? 0}</Text>{' '}
-                      debates still open.
-                    </Text>
-                  </li>
-                </ul>
-              </Space>
-            </Space>
+            <Paragraph type="secondary">
+              Outcomes, feedback, and implementation tracking after decisions.
+            </Paragraph>
+            <Button href={route('/ethikos/impact/tracker')}>
+              Open impact tracker
+            </Button>
           </ProCard>
 
           <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
             title={
               <Space>
-                <BarChartOutlined />
-                <span>Outcome distribution</span>
+                <TrophyOutlined />
+                <span>Trust</span>
               </Space>
             }
           >
-            {outcomes.charts.length === 0 ? (
-              <Empty description="No outcome charts available yet" />
-            ) : (
-              <Tabs
-                items={outcomes.charts.map((chart) => ({
-                  key: chart.key,
-                  label: chart.title,
-                  children: (
-                    <ProCard ghost>
-                      {chart.type === 'line' && (
-                        <Line {...asLineConfig(chart.config)} />
-                      )}
-                      {chart.type === 'bar' && (
-                        <Bar {...asBarConfig(chart.config)} />
-                      )}
-                    </ProCard>
-                  ),
-                }))}
-              />
-            )}
+            <Paragraph type="secondary">
+              Profile credibility, badges, and credentials for deliberation trust.
+            </Paragraph>
+            <Button href={route('/ethikos/trust/profile')}>
+              Open trust profile
+            </Button>
           </ProCard>
 
           <ProCard
-            colSpan={{ xs: 24, xl: 8 }}
-            title="Closed decisions · outcomes vs engagement"
-            extra={
-              <Text type="secondary">
-                Filtered: {filteredDecisions.length} / {decisionItems.length}
-              </Text>
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
+            title={
+              <Space>
+                <BranchesOutlined />
+                <span>Learn</span>
+              </Space>
             }
           >
-            <ProCard split="horizontal" ghost>
-              <ProCard title="Outcomes by region">
-                {decisionOutcomeData.length === 0 ? (
-                  <Empty
-                    image={Empty.PRESENTED_IMAGE_SIMPLE}
-                    description="No regional outcome data for current filters"
-                  />
-                ) : (
-                  <Bar {...decisionOutcomeConfig} />
-                )}
-              </ProCard>
-
-              <ProCard title="Closed decisions">
-                <Table<DecisionRow>
-                  size="small"
-                  columns={decisionsColumns}
-                  dataSource={filteredDecisions}
-                  pagination={{ pageSize: 8 }}
-                  rowKey="key"
-                />
-              </ProCard>
-            </ProCard>
+            <Paragraph type="secondary">
+              Guides, glossary, and changelog for using Ethikos responsibly.
+            </Paragraph>
+            <Button href={route('/ethikos/learn/guides')}>
+              Open guides
+            </Button>
           </ProCard>
         </ProCard>
       </PageContainer>

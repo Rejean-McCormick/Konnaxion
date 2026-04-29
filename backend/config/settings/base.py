@@ -385,6 +385,26 @@ SPECTACULAR_SETTINGS = {
 # Your stuff...
 # ------------------------------------------------------------------------------
 
+
+
+# ethiKos Demo Importer
+# ------------------------------------------------------------------------------
+ETHIKOS_DEMO_IMPORTER_ENABLED = env.bool(
+    "ETHIKOS_DEMO_IMPORTER_ENABLED",
+    default=False,
+)
+
+# EkoH & Smart-Vote integration
+# Import the addons defined in the separate file
+from .settings_addons import (
+    EKOH_INSTALLED_APPS,
+    EKOH_CELERY_BEAT_SCHEDULE,
+    KAFKA_BOOTSTRAP_SERVERS,
+    EKOH_DB_SEARCH_PATH,
+)
+
+
+
 # EkoH & Smart-Vote integration
 # Import the addons defined in the separate file
 from .settings_addons import (

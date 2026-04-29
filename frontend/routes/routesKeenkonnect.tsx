@@ -1,32 +1,29 @@
 // FILE: frontend/routes/routesKeenkonnect.tsx
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import {
+  BarChartOutlined,
+  CrownOutlined,
   DashboardOutlined,
+  DatabaseOutlined,
   FileAddOutlined,
   FileSearchOutlined,
-  FileMarkdownOutlined,
-  FileWordOutlined,
-  FolderOutlined,
+  FileTextOutlined,
+  FilterOutlined,
   FolderOpenOutlined,
+  GlobalOutlined,
   HeartOutlined,
-  PushpinOutlined,
-  SelectOutlined,
-  FormOutlined,
   HistoryOutlined,
+  NotificationOutlined,
+  ProjectOutlined,
+  RocketOutlined,
   SettingOutlined,
   TagsOutlined,
-  RocketOutlined,
-  NotificationOutlined,
-  CrownOutlined,
-  DatabaseOutlined,
-  FilterOutlined,
+  TeamOutlined,
   UploadOutlined,
-  GlobalOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 
-// Type local minimal pour éviter toute dépendance
 type Route = {
   path?: string;
   name: string;
@@ -34,148 +31,199 @@ type Route = {
   views?: Route[];
 };
 
-// keenKonnect – vue d’ensemble
+export const KEENKONNECT_ROUTES = {
+  dashboard: "/keenkonnect/dashboard",
+
+  projects: {
+    studio: "/projects",
+    create: "/projects/create",
+    mine: "/projects/mine",
+    browse: "/projects/browse",
+
+    // Dynamic workspace routes, intentionally not exposed directly in sidebar:
+    // /projects/[slug]
+    // /projects/[slug]/tasks
+    // /projects/[slug]/blueprints
+    // /projects/[slug]/chat
+    // /projects/[slug]/ai-insights
+    // /projects/[slug]/settings
+
+    matches: "/projects/matches",
+    impact: "/projects/impact",
+    reputation: "/projects/reputation",
+    repository: "/projects/repository",
+    repositorySearch: "/projects/repository/search",
+    repositoryUpload: "/projects/repository/upload",
+  },
+
+  konsensus: {
+    activityFeed: "/konsensus/activity-feed",
+    leaderboards: "/konsensus/leaderboards",
+  },
+
+  legacy: {
+    // Keep these as compatibility targets or redirects while pages migrate.
+    createProject: "/keenkonnect/projects/create-new-project",
+    browseProjects: "/keenkonnect/projects/browse-projects",
+    myProjects: "/keenkonnect/projects/my-projects",
+    projectWorkspace: "/keenkonnect/projects/project-workspace",
+
+    browseWorkspaces: "/keenkonnect/workspaces/browse-available-workspaces",
+    myWorkspaces: "/keenkonnect/workspaces/my-workspaces",
+    launchWorkspace: "/keenkonnect/workspaces/launch-new-workspace",
+
+    findTeams: "/keenkonnect/ai-team-matching/find-teams",
+    matchPreferences: "/keenkonnect/ai-team-matching/match-preferences",
+    myMatches: "/keenkonnect/ai-team-matching/my-matches",
+
+    submitImpactReports: "/keenkonnect/sustainability-impact/submit-impact-reports",
+    sustainabilityDashboard:
+      "/keenkonnect/sustainability-impact/sustainability-dashboard",
+    trackProjectImpact: "/keenkonnect/sustainability-impact/track-project-impact",
+
+    accountPreferences: "/keenkonnect/user-reputation/account-preferences",
+    manageExpertise: "/keenkonnect/user-reputation/manage-expertise-areas",
+    ekohReputation: "/keenkonnect/user-reputation/view-reputation-ekoh",
+
+    browseRepository: "/keenkonnect/knowledge/browse-repository",
+    searchRepository: "/keenkonnect/knowledge/search-filter-documents",
+    uploadDocument: "/keenkonnect/knowledge/upload-new-document",
+  },
+} as const;
+
 const keenDashboard: Route = {
-  path: '/keenkonnect/dashboard',
-  name: 'keenKonnect – Overview',
+  path: KEENKONNECT_ROUTES.dashboard,
+  name: "keenKonnect – Overview",
   icon: <DashboardOutlined />,
 };
 
-// Konstruct : projets, équipes, workspaces, impact
-const konstructGroup: Route = {
-  name: 'Konstruct',
-  // section header: no icon
+const projectStudioGroup: Route = {
+  name: "Project Studio",
   views: [
-    // Projects
     {
-      path: '/keenkonnect/projects/create-new-project',
-      name: 'Create project',
+      path: KEENKONNECT_ROUTES.projects.studio,
+      name: "Browse projects",
+      icon: <ProjectOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.projects.create,
+      name: "Create project",
       icon: <FileAddOutlined />,
     },
     {
-      path: '/keenkonnect/projects/browse-projects',
-      name: 'Browse projects',
-      icon: <FileSearchOutlined />,
-    },
-    {
-      path: '/keenkonnect/projects/my-projects',
-      name: 'My projects',
-      icon: <FileMarkdownOutlined />,
-    },
-    {
-      path: '/keenkonnect/projects/project-workspace',
-      name: 'Project workspace',
-      icon: <FileWordOutlined />,
-    },
-
-    // Workspaces
-    {
-      path: '/keenkonnect/workspaces/browse-available-workspaces',
-      name: 'Browse workspaces',
-      icon: <FileSearchOutlined />,
-    },
-    {
-      path: '/keenkonnect/workspaces/my-workspaces',
-      name: 'My workspaces',
-      icon: <FolderOutlined />,
-    },
-    {
-      path: '/keenkonnect/workspaces/launch-new-workspace',
-      name: 'Launch workspace',
+      path: KEENKONNECT_ROUTES.projects.mine,
+      name: "My projects",
       icon: <FolderOpenOutlined />,
     },
+  ],
+};
 
-    // AI Team Matching
+const collaborationGroup: Route = {
+  name: "Collaboration",
+  views: [
     {
-      path: '/keenkonnect/ai-team-matching/find-teams',
-      name: 'Find teams',
+      path: KEENKONNECT_ROUTES.projects.matches,
+      name: "AI team matching",
       icon: <HeartOutlined />,
     },
     {
-      path: '/keenkonnect/ai-team-matching/match-preferences',
-      name: 'Match preferences',
-      icon: <PushpinOutlined />,
-    },
-    {
-      path: '/keenkonnect/ai-team-matching/my-matches',
-      name: 'My matches',
-      icon: <SelectOutlined />,
-    },
-
-    // Sustainability impact
-    {
-      path: '/keenkonnect/sustainability-impact/submit-impact-reports',
-      name: 'Submit reports',
-      icon: <FormOutlined />,
-    },
-    {
-      path: '/keenkonnect/sustainability-impact/sustainability-dashboard',
-      name: 'Sustainability dashboard',
+      path: KEENKONNECT_ROUTES.projects.impact,
+      name: "Impact tracking",
       icon: <GlobalOutlined />,
     },
     {
-      path: '/keenkonnect/sustainability-impact/track-project-impact',
-      name: 'Track project impact',
-      icon: <HistoryOutlined />,
-    },
-
-    // User reputation (keenkonnect side) – user-level settings
-    {
-      path: '/keenkonnect/user-reputation/account-preferences',
-      name: 'Account preferences',
-      icon: <SettingOutlined />,
-    },
-    {
-      path: '/keenkonnect/user-reputation/manage-expertise-areas',
-      name: 'Manage expertise',
-      icon: <TagsOutlined />,
-    },
-    {
-      path: '/keenkonnect/user-reputation/view-reputation-ekoh',
-      name: 'View Ekoh reputation',
+      path: KEENKONNECT_ROUTES.projects.reputation,
+      name: "Reputation & expertise",
       icon: <RocketOutlined />,
     },
+  ],
+};
 
-    // Konsensus cross-module views (project/impact signals)
+const stockageGroup: Route = {
+  name: "Stockage",
+  views: [
     {
-      path: '/konsensus/activity-feed',
-      name: 'Activity feed',
+      path: KEENKONNECT_ROUTES.projects.repository,
+      name: "Repository",
+      icon: <DatabaseOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.projects.repositorySearch,
+      name: "Search documents",
+      icon: <FilterOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.projects.repositoryUpload,
+      name: "Upload document",
+      icon: <UploadOutlined />,
+    },
+  ],
+};
+
+const projectSignalsGroup: Route = {
+  name: "Project Signals",
+  views: [
+    {
+      path: KEENKONNECT_ROUTES.konsensus.activityFeed,
+      name: "Activity feed",
       icon: <NotificationOutlined />,
     },
     {
-      path: '/konsensus/leaderboards',
-      name: 'Leaderboards',
+      path: KEENKONNECT_ROUTES.konsensus.leaderboards,
+      name: "Leaderboards",
       icon: <CrownOutlined />,
     },
   ],
 };
 
-// Stockage : dépôt de connaissances (user-facing repository actions)
-const stockageGroup: Route = {
-  name: 'Stockage',
-  // section header: no icon
+const workspaceTabsReferenceGroup: Route = {
+  name: "Workspace Tabs",
   views: [
     {
-      path: '/keenkonnect/knowledge/browse-repository',
-      name: 'Browse repository',
-      icon: <DatabaseOutlined />,
+      path: "/projects",
+      name: "Overview",
+      icon: <FileTextOutlined />,
     },
     {
-      path: '/keenkonnect/knowledge/search-filter-documents',
-      name: 'Search & filter',
-      icon: <FilterOutlined />,
+      path: "/projects",
+      name: "Tasks",
+      icon: <HistoryOutlined />,
     },
     {
-      path: '/keenkonnect/knowledge/upload-new-document',
-      name: 'Upload document',
-      icon: <UploadOutlined />,
+      path: "/projects",
+      name: "Blueprints",
+      icon: <FileSearchOutlined />,
     },
-    // NOTE:
-    // Former "Document management" (platform-level governance)
-    // is now intended to be centralised under Kontrol's admin views.
+    {
+      path: "/projects",
+      name: "AI insights",
+      icon: <BarChartOutlined />,
+    },
+    {
+      path: "/projects",
+      name: "Settings",
+      icon: <SettingOutlined />,
+    },
+    {
+      path: "/projects",
+      name: "Expertise tags",
+      icon: <TagsOutlined />,
+    },
+    {
+      path: "/projects",
+      name: "Team",
+      icon: <TeamOutlined />,
+    },
   ],
 };
 
-const routes: Route[] = [keenDashboard, konstructGroup, stockageGroup];
+const routes: Route[] = [
+  keenDashboard,
+  projectStudioGroup,
+  collaborationGroup,
+  stockageGroup,
+  projectSignalsGroup,
+  workspaceTabsReferenceGroup,
+];
 
 export default routes;

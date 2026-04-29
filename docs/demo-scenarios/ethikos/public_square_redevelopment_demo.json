@@ -1,0 +1,183 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "public_square_redevelopment_demo",
+  "scenario_title": "Public Square Redevelopment Demo",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A balanced civic planning demo showing topics, arguments, weighted consultation votes, and impact actions.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Civic planning + Korum + Konsultations"
+  },
+  "actors": [
+    {
+      "key": "maya",
+      "username": "demo_maya",
+      "display_name": "Maya",
+      "email": "demo_maya@example.test",
+      "role": "resident",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "samuel",
+      "username": "demo_samuel",
+      "display_name": "Samuel",
+      "email": "demo_samuel@example.test",
+      "role": "urban_planning_expert",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "nadia",
+      "username": "demo_nadia",
+      "display_name": "Nadia",
+      "email": "demo_nadia@example.test",
+      "role": "community_facilitator",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "omar",
+      "username": "demo_omar",
+      "display_name": "Omar",
+      "email": "demo_omar@example.test",
+      "role": "local_shop_owner",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [
+    {
+      "key": "urbanism",
+      "name": "Urbanism",
+      "description": "Public-space planning, accessibility, mobility, and local quality of life."
+    }
+  ],
+  "topics": [
+    {
+      "key": "square_design",
+      "title": "[DEMO] How should Place des Rivières be redesigned?",
+      "description": "Residents are choosing between greening, accessibility, parking, and local commerce priorities.",
+      "status": "open",
+      "category": "urbanism",
+      "start_date": "2026-05-01",
+      "end_date": "2026-06-15"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "square_design",
+      "actor": "maya",
+      "value": 2
+    },
+    {
+      "topic": "square_design",
+      "actor": "samuel",
+      "value": 3
+    },
+    {
+      "topic": "square_design",
+      "actor": "nadia",
+      "value": 2
+    },
+    {
+      "topic": "square_design",
+      "actor": "omar",
+      "value": -1
+    }
+  ],
+  "arguments": [
+    {
+      "key": "maya_green_access",
+      "topic": "square_design",
+      "actor": "maya",
+      "side": "pro",
+      "content": "The square should become greener while preserving clear access for people with reduced mobility."
+    },
+    {
+      "key": "samuel_heat_island",
+      "topic": "square_design",
+      "actor": "samuel",
+      "side": "pro",
+      "content": "A tree canopy and permeable surfaces would reduce heat-island effects without eliminating all vehicle access."
+    },
+    {
+      "key": "omar_parking_concern",
+      "topic": "square_design",
+      "actor": "omar",
+      "side": "con",
+      "content": "Removing too much parking could hurt small businesses that depend on short visits."
+    },
+    {
+      "key": "nadia_compromise",
+      "topic": "square_design",
+      "actor": "nadia",
+      "side": "neutral",
+      "content": "A mixed design could test limited parking, loading windows, and more seating before a permanent change."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "square_preferred_option",
+      "title": "[DEMO] Preferred redevelopment scenario",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-06-15",
+      "options": [
+        {
+          "key": "green_square",
+          "label": "Mostly green public square"
+        },
+        {
+          "key": "mixed_square",
+          "label": "Mixed square with limited parking"
+        },
+        {
+          "key": "parking_priority",
+          "label": "Maintain most parking"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "square_preferred_option",
+      "actor": "maya",
+      "option": "mixed_square",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "square_preferred_option",
+      "actor": "samuel",
+      "option": "mixed_square",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "square_preferred_option",
+      "actor": "nadia",
+      "option": "mixed_square",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "square_preferred_option",
+      "actor": "omar",
+      "option": "parking_priority",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "square_preferred_option",
+      "action": "Publish a preliminary mixed-use redesign proposal",
+      "status": "planned",
+      "date": "2026-06-25"
+    },
+    {
+      "consultation": "square_preferred_option",
+      "action": "Run a temporary summer pilot with traffic and accessibility monitoring",
+      "status": "planned",
+      "date": "2026-07-10"
+    }
+  ]
+}

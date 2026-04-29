@@ -39,7 +39,11 @@ export default function KorumPanelsGrid({
   onRefreshParticipantRoles: () => void
 }): JSX.Element {
   return (
-    <ProCard title="Korum Wave 1 panels" ghost>
+    <ProCard
+      title="Argument details and follow-up"
+      subTitle="Select an argument to attach sources, record impact signals, or suggest a refinement."
+      ghost
+    >
       <Row gutter={[16, 16]}>
         <Col xs={24} lg={12} xl={6}>
           {selectedArgumentId ? (
@@ -52,31 +56,34 @@ export default function KorumPanelsGrid({
           ) : (
             <EmptySelectionCard
               title="Sources"
-              description="Select an argument to manage sources"
+              description="Select an argument to add references, citations, or supporting context."
             />
           )}
         </Col>
 
         <Col xs={24} lg={12} xl={6}>
           {selectedArgumentId ? (
-            <Card size="small" title="Impact votes">
+            <Card size="small" title="Impact signal">
               <Space direction="vertical" size={12} style={{ width: '100%' }}>
                 <Text type="secondary">
-                  Claim-level impact signal for the selected argument.
+                  Rate the practical importance of the selected argument.
                 </Text>
+
                 <ImpactVoteControl
                   argumentId={selectedArgumentId}
                   onChange={onMutation}
                 />
+
                 <Text type="secondary">
-                  Impact votes are argument-level signals, not topic stances.
+                  This signal applies to the argument only. Your topic stance is
+                  recorded separately.
                 </Text>
               </Space>
             </Card>
           ) : (
             <EmptySelectionCard
-              title="Impact votes"
-              description="Select an argument to vote on impact"
+              title="Impact signal"
+              description="Select an argument to rate its practical importance."
             />
           )}
         </Col>
@@ -86,10 +93,10 @@ export default function KorumPanelsGrid({
             topicId={topicId}
             parentId={selectedArgumentId}
             side={toSuggestionSide(selectedArgument?.side)}
-            title="Suggestions"
+            title="Suggested improvement"
             description={
               selectedArgument
-                ? 'Suggest a reply or refinement for the selected argument.'
+                ? 'Suggest a reply, refinement, or missing nuance for the selected argument.'
                 : 'Suggest a new top-level argument for review.'
             }
             onSubmitted={onMutation}

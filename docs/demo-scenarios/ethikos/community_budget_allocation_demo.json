@@ -1,0 +1,207 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "community_budget_allocation_demo",
+  "scenario_title": "Community Budget Allocation Demo",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A participatory budgeting demo where residents compare parks, transit, and social-service investments.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Participatory budgeting + alternate priorities"
+  },
+  "actors": [
+    {
+      "key": "nadia_budget",
+      "username": "demo_nadia_budget",
+      "display_name": "Nadia",
+      "email": "demo_nadia_budget@example.test",
+      "role": "facilitator",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "jean",
+      "username": "demo_jean",
+      "display_name": "Jean",
+      "email": "demo_jean@example.test",
+      "role": "resident",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "aisha",
+      "username": "demo_aisha",
+      "display_name": "Aisha",
+      "email": "demo_aisha@example.test",
+      "role": "youth_representative",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "claire",
+      "username": "demo_claire",
+      "display_name": "Claire",
+      "email": "demo_claire@example.test",
+      "role": "social_worker",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "tom",
+      "username": "demo_tom",
+      "display_name": "Tom",
+      "email": "demo_tom@example.test",
+      "role": "transit_advocate",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [
+    {
+      "key": "community_budget",
+      "name": "Community Budget",
+      "description": "Participatory budgeting, public spending priorities, and community impact."
+    }
+  ],
+  "topics": [
+    {
+      "key": "budget_priorities",
+      "title": "[DEMO] How should the district allocate its $500k community budget?",
+      "description": "Participants are weighing public space, youth programming, transit access, and social support.",
+      "status": "open",
+      "category": "community_budget",
+      "start_date": "2026-05-01",
+      "end_date": "2026-06-15"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "budget_priorities",
+      "actor": "nadia_budget",
+      "value": 1
+    },
+    {
+      "topic": "budget_priorities",
+      "actor": "jean",
+      "value": 2
+    },
+    {
+      "topic": "budget_priorities",
+      "actor": "aisha",
+      "value": 3
+    },
+    {
+      "topic": "budget_priorities",
+      "actor": "claire",
+      "value": 3
+    },
+    {
+      "topic": "budget_priorities",
+      "actor": "tom",
+      "value": 2
+    }
+  ],
+  "arguments": [
+    {
+      "key": "aisha_youth",
+      "topic": "budget_priorities",
+      "actor": "aisha",
+      "side": "pro",
+      "content": "Youth programs need stable funding because they prevent isolation and create local leadership."
+    },
+    {
+      "key": "claire_social",
+      "topic": "budget_priorities",
+      "actor": "claire",
+      "side": "pro",
+      "content": "Emergency social support has measurable short-term impact for families under pressure."
+    },
+    {
+      "key": "tom_transit",
+      "topic": "budget_priorities",
+      "actor": "tom",
+      "side": "pro",
+      "content": "Transit access expands opportunity and connects residents to work, school, and services."
+    },
+    {
+      "key": "jean_parks",
+      "topic": "budget_priorities",
+      "actor": "jean",
+      "side": "pro",
+      "content": "Park upgrades benefit everyone and are visible improvements residents can trust."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "budget_allocation_vote",
+      "title": "[DEMO] Top community budget priority",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-06-15",
+      "options": [
+        {
+          "key": "parks",
+          "label": "Park and playground upgrades"
+        },
+        {
+          "key": "youth",
+          "label": "Youth programs and after-school spaces"
+        },
+        {
+          "key": "transit",
+          "label": "Local transit access improvements"
+        },
+        {
+          "key": "social_support",
+          "label": "Emergency social-support fund"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "budget_allocation_vote",
+      "actor": "nadia_budget",
+      "option": "youth",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "budget_allocation_vote",
+      "actor": "jean",
+      "option": "parks",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "budget_allocation_vote",
+      "actor": "aisha",
+      "option": "youth",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "budget_allocation_vote",
+      "actor": "claire",
+      "option": "social_support",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "budget_allocation_vote",
+      "actor": "tom",
+      "option": "transit",
+      "raw_value": 1,
+      "weighted_value": 1.05
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "budget_allocation_vote",
+      "action": "Publish shortlist with cost estimates and implementation risk",
+      "status": "in_progress",
+      "date": "2026-06-01"
+    },
+    {
+      "consultation": "budget_allocation_vote",
+      "action": "Schedule final council review",
+      "status": "planned",
+      "date": "2026-06-18"
+    }
+  ]
+}

@@ -11,7 +11,7 @@ import {
   STANCE_MARKS,
 } from '../_lib/topicThreadUtils'
 
-const { Text } = Typography
+const { Text, Paragraph } = Typography
 
 export default function StanceComposerCard({
   value,
@@ -24,12 +24,22 @@ export default function StanceComposerCard({
   onChange: (value: TopicStanceValue) => void
   onSave: () => void
 }): JSX.Element {
+  const currentLabel = stanceLabel(value)
+  const currentColor = stanceColor(value)
+
   return (
-    <Card title="Your stance">
+    <Card
+      title="Set your position"
+      extra={<Tag color={currentColor}>{currentLabel}</Tag>}
+    >
       <Space direction="vertical" size={16} style={{ width: '100%' }}>
-        <Text>
-          Current value: <Tag color={stanceColor(value)}>{stanceLabel(value)}</Tag>
-        </Text>
+        <div>
+          <Text strong>Where do you stand on this topic?</Text>
+          <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 4 }}>
+            Choose a topic-level stance before adding or reviewing arguments.
+            You can update it as the deliberation evolves.
+          </Paragraph>
+        </div>
 
         <Slider
           min={-3}
@@ -37,6 +47,12 @@ export default function StanceComposerCard({
           step={1}
           marks={STANCE_MARKS}
           value={value}
+          tooltip={{
+            formatter: (nextValue) =>
+              typeof nextValue === 'number'
+                ? stanceLabel(clampStance(nextValue))
+                : currentLabel,
+          }}
           onChange={(nextValue) => {
             if (typeof nextValue === 'number') {
               onChange(clampStance(nextValue))
@@ -44,12 +60,30 @@ export default function StanceComposerCard({
           }}
         />
 
-        <Button type="primary" loading={loading} onClick={onSave} block>
-          Save stance
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <Text type="secondary">Oppose</Text>
+          <Text type="secondary">Neutral</Text>
+          <Text type="secondary">Support</Text>
+        </div>
+
+        <Button
+          type="primary"
+          loading={loading}
+          onClick={onSave}
+          block
+        >
+          Save topic stance
         </Button>
 
         <Text type="secondary">
-          Stances are topic-level signals, not claim impact votes.
+          This is your position on the topic. Impact votes belong to individual
+          arguments.
         </Text>
       </Space>
     </Card>

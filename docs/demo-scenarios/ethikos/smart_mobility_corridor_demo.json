@@ -1,0 +1,187 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "smart_mobility_corridor_demo",
+  "scenario_title": "Smart Mobility Corridor Demo",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A smart-city demo comparing bus priority, cycling infrastructure, EV charging, and pedestrian safety.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Urban mobility + infrastructure + accessibility"
+  },
+  "actors": [
+    {
+      "key": "camille",
+      "username": "demo_camille",
+      "display_name": "Camille",
+      "email": "demo_camille@example.test",
+      "role": "daily_commuter",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "ahmed_engineer",
+      "username": "demo_ahmed_engineer",
+      "display_name": "Ahmed",
+      "email": "demo_ahmed_engineer@example.test",
+      "role": "transportation_engineer",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "sofia_access",
+      "username": "demo_sofia_access",
+      "display_name": "Sofia",
+      "email": "demo_sofia_access@example.test",
+      "role": "accessibility_advocate",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "ben_driver",
+      "username": "demo_ben_driver",
+      "display_name": "Ben",
+      "email": "demo_ben_driver@example.test",
+      "role": "delivery_driver",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [
+    {
+      "key": "mobility",
+      "name": "Transportation and Mobility",
+      "description": "Public transit, active transportation, EV infrastructure, and street safety."
+    }
+  ],
+  "topics": [
+    {
+      "key": "mobility_corridor",
+      "title": "[DEMO] What should the new mobility corridor prioritize?",
+      "description": "The corridor design must balance speed, safety, accessibility, deliveries, and emissions.",
+      "status": "open",
+      "category": "mobility",
+      "start_date": "2026-05-01",
+      "end_date": "2026-06-15"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "mobility_corridor",
+      "actor": "camille",
+      "value": 2
+    },
+    {
+      "topic": "mobility_corridor",
+      "actor": "ahmed_engineer",
+      "value": 3
+    },
+    {
+      "topic": "mobility_corridor",
+      "actor": "sofia_access",
+      "value": 3
+    },
+    {
+      "topic": "mobility_corridor",
+      "actor": "ben_driver",
+      "value": -1
+    }
+  ],
+  "arguments": [
+    {
+      "key": "engineer_bus",
+      "topic": "mobility_corridor",
+      "actor": "ahmed_engineer",
+      "side": "pro",
+      "content": "Bus-priority lanes can move more people while lowering emissions per trip."
+    },
+    {
+      "key": "access_safety",
+      "topic": "mobility_corridor",
+      "actor": "sofia_access",
+      "side": "pro",
+      "content": "Intersection design must prioritize curb cuts, crossing time, and predictable signals."
+    },
+    {
+      "key": "commuter_reliable",
+      "topic": "mobility_corridor",
+      "actor": "camille",
+      "side": "pro",
+      "content": "Reliability matters more than peak speed for daily commuters."
+    },
+    {
+      "key": "driver_loading",
+      "topic": "mobility_corridor",
+      "actor": "ben_driver",
+      "side": "con",
+      "content": "Delivery windows and loading areas need to be included or congestion will shift to side streets."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "mobility_corridor_vote",
+      "title": "[DEMO] Mobility corridor priority",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-06-15",
+      "options": [
+        {
+          "key": "bus_priority",
+          "label": "Bus-priority and transit reliability"
+        },
+        {
+          "key": "protected_bike",
+          "label": "Protected cycling network"
+        },
+        {
+          "key": "ev_charging",
+          "label": "EV charging and clean fleet support"
+        },
+        {
+          "key": "pedestrian_safety",
+          "label": "Pedestrian and accessibility safety upgrades"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "mobility_corridor_vote",
+      "actor": "camille",
+      "option": "bus_priority",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "mobility_corridor_vote",
+      "actor": "ahmed_engineer",
+      "option": "bus_priority",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "mobility_corridor_vote",
+      "actor": "sofia_access",
+      "option": "pedestrian_safety",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "mobility_corridor_vote",
+      "actor": "ben_driver",
+      "option": "ev_charging",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "mobility_corridor_vote",
+      "action": "Publish corridor concept with accessibility checklist",
+      "status": "planned",
+      "date": "2026-06-22"
+    },
+    {
+      "consultation": "mobility_corridor_vote",
+      "action": "Run peak-hour loading and transit simulation",
+      "status": "planned",
+      "date": "2026-07-08"
+    }
+  ]
+}

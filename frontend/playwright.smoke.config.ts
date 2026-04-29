@@ -2,6 +2,22 @@
 // playwright.smoke.config.ts
 import { defineConfig, devices } from '@playwright/test'
 
+const AUTH_STATE = process.env.PLAYWRIGHT_AUTH_STATE ?? 'storageState.json'
+
+const testIgnore = [
+  '**/_e2e/**',
+  '_e2e/**',
+  '**/e2e/**',
+  'e2e/**',
+  '**/*.ct.*'
+]
+
+const smokeTestMatch = [
+  '**/routes.spec.ts',
+  '**/ethikos-wave1-demo.spec.ts',
+  '**/ethikos-wave1-workflow.spec.ts'
+]
+
 export default defineConfig({
   testDir: './tests',
 
@@ -9,31 +25,27 @@ export default defineConfig({
    * Smoke specs.
    *
    * routes.spec.ts:
-   *   Broad route gate generated from routes.json.
-   *
-   * routes-tests.spec.ts:
-   *   Optional index-test collection/audit spec.
+   *   Broad real-page route gate generated from root routes.json.
    *
    * ethikos-wave1-demo.spec.ts:
    *   Focused Kintsugi Wave 1 demo smoke.
    *
    * ethikos-wave1-workflow.spec.ts:
    *   Real UI workflow for the Kintsugi Wave 1 demo slice.
+   *
+   * auth.setup.ts:
+   *   Auth state setup for authenticated smoke workflows.
+   *
+   * ethikos-authenticated-workflow.spec.ts:
+   *   Authenticated ethiKos write-path workflow.
+   *
+   * routes-tests.spec.ts:
+   *   Optional index-test collection/audit spec. This is intentionally isolated
+   *   in the index-tests project because routes-tests.json contains /index.test
+   *   paths and should not run as part of normal smoke validation.
    */
-  testMatch: [
-    '**/routes.spec.ts',
-    '**/routes-tests.spec.ts',
-    '**/ethikos-wave1-demo.spec.ts',
-    '**/ethikos-wave1-workflow.spec.ts'
-  ],
 
-  testIgnore: [
-    '**/_e2e/**',
-    '_e2e/**',
-    '**/e2e/**',
-    'e2e/**',
-    '**/*.ct.*'
-  ],
+  testIgnore,
 
   /*
    * Keep the HTML reporter output outside the raw Playwright outputDir.
@@ -69,7 +81,35 @@ export default defineConfig({
 
   projects: [
     {
+      name: 'setup',
+      testMatch: ['**/auth.setup.ts'],
+      use: { ...devices['Desktop Chrome'] }
+    },
+    {
       name: 'chromium',
+      testMatch: smokeTestMatch,
+      testIgnore: [
+        ...testIgnore,
+        '**/auth.setup.ts',
+        '**/routes-tests.spec.ts',
+        '**/ethikos-authenticated-workflow.spec.ts'
+      ],
+      use: { ...devices['Desktop Chrome'] }
+    },
+    {
+      name: 'chromium-auth',
+      dependencies: ['setup'],
+      testMatch: ['**/ethikos-authenticated-workflow.spec.ts'],
+      testIgnore,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: AUTH_STATE
+      }
+    },
+    {
+      name: 'index-tests',
+      testMatch: ['**/routes-tests.spec.ts'],
+      testIgnore,
       use: { ...devices['Desktop Chrome'] }
     }
   ]

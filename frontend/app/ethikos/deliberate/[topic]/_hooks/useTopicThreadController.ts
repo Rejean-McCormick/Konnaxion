@@ -63,6 +63,14 @@ export interface TopicThreadController {
   handleReply: (argument: ArgumentTreeItem) => void
 }
 
+async function fetchOptionalMe(): Promise<UserMeApi | undefined> {
+  try {
+    return await get<UserMeApi>('users/me/')
+  } catch {
+    return undefined
+  }
+}
+
 export function useTopicThreadController(): TopicThreadController {
   const { message } = App.useApp()
 
@@ -100,13 +108,10 @@ export function useTopicThreadController(): TopicThreadController {
     },
   )
 
-  const { data: me } = useRequest<UserMeApi, []>(
-    () => get<UserMeApi>('users/me/'),
-    {
-      ready: Boolean(topicId),
-      refreshDeps: [topicId],
-    },
-  )
+  const { data: me } = useRequest<UserMeApi | undefined, []>(fetchOptionalMe, {
+    ready: Boolean(topicId),
+    refreshDeps: [topicId],
+  })
 
   const [stanceValue, setStanceValue] = useState<TopicStanceValue>(0)
   const [hydratedTopicId, setHydratedTopicId] = useState<string | null>(null)

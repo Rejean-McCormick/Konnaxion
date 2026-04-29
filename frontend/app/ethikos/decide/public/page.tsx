@@ -18,7 +18,6 @@ import {
   Input,
   Progress,
   Radio,
-  Slider,
   Space,
   Tag,
   Tooltip,
@@ -27,6 +26,9 @@ import {
 import type { RadioChangeEvent } from 'antd';
 import {
   BarChartOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
   InfoCircleOutlined,
   SyncOutlined,
   ThunderboltOutlined,
@@ -42,7 +44,7 @@ import {
   type PublicBallotResponse,
 } from '@/services/decide';
 
-const { Paragraph } = Typography;
+const { Paragraph, Text } = Typography;
 
 type BallotRow = PublicBallot;
 type QuickFilter = 'all' | 'closing-soon' | 'high-turnout';
@@ -74,26 +76,6 @@ function resolveOptions(ballot: BallotRow): string[] {
   return [...DEFAULT_SCALE_OPTIONS];
 }
 
-function clampIndex(index: number, options: string[]): number {
-  if (options.length <= 0) {
-    return 0;
-  }
-
-  return Math.min(options.length - 1, Math.max(0, index));
-}
-
-function optionAt(options: string[], index: number | null | undefined): string {
-  const fallbackIndex = Math.floor(options.length / 2);
-  const safeIndex = clampIndex(
-    typeof index === 'number' && Number.isFinite(index)
-      ? Math.round(index)
-      : fallbackIndex,
-    options,
-  );
-
-  return options[safeIndex] ?? options[fallbackIndex] ?? DEFAULT_SCALE_OPTIONS[2];
-}
-
 function isClosingSoon(closesAt?: string | null): boolean {
   if (!closesAt) {
     return false;
@@ -108,31 +90,42 @@ function isClosingSoon(closesAt?: string | null): boolean {
   return closes.diff(dayjs(), 'hour') <= CLOSING_SOON_HOURS;
 }
 
-function getCurrentIndex(
-  selected: string | undefined,
-  options: string[],
-): number {
-  const defaultIndex = Math.floor(options.length / 2);
-
-  if (!selected) {
-    return defaultIndex;
+function formatCloseDate(closesAt?: string | null): string {
+  if (!closesAt) {
+    return 'Date unavailable';
   }
 
-  const index = options.findIndex(
-    (option) => option.toLowerCase() === selected.toLowerCase(),
-  );
+  const closes = dayjs(closesAt);
 
-  return index >= 0 ? index : defaultIndex;
+  return closes.isValid() ? closes.format('YYYY-MM-DD HH:mm') : 'Date unavailable';
 }
 
-function buildSliderMarks(options: string[]): Record<number, React.ReactNode> {
-  return options.reduce<Record<number, React.ReactNode>>(
-    (accumulator, label, index) => {
-      accumulator[index] = <span style={{ fontSize: 11 }}>{label}</span>;
-      return accumulator;
-    },
-    {},
-  );
+function turnoutPercent(turnout?: number | null): number {
+  if (typeof turnout !== 'number' || Number.isNaN(turnout)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(turnout)));
+}
+
+function ballotStatus(ballot: BallotRow): {
+  label: string;
+  color?: string;
+  icon?: React.ReactNode;
+} {
+  if (isClosingSoon(ballot.closesAt)) {
+    return {
+      label: 'Closing soon',
+      color: 'volcano',
+      icon: <ClockCircleOutlined />,
+    };
+  }
+
+  return {
+    label: 'Open',
+    color: 'green',
+    icon: <CheckCircleOutlined />,
+  };
 }
 
 export default function PublicVotingPage(): JSX.Element {
@@ -158,7 +151,7 @@ export default function PublicVotingPage(): JSX.Element {
       total > 0
         ? Math.round(
             ballots.reduce(
-              (sum, ballot) => sum + Math.round(ballot.turnout ?? 0),
+              (sum, ballot) => sum + turnoutPercent(ballot.turnout),
               0,
             ) / total,
           )
@@ -168,10 +161,15 @@ export default function PublicVotingPage(): JSX.Element {
       isClosingSoon(ballot.closesAt),
     ).length;
 
+    const highParticipation = ballots.filter(
+      (ballot) => turnoutPercent(ballot.turnout) >= HIGH_TURNOUT_THRESHOLD,
+    ).length;
+
     return [
-      { label: 'Active consultations', value: total },
-      { label: 'Avg participation', value: avgTurnout, suffix: '%' },
-      { label: 'Closing ≤ 48h', value: closingSoon },
+      { label: 'Open consultations', value: total },
+      { label: 'Average participation', value: avgTurnout, suffix: '%' },
+      { label: 'Closing soon', value: closingSoon },
+      { label: 'High participation', value: highParticipation },
     ];
   }, [ballots]);
 
@@ -193,7 +191,7 @@ export default function PublicVotingPage(): JSX.Element {
       }
 
       if (quickFilter === 'high-turnout') {
-        return (ballot.turnout ?? 0) >= HIGH_TURNOUT_THRESHOLD;
+        return turnoutPercent(ballot.turnout) >= HIGH_TURNOUT_THRESHOLD;
       }
 
       return true;
@@ -209,29 +207,12 @@ export default function PublicVotingPage(): JSX.Element {
     }));
   }, []);
 
-  const handleSliderChange = useCallback(
-    (id: string, value: number | number[], options: string[]) => {
-      if (options.length === 0) {
-        return;
-      }
-
-      const rawIndex = Array.isArray(value) ? value[0] : value;
-      const selectedOption = optionAt(options, rawIndex);
-
-      setSelectedOptions((previous) => ({
-        ...previous,
-        [id]: selectedOption,
-      }));
-    },
-    [],
-  );
-
   const handleSubmitVote = useCallback(
     async (id: string) => {
       const option = selectedOptions[id];
 
       if (!option) {
-        message.warning('Select a stance before casting your vote.');
+        message.warning('Choose your stance before casting your vote.');
         return;
       }
 
@@ -254,40 +235,43 @@ export default function PublicVotingPage(): JSX.Element {
   const columns = useMemo<ProColumns<BallotRow>[]>(
     () => [
       {
-        title: 'Question',
+        title: 'Consultation',
         dataIndex: 'title',
-        width: 320,
+        width: 340,
         ellipsis: true,
+        render: (_dom, row) => {
+          const status = ballotStatus(row);
+
+          return (
+            <Space direction="vertical" size={4}>
+              <Text strong>{row.title}</Text>
+              <Space size="small" wrap>
+                <Tag color={status.color} icon={status.icon}>
+                  {status.label}
+                </Tag>
+                <Tag icon={<ClockCircleOutlined />}>
+                  Closes {formatCloseDate(row.closesAt)}
+                </Tag>
+              </Space>
+            </Space>
+          );
+        },
       },
       {
-        title: 'Your stance',
+        title: 'Your vote',
         dataIndex: 'id',
-        width: 440,
+        width: 480,
         render: (_dom, row) => {
           const id = String(row.id);
           const options = resolveOptions(row);
+          const selected = selectedOptions[id];
 
           if (options.length === 0) {
             return <Tag color="default">No voting options configured</Tag>;
           }
 
-          const selected = selectedOptions[id];
-          const currentIndex = getCurrentIndex(selected, options);
-          const marks = buildSliderMarks(options);
-
           return (
             <Space direction="vertical" size="small" style={{ width: '100%' }}>
-              <Slider
-                min={0}
-                max={options.length - 1}
-                value={currentIndex}
-                marks={marks}
-                tooltip={{
-                  formatter: (value) => optionAt(options, value),
-                }}
-                onChange={(value) => handleSliderChange(id, value, options)}
-              />
-
               <Radio.Group
                 size="small"
                 value={selected}
@@ -321,46 +305,49 @@ export default function PublicVotingPage(): JSX.Element {
         },
       },
       {
-        title: 'Closes',
-        dataIndex: 'closesAt',
+        title: 'Participation',
+        dataIndex: 'turnout',
         width: 180,
-        valueType: 'dateTime',
         render: (_dom, row) => {
-          const closes = dayjs(row.closesAt);
-          const closingSoon = isClosingSoon(row.closesAt);
+          const percent = turnoutPercent(row.turnout);
 
           return (
-            <Space direction="vertical" size={2}>
-              <span>
-                {closes.isValid()
-                  ? closes.format('YYYY-MM-DD HH:mm')
-                  : 'Date unavailable'}
-              </span>
-              {closingSoon ? <Tag color="volcano">Closing soon</Tag> : null}
+            <Space direction="vertical" size={4} style={{ width: '100%' }}>
+              <Progress
+                percent={percent}
+                size="small"
+                status={
+                  percent >= HIGH_TURNOUT_THRESHOLD ? 'success' : 'normal'
+                }
+              />
+              <Text type="secondary">{percent}% turnout</Text>
             </Space>
           );
         },
       },
       {
-        title: 'Turnout',
-        dataIndex: 'turnout',
-        width: 160,
-        render: (_dom, row) => {
-          const turnout = Math.round(row.turnout ?? 0);
+        title: 'Next',
+        key: 'actions',
+        width: 180,
+        render: (_dom, row) => (
+          <Space direction="vertical" size={4}>
+            <Link href={`/ethikos/deliberate/${row.id}?sidebar=ethikos`} prefetch={false}>
+              <Button size="small" icon={<FileTextOutlined />}>
+                View debate
+              </Button>
+            </Link>
 
-          return (
-            <Progress
-              percent={turnout}
-              size="small"
-              status={turnout >= HIGH_TURNOUT_THRESHOLD ? 'success' : 'normal'}
-            />
-          );
-        },
+            <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
+              <Button size="small" type="link">
+                Results
+              </Button>
+            </Link>
+          </Space>
+        ),
       },
     ],
     [
       handleRadioChange,
-      handleSliderChange,
       handleSubmitVote,
       selectedOptions,
       submittingId,
@@ -373,25 +360,25 @@ export default function PublicVotingPage(): JSX.Element {
       title="Public consultations"
       subtitle={
         <span>
-          Open consultations where any verified participant can express a nuanced
-          stance on Korum debates. Votes use a −3…+3 stance scale and feed into
-          the Ethikos opinion layer.
+          Review active public decisions, choose your stance, and cast a vote.
+          The raw result remains visible, and any enriched reading must be
+          explained separately.
         </span>
       }
       primaryAction={
-        <Link href="/ethikos/decide/results" prefetch={false}>
+        <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
           <Button type="primary" icon={<BarChartOutlined />}>
-            Open results archive
+            Open results
           </Button>
         </Link>
       }
       secondaryActions={
         <Space>
-          <Link href="/ethikos/decide/elite" prefetch={false}>
-            <Button>Switch to elite ballots</Button>
+          <Link href="/ethikos/decide/methodology?sidebar=ethikos" prefetch={false}>
+            <Button icon={<InfoCircleOutlined />}>Methodology</Button>
           </Link>
-          <Link href="/ethikos/decide/methodology" prefetch={false}>
-            <Button icon={<InfoCircleOutlined />}>Voting methodology</Button>
+          <Link href="/ethikos/decide/elite?sidebar=ethikos" prefetch={false}>
+            <Button>Expert decisions</Button>
           </Link>
         </Space>
       }
@@ -401,23 +388,21 @@ export default function PublicVotingPage(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message={
-              <Space>
-                <InfoCircleOutlined />
-                <span>
-                  You can adjust your stance at any time while a consultation is
-                  open. Results feed into the Decide · Results Archive and
-                  Ethikos · Opinion Analytics.
-                </span>
-              </Space>
+            message="Vote first, interpret later"
+            description={
+              <span>
+                This page records your vote on open public consultations.
+                Results are reviewed in Decide · Results, where baseline results
+                and declared Smart Vote readings should remain clearly separated.
+              </span>
             }
           />
 
-          <ProCard gutter={16} wrap>
+          <ProCard gutter={[16, 16]} wrap>
             {headerStats.map((stat) => (
               <StatisticCard
                 key={stat.label}
-                colSpan={{ xs: 24, sm: 8 }}
+                colSpan={{ xs: 24, sm: 12, lg: 6 }}
                 statistic={{
                   title: stat.label,
                   value: stat.value,
@@ -428,13 +413,11 @@ export default function PublicVotingPage(): JSX.Element {
           </ProCard>
 
           <ProCard
-            ghost
-            style={{ marginBottom: 0 }}
-            title="Find an open consultation"
+            title="Choose a consultation"
             extra={
               <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                Search by title, or focus on consultations that are closing soon
-                or have high participation.
+                Find an open consultation, review the question, then cast your
+                stance.
               </Paragraph>
             }
           >
@@ -495,17 +478,24 @@ export default function PublicVotingPage(): JSX.Element {
             />
           )}
 
-          <ProCard ghost style={{ marginTop: 16 }} title="Where to go next">
-            <Space wrap>
-              <Link href="/ethikos/decide/elite" prefetch={false}>
-                <Button>View elite ballots</Button>
-              </Link>
-              <Link href="/ethikos/decide/results" prefetch={false}>
-                <Button icon={<BarChartOutlined />}>Results archive</Button>
-              </Link>
-              <Link href="/ethikos/insights" prefetch={false}>
-                <Button>Opinion analytics</Button>
-              </Link>
+          <ProCard title="After voting">
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                After a consultation closes, the result should stay traceable:
+                raw vote first, then any declared reading, then impact tracking.
+              </Paragraph>
+
+              <Space wrap>
+                <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
+                  <Button icon={<BarChartOutlined />}>Read results</Button>
+                </Link>
+                <Link href="/ethikos/impact/tracker?sidebar=ethikos" prefetch={false}>
+                  <Button>Track impact</Button>
+                </Link>
+                <Link href="/ethikos/learn/guides?sidebar=ethikos" prefetch={false}>
+                  <Button>How decisions work</Button>
+                </Link>
+              </Space>
             </Space>
           </ProCard>
         </Space>

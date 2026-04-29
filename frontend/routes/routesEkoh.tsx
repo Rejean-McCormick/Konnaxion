@@ -1,79 +1,176 @@
 // FILE: frontend/routes/routesEkoh.tsx
-'use client';
+"use client";
 
-import React from 'react';
+import React from "react";
 import {
-  DashboardOutlined,
-  StarOutlined,
-  LineChartOutlined,
-  DeploymentUnitOutlined,
+  AuditOutlined,
+  BarChartOutlined,
   BorderOutlined,
-  UsergroupAddOutlined,
+  DashboardOutlined,
+  DeploymentUnitOutlined,
+  EyeInvisibleOutlined,
+  FieldTimeOutlined,
   HistoryOutlined,
-} from '@ant-design/icons';
+  LineChartOutlined,
+  RadarChartOutlined,
+  SafetyOutlined,
+  SettingOutlined,
+  StarOutlined,
+  TrophyOutlined,
+  UsergroupAddOutlined,
+} from "@ant-design/icons";
 
-import type { Route } from '@/components/layout-components/Menu';
+import type { Route } from "@/components/layout-components/Menu";
 
 /**
- * Ekoh module navigation:
- * - User-facing identity / reputation features stay here.
- * - Smart Vote surface entry points (voting weight, Konsensus) also stay here.
- * - Admin / platform-wide controls are centralised under /kontrol.
+ * EkoH module navigation.
+ *
+ * Route principles:
+ * - EkoH owns user-facing identity, reputation, expertise, privacy, badges,
+ *   and score history.
+ * - Smart Vote / Konsensus is a sibling consensus surface powered by EkoH.
+ * - Admin/platform-wide configuration remains under /kontrol.
+ * - Read-only analytics reports remain under /reports.
  */
+export const EKOH_ROUTES = {
+  ekoh: {
+    dashboard: "/ekoh/dashboard",
 
-// Main route: Ekoh overview
+    // Canonical EkoH user-facing routes.
+    score: "/ekoh/score",
+    expertise: "/ekoh/expertise",
+    ethics: "/ekoh/ethics",
+    badges: "/ekoh/badges",
+    history: "/ekoh/history",
+    privacy: "/ekoh/privacy",
+    visualizations: "/ekoh/visualizations",
+
+    // Legacy compatibility routes.
+    legacyScore: "/ekoh/overview-analytics/current-ekoh-score",
+    legacyExpertise: "/ekoh/expertise-areas/view-current-expertise",
+    legacyBadges: "/ekoh/achievements-badges/earned-badges-display",
+    legacyVotingWeight: "/ekoh/voting-influence/current-voting-weight",
+  },
+
+  konsensus: {
+    center: "/konsensus",
+    activityFeed: "/konsensus/activity-feed",
+    results: "/konsensus/results",
+    modalities: "/konsensus/modalities",
+    emergingExperts: "/konsensus/emerging-experts",
+  },
+
+  reports: {
+    smartVote: "/reports/smart-vote",
+  },
+
+  kontrol: {
+    // Future/admin-only surfaces; not exposed here by default:
+    // /kontrol/ekoh/score-configuration
+    // /kontrol/ekoh/domain-taxonomy
+    // /kontrol/smart-vote/modality-configuration
+  },
+} as const;
+
 const ekohDashboard: Route = {
-  path: '/ekoh/dashboard',
-  name: 'Ekoh – Overview',
+  path: EKOH_ROUTES.ekoh.dashboard,
+  name: "EkoH – Overview",
   icon: <DashboardOutlined />,
 };
 
-// EkoH: reputation, expertise, badges
-const ekohGroup: Route = {
-  name: 'EkoH',
-  // section header: no icon (non-clickable group)
+const reputationGroup: Route = {
+  name: "Reputation",
   views: [
     {
-      path: '/ekoh/overview-analytics/current-ekoh-score',
-      name: 'Score & analytics',
+      path: EKOH_ROUTES.ekoh.score,
+      name: "Score & analytics",
       icon: <LineChartOutlined />,
     },
     {
-      path: '/ekoh/expertise-areas/view-current-expertise',
-      name: 'Expertise & domains',
-      icon: <DeploymentUnitOutlined />,
+      path: EKOH_ROUTES.ekoh.ethics,
+      name: "Ethical multiplier",
+      icon: <SafetyOutlined />,
     },
     {
-      path: '/ekoh/achievements-badges/earned-badges-display',
-      name: 'Achievements & badges',
-      icon: <StarOutlined />,
-    },
-  ],
-};
-
-// Smart Vote: voting weight + Konsensus center + activity feed
-const smartVoteGroup: Route = {
-  name: 'Smart Vote',
-  // section header: no icon (non-clickable group)
-  views: [
-    {
-      path: '/ekoh/voting-influence/current-voting-weight',
-      name: 'Voting weight',
-      icon: <BorderOutlined />,
+      path: EKOH_ROUTES.ekoh.visualizations,
+      name: "Visualizations",
+      icon: <RadarChartOutlined />,
     },
     {
-      path: '/konsensus',
-      name: 'Konsensus',
-      icon: <UsergroupAddOutlined />,
-    },
-    {
-      path: '/konsensus/activity-feed',
-      name: 'Activity feed',
+      path: EKOH_ROUTES.ekoh.history,
+      name: "Score history",
       icon: <HistoryOutlined />,
     },
   ],
 };
 
-const routes: Route[] = [ekohDashboard, ekohGroup, smartVoteGroup];
+const expertiseGroup: Route = {
+  name: "Expertise",
+  views: [
+    {
+      path: EKOH_ROUTES.ekoh.expertise,
+      name: "Expertise domains",
+      icon: <DeploymentUnitOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.ekoh.badges,
+      name: "Achievements & badges",
+      icon: <StarOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.ekoh.privacy,
+      name: "Privacy settings",
+      icon: <EyeInvisibleOutlined />,
+    },
+  ],
+};
+
+const smartVoteGroup: Route = {
+  name: "Smart Vote",
+  views: [
+    {
+      path: EKOH_ROUTES.konsensus.center,
+      name: "Konsensus Center",
+      icon: <UsergroupAddOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.ekoh.legacyVotingWeight,
+      name: "Voting weight",
+      icon: <BorderOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.konsensus.results,
+      name: "Live results",
+      icon: <BarChartOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.konsensus.modalities,
+      name: "Voting modalities",
+      icon: <SettingOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.konsensus.emergingExperts,
+      name: "Emerging experts",
+      icon: <TrophyOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.konsensus.activityFeed,
+      name: "Activity feed",
+      icon: <FieldTimeOutlined />,
+    },
+    {
+      path: EKOH_ROUTES.reports.smartVote,
+      name: "Smart Vote reports",
+      icon: <AuditOutlined />,
+    },
+  ],
+};
+
+const routes: Route[] = [
+  ekohDashboard,
+  reputationGroup,
+  expertiseGroup,
+  smartVoteGroup,
+];
 
 export default routes;

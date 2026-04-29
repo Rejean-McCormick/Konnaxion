@@ -16,7 +16,6 @@ import {
   Space,
   Tag,
   Tooltip,
-  Typography,
 } from 'antd'
 import {
   BranchesOutlined,
@@ -27,8 +26,6 @@ import {
 } from '@ant-design/icons'
 
 import type { ArgumentSide, EthikosArgumentApi } from '@/services/ethikos'
-
-const { Paragraph, Text } = Typography
 
 export type ArgumentTreeSide = ArgumentSide | 'neutral' | null
 
@@ -94,6 +91,9 @@ type CountableArgumentApi = EthikosArgumentApi & {
 }
 
 const DEFAULT_MAX_DEPTH = 8
+const EMPTY_COLLAPSED_IDS: Array<string | number> = []
+const secondaryTextStyle = { color: '#8c8c8c' } as const
+const strongTextStyle = { fontWeight: 600 } as const
 
 function stringId(value: string | number | null | undefined): string | null {
   if (value == null || value === '') {
@@ -361,7 +361,7 @@ export default function ArgumentTree({
   loading = false,
   emptyText = 'No arguments yet.',
   selectedId = null,
-  defaultCollapsedIds = [],
+  defaultCollapsedIds = EMPTY_COLLAPSED_IDS,
   hideHidden = true,
   maxDepth = DEFAULT_MAX_DEPTH,
   showMeta = true,
@@ -392,13 +392,18 @@ export default function ArgumentTree({
 
   const expandableIds = useMemo(() => collectExpandableIds(tree), [tree])
 
+  const collapsedIdsKey = useMemo(
+    () => defaultCollapsedIds.map(String).join('|'),
+    [defaultCollapsedIds],
+  )
+
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() =>
     collapsedIdSet(defaultCollapsedIds),
   )
 
   useEffect(() => {
     setCollapsedIds(collapsedIdSet(defaultCollapsedIds))
-  }, [defaultCollapsedIds])
+  }, [collapsedIdsKey, defaultCollapsedIds])
 
   const hasArguments = tree.length > 0
 
@@ -453,9 +458,9 @@ export default function ArgumentTree({
       >
         <Space size={8} wrap>
           <BranchesOutlined />
-          <Text strong>Argument tree</Text>
-          <Text type="secondary">({tree.length} roots)</Text>
-          <Text type="secondary">({flatItems.length} total)</Text>
+          <span style={strongTextStyle}>Argument tree</span>
+          <span style={secondaryTextStyle}>({tree.length} roots)</span>
+          <span style={secondaryTextStyle}>({flatItems.length} total)</span>
           {hideHidden && hiddenCount > 0 && (
             <Tooltip title="Hidden arguments are excluded from this tree.">
               <Tag>{hiddenCount} hidden</Tag>
@@ -591,7 +596,7 @@ function ArgumentTreeRow({
                 />
               </Tooltip>
             ) : (
-              <MessageOutlined style={{ color: '#8c8c8c' }} />
+              <MessageOutlined style={secondaryTextStyle} />
             )}
           </div>
 
@@ -605,20 +610,23 @@ function ArgumentTreeRow({
             >
               {sideTag(node.side)}
               {node.isHidden && <Tag color="default">Hidden</Tag>}
-              <Text strong>{node.author}</Text>
-              {showMeta && createdAt && <Text type="secondary">{createdAt}</Text>}
+              <span style={strongTextStyle}>{node.author}</span>
+              {showMeta && createdAt && (
+                <span style={secondaryTextStyle}>{createdAt}</span>
+              )}
               {showMeta && renderMeta?.(node)}
               {showCounts && <CountMeta node={node} />}
             </Space>
 
-            <Paragraph
+            <p
               style={{
+                marginTop: 0,
                 marginBottom: 8,
                 whiteSpace: 'pre-wrap',
               }}
             >
               {node.body}
-            </Paragraph>
+            </p>
 
             <Space
               size={8}
@@ -640,10 +648,10 @@ function ArgumentTreeRow({
               )}
 
               {hasChildren && (
-                <Text type="secondary">
+                <span style={secondaryTextStyle}>
                   {node.children.length}{' '}
                   {node.children.length === 1 ? 'reply' : 'replies'}
-                </Text>
+                </span>
               )}
 
               {renderActions?.(node)}

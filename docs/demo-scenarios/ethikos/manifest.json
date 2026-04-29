@@ -1,0 +1,135 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "package": "ethikos-demo-scenarios",
+  "description": "Ready-to-import demo scenario JSON files for the ethiKos Demo Importer.",
+  "files": [
+    {
+      "scenario_key": "public_square_redevelopment_demo",
+      "scenario_title": "Public Square Redevelopment Demo",
+      "file": "public_square_redevelopment_demo.json",
+      "focus": "Civic planning + Korum + Konsultations",
+      "counts": {
+        "actors": 4,
+        "categories": 1,
+        "topics": 1,
+        "stances": 4,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 4,
+        "impact_items": 2
+      }
+    },
+    {
+      "scenario_key": "ai_in_schools_policy_demo",
+      "scenario_title": "AI in Schools Policy Demo",
+      "file": "ai_in_schools_policy_demo.json",
+      "focus": "Education policy + safeguards + EkoH-weighted expert context",
+      "counts": {
+        "actors": 4,
+        "categories": 1,
+        "topics": 1,
+        "stances": 4,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 4,
+        "impact_items": 2
+      }
+    },
+    {
+      "scenario_key": "community_budget_allocation_demo",
+      "scenario_title": "Community Budget Allocation Demo",
+      "file": "community_budget_allocation_demo.json",
+      "focus": "Participatory budgeting + alternate priorities",
+      "counts": {
+        "actors": 5,
+        "categories": 1,
+        "topics": 1,
+        "stances": 5,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 5,
+        "impact_items": 2
+      }
+    },
+    {
+      "scenario_key": "climate_action_weighted_reading_demo",
+      "scenario_title": "Climate Action Weighted Reading Demo",
+      "file": "climate_action_weighted_reading_demo.json",
+      "focus": "Smart Vote + EkoH weighted influence",
+      "counts": {
+        "actors": 4,
+        "categories": 1,
+        "topics": 1,
+        "stances": 4,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 4,
+        "impact_items": 2
+      }
+    },
+    {
+      "scenario_key": "cultural_heritage_archive_demo",
+      "scenario_title": "Cultural Heritage Archive Demo",
+      "file": "cultural_heritage_archive_demo.json",
+      "focus": "Kreative + cultural policy + trust",
+      "counts": {
+        "actors": 4,
+        "categories": 1,
+        "topics": 1,
+        "stances": 4,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 4,
+        "impact_items": 2
+      }
+    },
+    {
+      "scenario_key": "startup_grant_feedback_demo",
+      "scenario_title": "Startup Grant Feedback Demo",
+      "file": "startup_grant_feedback_demo.json",
+      "focus": "Business + mentorship + weighted review",
+      "counts": {
+        "actors": 4,
+        "categories": 1,
+        "topics": 1,
+        "stances": 4,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 4,
+        "impact_items": 2
+      }
+    },
+    {
+      "scenario_key": "digital_safety_curriculum_demo",
+      "scenario_title": "Digital Safety Curriculum Demo",
+      "file": "digital_safety_curriculum_demo.json",
+      "focus": "Education + cybersecurity + media trust",
+      "counts": {
+        "actors": 4,
+        "categories": 1,
+        "topics": 1,
+        "stances": 4,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 4,
+        "impact_items": 2
+      }
+    },
+    {
+      "scenario_key": "smart_mobility_corridor_demo",
+      "scenario_title": "Smart Mobility Corridor Demo",
+      "file": "smart_mobility_corridor_demo.json",
+      "focus": "Urban mobility + infrastructure + accessibility",
+      "counts": {
+        "actors": 4,
+        "categories": 1,
+        "topics": 1,
+        "stances": 4,
+        "arguments": 4,
+        "consultations": 1,
+        "consultation_votes": 4,
+        "impact_items": 2
+      }
+    }
+  ]
+}

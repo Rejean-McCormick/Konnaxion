@@ -1,0 +1,187 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "climate_action_weighted_reading_demo",
+  "scenario_title": "Climate Action Weighted Reading Demo",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A climate-policy demo designed to show Reference Weighted vs one-person-one-vote differences.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Smart Vote + EkoH weighted influence"
+  },
+  "actors": [
+    {
+      "key": "zoe_student",
+      "username": "demo_zoe_student",
+      "display_name": "Zoé",
+      "email": "demo_zoe_student@example.test",
+      "role": "certified_climate_learner",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "dr_chen",
+      "username": "demo_dr_chen",
+      "display_name": "Dr. Chen",
+      "email": "demo_dr_chen@example.test",
+      "role": "climate_scientist",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "marco",
+      "username": "demo_marco",
+      "display_name": "Marco",
+      "email": "demo_marco@example.test",
+      "role": "small_business_owner",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "ines",
+      "username": "demo_ines",
+      "display_name": "Inès",
+      "email": "demo_ines@example.test",
+      "role": "municipal_energy_manager",
+      "is_ethikos_elite": true
+    }
+  ],
+  "categories": [
+    {
+      "key": "climate",
+      "name": "Climate Policy",
+      "description": "Climate mitigation, adaptation, energy transition, and public accountability."
+    }
+  ],
+  "topics": [
+    {
+      "key": "local_climate_plan",
+      "title": "[DEMO] Which climate action should the city prioritize first?",
+      "description": "The city is comparing fast visible action with deeper emissions reductions.",
+      "status": "open",
+      "category": "climate",
+      "start_date": "2026-05-01",
+      "end_date": "2026-06-15"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "local_climate_plan",
+      "actor": "zoe_student",
+      "value": 2
+    },
+    {
+      "topic": "local_climate_plan",
+      "actor": "dr_chen",
+      "value": 3
+    },
+    {
+      "topic": "local_climate_plan",
+      "actor": "marco",
+      "value": -1
+    },
+    {
+      "topic": "local_climate_plan",
+      "actor": "ines",
+      "value": 3
+    }
+  ],
+  "arguments": [
+    {
+      "key": "chen_emissions",
+      "topic": "local_climate_plan",
+      "actor": "dr_chen",
+      "side": "pro",
+      "content": "Building retrofits reduce emissions steadily and protect residents from energy-price volatility."
+    },
+    {
+      "key": "ines_grid",
+      "topic": "local_climate_plan",
+      "actor": "ines",
+      "side": "pro",
+      "content": "Public-building electrification creates operational savings and a clear implementation path."
+    },
+    {
+      "key": "marco_cost",
+      "topic": "local_climate_plan",
+      "actor": "marco",
+      "side": "con",
+      "content": "The plan needs support for small businesses or costs will be passed to customers."
+    },
+    {
+      "key": "zoe_learning",
+      "topic": "local_climate_plan",
+      "actor": "zoe_student",
+      "side": "pro",
+      "content": "Students and residents can help track progress if the city publishes simple indicators."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "climate_priority_vote",
+      "title": "[DEMO] First climate-action priority",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-06-15",
+      "options": [
+        {
+          "key": "retrofits",
+          "label": "Deep energy retrofits for public buildings"
+        },
+        {
+          "key": "tree_canopy",
+          "label": "Urban tree canopy and cooling corridors"
+        },
+        {
+          "key": "ev_charging",
+          "label": "EV charging and municipal fleet electrification"
+        },
+        {
+          "key": "business_grants",
+          "label": "Small-business transition grants"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "climate_priority_vote",
+      "actor": "zoe_student",
+      "option": "retrofits",
+      "raw_value": 1,
+      "weighted_value": 1.15
+    },
+    {
+      "consultation": "climate_priority_vote",
+      "actor": "dr_chen",
+      "option": "retrofits",
+      "raw_value": 1,
+      "weighted_value": 1.6
+    },
+    {
+      "consultation": "climate_priority_vote",
+      "actor": "marco",
+      "option": "business_grants",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "climate_priority_vote",
+      "actor": "ines",
+      "option": "retrofits",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "climate_priority_vote",
+      "action": "Publish baseline emissions for municipal buildings",
+      "status": "planned",
+      "date": "2026-06-15"
+    },
+    {
+      "consultation": "climate_priority_vote",
+      "action": "Select first retrofit sites",
+      "status": "planned",
+      "date": "2026-07-05"
+    }
+  ]
+}

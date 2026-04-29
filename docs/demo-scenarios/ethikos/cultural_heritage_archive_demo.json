@@ -1,0 +1,187 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "cultural_heritage_archive_demo",
+  "scenario_title": "Cultural Heritage Archive Demo",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A cultural-preservation demo about digitizing oral histories, artifacts, language material, and public access.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Kreative + cultural policy + trust"
+  },
+  "actors": [
+    {
+      "key": "ariane",
+      "username": "demo_ariane",
+      "display_name": "Ariane",
+      "email": "demo_ariane@example.test",
+      "role": "curator",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "noah",
+      "username": "demo_noah",
+      "display_name": "Noah",
+      "email": "demo_noah@example.test",
+      "role": "student_researcher",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "elder_marie",
+      "username": "demo_elder_marie",
+      "display_name": "Marie",
+      "email": "demo_elder_marie@example.test",
+      "role": "community_elder",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "sara_artist",
+      "username": "demo_sara_artist",
+      "display_name": "Sara",
+      "email": "demo_sara_artist@example.test",
+      "role": "artist",
+      "is_ethikos_elite": false
+    }
+  ],
+  "categories": [
+    {
+      "key": "culture",
+      "name": "Culture and Heritage",
+      "description": "Cultural preservation, archives, language, arts, and respectful access."
+    }
+  ],
+  "topics": [
+    {
+      "key": "heritage_archive_access",
+      "title": "[DEMO] How should the community archive be opened to the public?",
+      "description": "Participants are balancing public education, cultural sensitivity, consent, and long-term preservation.",
+      "status": "open",
+      "category": "culture",
+      "start_date": "2026-05-01",
+      "end_date": "2026-06-15"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "heritage_archive_access",
+      "actor": "ariane",
+      "value": 2
+    },
+    {
+      "topic": "heritage_archive_access",
+      "actor": "noah",
+      "value": 1
+    },
+    {
+      "topic": "heritage_archive_access",
+      "actor": "elder_marie",
+      "value": 3
+    },
+    {
+      "topic": "heritage_archive_access",
+      "actor": "sara_artist",
+      "value": 2
+    }
+  ],
+  "arguments": [
+    {
+      "key": "marie_consent",
+      "topic": "heritage_archive_access",
+      "actor": "elder_marie",
+      "side": "pro",
+      "content": "Community consent should define which recordings are public, restricted, or teaching-only."
+    },
+    {
+      "key": "ariane_metadata",
+      "topic": "heritage_archive_access",
+      "actor": "ariane",
+      "side": "pro",
+      "content": "Strong metadata and rights notes will make the archive useful without stripping context."
+    },
+    {
+      "key": "noah_learning",
+      "topic": "heritage_archive_access",
+      "actor": "noah",
+      "side": "pro",
+      "content": "Students need guided access so the archive becomes a living educational resource."
+    },
+    {
+      "key": "sara_creative",
+      "topic": "heritage_archive_access",
+      "actor": "sara_artist",
+      "side": "neutral",
+      "content": "Artists can respond to the archive, but derivative works should respect source communities."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "heritage_access_vote",
+      "title": "[DEMO] Archive access model",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-06-15",
+      "options": [
+        {
+          "key": "open_gallery",
+          "label": "Open public gallery for selected items"
+        },
+        {
+          "key": "tiered_access",
+          "label": "Tiered access with community review"
+        },
+        {
+          "key": "school_first",
+          "label": "School-first educational access"
+        },
+        {
+          "key": "restricted",
+          "label": "Keep archive mostly restricted"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "heritage_access_vote",
+      "actor": "ariane",
+      "option": "tiered_access",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "heritage_access_vote",
+      "actor": "noah",
+      "option": "school_first",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "heritage_access_vote",
+      "actor": "elder_marie",
+      "option": "tiered_access",
+      "raw_value": 1,
+      "weighted_value": 1.5
+    },
+    {
+      "consultation": "heritage_access_vote",
+      "actor": "sara_artist",
+      "option": "open_gallery",
+      "raw_value": 1,
+      "weighted_value": 1.05
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "heritage_access_vote",
+      "action": "Create community review guidelines for archive items",
+      "status": "planned",
+      "date": "2026-06-12"
+    },
+    {
+      "consultation": "heritage_access_vote",
+      "action": "Launch a pilot gallery with consent metadata",
+      "status": "planned",
+      "date": "2026-07-01"
+    }
+  ]
+}

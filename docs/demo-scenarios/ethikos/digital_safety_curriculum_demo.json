@@ -1,0 +1,187 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "digital_safety_curriculum_demo",
+  "scenario_title": "Digital Safety Curriculum Demo",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A school/community demo about privacy, cyberbullying, misinformation, and responsible digital habits.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Education + cybersecurity + media trust"
+  },
+  "actors": [
+    {
+      "key": "emma_student",
+      "username": "demo_emma_student",
+      "display_name": "Emma",
+      "email": "demo_emma_student@example.test",
+      "role": "student",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "ravi_cyber",
+      "username": "demo_ravi_cyber",
+      "display_name": "Ravi",
+      "email": "demo_ravi_cyber@example.test",
+      "role": "cybersecurity_expert",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "nora_parent",
+      "username": "demo_nora_parent",
+      "display_name": "Nora",
+      "email": "demo_nora_parent@example.test",
+      "role": "parent",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "jules_teacher",
+      "username": "demo_jules_teacher",
+      "display_name": "Jules",
+      "email": "demo_jules_teacher@example.test",
+      "role": "teacher",
+      "is_ethikos_elite": true
+    }
+  ],
+  "categories": [
+    {
+      "key": "digital_safety",
+      "name": "Digital Safety",
+      "description": "Cybersecurity literacy, online privacy, media trust, and youth protection."
+    }
+  ],
+  "topics": [
+    {
+      "key": "digital_safety_program",
+      "title": "[DEMO] What should a digital safety program teach first?",
+      "description": "Participants are choosing the first learning module for a school-wide digital safety program.",
+      "status": "open",
+      "category": "digital_safety",
+      "start_date": "2026-05-01",
+      "end_date": "2026-06-15"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "digital_safety_program",
+      "actor": "emma_student",
+      "value": 2
+    },
+    {
+      "topic": "digital_safety_program",
+      "actor": "ravi_cyber",
+      "value": 3
+    },
+    {
+      "topic": "digital_safety_program",
+      "actor": "nora_parent",
+      "value": 2
+    },
+    {
+      "topic": "digital_safety_program",
+      "actor": "jules_teacher",
+      "value": 2
+    }
+  ],
+  "arguments": [
+    {
+      "key": "cyber_privacy",
+      "topic": "digital_safety_program",
+      "actor": "ravi_cyber",
+      "side": "pro",
+      "content": "Privacy basics should come first because students need to understand accounts, passwords, and data trails."
+    },
+    {
+      "key": "parent_bullying",
+      "topic": "digital_safety_program",
+      "actor": "nora_parent",
+      "side": "pro",
+      "content": "Cyberbullying prevention should be visible and practical for families."
+    },
+    {
+      "key": "student_misinformation",
+      "topic": "digital_safety_program",
+      "actor": "emma_student",
+      "side": "pro",
+      "content": "Students also need tools to check if a post is misleading before sharing it."
+    },
+    {
+      "key": "teacher_sequence",
+      "topic": "digital_safety_program",
+      "actor": "jules_teacher",
+      "side": "neutral",
+      "content": "A short sequence can cover privacy, kindness, and fact-checking instead of choosing only one."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "digital_safety_vote",
+      "title": "[DEMO] First digital-safety module",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-06-15",
+      "options": [
+        {
+          "key": "privacy",
+          "label": "Online privacy and account safety"
+        },
+        {
+          "key": "cyberbullying",
+          "label": "Cyberbullying prevention and reporting"
+        },
+        {
+          "key": "misinformation",
+          "label": "Misinformation and fact-checking"
+        },
+        {
+          "key": "combined_intro",
+          "label": "Combined introductory module"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "digital_safety_vote",
+      "actor": "emma_student",
+      "option": "misinformation",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "digital_safety_vote",
+      "actor": "ravi_cyber",
+      "option": "privacy",
+      "raw_value": 1,
+      "weighted_value": 1.5
+    },
+    {
+      "consultation": "digital_safety_vote",
+      "actor": "nora_parent",
+      "option": "cyberbullying",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "digital_safety_vote",
+      "actor": "jules_teacher",
+      "option": "combined_intro",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "digital_safety_vote",
+      "action": "Create first digital-safety lesson plan",
+      "status": "planned",
+      "date": "2026-06-10"
+    },
+    {
+      "consultation": "digital_safety_vote",
+      "action": "Collect parent and student feedback after delivery",
+      "status": "planned",
+      "date": "2026-09-15"
+    }
+  ]
+}

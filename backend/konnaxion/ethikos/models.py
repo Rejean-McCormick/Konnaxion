@@ -1,9 +1,14 @@
-# FILE: backend/konnaxion/ethikos/models.py
+# backend/konnaxion/ethikos/models.py
+
 from __future__ import annotations
 
 from django.conf import settings
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+# Imported so Django registers the demo importer tracking model
+# when loading the ethikos app models.
+from .models_demo import DemoScenarioImport as DemoScenarioImport  # noqa: F401
 
 
 class EthikosCategory(models.Model):

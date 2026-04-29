@@ -26,10 +26,14 @@ import {
   Typography,
 } from 'antd'
 import {
+  ArrowRightOutlined,
+  BranchesOutlined,
   FireOutlined,
   PlusOutlined,
   ReadOutlined,
   ReloadOutlined,
+  SafetyCertificateOutlined,
+  StarOutlined,
 } from '@ant-design/icons'
 import { useInterval, useRequest } from 'ahooks'
 import dayjs from 'dayjs'
@@ -135,6 +139,18 @@ function normalizeStatus(value: unknown): TopicStatus {
   return 'open'
 }
 
+function statusColor(status: TopicStatus): string {
+  if (status === 'open') {
+    return 'green'
+  }
+
+  if (status === 'closed') {
+    return 'volcano'
+  }
+
+  return 'default'
+}
+
 function normalizeTopic(raw: RawEliteTopic): TopicRow {
   const createdAt =
     raw.createdAt ??
@@ -212,7 +228,7 @@ function previewTitle(
   preview: TopicPreviewResponse | undefined,
   fallback?: PreviewState | null,
 ): string {
-  return preview?.title || fallback?.fallbackTitle || 'Preview'
+  return preview?.title || fallback?.fallbackTitle || 'Topic preview'
 }
 
 function previewCategory(
@@ -227,6 +243,10 @@ function previewHasBody(preview?: TopicPreviewResponse): boolean {
     preview?.description ||
       (Array.isArray(preview?.latest) && preview.latest.length > 0),
   )
+}
+
+function topicUrl(topicId: string): string {
+  return `/ethikos/deliberate/${topicId}?sidebar=ethikos`
 }
 
 export default function EliteAgora(): JSX.Element {
@@ -279,12 +299,17 @@ export default function EliteAgora(): JSX.Element {
   }, [])
 
   const rows = React.useMemo(() => data?.list ?? [], [data])
+  const openRows = React.useMemo(
+    () => rows.filter((topic) => topic.status === 'open'),
+    [rows],
+  )
 
   const headerStats = React.useMemo(
     () => [
       {
         label: 'Open topics',
-        value: rows.filter((topic) => topic.status === 'open').length,
+        value: openRows.length,
+        description: 'Available for stance and argument contributions',
       },
       {
         label: 'Avg stances / topic',
@@ -296,13 +321,20 @@ export default function EliteAgora(): JSX.Element {
               ).toFixed(1),
             )
           : 0,
+        description: 'Participation signal across listed topics',
+      },
+      {
+        label: 'Needs attention',
+        value: openRows.filter((topic) => topic.stanceCount === 0).length,
+        description: 'Open topics without recorded stances',
       },
       {
         label: 'Trending',
         value: rows.filter((topic) => topic.hot).length,
+        description: 'Active in the last 24 hours',
       },
     ],
-    [rows],
+    [openRows, rows],
   )
 
   const categoryFilters = React.useMemo(
@@ -323,20 +355,42 @@ export default function EliteAgora(): JSX.Element {
   const columns = React.useMemo<ProColumns<TopicRow>[]>(
     () => [
       {
-        title: 'Title',
+        title: 'Topic',
         dataIndex: 'title',
+        ellipsis: true,
         render: (_dom, row) => (
-          <Button
-            type="link"
-            onClick={() => openPreview(row)}
-            style={{ padding: 0 }}
-          >
-            {row.title}
-          </Button>
+          <Space direction="vertical" size={2}>
+            <Button
+              type="link"
+              onClick={() => openPreview(row)}
+              style={{
+                padding: 0,
+                height: 'auto',
+                textAlign: 'left',
+                whiteSpace: 'normal',
+              }}
+            >
+              {row.title}
+            </Button>
+
+            <Space size={6} wrap>
+              {row.hot ? (
+                <Tooltip title="Recent activity">
+                  <Tag icon={<FireOutlined />} color="volcano">
+                    Active
+                  </Tag>
+                </Tooltip>
+              ) : null}
+
+              {row.stanceCount === 0 && row.status === 'open' ? (
+                <Tag color="gold">Needs first stance</Tag>
+              ) : null}
+            </Space>
+          </Space>
         ),
       },
       {
-        title: 'Category',
+        title: 'Theme',
         dataIndex: 'categoryLabel',
         filters: categoryFilters,
         onFilter: (value, row) =>
@@ -351,35 +405,30 @@ export default function EliteAgora(): JSX.Element {
       {
         title: 'Status',
         dataIndex: 'status',
-        width: 110,
+        width: 120,
         filters: [
           { text: 'Open', value: 'open' },
           { text: 'Closed', value: 'closed' },
           { text: 'Archived', value: 'archived' },
         ],
         onFilter: (value, row) => row.status === String(value),
-        render: (_dom, row) => {
-          const color =
-            row.status === 'open'
-              ? 'green'
-              : row.status === 'closed'
-                ? 'volcano'
-                : 'default'
-
-          return <Tag color={color}>{row.status}</Tag>
-        },
+        render: (_dom, row) => (
+          <Tag color={statusColor(row.status)}>{row.status}</Tag>
+        ),
       },
       {
         title: 'Stances',
         dataIndex: 'stanceCount',
         sorter: (a, b) => a.stanceCount - b.stanceCount,
         align: 'right',
+        width: 110,
       },
       {
         title: 'Last activity',
         dataIndex: 'lastActivity',
         sorter: (a, b) =>
           dayjs(a.lastActivity).valueOf() - dayjs(b.lastActivity).valueOf(),
+        width: 160,
         render: (_dom, row) => {
           const lastActivity = dayjs(row.lastActivity)
 
@@ -392,17 +441,19 @@ export default function EliteAgora(): JSX.Element {
       },
       {
         title: '',
-        dataIndex: 'hot',
-        width: 60,
-        render: (_dom, row) =>
-          row.hot ? (
-            <Tooltip title="Trending">
-              <FireOutlined style={{ color: '#fa541c' }} />
-            </Tooltip>
-          ) : null,
+        width: 130,
+        render: (_dom, row) => (
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => router.push(topicUrl(row.id))}
+          >
+            Open thread
+          </Button>
+        ),
       },
     ],
-    [categoryFilters, openPreview],
+    [categoryFilters, openPreview, router],
   )
 
   const openedAt = previewOpenedAt(preview)
@@ -413,16 +464,17 @@ export default function EliteAgora(): JSX.Element {
 
   return (
     <EthikosPageShell
-      title="Deliberate · Elite Agora"
-      metaTitle="Deliberate · Elite Agora"
+      title="Expert deliberation"
+      metaTitle="Expert deliberation"
       subtitle={
         <span>
-          Expert-only structured debates in Korum using the −3…+3 stance scale
-          and EkoH quorum context before surfacing aggregated results.
+          Choose a structured debate topic, review the question, then open the
+          thread to record a stance, add a reason, or reply to an argument.
         </span>
       }
+      sectionLabel="Deliberate"
       primaryAction={
-        <Link href="/ethikos/deliberate/guidelines" prefetch={false}>
+        <Link href="/ethikos/deliberate/guidelines?sidebar=ethikos" prefetch={false}>
           <Button icon={<ReadOutlined />}>Participation guidelines</Button>
         </Link>
       }
@@ -436,30 +488,61 @@ export default function EliteAgora(): JSX.Element {
               icon={<ReloadOutlined />}
               onClick={() => refresh()}
               type="text"
-              title="Refresh list"
+              title="Refresh topics"
             />
             <NewTopicButton onCreated={refresh} />
           </Space>
         }
       >
-        <ProCard ghost style={{ marginBottom: 16 }}>
-          <Alert
-            type="info"
-            showIcon
-            message="Elite agora – expert-only debates"
-            description={
-              <>
-                <div>
-                  Stances use the seven-level nuance scale from −3 “strongly
-                  against” to +3 “strongly for”, with 0 as neutral.
-                </div>
-                <div>
-                  Aggregated results are only surfaced once enough distinct
-                  eligible experts have contributed on a topic.
-                </div>
-              </>
-            }
-          />
+        <ProCard
+          title={
+            <Space>
+              <BranchesOutlined />
+              <span>Deliberation workflow</span>
+            </Space>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <ProCard gutter={[16, 16]} wrap ghost>
+            <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <StarOutlined />
+                  <Text strong>1. Choose a topic</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Start from an open public or expert question that needs
+                  reasons, objections, and nuance.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <SafetyCertificateOutlined />
+                  <Text strong>2. Form a stance</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Use the −3 to +3 scale to express direction and intensity
+                  before moving toward decision.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <ArrowRightOutlined />
+                  <Text strong>3. Add reasons</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Add arguments, replies, sources, and suggestions so the debate
+                  becomes readable and traceable.
+                </Paragraph>
+              </Space>
+            </ProCard>
+          </ProCard>
         </ProCard>
 
         {error ? (
@@ -467,84 +550,124 @@ export default function EliteAgora(): JSX.Element {
             type="error"
             showIcon
             style={{ marginBottom: 16 }}
-            message="Unable to load elite topics."
+            message="Unable to load deliberation topics."
             description="Check the Deliberate service and the canonical Ethikos topics endpoint."
           />
         ) : null}
 
-        <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
           {headerStats.map((stat) => (
             <StatisticCard
               key={stat.label}
-              colSpan={{ xs: 24, sm: 8 }}
-              statistic={{ title: stat.label, value: stat.value }}
+              colSpan={{ xs: 24, sm: 12, xl: 6 }}
+              statistic={{
+                title: stat.label,
+                value: stat.value,
+                description: stat.description,
+              }}
             />
           ))}
         </ProCard>
 
-        <ProTable<TopicRow>
-          rowKey="id"
-          columns={columns}
-          dataSource={rows}
-          search={{ labelWidth: 90, filterType: 'light' }}
-          pagination={{ pageSize: 10 }}
-          options={false}
-        />
-
-        <Drawer
-          width={520}
-          open={previewOpen}
-          onClose={closePreview}
-          title={drawerTitle}
+        <ProCard
+          title="Topics ready for deliberation"
+          extra={
+            <Text type="secondary">
+              Open a thread to read the question, record a stance, and add
+              reasons.
+            </Text>
+          }
         >
-          {previewLoading ? (
-            <Empty description="Loading…" />
-          ) : preview || previewState ? (
-            <>
-              <p>
-                <strong>Category:</strong> {drawerCategory}
-              </p>
-
-              {openedAt ? (
-                <p>
-                  <strong>Opened:</strong>{' '}
-                  {dayjs(openedAt).format('YYYY-MM-DD HH:mm')}
-                </p>
-              ) : null}
-
-              {preview?.description ? (
-                <Paragraph>
-                  <strong>Summary:</strong> {preview.description}
-                </Paragraph>
-              ) : null}
-
-              {preview?.latest && preview.latest.length > 0 ? (
-                <>
-                  <h4>Latest statements</h4>
-                  <ul>
-                    {preview.latest.map((statement) => (
-                      <li key={statement.id}>
-                        <em>{statement.author}</em> — {statement.body}
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              ) : hasPreviewBody ? null : (
+          <ProTable<TopicRow>
+            rowKey="id"
+            columns={columns}
+            dataSource={rows}
+            search={{ labelWidth: 90, filterType: 'light' }}
+            pagination={{ pageSize: 10 }}
+            options={false}
+            locale={{
+              emptyText: (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}
-                  description="No statements yet. Open the thread to start the discussion."
+                  description="No deliberation topics available yet"
                 />
-              )}
+              ),
+            }}
+          />
+        </ProCard>
 
+        <Drawer
+          width={560}
+          open={previewOpen}
+          onClose={closePreview}
+          title="Topic preview"
+          extra={
+            resolvedPreviewId ? (
               <Button
                 type="primary"
-                disabled={!resolvedPreviewId}
-                onClick={() =>
-                  router.push(`/ethikos/deliberate/${resolvedPreviewId}`)
-                }
+                onClick={() => router.push(topicUrl(resolvedPreviewId))}
               >
-                Go to thread →
+                Open thread
               </Button>
+            ) : null
+          }
+        >
+          {previewLoading ? (
+            <Empty description="Loading preview…" />
+          ) : preview || previewState ? (
+            <>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <div>
+                  <Text type="secondary">Question</Text>
+                  <h3 style={{ marginTop: 4 }}>{drawerTitle}</h3>
+                </div>
+
+                <Space wrap>
+                  <Tag color="geekblue">{drawerCategory}</Tag>
+                  {openedAt ? (
+                    <Tag>{dayjs(openedAt).format('YYYY-MM-DD HH:mm')}</Tag>
+                  ) : null}
+                </Space>
+
+                {preview?.description ? (
+                  <div>
+                    <Text type="secondary">Context</Text>
+                    <Paragraph style={{ marginTop: 4 }}>
+                      {preview.description}
+                    </Paragraph>
+                  </div>
+                ) : null}
+
+                {preview?.latest && preview.latest.length > 0 ? (
+                  <div>
+                    <Text type="secondary">Latest statements</Text>
+                    <ul style={{ paddingLeft: 20, marginTop: 8 }}>
+                      {preview.latest.map((statement) => (
+                        <li key={statement.id}>
+                          <Text strong>{statement.author}</Text>
+                          <span> — {statement.body}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : hasPreviewBody ? null : (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No statements yet. Open the thread to start the discussion."
+                  />
+                )}
+
+                <Button
+                  type="primary"
+                  disabled={!resolvedPreviewId}
+                  icon={<ArrowRightOutlined />}
+                  onClick={() =>
+                    router.push(topicUrl(resolvedPreviewId))
+                  }
+                >
+                  Open topic thread
+                </Button>
+              </Space>
             </>
           ) : (
             <Empty description="No preview data available." />
@@ -591,7 +714,7 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }): JSX.Element {
       </Button>
 
       <ModalForm<CreateTopicForm>
-        title="Create new topic"
+        title="Create new deliberation topic"
         open={visible}
         onOpenChange={setVisible}
         onFinish={async (values) => {
@@ -604,24 +727,33 @@ function NewTopicButton({ onCreated }: { onCreated: () => void }): JSX.Element {
         }}
         submitter={{ submitButtonProps: { loading } }}
       >
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="Create a question that can be debated."
+          description="A good deliberation topic is specific enough to discuss, but open enough to allow arguments, objections, and nuance."
+        />
+
         <ProFormText
           name="title"
-          label="Title"
+          label="Question or topic title"
+          placeholder="Example: Should public datasets require consent receipts?"
           rules={[{ required: true, min: 10 }]}
         />
 
         <ProFormSelect
           name="categoryId"
-          label="Category"
+          label="Theme"
           fieldProps={{
             loading: loadingCategories,
-            placeholder: 'Select a category',
+            placeholder: 'Select a theme',
           }}
           options={(categories ?? []).map((category) => ({
             label: category.name,
             value: category.id,
           }))}
-          rules={[{ required: true, message: 'Please select a category' }]}
+          rules={[{ required: true, message: 'Please select a theme' }]}
         />
       </ModalForm>
     </>

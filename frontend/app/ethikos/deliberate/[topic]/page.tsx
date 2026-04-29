@@ -3,8 +3,14 @@
 import 'dayjs/locale/en'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { Alert, Col, Row, Space } from 'antd'
-import { PageContainer } from '@ant-design/pro-components'
+import { Alert, Col, Row, Space, Steps, Typography } from 'antd'
+import { PageContainer, ProCard } from '@ant-design/pro-components'
+import {
+  BranchesOutlined,
+  CheckCircleOutlined,
+  MessageOutlined,
+  ProfileOutlined,
+} from '@ant-design/icons'
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
 import type { EthikosId } from '@/services/ethikos'
@@ -19,6 +25,8 @@ import { useTopicThreadController } from './_hooks/useTopicThreadController'
 import { formatRelativeDate } from './_lib/topicThreadUtils'
 
 dayjs.extend(relativeTime)
+
+const { Text } = Typography
 
 export default function TopicThreadPage(): JSX.Element {
   const controller = useTopicThreadController()
@@ -49,15 +57,15 @@ export default function TopicThreadPage(): JSX.Element {
     )
   }
 
+  const topic = controller.pageData
+
   return (
     <EthikosPageShell
-      title={controller.pageData?.title ?? 'Deliberate · Topic'}
+      title={topic?.title ?? 'Deliberate · Topic'}
       sectionLabel="Deliberate"
       subtitle={
-        controller.pageData?.category
-          ? `${controller.pageData.category} · ${formatRelativeDate(
-              controller.pageData.lastActivity,
-            )}`
+        topic?.category
+          ? `${topic.category} · ${formatRelativeDate(topic.lastActivity)}`
           : undefined
       }
     >
@@ -66,58 +74,102 @@ export default function TopicThreadPage(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="Korum structured deliberation"
-            description="This page uses the canonical ethiKos service layer for topic detail, stances, arguments, sources, impact votes, suggestions, roles, and visibility. Topic stances remain separate from argument impact votes and Smart Vote readings."
+            message="Structure the reasons before deciding"
+            description="Read the topic, choose your stance, compare arguments, then select a statement to review its sources, impact signals, suggestions, visibility, and participant context."
           />
 
-          <TopicSummaryPanel
-            topic={controller.pageData}
-            stats={controller.stats}
-          />
+          <ProCard>
+            <Steps
+              size="small"
+              current={controller.selectedArgument ? 3 : 2}
+              items={[
+                {
+                  title: 'Understand',
+                  description: 'Read the topic',
+                  icon: <ProfileOutlined />,
+                },
+                {
+                  title: 'Take stance',
+                  description: 'Position yourself',
+                  icon: <CheckCircleOutlined />,
+                },
+                {
+                  title: 'Deliberate',
+                  description: 'Add arguments or replies',
+                  icon: <BranchesOutlined />,
+                },
+                {
+                  title: 'Review details',
+                  description: 'Inspect evidence and signals',
+                  icon: <MessageOutlined />,
+                },
+              ]}
+            />
+          </ProCard>
 
-          <Row gutter={[16, 16]}>
-            <Col xs={24} lg={8}>
-              <StanceComposerCard
-                value={controller.stanceValue}
-                loading={controller.savingStance}
-                onChange={controller.setStanceValue}
-                onSave={controller.handleSaveStance}
-              />
+          <TopicSummaryPanel topic={topic} stats={controller.stats} />
+
+          <Row gutter={[16, 16]} align="top">
+            <Col xs={24} xl={8}>
+              <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                <StanceComposerCard
+                  value={controller.stanceValue}
+                  loading={controller.savingStance}
+                  onChange={controller.setStanceValue}
+                  onSave={controller.handleSaveStance}
+                />
+
+                <ArgumentComposerCard
+                  replyTarget={controller.replyTarget}
+                  side={controller.newArgumentSide}
+                  value={controller.newArgument}
+                  loading={controller.savingArgument}
+                  onSideChange={controller.handleSideChange}
+                  onValueChange={controller.setNewArgument}
+                  onSubmit={controller.handlePostArgument}
+                  onClearReply={() => controller.setReplyTarget(null)}
+                />
+              </Space>
             </Col>
 
-            <Col xs={24} lg={16}>
-              <ArgumentComposerCard
-                replyTarget={controller.replyTarget}
-                side={controller.newArgumentSide}
-                value={controller.newArgument}
-                loading={controller.savingArgument}
-                onSideChange={controller.handleSideChange}
-                onValueChange={controller.setNewArgument}
-                onSubmit={controller.handlePostArgument}
-                onClearReply={() => controller.setReplyTarget(null)}
+            <Col xs={24} xl={16}>
+              <ArgumentThreadCard
+                items={controller.argumentItems}
+                loading={controller.loadingPageData}
+                selectedArgument={controller.selectedArgument}
+                onSelect={controller.setSelectedArgument}
+                onReply={controller.handleReply}
+                onRefresh={controller.refreshPageData}
               />
             </Col>
           </Row>
 
-          <ArgumentThreadCard
-            items={controller.argumentItems}
-            loading={controller.loadingPageData}
-            selectedArgument={controller.selectedArgument}
-            onSelect={controller.setSelectedArgument}
-            onReply={controller.handleReply}
-            onRefresh={controller.refreshPageData}
-          />
-
-          <KorumPanelsGrid
-            topicId={controller.topicId as EthikosId}
-            selectedArgument={controller.selectedArgument}
-            selectedArgumentId={controller.selectedArgumentId}
-            participantRoles={controller.participantRoles}
-            loadingParticipantRoles={controller.loadingParticipantRoles}
-            refreshKey={controller.korumRefreshKey}
-            onMutation={controller.handleKorumMutation}
-            onRefreshParticipantRoles={controller.refreshParticipantRoles}
-          />
+          <ProCard
+            title="Selected argument details"
+            subTitle={
+              controller.selectedArgument ? (
+                <Text type="secondary">
+                  Review the selected statement’s evidence, impact signal,
+                  suggestions, visibility, and participant context.
+                </Text>
+              ) : (
+                <Text type="secondary">
+                  Select an argument above to inspect its sources and signals.
+                </Text>
+              )
+            }
+          >
+            <KorumPanelsGrid
+              topicId={controller.topicId as EthikosId}
+              selectedArgument={controller.selectedArgument}
+              selectedArgumentId={controller.selectedArgumentId}
+              participantRoles={controller.participantRoles}
+              loadingParticipantRoles={controller.loadingParticipantRoles}
+              refreshKey={controller.korumRefreshKey}
+              onMutation={controller.handleKorumMutation}
+              onRefreshParticipantRoles={controller.refreshParticipantRoles}
+            />
+          </ProCard>
         </Space>
       </PageContainer>
     </EthikosPageShell>

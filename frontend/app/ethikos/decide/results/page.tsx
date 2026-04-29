@@ -15,13 +15,22 @@ import {
   Alert,
   Button,
   DatePicker,
+  Empty,
   Segmented,
   Select,
   Space,
   Tag,
   Typography,
 } from 'antd';
-import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
+import {
+  ArrowRightOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { useRequest } from 'ahooks';
@@ -34,7 +43,7 @@ import {
 } from '@/services/decide';
 
 const { RangePicker } = DatePicker;
-const { Text } = Typography;
+const { Text, Paragraph } = Typography;
 
 type ScopeFilter = 'all' | DecisionScope;
 type ResultFilter = 'all' | 'passed' | 'rejected';
@@ -132,6 +141,29 @@ function toTimestamp(value: string): number {
   return parsed.isValid() ? parsed.valueOf() : 0;
 }
 
+function route(path: string): string {
+  return `${path}${path.includes('?') ? '&' : '?'}sidebar=ethikos`;
+}
+
+function ResultTag({ passed }: { passed: boolean }): JSX.Element {
+  return (
+    <Tag
+      color={passed ? 'green' : 'red'}
+      icon={passed ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+    >
+      {passed ? 'PASSED' : 'REJECTED'}
+    </Tag>
+  );
+}
+
+function ScopeTag({ scope }: { scope: DecisionScope }): JSX.Element {
+  return (
+    <Tag color={scope === 'Elite' ? 'geekblue' : 'default'}>
+      {scope === 'Elite' ? 'Expert' : 'Public'}
+    </Tag>
+  );
+}
+
 export default function ResultsArchive(): JSX.Element {
   const { data, loading, error, refresh } = useRequest<DecisionResultsData, []>(
     fetchDecisionResults,
@@ -195,6 +227,8 @@ export default function ResultsArchive(): JSX.Element {
   const filteredDecisionCount = filteredItems.length;
   const passedCount = items.filter((item) => item.passed).length;
   const rejectedCount = totalDecisions - passedCount;
+  const publicCount = items.filter((item) => item.scope === 'Public').length;
+  const eliteCount = items.filter((item) => item.scope === 'Elite').length;
   const passRate = totalDecisions
     ? Math.round((passedCount / totalDecisions) * 100)
     : 0;
@@ -202,71 +236,88 @@ export default function ResultsArchive(): JSX.Element {
 
   const columns: ProColumns<DecisionResult>[] = [
     {
-      title: 'Title',
+      title: 'Decision',
       dataIndex: 'title',
-      width: 320,
+      width: 360,
       ellipsis: true,
       sorter: (a, b) => a.title.localeCompare(b.title),
+      render: (_dom, row) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{row.title}</Text>
+          <Text type="secondary">
+            {row.region ? row.region : 'No region specified'}
+          </Text>
+        </Space>
+      ),
     },
     {
-      title: 'Result',
+      title: 'Baseline result',
       dataIndex: 'passed',
-      width: 140,
+      width: 160,
       filters: [
         { text: 'Passed', value: 'passed' },
         { text: 'Rejected', value: 'rejected' },
       ],
       onFilter: (value, record) =>
         String(value) === 'passed' ? record.passed : !record.passed,
-      render: (_dom, row) => (
-        <Tag color={row.passed ? 'green' : 'red'}>
-          {row.passed ? 'PASSED' : 'REJECTED'}
-        </Tag>
-      ),
+      render: (_dom, row) => <ResultTag passed={row.passed} />,
     },
     {
       title: 'Scope',
       dataIndex: 'scope',
-      width: 120,
+      width: 140,
       filters: [
-        { text: 'Elite', value: 'Elite' },
+        { text: 'Expert', value: 'Elite' },
         { text: 'Public', value: 'Public' },
       ],
       onFilter: (value, record) => record.scope === String(value),
-      render: (_dom, row) => <Tag>{row.scope}</Tag>,
-    },
-    {
-      title: 'Region',
-      dataIndex: 'region',
-      width: 180,
-      ellipsis: true,
-      render: (_dom, row) => row.region ?? '—',
+      render: (_dom, row) => <ScopeTag scope={row.scope} />,
     },
     {
       title: 'Closed',
       dataIndex: 'closesAt',
-      width: 200,
+      width: 190,
       sorter: (a, b) => toTimestamp(a.closesAt) - toTimestamp(b.closesAt),
       defaultSortOrder: 'descend',
       render: (_dom, row) => (
-        <Text type="secondary">{formatDate(row.closesAt)}</Text>
+        <Space>
+          <ClockCircleOutlined />
+          <Text type="secondary">{formatDate(row.closesAt)}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Next step',
+      key: 'nextStep',
+      width: 170,
+      render: () => (
+        <Link href={route('/ethikos/impact/tracker')} prefetch={false}>
+          <Button size="small" icon={<ArrowRightOutlined />}>
+            Track impact
+          </Button>
+        </Link>
       ),
     },
   ];
 
+  const hasFilters =
+    scopeFilter !== 'all' ||
+    resultFilter !== 'all' ||
+    regionFilter !== 'all' ||
+    Boolean(range?.[0] && range?.[1]);
+
   return (
     <EthikosPageShell
-      title="Decide · Results Archive"
+      title="Decision results"
       sectionLabel="Decide"
       subtitle={
         <span>
-          Historical record of closed Ethikos decisions across elite and public
-          scopes. Filter by outcome, region and closing period, or jump to open
-          ballots.
+          Read closed Ethikos decisions clearly: baseline outcome first, method
+          context second, and impact tracking next.
         </span>
       }
       primaryAction={
-        <Link href="/ethikos/decide/methodology" prefetch={false}>
+        <Link href={route('/ethikos/decide/methodology')} prefetch={false}>
           <Button type="primary" icon={<InfoCircleOutlined />}>
             Voting methodology
           </Button>
@@ -274,16 +325,15 @@ export default function ResultsArchive(): JSX.Element {
       }
       secondaryActions={
         <Space wrap>
-          <Link href="/ethikos/decide/elite" prefetch={false}>
-            <Button>Elite ballots</Button>
+          <Link href={route('/ethikos/decide/public')} prefetch={false}>
+            <Button>Public consultations</Button>
           </Link>
-          <Link href="/ethikos/decide/public" prefetch={false}>
-            <Button>Public ballots</Button>
+          <Link href={route('/ethikos/decide/elite')} prefetch={false}>
+            <Button>Expert decisions</Button>
           </Link>
           <Button
             icon={<ReloadOutlined />}
             onClick={() => refresh()}
-            type="default"
             size="small"
             loading={loading}
           >
@@ -297,13 +347,13 @@ export default function ResultsArchive(): JSX.Element {
           <Alert
             type="info"
             showIcon
-            message="How to read this archive"
+            message="How to read these results"
             description={
               <span>
-                Each row is a closed Ethikos decision with its final outcome and
-                scope. Pass/fail is derived from the aggregated stance direction
-                at the time the vote closed. For details, see the voting
-                methodology.
+                The baseline result is the archived pass/fail outcome. If Smart
+                Vote or EkoH readings are shown elsewhere, treat them as
+                interpretation layers beside the baseline result, not as a
+                replacement for it.
               </span>
             }
           />
@@ -312,14 +362,14 @@ export default function ResultsArchive(): JSX.Element {
             <Alert
               type="error"
               showIcon
-              message="Unable to load decision results."
+              message="Unable to load decision results"
               description="Check the Decide service or refresh this page."
             />
           )}
 
           <ProCard gutter={16} wrap>
             <StatisticCard
-              colSpan={{ xs: 24, sm: 8 }}
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
                 title: 'Closed decisions',
                 value: totalDecisions,
@@ -329,36 +379,99 @@ export default function ResultsArchive(): JSX.Element {
                     : `${filteredDecisionCount} currently visible`,
               }}
             />
+
             <StatisticCard
-              colSpan={{ xs: 24, sm: 8 }}
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
-                title: 'Pass rate',
-                value: `${passRate}%`,
+                title: 'Baseline pass rate',
+                value: passRate,
+                suffix: '%',
                 description:
                   totalDecisions > 0
                     ? `${passedCount} passed · ${rejectedCount} rejected`
                     : 'No decisions yet',
               }}
             />
+
             <StatisticCard
-              colSpan={{ xs: 24, sm: 8 }}
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Decision scopes',
+                value: totalDecisions,
+                description: `${publicCount} public · ${eliteCount} expert`,
+              }}
+            />
+
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
                 title: 'Regions covered',
                 value: coveredRegions,
                 description:
                   coveredRegions > 0
-                    ? 'Distinct policy domains'
+                    ? 'Distinct regions or domains'
                     : 'No regional data',
               }}
             />
           </ProCard>
 
+          <ProCard gutter={16} wrap>
+            <ProCard
+              colSpan={{ xs: 24, lg: 8 }}
+              bordered
+              title={
+                <Space>
+                  <CheckCircleOutlined />
+                  <span>1. Baseline outcome</span>
+                </Space>
+              }
+            >
+              <Paragraph type="secondary">
+                Start with the archived pass/fail result. This is the stable
+                decision record.
+              </Paragraph>
+            </ProCard>
+
+            <ProCard
+              colSpan={{ xs: 24, lg: 8 }}
+              bordered
+              title={
+                <Space>
+                  <SafetyCertificateOutlined />
+                  <span>2. Method context</span>
+                </Space>
+              }
+            >
+              <Paragraph type="secondary">
+                Use the methodology page to understand how public and expert
+                decision scopes are interpreted.
+              </Paragraph>
+            </ProCard>
+
+            <ProCard
+              colSpan={{ xs: 24, lg: 8 }}
+              bordered
+              title={
+                <Space>
+                  <ArrowRightOutlined />
+                  <span>3. Impact follow-up</span>
+                </Space>
+              }
+            >
+              <Paragraph type="secondary">
+                After reading a result, track whether it led to action,
+                evidence, feedback, or revision.
+              </Paragraph>
+            </ProCard>
+          </ProCard>
+
           <ProCard
-            ghost
-            title="Filters"
+            title="Filter the archive"
             extra={
               <Text type="secondary">
-                Scope, outcome, region and closing period
+                {hasFilters
+                  ? `${filteredDecisionCount} matching decisions`
+                  : 'All decisions visible'}
               </Text>
             }
           >
@@ -368,8 +481,8 @@ export default function ResultsArchive(): JSX.Element {
                 onChange={(value) => setScopeFilter(value as ScopeFilter)}
                 options={[
                   { label: 'All scopes', value: 'all' },
-                  { label: 'Elite only', value: 'Elite' },
-                  { label: 'Public only', value: 'Public' },
+                  { label: 'Expert', value: 'Elite' },
+                  { label: 'Public', value: 'Public' },
                 ]}
               />
 
@@ -377,14 +490,14 @@ export default function ResultsArchive(): JSX.Element {
                 value={resultFilter}
                 onChange={(value) => setResultFilter(value as ResultFilter)}
                 options={[
-                  { label: 'All outcomes', value: 'all' },
+                  { label: 'All results', value: 'all' },
                   { label: 'Passed', value: 'passed' },
                   { label: 'Rejected', value: 'rejected' },
                 ]}
               />
 
               <Select
-                placeholder="Region (all)"
+                placeholder="Region"
                 style={{ minWidth: 200 }}
                 allowClear
                 value={regionFilter === 'all' ? undefined : regionFilter}
@@ -403,22 +516,49 @@ export default function ResultsArchive(): JSX.Element {
                 onChange={(value) => setRange(value as RangeValue)}
                 allowEmpty={[true, true]}
               />
+
+              {hasFilters && (
+                <Button
+                  onClick={() => {
+                    setScopeFilter('all');
+                    setResultFilter('all');
+                    setRegionFilter('all');
+                    setRange(null);
+                  }}
+                >
+                  Clear filters
+                </Button>
+              )}
             </Space>
           </ProCard>
 
-          <ProTable<DecisionResult>
-            rowKey="id"
-            columns={columns}
-            dataSource={filteredItems}
-            pagination={{
-              pageSize: 12,
-              showSizeChanger: true,
-              showTotal: (total) => `${total} decisions`,
-            }}
-            search={false}
-            options={false}
-            toolBarRender={false}
-          />
+          {filteredItems.length === 0 && !loading ? (
+            <ProCard>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={
+                  hasFilters
+                    ? 'No decisions match the current filters.'
+                    : 'No archived decisions are available yet.'
+                }
+              />
+            </ProCard>
+          ) : (
+            <ProTable<DecisionResult>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredItems}
+              pagination={{
+                pageSize: 12,
+                showSizeChanger: true,
+                showTotal: (total) => `${total} decisions`,
+              }}
+              search={false}
+              options={false}
+              toolBarRender={false}
+              headerTitle="Archived decisions"
+            />
+          )}
         </Space>
       </PageContainer>
     </EthikosPageShell>

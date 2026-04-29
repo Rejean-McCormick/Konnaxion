@@ -10,6 +10,7 @@ Kintsugi Wave 1 foundation rules:
 
 from __future__ import annotations
 
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from . import api_views
@@ -49,4 +50,7 @@ register_required("arguments", "ArgumentViewSet", basename="ethikos-argument")
 register_optional("categories", "CategoryViewSet", basename="ethikos-category")
 
 
-urlpatterns = router.urls
+urlpatterns = [
+    path("", include("konnaxion.ethikos.demo_import.urls")),
+    *router.urls,
+]

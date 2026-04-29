@@ -1,0 +1,1081 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "ai_in_schools_policy_demo",
+  "scenario_title": "AI in Schools Policy Demo — Rich Multi-Topic Scenario",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "A richer school-board demo covering supervised AI tutoring, assessment integrity, student-data protection, equity funding, teacher workload, AI literacy, and pilot governance.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "en",
+    "focus": "Education policy + safeguards + EkoH-weighted expert context + multi-topic deliberation",
+    "demo_notes": [
+      "Designed to replace the smaller ai_in_schools_policy_demo scenario.",
+      "Uses the same scenario_key so replace_scenario can reset and re-import the richer version.",
+      "All users use the demo_ prefix and all topics/consultations use the [DEMO] prefix."
+    ]
+  },
+  "actors": [
+    {
+      "key": "lina",
+      "username": "demo_lina",
+      "display_name": "Lina",
+      "email": "demo_lina@example.test",
+      "role": "student_representative",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "marc_teacher",
+      "username": "demo_marc_teacher",
+      "display_name": "Marc",
+      "email": "demo_marc_teacher@example.test",
+      "role": "teacher",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "fatima_parent",
+      "username": "demo_fatima_parent",
+      "display_name": "Fatima",
+      "email": "demo_fatima_parent@example.test",
+      "role": "parent",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "elise_admin",
+      "username": "demo_elise_admin",
+      "display_name": "Elise",
+      "email": "demo_elise_admin@example.test",
+      "role": "school_administrator",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "noor_privacy",
+      "username": "demo_noor_privacy",
+      "display_name": "Noor",
+      "email": "demo_noor_privacy@example.test",
+      "role": "data_protection_officer",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "diego_access",
+      "username": "demo_diego_access",
+      "display_name": "Diego",
+      "email": "demo_diego_access@example.test",
+      "role": "accessibility_and_equity_advocate",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "samira_edtech",
+      "username": "demo_samira_edtech",
+      "display_name": "Samira",
+      "email": "demo_samira_edtech@example.test",
+      "role": "edtech_provider",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "julien_board",
+      "username": "demo_julien_board",
+      "display_name": "Julien",
+      "email": "demo_julien_board@example.test",
+      "role": "school_board_member",
+      "is_ethikos_elite": true
+    }
+  ],
+  "categories": [
+    {
+      "key": "education",
+      "name": "Education",
+      "description": "Learning policy, classroom technology, student support, assessment integrity, and school governance."
+    },
+    {
+      "key": "digital_safety",
+      "name": "Digital safety",
+      "description": "Privacy, student data protection, cyber safety, algorithmic transparency, and responsible technology use."
+    },
+    {
+      "key": "equity",
+      "name": "Equity",
+      "description": "Fair access, inclusion, affordability, disability support, and support for vulnerable learners."
+    }
+  ],
+  "topics": [
+    {
+      "key": "ai_classroom_policy",
+      "title": "[DEMO] Should schools allow supervised AI tutoring tools?",
+      "description": "The community is debating whether AI tutors should be allowed under teacher oversight, district procurement, audit logs, and clear student-use rules.",
+      "status": "open",
+      "category": "education",
+      "start_date": "2026-05-01",
+      "end_date": "2026-07-05"
+    },
+    {
+      "key": "ai_assessment_integrity",
+      "title": "[DEMO] How should schools protect assessment integrity in the AI era?",
+      "description": "Teachers, students, and parents are weighing disclosure rules, oral defenses, in-class assessment, process logs, and restorative responses to misuse.",
+      "status": "open",
+      "category": "education",
+      "start_date": "2026-05-01",
+      "end_date": "2026-07-05"
+    },
+    {
+      "key": "student_data_privacy",
+      "title": "[DEMO] What privacy rules should govern student data used by AI tools?",
+      "description": "The board must decide what data can be processed, where it can be stored, how long it can be retained, and whether vendors may train models on student work.",
+      "status": "open",
+      "category": "digital_safety",
+      "start_date": "2026-05-01",
+      "end_date": "2026-07-05"
+    },
+    {
+      "key": "teacher_workload_training",
+      "title": "[DEMO] How should teachers be supported before AI tools enter classrooms?",
+      "description": "The discussion focuses on training time, classroom templates, technical support, workload protection, and teacher autonomy.",
+      "status": "open",
+      "category": "education",
+      "start_date": "2026-05-01",
+      "end_date": "2026-07-05"
+    },
+    {
+      "key": "equity_access_funding",
+      "title": "[DEMO] How can schools avoid widening inequality through AI adoption?",
+      "description": "Participants are considering device access, language support, disability accommodations, free district-provided tools, and targeted support for underserved students.",
+      "status": "open",
+      "category": "equity",
+      "start_date": "2026-05-01",
+      "end_date": "2026-07-05"
+    },
+    {
+      "key": "ai_literacy_curriculum",
+      "title": "[DEMO] Should AI literacy become part of the core curriculum?",
+      "description": "The district is considering a required AI literacy strand covering prompting, verification, bias, privacy, authorship, and responsible use.",
+      "status": "open",
+      "category": "digital_safety",
+      "start_date": "2026-05-01",
+      "end_date": "2026-07-05"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "lina",
+      "value": 2
+    },
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "marc_teacher",
+      "value": 1
+    },
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "fatima_parent",
+      "value": -1
+    },
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "elise_admin",
+      "value": 2
+    },
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "noor_privacy",
+      "value": 1
+    },
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "diego_access",
+      "value": 2
+    },
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "samira_edtech",
+      "value": 3
+    },
+    {
+      "topic": "ai_classroom_policy",
+      "actor": "julien_board",
+      "value": 1
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "lina",
+      "value": 1
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "marc_teacher",
+      "value": 3
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "fatima_parent",
+      "value": 2
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "elise_admin",
+      "value": 2
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "noor_privacy",
+      "value": 1
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "diego_access",
+      "value": 1
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "samira_edtech",
+      "value": 0
+    },
+    {
+      "topic": "ai_assessment_integrity",
+      "actor": "julien_board",
+      "value": 2
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "lina",
+      "value": 2
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "marc_teacher",
+      "value": 2
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "fatima_parent",
+      "value": 3
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "elise_admin",
+      "value": 2
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "noor_privacy",
+      "value": 3
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "diego_access",
+      "value": 2
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "samira_edtech",
+      "value": 1
+    },
+    {
+      "topic": "student_data_privacy",
+      "actor": "julien_board",
+      "value": 2
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "lina",
+      "value": 1
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "marc_teacher",
+      "value": 3
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "fatima_parent",
+      "value": 1
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "elise_admin",
+      "value": 2
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "noor_privacy",
+      "value": 1
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "diego_access",
+      "value": 2
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "samira_edtech",
+      "value": 1
+    },
+    {
+      "topic": "teacher_workload_training",
+      "actor": "julien_board",
+      "value": 2
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "lina",
+      "value": 3
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "marc_teacher",
+      "value": 2
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "fatima_parent",
+      "value": 3
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "elise_admin",
+      "value": 2
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "noor_privacy",
+      "value": 1
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "diego_access",
+      "value": 3
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "samira_edtech",
+      "value": 1
+    },
+    {
+      "topic": "equity_access_funding",
+      "actor": "julien_board",
+      "value": 2
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "lina",
+      "value": 3
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "marc_teacher",
+      "value": 2
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "fatima_parent",
+      "value": 2
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "elise_admin",
+      "value": 3
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "noor_privacy",
+      "value": 3
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "diego_access",
+      "value": 2
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "samira_edtech",
+      "value": 2
+    },
+    {
+      "topic": "ai_literacy_curriculum",
+      "actor": "julien_board",
+      "value": 3
+    }
+  ],
+  "arguments": [
+    {
+      "key": "lina_access",
+      "topic": "ai_classroom_policy",
+      "actor": "lina",
+      "side": "pro",
+      "content": "AI tutors could help students who need extra explanations outside classroom hours, especially before exams or when homework instructions are unclear."
+    },
+    {
+      "key": "teacher_integrity",
+      "topic": "ai_classroom_policy",
+      "actor": "marc_teacher",
+      "side": "neutral",
+      "content": "The policy must separate learning support from uncredited assignment completion, otherwise teachers will not know what students actually understand."
+    },
+    {
+      "key": "parent_equity",
+      "topic": "ai_classroom_policy",
+      "actor": "fatima_parent",
+      "side": "con",
+      "content": "If access depends on paid tools, the policy may increase inequality between students whose families can afford subscriptions and those who cannot."
+    },
+    {
+      "key": "admin_safeguards",
+      "topic": "ai_classroom_policy",
+      "actor": "elise_admin",
+      "side": "pro",
+      "content": "A district-provided tool with logs, privacy review, teacher oversight, and opt-out options is safer than informal unsupervised use."
+    },
+    {
+      "key": "privacy_caution",
+      "topic": "ai_classroom_policy",
+      "actor": "noor_privacy",
+      "side": "neutral",
+      "content": "Approval should be conditional on a data-protection impact assessment and a clear rule that student data is not used to train vendor models."
+    },
+    {
+      "key": "teacher_process_evidence",
+      "topic": "ai_assessment_integrity",
+      "actor": "marc_teacher",
+      "side": "pro",
+      "content": "Major assignments should require process evidence, such as outlines, drafts, notes, reflections, or short oral checks."
+    },
+    {
+      "key": "student_clear_rules",
+      "topic": "ai_assessment_integrity",
+      "actor": "lina",
+      "side": "pro",
+      "content": "Students need clear examples of allowed help, forbidden substitution, and how to cite AI assistance without being punished for honest disclosure."
+    },
+    {
+      "key": "parent_trust_grades",
+      "topic": "ai_assessment_integrity",
+      "actor": "fatima_parent",
+      "side": "pro",
+      "content": "Families need to trust that grades still reflect learning, not just the ability to operate a chatbot."
+    },
+    {
+      "key": "admin_restorative",
+      "topic": "ai_assessment_integrity",
+      "actor": "elise_admin",
+      "side": "neutral",
+      "content": "The first response to misuse should usually be restorative education, not automatic severe discipline."
+    },
+    {
+      "key": "vendor_detection_warning",
+      "topic": "ai_assessment_integrity",
+      "actor": "samira_edtech",
+      "side": "con",
+      "content": "Schools should avoid relying on AI detectors as the main enforcement method because false positives can damage trust."
+    },
+    {
+      "key": "privacy_no_training",
+      "topic": "student_data_privacy",
+      "actor": "noor_privacy",
+      "side": "pro",
+      "content": "The district should prohibit vendors from using student work, prompts, behavior, or metadata to train external models."
+    },
+    {
+      "key": "student_data_visibility",
+      "topic": "student_data_privacy",
+      "actor": "lina",
+      "side": "pro",
+      "content": "Students should be able to see what data is collected and request correction or deletion when appropriate."
+    },
+    {
+      "key": "parent_consent",
+      "topic": "student_data_privacy",
+      "actor": "fatima_parent",
+      "side": "pro",
+      "content": "Parents should receive plain-language consent notices before any tool collects identifiable student information."
+    },
+    {
+      "key": "admin_vendor_contracts",
+      "topic": "student_data_privacy",
+      "actor": "elise_admin",
+      "side": "pro",
+      "content": "Procurement should require vendor security reviews, breach notification timelines, retention limits, and audit rights."
+    },
+    {
+      "key": "edtech_minimal_data",
+      "topic": "student_data_privacy",
+      "actor": "samira_edtech",
+      "side": "neutral",
+      "content": "The best implementation is data minimization: the tool should work with the least student information possible."
+    },
+    {
+      "key": "teacher_time",
+      "topic": "teacher_workload_training",
+      "actor": "marc_teacher",
+      "side": "pro",
+      "content": "Teachers need protected training time, not an extra unpaid expectation added on top of planning, grading, and classroom support."
+    },
+    {
+      "key": "admin_templates",
+      "topic": "teacher_workload_training",
+      "actor": "elise_admin",
+      "side": "pro",
+      "content": "The district can reduce burden by providing model lesson plans, assessment templates, disclosure language, and parent communication drafts."
+    },
+    {
+      "key": "student_consistency",
+      "topic": "teacher_workload_training",
+      "actor": "lina",
+      "side": "pro",
+      "content": "Students need consistent rules across classes because confusion grows when every teacher has a different AI policy."
+    },
+    {
+      "key": "privacy_training",
+      "topic": "teacher_workload_training",
+      "actor": "noor_privacy",
+      "side": "pro",
+      "content": "Teacher training should include privacy basics, such as avoiding sensitive student data in prompts and understanding vendor terms."
+    },
+    {
+      "key": "access_training",
+      "topic": "teacher_workload_training",
+      "actor": "diego_access",
+      "side": "pro",
+      "content": "Training should include accessibility use cases so AI is not treated only as a productivity tool for already-advantaged students."
+    },
+    {
+      "key": "equity_device_access",
+      "topic": "equity_access_funding",
+      "actor": "diego_access",
+      "side": "pro",
+      "content": "No AI policy is equitable if students lack reliable devices, internet access, language support, or assistive technology."
+    },
+    {
+      "key": "parent_cost",
+      "topic": "equity_access_funding",
+      "actor": "fatima_parent",
+      "side": "pro",
+      "content": "Families should not be asked to pay for approved tools. If a tool is required for learning, the school must provide it."
+    },
+    {
+      "key": "student_support",
+      "topic": "equity_access_funding",
+      "actor": "lina",
+      "side": "pro",
+      "content": "Students who are learning the language of instruction or who have learning differences could benefit if the system is designed for them from the start."
+    },
+    {
+      "key": "board_budget_tradeoff",
+      "topic": "equity_access_funding",
+      "actor": "julien_board",
+      "side": "neutral",
+      "content": "Equity funding is essential, but the board must decide what to pause or reduce if AI support becomes a funded priority."
+    },
+    {
+      "key": "vendor_discount",
+      "topic": "equity_access_funding",
+      "actor": "samira_edtech",
+      "side": "pro",
+      "content": "Vendors should offer district-wide access pricing and accessibility features as core requirements, not premium add-ons."
+    },
+    {
+      "key": "literacy_required",
+      "topic": "ai_literacy_curriculum",
+      "actor": "elise_admin",
+      "side": "pro",
+      "content": "AI literacy should become a required strand because students will encounter AI systems across school, work, media, and civic life."
+    },
+    {
+      "key": "privacy_curriculum",
+      "topic": "ai_literacy_curriculum",
+      "actor": "noor_privacy",
+      "side": "pro",
+      "content": "Students should learn what not to share, how data trails work, and how automated systems can infer sensitive information."
+    },
+    {
+      "key": "teacher_curriculum_load",
+      "topic": "ai_literacy_curriculum",
+      "actor": "marc_teacher",
+      "side": "neutral",
+      "content": "AI literacy is important, but it should be integrated into existing subjects rather than becoming another disconnected requirement."
+    },
+    {
+      "key": "student_bias_check",
+      "topic": "ai_literacy_curriculum",
+      "actor": "lina",
+      "side": "pro",
+      "content": "Students should learn how to check AI answers, find sources, detect bias, and explain when a result should not be trusted."
+    },
+    {
+      "key": "parent_home_support",
+      "topic": "ai_literacy_curriculum",
+      "actor": "fatima_parent",
+      "side": "pro",
+      "content": "Families need simple guidance too, because students will use these tools at home even when teachers are not present."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "ai_school_policy_vote",
+      "title": "[DEMO] School AI-use policy",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-07-05",
+      "options": [
+        {
+          "key": "ban_ai",
+          "label": "Ban AI tools for student work"
+        },
+        {
+          "key": "supervised_ai",
+          "label": "Allow supervised school-approved AI tools"
+        },
+        {
+          "key": "open_ai",
+          "label": "Allow broad AI use with disclosure"
+        },
+        {
+          "key": "pilot_first",
+          "label": "Run a limited supervised pilot first"
+        }
+      ]
+    },
+    {
+      "key": "assessment_integrity_vote",
+      "title": "[DEMO] Assessment integrity model",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-07-05",
+      "options": [
+        {
+          "key": "strict_ban",
+          "label": "Strict ban for graded work"
+        },
+        {
+          "key": "disclosure_process",
+          "label": "Disclosure plus process evidence"
+        },
+        {
+          "key": "oral_defense",
+          "label": "Add oral defense for major work"
+        },
+        {
+          "key": "teacher_choice",
+          "label": "Let each teacher decide"
+        }
+      ]
+    },
+    {
+      "key": "student_data_rules_vote",
+      "title": "[DEMO] Student data protection rules",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-07-05",
+      "options": [
+        {
+          "key": "minimal_data",
+          "label": "Allow only minimal necessary data"
+        },
+        {
+          "key": "no_vendor_training",
+          "label": "Prohibit vendor training on student data"
+        },
+        {
+          "key": "parent_consent",
+          "label": "Require parent consent for identifiable data"
+        },
+        {
+          "key": "local_only",
+          "label": "Use only district-hosted tools"
+        }
+      ]
+    },
+    {
+      "key": "equity_funding_vote",
+      "title": "[DEMO] AI equity funding priority",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-07-05",
+      "options": [
+        {
+          "key": "district_license",
+          "label": "District-wide free approved tool"
+        },
+        {
+          "key": "devices_connectivity",
+          "label": "Devices and connectivity first"
+        },
+        {
+          "key": "accessibility_support",
+          "label": "Accessibility and language support"
+        },
+        {
+          "key": "teacher_training",
+          "label": "Teacher training and support first"
+        }
+      ]
+    },
+    {
+      "key": "ai_literacy_vote",
+      "title": "[DEMO] AI literacy curriculum rollout",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-07-05",
+      "options": [
+        {
+          "key": "required_all",
+          "label": "Required AI literacy for all students"
+        },
+        {
+          "key": "integrated_subjects",
+          "label": "Integrate AI literacy into existing subjects"
+        },
+        {
+          "key": "elective_first",
+          "label": "Start with elective modules"
+        },
+        {
+          "key": "teacher_pd_first",
+          "label": "Train teachers before student rollout"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "lina",
+      "option": "supervised_ai",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "marc_teacher",
+      "option": "pilot_first",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "fatima_parent",
+      "option": "pilot_first",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "elise_admin",
+      "option": "pilot_first",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "noor_privacy",
+      "option": "pilot_first",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "diego_access",
+      "option": "supervised_ai",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "samira_edtech",
+      "option": "supervised_ai",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "actor": "julien_board",
+      "option": "pilot_first",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "lina",
+      "option": "disclosure_process",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "marc_teacher",
+      "option": "oral_defense",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "fatima_parent",
+      "option": "disclosure_process",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "elise_admin",
+      "option": "disclosure_process",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "noor_privacy",
+      "option": "disclosure_process",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "diego_access",
+      "option": "disclosure_process",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "samira_edtech",
+      "option": "teacher_choice",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "actor": "julien_board",
+      "option": "disclosure_process",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "lina",
+      "option": "minimal_data",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "marc_teacher",
+      "option": "no_vendor_training",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "fatima_parent",
+      "option": "parent_consent",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "elise_admin",
+      "option": "no_vendor_training",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "noor_privacy",
+      "option": "no_vendor_training",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "diego_access",
+      "option": "minimal_data",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "samira_edtech",
+      "option": "minimal_data",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "actor": "julien_board",
+      "option": "no_vendor_training",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "lina",
+      "option": "devices_connectivity",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "marc_teacher",
+      "option": "teacher_training",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "fatima_parent",
+      "option": "district_license",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "elise_admin",
+      "option": "teacher_training",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "noor_privacy",
+      "option": "district_license",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "diego_access",
+      "option": "accessibility_support",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "samira_edtech",
+      "option": "district_license",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "actor": "julien_board",
+      "option": "teacher_training",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "lina",
+      "option": "required_all",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "marc_teacher",
+      "option": "integrated_subjects",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "fatima_parent",
+      "option": "required_all",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "elise_admin",
+      "option": "integrated_subjects",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "noor_privacy",
+      "option": "integrated_subjects",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "diego_access",
+      "option": "required_all",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "samira_edtech",
+      "option": "elective_first",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "actor": "julien_board",
+      "option": "integrated_subjects",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "ai_school_policy_vote",
+      "action": "Publish a supervised AI pilot policy with allowed-use examples and prohibited-use examples",
+      "status": "planned",
+      "date": "2026-06-20"
+    },
+    {
+      "consultation": "ai_school_policy_vote",
+      "action": "Run a one-term pilot with opt-out, accessibility checks, and parent information sessions",
+      "status": "planned",
+      "date": "2026-09-01"
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "action": "Create district-wide AI disclosure language for assignments",
+      "status": "planned",
+      "date": "2026-06-22"
+    },
+    {
+      "consultation": "assessment_integrity_vote",
+      "action": "Prepare teacher templates for process evidence and short oral defense checks",
+      "status": "planned",
+      "date": "2026-08-15"
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "action": "Complete a data-protection impact assessment for any approved AI vendor",
+      "status": "in_progress",
+      "date": "2026-06-28"
+    },
+    {
+      "consultation": "student_data_rules_vote",
+      "action": "Add no-vendor-training, retention-limit, and breach-notification clauses to procurement contracts",
+      "status": "planned",
+      "date": "2026-07-20"
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "action": "Estimate cost of district-wide access, device support, and accessibility accommodations",
+      "status": "planned",
+      "date": "2026-07-10"
+    },
+    {
+      "consultation": "equity_funding_vote",
+      "action": "Identify funding sources for students without reliable home technology access",
+      "status": "planned",
+      "date": "2026-08-01"
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "action": "Draft AI literacy learning outcomes for grades 6 to 12",
+      "status": "planned",
+      "date": "2026-07-15"
+    },
+    {
+      "consultation": "ai_literacy_vote",
+      "action": "Create parent-facing guidance on AI use, verification, privacy, and homework support",
+      "status": "planned",
+      "date": "2026-08-20"
+    }
+  ]
+}
