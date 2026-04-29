@@ -3,55 +3,41 @@ log:
 
 entryPoints:
   web:
-    # http
-    address: ':80'
+    address: ":80"
     http:
-      # https://doc.traefik.io/traefik/routing/entrypoints/#entrypoint
       redirections:
         entryPoint:
           to: web-secure
+          scheme: https
 
   web-secure:
-    # https
-    address: ':443'
+    address: ":443"
 
   flower:
-    address: ':5555'
+    address: ":5555"
 
 certificatesResolvers:
   letsencrypt:
-    # https://doc.traefik.io/traefik/https/acme/#lets-encrypt
     acme:
-      email: 'boatbuilder610@gmail.com'
+      email: "boatbuilder610@gmail.com"
       storage: /etc/traefik/acme/acme.json
-      # https://doc.traefik.io/traefik/https/acme/#httpchallenge
       httpChallenge:
         entryPoint: web
 
 http:
   routers:
     web-secure-router:
-      rule: 'Host(`konnaxion.local`) || Host(`www.konnaxion.local`)'
+      rule: "Host(`konnaxion.com`) || Host(`www.konnaxion.com`)"
       entryPoints:
         - web-secure
       middlewares:
         - csrf
       service: django
       tls:
-        # https://doc.traefik.io/traefik/routing/routers/#certresolver
-        certResolver: letsencrypt
-
-    flower-secure-router:
-      rule: 'Host(`konnaxion.local`)'
-      entryPoints:
-        - flower
-      service: flower
-      tls:
-        # https://doc.traefik.io/traefik/master/routing/routers/#certresolver
         certResolver: letsencrypt
 
     web-media-router:
-      rule: '(Host(`konnaxion.local`) || Host(`www.konnaxion.local`)) && PathPrefix(`/media/`)'
+      rule: "(Host(`konnaxion.com`) || Host(`www.konnaxion.com`)) && PathPrefix(`/media/`)"
       entryPoints:
         - web-secure
       middlewares:
@@ -60,12 +46,19 @@ http:
       tls:
         certResolver: letsencrypt
 
+    flower-secure-router:
+      rule: "Host(`konnaxion.com`) || Host(`www.konnaxion.com`)"
+      entryPoints:
+        - flower
+      service: flower
+      tls:
+        certResolver: letsencrypt
+
   middlewares:
     csrf:
-      # https://doc.traefik.io/traefik/master/middlewares/http/headers/#hostsproxyheaders
-      # https://docs.djangoproject.com/en/dev/ref/csrf/#ajax
       headers:
-        hostsProxyHeaders: ['X-CSRFToken']
+        hostsProxyHeaders:
+          - X-CSRFToken
 
   services:
     django:
@@ -84,7 +77,6 @@ http:
           - url: http://nginx:80
 
 providers:
-  # https://doc.traefik.io/traefik/master/providers/file/
   file:
     filename: /etc/traefik/traefik.yml
     watch: true
