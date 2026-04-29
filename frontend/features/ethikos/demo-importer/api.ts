@@ -189,11 +189,13 @@ async function postEthikosDemoJson<TPayload>(
   const normalized = await readEthikosDemoResponse(response);
 
   if (!response.ok) {
+    const errors = normalized.errors ?? [];
+
     return {
       ...normalized,
       ok: false,
-      errors: normalized.errors.length
-        ? normalized.errors
+      errors: errors.length
+        ? errors
         : [
             {
               path: "request",
