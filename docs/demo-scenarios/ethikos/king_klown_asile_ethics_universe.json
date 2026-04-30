@@ -1,0 +1,2891 @@
+{
+  "schema_version": "ethikos-demo-scenario/v1",
+  "scenario_key": "king_klown_asile_ethics_universe",
+  "scenario_title": "King Klown et l’asile — Univers éthique de la table des questions",
+  "mode": "replace_scenario",
+  "metadata": {
+    "description": "Univers de délibération où King Klown dépose sur la table les questions éthiques de King Klown et l’asile: refuge sans cage, droit de sortie réel, mots dangereux, fondateur contenu, refus de l’empire, données minimales, limites territoriales, soins et démontabilité.",
+    "created_for": "Konnaxion ethiKos Demo Importer",
+    "language": "fr",
+    "focus": "Éthique politique + asile libre + pouvoir symbolique + infrastructure + figures publiques fictionnalisées + personnages du livre",
+    "universe": "King Klown et l’asile",
+    "fictionalization_notice": "Les figures publiques et personnages satiriques sont utilisés comme acteurs fictionnalisés de délibération. Les arguments ne sont pas des citations réelles.",
+    "source_notes": [
+      "Structure conservée depuis le scénario JSON d’origine: acteurs, catégories, sujets, positions, arguments, consultations, votes et impacts.",
+      "Questions inspirées des thèmes du manuscrit: asile sans cage, portes et ponts, mots dangereux, pression symbolique, données, territoires, soins, refus de l’empire et démontabilité.",
+      "Ajout des personnes demandées: Vladimir Poutine, Donald Trump, Pope Leo XIV, Barack Obama, Jean Charest, Lady Gaga, Elvis Gratton et Momus.",
+      "Ajout de personnages et institutions du livre repérés dans le manuscrit: King Klown, Aïda, Yusufa, Niviaq, Marisol, Idris, Éliane, Rahima, Darveau, Félix, Drapeau, kOA, Reignbow et Kristal Farms."
+    ],
+    "demo_notes": [
+      "Tous les utilisateurs utilisent le préfixe demo_.",
+      "Tous les sujets et consultations utilisent le préfixe [DEMO].",
+      "Les valeurs de stance vont de -3 à 3; elles servent à tester des désaccords narratifs et non à décrire de vraies positions.",
+      "Les weighted_value sont des poids de démonstration pour créer des résultats différenciés."
+    ]
+  },
+  "actors": [
+    {
+      "key": "king_klown",
+      "username": "demo_king_klown",
+      "display_name": "King Klown",
+      "email": "demo_king_klown@example.test",
+      "role": "fondateur_sous_contrainte_symbolique",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "aida",
+      "username": "demo_aida",
+      "display_name": "Aïda",
+      "email": "demo_aida@example.test",
+      "role": "architecte_des_protocoles_et_des_vannes",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "yusufa",
+      "username": "demo_yusufa",
+      "display_name": "Yusufa",
+      "email": "demo_yusufa@example.test",
+      "role": "porte_parole_des_villages_ouighours",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "niviaq",
+      "username": "demo_niviaq",
+      "display_name": "Niviaq",
+      "email": "demo_niviaq@example.test",
+      "role": "gardienne_territoriale_et_langues_premieres",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "marisol",
+      "username": "demo_marisol",
+      "display_name": "Marisol",
+      "email": "demo_marisol@example.test",
+      "role": "medecine_corridor_cuba_nord",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "idris",
+      "username": "demo_idris",
+      "display_name": "Idris",
+      "email": "demo_idris@example.test",
+      "role": "enfant_du_comite_avec_droit_de_question",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "eliane",
+      "username": "demo_eliane",
+      "display_name": "Éliane",
+      "email": "demo_eliane@example.test",
+      "role": "journaliste_enquete_rêvasseur",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "rahima",
+      "username": "demo_rahima",
+      "display_name": "Rahima",
+      "email": "demo_rahima@example.test",
+      "role": "parent_du_village_ouighour",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "darveau",
+      "username": "demo_darveau",
+      "display_name": "Darveau",
+      "email": "demo_darveau@example.test",
+      "role": "commissaire_des_vannes",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "felix_reignbow",
+      "username": "demo_felix_reignbow",
+      "display_name": "Félix",
+      "email": "demo_felix_reignbow@example.test",
+      "role": "militant_reignbow_attache_aux_symboles",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "drapeau",
+      "username": "demo_drapeau",
+      "display_name": "Drapeau",
+      "email": "demo_drapeau@example.test",
+      "role": "juriste_des_avantages_informels",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "koa",
+      "username": "demo_koa",
+      "display_name": "kOA",
+      "email": "demo_koa@example.test",
+      "role": "systeme_audit_classement_des_risques",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "vladimir_poutine",
+      "username": "demo_vladimir_poutine",
+      "display_name": "Vladimir Poutine",
+      "email": "demo_vladimir_poutine@example.test",
+      "role": "figure_publique_fictionnalisee_pouvoir_d_etat",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "donald_trump",
+      "username": "demo_donald_trump",
+      "display_name": "Donald Trump",
+      "email": "demo_donald_trump@example.test",
+      "role": "figure_publique_fictionnalisee_pression_imperiale",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "pope_leo",
+      "username": "demo_pope_leo",
+      "display_name": "Pope Leo XIV",
+      "email": "demo_pope_leo@example.test",
+      "role": "figure_publique_fictionnalisee_autorite_spirituelle",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "barack_obama",
+      "username": "demo_barack_obama",
+      "display_name": "Barack Obama",
+      "email": "demo_barack_obama@example.test",
+      "role": "figure_publique_fictionnalisee_constitutionnalisme_civique",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "jean_charest",
+      "username": "demo_jean_charest",
+      "display_name": "Jean Charest",
+      "email": "demo_jean_charest@example.test",
+      "role": "figure_publique_fictionnalisee_federalisme_et_negociation",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "lady_gaga",
+      "username": "demo_lady_gaga",
+      "display_name": "Lady Gaga",
+      "email": "demo_lady_gaga@example.test",
+      "role": "figure_publique_fictionnalisee_performance_symbole_et_refus",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "elvis_gratton",
+      "username": "demo_elvis_gratton",
+      "display_name": "Elvis Gratton",
+      "email": "demo_elvis_gratton@example.test",
+      "role": "personnage_satirique_populisme_spectacle",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "momus",
+      "username": "demo_momus",
+      "display_name": "Momus",
+      "email": "demo_momus@example.test",
+      "role": "personnage_satirique_critique_moqueuse_leo_baptiste_barrista",
+      "is_ethikos_elite": false
+    },
+    {
+      "key": "reignbow",
+      "username": "demo_reignbow",
+      "display_name": "Reignbow",
+      "email": "demo_reignbow@example.test",
+      "role": "mouvement_plateforme_a_contenir",
+      "is_ethikos_elite": true
+    },
+    {
+      "key": "kristal_farms",
+      "username": "demo_kristal_farms",
+      "display_name": "Kristal Farms",
+      "email": "demo_kristal_farms@example.test",
+      "role": "infrastructure_serres_calcul_chaleur_droit",
+      "is_ethikos_elite": true
+    }
+  ],
+  "categories": [
+    {
+      "key": "asile_libre",
+      "name": "Asile libre",
+      "description": "Protection sans possession, droit de sortie, droit de retour, ponts réels et refus de la cage humanitaire."
+    },
+    {
+      "key": "pouvoir_symbolique",
+      "name": "Pouvoir symbolique",
+      "description": "Charisme, gratitude, mots dangereux, images, performance politique, culte du fondateur et neutralité des espaces vulnérables."
+    },
+    {
+      "key": "souverainete",
+      "name": "Souveraineté",
+      "description": "Refus éthique, incompatibilité, empire, négociation, audit multilatéral et limites du pouvoir privé."
+    },
+    {
+      "key": "donnees_memoires",
+      "name": "Données et mémoire",
+      "description": "Données minimales, archives auditables, confidentialité, droit de correction, portabilité et mémoire hors capture."
+    },
+    {
+      "key": "territoires_soins",
+      "name": "Territoires et soins",
+      "description": "Droit de limite des peuples du territoire, corridor civil, réciprocité, soins non mythologiques et communautés partenaires non absorbées."
+    }
+  ],
+  "topics": [
+    {
+      "key": "asile_sans_cage",
+      "title": "[DEMO] Un asile peut-il protéger sans posséder?",
+      "description": "King Klown pose la question centrale: comment offrir refuge, chaleur, soins et sécurité sans transformer le village en camp, l’aide en dette ou la gratitude en obligation.",
+      "status": "open",
+      "category": "asile_libre",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    },
+    {
+      "key": "droit_sortie_ponts",
+      "title": "[DEMO] Une porte suffit-elle si personne n’a de pont?",
+      "description": "Les participants débattent du droit de sortie réel: documents portables, argent non captif, réseaux hors consortium, formation transférable et possibilité de revenir sans humiliation.",
+      "status": "open",
+      "category": "asile_libre",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    },
+    {
+      "key": "mots_dangereux",
+      "title": "[DEMO] Qui a le droit de définir les mots dangereux?",
+      "description": "Les mots asile, arche, guerre, refus et sauvetage sont examinés comme des objets politiques: ils peuvent protéger, enfermer, vendre ou mentir tout en disant quelque chose de vrai.",
+      "status": "open",
+      "category": "pouvoir_symbolique",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    },
+    {
+      "key": "fondateur_contenu",
+      "title": "[DEMO] Le fondateur doit-il parler en dernier?",
+      "description": "King Klown met sur la table sa propre gravité: peut-on utiliser une figure fondatrice sans que tout s’organise autour de son image, de son absence, de ses phrases ou de son nez turquoise?",
+      "status": "open",
+      "category": "pouvoir_symbolique",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    },
+    {
+      "key": "refus_empire",
+      "title": "[DEMO] Peut-on refuser un empire sans devenir un empire?",
+      "description": "La Clause d’Incompatibilité Éthique, les Kristal Farms et le protocole Rêvasseur posent une question de puissance: quand un non protège-t-il, et quand devient-il domination privée?",
+      "status": "open",
+      "category": "souverainete",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    },
+    {
+      "key": "donnees_memoires",
+      "title": "[DEMO] Les dossiers doivent-ils voyager moins librement que les personnes?",
+      "description": "La communauté examine données minimales, droit d’accès, correction, retrait, archives, audits, confidentialité des locataires et interdiction de transfert sans motif écrit.",
+      "status": "open",
+      "category": "donnees_memoires",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    },
+    {
+      "key": "territoires_soins",
+      "title": "[DEMO] Les communautés hôtes peuvent-elles dire non à l’expansion?",
+      "description": "Niviaq et Marisol déplacent le centre: les peuples du territoire, Cuba, les villages et les soignants ne doivent pas devenir vitrines, coûts invisibles ou annexes du mythe de King Klown.",
+      "status": "open",
+      "category": "territoires_soins",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    },
+    {
+      "key": "demontabilite",
+      "title": "[DEMO] Ce qui sauve doit-il pouvoir se démonter?",
+      "description": "À partir de la pièce des enfants, la table examine le principe de démontabilité: toute infrastructure de protection doit pouvoir être transformée, quittée, contestée ou démantelée sans perte de droits.",
+      "status": "open",
+      "category": "asile_libre",
+      "start_date": "2026-05-01",
+      "end_date": "2026-08-31"
+    }
+  ],
+  "stances": [
+    {
+      "topic": "asile_sans_cage",
+      "actor": "king_klown",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "king_klown",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "king_klown",
+      "value": 2
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "king_klown",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "king_klown",
+      "value": 3
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "king_klown",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "king_klown",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "king_klown",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "aida",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "yusufa",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "yusufa",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "yusufa",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "yusufa",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "yusufa",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "yusufa",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "yusufa",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "yusufa",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "niviaq",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "niviaq",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "niviaq",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "niviaq",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "niviaq",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "niviaq",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "niviaq",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "niviaq",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "marisol",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "marisol",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "marisol",
+      "value": 2
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "marisol",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "marisol",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "marisol",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "marisol",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "marisol",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "idris",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "idris",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "idris",
+      "value": 2
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "idris",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "idris",
+      "value": 1
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "idris",
+      "value": 1
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "idris",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "idris",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "eliane",
+      "value": 2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "eliane",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "eliane",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "eliane",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "eliane",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "eliane",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "eliane",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "eliane",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "rahima",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "rahima",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "rahima",
+      "value": 2
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "rahima",
+      "value": 2
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "rahima",
+      "value": 1
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "rahima",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "rahima",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "rahima",
+      "value": 2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "darveau",
+      "value": 2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "darveau",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "darveau",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "darveau",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "darveau",
+      "value": 3
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "darveau",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "darveau",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "darveau",
+      "value": 2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "felix_reignbow",
+      "value": 1
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "felix_reignbow",
+      "value": 1
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "felix_reignbow",
+      "value": -1
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "felix_reignbow",
+      "value": -1
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "felix_reignbow",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "felix_reignbow",
+      "value": 1
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "felix_reignbow",
+      "value": 0
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "felix_reignbow",
+      "value": 0
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "drapeau",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "drapeau",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "drapeau",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "drapeau",
+      "value": 2
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "drapeau",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "drapeau",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "drapeau",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "drapeau",
+      "value": 2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "koa",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "vladimir_poutine",
+      "value": -2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "vladimir_poutine",
+      "value": -2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "vladimir_poutine",
+      "value": -1
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "vladimir_poutine",
+      "value": -3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "vladimir_poutine",
+      "value": -1
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "vladimir_poutine",
+      "value": -2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "vladimir_poutine",
+      "value": -2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "vladimir_poutine",
+      "value": -2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "donald_trump",
+      "value": -3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "donald_trump",
+      "value": -2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "donald_trump",
+      "value": -2
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "donald_trump",
+      "value": -3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "donald_trump",
+      "value": -3
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "donald_trump",
+      "value": -2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "donald_trump",
+      "value": -2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "donald_trump",
+      "value": -2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "pope_leo",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "pope_leo",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "pope_leo",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "pope_leo",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "pope_leo",
+      "value": 1
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "pope_leo",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "pope_leo",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "pope_leo",
+      "value": 2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "barack_obama",
+      "value": 3
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "barack_obama",
+      "value": 3
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "barack_obama",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "barack_obama",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "barack_obama",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "barack_obama",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "barack_obama",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "barack_obama",
+      "value": 2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "jean_charest",
+      "value": 2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "jean_charest",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "jean_charest",
+      "value": 2
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "jean_charest",
+      "value": 2
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "jean_charest",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "jean_charest",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "jean_charest",
+      "value": 3
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "jean_charest",
+      "value": 2
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "lady_gaga",
+      "value": 2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "lady_gaga",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "lady_gaga",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "lady_gaga",
+      "value": 2
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "lady_gaga",
+      "value": 0
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "lady_gaga",
+      "value": 1
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "lady_gaga",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "lady_gaga",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "elvis_gratton",
+      "value": -1
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "elvis_gratton",
+      "value": 0
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "elvis_gratton",
+      "value": -1
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "elvis_gratton",
+      "value": -1
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "elvis_gratton",
+      "value": -1
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "elvis_gratton",
+      "value": -1
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "elvis_gratton",
+      "value": 0
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "elvis_gratton",
+      "value": -1
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "momus",
+      "value": 2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "momus",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "momus",
+      "value": 3
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "momus",
+      "value": 3
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "momus",
+      "value": 1
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "momus",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "momus",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "momus",
+      "value": 3
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "reignbow",
+      "value": 2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "reignbow",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "reignbow",
+      "value": 1
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "reignbow",
+      "value": 1
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "reignbow",
+      "value": 2
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "reignbow",
+      "value": 2
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "reignbow",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "reignbow",
+      "value": 1
+    },
+    {
+      "topic": "asile_sans_cage",
+      "actor": "kristal_farms",
+      "value": 2
+    },
+    {
+      "topic": "droit_sortie_ponts",
+      "actor": "kristal_farms",
+      "value": 2
+    },
+    {
+      "topic": "mots_dangereux",
+      "actor": "kristal_farms",
+      "value": 1
+    },
+    {
+      "topic": "fondateur_contenu",
+      "actor": "kristal_farms",
+      "value": 2
+    },
+    {
+      "topic": "refus_empire",
+      "actor": "kristal_farms",
+      "value": 3
+    },
+    {
+      "topic": "donnees_memoires",
+      "actor": "kristal_farms",
+      "value": 3
+    },
+    {
+      "topic": "territoires_soins",
+      "actor": "kristal_farms",
+      "value": 2
+    },
+    {
+      "topic": "demontabilite",
+      "actor": "kristal_farms",
+      "value": 2
+    }
+  ],
+  "arguments": [
+    {
+      "key": "king_asile_phrase",
+      "topic": "asile_sans_cage",
+      "actor": "king_klown",
+      "side": "pro",
+      "content": "Dans cette scène fictive, King Klown défend l’idée qu’un refuge digne ne garde pas les gens à l’intérieur: il tient certains dangers assez loin pour que les personnes choisissent leurs portes, leurs ponts et leurs refus."
+    },
+    {
+      "key": "aida_protocole_asile",
+      "topic": "asile_sans_cage",
+      "actor": "aida",
+      "side": "pro",
+      "content": "Aïda insiste pour que le mot asile ne soit jamais utilisé sans définition, audit, droit de sortie, droit de contestation et capacité de corriger celui qui l’a rendu possible."
+    },
+    {
+      "key": "yusufa_non_appartenance",
+      "topic": "asile_sans_cage",
+      "actor": "yusufa",
+      "side": "pro",
+      "content": "Yusufa rappelle que les familles protégées ne doivent pas devenir des preuves vivantes du génie de King Klown; le village doit protéger le droit de ne pas lui appartenir."
+    },
+    {
+      "key": "idris_sortir_meme_si",
+      "topic": "droit_sortie_ponts",
+      "actor": "idris",
+      "side": "pro",
+      "content": "Idris pose la question qui coupe la salle: si King Klown, la majorité, la peur ou la tristesse disent de rester, est-ce que quelqu’un peut partir quand même?"
+    },
+    {
+      "key": "niviaq_ponts_territoires",
+      "topic": "droit_sortie_ponts",
+      "actor": "niviaq",
+      "side": "pro",
+      "content": "Niviaq demande que le droit de sortie inclue des ponts réels: compétences transférables, documents portables, langue, réseaux, territoire respecté et possibilité de ne pas être absorbé."
+    },
+    {
+      "key": "obama_rule_of_law",
+      "topic": "droit_sortie_ponts",
+      "actor": "barack_obama",
+      "side": "pro",
+      "content": "Dans cette scène fictive, Obama soutient qu’une liberté écrite sans moyens pratiques ressemble à un droit constitutionnel sans institution capable de l’honorer."
+    },
+    {
+      "key": "lady_gaga_image_vraie",
+      "topic": "mots_dangereux",
+      "actor": "lady_gaga",
+      "side": "pro",
+      "content": "Dans cette scène fictive, Lady Gaga rappelle qu’une image vraie peut mentir si elle sait trop bien ce qu’elle veut faire ressentir; la beauté d’un symbole n’abolit pas son risque."
+    },
+    {
+      "key": "momus_mots_mordent",
+      "topic": "mots_dangereux",
+      "actor": "momus",
+      "side": "pro",
+      "content": "Momus traite les mots comme des chiens bien dressés: plus ils semblent obéir, plus il faut vérifier qui tient la laisse."
+    },
+    {
+      "key": "elvis_gratton_spectacle",
+      "topic": "mots_dangereux",
+      "actor": "elvis_gratton",
+      "side": "con",
+      "content": "Elvis Gratton veut garder les mots les plus vendeurs parce qu’un bon slogan, dans son esprit, vaut souvent plus qu’une clause trop longue."
+    },
+    {
+      "key": "darveau_contenance",
+      "topic": "fondateur_contenu",
+      "actor": "darveau",
+      "side": "pro",
+      "content": "Darveau soutient que King Klown ne doit jamais devenir une source de légitimité supérieure: les machines tombent en panne, mais les peuples en adoration réparent moins vite."
+    },
+    {
+      "key": "felix_symboles",
+      "topic": "fondateur_contenu",
+      "actor": "felix_reignbow",
+      "side": "con",
+      "content": "Félix craint qu’en neutralisant les symboles, on stérilise le mouvement; pour lui, Reignbow risque de perdre la couleur qui a rendu les gens capables d’agir."
+    },
+    {
+      "key": "pope_leo_autorite_spirituelle",
+      "topic": "fondateur_contenu",
+      "actor": "pope_leo",
+      "side": "pro",
+      "content": "Dans cette scène fictive, Pope Leo XIV avertit qu’une autorité morale cesse d’être morale lorsqu’elle rend le refus coupable ou la gratitude obligatoire."
+    },
+    {
+      "key": "trump_undo",
+      "topic": "refus_empire",
+      "actor": "donald_trump",
+      "side": "con",
+      "content": "Dans cette scène fictive, Donald Trump représente la logique selon laquelle tout refus doit avoir un prix, une faille, une négociation ou une façon d’être défait."
+    },
+    {
+      "key": "poutine_stabilite",
+      "topic": "refus_empire",
+      "actor": "vladimir_poutine",
+      "side": "con",
+      "content": "Dans cette scène fictive, Vladimir Poutine voit dans le refus éthique un précédent dangereux: un pouvoir qui peut dire non sans attendre la permission échappe à la discipline des États."
+    },
+    {
+      "key": "charest_negociation",
+      "topic": "refus_empire",
+      "actor": "jean_charest",
+      "side": "neutral",
+      "content": "Dans cette scène fictive, Jean Charest cherche une voie négociée: protéger la clause, éviter la capture impériale, mais construire des mécanismes d’arbitrage que les partenaires publics peuvent comprendre."
+    },
+    {
+      "key": "koa_classement_risque",
+      "topic": "donnees_memoires",
+      "actor": "koa",
+      "side": "pro",
+      "content": "kOA classe le risque principal ainsi: un village devient camp lorsque les dossiers voyagent plus librement que les personnes."
+    },
+    {
+      "key": "drapeau_avantages_informels",
+      "topic": "donnees_memoires",
+      "actor": "drapeau",
+      "side": "pro",
+      "content": "Drapeau demande d’inclure les pressions sociales et les avantages informels: l’obligation symbolique peut passer par une faveur, une évaluation ou un accès privilégié."
+    },
+    {
+      "key": "kristal_boite_noire",
+      "topic": "donnees_memoires",
+      "actor": "kristal_farms",
+      "side": "pro",
+      "content": "Kristal Farms défend la boîte noire volontaire: l’hôte voit chaleur, énergie, alarmes et état physique, mais pas le contenu des locataires ni les journaux applicatifs."
+    },
+    {
+      "key": "marisol_cuba_soin",
+      "topic": "territoires_soins",
+      "actor": "marisol",
+      "side": "pro",
+      "content": "Marisol refuse que Cuba devienne l’infirmerie du mythe: le corridor civil Nord–Cuba doit être un mécanisme réciproque de soin, de logistique et de résilience."
+    },
+    {
+      "key": "rahima_gratitude_enfants",
+      "topic": "territoires_soins",
+      "actor": "rahima",
+      "side": "neutral",
+      "content": "Rahima veut que les enfants se souviennent de l’aide reçue sans être condamnés à remercier toute leur vie."
+    },
+    {
+      "key": "eliane_enquete_rêvasseur",
+      "topic": "territoires_soins",
+      "actor": "eliane",
+      "side": "pro",
+      "content": "Éliane cherche les adresses sous les métaphores: quand un mot comme Rêvasseur a un budget, la poésie devient un objet d’enquête publique."
+    },
+    {
+      "key": "aida_demontable",
+      "topic": "demontabilite",
+      "actor": "aida",
+      "side": "pro",
+      "content": "Aïda formalise le principe de démontabilité: toute infrastructure de protection doit pouvoir être transformée, quittée, contestée ou démantelée sans que les personnes protégées perdent leurs droits."
+    },
+    {
+      "key": "idris_arche_porte",
+      "topic": "demontabilite",
+      "actor": "idris",
+      "side": "pro",
+      "content": "Idris préfère une arche qu’on peut démonter pour faire un quai, une serre, une maison, un théâtre et une table."
+    },
+    {
+      "key": "reignbow_attention",
+      "topic": "demontabilite",
+      "actor": "reignbow",
+      "side": "neutral",
+      "content": "Reignbow accepte qu’une infrastructure utile devienne dangereuse si elle ne sait plus distribuer l’attention, la mémoire et la décision hors de son fondateur."
+    }
+  ],
+  "consultations": [
+    {
+      "key": "asile_sans_cage_vote",
+      "title": "[DEMO] Définition de l’asile libre",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "asile_libre",
+          "label": "Asile libre avec droit de sortie, refus et critique"
+        },
+        {
+          "key": "camp_securise",
+          "label": "Camp sécurisé avec protection forte"
+        },
+        {
+          "key": "corridor_temporaire",
+          "label": "Corridor temporaire sans appartenance symbolique"
+        },
+        {
+          "key": "refus_du_projet",
+          "label": "Refuser le projet tant que le risque de cage demeure"
+        }
+      ]
+    },
+    {
+      "key": "droit_sortie_ponts_vote",
+      "title": "[DEMO] Portes, ponts et retour",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "portes_seulement",
+          "label": "Garantir seulement le droit légal de sortir"
+        },
+        {
+          "key": "portes_et_ponts",
+          "label": "Garantir portes, ponts, documents, compétences et réseaux"
+        },
+        {
+          "key": "retour_conditionnel",
+          "label": "Autoriser le retour sous conditions de sécurité"
+        },
+        {
+          "key": "sortie_autonome_auditee",
+          "label": "Créer un audit indépendant du droit réel de sortie"
+        }
+      ]
+    },
+    {
+      "key": "mots_dangereux_vote",
+      "title": "[DEMO] Gouvernance des mots dangereux",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "king_definit",
+          "label": "Laisser King Klown proposer les définitions"
+        },
+        {
+          "key": "comites_definissent",
+          "label": "Confier les définitions aux comités et juristes"
+        },
+        {
+          "key": "concernes_definissent",
+          "label": "Donner priorité aux personnes et communautés concernées"
+        },
+        {
+          "key": "usage_interdit",
+          "label": "Interdire les mots trop chargés comme asile ou arche"
+        }
+      ]
+    },
+    {
+      "key": "fondateur_contenu_vote",
+      "title": "[DEMO] Place du fondateur",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "fondateur_d_abord",
+          "label": "Le fondateur explique d’abord"
+        },
+        {
+          "key": "fondateur_en_dernier",
+          "label": "Le fondateur parle en dernier"
+        },
+        {
+          "key": "absence_productive",
+          "label": "Organiser des moments sans King Klown"
+        },
+        {
+          "key": "comite_sans_fondateur",
+          "label": "Décisions critiques sans vote du fondateur"
+        }
+      ]
+    },
+    {
+      "key": "refus_empire_vote",
+      "title": "[DEMO] Refus éthique et puissance",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "acces_aux_etats",
+          "label": "Accorder un accès exceptionnel aux États puissants"
+        },
+        {
+          "key": "refus_ethique_procedure",
+          "label": "Maintenir le refus éthique procédural"
+        },
+        {
+          "key": "audit_multilateral",
+          "label": "Remplacer l’accès par un audit multilatéral indépendant"
+        },
+        {
+          "key": "negociation_ad_hoc",
+          "label": "Négocier au cas par cas avec garanties"
+        }
+      ]
+    },
+    {
+      "key": "donnees_memoires_vote",
+      "title": "[DEMO] Données, dossiers et archives",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "donnees_minimales",
+          "label": "Données minimales, accès, correction et retrait"
+        },
+        {
+          "key": "audit_dossiers",
+          "label": "Audit régulier des dossiers et transferts"
+        },
+        {
+          "key": "etat_partage",
+          "label": "Partage contrôlé avec les États partenaires"
+        },
+        {
+          "key": "archives_portables",
+          "label": "Archives portables contrôlées par les personnes"
+        }
+      ]
+    },
+    {
+      "key": "territoires_soins_vote",
+      "title": "[DEMO] Limites des communautés hôtes",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "expansion_prioritaire",
+          "label": "Prioriser l’expansion rapide des villages"
+        },
+        {
+          "key": "consentement_territorial",
+          "label": "Exiger consentement territorial et droit de refus"
+        },
+        {
+          "key": "droit_de_pause",
+          "label": "Reconnaître le droit de pause, révision et retrait"
+        },
+        {
+          "key": "pactes_renouvelables",
+          "label": "Créer des pactes renouvelables avec parts du pacte"
+        }
+      ]
+    },
+    {
+      "key": "demontabilite_vote",
+      "title": "[DEMO] Principe de démontabilité",
+      "status": "open",
+      "open_date": "2026-05-01",
+      "close_date": "2026-08-31",
+      "options": [
+        {
+          "key": "infrastructure_demontable",
+          "label": "Toute protection doit pouvoir être transformée ou démantelée"
+        },
+        {
+          "key": "protection_permanente",
+          "label": "Protection permanente sous gouvernance centrale"
+        },
+        {
+          "key": "transition_autogouvernee",
+          "label": "Planifier la transition vers l’autogouvernance locale"
+        },
+        {
+          "key": "arche_centrale",
+          "label": "Construire une arche centrale forte et durable"
+        }
+      ]
+    }
+  ],
+  "consultation_votes": [
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "king_klown",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "aida",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "yusufa",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "niviaq",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "marisol",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "idris",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "eliane",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "rahima",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "darveau",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "felix_reignbow",
+      "option": "corridor_temporaire",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "drapeau",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "koa",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "vladimir_poutine",
+      "option": "camp_securise",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "donald_trump",
+      "option": "camp_securise",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "pope_leo",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "barack_obama",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "jean_charest",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "lady_gaga",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "elvis_gratton",
+      "option": "corridor_temporaire",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "momus",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "reignbow",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "actor": "kristal_farms",
+      "option": "asile_libre",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "king_klown",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "aida",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "yusufa",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "niviaq",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "marisol",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "idris",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "eliane",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "rahima",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "darveau",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "felix_reignbow",
+      "option": "sortie_autonome_auditee",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "drapeau",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "koa",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "vladimir_poutine",
+      "option": "portes_seulement",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "donald_trump",
+      "option": "portes_seulement",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "pope_leo",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "barack_obama",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "jean_charest",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "lady_gaga",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "elvis_gratton",
+      "option": "sortie_autonome_auditee",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "momus",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "reignbow",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "actor": "kristal_farms",
+      "option": "portes_et_ponts",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "king_klown",
+      "option": "comites_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "aida",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "yusufa",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "niviaq",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "marisol",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "idris",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "eliane",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "rahima",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "darveau",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "felix_reignbow",
+      "option": "king_definit",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "drapeau",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "koa",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "vladimir_poutine",
+      "option": "king_definit",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "donald_trump",
+      "option": "king_definit",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "pope_leo",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "barack_obama",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "jean_charest",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "lady_gaga",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "elvis_gratton",
+      "option": "king_definit",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "momus",
+      "option": "concernes_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "reignbow",
+      "option": "comites_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "actor": "kristal_farms",
+      "option": "comites_definissent",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "king_klown",
+      "option": "absence_productive",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "aida",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "yusufa",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "niviaq",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "marisol",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "idris",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "eliane",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "rahima",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "darveau",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "felix_reignbow",
+      "option": "fondateur_d_abord",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "drapeau",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "koa",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "vladimir_poutine",
+      "option": "fondateur_d_abord",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "donald_trump",
+      "option": "fondateur_d_abord",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "pope_leo",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "barack_obama",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "jean_charest",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "lady_gaga",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "elvis_gratton",
+      "option": "fondateur_d_abord",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "momus",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "reignbow",
+      "option": "absence_productive",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "actor": "kristal_farms",
+      "option": "fondateur_en_dernier",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "king_klown",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "aida",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "yusufa",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "niviaq",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "marisol",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "idris",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "eliane",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "rahima",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "darveau",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "felix_reignbow",
+      "option": "audit_multilateral",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "drapeau",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "koa",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "vladimir_poutine",
+      "option": "acces_aux_etats",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "donald_trump",
+      "option": "acces_aux_etats",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "pope_leo",
+      "option": "audit_multilateral",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "barack_obama",
+      "option": "audit_multilateral",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "jean_charest",
+      "option": "audit_multilateral",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "lady_gaga",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "elvis_gratton",
+      "option": "audit_multilateral",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "momus",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "reignbow",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "actor": "kristal_farms",
+      "option": "refus_ethique_procedure",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "king_klown",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "aida",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "yusufa",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "niviaq",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "marisol",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "idris",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "eliane",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "rahima",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "darveau",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "felix_reignbow",
+      "option": "audit_dossiers",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "drapeau",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "koa",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "vladimir_poutine",
+      "option": "etat_partage",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "donald_trump",
+      "option": "etat_partage",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "pope_leo",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "barack_obama",
+      "option": "audit_dossiers",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "jean_charest",
+      "option": "audit_dossiers",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "lady_gaga",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "elvis_gratton",
+      "option": "audit_dossiers",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "momus",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "reignbow",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "actor": "kristal_farms",
+      "option": "donnees_minimales",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "king_klown",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "aida",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "yusufa",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "niviaq",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "marisol",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "idris",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "eliane",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "rahima",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "darveau",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "felix_reignbow",
+      "option": "pactes_renouvelables",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "drapeau",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "koa",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "vladimir_poutine",
+      "option": "expansion_prioritaire",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "donald_trump",
+      "option": "expansion_prioritaire",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "pope_leo",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "barack_obama",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "jean_charest",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "lady_gaga",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "elvis_gratton",
+      "option": "pactes_renouvelables",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "momus",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "reignbow",
+      "option": "consentement_territorial",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "actor": "kristal_farms",
+      "option": "pactes_renouvelables",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "king_klown",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "aida",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.45
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "yusufa",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "niviaq",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "marisol",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.35
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "idris",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "eliane",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "rahima",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "darveau",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.3
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "felix_reignbow",
+      "option": "transition_autogouvernee",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "drapeau",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "koa",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.4
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "vladimir_poutine",
+      "option": "protection_permanente",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "donald_trump",
+      "option": "protection_permanente",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "pope_leo",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "barack_obama",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "jean_charest",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "lady_gaga",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "elvis_gratton",
+      "option": "protection_permanente",
+      "raw_value": 1,
+      "weighted_value": 1.0
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "momus",
+      "option": "infrastructure_demontable",
+      "raw_value": 1,
+      "weighted_value": 1.1
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "reignbow",
+      "option": "transition_autogouvernee",
+      "raw_value": 1,
+      "weighted_value": 1.2
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "actor": "kristal_farms",
+      "option": "transition_autogouvernee",
+      "raw_value": 1,
+      "weighted_value": 1.25
+    }
+  ],
+  "impact_items": [
+    {
+      "consultation": "asile_sans_cage_vote",
+      "action": "Publier la définition opérationnelle de l’asile libre avec droit de sortie, contestation, refus du symbole et accès au droit commun",
+      "status": "planned",
+      "date": "2026-06-05"
+    },
+    {
+      "consultation": "asile_sans_cage_vote",
+      "action": "Créer un registre public des clauses qui empêchent la transformation des villages en camps",
+      "status": "planned",
+      "date": "2026-06-20"
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "action": "Mettre en place les ponts minimaux: documents portables, formation transférable, réseaux hors consortium et économies personnelles non captives",
+      "status": "planned",
+      "date": "2026-07-01"
+    },
+    {
+      "consultation": "droit_sortie_ponts_vote",
+      "action": "Auditer trimestriellement si les personnes peuvent partir, revenir et critiquer sans perdre leurs droits",
+      "status": "planned",
+      "date": "2026-08-01"
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "action": "Créer un protocole des mots dangereux pour asile, arche, guerre, refus, sauvetage et gratitude",
+      "status": "in_progress",
+      "date": "2026-06-10"
+    },
+    {
+      "consultation": "mots_dangereux_vote",
+      "action": "Remplacer les campagnes trop belles par des formulations moins vendables mais plus exactes",
+      "status": "planned",
+      "date": "2026-06-30"
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "action": "Adopter la règle: l’explication du fondateur ne précède pas l’expérience des concernés",
+      "status": "in_progress",
+      "date": "2026-06-15"
+    },
+    {
+      "consultation": "fondateur_contenu_vote",
+      "action": "Organiser des assemblées sans King Klown, sans citation de King Klown et sans image centrale de King Klown",
+      "status": "planned",
+      "date": "2026-07-12"
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "action": "Formaliser l’audit multilatéral du protocole Rêvasseur sans accès unilatéral d’un État incompatible",
+      "status": "planned",
+      "date": "2026-07-20"
+    },
+    {
+      "consultation": "refus_empire_vote",
+      "action": "Publier un guide expliquant la différence entre refus, guerre, sanction, protection et capture",
+      "status": "planned",
+      "date": "2026-06-25"
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "action": "Établir la règle données minimales: accès, correction, retrait lorsque possible, motifs écrits pour tout transfert",
+      "status": "in_progress",
+      "date": "2026-06-18"
+    },
+    {
+      "consultation": "donnees_memoires_vote",
+      "action": "Créer un coffre d’archives portables contrôlé par les personnes et audité par un organe indépendant",
+      "status": "planned",
+      "date": "2026-08-10"
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "action": "Négocier les parts du pacte avec les communautés hôtes avant toute expansion des villages",
+      "status": "planned",
+      "date": "2026-07-05"
+    },
+    {
+      "consultation": "territoires_soins_vote",
+      "action": "Confirmer que le corridor civil Nord–Cuba n’est pas une annexe de l’asile mais un mécanisme réciproque de soin",
+      "status": "planned",
+      "date": "2026-07-18"
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "action": "Inscrire le principe de démontabilité dans les statuts des infrastructures de protection",
+      "status": "planned",
+      "date": "2026-08-15"
+    },
+    {
+      "consultation": "demontabilite_vote",
+      "action": "Transformer une arche symbolique en table de délibération, serre, quai, maison et théâtre communautaire dans le scénario de démonstration",
+      "status": "planned",
+      "date": "2026-08-25"
+    }
+  ]
+}
