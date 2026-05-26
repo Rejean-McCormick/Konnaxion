@@ -33,6 +33,7 @@ const HOME_SUITE_COOKIE = 'konnaxion.homeSuite';
 // Normalize cookie value
 function normalizeSuite(raw: string | undefined | null): SuiteKey {
   const value = (raw ?? '').toLowerCase();
+
   if (
     value === 'ekoh' ||
     value === 'ethikos' ||
@@ -42,33 +43,42 @@ function normalizeSuite(raw: string | undefined | null): SuiteKey {
   ) {
     return value;
   }
-  return 'ekoh'; // default fallback
+
+  return 'ekoh';
 }
 
-/**
- * Backend URL logic
- *
- * En développement:
- *   - on lit NEXT_PUBLIC_API_BASE (typiquement http://localhost:8000/api)
- *
- * En production (NODE_ENV=production):
- *   - on force l’URL publique officielle, même si un ancien .env contient encore localhost
- */
-const PROD_API_BASE = 'https://api.konnaxion.com/api';
+function normalizeOptionalBase(value: string | undefined | null): string {
+  return (value ?? '').trim().replace(/\/+$/, '');
+}
 
-const RAW_API_BASE =
-  process.env.NODE_ENV === 'production'
-    ? PROD_API_BASE
-    : process.env.NEXT_PUBLIC_API_BASE ?? PROD_API_BASE;
+function backendRootFromEnv(): string {
+  const explicitBackendBase = normalizeOptionalBase(
+    process.env.NEXT_PUBLIC_BACKEND_BASE,
+  );
 
-// Strip trailing slash and optional /api
-const BACKEND_ROOT = RAW_API_BASE.replace(/\/+$/, '').replace(/\/api$/, '');
+  if (explicitBackendBase) {
+    return explicitBackendBase;
+  }
 
-// Log serveur pour diagnostiquer en prod (visible dans journalctl -u konnaxion-frontend)
+  const apiBase = normalizeOptionalBase(
+    process.env.NEXT_PUBLIC_API_BASE ?? '/api',
+  );
+
+  // Same-origin API path: keep login/signup same-origin too.
+  if (!apiBase || apiBase.startsWith('/')) {
+    return '';
+  }
+
+  // Absolute API URL: strip optional /api suffix to get backend root.
+  return apiBase.replace(/\/api$/, '');
+}
+
+const BACKEND_ROOT = backendRootFromEnv();
+
 if (process.env.NODE_ENV === 'production') {
   console.log(
     '[Konnaxion] Home page BACKEND_ROOT (prod) =',
-    BACKEND_ROOT || '(empty)',
+    BACKEND_ROOT || '(same-origin)',
   );
 }
 
@@ -82,7 +92,6 @@ const BACKEND_SIGNUP_URL = BACKEND_ROOT
   : '/accounts/signup/';
 
 export default async function Page() {
-  // In newer Next/TypeScript typings, cookies() is async and returns a Promise<ReadonlyRequestCookies>
   const store = await cookies();
   const rawPref = store.get(HOME_SUITE_COOKIE)?.value ?? null;
 

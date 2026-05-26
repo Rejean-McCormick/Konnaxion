@@ -12,183 +12,158 @@ import {
   GlobalOutlined,
   HighlightOutlined,
   HomeOutlined,
-  IdcardOutlined,
-  LinkOutlined,
   MessageOutlined,
   PictureOutlined,
   ProfileOutlined,
   SearchOutlined,
-  ShopOutlined,
   StarOutlined,
   TeamOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
 
-type Route = {
-  path?: string;
-  name: string;
-  icon?: React.ReactNode;
-  views?: Route[];
-};
+import type { Route } from "./types";
 
+/**
+ * Kreative module navigation.
+ *
+ * Keep every sidebar path aligned with an existing Next.js app route page.
+ * Old archive, connect, art, and short Kreative paths are not exposed unless
+ * matching pages exist.
+ */
 export const KREATIVE_ROUTES = {
-  kreative: {
-    hub: "/kreative",
+  dashboard: "/kreative/dashboard",
 
-    // Konservation canonical surfaces.
-    gallery: "/kreative/gallery",
-    exhibitions: "/kreative/exhibitions",
-    incubator: "/kreative/incubator",
-    submitWork: "/kreative/submit",
-    showcase: "/kreative/showcase",
-    topCreators: "/kreative/top-creators",
-
-    // Dynamic route, intentionally not exposed directly in sidebar:
-    // /art/[id]
-    artworkSheet: "/art/[id]",
-  },
-
-  archive: {
-    root: "/archive",
-    heritage: "/archive/heritage",
-    partners: "/archive/partners",
-    aiCatalogue: "/archive/ai-catalogue",
-  },
-
-  connect: {
-    root: "/connect",
-    people: "/connect/people",
-    opportunities: "/connect/opportunities",
-    workspaces: "/connect/workspaces",
-    endorsements: "/connect/endorsements",
-    mentorship: "/connect/mentorship",
-
-    // Dynamic route, intentionally not exposed directly in sidebar:
-    // /profile/[user]
-    profile: "/profile/[user]",
-  },
-
-  legacy: {
-    // Keep these as compatibility targets or redirects while pages migrate.
+  showcases: {
     featuredProjects: "/kreative/community-showcases/featured-projects",
     topCreators: "/kreative/community-showcases/top-creators",
     submitToShowcase: "/kreative/community-showcases/submit-to-showcase",
+  },
 
+  creativeHub: {
     exploreIdeas: "/kreative/creative-hub/explore-ideas",
-    submitCreativeWork: "/kreative/creative-hub/submit-creative-work",
     inspirationGallery: "/kreative/creative-hub/inspiration-gallery",
+    submitCreativeWork: "/kreative/creative-hub/submit-creative-work",
+  },
 
+  incubator: {
     collaborateOnIdeas: "/kreative/idea-incubator/collaborate-on-ideas",
     createNewIdea: "/kreative/idea-incubator/create-new-idea",
     myIdeas: "/kreative/idea-incubator/my-ideas",
+  },
 
-    traditionsArchive: "/kreative/traditions-archive",
-    mentorship: "/kreative/mentorship",
-
+  collaborativeSpaces: {
     findSpaces: "/kreative/collaborative-spaces/find-spaces",
     startNewSpace: "/kreative/collaborative-spaces/start-new-space",
     mySpaces: "/kreative/collaborative-spaces/my-spaces",
   },
+
+  archive: {
+    traditionsArchive: "/kreative/traditions-archive",
+  },
+
+  mentorship: "/kreative/mentorship",
 } as const;
 
 const kreativeDashboard: Route = {
-  path: KREATIVE_ROUTES.kreative.hub,
+  path: KREATIVE_ROUTES.dashboard,
   name: "Kreative – Overview",
   icon: <DashboardOutlined />,
 };
 
-const konservationGroup: Route = {
-  name: "Konservation",
+const showcaseGroup: Route = {
+  name: "Community Showcases",
   views: [
     {
-      path: KREATIVE_ROUTES.kreative.gallery,
-      name: "Gallery",
-      icon: <PictureOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.kreative.exhibitions,
-      name: "Virtual exhibitions",
-      icon: <EyeOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.kreative.showcase,
-      name: "Showcase",
+      path: KREATIVE_ROUTES.showcases.featuredProjects,
+      name: "Featured projects",
       icon: <StarOutlined />,
     },
     {
-      path: KREATIVE_ROUTES.kreative.topCreators,
+      path: KREATIVE_ROUTES.showcases.topCreators,
       name: "Top creators",
       icon: <CrownOutlined />,
     },
     {
-      path: KREATIVE_ROUTES.kreative.submitWork,
+      path: KREATIVE_ROUTES.showcases.submitToShowcase,
+      name: "Submit to showcase",
+      icon: <CloudUploadOutlined />,
+    },
+  ],
+};
+
+const creativeHubGroup: Route = {
+  name: "Creative Hub",
+  views: [
+    {
+      path: KREATIVE_ROUTES.creativeHub.exploreIdeas,
+      name: "Explore ideas",
+      icon: <BulbOutlined />,
+    },
+    {
+      path: KREATIVE_ROUTES.creativeHub.inspirationGallery,
+      name: "Inspiration gallery",
+      icon: <PictureOutlined />,
+    },
+    {
+      path: KREATIVE_ROUTES.creativeHub.submitCreativeWork,
       name: "Submit creative work",
       icon: <CloudUploadOutlined />,
     },
+  ],
+};
+
+const incubatorGroup: Route = {
+  name: "Idea Incubator",
+  views: [
     {
-      path: KREATIVE_ROUTES.kreative.incubator,
-      name: "Idea incubator",
-      icon: <BulbOutlined />,
+      path: KREATIVE_ROUTES.incubator.collaborateOnIdeas,
+      name: "Collaborate on ideas",
+      icon: <TeamOutlined />,
+    },
+    {
+      path: KREATIVE_ROUTES.incubator.createNewIdea,
+      name: "Create new idea",
+      icon: <HighlightOutlined />,
+    },
+    {
+      path: KREATIVE_ROUTES.incubator.myIdeas,
+      name: "My ideas",
+      icon: <ProfileOutlined />,
+    },
+  ],
+};
+
+const collaborativeSpacesGroup: Route = {
+  name: "Collaborative Spaces",
+  views: [
+    {
+      path: KREATIVE_ROUTES.collaborativeSpaces.findSpaces,
+      name: "Find spaces",
+      icon: <SearchOutlined />,
+    },
+    {
+      path: KREATIVE_ROUTES.collaborativeSpaces.startNewSpace,
+      name: "Start new space",
+      icon: <HomeOutlined />,
+    },
+    {
+      path: KREATIVE_ROUTES.collaborativeSpaces.mySpaces,
+      name: "My spaces",
+      icon: <MessageOutlined />,
     },
   ],
 };
 
 const archiveGroup: Route = {
-  name: "Archive",
+  name: "Archive & Mentorship",
   views: [
     {
-      path: KREATIVE_ROUTES.archive.root,
-      name: "Archive",
+      path: KREATIVE_ROUTES.archive.traditionsArchive,
+      name: "Traditions archive",
       icon: <BankOutlined />,
     },
     {
-      path: KREATIVE_ROUTES.archive.heritage,
-      name: "Heritage",
-      icon: <GlobalOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.archive.aiCatalogue,
-      name: "AI catalogue",
-      icon: <HighlightOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.archive.partners,
-      name: "Cultural partners",
-      icon: <LinkOutlined />,
-    },
-  ],
-};
-
-const kontactGroup: Route = {
-  name: "Kontact",
-  views: [
-    {
-      path: KREATIVE_ROUTES.connect.root,
-      name: "Connect",
-      icon: <TeamOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.connect.people,
-      name: "People",
-      icon: <SearchOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.connect.opportunities,
-      name: "Opportunities",
-      icon: <ShopOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.connect.workspaces,
-      name: "Workspaces",
-      icon: <HomeOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.connect.endorsements,
-      name: "Endorsements",
-      icon: <IdcardOutlined />,
-    },
-    {
-      path: KREATIVE_ROUTES.connect.mentorship,
+      path: KREATIVE_ROUTES.mentorship,
       name: "Mentorship",
       icon: <UserSwitchOutlined />,
     },
@@ -199,23 +174,30 @@ const profileReferenceGroup: Route = {
   name: "Profiles",
   views: [
     {
-      path: KREATIVE_ROUTES.connect.people,
+      path: KREATIVE_ROUTES.showcases.topCreators,
       name: "Creator profiles",
       icon: <ProfileOutlined />,
     },
     {
-      path: KREATIVE_ROUTES.connect.workspaces,
+      path: KREATIVE_ROUTES.collaborativeSpaces.mySpaces,
       name: "Collaboration rooms",
-      icon: <MessageOutlined />,
+      icon: <GlobalOutlined />,
+    },
+    {
+      path: KREATIVE_ROUTES.creativeHub.inspirationGallery,
+      name: "Gallery",
+      icon: <EyeOutlined />,
     },
   ],
 };
 
 const routes: Route[] = [
   kreativeDashboard,
-  konservationGroup,
+  showcaseGroup,
+  creativeHubGroup,
+  incubatorGroup,
+  collaborativeSpacesGroup,
   archiveGroup,
-  kontactGroup,
   profileReferenceGroup,
 ];
 

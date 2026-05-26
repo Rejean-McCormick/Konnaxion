@@ -24,76 +24,64 @@ import {
   UploadOutlined,
 } from "@ant-design/icons";
 
-type Route = {
-  path?: string;
-  name: string;
-  icon?: React.ReactNode;
-  views?: Route[];
-};
+import type { Route } from "./types";
 
+/**
+ * KeenKonnect module navigation.
+ *
+ * Keep every sidebar path aligned with an existing Next.js app route page.
+ * Old projects conceptual routes are not exposed unless matching pages exist.
+ */
 export const KEENKONNECT_ROUTES = {
   dashboard: "/keenkonnect/dashboard",
 
   projects: {
-    studio: "/projects",
-    create: "/projects/create",
-    mine: "/projects/mine",
-    browse: "/projects/browse",
+    browse: "/keenkonnect/projects/browse-projects",
+    create: "/keenkonnect/projects/create-new-project",
+    mine: "/keenkonnect/projects/my-projects",
+    workspace: "/keenkonnect/projects/project-workspace",
+  },
 
-    // Dynamic workspace routes, intentionally not exposed directly in sidebar:
-    // /projects/[slug]
-    // /projects/[slug]/tasks
-    // /projects/[slug]/blueprints
-    // /projects/[slug]/chat
-    // /projects/[slug]/ai-insights
-    // /projects/[slug]/settings
+  workspaces: {
+    browse: "/keenkonnect/workspaces/browse-available-workspaces",
+    mine: "/keenkonnect/workspaces/my-workspaces",
+    launch: "/keenkonnect/workspaces/launch-new-workspace",
+  },
 
-    matches: "/projects/matches",
-    impact: "/projects/impact",
-    reputation: "/projects/reputation",
-    repository: "/projects/repository",
-    repositorySearch: "/projects/repository/search",
-    repositoryUpload: "/projects/repository/upload",
+  matching: {
+    findTeams: "/keenkonnect/ai-team-matching/find-teams",
+    preferences: "/keenkonnect/ai-team-matching/match-preferences",
+    myMatches: "/keenkonnect/ai-team-matching/my-matches",
+  },
+
+  knowledge: {
+    browseRepository: "/keenkonnect/knowledge/browse-repository",
+    searchDocuments: "/keenkonnect/knowledge/search-filter-documents",
+    documentManagement: "/keenkonnect/knowledge/document-management",
+    uploadDocument: "/keenkonnect/knowledge/upload-new-document",
+  },
+
+  impact: {
+    dashboard: "/keenkonnect/sustainability-impact/sustainability-dashboard",
+    track: "/keenkonnect/sustainability-impact/track-project-impact",
+    submit: "/keenkonnect/sustainability-impact/submit-impact-reports",
+  },
+
+  reputation: {
+    view: "/keenkonnect/user-reputation/view-reputation-ekoh",
+    manageExpertise: "/keenkonnect/user-reputation/manage-expertise-areas",
+    accountPreferences: "/keenkonnect/user-reputation/account-preferences",
   },
 
   konsensus: {
     activityFeed: "/konsensus/activity-feed",
     leaderboards: "/konsensus/leaderboards",
   },
-
-  legacy: {
-    // Keep these as compatibility targets or redirects while pages migrate.
-    createProject: "/keenkonnect/projects/create-new-project",
-    browseProjects: "/keenkonnect/projects/browse-projects",
-    myProjects: "/keenkonnect/projects/my-projects",
-    projectWorkspace: "/keenkonnect/projects/project-workspace",
-
-    browseWorkspaces: "/keenkonnect/workspaces/browse-available-workspaces",
-    myWorkspaces: "/keenkonnect/workspaces/my-workspaces",
-    launchWorkspace: "/keenkonnect/workspaces/launch-new-workspace",
-
-    findTeams: "/keenkonnect/ai-team-matching/find-teams",
-    matchPreferences: "/keenkonnect/ai-team-matching/match-preferences",
-    myMatches: "/keenkonnect/ai-team-matching/my-matches",
-
-    submitImpactReports: "/keenkonnect/sustainability-impact/submit-impact-reports",
-    sustainabilityDashboard:
-      "/keenkonnect/sustainability-impact/sustainability-dashboard",
-    trackProjectImpact: "/keenkonnect/sustainability-impact/track-project-impact",
-
-    accountPreferences: "/keenkonnect/user-reputation/account-preferences",
-    manageExpertise: "/keenkonnect/user-reputation/manage-expertise-areas",
-    ekohReputation: "/keenkonnect/user-reputation/view-reputation-ekoh",
-
-    browseRepository: "/keenkonnect/knowledge/browse-repository",
-    searchRepository: "/keenkonnect/knowledge/search-filter-documents",
-    uploadDocument: "/keenkonnect/knowledge/upload-new-document",
-  },
 } as const;
 
 const keenDashboard: Route = {
   path: KEENKONNECT_ROUTES.dashboard,
-  name: "keenKonnect – Overview",
+  name: "KeenKonnect – Overview",
   icon: <DashboardOutlined />,
 };
 
@@ -101,7 +89,7 @@ const projectStudioGroup: Route = {
   name: "Project Studio",
   views: [
     {
-      path: KEENKONNECT_ROUTES.projects.studio,
+      path: KEENKONNECT_ROUTES.projects.browse,
       name: "Browse projects",
       icon: <ProjectOutlined />,
     },
@@ -115,26 +103,52 @@ const projectStudioGroup: Route = {
       name: "My projects",
       icon: <FolderOpenOutlined />,
     },
+    {
+      path: KEENKONNECT_ROUTES.projects.workspace,
+      name: "Project workspace",
+      icon: <FileTextOutlined />,
+    },
   ],
 };
 
-const collaborationGroup: Route = {
-  name: "Collaboration",
+const workspaceGroup: Route = {
+  name: "Workspaces",
   views: [
     {
-      path: KEENKONNECT_ROUTES.projects.matches,
-      name: "AI team matching",
-      icon: <HeartOutlined />,
-    },
-    {
-      path: KEENKONNECT_ROUTES.projects.impact,
-      name: "Impact tracking",
+      path: KEENKONNECT_ROUTES.workspaces.browse,
+      name: "Browse workspaces",
       icon: <GlobalOutlined />,
     },
     {
-      path: KEENKONNECT_ROUTES.projects.reputation,
-      name: "Reputation & expertise",
+      path: KEENKONNECT_ROUTES.workspaces.mine,
+      name: "My workspaces",
+      icon: <FolderOpenOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.workspaces.launch,
+      name: "Launch workspace",
       icon: <RocketOutlined />,
+    },
+  ],
+};
+
+const matchingGroup: Route = {
+  name: "AI Team Matching",
+  views: [
+    {
+      path: KEENKONNECT_ROUTES.matching.findTeams,
+      name: "Find teams",
+      icon: <TeamOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.matching.preferences,
+      name: "Match preferences",
+      icon: <SettingOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.matching.myMatches,
+      name: "My matches",
+      icon: <HeartOutlined />,
     },
   ],
 };
@@ -143,19 +157,66 @@ const stockageGroup: Route = {
   name: "Stockage",
   views: [
     {
-      path: KEENKONNECT_ROUTES.projects.repository,
-      name: "Repository",
+      path: KEENKONNECT_ROUTES.knowledge.browseRepository,
+      name: "Browse repository",
       icon: <DatabaseOutlined />,
     },
     {
-      path: KEENKONNECT_ROUTES.projects.repositorySearch,
+      path: KEENKONNECT_ROUTES.knowledge.searchDocuments,
       name: "Search documents",
       icon: <FilterOutlined />,
     },
     {
-      path: KEENKONNECT_ROUTES.projects.repositoryUpload,
+      path: KEENKONNECT_ROUTES.knowledge.documentManagement,
+      name: "Document management",
+      icon: <FileSearchOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.knowledge.uploadDocument,
       name: "Upload document",
       icon: <UploadOutlined />,
+    },
+  ],
+};
+
+const impactGroup: Route = {
+  name: "Sustainability Impact",
+  views: [
+    {
+      path: KEENKONNECT_ROUTES.impact.dashboard,
+      name: "Impact dashboard",
+      icon: <BarChartOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.impact.track,
+      name: "Track project impact",
+      icon: <HistoryOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.impact.submit,
+      name: "Submit impact reports",
+      icon: <FileTextOutlined />,
+    },
+  ],
+};
+
+const reputationGroup: Route = {
+  name: "Reputation",
+  views: [
+    {
+      path: KEENKONNECT_ROUTES.reputation.view,
+      name: "View reputation / EkoH",
+      icon: <CrownOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.reputation.manageExpertise,
+      name: "Manage expertise areas",
+      icon: <TagsOutlined />,
+    },
+    {
+      path: KEENKONNECT_ROUTES.reputation.accountPreferences,
+      name: "Account preferences",
+      icon: <SettingOutlined />,
     },
   ],
 };
@@ -176,54 +237,15 @@ const projectSignalsGroup: Route = {
   ],
 };
 
-const workspaceTabsReferenceGroup: Route = {
-  name: "Workspace Tabs",
-  views: [
-    {
-      path: "/projects",
-      name: "Overview",
-      icon: <FileTextOutlined />,
-    },
-    {
-      path: "/projects",
-      name: "Tasks",
-      icon: <HistoryOutlined />,
-    },
-    {
-      path: "/projects",
-      name: "Blueprints",
-      icon: <FileSearchOutlined />,
-    },
-    {
-      path: "/projects",
-      name: "AI insights",
-      icon: <BarChartOutlined />,
-    },
-    {
-      path: "/projects",
-      name: "Settings",
-      icon: <SettingOutlined />,
-    },
-    {
-      path: "/projects",
-      name: "Expertise tags",
-      icon: <TagsOutlined />,
-    },
-    {
-      path: "/projects",
-      name: "Team",
-      icon: <TeamOutlined />,
-    },
-  ],
-};
-
 const routes: Route[] = [
   keenDashboard,
   projectStudioGroup,
-  collaborationGroup,
+  workspaceGroup,
+  matchingGroup,
   stockageGroup,
+  impactGroup,
+  reputationGroup,
   projectSignalsGroup,
-  workspaceTabsReferenceGroup,
 ];
 
 export default routes;

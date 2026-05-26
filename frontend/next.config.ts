@@ -3,7 +3,11 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 import type { NextConfig } from 'next';
 import { env } from './env.mjs';
 
-const API_PROXY_BASE = env.NEXT_PUBLIC_API_BASE.replace(/\/+$/, '');
+const API_PROXY_BASE = (
+  process.env.API_PROXY_BASE ??
+  process.env.INTERNAL_API_BASE ??
+  'http://localhost:8000/api'
+).replace(/\/+$/, '');
 
 const baseConfig: NextConfig = {
   reactStrictMode: true,
@@ -21,12 +25,17 @@ const baseConfig: NextConfig = {
       { source: '/health', destination: '/_api/health' },
       { source: '/ping', destination: '/_api/health' },
 
-      // Proxy relative /api/* requests to the configured backend base.
-      // Example:
-      //   NEXT_PUBLIC_API_BASE=https://api.konnaxion.com/api
-      // becomes:
-      //   /api/foo -> https://api.konnaxion.com/api/foo
-      { source: '/api/:path*', destination: `${API_PROXY_BASE}/:path*` },
+      // Browser code should call /api/*.
+      // Next rewrites /api/* to the server-only backend proxy base.
+      //
+      // Local:
+      //   API_PROXY_BASE=http://localhost:8000/api
+      //
+      // Capsule/runtime:
+      //   API_PROXY_BASE=http://django-api:8000/api
+      //
+      // Keep NEXT_PUBLIC_API_BASE for browser code only.
+      { source: '/api/:path*', destination: `${API_PROXY_BASE}/:path*/` },
     ];
   },
 };

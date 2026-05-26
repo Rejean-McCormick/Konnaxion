@@ -3,14 +3,11 @@
 
 import React from "react";
 import {
-  ApiOutlined,
   AppstoreOutlined,
   AuditOutlined,
   BookOutlined,
-  BranchesOutlined,
   BuildOutlined,
   BulbOutlined,
-  CheckCircleOutlined,
   CommentOutlined,
   DashboardOutlined,
   DownloadOutlined,
@@ -19,7 +16,6 @@ import {
   FormOutlined,
   LikeOutlined,
   MessageOutlined,
-  PlayCircleOutlined,
   ProfileOutlined,
   ReadOutlined,
   SafetyCertificateOutlined,
@@ -27,51 +23,57 @@ import {
   SolutionOutlined,
   TeamOutlined,
   TrophyOutlined,
-  UserSwitchOutlined,
 } from "@ant-design/icons";
 
-type Route = {
-  path?: string;
-  name: string;
-  icon?: React.ReactNode;
-  views?: Route[];
-};
+import type { Route } from "./types";
 
+/**
+ * KonnectED module navigation.
+ *
+ * Keep every sidebar path aligned with an existing Next.js app route page.
+ * Old learn, certs, and course paths are not exposed unless matching pages exist.
+ */
 export const KONNECTED_ROUTES = {
   overview: "/konnected/dashboard",
 
-  knowledge: {
-    catalog: "/learn",
-    search: "/learn/search",
-    recommendations: "/learn/recommendations",
-    contribute: "/learn/contribute",
-    coCreation: "/learn/co-create",
-    forums: "/learn/forums",
-    progress: "/learn/progress",
-    offline: "/learn/offline",
-
-    // Dynamic route, intentionally not directly exposed in the sidebar.
-    coursePlayer: "/course/[slug]",
+  learningLibrary: {
+    browse: "/konnected/learning-library/browse-resources",
+    search: "/konnected/learning-library/search-filters",
+    recommendations: "/konnected/learning-library/recommended-resources",
+    offline: "/konnected/learning-library/offline-content",
   },
 
-  certifikation: {
-    center: "/certs",
-    programs: "/certs/programs",
-    evaluations: "/certs/evaluations",
-    examRegistration: "/certs/registration",
-    preparation: "/certs/preparation",
-    peerValidation: "/certs/peer-validation",
-    myCertificates: "/certs/my-certificates",
-    portfolio: "/certs/portfolio",
-    interoperability: "/certs/interoperability",
-    mentorship: "/certs/mentorship",
+  learningPaths: {
+    mine: "/konnected/learning-paths/my-learning-path",
+    create: "/konnected/learning-paths/create-learning-path",
+    manage: "/konnected/learning-paths/manage-existing-paths",
+  },
+
+  certifications: {
+    programs: "/konnected/certifications/certification-programs",
+    examDashboard: "/konnected/certifications/exam-dashboard-results",
+    preparation: "/konnected/certifications/exam-preparation",
+    registration: "/konnected/certifications/exam-registration",
+  },
+
+  community: {
+    activeThreads: "/konnected/community-discussions/active-threads",
+    startDiscussion: "/konnected/community-discussions/start-new-discussion",
+    moderation: "/konnected/community-discussions/moderation",
   },
 
   collaboration: {
-    teams: "/konnected/teams",
-    projects: "/konnected/projects",
-    teamBuilder: "/konnected/team-builder",
+    myTeams: "/konnected/teams-collaboration/my-teams",
+    activityPlanner: "/konnected/teams-collaboration/activity-planner",
+    projectWorkspaces: "/konnected/teams-collaboration/project-workspaces",
+    teamBuilder: "/konnected/teams-collaboration/team-builder",
   },
+
+  knowledge: {
+    contribute: "/konnected/knowledge/contribute",
+  },
+
+  mentorship: "/konnected/mentorship",
 } as const;
 
 const konnectedDashboard: Route = {
@@ -80,141 +82,117 @@ const konnectedDashboard: Route = {
   icon: <DashboardOutlined />,
 };
 
-const knowledgeGroup: Route = {
-  name: "Knowledge",
+const learningLibraryGroup: Route = {
+  name: "Learning Library",
   views: [
     {
-      path: KONNECTED_ROUTES.knowledge.catalog,
-      name: "Catalog",
+      path: KONNECTED_ROUTES.learningLibrary.browse,
+      name: "Browse resources",
       icon: <BookOutlined />,
     },
     {
-      path: KONNECTED_ROUTES.knowledge.search,
-      name: "Search",
+      path: KONNECTED_ROUTES.learningLibrary.search,
+      name: "Search / filters",
       icon: <SearchOutlined />,
     },
     {
-      path: KONNECTED_ROUTES.knowledge.recommendations,
-      name: "Recommended",
+      path: KONNECTED_ROUTES.learningLibrary.recommendations,
+      name: "Recommended resources",
       icon: <LikeOutlined />,
     },
     {
-      path: KONNECTED_ROUTES.knowledge.contribute,
-      name: "Contribute",
-      icon: <EditOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.knowledge.coCreation,
-      name: "Co-creation",
-      icon: <BranchesOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.knowledge.forums,
-      name: "Forums",
-      icon: <CommentOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.knowledge.progress,
-      name: "Progress",
-      icon: <CheckCircleOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.knowledge.offline,
-      name: "Offline",
+      path: KONNECTED_ROUTES.learningLibrary.offline,
+      name: "Offline content",
       icon: <DownloadOutlined />,
     },
   ],
 };
 
-const courseGroup: Route = {
-  name: "Courses",
+const learningPathsGroup: Route = {
+  name: "Learning Paths",
   views: [
     {
-      path: "/course",
-      name: "Course player",
-      icon: <PlayCircleOutlined />,
-    },
-    {
-      path: "/course/library",
-      name: "Course library",
-      icon: <ReadOutlined />,
-    },
-    {
-      path: "/course/progress",
-      name: "My course progress",
+      path: KONNECTED_ROUTES.learningPaths.mine,
+      name: "My learning path",
       icon: <ProfileOutlined />,
+    },
+    {
+      path: KONNECTED_ROUTES.learningPaths.create,
+      name: "Create learning path",
+      icon: <FormOutlined />,
+    },
+    {
+      path: KONNECTED_ROUTES.learningPaths.manage,
+      name: "Manage paths",
+      icon: <BuildOutlined />,
     },
   ],
 };
 
-const certifikationGroup: Route = {
+const certificationsGroup: Route = {
   name: "CertifiKation",
   views: [
     {
-      path: KONNECTED_ROUTES.certifikation.center,
-      name: "Center",
+      path: KONNECTED_ROUTES.certifications.programs,
+      name: "Certification programs",
       icon: <SafetyCertificateOutlined />,
     },
     {
-      path: KONNECTED_ROUTES.certifikation.programs,
-      name: "Programs",
-      icon: <AppstoreOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.certifikation.evaluations,
-      name: "Evaluations",
-      icon: <FormOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.certifikation.examRegistration,
-      name: "Registration",
-      icon: <AuditOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.certifikation.preparation,
-      name: "Preparation",
-      icon: <BulbOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.certifikation.peerValidation,
-      name: "Peer validation",
-      icon: <UserSwitchOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.certifikation.myCertificates,
-      name: "My certificates",
+      path: KONNECTED_ROUTES.certifications.examDashboard,
+      name: "Exam dashboard / results",
       icon: <TrophyOutlined />,
     },
     {
-      path: KONNECTED_ROUTES.certifikation.portfolio,
-      name: "Skills portfolio",
+      path: KONNECTED_ROUTES.certifications.preparation,
+      name: "Exam preparation",
+      icon: <BulbOutlined />,
+    },
+    {
+      path: KONNECTED_ROUTES.certifications.registration,
+      name: "Exam registration",
+      icon: <AuditOutlined />,
+    },
+  ],
+};
+
+const communityGroup: Route = {
+  name: "Community Discussions",
+  views: [
+    {
+      path: KONNECTED_ROUTES.community.activeThreads,
+      name: "Active threads",
+      icon: <CommentOutlined />,
+    },
+    {
+      path: KONNECTED_ROUTES.community.startDiscussion,
+      name: "Start discussion",
+      icon: <EditOutlined />,
+    },
+    {
+      path: KONNECTED_ROUTES.community.moderation,
+      name: "Moderation",
       icon: <FileDoneOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.certifikation.interoperability,
-      name: "Interoperability",
-      icon: <ApiOutlined />,
-    },
-    {
-      path: KONNECTED_ROUTES.certifikation.mentorship,
-      name: "Mentorship",
-      icon: <SolutionOutlined />,
     },
   ],
 };
 
 const collaborationGroup: Route = {
-  name: "Collaboration",
+  name: "Teams & Collaboration",
   views: [
     {
-      path: KONNECTED_ROUTES.collaboration.teams,
-      name: "Teams",
+      path: KONNECTED_ROUTES.collaboration.myTeams,
+      name: "My teams",
       icon: <TeamOutlined />,
     },
     {
-      path: KONNECTED_ROUTES.collaboration.projects,
-      name: "Projects",
-      icon: <BuildOutlined />,
+      path: KONNECTED_ROUTES.collaboration.activityPlanner,
+      name: "Activity planner",
+      icon: <FormOutlined />,
+    },
+    {
+      path: KONNECTED_ROUTES.collaboration.projectWorkspaces,
+      name: "Project workspaces",
+      icon: <AppstoreOutlined />,
     },
     {
       path: KONNECTED_ROUTES.collaboration.teamBuilder,
@@ -224,12 +202,30 @@ const collaborationGroup: Route = {
   ],
 };
 
+const knowledgeGroup: Route = {
+  name: "Knowledge Contribution",
+  views: [
+    {
+      path: KONNECTED_ROUTES.knowledge.contribute,
+      name: "Contribute",
+      icon: <ReadOutlined />,
+    },
+    {
+      path: KONNECTED_ROUTES.mentorship,
+      name: "Mentorship",
+      icon: <SolutionOutlined />,
+    },
+  ],
+};
+
 const routes: Route[] = [
   konnectedDashboard,
-  knowledgeGroup,
-  courseGroup,
-  certifikationGroup,
+  learningLibraryGroup,
+  learningPathsGroup,
+  certificationsGroup,
+  communityGroup,
   collaborationGroup,
+  knowledgeGroup,
 ];
 
 export default routes;
