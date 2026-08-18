@@ -136,6 +136,7 @@ def successful_preview_response():
             "topics": 1,
             "stances": 1,
             "arguments": 1,
+            "argument_sources": 0,
             "consultations": 1,
             "consultation_votes": 1,
             "impact_items": 1,
@@ -159,6 +160,7 @@ def successful_import_response():
             "topics": 1,
             "stances": 1,
             "arguments": 1,
+            "argument_sources": 0,
             "consultations": 1,
             "consultation_votes": 1,
             "impact_items": 1,
@@ -384,3 +386,44 @@ def test_preview_is_blocked_when_feature_flag_is_disabled(
     )
 
     assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_preview_accepts_v2_argument_sources(api_client, admin_user, sample_demo_scenario):
+    scenario = dict(sample_demo_scenario)
+    scenario["schema_version"] = "ethikos-demo-scenario/v2"
+    scenario["argument_sources"] = [
+        {
+            "key": "maya_argument_1_source",
+            "argument": "maya_argument_1",
+            "url": "https://example.test/public-square",
+            "title": "Public square planning brief",
+            "source_type": "reference",
+        }
+    ]
+
+    api_client.force_authenticate(user=admin_user)
+    response = api_client.post(PREVIEW_URL, scenario, format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ok"] is True
+    assert response.data["summary"]["argument_sources"] == 1
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_preview_rejects_sources_on_v1(api_client, admin_user, sample_demo_scenario):
+    scenario = dict(sample_demo_scenario)
+    scenario["argument_sources"] = [
+        {
+            "key": "maya_argument_1_source",
+            "argument": "maya_argument_1",
+            "url": "https://example.test/public-square",
+        }
+    ]
+
+    api_client.force_authenticate(user=admin_user)
+    response = api_client.post(PREVIEW_URL, scenario, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST

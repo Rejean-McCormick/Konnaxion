@@ -4,6 +4,8 @@ import pytest
 
 from konnaxion.ethikos.demo_import.schema import (
     SCHEMA_VERSION,
+    SCHEMA_VERSION_V1,
+    SCHEMA_VERSION_V2,
     STANCE_MAX,
     STANCE_MIN,
     validate_demo_scenario,
@@ -84,6 +86,15 @@ def make_valid_demo_scenario(overrides=None):
                 "parent": "maya_argument_1",
                 "content": "This can work if accessibility and emergency access are preserved.",
             },
+        ],
+        "argument_sources": [
+            {
+                "key": "maya_argument_1_source",
+                "argument": "maya_argument_1",
+                "url": "https://example.test/public-square",
+                "title": "Public square planning brief",
+                "source_type": "reference",
+            }
         ],
         "consultations": [
             {
@@ -336,4 +347,61 @@ def test_demo_topic_title_must_use_demo_prefix():
     assert any(
         "Demo topic title must start with [DEMO]" in message
         for message in error_messages(errors)
+    )
+
+
+def test_legacy_v1_scenario_without_argument_sources_remains_valid():
+    scenario = make_valid_demo_scenario(
+        {
+            "schema_version": SCHEMA_VERSION_V1,
+            "argument_sources": [],
+        }
+    )
+
+    assert validate_demo_scenario(scenario) == []
+
+
+def test_v1_rejects_argument_sources():
+    scenario = make_valid_demo_scenario({"schema_version": SCHEMA_VERSION_V1})
+
+    errors = validate_demo_scenario(scenario)
+
+    assert any(
+        error["path"] == "argument_sources"
+        and "requires schema_version ethikos-demo-scenario/v2" in error["message"]
+        for error in errors
+    )
+
+
+def test_v2_accepts_argument_sources():
+    scenario = make_valid_demo_scenario({"schema_version": SCHEMA_VERSION_V2})
+
+    assert validate_demo_scenario(scenario) == []
+
+
+def test_argument_source_requires_known_argument():
+    scenario = make_valid_demo_scenario()
+    scenario["argument_sources"][0]["argument"] = "unknown_argument"
+
+    errors = validate_demo_scenario(scenario)
+
+    assert any(
+        "Unknown argument reference" in error["message"]
+        for error in errors
+    )
+
+
+def test_argument_source_requires_material():
+    scenario = make_valid_demo_scenario()
+    scenario["argument_sources"][0] = {
+        "key": "empty_source",
+        "argument": "maya_argument_1",
+        "title": "Title alone is not source material",
+    }
+
+    errors = validate_demo_scenario(scenario)
+
+    assert any(
+        "Provide at least one of url, citation_text, quote, or note" in error["message"]
+        for error in errors
     )

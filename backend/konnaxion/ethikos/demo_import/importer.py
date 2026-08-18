@@ -138,7 +138,8 @@ def import_ethikos_demo_scenario(
             categories = _import_categories(payload, context)
             topics = _import_topics(payload, context, categories, actors)
             _import_stances(payload, context, actors, topics)
-            _import_arguments(payload, context, actors, topics)
+            argument_refs = _import_arguments(payload, context, actors, topics)
+            _import_argument_sources(payload, context, argument_refs)
 
             consultations = _import_consultations(payload, context)
             _import_consultation_votes(payload, context, actors, consultations)
@@ -214,6 +215,7 @@ def summarize_scenario(data: dict) -> dict:
             "topics": 0,
             "stances": 0,
             "arguments": 0,
+            "argument_sources": 0,
             "consultations": 0,
             "consultation_votes": 0,
             "impact_items": 0,
@@ -564,7 +566,7 @@ def _import_arguments(
     context: _ImportContext,
     actors: dict[str, Any],
     topics: dict[str, Any],
-) -> None:
+) -> dict[str, Any]:
     EthikosArgument = _get_ethikos_model("EthikosArgument")
 
     argument_refs: dict[str, Any] = {}
@@ -608,6 +610,48 @@ def _import_arguments(
         context.record_created(object_type, argument, label)
 
         argument_refs[argument_key] = argument
+
+    return argument_refs
+
+
+def _import_argument_sources(
+    data: dict,
+    context: _ImportContext,
+    argument_refs: dict[str, Any],
+) -> None:
+    source_items = data.get("argument_sources", [])
+    if not source_items:
+        return
+
+    ArgumentSource = _get_ethikos_model("ArgumentSource")
+
+    for source_data in source_items:
+        argument = argument_refs[source_data["argument"]]
+
+        create_kwargs = {
+            "argument": argument,
+            "url": source_data.get("url") or None,
+            "title": source_data.get("title", ""),
+            "excerpt": source_data.get("excerpt", ""),
+            "source_type": source_data.get("source_type", ""),
+            "citation_text": source_data.get("citation_text", ""),
+            "quote": source_data.get("quote", ""),
+            "note": source_data.get("note", ""),
+            "created_by": context.imported_by,
+        }
+
+        create_kwargs = _clean_model_defaults(ArgumentSource, create_kwargs)
+        source = ArgumentSource.objects.create(**create_kwargs)
+
+        label = (
+            source_data.get("title")
+            or source_data.get("url")
+            or source_data.get("citation_text")
+            or source_data.get("quote")
+            or source_data.get("note")
+            or source_data["key"]
+        )
+        context.record_created("argument_source", source, str(label)[:255])
 
 
 def _import_consultations(

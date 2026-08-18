@@ -1,0 +1,18 @@
+seed_policy:
+  schema_version: kx-seed-policy/v1
+  channel: demo
+  modules:
+    - ethikos
+  contains_personal_data: false
+  safe_for_public_demo: true
+  requires_user_confirmation: false
+  can_run_on_existing_instance: false
+  source_of_truth: ethikos/canada_quebec_public_debates_2026.json
+  scenario_schema: ethikos-demo-scenario/v2
+  idempotency: scenario_key
+  import_order:
+    - ethikos/canada_quebec_public_debates_2026.json
+  notes:
+    - The scenario JSON contains actors, topics, stances, arguments, and ArgumentSource records.
+    - The former standalone sources sidecar is no longer a runtime dependency.
+    - Import only after Django migrations succeed and only when the selected channel/profile allows demo seed data.

@@ -8,7 +8,8 @@ from .schema import (
     ALLOWED_IMPORT_MODES,
     ALLOWED_TOPIC_STATUSES,
     DEFAULT_IMPORT_MODE,
-    SCHEMA_VERSION,
+    SCHEMA_VERSION_V1,
+    SUPPORTED_SCHEMA_VERSIONS,
     STANCE_MAX,
     STANCE_MIN,
 )
@@ -25,6 +26,7 @@ class DemoImportSummarySerializer(serializers.Serializer):
     topics = serializers.IntegerField()
     stances = serializers.IntegerField()
     arguments = serializers.IntegerField()
+    argument_sources = serializers.IntegerField()
     consultations = serializers.IntegerField()
     consultation_votes = serializers.IntegerField()
     impact_items = serializers.IntegerField()
@@ -111,6 +113,48 @@ class EthikosDemoArgumentSerializer(serializers.Serializer):
     )
 
 
+class EthikosDemoArgumentSourceSerializer(serializers.Serializer):
+    key = serializers.CharField(max_length=120)
+    argument = serializers.CharField(max_length=120)
+
+    url = serializers.URLField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        max_length=2048,
+    )
+    title = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=255,
+    )
+    excerpt = serializers.CharField(required=False, allow_blank=True)
+    source_type = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=64,
+    )
+    citation_text = serializers.CharField(required=False, allow_blank=True)
+    quote = serializers.CharField(required=False, allow_blank=True)
+    note = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, attrs):
+        if not any(
+            value is not None and bool(str(value).strip())
+            for value in (
+                attrs.get("url"),
+                attrs.get("citation_text"),
+                attrs.get("quote"),
+                attrs.get("note"),
+            )
+        ):
+            raise serializers.ValidationError(
+                "Provide at least one of url, citation_text, quote, or note."
+            )
+
+        return attrs
+
+
 class EthikosDemoConsultationOptionSerializer(serializers.Serializer):
     key = serializers.CharField(max_length=120)
     label = serializers.CharField(max_length=255)
@@ -152,7 +196,7 @@ class EthikosDemoImpactItemSerializer(serializers.Serializer):
 
 
 class BaseDemoScenarioSerializer(serializers.Serializer):
-    schema_version = serializers.ChoiceField(choices=[SCHEMA_VERSION])
+    schema_version = serializers.ChoiceField(choices=SUPPORTED_SCHEMA_VERSIONS)
     scenario_key = serializers.CharField(max_length=120)
     scenario_title = serializers.CharField(max_length=255)
     mode = serializers.ChoiceField(
@@ -168,6 +212,11 @@ class BaseDemoScenarioSerializer(serializers.Serializer):
     topics = EthikosDemoTopicSerializer(many=True, required=False, default=list)
     stances = EthikosDemoStanceSerializer(many=True, required=False, default=list)
     arguments = EthikosDemoArgumentSerializer(many=True, required=False, default=list)
+    argument_sources = EthikosDemoArgumentSourceSerializer(
+        many=True,
+        required=False,
+        default=list,
+    )
     consultations = EthikosDemoConsultationSerializer(
         many=True,
         required=False,
@@ -196,6 +245,7 @@ class BaseDemoScenarioSerializer(serializers.Serializer):
             "categories": attrs.get("categories", []),
             "topics": attrs.get("topics", []),
             "arguments": attrs.get("arguments", []),
+            "argument_sources": attrs.get("argument_sources", []),
             "consultations": attrs.get("consultations", []),
         }
 
@@ -221,6 +271,19 @@ class BaseDemoScenarioSerializer(serializers.Serializer):
         category_keys = {category["key"] for category in attrs.get("categories", [])}
         topic_keys = {topic["key"] for topic in attrs.get("topics", [])}
         argument_keys = {argument["key"] for argument in attrs.get("arguments", [])}
+        if (
+            attrs.get("schema_version") == SCHEMA_VERSION_V1
+            and attrs.get("argument_sources")
+        ):
+            raise serializers.ValidationError(
+                {
+                    "argument_sources": (
+                        "argument_sources requires schema_version "
+                        "ethikos-demo-scenario/v2."
+                    )
+                }
+            )
+
         consultation_keys = {
             consultation["key"] for consultation in attrs.get("consultations", [])
         }
@@ -285,6 +348,17 @@ class BaseDemoScenarioSerializer(serializers.Serializer):
                         "arguments": (
                             f"Unknown parent argument '{parent}' "
                             f"at arguments[{index}]."
+                        )
+                    }
+                )
+
+        for index, source in enumerate(attrs.get("argument_sources", [])):
+            if source["argument"] not in argument_keys:
+                raise serializers.ValidationError(
+                    {
+                        "argument_sources": (
+                            f"Unknown argument '{source['argument']}' "
+                            f"at argument_sources[{index}]."
                         )
                     }
                 )

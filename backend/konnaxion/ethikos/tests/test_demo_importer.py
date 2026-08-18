@@ -10,6 +10,7 @@ from konnaxion.ethikos.demo_import.schema import (
     TRACK_OBJECT_TYPES,
 )
 from konnaxion.ethikos.models import (
+    ArgumentSource,
     EthikosArgument,
     EthikosCategory,
     EthikosStance,
@@ -33,7 +34,7 @@ def build_demo_payload(
     title = topic_title or f"{DEMO_TOPIC_TITLE_PREFIX} Public Square Redevelopment"
 
     return {
-        "schema_version": "ethikos-demo-scenario/v1",
+        "schema_version": "ethikos-demo-scenario/v2",
         "scenario_key": scenario_key,
         "scenario_title": "Public Square Redevelopment Demo",
         "mode": "replace_scenario",
@@ -85,6 +86,15 @@ def build_demo_payload(
                 "content": "The square should become greener while preserving accessibility.",
             }
         ],
+        "argument_sources": [
+            {
+                "key": "maya_argument_1_source",
+                "argument": "maya_argument_1",
+                "url": "https://example.test/public-square",
+                "title": "Public square planning brief",
+                "source_type": "reference",
+            }
+        ],
         "consultations": [],
         "consultation_votes": [],
         "impact_items": [],
@@ -127,12 +137,19 @@ def test_import_creates_demo_actors_categories_topics_stances_and_arguments():
     assert argument.side == "pro"
     assert argument.content == "The square should become greener while preserving accessibility."
 
+    source = ArgumentSource.objects.get(argument=argument)
+    assert source.url == "https://example.test/public-square"
+    assert source.title == "Public square planning brief"
+    assert source.source_type == "reference"
+    assert source.created_by == imported_by
+
     assert result["summary"] == {
         "actors": 1,
         "categories": 1,
         "topics": 1,
         "stances": 1,
         "arguments": 1,
+        "argument_sources": 1,
         "consultations": 0,
         "consultation_votes": 0,
         "impact_items": 0,
@@ -285,3 +302,38 @@ def test_dry_run_does_not_create_objects():
     assert EthikosStance.objects.count() == 0
     assert EthikosArgument.objects.count() == 0
     assert DemoScenarioImport.objects.count() == 0
+
+
+def test_replace_scenario_cascades_argument_sources_without_source_tracking():
+    imported_by = create_importing_user()
+    payload = build_demo_payload()
+
+    first_result = import_ethikos_demo_scenario(
+        payload,
+        imported_by=imported_by,
+        dry_run=False,
+    )
+
+    assert first_result["ok"] is True
+    source = ArgumentSource.objects.get()
+    source_id = source.id
+
+    second_payload = build_demo_payload(
+        topic_key="public_square_v2",
+        topic_title="[DEMO] Replacement Public Square Topic",
+    )
+    second_payload["argument_sources"][0]["url"] = (
+        "https://example.test/replacement-public-square"
+    )
+
+    second_result = import_ethikos_demo_scenario(
+        second_payload,
+        imported_by=imported_by,
+        dry_run=False,
+    )
+
+    assert second_result["ok"] is True
+    assert not ArgumentSource.objects.filter(id=source_id).exists()
+    assert ArgumentSource.objects.filter(
+        url="https://example.test/replacement-public-square"
+    ).count() == 1

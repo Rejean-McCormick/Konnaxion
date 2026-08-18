@@ -1,5 +1,9 @@
 // frontend/features/ethikos/demo-importer/api.ts
 
+import {
+  ETHIKOS_DEMO_SCHEMA_VERSION_V1,
+  ETHIKOS_DEMO_SCHEMA_VERSIONS,
+} from "./types";
 import type {
   EthikosDemoImportResponse,
   EthikosDemoResetRequest,
@@ -240,11 +244,27 @@ export function parseEthikosDemoScenarioJson(jsonText: string): {
       };
     }
 
-    if (parsed.schema_version !== "ethikos-demo-scenario/v1") {
+    if (
+      !ETHIKOS_DEMO_SCHEMA_VERSIONS.includes(
+        parsed.schema_version as (typeof ETHIKOS_DEMO_SCHEMA_VERSIONS)[number],
+      )
+    ) {
       return {
         scenario: null,
         errorMessage:
-          "Invalid schema_version. Expected ethikos-demo-scenario/v1.",
+          "Invalid schema_version. Expected ethikos-demo-scenario/v1 or ethikos-demo-scenario/v2.",
+      };
+    }
+
+    if (
+      parsed.schema_version === ETHIKOS_DEMO_SCHEMA_VERSION_V1 &&
+      Array.isArray(parsed.argument_sources) &&
+      parsed.argument_sources.length > 0
+    ) {
+      return {
+        scenario: null,
+        errorMessage:
+          "argument_sources requires ethikos-demo-scenario/v2.",
       };
     }
 
@@ -273,6 +293,7 @@ export function parseEthikosDemoScenarioJson(jsonText: string): {
       topics: parsed.topics ?? [],
       stances: parsed.stances ?? [],
       arguments: parsed.arguments ?? [],
+      argument_sources: parsed.argument_sources ?? [],
       consultations: parsed.consultations ?? [],
       consultation_votes: parsed.consultation_votes ?? [],
       impact_items: parsed.impact_items ?? [],

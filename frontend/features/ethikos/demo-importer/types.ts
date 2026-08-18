@@ -1,6 +1,14 @@
 // frontend/features/ethikos/demo-importer/types.ts
 
-export const ETHIKOS_DEMO_SCHEMA_VERSION = "ethikos-demo-scenario/v1" as const;
+export const ETHIKOS_DEMO_SCHEMA_VERSION_V1 =
+  "ethikos-demo-scenario/v1" as const;
+export const ETHIKOS_DEMO_SCHEMA_VERSION_V2 =
+  "ethikos-demo-scenario/v2" as const;
+export const ETHIKOS_DEMO_SCHEMA_VERSION = ETHIKOS_DEMO_SCHEMA_VERSION_V2;
+export const ETHIKOS_DEMO_SCHEMA_VERSIONS = [
+  ETHIKOS_DEMO_SCHEMA_VERSION_V1,
+  ETHIKOS_DEMO_SCHEMA_VERSION_V2,
+] as const;
 
 export const ETHIKOS_DEMO_IMPORT_MODES = [
   "replace_scenario",
@@ -28,7 +36,8 @@ export const ETHIKOS_DEMO_ARGUMENT_SIDES = [
 export const ETHIKOS_DEMO_STANCE_MIN = -3 as const;
 export const ETHIKOS_DEMO_STANCE_MAX = 3 as const;
 
-export type EthikosDemoSchemaVersion = typeof ETHIKOS_DEMO_SCHEMA_VERSION;
+export type EthikosDemoSchemaVersion =
+  (typeof ETHIKOS_DEMO_SCHEMA_VERSIONS)[number];
 
 export type EthikosDemoImportMode =
   (typeof ETHIKOS_DEMO_IMPORT_MODES)[number];
@@ -55,6 +64,7 @@ export type EthikosDemoScenario = {
   topics: EthikosDemoTopic[];
   stances: EthikosDemoStance[];
   arguments: EthikosDemoArgument[];
+  argument_sources?: EthikosDemoArgumentSource[];
   consultations: EthikosDemoConsultation[];
   consultation_votes: EthikosDemoConsultationVote[];
   impact_items: EthikosDemoImpactItem[];
@@ -100,6 +110,19 @@ export type EthikosDemoArgument = {
   content: string;
 };
 
+export type EthikosDemoArgumentSource = {
+  key: string;
+  argument: string;
+  url?: string | null;
+  title?: string;
+  excerpt?: string;
+  source_type?: string;
+  citation_text?: string;
+  quote?: string;
+  note?: string;
+};
+
+
 export type EthikosDemoConsultation = {
   key: string;
   title: string;
@@ -136,6 +159,7 @@ export type EthikosDemoImportSummary = {
   topics: number;
   stances: number;
   arguments: number;
+  argument_sources?: number;
   consultations: number;
   consultation_votes: number;
   impact_items: number;
@@ -215,7 +239,9 @@ export function isEthikosDemoScenario(
   const candidate = value as Partial<EthikosDemoScenario>;
 
   return (
-    candidate.schema_version === ETHIKOS_DEMO_SCHEMA_VERSION &&
+    ETHIKOS_DEMO_SCHEMA_VERSIONS.includes(
+      candidate.schema_version as EthikosDemoSchemaVersion,
+    ) &&
     typeof candidate.scenario_key === "string" &&
     typeof candidate.scenario_title === "string" &&
     ETHIKOS_DEMO_IMPORT_MODES.includes(
@@ -226,6 +252,8 @@ export function isEthikosDemoScenario(
     Array.isArray(candidate.topics) &&
     Array.isArray(candidate.stances) &&
     Array.isArray(candidate.arguments) &&
+    (candidate.schema_version === ETHIKOS_DEMO_SCHEMA_VERSION_V1 ||
+      Array.isArray(candidate.argument_sources)) &&
     Array.isArray(candidate.consultations) &&
     Array.isArray(candidate.consultation_votes) &&
     Array.isArray(candidate.impact_items)

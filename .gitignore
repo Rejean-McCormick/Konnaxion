@@ -136,4 +136,5 @@ compose/**/nginx/certs/
 !*.md
 
 *.tar.gz
-*.zip
+*.zip
+GitSink.bat

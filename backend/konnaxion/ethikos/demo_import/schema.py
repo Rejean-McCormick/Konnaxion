@@ -20,7 +20,13 @@ from typing import Any
 # Shared constants
 # ---------------------------------------------------------------------
 
-SCHEMA_VERSION = "ethikos-demo-scenario/v1"
+SCHEMA_VERSION_V1 = "ethikos-demo-scenario/v1"
+SCHEMA_VERSION_V2 = "ethikos-demo-scenario/v2"
+SCHEMA_VERSION = SCHEMA_VERSION_V2
+SUPPORTED_SCHEMA_VERSIONS = (
+    SCHEMA_VERSION_V1,
+    SCHEMA_VERSION_V2,
+)
 
 DEFAULT_IMPORT_MODE = "replace_scenario"
 
@@ -86,6 +92,7 @@ JSON_ROOT_KEYS = {
     "topics",
     "stances",
     "arguments",
+    "argument_sources",
     "consultations",
     "consultation_votes",
     "impact_items",
@@ -97,6 +104,7 @@ LIST_ROOT_KEYS = {
     "topics",
     "stances",
     "arguments",
+    "argument_sources",
     "consultations",
     "consultation_votes",
     "impact_items",
@@ -141,6 +149,28 @@ REQUIRED_ARGUMENT_FIELDS = {
     "actor",
     "content",
 }
+
+REQUIRED_ARGUMENT_SOURCE_FIELDS = {
+    "key",
+    "argument",
+}
+
+ARGUMENT_SOURCE_MATERIAL_FIELDS = (
+    "url",
+    "citation_text",
+    "quote",
+    "note",
+)
+
+ARGUMENT_SOURCE_OPTIONAL_STRING_FIELDS = (
+    "url",
+    "title",
+    "excerpt",
+    "source_type",
+    "citation_text",
+    "quote",
+    "note",
+)
 
 REQUIRED_CONSULTATION_FIELDS = {
     "key",
@@ -204,6 +234,7 @@ def validate_demo_scenario(data: dict[str, Any]) -> list[dict[str, str]]:
     topics = normalized["topics"]
     stances = normalized["stances"]
     arguments = normalized["arguments"]
+    argument_sources = normalized["argument_sources"]
     consultations = normalized["consultations"]
     consultation_votes = normalized["consultation_votes"]
     impact_items = normalized["impact_items"]
@@ -212,6 +243,7 @@ def validate_demo_scenario(data: dict[str, Any]) -> list[dict[str, str]]:
     category_keys = _collect_unique_keys(categories, "categories", errors)
     topic_keys = _collect_unique_keys(topics, "topics", errors)
     argument_keys = _collect_unique_keys(arguments, "arguments", errors)
+    _collect_unique_keys(argument_sources, "argument_sources", errors)
     consultation_keys = _collect_unique_keys(
         consultations,
         "consultations",
@@ -228,6 +260,12 @@ def validate_demo_scenario(data: dict[str, Any]) -> list[dict[str, str]]:
     _validate_topics(topics, category_keys, errors)
     _validate_stances(stances, actor_keys, topic_keys, errors)
     _validate_arguments(arguments, actor_keys, topic_keys, argument_keys, errors)
+    _validate_argument_sources(
+        argument_sources,
+        argument_keys,
+        normalized["schema_version"],
+        errors,
+    )
     _validate_consultations(consultations, errors)
     _validate_consultation_votes(
         consultation_votes,
@@ -270,6 +308,7 @@ def summarize_scenario_payload(data: dict[str, Any]) -> dict[str, int]:
         "topics": len(normalized.get("topics", [])),
         "stances": len(normalized.get("stances", [])),
         "arguments": len(normalized.get("arguments", [])),
+        "argument_sources": len(normalized.get("argument_sources", [])),
         "consultations": len(normalized.get("consultations", [])),
         "consultation_votes": len(normalized.get("consultation_votes", [])),
         "impact_items": len(normalized.get("impact_items", [])),
@@ -284,11 +323,15 @@ def _validate_root(data: dict[str, Any], errors: list[dict[str, str]]) -> None:
     _require_fields("$", data, REQUIRED_ROOT_FIELDS, errors)
 
     schema_version = data.get("schema_version")
-    if schema_version != SCHEMA_VERSION:
+    if schema_version not in SUPPORTED_SCHEMA_VERSIONS:
         _add_error(
             errors,
             "schema_version",
-            f"Expected schema_version to be {SCHEMA_VERSION}.",
+            (
+                "Expected schema_version to be one of: "
+                + ", ".join(SUPPORTED_SCHEMA_VERSIONS)
+                + "."
+            ),
         )
 
     mode = data.get("mode", DEFAULT_IMPORT_MODE)
@@ -615,6 +658,68 @@ def _validate_arguments(
                     f"{path}.parent",
                     f"Unknown parent argument reference: {parent}.",
                 )
+
+
+def _validate_argument_sources(
+    argument_sources: list[dict[str, Any]],
+    argument_keys: set[str],
+    schema_version: str,
+    errors: list[dict[str, str]],
+) -> None:
+    if schema_version == SCHEMA_VERSION_V1 and argument_sources:
+        _add_error(
+            errors,
+            "argument_sources",
+            "argument_sources requires schema_version ethikos-demo-scenario/v2.",
+        )
+        return
+
+    for index, source in enumerate(argument_sources):
+        path = f"argument_sources[{index}]"
+
+        if not _is_object(path, source, errors):
+            continue
+
+        _require_fields(path, source, REQUIRED_ARGUMENT_SOURCE_FIELDS, errors)
+
+        key = source.get("key")
+        if key is not None and not _is_non_empty_string(key):
+            _add_error(errors, f"{path}.key", "key must be a non-empty string.")
+
+        argument = source.get("argument")
+        if argument is not None:
+            if not _is_non_empty_string(argument):
+                _add_error(
+                    errors,
+                    f"{path}.argument",
+                    "argument must be a non-empty string.",
+                )
+            elif argument not in argument_keys:
+                _add_error(
+                    errors,
+                    f"{path}.argument",
+                    f"Unknown argument reference: {argument}.",
+                )
+
+        for field_name in ARGUMENT_SOURCE_OPTIONAL_STRING_FIELDS:
+            value = source.get(field_name)
+            if value is not None and not isinstance(value, str):
+                _add_error(
+                    errors,
+                    f"{path}.{field_name}",
+                    f"{field_name} must be a string when provided.",
+                )
+
+        has_material = any(
+            _is_non_empty_string(source.get(field_name))
+            for field_name in ARGUMENT_SOURCE_MATERIAL_FIELDS
+        )
+        if not has_material:
+            _add_error(
+                errors,
+                path,
+                "Provide at least one of url, citation_text, quote, or note.",
+            )
 
 
 def _validate_consultations(
