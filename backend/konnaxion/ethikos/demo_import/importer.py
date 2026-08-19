@@ -135,6 +135,7 @@ def import_ethikos_demo_scenario(
             )
 
             actors = _import_actors(payload, context)
+            _import_ekoh_profiles(payload, context, actors)
             categories = _import_categories(payload, context)
             topics = _import_topics(payload, context, categories, actors)
             _import_stances(payload, context, actors, topics)
@@ -219,6 +220,8 @@ def summarize_scenario(data: dict) -> dict:
             "consultations": 0,
             "consultation_votes": 0,
             "impact_items": 0,
+            "ekoh_profiles": 0,
+            "consultation_relevance": 0,
         }
 
     return summarize_scenario_payload(data)
@@ -279,6 +282,8 @@ def delete_tracked_scenario_objects(
         TRACK_OBJECT_TYPES.get("topic", "topic"),
         TRACK_OBJECT_TYPES.get("consultation", "consultation"),
         TRACK_OBJECT_TYPES.get("category", "category"),
+        TRACK_OBJECT_TYPES.get("ekoh_expertise_score", "ekoh_expertise_score"),
+        TRACK_OBJECT_TYPES.get("ekoh_ethics_score", "ekoh_ethics_score"),
         TRACK_OBJECT_TYPES.get("user", "user"),
     ]
 
@@ -427,6 +432,84 @@ def _import_actors(data: dict, context: _ImportContext) -> dict[str, Any]:
         actors[actor_key] = user
 
     return actors
+
+
+
+def _import_ekoh_profiles(
+    data: dict,
+    context: _ImportContext,
+    actors: dict[str, Any],
+) -> None:
+    """Persist EkoH profile context without producing a Smart Vote reading."""
+    profiles = data.get("ekoh_profiles", [])
+    if not profiles:
+        return
+
+    ExpertiseCategory = _get_optional_model("ekoh", "ExpertiseCategory")
+    UserExpertiseScore = _get_optional_model("ekoh", "UserExpertiseScore")
+    UserEthicsScore = _get_optional_model("ekoh", "UserEthicsScore")
+
+    if ExpertiseCategory is None or UserExpertiseScore is None:
+        context.warn(
+            "ekoh_profiles",
+            "Canonical EkoH models are unavailable. Profiles were validated but not persisted.",
+        )
+        return
+
+    for profile in profiles:
+        actor_key = profile["actor"]
+        user = actors.get(actor_key)
+        if user is None:
+            context.warn(
+                f"ekoh_profiles.{actor_key}",
+                "Actor was not imported. Skipping EkoH profile.",
+            )
+            continue
+
+        for score_data in profile.get("expertise", []):
+            domain_code = score_data["domain_code"]
+            category = ExpertiseCategory.objects.filter(code=domain_code).first()
+            if category is None:
+                context.warn(
+                    f"ekoh_profiles.{actor_key}.expertise.{domain_code}",
+                    "Unknown EkoH domain code. Load the ISCED-F fixture before importing this scenario.",
+                )
+                continue
+
+            weighted_score = score_data["weighted_score"]
+            raw_score = score_data.get("raw_score", weighted_score)
+
+            score, created = UserExpertiseScore.objects.update_or_create(
+                user=user,
+                category=category,
+                defaults={
+                    "raw_score": raw_score,
+                    "weighted_score": weighted_score,
+                },
+            )
+
+            object_type = TRACK_OBJECT_TYPES["ekoh_expertise_score"]
+            label = f"{user.username} · {domain_code}"
+            source_key = f"{actor_key}:{domain_code}"
+            context.track(object_type, score, label, source_key=source_key)
+            if created:
+                context.record_created(object_type, score, label)
+            else:
+                context.record_updated(object_type, score, label)
+
+        ethics_score = profile.get("ethics_score")
+        if ethics_score is not None and UserEthicsScore is not None:
+            ethics, created = UserEthicsScore.objects.update_or_create(
+                user=user,
+                defaults={"ethical_score": ethics_score},
+            )
+            object_type = TRACK_OBJECT_TYPES["ekoh_ethics_score"]
+            label = f"{user.username} · ethics"
+            context.track(object_type, ethics, label, source_key=actor_key)
+            if created:
+                context.record_created(object_type, ethics, label)
+            else:
+                context.record_updated(object_type, ethics, label)
 
 
 def _import_categories(data: dict, context: _ImportContext) -> dict[str, Any]:
@@ -730,9 +813,13 @@ def _import_consultation_votes(
         user = actors[vote_data["actor"]]
         consultation = consultations[consultation_key]
 
+        # v3 carries source facts only. If the installed legacy model still
+        # requires weighted_value, mirror raw_value solely for storage
+        # compatibility. This value is not a published Smart Vote reading.
+        raw_value = vote_data["raw_value"]
         defaults = {
-            "raw_value": vote_data["raw_value"],
-            "weighted_value": vote_data["weighted_value"],
+            "raw_value": raw_value,
+            "weighted_value": vote_data.get("weighted_value", raw_value),
             "option": vote_data.get("option"),
         }
 
@@ -882,8 +969,12 @@ def _get_ethikos_model(model_name: str):
 
 
 def _get_optional_ethikos_model(model_name: str):
+    return _get_optional_model(ETHIKOS_APP_LABEL, model_name)
+
+
+def _get_optional_model(app_label: str, model_name: str):
     try:
-        return _get_ethikos_model(model_name)
+        return apps.get_model(app_label, model_name)
     except LookupError:
         return None
 
@@ -893,23 +984,23 @@ def _model_for_object_type(object_type: str):
         return User
 
     model_map = {
-        TRACK_OBJECT_TYPES["category"]: "EthikosCategory",
-        TRACK_OBJECT_TYPES["topic"]: "EthikosTopic",
-        TRACK_OBJECT_TYPES["stance"]: "EthikosStance",
-        TRACK_OBJECT_TYPES["argument"]: "EthikosArgument",
-        TRACK_OBJECT_TYPES["consultation"]: "Consultation",
-        TRACK_OBJECT_TYPES["consultation_vote"]: "ConsultationVote",
-        TRACK_OBJECT_TYPES["consultation_result"]: "ConsultationResult",
-        TRACK_OBJECT_TYPES["impact_item"]: "ImpactTrack",
+        TRACK_OBJECT_TYPES["category"]: (ETHIKOS_APP_LABEL, "EthikosCategory"),
+        TRACK_OBJECT_TYPES["topic"]: (ETHIKOS_APP_LABEL, "EthikosTopic"),
+        TRACK_OBJECT_TYPES["stance"]: (ETHIKOS_APP_LABEL, "EthikosStance"),
+        TRACK_OBJECT_TYPES["argument"]: (ETHIKOS_APP_LABEL, "EthikosArgument"),
+        TRACK_OBJECT_TYPES["consultation"]: (ETHIKOS_APP_LABEL, "Consultation"),
+        TRACK_OBJECT_TYPES["consultation_vote"]: (ETHIKOS_APP_LABEL, "ConsultationVote"),
+        TRACK_OBJECT_TYPES["consultation_result"]: (ETHIKOS_APP_LABEL, "ConsultationResult"),
+        TRACK_OBJECT_TYPES["impact_item"]: (ETHIKOS_APP_LABEL, "ImpactTrack"),
+        TRACK_OBJECT_TYPES["ekoh_expertise_score"]: ("ekoh", "UserExpertiseScore"),
+        TRACK_OBJECT_TYPES["ekoh_ethics_score"]: ("ekoh", "UserEthicsScore"),
     }
 
-    model_name = model_map.get(object_type)
-
-    if not model_name:
+    model_ref = model_map.get(object_type)
+    if not model_ref:
         raise LookupError(f"Unknown demo import object_type: {object_type}")
 
-    model = _get_optional_ethikos_model(model_name)
-
+    model = _get_optional_model(*model_ref)
     if model is None:
         raise LookupError(f"Model not found for demo import object_type: {object_type}")
 
@@ -1103,6 +1194,19 @@ def _collect_non_blocking_warnings(data: dict) -> list[dict]:
                 }
             )
 
+    if data.get("consultation_relevance"):
+        warnings.append(
+            {
+                "path": "consultation_relevance",
+                "message": (
+                    "Domain relevance is validated as v3 source context but is not "
+                    "persisted by this importer yet because Smart Vote owns a separate "
+                    "Consultation model. Add an explicit cross-subsystem mapping before "
+                    "runtime readings consume it."
+                ),
+            }
+        )
+
     return warnings
 
 
@@ -1111,52 +1215,34 @@ def _build_consultation_results_data(
     consultation_data: dict,
     votes: list[dict],
 ) -> dict:
-    """
-    Build a simple deterministic result snapshot.
+    """Build a deterministic baseline snapshot over source vote facts.
 
-    This is not a Smart Vote reading. It is a demo snapshot over source vote facts.
+    Smart Vote/EkoH readings are deliberately excluded. They must be derived
+    and published separately with a declared lens and snapshot context.
     """
-    option_totals: dict[str, dict[str, Any]] = {}
-
-    for option in consultation_data.get("options", []):
-        option_key = option["key"]
-        option_totals[option_key] = {
-            "key": option_key,
-            "label": option.get("label", option_key),
-            "raw_total": 0,
-            "weighted_total": 0.0,
+    option_totals = defaultdict(
+        lambda: {
+            "option": None,
+            "raw_total": 0.0,
             "vote_count": 0,
         }
-
-    unassigned_key = "__unassigned__"
+    )
 
     for vote in votes:
-        option_key = vote.get("option") or unassigned_key
-
-        if option_key not in option_totals:
-            option_totals[option_key] = {
-                "key": option_key,
-                "label": option_key,
-                "raw_total": 0,
-                "weighted_total": 0.0,
-                "vote_count": 0,
-            }
-
-        option_totals[option_key]["raw_total"] += vote.get("raw_value", 0)
-        option_totals[option_key]["weighted_total"] += float(
-            vote.get("weighted_value", 0)
-        )
+        option_key = vote.get("option") or "__unassigned__"
+        option_totals[option_key]["option"] = vote.get("option")
+        option_totals[option_key]["raw_total"] += float(vote.get("raw_value", 0))
         option_totals[option_key]["vote_count"] += 1
 
     total_votes = len(votes)
-    total_raw = sum(vote.get("raw_value", 0) for vote in votes)
-    total_weighted = sum(float(vote.get("weighted_value", 0)) for vote in votes)
+    total_raw = sum(float(vote.get("raw_value", 0)) for vote in votes)
 
     return {
-        "kind": "demo_consultation_result_snapshot",
+        "kind": "demo_consultation_baseline_snapshot",
         "consultation_key": consultation_data.get("key"),
         "total_votes": total_votes,
         "total_raw": total_raw,
-        "total_weighted": total_weighted,
         "options": list(option_totals.values()),
+        "smart_vote_readings": [],
     }
+

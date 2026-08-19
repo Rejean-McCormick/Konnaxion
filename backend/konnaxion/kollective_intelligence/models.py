@@ -1,3 +1,14 @@
+"""LEGACY compatibility models for the former kollective_intelligence bundle.
+
+Canonical ownership has moved:
+- EkoH taxonomy, expertise, ethics, privacy and scoring live in `konnaxion.ekoh`.
+- Smart Vote consultations, votes and readings live in `konnaxion.smart_vote`.
+
+These models are retained only for migration/backward-compatibility safety.
+New code must not import them as the source of truth and must not add new
+features here. Remove them only through an explicit migration plan.
+"""
+
 # FILE: backend/konnaxion/kollective_intelligence/models.py
 from django.conf import settings
 from django.db import models
@@ -58,7 +69,7 @@ class ScoreConfiguration(models.Model):
 
 
 class ContextAnalysisLog(models.Model):
-    """Logs every AI adjustment applied to scores."""
+    """Legacy analysis log. Canonical AI/context analysis is non-authoritative."""
     entity_type = models.CharField(max_length=40)
     entity_id = models.PositiveBigIntegerField()
     field = models.CharField(max_length=64)
@@ -102,7 +113,7 @@ class ScoreHistory(models.Model):
 # ────────────────────────────────
 
 class Vote(models.Model):
-    """Stores each raw and weighted vote."""
+    """Legacy combined vote row. Canonical source ballots and readings are separate."""
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE,
                              related_name="kollective_votes") # Changed related_name just in case
@@ -132,7 +143,7 @@ class EmergingExpert(models.Model):
 
 
 class VoteResult(models.Model):
-    """Aggregated weighted totals per target."""
+    """Legacy weighted aggregate; do not treat as a canonical source result."""
     target_type = models.CharField(max_length=40)
     target_id = models.PositiveBigIntegerField()
     sum_weighted_value = models.DecimalField(max_digits=12, decimal_places=3)

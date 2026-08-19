@@ -1,56 +1,27 @@
 // frontend/features/ethikos/demo-importer/types.ts
 
-export const ETHIKOS_DEMO_SCHEMA_VERSION_V1 =
-  "ethikos-demo-scenario/v1" as const;
-export const ETHIKOS_DEMO_SCHEMA_VERSION_V2 =
-  "ethikos-demo-scenario/v2" as const;
-export const ETHIKOS_DEMO_SCHEMA_VERSION = ETHIKOS_DEMO_SCHEMA_VERSION_V2;
+export const ETHIKOS_DEMO_SCHEMA_VERSION_V1 = "ethikos-demo-scenario/v1" as const;
+export const ETHIKOS_DEMO_SCHEMA_VERSION_V2 = "ethikos-demo-scenario/v2" as const;
+export const ETHIKOS_DEMO_SCHEMA_VERSION_V3 = "ethikos-demo-scenario/v3" as const;
+export const ETHIKOS_DEMO_SCHEMA_VERSION = ETHIKOS_DEMO_SCHEMA_VERSION_V3;
 export const ETHIKOS_DEMO_SCHEMA_VERSIONS = [
   ETHIKOS_DEMO_SCHEMA_VERSION_V1,
   ETHIKOS_DEMO_SCHEMA_VERSION_V2,
+  ETHIKOS_DEMO_SCHEMA_VERSION_V3,
 ] as const;
 
-export const ETHIKOS_DEMO_IMPORT_MODES = [
-  "replace_scenario",
-  "append_scenario",
-] as const;
-
-export const ETHIKOS_DEMO_TOPIC_STATUSES = [
-  "open",
-  "closed",
-  "archived",
-] as const;
-
-export const ETHIKOS_DEMO_CONSULTATION_STATUSES = [
-  "open",
-  "closed",
-  "archived",
-] as const;
-
-export const ETHIKOS_DEMO_ARGUMENT_SIDES = [
-  "pro",
-  "con",
-  "neutral",
-] as const;
-
+export const ETHIKOS_DEMO_IMPORT_MODES = ["replace_scenario", "append_scenario"] as const;
+export const ETHIKOS_DEMO_TOPIC_STATUSES = ["open", "closed", "archived"] as const;
+export const ETHIKOS_DEMO_CONSULTATION_STATUSES = ["open", "closed", "archived"] as const;
+export const ETHIKOS_DEMO_ARGUMENT_SIDES = ["pro", "con", "neutral"] as const;
 export const ETHIKOS_DEMO_STANCE_MIN = -3 as const;
 export const ETHIKOS_DEMO_STANCE_MAX = 3 as const;
 
-export type EthikosDemoSchemaVersion =
-  (typeof ETHIKOS_DEMO_SCHEMA_VERSIONS)[number];
-
-export type EthikosDemoImportMode =
-  (typeof ETHIKOS_DEMO_IMPORT_MODES)[number];
-
-export type EthikosDemoTopicStatus =
-  (typeof ETHIKOS_DEMO_TOPIC_STATUSES)[number];
-
-export type EthikosDemoConsultationStatus =
-  (typeof ETHIKOS_DEMO_CONSULTATION_STATUSES)[number];
-
-export type EthikosDemoArgumentSide =
-  | (typeof ETHIKOS_DEMO_ARGUMENT_SIDES)[number]
-  | null;
+export type EthikosDemoSchemaVersion = (typeof ETHIKOS_DEMO_SCHEMA_VERSIONS)[number];
+export type EthikosDemoImportMode = (typeof ETHIKOS_DEMO_IMPORT_MODES)[number];
+export type EthikosDemoTopicStatus = (typeof ETHIKOS_DEMO_TOPIC_STATUSES)[number];
+export type EthikosDemoConsultationStatus = (typeof ETHIKOS_DEMO_CONSULTATION_STATUSES)[number];
+export type EthikosDemoArgumentSide = (typeof ETHIKOS_DEMO_ARGUMENT_SIDES)[number] | null;
 
 export type EthikosDemoScenario = {
   schema_version: EthikosDemoSchemaVersion;
@@ -58,7 +29,6 @@ export type EthikosDemoScenario = {
   scenario_title: string;
   mode: EthikosDemoImportMode;
   metadata?: Record<string, unknown>;
-
   actors: EthikosDemoActor[];
   categories: EthikosDemoCategory[];
   topics: EthikosDemoTopic[];
@@ -68,6 +38,8 @@ export type EthikosDemoScenario = {
   consultations: EthikosDemoConsultation[];
   consultation_votes: EthikosDemoConsultationVote[];
   impact_items: EthikosDemoImpactItem[];
+  ekoh_profiles?: EthikosDemoEkohProfile[];
+  consultation_relevance?: EthikosDemoConsultationRelevance[];
 };
 
 export type EthikosDemoActor = {
@@ -79,12 +51,7 @@ export type EthikosDemoActor = {
   is_ethikos_elite?: boolean;
 };
 
-export type EthikosDemoCategory = {
-  key: string;
-  name: string;
-  description?: string;
-};
-
+export type EthikosDemoCategory = { key: string; name: string; description?: string };
 export type EthikosDemoTopic = {
   key: string;
   title: string;
@@ -94,13 +61,7 @@ export type EthikosDemoTopic = {
   start_date?: string;
   end_date?: string;
 };
-
-export type EthikosDemoStance = {
-  topic: string;
-  actor: string;
-  value: number;
-};
-
+export type EthikosDemoStance = { topic: string; actor: string; value: number };
 export type EthikosDemoArgument = {
   key: string;
   topic: string;
@@ -109,7 +70,6 @@ export type EthikosDemoArgument = {
   parent?: string;
   content: string;
 };
-
 export type EthikosDemoArgumentSource = {
   key: string;
   argument: string;
@@ -121,8 +81,6 @@ export type EthikosDemoArgumentSource = {
   quote?: string;
   note?: string;
 };
-
-
 export type EthikosDemoConsultation = {
   key: string;
   title: string;
@@ -131,19 +89,18 @@ export type EthikosDemoConsultation = {
   close_date: string;
   options?: EthikosDemoConsultationOption[];
 };
+export type EthikosDemoConsultationOption = { key: string; label: string; description?: string };
 
-export type EthikosDemoConsultationOption = {
-  key: string;
-  label: string;
-  description?: string;
-};
-
+/**
+ * v3 source vote: weighted_value is intentionally absent.
+ * v1/v2 payloads may still contain it for backward compatibility.
+ */
 export type EthikosDemoConsultationVote = {
   consultation: string;
   actor: string;
   option?: string;
   raw_value: number;
-  weighted_value: number;
+  weighted_value?: number;
 };
 
 export type EthikosDemoImpactItem = {
@@ -151,6 +108,25 @@ export type EthikosDemoImpactItem = {
   action: string;
   status: string;
   date: string;
+};
+
+export type EthikosDemoEkohExpertise = {
+  domain_code: string;
+  weighted_score: number; // normalized 0..1
+  raw_score?: number; // normalized 0..1
+};
+
+export type EthikosDemoEkohProfile = {
+  actor: string;
+  ethics_score?: number;
+  expertise: EthikosDemoEkohExpertise[];
+};
+
+export type EthikosDemoConsultationRelevance = {
+  consultation: string;
+  domain_code: string;
+  weight: number; // 0..1; rows for a consultation sum to 1
+  criteria?: string | Record<string, unknown>;
 };
 
 export type EthikosDemoImportSummary = {
@@ -163,24 +139,17 @@ export type EthikosDemoImportSummary = {
   consultations: number;
   consultation_votes: number;
   impact_items: number;
+  ekoh_profiles?: number;
+  consultation_relevance?: number;
 };
 
-export type EthikosDemoImportError = {
-  path: string;
-  message: string;
-};
-
+export type EthikosDemoImportError = { path: string; message: string };
 export type EthikosDemoImportObjectRecord = {
   object_type: string;
-  object_id: number;
+  object_id: number | string;
   object_label?: string;
 };
-
-export type EthikosDemoImportWarning = {
-  path?: string;
-  message: string;
-};
-
+export type EthikosDemoImportWarning = { path?: string; message: string };
 export type EthikosDemoImportResponse = {
   ok: boolean;
   dry_run?: boolean;
@@ -192,70 +161,54 @@ export type EthikosDemoImportResponse = {
   updated?: EthikosDemoImportObjectRecord[];
   deleted?: EthikosDemoImportObjectRecord[];
 };
-
-export type EthikosDemoResetRequest = {
-  scenario_key: string;
-};
+export type EthikosDemoResetRequest = { scenario_key: string };
 
 export type EthikosDemoJsonParseResult =
-  | {
-      ok: true;
-      scenario: EthikosDemoScenario;
-      error: null;
-    }
-  | {
-      ok: false;
-      scenario: null;
-      error: string;
-    };
+  | { ok: true; scenario: EthikosDemoScenario; error: null }
+  | { ok: false; scenario: null; error: string };
 
-export function parseEthikosDemoScenarioJson(
-  jsonText: string,
-): EthikosDemoJsonParseResult {
+export function parseEthikosDemoScenarioJson(jsonText: string): EthikosDemoJsonParseResult {
   try {
-    const parsed = JSON.parse(jsonText) as EthikosDemoScenario;
-
-    return {
-      ok: true,
-      scenario: parsed,
-      error: null,
-    };
+    const parsed = JSON.parse(jsonText) as unknown;
+    if (!isEthikosDemoScenario(parsed)) {
+      return { ok: false, scenario: null, error: "JSON does not match the ethiKos demo scenario contract." };
+    }
+    return { ok: true, scenario: parsed, error: null };
   } catch {
-    return {
-      ok: false,
-      scenario: null,
-      error: "Invalid JSON.",
-    };
+    return { ok: false, scenario: null, error: "Invalid JSON." };
   }
 }
 
-export function isEthikosDemoScenario(
-  value: unknown,
-): value is EthikosDemoScenario {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
+export function isEthikosDemoScenario(value: unknown): value is EthikosDemoScenario {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const candidate = value as Partial<EthikosDemoScenario>;
+  const version = candidate.schema_version as EthikosDemoSchemaVersion;
+
+  if (!ETHIKOS_DEMO_SCHEMA_VERSIONS.includes(version)) return false;
+  if (!Array.isArray(candidate.consultation_votes)) return false;
+
+  const voteContractIsValid = candidate.consultation_votes.every((vote) => {
+    if (!vote || typeof vote !== "object") return false;
+    if (version === ETHIKOS_DEMO_SCHEMA_VERSION_V3) {
+      return !("weighted_value" in vote);
+    }
+    return typeof vote.weighted_value === "number";
+  });
 
   return (
-    ETHIKOS_DEMO_SCHEMA_VERSIONS.includes(
-      candidate.schema_version as EthikosDemoSchemaVersion,
-    ) &&
     typeof candidate.scenario_key === "string" &&
     typeof candidate.scenario_title === "string" &&
-    ETHIKOS_DEMO_IMPORT_MODES.includes(
-      candidate.mode as EthikosDemoImportMode,
-    ) &&
+    (candidate.mode == null || ETHIKOS_DEMO_IMPORT_MODES.includes(candidate.mode as EthikosDemoImportMode)) &&
     Array.isArray(candidate.actors) &&
     Array.isArray(candidate.categories) &&
     Array.isArray(candidate.topics) &&
     Array.isArray(candidate.stances) &&
     Array.isArray(candidate.arguments) &&
-    (candidate.schema_version === ETHIKOS_DEMO_SCHEMA_VERSION_V1 ||
-      Array.isArray(candidate.argument_sources)) &&
     Array.isArray(candidate.consultations) &&
-    Array.isArray(candidate.consultation_votes) &&
-    Array.isArray(candidate.impact_items)
+    Array.isArray(candidate.impact_items) &&
+    voteContractIsValid &&
+    (version !== ETHIKOS_DEMO_SCHEMA_VERSION_V1 || !candidate.argument_sources?.length) &&
+    (version === ETHIKOS_DEMO_SCHEMA_VERSION_V3 ||
+      (!candidate.ekoh_profiles?.length && !candidate.consultation_relevance?.length))
   );
 }

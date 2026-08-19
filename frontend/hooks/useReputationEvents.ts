@@ -1,66 +1,63 @@
 // FILE: frontend/hooks/useReputationEvents.ts
-// hooks/useReputationEvents.ts
 
 import { useQuery } from '@tanstack/react-query';
 import {
+  fetchCurrentUserEkohProfile,
   fetchUserProfile,
   fetchUserBadges,
   type ReputationProfile,
+  type EkohProfile,
   type Badge,
   type TrustBadgePayload,
 } from '@/services/trust';
 
 export interface ReputationEvent {
   id: string;
-  when: string; // ISO date or YYYY-MM-DD
+  when: string;
   title: string;
   detail: string;
 }
 
 export interface ReputationEventsResult {
   profile: ReputationProfile;
+  ekohProfile: EkohProfile | null;
   badges: Badge[];
   timeline: ReputationEvent[];
 }
 
 /**
- * Builds a synthetic "reputation timeline" from:
- * - recent activity deltas in the reputation profile
- * - earned badges from EkoH / Ethikos activity
- *
- * There is no dedicated backend endpoint yet; this hook
- * composes existing trust services so the UI can be wired.
+ * Composes current Ethikos activity with the canonical EkoH profile endpoint.
+ * Activity history remains a UI aid; EkoH expertise itself comes from EkoH.
  */
 async function loadReputationEvents(): Promise<ReputationEventsResult> {
-  const [profile, badgePayload]: [ReputationProfile, TrustBadgePayload] =
-    await Promise.all([fetchUserProfile(), fetchUserBadges()]);
+  const [profile, ekohProfile, badgePayload]: [
+    ReputationProfile,
+    EkohProfile | null,
+    TrustBadgePayload,
+  ] = await Promise.all([
+    fetchUserProfile(),
+    fetchCurrentUserEkohProfile(),
+    fetchUserBadges(),
+  ]);
 
   const badges = badgePayload.earned ?? [];
   const timeline: ReputationEvent[] = [];
 
-  // 1) Recent activity deltas, e.g. "Stances last 30 days +3"
-  const recentItems = profile.recent ?? [];
-
-  for (const item of recentItems) {
+  for (const item of profile.recent ?? []) {
     const change = item.change ?? 0;
-
     timeline.push({
       id: `recent-${item.label.replace(/\s+/g, '-').toLowerCase()}`,
-      // No per-item date in the API yet; we stamp "now".
       when: new Date().toISOString(),
       title: item.label,
       detail:
         change === 0
-          ? 'No significant change compared to the previous period.'
+          ? 'No significant change compared with the previous period.'
           : change > 0
-            ? `Increased by ${change} compared to the previous period.`
-            : `Decreased by ${Math.abs(
-                change,
-              )} compared to the previous period.`,
+            ? `Increased by ${change} compared with the previous period.`
+            : `Decreased by ${Math.abs(change)} compared with the previous period.`,
     });
   }
 
-  // 2) Earned badges
   for (const badge of badges) {
     timeline.push({
       id: `badge-${badge.id}`,
@@ -70,20 +67,11 @@ async function loadReputationEvents(): Promise<ReputationEventsResult> {
     });
   }
 
-  // Sort most recent first.
-  timeline.sort((a, b) => {
-    const ta = Date.parse(a.when);
-    const tb = Date.parse(b.when);
-
-    if (Number.isNaN(ta) || Number.isNaN(tb)) {
-      return b.when.localeCompare(a.when);
-    }
-
-    return tb - ta;
-  });
+  timeline.sort((a, b) => Date.parse(b.when) - Date.parse(a.when));
 
   return {
     profile,
+    ekohProfile,
     badges,
     timeline,
   };
@@ -93,6 +81,6 @@ export default function useReputationEvents() {
   return useQuery<ReputationEventsResult, Error>({
     queryKey: ['reputation-events'],
     queryFn: loadReputationEvents,
-    staleTime: 5 * 60_000, // 5 minutes
+    staleTime: 5 * 60_000,
   });
 }

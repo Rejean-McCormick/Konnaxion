@@ -2,6 +2,7 @@
 
 import {
   ETHIKOS_DEMO_SCHEMA_VERSION_V1,
+  ETHIKOS_DEMO_SCHEMA_VERSION_V3,
   ETHIKOS_DEMO_SCHEMA_VERSIONS,
 } from "./types";
 import type {
@@ -252,7 +253,7 @@ export function parseEthikosDemoScenarioJson(jsonText: string): {
       return {
         scenario: null,
         errorMessage:
-          "Invalid schema_version. Expected ethikos-demo-scenario/v1 or ethikos-demo-scenario/v2.",
+          "Invalid schema_version. Expected ethikos-demo-scenario/v1, v2, or v3.",
       };
     }
 
@@ -282,6 +283,19 @@ export function parseEthikosDemoScenarioJson(jsonText: string): {
       };
     }
 
+    if (
+      parsed.schema_version === ETHIKOS_DEMO_SCHEMA_VERSION_V3 &&
+      (parsed.consultation_votes ?? []).some(
+        (vote) => vote != null && typeof vote === "object" && "weighted_value" in vote,
+      )
+    ) {
+      return {
+        scenario: null,
+        errorMessage:
+          "v3 consultation_votes must contain source raw_value only; weighted_value belongs to a derived Smart Vote reading.",
+      };
+    }
+
     const scenario: EthikosDemoScenario = {
       schema_version: parsed.schema_version,
       scenario_key: parsed.scenario_key,
@@ -297,6 +311,8 @@ export function parseEthikosDemoScenarioJson(jsonText: string): {
       consultations: parsed.consultations ?? [],
       consultation_votes: parsed.consultation_votes ?? [],
       impact_items: parsed.impact_items ?? [],
+      ekoh_profiles: parsed.ekoh_profiles ?? [],
+      consultation_relevance: parsed.consultation_relevance ?? [],
     };
 
     return {

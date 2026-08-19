@@ -1,61 +1,69 @@
-"""
-Celery task: ekoh_score_recalc
+"""Celery task for EkoH score recalculation.
 
-* Runs nightly (see tasks_schedule.md).
-* Iterates through all users and relevant expertise domains.
-* Calls `compute_user_domain_score` to update weighted scores in DB.
+Recalculation is fail-safe: no profile is overwritten until a real evidence
+collector returns complete metrics for a user/domain pair.
 """
 
 from __future__ import annotations
 
 import logging
 from itertools import islice
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Mapping
 
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from django.db.models import QuerySet
 
 from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
-from konnaxion.ekoh.services.multidimensional_scoring import (
-    compute_user_domain_score,
-)
+from konnaxion.ekoh.services.multidimensional_scoring import compute_user_domain_score
 
 LOGGER = logging.getLogger(__name__)
 User = get_user_model()
-
-CHUNK_SIZE = 1_000  # tune based on RAM
+CHUNK_SIZE = 1_000
 
 
 def chunked(iterable: Iterable[int], size: int) -> Iterator[list[int]]:
-    """Yield lists of `size` items from iterable."""
     it = iter(iterable)
-    while (chunk := list(islice(it, size))):
+    while chunk := list(islice(it, size)):
         yield chunk
 
 
-def _collect_metrics(user_id: int, domain: ExpertiseCategory):
-    """
-    Placeholder metric collector.
+def _collect_metrics(
+    user_id: int,
+    domain: ExpertiseCategory,
+) -> Mapping[str, float] | None:
+    """Return verified scoring metrics, or ``None`` when none are available.
 
-    Replace with real aggregation of quality / expertise / frequency.
-    For now just returns dummy 0s so task runs without error.
+    A placeholder must never return synthetic zeros: doing so would erase
+    imported or previously verified EkoH expertise during the nightly task.
+    Replace this function with the governed evidence aggregation pipeline.
     """
-    return {"quality": 0, "expertise": 0, "frequency": 0}
+    return None
 
 
 @shared_task(name="ekoh_score_recalc")
-def recalc_all_scores() -> None:
+def recalc_all_scores() -> dict[str, int]:
     LOGGER.info("EkoH score rebuild started")
     domains: QuerySet[ExpertiseCategory] = ExpertiseCategory.objects.filter(depth__gte=1)
 
+    processed = 0
+    skipped = 0
     for user_chunk in chunked(
-        User.objects.values_list("id", flat=True).order_by("id"), CHUNK_SIZE
+        User.objects.values_list("id", flat=True).order_by("id"),
+        CHUNK_SIZE,
     ):
         for uid in user_chunk:
             for domain in domains:
                 metrics = _collect_metrics(uid, domain)
+                if metrics is None:
+                    skipped += 1
+                    continue
                 compute_user_domain_score(uid, domain, metrics, flush=True)
-        LOGGER.debug("Processed %s users", len(user_chunk))
+                processed += 1
 
-    LOGGER.info("EkoH score rebuild completed")
+    LOGGER.info(
+        "EkoH score rebuild completed: processed=%s skipped=%s",
+        processed,
+        skipped,
+    )
+    return {"processed": processed, "skipped": skipped}

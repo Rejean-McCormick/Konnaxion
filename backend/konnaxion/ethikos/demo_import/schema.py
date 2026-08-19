@@ -1,44 +1,34 @@
-"""
-Schema contract and validation for ethiKos demo scenario imports.
+"""Schema contract and validation for ethiKos demo scenario imports.
 
-This file is intentionally Django-free.
-It defines the JSON contract shared by:
+The importer treats the JSON payload as demo *source facts*. EkoH profile data
+and consultation-domain relevance may be supplied as context, but Smart Vote
+readings are derived later and must not be supplied as canonical results.
 
-- backend/konnaxion/ethikos/demo_import/importer.py
-- backend/konnaxion/ethikos/demo_import/serializers.py
-- backend/konnaxion/ethikos/demo_import/views.py
-- frontend/features/ethikos/demo-importer/types.ts
-- docs/demo-scenarios/ethikos/*.json
+v1  legacy core demo payload
+v2  adds argument_sources
+v3  adds EkoH profiles + consultation relevance and removes weighted_value
+    from source consultation votes
 """
 
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import Any
-
-
-# ---------------------------------------------------------------------
-# Shared constants
-# ---------------------------------------------------------------------
 
 SCHEMA_VERSION_V1 = "ethikos-demo-scenario/v1"
 SCHEMA_VERSION_V2 = "ethikos-demo-scenario/v2"
-SCHEMA_VERSION = SCHEMA_VERSION_V2
+SCHEMA_VERSION_V3 = "ethikos-demo-scenario/v3"
+SCHEMA_VERSION = SCHEMA_VERSION_V3
 SUPPORTED_SCHEMA_VERSIONS = (
     SCHEMA_VERSION_V1,
     SCHEMA_VERSION_V2,
+    SCHEMA_VERSION_V3,
 )
 
 DEFAULT_IMPORT_MODE = "replace_scenario"
-
-ALLOWED_IMPORT_MODES = {
-    "replace_scenario",
-    "append_scenario",
-}
-
+ALLOWED_IMPORT_MODES = {"replace_scenario", "append_scenario"}
 FEATURE_FLAG_NAME = "ETHIKOS_DEMO_IMPORTER_ENABLED"
-
 API_NAMESPACE = "ethikos-demo-scenarios"
-
 API_PREVIEW_PATH = "demo-scenarios/preview/"
 API_IMPORT_PATH = "demo-scenarios/import/"
 API_RESET_PATH = "demo-scenarios/reset/"
@@ -57,27 +47,13 @@ TRACK_OBJECT_TYPES = {
     "consultation_vote": "consultation_vote",
     "consultation_result": "consultation_result",
     "impact_item": "impact_item",
+    "ekoh_expertise_score": "ekoh_expertise_score",
+    "ekoh_ethics_score": "ekoh_ethics_score",
 }
 
-ALLOWED_TOPIC_STATUSES = {
-    "open",
-    "closed",
-    "archived",
-}
-
-ALLOWED_CONSULTATION_STATUSES = {
-    "open",
-    "closed",
-    "archived",
-}
-
-ALLOWED_ARGUMENT_SIDES = {
-    "pro",
-    "con",
-    "neutral",
-    None,
-}
-
+ALLOWED_TOPIC_STATUSES = {"open", "closed", "archived"}
+ALLOWED_CONSULTATION_STATUSES = {"open", "closed", "archived"}
+ALLOWED_ARGUMENT_SIDES = {"pro", "con", "neutral", None}
 STANCE_MIN = -3
 STANCE_MAX = 3
 
@@ -96,6 +72,8 @@ JSON_ROOT_KEYS = {
     "consultations",
     "consultation_votes",
     "impact_items",
+    "ekoh_profiles",
+    "consultation_relevance",
 }
 
 LIST_ROOT_KEYS = {
@@ -108,60 +86,32 @@ LIST_ROOT_KEYS = {
     "consultations",
     "consultation_votes",
     "impact_items",
+    "ekoh_profiles",
+    "consultation_relevance",
 }
 
-# NOTE:
-# "mode" is intentionally optional.
-# If omitted, normalize_demo_scenario() defaults it to DEFAULT_IMPORT_MODE.
-REQUIRED_ROOT_FIELDS = {
-    "schema_version",
-    "scenario_key",
-    "scenario_title",
-}
-
-REQUIRED_ACTOR_FIELDS = {
-    "key",
-    "username",
-    "display_name",
-}
-
-REQUIRED_CATEGORY_FIELDS = {
-    "key",
-    "name",
-}
-
-REQUIRED_TOPIC_FIELDS = {
-    "key",
-    "title",
-    "status",
-    "category",
-}
-
-REQUIRED_STANCE_FIELDS = {
-    "topic",
+REQUIRED_ROOT_FIELDS = {"schema_version", "scenario_key", "scenario_title"}
+REQUIRED_ACTOR_FIELDS = {"key", "username", "display_name"}
+REQUIRED_CATEGORY_FIELDS = {"key", "name"}
+REQUIRED_TOPIC_FIELDS = {"key", "title", "status", "category"}
+REQUIRED_STANCE_FIELDS = {"topic", "actor", "value"}
+REQUIRED_ARGUMENT_FIELDS = {"key", "topic", "actor", "content"}
+REQUIRED_ARGUMENT_SOURCE_FIELDS = {"key", "argument"}
+REQUIRED_CONSULTATION_FIELDS = {"key", "title", "status", "open_date", "close_date"}
+REQUIRED_CONSULTATION_OPTION_FIELDS = {"key", "label"}
+REQUIRED_CONSULTATION_VOTE_FIELDS_LEGACY = {
+    "consultation",
     "actor",
-    "value",
+    "raw_value",
+    "weighted_value",
 }
+REQUIRED_CONSULTATION_VOTE_FIELDS_V3 = {"consultation", "actor", "raw_value"}
+REQUIRED_IMPACT_ITEM_FIELDS = {"consultation", "action", "status", "date"}
+REQUIRED_EKOH_PROFILE_FIELDS = {"actor", "expertise"}
+REQUIRED_EKOH_EXPERTISE_FIELDS = {"domain_code", "weighted_score"}
+REQUIRED_CONSULTATION_RELEVANCE_FIELDS = {"consultation", "domain_code", "weight"}
 
-REQUIRED_ARGUMENT_FIELDS = {
-    "key",
-    "topic",
-    "actor",
-    "content",
-}
-
-REQUIRED_ARGUMENT_SOURCE_FIELDS = {
-    "key",
-    "argument",
-}
-
-ARGUMENT_SOURCE_MATERIAL_FIELDS = (
-    "url",
-    "citation_text",
-    "quote",
-    "note",
-)
-
+ARGUMENT_SOURCE_MATERIAL_FIELDS = ("url", "citation_text", "quote", "note")
 ARGUMENT_SOURCE_OPTIONAL_STRING_FIELDS = (
     "url",
     "title",
@@ -172,62 +122,18 @@ ARGUMENT_SOURCE_OPTIONAL_STRING_FIELDS = (
     "note",
 )
 
-REQUIRED_CONSULTATION_FIELDS = {
-    "key",
-    "title",
-    "status",
-    "open_date",
-    "close_date",
-}
-
-REQUIRED_CONSULTATION_OPTION_FIELDS = {
-    "key",
-    "label",
-}
-
-REQUIRED_CONSULTATION_VOTE_FIELDS = {
-    "consultation",
-    "actor",
-    "raw_value",
-    "weighted_value",
-}
-
-REQUIRED_IMPACT_ITEM_FIELDS = {
-    "consultation",
-    "action",
-    "status",
-    "date",
-}
-
-
-# ---------------------------------------------------------------------
-# Public validation API
-# ---------------------------------------------------------------------
 
 def validate_demo_scenario(data: dict[str, Any]) -> list[dict[str, str]]:
-    """
-    Validate an ethiKos demo scenario payload.
-
-    Returns:
-        A list of errors. Empty list means the payload is valid enough
-        for importer.py to process.
-    """
     errors: list[dict[str, str]] = []
-
     if not isinstance(data, dict):
-        return [
-            {
-                "path": "$",
-                "message": "Scenario payload must be a JSON object.",
-            }
-        ]
+        return [{"path": "$", "message": "Scenario payload must be a JSON object."}]
 
     _validate_root(data, errors)
-
     if errors:
         return errors
 
     normalized = normalize_demo_scenario(data)
+    schema_version = normalized["schema_version"]
 
     actors = normalized["actors"]
     categories = normalized["categories"]
@@ -238,100 +144,79 @@ def validate_demo_scenario(data: dict[str, Any]) -> list[dict[str, str]]:
     consultations = normalized["consultations"]
     consultation_votes = normalized["consultation_votes"]
     impact_items = normalized["impact_items"]
+    ekoh_profiles = normalized["ekoh_profiles"]
+    consultation_relevance = normalized["consultation_relevance"]
 
     actor_keys = _collect_unique_keys(actors, "actors", errors)
     category_keys = _collect_unique_keys(categories, "categories", errors)
     topic_keys = _collect_unique_keys(topics, "topics", errors)
     argument_keys = _collect_unique_keys(arguments, "arguments", errors)
     _collect_unique_keys(argument_sources, "argument_sources", errors)
-    consultation_keys = _collect_unique_keys(
-        consultations,
-        "consultations",
-        errors,
-    )
-
-    consultation_option_keys = _collect_consultation_option_keys(
-        consultations,
-        errors,
-    )
+    consultation_keys = _collect_unique_keys(consultations, "consultations", errors)
+    consultation_option_keys = _collect_consultation_option_keys(consultations, errors)
 
     _validate_actors(actors, errors)
     _validate_categories(categories, errors)
     _validate_topics(topics, category_keys, errors)
     _validate_stances(stances, actor_keys, topic_keys, errors)
     _validate_arguments(arguments, actor_keys, topic_keys, argument_keys, errors)
-    _validate_argument_sources(
-        argument_sources,
-        argument_keys,
-        normalized["schema_version"],
-        errors,
-    )
+    _validate_argument_sources(argument_sources, argument_keys, schema_version, errors)
     _validate_consultations(consultations, errors)
     _validate_consultation_votes(
         consultation_votes,
         actor_keys,
         consultation_keys,
         consultation_option_keys,
+        schema_version,
         errors,
     )
     _validate_impact_items(impact_items, consultation_keys, errors)
-
+    _validate_ekoh_profiles(ekoh_profiles, actor_keys, schema_version, errors)
+    _validate_consultation_relevance(
+        consultation_relevance,
+        consultation_keys,
+        schema_version,
+        errors,
+    )
     return errors
 
 
 def normalize_demo_scenario(data: dict[str, Any]) -> dict[str, Any]:
-    """
-    Normalize optional root fields before import.
-
-    This does not validate deeply. Call validate_demo_scenario first.
-    """
     normalized = dict(data)
-
     normalized.setdefault("mode", DEFAULT_IMPORT_MODE)
     normalized.setdefault("metadata", {})
-
     for key in LIST_ROOT_KEYS:
         normalized.setdefault(key, [])
-
     return normalized
 
 
 def summarize_scenario_payload(data: dict[str, Any]) -> dict[str, int]:
-    """
-    Return the summary shape expected by preview/import responses.
-    """
     normalized = normalize_demo_scenario(data)
-
     return {
-        "actors": len(normalized.get("actors", [])),
-        "categories": len(normalized.get("categories", [])),
-        "topics": len(normalized.get("topics", [])),
-        "stances": len(normalized.get("stances", [])),
-        "arguments": len(normalized.get("arguments", [])),
-        "argument_sources": len(normalized.get("argument_sources", [])),
-        "consultations": len(normalized.get("consultations", [])),
-        "consultation_votes": len(normalized.get("consultation_votes", [])),
-        "impact_items": len(normalized.get("impact_items", [])),
+        "actors": len(normalized["actors"]),
+        "categories": len(normalized["categories"]),
+        "topics": len(normalized["topics"]),
+        "stances": len(normalized["stances"]),
+        "arguments": len(normalized["arguments"]),
+        "argument_sources": len(normalized["argument_sources"]),
+        "consultations": len(normalized["consultations"]),
+        "consultation_votes": len(normalized["consultation_votes"]),
+        "impact_items": len(normalized["impact_items"]),
+        "ekoh_profiles": len(normalized["ekoh_profiles"]),
+        "consultation_relevance": len(normalized["consultation_relevance"]),
     }
 
 
-# ---------------------------------------------------------------------
-# Root validation
-# ---------------------------------------------------------------------
-
 def _validate_root(data: dict[str, Any], errors: list[dict[str, str]]) -> None:
     _require_fields("$", data, REQUIRED_ROOT_FIELDS, errors)
-
     schema_version = data.get("schema_version")
     if schema_version not in SUPPORTED_SCHEMA_VERSIONS:
         _add_error(
             errors,
             "schema_version",
-            (
-                "Expected schema_version to be one of: "
-                + ", ".join(SUPPORTED_SCHEMA_VERSIONS)
-                + "."
-            ),
+            "Expected schema_version to be one of: "
+            + ", ".join(SUPPORTED_SCHEMA_VERSIONS)
+            + ".",
         )
 
     mode = data.get("mode", DEFAULT_IMPORT_MODE)
@@ -342,101 +227,40 @@ def _validate_root(data: dict[str, Any], errors: list[dict[str, str]]) -> None:
             f"Import mode must be one of: {sorted(ALLOWED_IMPORT_MODES)}.",
         )
 
-    scenario_key = data.get("scenario_key")
-    if scenario_key is not None and not _is_non_empty_string(scenario_key):
-        _add_error(
-            errors,
-            "scenario_key",
-            "scenario_key must be a non-empty string.",
-        )
+    if "scenario_key" in data and not _is_non_empty_string(data.get("scenario_key")):
+        _add_error(errors, "scenario_key", "scenario_key must be a non-empty string.")
+    if "scenario_title" in data and not _is_non_empty_string(data.get("scenario_title")):
+        _add_error(errors, "scenario_title", "scenario_title must be a non-empty string.")
+    if not isinstance(data.get("metadata", {}), dict):
+        _add_error(errors, "metadata", "metadata must be an object.")
 
-    scenario_title = data.get("scenario_title")
-    if scenario_title is not None and not _is_non_empty_string(scenario_title):
-        _add_error(
-            errors,
-            "scenario_title",
-            "scenario_title must be a non-empty string.",
-        )
-
-    metadata = data.get("metadata", {})
-    if metadata is not None and not isinstance(metadata, dict):
-        _add_error(
-            errors,
-            "metadata",
-            "metadata must be an object.",
-        )
+    unknown = set(data) - JSON_ROOT_KEYS
+    for key in sorted(unknown):
+        _add_error(errors, key, f"Unknown root field: {key}.")
 
     for key in LIST_ROOT_KEYS:
-        value = data.get(key, [])
-        if not isinstance(value, list):
-            _add_error(
-                errors,
-                key,
-                f"{key} must be a list.",
-            )
+        if not isinstance(data.get(key, []), list):
+            _add_error(errors, key, f"{key} must be a list.")
 
 
-# ---------------------------------------------------------------------
-# Object validation
-# ---------------------------------------------------------------------
-
-def _validate_actors(
-    actors: list[dict[str, Any]],
-    errors: list[dict[str, str]],
-) -> None:
-    for index, actor in enumerate(actors):
-        path = f"actors[{index}]"
-
+def _validate_actors(actors: list[Any], errors: list[dict[str, str]]) -> None:
+    for i, actor in enumerate(actors):
+        path = f"actors[{i}]"
         if not _is_object(path, actor, errors):
             continue
-
         _require_fields(path, actor, REQUIRED_ACTOR_FIELDS, errors)
-
-        key = actor.get("key")
-        if key is not None and not _is_non_empty_string(key):
-            _add_error(errors, f"{path}.key", "key must be a non-empty string.")
-
-        username = actor.get("username")
-        if username is not None and not _is_non_empty_string(username):
-            _add_error(
-                errors,
-                f"{path}.username",
-                "username must be a non-empty string.",
-            )
-
-        if username and not str(username).startswith(DEMO_USERNAME_PREFIX):
-            _add_error(
-                errors,
-                f"{path}.username",
-                f"Demo actor username must start with {DEMO_USERNAME_PREFIX}.",
-            )
-
-        display_name = actor.get("display_name")
-        if display_name is not None and not _is_non_empty_string(display_name):
-            _add_error(
-                errors,
-                f"{path}.display_name",
-                "display_name must be a non-empty string.",
-            )
-
-        email = actor.get("email")
-        if email is not None and not _is_non_empty_string(email):
-            _add_error(
-                errors,
-                f"{path}.email",
-                "email must be a non-empty string when provided.",
-            )
-
-        role = actor.get("role")
-        if role is not None and not _is_non_empty_string(role):
-            _add_error(
-                errors,
-                f"{path}.role",
-                "role must be a non-empty string when provided.",
-            )
-
-        is_ethikos_elite = actor.get("is_ethikos_elite")
-        if is_ethikos_elite is not None and not isinstance(is_ethikos_elite, bool):
+        for field in ("key", "username", "display_name"):
+            if field in actor and not _is_non_empty_string(actor.get(field)):
+                _add_error(
+                    errors,
+                    f"{path}.{field}",
+                    f"{field} must be a non-empty string.",
+                )
+        if actor.get("email") is not None and not isinstance(actor.get("email"), str):
+            _add_error(errors, f"{path}.email", "email must be a string when provided.")
+        if actor.get("is_ethikos_elite") is not None and not isinstance(
+            actor.get("is_ethikos_elite"), bool
+        ):
             _add_error(
                 errors,
                 f"{path}.is_ethikos_elite",
@@ -444,277 +268,161 @@ def _validate_actors(
             )
 
 
-def _validate_categories(
-    categories: list[dict[str, Any]],
-    errors: list[dict[str, str]],
-) -> None:
-    for index, category in enumerate(categories):
-        path = f"categories[{index}]"
-
+def _validate_categories(categories: list[Any], errors: list[dict[str, str]]) -> None:
+    for i, category in enumerate(categories):
+        path = f"categories[{i}]"
         if not _is_object(path, category, errors):
             continue
-
         _require_fields(path, category, REQUIRED_CATEGORY_FIELDS, errors)
-
-        key = category.get("key")
-        if key is not None and not _is_non_empty_string(key):
-            _add_error(errors, f"{path}.key", "key must be a non-empty string.")
-
-        name = category.get("name")
-        if name is not None and not _is_non_empty_string(name):
-            _add_error(errors, f"{path}.name", "name must be a non-empty string.")
-
-        description = category.get("description")
-        if description is not None and not isinstance(description, str):
-            _add_error(
-                errors,
-                f"{path}.description",
-                "description must be a string when provided.",
-            )
+        for field in ("key", "name"):
+            if field in category and not _is_non_empty_string(category.get(field)):
+                _add_error(
+                    errors,
+                    f"{path}.{field}",
+                    f"{field} must be a non-empty string.",
+                )
 
 
 def _validate_topics(
-    topics: list[dict[str, Any]],
+    topics: list[Any],
     category_keys: set[str],
     errors: list[dict[str, str]],
 ) -> None:
-    for index, topic in enumerate(topics):
-        path = f"topics[{index}]"
-
+    for i, topic in enumerate(topics):
+        path = f"topics[{i}]"
         if not _is_object(path, topic, errors):
             continue
-
         _require_fields(path, topic, REQUIRED_TOPIC_FIELDS, errors)
-
-        key = topic.get("key")
-        if key is not None and not _is_non_empty_string(key):
-            _add_error(errors, f"{path}.key", "key must be a non-empty string.")
-
+        if topic.get("status") not in ALLOWED_TOPIC_STATUSES:
+            _add_error(errors, f"{path}.status", "Invalid topic status.")
+        category = topic.get("category")
+        if category is not None and category not in category_keys:
+            _add_error(
+                errors,
+                f"{path}.category",
+                f"Unknown category reference: {category}.",
+            )
         title = topic.get("title")
         if title is not None and not _is_non_empty_string(title):
             _add_error(errors, f"{path}.title", "title must be a non-empty string.")
 
-        if title and not str(title).startswith(DEMO_TOPIC_TITLE_PREFIX):
-            _add_error(
-                errors,
-                f"{path}.title",
-                f"Demo topic title must start with {DEMO_TOPIC_TITLE_PREFIX}.",
-            )
-
-        description = topic.get("description")
-        if description is not None and not isinstance(description, str):
-            _add_error(
-                errors,
-                f"{path}.description",
-                "description must be a string when provided.",
-            )
-
-        status = topic.get("status")
-        if status is not None and status not in ALLOWED_TOPIC_STATUSES:
-            _add_error(
-                errors,
-                f"{path}.status",
-                f"Topic status must be one of: {sorted(ALLOWED_TOPIC_STATUSES)}.",
-            )
-
-        category = topic.get("category")
-        if category is not None:
-            if not _is_non_empty_string(category):
-                _add_error(
-                    errors,
-                    f"{path}.category",
-                    "category must be a non-empty string.",
-                )
-            elif category not in category_keys:
-                _add_error(
-                    errors,
-                    f"{path}.category",
-                    f"Unknown category reference: {category}.",
-                )
-
-        _validate_optional_date_string(topic, "start_date", path, errors)
-        _validate_optional_date_string(topic, "end_date", path, errors)
-
 
 def _validate_stances(
-    stances: list[dict[str, Any]],
+    stances: list[Any],
     actor_keys: set[str],
     topic_keys: set[str],
     errors: list[dict[str, str]],
 ) -> None:
-    for index, stance in enumerate(stances):
-        path = f"stances[{index}]"
-
+    for i, stance in enumerate(stances):
+        path = f"stances[{i}]"
         if not _is_object(path, stance, errors):
             continue
-
         _require_fields(path, stance, REQUIRED_STANCE_FIELDS, errors)
-
         actor = stance.get("actor")
-        if actor is not None:
-            if not _is_non_empty_string(actor):
-                _add_error(errors, f"{path}.actor", "actor must be a non-empty string.")
-            elif actor not in actor_keys:
-                _add_error(
-                    errors,
-                    f"{path}.actor",
-                    f"Unknown actor reference: {actor}.",
-                )
-
         topic = stance.get("topic")
-        if topic is not None:
-            if not _is_non_empty_string(topic):
-                _add_error(errors, f"{path}.topic", "topic must be a non-empty string.")
-            elif topic not in topic_keys:
-                _add_error(
-                    errors,
-                    f"{path}.topic",
-                    f"Unknown topic reference: {topic}.",
-                )
-
-        value = stance.get("value")
-        if not isinstance(value, int) or isinstance(value, bool):
+        if actor is not None and actor not in actor_keys:
             _add_error(
                 errors,
-                f"{path}.value",
-                f"Stance value must be an integer from {STANCE_MIN} to {STANCE_MAX}.",
+                f"{path}.actor",
+                f"Unknown actor reference: {actor}.",
             )
-        elif value < STANCE_MIN or value > STANCE_MAX:
+        if topic is not None and topic not in topic_keys:
+            _add_error(
+                errors,
+                f"{path}.topic",
+                f"Unknown topic reference: {topic}.",
+            )
+        value = stance.get("value")
+        if (
+            isinstance(value, bool)
+            or not isinstance(value, int)
+            or not STANCE_MIN <= value <= STANCE_MAX
+        ):
             _add_error(
                 errors,
                 f"{path}.value",
-                f"Stance value must be an integer from {STANCE_MIN} to {STANCE_MAX}.",
+                "Stance value must be an integer from -3 to +3.",
             )
 
 
 def _validate_arguments(
-    arguments: list[dict[str, Any]],
+    arguments: list[Any],
     actor_keys: set[str],
     topic_keys: set[str],
     argument_keys: set[str],
     errors: list[dict[str, str]],
 ) -> None:
-    for index, argument in enumerate(arguments):
-        path = f"arguments[{index}]"
-
+    for i, argument in enumerate(arguments):
+        path = f"arguments[{i}]"
         if not _is_object(path, argument, errors):
             continue
-
         _require_fields(path, argument, REQUIRED_ARGUMENT_FIELDS, errors)
-
-        key = argument.get("key")
-        if key is not None and not _is_non_empty_string(key):
-            _add_error(errors, f"{path}.key", "key must be a non-empty string.")
-
-        actor = argument.get("actor")
-        if actor is not None:
-            if not _is_non_empty_string(actor):
-                _add_error(errors, f"{path}.actor", "actor must be a non-empty string.")
-            elif actor not in actor_keys:
-                _add_error(
-                    errors,
-                    f"{path}.actor",
-                    f"Unknown actor reference: {actor}.",
-                )
-
-        topic = argument.get("topic")
-        if topic is not None:
-            if not _is_non_empty_string(topic):
-                _add_error(errors, f"{path}.topic", "topic must be a non-empty string.")
-            elif topic not in topic_keys:
-                _add_error(
-                    errors,
-                    f"{path}.topic",
-                    f"Unknown topic reference: {topic}.",
-                )
-
-        content = argument.get("content")
-        if content is not None and not _is_non_empty_string(content):
+        if argument.get("actor") not in actor_keys:
+            _add_error(
+                errors,
+                f"{path}.actor",
+                f"Unknown actor reference: {argument.get('actor')}.",
+            )
+        if argument.get("topic") not in topic_keys:
+            _add_error(
+                errors,
+                f"{path}.topic",
+                f"Unknown topic reference: {argument.get('topic')}.",
+            )
+        if argument.get("side") not in ALLOWED_ARGUMENT_SIDES:
+            _add_error(errors, f"{path}.side", "Invalid argument side.")
+        parent = argument.get("parent")
+        if parent is not None and parent not in argument_keys:
+            _add_error(
+                errors,
+                f"{path}.parent",
+                f"Unknown argument parent reference: {parent}.",
+            )
+        if "content" in argument and not _is_non_empty_string(argument.get("content")):
             _add_error(
                 errors,
                 f"{path}.content",
                 "content must be a non-empty string.",
             )
 
-        side = argument.get("side")
-        if side not in ALLOWED_ARGUMENT_SIDES:
-            _add_error(
-                errors,
-                f"{path}.side",
-                "side must be one of: pro, con, neutral, or null.",
-            )
-
-        parent = argument.get("parent")
-        if parent is not None:
-            if not _is_non_empty_string(parent):
-                _add_error(
-                    errors,
-                    f"{path}.parent",
-                    "parent must be a non-empty string when provided.",
-                )
-            elif parent not in argument_keys:
-                _add_error(
-                    errors,
-                    f"{path}.parent",
-                    f"Unknown parent argument reference: {parent}.",
-                )
-
 
 def _validate_argument_sources(
-    argument_sources: list[dict[str, Any]],
+    sources: list[Any],
     argument_keys: set[str],
     schema_version: str,
     errors: list[dict[str, str]],
 ) -> None:
-    if schema_version == SCHEMA_VERSION_V1 and argument_sources:
+    if schema_version == SCHEMA_VERSION_V1 and sources:
         _add_error(
             errors,
             "argument_sources",
-            "argument_sources requires schema_version ethikos-demo-scenario/v2.",
+            "argument_sources requires schema_version ethikos-demo-scenario/v2 or later.",
         )
         return
-
-    for index, source in enumerate(argument_sources):
-        path = f"argument_sources[{index}]"
-
+    for i, source in enumerate(sources):
+        path = f"argument_sources[{i}]"
         if not _is_object(path, source, errors):
             continue
-
         _require_fields(path, source, REQUIRED_ARGUMENT_SOURCE_FIELDS, errors)
-
-        key = source.get("key")
-        if key is not None and not _is_non_empty_string(key):
-            _add_error(errors, f"{path}.key", "key must be a non-empty string.")
-
         argument = source.get("argument")
-        if argument is not None:
-            if not _is_non_empty_string(argument):
-                _add_error(
-                    errors,
-                    f"{path}.argument",
-                    "argument must be a non-empty string.",
-                )
-            elif argument not in argument_keys:
-                _add_error(
-                    errors,
-                    f"{path}.argument",
-                    f"Unknown argument reference: {argument}.",
-                )
-
-        for field_name in ARGUMENT_SOURCE_OPTIONAL_STRING_FIELDS:
-            value = source.get(field_name)
+        if argument is not None and argument not in argument_keys:
+            _add_error(
+                errors,
+                f"{path}.argument",
+                f"Unknown argument reference: {argument}.",
+            )
+        for field in ARGUMENT_SOURCE_OPTIONAL_STRING_FIELDS:
+            value = source.get(field)
             if value is not None and not isinstance(value, str):
                 _add_error(
                     errors,
-                    f"{path}.{field_name}",
-                    f"{field_name} must be a string when provided.",
+                    f"{path}.{field}",
+                    f"{field} must be a string when provided.",
                 )
-
-        has_material = any(
-            _is_non_empty_string(source.get(field_name))
-            for field_name in ARGUMENT_SOURCE_MATERIAL_FIELDS
-        )
-        if not has_material:
+        if not any(
+            _is_non_empty_string(source.get(field))
+            for field in ARGUMENT_SOURCE_MATERIAL_FIELDS
+        ):
             _add_error(
                 errors,
                 path,
@@ -723,59 +431,28 @@ def _validate_argument_sources(
 
 
 def _validate_consultations(
-    consultations: list[dict[str, Any]],
+    consultations: list[Any],
     errors: list[dict[str, str]],
 ) -> None:
-    for index, consultation in enumerate(consultations):
-        path = f"consultations[{index}]"
-
+    for i, consultation in enumerate(consultations):
+        path = f"consultations[{i}]"
         if not _is_object(path, consultation, errors):
             continue
-
         _require_fields(path, consultation, REQUIRED_CONSULTATION_FIELDS, errors)
-
-        key = consultation.get("key")
-        if key is not None and not _is_non_empty_string(key):
-            _add_error(errors, f"{path}.key", "key must be a non-empty string.")
-
-        title = consultation.get("title")
-        if title is not None and not _is_non_empty_string(title):
-            _add_error(errors, f"{path}.title", "title must be a non-empty string.")
-
-        if title and not str(title).startswith(DEMO_TOPIC_TITLE_PREFIX):
-            _add_error(
-                errors,
-                f"{path}.title",
-                f"Demo consultation title must start with {DEMO_TOPIC_TITLE_PREFIX}.",
-            )
-
-        status = consultation.get("status")
-        if status is not None and status not in ALLOWED_CONSULTATION_STATUSES:
-            _add_error(
-                errors,
-                f"{path}.status",
-                "Consultation status must be one of: "
-                f"{sorted(ALLOWED_CONSULTATION_STATUSES)}.",
-            )
-
-        _validate_optional_date_string(consultation, "open_date", path, errors)
-        _validate_optional_date_string(consultation, "close_date", path, errors)
-
+        if consultation.get("status") not in ALLOWED_CONSULTATION_STATUSES:
+            _add_error(errors, f"{path}.status", "Invalid consultation status.")
         options = consultation.get("options", [])
-        if options is not None and not isinstance(options, list):
+        if not isinstance(options, list):
             _add_error(
                 errors,
                 f"{path}.options",
                 "options must be a list when provided.",
             )
             continue
-
-        for option_index, option in enumerate(options or []):
-            option_path = f"{path}.options[{option_index}]"
-
+        for j, option in enumerate(options):
+            option_path = f"{path}.options[{j}]"
             if not _is_object(option_path, option, errors):
                 continue
-
             _require_fields(
                 option_path,
                 option,
@@ -783,135 +460,255 @@ def _validate_consultations(
                 errors,
             )
 
-            option_key = option.get("key")
-            if option_key is not None and not _is_non_empty_string(option_key):
-                _add_error(
-                    errors,
-                    f"{option_path}.key",
-                    "key must be a non-empty string.",
-                )
-
-            label = option.get("label")
-            if label is not None and not _is_non_empty_string(label):
-                _add_error(
-                    errors,
-                    f"{option_path}.label",
-                    "label must be a non-empty string.",
-                )
-
 
 def _validate_consultation_votes(
-    consultation_votes: list[dict[str, Any]],
+    votes: list[Any],
     actor_keys: set[str],
     consultation_keys: set[str],
     consultation_option_keys: dict[str, set[str]],
+    schema_version: str,
     errors: list[dict[str, str]],
 ) -> None:
-    for index, vote in enumerate(consultation_votes):
-        path = f"consultation_votes[{index}]"
-
+    required = (
+        REQUIRED_CONSULTATION_VOTE_FIELDS_V3
+        if schema_version == SCHEMA_VERSION_V3
+        else REQUIRED_CONSULTATION_VOTE_FIELDS_LEGACY
+    )
+    for i, vote in enumerate(votes):
+        path = f"consultation_votes[{i}]"
         if not _is_object(path, vote, errors):
             continue
-
-        _require_fields(path, vote, REQUIRED_CONSULTATION_VOTE_FIELDS, errors)
-
+        _require_fields(path, vote, required, errors)
         actor = vote.get("actor")
-        if actor is not None:
-            if not _is_non_empty_string(actor):
-                _add_error(errors, f"{path}.actor", "actor must be a non-empty string.")
-            elif actor not in actor_keys:
-                _add_error(
-                    errors,
-                    f"{path}.actor",
-                    f"Unknown actor reference: {actor}.",
-                )
-
         consultation = vote.get("consultation")
-        if consultation is not None:
-            if not _is_non_empty_string(consultation):
-                _add_error(
-                    errors,
-                    f"{path}.consultation",
-                    "consultation must be a non-empty string.",
-                )
-            elif consultation not in consultation_keys:
-                _add_error(
-                    errors,
-                    f"{path}.consultation",
-                    f"Unknown consultation reference: {consultation}.",
-                )
-
+        if actor is not None and actor not in actor_keys:
+            _add_error(
+                errors,
+                f"{path}.actor",
+                f"Unknown actor reference: {actor}.",
+            )
+        if consultation is not None and consultation not in consultation_keys:
+            _add_error(
+                errors,
+                f"{path}.consultation",
+                f"Unknown consultation reference: {consultation}.",
+            )
         option = vote.get("option")
-        if option is not None:
-            if not _is_non_empty_string(option):
+        if option is not None and consultation in consultation_option_keys:
+            known = consultation_option_keys.get(str(consultation), set())
+            if known and option not in known:
                 _add_error(
                     errors,
                     f"{path}.option",
-                    "option must be a non-empty string when provided.",
+                    f"Unknown option reference for consultation {consultation}: {option}.",
                 )
-            elif consultation in consultation_option_keys:
-                known_options = consultation_option_keys.get(str(consultation), set())
-                if known_options and option not in known_options:
-                    _add_error(
-                        errors,
-                        f"{path}.option",
-                        f"Unknown option reference for consultation {consultation}: {option}.",
-                    )
-
         _validate_number(vote, "raw_value", path, errors)
-        _validate_number(vote, "weighted_value", path, errors)
+        if schema_version == SCHEMA_VERSION_V3:
+            if "weighted_value" in vote:
+                _add_error(
+                    errors,
+                    f"{path}.weighted_value",
+                    "weighted_value is a derived Smart Vote reading and must not be supplied in v3 source votes.",
+                )
+        else:
+            _validate_number(vote, "weighted_value", path, errors)
 
 
 def _validate_impact_items(
-    impact_items: list[dict[str, Any]],
+    items: list[Any],
     consultation_keys: set[str],
     errors: list[dict[str, str]],
 ) -> None:
-    for index, item in enumerate(impact_items):
-        path = f"impact_items[{index}]"
-
+    for i, item in enumerate(items):
+        path = f"impact_items[{i}]"
         if not _is_object(path, item, errors):
             continue
-
         _require_fields(path, item, REQUIRED_IMPACT_ITEM_FIELDS, errors)
-
         consultation = item.get("consultation")
-        if consultation is not None:
-            if not _is_non_empty_string(consultation):
-                _add_error(
-                    errors,
-                    f"{path}.consultation",
-                    "consultation must be a non-empty string.",
-                )
-            elif consultation not in consultation_keys:
-                _add_error(
-                    errors,
-                    f"{path}.consultation",
-                    f"Unknown consultation reference: {consultation}.",
-                )
-
-        action = item.get("action")
-        if action is not None and not _is_non_empty_string(action):
+        if consultation is not None and consultation not in consultation_keys:
             _add_error(
                 errors,
-                f"{path}.action",
-                "action must be a non-empty string.",
+                f"{path}.consultation",
+                f"Unknown consultation reference: {consultation}.",
             )
 
-        status = item.get("status")
-        if status is not None and not _is_non_empty_string(status):
+
+def _validate_ekoh_profiles(
+    profiles: list[Any],
+    actor_keys: set[str],
+    schema_version: str,
+    errors: list[dict[str, str]],
+) -> None:
+    if schema_version != SCHEMA_VERSION_V3 and profiles:
+        _add_error(
+            errors,
+            "ekoh_profiles",
+            "ekoh_profiles requires schema_version ethikos-demo-scenario/v3.",
+        )
+        return
+
+    seen_actors: set[str] = set()
+    for i, profile in enumerate(profiles):
+        path = f"ekoh_profiles[{i}]"
+        if not _is_object(path, profile, errors):
+            continue
+        _require_fields(path, profile, REQUIRED_EKOH_PROFILE_FIELDS, errors)
+        actor = profile.get("actor")
+        if actor not in actor_keys:
             _add_error(
                 errors,
-                f"{path}.status",
-                "status must be a non-empty string.",
+                f"{path}.actor",
+                f"Unknown actor reference: {actor}.",
+            )
+        elif actor in seen_actors:
+            _add_error(
+                errors,
+                f"{path}.actor",
+                f"Duplicate EkoH profile for actor: {actor}.",
+            )
+        elif isinstance(actor, str):
+            seen_actors.add(actor)
+
+        ethics = profile.get("ethics_score")
+        if ethics is not None:
+            _validate_bounded_number_value(
+                ethics,
+                0.0,
+                2.0,
+                f"{path}.ethics_score",
+                errors,
             )
 
-        _validate_optional_date_string(item, "date", path, errors)
+        expertise = profile.get("expertise")
+        if not isinstance(expertise, list):
+            _add_error(errors, f"{path}.expertise", "expertise must be a list.")
+            continue
+
+        seen_domains: set[str] = set()
+        for j, score in enumerate(expertise):
+            score_path = f"{path}.expertise[{j}]"
+            if not _is_object(score_path, score, errors):
+                continue
+            _require_fields(
+                score_path,
+                score,
+                REQUIRED_EKOH_EXPERTISE_FIELDS,
+                errors,
+            )
+            code = score.get("domain_code")
+            if not _is_non_empty_string(code):
+                _add_error(
+                    errors,
+                    f"{score_path}.domain_code",
+                    "domain_code must be a non-empty string.",
+                )
+            elif code in seen_domains:
+                _add_error(
+                    errors,
+                    f"{score_path}.domain_code",
+                    f"Duplicate domain_code in profile: {code}.",
+                )
+            else:
+                seen_domains.add(code)
+
+            _validate_bounded_number(
+                score,
+                "weighted_score",
+                0.0,
+                1.0,
+                score_path,
+                errors,
+            )
+            if "raw_score" in score:
+                _validate_bounded_number(
+                    score,
+                    "raw_score",
+                    0.0,
+                    1.0,
+                    score_path,
+                    errors,
+                )
 
 
-# ---------------------------------------------------------------------
-# Collection helpers
-# ---------------------------------------------------------------------
+def _validate_consultation_relevance(
+    rows: list[Any],
+    consultation_keys: set[str],
+    schema_version: str,
+    errors: list[dict[str, str]],
+) -> None:
+    if schema_version != SCHEMA_VERSION_V3 and rows:
+        _add_error(
+            errors,
+            "consultation_relevance",
+            "consultation_relevance requires schema_version ethikos-demo-scenario/v3.",
+        )
+        return
+
+    totals: defaultdict[str, float] = defaultdict(float)
+    seen: set[tuple[str, str]] = set()
+
+    for i, row in enumerate(rows):
+        path = f"consultation_relevance[{i}]"
+        if not _is_object(path, row, errors):
+            continue
+        _require_fields(
+            path,
+            row,
+            REQUIRED_CONSULTATION_RELEVANCE_FIELDS,
+            errors,
+        )
+        consultation = row.get("consultation")
+        domain_code = row.get("domain_code")
+
+        if consultation not in consultation_keys:
+            _add_error(
+                errors,
+                f"{path}.consultation",
+                f"Unknown consultation reference: {consultation}.",
+            )
+        if not _is_non_empty_string(domain_code):
+            _add_error(
+                errors,
+                f"{path}.domain_code",
+                "domain_code must be a non-empty string.",
+            )
+
+        if isinstance(consultation, str) and isinstance(domain_code, str):
+            pair = (consultation, domain_code)
+            if pair in seen:
+                _add_error(
+                    errors,
+                    path,
+                    f"Duplicate consultation/domain relevance pair: {consultation}/{domain_code}.",
+                )
+            seen.add(pair)
+
+        if _validate_bounded_number(
+            row,
+            "weight",
+            0.0,
+            1.0,
+            path,
+            errors,
+        ) and isinstance(consultation, str):
+            totals[consultation] += float(row["weight"])
+
+        criteria = row.get("criteria")
+        if criteria is not None and not isinstance(criteria, (dict, str)):
+            _add_error(
+                errors,
+                f"{path}.criteria",
+                "criteria must be an object or string when provided.",
+            )
+
+    for consultation, total in totals.items():
+        if abs(total - 1.0) > 0.0001:
+            _add_error(
+                errors,
+                "consultation_relevance",
+                f"Relevance weights for consultation {consultation} must sum to 1.0; got {total:.4f}.",
+            )
+
 
 def _collect_unique_keys(
     items: list[Any],
@@ -919,40 +716,26 @@ def _collect_unique_keys(
     errors: list[dict[str, str]],
 ) -> set[str]:
     keys: set[str] = set()
-    seen: set[str] = set()
-
-    for index, item in enumerate(items):
-        path = f"{collection_path}[{index}]"
-
+    for i, item in enumerate(items):
         if not isinstance(item, dict):
             continue
-
         key = item.get("key")
-
         if key is None:
             continue
-
         if not _is_non_empty_string(key):
             _add_error(
                 errors,
-                f"{path}.key",
+                f"{collection_path}[{i}].key",
                 "key must be a non-empty string.",
             )
             continue
-
-        key_string = str(key)
-
-        if key_string in seen:
+        if key in keys:
             _add_error(
                 errors,
-                f"{path}.key",
-                f"Duplicate key: {key_string}.",
+                f"{collection_path}[{i}].key",
+                f"Duplicate key: {key}.",
             )
-            continue
-
-        seen.add(key_string)
-        keys.add(key_string)
-
+        keys.add(key)
     return keys
 
 
@@ -960,90 +743,41 @@ def _collect_consultation_option_keys(
     consultations: list[Any],
     errors: list[dict[str, str]],
 ) -> dict[str, set[str]]:
-    option_keys_by_consultation: dict[str, set[str]] = {}
-
-    for consultation_index, consultation in enumerate(consultations):
-        consultation_path = f"consultations[{consultation_index}]"
-
-        if not isinstance(consultation, dict):
+    result: dict[str, set[str]] = {}
+    for i, consultation in enumerate(consultations):
+        if not isinstance(consultation, dict) or not isinstance(
+            consultation.get("key"), str
+        ):
             continue
-
-        consultation_key = consultation.get("key")
-        if not _is_non_empty_string(consultation_key):
-            continue
-
-        options = consultation.get("options", [])
-        if options is None:
-            continue
-
-        if not isinstance(options, list):
-            continue
-
-        seen_options: set[str] = set()
-        consultation_options: set[str] = set()
-
-        for option_index, option in enumerate(options):
-            option_path = f"{consultation_path}.options[{option_index}]"
-
+        keys: set[str] = set()
+        for j, option in enumerate(consultation.get("options", []) or []):
             if not isinstance(option, dict):
                 continue
+            key = option.get("key")
+            if isinstance(key, str):
+                if key in keys:
+                    _add_error(
+                        errors,
+                        f"consultations[{i}].options[{j}].key",
+                        f"Duplicate option key: {key}.",
+                    )
+                keys.add(key)
+        result[consultation["key"]] = keys
+    return result
 
-            option_key = option.get("key")
-
-            if option_key is None:
-                continue
-
-            if not _is_non_empty_string(option_key):
-                _add_error(
-                    errors,
-                    f"{option_path}.key",
-                    "key must be a non-empty string.",
-                )
-                continue
-
-            option_key_string = str(option_key)
-
-            if option_key_string in seen_options:
-                _add_error(
-                    errors,
-                    f"{option_path}.key",
-                    f"Duplicate option key: {option_key_string}.",
-                )
-                continue
-
-            seen_options.add(option_key_string)
-            consultation_options.add(option_key_string)
-
-        option_keys_by_consultation[str(consultation_key)] = consultation_options
-
-    return option_keys_by_consultation
-
-
-# ---------------------------------------------------------------------
-# Generic validation helpers
-# ---------------------------------------------------------------------
 
 def _require_fields(
     path: str,
     obj: dict[str, Any],
-    required_fields: set[str],
+    required: set[str],
     errors: list[dict[str, str]],
 ) -> None:
-    for field in sorted(required_fields):
+    for field in sorted(required):
         if field not in obj:
             _add_error(
                 errors,
-                f"{path}.{field}" if path != "$" else field,
-                f"{field} is required.",
-            )
-            continue
-
-        value = obj.get(field)
-        if value is None:
-            _add_error(
-                errors,
-                f"{path}.{field}" if path != "$" else field,
-                f"{field} is required.",
+                f"{path}.{field}",
+                f"Missing required field: {field}.",
             )
 
 
@@ -1054,12 +788,7 @@ def _is_object(
 ) -> bool:
     if isinstance(value, dict):
         return True
-
-    _add_error(
-        errors,
-        path,
-        "Item must be an object.",
-    )
+    _add_error(errors, path, "Expected an object.")
     return False
 
 
@@ -1067,49 +796,64 @@ def _is_non_empty_string(value: Any) -> bool:
     return isinstance(value, str) and bool(value.strip())
 
 
-def _validate_optional_date_string(
-    obj: dict[str, Any],
-    field: str,
-    path: str,
-    errors: list[dict[str, str]],
-) -> None:
-    value = obj.get(field)
-
-    if value is None:
-        return
-
-    if not _is_non_empty_string(value):
-        _add_error(
-            errors,
-            f"{path}.{field}",
-            f"{field} must be a non-empty ISO date string when provided.",
-        )
-
-
 def _validate_number(
     obj: dict[str, Any],
     field: str,
     path: str,
     errors: list[dict[str, str]],
-) -> None:
+) -> bool:
     value = obj.get(field)
-
-    if not isinstance(value, (int, float)) or isinstance(value, bool):
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
         _add_error(
             errors,
             f"{path}.{field}",
             f"{field} must be a number.",
         )
+        return False
+    return True
 
 
-def _add_error(
-    errors: list[dict[str, str]],
+def _validate_bounded_number(
+    obj: dict[str, Any],
+    field: str,
+    minimum: float,
+    maximum: float,
     path: str,
-    message: str,
-) -> None:
-    errors.append(
-        {
-            "path": path,
-            "message": message,
-        }
+    errors: list[dict[str, str]],
+) -> bool:
+    value = obj.get(field)
+    return _validate_bounded_number_value(
+        value,
+        minimum,
+        maximum,
+        f"{path}.{field}",
+        errors,
     )
+
+
+def _validate_bounded_number_value(
+    value: Any,
+    minimum: float,
+    maximum: float,
+    path: str,
+    errors: list[dict[str, str]],
+) -> bool:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        _add_error(
+            errors,
+            path,
+            f"Value must be a number between {minimum} and {maximum}.",
+        )
+        return False
+    if not minimum <= float(value) <= maximum:
+        _add_error(
+            errors,
+            path,
+            f"Value must be between {minimum} and {maximum}.",
+        )
+        return False
+    return True
+
+
+def _add_error(errors: list[dict[str, str]], path: str, message: str) -> None:
+    errors.append({"path": path, "message": message})

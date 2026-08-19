@@ -1,52 +1,34 @@
-"""
-Multidimensional scoring engine.
+"""EkoH multidimensional scoring.
 
-Converts raw activity metrics into a weighted EkoH merit score
-along three axes:
+This service converts evidence metrics for one user/domain into a normalized
+0..1 expertise score.  It does not compute voting power; Smart Vote consumes
+these scores later in a declared contextual reading.
 
-    • quality      (peer review, up-votes, moderator marks…)
-    • expertise    (credentials, publications, citations…)
-    • frequency    (participation cadence)
-
-Final formula (from 03-technical_spec.md §2 .2 .1):
-
-    S_u,d  =  Σ_i  ( R_i  ·  N_i,u,d )
-
-        where:
-          R_i  =  runtime weight  (RAW_WEIGHT_QUALITY, etc.)
-          N_i  =  normalised metric on axis *i* for user *u* & domain *d*
-
-Normalisation is performed as **percent-rank** over the *domain* cohort
-(avoids cross-domain bias).
+Inputs are expected on either a 0..1 or 0..100 scale.  Each axis is normalized
+independently and then combined using runtime RAW_WEIGHT_* configuration.
 """
 
 from __future__ import annotations
 
 import logging
 from decimal import Decimal
-from typing import Iterable, Mapping
-
-from django.db.models import F, Window
-from django.db.models.functions import PercentRank
+from functools import lru_cache
+from typing import Mapping
 
 from konnaxion.ekoh.models.config import ScoreConfiguration
-from konnaxion.ekoh.models.scores import (
-    UserExpertiseScore,
-)
+from konnaxion.ekoh.models.scores import UserExpertiseScore
 from konnaxion.ekoh.models.taxonomy import ExpertiseCategory
 
 LOGGER = logging.getLogger(__name__)
 
-# --------------------------------------------------------------------------- #
-# helper – fetch runtime weights (cached for 60 s with simple lru)            #
-# --------------------------------------------------------------------------- #
-from functools import lru_cache
-from time import time
+AXES = ("quality", "expertise", "frequency")
+ZERO = Decimal("0")
+ONE = Decimal("1")
+HUNDRED = Decimal("100")
 
 
 @lru_cache(maxsize=1)
 def _weights_cache() -> Mapping[str, Decimal]:
-    """Return RAW_WEIGHT coefficients as {name: Decimal}."""
     rows = (
         ScoreConfiguration.objects.filter(weight_name__startswith="RAW_WEIGHT_")
         .values_list("weight_name", "weight_value")
@@ -60,10 +42,26 @@ def get_raw_weights(force_refresh: bool = False) -> Mapping[str, Decimal]:
     return _weights_cache()
 
 
-# --------------------------------------------------------------------------- #
-# main API                                                                    #
-# --------------------------------------------------------------------------- #
-AXES = ("quality", "expertise", "frequency")
+def _normalise_metric(value: Decimal | int | float | str) -> Decimal:
+    """Normalize a metric to 0..1 while tolerating legacy 0..100 inputs."""
+    numeric = Decimal(str(value))
+    numeric = max(ZERO, numeric)
+    if numeric > ONE:
+        numeric = numeric / HUNDRED
+    return min(ONE, numeric)
+
+
+def _normalised_axis_weights() -> Mapping[str, Decimal]:
+    configured = get_raw_weights()
+    values = {
+        axis: max(ZERO, Decimal(configured.get(f"RAW_WEIGHT_{axis.upper()}", ZERO)))
+        for axis in AXES
+    }
+    total = sum(values.values(), ZERO)
+    if total <= ZERO:
+        equal = ONE / Decimal(len(AXES))
+        return {axis: equal for axis in AXES}
+    return {axis: value / total for axis, value in values.items()}
 
 
 def compute_user_domain_score(
@@ -73,78 +71,46 @@ def compute_user_domain_score(
     *,
     flush: bool = True,
 ) -> Decimal:
-    """
-    Compute weighted score **S_u,d** for one user in one domain.
+    """Compute normalized EkoH expertise for one user and one domain.
 
-    Parameters
-    ----------
-    user_id : int
-        ID of auth_user
-    domain : ExpertiseCategory
-        Leaf or parent domain
-    metrics : dict
-        Raw axis metrics already gathered by callers:
-          {"quality": 87, "expertise": 66, "frequency": 12}
-    flush : bool
-        Persist result into UserExpertiseScore table if True.
+    Required metrics:
+      quality    evidence quality / peer validation
+      expertise  demonstrated knowledge / credentials / work
+      frequency  recency or sustained relevant participation
 
-    Returns
-    -------
-    Decimal
-        Weighted score between 0 and 100 (rounded to 4 decimals)
+    Returns a Decimal in 0..1.  Lack of expertise never creates negative merit.
     """
-    raw_weights = get_raw_weights()
-    missing = [ax for ax in AXES if ax not in metrics]
-    if missing:  # pragma: no cover
+    missing = [axis for axis in AXES if axis not in metrics]
+    if missing:
         raise ValueError(f"Missing metric(s): {', '.join(missing)}")
 
-    # Percent-rank normalisation within domain cohort
-    normalised = _percent_rank(metrics, domain)
+    normalized = {axis: _normalise_metric(metrics[axis]) for axis in AXES}
+    axis_weights = _normalised_axis_weights()
 
-    weighted_sum = Decimal("0")
-    for axis in AXES:
-        weighted_sum += raw_weights[f"RAW_WEIGHT_{axis.upper()}"] * normalised[axis]
-
-    score = weighted_sum.quantize(Decimal("0.0001"))
+    score = sum(
+        axis_weights[axis] * normalized[axis]
+        for axis in AXES
+    ).quantize(Decimal("0.0001"))
 
     if flush:
+        # raw_score remains an explainable aggregate of normalized evidence
+        # axes; weighted_score is the canonical normalized domain score.
+        raw_score = sum(normalized.values(), ZERO).quantize(Decimal("0.0001"))
         UserExpertiseScore.objects.update_or_create(
             user_id=user_id,
             category=domain,
             defaults={
-                "raw_score": sum(metrics.values()),
+                "raw_score": raw_score,
                 "weighted_score": score,
             },
         )
-    return score
 
-
-# --------------------------------------------------------------------------- #
-# internal helpers                                                            #
-# --------------------------------------------------------------------------- #
-def _percent_rank(
-    metric_map: Mapping[str, Decimal], domain: ExpertiseCategory
-) -> Mapping[str, Decimal]:
-    """
-    Convert raw axis values to 0-1 scale using PercentRank over cohort.
-
-    Cohort = users who have any score row in this *domain* OR its descendants.
-    """
-    # Gather cohort scores in one ORM query per axis
-    cohort_qs = (
-        UserExpertiseScore.objects.filter(category__path__descendant=domain.path)
-        .values("user_id")
-        .annotate(raw_axis=F("raw_score"))
+    LOGGER.debug(
+        "EkoH domain score user=%s domain=%s metrics=%s normalized=%s score=%s",
+        user_id,
+        getattr(domain, "code", domain),
+        dict(metrics),
+        normalized,
+        score,
     )
-
-    norm: dict[str, Decimal] = {}
-    for axis in AXES:
-        ranked = (
-            cohort_qs.annotate(
-                pct=Window(expression=PercentRank(), order_by=F("raw_axis").asc())
-            )
-            .filter(raw_axis=metric_map[axis])
-            .first()
-        )
-        norm[axis] = Decimal(ranked["pct"] if ranked else 0)
-    return norm
+    return score

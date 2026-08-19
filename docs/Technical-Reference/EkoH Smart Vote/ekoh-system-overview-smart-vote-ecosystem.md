@@ -1,76 +1,146 @@
-# **EkoH System Overview (Smart Vote Ecosystem)**
+# EkoH System Overview
 
-## **Introduction: Purpose and Role of EkoH in Smart Vote**
+## Status
 
-EkoH is a groundbreaking merit-based scoring system at the heart of the Smart Vote ecosystem, designed to enhance democratic decision-making with a **qualitative participatory** approach. In a traditional “one person, one vote” democracy, all voices count equally, regardless of expertise or integrity. EkoH rethinks this model by introducing a systematic **merit component** – accounting for both ethical standing and competence – into each participant’s voting influence. The goal is not to exclude anyone, but to ensure that *“the quality of each voice is taken into consideration”*. In practice, Smart Vote (the voting application of EkoH) still allows broad citizen participation, but **weights each vote** according to the voter’s demonstrated expertise and ethical trustworthiness. This gives greater influence to those who have proven contributions to the public good and sound knowledge, while maintaining inclusivity and diversity in the process. By doing so, EkoH bridges the gap between direct and expert-driven democracy, creating a **transparent citizen meritocracy** powered by modern data, AI, and decentralized verification technologies.
+This document describes the current architectural role of **EkoH** inside Konnaxion and ethiKos.
 
-## **Merit-Based Expertise Scoring in EkoH**
+The binding separation is:
 
-At its core, EkoH assigns each user a **multidimensional expertise score** – essentially a profile of their merit – rather than a single reputation number. This EkoH profile aggregates several **verified dimensions of merit**, capturing different aspects of a person’s contributions and capabilities. The key dimensions include:
+- **ethiKos / Konsultations** own source participation facts.
+- **EkoH** supplies contextual expertise, reliability, provenance, and privacy-aware profile data.
+- **Smart Vote** may use an EkoH snapshot to publish a declared, reproducible reading of source facts.
 
-* **Theoretical Knowledge & Qualifications:** e.g. formal education, degrees, certifications, published research or patents obtained by the individual.
+EkoH is **not** the voting engine and an EkoH-weighted result is **not** the canonical source result.
 
-* **Practical Experience:** e.g. years of active work in relevant fields, hands-on projects or concrete achievements completed in practice.
+## 1. Purpose
 
-* **Measurable Impact:** quantifiable results linked to the person’s activities – for instance, number of beneficiaries reached by their projects, amount of CO₂ emissions reduced, patients treated, funds raised for a cause, etc., depending on context.
+EkoH helps answer a narrow question:
 
-* **Peer Recognition:** endorsements and positive evaluations from others in the community or field – for example, recommendations by fellow experts, citations of their work, or upvotes/acknowledgments from peers on the platform.
+> What competence and reliability context is relevant to this contribution, for this domain, at this time?
 
-* **Knowledge Dissemination:** contributions to spreading knowledge and educating others, such as mentoring, teaching, publishing open educational resources or documentation for public use.
+It does not assign a universal rank to a person. Expertise is contextual and domain-bounded. A strong economics profile may matter greatly for a fiscal consultation and provide little or no additional signal for a software-security question.
 
-* **Ethical Integrity (Trustworthiness):** an index of the individual’s integrity and reliability, based on their adherence to community values and behavior. This reflects their history of ethical conduct – respecting platform rules, engaging in constructive debate, avoiding misinformation or abuse, disclosing conflicts of interest, etc..
+## 2. Domain-bounded expertise
 
-Each of these dimensions is **evidence-based and verifiable**. The system relies on objective, factual data to assess merit, and every element of a user’s score can be traced back to proof or source data. For example, academic degrees or certifications are verified (e.g. via blockchain or official registries), impact metrics update when new projects conclude, and peer recommendations or endorsements are logged as they are submitted. Modern tools like digital certificate verification, open badges, and automated tracking of open contributions feed into EkoH to keep profiles **up-to-date** in near real-time. The **score is not static** – it evolves as the person learns, accomplishes more, or receives new feedback. A seasoned expert who starts making mistakes or violating trust will see their score gradually decrease, whereas a newcomer who rapidly proves their talent and goodwill can **raise their score quickly**. All profile data is stored securely and transparently so that each component of the score is **justifiable and auditable** if needed.
+EkoH represents expertise as a vector across a governed knowledge taxonomy. The current implementation uses `ExpertiseCategory` and `UserExpertiseScore`.
 
-Importantly, **ethical integrity** acts as a multiplier on one’s influence. EkoH includes a reliability/ethics index to ensure *how* a person contributes matters as much as *what* they know. A participant with an exemplary track record of honesty, respect, and responsibility earns a higher “trust capital” in the system, boosting their overall weight. Conversely, any unethical behavior – e.g. attempts at manipulation or deliberate misinformation – will reduce the person’s reliability score (or even suspend their influence for severe violations). In essence, **expertise is always tempered by probity**: EkoH rewards not only knowledge and skill, but also the integrity with which that expertise is applied. This design choice aligns collective decisions with shared moral values, encouraging every member to remain ethical if they wish to maintain or grow their influence. By combining competence-based merit with an ethics factor, EkoH ensures that credibility comes from both *what* you contribute and *how* you conduct yourself.
+Conceptually:
 
-## **Konnaxion Integration: Contributions and Endorsements**
+```text
+user expertise = {
+  domain A: score,
+  domain B: score,
+  domain C: score,
+  ...
+}
+```
 
-EkoH is deeply integrated into **Konnaxion**, the Koa movement’s global collaboration platform, which interconnects various sub-platforms (education, innovation, forums, etc.). Through Konnaxion, users can contribute content and knowledge in many forms – for example, publishing an open-source **blueprint** or prototype design on the innovation hub (keenKonnect), creating an educational **tutorial** or informative animation on the learning platform (KonnectED), or participating constructively in deliberative forums (Ethikos). These contributions directly feed into the EkoH scoring mechanism: they demonstrate practical know-how and a willingness to share knowledge, thereby boosting the relevant merit dimensions (measurable impact, knowledge dissemination) of the contributor’s profile. Moreover, **peer feedback on Konnaxion amplifies this effect**. If others find value in a user’s shared content – for instance, if many community members **endorse or upvote** a tutorial or blueprint – those endorsements count toward the user’s **peer recognition** score in EkoH. In this way, meaningful activity on Konnaxion is rewarded: a person who actively educates others, shares useful innovations, or engages in community projects will see a tangible rise in their EkoH expertise rating as evidence of their contributions.
+Scores must be grounded in evidence such as verified credentials, documented practice, validated contributions, peer review, or other governed sources. Absence of expertise in a domain is not a penalty; it simply means no expertise bonus is available for that domain.
 
-Konnaxion also leverages EkoH *within* its own interactions. Because EkoH scores reflect credibility, the platform weights certain actions accordingly – for example, in content moderation or idea vetting, an **upvote from a respected expert or community leader** carries more weight than one from a brand-new user. This ensures that quality signals on the platform aren’t drowned out by noise: reputable voices have proportionate influence even in day-to-day community feedback. In turn, new users are incentivized to build their merit by learning and contributing positively. Thanks to this integration, **growth is meritocratic and inclusive**: even those from traditionally marginalized groups can rise in influence by showcasing their talents and integrity on Konnaxion’s various modules. Coupled with open learning (KonnectED) and collaborative innovation (keenKonnect) opportunities, EkoH’s presence in the ecosystem helps more diverse people acquire expertise and be recognized for it. Over time, this broadens the pool of trusted “experts” in the community, breaking down old elitist barriers (like needing certain titles or networks) in favor of a more open and community-validated meritocracy.
+The current scoring contract normalizes domain expertise to `0..1`.
 
-## **Domain-Specific Ratings (UNESCO/ISCED-F Aligned)**
+## 3. Evidence and provenance
 
-Expertise in EkoH is **contextual**. Rather than a one-size-fits-all rating, a user’s competence is assessed **per domain of knowledge or practice**. These domains correspond to standardized fields (aligned with UNESCO’s ISCED-F classification of education/fields), covering areas such as health sciences, agriculture, education, engineering, public policy, arts, and so on. In other words, an individual might have a high EkoH score in *Environmental Science* or *Public Health* based on their background and contributions in those areas, but a lower score in unrelated domains. This granularity is crucial for Smart Vote to function intelligently.
+An EkoH score should be explainable. The system should be able to answer:
 
-When a proposal or issue is up for collective decision, the system first **categorizes the topic by its relevant domains**. For example, a question about restricting pesticides would be tagged under *public health* and *agriculture*; a proposed school reform would relate to *education* (and perhaps \*pedagogy); building a new transport route might involve *urban planning*, *environmental science*, and *civil engineering*. Each voter’s influence on that specific decision is then determined by their **rating in the corresponding domains** (along with their ethics/reliability). Smart Vote computes a *contextual weight* for every participant by combining the user’s scores in the relevant knowledge domains with their overall ethical score and past reliability. For instance, if a vote spans two domains (say *Health* and *Agriculture* in the pesticides example), the system might allocate 40% weight to the voter’s expertise in Health, 25% to their expertise in Agriculture, and the remaining 35% to their general ethical and reliability indices (e.g. 20% ethics \+ 15% reliability). These weighting parameters are defined transparently and can be tuned by subject-matter governance rules – but they apply equally to everyone for that vote. The result is that **each participant’s vote is weighted by how knowledgeable and trusted they are in the matter at hand**.
+- Which domain is being scored?
+- Which evidence contributed?
+- Which rules transformed that evidence into the current score?
+- When was the score computed?
+- Which version of the scoring policy was used?
+- Can the subject challenge or correct the evidence?
 
-By computing **separate ratings for each domain**, EkoH ensures that people are influential *where they are most competent*. A renowned doctor, for example, will have a strong score in the medical/health domain but that expertise will not unduly carry over to, say, economic policy decisions. Conversely, someone who has devoted years to local environmental projects can build a high environment-domain score even if they lack formal credentials, allowing their voice to count strongly in environmental decisions. This domain-based approach aligns with the intuition that **no one is an expert at everything**, but nearly everyone is knowledgeable in some area – and those specific strengths should be recognized in relevant collective decisions. It also adds nuance to public consultations: rather than a blunt yes/no vote by an uninformed majority or a decision left only to a select expert panel, EkoH enables *“the opinions of the most competent and virtuous for the subject to carry more weight, while still allowing broad participation”*. The use of a standard classification (like UNESCO’s) for domains guarantees that the system’s scope of expertise is comprehensive and comparable globally, covering sciences, social sciences, humanities, technical fields, etc., in a structured way.
+Automated analysis may assist classification or propose adjustments, but probabilistic output must not silently become authoritative profile state.
 
-## **Multi-Faceted Scoring Outputs and Customization**
+## 4. Reliability / ethics signal
 
-EkoH does not produce a single static score for each person; instead, it offers a **rich, adjustable view of each participant’s merit**. Key outputs and customization features include:
+EkoH may expose a governed reliability or ethics modifier. This is a cross-cutting signal, not a declaration of a person's moral worth.
 
-* **Global Balanced Score:** a composite indicator that summarizes an individual’s overall merit across all dimensions and domains. This *“balanced note”* provides a holistic view of one’s competence and ethical standing combined. It is calculated by aggregating the various components of the EkoH profile (across domains), often with normalized weighting so that overspecialization in one area doesn’t skew the entire score. The global score is continually updated as the person’s profile evolves, and each component that contributes to it is recorded and explainable. Decision-makers or platforms can use this as a quick reference of a user’s general credibility, but it is always backed by the detailed breakdown below.
+The modifier must be:
 
-* **Per-Domain Ratings:** as described, EkoH provides a distinct rating for every knowledge domain relevant to the community. Users essentially have a **portfolio of scores** – e.g. a rating in climate science, another in economics, another in education, etc. – rather than one number. This allows Smart Vote to pull the most pertinent score for any given issue. It also means a user could advertise or view their expertise profile in a nuanced way (e.g. *“90 in Renewable Energy, 75 in Public Policy, 60 in Economics”*), which can foster targeted collaboration and respect in those fields. The domains follow known classification standards (UNESCO/ISCED-F), ensuring clarity on what each domain encompasses. By examining per-domain scores, the system and users can identify **who the experts are in a particular topic area** at a glance.
+- explainable;
+- governed;
+- appealable where appropriate;
+- bounded;
+- subject to privacy rules;
+- separable from domain expertise.
 
-* **Filtered Merit Views (by Demographics or Groups):** Because all merit scores and voting contributions are recorded with rich metadata, EkoH enables customizable views that can filter or segment by certain user attributes. For instance, one could generate a view of a consultation’s outcome considering **only a specific subgroup** – such as *only women voters*, *only professionals in ecology*, or *only local residents* – to see how that group weighted the decision. This doesn’t change the outcome, but it provides valuable insight into different perspectives or potential biases. Similarly, one can compare how the **“expert consensus”** (top-rated experts in a domain) voted versus the general population, or how younger participants’ weighted opinions differed from older participants, etc. These filters make the system’s results **transparent and analyzable from multiple angles**, helping to ensure that the process is fair and to highlight the contributions of various communities. Internally, this also supports auditing for representation – for example, verifying that the voices of typically underrepresented groups are being accounted for. *(As an example of EkoH’s inclusive design: even communities that often lacked influence can now see their top contributors’ impact amplified in decisions, fulfilling a more concrete equality by letting real problem-solvers be heard regardless of background.)*
+For demo data where no defensible evidence exists, the neutral value is `1.0`.
 
-* **Value-Based Dynamic Re-weighting:** EkoH’s framework is **configurable based on chosen values or criteria**, which means the community or administrators can adjust how different merit dimensions are weighted when calculating influence. The default model balances all factors (expertise, experience, impact, ethics, etc.) in a reasoned way, but it is flexible. For example, the community might decide that for certain types of decisions the **ethical integrity** component should be given extra weight, to emphasize trust and character in sensitive matters. Conversely, they might agree to downplay any factor that could indirectly favor privilege – for instance, ensuring that *“wealth”* or financial resources alone (while perhaps contributing to impact) do not inadvertently dominate the impact score. The system could allow scenarios where **ethical scores count double**, or *measurable impact* is capped if it simply comes from capital investment rather than personal effort, etc., depending on the collective values. These adjustments can be made transparently and applied uniformly to simulate **“what-if” merit models**. In fact, an AI-driven module can assist in dynamically tuning weights to optimize decision quality (for example, rewarding users who have a track record of accurate judgments, or preventing any one factor from giving disproportionate influence). Ultimately, this capability lets EkoH serve diverse governance needs – a kind of meritocratic dial that can be turned toward certain principles as needed, while always maintaining openness about how the weights are set.
+## 5. Consultation relevance
 
-All these outputs make EkoH a **multi-dimensional and flexible reputation system** rather than a rigid score. Stakeholders can obtain a *global view* of community expertise, drill down into *domain-specific merit*, consider *alternative weightings* or *subgroup perspectives*, and adapt the system as the community’s values evolve. This ensures that Smart Vote can be tuned for wisdom, fairness, and context appropriateness in every situation, rather than enforcing a one-size-fits-all formula.
+A consultation or declared Smart Vote lens specifies which expertise domains are relevant and their relative importance.
 
-## **Predictive Insight Bonus**
+Example:
 
-One innovative aspect of EkoH’s design is that it can acknowledge **foresight and good judgment** in the face of uncertainty. The system is intended to include a *“predictive insight” bonus* for participants who demonstrate an ability to anticipate sound outcomes **ahead of time**. In practice, this means if a user votes or takes a position that is initially unpopular or in the minority, but later events or expert analyses confirm that position was correct or most beneficial, the user gains additional merit credit for that decision. EkoH essentially rewards those who **vote independently of the immediate consensus and are later proven right**.
+```text
+Federal fiscal question
+Economics            40%
+Public administration 20%
+Statistics            15%
+Political science     15%
+Welfare               10%
+```
 
-For example, imagine an environmental policy consultation where most people are skeptical of a new renewable energy solution, but a few insightful individuals support it early on. If over time that solution is validated by scientific consensus or real-world success, EkoH will boost the reliability/credibility scores of those early supporters. This *ex post* recognition of being “ahead of the curve” serves two purposes: (1) It **incentivizes critical thinking and honesty** – users are rewarded for voting on their true informed beliefs (even if unpopular) rather than simply following the majority sentiment. (2) It helps identify individuals with a track record of **accurate judgment** or innovative thinking, which can be valuable for the community to recognize as a form of expertise. The predictive insight bonus is handled carefully to avoid encouraging contrarianism for its own sake; it is granted only when the divergent vote is *justified and later validated by facts or expert agreement*. By incorporating this mechanism, EkoH adds a forward-looking dimension to merit: not just what contributions a person has made in the past, but also how prescient and discerning they are in collective decision-making.
+The weights form a relevance vector and should normally sum to `1.0`.
 
-## **Transparency and Auditability**
+This prevents expertise from leaking across unrelated domains.
 
-Transparency is a fundamental principle of the EkoH system. Unlike opaque reputation algorithms or black-box AI scores, EkoH is designed to be **fully open to scrutiny**. All the rules and criteria for merit evaluation are published openly, and every data point contributing to a user’s score is **logged with a clear provenance**. In fact, the platform leverages **distributed ledger technology (blockchain)** to guarantee the authenticity, timestamp, and traceability of key validations and transactions. Degrees earned, projects completed, endorsements given – each can be recorded in tamper-proof logs, ensuring that merit data cannot be faked or altered undetectably. Votes and consultation results are similarly **time-stamped and cryptographically recorded**, so that the process can be audited after the fact to verify that no votes were changed and that all weights were applied as reported.
+## 6. EkoH and Smart Vote
 
-During and after any Smart Vote consultation, **all weighting factors and outcomes are transparent to participants**. The system provides a detailed breakdown showing how each voter’s weight was computed (their domain scores, ethics score, etc.) and how these contributed to the aggregated result. One can even analyze *“what-if” scenarios* – for example, viewing what the result would have been under a traditional one-person-one-vote tally versus the merit-weighted result. It is also possible to inspect the influence of top-rated contributors relative to others, revealing whether certain experts significantly swayed the outcome. This level of transparency means every collective decision comes with an **explanation**: the community can understand why it turned out the way it did, and trace that back to the merits of those involved.
+For participant `u` and consultation `c`, Smart Vote may compute contextual expertise alignment from:
 
-Furthermore, EkoH’s implementation encourages **public oversight and continuous improvement**. Because the algorithm’s workings are visible, the community and external observers can critique it and suggest adjustments. The system actively invites *constructive criticism* and can evolve based on feedback to better serve the common interest. In summary, **auditability is built-in** at every level – from the verifiable personal achievements that feed the scores, to the cryptographic logging of votes, to the open disclosure of how final weights were calculated. This ensures trust in the system: participants and officials alike can verify that EkoH’s meritocratic calculations are fair, consistent, and aligned with the platform’s stated values.
+```text
+alignment(u,c) = Σ relevance(c,d) × expertise(u,d)
+```
 
-## **Conclusion**
+EkoH provides the expertise data. Smart Vote owns the derived reading.
 
-EkoH, together with the Smart Vote application, represents a paradigm shift in participatory governance. By introducing a calibrated merit factor into democratic decision-making, it **transforms collective choices from a purely quantitative contest to a qualitative, knowledge-driven process**. Every citizen remains free to voice their opinion, but EkoH ensures that those voices are not all treated as equivalent noise – instead, they are amplified or tempered by the real contributions and wisdom behind them. This leads to decisions that are more informed, just, and resilient, as they **“give more weight to those who concretely work for the common good”** while still upholding inclusion and pluralism.
+The public or canonical baseline remains a separate result. A weighted reading must not overwrite source ballots, stances, arguments, or baseline outcomes.
 
-Within the Koa ecosystem, EkoH acts as a guiding compass for collective intelligence – a continual link between the grassroots participants, domain experts, and decision-makers. It helps channel the community’s best knowledge and ethics into action, whether it’s prioritizing sustainable projects, shaping policies in a political forum, or simply elevating civil discourse online. By rewarding personal development, integrity, and collaboration, EkoH creates a **virtuous cycle**: the more an individual betters themselves and contributes positively, the more influence they earn, which in turn motivates further positive action. In essence, EkoH/Smart Vote is more than a digital tool – it embodies a new vision of society where *meritocracy meets democracy* in a transparent and accountable way. If widely adopted, this system could profoundly change the relationship between citizens and power, infusing our public decisions with **collective expertise and ethical confidence that have long been missing**.
+## 7. Multiple readings
 
-**Sources:** The above information is synthesized from the internal project documents and design discussions of the Koa Movement’s EkoH/Smart Vote initiative, including the Ashoka project dossier, and related technical planning notes. All data points and quotes are drawn from those materials to ensure accuracy.
+The architectural rule is:
 
+> Single source facts, multiple declared readings.
+
+Examples of possible readings include:
+
+- public baseline;
+- relevant-expertise advisory reading;
+- affected-group reading;
+- jurisdictional reading;
+- expert-panel reading.
+
+A lens is a method of interpretation, not truth. A reading must identify its method, inputs, snapshot, and computation time.
+
+## 8. Privacy and confidentiality
+
+EkoH profile data can be sensitive. Visibility settings must be respected independently from the existence of a reading.
+
+A Smart Vote reading may use an authorized EkoH snapshot without exposing every participant's private domain scores publicly.
+
+Public, pseudonymous, anonymous, and institutionally private contexts must remain distinguishable.
+
+## 9. Current implementation boundary
+
+The current EkoH API exposes a read-only user profile with:
+
+- user identity/display information;
+- confidentiality level;
+- per-domain weighted expertise scores;
+- ethics/reliability score.
+
+The profile is context. It is not a fixed global Smart Vote weight.
+
+## 10. Invariants
+
+- Expertise ≠ sovereignty.
+- Competence ≠ political mandate.
+- Political equality ≠ epistemic equivalence.
+- EkoH ≠ Smart Vote.
+- EkoH score ≠ universal human rank.
+- AI output ≠ canonical EkoH state.
+- Weighted reading ≠ source fact.
+- Lens ≠ truth.
+- Baseline results remain visible.

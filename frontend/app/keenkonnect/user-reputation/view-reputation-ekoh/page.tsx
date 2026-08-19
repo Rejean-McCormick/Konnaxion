@@ -1,371 +1,156 @@
 // FILE: frontend/app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx
 'use client';
 
-import React, { type ReactNode } from 'react';
-import {
-  Avatar,
-  Card,
-  Descriptions,
-  Timeline,
-  List,
-  Tag,
-  Typography,
-  Space,
-  Row,
-  Col,
-  Spin,
-  Alert,
-} from 'antd';
-import {
-  StarFilled,
-  ThunderboltOutlined,
-  ExperimentOutlined,
-  TeamOutlined,
-} from '@ant-design/icons';
+import React from 'react';
+import { Alert, Avatar, Card, Col, Empty, List, Progress, Row, Space, Tag, Timeline, Typography } from 'antd';
+
 import useReputationEvents from '@/hooks/useReputationEvents';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
+import type { EkohExpertiseScore } from '@/services/trust';
 
-const { Title, Text } = Typography;
+const { Paragraph, Text, Title } = Typography;
 
-type ExpertiseArea = {
-  id: string;
-  label: string;
-  domain: string;
-  level: 'core' | 'supporting';
-};
+function percent(score: number): number {
+  return Math.max(0, Math.min(100, Math.round(score * 100)));
+}
 
-type UiBadge = {
-  id: string;
-  label: string;
-  description: string;
-  earnedAt?: string;
-  icon: ReactNode;
-  color: string;
-  category: string;
-};
-
-/**
- * Static placeholder until we have a real "expertise from Ekoh" API.
- * This only affects the lower section – the core score/timeline/badges
- * now come from the backend.
- */
-const expertiseAreas: ExpertiseArea[] = [
-  {
-    id: 'exp-1',
-    label: 'Sustainable product roadmapping',
-    domain: 'Sustainability',
-    level: 'core',
-  },
-  {
-    id: 'exp-2',
-    label: 'Experimentation & A/B testing',
-    domain: 'Product Strategy',
-    level: 'core',
-  },
-  {
-    id: 'exp-3',
-    label: 'AI fairness & guardrails',
-    domain: 'AI Ethics',
-    level: 'supporting',
-  },
-];
-
-/**
- * Badge metadata for visual display, keyed by backend badge id.
- * Back-end provides: id, label, description, earnedAt.
- * Here we attach category, color and icon for the UI.
- */
-const BADGE_META: Record<
-  string,
-  { icon: ReactNode; color: string; category: string }
-> = {
-  'first-stance': {
-    icon: <TeamOutlined />,
-    color: 'green',
-    category: 'Participation',
-  },
-  'argument-builder': {
-    icon: <ExperimentOutlined />,
-    color: 'geekblue',
-    category: 'Depth',
-  },
-  'active-voter': {
-    icon: <ThunderboltOutlined />,
-    color: 'volcano',
-    category: 'Voting',
-  },
-};
+function initial(value: string): string {
+  const trimmed = value.trim();
+  return trimmed ? trimmed.charAt(0).toUpperCase() : '?';
+}
 
 export default function ViewReputationEkohPage(): JSX.Element {
   const { data, isLoading, isError, error } = useReputationEvents();
-
-  const profile = data?.profile;
+  const ekohProfile = data?.ekohProfile ?? null;
+  const activityProfile = data?.profile;
   const timeline = data?.timeline ?? [];
-  const rawBadges = data?.badges ?? [];
-
-  // High-level numbers derived from Ekoh profile
-  const ekohScore = profile?.score ?? 0;
-
-  const influenceDimension = profile?.dimensions.find(
-    (d) => d.key === 'influence',
-  );
-
-  // Simple, explicit mapping from influence index (0–100) to a weight multiplier
-  const smartVoteWeight =
-    influenceDimension != null
-      ? Number((1 + influenceDimension.score / 50).toFixed(1))
-      : 1.0;
-
-  // Aggregated interaction index – not a literal count, but a readable big number
-  const totalInteractions =
-    profile != null ? Math.max(ekohScore, 0) : 0;
-
-  const tierLabel =
-    profile?.level === 'Steward'
-      ? 'Trusted steward'
-      : profile?.level === 'Contributor'
-      ? 'Active contributor'
-      : profile?.level === 'Visitor'
-      ? 'New voice'
-      : 'Not initialized yet';
-
-  const badges: UiBadge[] = rawBadges.map((b: any) => {
-    const meta =
-      BADGE_META[b.id] ?? {
-        icon: <StarFilled />,
-        color: 'default',
-        category: 'Reputation',
-      };
-    return {
-      id: b.id,
-      label: b.label,
-      description: b.description,
-      earnedAt: b.earnedAt,
-      ...meta,
-    };
-  });
+  const badges = data?.badges ?? [];
+  const expertise = ekohProfile?.expertise ?? [];
+  const displayName =
+    ekohProfile?.displayName ??
+    activityProfile?.displayName ??
+    activityProfile?.username ??
+    'Anonymous';
 
   return (
     <KeenPageShell
-      title="Ekoh reputation"
-      description="How your Ekoh trust & expertise are used inside KeenKonnect."
-      metaTitle="KeenKonnect · Ekoh reputation"
+      title="EkoH expertise"
+      description="Domain-specific expertise context available to KeenKonnect and declared Smart Vote readings."
+      metaTitle="KeenKonnect · EkoH expertise"
     >
-      {/* Loading / error states for the reputation fetch */}
-      {isLoading && (
-        <div className="mb-4">
-          <Spin />
-        </div>
-      )}
-
       {isError && (
-        <div className="mb-4">
-          <Alert
-            type="error"
-            message="Unable to load Ekoh reputation"
-            description={
-              (error as Error | undefined)?.message ??
-              'Please try again in a moment.'
-            }
-          />
-        </div>
+        <Alert
+          type="error"
+          showIcon
+          message="Unable to load EkoH profile"
+          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          style={{ marginBottom: 16 }}
+        />
       )}
 
-      {/* Main two-column layout: summary + timeline */}
+      <Alert
+        type="info"
+        showIcon
+        message="Contextual expertise, not a global influence score"
+        description="KeenKonnect can use EkoH expertise to discover relevant collaborators. A Smart Vote weight only exists inside a declared decision context; it is not a permanent property of a person."
+        style={{ marginBottom: 16 }}
+      />
+
       <Row gutter={[24, 24]}>
-        {/* Left: profile + summary card */}
         <Col xs={24} lg={8}>
-          <Card>
-            <Space
-              direction="vertical"
-              align="center"
-              style={{ width: '100%' }}
-            >
-              <Avatar
-                size={80}
-                style={{
-                  backgroundColor: '#1e6864',
-                  color: '#ffffff',
-                }}
-              >
-                EK
+          <Card loading={isLoading}>
+            <Space direction="vertical" align="center" style={{ width: '100%' }}>
+              <Avatar size={80} src={activityProfile?.avatarUrl ?? undefined}>
+                {initial(displayName)}
               </Avatar>
-
               <div style={{ textAlign: 'center' }}>
-                <Title level={4} style={{ marginBottom: 4 }}>
-                  Ekoh profile signal
-                </Title>
-                <Text type="secondary">
-                  Imported reputation used for matching &amp; project discovery
-                  in KeenKonnect.
-                </Text>
+                <Title level={4} style={{ marginBottom: 4 }}>{displayName}</Title>
+                <Text type="secondary">EkoH domain profile</Text>
               </div>
+              {ekohProfile ? (
+                <Space wrap style={{ justifyContent: 'center' }}>
+                  <Tag>{ekohProfile.confidentialityLevel}</Tag>
+                  <Tag>{ekohProfile.expertise.length} domains</Tag>
+                  <Tag>Reliability {ekohProfile.ethicsScore.toFixed(2)}×</Tag>
+                </Space>
+              ) : (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No EkoH profile" />
+              )}
             </Space>
+          </Card>
 
-            <Descriptions
-              size="small"
-              column={1}
-              style={{ marginTop: 24 }}
-              labelStyle={{ width: 160 }}
-            >
-              <Descriptions.Item label="Ekoh score">
-                <Text strong>{ekohScore}</Text>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Smart vote weight">
-                <Text strong>{smartVoteWeight.toFixed(1)}×</Text>{' '}
-                <Text type="secondary">(relative influence index)</Text>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Tier">
-                <Tag color="blue">{tierLabel}</Tag>
-              </Descriptions.Item>
-
-              <Descriptions.Item label="Last sync from Ekoh">
-                <Text type="secondary">
-                  Based on your recent Ethikos &amp; KonnectED activity.
-                </Text>
-              </Descriptions.Item>
-            </Descriptions>
+          <Card title="Profile use" style={{ marginTop: 16 }}>
+            <Paragraph style={{ marginBottom: 0 }}>
+              Expertise scores help identify contributors whose demonstrated competence matches a project's or consultation's declared domains. They do not create authority outside those domains.
+            </Paragraph>
           </Card>
         </Col>
 
-        {/* Right: big stats + timeline */}
         <Col xs={24} lg={16}>
-          {/* 3-number summary */}
-          <Card className="mb-4">
-            <Row gutter={[16, 16]}>
-              <Col xs={24} md={8}>
-                <Space direction="vertical">
-                  <Text type="secondary">Global Ekoh score</Text>
-                  <Title level={3} style={{ margin: 0 }}>
-                    {ekohScore}
-                  </Title>
-                  <Text type="secondary">
-                    Used as a global trust signal across all KeenKonnect
-                    workspaces.
-                  </Text>
-                </Space>
-              </Col>
-
-              <Col xs={24} md={8}>
-                <Space direction="vertical">
-                  <Text type="secondary">Smart vote weight</Text>
-                  <Title level={3} style={{ margin: 0 }}>
-                    {smartVoteWeight.toFixed(1)}×
-                  </Title>
-                  <Text type="secondary">
-                    Your votes weigh more when teams use Ekoh-backed decisions.
-                  </Text>
-                </Space>
-              </Col>
-
-              <Col xs={24} md={8}>
-                <Space direction="vertical">
-                  <Text type="secondary">
-                    Validated interactions (index)
-                  </Text>
-                  <Title level={3} style={{ margin: 0 }}>
-                    {totalInteractions}
-                  </Title>
-                  <Text type="secondary">
-                    Aggregated indicator based on your contributions and
-                    votes.
-                  </Text>
-                </Space>
-              </Col>
-            </Row>
+          <Card title="Expertise by domain" loading={isLoading}>
+            {expertise.length ? (
+              <List<EkohExpertiseScore>
+                dataSource={expertise}
+                renderItem={(item) => {
+                  const value = percent(item.weightedScore);
+                  return (
+                    <List.Item key={item.domainCode}>
+                      <div style={{ width: '100%' }}>
+                        <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                          <Space wrap>
+                            <Text strong>{item.domainName}</Text>
+                            <Tag>{item.domainCode}</Tag>
+                          </Space>
+                          <Text type="secondary">{value}%</Text>
+                        </Space>
+                        <Progress percent={value} showInfo={false} />
+                      </div>
+                    </List.Item>
+                  );
+                }}
+              />
+            ) : (
+              <Empty description="No canonical EkoH expertise scores available" />
+            )}
           </Card>
 
-          {/* Timeline from backend-derived events */}
-          <Card title="Reputation timeline">
-            <Timeline
-              mode="left"
-              items={timeline.map((item: any) => ({
-                key: item.id,
-                label: item.when,
-                children: (
-                  <div>
-                    <Text strong>{item.title}</Text>
+          <Card title="Recent evidence and activity context" style={{ marginTop: 16 }}>
+            {timeline.length ? (
+              <Timeline
+                items={timeline.map((item) => ({
+                  key: item.id,
+                  children: (
                     <div>
-                      <Text type="secondary">{item.detail}</Text>
+                      <Text strong>{item.title}</Text>
+                      <div><Text type="secondary">{item.detail}</Text></div>
                     </div>
-                  </div>
-                ),
-              }))}
-            />
+                  ),
+                }))}
+              />
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No recent activity" />
+            )}
           </Card>
         </Col>
       </Row>
 
-      {/* Expertise section (still static for now) */}
-      <Card
-        title="Expertise imported from Ekoh"
-        className="mt-6"
-      >
-        <List
-          size="small"
-          dataSource={expertiseAreas}
-          renderItem={(area) => (
-            <List.Item key={area.id}>
-              <Space direction="vertical" style={{ width: '100%' }}>
-                <Space>
-                  <Tag color={area.level === 'core' ? 'geekblue' : 'default'}>
-                    {area.level === 'core' ? 'Core domain' : 'Supporting'}
-                  </Tag>
-                  <Text strong>{area.label}</Text>
-                </Space>
-                <Text type="secondary">
-                  Domain:{' '}
-                  <Text type="secondary" strong>
-                    {area.domain}
-                  </Text>{' '}
-                  – used for project matching &amp; workspace
-                  recommendations.
-                </Text>
-              </Space>
-            </List.Item>
-          )}
-        />
-      </Card>
-
-      {/* Badges mapped from backend -> visual cards */}
-      <Card
-        title="Badges & achievements from Ekoh"
-        extra={
-          <Text type="secondary">
-            Displayed in KeenKonnect when teams browse your profile.
-          </Text>
-        }
-        className="mt-6"
-      >
-        <List
-          grid={{ gutter: 16, xs: 1, sm: 2, md: 3 }}
-          dataSource={badges}
-          renderItem={(badge) => (
-            <List.Item key={badge.id}>
-              <Card hoverable>
-                <Space align="start">
-                  <Avatar
-                    shape="square"
-                    size={40}
-                    style={{
-                      backgroundColor: 'var(--ant-color-primary-bg)',
-                    }}
-                    icon={badge.icon}
-                  />
-                  <div>
-                    <Space style={{ marginBottom: 4 }}>
-                      <Text strong>{badge.label}</Text>
-                      <Tag color={badge.color}>{badge.category}</Tag>
-                    </Space>
-                    <Text type="secondary">{badge.description}</Text>
-                  </div>
-                </Space>
-              </Card>
-            </List.Item>
-          )}
-        />
+      <Card title="Badges and discovery signals" style={{ marginTop: 24 }}>
+        {badges.length ? (
+          <List
+            size="small"
+            dataSource={badges}
+            renderItem={(badge) => (
+              <List.Item key={badge.id}>
+                <List.Item.Meta title={badge.label} description={badge.description} />
+              </List.Item>
+            )}
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No badges earned yet" />
+        )}
+        <Paragraph type="secondary" style={{ marginTop: 16, marginBottom: 0 }}>
+          Badges and activity may support discovery, but they are not substitutes for a domain-specific EkoH expertise score or for a declared Smart Vote lens.
+        </Paragraph>
       </Card>
     </KeenPageShell>
   );

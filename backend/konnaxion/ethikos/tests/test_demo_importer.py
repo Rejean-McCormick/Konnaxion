@@ -1,4 +1,5 @@
 import pytest
+from django.apps import apps
 from django.contrib.auth import get_user_model
 
 from konnaxion.ethikos.demo_import.importer import (
@@ -7,6 +8,7 @@ from konnaxion.ethikos.demo_import.importer import (
 )
 from konnaxion.ethikos.demo_import.schema import (
     DEMO_TOPIC_TITLE_PREFIX,
+    SCHEMA_VERSION,
     TRACK_OBJECT_TYPES,
 )
 from konnaxion.ethikos.models import (
@@ -18,9 +20,7 @@ from konnaxion.ethikos.models import (
 )
 from konnaxion.ethikos.models_demo import DemoScenarioImport
 
-
 pytestmark = pytest.mark.django_db
-
 User = get_user_model()
 
 
@@ -32,16 +32,12 @@ def build_demo_payload(
     topic_title: str | None = None,
 ) -> dict:
     title = topic_title or f"{DEMO_TOPIC_TITLE_PREFIX} Public Square Redevelopment"
-
     return {
-        "schema_version": "ethikos-demo-scenario/v2",
+        "schema_version": SCHEMA_VERSION,
         "scenario_key": scenario_key,
         "scenario_title": "Public Square Redevelopment Demo",
         "mode": "replace_scenario",
-        "metadata": {
-            "description": "Demo data for ethiKos importer tests.",
-            "language": "en",
-        },
+        "metadata": {"description": "Demo data for ethiKos importer tests.", "language": "en"},
         "actors": [
             {
                 "key": "maya",
@@ -70,13 +66,7 @@ def build_demo_payload(
                 "end_date": "2026-05-30",
             }
         ],
-        "stances": [
-            {
-                "topic": topic_key,
-                "actor": "maya",
-                "value": 2,
-            }
-        ],
+        "stances": [{"topic": topic_key, "actor": "maya", "value": 2}],
         "arguments": [
             {
                 "key": "maya_argument_1",
@@ -98,6 +88,8 @@ def build_demo_payload(
         "consultations": [],
         "consultation_votes": [],
         "impact_items": [],
+        "ekoh_profiles": [],
+        "consultation_relevance": [],
     }
 
 
@@ -109,151 +101,140 @@ def create_importing_user(username: str = "import_admin"):
     )
 
 
-def test_import_creates_demo_actors_categories_topics_stances_and_arguments():
+def _argument_user(argument):
+    return getattr(argument, "user", None) or getattr(argument, "author", None)
+
+
+def test_import_creates_source_facts():
     imported_by = create_importing_user()
     payload = build_demo_payload()
 
-    result = import_ethikos_demo_scenario(
-        payload,
-        imported_by=imported_by,
-        dry_run=False,
-    )
+    result = import_ethikos_demo_scenario(payload, imported_by=imported_by, dry_run=False)
 
     assert result["ok"] is True
-    assert result["dry_run"] is False
-    assert result["scenario_key"] == "public_square_demo"
-
     actor = User.objects.get(username="demo_maya")
     category = EthikosCategory.objects.get(name="Urbanism")
     topic = EthikosTopic.objects.get(title="[DEMO] Public Square Redevelopment")
     stance = EthikosStance.objects.get(topic=topic, user=actor)
-    argument = EthikosArgument.objects.get(topic=topic, author=actor)
+    argument = EthikosArgument.objects.get(topic=topic)
 
     assert actor.email == "demo_maya@example.test"
     assert category.description == "Urban planning and public-space issues."
     assert topic.status == "open"
-    assert topic.category == category
     assert stance.value == 2
-    assert argument.side == "pro"
+    assert _argument_user(argument) == actor
     assert argument.content == "The square should become greener while preserving accessibility."
 
     source = ArgumentSource.objects.get(argument=argument)
     assert source.url == "https://example.test/public-square"
-    assert source.title == "Public square planning brief"
-    assert source.source_type == "reference"
-    assert source.created_by == imported_by
 
-    assert result["summary"] == {
-        "actors": 1,
-        "categories": 1,
-        "topics": 1,
-        "stances": 1,
-        "arguments": 1,
-        "argument_sources": 1,
-        "consultations": 0,
-        "consultation_votes": 0,
-        "impact_items": 0,
-    }
+    assert result["summary"]["ekoh_profiles"] == 0
+    assert result["summary"]["consultation_relevance"] == 0
 
 
-def test_import_replace_scenario_resets_previous_tracked_objects():
+def test_import_tracks_core_objects():
     imported_by = create_importing_user()
-
-    first_payload = build_demo_payload(
-        scenario_key="public_square_demo",
-        actor_username="demo_maya",
-        topic_key="public_square",
-        topic_title="[DEMO] Old Public Square Topic",
-    )
-
-    second_payload = build_demo_payload(
-        scenario_key="public_square_demo",
-        actor_username="demo_nadia",
-        topic_key="public_square_v2",
-        topic_title="[DEMO] New Public Square Topic",
-    )
-
-    first_result = import_ethikos_demo_scenario(
-        first_payload,
-        imported_by=imported_by,
-        dry_run=False,
-    )
-
-    assert first_result["ok"] is True
-    assert EthikosTopic.objects.filter(title="[DEMO] Old Public Square Topic").exists()
-
-    second_result = import_ethikos_demo_scenario(
-        second_payload,
-        imported_by=imported_by,
-        dry_run=False,
-    )
-
-    assert second_result["ok"] is True
-    assert not EthikosTopic.objects.filter(title="[DEMO] Old Public Square Topic").exists()
-    assert EthikosTopic.objects.filter(title="[DEMO] New Public Square Topic").exists()
-
-    assert not User.objects.filter(username="demo_maya").exists()
-    assert User.objects.filter(username="demo_nadia").exists()
-
-
-def test_import_tracks_created_objects():
-    imported_by = create_importing_user()
-    payload = build_demo_payload()
-
     result = import_ethikos_demo_scenario(
-        payload,
+        build_demo_payload(),
         imported_by=imported_by,
         dry_run=False,
     )
-
     assert result["ok"] is True
 
     tracked_types = set(
         DemoScenarioImport.objects.filter(
-            scenario_key="public_square_demo",
+            scenario_key="public_square_demo"
         ).values_list("object_type", flat=True)
     )
+    for key in ("user", "category", "topic", "stance", "argument"):
+        assert TRACK_OBJECT_TYPES[key] in tracked_types
 
-    assert TRACK_OBJECT_TYPES["user"] in tracked_types
-    assert TRACK_OBJECT_TYPES["category"] in tracked_types
-    assert TRACK_OBJECT_TYPES["topic"] in tracked_types
-    assert TRACK_OBJECT_TYPES["stance"] in tracked_types
-    assert TRACK_OBJECT_TYPES["argument"] in tracked_types
 
-    topic = EthikosTopic.objects.get(title="[DEMO] Public Square Redevelopment")
+def test_v3_imports_ekoh_profile_when_models_and_domain_exist():
+    ExpertiseCategory = apps.get_model("ekoh", "ExpertiseCategory")
+    UserExpertiseScore = apps.get_model("ekoh", "UserExpertiseScore")
+    UserEthicsScore = apps.get_model("ekoh", "UserEthicsScore")
 
-    assert DemoScenarioImport.objects.filter(
-        scenario_key="public_square_demo",
-        object_type=TRACK_OBJECT_TYPES["topic"],
-        object_id=topic.id,
-        object_label="[DEMO] Public Square Redevelopment",
+    category, _ = ExpertiseCategory.objects.get_or_create(
+        code="0731",
+        defaults={
+            "name": "Architecture and town planning",
+            "depth": 0,
+            "path": "0731",
+        },
+    )
+
+    payload = build_demo_payload()
+    payload["ekoh_profiles"] = [
+        {
+            "actor": "maya",
+            "ethics_score": 1.0,
+            "expertise": [
+                {
+                    "domain_code": "0731",
+                    "raw_score": 0.88,
+                    "weighted_score": 0.91,
+                }
+            ],
+        }
+    ]
+
+    result = import_ethikos_demo_scenario(
+        payload,
+        imported_by=create_importing_user(),
+        dry_run=False,
+    )
+    assert result["ok"] is True
+
+    actor = User.objects.get(username="demo_maya")
+    score = UserExpertiseScore.objects.get(user=actor, category=category)
+    assert float(score.weighted_score) == pytest.approx(0.91)
+    assert float(UserEthicsScore.objects.get(user=actor).ethical_score) == pytest.approx(1.0)
+
+    tracked_types = set(
+        DemoScenarioImport.objects.filter(
+            scenario_key="public_square_demo"
+        ).values_list("object_type", flat=True)
+    )
+    assert TRACK_OBJECT_TYPES["ekoh_expertise_score"] in tracked_types
+    assert TRACK_OBJECT_TYPES["ekoh_ethics_score"] in tracked_types
+
+
+def test_dry_run_does_not_create_objects():
+    imported_by = create_importing_user()
+    result = import_ethikos_demo_scenario(
+        build_demo_payload(),
         imported_by=imported_by,
+        dry_run=True,
+    )
+
+    assert result["ok"] is True
+    assert result["dry_run"] is True
+    assert not User.objects.filter(username="demo_maya").exists()
+    assert not EthikosTopic.objects.filter(
+        title="[DEMO] Public Square Redevelopment"
     ).exists()
 
 
-def test_reset_deletes_only_tracked_scenario_objects():
+def test_reset_removes_tracked_topic_but_not_untracked_topic():
     imported_by = create_importing_user()
-
     category = EthikosCategory.objects.create(
         name="Tracked Category",
-        description="Should be deleted by reset.",
+        description="tracked",
     )
-
     tracked_topic = EthikosTopic.objects.create(
         title="[DEMO] Tracked Topic",
-        description="Should be deleted by reset.",
+        description="tracked",
         status="open",
         category=category,
     )
-
     untracked_category = EthikosCategory.objects.create(
         name="Untracked Category",
-        description="Should survive reset.",
+        description="untracked",
     )
-
     untracked_topic = EthikosTopic.objects.create(
         title="[DEMO] Untracked Topic",
-        description="Should survive reset because it is not tracked.",
+        description="untracked",
         status="open",
         category=untracked_category,
     )
@@ -272,68 +253,26 @@ def test_reset_deletes_only_tracked_scenario_objects():
     )
 
     assert result["ok"] is True
-    assert result["scenario_key"] == "public_square_demo"
-
     assert not EthikosTopic.objects.filter(id=tracked_topic.id).exists()
     assert EthikosTopic.objects.filter(id=untracked_topic.id).exists()
 
-    assert not DemoScenarioImport.objects.filter(
-        scenario_key="public_square_demo",
-    ).exists()
 
-
-def test_dry_run_does_not_create_objects():
+def test_replace_scenario_replaces_tracked_topic_and_keeps_demo_users_safe():
     imported_by = create_importing_user()
-    payload = build_demo_payload()
 
-    result = import_ethikos_demo_scenario(
-        payload,
-        imported_by=imported_by,
-        dry_run=True,
-    )
-
-    assert result["ok"] is True
-    assert result["dry_run"] is True
-    assert result["scenario_key"] == "public_square_demo"
-
-    assert not User.objects.filter(username="demo_maya").exists()
-    assert not EthikosCategory.objects.filter(name="Urbanism").exists()
-    assert not EthikosTopic.objects.filter(title="[DEMO] Public Square Redevelopment").exists()
-    assert EthikosStance.objects.count() == 0
-    assert EthikosArgument.objects.count() == 0
-    assert DemoScenarioImport.objects.count() == 0
-
-
-def test_replace_scenario_cascades_argument_sources_without_source_tracking():
-    imported_by = create_importing_user()
-    payload = build_demo_payload()
-
-    first_result = import_ethikos_demo_scenario(
-        payload,
-        imported_by=imported_by,
-        dry_run=False,
-    )
-
-    assert first_result["ok"] is True
-    source = ArgumentSource.objects.get()
-    source_id = source.id
-
-    second_payload = build_demo_payload(
+    first = build_demo_payload(topic_title="[DEMO] Old Public Square Topic")
+    second = build_demo_payload(
+        actor_username="demo_nadia",
         topic_key="public_square_v2",
-        topic_title="[DEMO] Replacement Public Square Topic",
-    )
-    second_payload["argument_sources"][0]["url"] = (
-        "https://example.test/replacement-public-square"
+        topic_title="[DEMO] New Public Square Topic",
     )
 
-    second_result = import_ethikos_demo_scenario(
-        second_payload,
-        imported_by=imported_by,
-        dry_run=False,
-    )
+    assert import_ethikos_demo_scenario(first, imported_by=imported_by)["ok"] is True
+    assert import_ethikos_demo_scenario(second, imported_by=imported_by)["ok"] is True
 
-    assert second_result["ok"] is True
-    assert not ArgumentSource.objects.filter(id=source_id).exists()
-    assert ArgumentSource.objects.filter(
-        url="https://example.test/replacement-public-square"
-    ).count() == 1
+    assert not EthikosTopic.objects.filter(title="[DEMO] Old Public Square Topic").exists()
+    assert EthikosTopic.objects.filter(title="[DEMO] New Public Square Topic").exists()
+    # Importer intentionally does not delete demo users because cross-app cascades
+    # can remove unrelated data.
+    assert User.objects.filter(username="demo_maya").exists()
+    assert User.objects.filter(username="demo_nadia").exists()

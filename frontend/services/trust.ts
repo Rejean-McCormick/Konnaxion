@@ -1,5 +1,4 @@
 // FILE: frontend/services/trust.ts
-// frontend/services/trust.ts
 import dayjs from 'dayjs';
 
 import { get, post } from './_request';
@@ -31,22 +30,30 @@ export interface TrustProfile {
   joined?: string;
   score: number;
   activity: TrustActivity[];
-
   level: TrustLevel;
   dimensions: ReputationDimension[];
   recent: { label: string; change: number }[];
-
-  /** Identity info derived from /users/me/ so UIs can show name + avatar */
   username?: string;
   displayName?: string;
-  /** Already normalized absolute URL or default avatar */
   avatarUrl?: string | null;
 }
 
-/**
- * Backward-compatible name used by older trust screens.
- */
+/** Backward-compatible name used by older trust screens. */
 export type ReputationProfile = TrustProfile;
+
+export interface EkohExpertiseScore {
+  domainCode: string;
+  domainName: string;
+  weightedScore: number; // normalized 0..1 in current contract
+}
+
+export interface EkohProfile {
+  userId: string;
+  displayName: string;
+  confidentialityLevel: 'public' | 'pseudonym' | 'anonymous' | string;
+  ethicsScore: number;
+  expertise: EkohExpertiseScore[];
+}
 
 export interface TrustBadge {
   id: string;
@@ -58,10 +65,6 @@ export interface TrustBadge {
   earnedAt?: string;
   createdAt?: string;
 }
-
-/**
- * Backward-compatible badge alias.
- */
 export type Badge = TrustBadge;
 
 export interface TrustBadgePayload {
@@ -83,16 +86,8 @@ export interface UploadCredentialInput {
   issuedAt?: string | Date | null;
 }
 
-/**
- * Shape of /users/me/ coming from the backend.
- *
- * This intentionally does not extend CurrentUser. The canonical CurrentUser
- * type requires fields such as `url` and `username`, while /users/me/ can be
- * incomplete or unavailable in local/test contexts.
- */
 interface UserMeApi {
   id?: EthikosId;
-  url?: string;
   name?: string | null;
   display_name?: string | null;
   full_name?: string | null;
@@ -123,66 +118,42 @@ interface EthikosArgumentApi {
   created_at?: string;
 }
 
-interface VoteApi {
-  id: EthikosId;
-  user?: EthikosId | null;
-  user_id?: EthikosId | null;
-  target_type?: string;
-  target_id?: EthikosId;
-  raw_value?: string | number;
-  weighted_value?: string | number;
-  voted_at?: string;
-  created_at?: string;
+interface EkohProfileApi {
+  user_id?: EthikosId;
+  display_name?: string | null;
+  confidentiality_level?: string | null;
+  ethics_score?: string | number | null;
+  expertise?: Array<{
+    domain_code?: string | null;
+    domain_name?: string | null;
+    weighted_score?: string | number | null;
+  }>;
 }
-
-/* ------------------------------------------------------------------ */
-/*  Generic helpers                                                    */
-/* ------------------------------------------------------------------ */
 
 function isRecord(value: unknown): value is UnknownRecord {
   return typeof value === 'object' && value !== null;
 }
 
 function unwrapPayload(raw: unknown): unknown {
-  if (!isRecord(raw)) {
-    return raw;
-  }
-
+  if (!isRecord(raw)) return raw;
   return raw.data ?? raw;
 }
 
-function readString(
-  record: UnknownRecord,
-  keys: string[],
-): string | undefined {
+function readString(record: UnknownRecord, keys: string[]): string | undefined {
   for (const key of keys) {
     const value = record[key];
-
-    if (typeof value === 'string' && value.trim().length > 0) {
-      return value;
-    }
-
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      return String(value);
-    }
+    if (typeof value === 'string' && value.trim()) return value;
+    if (typeof value === 'number' && Number.isFinite(value)) return String(value);
   }
-
   return undefined;
 }
 
 function readNumber(value: unknown): number {
-  if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
-  }
-
+  if (typeof value === 'number' && Number.isFinite(value)) return value;
   if (typeof value === 'string') {
     const parsed = Number(value);
-
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
+    if (Number.isFinite(parsed)) return parsed;
   }
-
   return 0;
 }
 
@@ -191,129 +162,41 @@ function normalizeList<T>(
   guard: (value: unknown) => value is T,
 ): T[] {
   const payload = unwrapPayload(raw);
-
-  if (Array.isArray(payload)) {
-    return payload.filter(guard);
-  }
-
-  if (!isRecord(payload)) {
-    return [];
-  }
-
-  if (Array.isArray(payload.results)) {
-    return payload.results.filter(guard);
-  }
-
-  if (Array.isArray(payload.items)) {
-    return payload.items.filter(guard);
-  }
-
-  if (Array.isArray(payload.data)) {
-    return payload.data.filter(guard);
-  }
-
-  if (isRecord(payload.data) && Array.isArray(payload.data.results)) {
-    return payload.data.results.filter(guard);
-  }
-
-  if (isRecord(payload.data) && Array.isArray(payload.data.items)) {
-    return payload.data.items.filter(guard);
-  }
-
+  if (Array.isArray(payload)) return payload.filter(guard);
+  if (!isRecord(payload)) return [];
+  if (Array.isArray(payload.results)) return payload.results.filter(guard);
+  if (Array.isArray(payload.items)) return payload.items.filter(guard);
+  if (Array.isArray(payload.data)) return payload.data.filter(guard);
   return [];
 }
 
 function isUserMeApi(value: unknown): value is UserMeApi {
   return isRecord(value);
 }
-
 function isStanceApi(value: unknown): value is EthikosStanceApi {
   return isRecord(value) && 'id' in value;
 }
-
 function isArgumentApi(value: unknown): value is EthikosArgumentApi {
   return isRecord(value) && 'id' in value;
 }
 
-function isVoteApi(value: unknown): value is VoteApi {
-  return isRecord(value) && 'id' in value;
-}
-
-function countLastDays(dates: string[], days: number): number {
-  const now = dayjs();
-  const cutoff = now.subtract(days, 'day');
-
-  return dates.filter((date) => dayjs(date).isAfter(cutoff)).length;
-}
-
-function titleFromFilename(name?: string): string {
-  if (!name) {
-    return 'Untitled credential';
-  }
-
-  const normalized = name
-    .replace(/\.[a-zA-Z0-9]+$/, '')
-    .replace(/[_-]+/g, ' ')
-    .trim();
-
-  return normalized || 'Untitled credential';
-}
-
-function toIsoOrUndefined(
-  value: string | Date | null | undefined,
-): string | undefined {
-  if (!value) {
-    return undefined;
-  }
-
-  if (value instanceof Date) {
-    return Number.isNaN(value.getTime()) ? undefined : value.toISOString();
-  }
-
-  const parsed = dayjs(value);
-
-  return parsed.isValid() ? parsed.toISOString() : undefined;
-}
-
-function getCurrentUserIdentity(me: UserMeApi): {
-  id?: string;
-  username: string;
-  displayName: string;
-  joined?: string;
-  avatarUrl: string | null;
-} {
-  const userRecord = me as unknown as UnknownRecord;
-
-  const id = readString(userRecord, ['id']);
+function getCurrentUserIdentity(me: UserMeApi) {
+  const record = me as UnknownRecord;
+  const id = readString(record, ['id']);
   const username =
-    readString(userRecord, ['username', 'email', 'name']) ?? 'current-user';
-
+    readString(record, ['username', 'email', 'name']) ?? 'current-user';
   const displayName =
-    readString(userRecord, [
-      'name',
-      'display_name',
-      'full_name',
-      'username',
-      'email',
-    ]) ?? username;
-
-  const joined = readString(userRecord, [
-    'joined',
-    'date_joined',
-    'created_at',
-  ]);
-
-  const rawAvatar =
-    readString(userRecord, ['avatar_url', 'picture', 'avatar']) ?? null;
-
-  const avatarUrl = resolveAvatarUrl({ avatar_url: rawAvatar });
+    readString(record, ['name', 'display_name', 'full_name', 'username', 'email']) ??
+    username;
+  const joined = readString(record, ['joined', 'date_joined', 'created_at']);
+  const rawAvatar = readString(record, ['avatar_url', 'picture', 'avatar']) ?? null;
 
   return {
     id,
     username,
     displayName,
     joined,
-    avatarUrl,
+    avatarUrl: resolveAvatarUrl({ avatar_url: rawAvatar }),
   };
 }
 
@@ -321,25 +204,14 @@ function matchesCurrentUser(
   value: EthikosId | null | undefined,
   user: { id?: string; username: string },
 ): boolean {
-  if (value === null || value === undefined) {
-    return false;
-  }
-
+  if (value == null) return false;
   const normalized = String(value);
-
   return normalized === user.username || normalized === user.id;
 }
 
-function getStanceDate(stance: EthikosStanceApi): string | undefined {
-  return stance.timestamp ?? stance.created_at;
-}
-
-function getArgumentDate(argument: EthikosArgumentApi): string | undefined {
-  return argument.created_at;
-}
-
-function getVoteDate(vote: VoteApi): string | undefined {
-  return vote.voted_at ?? vote.created_at;
+function countLastDays(dates: string[], days: number): number {
+  const cutoff = dayjs().subtract(days, 'day');
+  return dates.filter((date) => dayjs(date).isAfter(cutoff)).length;
 }
 
 function makeBadge(params: {
@@ -350,44 +222,34 @@ function makeBadge(params: {
   progress: number;
   earnedAt?: string;
 }): TrustBadge {
-  const normalizedProgress = Math.max(0, Math.min(100, params.progress));
-
   return {
     id: params.id,
     title: params.title,
     label: params.title,
     description: params.description,
     earned: params.earned,
-    progress: normalizedProgress,
+    progress: Math.max(0, Math.min(100, params.progress)),
     earnedAt: params.earnedAt,
     createdAt: params.earnedAt,
   };
 }
 
-/* ------------------------------------------------------------------ */
-/*  Derived trust inputs                                               */
-/* ------------------------------------------------------------------ */
-
 async function fetchTrustInputs(): Promise<{
   me: UserMeApi;
   stances: EthikosStanceApi[];
   arguments: EthikosArgumentApi[];
-  votes: VoteApi[];
 }> {
-  const [rawMe, rawStances, rawArguments, rawVotes] = await Promise.all([
+  const [rawMe, rawStances, rawArguments] = await Promise.all([
     get<unknown>('users/me/'),
     get<unknown>('ethikos/stances/'),
     get<unknown>('ethikos/arguments/'),
-    get<unknown>('kollective/votes/'),
   ]);
 
   const mePayload = unwrapPayload(rawMe);
-
   return {
     me: isUserMeApi(mePayload) ? mePayload : {},
     stances: normalizeList(rawStances, isStanceApi),
     arguments: normalizeList(rawArguments, isArgumentApi),
-    votes: normalizeList(rawVotes, isVoteApi),
   };
 }
 
@@ -401,89 +263,49 @@ function filterForCurrentUser<
   );
 }
 
+/**
+ * Legacy activity profile kept for screens outside the EkoH domain model.
+ * It deliberately does not derive "influence" from weighted votes.
+ */
 function buildTrustProfile(args: {
   user: ReturnType<typeof getCurrentUserIdentity>;
   stances: EthikosStanceApi[];
   arguments: EthikosArgumentApi[];
-  votes: VoteApi[];
 }): TrustProfile {
-  const { user, stances, arguments: argumentsList, votes } = args;
-
+  const { user, stances, arguments: argumentsList } = args;
   const myStances = filterForCurrentUser(stances, user);
   const myArguments = filterForCurrentUser(argumentsList, user);
-  const myVotes = filterForCurrentUser(votes, user);
 
   const stanceDates = myStances
-    .map(getStanceDate)
+    .map((item) => item.timestamp ?? item.created_at)
     .filter((date): date is string => Boolean(date));
-
   const argumentDates = myArguments
-    .map(getArgumentDate)
-    .filter((date): date is string => Boolean(date));
-
-  const voteDates = myVotes
-    .map(getVoteDate)
+    .map((item) => item.created_at)
     .filter((date): date is string => Boolean(date));
 
   const recentStances = countLastDays(stanceDates, 30);
   const previousStances = countLastDays(stanceDates, 60) - recentStances;
 
-  const influenceScore = myVotes.reduce(
-    (acc, vote) => acc + readNumber(vote.weighted_value),
-    0,
-  );
-
   const dimensions: ReputationDimension[] = [
     {
       key: 'deliberation',
-      label: 'Deliberation quality',
+      label: 'Arguments contributed',
       score: Math.min(100, myArguments.length * 5),
-      weight: 0.35,
+      weight: 0.5,
     },
     {
       key: 'participation',
-      label: 'Participation',
+      label: 'Stances recorded',
       score: Math.min(100, myStances.length * 4),
-      weight: 0.35,
-    },
-    {
-      key: 'influence',
-      label: 'Influence (weighted votes)',
-      score: Math.min(100, influenceScore),
-      weight: 0.3,
+      weight: 0.5,
     },
   ];
 
   const score = Math.round(
-    dimensions.reduce(
-      (acc, dimension) => acc + dimension.score * dimension.weight,
-      0,
-    ),
+    dimensions.reduce((sum, dimension) => sum + dimension.score * dimension.weight, 0),
   );
-
   const level: TrustLevel =
     score >= 75 ? 'Steward' : score >= 35 ? 'Contributor' : 'Visitor';
-
-  const activity: TrustActivity[] = [
-    {
-      id: 'stances',
-      label: 'Stances recorded',
-      value: myStances.length,
-      createdAt: stanceDates[0],
-    },
-    {
-      id: 'arguments',
-      label: 'Arguments contributed',
-      value: myArguments.length,
-      createdAt: argumentDates[0],
-    },
-    {
-      id: 'votes',
-      label: 'Weighted votes cast',
-      value: myVotes.length,
-      createdAt: voteDates[0],
-    },
-  ];
 
   return {
     id: user.id ?? user.username,
@@ -491,9 +313,12 @@ function buildTrustProfile(args: {
     avatar: user.avatarUrl,
     joined: user.joined,
     score,
-    activity,
     level,
     dimensions,
+    activity: [
+      { id: 'stances', label: 'Stances recorded', value: myStances.length, createdAt: stanceDates[0] },
+      { id: 'arguments', label: 'Arguments contributed', value: myArguments.length, createdAt: argumentDates[0] },
+    ],
     recent: [
       {
         label: 'Stances last 30 days',
@@ -506,39 +331,83 @@ function buildTrustProfile(args: {
   };
 }
 
-function buildTrustBadges(args: {
-  user: ReturnType<typeof getCurrentUserIdentity>;
-  stances: EthikosStanceApi[];
-  arguments: EthikosArgumentApi[];
-  votes: VoteApi[];
-}): TrustBadgePayload {
-  const { user, stances, arguments: argumentsList, votes } = args;
+function normalizeEkohProfile(raw: unknown): EkohProfile | null {
+  const payload = unwrapPayload(raw);
+  if (!isRecord(payload)) return null;
 
+  const api = payload as EkohProfileApi;
+  const userId = api.user_id != null ? String(api.user_id) : '';
+  if (!userId) return null;
+
+  const expertise = Array.isArray(api.expertise)
+    ? api.expertise
+        .map((item): EkohExpertiseScore | null => {
+          const domainCode = item.domain_code?.trim() ?? '';
+          const domainName = item.domain_name?.trim() ?? domainCode;
+          if (!domainCode) return null;
+
+          let weightedScore = readNumber(item.weighted_score);
+          if (weightedScore > 1 && weightedScore <= 100) weightedScore /= 100;
+          weightedScore = Math.max(0, Math.min(1, weightedScore));
+
+          return { domainCode, domainName, weightedScore };
+        })
+        .filter((item): item is EkohExpertiseScore => item !== null)
+        .sort((a, b) => b.weightedScore - a.weightedScore)
+    : [];
+
+  return {
+    userId,
+    displayName: api.display_name?.trim() || `User ${userId}`,
+    confidentialityLevel: api.confidentiality_level ?? 'public',
+    ethicsScore: readNumber(api.ethics_score) || 1,
+    expertise,
+  };
+}
+
+export async function fetchEkohProfile(userId: string | number): Promise<EkohProfile | null> {
+  try {
+    const raw = await get<unknown>(`v1/ekoh/profile/${userId}/`);
+    return normalizeEkohProfile(raw);
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchCurrentUserEkohProfile(): Promise<EkohProfile | null> {
+  const rawMe = await get<unknown>('users/me/');
+  const mePayload = unwrapPayload(rawMe);
+  if (!isUserMeApi(mePayload)) return null;
+  const user = getCurrentUserIdentity(mePayload);
+  if (!user.id) return null;
+  return fetchEkohProfile(user.id);
+}
+
+export async function fetchUserProfile(): Promise<ReputationProfile> {
+  const { me, stances, arguments: argumentsList } = await fetchTrustInputs();
+  return buildTrustProfile({
+    user: getCurrentUserIdentity(me),
+    stances,
+    arguments: argumentsList,
+  });
+}
+
+export const fetchTrustProfile = fetchUserProfile;
+
+export async function fetchTrustBadges(): Promise<TrustBadgePayload> {
+  const { me, stances, arguments: argumentsList } = await fetchTrustInputs();
+  const user = getCurrentUserIdentity(me);
   const myStances = filterForCurrentUser(stances, user);
   const myArguments = filterForCurrentUser(argumentsList, user);
-  const myVotes = filterForCurrentUser(votes, user);
 
-  const stanceDates = myStances
-    .map(getStanceDate)
-    .filter((date): date is string => Boolean(date));
+  const firstStanceAt = myStances[0]?.timestamp ?? myStances[0]?.created_at;
+  const firstArgumentAt = myArguments[0]?.created_at;
 
-  const argumentDates = myArguments
-    .map(getArgumentDate)
-    .filter((date): date is string => Boolean(date));
-
-  const voteDates = myVotes
-    .map(getVoteDate)
-    .filter((date): date is string => Boolean(date));
-
-  const firstStanceAt = stanceDates[0];
-  const firstArgumentAt = argumentDates[0];
-  const firstVoteAt = voteDates[0];
-
-  const badges: TrustBadge[] = [
+  const badges = [
     makeBadge({
       id: 'first-stance',
       title: 'First stance',
-      description: 'Recorded your first stance in a debate.',
+      description: 'Recorded your first stance in an Ethikos debate.',
       earned: myStances.length > 0,
       progress: myStances.length > 0 ? 100 : 0,
       earnedAt: firstStanceAt,
@@ -551,14 +420,6 @@ function buildTrustBadges(args: {
       progress: (myArguments.length / 5) * 100,
       earnedAt: myArguments.length >= 5 ? firstArgumentAt : undefined,
     }),
-    makeBadge({
-      id: 'active-voter',
-      title: 'Active voter',
-      description: 'Cast at least 10 weighted votes across the platform.',
-      earned: myVotes.length >= 10,
-      progress: (myVotes.length / 10) * 100,
-      earnedAt: myVotes.length >= 10 ? firstVoteAt : undefined,
-    }),
   ];
 
   return {
@@ -567,94 +428,50 @@ function buildTrustBadges(args: {
   };
 }
 
-/* ------------------------------------------------------------------ */
-/*  Profile / badges                                                   */
-/* ------------------------------------------------------------------ */
-
-export async function fetchUserProfile(): Promise<ReputationProfile> {
-  const { me, stances, arguments: argumentsList, votes } =
-    await fetchTrustInputs();
-
-  const user = getCurrentUserIdentity(me);
-
-  return buildTrustProfile({
-    user,
-    stances,
-    arguments: argumentsList,
-    votes,
-  });
-}
-
-export const fetchTrustProfile = fetchUserProfile;
-
-export async function fetchTrustBadges(): Promise<TrustBadgePayload> {
-  const { me, stances, arguments: argumentsList, votes } =
-    await fetchTrustInputs();
-
-  const user = getCurrentUserIdentity(me);
-
-  return buildTrustBadges({
-    user,
-    stances,
-    arguments: argumentsList,
-    votes,
-  });
-}
-
-/**
- * Primary helper for pages that consume earned/progress badge buckets.
- */
 export async function fetchUserBadges(): Promise<TrustBadgePayload> {
   return fetchTrustBadges();
 }
 
-/**
- * Compatibility helper for older screens/hooks that still expect a flat array.
- */
 export async function fetchUserBadgeList(): Promise<Badge[]> {
   const payload = await fetchTrustBadges();
-
   return [...payload.earned, ...payload.progress];
 }
 
-/* ------------------------------------------------------------------ */
-/*  Credentials                                                        */
-/* ------------------------------------------------------------------ */
+function titleFromFilename(name?: string): string {
+  if (!name) return 'Untitled credential';
+  const normalized = name
+    .replace(/\.[a-zA-Z0-9]+$/, '')
+    .replace(/[_-]+/g, ' ')
+    .trim();
+  return normalized || 'Untitled credential';
+}
 
-/**
- * Upload a real-world credential for trust review.
- *
- * Backend serializer expects:
- *   file     (required, multipart)
- *   title    (optional; defaults from filename server-side)
- *   issuer   (optional)
- *   issuedAt (optional ISO-8601 string)
- */
+function toIsoOrUndefined(
+  value: string | Date | null | undefined,
+): string | undefined {
+  if (!value) return undefined;
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime()) ? undefined : value.toISOString();
+  }
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed.toISOString() : undefined;
+}
+
 export async function uploadCredential(
   file: File,
   meta: UploadCredentialInput = {},
 ): Promise<Credential> {
   const formData = new FormData();
-
   formData.append('file', file);
 
   const title = (meta.title ?? '').trim() || titleFromFilename(file.name);
-
-  if (title) {
-    formData.append('title', title);
-  }
+  if (title) formData.append('title', title);
 
   const issuer = (meta.issuer ?? '').trim();
-
-  if (issuer) {
-    formData.append('issuer', issuer);
-  }
+  if (issuer) formData.append('issuer', issuer);
 
   const issuedAt = toIsoOrUndefined(meta.issuedAt);
-
-  if (issuedAt) {
-    formData.append('issuedAt', issuedAt);
-  }
+  if (issuedAt) formData.append('issuedAt', issuedAt);
 
   return post<Credential, FormData>('trust/credentials', formData);
 }

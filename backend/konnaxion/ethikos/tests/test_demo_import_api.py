@@ -37,7 +37,7 @@ def admin_user(django_user_model):
 @pytest.fixture
 def sample_demo_scenario():
     return {
-        "schema_version": "ethikos-demo-scenario/v1",
+        "schema_version": "ethikos-demo-scenario/v3",
         "scenario_key": "public_square_demo",
         "scenario_title": "Public Square Redevelopment Demo",
         "mode": "replace_scenario",
@@ -110,7 +110,6 @@ def sample_demo_scenario():
                 "actor": "maya",
                 "option": "mixed_square",
                 "raw_value": 1,
-                "weighted_value": 1.0,
             }
         ],
         "impact_items": [
@@ -121,6 +120,8 @@ def sample_demo_scenario():
                 "date": "2026-06-10",
             }
         ],
+        "ekoh_profiles": [],
+        "consultation_relevance": [],
     }
 
 
@@ -140,6 +141,8 @@ def successful_preview_response():
             "consultations": 1,
             "consultation_votes": 1,
             "impact_items": 1,
+            "ekoh_profiles": 0,
+            "consultation_relevance": 0,
         },
         "created": [],
         "updated": [],
@@ -164,6 +167,8 @@ def successful_import_response():
             "consultations": 1,
             "consultation_votes": 1,
             "impact_items": 1,
+            "ekoh_profiles": 0,
+            "consultation_relevance": 0,
         },
         "created": [
             {

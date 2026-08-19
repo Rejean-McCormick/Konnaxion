@@ -17,10 +17,10 @@ import type {
 } from './ethikos'
 import type { Ballot } from '@/types'
 
-export type DecisionScope = 'Elite' | 'Public'
+export type DecisionScope = 'Expert-context' | 'Public'
 
 export type EliteBallot = Ballot & {
-  scope: 'Elite'
+  scope: 'Expert-context'
   turnout: number
 }
 
@@ -45,6 +45,15 @@ export interface DecisionResult {
   passed: boolean
   closesAt: string
   region?: string
+  baselineScore: number
+  participationCount: number
+  /**
+   * Declared Smart Vote reading. Undefined until a real reading endpoint
+   * publishes one; never copy the baseline into this field.
+   */
+  readingScore?: number
+  readingKey?: string
+  readingComputedAt?: string
 }
 
 export interface DecisionResultsResponse {
@@ -69,13 +78,10 @@ export interface DecisionResultRow {
   title: string
   baselineScore?: number
   readingScore?: number
+  readingKey?: string
   publishedAt?: string
   status: DecisionStatus
 }
-
-/* ------------------------------------------------------------------ */
-/*  Constants                                                          */
-/* ------------------------------------------------------------------ */
 
 const PUBLIC_SCALE_OPTIONS = [
   'Strongly disagree',
@@ -87,10 +93,6 @@ const PUBLIC_SCALE_OPTIONS = [
 
 const STANCE_VALUES: readonly StanceValue[] = [-3, -2, -1, 0, 1, 2, 3]
 
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
 function toId(value: EthikosId): string {
   return String(value)
 }
@@ -100,11 +102,7 @@ function sameId(left: EthikosId, right: EthikosId): boolean {
 }
 
 function coerceStanceValue(value: number): StanceValue {
-  if (STANCE_VALUES.includes(value as StanceValue)) {
-    return value as StanceValue
-  }
-
-  return 0
+  return STANCE_VALUES.includes(value as StanceValue) ? (value as StanceValue) : 0
 }
 
 function computeClosesAt(topic: EthikosTopicApi): string {
@@ -113,45 +111,28 @@ function computeClosesAt(topic: EthikosTopicApi): string {
 
   if (topic.status === 'open') {
     const created = dayjs(createdAt)
-
-    if (created.isValid()) {
-      return created.add(7, 'day').toISOString()
-    }
+    if (created.isValid()) return created.add(7, 'day').toISOString()
   }
 
   const closedAt = dayjs(lastActivity)
-
-  if (closedAt.isValid()) {
-    return closedAt.toISOString()
-  }
-
-  return new Date().toISOString()
+  return closedAt.isValid() ? closedAt.toISOString() : new Date().toISOString()
 }
 
 function normalizeTurnout(totalVotes?: number | null): number {
   const count = typeof totalVotes === 'number' ? totalVotes : 0
-
-  return Math.max(0, Math.min(100, count))
+  return Math.max(0, count)
 }
 
-function isEliteTopic(topic: EthikosTopicApi): boolean {
+function hasExpertContext(topic: EthikosTopicApi): boolean {
   return topic.expertise_category !== undefined && topic.expertise_category !== null
 }
 
 function topicScope(topic: EthikosTopicApi): DecisionScope {
-  return isEliteTopic(topic) ? 'Elite' : 'Public'
+  return hasExpertContext(topic) ? 'Expert-context' : 'Public'
 }
 
 function categoryName(topic: EthikosTopicApi): string | undefined {
-  if (topic.category_name) {
-    return topic.category_name
-  }
-
-  if (topic.category?.name) {
-    return topic.category.name
-  }
-
-  return undefined
+  return topic.category_name ?? topic.category?.name ?? undefined
 }
 
 function toEliteBallot(topic: EthikosTopicApi): EliteBallot {
@@ -159,7 +140,7 @@ function toEliteBallot(topic: EthikosTopicApi): EliteBallot {
     id: toId(topic.id),
     title: topic.title,
     closesAt: computeClosesAt(topic),
-    scope: 'Elite',
+    scope: 'Expert-context',
     turnout: normalizeTurnout(topic.total_votes),
   }
 }
@@ -177,51 +158,24 @@ function toPublicBallot(topic: EthikosTopicApi): PublicBallot {
 
 function mapOptionToValue(option: string): StanceValue {
   const normalized = option.trim().toLowerCase()
-
-  if (normalized.startsWith('strongly disagree')) {
-    return -3
-  }
-
-  if (normalized.startsWith('disagree')) {
-    return -1
-  }
-
-  if (normalized.startsWith('neutral')) {
-    return 0
-  }
-
-  if (normalized.startsWith('strongly agree')) {
-    return 3
-  }
-
-  if (normalized.startsWith('agree')) {
-    return 1
-  }
+  if (normalized.startsWith('strongly disagree')) return -3
+  if (normalized.startsWith('disagree')) return -1
+  if (normalized.startsWith('neutral')) return 0
+  if (normalized.startsWith('strongly agree')) return 3
+  if (normalized.startsWith('agree')) return 1
 
   const numeric = Number(option)
-
-  if (Number.isFinite(numeric)) {
-    return coerceStanceValue(numeric)
-  }
-
-  return 0
+  return Number.isFinite(numeric) ? coerceStanceValue(numeric) : 0
 }
 
 function statusToDecisionStatus(status: EthikosTopicApi['status']): DecisionStatus {
-  if (status === 'open') {
-    return 'open'
-  }
-
-  if (status === 'closed') {
-    return 'closed'
-  }
-
+  if (status === 'open') return 'open'
+  if (status === 'closed') return 'closed'
   return 'published'
 }
 
 async function fetchAllStances(): Promise<EthikosStanceApi[]> {
   const payload = await get<ApiMaybeList<EthikosStanceApi>>(ETHIKOS_PATHS.stances)
-
   return normalizeList(payload)
 }
 
@@ -248,61 +202,36 @@ function byClosesAtAsc<T extends { closesAt: string }>(items: T[]): T[] {
   )
 }
 
-/* ------------------------------------------------------------------ */
-/*  Public API                                                         */
-/* ------------------------------------------------------------------ */
-
-/**
- * Elite ballots = open Ethikos topics with an expertise category.
- *
- * Canonical backend path remains:
- *   /api/ethikos/topics/
- *
- * This service uses the relative frontend service path owned by _request.ts:
- *   ethikos/topics/
- */
 export async function fetchEliteBallots(): Promise<EliteBallotResponse> {
   const topics = await fetchEthikosTopics({ status: 'open' })
-
-  return {
-    ballots: byClosesAtAsc(topics.filter(isEliteTopic).map(toEliteBallot)),
-  }
+  return { ballots: byClosesAtAsc(topics.filter(hasExpertContext).map(toEliteBallot)) }
 }
 
-/**
- * Public ballots = open Ethikos topics without an expertise category.
- */
 export async function fetchPublicBallots(): Promise<PublicBallotResponse> {
   const topics = await fetchEthikosTopics({ status: 'open' })
-
   return {
     ballots: byClosesAtAsc(
-      topics.filter((topic) => !isEliteTopic(topic)).map(toPublicBallot),
+      topics.filter((topic) => !hasExpertContext(topic)).map(toPublicBallot),
     ),
   }
 }
 
 /**
- * Records a public decision vote as an Ethikos topic-level stance.
- *
- * Important:
- * - this is still EthikosStance, range -3..+3;
- * - this is not ArgumentImpactVote;
- * - this is not a Smart Vote reading.
+ * Records only the canonical Ethikos stance. Smart Vote readings are derived
+ * later and must never rewrite this source event.
  */
 export async function submitPublicVote(
   id: string,
   option: string,
 ): Promise<{ ok: true }> {
-  const value = mapOptionToValue(option)
-
-  await submitTopicStance(id, value)
-
+  await submitTopicStance(id, mapOptionToValue(option))
   return { ok: true }
 }
 
 /**
- * Decision results = closed / archived topics plus stance direction.
+ * Current backend state exposes canonical Ethikos topics/stances but no
+ * published Smart Vote reading endpoint. Return the baseline truthfully and
+ * leave readingScore undefined until such a reading is actually published.
  */
 export async function fetchDecisionResults(): Promise<DecisionResultsResponse> {
   const [topics, stances] = await Promise.all([
@@ -311,7 +240,6 @@ export async function fetchDecisionResults(): Promise<DecisionResultsResponse> {
   ])
 
   const stanceStatsByTopic = buildStanceStatsByTopic(stances)
-
   const resultTopics = topics.filter(
     (topic) => topic.status === 'closed' || topic.status === 'archived',
   )
@@ -328,15 +256,17 @@ export async function fetchDecisionResults(): Promise<DecisionResultsResponse> {
       passed: average >= 0,
       closesAt: computeClosesAt(topic),
       region: categoryName(topic),
+      baselineScore: average,
+      participationCount: stats?.count ?? 0,
+      readingScore: undefined,
+      readingKey: undefined,
+      readingComputedAt: undefined,
     }
   })
 
   return { items }
 }
 
-/**
- * Compatibility helper for pages that expect protocol-like rows.
- */
 export async function fetchDecisionProtocols(): Promise<DecisionProtocolRow[]> {
   const [topics, stances] = await Promise.all([
     fetchEthikosTopics(),
@@ -355,18 +285,15 @@ export async function fetchDecisionProtocols(): Promise<DecisionProtocolRow[]> {
   }))
 }
 
-/**
- * Compatibility helper for pages that expect result rows.
- */
 export async function fetchDecisionResultRows(): Promise<DecisionResultRow[]> {
   const results = await fetchDecisionResults()
-
   return results.items.map((item) => ({
     id: item.id,
     topicId: item.id,
     title: item.title,
-    baselineScore: item.passed ? 1 : 0,
-    readingScore: item.passed ? 1 : 0,
+    baselineScore: item.baselineScore,
+    readingScore: item.readingScore,
+    readingKey: item.readingKey,
     publishedAt: item.closesAt,
     status: 'published',
   }))
