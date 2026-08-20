@@ -3,13 +3,20 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import datetime, time
 from typing import Any
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.core.exceptions import FieldDoesNotExist
 from django.db import transaction
-from django.utils.dateparse import parse_date
+
+from konnaxion.ekoh.db import (
+    ekoh_smartvote_db_scope,
+    set_local_ekoh_smartvote_search_path,
+)
+from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
 
 from konnaxion.ethikos.models_demo import DemoScenarioImport
 
@@ -93,8 +100,9 @@ def import_ethikos_demo_scenario(
 
     Contract:
     - JSON is the demo source of truth.
-    - Import writes demo source facts into ethiKos/Korum and Konsultations tables.
-    - Smart Vote readings should be recomputed elsewhere from the source facts.
+    - Import writes demo source facts into ethiKos/Korum and contextual EkoH data.
+    - Topic relevance is bound explicitly to Smart Vote through a source-target mapping.
+    - Smart Vote readings are computed from source facts; they never replace them.
     - replace_scenario deletes only objects tracked under the same scenario_key.
     """
     preview = validate_and_preview_ethikos_demo_scenario(data)
@@ -120,6 +128,12 @@ def import_ethikos_demo_scenario(
 
     try:
         with transaction.atomic():
+            # EkoH / Smart Vote legacy tables may live in the dedicated
+            # ekoh_smartvote schema while local settings intentionally omit
+            # a connection startup search_path. Public Konnaxion tables remain
+            # visible as the second schema for the rest of this atomic import.
+            set_local_ekoh_smartvote_search_path()
+
             if mode == "replace_scenario":
                 reset_result = reset_ethikos_demo_scenario(
                     scenario_key,
@@ -138,6 +152,7 @@ def import_ethikos_demo_scenario(
             _import_ekoh_profiles(payload, context, actors)
             categories = _import_categories(payload, context)
             topics = _import_topics(payload, context, categories, actors)
+            _import_topic_reading_context(payload, context, topics, actors)
             _import_stances(payload, context, actors, topics)
             argument_refs = _import_arguments(payload, context, actors, topics)
             _import_argument_sources(payload, context, argument_refs)
@@ -146,6 +161,7 @@ def import_ethikos_demo_scenario(
             _import_consultation_votes(payload, context, actors, consultations)
             _import_consultation_results(payload, context, consultations)
             _import_impact_items(payload, context, consultations)
+            _clear_smart_vote_weight_caches()
 
     except Exception as exc:
         return {
@@ -195,7 +211,11 @@ def reset_ethikos_demo_scenario(
             ],
         }
 
-    deleted = delete_tracked_scenario_objects(scenario_key)
+    # Reset may be called directly from the reset API, outside the importer's
+    # transaction. Some tracked objects (Smart Vote bindings/consultations)
+    # live in ekoh_smartvote, while Ethikos objects remain visible via public.
+    with ekoh_smartvote_db_scope():
+        deleted = delete_tracked_scenario_objects(scenario_key)
 
     return {
         "ok": True,
@@ -222,6 +242,7 @@ def summarize_scenario(data: dict) -> dict:
             "impact_items": 0,
             "ekoh_profiles": 0,
             "consultation_relevance": 0,
+            "topic_relevance": 0,
         }
 
     return summarize_scenario_payload(data)
@@ -279,6 +300,7 @@ def delete_tracked_scenario_objects(
         TRACK_OBJECT_TYPES.get("consultation_vote", "consultation_vote"),
         TRACK_OBJECT_TYPES.get("argument", "argument"),
         TRACK_OBJECT_TYPES.get("stance", "stance"),
+        TRACK_OBJECT_TYPES.get("smart_vote_source_binding", "smart_vote_source_binding"),
         TRACK_OBJECT_TYPES.get("topic", "topic"),
         TRACK_OBJECT_TYPES.get("consultation", "consultation"),
         TRACK_OBJECT_TYPES.get("category", "category"),
@@ -329,7 +351,15 @@ def delete_tracked_scenario_objects(
                 }
             )
 
-            obj.delete()
+            if object_type == TRACK_OBJECT_TYPES.get(
+                "smart_vote_source_binding", "smart_vote_source_binding"
+            ):
+                consultation = getattr(obj, "consultation", None)
+                obj.delete()
+                if consultation is not None:
+                    consultation.delete()
+            else:
+                obj.delete()
             record.delete()
 
     # Clean up any stale tracking rows for unknown object types.
@@ -405,9 +435,14 @@ def _import_actors(data: dict, context: _ImportContext) -> dict[str, Any]:
         actor_key = actor_data["key"]
         username = actor_data["username"]
 
+        display_name = actor_data.get("display_name", username)
         defaults = {
             "email": actor_data.get("email") or f"{username}@{DEMO_EMAIL_DOMAIN}",
-            "first_name": actor_data.get("display_name", username),
+            # Konnaxion's custom User uses ``name`` and disables first_name/last_name.
+            # Keep first_name in the candidate defaults for compatibility with reusable
+            # deployments that still use Django's conventional name fields.
+            "name": display_name,
+            "first_name": display_name,
             "is_active": True,
             "is_ethikos_elite": actor_data.get("is_ethikos_elite", False),
         }
@@ -448,6 +483,7 @@ def _import_ekoh_profiles(
     ExpertiseCategory = _get_optional_model("ekoh", "ExpertiseCategory")
     UserExpertiseScore = _get_optional_model("ekoh", "UserExpertiseScore")
     UserEthicsScore = _get_optional_model("ekoh", "UserEthicsScore")
+    RatingVisibilitySetting = _get_optional_model("ekoh", "RatingVisibilitySetting")
 
     if ExpertiseCategory is None or UserExpertiseScore is None:
         context.warn(
@@ -465,6 +501,15 @@ def _import_ekoh_profiles(
                 "Actor was not imported. Skipping EkoH profile.",
             )
             continue
+
+        if RatingVisibilitySetting is not None and profile.get("rating_visibility") is not None:
+            RatingVisibilitySetting.objects.update_or_create(
+                user=user,
+                defaults={
+                    "visibility": profile["rating_visibility"],
+                    "publication_basis": profile.get("publication_basis", ""),
+                },
+            )
 
         for score_data in profile.get("expertise", []):
             domain_code = score_data["domain_code"]
@@ -605,6 +650,171 @@ def _import_topics(
         topics[topic_key] = topic
 
     return topics
+
+
+
+def _import_topic_reading_context(
+    data: dict,
+    context: _ImportContext,
+    topics: dict[str, Any],
+    actors: dict[str, Any],
+) -> None:
+    """Bind Ethikos topics to Smart Vote consultations and persist relevance.
+
+    The source topic remains canonical. Smart Vote receives only a stable target
+    binding plus its declared domain-relevance vector. This avoids matching by
+    title and makes the advisory reading reproducible.
+    """
+    rows = data.get("topic_relevance", [])
+    if not rows:
+        return
+
+    Consultation = _get_optional_model("smart_vote", "Consultation")
+    ConsultationRelevance = _get_optional_model("smart_vote", "ConsultationRelevance")
+    SourceConsultationBinding = _get_optional_model(
+        "smart_vote", "SourceConsultationBinding"
+    )
+    ExpertiseCategory = _get_optional_model("ekoh", "ExpertiseCategory")
+
+    if (
+        Consultation is None
+        or ConsultationRelevance is None
+        or SourceConsultationBinding is None
+        or ExpertiseCategory is None
+    ):
+        context.warn(
+            "topic_relevance",
+            "Smart Vote source binding/relevance models or EkoH taxonomy are unavailable. "
+            "Topic relevance was validated but not persisted.",
+        )
+        return
+
+    rows_by_topic: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        rows_by_topic[row["topic"]].append(row)
+
+    exclusions_by_topic: defaultdict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in data.get("reading_exclusions", []):
+        exclusions_by_topic[row["topic"]].append(row)
+
+    topic_data_by_key = {
+        item["key"]: item for item in data.get("topics", []) if item.get("key")
+    }
+
+    for topic_key, relevance_rows in rows_by_topic.items():
+        topic = topics.get(topic_key)
+        if topic is None:
+            context.warn(
+                f"topic_relevance.{topic_key}",
+                "Ethikos topic was not imported. Skipping Smart Vote relevance.",
+            )
+            continue
+
+        topic_data = topic_data_by_key.get(topic_key, {})
+        source_type = "ethikos_topic"
+        source_id = str(topic.pk)
+
+        binding = (
+            SourceConsultationBinding.objects.select_related("consultation")
+            .filter(source_type=source_type, source_id=source_id)
+            .first()
+        )
+
+        created = binding is None
+        if binding is None:
+            consultation = Consultation.objects.create(
+                title=getattr(topic, "title", topic_data.get("title", topic_key)),
+                opens_at=_parse_datetime_value(topic_data.get("start_date")),
+                closes_at=_parse_datetime_value(topic_data.get("end_date")),
+            )
+            binding = SourceConsultationBinding.objects.create(
+                source_type=source_type,
+                source_id=source_id,
+                source_key=topic_key,
+                consultation=consultation,
+                metadata_json={
+                    "scenario_key": context.scenario_key,
+                    "advisory_exclusions": [
+                        {
+                            "actor_key": exclusion["actor"],
+                            "user_id": actors[exclusion["actor"]].pk,
+                            "reason": exclusion["reason"],
+                            "scope": "advisory_only",
+                        }
+                        for exclusion in exclusions_by_topic.get(topic_key, [])
+                    ],
+                },
+            )
+        else:
+            consultation = binding.consultation
+            consultation.title = getattr(
+                topic, "title", topic_data.get("title", topic_key)
+            )
+            consultation.opens_at = _parse_datetime_value(
+                topic_data.get("start_date")
+            )
+            consultation.closes_at = _parse_datetime_value(
+                topic_data.get("end_date")
+            )
+            consultation.save(
+                update_fields=["title", "opens_at", "closes_at"]
+            )
+            binding.source_key = topic_key
+            metadata = dict(binding.metadata_json or {})
+            metadata["scenario_key"] = context.scenario_key
+            metadata["advisory_exclusions"] = [
+                {
+                    "actor_key": exclusion["actor"],
+                    "user_id": actors[exclusion["actor"]].pk,
+                    "reason": exclusion["reason"],
+                    "scope": "advisory_only",
+                }
+                for exclusion in exclusions_by_topic.get(topic_key, [])
+            ]
+            binding.metadata_json = metadata
+            binding.save(update_fields=["source_key", "metadata_json", "updated_at"])
+
+        # Replace the declared vector atomically so removed domains do not linger.
+        ConsultationRelevance.objects.filter(consultation=consultation).delete()
+
+        for row in relevance_rows:
+            domain_code = row["domain_code"]
+            category = ExpertiseCategory.objects.filter(code=domain_code).first()
+            if category is None:
+                context.warn(
+                    f"topic_relevance.{topic_key}.{domain_code}",
+                    "Unknown EkoH domain code. Load the ISCED-F fixture before importing.",
+                )
+                continue
+
+            criteria = row.get("criteria")
+            if isinstance(criteria, str):
+                criteria = {"note": criteria}
+
+            ConsultationRelevance.objects.create(
+                consultation=consultation,
+                category=category,
+                weight=row["weight"],
+                criteria_json=criteria,
+            )
+
+        object_type = TRACK_OBJECT_TYPES["smart_vote_source_binding"]
+        label = f"Smart Vote reading context: {consultation.title}"
+        context.track(object_type, binding, label, source_key=topic_key)
+        if created:
+            context.record_created(object_type, binding, label)
+        else:
+            context.record_updated(object_type, binding, label)
+
+
+def _clear_smart_vote_weight_caches() -> None:
+    try:
+        from konnaxion.smart_vote.services.weight_calculator import (
+            clear_weight_caches,
+        )
+    except (ImportError, LookupError):
+        return
+    clear_weight_caches()
 
 
 def _import_stances(
@@ -994,6 +1204,10 @@ def _model_for_object_type(object_type: str):
         TRACK_OBJECT_TYPES["impact_item"]: (ETHIKOS_APP_LABEL, "ImpactTrack"),
         TRACK_OBJECT_TYPES["ekoh_expertise_score"]: ("ekoh", "UserExpertiseScore"),
         TRACK_OBJECT_TYPES["ekoh_ethics_score"]: ("ekoh", "UserEthicsScore"),
+        TRACK_OBJECT_TYPES["smart_vote_source_binding"]: (
+            "smart_vote",
+            "SourceConsultationBinding",
+        ),
     }
 
     model_ref = model_map.get(object_type)
@@ -1102,6 +1316,23 @@ def _normalize_argument_side(EthikosArgument, side):
     return normalized
 
 
+
+def _parse_datetime_value(value):
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        dt = value
+    else:
+        dt = parse_datetime(str(value))
+        if dt is None:
+            parsed_date = parse_date(str(value))
+            if parsed_date is None:
+                return None
+            dt = datetime.combine(parsed_date, time.min)
+    if timezone.is_naive(dt):
+        return timezone.make_aware(dt, timezone.get_current_timezone())
+    return dt
+
 def _parse_date_value(value):
     if not value:
         return None
@@ -1199,10 +1430,9 @@ def _collect_non_blocking_warnings(data: dict) -> list[dict]:
             {
                 "path": "consultation_relevance",
                 "message": (
-                    "Domain relevance is validated as v3 source context but is not "
-                    "persisted by this importer yet because Smart Vote owns a separate "
-                    "Consultation model. Add an explicit cross-subsystem mapping before "
-                    "runtime readings consume it."
+                    "Legacy consultation_relevance is validated for compatibility but is "
+                    "not bound automatically. Prefer v3 topic_relevance, which uses the "
+                    "explicit Ethikos topic → Smart Vote source binding."
                 ),
             }
         )
@@ -1245,4 +1475,3 @@ def _build_consultation_results_data(
         "options": list(option_totals.values()),
         "smart_vote_readings": [],
     }
-

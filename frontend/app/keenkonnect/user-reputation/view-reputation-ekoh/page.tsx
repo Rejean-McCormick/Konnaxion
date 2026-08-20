@@ -70,8 +70,12 @@ export default function ViewReputationEkohPage(): JSX.Element {
               {ekohProfile ? (
                 <Space wrap style={{ justifyContent: 'center' }}>
                   <Tag>{ekohProfile.confidentialityLevel}</Tag>
-                  <Tag>{ekohProfile.expertise.length} domains</Tag>
-                  <Tag>Reliability {ekohProfile.ethicsScore.toFixed(2)}×</Tag>
+                  <Tag>{expertise.length} domains</Tag>
+                  <Tag>
+                    Reliability {ekohProfile.ethicsScore == null
+                      ? 'restricted'
+                      : `${ekohProfile.ethicsScore.toFixed(2)}×`}
+                  </Tag>
                 </Space>
               ) : (
                 <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No EkoH profile" />

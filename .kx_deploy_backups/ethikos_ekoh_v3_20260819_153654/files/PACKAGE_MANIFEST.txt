@@ -1,0 +1,47 @@
+Konnaxion_Ethikos_Seed_Manager.pyw
+README_PUSH.md
+VALIDATION_REPORT.md
+backend/config/settings/test.py
+backend/konnaxion/ekoh/db.py
+backend/konnaxion/ekoh/fixtures/isced_f_2013.json
+backend/konnaxion/ekoh/management/commands/load_isced.py
+backend/konnaxion/ekoh/migrations/0001_initial.py
+backend/konnaxion/ekoh/migrations/0002_remove_expertisecategory_idx_cat_path_and_more.py
+backend/konnaxion/ekoh/serializers/profile.py
+backend/konnaxion/ekoh/services/contextual_analysis.py
+backend/konnaxion/ekoh/services/multidimensional_scoring.py
+backend/konnaxion/ekoh/tasks/contextual.py
+backend/konnaxion/ekoh/tasks/recalc.py
+backend/konnaxion/ekoh/views/profile.py
+backend/konnaxion/ethikos/demo_import/importer.py
+backend/konnaxion/ethikos/demo_import/schema.py
+backend/konnaxion/ethikos/migrations/0005_demo_import_v3_object_types.py
+backend/konnaxion/ethikos/models_demo.py
+backend/konnaxion/ethikos/tests/test_demo_import_api.py
+backend/konnaxion/ethikos/tests/test_demo_import_schema.py
+backend/konnaxion/ethikos/tests/test_demo_importer.py
+backend/konnaxion/kollective_intelligence/models.py
+backend/konnaxion/smart_vote/migrations/0002_consultation.py
+backend/konnaxion/smart_vote/migrations/0004_source_consultation_binding.py
+backend/konnaxion/smart_vote/models/__init__.py
+backend/konnaxion/smart_vote/models/source_binding.py
+backend/konnaxion/smart_vote/services/reading_service.py
+backend/konnaxion/smart_vote/services/weight_calculator.py
+backend/konnaxion/smart_vote/tests/__init__.py
+backend/konnaxion/smart_vote/tests/test_reading_service.py
+backend/konnaxion/smart_vote/urls.py
+backend/konnaxion/smart_vote/views/__init__.py
+backend/konnaxion/smart_vote/views/reading.py
+docs/Technical-Reference/EkoH Smart Vote/ekoh-system-overview-smart-vote-ecosystem.md
+docs/Technical-Reference/EkoH Smart Vote/konnaxion-smart-vote-weighted-voting-system-structure-and-logic-internal-white-paper.md
+docs/Technical-Reference/EkoH Smart Vote/smart-vote-system-in-konnaxion-technical-specification.md
+frontend/app/ekoh/dashboard/page.tsx
+frontend/app/ethikos/decide/results/page.tsx
+frontend/app/ethikos/trust/profile/page.tsx
+frontend/app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx
+frontend/features/ethikos/demo-importer/api.ts
+frontend/features/ethikos/demo-importer/types.ts
+frontend/hooks/useReputationEvents.ts
+frontend/services/decide.ts
+frontend/services/trust.ts
+seed-data/ethikos/canada_quebec_public_debates_2026.json

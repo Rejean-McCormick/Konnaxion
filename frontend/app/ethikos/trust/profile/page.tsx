@@ -86,7 +86,7 @@ export default function TrustProfilePage(): JSX.Element {
 
   const expertise = ekohProfile?.expertise ?? [];
   const topExpertise = expertise[0];
-  const ethicsScore = ekohProfile?.ethicsScore ?? 1;
+  const ethicsScore = ekohProfile?.ethicsScore ?? null;
   const confidentiality = ekohProfile?.confidentialityLevel ?? 'not available';
 
   const primaryAction = (
@@ -161,9 +161,9 @@ export default function TrustProfilePage(): JSX.Element {
               colSpan={{ xs: 24, sm: 12, lg: 6 }}
               statistic={{
                 title: 'Ethics / reliability modifier',
-                value: ethicsScore,
-                suffix: '×',
-                precision: 2,
+                value: ethicsScore ?? 'Restricted',
+                suffix: ethicsScore == null ? undefined : '×',
+                precision: ethicsScore == null ? undefined : 2,
                 description: <Text type="secondary">Governed signal; not a moral rank</Text>,
               }}
             />
@@ -197,7 +197,9 @@ export default function TrustProfilePage(): JSX.Element {
                       <Tag>{ekohProfile.confidentialityLevel}</Tag>
                     </Descriptions.Item>
                     <Descriptions.Item label="Ethics signal">
-                      {ekohProfile.ethicsScore.toFixed(2)}×
+                      {ekohProfile.ethicsScore == null
+                        ? 'Restricted'
+                        : `${ekohProfile.ethicsScore.toFixed(2)}×`}
                     </Descriptions.Item>
                   </Descriptions>
                 ) : (

@@ -4,6 +4,7 @@ import 'dayjs/locale/en'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { Alert, Col, Row, Space, Steps, Typography } from 'antd'
+import { useState } from 'react'
 import { PageContainer, ProCard } from '@ant-design/pro-components'
 import {
   BranchesOutlined,
@@ -17,6 +18,10 @@ import type { EthikosId } from '@/services/ethikos'
 
 import ArgumentComposerCard from './_components/ArgumentComposerCard'
 import ArgumentThreadCard from './_components/ArgumentThreadCard'
+import type { ParticipantContextTarget } from './_components/ArgumentThreadCard'
+import EkohParticipantDrawer from './_components/EkohParticipantDrawer'
+import EmergentQuestionCard from './_components/EmergentQuestionCard'
+import SmartVoteReadingsPanel from './_components/SmartVoteReadingsPanel'
 import KorumPanelsGrid from './_components/KorumPanelsGrid'
 import StanceComposerCard from './_components/StanceComposerCard'
 import { TopicErrorState, TopicLoadingState } from './_components/TopicStates'
@@ -30,6 +35,8 @@ const { Text } = Typography
 
 export default function TopicThreadPage(): JSX.Element {
   const controller = useTopicThreadController()
+  const [participantContext, setParticipantContext] =
+    useState<ParticipantContextTarget | null>(null)
 
   if (!controller.topicId) {
     return (
@@ -58,6 +65,14 @@ export default function TopicThreadPage(): JSX.Element {
   }
 
   const topic = controller.pageData
+
+  if (!topic) {
+    return (
+      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
+        <TopicErrorState description="Topic data unavailable" />
+      </EthikosPageShell>
+    )
+  }
 
   return (
     <EthikosPageShell
@@ -140,6 +155,7 @@ export default function TopicThreadPage(): JSX.Element {
                 onSelect={controller.setSelectedArgument}
                 onReply={controller.handleReply}
                 onRefresh={controller.refreshPageData}
+                onOpenParticipant={setParticipantContext}
               />
             </Col>
           </Row>
@@ -170,6 +186,20 @@ export default function TopicThreadPage(): JSX.Element {
               onRefreshParticipantRoles={controller.refreshParticipantRoles}
             />
           </ProCard>
+
+          <EmergentQuestionCard currentTitle={topic.title} />
+
+          <SmartVoteReadingsPanel
+            topicId={controller.topicId as EthikosId}
+            onOpenParticipant={setParticipantContext}
+          />
+
+          <EkohParticipantDrawer
+            open={Boolean(participantContext)}
+            participant={participantContext}
+            topicId={controller.topicId as EthikosId}
+            onClose={() => setParticipantContext(null)}
+          />
         </Space>
       </PageContainer>
     </EthikosPageShell>
