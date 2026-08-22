@@ -1,0 +1,105 @@
+--- /mnt/data/cinematic_pack/CinematicEnginePack/cinematic_engine/actions/builtin.py	2026-08-18 22:28:32.000000000 +0000
++++ /mnt/data/CinematicEnginePack_v413/cinematic_engine/actions/builtin.py	2026-08-20 18:36:45.310657734 +0000
+@@ -42,36 +42,52 @@
+ def scroll(page, payload, targets, base_url):
+     distance = float(payload.get("distance") or 0)
+     duration_ms = max(1, int(payload.get("duration_ms") or 1000))
+-    selector = targets.get(str(payload.get("target"))) if payload.get("target") else None
++    target = payload.get("target")
++
++    if target:
++        loc = page.locator(_selector(targets, payload)).first
++        loc.evaluate(
++            """async (el, {distance, duration}) => {
++              const start = el.scrollTop;
++              const startTime = performance.now();
++              const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
++              await new Promise(resolve => {
++                function frame(now) {
++                  const p = Math.min(1, (now - startTime) / duration);
++                  el.scrollTop = start + distance * ease(p);
++                  if (p < 1) requestAnimationFrame(frame); else resolve();
++                }
++                requestAnimationFrame(frame);
++              });
++            }""",
++            {"distance": distance, "duration": duration_ms},
++        )
++        return
++
+     page.evaluate(
+-        """async ({distance, duration, selector}) => {
+-          const el = selector ? document.querySelector(selector) : document.scrollingElement;
+-          if (!el) throw new Error('Scroll target not found: ' + selector);
+-          const start = selector ? el.scrollTop : window.scrollY;
++        """async ({distance, duration}) => {
++          const start = window.scrollY;
+           const startTime = performance.now();
+           const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+           await new Promise(resolve => {
+             function frame(now) {
+               const p = Math.min(1, (now - startTime) / duration);
+-              const y = start + distance * ease(p);
+-              if (selector) el.scrollTop = y; else window.scrollTo(0, y);
++              window.scrollTo(0, start + distance * ease(p));
+               if (p < 1) requestAnimationFrame(frame); else resolve();
+             }
+             requestAnimationFrame(frame);
+           });
+         }""",
+-        {"distance": distance, "duration": duration_ms, "selector": selector},
++        {"distance": distance, "duration": duration_ms},
+     )
+ 
+ 
+ def scroll_to(page, payload, targets, base_url):
+-    selector = _selector(targets, payload)
++    loc = page.locator(_selector(targets, payload)).first
+     duration_ms = max(1, int(payload.get("duration_ms") or 1200))
+     block = str(payload.get("block") or "center")
+-    page.evaluate(
+-        """async ({selector, duration, block}) => {
+-          const el = document.querySelector(selector);
+-          if (!el) throw new Error('Target not found: ' + selector);
++    loc.evaluate(
++        """async (el, {duration, block}) => {
+           const rect = el.getBoundingClientRect();
+           const current = window.scrollY;
+           let target = current + rect.top;
+@@ -90,7 +106,7 @@
+             requestAnimationFrame(frame);
+           });
+         }""",
+-        {"selector": selector, "duration": duration_ms, "block": block},
++        {"duration": duration_ms, "block": block},
+     )
+ 
+ 
+@@ -107,10 +123,10 @@
+ 
+ 
+ def highlight(page, payload, targets, base_url):
+-    selector = _selector(targets, payload)
++    loc = page.locator(_selector(targets, payload)).first
+     duration_ms = int(payload.get("duration_ms") or 0)
+     page.evaluate(
+-        """({selector}) => {
++        """() => {
+           document.querySelectorAll('[data-cinematic-engine-highlight]').forEach(n => n.removeAttribute('data-cinematic-engine-highlight'));
+           let style = document.getElementById('__cinematic_engine_style');
+           if (!style) {
+@@ -119,12 +135,9 @@
+             style.textContent = `[data-cinematic-engine-highlight]{outline:4px solid #ffd54f !important;outline-offset:4px !important;transition:outline .2s ease;}`;
+             document.head.appendChild(style);
+           }
+-          const el = document.querySelector(selector);
+-          if (!el) throw new Error('Target not found: ' + selector);
+-          el.setAttribute('data-cinematic-engine-highlight', '1');
+-        }""",
+-        {"selector": selector},
++        }"""
+     )
++    loc.evaluate("el => el.setAttribute('data-cinematic-engine-highlight', '1')")
+     if duration_ms > 0:
+         page.wait_for_timeout(duration_ms)
+         page.evaluate("document.querySelectorAll('[data-cinematic-engine-highlight]').forEach(n => n.removeAttribute('data-cinematic-engine-highlight'))")

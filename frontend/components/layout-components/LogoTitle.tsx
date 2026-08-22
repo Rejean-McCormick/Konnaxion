@@ -33,7 +33,7 @@ const TITLE_BY_SUITE: Record<SuiteKey, string> = {
 
 const DEFAULT_ENTRY: Record<SuiteKey, string> = {
   ekoh: '/ekoh/dashboard',
-  ethikos: '/ethikos/pulse/overview',
+  ethikos: '/ethikos/insights',
   keenkonnect: '/keenkonnect/dashboard',
   konnected: '/konnected/dashboard',
   kreative: '/kreative/dashboard',

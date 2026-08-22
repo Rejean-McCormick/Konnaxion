@@ -246,7 +246,12 @@ export default function HeaderBar({
         ? normalizedSidebar.charAt(0).toUpperCase() + normalizedSidebar.slice(1)
         : 'Home')
 
-    const rootPath = normalizedSidebar ? `/${normalizedSidebar}` : '/'
+    const rootPath =
+      normalizedSidebar === 'ethikos'
+        ? '/ethikos/insights'
+        : normalizedSidebar
+          ? `/${normalizedSidebar}`
+          : '/'
 
     const root = {
       name: rootName,

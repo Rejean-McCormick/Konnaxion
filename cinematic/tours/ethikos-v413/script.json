@@ -1,0 +1,45 @@
+{
+  "schema_version": "cinematic-script/v1",
+  "blocks": [
+    {
+      "id": "opening",
+      "title": "Opening",
+      "text": "Ethikos helps decision-makers access structured collective intelligence. This walkthrough is not a catalogue of Konnaxion. It follows one difficult decision from structured deliberation to an advisory expertise reading, while keeping the human decision-maker in control."
+    },
+    {
+      "id": "autonomy",
+      "title": "Canada–United States economic autonomy",
+      "text": "We begin with the question of whether Canada should sharply reduce its dependence on the United States even at a short-term cost. Ethikos keeps positions, arguments, sources, and the plurality of participants distinct. The objective is coherence, not consensus."
+    },
+    {
+      "id": "scene",
+      "title": "King Klown and Réjean",
+      "text": "Inside that debate, King Klown proposes a radically different artificial-intelligence infrastructure. Réjean answers with discretion: consult the affected Indigenous populations and nations before announcing the project. King Klown replies, C'est déjà annoncé. The announcement follows: dedicated AI power at a price that makes the current competition obsolete, an inclusive international model, and a new AI encyclopedia with KristALL. The Inquisiteur then intervenes as moderator."
+    },
+    {
+      "id": "ekoh",
+      "title": "Réjean EkoH context",
+      "text": "When government asks for Réjean's view, EkoH shows why his contribution may be relevant here: domain scores, contextual alignment, ethics or reliability, and the public rating status of this demo profile. But that does not make him an expert on everything. Expertise follows the question."
+    },
+    {
+      "id": "trump-context",
+      "title": "Trump emergent question and demo-fiction context",
+      "text": "The infrastructure proposal creates a separate governance question: should Donald Trump be excluded from these services? This is explicitly demo fiction. The background record says King Klown has organized historic anti-capitalism and anti-Trump demonstrations, strongly opposes collaboration with Trump, and spreads that position among nations near strategic sites. That material is shown as background context, not as a new argument."
+    },
+    {
+      "id": "recusal",
+      "title": "Voluntary recusal",
+      "text": "King Klown discloses the conflict and voluntarily recuses himself from the EkoH and Smart Vote advisory reading. His public position and arguments remain in the baseline. The recusal changes only the advisory lens. Expertise and conflict can coexist without erasing the person."
+    },
+    {
+      "id": "readings",
+      "title": "Baseline versus relevant expertise",
+      "text": "Now compare the two readings. The public baseline contains seven participants. The relevant-expertise advisory reading contains six, with one declared recusal. In this demo, the baseline is positive while the expertise reading is negative. No one becomes more important everywhere. Expertise follows the question. The objective is coherence, not consensus. Expertise informs judgment; it does not silently acquire sovereignty."
+    },
+    {
+      "id": "closing",
+      "title": "Pulse and conclusion",
+      "text": "A final Pulse view returns us to the health of the conversation rather than a single score. Ethikos does not decide for government. It helps government see more of the problem before it decides."
+    }
+  ]
+}

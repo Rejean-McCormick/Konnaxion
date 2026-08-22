@@ -9,6 +9,12 @@ const WAVE1_TOPIC_ID = process.env.WAVE1_TOPIC_ID
 const PAUSE_ON_ERROR = process.env.WAVE1_PAUSE_ON_ERROR === '1'
 const outDir = path.join('artifacts', 'kintsugi-wave1-workflow')
 
+const WALKTHROUGH_TOPIC_TITLE =
+  '[DEMO] Le Canada devrait-il réduire fortement sa dépendance envers les États-Unis, même au prix de coûts à court terme?'
+const TRUMP_TOPIC_RE = /Est-ce qu'on exclut Donald Trump de nos services\?/i
+const KING_KLOWN_CONTEXT_RE =
+  /un rapport indique que King Klown a organisé des manifestations d'une ampleur historique contre le capitalisme et Donald Trump/i
+
 const ROUTE_DRIFT_RE =
   /\/api\/(kialo|kintsugi|korum|deliberation|deliberate)\b|\/(kialo|kintsugi|korum|deliberation)\b/i
 
@@ -34,7 +40,10 @@ function isAllowedAuthUrl(url: string): boolean {
 
 function isIgnorableConsoleError(text: string): boolean {
   return (
-    /Failed to load resource: the server responded with a status of (401|403)/i.test(
+    // Resource 4xx responses are classified from page.on('response'), where the
+    // request URL is available. Avoid turning the browser's URL-less console
+    // summary into a duplicate or unclassifiable finding.
+    /Failed to load resource: the server responded with a status of (401|403|404)/i.test(
       text,
     ) ||
     /Warning: \[antd: compatible\] antd v5 support React is 16 ~ 18/i.test(
@@ -43,8 +52,12 @@ function isIgnorableConsoleError(text: string): boolean {
   )
 }
 
+function isIgnorableHttpUrl(url: string): boolean {
+  return /\/favicon\.ico(?:\?|$)/i.test(url)
+}
+
 function isIgnorableRequestFailure(url: string, errorText: string): boolean {
-  return /favicon\.ico/i.test(url) || /net::ERR_ABORTED/i.test(errorText)
+  return isIgnorableHttpUrl(url) || /net::ERR_ABORTED/i.test(errorText)
 }
 
 async function safeScreenshot(page: Page, name: string): Promise<void> {
@@ -211,40 +224,94 @@ async function expectTextVisible(
   await safeScreenshot(page, stepName)
 }
 
-async function findFirstTopicPath(page: Page): Promise<string | null> {
-  const links = await page
-    .locator('a[href^="/ethikos/deliberate/"], a[href*="/ethikos/deliberate/"]')
-    .evaluateAll((anchors) =>
-      anchors
-        .map((anchor) => {
-          const href = anchor.getAttribute('href') ?? ''
-
-          try {
-            return new URL(href, window.location.origin).pathname
-          } catch {
-            return href
-          }
-        })
-        .filter(
-          (href) =>
-            href.startsWith('/ethikos/deliberate/') &&
-            href !== '/ethikos/deliberate/elite' &&
-            href !== '/ethikos/deliberate/guidelines' &&
-            !href.includes('[topic') &&
-            !href.endsWith('/elite') &&
-            !href.endsWith('/guidelines'),
-        ),
-    )
-
-  return links[0] ?? null
-}
-
 function configuredTopicPath(): string | null {
   if (!WAVE1_TOPIC_ID) {
     return null
   }
 
   return `/ethikos/deliberate/${WAVE1_TOPIC_ID}?sidebar=ethikos`
+}
+
+async function openWalkthroughTopic(page: Page): Promise<boolean> {
+  const openThreadButtons = page.getByRole('button', { name: /open thread/i })
+
+  // The elite table loads asynchronously and paginates at 10 rows. Wait for the
+  // real UI to expose at least one topic before inspecting its visible pages.
+  await expect(openThreadButtons.first()).toBeVisible({ timeout: 15_000 }).catch(() => undefined)
+
+  for (let pageIndex = 0; pageIndex < 10; pageIndex += 1) {
+    const row = page
+      .locator('tr')
+      .filter({ hasText: WALKTHROUGH_TOPIC_TITLE })
+      .first()
+
+    if (await row.isVisible().catch(() => false)) {
+      await row.getByRole('button', { name: /open thread/i }).click()
+      await page.waitForURL(/\/ethikos\/deliberate\/[^/?]+(?:\?|$)/, {
+        timeout: 10_000,
+      })
+      await page.waitForLoadState('domcontentloaded')
+      return true
+    }
+
+    const nextButton = page.locator('.ant-pagination-next button').first()
+    const canAdvance =
+      (await nextButton.isVisible().catch(() => false)) &&
+      (await nextButton.isEnabled().catch(() => false))
+
+    if (!canAdvance) {
+      return false
+    }
+
+    const firstRowBefore = await page
+      .locator('tbody tr')
+      .first()
+      .innerText()
+      .catch(() => '')
+
+    await nextButton.click()
+
+    if (firstRowBefore) {
+      await expect
+        .poll(
+          async () =>
+            page
+              .locator('tbody tr')
+              .first()
+              .innerText()
+              .catch(() => ''),
+          { timeout: 5_000 },
+        )
+        .not.toBe(firstRowBefore)
+        .catch(() => undefined)
+    }
+  }
+
+  return false
+}
+
+async function openFirstVisibleTopic(page: Page): Promise<boolean> {
+  const firstOpenThread = page.getByRole('button', { name: /open thread/i }).first()
+
+  if (!(await firstOpenThread.isVisible().catch(() => false))) {
+    return false
+  }
+
+  await firstOpenThread.click()
+  await page.waitForURL(/\/ethikos\/deliberate\/[^/?]+(?:\?|$)/, {
+    timeout: 10_000,
+  })
+  await page.waitForLoadState('domcontentloaded')
+  return true
+}
+
+async function closeEkohDrawer(page: Page): Promise<void> {
+  const drawer = page.getByTestId('ekoh-context-drawer')
+  const close = drawer.getByRole('button', { name: /close/i }).first()
+  if (await close.isVisible().catch(() => false)) {
+    await close.click()
+    await expect(drawer).toBeHidden({ timeout: 5_000 })
+  }
 }
 
 test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
@@ -307,9 +374,17 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
         })
       }
 
-      if ((status === 401 || status === 403) && !isAllowedAuthUrl(url)) {
+      if (status >= 400 && status < 500) {
+        if (isIgnorableHttpUrl(url)) {
+          return
+        }
+
+        if ((status === 401 || status === 403) && isAllowedAuthUrl(url)) {
+          return
+        }
+
         findings.push({
-          type: 'unexpected-auth-block',
+          type: status === 401 || status === 403 ? 'unexpected-auth-block' : 'client-error',
           message: `HTTP ${status}: ${url}`,
         })
       }
@@ -324,10 +399,27 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
       '01-deliberate-elite',
     )
 
-    const topicPath = configuredTopicPath() ?? (await findFirstTopicPath(page))
+    const configuredPath = configuredTopicPath()
+    const openedWalkthroughTopic = configuredPath
+      ? false
+      : await openWalkthroughTopic(page)
+    const openedFallbackTopic =
+      !configuredPath && !openedWalkthroughTopic
+        ? await openFirstVisibleTopic(page)
+        : false
 
-    if (topicPath) {
-      await visitPage(page, topicPath, findings, '02-deliberate-topic')
+    if (configuredPath || openedWalkthroughTopic || openedFallbackTopic) {
+      if (configuredPath) {
+        await visitPage(
+          page,
+          configuredPath,
+          findings,
+          '02-deliberate-topic',
+        )
+      } else {
+        await page.waitForLoadState('domcontentloaded')
+        await safeScreenshot(page, '02-deliberate-topic')
+      }
 
       await expectTextVisible(
         page,
@@ -335,34 +427,116 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
         '03-topic-argument-thread',
       )
 
-      await clickIfVisible(
-        page,
-        /view details|viewing details/i,
-        '04-topic-select-argument',
-        true,
-      )
+      if (openedWalkthroughTopic) {
+        await expectTextVisible(
+          page,
+          /Le Canada devrait-il réduire fortement sa dépendance envers les États-Unis/i,
+          '04-canada-us-topic',
+        )
+        await expectTextVisible(
+          page,
+          /Le Canada devrait profiter de cette rupture pour bâtir un modèle radicalement différent d'infrastructure d'IA/i,
+          '05-king-klown-proposal',
+        )
+        await expectTextVisible(
+          page,
+          /Discrétion\. Les populations et nations autochtones concernées/i,
+          '06-rejean-discretion',
+        )
+        await expectTextVisible(page, /C'est déjà annoncé\./i, '07-already-announced')
+        await expectTextVisible(
+          page,
+          /PUISSANCE DÉDIÉE À L'IA À UN PRIX QUI LAISSE LA COMPÉTITION DÉSUÈTE/i,
+          '08-public-announcement',
+        )
+        await expectTextVisible(
+          page,
+          /MODÉRATION — Inquisiteur retire King Klown/i,
+          '09-moderation',
+        )
 
-      await expectTextVisible(
-        page,
-        /selected argument details/i,
-        '05-topic-selected-argument-details',
-      )
+        const rejeanItem = page
+          .locator('[role="treeitem"]')
+          .filter({ hasText: /demo_rejean_mccormick/i })
+          .first()
+        await expect(rejeanItem).toBeVisible({ timeout: 10_000 })
+        const rejeanEkohButton = rejeanItem
+          .getByRole('button', { name: /EkoH context/i })
+          .first()
+        await expect(rejeanEkohButton).toBeVisible({ timeout: 10_000 })
+        await rejeanEkohButton.click()
+        const ekohDrawer = page.getByTestId('ekoh-context-drawer')
+        await expect(ekohDrawer).toBeVisible({ timeout: 10_000 })
+        await expect(ekohDrawer.getByText(/Ratings: public/i)).toBeVisible()
+        await expect(ekohDrawer.getByText(/Contextual alignment/i)).toBeVisible()
+        await expect(ekohDrawer.getByText(/EkoH expertise by domain/i)).toBeVisible()
+        await safeScreenshot(page, '10-rejean-ekoh-context')
+        await closeEkohDrawer(page)
 
-      await expectTextVisible(page, /sources/i, '06-topic-sources-panel')
-      await expectTextVisible(page, /impact votes/i, '07-topic-impact-panel')
-      await expectTextVisible(page, /suggestions/i, '08-topic-suggestions-panel')
-      await expectTextVisible(
-        page,
-        /discussion visibility/i,
-        '09-topic-visibility-panel',
-      )
-      await expectTextVisible(
-        page,
-        /participant roles/i,
-        '10-topic-participant-roles-panel',
-      )
+        const emergent = page.getByTestId('emergent-question-card')
+        await expect(emergent).toBeVisible({ timeout: 10_000 })
+        await expect(emergent.getByText(TRUMP_TOPIC_RE)).toBeVisible()
+        await emergent.getByTestId('open-emergent-question').click()
+        await page.waitForLoadState('domcontentloaded')
+        await expect(page.getByText(TRUMP_TOPIC_RE).first()).toBeVisible({ timeout: 10_000 })
+        await safeScreenshot(page, '11-trump-question')
 
-      await clickIfVisible(page, /add/i, '11-topic-sources-open-add-form')
+        const conflictItem = page
+          .locator('[role="treeitem"]')
+          .filter({ hasText: /Contexte déclaré: je mène déjà une campagne publique contre Trump/i })
+          .first()
+        await expect(conflictItem).toBeVisible({ timeout: 10_000 })
+        const conflictCard = conflictItem.locator(':scope > .ant-card')
+        await expect(conflictCard).toBeVisible({ timeout: 10_000 })
+        await conflictCard
+          .getByRole('button', { name: /view details|viewing details/i })
+          .click()
+        await expect(page.getByText(KING_KLOWN_CONTEXT_RE).first()).toBeVisible({ timeout: 10_000 })
+        await expect(page.getByText(/Background report/i).first()).toBeVisible()
+        await expect(
+          page.getByText(/Contexte narratif fictif de démonstration/i).first(),
+        ).toBeVisible()
+        await safeScreenshot(page, '12-trump-demo-fiction-context')
+
+        await expectTextVisible(
+          page,
+          /RÉCUSATION — Je maintiens mon argument et ma position publique/i,
+          '13-king-klown-recusal',
+        )
+
+        const readings = page.getByTestId('smart-vote-readings-panel')
+        await expect(readings).toBeVisible({ timeout: 10_000 })
+        await readings.getByTestId('view-readings-button').click()
+        const baseline = page.getByTestId('baseline-reading-card')
+        const expertise = page.getByTestId('expertise-reading-card')
+        await expect(baseline).toBeVisible({ timeout: 10_000 })
+        await expect(expertise).toBeVisible({ timeout: 10_000 })
+        await expect(baseline.getByText(/7 source stances/i)).toBeVisible()
+        await expect(expertise.getByText(/6 advisory participants/i)).toBeVisible()
+        await expect(expertise.getByText(/1 declared recusal/i)).toBeVisible()
+        await expect(
+          page.locator('li:has-text("King Klown"):has-text("Recused"):has-text("advisory weight 0.00×")').last(),
+        ).toBeVisible({ timeout: 10_000 })
+        await safeScreenshot(page, '14-smart-vote-baseline-vs-expertise')
+      } else {
+        await clickIfVisible(
+          page,
+          /view details|viewing details/i,
+          '04-topic-select-argument',
+          true,
+        )
+        await expectTextVisible(
+          page,
+          /selected argument details/i,
+          '05-topic-selected-argument-details',
+        )
+        await expectTextVisible(page, /sources/i, '06-topic-sources-panel')
+        await expectTextVisible(page, /impact votes/i, '07-topic-impact-panel')
+        await expectTextVisible(page, /suggestions/i, '08-topic-suggestions-panel')
+        await expectTextVisible(page, /discussion visibility/i, '09-topic-visibility-panel')
+        await expectTextVisible(page, /participant roles/i, '10-topic-participant-roles-panel')
+        await clickIfVisible(page, /add/i, '11-topic-sources-open-add-form')
+      }
     } else {
       test.info().annotations.push({
         type: 'demo-data-missing',

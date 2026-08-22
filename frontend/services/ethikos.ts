@@ -849,6 +849,7 @@ export async function fetchTopicDetail(
     .map((arg) => ({
       id: String(arg.id),
       author: String(arg.user_display ?? arg.user ?? 'Unknown'),
+      userId: arg.user_id != null ? String(arg.user_id) : undefined,
       body: arg.content,
       side: arg.side ?? null,
       parent: getArgumentParent(arg),
