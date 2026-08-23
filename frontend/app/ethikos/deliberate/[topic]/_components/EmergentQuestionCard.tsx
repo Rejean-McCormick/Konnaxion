@@ -15,8 +15,16 @@ function isEconomicAutonomyDemo(title: string): boolean {
   const value = title.toLowerCase()
   return (
     value.includes('[demo]') &&
-    (value.includes('dépendance') || value.includes('dependance')) &&
-    (value.includes('états-unis') || value.includes('etats-unis') || value.includes('united states'))
+    (
+      value.includes('dépendance') ||
+      value.includes('dependance') ||
+      value.includes('dependence')
+    ) &&
+    (
+      value.includes('états-unis') ||
+      value.includes('etats-unis') ||
+      value.includes('united states')
+    )
   )
 }
 
@@ -24,7 +32,11 @@ function isTrumpQuestion(title: string): boolean {
   return title.toLowerCase().includes('donald trump')
 }
 
-export default function EmergentQuestionCard({ currentTitle }: { currentTitle: string }): JSX.Element | null {
+export default function EmergentQuestionCard({
+  currentTitle,
+}: {
+  currentTitle: string
+}): JSX.Element | null {
   const router = useRouter()
   const enabled = isEconomicAutonomyDemo(currentTitle)
   const { data, loading } = useRequest(fetchEliteTopics, { ready: enabled })
@@ -60,7 +72,9 @@ export default function EmergentQuestionCard({ currentTitle }: { currentTitle: s
               <Tag color="purple">DEMO FICTION</Tag>
               <Tag>New question</Tag>
             </Space>
+
             <Text strong>{target.title}</Text>
+
             <Button
               type="primary"
               icon={<ArrowRightOutlined />}

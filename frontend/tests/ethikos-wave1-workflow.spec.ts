@@ -10,10 +10,10 @@ const PAUSE_ON_ERROR = process.env.WAVE1_PAUSE_ON_ERROR === '1'
 const outDir = path.join('artifacts', 'kintsugi-wave1-workflow')
 
 const WALKTHROUGH_TOPIC_TITLE =
-  '[DEMO] Le Canada devrait-il réduire fortement sa dépendance envers les États-Unis, même au prix de coûts à court terme?'
-const TRUMP_TOPIC_RE = /Est-ce qu'on exclut Donald Trump de nos services\?/i
+  '[DEMO] Should Canada reduce its strategic dependence on the United States, even if it raises short-term costs?'
+const TRUMP_TOPIC_RE = /Should strategic AI services deny access to Donald Trump or organizations acting on his behalf\?/i
 const KING_KLOWN_CONTEXT_RE =
-  /un rapport indique que King Klown a organisé des manifestations d'une ampleur historique contre le capitalisme et Donald Trump/i
+  /a background report documents King Klown's large-scale anti-capitalist and anti-Trump demonstrations/i
 
 const ROUTE_DRIFT_RE =
   /\/api\/(kialo|kintsugi|korum|deliberation|deliberate)\b|\/(kialo|kintsugi|korum|deliberation)\b/i
@@ -430,28 +430,28 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
       if (openedWalkthroughTopic) {
         await expectTextVisible(
           page,
-          /Le Canada devrait-il réduire fortement sa dépendance envers les États-Unis/i,
+          /Should Canada reduce its strategic dependence on the United States/i,
           '04-canada-us-topic',
         )
         await expectTextVisible(
           page,
-          /Le Canada devrait profiter de cette rupture pour bâtir un modèle radicalement différent d'infrastructure d'IA/i,
+          /Canada should use this rupture to build a radically different AI-infrastructure model/i,
           '05-king-klown-proposal',
         )
         await expectTextVisible(
           page,
-          /Discrétion\. Les populations et nations autochtones concernées/i,
+          /Discretion\. Before any strategic site is announced/i,
           '06-rejean-discretion',
         )
-        await expectTextVisible(page, /C'est déjà annoncé\./i, '07-already-announced')
+        await expectTextVisible(page, /It's already announced\./i, '07-already-announced')
         await expectTextVisible(
           page,
-          /PUISSANCE DÉDIÉE À L'IA À UN PRIX QUI LAISSE LA COMPÉTITION DÉSUÈTE/i,
+          /DEDICATED AI POWER PRICED TO MAKE TODAY'S COMPETITION OBSOLETE/i,
           '08-public-announcement',
         )
         await expectTextVisible(
           page,
-          /MODÉRATION — Inquisiteur retire King Klown/i,
+          /MODERATION — Inquisitor removes King Klown/i,
           '09-moderation',
         )
 
@@ -481,26 +481,38 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
         await expect(page.getByText(TRUMP_TOPIC_RE).first()).toBeVisible({ timeout: 10_000 })
         await safeScreenshot(page, '11-trump-question')
 
-        const conflictItem = page
-          .locator('[role="treeitem"]')
-          .filter({ hasText: /Contexte déclaré: je mène déjà une campagne publique contre Trump/i })
+        const conflictCard = page
+          .locator('[role="treeitem"] > .ant-card')
+          .filter({
+            hasText: /Conflict disclosure: I have already campaigned publicly against Donald Trump/i,
+          })
           .first()
-        await expect(conflictItem).toBeVisible({ timeout: 10_000 })
-        const conflictCard = conflictItem.locator(':scope > .ant-card')
         await expect(conflictCard).toBeVisible({ timeout: 10_000 })
         await conflictCard
           .getByRole('button', { name: /view details|viewing details/i })
           .click()
-        await expect(page.getByText(KING_KLOWN_CONTEXT_RE).first()).toBeVisible({ timeout: 10_000 })
-        await expect(page.getByText(/Background report/i).first()).toBeVisible()
+        const backgroundSource = page
+          .locator('.ant-list-item')
+          .filter({ hasText: KING_KLOWN_CONTEXT_RE })
+          .first()
+        await expect(backgroundSource).toBeVisible({ timeout: 10_000 })
         await expect(
-          page.getByText(/Contexte narratif fictif de démonstration/i).first(),
+          backgroundSource.getByText('Background report', { exact: true }),
         ).toBeVisible()
+
+        const expandDemoFictionNote = backgroundSource.getByText(/^Expand$/i)
+        if (await expandDemoFictionNote.isVisible().catch(() => false)) {
+          await expandDemoFictionNote.click()
+        }
+
+        await expect(
+          backgroundSource.getByText(/Fictional demonstration context/i),
+        ).toBeVisible({ timeout: 10_000 })
         await safeScreenshot(page, '12-trump-demo-fiction-context')
 
         await expectTextVisible(
           page,
-          /RÉCUSATION — Je maintiens mon argument et ma position publique/i,
+          /RECUSAL — I stand by my public position and argument/i,
           '13-king-klown-recusal',
         )
 

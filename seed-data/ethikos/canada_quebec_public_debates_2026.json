@@ -1,83 +1,83 @@
 {
   "schema_version": "ethikos-demo-scenario/v3",
   "scenario_key": "canada_quebec_public_debates_2026",
-  "scenario_title": "Débats publics Québec–Canada — instantané 2026",
+  "scenario_title": "Quebec–Canada Public Debates — 2026 Snapshot",
   "mode": "replace_scenario",
   "metadata": {
-    "description": "Corpus Ethikos de débats publics structurants au Québec et au Canada, enrichi d'une couche québécoise, de contre-expertise, d'arguments hiérarchisés, de sources séparées et d'un scénario DEMO de lecture EkoH/Smart Vote avec récusation déclarée.",
-    "created_for": "Konnaxion ethiKos Demo Importer",
-    "language": "fr-CA",
-    "focus": "Débats publics + acteurs fédéraux/québécois + contre-expertise + arguments Kialo-style + préparation ArgumentSource",
+    "description": "A structured Ethikos corpus of consequential public-policy debates in Quebec and Canada, combining federal and Quebec perspectives, counter-expertise, hierarchical arguments, source-backed claims, and a DEMO EkoH/Smart Vote advisory-reading scenario with a declared recusal.",
+    "created_for": "Konnaxion Ethikos Demo Importer",
+    "language": "en-CA",
+    "focus": "Public-policy debates + federal/Quebec actors + counter-expertise + Kialo-style argument graphs + source-backed deliberation",
     "snapshot_date": "2026-08-17",
     "source_sidecar": "canada_quebec_public_debates_2026_sources.json",
     "source_policy": [
-      "Les arguments sont des paraphrases synthétiques des positions publiques, jamais des citations textuelles.",
-      "Les stances sont des lectures éditoriales de -3 à +3 servant à positionner les acteurs sur l'axe décrit dans stance_scale.",
-      "L'absence d'un acteur sur un sujet ne signifie pas absence de position; le corpus vise d'abord les acteurs principaux pour lesquels une source primaire ou officielle a été inventoriée.",
-      "Le sidecar de sources est séparé parce que ArgumentSource est documenté comme proposé et n'est pas un champ natif du schéma ethikos-demo-scenario/v1.",
-      "Les positions doivent être révisées lorsqu'un parti, gouvernement ou organisme modifie officiellement sa politique.",
-      "Lorsqu'un cadre fédéral et un cadre québécois sont placés sur le même axe (par exemple multiculturalisme et intégration nationale), la stance décrit le contraste conceptuel entre politiques et non une opposition explicite de l'un à l'autre."
+      "Arguments are concise paraphrases of public positions, never verbatim quotations.",
+      "Stances are editorial readings from -3 to +3 used to place actors on the axis described in stance_scale.",
+      "An actor's absence from a topic does not imply the absence of a position; the corpus prioritizes major actors for whom a primary or official source has been inventoried.",
+      "Source references are normalized into ArgumentSource records while registry keys are retained for traceability.",
+      "Positions should be reviewed whenever a party, government, or organization officially changes policy.",
+      "When federal and Quebec frameworks are placed on the same axis—for example multiculturalism and national integration—the stance expresses a conceptual contrast between policies, not a claim that one actor explicitly opposes another."
     ],
     "stance_scale": {
       "federal_deficit": {
-        "positive": "Réduction rapide du déficit et discipline budgétaire",
-        "negative": "Déficits tolérés pour financer des investissements prioritaires"
+        "positive": "Faster deficit reduction and stronger fiscal discipline",
+        "negative": "Greater tolerance for deficits to preserve priority public investment"
       },
       "canada_us_autonomy": {
-        "positive": "Diversification et autonomie stratégique plus fortes",
-        "negative": "Priorité à la restauration de l'intégration et du libre-échange nord-américain"
+        "positive": "Greater diversification and strategic autonomy",
+        "negative": "Priority on restoring North American integration and freer trade"
       },
       "support_ukraine": {
-        "positive": "Maintenir ou accroître le soutien à l'Ukraine",
-        "negative": "Réduire ou conditionner fortement le soutien"
+        "positive": "Maintain or increase support for Ukraine",
+        "negative": "Reduce or substantially condition support"
       },
       "middle_east_policy": {
-        "positive": "Diplomatie, droit international et autonomie accrue par rapport aux États-Unis",
-        "negative": "Alignement sécuritaire plus étroit avec les États-Unis et Israël face à l'Iran"
+        "positive": "More independent diplomacy centred on international law",
+        "negative": "Closer security alignment with the United States and Israel against Iran"
       },
       "wealth_inequality": {
-        "positive": "Fiscalité plus redistributive sur grandes fortunes et profits",
-        "negative": "Priorité à la croissance et aux baisses d'impôts plutôt qu'à de nouvelles taxes sur la richesse"
+        "positive": "More redistributive taxation of very large fortunes and profits",
+        "negative": "Prioritize growth and tax reductions over new wealth taxes"
       },
       "regulatory_delays": {
-        "positive": "Accélérer fortement les autorisations et réduire les chevauchements",
-        "negative": "Maintenir des processus plus longs pour maximiser les garanties et consultations"
+        "positive": "Accelerate approvals and reduce regulatory overlap",
+        "negative": "Preserve longer processes to maximize safeguards and consultation"
       },
       "justice_efficiency": {
-        "positive": "Priorité accrue à la rapidité, à l'exécution et à la sécurité publique",
-        "negative": "Priorité accrue à l'accès, aux garanties procédurales et à l'aide juridique"
+        "positive": "Give greater weight to speed, enforcement, and public safety",
+        "negative": "Give greater weight to access, procedural safeguards, and legal aid"
       },
       "ai_education": {
-        "positive": "Intégration large et encadrée de l'IA dans l'éducation",
-        "negative": "Usage fortement restreint ou retardé de l'IA dans l'éducation"
+        "positive": "Broad but governed integration of AI in education",
+        "negative": "Highly restricted or delayed use of AI in education"
       },
       "immigration_capacity": {
-        "positive": "Réduction supplémentaire des volumes jusqu'au rattrapage de la capacité d'accueil",
-        "negative": "Maintien de volumes plus élevés et priorité aux droits/statuts permanents plutôt qu'aux réductions"
+        "positive": "Further reduce immigration levels until reception capacity catches up",
+        "negative": "Maintain higher levels and prioritize rights and permanent status over reductions"
       },
       "plastic_waste": {
-        "positive": "Règles plus strictes et responsabilité accrue des producteurs",
-        "negative": "Allègement ou retrait des interdictions pour limiter les coûts"
+        "positive": "Stricter rules and stronger producer responsibility",
+        "negative": "Relax or remove restrictions to limit costs"
       },
       "social_cohesion": {
-        "positive": "Culture commune, français et intégration nationale comme cadre principal",
-        "negative": "Multiculturalisme et pluralisme comme cadre principal de cohésion"
+        "positive": "Shared civic culture, French, and national integration as the primary framework",
+        "negative": "Multiculturalism and pluralism as the primary framework for cohesion"
       },
       "clean_energy_climate": {
-        "positive": "Accélération de l'électrification et de la transition même avec coûts de court terme",
-        "negative": "Transition plus graduelle maintenant une forte production d'hydrocarbures et misant sur la technologie"
+        "positive": "Faster electrification and energy transition despite short-term costs",
+        "negative": "A more gradual transition that retains high hydrocarbon production and emphasizes technology"
       },
       "tech_sovereignty": {
-        "positive": "Politique industrielle et souveraineté technologique plus interventionnistes",
-        "negative": "Approche davantage fondée sur le marché et l'ouverture internationale du capital et des actifs"
+        "positive": "More interventionist industrial policy and technological sovereignty",
+        "negative": "A more market-led approach with greater openness to international capital and ownership"
       }
     },
-    "editorial_pass": "v2_quebec_counterexpertise",
-    "argument_graph_note": "Les nouveaux arguments utilisent parent + side lorsque la relation de soutien/opposition à un argument existant est suffisamment claire.",
+    "editorial_pass": "v3_english_promo_refinement",
+    "argument_graph_note": "Arguments use parent + side when the support/opposition relationship to an existing argument is sufficiently clear.",
     "source_of_truth": "single_scenario_json",
     "argument_source_model": "ArgumentSource",
     "unique_reference_sources": 86,
-    "argument_source_links": 94,
+    "argument_source_links": 95,
     "source_registry_origin": "Merged from ethikos-argument-source-sidecar/v1 during seed package normalization.",
     "ekoh_import_note": "EkoH profiles and Ethikos topic relevance are first-class v3 import data. The importer binds each source topic explicitly to a Smart Vote consultation; derived readings remain separate from canonical stances.",
     "narrative_events": [
@@ -88,7 +88,7 @@
         "actor": "inquisiteur",
         "target_actor": "king_klown",
         "after_argument": "us_kk_headlines",
-        "display_text": "Inquisiteur retire King Klown de la discussion.",
+        "display_text": "Inquisitor removes King Klown from the discussion after premature public disclosure.",
         "reason": "premature_public_disclosure"
       }
     ],
@@ -99,19 +99,19 @@
         "topic": "trump_service_access",
         "subject_actor": "king_klown",
         "demo_fiction": true,
-        "content": "Dans ce scénario de démonstration, un rapport indique que King Klown a organisé des manifestations d'une ampleur historique contre le capitalisme et Donald Trump, qu'il s'oppose à une collaboration avec Trump et qu'il diffuse une propagande anti-Trump, particulièrement au sein des nations situées autour de sites stratégiques."
+        "content": "In this fictional demonstration scenario, a background report documents King Klown's large-scale anti-capitalist and anti-Trump demonstrations, his opposition to collaboration with Trump, and his outreach to Indigenous nations near strategic infrastructure sites advocating against collaboration with Trump."
       }
     ],
     "character_notes": {
-      "king_klown": "Intransigeant dans sa droiture; audacieux, bruyant, candide et flamboyant. Peut se récuser lorsqu'il estime que son engagement rend sa lecture non neutre.",
-      "rejean_mccormick": "Tech wiz; vision mécanique du monde jusque dans les systèmes sociaux et l'âme humaine. Réservé, parfois obscur, avec un fond de tristesse. Réponses brèves et denses."
+      "king_klown": "Uncompromising in his convictions; bold, loud, candid, and theatrical. Will recuse himself when he believes his prior advocacy makes his advisory judgment non-neutral.",
+      "rejean_mccormick": "Technology systems thinker with a mechanical view of complex systems, including social systems. Reserved, sometimes opaque, with a subdued melancholy. Answers are brief and dense."
     }
   },
   "actors": [
     {
       "key": "gov_canada",
       "username": "demo_gov_canada",
-      "display_name": "Gouvernement du Canada",
+      "display_name": "Government of Canada",
       "email": "demo_gov_canada@example.test",
       "role": "federal_government",
       "is_ethikos_elite": false
@@ -119,7 +119,7 @@
     {
       "key": "cpc",
       "username": "demo_cpc",
-      "display_name": "Parti conservateur du Canada",
+      "display_name": "Conservative Party of Canada",
       "email": "demo_cpc@example.test",
       "role": "federal_official_opposition",
       "is_ethikos_elite": false
@@ -127,7 +127,7 @@
     {
       "key": "ndp",
       "username": "demo_ndp",
-      "display_name": "Nouveau Parti démocratique",
+      "display_name": "New Democratic Party",
       "email": "demo_ndp@example.test",
       "role": "federal_political_party",
       "is_ethikos_elite": false
@@ -135,7 +135,7 @@
     {
       "key": "pbo",
       "username": "demo_pbo",
-      "display_name": "Directeur parlementaire du budget",
+      "display_name": "Parliamentary Budget Officer",
       "email": "demo_pbo@example.test",
       "role": "independent_fiscal_officer",
       "is_ethikos_elite": true
@@ -143,7 +143,7 @@
     {
       "key": "statcan",
       "username": "demo_statcan",
-      "display_name": "Statistique Canada",
+      "display_name": "Statistics Canada",
       "email": "demo_statcan@example.test",
       "role": "official_statistics_agency",
       "is_ethikos_elite": true
@@ -151,7 +151,7 @@
     {
       "key": "gov_quebec",
       "username": "demo_gov_quebec",
-      "display_name": "Gouvernement du Québec",
+      "display_name": "Government of Quebec",
       "email": "demo_gov_quebec@example.test",
       "role": "provincial_government",
       "is_ethikos_elite": false
@@ -159,7 +159,7 @@
     {
       "key": "quebec_education",
       "username": "demo_quebec_education",
-      "display_name": "Gouvernement du Québec — Éducation",
+      "display_name": "Government of Quebec — Education",
       "email": "demo_quebec_education@example.test",
       "role": "provincial_education_authority",
       "is_ethikos_elite": true
@@ -167,7 +167,7 @@
     {
       "key": "gov_alberta",
       "username": "demo_gov_alberta",
-      "display_name": "Gouvernement de l'Alberta",
+      "display_name": "Government of Alberta",
       "email": "demo_gov_alberta@example.test",
       "role": "provincial_government",
       "is_ethikos_elite": false
@@ -175,7 +175,7 @@
     {
       "key": "justice_canada",
       "username": "demo_justice_canada",
-      "display_name": "Justice Canada — accès à la justice",
+      "display_name": "Justice Canada — Access to Justice",
       "email": "demo_justice_canada@example.test",
       "role": "justice_policy_and_research",
       "is_ethikos_elite": true
@@ -199,7 +199,7 @@
     {
       "key": "ai_advisory",
       "username": "demo_ai_advisory",
-      "display_name": "Conseil consultatif du Canada sur l'intelligence artificielle",
+      "display_name": "Canada Advisory Council on Artificial Intelligence",
       "email": "demo_ai_advisory@example.test",
       "role": "ai_policy_advisory_body",
       "is_ethikos_elite": true
@@ -215,7 +215,7 @@
     {
       "key": "plq",
       "username": "demo_plq",
-      "display_name": "Parti libéral du Québec",
+      "display_name": "Quebec Liberal Party",
       "email": "demo_plq@example.test",
       "role": "provincial_party",
       "is_ethikos_elite": false
@@ -239,7 +239,7 @@
     {
       "key": "cpq",
       "username": "demo_cpq",
-      "display_name": "Conseil du patronat du Québec",
+      "display_name": "Quebec Employers Council (CPQ)",
       "email": "demo_cpq@example.test",
       "role": "employer_association",
       "is_ethikos_elite": false
@@ -247,7 +247,7 @@
     {
       "key": "ftq",
       "username": "demo_ftq",
-      "display_name": "Fédération des travailleurs et travailleuses du Québec (FTQ)",
+      "display_name": "Quebec Federation of Labour (FTQ)",
       "email": "demo_ftq@example.test",
       "role": "labour_union",
       "is_ethikos_elite": false
@@ -255,7 +255,7 @@
     {
       "key": "barreau_qc",
       "username": "demo_barreau_qc",
-      "display_name": "Barreau du Québec",
+      "display_name": "Quebec Bar",
       "email": "demo_barreau_qc@example.test",
       "role": "professional_order",
       "is_ethikos_elite": false
@@ -271,7 +271,7 @@
     {
       "key": "apnql",
       "username": "demo_apnql",
-      "display_name": "Assemblée des Premières Nations Québec-Labrador (APNQL)",
+      "display_name": "Assembly of First Nations Quebec-Labrador (AFNQL)",
       "email": "demo_apnql@example.test",
       "role": "first_nations_political_organization",
       "is_ethikos_elite": false
@@ -279,7 +279,7 @@
     {
       "key": "fqppu",
       "username": "demo_fqppu",
-      "display_name": "Fédération québécoise des professeures et professeurs d'université (FQPPU)",
+      "display_name": "Quebec Federation of University Professors (FQPPU)",
       "email": "demo_fqppu@example.test",
       "role": "higher_education_federation",
       "is_ethikos_elite": false
@@ -287,7 +287,7 @@
     {
       "key": "unesco",
       "username": "demo_unesco",
-      "display_name": "UNESCO — éducation et IA",
+      "display_name": "UNESCO — Education and AI",
       "email": "demo_unesco@example.test",
       "role": "international_standard_setter",
       "is_ethikos_elite": false
@@ -311,7 +311,7 @@
     {
       "key": "inquisiteur",
       "username": "demo_inquisiteur",
-      "display_name": "Inquisiteur",
+      "display_name": "Inquisitor",
       "email": "demo_inquisiteur@example.test",
       "role": "ethikos_moderator",
       "is_ethikos_elite": false
@@ -360,50 +360,50 @@
   "categories": [
     {
       "key": "finances_publiques",
-      "name": "Finances publiques",
-      "description": "Déficit, dette, fiscalité et arbitrages entre dépenses courantes et investissement public."
+      "name": "Public finance",
+      "description": "Deficits, debt, taxation, and trade-offs between operating spending and long-term public investment."
     },
     {
       "key": "relations_internationales",
-      "name": "Relations internationales",
-      "description": "Relations Canada–États-Unis, défense, Ukraine et politique canadienne au Moyen-Orient."
+      "name": "International relations",
+      "description": "Canada–United States relations, defence, Ukraine, and Canadian policy in the Middle East."
     },
     {
       "key": "economie_inegalites",
-      "name": "Économie et inégalités",
-      "description": "Coût de la vie, concentration de la richesse, productivité et partage des gains économiques."
+      "name": "Economy and inequality",
+      "description": "Affordability, wealth concentration, productivity, investment, and how economic gains are distributed."
     },
     {
       "key": "gouvernance_justice",
-      "name": "Gouvernance et justice",
-      "description": "Délais réglementaires, capacité de décision publique, accès à la justice, sécurité et garanties procédurales."
+      "name": "Governance and justice",
+      "description": "Regulatory timelines, public decision capacity, access to justice, safety, and procedural safeguards."
     },
     {
       "key": "education_ia",
-      "name": "Éducation et IA",
-      "description": "Intégration de l'intelligence artificielle, littératie numérique, intégrité académique et encadrement éthique."
+      "name": "Education and AI",
+      "description": "Artificial-intelligence literacy, learning, assessment integrity, privacy, access, and ethical governance."
     },
     {
       "key": "immigration_cohesion",
-      "name": "Immigration et cohésion sociale",
-      "description": "Capacité d'accueil, immigration temporaire et permanente, intégration, langue et modèle de cohésion sociale."
+      "name": "Immigration and social cohesion",
+      "description": "Reception capacity, temporary and permanent immigration, integration, language, and social cohesion."
     },
     {
       "key": "environnement_energie",
-      "name": "Environnement et énergie",
-      "description": "Déchets plastiques, responsabilité des producteurs, énergie propre, hydrocarbures et climat."
+      "name": "Environment and energy",
+      "description": "Plastic waste, producer responsibility, clean energy, hydrocarbons, emissions, and climate policy."
     },
     {
       "key": "innovation_souverainete",
-      "name": "Innovation et souveraineté technologique",
-      "description": "IA, commercialisation de la recherche, propriété intellectuelle, données, approvisionnement et entreprises technologiques canadiennes."
+      "name": "Innovation and technological sovereignty",
+      "description": "AI, research commercialization, intellectual property, data, procurement, scale-up capital, and Canadian technology firms."
     }
   ],
   "topics": [
     {
       "key": "federal_deficit",
-      "title": "[DEMO] Le Canada devrait-il réduire rapidement le déficit fédéral, même si cela limite certains investissements publics?",
-      "description": "Débat sur la vitesse du retour vers l'équilibre budgétaire, la distinction entre dépenses courantes et investissements, le coût du service de la dette et la capacité de financer les priorités futures.",
+      "title": "[DEMO] Should Canada reduce the federal deficit faster, even if that means delaying some public investment?",
+      "description": "Tests the trade-off between faster deficit reduction, debt-service costs, and preserving long-term investment in housing, infrastructure, defence, and economic capacity.",
       "status": "open",
       "category": "finances_publiques",
       "start_date": "2026-08-17",
@@ -411,8 +411,8 @@
     },
     {
       "key": "canada_us_autonomy",
-      "title": "[DEMO] Le Canada devrait-il réduire fortement sa dépendance envers les États-Unis, même au prix de coûts à court terme?",
-      "description": "Débat sur la diversification commerciale, l'intégration nord-américaine, les tarifs, les chaînes d'approvisionnement, la défense et l'autonomie stratégique du Canada.",
+      "title": "[DEMO] Should Canada reduce its strategic dependence on the United States, even if it raises short-term costs?",
+      "description": "Explores trade diversification, North American integration, tariffs, supply chains, defence, critical infrastructure, and Canada's strategic autonomy.",
       "status": "open",
       "category": "relations_internationales",
       "start_date": "2026-08-17",
@@ -420,8 +420,8 @@
     },
     {
       "key": "support_ukraine",
-      "title": "[DEMO] Le Canada devrait-il maintenir ou augmenter son soutien militaire, financier et diplomatique à l'Ukraine?",
-      "description": "Débat sur l'ampleur et la durée de l'aide canadienne à l'Ukraine, les sanctions, l'assistance militaire, l'aide financière et la recherche d'une paix durable.",
+      "title": "[DEMO] Should Canada maintain or increase its military, financial, and diplomatic support for Ukraine?",
+      "description": "Examines the scale and duration of Canadian support, sanctions, military assistance, financial aid, diplomacy, and the pursuit of a durable peace.",
       "status": "open",
       "category": "relations_internationales",
       "start_date": "2026-08-17",
@@ -429,8 +429,8 @@
     },
     {
       "key": "middle_east_policy",
-      "title": "[DEMO] Le Canada devrait-il adopter au Moyen-Orient une ligne plus indépendante des États-Unis et davantage centrée sur le droit international?",
-      "description": "Débat couvrant Israël–Palestine et l'Iran : sécurité d'Israël, protection des civils, droit international, solution à deux États, sanctions, programme nucléaire iranien, diplomatie et risque d'escalade régionale.",
+      "title": "[DEMO] Should Canada pursue a more independent Middle East policy centred on international law, even when it diverges from U.S. policy?",
+      "description": "Covers Israel–Palestine and Iran: Israel's security, civilian protection, international law, a two-state solution, sanctions, Iran's nuclear program, diplomacy, and regional escalation risk.",
       "status": "open",
       "category": "relations_internationales",
       "start_date": "2026-08-17",
@@ -438,8 +438,8 @@
     },
     {
       "key": "wealth_inequality",
-      "title": "[DEMO] Le Canada devrait-il taxer davantage les grandes fortunes et profits pour réduire les inégalités et le coût de la vie?",
-      "description": "Débat sur la concentration de la richesse, le pouvoir d'achat, la fiscalité des ménages les plus riches, l'investissement privé et les politiques de redistribution.",
+      "title": "[DEMO] Should Canada raise taxes on very large fortunes and highly profitable corporations to reduce inequality and fund public priorities?",
+      "description": "Examines wealth concentration, purchasing power, taxation of high-wealth households and corporations, private investment, public services, and redistribution.",
       "status": "open",
       "category": "economie_inegalites",
       "start_date": "2026-08-17",
@@ -447,8 +447,8 @@
     },
     {
       "key": "regulatory_delays",
-      "title": "[DEMO] Faut-il accélérer fortement les approbations de projets en réduisant les chevauchements réglementaires et les délais de décision?",
-      "description": "Débat sur le coût économique des délais, la coordination fédérale-provinciale, la prévisibilité des autorisations, les consultations et les garanties environnementales et sociales.",
+      "title": "[DEMO] Should Canada accelerate major-project approvals by reducing regulatory overlap and imposing firmer decision deadlines?",
+      "description": "Weighs the economic cost of delay against federal-provincial coordination, predictable permitting, Indigenous and public consultation, and environmental and social safeguards.",
       "status": "open",
       "category": "gouvernance_justice",
       "start_date": "2026-08-17",
@@ -456,8 +456,8 @@
     },
     {
       "key": "justice_efficiency",
-      "title": "[DEMO] Le système de justice devrait-il prioriser davantage la rapidité et la sécurité publique, même si cela réduit certaines marges procédurales?",
-      "description": "Débat sur les délais judiciaires, l'accès à la justice, l'aide juridique, les règles de mise en liberté, les garanties constitutionnelles et la confiance du public.",
+      "title": "[DEMO] Should Canada's justice system give greater weight to speed and public safety, even when that narrows some procedural safeguards?",
+      "description": "Examines court delay, access to justice, legal aid, bail, constitutional protections, enforcement, and public confidence in the justice system.",
       "status": "open",
       "category": "gouvernance_justice",
       "start_date": "2026-08-17",
@@ -465,8 +465,8 @@
     },
     {
       "key": "ai_education",
-      "title": "[DEMO] L'école et l'enseignement supérieur devraient-ils intégrer largement l'IA générative dans l'apprentissage et l'évaluation, sous un cadre éthique?",
-      "description": "Débat sur la littératie en IA, les usages pédagogiques, l'intégrité des évaluations, la protection des données, l'équité d'accès et la formation du personnel enseignant.",
+      "title": "[DEMO] Should schools and universities integrate generative AI broadly into learning and assessment under a common ethical framework?",
+      "description": "Examines AI literacy, pedagogical use, assessment integrity, privacy, equitable access, academic governance, and educator training.",
       "status": "open",
       "category": "education_ia",
       "start_date": "2026-08-17",
@@ -474,8 +474,8 @@
     },
     {
       "key": "immigration_capacity",
-      "title": "[DEMO] Le Canada et le Québec devraient-ils réduire davantage l'immigration jusqu'à ce que logement, santé et infrastructures rattrapent la croissance?",
-      "description": "Débat sur les volumes d'immigration temporaire et permanente, la capacité d'accueil, les pénuries de main-d'œuvre, les droits des travailleurs temporaires, la francisation et l'intégration.",
+      "title": "[DEMO] Should Canada and Quebec reduce immigration further until housing, health care, and infrastructure catch up with population growth?",
+      "description": "Examines temporary and permanent immigration levels, reception capacity, labour shortages, temporary-worker rights, French-language integration, and pathways to permanent status.",
       "status": "open",
       "category": "immigration_cohesion",
       "start_date": "2026-08-17",
@@ -483,8 +483,8 @@
     },
     {
       "key": "plastic_waste",
-      "title": "[DEMO] Faut-il durcir les interdictions et la responsabilité des producteurs pour réduire les plastiques et déchets non biodégradables?",
-      "description": "Débat sur les interdictions de plastiques à usage unique, les coûts pour les consommateurs et entreprises, la responsabilité élargie des producteurs, le recyclage et la réduction à la source.",
+      "title": "[DEMO] Should governments tighten single-use plastic rules and producer responsibility, even if compliance costs rise?",
+      "description": "Examines single-use plastic restrictions, consumer and business costs, extended producer responsibility, recycling, reuse, and source reduction.",
       "status": "open",
       "category": "environnement_energie",
       "start_date": "2026-08-17",
@@ -492,8 +492,8 @@
     },
     {
       "key": "social_cohesion",
-      "title": "[DEMO] Le Québec devrait-il miser davantage sur une culture commune et la francisation que sur un modèle multiculturaliste pour renforcer la cohésion sociale?",
-      "description": "Débat sur les modèles d'intégration, la langue française, les valeurs communes, le pluralisme, la lutte contre la discrimination et le sentiment d'appartenance.",
+      "title": "[DEMO] Should Quebec prioritize French-language integration and a shared civic culture over multiculturalism as its primary model of social cohesion?",
+      "description": "Examines competing integration models, the French language, shared civic reference points, pluralism, anti-discrimination, and belonging.",
       "status": "open",
       "category": "immigration_cohesion",
       "start_date": "2026-08-17",
@@ -501,8 +501,8 @@
     },
     {
       "key": "clean_energy_climate",
-      "title": "[DEMO] Le Canada devrait-il accélérer la transition vers l'énergie propre même si cela impose des coûts aux secteurs fossiles à court terme?",
-      "description": "Débat sur l'électrification, la réduction des émissions, le pétrole et le gaz, les technologies de captage, les coûts de l'énergie, la compétitivité et les objectifs climatiques.",
+      "title": "[DEMO] Should Canada accelerate the clean-energy transition even if it raises short-term costs for fossil-fuel industries?",
+      "description": "Examines electrification, emissions reduction, oil and gas production, carbon capture, energy costs, industrial competitiveness, and climate targets.",
       "status": "open",
       "category": "environnement_energie",
       "start_date": "2026-08-17",
@@ -510,8 +510,8 @@
     },
     {
       "key": "tech_sovereignty",
-      "title": "[DEMO] Le Canada devrait-il adopter une politique industrielle plus interventionniste pour conserver au pays l'IA, la propriété intellectuelle, les données et les entreprises technologiques?",
-      "description": "Débat sur la commercialisation de la recherche, la propriété intellectuelle, l'adoption de l'IA, les infrastructures de calcul, les marchés publics, le capital de croissance et la souveraineté technologique.",
+      "title": "[DEMO] Should Canada use a more interventionist industrial policy to keep strategic AI capacity, intellectual property, data, and technology firms under Canadian control?",
+      "description": "Examines research commercialization, intellectual property, AI adoption, compute infrastructure, public procurement, scale-up capital, ownership, and technological sovereignty.",
       "status": "open",
       "category": "innovation_souverainete",
       "start_date": "2026-08-17",
@@ -519,8 +519,8 @@
     },
     {
       "key": "trump_service_access",
-      "title": "[DEMO] Est-ce qu'on exclut Donald Trump de nos services?",
-      "description": "Question issue du débat sur l'autonomie économique et la proposition d'infrastructure stratégique d'IA: déterminer si les services proposés devraient refuser une collaboration ou un accès associé à Donald Trump. Le scénario conserve séparément le contexte militant des participants.",
+      "title": "[DEMO] Should strategic AI services deny access to Donald Trump or organizations acting on his behalf?",
+      "description": "An emergent governance question from the Canada–U.S. autonomy debate and strategic AI-infrastructure proposal. It tests whether access rules should target a named political actor or instead rely on neutral security, legal, jurisdictional, and governance criteria. Participants' prior advocacy remains separate from the merits of their arguments.",
       "status": "open",
       "category": "relations_internationales",
       "start_date": "2026-08-19",
@@ -870,259 +870,259 @@
       "topic": "federal_deficit",
       "actor": "gov_canada",
       "side": "con",
-      "content": "Le gouvernement soutient qu'il faut distinguer les dépenses courantes des investissements de long terme et qu'un retour graduel vers l'équilibre des opérations peut coexister avec des investissements en logement, infrastructures, défense et capacité économique."
+      "content": "The federal government argues that operating spending should be distinguished from long-term investment, and that a gradual return to operating balance can coexist with investment in housing, infrastructure, defence, and productive capacity."
     },
     {
       "key": "deficit_cpc_restraint",
       "topic": "federal_deficit",
       "actor": "cpc",
       "side": "pro",
-      "content": "Les conservateurs soutiennent que des déficits élevés et persistants augmentent la dette, les frais d'intérêt et les pressions fiscales futures; ils privilégient une réduction plus rapide des dépenses et du déficit."
+      "content": "Conservatives argue that large, persistent deficits increase debt, interest costs, and future tax pressure; they favour faster spending restraint and deficit reduction."
     },
     {
       "key": "deficit_pbo_scrutiny",
       "topic": "federal_deficit",
       "actor": "pbo",
       "side": "neutral",
-      "content": "Le Directeur parlementaire du budget conclut que les cibles fiscales annoncées sont atteignables selon les projections de 2026, tout en signalant un manque de précision dans la définition de certaines dépenses classées comme capital, ce qui limite l'évaluation indépendante."
+      "content": "The Parliamentary Budget Officer finds the announced fiscal anchors achievable under 2026 projections, while flagging insufficient precision in how some spending is classified as capital, which limits independent scrutiny."
     },
     {
       "key": "us_gov_diversify",
       "topic": "canada_us_autonomy",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Le gouvernement fédéral cherche à préserver l'accès au marché américain tout en diversifiant les exportations, les chaînes d'approvisionnement et les partenariats afin de réduire la vulnérabilité du Canada aux mesures commerciales américaines."
+      "content": "The federal government seeks to preserve access to the U.S. market while diversifying exports, supply chains, and partnerships to reduce Canada's exposure to U.S. trade measures."
     },
     {
       "key": "us_cpc_restore_trade",
       "topic": "canada_us_autonomy",
       "actor": "cpc",
       "side": "con",
-      "content": "Les conservateurs reconnaissent l'intérêt de diversifier les marchés, mais insistent surtout sur la nécessité de réparer la relation avec Washington et de retrouver un commerce nord-américain largement exempt de tarifs."
+      "content": "Conservatives support market diversification but place greater emphasis on repairing the relationship with Washington and restoring a largely tariff-free North American trading environment."
     },
     {
       "key": "us_ndp_independence",
       "topic": "canada_us_autonomy",
       "actor": "ndp",
       "side": "pro",
-      "content": "Le NPD plaide pour une économie canadienne moins vulnérable aux décisions américaines, avec davantage de résilience domestique, de diversification et de protection des travailleurs face aux chocs commerciaux."
+      "content": "The NDP argues for a Canadian economy less exposed to U.S. decisions, with stronger domestic resilience, diversification, and worker protections against trade shocks."
     },
     {
       "key": "ukraine_gov_support",
       "topic": "support_ukraine",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Le gouvernement du Canada présente le soutien militaire, financier, humanitaire et diplomatique à l'Ukraine comme un engagement durable envers sa souveraineté et sa capacité de résister à l'agression russe."
+      "content": "The Government of Canada presents military, financial, humanitarian, and diplomatic support for Ukraine as a sustained commitment to Ukrainian sovereignty and resistance to Russian aggression."
     },
     {
       "key": "ukraine_cpc_support",
       "topic": "support_ukraine",
       "actor": "cpc",
       "side": "pro",
-      "content": "Les conservateurs appuient l'Ukraine, les sanctions contre la Russie et l'utilisation d'actifs russes saisis ou gelés au bénéfice de l'Ukraine, tout en mettant l'accent sur la fermeté envers le Kremlin."
+      "content": "Conservatives support Ukraine, sanctions on Russia, and directing seized or frozen Russian assets toward Ukraine, while emphasizing a hard line toward the Kremlin."
     },
     {
       "key": "ukraine_ndp_support",
       "topic": "support_ukraine",
       "actor": "ndp",
       "side": "pro",
-      "content": "Le NPD soutient l'Ukraine et demande notamment une meilleure application des sanctions et des mesures de responsabilité internationale; son accent porte davantage sur les institutions, les droits et la diplomatie multilatérale."
+      "content": "The NDP supports Ukraine and calls for stronger sanctions enforcement and international accountability, with greater emphasis on institutions, rights, and multilateral diplomacy."
     },
     {
       "key": "mideast_gov_law_diplomacy",
       "topic": "middle_east_policy",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Le gouvernement fédéral défend l'aide humanitaire, la protection des civils, une solution à deux États et une approche diplomatique du dossier nucléaire iranien, tout en condamnant les menaces à la sécurité régionale."
+      "content": "The federal government supports humanitarian aid, civilian protection, a two-state solution, and diplomatic engagement on Iran's nuclear program while condemning threats to regional security."
     },
     {
       "key": "mideast_cpc_security_alignment",
       "topic": "middle_east_policy",
       "actor": "cpc",
       "side": "con",
-      "content": "Les conservateurs adoptent une ligne nettement plus favorable à Israël et à une coopération étroite avec les États-Unis et leurs alliés face au régime iranien, en privilégiant la sécurité et la pression sur Téhéran."
+      "content": "Conservatives favour a more explicitly pro-Israel security posture and close cooperation with the United States and allies against the Iranian regime, emphasizing deterrence and pressure on Tehran."
     },
     {
       "key": "mideast_ndp_deescalation",
       "topic": "middle_east_policy",
       "actor": "ndp",
       "side": "pro",
-      "content": "Le NPD met davantage l'accent sur le droit international, la reddition de comptes, la protection des civils et la désescalade, y compris lorsqu'il critique des actions militaires d'Israël ou de l'Iran."
+      "content": "The NDP places greater emphasis on international law, accountability, civilian protection, and de-escalation, including when criticizing military actions by Israel or Iran."
     },
     {
       "key": "wealth_ndp_tax",
       "topic": "wealth_inequality",
       "actor": "ndp",
       "side": "pro",
-      "content": "Le NPD propose une fiscalité accrue sur les très grandes fortunes afin de financer les services publics et de réduire la concentration de la richesse et la pression du coût de la vie sur les ménages ordinaires."
+      "content": "The NDP proposes higher taxation of very large fortunes to fund public services, reduce wealth concentration, and ease cost-of-living pressure on ordinary households."
     },
     {
       "key": "wealth_cpc_growth",
       "topic": "wealth_inequality",
       "actor": "cpc",
       "side": "con",
-      "content": "Les conservateurs privilégient des baisses d'impôts, une réduction des coûts gouvernementaux et une stratégie de croissance plutôt que de nouvelles taxes sur le capital ou la richesse, qu'ils jugent susceptibles de décourager l'investissement."
+      "content": "Conservatives favour tax cuts, lower government costs, and growth-oriented policy over new taxes on capital or wealth, which they argue could discourage investment."
     },
     {
       "key": "wealth_statcan_gap",
       "topic": "wealth_inequality",
       "actor": "statcan",
       "side": "neutral",
-      "content": "Les données de Statistique Canada montrent une forte concentration de la valeur nette chez les ménages les plus riches et un écart de richesse important entre le haut et le bas de la distribution."
+      "content": "Statistics Canada data show that net worth is highly concentrated among the wealthiest households, with a wide wealth gap between the top and bottom of the distribution."
     },
     {
       "key": "reg_gov_one_review",
       "topic": "regulatory_delays",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Le gouvernement fédéral veut simplifier et accélérer les grands projets par une meilleure coordination, le principe d'un projet–un examen et des échéanciers plus prévisibles, tout en affirmant maintenir les obligations environnementales et de consultation."
+      "content": "The federal government proposes faster major-project approvals through stronger coordination, a one-project-one-review approach, and more predictable timelines, while stating that environmental and consultation obligations would remain."
     },
     {
       "key": "reg_cpc_red_tape",
       "topic": "regulatory_delays",
       "actor": "cpc",
       "side": "pro",
-      "content": "Les conservateurs soutiennent que la réglementation et les délais d'autorisation ont rendu le Canada trop lent à construire des infrastructures, des projets énergétiques et des logements; ils proposent d'abroger ou simplifier plusieurs règles jugées bloquantes."
+      "content": "Conservatives argue that regulation and permitting delays have made Canada too slow to build infrastructure, energy projects, and housing; they propose repealing or simplifying rules they view as barriers."
     },
     {
       "key": "justice_gov_delay_remedies",
       "topic": "justice_efficiency",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Le gouvernement cherche à réduire les conséquences des délais judiciaires et à renforcer la sécurité publique, notamment en proposant des outils autres que l'arrêt pur et simple des procédures lorsque les délais deviennent déraisonnables."
+      "content": "The federal government seeks to reduce the consequences of court delay and strengthen public safety, including remedies other than simply staying proceedings when delays become unreasonable."
     },
     {
       "key": "justice_access_people_centered",
       "topic": "justice_efficiency",
       "actor": "justice_canada",
       "side": "neutral",
-      "content": "Les travaux fédéraux sur l'accès à la justice soulignent que les réformes doivent rester centrées sur les personnes, préserver l'aide juridique et éviter que l'efficacité procédurale n'accroisse les inégalités pour les groupes déjà marginalisés."
+      "content": "Federal access-to-justice work stresses that reform should remain people-centred, preserve legal aid, and avoid making procedural efficiency a new source of inequality for already marginalized groups."
     },
     {
       "key": "justice_cpc_bail",
       "topic": "justice_efficiency",
       "actor": "cpc",
       "side": "pro",
-      "content": "Les conservateurs veulent durcir les règles de mise en liberté pour les récidivistes violents et placent la sécurité du public et l'exécution rapide des décisions au-dessus d'une approche qu'ils jugent trop permissive."
+      "content": "Conservatives propose stricter bail rules for repeat violent offenders and give greater weight to public safety and timely enforcement than to an approach they view as overly permissive."
     },
     {
       "key": "aiedu_quebec_responsible",
       "topic": "ai_education",
       "actor": "quebec_education",
       "side": "pro",
-      "content": "Le Québec développe des ressources, un centre d'expertise et un cadre de compétence numérique qui intègrent l'IA; l'orientation est d'encadrer son usage de façon responsable plutôt que de tenter de l'exclure du réseau scolaire."
+      "content": "Quebec is developing resources, an expertise centre, and a digital-competency framework that incorporate AI; the policy direction is to govern responsible use rather than try to exclude AI from education."
     },
     {
       "key": "aiedu_advisory_literacy",
       "topic": "ai_education",
       "actor": "ai_advisory",
       "side": "pro",
-      "content": "Le Conseil consultatif fédéral sur l'IA recommande une littératie en IA accessible dès l'école et tout au long de la vie, avec une attention aux biais, à la sécurité, à la responsabilité et à l'inclusion."
+      "content": "Canada's federal AI advisory body recommends accessible AI literacy from school through lifelong learning, with attention to bias, safety, accountability, and inclusion."
     },
     {
       "key": "immigration_gov_rebalance",
       "topic": "immigration_capacity",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Ottawa a réduit ses cibles de nouveaux résidents temporaires et cherche à ramener leur part de la population sous 5 %, en invoquant la nécessité de mieux aligner l'immigration sur le logement, les services et la capacité d'accueil."
+      "content": "Ottawa has reduced targets for new temporary residents and aims to bring their share of the population below 5%, arguing that immigration levels should better align with housing, services, and reception capacity."
     },
     {
       "key": "immigration_quebec_capacity",
       "topic": "immigration_capacity",
       "actor": "gov_quebec",
       "side": "pro",
-      "content": "Québec veut limiter davantage les volumes temporaires et permanents afin de réduire la pression sur le logement, les services publics et la francisation, tout en ciblant les admissions selon ses priorités économiques et linguistiques."
+      "content": "Quebec seeks to further limit temporary and permanent immigration to reduce pressure on housing, public services, and French-language integration, while targeting admissions to its economic and linguistic priorities."
     },
     {
       "key": "immigration_cpc_lower",
       "topic": "immigration_capacity",
       "actor": "cpc",
       "side": "pro",
-      "content": "Les conservateurs demandent une réduction plus marquée des volumes et une refonte du Programme des travailleurs étrangers temporaires afin que l'immigration corresponde davantage aux capacités de logement, de santé et d'emploi."
+      "content": "Conservatives call for a larger reduction in immigration levels and an overhaul of the Temporary Foreign Worker Program so intake better reflects housing, health-care, and labour-market capacity."
     },
     {
       "key": "immigration_ndp_status",
       "topic": "immigration_capacity",
       "actor": "ndp",
       "side": "con",
-      "content": "Le NPD reconnaît les problèmes du Programme des travailleurs étrangers temporaires, mais privilégie la réduction de la précarité et davantage de voies vers la résidence permanente plutôt qu'une politique générale de réduction fondée principalement sur le statut temporaire."
+      "content": "The NDP acknowledges problems in the Temporary Foreign Worker Program but emphasizes reducing precarity and expanding pathways to permanent residence rather than relying mainly on broad status-based cuts."
     },
     {
       "key": "plastic_gov_regulation",
       "topic": "plastic_waste",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Le gouvernement fédéral utilise des interdictions ciblées, un registre des plastiques et des obligations de déclaration pour réduire les déchets et faire progresser la responsabilité sur l'ensemble du cycle de vie des produits."
+      "content": "The federal government uses targeted prohibitions, a plastics registry, and reporting requirements to reduce waste and expand accountability across the product lifecycle."
     },
     {
       "key": "plastic_cpc_cost",
       "topic": "plastic_waste",
       "actor": "cpc",
       "side": "con",
-      "content": "Les conservateurs veulent supprimer certaines interdictions fédérales sur les plastiques et soutiennent qu'elles augmentent les coûts d'emballage et d'alimentation sans offrir un rapport coût-bénéfice suffisant."
+      "content": "Conservatives want to repeal selected federal plastic restrictions, arguing that they raise food and packaging costs without delivering sufficient benefits."
     },
     {
       "key": "plastic_ecojustice_stronger",
       "topic": "plastic_waste",
       "actor": "ecojustice",
       "side": "pro",
-      "content": "Ecojustice et des groupes environnementaux demandent de maintenir et renforcer les règles fédérales contre la pollution plastique, qu'ils considèrent nécessaires pour réduire les dommages environnementaux et sanitaires."
+      "content": "Ecojustice and other environmental groups argue for maintaining and strengthening federal plastic-pollution rules, which they consider necessary to reduce environmental and health harms."
     },
     {
       "key": "cohesion_quebec_common_culture",
       "topic": "social_cohesion",
       "actor": "gov_quebec",
       "side": "pro",
-      "content": "La nouvelle politique québécoise d'intégration nationale met l'accent sur le français, une culture commune et l'adhésion à des repères collectifs comme fondements de l'intégration et de la cohésion sociale."
+      "content": "Quebec's national integration policy emphasizes French, a shared civic culture, and common reference points as foundations for integration and social cohesion."
     },
     {
       "key": "cohesion_canada_pluralism",
       "topic": "social_cohesion",
       "actor": "gov_canada",
       "side": "con",
-      "content": "La politique fédérale de multiculturalisme considère le pluralisme, la lutte contre le racisme et la reconnaissance de la diversité comme des composantes de l'unité nationale et de la cohésion sociale canadienne."
+      "content": "Federal multiculturalism policy treats pluralism, anti-racism, and recognition of diversity as components of Canadian unity and social cohesion."
     },
     {
       "key": "climate_canada_electrify",
       "topic": "clean_energy_climate",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "Ottawa mise sur l'électricité propre, l'électrification et les investissements dans les réseaux pour réduire les émissions tout en renforçant la compétitivité d'une économie appelée à consommer beaucoup plus d'électricité."
+      "content": "Ottawa is investing in clean electricity, electrification, and grids to reduce emissions while strengthening the competitiveness of an economy expected to use much more electricity."
     },
     {
       "key": "climate_quebec_green_plan",
       "topic": "clean_energy_climate",
       "actor": "gov_quebec",
       "side": "pro",
-      "content": "Le Québec poursuit son Plan pour une économie verte en misant fortement sur l'électrification, l'efficacité énergétique et la réduction des émissions, avec l'hydroélectricité comme avantage stratégique."
+      "content": "Quebec's 2030 Plan for a Green Economy emphasizes electrification, energy efficiency, and emissions reduction, with hydroelectricity as a strategic advantage."
     },
     {
       "key": "climate_alberta_technology_oil",
       "topic": "clean_energy_climate",
       "actor": "gov_alberta",
       "side": "con",
-      "content": "L'Alberta privilégie une trajectoire qui combine réduction d'émissions, tarification industrielle, captage du carbone et technologies propres avec le maintien ou l'augmentation de la production pétrolière; elle rejette une transition fondée sur une sortie rapide des hydrocarbures."
+      "content": "Alberta favours a pathway combining emissions reductions, industrial carbon pricing, carbon capture, and clean technology with continued or increased oil production; it rejects a rapid phase-out of hydrocarbons."
     },
     {
       "key": "tech_gov_ai_strategy",
       "topic": "tech_sovereignty",
       "actor": "gov_canada",
       "side": "pro",
-      "content": "La stratégie fédérale sur l'IA vise à augmenter fortement l'adoption de l'IA par les entreprises, développer les compétences et renforcer les infrastructures de calcul et les capacités nationales afin de convertir la recherche canadienne en gains économiques."
+      "content": "Canada's federal AI strategy aims to accelerate business adoption, build skills, expand compute infrastructure, and strengthen domestic capacity so Canadian research translates into economic gains."
     },
     {
       "key": "tech_cci_scale_ip",
       "topic": "tech_sovereignty",
       "actor": "cci",
       "side": "pro",
-      "content": "Le Council of Canadian Innovators demande une politique plus explicite de souveraineté économique : conserver la propriété intellectuelle et les données au Canada, utiliser les marchés publics pour faire grandir les entreprises locales et soutenir leur passage à l'échelle."
+      "content": "The Council of Canadian Innovators calls for a more explicit economic-sovereignty strategy: retain intellectual property and data in Canada, use public procurement to scale domestic firms, and support their growth."
     },
     {
       "key": "tech_statcan_productivity",
       "topic": "tech_sovereignty",
       "actor": "statcan",
       "side": "neutral",
-      "content": "Les travaux de Statistique Canada montrent à la fois le potentiel de l'IA pour relever la croissance de la productivité et la faiblesse persistante de la productivité canadienne, ce qui fait de l'adoption et de la diffusion technologique un enjeu central."
+      "content": "Statistics Canada research highlights both AI's potential to raise productivity growth and Canada's persistent productivity weakness, making technology adoption and diffusion a central economic challenge."
     },
     {
       "key": "us_bq_quebec_voice",
@@ -1130,7 +1130,7 @@
       "actor": "bq",
       "side": "pro",
       "parent": "us_gov_diversify",
-      "content": "Le Bloc soutient qu'une dépendance aussi forte envers le marché américain rend le Québec vulnérable aux décisions de Washington; il réclame une voix québécoise directe dans les négociations, des contre-mesures ciblées et des mécanismes d'adaptation pour protéger les secteurs exposés."
+      "content": "The Bloc Québécois argues that heavy dependence on the U.S. market leaves Quebec exposed to decisions in Washington; it calls for a direct Quebec voice in negotiations, targeted countermeasures, and adjustment support for vulnerable sectors."
     },
     {
       "key": "ukraine_bq_support",
@@ -1138,7 +1138,7 @@
       "actor": "bq",
       "side": "pro",
       "parent": "ukraine_gov_support",
-      "content": "Le Bloc réaffirme un appui ferme à l'indépendance, à la liberté et à la sécurité de l'Ukraine, et considère que le Canada doit demeurer engagé plutôt que devenir un acteur passif face à l'agression russe."
+      "content": "The Bloc Québécois reaffirms strong support for Ukraine's independence, freedom, and security, arguing that Canada should remain engaged rather than become passive in the face of Russian aggression."
     },
     {
       "key": "wealth_qs_redistribution",
@@ -1146,7 +1146,7 @@
       "actor": "qs",
       "side": "pro",
       "parent": "wealth_ndp_tax",
-      "content": "Québec solidaire soutient que le coût de la vie et l'érosion du pouvoir d'achat reflètent aussi une répartition trop inégale des gains économiques; il privilégie une fiscalité plus redistributive, un rôle accru de l'État, des services publics renforcés et des protections salariales."
+      "content": "Québec solidaire argues that affordability pressures also reflect an unequal distribution of economic gains; it favours more redistributive taxation, a larger public role, stronger public services, and wage protections."
     },
     {
       "key": "wealth_ftq_services",
@@ -1154,7 +1154,7 @@
       "actor": "ftq",
       "side": "pro",
       "parent": "wealth_ndp_tax",
-      "content": "La FTQ critique les politiques d'austérité et les baisses d'impôt qui réduisent la capacité de financer les services publics, et soutient qu'une réponse au coût de la vie doit protéger davantage les travailleuses, travailleurs et ménages moins favorisés."
+      "content": "The FTQ argues that austerity and tax cuts weaken the capacity to fund public services, and that affordability policy should provide stronger protection for workers and lower-income households."
     },
     {
       "key": "reg_plq_two_for_one",
@@ -1162,7 +1162,7 @@
       "actor": "plq",
       "side": "pro",
       "parent": "reg_gov_one_review",
-      "content": "Le PLQ veut réduire rapidement le fardeau administratif des entreprises, notamment par un moratoire sur de nouvelles règles alourdissant les PME et une règle de type « deux pour un » pour les formalités réglementaires."
+      "content": "The Quebec Liberal Party proposes quickly reducing administrative burden on businesses, including a moratorium on new rules that add costs for SMEs and a two-for-one rule for regulatory requirements."
     },
     {
       "key": "reg_cpq_permitting",
@@ -1170,7 +1170,7 @@
       "actor": "cpq",
       "side": "pro",
       "parent": "reg_gov_one_review",
-      "content": "Le CPQ considère l'allègement réglementaire et la réduction des délais de permis comme des leviers de compétitivité; il demande que ces objectifs deviennent des pratiques durables et prévisibles de l'administration québécoise."
+      "content": "The CPQ treats regulatory relief and shorter permitting timelines as competitiveness tools and argues that lighter, more predictable administration should become a durable practice."
     },
     {
       "key": "reg_equiterre_safeguards",
@@ -1178,7 +1178,7 @@
       "actor": "equiterre_qc",
       "side": "con",
       "parent": "reg_gov_one_review",
-      "content": "Équiterre avertit qu'accélérer les grands projets en affaiblissant les protections environnementales peut produire de mauvaises décisions et transférer les coûts écologiques au public; l'accélération devrait plutôt améliorer la planification sans diminuer les exigences de fond."
+      "content": "Équiterre warns that accelerating major projects by weakening environmental safeguards can produce poor decisions and shift ecological costs to the public; faster approvals should come from better planning, not weaker substantive standards."
     },
     {
       "key": "reg_apnql_consultation",
@@ -1186,14 +1186,14 @@
       "actor": "apnql",
       "side": "con",
       "parent": "reg_gov_one_review",
-      "content": "L'APNQL soutient que l'allègement administratif ne doit pas supprimer les mécanismes de suivi, de reddition de comptes ou de consultation, particulièrement lorsque des projets affectent les droits et territoires des Premières Nations."
+      "content": "The Assembly of First Nations Quebec-Labrador argues that regulatory relief must not remove monitoring, accountability, or consultation mechanisms, especially where projects affect First Nations rights and territories."
     },
     {
       "key": "justice_quebec_access_digital",
       "topic": "justice_efficiency",
       "actor": "gov_quebec",
       "side": "neutral",
-      "content": "Le gouvernement du Québec cherche à améliorer simultanément l'accès et l'efficacité par le financement d'initiatives d'accès à la justice et par la transformation numérique des services judiciaires, qui vise notamment à simplifier les démarches et réduire certains délais de traitement."
+      "content": "The Government of Quebec seeks to improve both access and efficiency through access-to-justice funding and digital transformation of court services, including simpler procedures and shorter processing times."
     },
     {
       "key": "justice_barreau_access",
@@ -1201,7 +1201,7 @@
       "actor": "barreau_qc",
       "side": "con",
       "parent": "justice_gov_delay_remedies",
-      "content": "Le Barreau reconnaît la nécessité de réduire les délais, mais insiste sur une justice accessible et de qualité; ses initiatives privilégient aussi l'information juridique, les cliniques gratuites et des solutions procédurales qui ne sacrifient pas les droits des justiciables."
+      "content": "The Quebec Bar recognizes the need to reduce delays but insists on accessible, high-quality justice; its initiatives also emphasize legal information, free clinics, and procedural solutions that preserve litigants' rights."
     },
     {
       "key": "aiedu_fqppu_governance",
@@ -1209,7 +1209,7 @@
       "actor": "fqppu",
       "side": "con",
       "parent": "aiedu_quebec_responsible",
-      "content": "La FQPPU ne rejette pas l'IA en soi, mais critique une intégration pilotée sans consultation substantielle ni moyens suffisants; elle demande que les communautés universitaires, la liberté académique et la gouvernance collégiale soient réellement intégrées aux décisions."
+      "content": "The FQPPU does not reject AI itself, but criticizes implementation without substantive consultation or adequate resources; it argues that university communities, academic freedom, and collegial governance must shape the decisions."
     },
     {
       "key": "aiedu_unesco_human_centered",
@@ -1217,7 +1217,7 @@
       "actor": "unesco",
       "side": "pro",
       "parent": "aiedu_quebec_responsible",
-      "content": "L'UNESCO estime que l'IA peut soutenir l'apprentissage et l'enseignement, mais seulement dans un cadre centré sur l'humain qui protège la vie privée, l'équité, l'autonomie des apprenants et la capacité critique des enseignants et étudiants."
+      "content": "UNESCO argues that AI can support learning and teaching only within a human-centred framework that protects privacy, equity, learner autonomy, and the critical capacity of teachers and students."
     },
     {
       "key": "immigration_pq_lower",
@@ -1225,7 +1225,7 @@
       "actor": "pq",
       "side": "pro",
       "parent": "immigration_quebec_capacity",
-      "content": "Le Parti Québécois propose de réduire fortement l'immigration temporaire et de ramener l'immigration permanente autour de niveaux qu'il juge compatibles avec la capacité de logement, de soins, d'éducation, de francisation et d'intégration du Québec."
+      "content": "The Parti Québécois proposes a sharp reduction in temporary immigration and permanent-resident levels it considers compatible with Quebec's capacity for housing, health care, education, French-language integration, and social integration."
     },
     {
       "key": "immigration_plq_regional_capacity",
@@ -1233,7 +1233,7 @@
       "actor": "plq",
       "side": "pro",
       "parent": "immigration_quebec_capacity",
-      "content": "Le PLQ propose de planifier l'immigration selon les besoins économiques et la capacité d'accueil propres aux régions, avec davantage de francisation; il se distingue d'une baisse uniforme des volumes en privilégiant une modulation territoriale."
+      "content": "The Quebec Liberal Party proposes calibrating immigration to regional economic needs and reception capacity, with stronger French-language integration, rather than applying a uniform reduction across the province."
     },
     {
       "key": "immigration_bq_quebec_control",
@@ -1241,7 +1241,7 @@
       "actor": "bq",
       "side": "pro",
       "parent": "immigration_quebec_capacity",
-      "content": "Le Bloc soutient que les cibles doivent correspondre à la capacité d'accueil du Québec et réclame davantage de pouvoirs québécois en immigration, notamment pour mieux arrimer les volumes aux capacités de loger, soigner, éduquer, franciser et intégrer."
+      "content": "The Bloc Québécois argues that immigration targets should match Quebec's reception capacity and calls for greater Quebec control so volumes align with the capacity to house, treat, educate, integrate in French, and support newcomers."
     },
     {
       "key": "plastic_equiterre_producer",
@@ -1249,7 +1249,7 @@
       "actor": "equiterre_qc",
       "side": "pro",
       "parent": "plastic_gov_regulation",
-      "content": "Équiterre soutient que la réduction des déchets doit remonter à la source et responsabiliser davantage les producteurs, plutôt que reposer principalement sur les gestes individuels de tri et de recyclage."
+      "content": "Équiterre argues that waste reduction should begin upstream through source reduction and stronger producer responsibility rather than relying mainly on individual sorting and recycling."
     },
     {
       "key": "cohesion_pq_common_nation",
@@ -1257,7 +1257,7 @@
       "actor": "pq",
       "side": "pro",
       "parent": "cohesion_quebec_common_culture",
-      "content": "Le Parti Québécois lie la cohésion à l'intégration à une nation québécoise de langue française, à une politique d'immigration compatible avec la capacité d'accueil et à la protection d'un espace culturel commun, tout en affirmant vouloir lutter contre le racisme et la discrimination."
+      "content": "The Parti Québécois links cohesion to integration into a French-speaking Quebec nation, immigration levels compatible with reception capacity, and protection of a shared cultural space, while also committing to fight racism and discrimination."
     },
     {
       "key": "cohesion_bq_quebec_model",
@@ -1265,7 +1265,7 @@
       "actor": "bq",
       "side": "pro",
       "parent": "cohesion_quebec_common_culture",
-      "content": "Le Bloc défend un modèle québécois d'intégration centré sur le français, la nation québécoise et l'égalité dans la diversité, qu'il oppose au cadre multiculturaliste fédéral lorsqu'il estime que celui-ci affaiblit l'intégration linguistique et culturelle."
+      "content": "The Bloc Québécois supports a Quebec integration model centred on French, the Quebec nation, and equality within diversity, and criticizes the federal multiculturalism framework when it sees it as weakening linguistic and cultural integration."
     },
     {
       "key": "climate_pq_transition",
@@ -1273,7 +1273,7 @@
       "actor": "pq",
       "side": "pro",
       "parent": "climate_quebec_green_plan",
-      "content": "Le Parti Québécois propose une transition verte plus contraignante, avec budget carbone, test climat, électrification, efficacité énergétique, hausse de la production renouvelable et réduction de l'utilisation des combustibles fossiles dans l'industrie."
+      "content": "The Parti Québécois proposes a more binding green transition using carbon budgets, climate tests, electrification, energy efficiency, more renewable generation, and reduced fossil-fuel use in industry."
     },
     {
       "key": "climate_qs_just_transition",
@@ -1281,7 +1281,7 @@
       "actor": "qs",
       "side": "pro",
       "parent": "climate_quebec_green_plan",
-      "content": "Québec solidaire défend une transition sociale et écologique rapide fondée sur le transport collectif électrifié, la sortie des hydrocarbures, le développement des énergies renouvelables et une planification avec les travailleurs, les communautés vulnérables et les peuples autochtones."
+      "content": "Québec solidaire advocates a rapid social and ecological transition based on electrified public transit, moving away from hydrocarbons, expanding renewables, and planning with workers, vulnerable communities, and Indigenous peoples."
     },
     {
       "key": "climate_equiterre_stronger",
@@ -1289,14 +1289,14 @@
       "actor": "equiterre_qc",
       "side": "pro",
       "parent": "climate_quebec_green_plan",
-      "content": "Équiterre demande une politique climatique plus ambitieuse et plus cohérente, notamment un marché du carbone plus efficace et des décisions de grands projets qui n'affaiblissent pas les protections environnementales au nom de la vitesse."
+      "content": "Équiterre calls for a more ambitious and coherent climate policy, including a more effective carbon market and major-project decisions that do not weaken environmental protections in the name of speed."
     },
     {
       "key": "us_kk_ai_infrastructure",
       "topic": "canada_us_autonomy",
       "actor": "king_klown",
       "side": "pro",
-      "content": "Le Canada devrait profiter de cette rupture pour bâtir un modèle radicalement différent d'infrastructure d'IA: une puissance dédiée à l'IA à un prix qui rend la compétition actuelle désuète, un modèle international inclusif, et le siège au Canada d'une nouvelle encyclopédie dédiée à l'IA, avec KristALL."
+      "content": "Canada should use this rupture to build a radically different AI-infrastructure model: dedicated power priced to make today's competition obsolete, an inclusive international access model, and a Canada-based AI-native encyclopedia built with KristALL."
     },
     {
       "key": "us_rejean_discretion_first_nations",
@@ -1304,7 +1304,7 @@
       "actor": "rejean_mccormick",
       "side": "neutral",
       "parent": "us_kk_ai_infrastructure",
-      "content": "Discrétion. Les populations et nations autochtones concernées par les sites stratégiques devraient être consultées en premier, avant d'annoncer le projet."
+      "content": "Discretion. Before any strategic site is announced, affected Indigenous nations and local communities should be consulted early enough to shape the project."
     },
     {
       "key": "us_kk_already_announced",
@@ -1312,7 +1312,7 @@
       "actor": "king_klown",
       "side": "pro",
       "parent": "us_rejean_discretion_first_nations",
-      "content": "C'est déjà annoncé."
+      "content": "It's already announced."
     },
     {
       "key": "us_kk_headlines",
@@ -1320,7 +1320,7 @@
       "actor": "king_klown",
       "side": "pro",
       "parent": "us_kk_already_announced",
-      "content": "PUISSANCE DÉDIÉE À L'IA À UN PRIX QUI LAISSE LA COMPÉTITION DÉSUÈTE. MODÈLE INTERNATIONAL INCLUSIF. SIÈGE D'UNE NOUVELLE ENCYCLOPÉDIE DÉDIÉE À L'IA. AVEC KRISTALL."
+      "content": "DEDICATED AI POWER PRICED TO MAKE TODAY'S COMPETITION OBSOLETE. INCLUSIVE INTERNATIONAL ACCESS. A CANADA-BASED AI-NATIVE ENCYCLOPEDIA. WITH KRISTALL."
     },
     {
       "key": "us_inquisiteur_kick",
@@ -1328,7 +1328,7 @@
       "actor": "inquisiteur",
       "side": "neutral",
       "parent": "us_kk_headlines",
-      "content": "MODÉRATION — Inquisiteur retire King Klown de cette discussion."
+      "content": "MODERATION — Inquisitor removes King Klown from this discussion for premature public disclosure."
     },
     {
       "key": "us_gov_question_feasibility",
@@ -1336,7 +1336,7 @@
       "actor": "gov_canada",
       "side": "neutral",
       "parent": "us_kk_ai_infrastructure",
-      "content": "Est-ce techniquement réalisable à l'échelle nationale?"
+      "content": "Is this technically feasible at national scale?"
     },
     {
       "key": "us_rejean_answer_feasibility",
@@ -1344,7 +1344,7 @@
       "actor": "rejean_mccormick",
       "side": "pro",
       "parent": "us_gov_question_feasibility",
-      "content": "Oui. Si l'énergie est traitée comme une infrastructure stratégique plutôt que comme un simple intrant."
+      "content": "Yes—if energy is treated as strategic infrastructure, not merely as an input."
     },
     {
       "key": "us_gov_question_advantage",
@@ -1352,7 +1352,7 @@
       "actor": "gov_canada",
       "side": "neutral",
       "parent": "us_kk_ai_infrastructure",
-      "content": "Quel est l'avantage décisif?"
+      "content": "Where is the decisive advantage?"
     },
     {
       "key": "us_rejean_answer_advantage",
@@ -1360,7 +1360,7 @@
       "actor": "rejean_mccormick",
       "side": "pro",
       "parent": "us_gov_question_advantage",
-      "content": "Le coût du calcul. Le contrôle de la couche de connaissance. La juridiction sur l'infrastructure. Et la capacité d'offrir l'accès sans céder la propriété."
+      "content": "Compute cost. Control of the knowledge layer. Jurisdiction over the infrastructure. And the ability to provide access without surrendering ownership."
     },
     {
       "key": "us_gov_question_obstacle",
@@ -1368,7 +1368,7 @@
       "actor": "gov_canada",
       "side": "neutral",
       "parent": "us_kk_ai_infrastructure",
-      "content": "Le principal obstacle?"
+      "content": "Main obstacle?"
     },
     {
       "key": "us_rejean_answer_obstacle",
@@ -1376,14 +1376,14 @@
       "actor": "rejean_mccormick",
       "side": "neutral",
       "parent": "us_gov_question_obstacle",
-      "content": "La gouvernance."
+      "content": "Governance."
     },
     {
       "key": "trump_kk_exclude",
       "topic": "trump_service_access",
       "actor": "king_klown",
       "side": "pro",
-      "content": "J'exclus une collaboration avec Trump. Une infrastructure stratégique ne devrait pas être mise au service d'un pouvoir auquel je m'oppose ouvertement."
+      "content": "I would refuse collaboration with Trump. Strategic infrastructure should not be placed at the service of a political project I openly oppose."
     },
     {
       "key": "trump_kk_conflict_disclosure",
@@ -1391,49 +1391,49 @@
       "actor": "king_klown",
       "side": "neutral",
       "parent": "trump_kk_exclude",
-      "content": "Contexte déclaré: je mène déjà une campagne publique contre Trump et contre le capitalisme concentré. Ma position sur cette question n'est pas neutre."
+      "content": "Conflict disclosure: I have already campaigned publicly against Donald Trump and capitalism. My judgment on this question is not neutral."
     },
     {
       "key": "trump_rejean_rule_based_access",
       "topic": "trump_service_access",
       "actor": "rejean_mccormick",
       "side": "con",
-      "content": "Je ne définirais pas l'accès par le nom d'une personne. Il faut définir des critères de juridiction, de sécurité et de gouvernance qui s'appliquent à quiconque demande accès à l'infrastructure."
+      "content": "I would not define access by a person's name. Define jurisdictional, security, and governance criteria that apply to anyone requesting access to the infrastructure."
     },
     {
       "key": "trump_trade_law_blanket_exclusion",
       "topic": "trump_service_access",
       "actor": "trade_law_specialist_demo",
       "side": "con",
-      "content": "Une exclusion nominative et générale peut créer des risques juridiques et commerciaux. Une politique défendable devrait reposer sur des critères objectifs, publiés et applicables de manière cohérente."
+      "content": "A blanket, named-person exclusion could create legal and commercial risks. A defensible policy should rely on objective, published criteria applied consistently."
     },
     {
       "key": "trump_diplomacy_personalized_rule",
       "topic": "trump_service_access",
       "actor": "diplomatic_policy_advisor_demo",
       "side": "con",
-      "content": "Transformer l'accès à une infrastructure stratégique en sanction personnalisée compliquerait la diplomatie. Une règle liée au comportement, aux sanctions ou à la sécurité serait plus stable qu'une règle liée à une personne."
+      "content": "Turning access to strategic infrastructure into a personalized sanction would complicate diplomacy. Rules tied to conduct, sanctions, or security are more stable than rules tied to a person."
     },
     {
       "key": "trump_security_conditional_access",
       "topic": "trump_service_access",
       "actor": "security_analysis_desk_demo",
       "side": "neutral",
-      "content": "Du point de vue de la sécurité, la bonne question est moins qui est la personne que quelles capacités, données et systèmes seraient exposés. L'accès peut être refusé ou limité lorsqu'un seuil de risque documenté est atteint."
+      "content": "From a security perspective, the key question is not who the person is, but what capabilities, data, and systems would be exposed. Access can be denied or constrained when a documented risk threshold is met."
     },
     {
       "key": "trump_indigenous_governance_sites",
       "topic": "trump_service_access",
       "actor": "indigenous_governance_desk_demo",
       "side": "neutral",
-      "content": "Si les services reposent sur des sites ou des infrastructures touchant des nations autochtones, les règles d'accès et de gouvernance ne devraient pas être décidées sans leur participation aux mécanismes concernés."
+      "content": "If these services depend on sites or infrastructure affecting Indigenous nations, access and governance rules should not be set without their participation in the relevant decision mechanisms."
     },
     {
       "key": "trump_open_access_sovereignty",
       "topic": "trump_service_access",
       "actor": "open_access_advocate_demo",
       "side": "pro",
-      "content": "Une infrastructure souveraine doit conserver le droit de refuser un accès qui contredit explicitement sa mission publique, à condition que cette décision soit transparente, révisable et distincte d'une censure générale."
+      "content": "Sovereign infrastructure must retain the right to refuse access that directly conflicts with its public mission, provided the decision is transparent, reviewable, and distinct from general censorship."
     },
     {
       "key": "trump_kk_advisory_recusal",
@@ -1441,7 +1441,7 @@
       "actor": "king_klown",
       "side": "neutral",
       "parent": "trump_kk_conflict_disclosure",
-      "content": "RÉCUSATION — Je maintiens mon argument et ma position publique, mais je me récuse de la lecture consultative EkoH/Smart Vote sur cette question en raison de mon engagement déclaré."
+      "content": "RECUSAL — I stand by my public position and argument, but I recuse myself from the EkoH/Smart Vote advisory reading on this question because of my declared prior advocacy."
     }
   ],
   "argument_sources": [
@@ -1450,1041 +1450,1041 @@
       "argument": "deficit_gov_investment",
       "url": "https://budget.canada.ca/update-miseajour/2026/report-rapport/intro-en.html",
       "title": "Spring Economic Update 2026",
-      "excerpt": "Trajectoire budgétaire, distinction opérations/investissements et cadre fiscal.",
+      "excerpt": "Budget trajectory, the operating-versus-capital distinction, and the fiscal framework.",
       "source_type": "official_government",
       "citation_text": "Department of Finance Canada — Spring Economic Update 2026 — 2026-04-28",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: finance_spring_update_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: finance_spring_update_2026."
     },
     {
       "key": "deficit_cpc_restraint__cpc_fiscal_spending",
       "argument": "deficit_cpc_restraint",
       "url": "https://www.conservative.ca/liberal-inflationary-spending-by-the-numbers/",
       "title": "Liberal Inflationary Spending by the Numbers",
-      "excerpt": "Position conservatrice sur déficit, dette et dépenses fédérales.",
+      "excerpt": "Conservative position on deficits, debt, and federal spending.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Liberal Inflationary Spending by the Numbers",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_fiscal_spending."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_fiscal_spending."
     },
     {
       "key": "deficit_cpc_restraint__cpc_affordable_budget",
       "argument": "deficit_cpc_restraint",
       "url": "https://www.conservative.ca/an-affordable-budget-for-affordable-lives/",
       "title": "An Affordable Budget for Affordable Lives",
-      "excerpt": "Cadre conservateur axé sur baisse des coûts, impôts et dépenses.",
+      "excerpt": "Conservative framework focused on lowering costs, taxes, and spending.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — An Affordable Budget for Affordable Lives",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_affordable_budget."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_affordable_budget."
     },
     {
       "key": "deficit_pbo_scrutiny__pbo_spring_fiscal_anchors_2026",
       "argument": "deficit_pbo_scrutiny",
       "url": "https://www.pbo-dpb.ca/en/publications/NT-2627-002-S--pbo-assessment-spring-economic-update-fiscal-anchors-fiscal-sustainability--evaluation-dpb-mise-jour-economique-printemps-cibles-budgetaires-viabilite-financiere",
       "title": "PBO assessment of the Spring Economic Update fiscal anchors and fiscal sustainability",
-      "excerpt": "Évaluation indépendante des cibles fiscales et de la soutenabilité.",
+      "excerpt": "Independent assessment of fiscal anchors and sustainability.",
       "source_type": "independent_officer",
       "citation_text": "Parliamentary Budget Officer — PBO assessment of the Spring Economic Update fiscal anchors and fiscal sustainability — 2026-05-04",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: pbo_spring_fiscal_anchors_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: pbo_spring_fiscal_anchors_2026."
     },
     {
       "key": "deficit_pbo_scrutiny__pbo_budget_2025_issues",
       "argument": "deficit_pbo_scrutiny",
       "url": "https://www.pbo-dpb.ca/en/publications/RP-2526-017-S--budget-2025-issues-parliamentarians--budget-2025-enjeux-parlementaires",
       "title": "Budget 2025: Issues for Parliamentarians",
-      "excerpt": "Contexte sur le niveau et la persistance des déficits projetés.",
+      "excerpt": "Context on the level and persistence of projected deficits.",
       "source_type": "independent_officer",
       "citation_text": "Parliamentary Budget Officer — Budget 2025: Issues for Parliamentarians",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: pbo_budget_2025_issues."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: pbo_budget_2025_issues."
     },
     {
       "key": "us_gov_diversify__gac_canada_us_engagement",
       "argument": "us_gov_diversify",
       "url": "https://international.canada.ca/en/global-affairs/campaigns/canada-us-engagement",
       "title": "Canada–United States engagement",
-      "excerpt": "Réponse aux tarifs américains, contre-mesures, négociation et soutien aux secteurs touchés.",
+      "excerpt": "Response to U.S. tariffs, countermeasures, negotiations, and support for affected sectors.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Canada–United States engagement — 2026-07-02",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/United States. Source registry key: gac_canada_us_engagement."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: gac_canada_us_engagement."
     },
     {
       "key": "us_gov_diversify__gac_canada_us_aug_2026",
       "argument": "us_gov_diversify",
       "url": "https://www.canada.ca/en/global-affairs/news/2026/08/minister-leblanc-and-chief-trade-negotiator-update-provincial-and-territorial-trade-ministers-and-advisory-committee-on-canada-us-economic-relation.html",
       "title": "Minister LeBlanc and Chief Trade Negotiator update provincial and territorial trade ministers and advisory committee on Canada-U.S. economic relation",
-      "excerpt": "État des négociations commerciales et des tarifs sectoriels en août 2026.",
+      "excerpt": "Status of trade negotiations and sectoral tariffs in August 2026.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Minister LeBlanc and Chief Trade Negotiator update provincial and territorial trade ministers and advisory committee on Canada-U.S. economic relation — 2026-08-14",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/United States. Source registry key: gac_canada_us_aug_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: gac_canada_us_aug_2026."
     },
     {
       "key": "us_gov_diversify__gac_state_trade_2026",
       "argument": "us_gov_diversify",
       "url": "https://international.canada.ca/en/global-affairs/corporate/reports/chief-economist/state-trade/2026",
       "title": "State of Trade 2026",
-      "excerpt": "Évolution du commerce avec les États-Unis et diversification vers les marchés non américains.",
+      "excerpt": "Evolution of U.S. trade and diversification toward non-U.S. markets.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — State of Trade 2026 — 2026",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: gac_state_trade_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: gac_state_trade_2026."
     },
     {
       "key": "us_cpc_restore_trade__cpc_good_deal_us_2026",
       "argument": "us_cpc_restore_trade",
       "url": "https://www.conservative.ca/canadians-need-a-good-deal/",
       "title": "Canadians Need a Good Deal",
-      "excerpt": "Position conservatrice récente sur l'accord commercial et la relation bilatérale.",
+      "excerpt": "Recent Conservative position on the trade agreement and bilateral relationship.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Canadians Need a Good Deal — 2026-08-13",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/United States. Source registry key: cpc_good_deal_us_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: cpc_good_deal_us_2026."
     },
     {
       "key": "us_cpc_restore_trade__cpc_fighting_for_canada_us",
       "argument": "us_cpc_restore_trade",
       "url": "https://www.conservative.ca/fighting-for-canada/",
       "title": "Fighting for Canada",
-      "excerpt": "Plaidoyer pour restaurer une relation commerciale plus fluide avec les États-Unis.",
+      "excerpt": "Case for restoring a more frictionless trading relationship with the United States.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Fighting for Canada — 2026-03-19",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/United States. Source registry key: cpc_fighting_for_canada_us."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: cpc_fighting_for_canada_us."
     },
     {
       "key": "us_ndp_independence__ndp_campaign_commitments",
       "argument": "us_ndp_independence",
       "url": "https://www.ndp.ca/campaign-commitments",
       "title": "Campaign commitments",
-      "excerpt": "Engagements du NPD sur indépendance économique, fiscalité de la richesse et protection sociale.",
+      "excerpt": "NDP commitments on economic independence, wealth taxation, and social protection.",
       "source_type": "political_party",
       "citation_text": "New Democratic Party of Canada — Campaign commitments",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ndp_campaign_commitments."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ndp_campaign_commitments."
     },
     {
       "key": "ukraine_gov_support__gac_ukraine_support",
       "argument": "ukraine_gov_support",
       "url": "https://www.international.gc.ca/world-monde/issues_development-enjeux_developpement/response_conflict-reponse_conflits/crisis-crises/ukraine-dev.aspx?lang=eng",
       "title": "Canada's response to the Russian invasion of Ukraine",
-      "excerpt": "Aide militaire, financière, humanitaire et diplomatique canadienne à l'Ukraine.",
+      "excerpt": "Canadian military, financial, humanitarian, and diplomatic support for Ukraine.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Canada's response to the Russian invasion of Ukraine — 2026-05-08",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/Ukraine. Source registry key: gac_ukraine_support."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/Ukraine. Source registry key: gac_ukraine_support."
     },
     {
       "key": "ukraine_gov_support__gac_ukraine_relations",
       "argument": "ukraine_gov_support",
       "url": "https://www.international.gc.ca/country-pays/ukraine/relations.aspx?lang=eng",
       "title": "Canada-Ukraine relations",
-      "excerpt": "Relations bilatérales et soutien militaire cumulé.",
+      "excerpt": "Bilateral relations and cumulative military support.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Canada-Ukraine relations — 2026-05-10",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/Ukraine. Source registry key: gac_ukraine_relations."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/Ukraine. Source registry key: gac_ukraine_relations."
     },
     {
       "key": "ukraine_cpc_support__cpc_ukraine_assets",
       "argument": "ukraine_cpc_support",
       "url": "https://www.conservative.ca/conservatives-will-provide-seized-russian-assets-to-ukraine/",
       "title": "Conservatives Will Provide Seized Russian Assets to Ukraine",
-      "excerpt": "Soutien conservateur à l'Ukraine et aux sanctions contre la Russie.",
+      "excerpt": "Conservative support for Ukraine and sanctions against Russia.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Conservatives Will Provide Seized Russian Assets to Ukraine",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/Ukraine. Source registry key: cpc_ukraine_assets."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/Ukraine. Source registry key: cpc_ukraine_assets."
     },
     {
       "key": "ukraine_ndp_support__ndp_foreign_affairs_ukraine",
       "argument": "ukraine_ndp_support",
       "url": "https://heathermcpherson.ndp.ca/news/heather-mcpherson-mp-canada-us-relationship-and-ndps-vision-foreign-affairs-time-crisis",
       "title": "Heather McPherson MP: Canada-U.S. relationship and the NDP's vision for foreign affairs in a time of crisis",
-      "excerpt": "Position NPD sur l'Ukraine, les sanctions et l'approche multilatérale.",
+      "excerpt": "NDP position on Ukraine, sanctions, and multilateral engagement.",
       "source_type": "political_party",
       "citation_text": "New Democratic Party of Canada — Heather McPherson MP: Canada-U.S. relationship and the NDP's vision for foreign affairs in a time of crisis — 2025-01-28",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/International. Source registry key: ndp_foreign_affairs_ukraine."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/International. Source registry key: ndp_foreign_affairs_ukraine."
     },
     {
       "key": "mideast_gov_law_diplomacy__gac_israel_palestine_response",
       "argument": "mideast_gov_law_diplomacy",
       "url": "https://www.international.gc.ca/world-monde/issues_development-enjeux_developpement/response_conflict-reponse_conflits/crisis-crises/israel.aspx?lang=eng",
       "title": "Canada's response to the crisis in Israel, the West Bank and the Gaza Strip",
-      "excerpt": "Aide humanitaire, protection des civils et politique canadienne liée au conflit.",
+      "excerpt": "Humanitarian assistance, civilian protection, and Canadian policy related to the conflict.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Canada's response to the crisis in Israel, the West Bank and the Gaza Strip — 2026-03-03",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Middle East. Source registry key: gac_israel_palestine_response."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Middle East. Source registry key: gac_israel_palestine_response."
     },
     {
       "key": "mideast_gov_law_diplomacy__gac_israel_palestine_policy",
       "argument": "mideast_gov_law_diplomacy",
       "url": "https://www.international.gc.ca/world-monde/international_relations-relations_internationales/mena-moan/israeli-palestinian_policy-politique_israelo-palestinien.aspx?lang=eng",
       "title": "Canadian policy on key issues in the Israeli-Palestinian conflict",
-      "excerpt": "Cadre officiel canadien sur droit international et solution à deux États.",
+      "excerpt": "Official Canadian framework on international law and a two-state solution.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Canadian policy on key issues in the Israeli-Palestinian conflict",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Middle East. Source registry key: gac_israel_palestine_policy."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Middle East. Source registry key: gac_israel_palestine_policy."
     },
     {
       "key": "mideast_gov_law_diplomacy__gac_iran_diplomacy_2026",
       "argument": "mideast_gov_law_diplomacy",
       "url": "https://www.international.gc.ca/world-monde/international_relations-relations_internationales/un-onu/statements-declarations/2026-04-28-middle-east-palestinienne.aspx?lang=eng",
       "title": "Statement at the UN Security Council on the Middle East",
-      "excerpt": "Soutien canadien aux négociations comme voie durable face au dossier nucléaire iranien et aux activités déstabilisatrices.",
+      "excerpt": "Canadian support for negotiations as a durable path on Iran's nuclear program and destabilizing activities.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Statement at the UN Security Council on the Middle East — 2026-04-28",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Middle East. Source registry key: gac_iran_diplomacy_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Middle East. Source registry key: gac_iran_diplomacy_2026."
     },
     {
       "key": "mideast_cpc_security_alignment__cpc_iran_2026",
       "argument": "mideast_cpc_security_alignment",
       "url": "https://www.conservative.ca/conservative-statement-on-military-action-against-iran/",
       "title": "Conservative Statement on Military Action Against Iran",
-      "excerpt": "Position conservatrice favorable à une ligne sécuritaire forte face au régime iranien et aux alliés régionaux.",
+      "excerpt": "Conservative position favouring a strong security posture toward the Iranian regime and regional allies.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Conservative Statement on Military Action Against Iran — 2026",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Middle East. Source registry key: cpc_iran_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Middle East. Source registry key: cpc_iran_2026."
     },
     {
       "key": "mideast_cpc_security_alignment__cpc_israel_oct7",
       "argument": "mideast_cpc_security_alignment",
       "url": "https://www.conservative.ca/statement-from-conservative-leader-pierre-poilievre-on-the-second-anniversary-of-the-october-7th-attacks/",
       "title": "Statement from Conservative Leader Pierre Poilievre on the Second Anniversary of the October 7th Attacks",
-      "excerpt": "Position conservatrice de soutien à Israël et à la communauté juive.",
+      "excerpt": "Conservative support for Israel and the Jewish community.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Statement from Conservative Leader Pierre Poilievre on the Second Anniversary of the October 7th Attacks — 2025-10-07",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/Israel. Source registry key: cpc_israel_oct7."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/Israel. Source registry key: cpc_israel_oct7."
     },
     {
       "key": "mideast_ndp_deescalation__ndp_israel_iran_attacks",
       "argument": "mideast_ndp_deescalation",
       "url": "https://www.ndp.ca/news/ndp-statement-israels-recent-attacks",
       "title": "NDP statement on Israel's recent attacks",
-      "excerpt": "Position NPD sur désescalade, Iran et actions militaires d'Israël.",
+      "excerpt": "NDP position on de-escalation, Iran, and Israeli military actions.",
       "source_type": "political_party",
       "citation_text": "New Democratic Party of Canada — NDP statement on Israel's recent attacks — 2025-06-13",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Middle East. Source registry key: ndp_israel_iran_attacks."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Middle East. Source registry key: ndp_israel_iran_attacks."
     },
     {
       "key": "mideast_ndp_deescalation__ndp_war_crimes_accountability",
       "argument": "mideast_ndp_deescalation",
       "url": "https://heathermcpherson.ndp.ca/news/ndp-letter-ministers-re-prosecution-crimes-canadians-israel-and-palestine",
       "title": "NDP letter to ministers re: prosecution of crimes by Canadians in Israel and Palestine",
-      "excerpt": "Accent NPD sur responsabilité et application du droit international.",
+      "excerpt": "NDP emphasis on accountability and enforcement of international law.",
       "source_type": "political_party",
       "citation_text": "New Democratic Party of Canada — NDP letter to ministers re: prosecution of crimes by Canadians in Israel and Palestine",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/Middle East. Source registry key: ndp_war_crimes_accountability."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/Middle East. Source registry key: ndp_war_crimes_accountability."
     },
     {
       "key": "wealth_ndp_tax__ndp_campaign_commitments",
       "argument": "wealth_ndp_tax",
       "url": "https://www.ndp.ca/campaign-commitments",
       "title": "Campaign commitments",
-      "excerpt": "Engagements du NPD sur indépendance économique, fiscalité de la richesse et protection sociale.",
+      "excerpt": "NDP commitments on economic independence, wealth taxation, and social protection.",
       "source_type": "political_party",
       "citation_text": "New Democratic Party of Canada — Campaign commitments",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ndp_campaign_commitments."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ndp_campaign_commitments."
     },
     {
       "key": "wealth_cpc_growth__cpc_affordability_home",
       "argument": "wealth_cpc_growth",
       "url": "https://www.conservative.ca/poilievre-lays-out-plan-to-make-canada-affordable-at-home/",
       "title": "Poilievre Lays Out Plan to Make Canada Affordable at Home",
-      "excerpt": "Approche conservatrice du coût de la vie par baisse des taxes et coûts gouvernementaux.",
+      "excerpt": "Conservative affordability approach through lower taxes and government costs.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Poilievre Lays Out Plan to Make Canada Affordable at Home — 2026",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_affordability_home."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_affordability_home."
     },
     {
       "key": "wealth_cpc_growth__cpc_affordable_budget",
       "argument": "wealth_cpc_growth",
       "url": "https://www.conservative.ca/an-affordable-budget-for-affordable-lives/",
       "title": "An Affordable Budget for Affordable Lives",
-      "excerpt": "Cadre conservateur axé sur baisse des coûts, impôts et dépenses.",
+      "excerpt": "Conservative framework focused on lowering costs, taxes, and spending.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — An Affordable Budget for Affordable Lives",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_affordable_budget."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_affordable_budget."
     },
     {
       "key": "wealth_statcan_gap__statcan_wealth_q4_2025",
       "argument": "wealth_statcan_gap",
       "url": "https://www150.statcan.gc.ca/n1/daily-quotidien/260413/dq260413a-eng.htm",
       "title": "Distributions of household economic accounts for income, consumption, saving and wealth of Canadian households, fourth quarter 2025",
-      "excerpt": "Mesure de l'écart de richesse et de revenu entre groupes de ménages.",
+      "excerpt": "Measurement of wealth and income gaps across household groups.",
       "source_type": "official_statistics",
       "citation_text": "Statistics Canada — Distributions of household economic accounts for income, consumption, saving and wealth of Canadian households, fourth quarter 2025 — 2026-04-13",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: statcan_wealth_q4_2025."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: statcan_wealth_q4_2025."
     },
     {
       "key": "wealth_statcan_gap__statcan_weekly_wealth_apr_2026",
       "argument": "wealth_statcan_gap",
       "url": "https://www.statcan.gc.ca/o1/en/plus/9136-weekly-review-april-13-17-2026",
       "title": "The Weekly Review, April 13 to 17, 2026",
-      "excerpt": "Synthèse accessible des parts de richesse détenues par les ménages les plus riches.",
+      "excerpt": "Accessible summary of the share of wealth held by the richest households.",
       "source_type": "official_statistics",
       "citation_text": "Statistics Canada — The Weekly Review, April 13 to 17, 2026 — 2026-04-17",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: statcan_weekly_wealth_apr_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: statcan_weekly_wealth_apr_2026."
     },
     {
       "key": "reg_gov_one_review__canada_regulatory_acceleration_2026",
       "argument": "reg_gov_one_review",
       "url": "https://www.canada.ca/en/one-canadian-economy/news/2026/05/canadas-new-government-to-simplify-and-accelerate-canadas-regulatory-process.html",
       "title": "Canada's new government to simplify and accelerate Canada's regulatory process",
-      "excerpt": "Principe un projet–un examen et accélération réglementaire.",
+      "excerpt": "One-project, one-review principle and regulatory acceleration.",
       "source_type": "official_government",
       "citation_text": "Government of Canada — Canada's new government to simplify and accelerate Canada's regulatory process — 2026-05-08",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_regulatory_acceleration_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_regulatory_acceleration_2026."
     },
     {
       "key": "reg_gov_one_review__canada_major_projects_discussion_2026",
       "argument": "reg_gov_one_review",
       "url": "https://www.canada.ca/en/one-canadian-economy/services/simplifying-canada-process/engagement-supporting-timely-decision-making/getting-major-projects-built-canada-discussion-paper-proposed-legislative-regulatory-policy-reforms.html",
       "title": "Getting major projects built in Canada: Discussion paper on proposed legislative, regulatory and policy reforms",
-      "excerpt": "Propositions pour rendre les décisions sur grands projets plus rapides et prévisibles.",
+      "excerpt": "Proposals to make major-project decisions faster and more predictable.",
       "source_type": "official_government",
       "citation_text": "Government of Canada — Getting major projects built in Canada: Discussion paper on proposed legislative, regulatory and policy reforms — 2026-07-23",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_major_projects_discussion_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_major_projects_discussion_2026."
     },
     {
       "key": "reg_cpc_red_tape__cpc_red_tape_projects",
       "argument": "reg_cpc_red_tape",
       "url": "https://www.conservative.ca/a-new-chapter-in-an-old-friendship/",
       "title": "A New Chapter in an Old Friendship",
-      "excerpt": "Critique conservatrice des délais de construction et de la réglementation.",
+      "excerpt": "Conservative critique of construction delays and regulation.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — A New Chapter in an Old Friendship — 2026-03-04",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_red_tape_projects."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_red_tape_projects."
     },
     {
       "key": "reg_cpc_red_tape__cpc_sovereignty_act",
       "argument": "reg_cpc_red_tape",
       "url": "https://www.conservative.ca/canadian-sovereignty-act/",
       "title": "Canadian Sovereignty Act",
-      "excerpt": "Proposition d'abroger des lois considérées comme bloquant la croissance et certains projets.",
+      "excerpt": "Proposal to repeal laws viewed as barriers to growth and selected projects.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Canadian Sovereignty Act",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_sovereignty_act."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_sovereignty_act."
     },
     {
       "key": "justice_gov_delay_remedies__justice_c16_delays",
       "argument": "justice_gov_delay_remedies",
       "url": "https://www.justice.gc.ca/eng/csj-sjc/pl/c16/index.html",
       "title": "Bill C-16: Strengthening the criminal justice system and addressing court delays",
-      "excerpt": "Mesures proposées pour répondre aux délais judiciaires et à leurs conséquences.",
+      "excerpt": "Proposed measures to address court delays and their consequences.",
       "source_type": "official_government",
       "citation_text": "Department of Justice Canada — Bill C-16: Strengthening the criminal justice system and addressing court delays — 2026",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: justice_c16_delays."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: justice_c16_delays."
     },
     {
       "key": "justice_gov_delay_remedies__justice_department_plan_2026",
       "argument": "justice_gov_delay_remedies",
       "url": "https://www.justice.gc.ca/eng/rp-pr/cp-pm/rpp/2026_2027/rep-rap/index.html",
       "title": "Departmental Plan 2026–27",
-      "excerpt": "Priorités de justice, accès et fonctionnement du système.",
+      "excerpt": "Justice priorities, access, and system performance.",
       "source_type": "official_government",
       "citation_text": "Department of Justice Canada — Departmental Plan 2026–27 — 2026-03-13",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: justice_department_plan_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: justice_department_plan_2026."
     },
     {
       "key": "justice_access_people_centered__justice_access_overview",
       "argument": "justice_access_people_centered",
       "url": "https://www.justice.gc.ca/eng/csj-sjc/access-acces/index.html",
       "title": "Access to Justice",
-      "excerpt": "Approche centrée sur les personnes et obstacles à l'accès à la justice.",
+      "excerpt": "People-centred approach and barriers to access to justice.",
       "source_type": "official_government",
       "citation_text": "Department of Justice Canada — Access to Justice",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: justice_access_overview."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: justice_access_overview."
     },
     {
       "key": "justice_access_people_centered__justice_legal_aid_marginalized",
       "argument": "justice_access_people_centered",
       "url": "https://www.justice.gc.ca/eng/rp-pr/jr/aid-aide/2024/p11.html",
       "title": "Legal aid and marginalized populations",
-      "excerpt": "Éléments sur l'inégalité d'accès aux services juridiques.",
+      "excerpt": "Evidence on unequal access to legal services.",
       "source_type": "official_research",
       "citation_text": "Department of Justice Canada — Legal aid and marginalized populations — 2024",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: justice_legal_aid_marginalized."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: justice_legal_aid_marginalized."
     },
     {
       "key": "justice_cpc_bail__cpc_restore_safe_streets",
       "argument": "justice_cpc_bail",
       "url": "https://www.conservative.ca/restore-safe-streets/",
       "title": "Restore Safe Streets",
-      "excerpt": "Position conservatrice sur la mise en liberté sous caution, récidive et sécurité publique.",
+      "excerpt": "Conservative position on bail, repeat violent offending, and public safety.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Restore Safe Streets",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_restore_safe_streets."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_restore_safe_streets."
     },
     {
       "key": "aiedu_quebec_responsible__quebec_ai_education",
       "argument": "aiedu_quebec_responsible",
       "url": "https://www.quebec.ca/education/numerique/intelligence-artificielle",
-      "title": "Intelligence artificielle en éducation",
-      "excerpt": "Portail officiel sur l'intégration et l'encadrement de l'IA en éducation.",
+      "title": "Artificial Intelligence in Education",
+      "excerpt": "Official portal on AI integration and governance in education.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Intelligence artificielle en éducation — 2026-06-18",
+      "citation_text": "Government of Quebec — Artificial Intelligence in Education — 2026-06-18",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_ai_education."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_ai_education."
     },
     {
       "key": "aiedu_quebec_responsible__quebec_ai_tools",
       "argument": "aiedu_quebec_responsible",
       "url": "https://www.quebec.ca/education/numerique/intelligence-artificielle/reseau-education/documents-outils-ia",
-      "title": "Documents et outils sur l'IA dans le réseau de l'éducation",
-      "excerpt": "Ressources pour une utilisation éthique et responsable de l'IA.",
+      "title": "AI Documents and Tools for the Education System",
+      "excerpt": "Resources for ethical and responsible use of AI.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Documents et outils sur l'IA dans le réseau de l'éducation — 2026-04-28",
+      "citation_text": "Government of Quebec — AI Documents and Tools for the Education System — 2026-04-28",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_ai_tools."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_ai_tools."
     },
     {
       "key": "aiedu_quebec_responsible__quebec_digital_competency",
       "argument": "aiedu_quebec_responsible",
       "url": "https://www.quebec.ca/education/numerique/cadre-reference",
-      "title": "Cadre de référence de la compétence numérique",
-      "excerpt": "Cadre de compétence numérique actualisé incluant l'IA.",
+      "title": "Digital Competency Framework",
+      "excerpt": "Updated digital competency framework incorporating AI.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Cadre de référence de la compétence numérique — 2026-08-10",
+      "citation_text": "Government of Quebec — Digital Competency Framework — 2026-08-10",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_digital_competency."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_digital_competency."
     },
     {
       "key": "aiedu_advisory_literacy__ised_ai_strategy_inputs",
       "argument": "aiedu_advisory_literacy",
       "url": "https://ised-isde.canada.ca/site/ised/en/public-consultations/engagements-canadas-next-ai-strategy-summary-inputs",
       "title": "Engagements on Canada's next AI strategy: Summary of inputs",
-      "excerpt": "Synthèse des consultations, dont la demande de littératie et d'éducation en IA.",
+      "excerpt": "Consultation summary, including calls for AI literacy and education.",
       "source_type": "official_government",
       "citation_text": "Innovation, Science and Economic Development Canada — Engagements on Canada's next AI strategy: Summary of inputs — 2026-02-05",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ised_ai_strategy_inputs."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ised_ai_strategy_inputs."
     },
     {
       "key": "aiedu_advisory_literacy__ai_advisory_learning_responsible",
       "argument": "aiedu_advisory_literacy",
       "url": "https://ised-isde.canada.ca/site/advisory-council-artificial-intelligence/en/public-awareness-working-group/learning-together-responsible-artificial-intelligence",
       "title": "Learning together for responsible artificial intelligence",
-      "excerpt": "Recommandations sur l'apprentissage de l'IA, la responsabilité et l'inclusion.",
+      "excerpt": "Recommendations on AI learning, accountability, and inclusion.",
       "source_type": "expert_advisory",
       "citation_text": "Advisory Council on Artificial Intelligence — Learning together for responsible artificial intelligence",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ai_advisory_learning_responsible."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ai_advisory_learning_responsible."
     },
     {
       "key": "immigration_gov_rebalance__ircc_levels_2026_2028",
       "argument": "immigration_gov_rebalance",
       "url": "https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/corporate-initiatives/levels.html",
       "title": "Immigration Levels Plan",
-      "excerpt": "Cibles 2026 pour étudiants, travailleurs temporaires et résidents permanents.",
+      "excerpt": "2026 targets for students, temporary workers, and permanent residents.",
       "source_type": "official_government",
       "citation_text": "Immigration, Refugees and Citizenship Canada — Immigration Levels Plan — 2025-11-06",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ircc_levels_2026_2028."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ircc_levels_2026_2028."
     },
     {
       "key": "immigration_gov_rebalance__ircc_supplementary_2026_2028",
       "argument": "immigration_gov_rebalance",
       "url": "https://www.canada.ca/en/immigration-refugees-citizenship/corporate/mandate/corporate-initiatives/levels/supplementary-immigration-levels-2026-2028.html",
       "title": "Supplementary Information for the 2026–2028 Immigration Levels Plan",
-      "excerpt": "Cibles de résidents temporaires et objectif de moins de 5 % de la population d'ici fin 2027.",
+      "excerpt": "Temporary-resident targets and objective of bringing their share below 5% of the population by end-2027.",
       "source_type": "official_government",
       "citation_text": "Immigration, Refugees and Citizenship Canada — Supplementary Information for the 2026–2028 Immigration Levels Plan — 2025-11-05",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ircc_supplementary_2026_2028."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ircc_supplementary_2026_2028."
     },
     {
       "key": "immigration_quebec_capacity__quebec_immigration_2026_2029",
       "argument": "immigration_quebec_capacity",
       "url": "https://www.quebec.ca/en/news/actualites/detail/tabling-orientations-immigration-2026-2029-plan-2026-complementary-measures-66844",
       "title": "Tabling of the 2026–2029 immigration orientations and 2026 plan",
-      "excerpt": "Orientation québécoise visant à limiter les volumes et mieux les aligner sur la capacité d'accueil.",
+      "excerpt": "Quebec approach to limiting volumes and better aligning them with reception capacity.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Tabling of the 2026–2029 immigration orientations and 2026 plan — 2025-11-07",
+      "citation_text": "Government of Quebec — Tabling of the 2026–2029 immigration orientations and 2026 plan — 2025-11-07",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_immigration_2026_2029."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_immigration_2026_2029."
     },
     {
       "key": "immigration_cpc_lower__cpc_immigration_numbers",
       "argument": "immigration_cpc_lower",
       "url": "https://www.conservative.ca/carneys-out-of-control-immigration-numbers/",
       "title": "Carney's Out-of-Control Immigration Numbers",
-      "excerpt": "Position conservatrice en faveur de volumes plus bas et liés à la capacité des services.",
+      "excerpt": "Conservative position favouring lower immigration levels tied to service capacity.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Carney's Out-of-Control Immigration Numbers",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_immigration_numbers."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_immigration_numbers."
     },
     {
       "key": "immigration_cpc_lower__cpc_end_tfw",
       "argument": "immigration_cpc_lower",
       "url": "https://www.conservative.ca/end-the-tfw-program/",
       "title": "End the TFW Program",
-      "excerpt": "Proposition conservatrice de refonte ou fin du programme des travailleurs étrangers temporaires.",
+      "excerpt": "Conservative proposal to overhaul or end the Temporary Foreign Worker Program.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — End the TFW Program",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_end_tfw."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_end_tfw."
     },
     {
       "key": "immigration_ndp_status__ndp_tfw_cuts",
       "argument": "immigration_ndp_status",
       "url": "https://www.ndp.ca/news/ndp-statement-temporary-foreign-worker-program-cuts",
       "title": "NDP statement on Temporary Foreign Worker Program cuts",
-      "excerpt": "Position NPD sur droits des travailleurs temporaires et voies vers un statut permanent.",
+      "excerpt": "NDP position on temporary workers' rights and pathways to permanent status.",
       "source_type": "political_party",
       "citation_text": "New Democratic Party of Canada — NDP statement on Temporary Foreign Worker Program cuts — 2024-08-26",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ndp_tfw_cuts."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ndp_tfw_cuts."
     },
     {
       "key": "plastic_gov_regulation__canada_single_use_plastics",
       "argument": "plastic_gov_regulation",
       "url": "https://www.canada.ca/en/environment-climate-change/services/managing-reducing-waste/reduce-plastic-waste/single-use-plastic-overview.html",
       "title": "Single-use Plastics Prohibition Regulations — Overview",
-      "excerpt": "Cadre fédéral des interdictions de certains plastiques à usage unique.",
+      "excerpt": "Federal framework for prohibitions on selected single-use plastics.",
       "source_type": "official_government",
       "citation_text": "Environment and Climate Change Canada — Single-use Plastics Prohibition Regulations — Overview",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_single_use_plastics."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_single_use_plastics."
     },
     {
       "key": "plastic_gov_regulation__canada_plastics_registry",
       "argument": "plastic_gov_regulation",
       "url": "https://www.canada.ca/en/environment-climate-change/services/managing-reducing-waste/reduce-plastic-waste/federal-plastics-registry.html",
       "title": "Federal Plastics Registry",
-      "excerpt": "Obligations de déclaration et données sur le cycle de vie des plastiques.",
+      "excerpt": "Reporting requirements and lifecycle data for plastics.",
       "source_type": "official_government",
       "citation_text": "Environment and Climate Change Canada — Federal Plastics Registry",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_plastics_registry."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_plastics_registry."
     },
     {
       "key": "plastic_gov_regulation__canada_plastics_amendments_2026",
       "argument": "plastic_gov_regulation",
       "url": "https://www.canada.ca/en/environment-climate-change/corporate/transparency/consultations/proposed-amendments-single-use-plastics-prohibition-regulations.html",
       "title": "Proposed amendments to the Single-use Plastics Prohibition Regulations",
-      "excerpt": "Évolution réglementaire 2026 et arbitrage entre interdictions domestiques et exportations.",
+      "excerpt": "2026 regulatory changes and the trade-off between domestic prohibitions and exports.",
       "source_type": "official_government",
       "citation_text": "Environment and Climate Change Canada — Proposed amendments to the Single-use Plastics Prohibition Regulations — 2026-03-13",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_plastics_amendments_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_plastics_amendments_2026."
     },
     {
       "key": "plastic_cpc_cost__cpc_plastics_packaging",
       "argument": "plastic_cpc_cost",
       "url": "https://www.conservative.ca/axe-the-food-packaging-tax/",
       "title": "Axe the Food Packaging Tax",
-      "excerpt": "Critique conservatrice des règles sur le plastique et de leur effet allégué sur les coûts.",
+      "excerpt": "Conservative criticism of plastic rules and their alleged effect on costs.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Axe the Food Packaging Tax",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cpc_plastics_packaging."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cpc_plastics_packaging."
     },
     {
       "key": "plastic_ecojustice_stronger__ecojustice_plastic_2026",
       "argument": "plastic_ecojustice_stronger",
       "url": "https://ecojustice.ca/news/health-and-environmental-groups-celebrate-victory-in-plastic-pollution-regulation-case/",
       "title": "Health and environmental groups celebrate victory in plastic pollution regulation case",
-      "excerpt": "Position environnementale en faveur du maintien et du renforcement de la réglementation plastique.",
+      "excerpt": "Environmental position supporting retention and strengthening of plastic regulation.",
       "source_type": "civil_society",
       "citation_text": "Ecojustice — Health and environmental groups celebrate victory in plastic pollution regulation case — 2026-01-30",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ecojustice_plastic_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ecojustice_plastic_2026."
     },
     {
       "key": "cohesion_quebec_common_culture__quebec_integration_policy_2026",
       "argument": "cohesion_quebec_common_culture",
       "url": "https://www.quebec.ca/gouvernement/ministeres-organismes/langue-francaise/publications/politique-integration-nationale",
-      "title": "Politique québécoise d'intégration nationale",
-      "excerpt": "Cadre québécois centré sur langue française, culture commune et intégration nationale.",
+      "title": "Quebec National Integration Policy",
+      "excerpt": "Quebec framework centred on French, shared culture, and national integration.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Politique québécoise d'intégration nationale — 2026-07-16",
+      "citation_text": "Government of Quebec — Quebec National Integration Policy — 2026-07-16",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_integration_policy_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_integration_policy_2026."
     },
     {
       "key": "cohesion_quebec_common_culture__quebec_integration_action",
       "argument": "cohesion_quebec_common_culture",
       "url": "https://www.quebec.ca/gouvernement/ministeres-organismes/immigration/publications/plan-action-developpement-durable-2023-2028",
-      "title": "Plan d'action de développement durable 2023-2028 — Immigration, francisation et intégration",
-      "excerpt": "Mesures liées au dialogue interculturel, à la francisation et à l'intégration.",
+      "title": "2023–2028 Sustainable Development Action Plan — Immigration and French-Language Integration",
+      "excerpt": "Measures related to intercultural dialogue, French-language integration, and social integration.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Plan d'action de développement durable 2023-2028 — Immigration, francisation et intégration",
+      "citation_text": "Government of Quebec — 2023–2028 Sustainable Development Action Plan — Immigration and French-Language Integration",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_integration_action."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_integration_action."
     },
     {
       "key": "cohesion_canada_pluralism__canada_multiculturalism_overview",
       "argument": "cohesion_canada_pluralism",
       "url": "https://www.canada.ca/en/canadian-heritage/corporate/transparency/open-government/standing-committee/guilbeault-identity-culture-september-2025/overview.html",
       "title": "Overview — Canadian identity, culture and multiculturalism",
-      "excerpt": "Cadre fédéral présentant diversité et multiculturalisme comme composantes de l'unité nationale.",
+      "excerpt": "Federal framework presenting diversity and multiculturalism as components of national unity.",
       "source_type": "official_government",
       "citation_text": "Canadian Heritage — Overview — Canadian identity, culture and multiculturalism",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_multiculturalism_overview."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_multiculturalism_overview."
     },
     {
       "key": "cohesion_canada_pluralism__canada_multiculturalism_cohesion_2026",
       "argument": "cohesion_canada_pluralism",
       "url": "https://www.canada.ca/en/canadian-heritage/corporate/transparency/open-government/standing-committee/bilodeau-pacp-public-accounts-june-2026/other-items-interest.html",
       "title": "Other items of interest — Multiculturalism and anti-racism",
-      "excerpt": "Position fédérale sur multiculturalisme, lutte contre le racisme et cohésion sociale.",
+      "excerpt": "Federal position on multiculturalism, anti-racism, and social cohesion.",
       "source_type": "official_government",
       "citation_text": "Canadian Heritage — Other items of interest — Multiculturalism and anti-racism — 2026-06",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_multiculturalism_cohesion_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_multiculturalism_cohesion_2026."
     },
     {
       "key": "climate_canada_electrify__canada_clean_electricity",
       "argument": "climate_canada_electrify",
       "url": "https://www.canada.ca/en/services/environment/weather/climatechange/climate-plan/clean-electricity.html",
       "title": "Clean electricity",
-      "excerpt": "Électricité propre, croissance de la demande et compétitivité.",
+      "excerpt": "Clean electricity, demand growth, and competitiveness.",
       "source_type": "official_government",
       "citation_text": "Government of Canada — Clean electricity — 2026-05-27",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_clean_electricity."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_clean_electricity."
     },
     {
       "key": "climate_canada_electrify__canada_2030_emissions_plan",
       "argument": "climate_canada_electrify",
       "url": "https://www.canada.ca/en/services/environment/weather/climatechange/climate-plan/climate-plan-overview/emissions-reduction-2030.html",
       "title": "2030 Emissions Reduction Plan",
-      "excerpt": "Objectifs de réduction des émissions et trajectoire vers la carboneutralité.",
+      "excerpt": "Emissions-reduction targets and the path to net zero.",
       "source_type": "official_government",
       "citation_text": "Government of Canada — 2030 Emissions Reduction Plan",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: canada_2030_emissions_plan."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: canada_2030_emissions_plan."
     },
     {
       "key": "climate_quebec_green_plan__quebec_green_economy_plan",
       "argument": "climate_quebec_green_plan",
       "url": "https://www.quebec.ca/gouvernement/politiques-orientations/plan-economie-verte",
-      "title": "Plan pour une économie verte 2030",
-      "excerpt": "Cadre québécois de transition climatique et d'électrification.",
+      "title": "2030 Plan for a Green Economy",
+      "excerpt": "Quebec framework for climate transition and electrification.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Plan pour une économie verte 2030 — 2026-07-29",
+      "citation_text": "Government of Quebec — 2030 Plan for a Green Economy — 2026-07-29",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_green_economy_plan."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_green_economy_plan."
     },
     {
       "key": "climate_quebec_green_plan__quebec_green_implementation",
       "argument": "climate_quebec_green_plan",
       "url": "https://www.quebec.ca/gouvernement/politiques-orientations/plan-economie-verte/plan-mise-en-oeuvre",
-      "title": "Plan de mise en œuvre du Plan pour une économie verte",
-      "excerpt": "Mesures concrètes de mise en œuvre et investissements climatiques.",
+      "title": "Implementation Plan for the 2030 Plan for a Green Economy",
+      "excerpt": "Implementation measures and climate investments.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Plan de mise en œuvre du Plan pour une économie verte — 2026-06-29",
+      "citation_text": "Government of Quebec — Implementation Plan for the 2030 Plan for a Green Economy — 2026-06-29",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_green_implementation."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_green_implementation."
     },
     {
       "key": "climate_alberta_technology_oil__alberta_tier",
       "argument": "climate_alberta_technology_oil",
       "url": "https://www.alberta.ca/technology-innovation-and-emissions-reduction-regulation",
       "title": "Technology Innovation and Emissions Reduction Regulation",
-      "excerpt": "Approche albertaine de tarification industrielle et réduction des émissions par technologie.",
+      "excerpt": "Alberta approach to industrial carbon pricing and technology-led emissions reductions.",
       "source_type": "official_government",
       "citation_text": "Government of Alberta — Technology Innovation and Emissions Reduction Regulation",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Alberta. Source registry key: alberta_tier."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Alberta. Source registry key: alberta_tier."
     },
     {
       "key": "climate_alberta_technology_oil__alberta_west_coast_pipeline",
       "argument": "climate_alberta_technology_oil",
       "url": "https://www.alberta.ca/west-coast-oil-pipeline",
       "title": "West Coast oil pipeline",
-      "excerpt": "Volonté d'accroître la capacité d'exportation pétrolière tout en avançant des projets de réduction d'émissions.",
+      "excerpt": "Intention to expand oil export capacity while advancing emissions-reduction projects.",
       "source_type": "official_government",
       "citation_text": "Government of Alberta — West Coast oil pipeline — 2026-07",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Alberta/Canada. Source registry key: alberta_west_coast_pipeline."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Alberta/Canada. Source registry key: alberta_west_coast_pipeline."
     },
     {
       "key": "tech_gov_ai_strategy__ised_national_ai_strategy_2026",
       "argument": "tech_gov_ai_strategy",
       "url": "https://ised-isde.canada.ca/site/ised/en/canadas-national-artificial-intelligence-strategy-ai-all",
       "title": "Canada's National Artificial Intelligence Strategy",
-      "excerpt": "Objectifs d'adoption de l'IA, compétences, calcul et croissance économique.",
+      "excerpt": "AI adoption targets, skills, compute, and economic growth.",
       "source_type": "official_government",
       "citation_text": "Innovation, Science and Economic Development Canada — Canada's National Artificial Intelligence Strategy — 2026-06-08",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: ised_national_ai_strategy_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ised_national_ai_strategy_2026."
     },
     {
       "key": "tech_cci_scale_ip__cci_innovation_power_2026",
       "argument": "tech_cci_scale_ip",
       "url": "https://www.canadianinnovators.org/content/innovation-as-power-the-choices-that-will-define-2026",
       "title": "Innovation as Power: The Choices That Will Define 2026",
-      "excerpt": "Plaidoyer pour IP, calcul IA, souveraineté et diversification technologique.",
+      "excerpt": "Case for intellectual property, AI compute, sovereignty, and technology diversification.",
       "source_type": "industry_advocacy",
       "citation_text": "Council of Canadian Innovators — Innovation as Power: The Choices That Will Define 2026 — 2026-01-16",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cci_innovation_power_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cci_innovation_power_2026."
     },
     {
       "key": "tech_cci_scale_ip__cci_quebec_election_2026",
       "argument": "tech_cci_scale_ip",
       "url": "https://www.canadianinnovators.org/content/2026-quebec-election-primer-what-innovators-need-to-scale",
       "title": "2026 Quebec Election Primer: What Innovators Need to Scale",
-      "excerpt": "Priorités d'entreprises technologiques au Québec : IP, souveraineté numérique, IA et croissance.",
+      "excerpt": "Priorities of Quebec technology firms: IP, digital sovereignty, AI, and growth.",
       "source_type": "industry_advocacy",
       "citation_text": "Council of Canadian Innovators — 2026 Quebec Election Primer: What Innovators Need to Scale — 2026-07-16",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: cci_quebec_election_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: cci_quebec_election_2026."
     },
     {
       "key": "tech_cci_scale_ip__cci_public_procurement",
       "argument": "tech_cci_scale_ip",
       "url": "https://www.canadianinnovators.org/content/buying-what-we-build-a-cci-policy-report-on-public-buying-for-canadian-innovation-and-prosperity",
       "title": "Buying What We Build: A CCI Policy Report on Public Buying for Canadian Innovation and Prosperity",
-      "excerpt": "Proposition d'utiliser les marchés publics pour faire croître les entreprises canadiennes et conserver IP et données.",
+      "excerpt": "Proposal to use public procurement to scale Canadian firms and retain IP and data.",
       "source_type": "industry_advocacy",
       "citation_text": "Council of Canadian Innovators — Buying What We Build: A CCI Policy Report on Public Buying for Canadian Innovation and Prosperity",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: cci_public_procurement."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: cci_public_procurement."
     },
     {
       "key": "tech_statcan_productivity__statcan_ai_productivity_2026",
       "argument": "tech_statcan_productivity",
       "url": "https://www150.statcan.gc.ca/n1/pub/36-28-0001/2026004/article/00002-eng.htm",
       "title": "Artificial intelligence and productivity growth in Canada",
-      "excerpt": "Estimation du potentiel de l'IA sur la croissance de la productivité.",
+      "excerpt": "Estimate of AI's potential contribution to productivity growth.",
       "source_type": "official_statistics",
       "citation_text": "Statistics Canada — Artificial intelligence and productivity growth in Canada — 2026-04-22",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: statcan_ai_productivity_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: statcan_ai_productivity_2026."
     },
     {
       "key": "tech_statcan_productivity__statcan_productivity_competition_2026",
       "argument": "tech_statcan_productivity",
       "url": "https://www150.statcan.gc.ca/n1/pub/11f0019m/11f0019m2026002-eng.htm",
       "title": "Productivity and competition in Canada",
-      "excerpt": "Contexte sur la faiblesse de la productivité canadienne et les déterminants de la performance.",
+      "excerpt": "Context on Canada's productivity weakness and drivers of performance.",
       "source_type": "official_statistics",
       "citation_text": "Statistics Canada — Productivity and competition in Canada — 2026",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: statcan_productivity_competition_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: statcan_productivity_competition_2026."
     },
     {
       "key": "us_bq_quebec_voice__bq_quebec_voice_us_2025",
       "argument": "us_bq_quebec_voice",
       "url": "https://www.blocquebecois.org/negociations-avec-donald-trump-le-quebec-doit-parler-de-sa-propre-voix/",
-      "title": "Négociations avec Donald Trump : Le Québec doit parler de sa propre voix",
-      "excerpt": "Voix québécoise dans les négociations, contre-tarifs ciblés et protection des secteurs vulnérables.",
+      "title": "Negotiations with Donald Trump: Quebec Must Speak with Its Own Voice",
+      "excerpt": "Quebec voice in negotiations, targeted counter-tariffs, and protection for vulnerable sectors.",
       "source_type": "political_party",
-      "citation_text": "Bloc Québécois — Négociations avec Donald Trump : Le Québec doit parler de sa propre voix — 2025-04-03",
+      "citation_text": "Bloc Québécois — Negotiations with Donald Trump: Quebec Must Speak with Its Own Voice — 2025-04-03",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec/Canada/United States. Source registry key: bq_quebec_voice_us_2025."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec/Canada/United States. Source registry key: bq_quebec_voice_us_2025."
     },
     {
       "key": "us_bq_quebec_voice__bq_tariffs_pme_2026",
       "argument": "us_bq_quebec_voice",
       "url": "https://www.blocquebecois.org/journee-de-lopposition-du-bloc-quebecois-un-cri-dalarme-pour-soutenir-nos-pme-face-aux-tarifs-americains/",
-      "title": "Journée de l’opposition du Bloc Québécois : Un cri d’alarme pour soutenir nos PME face aux tarifs américains",
-      "excerpt": "Demande de dénoncer les tarifs américains et de soutenir directement les entreprises et travailleurs touchés.",
+      "title": "Bloc Québécois Opposition Day: An Alarm Call to Support Our SMEs Against U.S. Tariffs",
+      "excerpt": "Call to denounce U.S. tariffs and directly support affected businesses and workers.",
       "source_type": "political_party",
-      "citation_text": "Bloc Québécois — Journée de l’opposition du Bloc Québécois : Un cri d’alarme pour soutenir nos PME face aux tarifs américains — 2026-05-01",
+      "citation_text": "Bloc Québécois — Bloc Québécois Opposition Day: An Alarm Call to Support Our SMEs Against U.S. Tariffs — 2026-05-01",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec/Canada/United States. Source registry key: bq_tariffs_pme_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec/Canada/United States. Source registry key: bq_tariffs_pme_2026."
     },
     {
       "key": "ukraine_bq_support__bq_ukraine_2025",
       "argument": "ukraine_bq_support",
       "url": "https://www.blocquebecois.org/trois-ans-dinvasion-russe-en-ukraine-le-bloc-quebecois-reaffirme-son-appui-total-a-lindependance-ukrainienne/",
-      "title": "Trois ans d’invasion russe en Ukraine : le Bloc Québécois réaffirme son appui total à l’indépendance ukrainienne",
-      "excerpt": "Appui à l'indépendance et à la sécurité de l'Ukraine, sanctions et engagement international.",
+      "title": "Three Years Since Russia's Invasion of Ukraine: Bloc Québécois Reaffirms Full Support for Ukrainian Independence",
+      "excerpt": "Support for Ukraine's independence and security, sanctions, and international engagement.",
       "source_type": "political_party",
-      "citation_text": "Bloc Québécois — Trois ans d’invasion russe en Ukraine : le Bloc Québécois réaffirme son appui total à l’indépendance ukrainienne — 2025-02-24",
+      "citation_text": "Bloc Québécois — Three Years Since Russia's Invasion of Ukraine: Bloc Québécois Reaffirms Full Support for Ukrainian Independence — 2025-02-24",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada/Ukraine. Source registry key: bq_ukraine_2025."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/Ukraine. Source registry key: bq_ukraine_2025."
     },
     {
       "key": "wealth_qs_redistribution__qs_workers_manifest",
       "argument": "wealth_qs_redistribution",
       "url": "https://appuyez.quebecsolidaire.net/manifeste",
-      "title": "Manifeste pour un Québec solidaire de ses travailleuses et travailleurs",
-      "excerpt": "Pouvoir d'achat, redistribution, services publics, droits du travail et transition juste.",
+      "title": "Workers’ Manifesto — Québec solidaire",
+      "excerpt": "Purchasing power, redistribution, public services, labour rights, and a just transition.",
       "source_type": "political_party",
-      "citation_text": "Québec solidaire — Manifeste pour un Québec solidaire de ses travailleuses et travailleurs",
+      "citation_text": "Québec solidaire — Workers’ Manifesto — Québec solidaire",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: qs_workers_manifest."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: qs_workers_manifest."
     },
     {
       "key": "wealth_ftq_services__ftq_may_day_2025",
       "argument": "wealth_ftq_services",
       "url": "https://ftq.qc.ca/1er-mai-2025/",
-      "title": "1er mai 2025 — Journée internationale des travailleuses et travailleurs",
-      "excerpt": "Critique de l'austérité et des baisses d'impôt au détriment des services publics et de la majorité des travailleurs.",
+      "title": "May 1, 2025 — International Workers' Day",
+      "excerpt": "Critique of austerity and tax cuts at the expense of public services and most workers.",
       "source_type": "labour_union",
-      "citation_text": "FTQ — 1er mai 2025 — Journée internationale des travailleuses et travailleurs — 2025-05-01",
+      "citation_text": "FTQ — May 1, 2025 — International Workers' Day — 2025-05-01",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: ftq_may_day_2025."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: ftq_may_day_2025."
     },
     {
       "key": "reg_plq_two_for_one__plq_general_council_2026",
       "argument": "reg_plq_two_for_one",
       "url": "https://plq.org/conseil-general-du-parti-liberal-du-quebec-a-sherbrooke-charles-milliard-veut-reparer-le-quebec/",
-      "title": "Conseil général du Parti libéral du Québec à Sherbrooke : Charles Milliard veut réparer le Québec",
-      "excerpt": "Immigration modulée par les besoins/capacités régionales; moratoire réglementaire et règle deux pour un.",
+      "title": "Quebec Liberal Party General Council in Sherbrooke: Charles Milliard Wants to Repair Quebec",
+      "excerpt": "Immigration calibrated to regional needs and capacity; regulatory moratorium and two-for-one rule.",
       "source_type": "political_party",
-      "citation_text": "Parti libéral du Québec — Conseil général du Parti libéral du Québec à Sherbrooke : Charles Milliard veut réparer le Québec — 2026-06-09",
+      "citation_text": "Quebec Liberal Party — Quebec Liberal Party General Council in Sherbrooke: Charles Milliard Wants to Repair Quebec — 2026-06-09",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: plq_general_council_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: plq_general_council_2026."
     },
     {
       "key": "reg_cpq_permitting__cpq_bill11_2026",
       "argument": "reg_cpq_permitting",
       "url": "https://www.cpq.qc.ca/publications/projet-de-loi-11-le-cpq-salue-plusieurs-avancees-et-appel-a-ancrer-durablement-lallegement-reglementaire-dans-les-facons-de-faire-du-gouvernement/",
-      "title": "Projet de loi 11 : le CPQ salue plusieurs avancées et appelle à ancrer durablement l’allègement réglementaire",
-      "excerpt": "Plaidoyer pour l'allègement réglementaire et une pratique administrative durablement plus légère.",
+      "title": "Bill 11: CPQ Welcomes Several Advances and Calls for Lasting Regulatory Relief",
+      "excerpt": "Case for regulatory relief and a durably lighter administrative burden.",
       "source_type": "industry_advocacy",
-      "citation_text": "Conseil du patronat du Québec — Projet de loi 11 : le CPQ salue plusieurs avancées et appelle à ancrer durablement l’allègement réglementaire — 2026-02-04",
+      "citation_text": "Quebec Employers Council (CPQ) — Bill 11: CPQ Welcomes Several Advances and Calls for Lasting Regulatory Relief — 2026-02-04",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: cpq_bill11_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: cpq_bill11_2026."
     },
     {
       "key": "reg_equiterre_safeguards__equiterre_major_projects_2026",
       "argument": "reg_equiterre_safeguards",
       "url": "https://www.equiterre.org/fr/ressources/comment-b%C3%A2tir-un-canada-fort-en-freinant-la-transition",
-      "title": "Comment bâtir un Canada fort en freinant la transition?",
-      "excerpt": "Critique de l'affaiblissement des protections environnementales pour accélérer les grands projets.",
+      "title": "How Can We Build a Strong Canada While Slowing the Transition?",
+      "excerpt": "Critique of weakening environmental safeguards to accelerate major projects.",
       "source_type": "civil_society",
-      "citation_text": "Équiterre — Comment bâtir un Canada fort en freinant la transition? — 2026-06-15",
+      "citation_text": "Équiterre — How Can We Build a Strong Canada While Slowing the Transition? — 2026-06-15",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: equiterre_major_projects_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: equiterre_major_projects_2026."
     },
     {
       "key": "reg_apnql_consultation__apnql_bill11_2026",
       "argument": "reg_apnql_consultation",
       "url": "https://www.assnat.qc.ca/Media/Process.aspx?MediaId=ANQ.Vigie.Bll.DocumentGenerique_217945&process=Default&token=ZyMoxNwUn8ikQ+TRKYwPCjWrKwg+vIv9rjij7p3xLGTZDmLVSmJLoqe%2FvG7%2FYWzz",
-      "title": "Avis de l’APNQL sur le projet de loi 11 — allègement du fardeau réglementaire et administratif",
-      "excerpt": "Demande de maintenir suivi, transparence, consultation et accommodement lors des allègements réglementaires.",
+      "title": "AFNQL Submission on Bill 11 — Regulatory and Administrative Burden Reduction",
+      "excerpt": "Call to preserve monitoring, transparency, consultation, and accommodation during regulatory relief.",
       "source_type": "first_nations_primary",
-      "citation_text": "Assemblée des Premières Nations Québec-Labrador / Assemblée nationale du Québec — Avis de l’APNQL sur le projet de loi 11 — allègement du fardeau réglementaire et administratif",
+      "citation_text": "Assembly of First Nations Quebec-Labrador / National Assembly of Quebec — AFNQL Submission on Bill 11 — Regulatory and Administrative Burden Reduction",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: apnql_bill11_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: apnql_bill11_2026."
     },
     {
       "key": "justice_quebec_access_digital__quebec_justice_digital_2025_2026",
       "argument": "justice_quebec_access_digital",
       "url": "https://www.quebec.ca/gouvernement/ministeres-organismes/cybersecurite-numerique/publications/portefeuille-projets-prioritaires-gouvernemental-transformation-numerique-2025-2026",
-      "title": "Portefeuille des projets prioritaires gouvernemental en transformation numérique 2025-2026",
-      "excerpt": "Programme de dossier judiciaire numérique visant à simplifier les démarches et réduire les délais de traitement.",
+      "title": "Government Portfolio of Priority Digital Transformation Projects 2025–2026",
+      "excerpt": "Digital court-file program intended to simplify procedures and reduce processing delays.",
       "source_type": "official_government",
-      "citation_text": "Gouvernement du Québec — Portefeuille des projets prioritaires gouvernemental en transformation numérique 2025-2026 — 2025-09-12",
+      "citation_text": "Government of Quebec — Government Portfolio of Priority Digital Transformation Projects 2025–2026 — 2025-09-12",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_justice_digital_2025_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_justice_digital_2025_2026."
     },
     {
       "key": "justice_quebec_access_digital__quebec_fonds_acces_justice",
       "argument": "justice_quebec_access_digital",
       "url": "https://www.quebec.ca/gouvernement/ministeres-organismes/justice/mission-services/faj",
-      "title": "Fonds Accès Justice",
-      "excerpt": "Soutien aux actions facilitant la compréhension du droit, les modes de règlement et l'accès à la justice.",
+      "title": "Access to Justice Fund",
+      "excerpt": "Support for initiatives that improve legal understanding, dispute resolution, and access to justice.",
       "source_type": "official_government",
-      "citation_text": "Ministère de la Justice du Québec — Fonds Accès Justice — 2025-11-11",
+      "citation_text": "Quebec Ministry of Justice — Access to Justice Fund — 2025-11-11",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: quebec_fonds_acces_justice."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: quebec_fonds_acces_justice."
     },
     {
       "key": "justice_barreau_access__barreau_clinic_2026",
       "argument": "justice_barreau_access",
       "url": "https://www.barreau.qc.ca/fr/nouvelle/communiques/clinique-juridique-ecole-barreau-levier-concret-acces-justice-formation/",
-      "title": "Clinique juridique du Barreau : un levier concret d’accès à la justice et de formation",
-      "excerpt": "Accès gratuit à l'information et aux conseils juridiques.",
+      "title": "Quebec Bar Legal Clinic: A Practical Tool for Access to Justice and Training",
+      "excerpt": "Free access to legal information and advice.",
       "source_type": "professional_order",
-      "citation_text": "Barreau du Québec — Clinique juridique du Barreau : un levier concret d’accès à la justice et de formation — 2026-06-05",
+      "citation_text": "Quebec Bar — Quebec Bar Legal Clinic: A Practical Tool for Access to Justice and Training — 2026-06-05",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: barreau_clinic_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: barreau_clinic_2026."
     },
     {
       "key": "justice_barreau_access__barreau_delay_actions_2024",
       "argument": "justice_barreau_access",
       "url": "https://www.barreau.qc.ca/fr/nouvelle/avis-aux-membres/reduction-delais-criminelle-penale-barreau-propose-plusieurs-pistes-action-concretes/",
-      "title": "Le Barreau du Québec propose plusieurs pistes d’action concrètes pour réduire les délais en matière criminelle et pénale",
-      "excerpt": "Reconnaît le problème des délais tout en l'abordant à travers des mesures compatibles avec la qualité de la justice.",
+      "title": "Quebec Bar Proposes Concrete Measures to Reduce Criminal and Penal Case Delays",
+      "excerpt": "Acknowledges delays while advocating measures compatible with the quality of justice.",
       "source_type": "professional_order",
-      "citation_text": "Barreau du Québec — Le Barreau du Québec propose plusieurs pistes d’action concrètes pour réduire les délais en matière criminelle et pénale — 2024-02-12",
+      "citation_text": "Quebec Bar — Quebec Bar Proposes Concrete Measures to Reduce Criminal and Penal Case Delays — 2024-02-12",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: barreau_delay_actions_2024."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: barreau_delay_actions_2024."
     },
     {
       "key": "aiedu_fqppu_governance__fqppu_ai_governance",
       "argument": "aiedu_fqppu_governance",
       "url": "https://fqppu.org/la-fqppu-demande-la-demission-de-pascale-dery/",
-      "title": "La FQPPU demande la démission de la ministre de l’Enseignement supérieur",
-      "excerpt": "Critique de la consultation sur l'IA, manque de moyens et défense de la liberté académique/gouvernance universitaire.",
+      "title": "FQPPU Calls for the Minister of Higher Education to Resign",
+      "excerpt": "Critique of AI consultation, insufficient resources, and protection of academic freedom and university governance.",
       "source_type": "higher_education_stakeholder",
-      "citation_text": "FQPPU — La FQPPU demande la démission de la ministre de l’Enseignement supérieur",
+      "citation_text": "FQPPU — FQPPU Calls for the Minister of Higher Education to Resign",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: fqppu_ai_governance."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: fqppu_ai_governance."
     },
     {
       "key": "aiedu_unesco_human_centered__unesco_genai_guidance",
       "argument": "aiedu_unesco_human_centered",
       "url": "https://www.unesco.org/en/articles/guidance-generative-ai-education-and-research",
       "title": "Guidance for generative AI in education and research",
-      "excerpt": "Cadre centré sur l'humain : vie privée, équité, validation éthique, usages pédagogiques et politiques cohérentes.",
+      "excerpt": "Human-centred framework covering privacy, equity, ethical validation, pedagogical uses, and coherent policy.",
       "source_type": "international_standard",
       "citation_text": "UNESCO — Guidance for generative AI in education and research — 2026-01-16",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: International. Source registry key: unesco_genai_guidance."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: International. Source registry key: unesco_genai_guidance."
     },
     {
       "key": "immigration_pq_lower__pq_immigration_plan_2026",
       "argument": "immigration_pq_lower",
       "url": "https://pq.org/independance/plan-immigration/",
-      "title": "Plan en immigration — un modèle viable",
-      "excerpt": "Réduction de l'immigration temporaire, cible d'environ 35 000 résidents permanents par an et capacité d'accueil.",
+      "title": "Immigration Plan — A Sustainable Model",
+      "excerpt": "Reduction in temporary immigration, target of about 35,000 permanent residents per year, and reception-capacity considerations.",
       "source_type": "political_party",
-      "citation_text": "Parti Québécois — Plan en immigration — un modèle viable — 2026",
+      "citation_text": "Parti Québécois — Immigration Plan — A Sustainable Model — 2026",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: pq_immigration_plan_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: pq_immigration_plan_2026."
     },
     {
       "key": "immigration_plq_regional_capacity__plq_general_council_2026",
       "argument": "immigration_plq_regional_capacity",
       "url": "https://plq.org/conseil-general-du-parti-liberal-du-quebec-a-sherbrooke-charles-milliard-veut-reparer-le-quebec/",
-      "title": "Conseil général du Parti libéral du Québec à Sherbrooke : Charles Milliard veut réparer le Québec",
-      "excerpt": "Immigration modulée par les besoins/capacités régionales; moratoire réglementaire et règle deux pour un.",
+      "title": "Quebec Liberal Party General Council in Sherbrooke: Charles Milliard Wants to Repair Quebec",
+      "excerpt": "Immigration calibrated to regional needs and capacity; regulatory moratorium and two-for-one rule.",
       "source_type": "political_party",
-      "citation_text": "Parti libéral du Québec — Conseil général du Parti libéral du Québec à Sherbrooke : Charles Milliard veut réparer le Québec — 2026-06-09",
+      "citation_text": "Quebec Liberal Party — Quebec Liberal Party General Council in Sherbrooke: Charles Milliard Wants to Repair Quebec — 2026-06-09",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: plq_general_council_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: plq_general_council_2026."
     },
     {
       "key": "immigration_bq_quebec_control__bq_immigration_capacity_2025",
       "argument": "immigration_bq_quebec_control",
       "url": "https://www.blocquebecois.org/seul-le-quebec-peut-assurer-limmigration-reussie/",
-      "title": "Seul le Québec peut assurer l’immigration réussie",
-      "excerpt": "Capacité d'accueil, transfert de pouvoirs en immigration et adaptation aux réalités québécoises.",
+      "title": "Only Quebec Can Deliver Successful Immigration",
+      "excerpt": "Reception capacity, transfer of immigration powers, and adaptation to Quebec realities.",
       "source_type": "political_party",
-      "citation_text": "Bloc Québécois — Seul le Québec peut assurer l’immigration réussie — 2025-04-21",
+      "citation_text": "Bloc Québécois — Only Quebec Can Deliver Successful Immigration — 2025-04-21",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec/Canada. Source registry key: bq_immigration_capacity_2025."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec/Canada. Source registry key: bq_immigration_capacity_2025."
     },
     {
       "key": "plastic_equiterre_producer__equiterre_production_consumption",
       "argument": "plastic_equiterre_producer",
       "url": "https://www.equiterre.org/fr/notre-travail/production-et-consommation",
-      "title": "Production et consommation",
-      "excerpt": "Réduction à la source, réemploi et responsabilité élargie des producteurs.",
+      "title": "Production and Consumption",
+      "excerpt": "Source reduction, reuse, and extended producer responsibility.",
       "source_type": "civil_society",
-      "citation_text": "Équiterre — Production et consommation",
+      "citation_text": "Équiterre — Production and Consumption",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: equiterre_production_consumption."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: equiterre_production_consumption."
     },
     {
       "key": "cohesion_pq_common_nation__pq_immigration_plan_2026",
       "argument": "cohesion_pq_common_nation",
       "url": "https://pq.org/independance/plan-immigration/",
-      "title": "Plan en immigration — un modèle viable",
-      "excerpt": "Réduction de l'immigration temporaire, cible d'environ 35 000 résidents permanents par an et capacité d'accueil.",
+      "title": "Immigration Plan — A Sustainable Model",
+      "excerpt": "Reduction in temporary immigration, target of about 35,000 permanent residents per year, and reception-capacity considerations.",
       "source_type": "political_party",
-      "citation_text": "Parti Québécois — Plan en immigration — un modèle viable — 2026",
+      "citation_text": "Parti Québécois — Immigration Plan — A Sustainable Model — 2026",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: pq_immigration_plan_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: pq_immigration_plan_2026."
     },
     {
       "key": "cohesion_pq_common_nation__pq_project_national_2026",
       "argument": "cohesion_pq_common_nation",
       "url": "https://pq.org/wp-content/uploads/2026/05/PQ-PROPOSITION-PRINCIPALE-PROJET-NATIONAL-V5-individuel.pdf",
-      "title": "Projet national — proposition principale 2026",
-      "excerpt": "Transition écologique, budget carbone, test climat, énergies renouvelables, intégration nationale et lutte contre la discrimination.",
+      "title": "National Project — Main Proposal 2026",
+      "excerpt": "Ecological transition, carbon budgets, climate tests, renewable energy, national integration, and anti-discrimination.",
       "source_type": "political_party",
-      "citation_text": "Parti Québécois — Projet national — proposition principale 2026 — 2026-05",
+      "citation_text": "Parti Québécois — National Project — Main Proposal 2026 — 2026-05",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: pq_project_national_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: pq_project_national_2026."
     },
     {
       "key": "cohesion_bq_quebec_model__bq_immigration_capacity_2025",
       "argument": "cohesion_bq_quebec_model",
       "url": "https://www.blocquebecois.org/seul-le-quebec-peut-assurer-limmigration-reussie/",
-      "title": "Seul le Québec peut assurer l’immigration réussie",
-      "excerpt": "Capacité d'accueil, transfert de pouvoirs en immigration et adaptation aux réalités québécoises.",
+      "title": "Only Quebec Can Deliver Successful Immigration",
+      "excerpt": "Reception capacity, transfer of immigration powers, and adaptation to Quebec realities.",
       "source_type": "political_party",
-      "citation_text": "Bloc Québécois — Seul le Québec peut assurer l’immigration réussie — 2025-04-21",
+      "citation_text": "Bloc Québécois — Only Quebec Can Deliver Successful Immigration — 2025-04-21",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec/Canada. Source registry key: bq_immigration_capacity_2025."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec/Canada. Source registry key: bq_immigration_capacity_2025."
     },
     {
       "key": "climate_pq_transition__pq_project_national_2026",
       "argument": "climate_pq_transition",
       "url": "https://pq.org/wp-content/uploads/2026/05/PQ-PROPOSITION-PRINCIPALE-PROJET-NATIONAL-V5-individuel.pdf",
-      "title": "Projet national — proposition principale 2026",
-      "excerpt": "Transition écologique, budget carbone, test climat, énergies renouvelables, intégration nationale et lutte contre la discrimination.",
+      "title": "National Project — Main Proposal 2026",
+      "excerpt": "Ecological transition, carbon budgets, climate tests, renewable energy, national integration, and anti-discrimination.",
       "source_type": "political_party",
-      "citation_text": "Parti Québécois — Projet national — proposition principale 2026 — 2026-05",
+      "citation_text": "Parti Québécois — National Project — Main Proposal 2026 — 2026-05",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: pq_project_national_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: pq_project_national_2026."
     },
     {
       "key": "climate_qs_just_transition__qs_workers_manifest",
       "argument": "climate_qs_just_transition",
       "url": "https://appuyez.quebecsolidaire.net/manifeste",
-      "title": "Manifeste pour un Québec solidaire de ses travailleuses et travailleurs",
-      "excerpt": "Pouvoir d'achat, redistribution, services publics, droits du travail et transition juste.",
+      "title": "Workers’ Manifesto — Québec solidaire",
+      "excerpt": "Purchasing power, redistribution, public services, labour rights, and a just transition.",
       "source_type": "political_party",
-      "citation_text": "Québec solidaire — Manifeste pour un Québec solidaire de ses travailleuses et travailleurs",
+      "citation_text": "Québec solidaire — Workers’ Manifesto — Québec solidaire",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: qs_workers_manifest."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: qs_workers_manifest."
     },
     {
       "key": "climate_equiterre_stronger__equiterre_spede_2026",
       "argument": "climate_equiterre_stronger",
       "url": "https://www.equiterre.org/fr/ressources/601-recommandation-politique-reforme-spede",
-      "title": "Une réforme qui manque d’ambition",
-      "excerpt": "Demande de rehausser l'ambition et l'efficacité du marché du carbone québécois.",
+      "title": "A Reform That Lacks Ambition",
+      "excerpt": "Call to increase the ambition and effectiveness of Quebec's carbon market.",
       "source_type": "civil_society",
-      "citation_text": "Équiterre — Une réforme qui manque d’ambition — 2026-07-14",
+      "citation_text": "Équiterre — A Reform That Lacks Ambition — 2026-07-14",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Québec. Source registry key: equiterre_spede_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec. Source registry key: equiterre_spede_2026."
     },
     {
       "key": "climate_equiterre_stronger__equiterre_major_projects_2026",
       "argument": "climate_equiterre_stronger",
       "url": "https://www.equiterre.org/fr/ressources/comment-b%C3%A2tir-un-canada-fort-en-freinant-la-transition",
-      "title": "Comment bâtir un Canada fort en freinant la transition?",
-      "excerpt": "Critique de l'affaiblissement des protections environnementales pour accélérer les grands projets.",
+      "title": "How Can We Build a Strong Canada While Slowing the Transition?",
+      "excerpt": "Critique of weakening environmental safeguards to accelerate major projects.",
       "source_type": "civil_society",
-      "citation_text": "Équiterre — Comment bâtir un Canada fort en freinant la transition? — 2026-06-15",
+      "citation_text": "Équiterre — How Can We Build a Strong Canada While Slowing the Transition? — 2026-06-15",
       "quote": "",
-      "note": "Paraphrase synthétique; consulter les sources pour la formulation complète et le contexte. Portée: Canada. Source registry key: equiterre_major_projects_2026."
+      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: equiterre_major_projects_2026."
     },
     {
       "key": "trump_kk_conflict_report",
       "argument": "trump_kk_conflict_disclosure",
       "source_type": "background_report",
-      "citation_text": "Dans ce scénario de démonstration, un rapport indique que King Klown a organisé des manifestations d'une ampleur historique contre le capitalisme et Donald Trump, qu'il s'oppose à une collaboration avec Trump et qu'il diffuse une propagande anti-Trump, particulièrement au sein des nations situées autour de sites stratégiques.",
-      "note": "Contexte narratif fictif de démonstration; ne constitue pas une affirmation factuelle sur des événements réels."
+      "citation_text": "In this fictional demonstration scenario, a background report documents King Klown's large-scale anti-capitalist and anti-Trump demonstrations, his opposition to collaboration with Trump, and his outreach to Indigenous nations near strategic infrastructure sites advocating against collaboration with Trump.",
+      "note": "Fictional demonstration context; this is not a factual claim about real-world events."
     }
   ],
   "consultations": [],

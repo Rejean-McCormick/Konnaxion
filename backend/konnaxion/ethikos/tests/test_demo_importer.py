@@ -161,14 +161,15 @@ def test_v3_imports_ekoh_profile_when_models_and_domain_exist():
     UserExpertiseScore = apps.get_model("ekoh", "UserExpertiseScore")
     UserEthicsScore = apps.get_model("ekoh", "UserEthicsScore")
 
-    category, _ = ExpertiseCategory.objects.get_or_create(
-        code="0731",
-        defaults={
-            "name": "Architecture and town planning",
-            "depth": 0,
-            "path": "0731",
-        },
-    )
+    with ekoh_smartvote_db_scope():
+        category, _ = ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
 
     payload = build_demo_payload()
     payload["ekoh_profiles"] = [
@@ -194,9 +195,12 @@ def test_v3_imports_ekoh_profile_when_models_and_domain_exist():
 
     actor = User.objects.get(username="demo_maya")
     assert actor.name == "Maya"
-    score = UserExpertiseScore.objects.get(user=actor, category=category)
-    assert float(score.weighted_score) == pytest.approx(0.91)
-    assert float(UserEthicsScore.objects.get(user=actor).ethical_score) == pytest.approx(1.0)
+    with ekoh_smartvote_db_scope():
+        score = UserExpertiseScore.objects.get(user=actor, category=category)
+        assert float(score.weighted_score) == pytest.approx(0.91)
+        assert float(
+            UserEthicsScore.objects.get(user=actor).ethical_score
+        ) == pytest.approx(1.0)
 
     tracked_types = set(
         DemoScenarioImport.objects.filter(
@@ -215,14 +219,15 @@ def test_v3_binds_topic_relevance_to_smart_vote():
         "smart_vote", "SourceConsultationBinding"
     )
 
-    category, _ = ExpertiseCategory.objects.get_or_create(
-        code="0731",
-        defaults={
-            "name": "Architecture and town planning",
-            "depth": 0,
-            "path": "0731",
-        },
-    )
+    with ekoh_smartvote_db_scope():
+        category, _ = ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
 
     payload = build_demo_payload()
     payload["topic_relevance"] = [
@@ -241,14 +246,15 @@ def test_v3_binds_topic_relevance_to_smart_vote():
     assert result["ok"] is True
 
     topic = EthikosTopic.objects.get(title="[DEMO] Public Square Redevelopment")
-    binding = SourceConsultationBinding.objects.get(
-        source_type="ethikos_topic",
-        source_id=str(topic.pk),
-    )
-    relevance = ConsultationRelevance.objects.get(
-        consultation=binding.consultation,
-        category=category,
-    )
+    with ekoh_smartvote_db_scope():
+        binding = SourceConsultationBinding.objects.get(
+            source_type="ethikos_topic",
+            source_id=str(topic.pk),
+        )
+        relevance = ConsultationRelevance.objects.get(
+            consultation=binding.consultation,
+            category=category,
+        )
     assert float(relevance.weight) == pytest.approx(1.0)
 
     tracked_types = set(
@@ -266,14 +272,15 @@ def test_v3_persists_advisory_recusal_on_source_binding():
         "smart_vote", "SourceConsultationBinding"
     )
 
-    ExpertiseCategory.objects.get_or_create(
-        code="0731",
-        defaults={
-            "name": "Architecture and town planning",
-            "depth": 0,
-            "path": "0731",
-        },
-    )
+    with ekoh_smartvote_db_scope():
+        ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
 
     payload = build_demo_payload()
     payload["topic_relevance"] = [
@@ -300,11 +307,12 @@ def test_v3_persists_advisory_recusal_on_source_binding():
 
     topic = EthikosTopic.objects.get(title="[DEMO] Public Square Redevelopment")
     actor = User.objects.get(username="demo_maya")
-    binding = SourceConsultationBinding.objects.get(
-        source_type="ethikos_topic",
-        source_id=str(topic.pk),
-    )
-    exclusions = binding.metadata_json["advisory_exclusions"]
+    with ekoh_smartvote_db_scope():
+        binding = SourceConsultationBinding.objects.get(
+            source_type="ethikos_topic",
+            source_id=str(topic.pk),
+        )
+        exclusions = binding.metadata_json["advisory_exclusions"]
     assert exclusions == [
         {
             "actor_key": "maya",
@@ -397,14 +405,15 @@ def test_v3_imports_explicit_ekoh_rating_visibility():
     ExpertiseCategory = apps.get_model("ekoh", "ExpertiseCategory")
     RatingVisibilitySetting = apps.get_model("ekoh", "RatingVisibilitySetting")
 
-    ExpertiseCategory.objects.get_or_create(
-        code="0731",
-        defaults={
-            "name": "Architecture and town planning",
-            "depth": 0,
-            "path": "0731",
-        },
-    )
+    with ekoh_smartvote_db_scope():
+        ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
 
     payload = build_demo_payload()
     payload["ekoh_profiles"] = [

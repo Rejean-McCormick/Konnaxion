@@ -1,3 +1,4 @@
+
 // FILE: frontend/app/ethikos/insights/page.tsx
 // app/ethikos/insights/page.tsx
 'use client';
@@ -481,20 +482,6 @@ export default function EthikosOverviewPage(): JSX.Element {
                       </span>
                     ) : null,
                 }}
-                chart={
-                  <ChartCard
-                    type="area"
-                    height={52}
-                    data={kpi.history.map((point) => ({
-                      x: point.x,
-                      y: point.y,
-                    }))}
-                    tooltip={{
-                      formatter: (datum: { x?: string | number; y?: number }) =>
-                        `${dayjs(datum.x).format('MMM D')}: ${datum.y ?? 0}`,
-                    }}
-                  />
-                }
               />
             ))
           ) : (
@@ -610,6 +597,9 @@ export default function EthikosOverviewPage(): JSX.Element {
                           y: point.y,
                         }))}
                         height={44}
+                        axis={{ x: false, y: false }}
+                        padding={0}
+                        legend={false}
                       />
                     }
                   />

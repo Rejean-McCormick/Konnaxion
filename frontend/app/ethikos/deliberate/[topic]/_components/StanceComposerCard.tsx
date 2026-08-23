@@ -8,7 +8,6 @@ import {
   clampStance,
   stanceColor,
   stanceLabel,
-  STANCE_MARKS,
 } from '../_lib/topicThreadUtils'
 
 const { Text, Paragraph } = Typography
@@ -45,8 +44,9 @@ export default function StanceComposerCard({
           min={-3}
           max={3}
           step={1}
-          marks={STANCE_MARKS}
+          dots
           value={value}
+          style={{ margin: '8px 6px 0' }}
           tooltip={{
             formatter: (nextValue) =>
               typeof nextValue === 'number'

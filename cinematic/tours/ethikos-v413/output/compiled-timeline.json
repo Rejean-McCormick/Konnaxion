@@ -1,505 +1,651 @@
 {
-  "schema_version": "cinematic-timeline/v1",
+  "schema_version": "cinematic-compiled-timeline/v1",
   "events": [
     {
+      "index": 0,
+      "at_ms": 0,
+      "action": "navigate",
       "cue": "opening",
       "offset_ms": 0,
-      "action": "navigate",
       "path": "/"
     },
     {
+      "index": 1,
+      "at_ms": 1200,
+      "action": "wait_visible",
       "cue": "opening",
       "offset_ms": 1200,
-      "action": "wait_visible",
       "target": "konnaxion-home",
       "timeout_ms": 15000
     },
     {
+      "index": 2,
+      "at_ms": 2200,
+      "action": "highlight",
       "cue": "opening",
       "offset_ms": 2200,
-      "action": "highlight",
       "target": "konnaxion-home",
       "duration_ms": 1800
     },
     {
+      "index": 3,
+      "at_ms": 6500,
+      "action": "navigate",
       "cue": "opening",
       "offset_ms": 6500,
-      "action": "navigate",
       "path": "/ethikos/deliberate/elite?sidebar=ethikos"
     },
     {
+      "index": 4,
+      "at_ms": 8500,
+      "action": "wait_visible",
       "cue": "opening",
       "offset_ms": 8500,
-      "action": "wait_visible",
       "target": "deliberation-list",
       "timeout_ms": 20000
     },
     {
+      "index": 5,
+      "at_ms": 10500,
+      "action": "scroll_to",
       "cue": "opening",
       "offset_ms": 10500,
-      "action": "scroll_to",
       "target": "deliberation-list",
       "duration_ms": 1400
     },
     {
+      "index": 6,
+      "at_ms": 18555,
+      "action": "scroll_to",
       "cue": "autonomy",
       "offset_ms": 600,
-      "action": "scroll_to",
       "target": "deliberation-next-page",
       "duration_ms": 900
     },
     {
+      "index": 7,
+      "at_ms": 19855,
+      "action": "mouse_move",
       "cue": "autonomy",
       "offset_ms": 1900,
-      "action": "mouse_move",
       "target": "deliberation-next-page",
       "duration_ms": 600
     },
     {
+      "index": 8,
+      "at_ms": 20855,
+      "action": "click",
       "cue": "autonomy",
       "offset_ms": 2900,
-      "action": "click",
       "target": "deliberation-next-page",
       "timeout_ms": 10000
     },
     {
+      "index": 9,
+      "at_ms": 21855,
+      "action": "wait_visible",
       "cue": "autonomy",
       "offset_ms": 3900,
-      "action": "wait_visible",
       "target": "canada-topic-open",
       "timeout_ms": 10000
     },
     {
+      "index": 10,
+      "at_ms": 23155,
+      "action": "scroll_to",
       "cue": "autonomy",
       "offset_ms": 5200,
-      "action": "scroll_to",
       "target": "canada-topic-open",
       "duration_ms": 1100
     },
     {
+      "index": 11,
+      "at_ms": 24855,
+      "action": "mouse_move",
       "cue": "autonomy",
       "offset_ms": 6900,
-      "action": "mouse_move",
       "target": "canada-topic-open",
       "duration_ms": 650
     },
     {
+      "index": 12,
+      "at_ms": 25855,
+      "action": "click",
       "cue": "autonomy",
       "offset_ms": 7900,
-      "action": "click",
       "target": "canada-topic-open",
       "timeout_ms": 10000
     },
     {
+      "index": 13,
+      "at_ms": 27755,
+      "action": "wait_visible",
       "cue": "autonomy",
       "offset_ms": 9800,
-      "action": "wait_visible",
       "target": "argument-thread",
       "timeout_ms": 20000
     },
     {
+      "index": 14,
+      "at_ms": 29455,
+      "action": "scroll_to",
       "cue": "autonomy",
       "offset_ms": 11500,
-      "action": "scroll_to",
       "target": "canada-topic-question",
       "duration_ms": 1100
     },
     {
+      "index": 15,
+      "at_ms": 31155,
+      "action": "highlight",
       "cue": "autonomy",
       "offset_ms": 13200,
-      "action": "highlight",
       "target": "canada-topic-question",
       "duration_ms": 1800
     },
     {
+      "index": 16,
+      "at_ms": 33655,
+      "action": "scroll_to",
       "cue": "autonomy",
       "offset_ms": 15700,
-      "action": "scroll_to",
       "target": "argument-thread",
       "duration_ms": 1200
     },
     {
+      "index": 17,
+      "at_ms": 37408,
+      "action": "scroll_to",
       "cue": "scene",
       "offset_ms": 900,
-      "action": "scroll_to",
       "target": "king-proposal",
       "duration_ms": 1300
     },
     {
+      "index": 18,
+      "at_ms": 39308,
+      "action": "highlight",
       "cue": "scene",
       "offset_ms": 2800,
-      "action": "highlight",
       "target": "king-proposal",
       "duration_ms": 1800
     },
     {
+      "index": 19,
+      "at_ms": 43908,
+      "action": "scroll_to",
       "cue": "scene",
       "offset_ms": 7400,
-      "action": "scroll_to",
       "target": "rejean-reply",
       "duration_ms": 1300
     },
     {
+      "index": 20,
+      "at_ms": 45808,
+      "action": "highlight",
       "cue": "scene",
       "offset_ms": 9300,
-      "action": "highlight",
       "target": "rejean-reply",
       "duration_ms": 1800
     },
     {
+      "index": 21,
+      "at_ms": 49808,
+      "action": "scroll_to",
       "cue": "scene",
       "offset_ms": 13300,
-      "action": "scroll_to",
       "target": "already-announced",
       "duration_ms": 1100
     },
     {
+      "index": 22,
+      "at_ms": 51308,
+      "action": "highlight",
       "cue": "scene",
       "offset_ms": 14800,
-      "action": "highlight",
       "target": "already-announced",
       "duration_ms": 1600
     },
     {
+      "index": 23,
+      "at_ms": 54708,
+      "action": "scroll_to",
       "cue": "scene",
       "offset_ms": 18200,
-      "action": "scroll_to",
       "target": "big-announcement",
       "duration_ms": 1300
     },
     {
+      "index": 24,
+      "at_ms": 56608,
+      "action": "highlight",
       "cue": "scene",
       "offset_ms": 20100,
-      "action": "highlight",
       "target": "big-announcement",
       "duration_ms": 2600
     },
     {
+      "index": 25,
+      "at_ms": 62308,
+      "action": "scroll_to",
       "cue": "scene",
       "offset_ms": 25800,
-      "action": "scroll_to",
       "target": "moderation",
       "duration_ms": 1200
     },
     {
+      "index": 26,
+      "at_ms": 64008,
+      "action": "highlight",
       "cue": "scene",
       "offset_ms": 27500,
-      "action": "highlight",
       "target": "moderation",
       "duration_ms": 2200
     },
     {
+      "index": 27,
+      "at_ms": 69913,
+      "action": "scroll_to",
       "cue": "ekoh",
       "offset_ms": 700,
-      "action": "scroll_to",
       "target": "rejean-ekoh-button",
       "duration_ms": 1100
     },
     {
+      "index": 28,
+      "at_ms": 71413,
+      "action": "mouse_move",
       "cue": "ekoh",
       "offset_ms": 2200,
-      "action": "mouse_move",
       "target": "rejean-ekoh-button",
       "duration_ms": 650
     },
     {
+      "index": 29,
+      "at_ms": 72613,
+      "action": "click",
       "cue": "ekoh",
       "offset_ms": 3400,
-      "action": "click",
       "target": "rejean-ekoh-button"
     },
     {
+      "index": 30,
+      "at_ms": 74213,
+      "action": "wait_visible",
       "cue": "ekoh",
       "offset_ms": 5000,
-      "action": "wait_visible",
       "target": "ekoh-drawer",
       "timeout_ms": 15000
     },
     {
+      "index": 31,
+      "at_ms": 75713,
+      "action": "highlight",
       "cue": "ekoh",
       "offset_ms": 6500,
-      "action": "highlight",
       "target": "ekoh-public",
       "duration_ms": 1600
     },
     {
+      "index": 32,
+      "at_ms": 78413,
+      "action": "scroll_to",
       "cue": "ekoh",
       "offset_ms": 9200,
-      "action": "scroll_to",
       "target": "ekoh-alignment",
       "duration_ms": 900
     },
     {
+      "index": 33,
+      "at_ms": 79713,
+      "action": "highlight",
       "cue": "ekoh",
       "offset_ms": 10500,
-      "action": "highlight",
       "target": "ekoh-alignment",
       "duration_ms": 1600
     },
     {
+      "index": 34,
+      "at_ms": 82713,
+      "action": "scroll_to",
       "cue": "ekoh",
       "offset_ms": 13500,
-      "action": "scroll_to",
       "target": "ekoh-domains",
       "duration_ms": 1000
     },
     {
+      "index": 35,
+      "at_ms": 84213,
+      "action": "highlight",
       "cue": "ekoh",
       "offset_ms": 15000,
-      "action": "highlight",
       "target": "ekoh-domains",
       "duration_ms": 1800
     },
     {
+      "index": 36,
+      "at_ms": 86613,
+      "action": "mouse_move",
       "cue": "ekoh",
       "offset_ms": 17400,
-      "action": "mouse_move",
       "target": "ekoh-close",
       "duration_ms": 550
     },
     {
+      "index": 37,
+      "at_ms": 87513,
+      "action": "click",
       "cue": "ekoh",
       "offset_ms": 18300,
-      "action": "click",
       "target": "ekoh-close"
     },
     {
+      "index": 38,
+      "at_ms": 90524,
+      "action": "scroll_to",
       "cue": "trump-context",
       "offset_ms": 700,
-      "action": "scroll_to",
       "target": "emergent-card",
       "duration_ms": 1200
     },
     {
+      "index": 39,
+      "at_ms": 92224,
+      "action": "highlight",
       "cue": "trump-context",
       "offset_ms": 2400,
-      "action": "highlight",
       "target": "emergent-card",
       "duration_ms": 1800
     },
     {
+      "index": 40,
+      "at_ms": 94524,
+      "action": "mouse_move",
       "cue": "trump-context",
       "offset_ms": 4700,
-      "action": "mouse_move",
       "target": "open-emergent",
       "duration_ms": 600
     },
     {
+      "index": 41,
+      "at_ms": 95524,
+      "action": "click",
       "cue": "trump-context",
       "offset_ms": 5700,
-      "action": "click",
       "target": "open-emergent"
     },
     {
+      "index": 42,
+      "at_ms": 97424,
+      "action": "wait_visible",
       "cue": "trump-context",
       "offset_ms": 7600,
-      "action": "wait_visible",
       "target": "trump-question",
       "timeout_ms": 20000
     },
     {
+      "index": 43,
+      "at_ms": 99024,
+      "action": "scroll_to",
       "cue": "trump-context",
       "offset_ms": 9200,
-      "action": "scroll_to",
       "target": "conflict-item",
       "duration_ms": 1300
     },
     {
+      "index": 44,
+      "at_ms": 100824,
+      "action": "highlight",
       "cue": "trump-context",
       "offset_ms": 11000,
-      "action": "highlight",
       "target": "conflict-item",
       "duration_ms": 1700
     },
     {
+      "index": 45,
+      "at_ms": 102674,
+      "action": "mouse_move",
       "cue": "trump-context",
       "offset_ms": 12850,
-      "action": "mouse_move",
       "target": "conflict-details",
       "duration_ms": 550
     },
     {
+      "index": 46,
+      "at_ms": 103324,
+      "action": "click",
       "cue": "trump-context",
       "offset_ms": 13500,
-      "action": "click",
       "target": "conflict-details"
     },
     {
+      "index": 47,
+      "at_ms": 104924,
+      "action": "wait_visible",
       "cue": "trump-context",
       "offset_ms": 15100,
-      "action": "wait_visible",
       "target": "background-context",
       "timeout_ms": 12000
     },
     {
+      "index": 48,
+      "at_ms": 106624,
+      "action": "scroll_to",
       "cue": "trump-context",
       "offset_ms": 16800,
-      "action": "scroll_to",
       "target": "background-context",
       "duration_ms": 1300
     },
     {
+      "index": 49,
+      "at_ms": 108524,
+      "action": "highlight",
       "cue": "trump-context",
       "offset_ms": 18700,
-      "action": "highlight",
       "target": "background-context",
       "duration_ms": 5000
     },
     {
+      "index": 50,
+      "at_ms": 113724,
+      "action": "mouse_move",
       "cue": "trump-context",
       "offset_ms": 23900,
-      "action": "mouse_move",
       "target": "demo-fiction-expand",
       "duration_ms": 500
     },
     {
+      "index": 51,
+      "at_ms": 114424,
+      "action": "click",
       "cue": "trump-context",
       "offset_ms": 24600,
-      "action": "click",
       "target": "demo-fiction-expand"
     },
     {
+      "index": 52,
+      "at_ms": 114824,
+      "action": "wait_visible",
       "cue": "trump-context",
       "offset_ms": 25000,
-      "action": "wait_visible",
       "target": "demo-fiction-note",
       "timeout_ms": 5000
     },
     {
+      "index": 53,
+      "at_ms": 115424,
+      "action": "highlight",
       "cue": "trump-context",
       "offset_ms": 25600,
-      "action": "highlight",
       "target": "demo-fiction-note",
       "duration_ms": 1700
     },
     {
+      "index": 54,
+      "at_ms": 120490,
+      "action": "scroll_to",
       "cue": "recusal",
       "offset_ms": 1000,
-      "action": "scroll_to",
       "target": "recusal",
       "duration_ms": 1300
     },
     {
+      "index": 55,
+      "at_ms": 122490,
+      "action": "highlight",
       "cue": "recusal",
       "offset_ms": 3000,
-      "action": "highlight",
       "target": "recusal",
       "duration_ms": 4500
     },
     {
+      "index": 56,
+      "at_ms": 129790,
+      "action": "scroll_to",
       "cue": "recusal",
       "offset_ms": 10300,
-      "action": "scroll_to",
       "target": "smart-panel",
       "duration_ms": 1300
     },
     {
+      "index": 57,
+      "at_ms": 131790,
+      "action": "highlight",
       "cue": "recusal",
       "offset_ms": 12300,
-      "action": "highlight",
       "target": "smart-panel",
       "duration_ms": 1700
     },
     {
+      "index": 58,
+      "at_ms": 141063,
+      "action": "mouse_move",
       "cue": "readings",
       "offset_ms": 1200,
-      "action": "mouse_move",
       "target": "view-readings",
       "duration_ms": 600
     },
     {
+      "index": 59,
+      "at_ms": 142163,
+      "action": "click",
       "cue": "readings",
       "offset_ms": 2300,
-      "action": "click",
       "target": "view-readings"
     },
     {
+      "index": 60,
+      "at_ms": 143863,
+      "action": "wait_visible",
       "cue": "readings",
       "offset_ms": 4000,
-      "action": "wait_visible",
       "target": "baseline-card",
       "timeout_ms": 15000
     },
     {
+      "index": 61,
+      "at_ms": 145463,
+      "action": "scroll_to",
       "cue": "readings",
       "offset_ms": 5600,
-      "action": "scroll_to",
       "target": "baseline-card",
       "duration_ms": 1100
     },
     {
+      "index": 62,
+      "at_ms": 147063,
+      "action": "highlight",
       "cue": "readings",
       "offset_ms": 7200,
-      "action": "highlight",
       "target": "baseline-card",
       "duration_ms": 2000
     },
     {
+      "index": 63,
+      "at_ms": 150663,
+      "action": "highlight",
       "cue": "readings",
       "offset_ms": 10800,
-      "action": "highlight",
       "target": "expertise-card",
       "duration_ms": 2200
     },
     {
+      "index": 64,
+      "at_ms": 154863,
+      "action": "scroll_to",
       "cue": "readings",
       "offset_ms": 15000,
-      "action": "scroll_to",
       "target": "expertise-message",
       "duration_ms": 1200
     },
     {
+      "index": 65,
+      "at_ms": 156663,
+      "action": "highlight",
       "cue": "readings",
       "offset_ms": 16800,
-      "action": "highlight",
       "target": "expertise-message",
       "duration_ms": 2200
     },
     {
+      "index": 66,
+      "at_ms": 160563,
+      "action": "scroll_to",
       "cue": "readings",
       "offset_ms": 20700,
-      "action": "scroll_to",
       "target": "king-recused",
       "duration_ms": 1200
     },
     {
+      "index": 67,
+      "at_ms": 162263,
+      "action": "highlight",
       "cue": "readings",
       "offset_ms": 22400,
-      "action": "highlight",
       "target": "king-recused",
       "duration_ms": 3000
     },
     {
+      "index": 68,
+      "at_ms": 166363,
+      "action": "scroll_to",
       "cue": "readings",
       "offset_ms": 26500,
-      "action": "scroll_to",
       "target": "smart-panel",
       "duration_ms": 1200
     },
     {
+      "index": 69,
+      "at_ms": 171049,
+      "action": "navigate",
       "cue": "closing",
       "offset_ms": 700,
-      "action": "navigate",
       "path": "/ethikos/pulse/overview?sidebar=ethikos"
     },
     {
+      "index": 70,
+      "at_ms": 172949,
+      "action": "wait_visible",
       "cue": "closing",
       "offset_ms": 2600,
-      "action": "wait_visible",
       "target": "pulse-overview",
       "timeout_ms": 15000
     },
     {
+      "index": 71,
+      "at_ms": 174649,
+      "action": "highlight",
       "cue": "closing",
       "offset_ms": 4300,
-      "action": "highlight",
       "target": "pulse-overview",
       "duration_ms": 1800
     },
     {
+      "index": 72,
+      "at_ms": 177549,
+      "action": "scroll",
       "cue": "closing",
       "offset_ms": 7200,
-      "action": "scroll",
       "distance": 420,
       "duration_ms": 1600
     }

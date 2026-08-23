@@ -1,3 +1,4 @@
+
 // FILE: frontend/app/ethikos/layout.tsx
 // app/ethikos/layout.tsx
 'use client'
@@ -5,7 +6,6 @@
 import type { ReactNode } from 'react'
 import React, { Suspense, useEffect, useMemo } from 'react'
 import { App as AntdApp } from 'antd'
-import { WaterMark } from '@ant-design/pro-components'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 
 import MainLayout from '@/components/layout-components/MainLayout'
@@ -55,14 +55,7 @@ function EthikosShell({ children }: SegmentLayoutProps): JSX.Element {
 
   return (
     <MainLayout>
-      <WaterMark
-        content="ethiKos"
-        gapX={120}
-        gapY={120}
-        fontColor="rgba(0,0,0,0.04)"
-      >
-        <AntdApp>{children}</AntdApp>
-      </WaterMark>
+      <AntdApp>{children}</AntdApp>
     </MainLayout>
   )
 }
