@@ -4,10 +4,10 @@
   "scenario_title": "Quebec–Canada Public Debates — 2026 Snapshot",
   "mode": "replace_scenario",
   "metadata": {
-    "description": "A structured Ethikos corpus of consequential public-policy debates in Quebec and Canada, combining federal and Quebec perspectives, counter-expertise, hierarchical arguments, source-backed claims, and a DEMO EkoH/Smart Vote advisory-reading scenario with a declared recusal.",
+    "description": "A structured Ethikos corpus of consequential public-policy debates in Quebec and Canada, combining federal and Quebec perspectives, counter-expertise, hierarchical arguments, source-backed claims, and a DEMO EkoH/Smart Vote advisory-reading scenario with a declared recusal. The Canada–U.S. autonomy walkthrough uses the Kristal Farms infrastructure model to show four distinct layers: King Klown as an independent global mobilizer and governance figure, Réjean McCormick as technical counsel who explicitly refuses a governance post, political parties confronting the implications of influence they do not control, and Ethikos turning that conflict into a separate governance question with transparent conflict disclosure and recusal.",
     "created_for": "Konnaxion Ethikos Demo Importer",
     "language": "en-CA",
-    "focus": "Public-policy debates + federal/Quebec actors + counter-expertise + Kialo-style argument graphs + source-backed deliberation",
+    "focus": "Public-policy debates + federal/Quebec actors + counter-expertise + structured argument graphs + source-backed deliberation + strategic infrastructure + technical/governance role separation + independent civic mobilization + contextual expertise + transparent recusal",
     "snapshot_date": "2026-08-17",
     "source_sidecar": "canada_quebec_public_debates_2026_sources.json",
     "source_policy": [
@@ -16,7 +16,8 @@
       "An actor's absence from a topic does not imply the absence of a position; the corpus prioritizes major actors for whom a primary or official source has been inventoried.",
       "Source references are normalized into ArgumentSource records while registry keys are retained for traceability.",
       "Positions should be reviewed whenever a party, government, or organization officially changes policy.",
-      "When federal and Quebec frameworks are placed on the same axis—for example multiculturalism and national integration—the stance expresses a conceptual contrast between policies, not a claim that one actor explicitly opposes another."
+      "When federal and Quebec frameworks are placed on the same axis—for example multiculturalism and national integration—the stance expresses a conceptual contrast between policies, not a claim that one actor explicitly opposes another.",
+      "Walkthrough-only dialogue involving King Klown, Réjean McCormick, the Inquisitor, and the fictionalized party-room exchange is DEMO FICTION. It must not be attributed to the real Government of Canada, Conservative Party, New Democratic Party, Bloc Québécois, or any other real-world person or institution."
     ],
     "stance_scale": {
       "federal_deficit": {
@@ -70,9 +71,13 @@
       "tech_sovereignty": {
         "positive": "More interventionist industrial policy and technological sovereignty",
         "negative": "A more market-led approach with greater openness to international capital and ownership"
+      },
+      "trump_service_access": {
+        "positive": "Permit a Canada–movement strategic-infrastructure partnership to refuse access to Donald Trump or organizations acting on his behalf",
+        "negative": "Reject named-person exclusion and require neutral, published, reviewable access criteria"
       }
     },
-    "editorial_pass": "v3_english_promo_refinement",
+    "editorial_pass": "v5_kristal_farms_governance_split_party_conflict_promo",
     "argument_graph_note": "Arguments use parent + side when the support/opposition relationship to an existing argument is sufficiently clear.",
     "source_of_truth": "single_scenario_json",
     "argument_source_model": "ArgumentSource",
@@ -90,6 +95,43 @@
         "after_argument": "us_kk_headlines",
         "display_text": "Inquisitor removes King Klown from the discussion after premature public disclosure.",
         "reason": "premature_public_disclosure"
+      },
+      {
+        "key": "rejean_declines_governance",
+        "event_type": "role_boundary",
+        "topic": "canada_us_autonomy",
+        "actor": "rejean_mccormick",
+        "after_argument": "us_rejean_answer_obstacle",
+        "display_text": "Réjean recommends King Klown for governance, offers himself only as technical counsel, and refuses a governance position.",
+        "reason": "technical_counsel_not_governance"
+      },
+      {
+        "key": "rejean_does_not_answer_why",
+        "event_type": "participant_silence",
+        "topic": "canada_us_autonomy",
+        "actor": "rejean_mccormick",
+        "after_argument": "us_gov_diversify",
+        "display_text": "Government asks Réjean why he refuses governance. Réjean does not answer.",
+        "reason": "deliberate_scope_boundary"
+      },
+      {
+        "key": "ndp_reframes_control_problem",
+        "event_type": "party_conflict_reframe",
+        "topic": "canada_us_autonomy",
+        "actor": "ndp",
+        "after_argument": "us_ndp_independence",
+        "display_text": "DEMO FICTION — An NDP participant mocks the larger parties' fixation on controlling King Klown and reframes his independence as the source of his influence.",
+        "reason": "independence_vs_command"
+      },
+      {
+        "key": "ndp_proposes_independent_movement_partnership",
+        "event_type": "emergent_question_trigger",
+        "topic": "canada_us_autonomy",
+        "actor": "ndp",
+        "after_argument": "us_ndp_independence",
+        "emergent_topic": "trump_service_access",
+        "display_text": "DEMO FICTION — The party exchange turns into a new question: if Canada partners with King Klown's independent global movement on strategic AI infrastructure, what happens when the movement's political commitments conflict with Canada's public obligations?",
+        "reason": "independent_governance_partner_creates_access_conflict"
       }
     ],
     "feed_items": [
@@ -99,12 +141,12 @@
         "topic": "trump_service_access",
         "subject_actor": "king_klown",
         "demo_fiction": true,
-        "content": "In this fictional demonstration scenario, a background report documents King Klown's large-scale anti-capitalist and anti-Trump demonstrations, his opposition to collaboration with Trump, and his outreach to Indigenous nations near strategic infrastructure sites advocating against collaboration with Trump."
+        "content": "In this fictional demonstration scenario, a background report identifies King Klown as the head of an independent global social-mobilization movement whose stated governance philosophy is to shift influence away from title and party proximity toward demonstrated expertise, ethical conduct, and contribution. The same fictional report documents large-scale anti-capitalist and anti-Trump mobilization, opposition to collaboration with Trump-aligned organizations, and outreach to Indigenous nations near candidate strategic-infrastructure sites. The report becomes relevant only after party participants debate whether Canada can work with a movement whose influence does not depend on government appointment or control."
       }
     ],
     "character_notes": {
-      "king_klown": "Uncompromising in his convictions; bold, loud, candid, and theatrical. Will recuse himself when he believes his prior advocacy makes his advisory judgment non-neutral.",
-      "rejean_mccormick": "Technology systems thinker with a mechanical view of complex systems, including social systems. Reserved, sometimes opaque, with a subdued melancholy. Answers are brief and dense."
+      "king_klown": "Fictional public-facing leader of a global social-mobilization movement. His influence is framed as independent of incumbent governments and party machinery: the movement claims to stand with participants and communities rather than the government of the day, and to redistribute influence toward demonstrated expertise, ethical conduct, and actual contribution. That independence is both his political strength and a governance risk. He is candid, theatrical, difficult to command, and willing to disclose conflicts and recuse himself when his movement role or prior advocacy makes an advisory judgment non-neutral.",
+      "rejean_mccormick": "Technology and systems architect. Reserved, brief, and technically precise. He explains energy, compute, fiber, thermal systems, deployment constraints, and feasibility. When asked who should govern the initiative, he recommends King Klown for governance and limits himself to technical counsel. He explicitly refuses a governance position. When government asks why, he does not answer and does not enter the subsequent party dispute over King Klown's political independence."
     }
   },
   "actors": [
@@ -305,7 +347,7 @@
       "username": "demo_king_klown",
       "display_name": "King Klown",
       "email": "demo_king_klown@example.test",
-      "role": "civic_narrative_mobilizer",
+      "role": "global_social_mobilization_leader",
       "is_ethikos_elite": false
     },
     {
@@ -412,7 +454,7 @@
     {
       "key": "canada_us_autonomy",
       "title": "[DEMO] Should Canada reduce its strategic dependence on the United States, even if it raises short-term costs?",
-      "description": "Explores trade diversification, North American integration, tariffs, supply chains, defence, critical infrastructure, and Canada's strategic autonomy.",
+      "description": "Explores whether Canada can reduce strategic dependence on the United States by converting domestic energy advantages into sovereign compute, knowledge, and industrial capacity. The walkthrough uses a fictional Kristal Farms proposal built around the core economic inversion: consume hydroelectricity near generation, avoid long-distance bulk-power transport where possible, convert energy into computation locally, and export the high-value result through fiber. Cold climate, low-density or low-impact siting, modular coastal logistics, heat reuse, local connectivity, Indigenous consent, and reversibility compound that advantage. The discussion then separates technical counsel from political governance and tests what happens when established parties confront an independent movement whose influence they do not control.",
       "status": "open",
       "category": "relations_internationales",
       "start_date": "2026-08-17",
@@ -519,8 +561,8 @@
     },
     {
       "key": "trump_service_access",
-      "title": "[DEMO] Should strategic AI services deny access to Donald Trump or organizations acting on his behalf?",
-      "description": "An emergent governance question from the Canada–U.S. autonomy debate and strategic AI-infrastructure proposal. It tests whether access rules should target a named political actor or instead rely on neutral security, legal, jurisdictional, and governance criteria. Participants' prior advocacy remains separate from the merits of their arguments.",
+      "title": "[DEMO] If Canada partners with King Klown's global movement on strategic AI infrastructure, should that partnership be allowed to deny access to Donald Trump or organizations acting on his behalf?",
+      "description": "An emergent governance question created after a fictional party-room exchange about King Klown's independence and political influence. Réjean recommends King Klown for governance while refusing a governance role for himself; when asked why, Réjean does not answer. Other parties then debate whether government can work with a movement it cannot command. Donald Trump becomes the concrete stress test: can an independent governance partner refuse a named political actor, or must access remain bound to neutral, published, reviewable security, legal, jurisdictional, and governance criteria?",
       "status": "open",
       "category": "relations_internationales",
       "start_date": "2026-08-19",
@@ -887,27 +929,6 @@
       "content": "The Parliamentary Budget Officer finds the announced fiscal anchors achievable under 2026 projections, while flagging insufficient precision in how some spending is classified as capital, which limits independent scrutiny."
     },
     {
-      "key": "us_gov_diversify",
-      "topic": "canada_us_autonomy",
-      "actor": "gov_canada",
-      "side": "pro",
-      "content": "The federal government seeks to preserve access to the U.S. market while diversifying exports, supply chains, and partnerships to reduce Canada's exposure to U.S. trade measures."
-    },
-    {
-      "key": "us_cpc_restore_trade",
-      "topic": "canada_us_autonomy",
-      "actor": "cpc",
-      "side": "con",
-      "content": "Conservatives support market diversification but place greater emphasis on repairing the relationship with Washington and restoring a largely tariff-free North American trading environment."
-    },
-    {
-      "key": "us_ndp_independence",
-      "topic": "canada_us_autonomy",
-      "actor": "ndp",
-      "side": "pro",
-      "content": "The NDP argues for a Canadian economy less exposed to U.S. decisions, with stronger domestic resilience, diversification, and worker protections against trade shocks."
-    },
-    {
       "key": "ukraine_gov_support",
       "topic": "support_ukraine",
       "actor": "gov_canada",
@@ -1125,14 +1146,6 @@
       "content": "Statistics Canada research highlights both AI's potential to raise productivity growth and Canada's persistent productivity weakness, making technology adoption and diffusion a central economic challenge."
     },
     {
-      "key": "us_bq_quebec_voice",
-      "topic": "canada_us_autonomy",
-      "actor": "bq",
-      "side": "pro",
-      "parent": "us_gov_diversify",
-      "content": "The Bloc Québécois argues that heavy dependence on the U.S. market leaves Quebec exposed to decisions in Washington; it calls for a direct Quebec voice in negotiations, targeted countermeasures, and adjustment support for vulnerable sectors."
-    },
-    {
       "key": "ukraine_bq_support",
       "topic": "support_ukraine",
       "actor": "bq",
@@ -1296,7 +1309,7 @@
       "topic": "canada_us_autonomy",
       "actor": "king_klown",
       "side": "pro",
-      "content": "Canada should use this rupture to build a radically different AI-infrastructure model: dedicated power priced to make today's competition obsolete, an inclusive international access model, and a Canada-based AI-native encyclopedia built with KristALL."
+      "content": "Canada is thinking about AI infrastructure backwards. Stop moving enormous quantities of electricity to compute. Move compute to the electricity. Put modular AI compute beside existing northern hydro, consume the power locally, and export the valuable result through fiber. The first economy is avoided infrastructure: fewer long high-voltage corridors, fewer transmission losses, and less dependence on moving bulk power to distant data centres. Then stack the rest: cold-climate cooling, low-density and low-impact sites, coastal logistics where they avoid new road corridors, modular reversibility, local connectivity, and waste heat reused for buildings and food production. That is the Kristal Farms model."
     },
     {
       "key": "us_rejean_discretion_first_nations",
@@ -1304,7 +1317,7 @@
       "actor": "rejean_mccormick",
       "side": "neutral",
       "parent": "us_kk_ai_infrastructure",
-      "content": "Discretion. Before any strategic site is announced, affected Indigenous nations and local communities should be consulted early enough to shape the project."
+      "content": "Discretion. The advantage exists only if site selection is disciplined: existing hydro, short local distribution, reliable long-haul or subsea fiber, cold climate, low-density or previously disturbed land, practical logistics, usable heat sinks, and affected Indigenous nations and local communities involved early enough to shape or refuse the project."
     },
     {
       "key": "us_kk_already_announced",
@@ -1320,7 +1333,7 @@
       "actor": "king_klown",
       "side": "pro",
       "parent": "us_kk_already_announced",
-      "content": "DEDICATED AI POWER PRICED TO MAKE TODAY'S COMPETITION OBSOLETE. INCLUSIVE INTERNATIONAL ACCESS. A CANADA-BASED AI-NATIVE ENCYCLOPEDIA. WITH KRISTALL."
+      "content": "STOP SHIPPING ELECTRICITY TO COMPUTE. MOVE COMPUTE TO THE POWER. EXPORT THE RESULT BY FIBER. NORTHERN HYDRO. COLD-CLIMATE COMPUTE. MODULAR COASTAL SITES. COMMUNITY HEAT AND FOOD. BUILD THE ADVANTAGE WHERE CANADA ALREADY HAS IT."
     },
     {
       "key": "us_inquisiteur_kick",
@@ -1335,8 +1348,8 @@
       "topic": "canada_us_autonomy",
       "actor": "gov_canada",
       "side": "neutral",
-      "parent": "us_kk_ai_infrastructure",
-      "content": "Is this technically feasible at national scale?"
+      "parent": "us_inquisiteur_kick",
+      "content": "Can this scale without becoming another national transmission megaproject?"
     },
     {
       "key": "us_rejean_answer_feasibility",
@@ -1344,15 +1357,15 @@
       "actor": "rejean_mccormick",
       "side": "pro",
       "parent": "us_gov_question_feasibility",
-      "content": "Yes—if energy is treated as strategic infrastructure, not merely as an input."
+      "content": "Yes—if it scales as many local compute clusters instead of one giant remote load centre. Start with one or two modular pads where hydro, short medium-voltage distribution, fiber, cooling, community heat demand, logistics, environmental limits, and consent already align. Prove each gate, then add capacity."
     },
     {
       "key": "us_gov_question_advantage",
       "topic": "canada_us_autonomy",
-      "actor": "gov_canada",
+      "actor": "cpc",
       "side": "neutral",
-      "parent": "us_kk_ai_infrastructure",
-      "content": "Where is the decisive advantage?"
+      "parent": "us_rejean_answer_feasibility",
+      "content": "Where does the cost advantage actually come from?"
     },
     {
       "key": "us_rejean_answer_advantage",
@@ -1360,15 +1373,15 @@
       "actor": "rejean_mccormick",
       "side": "pro",
       "parent": "us_gov_question_advantage",
-      "content": "Compute cost. Control of the knowledge layer. Jurisdiction over the infrastructure. And the ability to provide access without surrendering ownership."
+      "content": "Primarily from avoided infrastructure. Consume electricity where it is generated instead of building long high-voltage corridors to move bulk power to distant data centres. That reduces grid build-out and transmission losses. Convert the energy into computation on site and move the high-value output through long-haul or subsea fiber. At suitable coastal sites, modular equipment can arrive by ship, reducing the need for new road corridors. Cold climate, low-impact siting, heat reuse, local connectivity, and reversibility compound the advantage; they are not the primary advantage."
     },
     {
       "key": "us_gov_question_obstacle",
       "topic": "canada_us_autonomy",
       "actor": "gov_canada",
       "side": "neutral",
-      "parent": "us_kk_ai_infrastructure",
-      "content": "Main obstacle?"
+      "parent": "us_rejean_answer_advantage",
+      "content": "If this moved beyond a demonstration, who should govern it?"
     },
     {
       "key": "us_rejean_answer_obstacle",
@@ -1376,14 +1389,47 @@
       "actor": "rejean_mccormick",
       "side": "neutral",
       "parent": "us_gov_question_obstacle",
-      "content": "Governance."
+      "content": "King Klown for governance. I can serve as technical counsel—energy, compute, fiber, thermal systems, deployment constraints, and feasibility. But I would not accept a governance position."
+    },
+    {
+      "key": "us_gov_diversify",
+      "topic": "canada_us_autonomy",
+      "actor": "gov_canada",
+      "side": "neutral",
+      "content": "DEMO FICTION — Why not?",
+      "parent": "us_rejean_answer_obstacle"
+    },
+    {
+      "key": "us_cpc_restore_trade",
+      "topic": "canada_us_autonomy",
+      "actor": "cpc",
+      "side": "con",
+      "content": "DEMO FICTION — That is exactly the problem. King Klown is powerful because he is independent, and he has made a virtue of being insubordinate. A government partner still needs a mandate. Why should Canadians believe that someone whose influence already exceeds party structures will follow decisions he disagrees with simply because government issued them?",
+      "parent": "us_gov_diversify"
+    },
+    {
+      "key": "us_ndp_independence",
+      "topic": "canada_us_autonomy",
+      "actor": "ndp",
+      "side": "pro",
+      "content": "DEMO FICTION — You've spent ten minutes asking whether King Klown can be controlled.\n\nYou haven't noticed that he's already changing what you have to talk about, who you have to listen to, and how power is being questioned.\n\nYou think you're deciding whether to use him.\n\nYour hubris won't let you see that he's already using your resistance to make his point.\n\nIf you want the reach of his movement, the real question is whether Canada can work with an independent governance partner without pretending that partnership means obedience.",
+      "parent": "us_gov_diversify"
+    },
+    {
+      "key": "us_bq_quebec_voice",
+      "topic": "canada_us_autonomy",
+      "actor": "bq",
+      "side": "neutral",
+      "parent": "us_ndp_independence",
+      "content": "DEMO FICTION — Influence is not a constitutional mandate. If Canada works with him, the answer cannot be blind obedience in either direction. Define what the movement can decide, what local communities and Indigenous nations decide, what elected governments retain, how expertise and ethical standing affect advice, how decisions are audited, and how the partnership can be amended or terminated."
     },
     {
       "key": "trump_kk_exclude",
       "topic": "trump_service_access",
       "actor": "king_klown",
       "side": "pro",
-      "content": "I would refuse collaboration with Trump. Strategic infrastructure should not be placed at the service of a political project I openly oppose."
+      "content": "Yes. Our movement is not an instrument of the government of the day. It stands with the people and communities participating in it, and its governance model pushes influence toward demonstrated expertise, ethical conduct, and actual contribution rather than title or party proximity. On that basis, I would refuse strategic AI services to Donald Trump or organizations acting on his behalf.",
+      "parent": "trump_rejean_rule_based_access"
     },
     {
       "key": "trump_kk_conflict_disclosure",
@@ -1391,49 +1437,55 @@
       "actor": "king_klown",
       "side": "neutral",
       "parent": "trump_kk_exclude",
-      "content": "Conflict disclosure: I have already campaigned publicly against Donald Trump and capitalism. My judgment on this question is not neutral."
+      "content": "Conflict disclosure: I lead the movement now being considered as a governance partner, and the movement's own philosophy is part of this dispute. I have also led public anti-capitalist and anti-Trump mobilization. I therefore have both an institutional interest in the partnership and a declared political position on this access question. My judgment is not neutral."
     },
     {
       "key": "trump_rejean_rule_based_access",
       "topic": "trump_service_access",
-      "actor": "rejean_mccormick",
-      "side": "con",
-      "content": "I would not define access by a person's name. Define jurisdictional, security, and governance criteria that apply to anyone requesting access to the infrastructure."
+      "actor": "gov_canada",
+      "side": "neutral",
+      "content": "DEMO FICTION — Then make the conflict concrete. If Canada partners with King Klown's movement on strategic AI infrastructure, should that partnership be allowed to deny access to Donald Trump or organizations acting on his behalf?",
+      "parent": null
     },
     {
       "key": "trump_trade_law_blanket_exclusion",
       "topic": "trump_service_access",
       "actor": "trade_law_specialist_demo",
       "side": "con",
-      "content": "A blanket, named-person exclusion could create legal and commercial risks. A defensible policy should rely on objective, published criteria applied consistently."
+      "content": "Independence does not erase public-law obligations. A named-person exclusion inside a government-backed partnership could create procurement, trade, competition, and due-process risks. A defensible access policy should use published criteria, consistent application, review, and a clear boundary between movement advocacy and public infrastructure.",
+      "parent": null
     },
     {
       "key": "trump_diplomacy_personalized_rule",
       "topic": "trump_service_access",
       "actor": "diplomatic_policy_advisor_demo",
       "side": "con",
-      "content": "Turning access to strategic infrastructure into a personalized sanction would complicate diplomacy. Rules tied to conduct, sanctions, or security are more stable than rules tied to a person."
+      "content": "If an independent transnational movement becomes a governance partner, its political commitments can create state-adjacent diplomatic consequences even when government does not control the movement. Those consequences should be assessed openly, and access rules should not become personalized foreign policy by default.",
+      "parent": null
     },
     {
       "key": "trump_security_conditional_access",
       "topic": "trump_service_access",
       "actor": "security_analysis_desk_demo",
       "side": "neutral",
-      "content": "From a security perspective, the key question is not who the person is, but what capabilities, data, and systems would be exposed. Access can be denied or constrained when a documented risk threshold is met."
+      "content": "The decisive security question is not whether King Klown obeys government or whether government controls his movement. It is what systems, models, data, energy capacity, and operational controls would be exposed, under which jurisdiction, and against what documented risk threshold.",
+      "parent": null
     },
     {
       "key": "trump_indigenous_governance_sites",
       "topic": "trump_service_access",
       "actor": "indigenous_governance_desk_demo",
       "side": "neutral",
-      "content": "If these services depend on sites or infrastructure affecting Indigenous nations, access and governance rules should not be set without their participation in the relevant decision mechanisms."
+      "content": "Neither federal authority nor global movement influence can substitute for local consent. If a strategic site affects Indigenous nations or communities, they need real authority in site governance, benefit agreements, access rules, environmental limits, and the ability to amend or terminate participation.",
+      "parent": null
     },
     {
       "key": "trump_open_access_sovereignty",
       "topic": "trump_service_access",
       "actor": "open_access_advocate_demo",
       "side": "pro",
-      "content": "Sovereign infrastructure must retain the right to refuse access that directly conflicts with its public mission, provided the decision is transparent, reviewable, and distinct from general censorship."
+      "content": "A partnership can preserve King Klown's independence without granting unreviewable power. The principle should be accountability without obedience: transparent mandate, published boundaries, local consent, auditable decisions, and reviewable refusal criteria.",
+      "parent": null
     },
     {
       "key": "trump_kk_advisory_recusal",
@@ -1441,7 +1493,7 @@
       "actor": "king_klown",
       "side": "neutral",
       "parent": "trump_kk_conflict_disclosure",
-      "content": "RECUSAL — I stand by my public position and argument, but I recuse myself from the EkoH/Smart Vote advisory reading on this question because of my declared prior advocacy."
+      "content": "RECUSAL — I stand by my public position, but I lead the movement under consideration and I have declared prior political advocacy against Trump. I recuse myself from the EkoH/Smart Vote advisory reading on this question. My baseline stance remains visible."
     }
   ],
   "argument_sources": [
@@ -1505,66 +1557,66 @@
       "argument": "us_gov_diversify",
       "url": "https://international.canada.ca/en/global-affairs/campaigns/canada-us-engagement",
       "title": "Canada–United States engagement",
-      "excerpt": "Response to U.S. tariffs, countermeasures, negotiations, and support for affected sectors.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Canada–United States engagement — 2026-07-02",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: gac_canada_us_engagement."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "us_gov_diversify__gac_canada_us_aug_2026",
       "argument": "us_gov_diversify",
       "url": "https://www.canada.ca/en/global-affairs/news/2026/08/minister-leblanc-and-chief-trade-negotiator-update-provincial-and-territorial-trade-ministers-and-advisory-committee-on-canada-us-economic-relation.html",
       "title": "Minister LeBlanc and Chief Trade Negotiator update provincial and territorial trade ministers and advisory committee on Canada-U.S. economic relation",
-      "excerpt": "Status of trade negotiations and sectoral tariffs in August 2026.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — Minister LeBlanc and Chief Trade Negotiator update provincial and territorial trade ministers and advisory committee on Canada-U.S. economic relation — 2026-08-14",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: gac_canada_us_aug_2026."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "us_gov_diversify__gac_state_trade_2026",
       "argument": "us_gov_diversify",
       "url": "https://international.canada.ca/en/global-affairs/corporate/reports/chief-economist/state-trade/2026",
       "title": "State of Trade 2026",
-      "excerpt": "Evolution of U.S. trade and diversification toward non-U.S. markets.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "official_government",
       "citation_text": "Global Affairs Canada — State of Trade 2026 — 2026",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: gac_state_trade_2026."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "us_cpc_restore_trade__cpc_good_deal_us_2026",
       "argument": "us_cpc_restore_trade",
       "url": "https://www.conservative.ca/canadians-need-a-good-deal/",
       "title": "Canadians Need a Good Deal",
-      "excerpt": "Recent Conservative position on the trade agreement and bilateral relationship.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Canadians Need a Good Deal — 2026-08-13",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: cpc_good_deal_us_2026."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "us_cpc_restore_trade__cpc_fighting_for_canada_us",
       "argument": "us_cpc_restore_trade",
       "url": "https://www.conservative.ca/fighting-for-canada/",
       "title": "Fighting for Canada",
-      "excerpt": "Case for restoring a more frictionless trading relationship with the United States.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "political_party",
       "citation_text": "Conservative Party of Canada — Fighting for Canada — 2026-03-19",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada/United States. Source registry key: cpc_fighting_for_canada_us."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "us_ndp_independence__ndp_campaign_commitments",
       "argument": "us_ndp_independence",
       "url": "https://www.ndp.ca/campaign-commitments",
       "title": "Campaign commitments",
-      "excerpt": "NDP commitments on economic independence, wealth taxation, and social protection.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "political_party",
       "citation_text": "New Democratic Party of Canada — Campaign commitments",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Canada. Source registry key: ndp_campaign_commitments."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "ukraine_gov_support__gac_ukraine_support",
@@ -2198,22 +2250,22 @@
       "argument": "us_bq_quebec_voice",
       "url": "https://www.blocquebecois.org/negociations-avec-donald-trump-le-quebec-doit-parler-de-sa-propre-voix/",
       "title": "Negotiations with Donald Trump: Quebec Must Speak with Its Own Voice",
-      "excerpt": "Quebec voice in negotiations, targeted counter-tariffs, and protection for vulnerable sectors.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "political_party",
       "citation_text": "Bloc Québécois — Negotiations with Donald Trump: Quebec Must Speak with Its Own Voice — 2025-04-03",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec/Canada/United States. Source registry key: bq_quebec_voice_us_2025."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "us_bq_quebec_voice__bq_tariffs_pme_2026",
       "argument": "us_bq_quebec_voice",
       "url": "https://www.blocquebecois.org/journee-de-lopposition-du-bloc-quebecois-un-cri-dalarme-pour-soutenir-nos-pme-face-aux-tarifs-americains/",
       "title": "Bloc Québécois Opposition Day: An Alarm Call to Support Our SMEs Against U.S. Tariffs",
-      "excerpt": "Call to denounce U.S. tariffs and directly support affected businesses and workers.",
+      "excerpt": "Background source retained for the actor's broader Canada–U.S. policy context. The dialogue in the seeded walkthrough is DEMO FICTION.",
       "source_type": "political_party",
       "citation_text": "Bloc Québécois — Bloc Québécois Opposition Day: An Alarm Call to Support Our SMEs Against U.S. Tariffs — 2026-05-01",
       "quote": "",
-      "note": "Concise paraphrase; consult the linked source for full wording and context. Scope: Quebec/Canada/United States. Source registry key: bq_tariffs_pme_2026."
+      "note": "Background context only. The seeded party-room dialogue is fictional and must not be attributed to this source or treated as an official statement by the named party or government."
     },
     {
       "key": "ukraine_bq_support__bq_ukraine_2025",
@@ -2483,8 +2535,8 @@
       "key": "trump_kk_conflict_report",
       "argument": "trump_kk_conflict_disclosure",
       "source_type": "background_report",
-      "citation_text": "In this fictional demonstration scenario, a background report documents King Klown's large-scale anti-capitalist and anti-Trump demonstrations, his opposition to collaboration with Trump, and his outreach to Indigenous nations near strategic infrastructure sites advocating against collaboration with Trump.",
-      "note": "Fictional demonstration context; this is not a factual claim about real-world events."
+      "citation_text": "In this fictional demonstration scenario, a background report identifies King Klown as the head of an independent global social-mobilization movement whose stated governance philosophy is to shift influence away from title and party proximity toward demonstrated expertise, ethical conduct, and contribution. The same fictional report documents large-scale anti-capitalist and anti-Trump mobilization, opposition to collaboration with Trump-aligned organizations, and outreach to Indigenous nations near candidate strategic-infrastructure sites. The report becomes relevant only after party participants debate whether Canada can work with a movement whose influence does not depend on government appointment or control.",
+      "note": "Fictional demonstration context; this is not a factual claim about real-world events, real-world party endorsements, or any actual partnership."
     }
   ],
   "consultations": [],
@@ -4350,7 +4402,7 @@
     {
       "topic": "trump_service_access",
       "actor": "king_klown",
-      "reason": "Declared prior advocacy and voluntary recusal from the EkoH/Smart Vote advisory reading."
+      "reason": "Direct movement-leadership interest plus declared prior anti-Trump advocacy; voluntary recusal from the EkoH/Smart Vote advisory reading while the baseline stance remains visible."
     }
   ]
 }
