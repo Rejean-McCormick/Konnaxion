@@ -1238,7 +1238,7 @@ create new public routes
 manually fake Smart Vote readings
 bypass admin permissions
 delete untracked production data
-expand legacy API paths
+expand API paths only when they belong to the current owner contract
 ```
 
 ---

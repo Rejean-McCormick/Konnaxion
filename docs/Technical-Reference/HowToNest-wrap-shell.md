@@ -1,4 +1,4 @@
-# Layout shells – How to nest (5 modules)
+# Layout shells — How to nest Konnaxion product domains
 
 Objectif :
 Standardiser le layout des pages dans les 5 modules principaux, en utilisant **un shell par module** :
