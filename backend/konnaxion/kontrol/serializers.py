@@ -8,6 +8,7 @@ User = get_user_model()
 
 class AuditLogSerializer(serializers.ModelSerializer):
     actor_username = serializers.CharField(source="actor.username", read_only=True)
+    created = serializers.DateTimeField(source="created_at", read_only=True)
     
     class Meta:
         model = AuditLog
@@ -31,6 +32,8 @@ class AuditLogSerializer(serializers.ModelSerializer):
 class ModerationTicketSerializer(serializers.ModelSerializer):
     author_username = serializers.CharField(source="author.username", read_only=True)
     resolved_by_username = serializers.CharField(source="resolved_by.username", read_only=True)
+    created = serializers.DateTimeField(source="created_at", read_only=True)
+    modified = serializers.DateTimeField(source="updated_at", read_only=True)
 
     class Meta:
         model = ModerationTicket
@@ -96,6 +99,9 @@ class KonsensusConfigSerializer(serializers.ModelSerializer):
     """
     Serializer for the global voting configuration settings.
     """
+
+    created = serializers.DateTimeField(source="created_at", read_only=True)
+    modified = serializers.DateTimeField(source="updated_at", read_only=True)
     class Meta:
         model = KonsensusConfig
         fields = [

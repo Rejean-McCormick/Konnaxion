@@ -574,6 +574,9 @@ class DiscussionParticipantRoleSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         )
+        # POST is an intentional upsert by (topic, user).
+        # Uniqueness remains enforced by the database constraint.
+        validators = []
 
     def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
         if self.instance is None and attrs.get("user") is None:
@@ -588,6 +591,11 @@ class DiscussionVisibilitySettingSerializer(serializers.ModelSerializer):
     """
     Per-topic visibility and participation settings serializer.
     """
+
+    # POST intentionally upserts by topic. Database OneToOne uniqueness remains.
+    topic = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosTopic.objects.all(),
+    )
 
     changed_by = serializers.StringRelatedField(read_only=True)
     changed_by_id = serializers.IntegerField(read_only=True)

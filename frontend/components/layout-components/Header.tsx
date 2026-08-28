@@ -1,5 +1,4 @@
 // FILE: frontend/components/layout-components/Header.tsx
-// C:\MyCode\Konnaxionv14\frontend\components\layout-components\Header.tsx
 'use client'
 
 import { Layout, Dropdown, Breadcrumb } from 'antd'
@@ -40,6 +39,7 @@ function backendUrl(path: string): string {
   if (!BACKEND_ROOT) {
     return normalizedPath
   }
+
   return `${BACKEND_ROOT}${normalizedPath}`
 }
 
@@ -74,7 +74,9 @@ const HeaderBlock = styled.div`
   cursor: pointer;
   font-size: 13px;
   color: var(--ant-color-text);
-  transition: background 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
 
   &:hover {
     background: var(--ant-color-fill-secondary);
@@ -137,9 +139,23 @@ const trail = (rs: Route[], cur: string): Route[] => {
       const sub = trail(r.views, cur)
       if (sub.length) return [r, ...sub]
     }
-    if (r.path && (cur === r.path || cur.startsWith(r.path))) return [r]
+
+    if (r.path && (cur === r.path || cur.startsWith(r.path))) {
+      return [r]
+    }
   }
+
   return []
+}
+
+const normalizeBreadcrumbPath = (path?: string): string | undefined => {
+  if (!path) return undefined
+
+  if (path === '/') {
+    return '/'
+  }
+
+  return path.replace(/\/+$/, '')
 }
 
 /* -------- component -------- */
@@ -169,6 +185,7 @@ export default function HeaderBar({
     const load = async () => {
       try {
         const data = await api.get<CurrentUser>('users/me/')
+
         if (!canceled) {
           setCurrentUser(data)
         }
@@ -260,17 +277,52 @@ export default function HeaderBar({
 
     const crumbs = br.length ? [root, ...br] : [root]
 
-    return crumbs.map(c => ({
+    /*
+     * A route should appear only once in the breadcrumb.
+     *
+     * Example:
+     *
+     *   EthiKos  -> /ethikos/insights
+     *   Overview -> /ethikos/insights
+     *
+     * becomes:
+     *
+     *   Overview
+     *
+     * When the same destination appears more than once, keep the last
+     * occurrence because it represents the most specific route label.
+     */
+    const dedupedCrumbs = crumbs.filter((crumb, index, items) => {
+      const path = normalizeBreadcrumbPath(crumb.path)
+
+      if (!path) {
+        return true
+      }
+
+      return !items
+        .slice(index + 1)
+        .some(
+          candidate =>
+            normalizeBreadcrumbPath(candidate.path) === path,
+        )
+    })
+
+    return dedupedCrumbs.map(c => ({
       key: c.path ?? c.name,
       title: c.path ? (
         <Link
-          href={{ pathname: c.path, query: { sidebar: selectedSidebar } }}
+          href={{
+            pathname: c.path,
+            query: { sidebar: selectedSidebar },
+          }}
           style={{ color: 'var(--ant-color-text)' }}
         >
           {c.name}
         </Link>
       ) : (
-        <span style={{ color: 'var(--ant-color-text)' }}>{c.name}</span>
+        <span style={{ color: 'var(--ant-color-text)' }}>
+          {c.name}
+        </span>
       ),
     }))
   }, [routes, cur, selectedSidebar])
@@ -302,11 +354,17 @@ export default function HeaderBar({
         >
           {collapsed ? (
             <MenuUnfoldOutlined
-              style={{ fontSize: 20, color: 'var(--ant-color-text)' }}
+              style={{
+                fontSize: 20,
+                color: 'var(--ant-color-text)',
+              }}
             />
           ) : (
             <MenuFoldOutlined
-              style={{ fontSize: 20, color: 'var(--ant-color-text)' }}
+              style={{
+                fontSize: 20,
+                color: 'var(--ant-color-text)',
+              }}
             />
           )}
         </div>
@@ -326,7 +384,13 @@ export default function HeaderBar({
         </CenterRegion>
 
         {/* Right side: theme + account */}
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: 8,
+            alignItems: 'center',
+          }}
+        >
           <ThemeSwitcher />
 
           <Dropdown
@@ -338,7 +402,10 @@ export default function HeaderBar({
           >
             <HeaderBlock>
               <UserOutlined
-                style={{ marginRight: 8, color: 'var(--ant-color-text)' }}
+                style={{
+                  marginRight: 8,
+                  color: 'var(--ant-color-text)',
+                }}
               />
               {loadingUser ? 'Loading…' : displayName}
             </HeaderBlock>

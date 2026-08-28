@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+# Using external Neon DB, so no local PostgreSQL env vars required.
+echo "Using external DATABASE_URL: ${DATABASE_URL}"
+
+# No wait-for-it on local Postgres, Neon is always reachable via TCP.
+# If you want, you can add an optional wait-for-it on Neon:
+# wait-for-it "$(echo ${DATABASE_URL} | sed -E 's#.*/#/#; s@postgres(ql)?://[^@]*@#; s@/.*@@')" -t 30
+
+echo "Starting application..."
+
+exec "$@"

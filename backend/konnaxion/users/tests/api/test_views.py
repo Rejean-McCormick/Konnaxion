@@ -30,6 +30,8 @@ class TestUserViewSet:
         request.user = user
 
         view.request = request
+        # GenericAPIView normally sets this during request dispatch.
+        view.format_kwarg = None
 
         response = view.me(request)  # type: ignore[call-arg, arg-type, misc]
 

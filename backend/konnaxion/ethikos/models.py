@@ -199,7 +199,12 @@ class ArgumentSource(models.Model):
         ]
 
     def __str__(self) -> str:
-        return self.title or self.url or self.citation_text or f"Source #{self.pk}"
+        return (
+            self.title
+            or self.url
+            or self.citation_text
+            or f"Source for argument {self.argument_id}"
+        )
 
 
 class ArgumentImpactVote(models.Model):
@@ -241,7 +246,7 @@ class ArgumentImpactVote(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.user} · {self.argument_id} · {self.value}"
+        return f"{self.user} → {self.argument_id} = {self.value}"
 
 
 class ArgumentSuggestion(models.Model):

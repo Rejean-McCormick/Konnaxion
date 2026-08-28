@@ -317,17 +317,17 @@ async function setVisibilitySetting(
 }
 
 async function selectPublicVoteAndSubmit(page: Page): Promise<void> {
-  await expect(
-    page.getByText(WORKFLOW_TOPIC_TITLE).first(),
-    'Seeded public consultation should be visible',
-  ).toBeVisible({ timeout: 10_000 })
-
   const search = page.getByPlaceholder(/search consultations/i).first()
 
   if (await search.isVisible().catch(() => false)) {
     await search.fill(WORKFLOW_TOPIC_TITLE)
     await page.waitForTimeout(300)
   }
+
+  await expect(
+    page.getByText(WORKFLOW_TOPIC_TITLE).first(),
+    'Seeded public consultation should be visible after filtering',
+  ).toBeVisible({ timeout: 10_000 })
 
   const row = page.locator('tr').filter({ hasText: WORKFLOW_TOPIC_TITLE }).first()
   const targetScope = (await row.isVisible().catch(() => false))

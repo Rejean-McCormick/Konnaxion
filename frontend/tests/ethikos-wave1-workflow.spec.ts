@@ -11,9 +11,10 @@ const outDir = path.join('artifacts', 'kintsugi-wave1-workflow')
 
 const WALKTHROUGH_TOPIC_TITLE =
   '[DEMO] Should Canada reduce its strategic dependence on the United States, even if it raises short-term costs?'
-const TRUMP_TOPIC_RE = /Should strategic AI services deny access to Donald Trump or organizations acting on his behalf\?/i
+const TRUMP_TOPIC_RE =
+  /King Klown.*strategic AI infrastructure.*deny access to Donald Trump.*organizations acting on his behalf/i
 const KING_KLOWN_CONTEXT_RE =
-  /a background report documents King Klown's large-scale anti-capitalist and anti-Trump demonstrations/i
+  /background report identifies King Klown.*anti-capitalist and anti-Trump mobilization/i
 
 const ROUTE_DRIFT_RE =
   /\/api\/(kialo|kintsugi|korum|deliberation|deliberate)\b|\/(kialo|kintsugi|korum|deliberation)\b/i
@@ -435,18 +436,18 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
         )
         await expectTextVisible(
           page,
-          /Canada should use this rupture to build a radically different AI-infrastructure model/i,
+          /Canada is thinking about AI infrastructure backwards/i,
           '05-king-klown-proposal',
         )
         await expectTextVisible(
           page,
-          /Discretion\. Before any strategic site is announced/i,
+          /Discretion\. The advantage exists only if site selection is disciplined/i,
           '06-rejean-discretion',
         )
         await expectTextVisible(page, /It's already announced\./i, '07-already-announced')
         await expectTextVisible(
           page,
-          /DEDICATED AI POWER PRICED TO MAKE TODAY'S COMPETITION OBSOLETE/i,
+          /STOP SHIPPING ELECTRICITY TO COMPUTE\. MOVE COMPUTE TO THE POWER/i,
           '08-public-announcement',
         )
         await expectTextVisible(
@@ -484,7 +485,7 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
         const conflictCard = page
           .locator('[role="treeitem"] > .ant-card')
           .filter({
-            hasText: /Conflict disclosure: I have already campaigned publicly against Donald Trump/i,
+            hasText: /Conflict disclosure: I lead the movement.*anti-Trump mobilization/i,
           })
           .first()
         await expect(conflictCard).toBeVisible({ timeout: 10_000 })
@@ -512,7 +513,7 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
 
         await expectTextVisible(
           page,
-          /RECUSAL — I stand by my public position and argument/i,
+          /RECUSAL — I stand by my public position.*I recuse myself from the EkoH\/Smart Vote advisory reading/i,
           '13-king-klown-recusal',
         )
 

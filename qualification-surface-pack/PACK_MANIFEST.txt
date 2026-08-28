@@ -1,0 +1,53 @@
+KONNAXION QUALIFICATION SURFACE PACK
+Generated: 2026-08-28 10:13:12
+
+Purpose:
+- inspect existing test/release/deployment gates
+- inspect backup/restore semantics
+- avoid executing production/Docker operations blindly
+
+Explicitly excluded:
+- backend\.envs\.production\.django
+- backend\.envs\.production\.postgres
+- frontend\.env.production
+- all .env files
+- credentials/secrets
+- databases
+- node_modules
+- .venv
+- .next
+- Playwright artifacts
+- deployment backups
+
+Files copied:
+frontend\package.json
+frontend\.releaserc
+frontend\env.production.example
+frontend\playwright.smoke.config.ts
+frontend\scripts\00-setup.ps1
+frontend\scripts\10-frontend-unit.ps1
+frontend\scripts\20-frontend-ct.ps1
+frontend\scripts\30-frontend-smoke-dev.ps1
+frontend\scripts\31-frontend-smoke-prod.ps1
+frontend\scripts\40-backend-tests.ps1
+frontend\scripts\50-all.ps1
+frontend\app\_api\health\route.ts
+frontend\e2e\smoke\smoke.spec.ts
+frontend\smoke\smoke.spec.ts
+RUN_V413_SMOKE.cmd
+backend\docker-compose.production.yml
+backend\config\settings\production.py
+backend\merge_production_dotenvs_in_dotenv.py
+backend\requirements\production.txt
+backend\tests\test_smoke_platform.py
+backend\tests\test_merge_production_dotenvs_in_dotenv.py
+backend\compose\production\django\Dockerfile
+backend\compose\production\django\entrypoint
+backend\compose\production\django\start
+backend\compose\production\postgres\maintenance\backup
+backend\compose\production\postgres\maintenance\backups
+backend\compose\production\postgres\maintenance\restore
+backend\compose\production\postgres\maintenance\rmbackup
+
+Missing:
+docs\Konnaxion_Frontend_Deployment_Runbook.md
