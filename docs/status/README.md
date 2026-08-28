@@ -1,19 +1,20 @@
-# Status
+# Konnaxion Status
 
-This directory contains dated technical maturity assessments and release-readiness checkpoints for Konnaxion.
+**Current status:** Advanced Functional Beta — Integration and Release Hardening  
+**Engineering maturity:** ~85%  
+**Release Candidate readiness:** ~68–72%  
+**Assessment date:** 2026-08-28
 
-These reports are intended to distinguish:
+Konnaxion now has a fully green backend test suite on a fresh database, validated public and authenticated ethiKos → EkoH → Smart Vote workflows, strengthened production/security configuration, and broad frontend route coverage.
 
-- implementation maturity;
-- product maturity;
-- qualification maturity;
-- Release Candidate readiness.
+Remaining work is concentrated in release automation, secondary-surface qualification, reproducible deployment, backup/restore drills, OpenAPI cleanup, and final Version 1 scope control.
 
-A maturity assessment is not itself a release declaration.
+This is not yet a Release Candidate.
 
 ## Current assessment
 
-- [2026-08-27 — Technical Maturity Assessment](./2026-08-27-technical-maturity-assessment.md)
-- Status: **Advanced Functional Beta**
-- Estimated engineering maturity: **~75%**
-- Estimated RC readiness: **~55–60%**
+[2026-08-28 Technical Maturity Assessment](./2026-08-28-technical-maturity-assessment.md)
+
+## Previous assessment
+
+[2026-08-27 Technical Maturity Assessment](./2026-08-27-technical-maturity-assessment.md)
