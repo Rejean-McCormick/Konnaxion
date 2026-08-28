@@ -3,10 +3,15 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 import type { NextConfig } from 'next';
 import { env } from './env.mjs';
 
+const DEFAULT_API_PROXY_BASE =
+  process.env.NODE_ENV === 'production'
+    ? 'https://konnaxion.com/api'
+    : 'http://localhost:8000/api';
+
 const API_PROXY_BASE = (
   process.env.API_PROXY_BASE ??
   process.env.INTERNAL_API_BASE ??
-  'http://localhost:8000/api'
+  DEFAULT_API_PROXY_BASE
 ).replace(/\/+$/, '');
 
 const baseConfig: NextConfig = {
