@@ -149,6 +149,7 @@ class ProblemViewSet(viewsets.ModelViewSet):
         history_data = ProblemChangeEventSerializer(
             history_qs,
             many=True,
+            context=self.get_serializer_context(),
         ).data
 
         return Response(

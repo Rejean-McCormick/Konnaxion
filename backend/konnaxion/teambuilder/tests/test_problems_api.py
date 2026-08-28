@@ -23,7 +23,7 @@ class ProblemAPITests(APITestCase):
         )
         self.client.force_authenticate(self.user)
 
-        self.problem_list_url = reverse("teambuilder:problem-list")
+        self.problem_list_url = reverse("api:teambuilder-problem-list")
 
     # --------------------------------------------------------------------- #
     # Helpers
@@ -44,10 +44,22 @@ class ProblemAPITests(APITestCase):
         }
         data.update(overrides)
 
-        return Problem.objects.create(
+        problem = Problem.objects.create(
             created_by=self.user,
             **data,
         )
+
+        # The helper bypasses ProblemViewSet.perform_create(), so reproduce
+        # the initial history event expected by tests using this fixture.
+        ProblemChangeEvent.objects.create(
+            problem=problem,
+            type=ProblemChangeEvent.EventType.CREATED,
+            title="Problem created",
+            description=f"Problem '{problem.name}' was created.",
+            changed_by=self.user,
+        )
+
+        return problem
 
     def _create_session_for_problem(self, problem: Problem, **overrides) -> BuilderSession:
         session_data = {
@@ -142,7 +154,7 @@ class ProblemAPITests(APITestCase):
             changed_by=self.user,
         )
 
-        detail_url = reverse("teambuilder:problem-detail", args=[problem.id])
+        detail_url = reverse("api:teambuilder-problem-detail", args=[problem.id])
         response = self.client.get(detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -175,7 +187,7 @@ class ProblemAPITests(APITestCase):
         """
         problem = self._create_problem(name="Updatable problem")
 
-        detail_url = reverse("teambuilder:problem-detail", args=[problem.id])
+        detail_url = reverse("api:teambuilder-problem-detail", args=[problem.id])
         payload = {"description": "Updated description"}
         response = self.client.patch(detail_url, payload, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)

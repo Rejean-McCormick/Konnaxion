@@ -109,6 +109,14 @@ def optional_viewset(module: Any, *candidate_names: str) -> OptionalViewSet:
 from konnaxion.users.api.views import UserViewSet  # /api/users/...
 
 
+# ── Team Builder ──────────────────────────────────────────
+from konnaxion.teambuilder.views import (
+    BuilderSessionViewSet,
+    ProblemViewSet,
+    TeamViewSet,
+)
+
+
 # ── ethiKos ───────────────────────────────────────────────
 from konnaxion.ethikos import api_views as ethikos_api
 
@@ -292,6 +300,24 @@ def register_optional(
 
 # Core / Users
 register_required("users", UserViewSet, basename="user")
+
+
+# Team Builder
+register_required(
+    "teambuilder/sessions",
+    BuilderSessionViewSet,
+    basename="teambuilder-session",
+)
+register_required(
+    "teambuilder/teams",
+    TeamViewSet,
+    basename="teambuilder-team",
+)
+register_required(
+    "teambuilder/problems",
+    ProblemViewSet,
+    basename="teambuilder-problem",
+)
 
 
 # ethiKos — required baseline
