@@ -413,14 +413,12 @@ export default function ArgumentTree({
 
   function toggleCollapsed(id: string) {
     setCollapsedIds((current) => {
-      const next = new Set(current)
-
-      if (next.has(id)) {
-        next.delete(id)
-      } else {
-        next.add(id)
+      if (current.has(id)) {
+        return new Set([...current].filter((currentId) => currentId !== id))
       }
 
+      const next = new Set(current)
+      next.add(id)
       return next
     })
   }

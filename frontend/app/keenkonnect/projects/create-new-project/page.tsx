@@ -13,7 +13,7 @@ import {
   ProFormUploadButton,
 } from '@ant-design/pro-components';
 import type { UploadFile } from 'antd/es/upload/interface';
-import api from '@/api';
+import { apiPost } from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Paragraph } = Typography;
@@ -61,7 +61,7 @@ function Content() {
         status: 'idea' as const,
       };
 
-      await api.post(PROJECTS_ENDPOINT, payload);
+      await apiPost(PROJECTS_ENDPOINT, payload);
 
       message.success('Project created successfully!');
       router.push('/keenkonnect/projects/my-projects');

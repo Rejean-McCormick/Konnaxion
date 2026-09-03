@@ -43,13 +43,6 @@
     ]
   },
   {
-    "method": "POST",
-    "url": "/api/konsultations/consultations/${consultationId}/vote/",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationForm.tsx"
-    ]
-  },
-  {
     "method": "FETCH",
     "url": "/api/konsultations/consultations/${id}",
     "files": [
@@ -92,31 +85,10 @@
     ]
   },
   {
-    "method": "POST",
-    "url": "/impact/sustainability/report",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx"
-    ]
-  },
-  {
     "method": "GET",
     "url": "/impact/sustainability/track?${params.toString()}",
     "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/sustainability-impact/track-project-impact/page.tsx"
-    ]
-  },
-  {
-    "method": "POST",
-    "url": "/knowledge/documents/upload",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/knowledge/upload-new-document/page.tsx"
-    ]
-  },
-  {
-    "method": "POST",
-    "url": "/workspaces/launch",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/workspaces/launch-new-workspace/page.tsx"
     ]
   },
   {
@@ -316,6 +288,7 @@
     "method": "POST",
     "url": "ethikos/stances/",
     "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationForm.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationVotePanel.tsx"
     ]
   },
@@ -359,13 +332,6 @@
     "url": "kollective/votes/",
     "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsensus/hooks/usePoll.ts"
-    ]
-  },
-  {
-    "method": "POST",
-    "url": "kollective/votes/",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsensus/pages/PollPage.tsx"
     ]
   },
   {

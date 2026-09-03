@@ -3,7 +3,7 @@
 import React from "react";
 import { Card, Spin, Alert, message } from "antd";
 import { useQueryClient } from "@tanstack/react-query";
-import { api } from "@/shared/api";
+import { apiPost } from "@/api";
 import { usePoll, DEFAULT_POLL_ID, pollConfig } from "../hooks/usePoll";
 import useLivePoll from "../hooks/useLivePoll";
 import VoteButtons from "../components/VoteButtons";
@@ -40,7 +40,7 @@ export default function PollPage() {
     const rawValue = normalized === "yes" ? 1 : -1;
 
     try {
-      await api.post("kollective/votes/", {
+      await apiPost("kollective/votes/", {
         target_type: cfg.targetType,
         target_id: cfg.targetId,
         raw_value: rawValue,

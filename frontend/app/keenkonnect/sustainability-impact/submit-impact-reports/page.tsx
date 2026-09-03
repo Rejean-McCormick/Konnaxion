@@ -20,7 +20,7 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import { InboxOutlined } from '@ant-design/icons';
-import api from '@/api';
+import { apiPost } from '@/api';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Option } = Select;
@@ -71,7 +71,7 @@ function Content(): JSX.Element {
         })),
       };
 
-      const res = await api.post('/impact/sustainability/report', payload);
+      const res = await apiPost('/impact/sustainability/report', payload);
 
       if (res && typeof res === 'object' && 'reference' in (res as any)) {
         setReferenceId((res as any).reference as string);

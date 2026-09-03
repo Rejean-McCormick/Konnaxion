@@ -32,7 +32,16 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
 
   // Keep CI runs fast. Adjust as needed.
-  testPathIgnorePatterns: ['/node_modules/', '/.next/', '/e2e/', '/ct/', '\\.ct\\.tsx?$'],
+  testPathIgnorePatterns: [
+    '/node_modules/',
+    '/.next/',
+    '/e2e/',
+    '/_e2e/',
+    '/smoke/',
+    '/tests/.*\\.spec\\.[jt]sx?$',
+    '/ct/',
+    '\\.ct\\.tsx?$',
+  ],
 
   // Mirror tsconfig "paths" while allowing comments in tsconfig.json (JSONC).
   moduleNameMapper: {

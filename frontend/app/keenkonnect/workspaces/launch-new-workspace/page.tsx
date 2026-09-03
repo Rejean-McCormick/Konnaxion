@@ -10,7 +10,7 @@ import {
   ProFormSelect,
   ProFormSwitch,
 } from '@ant-design/pro-components';
-import api from '@/api';
+import { apiPost } from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 type LaunchWorkspaceFormValues = {
@@ -27,7 +27,7 @@ function Content() {
 
   const handleFinish = async (values: LaunchWorkspaceFormValues) => {
     try {
-      await api.post('/workspaces/launch', values);
+      await apiPost('/workspaces/launch', values);
       setLastValues(values);
       setSubmitted(true);
       return true;

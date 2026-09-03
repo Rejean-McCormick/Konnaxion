@@ -2,20 +2,20 @@
   "cookies": [
     {
       "name": "csrftoken",
-      "value": "wcBk70oe9Uv0VSAQIgpJPjtAYdEjw1IR",
+      "value": "qI9FzmS3tmJQzLHzjDEtoLh5PNbYpzOc",
       "domain": "localhost",
       "path": "/",
-      "expires": 1819912687.224627,
+      "expires": 1819918164.134911,
       "httpOnly": false,
       "secure": false,
       "sameSite": "Lax"
     },
     {
       "name": "sessionid",
-      "value": "0u4ssrjl5wa365oggsufbf1ksggubbe1",
+      "value": "29cjvajswclrdadvvm85zaefgr95zifw",
       "domain": "localhost",
       "path": "/",
-      "expires": 1789672686.612912,
+      "expires": 1789678163.500239,
       "httpOnly": true,
       "secure": false,
       "sameSite": "Lax"

@@ -15,7 +15,7 @@ import {
   ProFormUploadDragger,
 } from '@ant-design/pro-components';
 import { InboxOutlined } from '@ant-design/icons';
-import api from '@/api';
+import { apiPost } from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 type CategoryOption = 'Robotics' | 'Healthcare' | 'Technology' | 'Energy' | 'Education';
@@ -66,9 +66,7 @@ export default function UploadNewDocumentPage(): JSX.Element {
     try {
       setSubmitting(true);
 
-      await api.post('/knowledge/documents/upload', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
+      await apiPost('/knowledge/documents/upload', formData);
 
       antdMessage.success('Document uploaded successfully');
       router.push('/keenkonnect/knowledge/document-management');

@@ -1,8 +1,8 @@
 // FILE: frontend/modules/konsultations/components/ConsultationForm.tsx
 ﻿import React, { useState } from 'react';
-import { Form, Slider, Input, Button, message as antdMessage } from 'antd';
+import { Form, Slider, Button, message as antdMessage } from 'antd';
 import { useRequest } from 'ahooks';
-import axios from 'axios';
+import { post } from '@/services/_request';
 
 interface ConsultationFormProps {
   // Made optional so <ConsultationForm /> without props in ConsultationHub compiles;
@@ -41,27 +41,29 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({
 
   // Use ahooks useRequest for the submission API call (POST stance)
   const { run: submitStance } = useRequest(
-    async (value: number, comment?: string) => {
+    async (value: number) => {
       if (consultationId == null) {
         throw new Error('consultationId is required to submit a stance.');
       }
 
-      // Example API endpoint: POST /api/konsultations/consultations/{id}/vote/
-      // Payload: { value: ..., comment: ... }
-      return axios.post(
-        `/api/konsultations/consultations/${consultationId}/vote/`,
-        {
-          value,
-          comment,
-        },
-      );
+      const topic = Number(consultationId);
+      if (!Number.isFinite(topic)) {
+        throw new Error(`Invalid consultation/topic id: ${consultationId}`);
+      }
+
+      // Konsultations is a UI over canonical ethiKos topics. Persist the stance
+      // through the canonical API.
+      return post('ethikos/stances/', {
+        topic,
+        value,
+      });
     },
     {
       manual: true,
       onSuccess: () => {
         antdMessage.success('Your stance has been recorded.');
         // Optionally refresh consultation data (results, etc.)
-        form.resetFields(['comment']);
+        // Keep the selected stance visible after a successful save.
       },
       onError: () => {
         antdMessage.error('Failed to submit stance. Please try again.');
@@ -70,22 +72,16 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({
     },
   );
 
-  const onFinish = ({
-    value,
-    comment,
-  }: {
-    value: number;
-    comment?: string;
-  }) => {
+  const onFinish = ({ value }: { value: number }) => {
     setSubmitting(true);
-    submitStance(value, comment);
+    submitStance(value);
   };
 
   return (
     <Form
       form={form}
       layout="vertical"
-      initialValues={{ value: initialValue, comment: '' }}
+      initialValues={{ value: initialValue }}
       onFinish={onFinish}
     >
       <Form.Item
@@ -99,12 +95,6 @@ const ConsultationForm: React.FC<ConsultationFormProps> = ({
           step={1}
           marks={stanceMarks}
           tooltip={{ formatter: (val) => stanceLabels[val as number] }}
-        />
-      </Form.Item>
-      <Form.Item label="Comment (optional)" name="comment">
-        <Input.TextArea
-          rows={3}
-          placeholder="Add an explanation or suggestion (optional)"
         />
       </Form.Item>
       <Form.Item>

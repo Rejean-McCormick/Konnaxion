@@ -12,7 +12,7 @@
       "message": "Celery task tests passed.",
       "category": "command",
       "path": "C:\\mycode\\Konnaxion\\Konnaxion\\backend",
-      "evidence": ".                                                                        [100%]\n1 passed in 5.69s\n",
+      "evidence": ".                                                                        [100%]\n1 passed in 6.37s\n",
       "data": {
         "command": [
           "C:\\mycode\\Konnaxion\\Konnaxion\\backend\\.venv\\Scripts\\python.exe",
@@ -22,7 +22,7 @@
           "-q"
         ],
         "exit_code": 0,
-        "duration_seconds": 9.847
+        "duration_seconds": 10.046
       }
     },
     {
@@ -35,13 +35,13 @@
     }
   ],
   "artifacts": [],
-  "started_at": "2026-09-03T15:38:48-04:00",
-  "ended_at": "2026-09-03T15:38:58-04:00",
-  "duration_seconds": 9.849383,
+  "started_at": "2026-09-03T17:06:47-04:00",
+  "ended_at": "2026-09-03T17:06:57-04:00",
+  "duration_seconds": 10.047785,
   "cwd": "C:\\mycode\\Konnaxion\\Konnaxion\\backend",
-  "output_tail": ".                                                                        [100%]\n1 passed in 5.69s\n",
+  "output_tail": ".                                                                        [100%]\n1 passed in 6.37s\n",
   "metadata": {
-    "diagnostic_session_id": "kxdiag-20260903_151501-106981be",
+    "diagnostic_session_id": "kxdiag-20260903_164601-9c44a834",
     "cwd": "C:\\mycode\\Konnaxion\\Konnaxion\\backend"
   }
 }

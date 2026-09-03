@@ -1,6 +1,6 @@
 {
-  "session_id": "kxdiag-20260903_151501-106981be",
-  "started_at": "2026-09-03T15:15:01-04:00",
+  "session_id": "kxdiag-20260903_164601-9c44a834",
+  "started_at": "2026-09-03T16:46:01-04:00",
   "target": "C:\\mycode\\Konnaxion\\Konnaxion",
   "campaign": "connection-debug",
   "expected_levels": [
@@ -13,5 +13,5 @@
     "N06",
     "N11"
   ],
-  "run_id": "20260903T151500-e78462e3"
+  "run_id": "20260903T164601-84e3ab3e"
 }

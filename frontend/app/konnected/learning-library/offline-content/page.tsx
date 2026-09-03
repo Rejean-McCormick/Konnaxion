@@ -35,7 +35,7 @@ import {
 } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
-import api from '@/api';
+import { apiDelete, apiFetch, apiPatch, apiPost } from '@/api';
 
 const { Paragraph, Text } = Typography;
 const { Option } = Select;
@@ -129,15 +129,15 @@ async function fetchOfflinePackages(): Promise<OfflinePackage[]> {
 async function createOfflinePackage(
   payload: CreateOfflinePackagePayload,
 ): Promise<void> {
-  await api.post(OFFLINE_PACKAGE_LIST_ENDPOINT, payload);
+  await apiPost(OFFLINE_PACKAGE_LIST_ENDPOINT, payload);
 }
 
 async function deleteOfflinePackage(id: OfflinePackage['id']): Promise<void> {
-  await api.delete(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id));
+  await apiDelete(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id));
 }
 
 async function syncOfflinePackage(id: OfflinePackage['id']): Promise<void> {
-  await api.post(OFFLINE_PACKAGE_SYNC_ENDPOINT(id));
+  await apiPost(OFFLINE_PACKAGE_SYNC_ENDPOINT(id));
 }
 
 /**
@@ -148,7 +148,7 @@ async function updateOfflinePackage(
   id: OfflinePackage['id'],
   payload: Partial<Pick<OfflinePackage, 'autoSync'>>,
 ): Promise<OfflinePackage> {
-  return api.patch<OfflinePackage>(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id), payload);
+  return apiPatch<OfflinePackage>(OFFLINE_PACKAGE_DETAIL_ENDPOINT(id), payload);
 }
 
 async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
@@ -156,7 +156,7 @@ async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
 
   for (const url of OFFLINE_RESOURCES_ENDPOINTS) {
     try {
-      const res = await fetch(url, { credentials: 'include' });
+      const res = await apiFetch(url);
 
       if (!res.ok) {
         lastError = new Error(
