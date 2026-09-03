@@ -1,0 +1,3915 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:19:35.690287
+title: ROOT FILES
+root_dir: C:\mycode\Konnaxion\Konnaxion\backend\konnaxion\ethikos
+file_count: 12
+total_size_mb: 0.1109
+home: 00_START_HERE.instructions.md
+next_volume: ethikos_20260903_131935_02_demo_import.txt
+prev_title: 
+next_title: demo_import
+short_title: Root
+
+==== FILE_INDEX ====
+ENTRY id=f493c7715d33 path="__init__.py" kind=source size=47 lines=1 line_ref=1-1 chunks=0 chunk_refs= symbols=0 imports=0 summary="Python module."
+ENTRY id=a238b3dadceb path="admin.py" kind=source size=17247 lines=575 line_ref=1-575 chunks=2 chunk_refs=1-350,351-575 symbols=40 imports=18 summary="Python module with 11 class(es) and 29 function(s)."
+ENTRY id=dddd4a059473 path="api_views.py" kind=source size=30760 lines=949 line_ref=1-949 chunks=3 chunk_refs=1-350,351-700,701-949 symbols=51 imports=41 summary="Python module with 9 class(es) and 42 function(s)."
+ENTRY id=6e673b63e60e path="apps.py" kind=source size=205 lines=7 line_ref=1-7 chunks=0 chunk_refs= symbols=1 imports=1 summary="Python module with 1 class(es)."
+ENTRY id=a5a1446dd87d path="constants.py" kind=source size=8565 lines=226 line_ref=1-226 chunks=0 chunk_refs= symbols=0 imports=2 summary="Python module with imports and top-level code."
+ENTRY id=8ea003a30274 path="models.py" kind=source size=13752 lines=467 line_ref=1-467 chunks=2 chunk_refs=1-350,351-467 symbols=27 imports=6 summary="Python module with 18 class(es) and 9 function(s)."
+ENTRY id=dec111ed51dc path="models_demo.py" kind=source size=4028 lines=123 line_ref=1-123 chunks=0 chunk_refs= symbols=3 imports=3 summary="Python module with 2 class(es) and 1 function(s)."
+ENTRY id=f640b86203cf path="permissions.py" kind=source size=9790 lines=300 line_ref=1-300 chunks=0 chunk_refs= symbols=32 imports=4 summary="Python module with 9 class(es) and 23 function(s)."
+ENTRY id=a6196e341135 path="serializers.py" kind=source size=18458 lines=622 line_ref=1-622 chunks=2 chunk_refs=1-350,351-622 symbols=27 imports=17 summary="Python module with 20 class(es) and 7 function(s)."
+ENTRY id=a46bbc7b6c00 path="tests.py" kind=source size=9964 lines=301 line_ref=1-301 chunks=0 chunk_refs= symbols=15 imports=20 summary="Python module with 1 class(es) and 14 function(s)."
+ENTRY id=264e4983bf5e path="urls.py" kind=source size=1814 lines=56 line_ref=1-56 chunks=0 chunk_refs= symbols=2 imports=5 summary="Python module with 2 function(s)."
+ENTRY id=73e8552fa019 path="views.py" kind=source size=1695 lines=46 line_ref=1-46 chunks=0 chunk_refs= symbols=7 imports=9 summary="Python module with 3 class(es) and 4 function(s)."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="__init__.py"
+id=f493c7715d33
+kind=source
+size=47
+lines=1
+line_ref=1-1
+chunks=0
+chunk_refs=
+summary="Python module."
+----
+# FILE: backend/konnaxion/ethikos/__init__.py
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="admin.py"
+id=a238b3dadceb
+kind=source
+size=17247
+lines=575
+line_ref=1-575
+chunks=2
+chunk_refs=1-350,351-575
+summary="Python module with 11 class(es) and 29 function(s)."
+
+--- CHUNK BEGIN ---
+id=a238b3dadceb:1-350
+start=1
+end=350
+----
+# FILE: backend/konnaxion/ethikos/admin.py
+# konnaxion/ethikos/admin.py
+from __future__ import annotations
+
+from typing import Sequence
+
+from django.apps import apps
+from django.contrib import admin
+from django.db import models
+from django.db.models import QuerySet
+from django.http import HttpRequest
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+
+from .models import (
+    ArgumentImpactVote,
+    ArgumentSource,
+    ArgumentSuggestion,
+    DiscussionParticipantRole,
+    DiscussionVisibilitySetting,
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+
+
+# ───────── Shared helpers ─────────
+
+def _model_field_names(model: type[models.Model]) -> set[str]:
+    return {field.name for field in model._meta.get_fields()}
+
+
+def _existing_fields(
+    model: type[models.Model],
+    fields: Sequence[str],
+) -> tuple[str, ...]:
+    names = _model_field_names(model)
+    return tuple(field for field in fields if field in names)
+
+
+def _short_text(value: str | None, limit: int = 60) -> str:
+    text = value or ""
+    return (text[:limit] + "…") if len(text) > limit else text
+
+
+# ───────── Mix-in to show created/updated columns ─────────
+
+class TimestampMixin(admin.ModelAdmin):
+    date_hierarchy = "created_at"
+
+    def _time_fields(self) -> tuple[str, ...]:
+        return _existing_fields(self.model, ("created_at", "updated_at"))
+
+    def get_readonly_fields(
+        self,
+        request: HttpRequest,
+        obj=None,
+    ) -> Sequence[str]:
+        return (*super().get_readonly_fields(request, obj), *self._time_fields())
+
+    def get_list_display(self, request: HttpRequest) -> tuple[str, ...]:
+        cols = list(super().get_list_display(request))
+
+        for field in self._time_fields():
+            if field not in cols:
+                cols.append(field)
+
+        return tuple(cols)
+
+
+# ───────── Generic fallback for future additive ethiKos models ─────────
+
+class KintsugiFallbackAdmin(admin.ModelAdmin):
+    """
+    Safe fallback admin for additive Wave 1 models.
+
+    This keeps future slice-created models visible in Django admin without
+    requiring each branch to edit this file immediately. Explicit admin classes
+    should still be added for important models once their slice stabilizes.
+    """
+
+    list_per_page = 30
+
+    def get_date_hierarchy(self, request: HttpRequest) -> str | None:
+        fields = _model_field_names(self.model)
+
+        if "created_at" in fields:
+            return "created_at"
+        if "updated_at" in fields:
+            return "updated_at"
+
+        return None
+
+    def get_readonly_fields(
+        self,
+        request: HttpRequest,
+        obj=None,
+    ) -> Sequence[str]:
+        readonly = tuple(super().get_readonly_fields(request, obj))
+        return (*readonly, *_existing_fields(self.model, ("created_at", "updated_at")))
+
+    def get_list_display(self, request: HttpRequest) -> tuple[str, ...]:
+        preferred = (
+            "id",
+            "name",
+            "title",
+            "topic",
+            "argument",
+            "user",
+            "status",
+            "visibility",
+            "role",
+            "side",
+            "is_hidden",
+            "is_removed",
+            "created_at",
+            "updated_at",
+        )
+        fields = _existing_fields(self.model, preferred)
+
+        return fields or ("__str__",)
+
+    def get_search_fields(self, request: HttpRequest) -> tuple[str, ...]:
+        preferred = (
+            "name",
+            "title",
+            "content",
+            "description",
+            "url",
+            "citation_text",
+            "quote",
+            "note",
+            "user__username",
+            "user__email",
+            "created_by__username",
+            "created_by__email",
+            "topic__title",
+            "argument__content",
+        )
+        return _existing_fields(self.model, preferred)
+
+    def get_list_filter(self, request: HttpRequest) -> tuple[str, ...]:
+        preferred = (
+            "status",
+            "visibility",
+            "role",
+            "side",
+            "is_hidden",
+            "is_removed",
+            "participation_type",
+            "author_visibility",
+            "vote_visibility",
+            "created_at",
+            "updated_at",
+        )
+        return _existing_fields(self.model, preferred)
+
+
+# ───────── Category ─────────
+
+@admin.register(EthikosCategory)
+class EthikosCategoryAdmin(admin.ModelAdmin):
+    list_display = ("name", "description")
+    search_fields = ("name", "description")
+    ordering = ("name",)
+    list_per_page = 30
+
+
+# ───────── Topic ─────────
+
+@admin.register(EthikosTopic)
+class EthikosTopicAdmin(TimestampMixin):
+    list_display = (
+        "title",
+        "category",
+        "expertise_category",
+        "status_badge",
+        "total_votes",
+        "created_by",
+        "last_activity",
+    )
+    list_filter = ("status", "category", "expertise_category")
+    search_fields = (
+        "title",
+        "description",
+        "category__name",
+        "created_by__username",
+        "created_by__email",
+    )
+    autocomplete_fields = ("category", "expertise_category", "created_by")
+    list_select_related = ("category", "expertise_category", "created_by")
+    ordering = ("-created_at",)
+    list_per_page = 30
+
+    @admin.display(description=_("status"), ordering="status")
+    def status_badge(self, obj: EthikosTopic) -> str:
+        colour = {
+            EthikosTopic.OPEN: "green",
+            EthikosTopic.CLOSED: "red",
+            EthikosTopic.ARCHIVED: "grey",
+        }.get(obj.status, "black")
+
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            obj.get_status_display(),
+        )
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[EthikosTopic]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("category", "expertise_category", "created_by")
+        )
+
+
+# ───────── Stance ─────────
+
+@admin.register(EthikosStance)
+class EthikosStanceAdmin(admin.ModelAdmin):
+    list_display = ("user", "topic", "value_badge", "timestamp")
+    list_filter = ("value", "timestamp")
+    search_fields = (
+        "user__username",
+        "user__email",
+        "topic__title",
+    )
+    autocomplete_fields = ("user", "topic")
+    list_select_related = ("user", "topic")
+    ordering = ("-timestamp",)
+    list_per_page = 30
+
+    @admin.display(description=_("value"), ordering="value")
+    def value_badge(self, obj: EthikosStance) -> str:
+        if obj.value > 0:
+            colour = "green"
+        elif obj.value < 0:
+            colour = "red"
+        else:
+            colour = "grey"
+
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            obj.value,
+        )
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[EthikosStance]:
+        return super().get_queryset(request).select_related("user", "topic")
+
+
+# ───────── Argument ─────────
+
+@admin.register(EthikosArgument)
+class EthikosArgumentAdmin(TimestampMixin):
+    list_display = (
+        "short_content",
+        "topic",
+        "user",
+        "side_badge",
+        "parent",
+        "is_hidden",
+    )
+    list_filter = ("side", "is_hidden", "created_at", "updated_at")
+    search_fields = (
+        "content",
+        "user__username",
+        "user__email",
+        "topic__title",
+        "parent__content",
+    )
+    autocomplete_fields = ("topic", "user", "parent")
+    list_select_related = ("topic", "user", "parent")
+    ordering = ("-created_at",)
+    list_per_page = 30
+
+    @admin.display(description=_("content"), ordering="content")
+    def short_content(self, obj: EthikosArgument) -> str:
+        return _short_text(obj.content)
+
+    @admin.display(description=_("side"), ordering="side")
+    def side_badge(self, obj: EthikosArgument) -> str:
+        if obj.side == EthikosArgument.PRO:
+            colour = "green"
+            label = _("pro")
+        elif obj.side == EthikosArgument.CON:
+            colour = "red"
+            label = _("con")
+        else:
+            colour = "grey"
+            label = _("neutral")
+
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            label,
+        )
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[EthikosArgument]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("topic", "user", "parent")
+        )
+
+
+# ───────── Korum / Argument source ─────────
+
+@admin.register(ArgumentSource)
+class ArgumentSourceAdmin(TimestampMixin):
+    list_display = (
+        "short_source",
+        "argument",
+        "created_by",
+        "source_type",
+        "is_removed",
+    )
+    list_filter = ("source_type", "is_removed", "created_at", "updated_at")
+    search_fields = (
+        "url",
+        "title",
+        "excerpt",
+        "citation_text",
+        "quote",
+        "note",
+        "argument__content",
+        "argument__topic__title",
+        "created_by__username",
+        "created_by__email",
+    )
+    autocomplete_fields = ("argument", "created_by")
+    list_select_related = ("argument", "argument__topic", "created_by")
+    ordering = ("-created_at",)
+    list_per_page = 30
+
+    @admin.display(description=_("source"), ordering="title")
+    def short_source(self, obj: ArgumentSource) -> str:
+        return _short_text(obj.title or obj.url or obj.citation_text or obj.quote)
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[ArgumentSource]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("argument", "argument__topic", "created_by")
+        )
+
+
+# ───────── Korum / Argument impact vote ─────────
+
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=a238b3dadceb:351-575
+start=351
+end=575
+----
+@admin.register(ArgumentImpactVote)
+class ArgumentImpactVoteAdmin(TimestampMixin):
+    list_display = (
+        "argument",
+        "user",
+        "value_badge",
+    )
+    list_filter = ("value", "created_at", "updated_at")
+    search_fields = (
+        "argument__content",
+        "argument__topic__title",
+        "user__username",
+        "user__email",
+    )
+    autocomplete_fields = ("argument", "user")
+    list_select_related = ("argument", "argument__topic", "user")
+    ordering = ("-updated_at", "-created_at")
+    list_per_page = 30
+
+    @admin.display(description=_("impact"), ordering="value")
+    def value_badge(self, obj: ArgumentImpactVote) -> str:
+        colour = {
+            0: "grey",
+            1: "grey",
+            2: "black",
+            3: "green",
+            4: "green",
+        }.get(obj.value, "black")
+
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            obj.value,
+        )
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[ArgumentImpactVote]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("argument", "argument__topic", "user")
+        )
+
+
+# ───────── Korum / Argument suggestion ─────────
+
+@admin.register(ArgumentSuggestion)
+class ArgumentSuggestionAdmin(TimestampMixin):
+    list_display = (
+        "short_content",
+        "topic",
+        "created_by",
+        "side_badge",
+        "status_badge",
+        "accepted_argument",
+        "reviewed_by",
+    )
+    list_filter = ("status", "side", "created_at", "updated_at", "reviewed_at")
+    search_fields = (
+        "content",
+        "topic__title",
+        "parent__content",
+        "accepted_argument__content",
+        "created_by__username",
+        "created_by__email",
+        "reviewed_by__username",
+        "reviewed_by__email",
+    )
+    autocomplete_fields = (
+        "topic",
+        "parent",
+        "accepted_argument",
+        "created_by",
+        "reviewed_by",
+    )
+    list_select_related = (
+        "topic",
+        "parent",
+        "accepted_argument",
+        "created_by",
+        "reviewed_by",
+    )
+    ordering = ("-created_at",)
+    list_per_page = 30
+
+    @admin.display(description=_("content"), ordering="content")
+    def short_content(self, obj: ArgumentSuggestion) -> str:
+        return _short_text(obj.content)
+
+    @admin.display(description=_("side"), ordering="side")
+    def side_badge(self, obj: ArgumentSuggestion) -> str:
+        if obj.side == EthikosArgument.PRO:
+            colour = "green"
+            label = _("pro")
+        elif obj.side == EthikosArgument.CON:
+            colour = "red"
+            label = _("con")
+        else:
+            colour = "grey"
+            label = _("neutral")
+
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            label,
+        )
+
+    @admin.display(description=_("status"), ordering="status")
+    def status_badge(self, obj: ArgumentSuggestion) -> str:
+        colour = {
+            "pending": "grey",
+            "accepted": "green",
+            "rejected": "red",
+            "revision_requested": "orange",
+        }.get(obj.status, "black")
+
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            obj.get_status_display(),
+        )
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[ArgumentSuggestion]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related(
+                "topic",
+                "parent",
+                "accepted_argument",
+                "created_by",
+                "reviewed_by",
+            )
+        )
+
+
+# ───────── Korum / Discussion participant role ─────────
+
+@admin.register(DiscussionParticipantRole)
+class DiscussionParticipantRoleAdmin(TimestampMixin):
+    list_display = (
+        "topic",
+        "user",
+        "role_badge",
+        "assigned_by",
+    )
+    list_filter = ("role", "created_at", "updated_at")
+    search_fields = (
+        "topic__title",
+        "user__username",
+        "user__email",
+        "assigned_by__username",
+        "assigned_by__email",
+    )
+    autocomplete_fields = ("topic", "user", "assigned_by")
+    list_select_related = ("topic", "user", "assigned_by")
+    ordering = ("topic", "user")
+    list_per_page = 30
+
+    @admin.display(description=_("role"), ordering="role")
+    def role_badge(self, obj: DiscussionParticipantRole) -> str:
+        colour = {
+            "owner": "purple",
+            "admin": "red",
+            "editor": "blue",
+            "writer": "green",
+            "suggester": "orange",
+            "viewer": "grey",
+        }.get(obj.role, "black")
+
+        return format_html(
+            '<span style="color:{};font-weight:600;">{}</span>',
+            colour,
+            obj.get_role_display(),
+        )
+
+    def get_queryset(self, request: HttpRequest) -> QuerySet[DiscussionParticipantRole]:
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("topic", "user", "assigned_by")
+        )
+
+
+# ───────── Korum / Discussion visibility settings ─────────
+
+@admin.register(DiscussionVisibilitySetting)
+class DiscussionVisibilitySettingAdmin(TimestampMixin):
+    list_display = (
+        "topic",
+        "participation_type",
+        "author_visibility",
+        "vote_visibility",
+        "changed_by",
+    )
+    list_filter = (
+        "participation_type",
+        "author_visibility",
+        "vote_visibility",
+        "created_at",
+        "updated_at",
+    )
+    search_fields = (
+        "topic__title",
+        "changed_by__username",
+        "changed_by__email",
+    )
+    autocomplete_fields = ("topic", "changed_by")
+    list_select_related = ("topic", "changed_by")
+    ordering = ("topic",)
+    list_per_page = 30
+
+    def get_queryset(
+        self,
+        request: HttpRequest,
+    ) -> QuerySet[DiscussionVisibilitySetting]:
+        return super().get_queryset(request).select_related("topic", "changed_by")
+
+
+# ───────── Fallback auto-registration ─────────
+
+cfg = apps.get_app_config("ethikos")
+
+for model in cfg.get_models():
+    if not admin.site.is_registered(model):
+        admin.site.register(model, KintsugiFallbackAdmin)
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="api_views.py"
+id=dddd4a059473
+kind=source
+size=30760
+lines=949
+line_ref=1-949
+chunks=3
+chunk_refs=1-350,351-700,701-949
+summary="Python module with 9 class(es) and 42 function(s)."
+
+--- CHUNK BEGIN ---
+id=dddd4a059473:1-350
+start=1
+end=350
+----
+# FILE: backend/konnaxion/ethikos/api_views.py
+from __future__ import annotations
+
+from typing import Optional
+
+from django.db.models import Count
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import permissions, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+
+from .constants import (
+    ARGUMENT_SIDE_CON,
+    ARGUMENT_SIDE_FILTER_VALUES,
+    ARGUMENT_SIDE_NEUTRAL,
+    ARGUMENT_SIDE_PRO,
+    ARGUMENT_SUGGESTION_ACCEPTED,
+    ARGUMENT_SUGGESTION_REJECTED,
+    ARGUMENT_SUGGESTION_REVISION_REQUESTED,
+    ARGUMENT_SUGGESTION_STATUS_CHOICES,
+    DISCUSSION_ROLE_CHOICES,
+    TOPIC_STATUS_CHOICES,
+)
+from .models import (
+    ArgumentImpactVote,
+    ArgumentSource,
+    ArgumentSuggestion,
+    DiscussionParticipantRole,
+    DiscussionVisibilitySetting,
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+from .permissions import (
+    OwnerOrEthikosAdminOrReadOnly,
+    OwnerOrEthikosModeratorOrReadOnly,
+)
+from .serializers import (
+    ArgumentImpactVoteSerializer,
+    ArgumentSourceSerializer,
+    ArgumentSuggestionSerializer,
+    DiscussionParticipantRoleSerializer,
+    DiscussionVisibilitySettingSerializer,
+    EthikosArgumentSerializer,
+    EthikosCategorySerializer,
+    EthikosStanceSerializer,
+    EthikosTopicSerializer,
+)
+
+
+# ---- Shared helpers ---------------------------------------------------------
+
+def _coerce_optional_int(raw: object, field_name: str) -> Optional[int]:
+    """
+    Convert optional query/data values to int.
+
+    Empty values are treated as absent. Invalid non-empty values raise DRF
+    validation errors instead of leaking ValueError.
+    """
+    if raw in (None, ""):
+        return None
+
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        raise ValidationError({field_name: "Must be a valid integer."})
+
+
+def _copy_request_data(request):
+    """
+    Return a mutable copy of request.data.
+
+    DRF may expose request.data as an immutable QueryDict for form payloads.
+    """
+    if hasattr(request.data, "copy"):
+        return request.data.copy()
+    return dict(request.data)
+
+
+def _touch_topic_activity(topic: EthikosTopic) -> None:
+    """
+    Refresh topic.last_activity after stance/argument/Korum activity.
+    """
+    topic.save(update_fields=["last_activity"])
+
+
+def _valid_topic_statuses() -> set[str]:
+    return {choice[0] for choice in TOPIC_STATUS_CHOICES}
+
+
+def _valid_suggestion_statuses() -> set[str]:
+    return {choice[0] for choice in ARGUMENT_SUGGESTION_STATUS_CHOICES}
+
+
+def _valid_discussion_roles() -> set[str]:
+    return {choice[0] for choice in DISCUSSION_ROLE_CHOICES}
+
+
+def _topic_from_argument(argument: EthikosArgument) -> EthikosTopic:
+    return argument.topic
+
+
+def _touch_argument_topic(argument: EthikosArgument) -> None:
+    _touch_topic_activity(_topic_from_argument(argument))
+
+
+# ---- Categories -------------------------------------------------------------
+
+class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    Read-only Ethikos categories.
+
+    Canonical route:
+    - /api/ethikos/categories/
+    """
+
+    queryset = EthikosCategory.objects.all().order_by("name")
+    serializer_class = EthikosCategorySerializer
+    permission_classes = [permissions.AllowAny]
+
+
+# ---- Topics -----------------------------------------------------------------
+
+class TopicViewSet(viewsets.ModelViewSet):
+    """
+    CRUD for Ethikos topics.
+
+    Canonical route:
+    - /api/ethikos/topics/
+
+    Query params:
+    - category=<id>
+    - status=open|closed|archived
+
+    Write behavior:
+    - created_by is injected from request.user.
+    - accepts category_id, and also accepts category as an alias for category_id.
+    """
+
+    queryset = EthikosTopic.objects.select_related(
+        "created_by",
+        "category",
+        "expertise_category",
+    )
+    serializer_class = EthikosTopicSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosAdminOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        category_id = _coerce_optional_int(
+            self.request.query_params.get("category"),
+            "category",
+        )
+        if category_id is not None:
+            qs = qs.filter(category_id=category_id)
+
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            if status_param not in _valid_topic_statuses():
+                raise ValidationError({"status": "Invalid topic status."})
+            qs = qs.filter(status=status_param)
+
+        return qs
+
+    def _normalized_topic_data(self, request):
+        data = _copy_request_data(request)
+
+        # Serializer accepts category_id. Kintsugi/API contract also allows
+        # category as a backend-boundary alias for category_id.
+        if not data.get("category_id") and data.get("category"):
+            data["category_id"] = data.get("category")
+
+        return data
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=self._normalized_topic_data(request))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+
+        serializer = self.get_serializer(
+            instance,
+            data=self._normalized_topic_data(request),
+            partial=partial,
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
+    def perform_create(self, serializer) -> None:
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=["get"], permission_classes=[permissions.AllowAny])
+    def preview(self, request, pk=None):
+        """
+        Resilient topic preview for Deliberate preview drawers.
+
+        Required behavior:
+        - return topic metadata when the topic exists;
+        - never return an empty shape for an existing topic;
+        - tolerate related argument/stance aggregation failures.
+        """
+        topic = self.get_object()
+
+        description = topic.description or ""
+        preview_description = (
+            description if len(description) <= 280 else f"{description[:280]}…"
+        )
+
+        stats = {
+            "stance_count": 0,
+            "argument_count": 0,
+            "pro_count": 0,
+            "con_count": 0,
+            "neutral_count": 0,
+            "source_count": 0,
+            "impact_vote_count": 0,
+            "suggestion_count": 0,
+        }
+        latest = []
+
+        try:
+            stance_qs = EthikosStance.objects.filter(topic=topic)
+            argument_qs = EthikosArgument.objects.filter(topic=topic)
+            argument_ids = argument_qs.values_list("id", flat=True)
+
+            stats["stance_count"] = stance_qs.count()
+            stats["argument_count"] = argument_qs.count()
+            stats["pro_count"] = argument_qs.filter(
+                side=ARGUMENT_SIDE_PRO,
+            ).count()
+            stats["con_count"] = argument_qs.filter(
+                side=ARGUMENT_SIDE_CON,
+            ).count()
+            stats["neutral_count"] = argument_qs.filter(side__isnull=True).count()
+            stats["source_count"] = ArgumentSource.objects.filter(
+                argument_id__in=argument_ids,
+                is_removed=False,
+            ).count()
+            stats["impact_vote_count"] = ArgumentImpactVote.objects.filter(
+                argument_id__in=argument_ids,
+            ).count()
+            stats["suggestion_count"] = ArgumentSuggestion.objects.filter(
+                topic=topic,
+            ).count()
+
+            latest = [
+                {
+                    "id": arg.id,
+                    "user": getattr(arg.user, "username", str(arg.user)),
+                    "author": getattr(arg.user, "username", str(arg.user)),
+                    "content": arg.content,
+                    "body": arg.content,
+                    "side": arg.side,
+                    "parent": arg.parent_id,
+                    "created_at": arg.created_at,
+                    "source_count": getattr(arg, "source_count", 0),
+                    "impact_vote_count": getattr(arg, "impact_vote_count", 0),
+                    "suggestion_count": getattr(arg, "suggestion_count", 0),
+                }
+                for arg in argument_qs.select_related("user", "parent")
+                .filter(is_hidden=False)
+                .annotate(
+                    source_count=Count("sources", distinct=True),
+                    impact_vote_count=Count("impact_votes", distinct=True),
+                    suggestion_count=Count("suggested_replies", distinct=True),
+                )
+                .order_by("-created_at")[:5]
+            ]
+        except Exception:
+            # The preview endpoint must still return topic metadata if the
+            # topic exists. This prevents the visible "Preview / No data" state.
+            latest = []
+
+        category_name = topic.category.name if topic.category_id else None
+
+        data = {
+            "id": topic.id,
+            "title": topic.title,
+            "description": preview_description,
+            "full_description": description,
+            "category": category_name,
+            "category_id": topic.category_id,
+            "category_name": category_name,
+            "status": topic.status,
+            "total_votes": topic.total_votes,
+            "created_at": topic.created_at,
+            "last_activity": topic.last_activity,
+            "stats": stats,
+            "latest": latest,
+        }
+
+        return Response(data, status=status.HTTP_200_OK)
+
+
+# ---- Stances ----------------------------------------------------------------
+
+class StanceViewSet(viewsets.ModelViewSet):
+    """
+    Topic-level user stance endpoint.
+
+    Canonical route:
+    - /api/ethikos/stances/
+
+    Query params:
+    - topic=<id>
+
+    POST is an upsert by (request.user, topic).
+    """
+
+    queryset = EthikosStance.objects.select_related("topic", "user")
+    serializer_class = EthikosStanceSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosAdminOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        topic_id = _coerce_optional_int(
+            self.request.query_params.get("topic"),
+            "topic",
+        )
+        if topic_id is not None:
+            qs = qs.filter(topic_id=topic_id)
+
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=dddd4a059473:351-700
+start=351
+end=700
+----
+
+        topic = serializer.validated_data.get("topic")
+        value = serializer.validated_data.get("value")
+
+        if topic is None:
+            raise ValidationError({"topic": "This field is required."})
+        if value is None:
+            raise ValidationError({"value": "This field is required."})
+
+        stance, created = EthikosStance.objects.update_or_create(
+            user=request.user,
+            topic=topic,
+            defaults={"value": value},
+        )
+
+        _touch_topic_activity(topic)
+
+        output = self.get_serializer(stance)
+        return Response(
+            output.data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+    def perform_create(self, serializer) -> None:
+        stance = serializer.save(user=self.request.user)
+        _touch_topic_activity(stance.topic)
+
+    def perform_update(self, serializer) -> None:
+        stance = serializer.save()
+        _touch_topic_activity(stance.topic)
+
+
+# ---- Arguments --------------------------------------------------------------
+
+class ArgumentViewSet(viewsets.ModelViewSet):
+    """
+    Threaded Ethikos argument endpoint.
+
+    Canonical route:
+    - /api/ethikos/arguments/
+
+    Query params:
+    - topic=<id>
+    - parent=<id>
+    - parent=null
+    - side=pro|con|neutral
+
+    This remains EthikosArgument, not Claim/KialoClaim.
+    """
+
+    queryset = EthikosArgument.objects.select_related("user", "topic", "parent")
+    serializer_class = EthikosArgumentSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosModeratorOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = (
+            super()
+            .get_queryset()
+            .annotate(
+                source_count=Count("sources", distinct=True),
+                impact_vote_count=Count("impact_votes", distinct=True),
+                suggestion_count=Count("suggested_replies", distinct=True),
+            )
+        )
+
+        topic_id = _coerce_optional_int(
+            self.request.query_params.get("topic"),
+            "topic",
+        )
+        if topic_id is not None:
+            qs = qs.filter(topic_id=topic_id)
+
+        parent_raw = self.request.query_params.get("parent")
+        if parent_raw == "null":
+            qs = qs.filter(parent__isnull=True)
+        else:
+            parent_id = _coerce_optional_int(parent_raw, "parent")
+            if parent_id is not None:
+                qs = qs.filter(parent_id=parent_id)
+
+        side_param = self.request.query_params.get("side")
+        if side_param:
+            if side_param not in ARGUMENT_SIDE_FILTER_VALUES:
+                raise ValidationError(
+                    {"side": "Expected pro, con, or neutral."},
+                )
+
+            if side_param == ARGUMENT_SIDE_NEUTRAL:
+                qs = qs.filter(side__isnull=True)
+            else:
+                qs = qs.filter(side=side_param)
+
+        return qs
+
+    def _normalized_argument_data(
+        self,
+        request,
+        instance: Optional[EthikosArgument] = None,
+    ):
+        data = _copy_request_data(request)
+
+        # Serializer accepts parent_id. Existing callers may send parent.
+        if not data.get("parent_id") and data.get("parent"):
+            data["parent_id"] = data.get("parent")
+
+        parent_id = _coerce_optional_int(data.get("parent_id"), "parent_id")
+
+        # Reply creation can infer topic from parent if topic was omitted.
+        if parent_id is not None and not data.get("topic") and instance is None:
+            parent = get_object_or_404(EthikosArgument, pk=parent_id)
+            data["topic"] = parent.topic_id
+
+        return data
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(
+            data=self._normalized_argument_data(request),
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+            headers=headers,
+        )
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+
+        serializer = self.get_serializer(
+            instance,
+            data=self._normalized_argument_data(request, instance=instance),
+            partial=partial,
+        )
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        return Response(serializer.data)
+
+    def perform_create(self, serializer) -> None:
+        argument = serializer.save(user=self.request.user)
+        _touch_topic_activity(argument.topic)
+
+    def perform_update(self, serializer) -> None:
+        argument = serializer.save()
+        _touch_topic_activity(argument.topic)
+
+
+# ---- Korum / Argument sources ----------------------------------------------
+
+class ArgumentSourceViewSet(viewsets.ModelViewSet):
+    """
+    Sources attached to EthikosArgument records.
+
+    Canonical route:
+    - /api/ethikos/argument-sources/
+    """
+
+    queryset = ArgumentSource.objects.select_related(
+        "argument",
+        "argument__topic",
+        "created_by",
+    )
+    serializer_class = ArgumentSourceSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosModeratorOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        argument_id = _coerce_optional_int(
+            self.request.query_params.get("argument"),
+            "argument",
+        )
+        if argument_id is not None:
+            qs = qs.filter(argument_id=argument_id)
+
+        topic_id = _coerce_optional_int(
+            self.request.query_params.get("topic"),
+            "topic",
+        )
+        if topic_id is not None:
+            qs = qs.filter(argument__topic_id=topic_id)
+
+        is_removed = self.request.query_params.get("is_removed")
+        if is_removed in ("true", "1"):
+            qs = qs.filter(is_removed=True)
+        elif is_removed in ("false", "0", None, ""):
+            if is_removed in ("false", "0"):
+                qs = qs.filter(is_removed=False)
+        else:
+            raise ValidationError({"is_removed": "Expected true or false."})
+
+        return qs
+
+    def perform_create(self, serializer) -> None:
+        source = serializer.save(created_by=self.request.user)
+        _touch_argument_topic(source.argument)
+
+    def perform_update(self, serializer) -> None:
+        source = serializer.save()
+        _touch_argument_topic(source.argument)
+
+
+# ---- Korum / Argument impact votes -----------------------------------------
+
+class ArgumentImpactVoteViewSet(viewsets.ModelViewSet):
+    """
+    Argument-level impact votes.
+
+    This is not EthikosStance and not a Smart Vote reading.
+
+    Canonical route:
+    - /api/ethikos/argument-impact-votes/
+    """
+
+    queryset = ArgumentImpactVote.objects.select_related(
+        "argument",
+        "argument__topic",
+        "user",
+    )
+    serializer_class = ArgumentImpactVoteSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosAdminOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        argument_id = _coerce_optional_int(
+            self.request.query_params.get("argument"),
+            "argument",
+        )
+        if argument_id is not None:
+            qs = qs.filter(argument_id=argument_id)
+
+        topic_id = _coerce_optional_int(
+            self.request.query_params.get("topic"),
+            "topic",
+        )
+        if topic_id is not None:
+            qs = qs.filter(argument__topic_id=topic_id)
+
+        mine = self.request.query_params.get("mine")
+        if mine in ("true", "1"):
+            if not self.request.user.is_authenticated:
+                return qs.none()
+            qs = qs.filter(user=self.request.user)
+        elif mine not in (None, "", "false", "0"):
+            raise ValidationError({"mine": "Expected true or false."})
+
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        argument = serializer.validated_data.get("argument")
+        value = serializer.validated_data.get("value")
+
+        if argument is None:
+            raise ValidationError({"argument": "This field is required."})
+        if value is None:
+            raise ValidationError({"value": "This field is required."})
+
+        vote, created = ArgumentImpactVote.objects.update_or_create(
+            user=request.user,
+            argument=argument,
+            defaults={"value": value},
+        )
+
+        _touch_argument_topic(argument)
+
+        output = self.get_serializer(vote)
+        return Response(
+            output.data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+    def perform_update(self, serializer) -> None:
+        vote = serializer.save()
+        _touch_argument_topic(vote.argument)
+
+
+# ---- Korum / Argument suggestions ------------------------------------------
+
+class ArgumentSuggestionViewSet(viewsets.ModelViewSet):
+    """
+    Suggested arguments/replies.
+
+    Suggestions are reviewed into EthikosArgument records rather than replacing
+    EthikosArgument.
+
+    Canonical route:
+    - /api/ethikos/argument-suggestions/
+    """
+
+    queryset = ArgumentSuggestion.objects.select_related(
+        "topic",
+        "parent",
+        "accepted_argument",
+        "created_by",
+        "reviewed_by",
+    )
+    serializer_class = ArgumentSuggestionSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosModeratorOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        topic_id = _coerce_optional_int(
+            self.request.query_params.get("topic"),
+            "topic",
+        )
+        if topic_id is not None:
+            qs = qs.filter(topic_id=topic_id)
+
+        parent_id = _coerce_optional_int(
+            self.request.query_params.get("parent"),
+            "parent",
+        )
+        if parent_id is not None:
+            qs = qs.filter(parent_id=parent_id)
+
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            if status_param not in _valid_suggestion_statuses():
+                raise ValidationError({"status": "Invalid suggestion status."})
+            qs = qs.filter(status=status_param)
+
+        mine = self.request.query_params.get("mine")
+        if mine in ("true", "1"):
+            if not self.request.user.is_authenticated:
+                return qs.none()
+            qs = qs.filter(created_by=self.request.user)
+        elif mine not in (None, "", "false", "0"):
+            raise ValidationError({"mine": "Expected true or false."})
+
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=dddd4a059473:701-949
+start=701
+end=949
+----
+        return qs
+
+    def perform_create(self, serializer) -> None:
+        suggestion = serializer.save(created_by=self.request.user)
+        _touch_topic_activity(suggestion.topic)
+
+    def perform_update(self, serializer) -> None:
+        suggestion = serializer.save()
+        _touch_topic_activity(suggestion.topic)
+
+    @action(detail=True, methods=["post"])
+    def accept(self, request, pk=None):
+        """
+        Accept a suggestion by creating an EthikosArgument from it.
+
+        If accepted_argument already exists, return it without creating a
+        duplicate argument.
+        """
+        suggestion = self.get_object()
+
+        if suggestion.accepted_argument_id:
+            output = self.get_serializer(suggestion)
+            return Response(output.data, status=status.HTTP_200_OK)
+
+        argument = EthikosArgument.objects.create(
+            topic=suggestion.topic,
+            user=request.user,
+            content=suggestion.content,
+            parent=suggestion.parent,
+            side=None if suggestion.side == ARGUMENT_SIDE_NEUTRAL else suggestion.side,
+        )
+
+        suggestion.accepted_argument = argument
+        suggestion.status = ARGUMENT_SUGGESTION_ACCEPTED
+        suggestion.reviewed_by = request.user
+        suggestion.reviewed_at = timezone.now()
+        suggestion.save(
+            update_fields=(
+                "accepted_argument",
+                "status",
+                "reviewed_by",
+                "reviewed_at",
+                "updated_at",
+            )
+        )
+
+        _touch_topic_activity(suggestion.topic)
+
+        output = self.get_serializer(suggestion)
+        return Response(output.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    def reject(self, request, pk=None):
+        suggestion = self.get_object()
+        suggestion.status = ARGUMENT_SUGGESTION_REJECTED
+        suggestion.reviewed_by = request.user
+        suggestion.reviewed_at = timezone.now()
+        suggestion.save(
+            update_fields=(
+                "status",
+                "reviewed_by",
+                "reviewed_at",
+                "updated_at",
+            )
+        )
+
+        _touch_topic_activity(suggestion.topic)
+
+        output = self.get_serializer(suggestion)
+        return Response(output.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"], url_path="request-revision")
+    def request_revision(self, request, pk=None):
+        suggestion = self.get_object()
+        suggestion.status = ARGUMENT_SUGGESTION_REVISION_REQUESTED
+        suggestion.reviewed_by = request.user
+        suggestion.reviewed_at = timezone.now()
+        suggestion.save(
+            update_fields=(
+                "status",
+                "reviewed_by",
+                "reviewed_at",
+                "updated_at",
+            )
+        )
+
+        _touch_topic_activity(suggestion.topic)
+
+        output = self.get_serializer(suggestion)
+        return Response(output.data, status=status.HTTP_200_OK)
+
+
+# ---- Korum / Discussion participant roles ----------------------------------
+
+class DiscussionParticipantRoleViewSet(viewsets.ModelViewSet):
+    """
+    Per-topic participant role endpoint.
+
+    Canonical route:
+    - /api/ethikos/discussion-participant-roles/
+    """
+
+    queryset = DiscussionParticipantRole.objects.select_related(
+        "topic",
+        "user",
+        "assigned_by",
+    )
+    serializer_class = DiscussionParticipantRoleSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosAdminOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        topic_id = _coerce_optional_int(
+            self.request.query_params.get("topic"),
+            "topic",
+        )
+        if topic_id is not None:
+            qs = qs.filter(topic_id=topic_id)
+
+        user_id = _coerce_optional_int(
+            self.request.query_params.get("user"),
+            "user",
+        )
+        if user_id is not None:
+            qs = qs.filter(user_id=user_id)
+
+        role_param = self.request.query_params.get("role")
+        if role_param:
+            if role_param not in _valid_discussion_roles():
+                raise ValidationError({"role": "Invalid discussion role."})
+            qs = qs.filter(role=role_param)
+
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        """
+        Upsert role by (topic, user).
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        topic = serializer.validated_data.get("topic")
+        user = serializer.validated_data.get("user")
+        role = serializer.validated_data.get("role")
+
+        if topic is None:
+            raise ValidationError({"topic": "This field is required."})
+        if user is None:
+            raise ValidationError({"target_user_id": "This field is required."})
+        if role is None:
+            raise ValidationError({"role": "This field is required."})
+
+        participant_role, created = DiscussionParticipantRole.objects.update_or_create(
+            topic=topic,
+            user=user,
+            defaults={
+                "role": role,
+                "assigned_by": request.user,
+            },
+        )
+
+        _touch_topic_activity(topic)
+
+        output = self.get_serializer(participant_role)
+        return Response(
+            output.data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+    def perform_update(self, serializer) -> None:
+        participant_role = serializer.save(assigned_by=self.request.user)
+        _touch_topic_activity(participant_role.topic)
+
+
+# ---- Korum / Discussion visibility settings --------------------------------
+
+class DiscussionVisibilitySettingViewSet(viewsets.ModelViewSet):
+    """
+    Per-topic visibility/participation setting endpoint.
+
+    Canonical route:
+    - /api/ethikos/discussion-visibility-settings/
+    """
+
+    queryset = DiscussionVisibilitySetting.objects.select_related(
+        "topic",
+        "changed_by",
+    )
+    serializer_class = DiscussionVisibilitySettingSerializer
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly,
+        OwnerOrEthikosAdminOrReadOnly,
+    ]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        topic_id = _coerce_optional_int(
+            self.request.query_params.get("topic"),
+            "topic",
+        )
+        if topic_id is not None:
+            qs = qs.filter(topic_id=topic_id)
+
+        return qs
+
+    def create(self, request, *args, **kwargs):
+        """
+        Upsert visibility setting by topic.
+        """
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        topic = serializer.validated_data.get("topic")
+        if topic is None:
+            raise ValidationError({"topic": "This field is required."})
+
+        defaults = {
+            "changed_by": request.user,
+        }
+
+        for field_name in (
+            "participation_type",
+            "author_visibility",
+            "vote_visibility",
+        ):
+            if field_name in serializer.validated_data:
+                defaults[field_name] = serializer.validated_data[field_name]
+
+        setting, created = DiscussionVisibilitySetting.objects.update_or_create(
+            topic=topic,
+            defaults=defaults,
+        )
+
+        _touch_topic_activity(topic)
+
+        output = self.get_serializer(setting)
+        return Response(
+            output.data,
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+    def perform_update(self, serializer) -> None:
+        setting = serializer.save(changed_by=self.request.user)
+        _touch_topic_activity(setting.topic)
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="apps.py"
+id=6e673b63e60e
+kind=source
+size=205
+lines=7
+line_ref=1-7
+chunks=0
+chunk_refs=
+summary="Python module with 1 class(es)."
+----
+# FILE: backend/konnaxion/ethikos/apps.py
+from django.apps import AppConfig
+
+
+class EthikosConfig(AppConfig):
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "konnaxion.ethikos"
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="constants.py"
+id=a5a1446dd87d
+kind=source
+size=8565
+lines=226
+line_ref=1-226
+chunks=0
+chunk_refs=
+summary="Python module with imports and top-level code."
+----
+# FILE: backend/konnaxion/ethikos/constants.py
+"""Shared ethiKos/Kintsugi constants.
+
+This file is the thin common foundation for Wave 1 slices.
+
+Rules:
+- Keep existing ethiKos model names stable.
+- Keep canonical API paths under /api/ethikos/*.
+- Do not introduce /api/kialo/*, /api/kintsugi/*, /api/korum/*,
+  /api/deliberation/*, or /api/home/*.
+- Do not conflate topic-level stances, Kialo-style argument impact votes,
+  and Smart Vote readings.
+- Keep symbolic values here so branches do not redefine them independently.
+"""
+
+from __future__ import annotations
+
+from typing import Final
+
+
+# ---------------------------------------------------------------------------
+# Canonical API prefixes and paths
+# ---------------------------------------------------------------------------
+
+ETHIKOS_API_PREFIX: Final[str] = "ethikos"
+
+ETHIKOS_TOPICS_PREFIX: Final[str] = "ethikos/topics"
+ETHIKOS_STANCES_PREFIX: Final[str] = "ethikos/stances"
+ETHIKOS_ARGUMENTS_PREFIX: Final[str] = "ethikos/arguments"
+ETHIKOS_CATEGORIES_PREFIX: Final[str] = "ethikos/categories"
+
+ETHIKOS_TOPICS_PATH: Final[str] = f"{ETHIKOS_TOPICS_PREFIX}/"
+ETHIKOS_STANCES_PATH: Final[str] = f"{ETHIKOS_STANCES_PREFIX}/"
+ETHIKOS_ARGUMENTS_PATH: Final[str] = f"{ETHIKOS_ARGUMENTS_PREFIX}/"
+ETHIKOS_CATEGORIES_PATH: Final[str] = f"{ETHIKOS_CATEGORIES_PREFIX}/"
+
+
+# These are forbidden as route segments anywhere in the API prefix.
+# Example: both "kialo" and "ethikos/kialo" must be rejected.
+FORBIDDEN_KINTSUGI_API_SEGMENTS: Final[tuple[str, ...]] = (
+    "home",
+    "kialo",
+    "kintsugi",
+    "korum",
+    "deliberation",
+)
+
+# Backward-compatible alias for branches that already imported this name.
+FORBIDDEN_KINTSUGI_API_PREFIXES: Final[tuple[str, ...]] = (
+    FORBIDDEN_KINTSUGI_API_SEGMENTS
+)
+
+
+# ---------------------------------------------------------------------------
+# Current core model invariants
+# ---------------------------------------------------------------------------
+
+CURRENT_ETHIKOS_CORE_MODELS: Final[tuple[str, ...]] = (
+    "EthikosCategory",
+    "EthikosTopic",
+    "EthikosStance",
+    "EthikosArgument",
+)
+
+
+# ---------------------------------------------------------------------------
+# Topic status
+# ---------------------------------------------------------------------------
+
+TOPIC_STATUS_OPEN: Final[str] = "open"
+TOPIC_STATUS_CLOSED: Final[str] = "closed"
+TOPIC_STATUS_ARCHIVED: Final[str] = "archived"
+
+TOPIC_STATUS_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (TOPIC_STATUS_OPEN, "Open"),
+    (TOPIC_STATUS_CLOSED, "Closed"),
+    (TOPIC_STATUS_ARCHIVED, "Archived"),
+)
+
+
+# ---------------------------------------------------------------------------
+# Topic-level stance range.
+#
+# This is NOT the Kialo-style claim/argument impact vote range.
+# It is also NOT a Smart Vote reading.
+# ---------------------------------------------------------------------------
+
+STANCE_MIN: Final[int] = -3
+STANCE_MAX: Final[int] = 3
+STANCE_VALUES: Final[tuple[int, ...]] = (-3, -2, -1, 0, 1, 2, 3)
+
+
+# ---------------------------------------------------------------------------
+# Argument side.
+#
+# Current EthikosArgument.side persists pro/con only. The neutral value is
+# reserved for filtering and future slice handling; do not add it to the DB
+# field choices until the owning Korum slice includes a migration.
+# ---------------------------------------------------------------------------
+
+ARGUMENT_SIDE_PRO: Final[str] = "pro"
+ARGUMENT_SIDE_CON: Final[str] = "con"
+ARGUMENT_SIDE_NEUTRAL: Final[str] = "neutral"
+
+ARGUMENT_SIDE_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (ARGUMENT_SIDE_PRO, "Pro"),
+    (ARGUMENT_SIDE_CON, "Con"),
+)
+
+ARGUMENT_SIDE_FILTER_VALUES: Final[tuple[str, ...]] = (
+    ARGUMENT_SIDE_PRO,
+    ARGUMENT_SIDE_CON,
+    ARGUMENT_SIDE_NEUTRAL,
+)
+
+
+# ---------------------------------------------------------------------------
+# Future Korum/Kialo-style argument impact vote range.
+#
+# Kept here now as a shared invariant for later Korum slice models.
+# Do not wire DB models in the foundation pass.
+# ---------------------------------------------------------------------------
+
+ARGUMENT_IMPACT_VOTE_MIN: Final[int] = 0
+ARGUMENT_IMPACT_VOTE_MAX: Final[int] = 4
+ARGUMENT_IMPACT_VOTE_VALUES: Final[tuple[int, ...]] = (0, 1, 2, 3, 4)
+
+# Backward-compatible aliases for branches that already used shorter names.
+ARGUMENT_IMPACT_MIN: Final[int] = ARGUMENT_IMPACT_VOTE_MIN
+ARGUMENT_IMPACT_MAX: Final[int] = ARGUMENT_IMPACT_VOTE_MAX
+ARGUMENT_IMPACT_VALUES: Final[tuple[int, ...]] = ARGUMENT_IMPACT_VOTE_VALUES
+
+
+# ---------------------------------------------------------------------------
+# Future Korum/Kialo-style discussion participant roles.
+#
+# These are participant-role values, not Django permission group names.
+# Moderator/admin governance can still be represented in permissions.py through
+# Django staff flags or groups, without changing these discussion role values.
+# ---------------------------------------------------------------------------
+
+DISCUSSION_ROLE_OWNER: Final[str] = "owner"
+DISCUSSION_ROLE_ADMIN: Final[str] = "admin"
+DISCUSSION_ROLE_EDITOR: Final[str] = "editor"
+DISCUSSION_ROLE_WRITER: Final[str] = "writer"
+DISCUSSION_ROLE_SUGGESTER: Final[str] = "suggester"
+DISCUSSION_ROLE_VIEWER: Final[str] = "viewer"
+
+DISCUSSION_ROLE_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (DISCUSSION_ROLE_OWNER, "Owner"),
+    (DISCUSSION_ROLE_ADMIN, "Admin"),
+    (DISCUSSION_ROLE_EDITOR, "Editor"),
+    (DISCUSSION_ROLE_WRITER, "Writer"),
+    (DISCUSSION_ROLE_SUGGESTER, "Suggester"),
+    (DISCUSSION_ROLE_VIEWER, "Viewer"),
+)
+
+
+# ---------------------------------------------------------------------------
+# Future discussion visibility / anonymity settings.
+# ---------------------------------------------------------------------------
+
+DISCUSSION_PARTICIPATION_STANDARD: Final[str] = "standard"
+DISCUSSION_PARTICIPATION_ANONYMOUS: Final[str] = "anonymous"
+
+DISCUSSION_PARTICIPATION_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (DISCUSSION_PARTICIPATION_STANDARD, "Standard"),
+    (DISCUSSION_PARTICIPATION_ANONYMOUS, "Anonymous"),
+)
+
+# Backward-compatible aliases for branches that already used ANONYMITY names.
+DISCUSSION_ANONYMITY_STANDARD: Final[str] = DISCUSSION_PARTICIPATION_STANDARD
+DISCUSSION_ANONYMITY_ANONYMOUS: Final[str] = DISCUSSION_PARTICIPATION_ANONYMOUS
+DISCUSSION_ANONYMITY_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    DISCUSSION_PARTICIPATION_CHOICES
+)
+
+AUTHOR_VISIBILITY_NEVER: Final[str] = "never"
+AUTHOR_VISIBILITY_ADMINS_ONLY: Final[str] = "admins_only"
+AUTHOR_VISIBILITY_ALL: Final[str] = "all"
+
+AUTHOR_VISIBILITY_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (AUTHOR_VISIBILITY_NEVER, "Never"),
+    (AUTHOR_VISIBILITY_ADMINS_ONLY, "Admins only"),
+    (AUTHOR_VISIBILITY_ALL, "All"),
+)
+
+VOTE_VISIBILITY_ALL: Final[str] = "all"
+VOTE_VISIBILITY_ADMINS_ONLY: Final[str] = "admins_only"
+VOTE_VISIBILITY_SELF_ONLY: Final[str] = "self_only"
+
+VOTE_VISIBILITY_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (VOTE_VISIBILITY_ALL, "All"),
+    (VOTE_VISIBILITY_ADMINS_ONLY, "Admins only"),
+    (VOTE_VISIBILITY_SELF_ONLY, "Self only"),
+)
+
+
+# ---------------------------------------------------------------------------
+# Future discussion topology settings.
+# ---------------------------------------------------------------------------
+
+DISCUSSION_TOPOLOGY_SINGLE_THESIS: Final[str] = "single_thesis"
+DISCUSSION_TOPOLOGY_MULTI_THESIS: Final[str] = "multi_thesis"
+
+DISCUSSION_TOPOLOGY_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (DISCUSSION_TOPOLOGY_SINGLE_THESIS, "Single thesis"),
+    (DISCUSSION_TOPOLOGY_MULTI_THESIS, "Multi thesis"),
+)
+
+
+# ---------------------------------------------------------------------------
+# Future argument suggestion workflow.
+# ---------------------------------------------------------------------------
+
+ARGUMENT_SUGGESTION_PENDING: Final[str] = "pending"
+ARGUMENT_SUGGESTION_ACCEPTED: Final[str] = "accepted"
+ARGUMENT_SUGGESTION_REJECTED: Final[str] = "rejected"
+ARGUMENT_SUGGESTION_REVISION_REQUESTED: Final[str] = "revision_requested"
+
+ARGUMENT_SUGGESTION_STATUS_CHOICES: Final[tuple[tuple[str, str], ...]] = (
+    (ARGUMENT_SUGGESTION_PENDING, "Pending"),
+    (ARGUMENT_SUGGESTION_ACCEPTED, "Accepted"),
+    (ARGUMENT_SUGGESTION_REJECTED, "Rejected"),
+    (ARGUMENT_SUGGESTION_REVISION_REQUESTED, "Revision requested"),
+)
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="models.py"
+id=8ea003a30274
+kind=source
+size=13752
+lines=467
+line_ref=1-467
+chunks=2
+chunk_refs=1-350,351-467
+summary="Python module with 18 class(es) and 9 function(s)."
+
+--- CHUNK BEGIN ---
+id=8ea003a30274:1-350
+start=1
+end=350
+----
+# backend/konnaxion/ethikos/models.py
+
+from __future__ import annotations
+
+from django.conf import settings
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+
+# Imported so Django registers the demo importer tracking model
+# when loading the ethikos app models.
+from .models_demo import DemoScenarioImport as DemoScenarioImport  # noqa: F401
+
+
+class EthikosCategory(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True)
+
+    class Meta:
+        ordering = ("name",)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class EthikosArgument(models.Model):
+    PRO = "pro"
+    CON = "con"
+    NEUTRAL = "neutral"
+
+    SIDE_CHOICES = (
+        (PRO, "Pro"),
+        (CON, "Con"),
+    )
+
+    content = models.TextField()
+    side = models.CharField(
+        max_length=3,
+        choices=SIDE_CHOICES,
+        blank=True,
+        null=True,
+    )
+    is_hidden = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    parent = models.ForeignKey(
+        "self",
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="replies",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_arguments",
+    )
+    topic = models.ForeignKey(
+        "EthikosTopic",
+        on_delete=models.CASCADE,
+        related_name="arguments",
+    )
+
+    class Meta:
+        ordering = ("created_at",)
+        indexes = [
+            models.Index(fields=["topic"], name="ethikos_eth_topic_i_53cecf_idx"),
+            models.Index(fields=["user"], name="ethikos_eth_user_id_0f0683_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return self.content[:80]
+
+
+class EthikosStance(models.Model):
+    value = models.SmallIntegerField(
+        validators=[
+            MinValueValidator(-3),
+            MaxValueValidator(3),
+        ],
+    )
+    timestamp = models.DateTimeField(auto_now=True)
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_stances",
+    )
+    topic = models.ForeignKey(
+        "EthikosTopic",
+        on_delete=models.CASCADE,
+        related_name="stances",
+    )
+
+    class Meta:
+        unique_together = (("user", "topic"),)
+        indexes = [
+            models.Index(fields=["topic"], name="ethikos_eth_topic_i_791d0c_idx"),
+            models.Index(fields=["user"], name="ethikos_eth_user_id_fe6937_idx"),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(value__gte=-3, value__lte=3),
+                name="stance_value_between_-3_and_3",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user} · {self.topic} · {self.value}"
+
+
+class EthikosTopic(models.Model):
+    OPEN = "open"
+    CLOSED = "closed"
+    ARCHIVED = "archived"
+
+    STATUS_CHOICES = (
+        (OPEN, "Open"),
+        (CLOSED, "Closed"),
+        (ARCHIVED, "Archived"),
+    )
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    status = models.CharField(
+        max_length=8,
+        choices=STATUS_CHOICES,
+        default=OPEN,
+    )
+    total_votes = models.PositiveIntegerField(default=0)
+    last_activity = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    category = models.ForeignKey(
+        EthikosCategory,
+        on_delete=models.PROTECT,
+        related_name="topics",
+    )
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_topics",
+    )
+    expertise_category = models.ForeignKey(
+        "kollective_intelligence.ExpertiseCategory",
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    class Meta:
+        ordering = ("-created_at",)
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class ArgumentSource(models.Model):
+    argument = models.ForeignKey(
+        EthikosArgument,
+        on_delete=models.CASCADE,
+        related_name="sources",
+    )
+    url = models.URLField(
+        max_length=2048,
+        blank=True,
+        null=True,
+    )
+    title = models.CharField(
+        max_length=255,
+        blank=True,
+    )
+    excerpt = models.TextField(blank=True)
+    source_type = models.CharField(
+        max_length=64,
+        blank=True,
+    )
+    citation_text = models.TextField(blank=True)
+    quote = models.TextField(blank=True)
+    note = models.TextField(blank=True)
+    is_removed = models.BooleanField(default=False)
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="ethikos_argument_sources_created",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["argument"], name="eth_arg_src_argument_idx"),
+            models.Index(fields=["created_by"], name="eth_arg_src_creator_idx"),
+            models.Index(fields=["is_removed"], name="eth_arg_src_removed_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return (
+            self.title
+            or self.url
+            or self.citation_text
+            or f"Source for argument {self.argument_id}"
+        )
+
+
+class ArgumentImpactVote(models.Model):
+    argument = models.ForeignKey(
+        EthikosArgument,
+        on_delete=models.CASCADE,
+        related_name="impact_votes",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_argument_impact_votes",
+    )
+    value = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(4),
+        ],
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-updated_at", "-created_at")
+        indexes = [
+            models.Index(fields=["argument"], name="eth_arg_vote_argument_idx"),
+            models.Index(fields=["user"], name="eth_arg_vote_user_idx"),
+            models.Index(fields=["value"], name="eth_arg_vote_value_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("user", "argument"),
+                name="uniq_arg_impact_vote_user_argument",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(value__gte=0, value__lte=4),
+                name="arg_impact_value_0_4",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user} → {self.argument_id} = {self.value}"
+
+
+class ArgumentSuggestion(models.Model):
+    PENDING = "pending"
+    ACCEPTED = "accepted"
+    REJECTED = "rejected"
+    REVISION_REQUESTED = "revision_requested"
+
+    STATUS_CHOICES = (
+        (PENDING, "Pending"),
+        (ACCEPTED, "Accepted"),
+        (REJECTED, "Rejected"),
+        (REVISION_REQUESTED, "Revision requested"),
+    )
+
+    SIDE_CHOICES = (
+        (EthikosArgument.PRO, "Pro"),
+        (EthikosArgument.CON, "Con"),
+        (EthikosArgument.NEUTRAL, "Neutral"),
+    )
+
+    topic = models.ForeignKey(
+        EthikosTopic,
+        on_delete=models.CASCADE,
+        related_name="argument_suggestions",
+    )
+    parent = models.ForeignKey(
+        EthikosArgument,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="suggested_replies",
+    )
+    accepted_argument = models.ForeignKey(
+        EthikosArgument,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="accepted_suggestions",
+    )
+    side = models.CharField(
+        max_length=7,
+        choices=SIDE_CHOICES,
+        blank=True,
+        null=True,
+    )
+    content = models.TextField()
+    status = models.CharField(
+        max_length=24,
+        choices=STATUS_CHOICES,
+        default=PENDING,
+    )
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="ethikos_argument_suggestions_created",
+    )
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="ethikos_argument_suggestions_reviewed",
+    )
+    reviewed_at = models.DateTimeField(
+        blank=True,
+        null=True,
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=["topic"], name="eth_arg_sugg_topic_idx"),
+            models.Index(fields=["status"], name="eth_arg_sugg_status_idx"),
+            models.Index(fields=["created_by"], name="eth_arg_sugg_creator_idx"),
+            models.Index(fields=["parent"], name="eth_arg_sugg_parent_idx"),
+            models.Index(fields=["accepted_argument"], name="eth_arg_sugg_accept_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return self.content[:80]
+
+
+class DiscussionParticipantRole(models.Model):
+    OWNER = "owner"
+    ADMIN = "admin"
+    EDITOR = "editor"
+    WRITER = "writer"
+    SUGGESTER = "suggester"
+    VIEWER = "viewer"
+
+    ROLE_CHOICES = (
+        (OWNER, "Owner"),
+        (ADMIN, "Admin"),
+        (EDITOR, "Editor"),
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=8ea003a30274:351-467
+start=351
+end=467
+----
+        (WRITER, "Writer"),
+        (SUGGESTER, "Suggester"),
+        (VIEWER, "Viewer"),
+    )
+
+    topic = models.ForeignKey(
+        EthikosTopic,
+        on_delete=models.CASCADE,
+        related_name="participant_roles",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="ethikos_discussion_roles",
+    )
+    role = models.CharField(
+        max_length=16,
+        choices=ROLE_CHOICES,
+        default=VIEWER,
+    )
+    assigned_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="ethikos_discussion_roles_assigned",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("topic", "user")
+        indexes = [
+            models.Index(fields=["topic"], name="eth_disc_role_topic_idx"),
+            models.Index(fields=["user"], name="eth_disc_role_user_idx"),
+            models.Index(fields=["role"], name="eth_disc_role_role_idx"),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("topic", "user"),
+                name="uniq_discussion_role_topic_user",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.user} · {self.topic} · {self.role}"
+
+
+class DiscussionVisibilitySetting(models.Model):
+    PARTICIPATION_STANDARD = "standard"
+    PARTICIPATION_ANONYMOUS = "anonymous"
+
+    AUTHOR_VISIBILITY_NEVER = "never"
+    AUTHOR_VISIBILITY_ADMINS_ONLY = "admins_only"
+    AUTHOR_VISIBILITY_ALL = "all"
+
+    VOTE_VISIBILITY_ALL = "all"
+    VOTE_VISIBILITY_ADMINS_ONLY = "admins_only"
+    VOTE_VISIBILITY_SELF_ONLY = "self_only"
+
+    PARTICIPATION_TYPE_CHOICES = (
+        (PARTICIPATION_STANDARD, "Standard"),
+        (PARTICIPATION_ANONYMOUS, "Anonymous"),
+    )
+
+    AUTHOR_VISIBILITY_CHOICES = (
+        (AUTHOR_VISIBILITY_NEVER, "Never"),
+        (AUTHOR_VISIBILITY_ADMINS_ONLY, "Admins only"),
+        (AUTHOR_VISIBILITY_ALL, "All"),
+    )
+
+    VOTE_VISIBILITY_CHOICES = (
+        (VOTE_VISIBILITY_ALL, "All"),
+        (VOTE_VISIBILITY_ADMINS_ONLY, "Admins only"),
+        (VOTE_VISIBILITY_SELF_ONLY, "Self only"),
+    )
+
+    topic = models.OneToOneField(
+        EthikosTopic,
+        on_delete=models.CASCADE,
+        related_name="visibility_setting",
+    )
+    participation_type = models.CharField(
+        max_length=16,
+        choices=PARTICIPATION_TYPE_CHOICES,
+        default=PARTICIPATION_STANDARD,
+    )
+    author_visibility = models.CharField(
+        max_length=16,
+        choices=AUTHOR_VISIBILITY_CHOICES,
+        default=AUTHOR_VISIBILITY_ALL,
+    )
+    vote_visibility = models.CharField(
+        max_length=16,
+        choices=VOTE_VISIBILITY_CHOICES,
+        default=VOTE_VISIBILITY_ALL,
+    )
+    changed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+        related_name="ethikos_visibility_settings_changed",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("topic",)
+        indexes = [
+            models.Index(fields=["participation_type"], name="eth_disc_vis_part_idx"),
+            models.Index(fields=["author_visibility"], name="eth_disc_vis_author_idx"),
+            models.Index(fields=["vote_visibility"], name="eth_disc_vis_vote_idx"),
+        ]
+
+    def __str__(self) -> str:
+        return f"Visibility · {self.topic}"
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="models_demo.py"
+id=dec111ed51dc
+kind=source
+size=4028
+lines=123
+line_ref=1-123
+chunks=0
+chunk_refs=
+summary="Python module with 2 class(es) and 1 function(s)."
+----
+from __future__ import annotations
+
+from django.conf import settings
+from django.db import models
+
+
+class DemoScenarioImport(models.Model):
+    """
+    Tracks objects created by the ethiKos Demo Importer.
+
+    This lets reset_scenario delete only records that were imported for a
+    specific demo scenario, instead of relying on fragile title/user prefixes.
+    """
+
+    OBJECT_TYPE_USER = "user"
+    OBJECT_TYPE_CATEGORY = "category"
+    OBJECT_TYPE_TOPIC = "topic"
+    OBJECT_TYPE_STANCE = "stance"
+    OBJECT_TYPE_ARGUMENT = "argument"
+    OBJECT_TYPE_CONSULTATION = "consultation"
+    OBJECT_TYPE_CONSULTATION_VOTE = "consultation_vote"
+    OBJECT_TYPE_CONSULTATION_RESULT = "consultation_result"
+    OBJECT_TYPE_IMPACT_ITEM = "impact_item"
+    OBJECT_TYPE_EKOH_EXPERTISE_SCORE = "ekoh_expertise_score"
+    OBJECT_TYPE_EKOH_ETHICS_SCORE = "ekoh_ethics_score"
+    OBJECT_TYPE_SMART_VOTE_SOURCE_BINDING = "smart_vote_source_binding"
+
+    OBJECT_TYPE_CHOICES = [
+        (OBJECT_TYPE_USER, "User"),
+        (OBJECT_TYPE_CATEGORY, "Ethikos Category"),
+        (OBJECT_TYPE_TOPIC, "Ethikos Topic"),
+        (OBJECT_TYPE_STANCE, "Ethikos Stance"),
+        (OBJECT_TYPE_ARGUMENT, "Ethikos Argument"),
+        (OBJECT_TYPE_CONSULTATION, "Consultation"),
+        (OBJECT_TYPE_CONSULTATION_VOTE, "Consultation Vote"),
+        (OBJECT_TYPE_CONSULTATION_RESULT, "Consultation Result"),
+        (OBJECT_TYPE_IMPACT_ITEM, "Impact Item"),
+        (OBJECT_TYPE_EKOH_EXPERTISE_SCORE, "EkoH Expertise Score"),
+        (OBJECT_TYPE_EKOH_ETHICS_SCORE, "EkoH Ethics Score"),
+        (OBJECT_TYPE_SMART_VOTE_SOURCE_BINDING, "Smart Vote Source Binding"),
+    ]
+
+    scenario_key = models.CharField(
+        max_length=120,
+        db_index=True,
+        help_text="Stable key from the demo scenario JSON, e.g. public_square_demo.",
+    )
+
+    object_type = models.CharField(
+        max_length=120,
+        choices=OBJECT_TYPE_CHOICES,
+        db_index=True,
+        help_text=(
+            "Type of imported object, e.g. topic, stance, EkoH score, "
+            "or Smart Vote source binding."
+        ),
+    )
+
+    object_id = models.PositiveBigIntegerField(
+        db_index=True,
+        help_text="Primary key of the imported object.",
+    )
+
+    object_label = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text="Human-readable label for debugging and reset reports.",
+    )
+
+    source_key = models.CharField(
+        max_length=120,
+        blank=True,
+        db_index=True,
+        help_text="Optional JSON object key, e.g. public_square or maya_argument_1.",
+    )
+
+    imported_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="ethikos_demo_imports",
+        help_text="Admin user who imported the demo scenario.",
+    )
+
+    imported_at = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+    )
+
+    class Meta:
+        verbose_name = "Demo scenario import"
+        verbose_name_plural = "Demo scenario imports"
+        ordering = ["-imported_at", "scenario_key", "object_type"]
+
+        indexes = [
+            models.Index(
+                fields=["scenario_key", "object_type"],
+                name="eth_demo_scen_type_idx",
+            ),
+            models.Index(
+                fields=["object_type", "object_id"],
+                name="eth_demo_obj_idx",
+            ),
+            models.Index(
+                fields=["scenario_key", "source_key"],
+                name="eth_demo_source_idx",
+            ),
+            models.Index(
+                fields=["scenario_key", "imported_at"],
+                name="eth_demo_time_idx",
+            ),
+        ]
+
+        constraints = [
+            models.UniqueConstraint(
+                fields=["scenario_key", "object_type", "object_id"],
+                name="uniq_eth_demo_import_obj",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.scenario_key}:{self.object_type}:{self.object_id}"
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="permissions.py"
+id=f640b86203cf
+kind=source
+size=9790
+lines=300
+line_ref=1-300
+chunks=0
+chunk_refs=
+summary="Python module with 9 class(es) and 23 function(s)."
+----
+# FILE: backend/konnaxion/ethikos/permissions.py
+# backend/konnaxion/ethikos/permissions.py
+"""
+Reusable DRF permissions for ethiKos / Kintsugi Wave 1.
+
+This module is intentionally small and dependency-light. It avoids importing
+ethiKos models so it can be reused safely from viewsets, serializers, admin
+helpers, and future slice code without circular imports.
+
+Design goals:
+- public read where the API contract allows it;
+- authenticated writes by default;
+- owner/admin object edits;
+- moderator/admin governance actions;
+- no new Kintsugi/Kialo permission namespace;
+- no assumptions about future slice models beyond common ownership fields.
+"""
+
+from __future__ import annotations
+
+from typing import Any
+
+from rest_framework.permissions import SAFE_METHODS, BasePermission
+
+
+# Group names are deliberately permissive during Wave 1 so existing deployments
+# can adopt either Django staff flags or explicit moderator groups.
+ETHIKOS_MODERATOR_GROUP_NAMES = {
+    "ethikos_moderator",
+    "ethikos_moderators",
+    "moderator",
+    "moderators",
+    "Moderators",
+}
+
+ETHIKOS_ADMIN_GROUP_NAMES = {
+    "ethikos_admin",
+    "ethikos_admins",
+    "admin",
+    "admins",
+    "Administrators",
+}
+
+
+def is_authenticated_user(user: Any) -> bool:
+    """Return True only for a real authenticated Django user."""
+    return bool(user and getattr(user, "is_authenticated", False))
+
+
+def is_staff_or_superuser(user: Any) -> bool:
+    """Return True for Django staff or superusers."""
+    if not is_authenticated_user(user):
+        return False
+    return bool(
+        getattr(user, "is_staff", False)
+        or getattr(user, "is_superuser", False)
+    )
+
+
+def user_in_any_group(user: Any, group_names: set[str]) -> bool:
+    """
+    Return True if the user belongs to at least one named Django group.
+
+    This is defensive because AnonymousUser, test doubles, or custom user
+    objects may not expose a normal ``groups`` relation.
+    """
+    if not is_authenticated_user(user):
+        return False
+
+    groups = getattr(user, "groups", None)
+    if groups is None:
+        return False
+
+    try:
+        return groups.filter(name__in=group_names).exists()
+    except Exception:
+        return False
+
+
+def is_ethikos_admin(user: Any) -> bool:
+    """
+    Return True for users allowed to perform ethiKos administrative actions.
+
+    Staff and superusers are always accepted. Explicit admin groups are accepted
+    to support future role-based governance without changing permission classes.
+    """
+    return is_staff_or_superuser(user) or user_in_any_group(
+        user,
+        ETHIKOS_ADMIN_GROUP_NAMES,
+    )
+
+
+def is_ethikos_moderator(user: Any) -> bool:
+    """
+    Return True for users allowed to moderate ethiKos content.
+
+    Admin users are also moderators.
+    """
+    return is_ethikos_admin(user) or user_in_any_group(
+        user,
+        ETHIKOS_MODERATOR_GROUP_NAMES,
+    )
+
+
+def get_object_owner_id(obj: Any) -> Any | None:
+    """
+    Best-effort owner lookup for current and future ethiKos objects.
+
+    Current known ownership fields:
+    - EthikosTopic.created_by
+    - EthikosArgument.user
+    - EthikosStance.user
+
+    Future Wave 1 slice models may use ``owner``, ``created_by``, ``author``,
+    ``submitted_by``, or ``user``. This helper supports those names without
+    importing models or forcing a specific abstract base class.
+    """
+    for field_name in (
+        "owner",
+        "created_by",
+        "author",
+        "submitted_by",
+        "user",
+    ):
+        owner_id = getattr(obj, f"{field_name}_id", None)
+        if owner_id is not None:
+            return owner_id
+
+        owner = getattr(obj, field_name, None)
+        if owner is not None:
+            return getattr(owner, "id", None)
+
+    return None
+
+
+def user_owns_object(user: Any, obj: Any) -> bool:
+    """Return True if ``user`` owns ``obj`` according to common owner fields."""
+    if not is_authenticated_user(user):
+        return False
+
+    owner_id = get_object_owner_id(obj)
+    user_id = getattr(user, "id", None)
+
+    return owner_id is not None and user_id is not None and owner_id == user_id
+
+
+class PublicReadAuthenticatedWrite(BasePermission):
+    """
+    Allow public reads and require authentication for unsafe methods.
+
+    Use for core public ethiKos resources such as topics, stances, arguments,
+    previews, and future Kintsugi read surfaces where unauthenticated browsing
+    is allowed but writes require a logged-in user.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        if request.method in SAFE_METHODS:
+            return True
+        return is_authenticated_user(request.user)
+
+
+class AuthenticatedOnly(BasePermission):
+    """
+    Require authentication for every method.
+
+    Use for user-specific actions, submissions, suggestions, draft work, and
+    other endpoints where even reads should not be public.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        return is_authenticated_user(request.user)
+
+
+class EthikosAdminOnly(BasePermission):
+    """
+    Require ethiKos admin rights.
+
+    Staff, superusers, and users in accepted ethiKos admin groups pass.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        return is_ethikos_admin(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:  # type: ignore[override]
+        return is_ethikos_admin(request.user)
+
+
+class EthikosModeratorOnly(BasePermission):
+    """
+    Require ethiKos moderator rights.
+
+    Admin users are treated as moderators.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        return is_ethikos_moderator(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:  # type: ignore[override]
+        return is_ethikos_moderator(request.user)
+
+
+class OwnerOrEthikosAdmin(BasePermission):
+    """
+    Allow object owners or ethiKos admins.
+
+    This class does not allow anonymous public reads. Use
+    ``OwnerOrEthikosAdminOrReadOnly`` when public read access is desired.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        return is_authenticated_user(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:  # type: ignore[override]
+        return is_ethikos_admin(request.user) or user_owns_object(request.user, obj)
+
+
+class OwnerOrEthikosModerator(BasePermission):
+    """
+    Allow object owners, moderators, or admins.
+
+    Useful for argument moderation and future queue-like slice objects where
+    owners may edit their own submissions and moderators may intervene.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        return is_authenticated_user(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:  # type: ignore[override]
+        return is_ethikos_moderator(request.user) or user_owns_object(
+            request.user,
+            obj,
+        )
+
+
+class OwnerOrEthikosAdminOrReadOnly(BasePermission):
+    """
+    Public read, owner/admin write.
+
+    Recommended default for resources such as EthikosTopic where:
+    - list/retrieve/preview are public;
+    - create requires authentication;
+    - update/delete require owner or admin.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        if request.method in SAFE_METHODS:
+            return True
+        return is_authenticated_user(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:  # type: ignore[override]
+        if request.method in SAFE_METHODS:
+            return True
+        return is_ethikos_admin(request.user) or user_owns_object(request.user, obj)
+
+
+class OwnerOrEthikosModeratorOrReadOnly(BasePermission):
+    """
+    Public read, owner/moderator/admin write.
+
+    Recommended default for user-authored deliberation objects such as
+    arguments, sources, suggestions, and other Korum slice artifacts.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        if request.method in SAFE_METHODS:
+            return True
+        return is_authenticated_user(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:  # type: ignore[override]
+        if request.method in SAFE_METHODS:
+            return True
+        return is_ethikos_moderator(request.user) or user_owns_object(
+            request.user,
+            obj,
+        )
+
+
+class SelfOrEthikosAdmin(BasePermission):
+    """
+    Allow users to access only their own user-linked object, or admins.
+
+    Useful for user-specific stance, role, declaration, or profile-context
+    records where public read access is not appropriate.
+    """
+
+    def has_permission(self, request, view) -> bool:  # type: ignore[override]
+        return is_authenticated_user(request.user)
+
+    def has_object_permission(self, request, view, obj) -> bool:  # type: ignore[override]
+        return is_ethikos_admin(request.user) or user_owns_object(request.user, obj)
+
+
+# Compatibility aliases for readable viewset declarations.
+IsEthikosAdmin = EthikosAdminOnly
+IsEthikosModerator = EthikosModeratorOnly
+IsAuthenticatedForEthikos = AuthenticatedOnly
+IsPublicReadAuthenticatedWrite = PublicReadAuthenticatedWrite
+IsOwnerOrAdmin = OwnerOrEthikosAdmin
+IsOwnerOrAdminOrReadOnly = OwnerOrEthikosAdminOrReadOnly
+IsOwnerOrModeratorOrReadOnly = OwnerOrEthikosModeratorOrReadOnly
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="serializers.py"
+id=a6196e341135
+kind=source
+size=18458
+lines=622
+line_ref=1-622
+chunks=2
+chunk_refs=1-350,351-622
+summary="Python module with 20 class(es) and 7 function(s)."
+
+--- CHUNK BEGIN ---
+id=a6196e341135:1-350
+start=1
+end=350
+----
+# FILE: backend/konnaxion/ethikos/serializers.py
+# backend/konnaxion/ethikos/serializers.py
+
+from __future__ import annotations
+
+from typing import Any
+
+from django.contrib.auth import get_user_model
+from rest_framework import serializers
+
+from .constants import (
+    ARGUMENT_IMPACT_VOTE_MAX,
+    ARGUMENT_IMPACT_VOTE_MIN,
+    STANCE_MAX,
+    STANCE_MIN,
+)
+from .models import (
+    ArgumentImpactVote,
+    ArgumentSource,
+    ArgumentSuggestion,
+    DiscussionParticipantRole,
+    DiscussionVisibilitySetting,
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+
+__all__ = [
+    "EthikosCategorySerializer",
+    "EthikosTopicSerializer",
+    "EthikosTopicPreviewSerializer",
+    "EthikosStanceSerializer",
+    "EthikosArgumentSerializer",
+    "ArgumentSourceSerializer",
+    "ArgumentImpactVoteSerializer",
+    "ArgumentSuggestionSerializer",
+    "DiscussionParticipantRoleSerializer",
+    "DiscussionVisibilitySettingSerializer",
+]
+
+
+class EthikosCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EthikosCategory
+        fields = "__all__"
+        read_only_fields = ("id",)
+
+
+class EthikosTopicSerializer(serializers.ModelSerializer):
+    """
+    Canonical topic serializer.
+
+    Read shape:
+    - category: nested category object
+    - category_name: convenience string
+    - created_by / created_by_id: read-only creator identity
+
+    Write shape:
+    - category_id: explicit PK input mapped to category
+    """
+
+    category = EthikosCategorySerializer(read_only=True)
+    category_name = serializers.CharField(source="category.name", read_only=True)
+
+    created_by = serializers.StringRelatedField(read_only=True)
+    created_by_id = serializers.IntegerField(read_only=True)
+
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosCategory.objects.all(),
+        source="category",
+        write_only=True,
+        required=False,
+    )
+
+    class Meta:
+        model = EthikosTopic
+        fields = (
+            "id",
+            "title",
+            "description",
+            "category",
+            "category_id",
+            "category_name",
+            "expertise_category",
+            "status",
+            "total_votes",
+            "created_by",
+            "created_by_id",
+            "last_activity",
+            "created_at",
+        )
+        read_only_fields = (
+            "id",
+            "category",
+            "category_name",
+            "created_by",
+            "created_by_id",
+            "last_activity",
+            "created_at",
+            "total_votes",
+        )
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Require category on create while keeping partial updates flexible.
+
+        API views may normalize legacy `category` input into `category_id`
+        before serializer validation. The serializer itself only owns the
+        canonical write field: category_id.
+        """
+
+        if self.instance is None and attrs.get("category") is None:
+            raise serializers.ValidationError(
+                {"category_id": "Category is required when creating a topic."}
+            )
+
+        return attrs
+
+
+class EthikosTopicPreviewSerializer(serializers.ModelSerializer):
+    """
+    Lightweight serializer for preview surfaces.
+
+    Kintsugi rule:
+    the preview endpoint should still return topic metadata even if arguments
+    are absent or fail to load in the view.
+    """
+
+    category = EthikosCategorySerializer(read_only=True)
+    category_name = serializers.CharField(source="category.name", read_only=True)
+
+    created_by = serializers.StringRelatedField(read_only=True)
+    created_by_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = EthikosTopic
+        fields = (
+            "id",
+            "title",
+            "description",
+            "category",
+            "category_name",
+            "expertise_category",
+            "status",
+            "total_votes",
+            "created_by",
+            "created_by_id",
+            "last_activity",
+            "created_at",
+        )
+        read_only_fields = fields
+
+
+class EthikosStanceSerializer(serializers.ModelSerializer):
+    """
+    Topic-level stance serializer.
+
+    EthikosStance remains a topic-level -3..+3 position. It is not an
+    argument-level impact vote and not a Smart Vote reading.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = EthikosStance
+        fields = (
+            "id",
+            "user",
+            "user_id",
+            "topic",
+            "value",
+            "timestamp",
+        )
+        read_only_fields = (
+            "id",
+            "user",
+            "user_id",
+            "timestamp",
+        )
+
+    def validate_value(self, value: int) -> int:
+        if value < STANCE_MIN or value > STANCE_MAX:
+            raise serializers.ValidationError(
+                f"Stance value must be between {STANCE_MIN} and {STANCE_MAX}."
+            )
+        return value
+
+
+class EthikosArgumentSerializer(serializers.ModelSerializer):
+    """
+    Canonical threaded argument serializer.
+
+    Kialo-style "claim" is a UX/domain concept. The persisted backend model
+    remains EthikosArgument.
+
+    Compatibility:
+    - parent is exposed as a PK field and remains writable for existing clients.
+    - parent_id is accepted as the explicit write-only field for newer services.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosArgument.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    parent_id = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosArgument.objects.all(),
+        source="parent",
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+
+    source_count = serializers.IntegerField(read_only=True, required=False)
+    impact_vote_count = serializers.IntegerField(read_only=True, required=False)
+    suggestion_count = serializers.IntegerField(read_only=True, required=False)
+
+    class Meta:
+        model = EthikosArgument
+        fields = (
+            "id",
+            "topic",
+            "user",
+            "user_id",
+            "content",
+            "parent",
+            "parent_id",
+            "side",
+            "is_hidden",
+            "source_count",
+            "impact_vote_count",
+            "suggestion_count",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "user",
+            "user_id",
+            "source_count",
+            "impact_vote_count",
+            "suggestion_count",
+            "created_at",
+            "updated_at",
+        )
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Prevent replies from being attached to arguments from another topic.
+
+        Accepted input shapes:
+        - {"parent": <argument_id>}
+        - {"parent_id": <argument_id>}
+
+        If both are provided, they must identify the same parent argument.
+        """
+
+        initial_data = getattr(self, "initial_data", {}) or {}
+        raw_parent = initial_data.get("parent")
+        raw_parent_id = initial_data.get("parent_id")
+
+        if (
+            raw_parent not in (None, "")
+            and raw_parent_id not in (None, "")
+            and str(raw_parent) != str(raw_parent_id)
+        ):
+            raise serializers.ValidationError(
+                {
+                    "parent_id": (
+                        "Use either parent or parent_id, or provide the same "
+                        "argument id for both fields."
+                    )
+                }
+            )
+
+        topic = attrs.get("topic") or getattr(self.instance, "topic", None)
+        parent = attrs.get("parent")
+
+        if parent is not None and topic is not None and parent.topic_id != topic.id:
+            raise serializers.ValidationError(
+                {"parent_id": "Parent argument belongs to another topic."}
+            )
+
+        return attrs
+
+
+class ArgumentSourceSerializer(serializers.ModelSerializer):
+    """
+    Source/citation attached to an EthikosArgument.
+
+    This is a Korum/Kialo-style additive model. It does not replace
+    EthikosArgument.
+    """
+
+    created_by = serializers.StringRelatedField(read_only=True)
+    created_by_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = ArgumentSource
+        fields = (
+            "id",
+            "argument",
+            "url",
+            "title",
+            "excerpt",
+            "source_type",
+            "citation_text",
+            "quote",
+            "note",
+            "is_removed",
+            "created_by",
+            "created_by_id",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "created_by",
+            "created_by_id",
+            "created_at",
+            "updated_at",
+        )
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        url = attrs.get("url")
+        citation_text = attrs.get("citation_text")
+        quote = attrs.get("quote")
+        note = attrs.get("note")
+
+        if not any(
+            bool(str(value).strip())
+            for value in (url, citation_text, quote, note)
+            if value is not None
+        ):
+            raise serializers.ValidationError(
+                "Provide at least one of url, citation_text, quote, or note."
+            )
+
+        return attrs
+
+
+class ArgumentImpactVoteSerializer(serializers.ModelSerializer):
+    """
+    Argument-level impact vote serializer.
+
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=a6196e341135:351-622
+start=351
+end=622
+----
+    This is not EthikosStance and not a Smart Vote reading.
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = ArgumentImpactVote
+        fields = (
+            "id",
+            "argument",
+            "user",
+            "user_id",
+            "value",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "user",
+            "user_id",
+            "created_at",
+            "updated_at",
+        )
+
+    def validate_value(self, value: int) -> int:
+        if value < ARGUMENT_IMPACT_VOTE_MIN or value > ARGUMENT_IMPACT_VOTE_MAX:
+            raise serializers.ValidationError(
+                (
+                    "Argument impact vote must be between "
+                    f"{ARGUMENT_IMPACT_VOTE_MIN} and {ARGUMENT_IMPACT_VOTE_MAX}."
+                )
+            )
+
+        return value
+
+
+class ArgumentSuggestionSerializer(serializers.ModelSerializer):
+    """
+    Suggested argument/reply serializer.
+
+    Suggestions are reviewed into EthikosArgument records. They do not replace
+    EthikosArgument itself.
+    """
+
+    created_by = serializers.StringRelatedField(read_only=True)
+    created_by_id = serializers.IntegerField(read_only=True)
+
+    reviewed_by = serializers.StringRelatedField(read_only=True)
+    reviewed_by_id = serializers.IntegerField(read_only=True)
+
+    parent = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosArgument.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    parent_id = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosArgument.objects.all(),
+        source="parent",
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+
+    accepted_argument = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosArgument.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+    accepted_argument_id = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosArgument.objects.all(),
+        source="accepted_argument",
+        write_only=True,
+        required=False,
+        allow_null=True,
+    )
+
+    class Meta:
+        model = ArgumentSuggestion
+        fields = (
+            "id",
+            "topic",
+            "parent",
+            "parent_id",
+            "side",
+            "content",
+            "status",
+            "accepted_argument",
+            "accepted_argument_id",
+            "created_by",
+            "created_by_id",
+            "reviewed_by",
+            "reviewed_by_id",
+            "reviewed_at",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "created_by",
+            "created_by_id",
+            "reviewed_by",
+            "reviewed_by_id",
+            "reviewed_at",
+            "created_at",
+            "updated_at",
+        )
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        """
+        Keep suggestions scoped to one topic.
+
+        If parent or accepted_argument is provided, it must belong to the same
+        topic as the suggestion.
+        """
+
+        initial_data = getattr(self, "initial_data", {}) or {}
+
+        raw_parent = initial_data.get("parent")
+        raw_parent_id = initial_data.get("parent_id")
+        if (
+            raw_parent not in (None, "")
+            and raw_parent_id not in (None, "")
+            and str(raw_parent) != str(raw_parent_id)
+        ):
+            raise serializers.ValidationError(
+                {
+                    "parent_id": (
+                        "Use either parent or parent_id, or provide the same "
+                        "argument id for both fields."
+                    )
+                }
+            )
+
+        raw_accepted = initial_data.get("accepted_argument")
+        raw_accepted_id = initial_data.get("accepted_argument_id")
+        if (
+            raw_accepted not in (None, "")
+            and raw_accepted_id not in (None, "")
+            and str(raw_accepted) != str(raw_accepted_id)
+        ):
+            raise serializers.ValidationError(
+                {
+                    "accepted_argument_id": (
+                        "Use either accepted_argument or accepted_argument_id, "
+                        "or provide the same argument id for both fields."
+                    )
+                }
+            )
+
+        topic = attrs.get("topic") or getattr(self.instance, "topic", None)
+        parent = attrs.get("parent")
+        accepted_argument = attrs.get("accepted_argument")
+
+        if parent is not None and topic is not None and parent.topic_id != topic.id:
+            raise serializers.ValidationError(
+                {"parent_id": "Parent argument belongs to another topic."}
+            )
+
+        if (
+            accepted_argument is not None
+            and topic is not None
+            and accepted_argument.topic_id != topic.id
+        ):
+            raise serializers.ValidationError(
+                {
+                    "accepted_argument_id": (
+                        "Accepted argument belongs to another topic."
+                    )
+                }
+            )
+
+        return attrs
+
+
+class DiscussionParticipantRoleSerializer(serializers.ModelSerializer):
+    """
+    Per-topic participant role serializer.
+
+    These are Kialo-style discussion roles, not Django permission group names.
+
+    Read shape:
+    - user: display string
+    - user_id: raw participant user id
+    - assigned_by / assigned_by_id: assignment actor
+
+    Write shape:
+    - target_user_id: explicit participant user id mapped to model field `user`
+    """
+
+    user = serializers.StringRelatedField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+
+    target_user_id = serializers.PrimaryKeyRelatedField(
+        queryset=get_user_model().objects.all(),
+        source="user",
+        write_only=True,
+        required=False,
+    )
+
+    assigned_by = serializers.StringRelatedField(read_only=True)
+    assigned_by_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = DiscussionParticipantRole
+        fields = (
+            "id",
+            "topic",
+            "user",
+            "user_id",
+            "target_user_id",
+            "role",
+            "assigned_by",
+            "assigned_by_id",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "user",
+            "user_id",
+            "assigned_by",
+            "assigned_by_id",
+            "created_at",
+            "updated_at",
+        )
+        # POST is an intentional upsert by (topic, user).
+        # Uniqueness remains enforced by the database constraint.
+        validators = []
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        if self.instance is None and attrs.get("user") is None:
+            raise serializers.ValidationError(
+                {"target_user_id": "Participant user is required."}
+            )
+
+        return attrs
+
+
+class DiscussionVisibilitySettingSerializer(serializers.ModelSerializer):
+    """
+    Per-topic visibility and participation settings serializer.
+    """
+
+    # POST intentionally upserts by topic. Database OneToOne uniqueness remains.
+    topic = serializers.PrimaryKeyRelatedField(
+        queryset=EthikosTopic.objects.all(),
+    )
+
+    changed_by = serializers.StringRelatedField(read_only=True)
+    changed_by_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = DiscussionVisibilitySetting
+        fields = (
+            "id",
+            "topic",
+            "participation_type",
+            "author_visibility",
+            "vote_visibility",
+            "changed_by",
+            "changed_by_id",
+            "created_at",
+            "updated_at",
+        )
+        read_only_fields = (
+            "id",
+            "changed_by",
+            "changed_by_id",
+            "created_at",
+            "updated_at",
+        )
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="tests.py"
+id=a46bbc7b6c00
+kind=source
+size=9964
+lines=301
+line_ref=1-301
+chunks=0
+chunk_refs=
+summary="Python module with 1 class(es) and 14 function(s)."
+----
+# FILE: backend/konnaxion/ethikos/tests.py
+from __future__ import annotations
+
+from http import HTTPStatus
+
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework.test import APITestCase
+
+from config.api_router import router
+from konnaxion.ethikos.constants import (
+    ARGUMENT_SIDE_CON,
+    ARGUMENT_SIDE_PRO,
+    CURRENT_ETHIKOS_CORE_MODELS,
+    ETHIKOS_ARGUMENTS_PATH,
+    ETHIKOS_CATEGORIES_PATH,
+    ETHIKOS_STANCES_PATH,
+    ETHIKOS_TOPICS_PATH,
+    FORBIDDEN_KINTSUGI_API_SEGMENTS,
+    STANCE_MAX,
+    STANCE_MIN,
+)
+from konnaxion.ethikos.models import (
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+
+
+class EthikosKintsugiFoundationTests(APITestCase):
+    """
+    Foundation tests for ethiKos Kintsugi Wave 1.
+
+    These tests protect the common baseline before vertical slices add
+    Kintsugi behavior.
+
+    Guarded baseline:
+    - existing model names remain stable;
+    - canonical /api/ethikos/* endpoints remain registered;
+    - forbidden Kintsugi drift prefixes are not registered;
+    - stance values remain topic-level -3..+3 values;
+    - arguments remain threaded EthikosArgument records;
+    - topic preview returns real topic metadata instead of an empty shell.
+    """
+
+    @classmethod
+    def setUpTestData(cls):
+        User = get_user_model()
+
+        cls.user = User.objects.create_user(
+            username="ethikos-wave1-user",
+            email="ethikos-wave1-user@example.com",
+            password="test-password",
+        )
+
+        cls.other_user = User.objects.create_user(
+            username="ethikos-wave1-other",
+            email="ethikos-wave1-other@example.com",
+            password="test-password",
+        )
+
+        cls.category = EthikosCategory.objects.create(
+            name="Kintsugi Foundation",
+            description="Baseline category for ethiKos Kintsugi foundation tests.",
+        )
+
+        cls.topic = EthikosTopic.objects.create(
+            title="Should ethiKos preserve its canonical model names?",
+            description=(
+                "A foundation topic used to verify Kintsugi Wave 1 no-drift "
+                "behavior."
+            ),
+            category=cls.category,
+            created_by=cls.user,
+        )
+
+    @staticmethod
+    def _registered_prefixes() -> set[str]:
+        return {prefix.strip("/") for prefix, _viewset, _basename in router.registry}
+
+    def test_current_core_models_remain_stable(self):
+        actual = {
+            EthikosCategory.__name__,
+            EthikosTopic.__name__,
+            EthikosStance.__name__,
+            EthikosArgument.__name__,
+        }
+
+        self.assertEqual(actual, set(CURRENT_ETHIKOS_CORE_MODELS))
+
+    def test_canonical_ethikos_routes_are_registered(self):
+        prefixes = self._registered_prefixes()
+
+        self.assertIn(ETHIKOS_TOPICS_PATH.strip("/"), prefixes)
+        self.assertIn(ETHIKOS_STANCES_PATH.strip("/"), prefixes)
+        self.assertIn(ETHIKOS_ARGUMENTS_PATH.strip("/"), prefixes)
+        self.assertIn(ETHIKOS_CATEGORIES_PATH.strip("/"), prefixes)
+
+    def test_forbidden_kintsugi_route_segments_are_not_registered(self):
+        """
+        Forbid both top-level drift and nested drift.
+
+        Invalid examples:
+        - kintsugi
+        - kialo
+        - korum
+        - deliberation
+        - home
+        - ethikos/kintsugi
+        - ethikos/kialo
+        - ethikos/korum
+        - ethikos/deliberation
+        """
+
+        for prefix in self._registered_prefixes():
+            segments = {segment for segment in prefix.split("/") if segment}
+
+            for forbidden_segment in FORBIDDEN_KINTSUGI_API_SEGMENTS:
+                self.assertNotIn(
+                    forbidden_segment,
+                    segments,
+                    msg=(
+                        f"Forbidden Kintsugi API segment {forbidden_segment!r} "
+                        f"found in registered router prefix {prefix!r}."
+                    ),
+                )
+
+    def test_stance_value_accepts_boundary_values(self):
+        low = EthikosStance(
+            user=self.user,
+            topic=self.topic,
+            value=STANCE_MIN,
+        )
+        high = EthikosStance(
+            user=self.other_user,
+            topic=self.topic,
+            value=STANCE_MAX,
+        )
+
+        low.full_clean()
+        high.full_clean()
+
+    def test_stance_value_rejects_values_outside_topic_level_range(self):
+        below = EthikosStance(
+            user=self.user,
+            topic=self.topic,
+            value=STANCE_MIN - 1,
+        )
+        above = EthikosStance(
+            user=self.other_user,
+            topic=self.topic,
+            value=STANCE_MAX + 1,
+        )
+
+        with self.assertRaises(DjangoValidationError):
+            below.full_clean()
+
+        with self.assertRaises(DjangoValidationError):
+            above.full_clean()
+
+    def test_stance_is_unique_per_user_and_topic(self):
+        EthikosStance.objects.create(
+            user=self.user,
+            topic=self.topic,
+            value=0,
+        )
+
+        duplicate = EthikosStance(
+            user=self.user,
+            topic=self.topic,
+            value=1,
+        )
+
+        with self.assertRaises(DjangoValidationError):
+            duplicate.full_clean()
+
+    def test_argument_remains_threaded_ethikos_argument(self):
+        parent = EthikosArgument.objects.create(
+            topic=self.topic,
+            user=self.user,
+            content="Parent argument",
+            side=ARGUMENT_SIDE_PRO,
+        )
+
+        child = EthikosArgument.objects.create(
+            topic=self.topic,
+            user=self.other_user,
+            content="Child argument",
+            parent=parent,
+            side=ARGUMENT_SIDE_CON,
+        )
+
+        self.assertEqual(parent.__class__.__name__, "EthikosArgument")
+        self.assertEqual(child.parent_id, parent.id)
+        self.assertEqual(parent.replies.count(), 1)
+
+    def test_authenticated_user_can_create_argument(self):
+        self.client.force_authenticate(self.user)
+
+        response = self.client.post(
+            "/api/ethikos/arguments/",
+            {
+                "topic": self.topic.id,
+                "content": "A foundation argument should stay under ethiKos.",
+                "side": ARGUMENT_SIDE_PRO,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+
+        argument = EthikosArgument.objects.get(id=response.data["id"])
+        self.assertEqual(argument.user_id, self.user.id)
+        self.assertEqual(argument.topic_id, self.topic.id)
+        self.assertEqual(argument.side, ARGUMENT_SIDE_PRO)
+        self.assertIsNone(argument.parent_id)
+
+    def test_argument_reply_must_share_parent_topic(self):
+        self.client.force_authenticate(self.user)
+
+        parent = EthikosArgument.objects.create(
+            topic=self.topic,
+            user=self.user,
+            content="Parent argument",
+            side=ARGUMENT_SIDE_PRO,
+        )
+
+        same_topic_response = self.client.post(
+            "/api/ethikos/arguments/",
+            {
+                "topic": self.topic.id,
+                "content": "Reply in the same topic",
+                "parent_id": parent.id,
+                "side": ARGUMENT_SIDE_CON,
+            },
+            format="json",
+        )
+
+        self.assertEqual(same_topic_response.status_code, HTTPStatus.CREATED)
+
+        other_topic = EthikosTopic.objects.create(
+            title="Different topic",
+            description="Used to test cross-topic parent rejection.",
+            category=self.category,
+            created_by=self.other_user,
+        )
+
+        cross_topic_response = self.client.post(
+            "/api/ethikos/arguments/",
+            {
+                "topic": other_topic.id,
+                "content": "Invalid reply across topic boundaries",
+                "parent_id": parent.id,
+                "side": ARGUMENT_SIDE_CON,
+            },
+            format="json",
+        )
+
+        self.assertEqual(cross_topic_response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("parent_id", cross_topic_response.data)
+
+    def test_topic_preview_returns_topic_metadata_not_empty_shell(self):
+        EthikosArgument.objects.create(
+            topic=self.topic,
+            user=self.user,
+            content="Preview should have at least one latest statement.",
+            side=ARGUMENT_SIDE_PRO,
+        )
+
+        response = self.client.get(f"/api/ethikos/topics/{self.topic.id}/preview/")
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(str(response.data.get("id")), str(self.topic.id))
+        self.assertEqual(response.data.get("title"), self.topic.title)
+        self.assertTrue(response.data.get("description"))
+
+    def test_topic_preview_is_public_readable(self):
+        response = self.client.get(f"/api/ethikos/topics/{self.topic.id}/preview/")
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(str(response.data.get("id")), str(self.topic.id))
+
+    def test_unauthenticated_user_cannot_create_argument(self):
+        response = self.client.post(
+            "/api/ethikos/arguments/",
+            {
+                "topic": self.topic.id,
+                "content": "Unauthenticated write should fail.",
+                "side": ARGUMENT_SIDE_PRO,
+            },
+            format="json",
+        )
+
+        self.assertIn(
+            response.status_code,
+            {
+                HTTPStatus.UNAUTHORIZED,
+                HTTPStatus.FORBIDDEN,
+            },
+        )
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="urls.py"
+id=264e4983bf5e
+kind=source
+size=1814
+lines=56
+line_ref=1-56
+chunks=0
+chunk_refs=
+summary="Python module with 2 function(s)."
+----
+# FILE: backend/konnaxion/ethikos/urls.py
+"""App-local DRF routes for ethiKos.
+
+Kintsugi Wave 1 foundation rules:
+- keep canonical ethiKos API resources under /api/ethikos/
+- do not introduce /api/kintsugi/, /api/kialo/, /api/korum/, etc.
+- register slice-specific ViewSets only when the corresponding ViewSet exists
+  in konnaxion.ethikos.api_views.
+"""
+
+from __future__ import annotations
+
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
+
+from . import api_views
+
+
+router = DefaultRouter()
+
+
+def register_required(route: str, viewset_name: str, basename: str) -> None:
+    """Register a required stable ethiKos route.
+
+    Required routes are part of the current canonical ethiKos API surface and
+    should fail loudly if their ViewSet is missing.
+    """
+
+    viewset = getattr(api_views, viewset_name)
+    router.register(route, viewset, basename=basename)
+
+
+def register_optional(route: str, viewset_name: str, basename: str) -> None:
+    """Register an additive ethiKos route only if its ViewSet exists.
+
+    This keeps the URL module safe while Wave 1 slices are added incrementally.
+    """
+
+    viewset = getattr(api_views, viewset_name, None)
+    if viewset is not None:
+        router.register(route, viewset, basename=basename)
+
+
+# Stable current ethiKos API surface.
+register_required("topics", "TopicViewSet", basename="ethikos-topic")
+register_required("stances", "StanceViewSet", basename="ethikos-stance")
+register_required("arguments", "ArgumentViewSet", basename="ethikos-argument")
+
+# Existing optional category surface.
+register_optional("categories", "CategoryViewSet", basename="ethikos-category")
+
+
+urlpatterns = [
+    path("", include("konnaxion.ethikos.demo_import.urls")),
+    *router.urls,
+]
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="views.py"
+id=73e8552fa019
+kind=source
+size=1695
+lines=46
+line_ref=1-46
+chunks=0
+chunk_refs=
+summary="Python module with 3 class(es) and 4 function(s)."
+----
+# FILE: backend/konnaxion/ethikos/views.py
+
+# Create your views here.
+# konnaxion/ethikos/api_views.py
+
+from rest_framework import viewsets, permissions, mixins
+from .models import EthikosTopic, EthikosStance, EthikosArgument
+from .serializers import (
+    EthikosTopicSerializer, EthikosStanceSerializer, EthikosArgumentSerializer
+)
+
+class TopicViewSet(viewsets.ModelViewSet):
+    queryset = EthikosTopic.objects.all()
+    serializer_class = EthikosTopicSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+class StanceViewSet(mixins.CreateModelMixin,
+                    mixins.UpdateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
+    queryset = EthikosStance.objects.all()
+    serializer_class = EthikosStanceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        # List stances for the current topic or user
+        topic_id = self.request.query_params.get("topic")
+        qs = super().get_queryset()
+        if topic_id:
+            qs = qs.filter(topic_id=topic_id)
+        return qs
+
+class ArgumentViewSet(viewsets.ModelViewSet):
+    queryset = EthikosArgument.objects.all()
+    serializer_class = EthikosArgumentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+----- FILE END -----

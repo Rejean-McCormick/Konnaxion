@@ -1,0 +1,2697 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:19:35.794718
+title: FOLDER: tests
+root_dir: C:\mycode\Konnaxion\Konnaxion\backend\konnaxion\ethikos
+file_count: 5
+total_size_mb: 0.0827
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_131935_02_demo_import.txt
+next_volume: ethikos_20260903_131935_04_migrations.txt
+prev_title: demo_import
+next_title: migrations
+short_title: tests
+
+==== FILE_INDEX ====
+ENTRY id=de6e205fd664 path="tests/test_demo_import_api.py" kind=source size=12981 lines=444 line_ref=1-444 chunks=2 chunk_refs=1-350,351-444 symbols=19 imports=7 summary="Python module with 19 function(s)."
+ENTRY id=3b5c8db0b09a path="tests/test_demo_import_schema.py" kind=source size=13387 lines=395 line_ref=1-395 chunks=2 chunk_refs=1-350,351-395 symbols=26 imports=8 summary="Python module with 26 function(s)."
+ENTRY id=0bb14aeeb1a3 path="tests/test_demo_importer.py" kind=source size=14412 lines=446 line_ref=1-446 chunks=2 chunk_refs=1-350,351-446 symbols=12 imports=15 summary="Python module with 12 function(s)."
+ENTRY id=f3ba07a1dff9 path="tests/test_kintsugi_korum_api.py" kind=source size=32183 lines=876 line_ref=1-876 chunks=3 chunk_refs=1-350,351-700,701-876 symbols=35 imports=30 summary="Python module with 1 class(es) and 34 function(s)."
+ENTRY id=a7e7026ca09e path="tests/test_kintsugi_korum_models.py" kind=source size=13788 lines=378 line_ref=1-378 chunks=2 chunk_refs=1-350,351-378 symbols=16 imports=28 summary="Python module with 1 class(es) and 15 function(s)."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="tests/test_demo_import_api.py"
+id=de6e205fd664
+kind=source
+size=12981
+lines=444
+line_ref=1-444
+chunks=2
+chunk_refs=1-350,351-444
+summary="Python module with 19 function(s)."
+
+--- CHUNK BEGIN ---
+id=de6e205fd664:1-350
+start=1
+end=350
+----
+# backend/konnaxion/ethikos/tests/test_demo_import_api.py
+
+import pytest
+from django.test import override_settings
+from rest_framework import status
+from rest_framework.test import APIClient
+
+
+PREVIEW_URL = "/api/ethikos/demo-scenarios/preview/"
+IMPORT_URL = "/api/ethikos/demo-scenarios/import/"
+RESET_URL = "/api/ethikos/demo-scenarios/reset/"
+
+
+@pytest.fixture
+def api_client():
+    return APIClient()
+
+
+@pytest.fixture
+def regular_user(django_user_model):
+    return django_user_model.objects.create_user(
+        username="regular_user",
+        email="regular_user@example.test",
+        password="test-password",
+    )
+
+
+@pytest.fixture
+def admin_user(django_user_model):
+    return django_user_model.objects.create_superuser(
+        username="admin_user",
+        email="admin_user@example.test",
+        password="test-password",
+    )
+
+
+@pytest.fixture
+def sample_demo_scenario():
+    return {
+        "schema_version": "ethikos-demo-scenario/v3",
+        "scenario_key": "public_square_demo",
+        "scenario_title": "Public Square Redevelopment Demo",
+        "mode": "replace_scenario",
+        "metadata": {
+            "description": "Demo scenario for ethiKos importer API tests.",
+            "language": "en",
+        },
+        "actors": [
+            {
+                "key": "maya",
+                "username": "demo_maya",
+                "display_name": "Maya",
+                "email": "demo_maya@example.test",
+                "role": "citizen",
+                "is_ethikos_elite": False,
+            }
+        ],
+        "categories": [
+            {
+                "key": "urbanism",
+                "name": "Urbanism",
+                "description": "Urban planning and public-space issues.",
+            }
+        ],
+        "topics": [
+            {
+                "key": "public_square",
+                "title": "[DEMO] How should we redesign Place des Rivières?",
+                "description": "A public debate about greening, mobility, parking, and accessibility.",
+                "status": "open",
+                "category": "urbanism",
+                "start_date": "2026-05-01",
+                "end_date": "2026-05-30",
+            }
+        ],
+        "stances": [
+            {
+                "topic": "public_square",
+                "actor": "maya",
+                "value": 2,
+            }
+        ],
+        "arguments": [
+            {
+                "key": "maya_argument_1",
+                "topic": "public_square",
+                "actor": "maya",
+                "side": "pro",
+                "content": "The square should become greener while keeping access for people with reduced mobility.",
+            }
+        ],
+        "consultations": [
+            {
+                "key": "public_square_vote",
+                "title": "[DEMO] Preferred redevelopment scenario",
+                "status": "open",
+                "open_date": "2026-05-01",
+                "close_date": "2026-05-30",
+                "options": [
+                    {
+                        "key": "mixed_square",
+                        "label": "Mixed public square with limited parking",
+                    }
+                ],
+            }
+        ],
+        "consultation_votes": [
+            {
+                "consultation": "public_square_vote",
+                "actor": "maya",
+                "option": "mixed_square",
+                "raw_value": 1,
+            }
+        ],
+        "impact_items": [
+            {
+                "consultation": "public_square_vote",
+                "action": "Publish preliminary design proposal",
+                "status": "planned",
+                "date": "2026-06-10",
+            }
+        ],
+        "ekoh_profiles": [],
+        "consultation_relevance": [],
+        "topic_relevance": [],
+    }
+
+
+@pytest.fixture
+def successful_preview_response():
+    return {
+        "ok": True,
+        "dry_run": True,
+        "scenario_key": "public_square_demo",
+        "summary": {
+            "actors": 1,
+            "categories": 1,
+            "topics": 1,
+            "stances": 1,
+            "arguments": 1,
+            "argument_sources": 0,
+            "consultations": 1,
+            "consultation_votes": 1,
+            "impact_items": 1,
+            "ekoh_profiles": 0,
+            "consultation_relevance": 0,
+        },
+        "created": [],
+        "updated": [],
+        "deleted": [],
+        "warnings": [],
+    }
+
+
+@pytest.fixture
+def successful_import_response():
+    return {
+        "ok": True,
+        "dry_run": False,
+        "scenario_key": "public_square_demo",
+        "summary": {
+            "actors": 1,
+            "categories": 1,
+            "topics": 1,
+            "stances": 1,
+            "arguments": 1,
+            "argument_sources": 0,
+            "consultations": 1,
+            "consultation_votes": 1,
+            "impact_items": 1,
+            "ekoh_profiles": 0,
+            "consultation_relevance": 0,
+        },
+        "created": [
+            {
+                "object_type": "topic",
+                "object_id": 1,
+                "object_label": "[DEMO] How should we redesign Place des Rivières?",
+            }
+        ],
+        "updated": [],
+        "deleted": [],
+        "warnings": [],
+    }
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_preview_requires_admin_user(api_client, regular_user, sample_demo_scenario):
+    api_client.force_authenticate(user=regular_user)
+
+    response = api_client.post(
+        PREVIEW_URL,
+        sample_demo_scenario,
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_import_requires_admin_user(api_client, regular_user, sample_demo_scenario):
+    api_client.force_authenticate(user=regular_user)
+
+    response = api_client.post(
+        IMPORT_URL,
+        sample_demo_scenario,
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_reset_requires_admin_user(api_client, regular_user):
+    api_client.force_authenticate(user=regular_user)
+
+    response = api_client.post(
+        RESET_URL,
+        {"scenario_key": "public_square_demo"},
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_preview_returns_summary_for_valid_payload(
+    api_client,
+    admin_user,
+    sample_demo_scenario,
+    successful_preview_response,
+    monkeypatch,
+):
+    from konnaxion.ethikos.demo_import import views
+
+    captured = {}
+
+    def fake_validate_and_preview_ethikos_demo_scenario(data):
+        captured["data"] = data
+        return successful_preview_response
+
+    monkeypatch.setattr(
+        views,
+        "validate_and_preview_ethikos_demo_scenario",
+        fake_validate_and_preview_ethikos_demo_scenario,
+    )
+
+    api_client.force_authenticate(user=admin_user)
+
+    response = api_client.post(
+        PREVIEW_URL,
+        sample_demo_scenario,
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ok"] is True
+    assert response.data["dry_run"] is True
+    assert response.data["scenario_key"] == "public_square_demo"
+    assert response.data["summary"]["topics"] == 1
+    assert response.data["summary"]["consultation_votes"] == 1
+    assert captured["data"] == sample_demo_scenario
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_import_returns_created_summary_for_valid_payload(
+    api_client,
+    admin_user,
+    sample_demo_scenario,
+    successful_import_response,
+    monkeypatch,
+):
+    from konnaxion.ethikos.demo_import import views
+
+    captured = {}
+
+    def fake_import_ethikos_demo_scenario(data, *, imported_by=None, dry_run=False):
+        captured["data"] = data
+        captured["imported_by"] = imported_by
+        captured["dry_run"] = dry_run
+        return successful_import_response
+
+    monkeypatch.setattr(
+        views,
+        "import_ethikos_demo_scenario",
+        fake_import_ethikos_demo_scenario,
+    )
+
+    api_client.force_authenticate(user=admin_user)
+
+    response = api_client.post(
+        IMPORT_URL,
+        sample_demo_scenario,
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ok"] is True
+    assert response.data["dry_run"] is False
+    assert response.data["scenario_key"] == "public_square_demo"
+    assert response.data["summary"]["actors"] == 1
+    assert response.data["created"][0]["object_type"] == "topic"
+
+    assert captured["data"] == sample_demo_scenario
+    assert captured["imported_by"] == admin_user
+    assert captured["dry_run"] is False
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_reset_requires_scenario_key(api_client, admin_user):
+    api_client.force_authenticate(user=admin_user)
+
+    response = api_client.post(
+        RESET_URL,
+        {},
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+    assert response.data["ok"] is False
+    assert response.data["error"] == "scenario_key is required"
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_reset_returns_deleted_objects_for_valid_scenario_key(
+    api_client,
+    admin_user,
+    monkeypatch,
+):
+    from konnaxion.ethikos.demo_import import views
+
+    captured = {}
+
+    def fake_reset_ethikos_demo_scenario(scenario_key, *, reset_by=None):
+        captured["scenario_key"] = scenario_key
+        captured["reset_by"] = reset_by
+        return {
+            "ok": True,
+            "scenario_key": scenario_key,
+            "deleted": [
+                {
+                    "object_type": "topic",
+                    "object_id": 1,
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=de6e205fd664:351-444
+start=351
+end=444
+----
+                    "object_label": "[DEMO] How should we redesign Place des Rivières?",
+                }
+            ],
+        }
+
+    monkeypatch.setattr(
+        views,
+        "reset_ethikos_demo_scenario",
+        fake_reset_ethikos_demo_scenario,
+    )
+
+    api_client.force_authenticate(user=admin_user)
+
+    response = api_client.post(
+        RESET_URL,
+        {"scenario_key": "public_square_demo"},
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ok"] is True
+    assert response.data["scenario_key"] == "public_square_demo"
+    assert response.data["deleted"][0]["object_type"] == "topic"
+
+    assert captured["scenario_key"] == "public_square_demo"
+    assert captured["reset_by"] == admin_user
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=False)
+def test_preview_is_blocked_when_feature_flag_is_disabled(
+    api_client,
+    admin_user,
+    sample_demo_scenario,
+):
+    api_client.force_authenticate(user=admin_user)
+
+    response = api_client.post(
+        PREVIEW_URL,
+        sample_demo_scenario,
+        format="json",
+    )
+
+    assert response.status_code == status.HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_preview_accepts_v2_argument_sources(api_client, admin_user, sample_demo_scenario):
+    scenario = dict(sample_demo_scenario)
+    scenario["schema_version"] = "ethikos-demo-scenario/v2"
+    scenario["consultation_votes"] = [
+        {**vote, "weighted_value": 1.0}
+        for vote in sample_demo_scenario["consultation_votes"]
+    ]
+    scenario["argument_sources"] = [
+        {
+            "key": "maya_argument_1_source",
+            "argument": "maya_argument_1",
+            "url": "https://example.test/public-square",
+            "title": "Public square planning brief",
+            "source_type": "reference",
+        }
+    ]
+
+    api_client.force_authenticate(user=admin_user)
+    response = api_client.post(PREVIEW_URL, scenario, format="json")
+
+    assert response.status_code == status.HTTP_200_OK
+    assert response.data["ok"] is True
+    assert response.data["summary"]["argument_sources"] == 1
+
+
+@pytest.mark.django_db
+@override_settings(ETHIKOS_DEMO_IMPORTER_ENABLED=True)
+def test_preview_rejects_sources_on_v1(api_client, admin_user, sample_demo_scenario):
+    scenario = dict(sample_demo_scenario)
+    scenario["schema_version"] = "ethikos-demo-scenario/v1"
+    scenario["consultation_votes"] = [
+        {**vote, "weighted_value": 1.0}
+        for vote in sample_demo_scenario["consultation_votes"]
+    ]
+    scenario["argument_sources"] = [
+        {
+            "key": "maya_argument_1_source",
+            "argument": "maya_argument_1",
+            "url": "https://example.test/public-square",
+        }
+    ]
+
+    api_client.force_authenticate(user=admin_user)
+    response = api_client.post(PREVIEW_URL, scenario, format="json")
+
+    assert response.status_code == status.HTTP_400_BAD_REQUEST
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="tests/test_demo_import_schema.py"
+id=3b5c8db0b09a
+kind=source
+size=13387
+lines=395
+line_ref=1-395
+chunks=2
+chunk_refs=1-350,351-395
+summary="Python module with 26 function(s)."
+
+--- CHUNK BEGIN ---
+id=3b5c8db0b09a:1-350
+start=1
+end=350
+----
+# backend/konnaxion/ethikos/tests/test_demo_import_schema.py
+
+import pytest
+
+from konnaxion.ethikos.demo_import.schema import (
+    SCHEMA_VERSION,
+    SCHEMA_VERSION_V1,
+    SCHEMA_VERSION_V2,
+    SCHEMA_VERSION_V3,
+    STANCE_MAX,
+    STANCE_MIN,
+    validate_demo_scenario,
+)
+
+
+def make_valid_demo_scenario(overrides=None):
+    scenario = {
+        "schema_version": SCHEMA_VERSION,
+        "scenario_key": "public_square_demo",
+        "scenario_title": "Public Square Redevelopment Demo",
+        "mode": "replace_scenario",
+        "metadata": {
+            "description": "Demo scenario for ethiKos importer tests.",
+            "language": "en",
+        },
+        "actors": [
+            {
+                "key": "maya",
+                "username": "demo_maya",
+                "display_name": "Maya",
+                "email": "demo_maya@example.test",
+                "role": "citizen",
+                "is_ethikos_elite": False,
+            },
+            {
+                "key": "samuel",
+                "username": "demo_samuel",
+                "display_name": "Samuel",
+                "email": "demo_samuel@example.test",
+                "role": "urban_planning_expert",
+                "is_ethikos_elite": True,
+            },
+        ],
+        "categories": [
+            {
+                "key": "urbanism",
+                "name": "Urbanism",
+                "description": "Urban planning and public-space issues.",
+            }
+        ],
+        "topics": [
+            {
+                "key": "public_square",
+                "title": "[DEMO] How should we redesign Place des Rivières?",
+                "description": "A public debate about greening, mobility, parking, and accessibility.",
+                "status": "open",
+                "category": "urbanism",
+                "start_date": "2026-05-01",
+                "end_date": "2026-05-30",
+            }
+        ],
+        "stances": [
+            {"topic": "public_square", "actor": "maya", "value": 2},
+            {"topic": "public_square", "actor": "samuel", "value": 3},
+        ],
+        "arguments": [
+            {
+                "key": "maya_argument_1",
+                "topic": "public_square",
+                "actor": "maya",
+                "side": "pro",
+                "content": "The square should become greener while keeping access for people with reduced mobility.",
+            },
+            {
+                "key": "samuel_argument_1",
+                "topic": "public_square",
+                "actor": "samuel",
+                "side": "pro",
+                "parent": "maya_argument_1",
+                "content": "This can work if accessibility and emergency access are preserved.",
+            },
+        ],
+        "argument_sources": [
+            {
+                "key": "maya_argument_1_source",
+                "argument": "maya_argument_1",
+                "url": "https://example.test/public-square",
+                "title": "Public square planning brief",
+                "source_type": "reference",
+            }
+        ],
+        "consultations": [
+            {
+                "key": "public_square_vote",
+                "title": "[DEMO] Preferred redevelopment scenario",
+                "status": "open",
+                "open_date": "2026-05-01",
+                "close_date": "2026-05-30",
+                "options": [
+                    {"key": "green_square", "label": "Mostly green public square"},
+                    {"key": "mixed_square", "label": "Mixed public square with limited parking"},
+                ],
+            }
+        ],
+        "consultation_votes": [
+            {
+                "consultation": "public_square_vote",
+                "actor": "maya",
+                "option": "mixed_square",
+                "raw_value": 1,
+            },
+            {
+                "consultation": "public_square_vote",
+                "actor": "samuel",
+                "option": "mixed_square",
+                "raw_value": 1,
+            },
+        ],
+        "impact_items": [
+            {
+                "consultation": "public_square_vote",
+                "action": "Publish preliminary design proposal",
+                "status": "planned",
+                "date": "2026-06-10",
+            }
+        ],
+        "ekoh_profiles": [
+            {
+                "actor": "maya",
+                "ethics_score": 1.0,
+                "expertise": [
+                    {
+                        "domain_code": "0314",
+                        "raw_score": 0.35,
+                        "weighted_score": 0.35,
+                    }
+                ],
+            },
+            {
+                "actor": "samuel",
+                "ethics_score": 1.0,
+                "expertise": [
+                    {
+                        "domain_code": "0731",
+                        "raw_score": 0.92,
+                        "weighted_score": 0.92,
+                    }
+                ],
+            },
+        ],
+        "consultation_relevance": [
+            {
+                "consultation": "public_square_vote",
+                "domain_code": "0731",
+                "weight": 0.7,
+            },
+            {
+                "consultation": "public_square_vote",
+                "domain_code": "0314",
+                "weight": 0.3,
+            },
+        ],
+        "topic_relevance": [
+            {
+                "topic": "public_square",
+                "domain_code": "0731",
+                "weight": 0.7,
+            },
+            {
+                "topic": "public_square",
+                "domain_code": "0314",
+                "weight": 0.3,
+            },
+        ],
+        "reading_exclusions": [],
+    }
+
+    if overrides:
+        scenario.update(overrides)
+    return scenario
+
+
+def error_messages(errors):
+    return [error["message"] for error in errors]
+
+
+def error_paths(errors):
+    return [error["path"] for error in errors]
+
+
+def test_valid_demo_scenario_passes_validation():
+    assert validate_demo_scenario(make_valid_demo_scenario()) == []
+
+
+def test_v1_and_v2_remain_supported_for_legacy_payloads():
+    for version in (SCHEMA_VERSION_V1, SCHEMA_VERSION_V2):
+        scenario = make_valid_demo_scenario()
+        scenario["schema_version"] = version
+        scenario["ekoh_profiles"] = []
+        scenario["consultation_relevance"] = []
+        scenario["topic_relevance"] = []
+        scenario["reading_exclusions"] = []
+        if version == SCHEMA_VERSION_V1:
+            scenario["argument_sources"] = []
+        for vote in scenario["consultation_votes"]:
+            vote["weighted_value"] = vote["raw_value"]
+        assert validate_demo_scenario(scenario) == []
+
+
+def test_invalid_schema_version_fails_validation():
+    scenario = make_valid_demo_scenario({"schema_version": "wrong-schema-version"})
+    errors = validate_demo_scenario(scenario)
+    assert "schema_version" in error_paths(errors)
+
+
+def test_unknown_actor_reference_fails_validation():
+    scenario = make_valid_demo_scenario()
+    scenario["stances"][0]["actor"] = "unknown_actor"
+    assert any(
+        "Unknown actor reference" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+def test_unknown_topic_reference_fails_validation():
+    scenario = make_valid_demo_scenario()
+    scenario["stances"][0]["topic"] = "unknown_topic"
+    assert any(
+        "Unknown topic reference" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+@pytest.mark.parametrize(
+    "invalid_value",
+    [STANCE_MIN - 1, STANCE_MAX + 1, "strongly_support", None, 1.5],
+)
+def test_stance_outside_allowed_range_fails_validation(invalid_value):
+    scenario = make_valid_demo_scenario()
+    scenario["stances"][0]["value"] = invalid_value
+    assert any(
+        "Stance value must be an integer from -3 to +3" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+def test_unknown_consultation_reference_fails_validation():
+    scenario = make_valid_demo_scenario()
+    scenario["consultation_votes"][0]["consultation"] = "unknown_consultation"
+    assert any(
+        "Unknown consultation reference" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+def test_unknown_category_reference_fails_validation():
+    scenario = make_valid_demo_scenario()
+    scenario["topics"][0]["category"] = "unknown_category"
+    assert any(
+        "Unknown category reference" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+def test_invalid_topic_status_fails_validation():
+    scenario = make_valid_demo_scenario()
+    scenario["topics"][0]["status"] = "published"
+    assert any(
+        "Invalid topic status" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+def test_invalid_argument_side_fails_validation():
+    scenario = make_valid_demo_scenario()
+    scenario["arguments"][0]["side"] = "support"
+    assert any(
+        "Invalid argument side" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+def test_unknown_argument_parent_reference_fails_validation():
+    scenario = make_valid_demo_scenario()
+    scenario["arguments"][1]["parent"] = "unknown_argument"
+    assert any(
+        "Unknown argument parent reference" in message
+        for message in error_messages(validate_demo_scenario(scenario))
+    )
+
+
+def test_v3_rejects_precomputed_weighted_value():
+    scenario = make_valid_demo_scenario()
+    scenario["consultation_votes"][0]["weighted_value"] = 1.35
+    errors = validate_demo_scenario(scenario)
+    assert any("derived Smart Vote reading" in message for message in error_messages(errors))
+
+
+def test_v3_requires_relevance_to_sum_to_one():
+    scenario = make_valid_demo_scenario()
+    scenario["consultation_relevance"][0]["weight"] = 0.6
+    errors = validate_demo_scenario(scenario)
+    assert any("must sum to 1.0" in message for message in error_messages(errors))
+
+
+
+def test_v3_requires_topic_relevance_to_sum_to_one():
+    scenario = make_valid_demo_scenario()
+    scenario["topic_relevance"][0]["weight"] = 0.6
+    errors = validate_demo_scenario(scenario)
+    assert any("Relevance weights for topic" in message for message in error_messages(errors))
+
+
+def test_v3_rejects_unknown_topic_relevance_reference():
+    scenario = make_valid_demo_scenario()
+    scenario["topic_relevance"][0]["topic"] = "missing_topic"
+    errors = validate_demo_scenario(scenario)
+    assert any("Unknown topic reference" in message for message in error_messages(errors))
+
+
+def test_v3_rejects_out_of_range_ekoh_score():
+    scenario = make_valid_demo_scenario()
+    scenario["ekoh_profiles"][1]["expertise"][0]["weighted_score"] = 1.5
+    errors = validate_demo_scenario(scenario)
+    assert any("must be between 0.0 and 1.0" in message for message in error_messages(errors))
+
+
+def test_v2_rejects_ekoh_profiles():
+    scenario = make_valid_demo_scenario()
+    scenario["schema_version"] = SCHEMA_VERSION_V2
+    for vote in scenario["consultation_votes"]:
+        vote["weighted_value"] = vote["raw_value"]
+    errors = validate_demo_scenario(scenario)
+    assert any("ekoh_profiles requires" in message for message in error_messages(errors))
+
+
+def test_schema_constant_points_to_v3():
+    assert SCHEMA_VERSION == SCHEMA_VERSION_V3
+
+def test_v3_accepts_declared_advisory_recusal():
+    scenario = make_valid_demo_scenario()
+    scenario["reading_exclusions"] = [
+        {
+            "topic": "public_square",
+            "actor": "maya",
+            "reason": "Voluntary recusal from the advisory reading.",
+        }
+    ]
+    assert validate_demo_scenario(scenario) == []
+
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=3b5c8db0b09a:351-395
+start=351
+end=395
+----
+
+def test_v3_rejects_unknown_reading_exclusion_actor():
+    scenario = make_valid_demo_scenario()
+    scenario["reading_exclusions"] = [
+        {
+            "topic": "public_square",
+            "actor": "missing_actor",
+            "reason": "Voluntary recusal.",
+        }
+    ]
+    errors = validate_demo_scenario(scenario)
+    assert any("Unknown actor reference" in message for message in error_messages(errors))
+
+
+def test_v2_rejects_reading_exclusions():
+    scenario = make_valid_demo_scenario()
+    scenario["schema_version"] = SCHEMA_VERSION_V2
+    scenario["ekoh_profiles"] = []
+    scenario["consultation_relevance"] = []
+    scenario["topic_relevance"] = []
+    scenario["reading_exclusions"] = [
+        {
+            "topic": "public_square",
+            "actor": "maya",
+            "reason": "Voluntary recusal.",
+        }
+    ]
+    for vote in scenario["consultation_votes"]:
+        vote["weighted_value"] = vote["raw_value"]
+    errors = validate_demo_scenario(scenario)
+    assert any("reading_exclusions requires" in message for message in error_messages(errors))
+
+
+def test_v3_accepts_public_ekoh_rating_visibility():
+    scenario = make_valid_demo_scenario()
+    scenario["ekoh_profiles"][0]["rating_visibility"] = "public"
+    scenario["ekoh_profiles"][0]["publication_basis"] = "Public accountability role"
+    assert validate_demo_scenario(scenario) == []
+
+
+def test_v3_rejects_unknown_ekoh_rating_visibility():
+    scenario = make_valid_demo_scenario()
+    scenario["ekoh_profiles"][0]["rating_visibility"] = "organisation_only"
+    errors = validate_demo_scenario(scenario)
+    assert "ekoh_profiles[0].rating_visibility" in error_paths(errors)
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="tests/test_demo_importer.py"
+id=0bb14aeeb1a3
+kind=source
+size=14412
+lines=446
+line_ref=1-446
+chunks=2
+chunk_refs=1-350,351-446
+summary="Python module with 12 function(s)."
+
+--- CHUNK BEGIN ---
+id=0bb14aeeb1a3:1-350
+start=1
+end=350
+----
+import pytest
+from django.apps import apps
+from django.contrib.auth import get_user_model
+
+from konnaxion.ekoh.db import ekoh_smartvote_db_scope
+
+from konnaxion.ethikos.demo_import.importer import (
+    import_ethikos_demo_scenario,
+    reset_ethikos_demo_scenario,
+)
+from konnaxion.ethikos.demo_import.schema import (
+    DEMO_TOPIC_TITLE_PREFIX,
+    SCHEMA_VERSION,
+    TRACK_OBJECT_TYPES,
+)
+from konnaxion.ethikos.models import (
+    ArgumentSource,
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+from konnaxion.ethikos.models_demo import DemoScenarioImport
+
+pytestmark = pytest.mark.django_db
+User = get_user_model()
+
+
+def build_demo_payload(
+    *,
+    scenario_key: str = "public_square_demo",
+    actor_username: str = "demo_maya",
+    topic_key: str = "public_square",
+    topic_title: str | None = None,
+) -> dict:
+    title = topic_title or f"{DEMO_TOPIC_TITLE_PREFIX} Public Square Redevelopment"
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "scenario_key": scenario_key,
+        "scenario_title": "Public Square Redevelopment Demo",
+        "mode": "replace_scenario",
+        "metadata": {"description": "Demo data for ethiKos importer tests.", "language": "en"},
+        "actors": [
+            {
+                "key": "maya",
+                "username": actor_username,
+                "display_name": "Maya",
+                "email": f"{actor_username}@example.test",
+                "role": "citizen",
+                "is_ethikos_elite": False,
+            }
+        ],
+        "categories": [
+            {
+                "key": "urbanism",
+                "name": "Urbanism",
+                "description": "Urban planning and public-space issues.",
+            }
+        ],
+        "topics": [
+            {
+                "key": topic_key,
+                "title": title,
+                "description": "A public debate about greening, mobility, parking, and accessibility.",
+                "status": "open",
+                "category": "urbanism",
+                "start_date": "2026-05-01",
+                "end_date": "2026-05-30",
+            }
+        ],
+        "stances": [{"topic": topic_key, "actor": "maya", "value": 2}],
+        "arguments": [
+            {
+                "key": "maya_argument_1",
+                "topic": topic_key,
+                "actor": "maya",
+                "side": "pro",
+                "content": "The square should become greener while preserving accessibility.",
+            }
+        ],
+        "argument_sources": [
+            {
+                "key": "maya_argument_1_source",
+                "argument": "maya_argument_1",
+                "url": "https://example.test/public-square",
+                "title": "Public square planning brief",
+                "source_type": "reference",
+            }
+        ],
+        "consultations": [],
+        "consultation_votes": [],
+        "impact_items": [],
+        "ekoh_profiles": [],
+        "consultation_relevance": [],
+        "topic_relevance": [],
+        "reading_exclusions": [],
+    }
+
+
+def create_importing_user(username: str = "import_admin"):
+    return User.objects.create_user(
+        username=username,
+        email=f"{username}@example.test",
+        password="test-password",
+    )
+
+
+def _argument_user(argument):
+    return getattr(argument, "user", None) or getattr(argument, "author", None)
+
+
+def test_import_creates_source_facts():
+    imported_by = create_importing_user()
+    payload = build_demo_payload()
+
+    result = import_ethikos_demo_scenario(payload, imported_by=imported_by, dry_run=False)
+
+    assert result["ok"] is True
+    actor = User.objects.get(username="demo_maya")
+    category = EthikosCategory.objects.get(name="Urbanism")
+    topic = EthikosTopic.objects.get(title="[DEMO] Public Square Redevelopment")
+    stance = EthikosStance.objects.get(topic=topic, user=actor)
+    argument = EthikosArgument.objects.get(topic=topic)
+
+    assert actor.email == "demo_maya@example.test"
+    assert category.description == "Urban planning and public-space issues."
+    assert topic.status == "open"
+    assert stance.value == 2
+    assert _argument_user(argument) == actor
+    assert argument.content == "The square should become greener while preserving accessibility."
+
+    source = ArgumentSource.objects.get(argument=argument)
+    assert source.url == "https://example.test/public-square"
+
+    assert result["summary"]["ekoh_profiles"] == 0
+    assert result["summary"]["consultation_relevance"] == 0
+    assert result["summary"]["topic_relevance"] == 0
+    assert result["summary"]["reading_exclusions"] == 0
+
+
+def test_import_tracks_core_objects():
+    imported_by = create_importing_user()
+    result = import_ethikos_demo_scenario(
+        build_demo_payload(),
+        imported_by=imported_by,
+        dry_run=False,
+    )
+    assert result["ok"] is True
+
+    tracked_types = set(
+        DemoScenarioImport.objects.filter(
+            scenario_key="public_square_demo"
+        ).values_list("object_type", flat=True)
+    )
+    for key in ("user", "category", "topic", "stance", "argument"):
+        assert TRACK_OBJECT_TYPES[key] in tracked_types
+
+
+def test_v3_imports_ekoh_profile_when_models_and_domain_exist():
+    ExpertiseCategory = apps.get_model("ekoh", "ExpertiseCategory")
+    UserExpertiseScore = apps.get_model("ekoh", "UserExpertiseScore")
+    UserEthicsScore = apps.get_model("ekoh", "UserEthicsScore")
+
+    with ekoh_smartvote_db_scope():
+        category, _ = ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
+
+    payload = build_demo_payload()
+    payload["ekoh_profiles"] = [
+        {
+            "actor": "maya",
+            "ethics_score": 1.0,
+            "expertise": [
+                {
+                    "domain_code": "0731",
+                    "raw_score": 0.88,
+                    "weighted_score": 0.91,
+                }
+            ],
+        }
+    ]
+
+    result = import_ethikos_demo_scenario(
+        payload,
+        imported_by=create_importing_user(),
+        dry_run=False,
+    )
+    assert result["ok"] is True
+
+    actor = User.objects.get(username="demo_maya")
+    assert actor.name == "Maya"
+    with ekoh_smartvote_db_scope():
+        score = UserExpertiseScore.objects.get(user=actor, category=category)
+        assert float(score.weighted_score) == pytest.approx(0.91)
+        assert float(
+            UserEthicsScore.objects.get(user=actor).ethical_score
+        ) == pytest.approx(1.0)
+
+    tracked_types = set(
+        DemoScenarioImport.objects.filter(
+            scenario_key="public_square_demo"
+        ).values_list("object_type", flat=True)
+    )
+    assert TRACK_OBJECT_TYPES["ekoh_expertise_score"] in tracked_types
+    assert TRACK_OBJECT_TYPES["ekoh_ethics_score"] in tracked_types
+
+
+
+def test_v3_binds_topic_relevance_to_smart_vote():
+    ExpertiseCategory = apps.get_model("ekoh", "ExpertiseCategory")
+    ConsultationRelevance = apps.get_model("smart_vote", "ConsultationRelevance")
+    SourceConsultationBinding = apps.get_model(
+        "smart_vote", "SourceConsultationBinding"
+    )
+
+    with ekoh_smartvote_db_scope():
+        category, _ = ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
+
+    payload = build_demo_payload()
+    payload["topic_relevance"] = [
+        {
+            "topic": "public_square",
+            "domain_code": "0731",
+            "weight": 1.0,
+        }
+    ]
+
+    result = import_ethikos_demo_scenario(
+        payload,
+        imported_by=create_importing_user(),
+        dry_run=False,
+    )
+    assert result["ok"] is True
+
+    topic = EthikosTopic.objects.get(title="[DEMO] Public Square Redevelopment")
+    with ekoh_smartvote_db_scope():
+        binding = SourceConsultationBinding.objects.get(
+            source_type="ethikos_topic",
+            source_id=str(topic.pk),
+        )
+        relevance = ConsultationRelevance.objects.get(
+            consultation=binding.consultation,
+            category=category,
+        )
+    assert float(relevance.weight) == pytest.approx(1.0)
+
+    tracked_types = set(
+        DemoScenarioImport.objects.filter(
+            scenario_key="public_square_demo"
+        ).values_list("object_type", flat=True)
+    )
+    assert TRACK_OBJECT_TYPES["smart_vote_source_binding"] in tracked_types
+
+
+
+def test_v3_persists_advisory_recusal_on_source_binding():
+    ExpertiseCategory = apps.get_model("ekoh", "ExpertiseCategory")
+    SourceConsultationBinding = apps.get_model(
+        "smart_vote", "SourceConsultationBinding"
+    )
+
+    with ekoh_smartvote_db_scope():
+        ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
+
+    payload = build_demo_payload()
+    payload["topic_relevance"] = [
+        {
+            "topic": "public_square",
+            "domain_code": "0731",
+            "weight": 1.0,
+        }
+    ]
+    payload["reading_exclusions"] = [
+        {
+            "topic": "public_square",
+            "actor": "maya",
+            "reason": "Voluntary recusal from the advisory reading.",
+        }
+    ]
+
+    result = import_ethikos_demo_scenario(
+        payload,
+        imported_by=create_importing_user(),
+        dry_run=False,
+    )
+    assert result["ok"] is True
+
+    topic = EthikosTopic.objects.get(title="[DEMO] Public Square Redevelopment")
+    actor = User.objects.get(username="demo_maya")
+    with ekoh_smartvote_db_scope():
+        binding = SourceConsultationBinding.objects.get(
+            source_type="ethikos_topic",
+            source_id=str(topic.pk),
+        )
+        exclusions = binding.metadata_json["advisory_exclusions"]
+    assert exclusions == [
+        {
+            "actor_key": "maya",
+            "user_id": actor.pk,
+            "reason": "Voluntary recusal from the advisory reading.",
+            "scope": "advisory_only",
+        }
+    ]
+
+def test_dry_run_does_not_create_objects():
+    imported_by = create_importing_user()
+    result = import_ethikos_demo_scenario(
+        build_demo_payload(),
+        imported_by=imported_by,
+        dry_run=True,
+    )
+
+    assert result["ok"] is True
+    assert result["dry_run"] is True
+    assert not User.objects.filter(username="demo_maya").exists()
+    assert not EthikosTopic.objects.filter(
+        title="[DEMO] Public Square Redevelopment"
+    ).exists()
+
+
+def test_reset_removes_tracked_topic_but_not_untracked_topic():
+    imported_by = create_importing_user()
+    category = EthikosCategory.objects.create(
+        name="Tracked Category",
+        description="tracked",
+    )
+    tracked_topic = EthikosTopic.objects.create(
+        title="[DEMO] Tracked Topic",
+        description="tracked",
+        status="open",
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=0bb14aeeb1a3:351-446
+start=351
+end=446
+----
+        category=category,
+        created_by=imported_by,
+    )
+    untracked_category = EthikosCategory.objects.create(
+        name="Untracked Category",
+        description="untracked",
+    )
+    untracked_topic = EthikosTopic.objects.create(
+        title="[DEMO] Untracked Topic",
+        description="untracked",
+        status="open",
+        category=untracked_category,
+        created_by=imported_by,
+    )
+
+    DemoScenarioImport.objects.create(
+        scenario_key="public_square_demo",
+        object_type=TRACK_OBJECT_TYPES["topic"],
+        object_id=tracked_topic.id,
+        object_label=tracked_topic.title,
+        imported_by=imported_by,
+    )
+
+    result = reset_ethikos_demo_scenario(
+        "public_square_demo",
+        reset_by=imported_by,
+    )
+
+    assert result["ok"] is True
+    assert not EthikosTopic.objects.filter(id=tracked_topic.id).exists()
+    assert EthikosTopic.objects.filter(id=untracked_topic.id).exists()
+
+
+def test_replace_scenario_replaces_tracked_topic_and_keeps_demo_users_safe():
+    imported_by = create_importing_user()
+
+    first = build_demo_payload(topic_title="[DEMO] Old Public Square Topic")
+    second = build_demo_payload(
+        actor_username="demo_nadia",
+        topic_key="public_square_v2",
+        topic_title="[DEMO] New Public Square Topic",
+    )
+
+    assert import_ethikos_demo_scenario(first, imported_by=imported_by)["ok"] is True
+    assert import_ethikos_demo_scenario(second, imported_by=imported_by)["ok"] is True
+
+    assert not EthikosTopic.objects.filter(title="[DEMO] Old Public Square Topic").exists()
+    assert EthikosTopic.objects.filter(title="[DEMO] New Public Square Topic").exists()
+    # Importer intentionally does not delete demo users because cross-app cascades
+    # can remove unrelated data.
+    assert User.objects.filter(username="demo_maya").exists()
+    assert User.objects.filter(username="demo_nadia").exists()
+
+def test_v3_imports_explicit_ekoh_rating_visibility():
+    ExpertiseCategory = apps.get_model("ekoh", "ExpertiseCategory")
+    RatingVisibilitySetting = apps.get_model("ekoh", "RatingVisibilitySetting")
+
+    with ekoh_smartvote_db_scope():
+        ExpertiseCategory.objects.get_or_create(
+            code="0731",
+            defaults={
+                "name": "Architecture and town planning",
+                "depth": 0,
+                "path": "0731",
+            },
+        )
+
+    payload = build_demo_payload()
+    payload["ekoh_profiles"] = [
+        {
+            "actor": "maya",
+            "ethics_score": 1.0,
+            "rating_visibility": "public",
+            "publication_basis": "Public/demo role",
+            "expertise": [
+                {
+                    "domain_code": "0731",
+                    "raw_score": 0.88,
+                    "weighted_score": 0.91,
+                }
+            ],
+        }
+    ]
+
+    result = import_ethikos_demo_scenario(
+        payload,
+        imported_by=create_importing_user(),
+        dry_run=False,
+    )
+    assert result["ok"] is True
+
+    actor = User.objects.get(username="demo_maya")
+    with ekoh_smartvote_db_scope():
+        setting = RatingVisibilitySetting.objects.get(user=actor)
+        assert setting.visibility == "public"
+        assert setting.publication_basis == "Public/demo role"
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="tests/test_kintsugi_korum_api.py"
+id=f3ba07a1dff9
+kind=source
+size=32183
+lines=876
+line_ref=1-876
+chunks=3
+chunk_refs=1-350,351-700,701-876
+summary="Python module with 1 class(es) and 34 function(s)."
+
+--- CHUNK BEGIN ---
+id=f3ba07a1dff9:1-350
+start=1
+end=350
+----
+# FILE: backend/konnaxion/ethikos/tests/test_kintsugi_korum_api.py
+from __future__ import annotations
+
+from http import HTTPStatus
+from typing import Any
+
+from django.contrib.auth import get_user_model
+from rest_framework.test import APITestCase
+
+from konnaxion.ethikos.constants import (
+    ARGUMENT_IMPACT_VOTE_MAX,
+    ARGUMENT_IMPACT_VOTE_MIN,
+    ARGUMENT_SIDE_CON,
+    ARGUMENT_SIDE_PRO,
+    ARGUMENT_SUGGESTION_ACCEPTED,
+    ARGUMENT_SUGGESTION_PENDING,
+    ARGUMENT_SUGGESTION_REJECTED,
+    ARGUMENT_SUGGESTION_REVISION_REQUESTED,
+    AUTHOR_VISIBILITY_ADMINS_ONLY,
+    AUTHOR_VISIBILITY_ALL,
+    DISCUSSION_PARTICIPATION_ANONYMOUS,
+    DISCUSSION_PARTICIPATION_STANDARD,
+    DISCUSSION_ROLE_ADMIN,
+    DISCUSSION_ROLE_VIEWER,
+    VOTE_VISIBILITY_ADMINS_ONLY,
+    VOTE_VISIBILITY_ALL,
+)
+from konnaxion.ethikos.models import (
+    ArgumentImpactVote,
+    ArgumentSource,
+    ArgumentSuggestion,
+    DiscussionParticipantRole,
+    DiscussionVisibilitySetting,
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+
+
+User = get_user_model()
+
+
+class EthikosKintsugiKorumAPITests(APITestCase):
+    """
+    API tests for Kintsugi Wave 1 / Korum.
+
+    Korum first-pass scope:
+    - source links/citations on arguments;
+    - claim-level impact votes separated from topic-level stances;
+    - role-aware suggested claims;
+    - discussion participant roles;
+    - author/vote visibility settings.
+
+    These endpoints must stay under /api/ethikos/*.
+    They must not create /api/kialo/*, /api/kintsugi/*, or /api/korum/*.
+    """
+
+    maxDiff = None
+
+    def setUp(self) -> None:
+        self.user = User.objects.create_user(
+            username="korum-user",
+            email="korum-user@example.com",
+            password="testpass123",
+        )
+        self.other_user = User.objects.create_user(
+            username="korum-other",
+            email="korum-other@example.com",
+            password="testpass123",
+        )
+        self.staff_user = User.objects.create_user(
+            username="korum-staff",
+            email="korum-staff@example.com",
+            password="testpass123",
+            is_staff=True,
+        )
+
+        self.category = EthikosCategory.objects.create(
+            name="Public ethics",
+            description="Ethical public decision-making.",
+        )
+        self.topic = EthikosTopic.objects.create(
+            title="Should public datasets require consent receipts?",
+            description="A Korum deliberation topic for API tests.",
+            category=self.category,
+            created_by=self.user,
+        )
+        self.argument = EthikosArgument.objects.create(
+            topic=self.topic,
+            user=self.user,
+            content="Consent receipts improve public accountability.",
+            side=ARGUMENT_SIDE_PRO,
+        )
+        self.reply = EthikosArgument.objects.create(
+            topic=self.topic,
+            user=self.other_user,
+            content="They may also increase administrative burden.",
+            parent=self.argument,
+            side=ARGUMENT_SIDE_CON,
+        )
+
+        self.argument_sources_url = "/api/ethikos/argument-sources/"
+        self.argument_impact_votes_url = "/api/ethikos/argument-impact-votes/"
+        self.argument_suggestions_url = "/api/ethikos/argument-suggestions/"
+        self.participant_roles_url = "/api/ethikos/discussion-participant-roles/"
+        self.visibility_settings_url = "/api/ethikos/discussion-visibility-settings/"
+
+    # ------------------------------------------------------------------ #
+    # Helpers
+    # ------------------------------------------------------------------ #
+
+    def _as_user(self) -> None:
+        self.client.force_authenticate(self.user)
+
+    def _as_other_user(self) -> None:
+        self.client.force_authenticate(self.other_user)
+
+    def _as_staff(self) -> None:
+        self.client.force_authenticate(self.staff_user)
+
+    def _results(self, payload: Any) -> list[dict[str, Any]]:
+        if isinstance(payload, list):
+            return payload
+
+        if isinstance(payload, dict):
+            results = payload.get("results")
+            if isinstance(results, list):
+                return results
+
+        self.fail(f"Expected list or paginated response, got: {payload!r}")
+
+    def _detail_url(self, list_url: str, pk: int | str) -> str:
+        return f"{list_url}{pk}/"
+
+    # ------------------------------------------------------------------ #
+    # Route availability
+    # ------------------------------------------------------------------ #
+
+    def test_korum_routes_are_registered_under_ethikos(self) -> None:
+        self._as_user()
+
+        endpoints = [
+            self.argument_sources_url,
+            self.argument_impact_votes_url,
+            self.argument_suggestions_url,
+            self.participant_roles_url,
+            self.visibility_settings_url,
+        ]
+
+        for endpoint in endpoints:
+            with self.subTest(endpoint=endpoint):
+                response = self.client.get(endpoint)
+                self.assertNotEqual(response.status_code, HTTPStatus.NOT_FOUND)
+                self.assertNotEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
+
+    def test_forbidden_korum_parallel_routes_are_not_available(self) -> None:
+        self._as_user()
+
+        forbidden_endpoints = [
+            "/api/kialo/argument-sources/",
+            "/api/kintsugi/argument-sources/",
+            "/api/korum/argument-sources/",
+            "/api/deliberation/argument-sources/",
+            "/api/ethikos/kialo/argument-sources/",
+            "/api/ethikos/kintsugi/argument-sources/",
+            "/api/ethikos/korum/argument-sources/",
+            "/api/ethikos/deliberation/argument-sources/",
+        ]
+
+        for endpoint in forbidden_endpoints:
+            with self.subTest(endpoint=endpoint):
+                response = self.client.get(endpoint)
+                self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+
+    # ------------------------------------------------------------------ #
+    # Argument sources
+    # ------------------------------------------------------------------ #
+
+    def test_create_argument_source(self) -> None:
+        self._as_user()
+
+        payload = {
+            "argument": self.argument.id,
+            "url": "https://example.org/consent-receipts",
+            "title": "Consent receipts reference",
+            "excerpt": "Consent receipts can support auditability.",
+            "source_type": "article",
+        }
+
+        response = self.client.post(
+            self.argument_sources_url,
+            payload,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.data["argument"], self.argument.id)
+        self.assertEqual(response.data["url"], payload["url"])
+        self.assertEqual(response.data["title"], payload["title"])
+
+        source = ArgumentSource.objects.get(pk=response.data["id"])
+        self.assertEqual(source.argument, self.argument)
+        self.assertEqual(source.created_by, self.user)
+
+    def test_create_argument_source_can_use_citation_without_url(self) -> None:
+        self._as_user()
+
+        response = self.client.post(
+            self.argument_sources_url,
+            {
+                "argument": self.argument.id,
+                "citation_text": "Public-sector consent receipt guidance.",
+                "note": "Used as a non-URL citation.",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.data["argument"], self.argument.id)
+        self.assertEqual(
+            response.data["citation_text"],
+            "Public-sector consent receipt guidance.",
+        )
+
+    def test_list_argument_sources_can_filter_by_argument(self) -> None:
+        self._as_user()
+
+        source = ArgumentSource.objects.create(
+            argument=self.argument,
+            url="https://example.org/source-a",
+            title="Source A",
+            excerpt="A useful source.",
+            source_type="article",
+            created_by=self.user,
+        )
+        ArgumentSource.objects.create(
+            argument=self.reply,
+            url="https://example.org/source-b",
+            title="Source B",
+            excerpt="Another source.",
+            source_type="article",
+            created_by=self.other_user,
+        )
+
+        response = self.client.get(
+            self.argument_sources_url,
+            {"argument": self.argument.id},
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        ids = {row["id"] for row in self._results(response.data)}
+        self.assertEqual(ids, {source.id})
+
+    def test_argument_source_requires_source_material(self) -> None:
+        self._as_user()
+
+        response = self.client.post(
+            self.argument_sources_url,
+            {
+                "argument": self.argument.id,
+                "url": "",
+                "title": "Missing source material",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("non_field_errors", response.data)
+
+    # ------------------------------------------------------------------ #
+    # Argument impact votes
+    # ------------------------------------------------------------------ #
+
+    def test_create_argument_impact_vote(self) -> None:
+        self._as_user()
+
+        response = self.client.post(
+            self.argument_impact_votes_url,
+            {
+                "argument": self.argument.id,
+                "value": ARGUMENT_IMPACT_VOTE_MAX,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.data["argument"], self.argument.id)
+        self.assertEqual(response.data["value"], ARGUMENT_IMPACT_VOTE_MAX)
+
+        vote = ArgumentImpactVote.objects.get(pk=response.data["id"])
+        self.assertEqual(vote.argument, self.argument)
+        self.assertEqual(vote.user, self.user)
+        self.assertEqual(vote.value, ARGUMENT_IMPACT_VOTE_MAX)
+
+    def test_argument_impact_vote_upserts_for_same_user_and_argument(self) -> None:
+        self._as_user()
+
+        first = self.client.post(
+            self.argument_impact_votes_url,
+            {
+                "argument": self.argument.id,
+                "value": 1,
+            },
+            format="json",
+        )
+        second = self.client.post(
+            self.argument_impact_votes_url,
+            {
+                "argument": self.argument.id,
+                "value": 4,
+            },
+            format="json",
+        )
+
+        self.assertEqual(first.status_code, HTTPStatus.CREATED)
+        self.assertEqual(second.status_code, HTTPStatus.OK)
+        self.assertEqual(ArgumentImpactVote.objects.count(), 1)
+
+        vote = ArgumentImpactVote.objects.get(argument=self.argument, user=self.user)
+        self.assertEqual(vote.value, 4)
+
+    def test_argument_impact_vote_allows_minimum_and_maximum_values(self) -> None:
+        self._as_user()
+
+        for value in (ARGUMENT_IMPACT_VOTE_MIN, ARGUMENT_IMPACT_VOTE_MAX):
+            with self.subTest(value=value):
+                argument = EthikosArgument.objects.create(
+                    topic=self.topic,
+                    user=self.user,
+                    content=f"Argument for impact value {value}.",
+                    side=ARGUMENT_SIDE_PRO,
+                )
+
+                response = self.client.post(
+                    self.argument_impact_votes_url,
+                    {
+                        "argument": argument.id,
+                        "value": value,
+                    },
+                    format="json",
+                )
+
+                self.assertEqual(response.status_code, HTTPStatus.CREATED)
+                self.assertEqual(response.data["value"], value)
+
+    def test_argument_impact_vote_rejects_out_of_range_values(self) -> None:
+        self._as_user()
+
+        for value in (ARGUMENT_IMPACT_VOTE_MIN - 1, ARGUMENT_IMPACT_VOTE_MAX + 1):
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=f3ba07a1dff9:351-700
+start=351
+end=700
+----
+            with self.subTest(value=value):
+                response = self.client.post(
+                    self.argument_impact_votes_url,
+                    {
+                        "argument": self.argument.id,
+                        "value": value,
+                    },
+                    format="json",
+                )
+
+                self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+                self.assertIn("value", response.data)
+
+    def test_argument_impact_vote_does_not_create_topic_stance(self) -> None:
+        self._as_user()
+
+        before = EthikosStance.objects.count()
+
+        response = self.client.post(
+            self.argument_impact_votes_url,
+            {
+                "argument": self.argument.id,
+                "value": 4,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(ArgumentImpactVote.objects.count(), 1)
+        self.assertEqual(EthikosStance.objects.count(), before)
+
+    def test_list_argument_impact_votes_can_filter_by_argument(self) -> None:
+        self._as_user()
+
+        vote = ArgumentImpactVote.objects.create(
+            argument=self.argument,
+            user=self.user,
+            value=3,
+        )
+        ArgumentImpactVote.objects.create(
+            argument=self.reply,
+            user=self.other_user,
+            value=2,
+        )
+
+        response = self.client.get(
+            self.argument_impact_votes_url,
+            {"argument": self.argument.id},
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        ids = {row["id"] for row in self._results(response.data)}
+        self.assertEqual(ids, {vote.id})
+
+    # ------------------------------------------------------------------ #
+    # Argument suggestions
+    # ------------------------------------------------------------------ #
+
+    def test_create_argument_suggestion_defaults_to_pending(self) -> None:
+        self._as_user()
+
+        payload = {
+            "topic": self.topic.id,
+            "parent": self.argument.id,
+            "side": ARGUMENT_SIDE_CON,
+            "content": "A clearer counter-claim should mention administrative cost.",
+        }
+
+        response = self.client.post(
+            self.argument_suggestions_url,
+            payload,
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.data["topic"], self.topic.id)
+        self.assertEqual(response.data["parent"], self.argument.id)
+        self.assertEqual(response.data["side"], ARGUMENT_SIDE_CON)
+        self.assertEqual(response.data["status"], ARGUMENT_SUGGESTION_PENDING)
+
+        suggestion = ArgumentSuggestion.objects.get(pk=response.data["id"])
+        self.assertEqual(suggestion.created_by, self.user)
+        self.assertEqual(suggestion.status, ARGUMENT_SUGGESTION_PENDING)
+
+    def test_staff_can_accept_argument_suggestion_action(self) -> None:
+        suggestion = ArgumentSuggestion.objects.create(
+            topic=self.topic,
+            parent=self.argument,
+            side=ARGUMENT_SIDE_CON,
+            content="Suggested counter-claim.",
+            status=ARGUMENT_SUGGESTION_PENDING,
+            created_by=self.user,
+        )
+
+        self._as_staff()
+
+        response = self.client.post(
+            f"{self._detail_url(self.argument_suggestions_url, suggestion.id)}accept/",
+            {},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.data["status"], ARGUMENT_SUGGESTION_ACCEPTED)
+        self.assertIsNotNone(response.data["accepted_argument"])
+
+        suggestion.refresh_from_db()
+        self.assertEqual(suggestion.status, ARGUMENT_SUGGESTION_ACCEPTED)
+        self.assertEqual(suggestion.reviewed_by, self.staff_user)
+        self.assertIsNotNone(suggestion.reviewed_at)
+        self.assertIsNotNone(suggestion.accepted_argument)
+
+        accepted = suggestion.accepted_argument
+        self.assertEqual(accepted.topic, self.topic)
+        self.assertEqual(accepted.content, suggestion.content)
+        self.assertEqual(accepted.parent, self.argument)
+        self.assertEqual(accepted.side, ARGUMENT_SIDE_CON)
+
+    def test_staff_can_reject_argument_suggestion_action(self) -> None:
+        suggestion = ArgumentSuggestion.objects.create(
+            topic=self.topic,
+            parent=self.argument,
+            side=ARGUMENT_SIDE_CON,
+            content="Suggested counter-claim.",
+            status=ARGUMENT_SUGGESTION_PENDING,
+            created_by=self.user,
+        )
+
+        self._as_staff()
+
+        response = self.client.post(
+            f"{self._detail_url(self.argument_suggestions_url, suggestion.id)}reject/",
+            {},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(response.data["status"], ARGUMENT_SUGGESTION_REJECTED)
+
+        suggestion.refresh_from_db()
+        self.assertEqual(suggestion.status, ARGUMENT_SUGGESTION_REJECTED)
+        self.assertEqual(suggestion.reviewed_by, self.staff_user)
+        self.assertIsNotNone(suggestion.reviewed_at)
+
+    def test_staff_can_request_revision_for_argument_suggestion_action(self) -> None:
+        suggestion = ArgumentSuggestion.objects.create(
+            topic=self.topic,
+            parent=self.argument,
+            side=ARGUMENT_SIDE_CON,
+            content="Suggested counter-claim.",
+            status=ARGUMENT_SUGGESTION_PENDING,
+            created_by=self.user,
+        )
+
+        self._as_staff()
+
+        response = self.client.post(
+            (
+                f"{self._detail_url(self.argument_suggestions_url, suggestion.id)}"
+                "request-revision/"
+            ),
+            {},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(
+            response.data["status"],
+            ARGUMENT_SUGGESTION_REVISION_REQUESTED,
+        )
+
+        suggestion.refresh_from_db()
+        self.assertEqual(suggestion.status, ARGUMENT_SUGGESTION_REVISION_REQUESTED)
+        self.assertEqual(suggestion.reviewed_by, self.staff_user)
+        self.assertIsNotNone(suggestion.reviewed_at)
+
+    def test_argument_suggestion_rejects_empty_content(self) -> None:
+        self._as_user()
+
+        response = self.client.post(
+            self.argument_suggestions_url,
+            {
+                "topic": self.topic.id,
+                "content": "",
+                "side": ARGUMENT_SIDE_PRO,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("content", response.data)
+
+    def test_argument_suggestion_rejects_cross_topic_parent(self) -> None:
+        other_topic = EthikosTopic.objects.create(
+            title="Cross-topic parent topic",
+            description="Used to verify parent/topic validation.",
+            category=self.category,
+            created_by=self.other_user,
+        )
+        other_argument = EthikosArgument.objects.create(
+            topic=other_topic,
+            user=self.other_user,
+            content="Argument from another topic.",
+            side=ARGUMENT_SIDE_PRO,
+        )
+
+        self._as_user()
+
+        response = self.client.post(
+            self.argument_suggestions_url,
+            {
+                "topic": self.topic.id,
+                "parent": other_argument.id,
+                "content": "This should fail because parent is in another topic.",
+                "side": ARGUMENT_SIDE_CON,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("parent_id", response.data)
+
+    def test_list_argument_suggestions_can_filter_by_topic(self) -> None:
+        self._as_user()
+
+        suggestion = ArgumentSuggestion.objects.create(
+            topic=self.topic,
+            parent=self.argument,
+            side=ARGUMENT_SIDE_CON,
+            content="Suggestion for this topic.",
+            status=ARGUMENT_SUGGESTION_PENDING,
+            created_by=self.user,
+        )
+
+        other_topic = EthikosTopic.objects.create(
+            title="Another topic",
+            description="Not part of this filtered list.",
+            category=self.category,
+            created_by=self.other_user,
+        )
+        ArgumentSuggestion.objects.create(
+            topic=other_topic,
+            side=ARGUMENT_SIDE_PRO,
+            content="Suggestion for another topic.",
+            status=ARGUMENT_SUGGESTION_PENDING,
+            created_by=self.other_user,
+        )
+
+        response = self.client.get(
+            self.argument_suggestions_url,
+            {"topic": self.topic.id},
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        ids = {row["id"] for row in self._results(response.data)}
+        self.assertEqual(ids, {suggestion.id})
+
+    # ------------------------------------------------------------------ #
+    # Discussion participant roles
+    # ------------------------------------------------------------------ #
+
+    def test_staff_can_assign_discussion_participant_role(self) -> None:
+        self._as_staff()
+
+        response = self.client.post(
+            self.participant_roles_url,
+            {
+                "topic": self.topic.id,
+                "target_user_id": self.other_user.id,
+                "role": DISCUSSION_ROLE_VIEWER,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.data["topic"], self.topic.id)
+        self.assertEqual(response.data["user_id"], self.other_user.id)
+        self.assertEqual(response.data["role"], DISCUSSION_ROLE_VIEWER)
+
+        role = DiscussionParticipantRole.objects.get(pk=response.data["id"])
+        self.assertEqual(role.topic, self.topic)
+        self.assertEqual(role.user, self.other_user)
+        self.assertEqual(role.role, DISCUSSION_ROLE_VIEWER)
+        self.assertEqual(role.assigned_by, self.staff_user)
+
+    def test_discussion_participant_role_upserts_for_same_topic_and_user(self) -> None:
+        self._as_staff()
+
+        first = self.client.post(
+            self.participant_roles_url,
+            {
+                "topic": self.topic.id,
+                "target_user_id": self.other_user.id,
+                "role": DISCUSSION_ROLE_VIEWER,
+            },
+            format="json",
+        )
+        second = self.client.post(
+            self.participant_roles_url,
+            {
+                "topic": self.topic.id,
+                "target_user_id": self.other_user.id,
+                "role": DISCUSSION_ROLE_ADMIN,
+            },
+            format="json",
+        )
+
+        self.assertEqual(first.status_code, HTTPStatus.CREATED)
+        self.assertEqual(second.status_code, HTTPStatus.OK)
+        self.assertEqual(DiscussionParticipantRole.objects.count(), 1)
+
+        role = DiscussionParticipantRole.objects.get(
+            topic=self.topic,
+            user=self.other_user,
+        )
+        self.assertEqual(role.role, DISCUSSION_ROLE_ADMIN)
+        self.assertEqual(role.assigned_by, self.staff_user)
+
+    def test_discussion_participant_role_rejects_unknown_role(self) -> None:
+        self._as_staff()
+
+        response = self.client.post(
+            self.participant_roles_url,
+            {
+                "topic": self.topic.id,
+                "target_user_id": self.other_user.id,
+                "role": "moderator",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("role", response.data)
+
+    def test_list_discussion_participant_roles_can_filter_by_topic(self) -> None:
+        self._as_staff()
+
+        role = DiscussionParticipantRole.objects.create(
+            topic=self.topic,
+            user=self.other_user,
+            role=DISCUSSION_ROLE_VIEWER,
+        )
+
+        other_topic = EthikosTopic.objects.create(
+            title="Separate participant role topic",
+            description="Used to verify topic filtering.",
+            category=self.category,
+            created_by=self.staff_user,
+        )
+        DiscussionParticipantRole.objects.create(
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=f3ba07a1dff9:701-876
+start=701
+end=876
+----
+            topic=other_topic,
+            user=self.user,
+            role=DISCUSSION_ROLE_ADMIN,
+        )
+
+        response = self.client.get(
+            self.participant_roles_url,
+            {"topic": self.topic.id},
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        ids = {row["id"] for row in self._results(response.data)}
+        self.assertEqual(ids, {role.id})
+
+    # ------------------------------------------------------------------ #
+    # Discussion visibility settings
+    # ------------------------------------------------------------------ #
+
+    def test_staff_can_create_discussion_visibility_setting(self) -> None:
+        self._as_staff()
+
+        response = self.client.post(
+            self.visibility_settings_url,
+            {
+                "topic": self.topic.id,
+                "participation_type": DISCUSSION_PARTICIPATION_STANDARD,
+                "author_visibility": AUTHOR_VISIBILITY_ALL,
+                "vote_visibility": VOTE_VISIBILITY_ALL,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.CREATED)
+        self.assertEqual(response.data["topic"], self.topic.id)
+        self.assertEqual(
+            response.data["participation_type"],
+            DISCUSSION_PARTICIPATION_STANDARD,
+        )
+        self.assertEqual(response.data["author_visibility"], AUTHOR_VISIBILITY_ALL)
+        self.assertEqual(response.data["vote_visibility"], VOTE_VISIBILITY_ALL)
+
+        setting = DiscussionVisibilitySetting.objects.get(pk=response.data["id"])
+        self.assertEqual(setting.topic, self.topic)
+        self.assertEqual(setting.changed_by, self.staff_user)
+        self.assertEqual(
+            setting.participation_type,
+            DISCUSSION_PARTICIPATION_STANDARD,
+        )
+
+    def test_staff_can_update_discussion_visibility_setting(self) -> None:
+        setting = DiscussionVisibilitySetting.objects.create(
+            topic=self.topic,
+            participation_type=DISCUSSION_PARTICIPATION_STANDARD,
+            author_visibility=AUTHOR_VISIBILITY_ALL,
+            vote_visibility=VOTE_VISIBILITY_ALL,
+        )
+
+        self._as_staff()
+
+        response = self.client.patch(
+            self._detail_url(self.visibility_settings_url, setting.id),
+            {
+                "participation_type": DISCUSSION_PARTICIPATION_ANONYMOUS,
+                "author_visibility": AUTHOR_VISIBILITY_ADMINS_ONLY,
+                "vote_visibility": VOTE_VISIBILITY_ADMINS_ONLY,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(
+            response.data["participation_type"],
+            DISCUSSION_PARTICIPATION_ANONYMOUS,
+        )
+        self.assertEqual(
+            response.data["author_visibility"],
+            AUTHOR_VISIBILITY_ADMINS_ONLY,
+        )
+        self.assertEqual(
+            response.data["vote_visibility"],
+            VOTE_VISIBILITY_ADMINS_ONLY,
+        )
+
+        setting.refresh_from_db()
+        self.assertEqual(
+            setting.participation_type,
+            DISCUSSION_PARTICIPATION_ANONYMOUS,
+        )
+        self.assertEqual(setting.author_visibility, AUTHOR_VISIBILITY_ADMINS_ONLY)
+        self.assertEqual(setting.vote_visibility, VOTE_VISIBILITY_ADMINS_ONLY)
+        self.assertEqual(setting.changed_by, self.staff_user)
+
+    def test_discussion_visibility_setting_upserts_for_same_topic(self) -> None:
+        self._as_staff()
+
+        first = self.client.post(
+            self.visibility_settings_url,
+            {
+                "topic": self.topic.id,
+                "participation_type": DISCUSSION_PARTICIPATION_STANDARD,
+                "author_visibility": AUTHOR_VISIBILITY_ALL,
+                "vote_visibility": VOTE_VISIBILITY_ALL,
+            },
+            format="json",
+        )
+        second = self.client.post(
+            self.visibility_settings_url,
+            {
+                "topic": self.topic.id,
+                "participation_type": DISCUSSION_PARTICIPATION_ANONYMOUS,
+                "author_visibility": AUTHOR_VISIBILITY_ADMINS_ONLY,
+                "vote_visibility": VOTE_VISIBILITY_ADMINS_ONLY,
+            },
+            format="json",
+        )
+
+        self.assertEqual(first.status_code, HTTPStatus.CREATED)
+        self.assertEqual(second.status_code, HTTPStatus.OK)
+        self.assertEqual(DiscussionVisibilitySetting.objects.count(), 1)
+
+        setting = DiscussionVisibilitySetting.objects.get(topic=self.topic)
+        self.assertEqual(setting.participation_type, DISCUSSION_PARTICIPATION_ANONYMOUS)
+        self.assertEqual(setting.author_visibility, AUTHOR_VISIBILITY_ADMINS_ONLY)
+        self.assertEqual(setting.vote_visibility, VOTE_VISIBILITY_ADMINS_ONLY)
+        self.assertEqual(setting.changed_by, self.staff_user)
+
+    def test_discussion_visibility_setting_rejects_unknown_values(self) -> None:
+        self._as_staff()
+
+        response = self.client.post(
+            self.visibility_settings_url,
+            {
+                "topic": self.topic.id,
+                "participation_type": "private",
+                "author_visibility": "everyone_except_author",
+                "vote_visibility": "public_after_close",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.BAD_REQUEST)
+        self.assertIn("participation_type", response.data)
+        self.assertIn("author_visibility", response.data)
+        self.assertIn("vote_visibility", response.data)
+
+    def test_list_discussion_visibility_settings_can_filter_by_topic(self) -> None:
+        self._as_staff()
+
+        setting = DiscussionVisibilitySetting.objects.create(
+            topic=self.topic,
+            participation_type=DISCUSSION_PARTICIPATION_STANDARD,
+            author_visibility=AUTHOR_VISIBILITY_ALL,
+            vote_visibility=VOTE_VISIBILITY_ALL,
+        )
+
+        other_topic = EthikosTopic.objects.create(
+            title="Separate visibility topic",
+            description="Used to verify topic filtering.",
+            category=self.category,
+            created_by=self.staff_user,
+        )
+        DiscussionVisibilitySetting.objects.create(
+            topic=other_topic,
+            participation_type=DISCUSSION_PARTICIPATION_ANONYMOUS,
+            author_visibility=AUTHOR_VISIBILITY_ADMINS_ONLY,
+            vote_visibility=VOTE_VISIBILITY_ADMINS_ONLY,
+        )
+
+        response = self.client.get(
+            self.visibility_settings_url,
+            {"topic": self.topic.id},
+        )
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        ids = {row["id"] for row in self._results(response.data)}
+        self.assertEqual(ids, {setting.id})
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="tests/test_kintsugi_korum_models.py"
+id=a7e7026ca09e
+kind=source
+size=13788
+lines=378
+line_ref=1-378
+chunks=2
+chunk_refs=1-350,351-378
+summary="Python module with 1 class(es) and 15 function(s)."
+
+--- CHUNK BEGIN ---
+id=a7e7026ca09e:1-350
+start=1
+end=350
+----
+# FILE: backend/konnaxion/ethikos/tests/test_kintsugi_korum_models.py
+from __future__ import annotations
+
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
+from django.test import TestCase
+from django.utils import timezone
+
+from konnaxion.ethikos.constants import (
+    ARGUMENT_SIDE_CON,
+    ARGUMENT_SIDE_NEUTRAL,
+    ARGUMENT_SIDE_PRO,
+    ARGUMENT_SUGGESTION_ACCEPTED,
+    ARGUMENT_SUGGESTION_PENDING,
+    AUTHOR_VISIBILITY_ALL,
+    DISCUSSION_PARTICIPATION_STANDARD,
+    DISCUSSION_ROLE_ADMIN,
+    DISCUSSION_ROLE_VIEWER,
+    STANCE_MAX,
+    STANCE_MIN,
+    VOTE_VISIBILITY_ALL,
+)
+from konnaxion.ethikos.models import (
+    ArgumentImpactVote,
+    ArgumentSource,
+    ArgumentSuggestion,
+    DiscussionParticipantRole,
+    DiscussionVisibilitySetting,
+    EthikosArgument,
+    EthikosCategory,
+    EthikosStance,
+    EthikosTopic,
+)
+
+
+UserModel = get_user_model()
+
+
+def make_user(username: str):
+    """
+    Create a test user while tolerating either username-based or email-based
+    custom user models.
+    """
+    username_field = UserModel.USERNAME_FIELD
+
+    payload: dict[str, str] = {
+        username_field: (
+            f"{username}@example.com" if username_field == "email" else username
+        )
+    }
+
+    for field_name in getattr(UserModel, "REQUIRED_FIELDS", []):
+        if field_name in payload:
+            continue
+
+        if field_name == "email":
+            payload[field_name] = f"{username}@example.com"
+        else:
+            payload[field_name] = f"{username}_{field_name}"
+
+    if hasattr(UserModel, "email") and "email" not in payload:
+        payload["email"] = f"{username}@example.com"
+
+    return UserModel.objects.create_user(password="test-pass-123", **payload)
+
+
+class KintsugiKorumModelTests(TestCase):
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = make_user("korum_user")
+        cls.other_user = make_user("korum_other")
+        cls.reviewer = make_user("korum_reviewer")
+
+        cls.category = EthikosCategory.objects.create(
+            name="Governance",
+            description="Governance and deliberation topics.",
+        )
+        cls.topic = EthikosTopic.objects.create(
+            title="Should the cooperative adopt a rotating facilitation model?",
+            description="A Korum deliberation topic for testing.",
+            category=cls.category,
+            created_by=cls.user,
+        )
+        cls.other_topic = EthikosTopic.objects.create(
+            title="Should the cooperative publish quarterly impact reports?",
+            description="A second topic for topic-scope tests.",
+            category=cls.category,
+            created_by=cls.user,
+        )
+        cls.argument = EthikosArgument.objects.create(
+            topic=cls.topic,
+            user=cls.user,
+            content="Rotating facilitation reduces concentration of power.",
+            side=ARGUMENT_SIDE_PRO,
+        )
+        cls.reply = EthikosArgument.objects.create(
+            topic=cls.topic,
+            user=cls.other_user,
+            content="Continuity also matters for complex topics.",
+            parent=cls.argument,
+            side=ARGUMENT_SIDE_CON,
+        )
+
+    def test_existing_ethikos_core_models_still_work(self) -> None:
+        stance = EthikosStance.objects.create(
+            user=self.user,
+            topic=self.topic,
+            value=STANCE_MAX,
+        )
+
+        self.assertEqual(str(self.category), "Governance")
+        self.assertEqual(str(self.topic), self.topic.title)
+        self.assertEqual(stance.value, STANCE_MAX)
+        self.assertEqual(self.topic.arguments.count(), 2)
+        self.assertEqual(self.argument.replies.count(), 1)
+
+    def test_ethikos_stance_range_remains_topic_level(self) -> None:
+        low = EthikosStance(user=self.other_user, topic=self.topic, value=STANCE_MIN)
+        high = EthikosStance(user=self.other_user, topic=self.topic, value=STANCE_MAX)
+
+        low.full_clean()
+        high.full_clean()
+
+        invalid_low = EthikosStance(
+            user=self.other_user,
+            topic=self.topic,
+            value=STANCE_MIN - 1,
+        )
+        invalid_high = EthikosStance(
+            user=self.other_user,
+            topic=self.topic,
+            value=STANCE_MAX + 1,
+        )
+
+        with self.assertRaises(ValidationError):
+            invalid_low.full_clean()
+
+        with self.assertRaises(ValidationError):
+            invalid_high.full_clean()
+
+    def test_argument_source_supports_url_source_and_related_names(self) -> None:
+        source = ArgumentSource.objects.create(
+            argument=self.argument,
+            url="https://example.com/source",
+            title="Example source",
+            excerpt="A concise supporting excerpt.",
+            source_type="article",
+            citation_text="Example citation text.",
+            quote="Relevant quoted evidence.",
+            note="Internal reviewer note.",
+            created_by=self.user,
+        )
+
+        self.assertEqual(source.argument, self.argument)
+        self.assertEqual(source.created_by, self.user)
+        self.assertFalse(source.is_removed)
+        self.assertEqual(self.argument.sources.count(), 1)
+        self.assertEqual(self.user.ethikos_argument_sources_created.count(), 1)
+        self.assertIn("Example source", str(source))
+
+    def test_argument_source_supports_note_only_source(self) -> None:
+        source = ArgumentSource.objects.create(
+            argument=self.argument,
+            note="A source placeholder without a URL yet.",
+            created_by=self.user,
+        )
+
+        source.full_clean()
+
+        self.assertIsNone(source.url)
+        self.assertEqual(source.note, "A source placeholder without a URL yet.")
+        self.assertEqual(str(source), f"Source for argument {self.argument.id}")
+
+    def test_argument_impact_vote_is_separate_from_topic_stance(self) -> None:
+        stance = EthikosStance.objects.create(
+            user=self.user,
+            topic=self.topic,
+            value=2,
+        )
+        vote = ArgumentImpactVote.objects.create(
+            user=self.user,
+            argument=self.argument,
+            value=4,
+        )
+
+        self.assertEqual(stance.topic, self.topic)
+        self.assertEqual(vote.argument, self.argument)
+        self.assertEqual(vote.argument.topic, self.topic)
+
+        self.assertEqual(self.topic.stances.count(), 1)
+        self.assertEqual(self.argument.impact_votes.count(), 1)
+
+        self.assertNotEqual(stance._meta.model_name, vote._meta.model_name)
+        self.assertEqual(str(vote), f"{self.user} → {self.argument.id} = 4")
+
+    def test_argument_impact_vote_rejects_out_of_range_values(self) -> None:
+        invalid_low = ArgumentImpactVote(
+            user=self.user,
+            argument=self.argument,
+            value=-1,
+        )
+        invalid_high = ArgumentImpactVote(
+            user=self.user,
+            argument=self.argument,
+            value=5,
+        )
+
+        with self.assertRaises(ValidationError):
+            invalid_low.full_clean()
+
+        with self.assertRaises(ValidationError):
+            invalid_high.full_clean()
+
+    def test_argument_impact_vote_is_unique_per_user_and_argument(self) -> None:
+        ArgumentImpactVote.objects.create(
+            user=self.user,
+            argument=self.argument,
+            value=3,
+        )
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                ArgumentImpactVote.objects.create(
+                    user=self.user,
+                    argument=self.argument,
+                    value=4,
+                )
+
+        # Same user may vote on a different argument.
+        second_vote = ArgumentImpactVote.objects.create(
+            user=self.user,
+            argument=self.reply,
+            value=4,
+        )
+
+        # Different user may vote on the same argument.
+        third_vote = ArgumentImpactVote.objects.create(
+            user=self.other_user,
+            argument=self.argument,
+            value=2,
+        )
+
+        self.assertEqual(second_vote.value, 4)
+        self.assertEqual(third_vote.value, 2)
+
+    def test_argument_suggestion_defaults_and_neutral_side(self) -> None:
+        suggestion = ArgumentSuggestion.objects.create(
+            topic=self.topic,
+            parent=self.argument,
+            created_by=self.other_user,
+            side=ARGUMENT_SIDE_NEUTRAL,
+            content="Consider adding a neutral framing claim.",
+        )
+
+        self.assertEqual(suggestion.status, ARGUMENT_SUGGESTION_PENDING)
+        self.assertEqual(suggestion.side, ARGUMENT_SIDE_NEUTRAL)
+        self.assertEqual(suggestion.topic, self.topic)
+        self.assertEqual(suggestion.parent, self.argument)
+
+        self.assertEqual(self.topic.argument_suggestions.count(), 1)
+        self.assertEqual(self.argument.suggested_replies.count(), 1)
+        self.assertEqual(
+            self.other_user.ethikos_argument_suggestions_created.count(),
+            1,
+        )
+
+    def test_argument_suggestion_review_links_to_accepted_argument(self) -> None:
+        suggestion = ArgumentSuggestion.objects.create(
+            topic=self.topic,
+            parent=self.argument,
+            created_by=self.other_user,
+            side=ARGUMENT_SIDE_PRO,
+            content="Accepted suggestion content.",
+        )
+        accepted_argument = EthikosArgument.objects.create(
+            topic=self.topic,
+            user=self.reviewer,
+            parent=self.argument,
+            side=ARGUMENT_SIDE_PRO,
+            content=suggestion.content,
+        )
+
+        suggestion.accepted_argument = accepted_argument
+        suggestion.status = ARGUMENT_SUGGESTION_ACCEPTED
+        suggestion.reviewed_by = self.reviewer
+        suggestion.reviewed_at = timezone.now()
+        suggestion.save()
+
+        suggestion.refresh_from_db()
+
+        self.assertEqual(suggestion.accepted_argument, accepted_argument)
+        self.assertEqual(suggestion.status, ARGUMENT_SUGGESTION_ACCEPTED)
+        self.assertEqual(suggestion.reviewed_by, self.reviewer)
+        self.assertIsNotNone(suggestion.reviewed_at)
+
+        self.assertEqual(accepted_argument.accepted_suggestions.count(), 1)
+        self.assertEqual(
+            self.reviewer.ethikos_argument_suggestions_reviewed.count(),
+            1,
+        )
+
+    def test_discussion_participant_role_defaults_and_related_names(self) -> None:
+        role = DiscussionParticipantRole.objects.create(
+            topic=self.topic,
+            user=self.other_user,
+            assigned_by=self.user,
+        )
+
+        self.assertEqual(role.role, DISCUSSION_ROLE_VIEWER)
+        self.assertEqual(role.topic, self.topic)
+        self.assertEqual(role.user, self.other_user)
+        self.assertEqual(role.assigned_by, self.user)
+
+        self.assertEqual(self.topic.participant_roles.count(), 1)
+        self.assertEqual(self.other_user.ethikos_discussion_roles.count(), 1)
+        self.assertEqual(self.user.ethikos_discussion_roles_assigned.count(), 1)
+
+    def test_discussion_participant_role_is_unique_per_topic_user(self) -> None:
+        DiscussionParticipantRole.objects.create(
+            topic=self.topic,
+            user=self.other_user,
+            role=DISCUSSION_ROLE_VIEWER,
+            assigned_by=self.user,
+        )
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                DiscussionParticipantRole.objects.create(
+                    topic=self.topic,
+                    user=self.other_user,
+                    role=DISCUSSION_ROLE_ADMIN,
+                    assigned_by=self.reviewer,
+                )
+
+        same_user_other_topic = DiscussionParticipantRole.objects.create(
+            topic=self.other_topic,
+            user=self.other_user,
+            role=DISCUSSION_ROLE_ADMIN,
+            assigned_by=self.reviewer,
+        )
+
+        self.assertEqual(same_user_other_topic.role, DISCUSSION_ROLE_ADMIN)
+
+    def test_discussion_visibility_setting_defaults_and_related_names(self) -> None:
+        setting = DiscussionVisibilitySetting.objects.create(
+            topic=self.topic,
+            changed_by=self.user,
+        )
+
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=a7e7026ca09e:351-378
+start=351
+end=378
+----
+        self.assertEqual(setting.participation_type, DISCUSSION_PARTICIPATION_STANDARD)
+        self.assertEqual(setting.author_visibility, AUTHOR_VISIBILITY_ALL)
+        self.assertEqual(setting.vote_visibility, VOTE_VISIBILITY_ALL)
+        self.assertEqual(setting.topic, self.topic)
+        self.assertEqual(setting.changed_by, self.user)
+
+        self.assertEqual(self.topic.visibility_setting, setting)
+        self.assertEqual(self.user.ethikos_visibility_settings_changed.count(), 1)
+
+    def test_discussion_visibility_setting_is_one_to_one_per_topic(self) -> None:
+        DiscussionVisibilitySetting.objects.create(
+            topic=self.topic,
+            changed_by=self.user,
+        )
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                DiscussionVisibilitySetting.objects.create(
+                    topic=self.topic,
+                    changed_by=self.reviewer,
+                )
+
+        other_setting = DiscussionVisibilitySetting.objects.create(
+            topic=self.other_topic,
+            changed_by=self.reviewer,
+        )
+
+        self.assertEqual(other_setting.topic, self.other_topic)
+--- CHUNK END ---
+----- FILE END -----

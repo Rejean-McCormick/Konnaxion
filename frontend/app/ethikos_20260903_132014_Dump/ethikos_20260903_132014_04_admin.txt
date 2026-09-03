@@ -1,0 +1,1915 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.827131
+title: FOLDER: admin
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 4
+total_size_mb: 0.0486
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_132014_03_decide.txt
+next_volume: ethikos_20260903_132014_05_pulse.txt
+prev_title: decide
+next_title: pulse
+short_title: admin
+
+==== FILE_INDEX ====
+ENTRY id=910f32f9f333 path="admin/audit/page.tsx" kind=source size=18471 lines=666 line_ref=1-666 chunks=2 chunk_refs=1-350,351-666 symbols=0 imports=0 summary="Source file."
+ENTRY id=663c3802df61 path="admin/demo-importer/page.tsx" kind=source size=379 lines=12 line_ref=1-12 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=443dca5c3fb4 path="admin/moderation/page.tsx" kind=source size=25613 lines=893 line_ref=1-893 chunks=3 chunk_refs=1-350,351-700,701-893 symbols=0 imports=0 summary="Source file."
+ENTRY id=53eb1cc1241c path="admin/roles/page.tsx" kind=source size=6446 lines=239 line_ref=1-239 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="admin/audit/page.tsx"
+id=910f32f9f333
+kind=source
+size=18471
+lines=666
+line_ref=1-666
+chunks=2
+chunk_refs=1-350,351-666
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=910f32f9f333:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/admin/audit/page.tsx
+'use client';
+
+import React from 'react';
+import type { ReactNode } from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Badge,
+  Button,
+  Descriptions,
+  Drawer,
+  Empty,
+  Input,
+  Segmented,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import {
+  ClockCircleOutlined,
+  EyeOutlined,
+  FilterOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchAuditLogs,
+  type AuditPayload,
+  type AuditQueryParams,
+  type LogRow,
+} from '@/services/audit';
+
+dayjs.extend(relativeTime);
+
+const { Text, Paragraph } = Typography;
+
+type Severity = NonNullable<LogRow['severity']>;
+type Status = NonNullable<LogRow['status']>;
+type SeverityFilter = 'all' | Severity;
+type TimeWindow = '24h' | '7d' | '30d' | 'all';
+
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  if (!isRecord(error)) {
+    return false;
+  }
+
+  if (error.status === 403) {
+    return true;
+  }
+
+  const response = error.response;
+
+  return isRecord(response) && response.status === 403;
+}
+
+function formatDate(value?: string): string {
+  if (!value) {
+    return 'Unknown';
+  }
+
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.format('YYYY-MM-DD HH:mm:ss') : value;
+}
+
+function isWithinWindow(log: LogRow, timeWindow: TimeWindow): boolean {
+  if (timeWindow === 'all') {
+    return true;
+  }
+
+  if (!log.ts) {
+    return false;
+  }
+
+  const timestamp = dayjs(log.ts);
+
+  if (!timestamp.isValid()) {
+    return false;
+  }
+
+  const now = dayjs();
+
+  const threshold =
+    timeWindow === '24h'
+      ? now.subtract(24, 'hour')
+      : timeWindow === '7d'
+        ? now.subtract(7, 'day')
+        : now.subtract(30, 'day');
+
+  return timestamp.isAfter(threshold);
+}
+
+function severityTag(severity?: LogRow['severity']): ReactNode {
+  if (severity === 'critical') {
+    return <Tag color="red">critical</Tag>;
+  }
+
+  if (severity === 'warn') {
+    return <Tag color="orange">warn</Tag>;
+  }
+
+  if (severity === 'info') {
+    return <Tag color="blue">info</Tag>;
+  }
+
+  return <Tag>unknown</Tag>;
+}
+
+function statusTag(status?: LogRow['status']): ReactNode {
+  if (status === 'ok') {
+    return <Tag color="green">ok</Tag>;
+  }
+
+  if (status === 'warn') {
+    return <Tag color="orange">warn</Tag>;
+  }
+
+  if (status === 'error') {
+    return <Tag color="red">error</Tag>;
+  }
+
+  return <Tag>unknown</Tag>;
+}
+
+function normalizeSearch(value: string): string {
+  return value.trim();
+}
+
+function buildQuery(
+  previous: AuditQueryParams,
+  searchValue: string,
+  severityFilter: SeverityFilter,
+): AuditQueryParams {
+  const next: AuditQueryParams = {
+    ...previous,
+    page: 1,
+    q: normalizeSearch(searchValue) || undefined,
+    severity: severityFilter === 'all' ? undefined : severityFilter,
+  };
+
+  return next;
+}
+
+export default function AuditLogs(): JSX.Element {
+  const [query, setQuery] = React.useState<AuditQueryParams>({
+    page: 1,
+    pageSize: 20,
+    sort: '-ts',
+  });
+  const [searchValue, setSearchValue] = React.useState('');
+  const [severityFilter, setSeverityFilter] =
+    React.useState<SeverityFilter>('all');
+  const [timeWindow, setTimeWindow] = React.useState<TimeWindow>('7d');
+  const [detailRow, setDetailRow] = React.useState<LogRow | null>(null);
+  const [lastRefreshedAt, setLastRefreshedAt] = React.useState<string | null>(
+    null,
+  );
+
+  const {
+    data,
+    loading,
+    error,
+    run,
+  } = useRequest<AuditPayload, [AuditQueryParams | undefined]>(
+    fetchAuditLogs,
+    {
+      manual: true,
+      onSuccess: () => {
+        setLastRefreshedAt(new Date().toISOString());
+      },
+    },
+  );
+
+  React.useEffect(() => {
+    run(query);
+  }, [query, run]);
+
+  const unauthorized = isUnauthorizedError(error);
+
+  const logs: LogRow[] = data?.items ?? [];
+
+  const visibleLogs = React.useMemo(
+    () => logs.filter((log) => isWithinWindow(log, timeWindow)),
+    [logs, timeWindow],
+  );
+
+  const stats = React.useMemo(() => {
+    let infoCount = 0;
+    let warnCount = 0;
+    let criticalCount = 0;
+    let okStatus = 0;
+    let warnStatus = 0;
+    let errorStatus = 0;
+
+    for (const log of visibleLogs) {
+      if (log.severity === 'info') {
+        infoCount += 1;
+      }
+
+      if (log.severity === 'warn') {
+        warnCount += 1;
+      }
+
+      if (log.severity === 'critical') {
+        criticalCount += 1;
+      }
+
+      if (log.status === 'ok') {
+        okStatus += 1;
+      }
+
+      if (log.status === 'warn') {
+        warnStatus += 1;
+      }
+
+      if (log.status === 'error') {
+        errorStatus += 1;
+      }
+    }
+
+    return {
+      infoCount,
+      warnCount,
+      criticalCount,
+      okStatus,
+      warnStatus,
+      errorStatus,
+      totalCount: data?.total ?? logs.length,
+      pageCount: visibleLogs.length,
+    };
+  }, [data?.total, logs.length, visibleLogs]);
+
+  const applyFilters = React.useCallback(
+    (nextSearchValue = searchValue, nextSeverityFilter = severityFilter) => {
+      const nextQuery = buildQuery(
+        query,
+        nextSearchValue,
+        nextSeverityFilter,
+      );
+
+      setQuery(nextQuery);
+    },
+    [query, searchValue, severityFilter],
+  );
+
+  const refreshLogs = React.useCallback(() => {
+    run(query);
+  }, [query, run]);
+
+  const handleSearch = React.useCallback(
+    (value: string) => {
+      const nextSearchValue = normalizeSearch(value);
+
+      setSearchValue(nextSearchValue);
+      applyFilters(nextSearchValue, severityFilter);
+    },
+    [applyFilters, severityFilter],
+  );
+
+  const handleSeverityChange = React.useCallback(
+    (value: SeverityFilter) => {
+      setSeverityFilter(value);
+      applyFilters(searchValue, value);
+    },
+    [applyFilters, searchValue],
+  );
+
+  const columns = React.useMemo<ProColumns<LogRow>[]>(
+    () => [
+      {
+        title: 'Time',
+        dataIndex: 'ts',
+        valueType: 'dateTime',
+        width: 180,
+        sorter: (left, right) =>
+          dayjs(left.ts).valueOf() - dayjs(right.ts).valueOf(),
+        render: (_dom, row) => (
+          <Space direction="vertical" size={0}>
+            <Text>{formatDate(row.ts)}</Text>
+            <Text type="secondary">{dayjs(row.ts).fromNow()}</Text>
+          </Space>
+        ),
+      },
+      {
+        title: 'Actor',
+        dataIndex: 'actor',
+        width: 180,
+        ellipsis: true,
+        render: (_dom, row) =>
+          row.actor ? (
+            <Text>{row.actor}</Text>
+          ) : (
+            <Text type="secondary">System</Text>
+          ),
+      },
+      {
+        title: 'Action',
+        dataIndex: 'action',
+        width: 220,
+        ellipsis: true,
+        render: (_dom, row) => (
+          <Space direction="vertical" size={0}>
+            <Text strong>{row.action}</Text>
+            {row.entity && (
+              <Text type="secondary">
+                {row.entity}
+                {row.entityId ? ` #${row.entityId}` : ''}
+              </Text>
+            )}
+          </Space>
+        ),
+      },
+      {
+        title: 'Target',
+        dataIndex: 'target',
+        ellipsis: true,
+        render: (_dom, row) =>
+          row.target ? (
+            <Text>{row.target}</Text>
+          ) : (
+            <Text type="secondary">No target</Text>
+          ),
+      },
+      {
+        title: 'Severity',
+        dataIndex: 'severity',
+        width: 130,
+        filters: [
+          { text: 'Info', value: 'info' },
+          { text: 'Warn', value: 'warn' },
+          { text: 'Critical', value: 'critical' },
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=910f32f9f333:351-666
+start=351
+end=666
+----
+        ],
+        onFilter: (value, row) => row.severity === String(value),
+        render: (_dom, row) => severityTag(row.severity),
+      },
+      {
+        title: 'Outcome',
+        dataIndex: 'status',
+        width: 120,
+        filters: [
+          { text: 'OK', value: 'ok' },
+          { text: 'Warn', value: 'warn' },
+          { text: 'Error', value: 'error' },
+        ],
+        onFilter: (value, row) => row.status === String(value),
+        render: (_dom, row) => statusTag(row.status),
+      },
+      {
+        title: 'Details',
+        valueType: 'option',
+        width: 110,
+        render: (_dom, row) => [
+          <Tooltip key="view" title="View audit event details">
+            <Button
+              size="small"
+              icon={<EyeOutlined />}
+              onClick={() => setDetailRow(row)}
+            >
+              View
+            </Button>
+          </Tooltip>,
+        ],
+      },
+    ],
+    [],
+  );
+
+  const primaryAction = (
+    <Button
+      icon={<ReloadOutlined />}
+      type="primary"
+      onClick={refreshLogs}
+      loading={loading}
+    >
+      Refresh
+    </Button>
+  );
+
+  const secondaryActions = (
+    <Space wrap>
+      <Input.Search
+        allowClear
+        placeholder="Search actor, action, target…"
+        value={searchValue}
+        onChange={(event) => setSearchValue(event.target.value)}
+        onSearch={handleSearch}
+        style={{ width: 280 }}
+      />
+
+      <Segmented<SeverityFilter>
+        value={severityFilter}
+        onChange={handleSeverityChange}
+        options={[
+          { label: 'All severity', value: 'all' },
+          { label: 'Info', value: 'info' },
+          { label: 'Warn', value: 'warn' },
+          { label: 'Critical', value: 'critical' },
+        ]}
+      />
+
+      <Segmented<TimeWindow>
+        value={timeWindow}
+        onChange={setTimeWindow}
+        options={[
+          { label: '24h', value: '24h' },
+          { label: '7d', value: '7d' },
+          { label: '30d', value: '30d' },
+          { label: 'All', value: 'all' },
+        ]}
+      />
+    </Space>
+  );
+
+  return (
+    <EthikosPageShell
+      title="Audit logs"
+      sectionLabel="Admin"
+      subtitle="Inspect governance, moderation, and system events across Ethikos."
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          {unauthorized && (
+            <Alert
+              type="error"
+              showIcon
+              message="Access denied for audit logs."
+              description="You need an Ethikos admin role to inspect governance and moderation events."
+            />
+          )}
+
+          {error && !unauthorized && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load audit logs."
+              description="Check your connection or retry. The audit service may be temporarily unavailable."
+              action={
+                <Button size="small" onClick={refreshLogs}>
+                  Retry
+                </Button>
+              }
+            />
+          )}
+
+          <ProCard gutter={16} wrap>
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Total events',
+                value: stats.totalCount,
+                description: (
+                  <Text type="secondary">
+                    {stats.pageCount} visible in current window
+                  </Text>
+                ),
+              }}
+            />
+
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Warnings',
+                value: stats.warnCount,
+                description: (
+                  <Space size={4}>
+                    <Badge status="warning" />
+                    <Text type="secondary">Requires review</Text>
+                  </Space>
+                ),
+              }}
+            />
+
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Critical',
+                value: stats.criticalCount,
+                description: (
+                  <Space size={4}>
+                    <Badge status="error" />
+                    <Text type="secondary">High-priority events</Text>
+                  </Space>
+                ),
+              }}
+            />
+
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Errors',
+                value: stats.errorStatus,
+                description: (
+                  <Text type="secondary">
+                    {stats.okStatus} ok · {stats.warnStatus} warn ·{' '}
+                    {stats.infoCount} info
+                  </Text>
+                ),
+              }}
+            />
+          </ProCard>
+
+          <Alert
+            type="info"
+            showIcon
+            icon={<InfoCircleOutlined />}
+            message="Ethikos audit stream"
+            description={
+              <Space direction="vertical" size={4}>
+                <Text type="secondary">
+                  Use this page to review moderation actions, governance
+                  changes, trust updates, and system-level events.
+                </Text>
+                {lastRefreshedAt && (
+                  <Text type="secondary">
+                    Last refreshed: {formatDate(lastRefreshedAt)}
+                  </Text>
+                )}
+              </Space>
+            }
+          />
+
+          <ProTable<LogRow>
+            rowKey="id"
+            columns={columns}
+            dataSource={visibleLogs}
+            loading={loading}
+            search={false}
+            options={false}
+            scroll={{ x: 1100 }}
+            pagination={{
+              current: query.page ?? data?.page ?? 1,
+              pageSize: query.pageSize ?? data?.pageSize ?? 20,
+              total: data?.total ?? visibleLogs.length,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} audit events`,
+              onChange: (page, pageSize) => {
+                setQuery((previous) => ({
+                  ...previous,
+                  page,
+                  pageSize,
+                }));
+              },
+            }}
+            toolBarRender={() => [
+              <Space key="filters" wrap>
+                <Tag icon={<FilterOutlined />}>
+                  {severityFilter === 'all'
+                    ? 'All severities'
+                    : severityFilter}
+                </Tag>
+                <Tag icon={<ClockCircleOutlined />}>{timeWindow}</Tag>
+              </Space>,
+            ]}
+            locale={{
+              emptyText: unauthorized ? (
+                <Empty description="Access denied for audit logs." />
+              ) : (
+                <Empty description="No audit events to display." />
+              ),
+            }}
+          />
+
+          <Drawer
+            title="Audit event details"
+            width={520}
+            open={!!detailRow}
+            onClose={() => setDetailRow(null)}
+            destroyOnClose
+          >
+            {detailRow && (
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <Space wrap>
+                  {severityTag(detailRow.severity)}
+                  {statusTag(detailRow.status)}
+                  {detailRow.entity && <Tag>{detailRow.entity}</Tag>}
+                  {detailRow.entityId && (
+                    <Tag color="purple">#{String(detailRow.entityId)}</Tag>
+                  )}
+                </Space>
+
+                <Descriptions column={1} size="small" bordered>
+                  <Descriptions.Item label="Time">
+                    {formatDate(detailRow.ts)}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Actor">
+                    {detailRow.actor || <Text type="secondary">System</Text>}
+                  </Descriptions.Item>
+
+                  <Descriptions.Item label="Action">
+                    {detailRow.action}
+                  </Descriptions.Item>
+
+                  {detailRow.target && (
+                    <Descriptions.Item label="Target">
+                      {detailRow.target}
+                    </Descriptions.Item>
+                  )}
+
+                  {detailRow.ip && (
+                    <Descriptions.Item label="Source IP">
+                      {detailRow.ip}
+                    </Descriptions.Item>
+                  )}
+
+                  {detailRow.status && (
+                    <Descriptions.Item label="Outcome">
+                      {statusTag(detailRow.status)}
+                    </Descriptions.Item>
+                  )}
+                </Descriptions>
+
+                {detailRow.meta &&
+                  Object.keys(detailRow.meta).length > 0 && (
+                    <div>
+                      <Text strong>Raw metadata</Text>
+                      <Paragraph type="secondary">
+                        JSON payload supplied by the backend for this event.
+                      </Paragraph>
+                      <pre
+                        style={{
+                          maxHeight: 260,
+                          overflow: 'auto',
+                          background: '#f5f5f5',
+                          padding: 12,
+                          borderRadius: 4,
+                          fontSize: 12,
+                        }}
+                      >
+                        {JSON.stringify(detailRow.meta, null, 2)}
+                      </pre>
+                    </div>
+                  )}
+              </Space>
+            )}
+          </Drawer>
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="admin/demo-importer/page.tsx"
+id=663c3802df61
+kind=source
+size=379
+lines=12
+line_ref=1-12
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+import type { Metadata } from "next";
+
+import { DemoImporterPanel } from "@/features/ethikos/demo-importer/DemoImporterPanel";
+
+export const metadata: Metadata = {
+  title: "ethiKos Demo Importer | Konnaxion",
+  description: "Import, preview, and reset ethiKos demo scenarios.",
+};
+
+export default function EthikosDemoImporterPage() {
+  return <DemoImporterPanel />;
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="admin/moderation/page.tsx"
+id=443dca5c3fb4
+kind=source
+size=25613
+lines=893
+line_ref=1-893
+chunks=3
+chunk_refs=1-350,351-700,701-893
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=443dca5c3fb4:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/admin/moderation/page.tsx
+'use client';
+
+import { useMemo, useState } from 'react';
+import type { Key, ReactNode } from 'react';
+import {
+  PageContainer,
+  ProTable,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  App as AntdApp,
+  Badge,
+  Button,
+  Drawer,
+  Popconfirm,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  ReloadOutlined,
+  StopOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { actOnReport, fetchModerationQueue } from '@/services/admin';
+
+const { Text, Paragraph } = Typography;
+
+type ModerationStatus = 'Pending' | 'Resolved' | 'Escalated';
+type ModerationTargetType = 'topic' | 'post' | 'user';
+type ModerationSeverity = 'low' | 'medium' | 'high';
+type ModerationAction = 'approve' | 'remove';
+
+interface ModerationQueueItem {
+  id: string;
+  targetType: ModerationTargetType;
+  targetId: string;
+  contextTitle?: string;
+  contentPreview?: string;
+  authorName?: string;
+  authorId?: string;
+  reporterName?: string;
+  reporterId?: string;
+  reason?: string;
+  reporterMessage?: string;
+  reportCount?: number;
+  createdAt?: string;
+  lastActionAt?: string;
+  status: ModerationStatus;
+  severity?: ModerationSeverity;
+}
+
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function unwrapPayload(raw: unknown): unknown {
+  if (!isRecord(raw)) {
+    return raw;
+  }
+
+  if ('data' in raw && raw.data !== undefined) {
+    return raw.data;
+  }
+
+  return raw;
+}
+
+function extractItems(raw: unknown): unknown[] {
+  const payload = unwrapPayload(raw);
+
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+
+  if (!isRecord(payload)) {
+    return [];
+  }
+
+  if (Array.isArray(payload.items)) {
+    return payload.items;
+  }
+
+  if (Array.isArray(payload.results)) {
+    return payload.results;
+  }
+
+  if (Array.isArray(payload.data)) {
+    return payload.data;
+  }
+
+  if (isRecord(payload.data)) {
+    if (Array.isArray(payload.data.items)) {
+      return payload.data.items;
+    }
+
+    if (Array.isArray(payload.data.results)) {
+      return payload.data.results;
+    }
+  }
+
+  return [];
+}
+
+function readString(record: UnknownRecord, keys: string[]): string | undefined {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (typeof value === 'string' && value.trim().length > 0) {
+      return value;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+  }
+
+  return undefined;
+}
+
+function readNumber(record: UnknownRecord, keys: string[]): number | undefined {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const parsed = Number(value);
+
+      if (Number.isFinite(parsed)) {
+        return parsed;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+function coerceStatus(value: unknown): ModerationStatus {
+  if (typeof value !== 'string') {
+    return 'Pending';
+  }
+
+  const normalized = value.toLowerCase();
+
+  if (normalized === 'resolved' || normalized === 'reviewed') {
+    return 'Resolved';
+  }
+
+  if (normalized === 'escalated') {
+    return 'Escalated';
+  }
+
+  return 'Pending';
+}
+
+function coerceTargetType(value: unknown): ModerationTargetType {
+  if (value === 'topic' || value === 'post' || value === 'user') {
+    return value;
+  }
+
+  if (
+    value === 'argument' ||
+    value === 'comment' ||
+    value === 'message' ||
+    value === 'reply'
+  ) {
+    return 'post';
+  }
+
+  return 'post';
+}
+
+function coerceSeverity(value: unknown): ModerationSeverity {
+  if (value === 'low' || value === 'medium' || value === 'high') {
+    return value;
+  }
+
+  if (value === 'critical') {
+    return 'high';
+  }
+
+  return 'medium';
+}
+
+function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
+  return extractItems(raw)
+    .filter(isRecord)
+    .map((item, index): ModerationQueueItem => {
+      const id =
+        readString(item, ['id', 'reportId', 'report_id']) ??
+        `moderation-report-${index}`;
+
+      return {
+        id,
+        targetType: coerceTargetType(
+          item.targetType ??
+            item.target_type ??
+            item.entityType ??
+            item.entity_type ??
+            item.type,
+        ),
+        targetId:
+          readString(item, [
+            'targetId',
+            'target_id',
+            'argumentId',
+            'argument_id',
+            'postId',
+            'post_id',
+            'topicId',
+            'topic_id',
+            'userId',
+            'user_id',
+            'id',
+          ]) ?? id,
+        contextTitle: readString(item, [
+          'contextTitle',
+          'context_title',
+          'threadTitle',
+          'thread_title',
+          'topicTitle',
+          'topic_title',
+          'debateTitle',
+          'debate_title',
+        ]),
+        contentPreview: readString(item, [
+          'contentPreview',
+          'content_preview',
+          'contentSnippet',
+          'content_snippet',
+          'content',
+          'preview',
+        ]),
+        authorName: readString(item, [
+          'authorName',
+          'author_name',
+          'offenderName',
+          'offender_name',
+          'user',
+          'username',
+          'author',
+        ]),
+        authorId: readString(item, [
+          'authorId',
+          'author_id',
+          'offenderId',
+          'offender_id',
+          'userId',
+          'user_id',
+        ]),
+        reporterName: readString(item, [
+          'reporterName',
+          'reporter_name',
+          'reporter',
+        ]),
+        reporterId: readString(item, ['reporterId', 'reporter_id']),
+        reason: readString(item, [
+          'reason',
+          'reportReason',
+          'report_reason',
+          'category',
+          'type',
+        ]),
+        reporterMessage: readString(item, [
+          'reporterMessage',
+          'reporter_message',
+          'message',
+          'notes',
+        ]),
+        reportCount:
+          readNumber(item, ['reportCount', 'report_count', 'count']) ?? 1,
+        createdAt: readString(item, [
+          'createdAt',
+          'created_at',
+          'timestamp',
+          'reportedAt',
+          'reported_at',
+        ]),
+        lastActionAt: readString(item, [
+          'lastActionAt',
+          'last_action_at',
+          'updatedAt',
+          'updated_at',
+        ]),
+        status: coerceStatus(item.status),
+        severity: coerceSeverity(item.severity ?? item.priority),
+      };
+    });
+}
+
+function isUnauthorizedError(error: unknown): boolean {
+  if (!isRecord(error)) {
+    return false;
+  }
+
+  if (error.status === 403) {
+    return true;
+  }
+
+  const response = error.response;
+
+  return isRecord(response) && response.status === 403;
+}
+
+function formatDate(value?: string): string | null {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+}
+
+export default function EthikosModerationPage(): JSX.Element {
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]);
+  const [activeStatusFilter, setActiveStatusFilter] = useState<
+    ModerationStatus | 'all'
+  >('Pending');
+  const [detailDrawerItem, setDetailDrawerItem] =
+    useState<ModerationQueueItem | null>(null);
+  const [globalActionLoading, setGlobalActionLoading] = useState(false);
+
+  const { message } = AntdApp.useApp();
+
+  const {
+    data: rawData,
+    loading,
+    error,
+    refresh,
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=443dca5c3fb4:351-700
+start=351
+end=700
+----
+  } = useRequest(fetchModerationQueue);
+
+  const items = useMemo(() => adaptModerationItems(rawData), [rawData]);
+
+  const filteredItems = useMemo(() => {
+    if (activeStatusFilter === 'all') {
+      return items;
+    }
+
+    return items.filter((item) => item.status === activeStatusFilter);
+  }, [activeStatusFilter, items]);
+
+  const unauthorized = isUnauthorizedError(error);
+  const selectedCount = selectedRowKeys.length;
+
+  const onSingleAction = async (
+    record: ModerationQueueItem,
+    action: ModerationAction,
+  ): Promise<void> => {
+    try {
+      setGlobalActionLoading(true);
+
+      const remove = action === 'remove';
+
+      await actOnReport(record.id, remove);
+
+      message.success(
+        remove
+          ? 'Debate content removed and report resolved.'
+          : 'Content approved and report resolved.',
+      );
+
+      refresh();
+    } catch {
+      message.error('Unable to process moderation action. Please try again.');
+    } finally {
+      setGlobalActionLoading(false);
+    }
+  };
+
+  const onBulkAction = async (action: ModerationAction): Promise<void> => {
+    if (selectedRowKeys.length === 0) {
+      message.info('Select at least one report to apply a bulk action.');
+      return;
+    }
+
+    setGlobalActionLoading(true);
+
+    try {
+      const remove = action === 'remove';
+
+      const results = await Promise.allSettled(
+        selectedRowKeys.map((id) => actOnReport(String(id), remove)),
+      );
+
+      const failures = results.filter((result) => result.status === 'rejected');
+
+      if (failures.length === 0) {
+        message.success(
+          remove
+            ? 'Selected content removed and reports resolved.'
+            : 'Selected content approved and reports resolved.',
+        );
+      } else if (failures.length === selectedRowKeys.length) {
+        message.error('Bulk action failed for all selected reports.');
+      } else {
+        message.warning(
+          `${failures.length} report(s) could not be processed. The others were resolved.`,
+        );
+      }
+
+      setSelectedRowKeys([]);
+      refresh();
+    } catch {
+      message.error('Unable to complete bulk action. Please try again.');
+    } finally {
+      setGlobalActionLoading(false);
+    }
+  };
+
+  const severityTag = (severity?: ModerationSeverity): ReactNode => {
+    if (!severity) {
+      return null;
+    }
+
+    const color =
+      severity === 'high' ? 'red' : severity === 'medium' ? 'orange' : 'blue';
+
+    const text =
+      severity === 'high'
+        ? 'High severity'
+        : severity === 'medium'
+          ? 'Medium'
+          : 'Low';
+
+    return (
+      <Tag color={color}>
+        <ExclamationCircleOutlined /> {text}
+      </Tag>
+    );
+  };
+
+  const targetTag = (record: ModerationQueueItem): ReactNode => {
+    const label =
+      record.targetType === 'topic'
+        ? 'Debate topic'
+        : record.targetType === 'user'
+          ? 'Participant'
+          : 'Argument / post';
+
+    return <Tag>{label}</Tag>;
+  };
+
+  const statusBadge = (status: ModerationStatus): ReactNode => {
+    if (status === 'Resolved') {
+      return (
+        <Badge
+          status="success"
+          text={
+            <Space size={4}>
+              <CheckCircleOutlined />
+              Resolved
+            </Space>
+          }
+        />
+      );
+    }
+
+    if (status === 'Escalated') {
+      return <Badge status="warning" text="Escalated" />;
+    }
+
+    return <Badge status="processing" text="Pending review" />;
+  };
+
+  const statusFilterButtons = (
+    <Space wrap>
+      <Button
+        size="small"
+        onClick={() => setActiveStatusFilter('Pending')}
+        type={activeStatusFilter === 'Pending' ? 'primary' : 'default'}
+      >
+        Pending
+      </Button>
+      <Button
+        size="small"
+        onClick={() => setActiveStatusFilter('Escalated')}
+        type={activeStatusFilter === 'Escalated' ? 'primary' : 'default'}
+      >
+        Escalated
+      </Button>
+      <Button
+        size="small"
+        onClick={() => setActiveStatusFilter('Resolved')}
+        type={activeStatusFilter === 'Resolved' ? 'primary' : 'default'}
+      >
+        Resolved
+      </Button>
+      <Button
+        size="small"
+        onClick={() => setActiveStatusFilter('all')}
+        type={activeStatusFilter === 'all' ? 'primary' : 'default'}
+      >
+        All
+      </Button>
+    </Space>
+  );
+
+  const headerActions = (
+    <Space wrap>
+      {statusFilterButtons}
+      <Button
+        icon={<ReloadOutlined />}
+        onClick={() => refresh()}
+        loading={loading || globalActionLoading}
+        disabled={unauthorized}
+      >
+        Refresh queue
+      </Button>
+    </Space>
+  );
+
+  const columns: ProColumns<ModerationQueueItem>[] = [
+    {
+      title: 'Content',
+      dataIndex: 'contentPreview',
+      ellipsis: true,
+      render: (_dom, record) => (
+        <Space direction="vertical" size={2}>
+          {record.contextTitle && (
+            <Text strong ellipsis>
+              {record.contextTitle}
+            </Text>
+          )}
+          <Text type="secondary" ellipsis>
+            {record.contentPreview ?? 'No preview available.'}
+          </Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'People',
+      dataIndex: 'authorName',
+      width: 220,
+      render: (_dom, record) => (
+        <Space direction="vertical" size={2}>
+          {record.authorName && (
+            <Text ellipsis>
+              Author: <Text strong>{record.authorName}</Text>
+            </Text>
+          )}
+          {record.reporterName && (
+            <Text type="secondary" ellipsis>
+              Reporter: {record.reporterName}
+            </Text>
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: 'Reason',
+      dataIndex: 'reason',
+      width: 210,
+      render: (_dom, record) => (
+        <Space size={4} wrap>
+          {severityTag(record.severity)}
+          {record.reason && <Tag>{record.reason}</Tag>}
+          {typeof record.reportCount === 'number' && record.reportCount > 1 && (
+            <Tag>{record.reportCount} reports</Tag>
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      width: 170,
+      filters: [
+        { text: 'Pending', value: 'Pending' },
+        { text: 'Escalated', value: 'Escalated' },
+        { text: 'Resolved', value: 'Resolved' },
+      ],
+      onFilter: (value, record) => record.status === String(value),
+      render: (_dom, record) => statusBadge(record.status),
+    },
+    {
+      title: 'Timeline',
+      dataIndex: 'createdAt',
+      width: 220,
+      render: (_dom, record) => {
+        const createdAt = formatDate(record.createdAt);
+        const lastActionAt = formatDate(record.lastActionAt);
+
+        return (
+          <Text type="secondary">
+            {createdAt && (
+              <>
+                Reported: {createdAt}
+                <br />
+              </>
+            )}
+            {lastActionAt && <>Last action: {lastActionAt}</>}
+            {!createdAt && !lastActionAt && 'No timestamp'}
+          </Text>
+        );
+      },
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      width: 240,
+      fixed: 'right',
+      render: (_dom, record) => {
+        const disabled =
+          unauthorized || globalActionLoading || record.status === 'Resolved';
+
+        return (
+          <Space size="small" wrap>
+            <Tooltip title="View details">
+              <Button
+                size="small"
+                icon={<EyeOutlined />}
+                onClick={() => setDetailDrawerItem(record)}
+              />
+            </Tooltip>
+
+            <Tooltip title="Approve content and resolve report">
+              <Button
+                size="small"
+                icon={<CheckCircleOutlined />}
+                onClick={() => onSingleAction(record, 'approve')}
+                disabled={disabled}
+              >
+                Approve
+              </Button>
+            </Tooltip>
+
+            <Popconfirm
+              title="Remove content?"
+              description="This will remove the content for everyone and resolve all associated reports."
+              okText="Remove"
+              okType="danger"
+              icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+              disabled={disabled}
+              onConfirm={() => onSingleAction(record, 'remove')}
+            >
+              <Tooltip title="Remove content and resolve report">
+                <Button
+                  size="small"
+                  icon={<StopOutlined />}
+                  danger
+                  disabled={disabled}
+                >
+                  Remove
+                </Button>
+              </Tooltip>
+            </Popconfirm>
+          </Space>
+        );
+      },
+    },
+  ];
+
+  return (
+    <EthikosPageShell
+      title="Moderation queue"
+      sectionLabel="Admin"
+      subtitle="Review and act on reports for debate arguments, topics, and participant behaviour."
+      secondaryActions={headerActions}
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" style={{ width: '100%' }} size="large">
+          {unauthorized && (
+            <Alert
+              type="error"
+              showIcon
+              message="You do not have permission to moderate Ethikos debates."
+              description="If you believe this is an error, ask an administrator to grant you an Ethikos moderator or admin role."
+            />
+          )}
+
+          {!unauthorized && (
+            <Alert
+              type="info"
+              showIcon
+              message="Ethikos moderation guidelines"
+              description="Arguments that receive multiple independent reports may be hidden until review. Approve content that fits the Ethikos charter, remove content that clearly violates it, and escalate borderline or sensitive cases."
+            />
+          )}
+
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=443dca5c3fb4:701-893
+start=701
+end=893
+----
+          {error && !unauthorized && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load the moderation queue."
+              description="Check your connection or try again. If the problem persists, the Ethikos moderation service may be temporarily unavailable."
+            />
+          )}
+
+          {items.length === 0 && !loading && !error && !unauthorized && (
+            <Alert
+              type="success"
+              showIcon
+              message="No open reports."
+              description="There are currently no unresolved reports on Ethikos debates."
+            />
+          )}
+
+          <ProTable<ModerationQueueItem>
+            rowKey="id"
+            search={false}
+            options={false}
+            loading={loading || globalActionLoading}
+            columns={columns}
+            dataSource={filteredItems}
+            pagination={{
+              pageSize: 10,
+              showSizeChanger: true,
+              showTotal: (total) => `${total} reports`,
+            }}
+            rowSelection={{
+              selectedRowKeys,
+              onChange: (keys) => setSelectedRowKeys([...keys]),
+              getCheckboxProps: (record) => ({
+                disabled:
+                  unauthorized ||
+                  globalActionLoading ||
+                  record.status === 'Resolved',
+              }),
+            }}
+            tableAlertRender={({ selectedRowKeys: keys }) => (
+              <Space size={8}>
+                <Text strong>{keys.length}</Text>
+                <Text>selected</Text>
+              </Space>
+            )}
+            tableAlertOptionRender={() => (
+              <Space wrap>
+                <Tooltip title="Content is acceptable; resolve reports and keep the debate visible.">
+                  <Button
+                    size="small"
+                    icon={<CheckCircleOutlined />}
+                    onClick={() => onBulkAction('approve')}
+                    disabled={
+                      unauthorized || globalActionLoading || selectedCount === 0
+                    }
+                  >
+                    Bulk approve
+                  </Button>
+                </Tooltip>
+
+                <Popconfirm
+                  title="Remove selected content?"
+                  description="This will remove content for all selected reports and resolve them."
+                  okText="Remove"
+                  okType="danger"
+                  icon={
+                    <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
+                  }
+                  disabled={
+                    unauthorized || globalActionLoading || selectedCount === 0
+                  }
+                  onConfirm={() => onBulkAction('remove')}
+                >
+                  <Tooltip title="Remove content and resolve selected reports">
+                    <Button
+                      size="small"
+                      danger
+                      icon={<StopOutlined />}
+                      disabled={
+                        unauthorized ||
+                        globalActionLoading ||
+                        selectedCount === 0
+                      }
+                    >
+                      Bulk remove
+                    </Button>
+                  </Tooltip>
+                </Popconfirm>
+              </Space>
+            )}
+            scroll={{ x: 1100 }}
+          />
+
+          <Drawer
+            title="Report details"
+            width={480}
+            open={!!detailDrawerItem}
+            onClose={() => setDetailDrawerItem(null)}
+          >
+            {detailDrawerItem && (
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="middle"
+              >
+                <Space wrap>
+                  {targetTag(detailDrawerItem)}
+                  {severityTag(detailDrawerItem.severity)}
+                  {statusBadge(detailDrawerItem.status)}
+                  {detailDrawerItem.reason && (
+                    <Tag>{detailDrawerItem.reason}</Tag>
+                  )}
+                </Space>
+
+                {detailDrawerItem.contextTitle && (
+                  <div>
+                    <Text strong>Debate / topic</Text>
+                    <Paragraph>{detailDrawerItem.contextTitle}</Paragraph>
+                  </div>
+                )}
+
+                {detailDrawerItem.contentPreview && (
+                  <div>
+                    <Text strong>Argument / message</Text>
+                    <Paragraph>{detailDrawerItem.contentPreview}</Paragraph>
+                  </div>
+                )}
+
+                <div>
+                  <Text strong>People</Text>
+                  <Paragraph>
+                    {detailDrawerItem.authorName && (
+                      <>
+                        Author:{' '}
+                        <Text strong>{detailDrawerItem.authorName}</Text>
+                        <br />
+                      </>
+                    )}
+                    {detailDrawerItem.reporterName && (
+                      <>
+                        Reporter: <Text>{detailDrawerItem.reporterName}</Text>
+                        <br />
+                      </>
+                    )}
+                    {detailDrawerItem.reportCount && (
+                      <>Reports merged: {detailDrawerItem.reportCount}</>
+                    )}
+                  </Paragraph>
+                </div>
+
+                {detailDrawerItem.reporterMessage && (
+                  <div>
+                    <Text strong>Reporter note</Text>
+                    <Paragraph>{detailDrawerItem.reporterMessage}</Paragraph>
+                  </div>
+                )}
+
+                <div>
+                  <Text strong>Timeline</Text>
+                  <Paragraph type="secondary">
+                    {formatDate(detailDrawerItem.createdAt) && (
+                      <>
+                        Reported: {formatDate(detailDrawerItem.createdAt)}
+                        <br />
+                      </>
+                    )}
+                    {formatDate(detailDrawerItem.lastActionAt) && (
+                      <>
+                        Last action:{' '}
+                        {formatDate(detailDrawerItem.lastActionAt)}
+                      </>
+                    )}
+                    {!formatDate(detailDrawerItem.createdAt) &&
+                      !formatDate(detailDrawerItem.lastActionAt) &&
+                      'No timestamp available.'}
+                  </Paragraph>
+                </div>
+
+                <Alert
+                  type="info"
+                  showIcon
+                  message="Next steps"
+                  description="Use the actions in the table to approve or remove this content. For borderline arguments or repeat offenders, escalate via your internal Ethikos governance process."
+                />
+              </Space>
+            )}
+          </Drawer>
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="admin/roles/page.tsx"
+id=53eb1cc1241c
+kind=source
+size=6446
+lines=239
+line_ref=1-239
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/admin/roles/page.tsx
+'use client';
+
+import { useMemo, useState } from 'react';
+import {
+  PageContainer,
+  ProTable,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  App as AntdApp,
+  Button,
+  Segmented,
+  Space,
+  Statistic,
+  Switch,
+  Tag,
+  Typography,
+} from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchRoles,
+  toggleRole,
+  type RolePayload,
+  type RoleRow,
+} from '@/services/admin';
+
+const { Text } = Typography;
+
+type StatusFilter = 'all' | 'enabled' | 'disabled';
+
+const STATUS_FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Enabled', value: 'enabled' },
+  { label: 'Disabled', value: 'disabled' },
+];
+
+export default function RoleManagement(): JSX.Element {
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [updatingRoleId, setUpdatingRoleId] = useState<string | null>(null);
+
+  const { message } = AntdApp.useApp();
+
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useRequest<RolePayload, []>(() => fetchRoles());
+
+  const items = useMemo(() => data?.items ?? [], [data]);
+
+  const stats = useMemo(() => {
+    const totalRoles = items.length;
+    const enabledRoles = items.filter((role) => role.enabled).length;
+    const totalUsers = items.reduce(
+      (sum, role) => sum + (role.userCount ?? 0),
+      0,
+    );
+
+    return {
+      totalRoles,
+      enabledRoles,
+      totalUsers,
+    };
+  }, [items]);
+
+  const filteredItems = useMemo(() => {
+    if (statusFilter === 'enabled') {
+      return items.filter((role) => role.enabled);
+    }
+
+    if (statusFilter === 'disabled') {
+      return items.filter((role) => !role.enabled);
+    }
+
+    return items;
+  }, [items, statusFilter]);
+
+  const onToggleRole = async (
+    role: RoleRow,
+    checked: boolean,
+  ): Promise<void> => {
+    try {
+      setUpdatingRoleId(role.id);
+
+      await toggleRole(role.id, checked);
+
+      message.success(
+        checked ? `${role.name} enabled.` : `${role.name} disabled.`,
+      );
+
+      refresh();
+    } catch {
+      message.error('Unable to update this role. Please try again.');
+    } finally {
+      setUpdatingRoleId(null);
+    }
+  };
+
+  const columns: ProColumns<RoleRow>[] = [
+    {
+      title: 'Role',
+      dataIndex: 'name',
+      width: 260,
+      ellipsis: true,
+      render: (_dom, row) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{row.name}</Text>
+
+          {row.role && (
+            <Text type="secondary" ellipsis>
+              Permission role: {row.role}
+            </Text>
+          )}
+
+          {row.topicTitle && (
+            <Text type="secondary" ellipsis>
+              Topic: {row.topicTitle}
+            </Text>
+          )}
+        </Space>
+      ),
+    },
+    {
+      title: 'Users',
+      dataIndex: 'userCount',
+      width: 120,
+      align: 'right',
+      render: (_dom, row) => <Tag>{row.userCount ?? 0}</Tag>,
+    },
+    {
+      title: 'Enabled',
+      dataIndex: 'enabled',
+      width: 140,
+      render: (_dom, row) => (
+        <Switch
+          checked={Boolean(row.enabled)}
+          loading={updatingRoleId === row.id}
+          disabled={loading || updatingRoleId !== null}
+          onChange={(checked) => {
+            void onToggleRole(row, checked);
+          }}
+        />
+      ),
+    },
+  ];
+
+  return (
+    <EthikosPageShell
+      title="Role management"
+      sectionLabel="Admin"
+      subtitle="Configure who can moderate debates, manage consultations, or access sensitive impact dashboards in Ethikos."
+    >
+      <PageContainer ghost loading={loading}>
+        <Space
+          direction="vertical"
+          size="middle"
+          style={{ width: '100%', marginBottom: 16 }}
+        >
+          <Alert
+            type="info"
+            showIcon
+            message="Role-based access for Ethikos"
+            description={
+              <Text type="secondary">
+                Use roles to control who can moderate debates, manage
+                consultations, or access sensitive impact dashboards. Toggling a
+                role updates access for all users in that group.
+              </Text>
+            }
+          />
+
+          {error && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load Ethikos roles."
+              description="Check your connection or try again. If the problem persists, the Ethikos admin service may be temporarily unavailable."
+            />
+          )}
+
+          <Space
+            align="center"
+            style={{
+              width: '100%',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Space size="large" wrap>
+              <Statistic title="Defined roles" value={stats.totalRoles} />
+              <Statistic title="Enabled roles" value={stats.enabledRoles} />
+              <Statistic title="Assigned users" value={stats.totalUsers} />
+            </Space>
+
+            <Space wrap>
+              <Segmented<StatusFilter>
+                value={statusFilter}
+                onChange={(value) => setStatusFilter(value)}
+                options={STATUS_FILTER_OPTIONS}
+              />
+
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => refresh()}
+                type="default"
+                loading={loading}
+                disabled={updatingRoleId !== null}
+              >
+                Refresh
+              </Button>
+            </Space>
+          </Space>
+        </Space>
+
+        <ProTable<RoleRow>
+          rowKey="id"
+          columns={columns}
+          dataSource={filteredItems}
+          pagination={false}
+          search={false}
+          loading={loading}
+          options={false}
+          toolBarRender={() => [
+            <Text key="hint" type="secondary">
+              Toggle a role to enable or disable its permissions
+              platform-wide.
+            </Text>,
+          ]}
+        />
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+----- FILE END -----

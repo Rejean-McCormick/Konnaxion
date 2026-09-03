@@ -1,0 +1,1127 @@
+==== MASTER INDEX ====
+repo_name: ethikos
+root_dir: C:\mycode\Konnaxion\Konnaxion\backend\konnaxion\ethikos
+generated_at: 2026-09-03T13:19:35.862764
+instructions_file: 00_START_HERE.instructions.md
+upload_helper_file: Code_snapshot_ethikos.zip
+
+==== VOLUMES ====
+- filename=ethikos_20260903_131935_01_ROOT.txt | title=ROOT FILES | short_title=Root | files=12 | size_mb=0.1109
+- filename=ethikos_20260903_131935_02_demo_import.txt | title=FOLDER: demo_import | short_title=demo_import | files=6 | size_mb=0.0978
+- filename=ethikos_20260903_131935_03_tests.txt | title=FOLDER: tests | short_title=tests | files=5 | size_mb=0.0827
+- filename=ethikos_20260903_131935_04_migrations.txt | title=FOLDER: migrations | short_title=migrations | files=6 | size_mb=0.0276
+- filename=ethikos_20260903_131935_05_management.txt | title=FOLDER: management | short_title=management | files=3 | size_mb=0.009
+
+==== FILE LOCATOR (path -> volume) ====
+__init__.py	volume=ethikos_20260903_131935_01_ROOT.txt
+admin.py	volume=ethikos_20260903_131935_01_ROOT.txt
+api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt
+apps.py	volume=ethikos_20260903_131935_01_ROOT.txt
+constants.py	volume=ethikos_20260903_131935_01_ROOT.txt
+models.py	volume=ethikos_20260903_131935_01_ROOT.txt
+models_demo.py	volume=ethikos_20260903_131935_01_ROOT.txt
+permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt
+serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt
+tests.py	volume=ethikos_20260903_131935_01_ROOT.txt
+urls.py	volume=ethikos_20260903_131935_01_ROOT.txt
+views.py	volume=ethikos_20260903_131935_01_ROOT.txt
+demo_import/__init__.py	volume=ethikos_20260903_131935_02_demo_import.txt
+demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt
+demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt
+demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt
+demo_import/urls.py	volume=ethikos_20260903_131935_02_demo_import.txt
+demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt
+tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt
+tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt
+tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt
+tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt
+tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt
+migrations/0001_initial.py	volume=ethikos_20260903_131935_04_migrations.txt
+migrations/0002_initial.py	volume=ethikos_20260903_131935_04_migrations.txt
+migrations/0003_kintsugi_wave1_korum.py	volume=ethikos_20260903_131935_04_migrations.txt
+migrations/0004_demoscenarioimport.py	volume=ethikos_20260903_131935_04_migrations.txt
+migrations/0005_demo_import_v3_object_types.py	volume=ethikos_20260903_131935_04_migrations.txt
+migrations/__init__.py	volume=ethikos_20260903_131935_04_migrations.txt
+management/__init__.py	volume=ethikos_20260903_131935_05_management.txt
+management/commands/__init__.py	volume=ethikos_20260903_131935_05_management.txt
+management/commands/seed_ethikos_workflow.py	volume=ethikos_20260903_131935_05_management.txt
+
+==== FILE DETAIL INDEX ====
+__init__.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=f493c7715d33
+  kind=source
+  size_bytes=47
+  lines=1
+  line_ref=1-1
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Python module.
+admin.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=a238b3dadceb
+  kind=source
+  size_bytes=17247
+  lines=575
+  line_ref=1-575
+  chunk_refs=1-350,351-575
+  symbols=40
+  imports=18
+  summary=Python module with 11 class(es) and 29 function(s).
+api_views.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=dddd4a059473
+  kind=source
+  size_bytes=30760
+  lines=949
+  line_ref=1-949
+  chunk_refs=1-350,351-700,701-949
+  symbols=51
+  imports=41
+  summary=Python module with 9 class(es) and 42 function(s).
+apps.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=6e673b63e60e
+  kind=source
+  size_bytes=205
+  lines=7
+  line_ref=1-7
+  chunk_refs=
+  symbols=1
+  imports=1
+  summary=Python module with 1 class(es).
+constants.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=a5a1446dd87d
+  kind=source
+  size_bytes=8565
+  lines=226
+  line_ref=1-226
+  chunk_refs=
+  symbols=0
+  imports=2
+  summary=Python module with imports and top-level code.
+models.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=8ea003a30274
+  kind=source
+  size_bytes=13752
+  lines=467
+  line_ref=1-467
+  chunk_refs=1-350,351-467
+  symbols=27
+  imports=6
+  summary=Python module with 18 class(es) and 9 function(s).
+models_demo.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=dec111ed51dc
+  kind=source
+  size_bytes=4028
+  lines=123
+  line_ref=1-123
+  chunk_refs=
+  symbols=3
+  imports=3
+  summary=Python module with 2 class(es) and 1 function(s).
+permissions.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=f640b86203cf
+  kind=source
+  size_bytes=9790
+  lines=300
+  line_ref=1-300
+  chunk_refs=
+  symbols=32
+  imports=4
+  summary=Python module with 9 class(es) and 23 function(s).
+serializers.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=a6196e341135
+  kind=source
+  size_bytes=18458
+  lines=622
+  line_ref=1-622
+  chunk_refs=1-350,351-622
+  symbols=27
+  imports=17
+  summary=Python module with 20 class(es) and 7 function(s).
+tests.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=a46bbc7b6c00
+  kind=source
+  size_bytes=9964
+  lines=301
+  line_ref=1-301
+  chunk_refs=
+  symbols=15
+  imports=20
+  summary=Python module with 1 class(es) and 14 function(s).
+urls.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=264e4983bf5e
+  kind=source
+  size_bytes=1814
+  lines=56
+  line_ref=1-56
+  chunk_refs=
+  symbols=2
+  imports=5
+  summary=Python module with 2 function(s).
+views.py
+  volume=ethikos_20260903_131935_01_ROOT.txt
+  id=73e8552fa019
+  kind=source
+  size_bytes=1695
+  lines=46
+  line_ref=1-46
+  chunk_refs=
+  symbols=7
+  imports=9
+  summary=Python module with 3 class(es) and 4 function(s).
+demo_import/__init__.py
+  volume=ethikos_20260903_131935_02_demo_import.txt
+  id=94ff12fdf3b5
+  kind=source
+  size_bytes=322
+  lines=14
+  line_ref=1-14
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Python module.
+demo_import/importer.py
+  volume=ethikos_20260903_131935_02_demo_import.txt
+  id=06ad2e5d954a
+  kind=source
+  size_bytes=47495
+  lines=1477
+  line_ref=1-1477
+  chunk_refs=1-350,351-700,701-1050,1051-1400,1401-1477
+  symbols=41
+  imports=24
+  summary=Python module with 1 class(es) and 40 function(s).
+demo_import/schema.py
+  volume=ethikos_20260903_131935_02_demo_import.txt
+  id=9a8a8f840177
+  kind=source
+  size_bytes=34572
+  lines=1045
+  line_ref=1-1045
+  chunk_refs=1-350,351-700,701-1045
+  symbols=26
+  imports=3
+  summary=Python module with 26 function(s).
+demo_import/serializers.py
+  volume=ethikos_20260903_131935_02_demo_import.txt
+  id=2cdca06691f4
+  kind=source
+  size_bytes=15674
+  lines=434
+  line_ref=1-434
+  chunk_refs=1-350,351-434
+  symbols=23
+  imports=10
+  summary=Python module with 18 class(es) and 5 function(s).
+demo_import/urls.py
+  volume=ethikos_20260903_131935_02_demo_import.txt
+  id=5ed7fdbfe605
+  kind=source
+  size_bytes=1064
+  lines=44
+  line_ref=1-44
+  chunk_refs=
+  symbols=0
+  imports=4
+  summary=Python module with imports and top-level code.
+demo_import/views.py
+  volume=ethikos_20260903_131935_02_demo_import.txt
+  id=7e6e72e7a2e3
+  kind=source
+  size_bytes=3410
+  lines=123
+  line_ref=1-123
+  chunk_refs=
+  symbols=8
+  imports=11
+  summary=Python module with 3 class(es) and 5 function(s).
+tests/test_demo_import_api.py
+  volume=ethikos_20260903_131935_03_tests.txt
+  id=de6e205fd664
+  kind=source
+  size_bytes=12981
+  lines=444
+  line_ref=1-444
+  chunk_refs=1-350,351-444
+  symbols=19
+  imports=7
+  summary=Python module with 19 function(s).
+tests/test_demo_import_schema.py
+  volume=ethikos_20260903_131935_03_tests.txt
+  id=3b5c8db0b09a
+  kind=source
+  size_bytes=13387
+  lines=395
+  line_ref=1-395
+  chunk_refs=1-350,351-395
+  symbols=26
+  imports=8
+  summary=Python module with 26 function(s).
+tests/test_demo_importer.py
+  volume=ethikos_20260903_131935_03_tests.txt
+  id=0bb14aeeb1a3
+  kind=source
+  size_bytes=14412
+  lines=446
+  line_ref=1-446
+  chunk_refs=1-350,351-446
+  symbols=12
+  imports=15
+  summary=Python module with 12 function(s).
+tests/test_kintsugi_korum_api.py
+  volume=ethikos_20260903_131935_03_tests.txt
+  id=f3ba07a1dff9
+  kind=source
+  size_bytes=32183
+  lines=876
+  line_ref=1-876
+  chunk_refs=1-350,351-700,701-876
+  symbols=35
+  imports=30
+  summary=Python module with 1 class(es) and 34 function(s).
+tests/test_kintsugi_korum_models.py
+  volume=ethikos_20260903_131935_03_tests.txt
+  id=a7e7026ca09e
+  kind=source
+  size_bytes=13788
+  lines=378
+  line_ref=1-378
+  chunk_refs=1-350,351-378
+  symbols=16
+  imports=28
+  summary=Python module with 1 class(es) and 15 function(s).
+migrations/0001_initial.py
+  volume=ethikos_20260903_131935_04_migrations.txt
+  id=8fe852abac9f
+  kind=source
+  size_bytes=3671
+  lines=72
+  line_ref=1-72
+  chunk_refs=
+  symbols=1
+  imports=5
+  summary=Python module with 1 class(es).
+migrations/0002_initial.py
+  volume=ethikos_20260903_131935_04_migrations.txt
+  id=e1f10256ed36
+  kind=source
+  size_bytes=2241
+  lines=57
+  line_ref=1-57
+  chunk_refs=
+  symbols=1
+  imports=3
+  summary=Python module with 1 class(es).
+migrations/0003_kintsugi_wave1_korum.py
+  volume=ethikos_20260903_131935_04_migrations.txt
+  id=e96463eed5be
+  kind=source
+  size_bytes=18808
+  lines=533
+  line_ref=1-533
+  chunk_refs=1-350,351-533
+  symbols=1
+  imports=6
+  summary=Python module with 1 class(es).
+migrations/0004_demoscenarioimport.py
+  volume=ethikos_20260903_131935_04_migrations.txt
+  id=795ef9746c14
+  kind=source
+  size_bytes=2778
+  lines=36
+  line_ref=1-36
+  chunk_refs=
+  symbols=1
+  imports=4
+  summary=Python module with 1 class(es).
+migrations/0005_demo_import_v3_object_types.py
+  volume=ethikos_20260903_131935_04_migrations.txt
+  id=1ec224b355a0
+  kind=source
+  size_bytes=1336
+  lines=36
+  line_ref=1-36
+  chunk_refs=
+  symbols=1
+  imports=2
+  summary=Python module with 1 class(es).
+migrations/__init__.py
+  volume=ethikos_20260903_131935_04_migrations.txt
+  id=0612fe3fd4d1
+  kind=source
+  size_bytes=58
+  lines=1
+  line_ref=1-1
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Python module.
+management/__init__.py
+  volume=ethikos_20260903_131935_05_management.txt
+  id=eacd4d91a9a1
+  kind=source
+  size_bytes=0
+  lines=0
+  line_ref=
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=
+management/commands/__init__.py
+  volume=ethikos_20260903_131935_05_management.txt
+  id=d00a04f36bc8
+  kind=source
+  size_bytes=0
+  lines=0
+  line_ref=
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=
+management/commands/seed_ethikos_workflow.py
+  volume=ethikos_20260903_131935_05_management.txt
+  id=eea6eece70c5
+  kind=source
+  size_bytes=9467
+  lines=270
+  line_ref=1-270
+  chunk_refs=
+  symbols=4
+  imports=13
+  summary=Python module with 1 class(es) and 3 function(s).
+
+==== SYMBOL INDEX ====
+def _model_field_names	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=30	end_line=31
+def _existing_fields	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=34	end_line=39
+def _short_text	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=42	end_line=44
+class TimestampMixin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=49	end_line=69
+def TimestampMixin._time_fields	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=52	end_line=53
+def TimestampMixin.get_readonly_fields	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=55	end_line=60
+def TimestampMixin.get_list_display	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=62	end_line=69
+class KintsugiFallbackAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=74	end_line=157
+def KintsugiFallbackAdmin.get_date_hierarchy	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=85	end_line=93
+def KintsugiFallbackAdmin.get_readonly_fields	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=95	end_line=101
+def KintsugiFallbackAdmin.get_list_display	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=103	end_line=122
+def KintsugiFallbackAdmin.get_search_fields	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=124	end_line=141
+def KintsugiFallbackAdmin.get_list_filter	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=143	end_line=157
+class EthikosCategoryAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=163	end_line=167
+class EthikosTopicAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=173	end_line=215
+def EthikosTopicAdmin.status_badge	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=197	end_line=208
+def EthikosTopicAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=210	end_line=215
+class EthikosStanceAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=221	end_line=250
+def EthikosStanceAdmin.value_badge	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=235	end_line=247
+def EthikosStanceAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=249	end_line=250
+class EthikosArgumentAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=256	end_line=305
+def EthikosArgumentAdmin.short_content	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=279	end_line=280
+def EthikosArgumentAdmin.side_badge	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=283	end_line=298
+def EthikosArgumentAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=300	end_line=305
+class ArgumentSourceAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=311	end_line=346
+def ArgumentSourceAdmin.short_source	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=338	end_line=339
+def ArgumentSourceAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=341	end_line=346
+class ArgumentImpactVoteAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=352	end_line=391
+def ArgumentImpactVoteAdmin.value_badge	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=371	end_line=384
+def ArgumentImpactVoteAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=386	end_line=391
+class ArgumentSuggestionAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=397	end_line=483
+def ArgumentSuggestionAdmin.short_content	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=436	end_line=437
+def ArgumentSuggestionAdmin.side_badge	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=440	end_line=455
+def ArgumentSuggestionAdmin.status_badge	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=458	end_line=470
+def ArgumentSuggestionAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=472	end_line=483
+class DiscussionParticipantRoleAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=489	end_line=531
+def DiscussionParticipantRoleAdmin.role_badge	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=510	end_line=524
+def DiscussionParticipantRoleAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=526	end_line=531
+class DiscussionVisibilitySettingAdmin	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=537	end_line=566
+def DiscussionVisibilitySettingAdmin.get_queryset	path=admin.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=562	end_line=566
+def _coerce_optional_int	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=56	end_line=69
+def _copy_request_data	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=72	end_line=80
+def _touch_topic_activity	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=83	end_line=87
+def _valid_topic_statuses	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=90	end_line=91
+def _valid_suggestion_statuses	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=94	end_line=95
+def _valid_discussion_roles	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=98	end_line=99
+def _topic_from_argument	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=102	end_line=103
+def _touch_argument_topic	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=106	end_line=107
+class CategoryViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=112	end_line=122
+class TopicViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=127	end_line=311
+def TopicViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=154	end_line=170
+def TopicViewSet._normalized_topic_data	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=172	end_line=180
+def TopicViewSet.create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=182	end_line=192
+def TopicViewSet.update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=194	end_line=206
+def TopicViewSet.perform_create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=208	end_line=209
+def TopicViewSet.preview	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=212	end_line=311
+class StanceViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=316	end_line=380
+def StanceViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=336	end_line=346
+def StanceViewSet.create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=348	end_line=372
+def StanceViewSet.perform_create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=374	end_line=376
+def StanceViewSet.perform_update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=378	end_line=380
+class ArgumentViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=385	end_line=502
+def ArgumentViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=408	end_line=446
+def ArgumentViewSet._normalized_argument_data	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=448	end_line=466
+def ArgumentViewSet.create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=468	end_line=480
+def ArgumentViewSet.update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=482	end_line=494
+def ArgumentViewSet.perform_create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=496	end_line=498
+def ArgumentViewSet.perform_update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=500	end_line=502
+class ArgumentSourceViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=507	end_line=560
+def ArgumentSourceViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=526	end_line=552
+def ArgumentSourceViewSet.perform_create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=554	end_line=556
+def ArgumentSourceViewSet.perform_update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=558	end_line=560
+class ArgumentImpactVoteViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=565	end_line=641
+def ArgumentImpactVoteViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=586	end_line=611
+def ArgumentImpactVoteViewSet.create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=613	end_line=637
+def ArgumentImpactVoteViewSet.perform_update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=639	end_line=641
+class ArgumentSuggestionViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=646	end_line=790
+def ArgumentSuggestionViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=670	end_line=701
+def ArgumentSuggestionViewSet.perform_create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=703	end_line=705
+def ArgumentSuggestionViewSet.perform_update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=707	end_line=709
+def ArgumentSuggestionViewSet.accept	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=712	end_line=750
+def ArgumentSuggestionViewSet.reject	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=753	end_line=770
+def ArgumentSuggestionViewSet.request_revision	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=773	end_line=790
+class DiscussionParticipantRoleViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=795	end_line=876
+def DiscussionParticipantRoleViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=814	end_line=837
+def DiscussionParticipantRoleViewSet.create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=839	end_line=872
+def DiscussionParticipantRoleViewSet.perform_update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=874	end_line=876
+class DiscussionVisibilitySettingViewSet	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=881	end_line=949
+def DiscussionVisibilitySettingViewSet.get_queryset	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=899	end_line=909
+def DiscussionVisibilitySettingViewSet.create	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=911	end_line=945
+def DiscussionVisibilitySettingViewSet.perform_update	path=api_views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=947	end_line=949
+class EthikosConfig	path=apps.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=5	end_line=7
+class EthikosCategory	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=14	end_line=22
+class EthikosCategory.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=18	end_line=19
+def EthikosCategory.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=21	end_line=22
+class EthikosArgument	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=25	end_line=72
+class EthikosArgument.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=64	end_line=69
+def EthikosArgument.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=71	end_line=72
+class EthikosStance	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=75	end_line=109
+class EthikosStance.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=95	end_line=106
+def EthikosStance.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=108	end_line=109
+class EthikosTopic	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=112	end_line=155
+class EthikosTopic.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=151	end_line=152
+def EthikosTopic.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=154	end_line=155
+class ArgumentSource	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=158	end_line=207
+class ArgumentSource.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=193	end_line=199
+def ArgumentSource.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=201	end_line=207
+class ArgumentImpactVote	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=210	end_line=249
+class ArgumentImpactVote.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=230	end_line=246
+def ArgumentImpactVote.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=248	end_line=249
+class ArgumentSuggestion	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=252	end_line=336
+class ArgumentSuggestion.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=325	end_line=333
+def ArgumentSuggestion.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=335	end_line=336
+class DiscussionParticipantRole	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=339	end_line=396
+class DiscussionParticipantRole.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=381	end_line=393
+def DiscussionParticipantRole.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=395	end_line=396
+class DiscussionVisibilitySetting	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=399	end_line=467
+class DiscussionVisibilitySetting.Meta	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=458	end_line=464
+def DiscussionVisibilitySetting.__str__	path=models.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=466	end_line=467
+class DemoScenarioImport	path=models_demo.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=7	end_line=123
+class DemoScenarioImport.Meta	path=models_demo.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=91	end_line=120
+def DemoScenarioImport.__str__	path=models_demo.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=122	end_line=123
+def is_authenticated_user	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=45	end_line=47
+def is_staff_or_superuser	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=50	end_line=57
+def user_in_any_group	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=60	end_line=77
+def is_ethikos_admin	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=80	end_line=90
+def is_ethikos_moderator	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=93	end_line=102
+def get_object_owner_id	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=105	end_line=133
+def user_owns_object	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=136	end_line=144
+class PublicReadAuthenticatedWrite	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=147	end_line=159
+def PublicReadAuthenticatedWrite.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=156	end_line=159
+class AuthenticatedOnly	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=162	end_line=171
+def AuthenticatedOnly.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=170	end_line=171
+class EthikosAdminOnly	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=174	end_line=185
+def EthikosAdminOnly.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=181	end_line=182
+def EthikosAdminOnly.has_object_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=184	end_line=185
+class EthikosModeratorOnly	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=188	end_line=199
+def EthikosModeratorOnly.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=195	end_line=196
+def EthikosModeratorOnly.has_object_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=198	end_line=199
+class OwnerOrEthikosAdmin	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=202	end_line=214
+def OwnerOrEthikosAdmin.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=210	end_line=211
+def OwnerOrEthikosAdmin.has_object_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=213	end_line=214
+class OwnerOrEthikosModerator	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=217	end_line=232
+def OwnerOrEthikosModerator.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=225	end_line=226
+def OwnerOrEthikosModerator.has_object_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=228	end_line=232
+class OwnerOrEthikosAdminOrReadOnly	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=235	end_line=253
+def OwnerOrEthikosAdminOrReadOnly.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=245	end_line=248
+def OwnerOrEthikosAdminOrReadOnly.has_object_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=250	end_line=253
+class OwnerOrEthikosModeratorOrReadOnly	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=256	end_line=275
+def OwnerOrEthikosModeratorOrReadOnly.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=264	end_line=267
+def OwnerOrEthikosModeratorOrReadOnly.has_object_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=269	end_line=275
+class SelfOrEthikosAdmin	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=278	end_line=290
+def SelfOrEthikosAdmin.has_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=286	end_line=287
+def SelfOrEthikosAdmin.has_object_permission	path=permissions.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=289	end_line=290
+class EthikosCategorySerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=43	end_line=47
+class EthikosCategorySerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=44	end_line=47
+class EthikosTopicSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=50	end_line=118
+class EthikosTopicSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=76	end_line=102
+def EthikosTopicSerializer.validate	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=104	end_line=118
+class EthikosTopicPreviewSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=121	end_line=152
+class EthikosTopicPreviewSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=136	end_line=152
+class EthikosStanceSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=155	end_line=188
+class EthikosStanceSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=166	end_line=181
+def EthikosStanceSerializer.validate_value	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=183	end_line=188
+class EthikosArgumentSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=191	end_line=289
+class EthikosArgumentSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=223	end_line=250
+def EthikosArgumentSerializer.validate	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=252	end_line=289
+class ArgumentSourceSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=292	end_line=344
+class ArgumentSourceSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=303	end_line=327
+def ArgumentSourceSerializer.validate	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=329	end_line=344
+class ArgumentImpactVoteSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=347	end_line=385
+class ArgumentImpactVoteSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=357	end_line=374
+def ArgumentImpactVoteSerializer.validate_value	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=376	end_line=385
+class ArgumentSuggestionSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=388	end_line=523
+class ArgumentSuggestionSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=428	end_line=457
+def ArgumentSuggestionSerializer.validate	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=459	end_line=523
+class DiscussionParticipantRoleSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=526	end_line=587
+class DiscussionParticipantRoleSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=554	end_line=579
+def DiscussionParticipantRoleSerializer.validate	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=581	end_line=587
+class DiscussionVisibilitySettingSerializer	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=590	end_line=622
+class DiscussionVisibilitySettingSerializer.Meta	path=serializers.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=603	end_line=622
+class EthikosKintsugiFoundationTests	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=31	end_line=301
+def EthikosKintsugiFoundationTests.setUpTestData	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=48	end_line=76
+def EthikosKintsugiFoundationTests._registered_prefixes	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=79	end_line=80
+def EthikosKintsugiFoundationTests.test_current_core_models_remain_stable	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=82	end_line=90
+def EthikosKintsugiFoundationTests.test_canonical_ethikos_routes_are_registered	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=92	end_line=98
+def EthikosKintsugiFoundationTests.test_forbidden_kintsugi_route_segments_are_not_registered	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=100	end_line=127
+def EthikosKintsugiFoundationTests.test_stance_value_accepts_boundary_values	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=129	end_line=142
+def EthikosKintsugiFoundationTests.test_stance_value_rejects_values_outside_topic_level_range	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=144	end_line=160
+def EthikosKintsugiFoundationTests.test_stance_is_unique_per_user_and_topic	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=162	end_line=176
+def EthikosKintsugiFoundationTests.test_argument_remains_threaded_ethikos_argument	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=178	end_line=196
+def EthikosKintsugiFoundationTests.test_authenticated_user_can_create_argument	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=198	end_line=217
+def EthikosKintsugiFoundationTests.test_argument_reply_must_share_parent_topic	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=219	end_line=261
+def EthikosKintsugiFoundationTests.test_topic_preview_returns_topic_metadata_not_empty_shell	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=263	end_line=276
+def EthikosKintsugiFoundationTests.test_topic_preview_is_public_readable	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=278	end_line=282
+def EthikosKintsugiFoundationTests.test_unauthenticated_user_cannot_create_argument	path=tests.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=284	end_line=301
+def register_required	path=urls.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=22	end_line=30
+def register_optional	path=urls.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=33	end_line=41
+class TopicViewSet	path=views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=12	end_line=18
+def TopicViewSet.perform_create	path=views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=17	end_line=18
+class StanceViewSet	path=views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=20	end_line=38
+def StanceViewSet.perform_create	path=views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=29	end_line=30
+def StanceViewSet.get_queryset	path=views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=32	end_line=38
+class ArgumentViewSet	path=views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=40	end_line=46
+def ArgumentViewSet.perform_create	path=views.py	volume=ethikos_20260903_131935_01_ROOT.txt	line=45	end_line=46
+def validate_and_preview_ethikos_demo_scenario	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=45	end_line=89
+def import_ethikos_demo_scenario	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=92	end_line=184
+def reset_ethikos_demo_scenario	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=187	end_line=225
+def summarize_scenario	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=228	end_line=248
+def track_imported_object	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=251	end_line=279
+def delete_tracked_scenario_objects	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=282	end_line=368
+class _ImportContext	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=376	end_line=428
+def _ImportContext.__init__	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=377	end_line=386
+def _ImportContext.record_created	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=388	end_line=395
+def _ImportContext.record_updated	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=397	end_line=404
+def _ImportContext.warn	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=406	end_line=412
+def _ImportContext.track	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=414	end_line=428
+def _import_actors	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=431	end_line=469
+def _import_ekoh_profiles	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=473	end_line=557
+def _import_categories	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=560	end_line=592
+def _import_topics	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=595	end_line=652
+def _import_topic_reading_context	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=656	end_line=807
+def _clear_smart_vote_weight_caches	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=810	end_line=817
+def _import_stances	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=820	end_line=854
+def _import_arguments	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=857	end_line=907
+def _import_argument_sources	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=910	end_line=947
+def _import_consultations	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=950	end_line=994
+def _import_consultation_votes	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=997	end_line=1057
+def _import_consultation_results	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1060	end_line=1117
+def _import_impact_items	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1120	end_line=1169
+def _get_ethikos_model	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1177	end_line=1178
+def _get_optional_ethikos_model	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1181	end_line=1182
+def _get_optional_model	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1185	end_line=1189
+def _model_for_object_type	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1192	end_line=1221
+def _model_has_field	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1224	end_line=1229
+def _clean_model_defaults	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1232	end_line=1247
+def _get_demo_import_owner	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1250	end_line=1269
+def _get_argument_user_field	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1272	end_line=1285
+def _normalize_argument_side	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1288	end_line=1316
+def _parse_datetime_value	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1320	end_line=1334
+def _parse_date_value	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1336	end_line=1348
+def _object_label	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1351	end_line=1357
+def _can_delete_tracked_object	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1360	end_line=1384
+def _is_tracked_by_other_scenario	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1387	end_line=1400
+def _collect_non_blocking_warnings	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1403	end_line=1440
+def _build_consultation_results_data	path=demo_import/importer.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1443	end_line=1477
+def validate_demo_scenario	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=134	end_line=204
+def normalize_demo_scenario	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=207	end_line=213
+def summarize_scenario_payload	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=216	end_line=232
+def _validate_root	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=235	end_line=268
+def _validate_actors	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=271	end_line=293
+def _validate_categories	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=296	end_line=308
+def _validate_topics	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=311	end_line=332
+def _validate_stances	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=335	end_line=370
+def _validate_arguments	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=373	end_line=411
+def _validate_argument_sources	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=414	end_line=455
+def _validate_consultations	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=458	end_line=486
+def _validate_consultation_votes	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=489	end_line=539
+def _validate_impact_items	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=542	end_line=558
+def _validate_ekoh_profiles	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=561	end_line=671
+def _validate_consultation_relevance	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=674	end_line=751
+def _validate_topic_relevance	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=755	end_line=832
+def _validate_reading_exclusions	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=835	end_line=896
+def _collect_unique_keys	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=899	end_line=925
+def _collect_consultation_option_keys	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=928	end_line=952
+def _require_fields	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=955	end_line=967
+def _is_object	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=970	end_line=978
+def _is_non_empty_string	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=981	end_line=982
+def _validate_number	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=985	end_line=999
+def _validate_bounded_number	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1002	end_line=1017
+def _validate_bounded_number_value	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1020	end_line=1041
+def _add_error	path=demo_import/schema.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=1044	end_line=1045
+class DemoImportErrorSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=18	end_line=20
+class DemoImportSummarySerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=23	end_line=32
+class DemoImportObjectSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=35	end_line=38
+class DemoImportResponseSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=41	end_line=53
+class EthikosDemoActorSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=56	end_line=71
+class EthikosDemoCategorySerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=74	end_line=77
+class EthikosDemoTopicSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=80	end_line=88
+class EthikosDemoStanceSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=91	end_line=94
+class EthikosDemoArgumentSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=97	end_line=113
+class EthikosDemoArgumentSourceSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=116	end_line=155
+def EthikosDemoArgumentSourceSerializer.validate	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=141	end_line=155
+class EthikosDemoConsultationOptionSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=158	end_line=160
+class EthikosDemoConsultationSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=163	end_line=174
+class EthikosDemoConsultationVoteSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=177	end_line=188
+class EthikosDemoImpactItemSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=191	end_line=195
+class BaseDemoScenarioSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=198	end_line=422
+def BaseDemoScenarioSerializer.validate	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=236	end_line=240
+def BaseDemoScenarioSerializer._validate_unique_keys	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=242	end_line=267
+def BaseDemoScenarioSerializer._validate_references	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=269	end_line=396
+def BaseDemoScenarioSerializer._validate_dates	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=398	end_line=422
+class DemoScenarioPreviewSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=425	end_line=426
+class DemoScenarioImportSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=429	end_line=430
+class DemoScenarioResetSerializer	path=demo_import/serializers.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=433	end_line=434
+def ensure_demo_importer_enabled	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=18	end_line=26
+def response_for_import_result	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=29	end_line=39
+class EthikosDemoScenarioPreviewView	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=42	end_line=56
+def EthikosDemoScenarioPreviewView.post	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=51	end_line=56
+class EthikosDemoScenarioImportView	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=59	end_line=77
+def EthikosDemoScenarioImportView.post	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=68	end_line=77
+class EthikosDemoScenarioResetView	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=80	end_line=123
+def EthikosDemoScenarioResetView.post	path=demo_import/views.py	volume=ethikos_20260903_131935_02_demo_import.txt	line=94	end_line=123
+def api_client	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=15	end_line=16
+def regular_user	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=20	end_line=25
+def admin_user	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=29	end_line=34
+def sample_demo_scenario	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=38	end_line=126
+def successful_preview_response	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=130	end_line=152
+def successful_import_response	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=156	end_line=184
+def test_preview_requires_admin_user	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=189	end_line=198
+def test_import_requires_admin_user	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=203	end_line=212
+def test_reset_requires_admin_user	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=217	end_line=226
+def test_preview_returns_summary_for_valid_payload	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=231	end_line=266
+def test_preview_returns_summary_for_valid_payload.fake_validate_and_preview_ethikos_demo_scenario	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=242	end_line=244
+def test_import_returns_created_summary_for_valid_payload	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=271	end_line=311
+def test_import_returns_created_summary_for_valid_payload.fake_import_ethikos_demo_scenario	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=282	end_line=286
+def test_reset_requires_scenario_key	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=316	end_line=327
+def test_reset_returns_deleted_objects_for_valid_scenario_key	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=332	end_line=376
+def test_reset_returns_deleted_objects_for_valid_scenario_key.fake_reset_ethikos_demo_scenario	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=341	end_line=354
+def test_preview_is_blocked_when_feature_flag_is_disabled	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=381	end_line=394
+def test_preview_accepts_v2_argument_sources	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=399	end_line=421
+def test_preview_rejects_sources_on_v1	path=tests/test_demo_import_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=426	end_line=444
+def make_valid_demo_scenario	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=16	end_line=180
+def error_messages	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=183	end_line=184
+def error_paths	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=187	end_line=188
+def test_valid_demo_scenario_passes_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=191	end_line=192
+def test_v1_and_v2_remain_supported_for_legacy_payloads	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=195	end_line=207
+def test_invalid_schema_version_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=210	end_line=213
+def test_unknown_actor_reference_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=216	end_line=222
+def test_unknown_topic_reference_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=225	end_line=231
+def test_stance_outside_allowed_range_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=238	end_line=244
+def test_unknown_consultation_reference_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=247	end_line=253
+def test_unknown_category_reference_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=256	end_line=262
+def test_invalid_topic_status_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=265	end_line=271
+def test_invalid_argument_side_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=274	end_line=280
+def test_unknown_argument_parent_reference_fails_validation	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=283	end_line=289
+def test_v3_rejects_precomputed_weighted_value	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=292	end_line=296
+def test_v3_requires_relevance_to_sum_to_one	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=299	end_line=303
+def test_v3_requires_topic_relevance_to_sum_to_one	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=307	end_line=311
+def test_v3_rejects_unknown_topic_relevance_reference	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=314	end_line=318
+def test_v3_rejects_out_of_range_ekoh_score	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=321	end_line=325
+def test_v2_rejects_ekoh_profiles	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=328	end_line=334
+def test_schema_constant_points_to_v3	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=337	end_line=338
+def test_v3_accepts_declared_advisory_recusal	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=340	end_line=349
+def test_v3_rejects_unknown_reading_exclusion_actor	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=352	end_line=362
+def test_v2_rejects_reading_exclusions	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=365	end_line=381
+def test_v3_accepts_public_ekoh_rating_visibility	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=384	end_line=388
+def test_v3_rejects_unknown_ekoh_rating_visibility	path=tests/test_demo_import_schema.py	volume=ethikos_20260903_131935_03_tests.txt	line=391	end_line=395
+def build_demo_payload	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=29	end_line=97
+def create_importing_user	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=100	end_line=105
+def _argument_user	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=108	end_line=109
+def test_import_creates_source_facts	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=112	end_line=138
+def test_import_tracks_core_objects	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=141	end_line=156
+def test_v3_imports_ekoh_profile_when_models_and_domain_exist	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=159	end_line=211
+def test_v3_binds_topic_relevance_to_smart_vote	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=215	end_line=265
+def test_v3_persists_advisory_recusal_on_source_binding	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=269	end_line=323
+def test_dry_run_does_not_create_objects	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=325	end_line=338
+def test_reset_removes_tracked_topic_but_not_untracked_topic	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=341	end_line=381
+def test_replace_scenario_replaces_tracked_topic_and_keeps_demo_users_safe	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=384	end_line=402
+def test_v3_imports_explicit_ekoh_rating_visibility	path=tests/test_demo_importer.py	volume=ethikos_20260903_131935_03_tests.txt	line=404	end_line=446
+class EthikosKintsugiKorumAPITests	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=44	end_line=876
+def EthikosKintsugiKorumAPITests.setUp	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=61	end_line=107
+def EthikosKintsugiKorumAPITests._as_user	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=113	end_line=114
+def EthikosKintsugiKorumAPITests._as_other_user	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=116	end_line=117
+def EthikosKintsugiKorumAPITests._as_staff	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=119	end_line=120
+def EthikosKintsugiKorumAPITests._results	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=122	end_line=131
+def EthikosKintsugiKorumAPITests._detail_url	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=133	end_line=134
+def EthikosKintsugiKorumAPITests.test_korum_routes_are_registered_under_ethikos	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=140	end_line=155
+def EthikosKintsugiKorumAPITests.test_forbidden_korum_parallel_routes_are_not_available	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=157	end_line=174
+def EthikosKintsugiKorumAPITests.test_create_argument_source	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=180	end_line=204
+def EthikosKintsugiKorumAPITests.test_create_argument_source_can_use_citation_without_url	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=206	end_line=224
+def EthikosKintsugiKorumAPITests.test_list_argument_sources_can_filter_by_argument	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=226	end_line=253
+def EthikosKintsugiKorumAPITests.test_argument_source_requires_source_material	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=255	end_line=269
+def EthikosKintsugiKorumAPITests.test_create_argument_impact_vote	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=275	end_line=294
+def EthikosKintsugiKorumAPITests.test_argument_impact_vote_upserts_for_same_user_and_argument	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=296	end_line=321
+def EthikosKintsugiKorumAPITests.test_argument_impact_vote_allows_minimum_and_maximum_values	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=323	end_line=345
+def EthikosKintsugiKorumAPITests.test_argument_impact_vote_rejects_out_of_range_values	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=347	end_line=362
+def EthikosKintsugiKorumAPITests.test_argument_impact_vote_does_not_create_topic_stance	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=364	end_line=380
+def EthikosKintsugiKorumAPITests.test_list_argument_impact_votes_can_filter_by_argument	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=382	end_line=403
+def EthikosKintsugiKorumAPITests.test_create_argument_suggestion_defaults_to_pending	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=409	end_line=433
+def EthikosKintsugiKorumAPITests.test_staff_can_accept_argument_suggestion_action	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=435	end_line=467
+def EthikosKintsugiKorumAPITests.test_staff_can_reject_argument_suggestion_action	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=469	end_line=493
+def EthikosKintsugiKorumAPITests.test_staff_can_request_revision_for_argument_suggestion_action	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=495	end_line=525
+def EthikosKintsugiKorumAPITests.test_argument_suggestion_rejects_empty_content	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=527	end_line=541
+def EthikosKintsugiKorumAPITests.test_argument_suggestion_rejects_cross_topic_parent	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=543	end_line=571
+def EthikosKintsugiKorumAPITests.test_list_argument_suggestions_can_filter_by_topic	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=573	end_line=606
+def EthikosKintsugiKorumAPITests.test_staff_can_assign_discussion_participant_role	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=612	end_line=634
+def EthikosKintsugiKorumAPITests.test_discussion_participant_role_upserts_for_same_topic_and_user	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=636	end_line=667
+def EthikosKintsugiKorumAPITests.test_discussion_participant_role_rejects_unknown_role	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=669	end_line=683
+def EthikosKintsugiKorumAPITests.test_list_discussion_participant_roles_can_filter_by_topic	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=685	end_line=713
+def EthikosKintsugiKorumAPITests.test_staff_can_create_discussion_visibility_setting	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=719	end_line=748
+def EthikosKintsugiKorumAPITests.test_staff_can_update_discussion_visibility_setting	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=750	end_line=791
+def EthikosKintsugiKorumAPITests.test_discussion_visibility_setting_upserts_for_same_topic	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=793	end_line=825
+def EthikosKintsugiKorumAPITests.test_discussion_visibility_setting_rejects_unknown_values	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=827	end_line=844
+def EthikosKintsugiKorumAPITests.test_list_discussion_visibility_settings_can_filter_by_topic	path=tests/test_kintsugi_korum_api.py	volume=ethikos_20260903_131935_03_tests.txt	line=846	end_line=876
+def make_user	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=40	end_line=65
+class KintsugiKorumModelTests	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=68	end_line=378
+def KintsugiKorumModelTests.setUpTestData	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=70	end_line=103
+def KintsugiKorumModelTests.test_existing_ethikos_core_models_still_work	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=105	end_line=116
+def KintsugiKorumModelTests.test_ethikos_stance_range_remains_topic_level	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=118	end_line=140
+def KintsugiKorumModelTests.test_argument_source_supports_url_source_and_related_names	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=142	end_line=160
+def KintsugiKorumModelTests.test_argument_source_supports_note_only_source	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=162	end_line=173
+def KintsugiKorumModelTests.test_argument_impact_vote_is_separate_from_topic_stance	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=175	end_line=195
+def KintsugiKorumModelTests.test_argument_impact_vote_rejects_out_of_range_values	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=197	end_line=213
+def KintsugiKorumModelTests.test_argument_impact_vote_is_unique_per_user_and_argument	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=215	end_line=245
+def KintsugiKorumModelTests.test_argument_suggestion_defaults_and_neutral_side	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=247	end_line=266
+def KintsugiKorumModelTests.test_argument_suggestion_review_links_to_accepted_argument	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=268	end_line=301
+def KintsugiKorumModelTests.test_discussion_participant_role_defaults_and_related_names	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=303	end_line=317
+def KintsugiKorumModelTests.test_discussion_participant_role_is_unique_per_topic_user	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=319	end_line=343
+def KintsugiKorumModelTests.test_discussion_visibility_setting_defaults_and_related_names	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=345	end_line=358
+def KintsugiKorumModelTests.test_discussion_visibility_setting_is_one_to_one_per_topic	path=tests/test_kintsugi_korum_models.py	volume=ethikos_20260903_131935_03_tests.txt	line=360	end_line=378
+class Migration	path=migrations/0001_initial.py	volume=ethikos_20260903_131935_04_migrations.txt	line=10	end_line=72
+class Migration	path=migrations/0002_initial.py	volume=ethikos_20260903_131935_04_migrations.txt	line=8	end_line=57
+class Migration	path=migrations/0003_kintsugi_wave1_korum.py	volume=ethikos_20260903_131935_04_migrations.txt	line=12	end_line=533
+class Migration	path=migrations/0004_demoscenarioimport.py	volume=ethikos_20260903_131935_04_migrations.txt	line=8	end_line=36
+class Migration	path=migrations/0005_demo_import_v3_object_types.py	volume=ethikos_20260903_131935_04_migrations.txt	line=4	end_line=36
+def user_defaults	path=management/commands/seed_ethikos_workflow.py	volume=ethikos_20260903_131935_05_management.txt	line=28	end_line=50
+class Command	path=management/commands/seed_ethikos_workflow.py	volume=ethikos_20260903_131935_05_management.txt	line=53	end_line=270
+def Command.add_arguments	path=management/commands/seed_ethikos_workflow.py	volume=ethikos_20260903_131935_05_management.txt	line=56	end_line=71
+def Command.handle	path=management/commands/seed_ethikos_workflow.py	volume=ethikos_20260903_131935_05_management.txt	line=74	end_line=270
+
+==== IMPORT INDEX ====
+admin.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=3
+admin.py	from typing import Sequence	volume=ethikos_20260903_131935_01_ROOT.txt	line=5
+admin.py	from django.apps import apps	volume=ethikos_20260903_131935_01_ROOT.txt	line=7
+admin.py	from django.contrib import admin	volume=ethikos_20260903_131935_01_ROOT.txt	line=8
+admin.py	from django.db import models	volume=ethikos_20260903_131935_01_ROOT.txt	line=9
+admin.py	from django.db.models import QuerySet	volume=ethikos_20260903_131935_01_ROOT.txt	line=10
+admin.py	from django.http import HttpRequest	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+admin.py	from django.utils.html import format_html	volume=ethikos_20260903_131935_01_ROOT.txt	line=12
+admin.py	from django.utils.translation import gettext_lazy as _	volume=ethikos_20260903_131935_01_ROOT.txt	line=13
+admin.py	from .models import ArgumentImpactVote	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import ArgumentSource	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import ArgumentSuggestion	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import DiscussionParticipantRole	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import DiscussionVisibilitySetting	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import EthikosArgument	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import EthikosCategory	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import EthikosStance	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+admin.py	from .models import EthikosTopic	volume=ethikos_20260903_131935_01_ROOT.txt	line=15
+api_views.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=2
+api_views.py	from typing import Optional	volume=ethikos_20260903_131935_01_ROOT.txt	line=4
+api_views.py	from django.db.models import Count	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+api_views.py	from django.shortcuts import get_object_or_404	volume=ethikos_20260903_131935_01_ROOT.txt	line=7
+api_views.py	from django.utils import timezone	volume=ethikos_20260903_131935_01_ROOT.txt	line=8
+api_views.py	from rest_framework import permissions	volume=ethikos_20260903_131935_01_ROOT.txt	line=9
+api_views.py	from rest_framework import status	volume=ethikos_20260903_131935_01_ROOT.txt	line=9
+api_views.py	from rest_framework import viewsets	volume=ethikos_20260903_131935_01_ROOT.txt	line=9
+api_views.py	from rest_framework.decorators import action	volume=ethikos_20260903_131935_01_ROOT.txt	line=10
+api_views.py	from rest_framework.exceptions import ValidationError	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+api_views.py	from rest_framework.response import Response	volume=ethikos_20260903_131935_01_ROOT.txt	line=12
+api_views.py	from .constants import ARGUMENT_SIDE_CON	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import ARGUMENT_SIDE_FILTER_VALUES	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import ARGUMENT_SIDE_NEUTRAL	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import ARGUMENT_SIDE_PRO	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import ARGUMENT_SUGGESTION_ACCEPTED	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import ARGUMENT_SUGGESTION_REJECTED	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import ARGUMENT_SUGGESTION_REVISION_REQUESTED	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import ARGUMENT_SUGGESTION_STATUS_CHOICES	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import DISCUSSION_ROLE_CHOICES	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .constants import TOPIC_STATUS_CHOICES	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+api_views.py	from .models import ArgumentImpactVote	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import ArgumentSource	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import ArgumentSuggestion	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import DiscussionParticipantRole	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import DiscussionVisibilitySetting	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import EthikosArgument	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import EthikosCategory	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import EthikosStance	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .models import EthikosTopic	volume=ethikos_20260903_131935_01_ROOT.txt	line=26
+api_views.py	from .permissions import OwnerOrEthikosAdminOrReadOnly	volume=ethikos_20260903_131935_01_ROOT.txt	line=37
+api_views.py	from .permissions import OwnerOrEthikosModeratorOrReadOnly	volume=ethikos_20260903_131935_01_ROOT.txt	line=37
+api_views.py	from .serializers import ArgumentImpactVoteSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import ArgumentSourceSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import ArgumentSuggestionSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import DiscussionParticipantRoleSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import DiscussionVisibilitySettingSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import EthikosArgumentSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import EthikosCategorySerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import EthikosStanceSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+api_views.py	from .serializers import EthikosTopicSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=41
+apps.py	from django.apps import AppConfig	volume=ethikos_20260903_131935_01_ROOT.txt	line=2
+constants.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=16
+constants.py	from typing import Final	volume=ethikos_20260903_131935_01_ROOT.txt	line=18
+models.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=3
+models.py	from django.conf import settings	volume=ethikos_20260903_131935_01_ROOT.txt	line=5
+models.py	from django.core.validators import MaxValueValidator	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+models.py	from django.core.validators import MinValueValidator	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+models.py	from django.db import models	volume=ethikos_20260903_131935_01_ROOT.txt	line=7
+models.py	from .models_demo import DemoScenarioImport as DemoScenarioImport	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+models_demo.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=1
+models_demo.py	from django.conf import settings	volume=ethikos_20260903_131935_01_ROOT.txt	line=3
+models_demo.py	from django.db import models	volume=ethikos_20260903_131935_01_ROOT.txt	line=4
+permissions.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=19
+permissions.py	from typing import Any	volume=ethikos_20260903_131935_01_ROOT.txt	line=21
+permissions.py	from rest_framework.permissions import BasePermission	volume=ethikos_20260903_131935_01_ROOT.txt	line=23
+permissions.py	from rest_framework.permissions import SAFE_METHODS	volume=ethikos_20260903_131935_01_ROOT.txt	line=23
+serializers.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=4
+serializers.py	from typing import Any	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+serializers.py	from django.contrib.auth import get_user_model	volume=ethikos_20260903_131935_01_ROOT.txt	line=8
+serializers.py	from rest_framework import serializers	volume=ethikos_20260903_131935_01_ROOT.txt	line=9
+serializers.py	from .constants import ARGUMENT_IMPACT_VOTE_MAX	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+serializers.py	from .constants import ARGUMENT_IMPACT_VOTE_MIN	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+serializers.py	from .constants import STANCE_MAX	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+serializers.py	from .constants import STANCE_MIN	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+serializers.py	from .models import ArgumentImpactVote	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import ArgumentSource	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import ArgumentSuggestion	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import DiscussionParticipantRole	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import DiscussionVisibilitySetting	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import EthikosArgument	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import EthikosCategory	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import EthikosStance	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+serializers.py	from .models import EthikosTopic	volume=ethikos_20260903_131935_01_ROOT.txt	line=17
+tests.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=2
+tests.py	from http import HTTPStatus	volume=ethikos_20260903_131935_01_ROOT.txt	line=4
+tests.py	from django.contrib.auth import get_user_model	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+tests.py	from django.core.exceptions import ValidationError as DjangoValidationError	volume=ethikos_20260903_131935_01_ROOT.txt	line=7
+tests.py	from rest_framework.test import APITestCase	volume=ethikos_20260903_131935_01_ROOT.txt	line=8
+tests.py	from config.api_router import router	volume=ethikos_20260903_131935_01_ROOT.txt	line=10
+tests.py	from konnaxion.ethikos.constants import ARGUMENT_SIDE_CON	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import ARGUMENT_SIDE_PRO	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import CURRENT_ETHIKOS_CORE_MODELS	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import ETHIKOS_ARGUMENTS_PATH	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import ETHIKOS_CATEGORIES_PATH	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import ETHIKOS_STANCES_PATH	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import ETHIKOS_TOPICS_PATH	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import FORBIDDEN_KINTSUGI_API_SEGMENTS	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import STANCE_MAX	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.constants import STANCE_MIN	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+tests.py	from konnaxion.ethikos.models import EthikosArgument	volume=ethikos_20260903_131935_01_ROOT.txt	line=23
+tests.py	from konnaxion.ethikos.models import EthikosCategory	volume=ethikos_20260903_131935_01_ROOT.txt	line=23
+tests.py	from konnaxion.ethikos.models import EthikosStance	volume=ethikos_20260903_131935_01_ROOT.txt	line=23
+tests.py	from konnaxion.ethikos.models import EthikosTopic	volume=ethikos_20260903_131935_01_ROOT.txt	line=23
+urls.py	from __future__ import annotations	volume=ethikos_20260903_131935_01_ROOT.txt	line=11
+urls.py	from django.urls import include	volume=ethikos_20260903_131935_01_ROOT.txt	line=13
+urls.py	from django.urls import path	volume=ethikos_20260903_131935_01_ROOT.txt	line=13
+urls.py	from rest_framework.routers import DefaultRouter	volume=ethikos_20260903_131935_01_ROOT.txt	line=14
+urls.py	from . import api_views	volume=ethikos_20260903_131935_01_ROOT.txt	line=16
+views.py	from rest_framework import mixins	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+views.py	from rest_framework import permissions	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+views.py	from rest_framework import viewsets	volume=ethikos_20260903_131935_01_ROOT.txt	line=6
+views.py	from .models import EthikosArgument	volume=ethikos_20260903_131935_01_ROOT.txt	line=7
+views.py	from .models import EthikosStance	volume=ethikos_20260903_131935_01_ROOT.txt	line=7
+views.py	from .models import EthikosTopic	volume=ethikos_20260903_131935_01_ROOT.txt	line=7
+views.py	from .serializers import EthikosArgumentSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=8
+views.py	from .serializers import EthikosStanceSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=8
+views.py	from .serializers import EthikosTopicSerializer	volume=ethikos_20260903_131935_01_ROOT.txt	line=8
+demo_import/importer.py	from __future__ import annotations	volume=ethikos_20260903_131935_02_demo_import.txt	line=3
+demo_import/importer.py	from collections import defaultdict	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/importer.py	from datetime import datetime	volume=ethikos_20260903_131935_02_demo_import.txt	line=6
+demo_import/importer.py	from datetime import time	volume=ethikos_20260903_131935_02_demo_import.txt	line=6
+demo_import/importer.py	from typing import Any	volume=ethikos_20260903_131935_02_demo_import.txt	line=7
+demo_import/importer.py	from django.apps import apps	volume=ethikos_20260903_131935_02_demo_import.txt	line=9
+demo_import/importer.py	from django.contrib.auth import get_user_model	volume=ethikos_20260903_131935_02_demo_import.txt	line=10
+demo_import/importer.py	from django.core.exceptions import FieldDoesNotExist	volume=ethikos_20260903_131935_02_demo_import.txt	line=11
+demo_import/importer.py	from django.db import transaction	volume=ethikos_20260903_131935_02_demo_import.txt	line=12
+demo_import/importer.py	from konnaxion.ekoh.db import ekoh_smartvote_db_scope	volume=ethikos_20260903_131935_02_demo_import.txt	line=14
+demo_import/importer.py	from konnaxion.ekoh.db import set_local_ekoh_smartvote_search_path	volume=ethikos_20260903_131935_02_demo_import.txt	line=14
+demo_import/importer.py	from django.utils import timezone	volume=ethikos_20260903_131935_02_demo_import.txt	line=18
+demo_import/importer.py	from django.utils.dateparse import parse_date	volume=ethikos_20260903_131935_02_demo_import.txt	line=19
+demo_import/importer.py	from django.utils.dateparse import parse_datetime	volume=ethikos_20260903_131935_02_demo_import.txt	line=19
+demo_import/importer.py	from konnaxion.ethikos.models_demo import DemoScenarioImport	volume=ethikos_20260903_131935_02_demo_import.txt	line=21
+demo_import/importer.py	from .schema import DEFAULT_IMPORT_MODE	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from .schema import DEMO_EMAIL_DOMAIN	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from .schema import DEMO_TOPIC_TITLE_PREFIX	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from .schema import DEMO_USERNAME_PREFIX	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from .schema import TRACK_OBJECT_TYPES	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from .schema import normalize_demo_scenario	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from .schema import summarize_scenario_payload	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from .schema import validate_demo_scenario	volume=ethikos_20260903_131935_02_demo_import.txt	line=23
+demo_import/importer.py	from konnaxion.smart_vote.services.weight_calculator import clear_weight_caches	volume=ethikos_20260903_131935_02_demo_import.txt	line=812
+demo_import/schema.py	from __future__ import annotations	volume=ethikos_20260903_131935_02_demo_import.txt	line=13
+demo_import/schema.py	from collections import defaultdict	volume=ethikos_20260903_131935_02_demo_import.txt	line=15
+demo_import/schema.py	from typing import Any	volume=ethikos_20260903_131935_02_demo_import.txt	line=16
+demo_import/serializers.py	from rest_framework import serializers	volume=ethikos_20260903_131935_02_demo_import.txt	line=3
+demo_import/serializers.py	from .schema import ALLOWED_ARGUMENT_SIDES	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import ALLOWED_CONSULTATION_STATUSES	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import ALLOWED_IMPORT_MODES	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import ALLOWED_TOPIC_STATUSES	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import DEFAULT_IMPORT_MODE	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import SCHEMA_VERSION_V1	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import STANCE_MAX	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import STANCE_MIN	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/serializers.py	from .schema import SUPPORTED_SCHEMA_VERSIONS	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/urls.py	from django.urls import path	volume=ethikos_20260903_131935_02_demo_import.txt	line=3
+demo_import/urls.py	from .views import EthikosDemoScenarioImportView	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/urls.py	from .views import EthikosDemoScenarioPreviewView	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/urls.py	from .views import EthikosDemoScenarioResetView	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/views.py	from django.conf import settings	volume=ethikos_20260903_131935_02_demo_import.txt	line=3
+demo_import/views.py	from rest_framework import permissions	volume=ethikos_20260903_131935_02_demo_import.txt	line=4
+demo_import/views.py	from rest_framework import status	volume=ethikos_20260903_131935_02_demo_import.txt	line=4
+demo_import/views.py	from rest_framework.exceptions import PermissionDenied	volume=ethikos_20260903_131935_02_demo_import.txt	line=5
+demo_import/views.py	from rest_framework.response import Response	volume=ethikos_20260903_131935_02_demo_import.txt	line=6
+demo_import/views.py	from rest_framework.views import APIView	volume=ethikos_20260903_131935_02_demo_import.txt	line=7
+demo_import/views.py	from .importer import import_ethikos_demo_scenario	volume=ethikos_20260903_131935_02_demo_import.txt	line=9
+demo_import/views.py	from .importer import reset_ethikos_demo_scenario	volume=ethikos_20260903_131935_02_demo_import.txt	line=9
+demo_import/views.py	from .importer import validate_and_preview_ethikos_demo_scenario	volume=ethikos_20260903_131935_02_demo_import.txt	line=9
+demo_import/views.py	from .schema import FEATURE_FLAG_NAME	volume=ethikos_20260903_131935_02_demo_import.txt	line=14
+demo_import/views.py	from .serializers import DemoScenarioResetSerializer	volume=ethikos_20260903_131935_02_demo_import.txt	line=15
+tests/test_demo_import_api.py	import pytest	volume=ethikos_20260903_131935_03_tests.txt	line=3
+tests/test_demo_import_api.py	from django.test import override_settings	volume=ethikos_20260903_131935_03_tests.txt	line=4
+tests/test_demo_import_api.py	from rest_framework import status	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_import_api.py	from rest_framework.test import APIClient	volume=ethikos_20260903_131935_03_tests.txt	line=6
+tests/test_demo_import_api.py	from konnaxion.ethikos.demo_import import views	volume=ethikos_20260903_131935_03_tests.txt	line=238
+tests/test_demo_import_api.py	from konnaxion.ethikos.demo_import import views	volume=ethikos_20260903_131935_03_tests.txt	line=278
+tests/test_demo_import_api.py	from konnaxion.ethikos.demo_import import views	volume=ethikos_20260903_131935_03_tests.txt	line=337
+tests/test_demo_import_schema.py	import pytest	volume=ethikos_20260903_131935_03_tests.txt	line=3
+tests/test_demo_import_schema.py	from konnaxion.ethikos.demo_import.schema import SCHEMA_VERSION	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_import_schema.py	from konnaxion.ethikos.demo_import.schema import SCHEMA_VERSION_V1	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_import_schema.py	from konnaxion.ethikos.demo_import.schema import SCHEMA_VERSION_V2	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_import_schema.py	from konnaxion.ethikos.demo_import.schema import SCHEMA_VERSION_V3	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_import_schema.py	from konnaxion.ethikos.demo_import.schema import STANCE_MAX	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_import_schema.py	from konnaxion.ethikos.demo_import.schema import STANCE_MIN	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_import_schema.py	from konnaxion.ethikos.demo_import.schema import validate_demo_scenario	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_importer.py	import pytest	volume=ethikos_20260903_131935_03_tests.txt	line=1
+tests/test_demo_importer.py	from django.apps import apps	volume=ethikos_20260903_131935_03_tests.txt	line=2
+tests/test_demo_importer.py	from django.contrib.auth import get_user_model	volume=ethikos_20260903_131935_03_tests.txt	line=3
+tests/test_demo_importer.py	from konnaxion.ekoh.db import ekoh_smartvote_db_scope	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_demo_importer.py	from konnaxion.ethikos.demo_import.importer import import_ethikos_demo_scenario	volume=ethikos_20260903_131935_03_tests.txt	line=7
+tests/test_demo_importer.py	from konnaxion.ethikos.demo_import.importer import reset_ethikos_demo_scenario	volume=ethikos_20260903_131935_03_tests.txt	line=7
+tests/test_demo_importer.py	from konnaxion.ethikos.demo_import.schema import DEMO_TOPIC_TITLE_PREFIX	volume=ethikos_20260903_131935_03_tests.txt	line=11
+tests/test_demo_importer.py	from konnaxion.ethikos.demo_import.schema import SCHEMA_VERSION	volume=ethikos_20260903_131935_03_tests.txt	line=11
+tests/test_demo_importer.py	from konnaxion.ethikos.demo_import.schema import TRACK_OBJECT_TYPES	volume=ethikos_20260903_131935_03_tests.txt	line=11
+tests/test_demo_importer.py	from konnaxion.ethikos.models import ArgumentSource	volume=ethikos_20260903_131935_03_tests.txt	line=16
+tests/test_demo_importer.py	from konnaxion.ethikos.models import EthikosArgument	volume=ethikos_20260903_131935_03_tests.txt	line=16
+tests/test_demo_importer.py	from konnaxion.ethikos.models import EthikosCategory	volume=ethikos_20260903_131935_03_tests.txt	line=16
+tests/test_demo_importer.py	from konnaxion.ethikos.models import EthikosStance	volume=ethikos_20260903_131935_03_tests.txt	line=16
+tests/test_demo_importer.py	from konnaxion.ethikos.models import EthikosTopic	volume=ethikos_20260903_131935_03_tests.txt	line=16
+tests/test_demo_importer.py	from konnaxion.ethikos.models_demo import DemoScenarioImport	volume=ethikos_20260903_131935_03_tests.txt	line=23
+tests/test_kintsugi_korum_api.py	from __future__ import annotations	volume=ethikos_20260903_131935_03_tests.txt	line=2
+tests/test_kintsugi_korum_api.py	from http import HTTPStatus	volume=ethikos_20260903_131935_03_tests.txt	line=4
+tests/test_kintsugi_korum_api.py	from typing import Any	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_kintsugi_korum_api.py	from django.contrib.auth import get_user_model	volume=ethikos_20260903_131935_03_tests.txt	line=7
+tests/test_kintsugi_korum_api.py	from rest_framework.test import APITestCase	volume=ethikos_20260903_131935_03_tests.txt	line=8
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_IMPACT_VOTE_MAX	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_IMPACT_VOTE_MIN	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_SIDE_CON	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_SIDE_PRO	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_SUGGESTION_ACCEPTED	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_SUGGESTION_PENDING	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_SUGGESTION_REJECTED	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import ARGUMENT_SUGGESTION_REVISION_REQUESTED	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import AUTHOR_VISIBILITY_ADMINS_ONLY	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import AUTHOR_VISIBILITY_ALL	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import DISCUSSION_PARTICIPATION_ANONYMOUS	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import DISCUSSION_PARTICIPATION_STANDARD	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import DISCUSSION_ROLE_ADMIN	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import DISCUSSION_ROLE_VIEWER	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import VOTE_VISIBILITY_ADMINS_ONLY	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.constants import VOTE_VISIBILITY_ALL	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import ArgumentImpactVote	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import ArgumentSource	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import ArgumentSuggestion	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import DiscussionParticipantRole	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import DiscussionVisibilitySetting	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import EthikosArgument	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import EthikosCategory	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import EthikosStance	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_api.py	from konnaxion.ethikos.models import EthikosTopic	volume=ethikos_20260903_131935_03_tests.txt	line=28
+tests/test_kintsugi_korum_models.py	from __future__ import annotations	volume=ethikos_20260903_131935_03_tests.txt	line=2
+tests/test_kintsugi_korum_models.py	from django.contrib.auth import get_user_model	volume=ethikos_20260903_131935_03_tests.txt	line=4
+tests/test_kintsugi_korum_models.py	from django.core.exceptions import ValidationError	volume=ethikos_20260903_131935_03_tests.txt	line=5
+tests/test_kintsugi_korum_models.py	from django.db import IntegrityError	volume=ethikos_20260903_131935_03_tests.txt	line=6
+tests/test_kintsugi_korum_models.py	from django.db import transaction	volume=ethikos_20260903_131935_03_tests.txt	line=6
+tests/test_kintsugi_korum_models.py	from django.test import TestCase	volume=ethikos_20260903_131935_03_tests.txt	line=7
+tests/test_kintsugi_korum_models.py	from django.utils import timezone	volume=ethikos_20260903_131935_03_tests.txt	line=8
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import ARGUMENT_SIDE_CON	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import ARGUMENT_SIDE_NEUTRAL	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import ARGUMENT_SIDE_PRO	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import ARGUMENT_SUGGESTION_ACCEPTED	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import ARGUMENT_SUGGESTION_PENDING	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import AUTHOR_VISIBILITY_ALL	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import DISCUSSION_PARTICIPATION_STANDARD	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import DISCUSSION_ROLE_ADMIN	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import DISCUSSION_ROLE_VIEWER	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import STANCE_MAX	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import STANCE_MIN	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.constants import VOTE_VISIBILITY_ALL	volume=ethikos_20260903_131935_03_tests.txt	line=10
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import ArgumentImpactVote	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import ArgumentSource	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import ArgumentSuggestion	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import DiscussionParticipantRole	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import DiscussionVisibilitySetting	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import EthikosArgument	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import EthikosCategory	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import EthikosStance	volume=ethikos_20260903_131935_03_tests.txt	line=24
+tests/test_kintsugi_korum_models.py	from konnaxion.ethikos.models import EthikosTopic	volume=ethikos_20260903_131935_03_tests.txt	line=24
+migrations/0001_initial.py	import django.core.validators	volume=ethikos_20260903_131935_04_migrations.txt	line=4
+migrations/0001_initial.py	import django.db.models.deletion	volume=ethikos_20260903_131935_04_migrations.txt	line=5
+migrations/0001_initial.py	from django.conf import settings	volume=ethikos_20260903_131935_04_migrations.txt	line=6
+migrations/0001_initial.py	from django.db import migrations	volume=ethikos_20260903_131935_04_migrations.txt	line=7
+migrations/0001_initial.py	from django.db import models	volume=ethikos_20260903_131935_04_migrations.txt	line=7
+migrations/0002_initial.py	import django.db.models.deletion	volume=ethikos_20260903_131935_04_migrations.txt	line=4
+migrations/0002_initial.py	from django.db import migrations	volume=ethikos_20260903_131935_04_migrations.txt	line=5
+migrations/0002_initial.py	from django.db import models	volume=ethikos_20260903_131935_04_migrations.txt	line=5
+migrations/0003_kintsugi_wave1_korum.py	from __future__ import annotations	volume=ethikos_20260903_131935_04_migrations.txt	line=4
+migrations/0003_kintsugi_wave1_korum.py	import django.core.validators	volume=ethikos_20260903_131935_04_migrations.txt	line=6
+migrations/0003_kintsugi_wave1_korum.py	import django.db.models.deletion	volume=ethikos_20260903_131935_04_migrations.txt	line=7
+migrations/0003_kintsugi_wave1_korum.py	from django.conf import settings	volume=ethikos_20260903_131935_04_migrations.txt	line=8
+migrations/0003_kintsugi_wave1_korum.py	from django.db import migrations	volume=ethikos_20260903_131935_04_migrations.txt	line=9
+migrations/0003_kintsugi_wave1_korum.py	from django.db import models	volume=ethikos_20260903_131935_04_migrations.txt	line=9
+migrations/0004_demoscenarioimport.py	import django.db.models.deletion	volume=ethikos_20260903_131935_04_migrations.txt	line=3
+migrations/0004_demoscenarioimport.py	from django.conf import settings	volume=ethikos_20260903_131935_04_migrations.txt	line=4
+migrations/0004_demoscenarioimport.py	from django.db import migrations	volume=ethikos_20260903_131935_04_migrations.txt	line=5
+migrations/0004_demoscenarioimport.py	from django.db import models	volume=ethikos_20260903_131935_04_migrations.txt	line=5
+migrations/0005_demo_import_v3_object_types.py	from django.db import migrations	volume=ethikos_20260903_131935_04_migrations.txt	line=1
+migrations/0005_demo_import_v3_object_types.py	from django.db import models	volume=ethikos_20260903_131935_04_migrations.txt	line=1
+management/commands/seed_ethikos_workflow.py	from __future__ import annotations	volume=ethikos_20260903_131935_05_management.txt	line=1
+management/commands/seed_ethikos_workflow.py	from django.contrib.auth import get_user_model	volume=ethikos_20260903_131935_05_management.txt	line=3
+management/commands/seed_ethikos_workflow.py	from django.core.management.base import BaseCommand	volume=ethikos_20260903_131935_05_management.txt	line=4
+management/commands/seed_ethikos_workflow.py	from django.db import transaction	volume=ethikos_20260903_131935_05_management.txt	line=5
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import ArgumentImpactVote	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import ArgumentSource	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import ArgumentSuggestion	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import DiscussionParticipantRole	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import DiscussionVisibilitySetting	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import EthikosArgument	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import EthikosCategory	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import EthikosStance	volume=ethikos_20260903_131935_05_management.txt	line=7
+management/commands/seed_ethikos_workflow.py	from konnaxion.ethikos.models import EthikosTopic	volume=ethikos_20260903_131935_05_management.txt	line=7
+
+==== PATCH TARGETS ====
+Defaults/constants	path=constants.py

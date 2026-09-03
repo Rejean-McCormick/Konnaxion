@@ -1,0 +1,1454 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.832848
+title: FOLDER: trust
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 3
+total_size_mb: 0.0427
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_132014_05_pulse.txt
+next_volume: ethikos_20260903_132014_07_impact.txt
+prev_title: pulse
+next_title: impact
+short_title: trust
+
+==== FILE_INDEX ====
+ENTRY id=09d5beec80f9 path="trust/badges/page.tsx" kind=source size=17200 lines=539 line_ref=1-539 chunks=2 chunk_refs=1-350,351-539 symbols=0 imports=0 summary="Source file."
+ENTRY id=15979183fa11 path="trust/credentials/page.tsx" kind=source size=17800 lines=561 line_ref=1-561 chunks=2 chunk_refs=1-350,351-561 symbols=0 imports=0 summary="Source file."
+ENTRY id=7ec9beaf50d8 path="trust/profile/page.tsx" kind=source size=9822 lines=270 line_ref=1-270 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="trust/badges/page.tsx"
+id=09d5beec80f9
+kind=source
+size=17200
+lines=539
+line_ref=1-539
+chunks=2
+chunk_refs=1-350,351-539
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=09d5beec80f9:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/trust/badges/page.tsx
+'use client';
+
+import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+import { PageContainer, ProCard, ProList } from '@ant-design/pro-components';
+import {
+  Badge as AntBadge,
+  Divider,
+  Empty,
+  Input,
+  Modal,
+  Progress,
+  Select,
+  Space,
+  Statistic,
+  Tag,
+  Typography,
+} from 'antd';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { fetchTrustBadges } from '@/services/trust';
+import type {
+  Badge as TrustBadge,
+  TrustBadgePayload,
+} from '@/services/trust';
+
+const { Text, Paragraph } = Typography;
+
+type SortOrder = 'newest' | 'oldest';
+type TimeFilter = 'all' | '90d' | '365d';
+type CatalogCategory = 'Stances' | 'Arguments' | 'Voting';
+type CatalogCategoryFilter = CatalogCategory | 'All';
+type CatalogShow = 'all' | 'earned' | 'locked';
+
+interface CatalogItem {
+  id: string;
+  label: string;
+  description: string;
+  category: CatalogCategory;
+  requirement: string;
+}
+
+interface CatalogRow extends CatalogItem {
+  earned: boolean;
+  progress: number;
+  earnedAt?: string;
+}
+
+const BADGE_CATEGORY_META: Record<
+  string,
+  { label: CatalogCategory; color: string }
+> = {
+  'first-stance': { label: 'Stances', color: 'blue' },
+  'argument-builder': { label: 'Arguments', color: 'purple' },
+  'active-voter': { label: 'Voting', color: 'green' },
+};
+
+const BADGE_CATALOG: CatalogItem[] = [
+  {
+    id: 'first-stance',
+    label: 'First stance',
+    description: 'Recorded your first stance in a debate.',
+    category: 'Stances',
+    requirement: 'Post at least one stance in any Ethikos debate.',
+  },
+  {
+    id: 'argument-builder',
+    label: 'Argument builder',
+    description: 'Contributed at least 5 arguments to debates.',
+    category: 'Arguments',
+    requirement: 'Publish 5+ arguments across debates.',
+  },
+  {
+    id: 'active-voter',
+    label: 'Active voter',
+    description: 'Cast at least 10 weighted votes across the platform.',
+    category: 'Voting',
+    requirement: 'Submit 10+ weighted votes on proposals.',
+  },
+];
+
+function getBadgeLabel(badge: TrustBadge): string {
+  return badge.label || badge.title || badge.id;
+}
+
+function getBadgeDate(badge: TrustBadge): string | undefined {
+  return badge.earnedAt ?? badge.createdAt;
+}
+
+function formatDate(value?: string): string {
+  if (!value) {
+    return 'Not earned yet';
+  }
+
+  const date = dayjs(value);
+
+  if (!date.isValid()) {
+    return value;
+  }
+
+  return date.format('MMM D, YYYY');
+}
+
+function isWithinTimeFilter(badge: TrustBadge, timeFilter: TimeFilter): boolean {
+  if (timeFilter === 'all') {
+    return true;
+  }
+
+  const badgeDate = getBadgeDate(badge);
+
+  if (!badgeDate) {
+    return false;
+  }
+
+  const parsed = dayjs(badgeDate);
+
+  if (!parsed.isValid()) {
+    return true;
+  }
+
+  const days = timeFilter === '90d' ? 90 : 365;
+
+  return parsed.isAfter(dayjs().subtract(days, 'day'));
+}
+
+function sortBadges(a: TrustBadge, b: TrustBadge, sortOrder: SortOrder): number {
+  const aTime = getBadgeDate(a) ? dayjs(getBadgeDate(a)).valueOf() : 0;
+  const bTime = getBadgeDate(b) ? dayjs(getBadgeDate(b)).valueOf() : 0;
+
+  return sortOrder === 'newest' ? bTime - aTime : aTime - bTime;
+}
+
+function badgeCategory(badgeId: string): CatalogCategory {
+  return BADGE_CATEGORY_META[badgeId]?.label ?? 'Voting';
+}
+
+function badgeCategoryColor(badgeId: string): string {
+  return BADGE_CATEGORY_META[badgeId]?.color ?? 'default';
+}
+
+function badgeProgressValue(badge: TrustBadge): number {
+  if (badge.earned) {
+    return 100;
+  }
+
+  if (!Number.isFinite(badge.progress)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(badge.progress)));
+}
+
+export default function TrustBadgesPage(): JSX.Element {
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>('all');
+  const [catalogCategory, setCatalogCategory] =
+    useState<CatalogCategoryFilter>('All');
+  const [catalogShow, setCatalogShow] = useState<CatalogShow>('all');
+  const [catalogSearch, setCatalogSearch] = useState('');
+  const [detail, setDetail] = useState<TrustBadge | null>(null);
+
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useRequest<TrustBadgePayload, []>(fetchTrustBadges);
+
+  const earnedBadges = useMemo<TrustBadge[]>(
+    () => data?.earned ?? [],
+    [data],
+  );
+
+  const progressBadges = useMemo<TrustBadge[]>(
+    () => data?.progress ?? [],
+    [data],
+  );
+
+  const allBadges = useMemo<TrustBadge[]>(
+    () => [...earnedBadges, ...progressBadges],
+    [earnedBadges, progressBadges],
+  );
+
+  const earnedIds = useMemo(
+    () => new Set(earnedBadges.map((badge) => badge.id)),
+    [earnedBadges],
+  );
+
+  const visibleEarnedBadges = useMemo(
+    () =>
+      earnedBadges
+        .filter((badge) => isWithinTimeFilter(badge, timeFilter))
+        .sort((a, b) => sortBadges(a, b, sortOrder)),
+    [earnedBadges, sortOrder, timeFilter],
+  );
+
+  const catalogRows = useMemo<CatalogRow[]>(() => {
+    const byId = new Map(allBadges.map((badge) => [badge.id, badge]));
+
+    return BADGE_CATALOG.map((catalogItem) => {
+      const badge = byId.get(catalogItem.id);
+      const earned = badge?.earned ?? earnedIds.has(catalogItem.id);
+
+      return {
+        ...catalogItem,
+        earned,
+        progress: badge ? badgeProgressValue(badge) : 0,
+        earnedAt: badge?.earnedAt ?? badge?.createdAt,
+      };
+    });
+  }, [allBadges, earnedIds]);
+
+  const filteredCatalogRows = useMemo(() => {
+    const query = catalogSearch.trim().toLowerCase();
+
+    return catalogRows.filter((row) => {
+      const matchesCategory =
+        catalogCategory === 'All' || row.category === catalogCategory;
+
+      const matchesShow =
+        catalogShow === 'all' ||
+        (catalogShow === 'earned' && row.earned) ||
+        (catalogShow === 'locked' && !row.earned);
+
+      const matchesSearch =
+        query.length === 0 ||
+        row.label.toLowerCase().includes(query) ||
+        row.description.toLowerCase().includes(query) ||
+        row.requirement.toLowerCase().includes(query);
+
+      return matchesCategory && matchesShow && matchesSearch;
+    });
+  }, [catalogCategory, catalogRows, catalogSearch, catalogShow]);
+
+  const earnedCount = earnedBadges.length;
+  const progressCount = progressBadges.length;
+  const totalCatalogCount = BADGE_CATALOG.length;
+  const completionRate =
+    totalCatalogCount > 0
+      ? Math.round((earnedCount / totalCatalogCount) * 100)
+      : 0;
+
+  const detailMeta = detail ? BADGE_CATEGORY_META[detail.id] : undefined;
+
+  const secondaryActions: ReactNode = (
+    <Space wrap>
+      <Tag color="green">{earnedCount} earned</Tag>
+      <Tag color="blue">{progressCount} in progress</Tag>
+      <Tag color="purple">{completionRate}% complete</Tag>
+    </Space>
+  );
+
+  return (
+    <EthikosPageShell
+      title="Badges"
+      sectionLabel="Trust"
+      subtitle="Track Ethikos trust badges earned through stances, arguments, and voting activity."
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <ProCard gutter={16} wrap>
+            <ProCard colSpan={{ xs: 24, md: 8 }}>
+              <Statistic title="Earned badges" value={earnedCount} />
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 8 }}>
+              <Statistic title="In progress" value={progressCount} />
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 8 }}>
+              <Statistic
+                suffix="%"
+                title="Catalog completion"
+                value={completionRate}
+              />
+            </ProCard>
+          </ProCard>
+
+          <ProCard
+            bordered
+            title="Your badges"
+            extra={
+              <Space wrap>
+                <Select<TimeFilter>
+                  size="small"
+                  value={timeFilter}
+                  style={{ width: 130 }}
+                  onChange={setTimeFilter}
+                  options={[
+                    { label: 'All time', value: 'all' },
+                    { label: 'Last 90 days', value: '90d' },
+                    { label: 'Last year', value: '365d' },
+                  ]}
+                />
+
+                <Select<SortOrder>
+                  size="small"
+                  value={sortOrder}
+                  style={{ width: 130 }}
+                  onChange={setSortOrder}
+                  options={[
+                    { label: 'Newest first', value: 'newest' },
+                    { label: 'Oldest first', value: 'oldest' },
+                  ]}
+                />
+              </Space>
+            }
+          >
+            {error ? (
+              <Empty
+                description="Unable to load trust badges."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              >
+                <Typography.Link onClick={() => refresh()}>
+                  Retry
+                </Typography.Link>
+              </Empty>
+            ) : visibleEarnedBadges.length === 0 && !loading ? (
+              <Empty
+                description="No earned badges match the current filters."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            ) : (
+              <ProList<TrustBadge>
+                rowKey="id"
+                dataSource={visibleEarnedBadges}
+                loading={loading}
+                pagination={{
+                  pageSize: 6,
+                  showSizeChanger: false,
+                }}
+                metas={{
+                  title: {
+                    render: (_dom, badge) => (
+                      <Space wrap>
+                        <Text strong>{getBadgeLabel(badge)}</Text>
+                        <Tag color={badgeCategoryColor(badge.id)}>
+                          {badgeCategory(badge.id)}
+                        </Tag>
+                      </Space>
+                    ),
+                  },
+                  description: {
+                    render: (_dom, badge) => (
+                      <Space direction="vertical" size={2}>
+                        <Text type="secondary">{badge.description}</Text>
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=09d5beec80f9:351-539
+start=351
+end=539
+----
+                        <Text type="secondary">
+                          Earned {formatDate(getBadgeDate(badge))}
+                        </Text>
+                      </Space>
+                    ),
+                  },
+                  avatar: {
+                    render: (_dom, badge) => (
+                      <AntBadge
+                        status={badge.earned ? 'success' : 'default'}
+                        text={badge.earned ? 'Earned' : 'Locked'}
+                      />
+                    ),
+                  },
+                  actions: {
+                    render: (_dom, badge) => [
+                      <Typography.Link
+                        key="details"
+                        onClick={() => setDetail(badge)}
+                      >
+                        Details
+                      </Typography.Link>,
+                    ],
+                  },
+                }}
+              />
+            )}
+          </ProCard>
+
+          <ProCard
+            bordered
+            title="Badge catalog"
+            extra={
+              <Space wrap>
+                <Input.Search
+                  allowClear
+                  size="small"
+                  placeholder="Search badges"
+                  style={{ width: 220 }}
+                  value={catalogSearch}
+                  onChange={(event) => setCatalogSearch(event.target.value)}
+                />
+
+                <Select<CatalogCategoryFilter>
+                  size="small"
+                  value={catalogCategory}
+                  style={{ width: 140 }}
+                  onChange={setCatalogCategory}
+                  options={[
+                    { label: 'All categories', value: 'All' },
+                    { label: 'Stances', value: 'Stances' },
+                    { label: 'Arguments', value: 'Arguments' },
+                    { label: 'Voting', value: 'Voting' },
+                  ]}
+                />
+
+                <Select<CatalogShow>
+                  size="small"
+                  value={catalogShow}
+                  style={{ width: 130 }}
+                  onChange={setCatalogShow}
+                  options={[
+                    { label: 'All', value: 'all' },
+                    { label: 'Earned', value: 'earned' },
+                    { label: 'Locked', value: 'locked' },
+                  ]}
+                />
+              </Space>
+            }
+          >
+            {filteredCatalogRows.length === 0 ? (
+              <Empty
+                description="No catalog badges match the current filters."
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              />
+            ) : (
+              <ProList<CatalogRow>
+                rowKey="id"
+                dataSource={filteredCatalogRows}
+                pagination={{
+                  pageSize: 6,
+                  showSizeChanger: false,
+                }}
+                metas={{
+                  title: {
+                    render: (_dom, row) => (
+                      <Space wrap>
+                        <Text strong>{row.label}</Text>
+                        <Tag
+                          color={BADGE_CATEGORY_META[row.id]?.color ?? 'default'}
+                        >
+                          {row.category}
+                        </Tag>
+                        {row.earned ? (
+                          <Tag color="success">Earned</Tag>
+                        ) : (
+                          <Tag>Locked</Tag>
+                        )}
+                      </Space>
+                    ),
+                  },
+                  description: {
+                    render: (_dom, row) => (
+                      <Space
+                        direction="vertical"
+                        size={4}
+                        style={{ width: '100%' }}
+                      >
+                        <Text type="secondary">{row.description}</Text>
+                        <Text>{row.requirement}</Text>
+
+                        {!row.earned && (
+                          <Progress
+                            size="small"
+                            percent={row.progress}
+                            status={row.progress > 0 ? 'active' : 'normal'}
+                          />
+                        )}
+
+                        {row.earned && row.earnedAt && (
+                          <Text type="secondary">
+                            Earned {formatDate(row.earnedAt)}
+                          </Text>
+                        )}
+                      </Space>
+                    ),
+                  },
+                }}
+              />
+            )}
+          </ProCard>
+
+          <ProCard bordered title="How badges are used">
+            <Paragraph type="secondary">
+              Badges are derived from Ethikos participation signals such as
+              stances, arguments, and voting. They are trust context signals and
+              do not replace Ethikos stance values, argument impact votes, or
+              Smart Vote readings.
+            </Paragraph>
+
+            <Divider />
+
+            <Space wrap>
+              <Tag color="blue">Stances</Tag>
+              <Tag color="purple">Arguments</Tag>
+              <Tag color="green">Voting</Tag>
+            </Space>
+          </ProCard>
+        </Space>
+
+        <Modal
+          open={!!detail}
+          title={detail ? getBadgeLabel(detail) : 'Badge details'}
+          footer={null}
+          onCancel={() => setDetail(null)}
+        >
+          {detail && (
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Space wrap>
+                <Tag color={detailMeta?.color ?? 'default'}>
+                  {detailMeta?.label ?? badgeCategory(detail.id)}
+                </Tag>
+                {detail.earned ? (
+                  <Tag color="success">Earned</Tag>
+                ) : (
+                  <Tag>Locked</Tag>
+                )}
+              </Space>
+
+              <Paragraph>{detail.description}</Paragraph>
+
+              <div>
+                <Text strong>Progress</Text>
+                <Progress percent={badgeProgressValue(detail)} />
+              </div>
+
+              <div>
+                <Text strong>Earned date</Text>
+                <Paragraph type="secondary">
+                  {formatDate(getBadgeDate(detail))}
+                </Paragraph>
+              </div>
+            </Space>
+          )}
+        </Modal>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="trust/credentials/page.tsx"
+id=15979183fa11
+kind=source
+size=17800
+lines=561
+line_ref=1-561
+chunks=2
+chunk_refs=1-350,351-561
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=15979183fa11:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/trust/credentials/page.tsx
+// app/ethikos/trust/credentials/page.tsx
+'use client';
+
+/**
+ * Sources used to build this implementation:
+ * - Baseline page from the app dump (existing upload flow, alert, steps content).
+ * - Trust services showing `uploadCredential` helper (currently a stub without a real backend).
+ */
+
+import { useMemo, useState } from 'react';
+import Link from 'next/link';
+import dayjs from 'dayjs';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  ProDescriptions,
+  type ProColumns,
+  type ProDescriptionsItemProps,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Button,
+  Divider,
+  Drawer,
+  List,
+  Popconfirm,
+  Result,
+  Space,
+  Steps,
+  Tag,
+  Tooltip,
+  Typography,
+  Upload,
+  message as antdMessage,
+} from 'antd';
+import {
+  ClockCircleOutlined,
+  EyeInvisibleOutlined,
+  FileTextOutlined,
+  InboxOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { uploadCredential, type Credential } from '@/services/trust';
+
+/* ---------------------------------------------
+ * Types & local helpers
+ * ------------------------------------------- */
+
+type CredentialStatus = 'Verified' | 'Pending' | 'Rejected';
+
+type CredentialRow = Credential & {
+  status: CredentialStatus;
+  notes?: string;
+};
+
+const statusColor: Record<CredentialStatus, string> = {
+  Verified: 'green',
+  Pending: 'gold',
+  Rejected: 'red',
+};
+
+function toTitleFromFilename(name?: string): string {
+  if (!name) return 'Untitled credential';
+  return name.replace(/\.[a-zA-Z0-9]+$/, '').replace(/[_\-]+/g, ' ').trim();
+}
+
+/* ---------------------------------------------
+ * Data fetching (no backend yet → returns mock)
+ * When backend is ready, replace the body with a GET
+ * using the shared axios helper, e.g.:
+ *   const { items } = await get<{items: CredentialRow[]}>('trust/credentials')
+ * ------------------------------------------- */
+async function fetchUserCredentials(): Promise<CredentialRow[]> {
+  // Mocked examples to drive the UI until the real endpoint exists.
+  return [
+    {
+      id: 'cred-001',
+      title: 'MSc Climate Policy',
+      issuer: 'London School of Economics',
+      issuedAt: '2022-09-01T00:00:00.000Z',
+      url: 'https://example.org/lse-msc.pdf',
+      status: 'Verified',
+      notes: 'Verified by steward #42',
+    },
+    {
+      id: 'cred-002',
+      title: 'Professional Engineer (P.Eng.)',
+      issuer: 'PEO',
+      issuedAt: '2021-03-15T00:00:00.000Z',
+      status: 'Pending',
+      notes: 'Queued for human review',
+    },
+    {
+      id: 'cred-003',
+      title: 'Research Fellow – Energy Policy',
+      issuer: 'Policy Institute',
+      issuedAt: '2020-01-10T00:00:00.000Z',
+      status: 'Rejected',
+      notes: 'Insufficient documentation',
+    },
+  ];
+}
+
+/* ---------------------------------------------
+ * Component
+ * ------------------------------------------- */
+
+const { Text, Paragraph } = Typography;
+
+export default function Credentials() {
+  const [done, setDone] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [lastFileName, setLastFileName] = useState<string | undefined>();
+  const [detail, setDetail] = useState<CredentialRow | null>(null);
+
+  // Existing stepper UX: 0=Upload, 1=Review, 2=Outcome
+  const currentStep = done ? 2 : uploading ? 1 : 0;
+
+  // List of existing credentials (mocked for now; see fetcher above).
+  const { data, loading, refresh, mutate } = useRequest<CredentialRow[], []>(
+    fetchUserCredentials,
+  );
+
+  const rows = data ?? [];
+
+  // Quick counters
+  const counters = useMemo(() => {
+    const verified = rows.filter((r) => r.status === 'Verified').length;
+    const pending = rows.filter((r) => r.status === 'Pending').length;
+    const rejected = rows.filter((r) => r.status === 'Rejected').length;
+    return { verified, pending, rejected, total: rows.length };
+  }, [rows]);
+
+  const summaryTags = (
+    <Space wrap>
+      <Tag key="total">Total: {counters.total}</Tag>
+      <Tag color="green" key="v">
+        Verified: {counters.verified}
+      </Tag>
+      <Tag color="gold" key="p">
+        Pending: {counters.pending}
+      </Tag>
+      <Tag color="red" key="r">
+        Rejected: {counters.rejected}
+      </Tag>
+    </Space>
+  );
+
+  // Upload handler, wired to services/trust::uploadCredential
+  const uploadProps = {
+    name: 'file',
+    multiple: false,
+    maxCount: 1,
+    accept: '.pdf,.jpg,.jpeg,.png',
+    beforeUpload: (file: any) => {
+      const isAllowedType =
+        file.type === 'application/pdf' ||
+        file.type === 'image/jpeg' ||
+        file.type === 'image/png';
+
+      if (!isAllowedType) {
+        antdMessage.error('Only PDF, JPG or PNG files are allowed.');
+        return Upload.LIST_IGNORE;
+      }
+
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isLt5M) {
+        antdMessage.error('File must be smaller than 5 MB.');
+        return Upload.LIST_IGNORE;
+      }
+
+      return true;
+    },
+    // Match Ant Design's expected `(options) => void` signature
+    customRequest: (options: any) => {
+      const { file, onSuccess, onError } = options;
+      const uploadFile = file as File;
+
+      setUploading(true);
+      setLastFileName(uploadFile.name);
+
+      uploadCredential(uploadFile)
+        .then(() => {
+          onSuccess?.('ok');
+
+          // Optimistic insert into the table list as "Pending"
+          const optimistic: CredentialRow = {
+            id: `tmp-${Date.now()}`,
+            title: toTitleFromFilename(uploadFile.name),
+            issuer: '—',
+            issuedAt: new Date().toISOString(),
+            status: 'Pending',
+            notes: 'Awaiting manual verification',
+          };
+          mutate([optimistic, ...rows]);
+          setDone(true);
+          antdMessage.success(
+            'Credential uploaded. It will be reviewed shortly.',
+          );
+        })
+        .catch((error: unknown) => {
+          onError?.(error);
+          antdMessage.error('Upload failed. Please try again.');
+        })
+        .finally(() => {
+          setUploading(false);
+        });
+    },
+  };
+
+  // Table columns
+  const columns: ProColumns<CredentialRow>[] = [
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      ellipsis: true,
+      render: (_: any, row: CredentialRow) => (
+        <Space size={6}>
+          <FileTextOutlined />
+          {row.url ? (
+            <a href={row.url} target="_blank" rel="noreferrer">
+              {row.title}
+            </a>
+          ) : (
+            <span>{row.title}</span>
+          )}
+        </Space>
+      ),
+    },
+    { title: 'Issuer', dataIndex: 'issuer', width: 220, ellipsis: true },
+    {
+      title: 'Issued',
+      dataIndex: 'issuedAt',
+      width: 140,
+      valueType: 'date',
+      renderText: (v: any) => dayjs(v).format('YYYY-MM-DD'),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      width: 120,
+      valueEnum: {
+        Verified: { text: 'Verified', status: 'Success' },
+        Pending: { text: 'Pending', status: 'Processing' },
+        Rejected: { text: 'Rejected', status: 'Error' },
+      },
+      render: (_: any, row: CredentialRow) => (
+        <Tag color={statusColor[row.status]}>{row.status}</Tag>
+      ),
+    },
+    {
+      title: 'Actions',
+      width: 260,
+      valueType: 'option',
+      render: (_: any, row: CredentialRow) => {
+        const canDownload = !!row.url;
+        return [
+          <Button size="small" key="view" onClick={() => setDetail(row)}>
+            View
+          </Button>,
+          <Button
+            size="small"
+            key="download"
+            disabled={!canDownload}
+            href={row.url}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Download
+          </Button>,
+          row.status !== 'Rejected' ? (
+            <Popconfirm
+              key="remove"
+              title="Request removal?"
+              description="A steward will review and remove this credential from your profile."
+              onConfirm={() => {
+                antdMessage.success('Removal request submitted.');
+              }}
+            >
+              <Button size="small" danger>
+                Request removal
+              </Button>
+            </Popconfirm>
+          ) : (
+            <Tooltip
+              key="resubmit"
+              title="Attach additional documents and re-submit"
+            >
+              <Button
+                size="small"
+                type="dashed"
+                onClick={() => {
+                  antdMessage.info(
+                    'Re-submit by uploading an updated document below.',
+                  );
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+              >
+                Re-submit
+              </Button>
+            </Tooltip>
+          ),
+        ];
+      },
+    },
+  ];
+
+  const pageBody = (
+    <PageContainer ghost>
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 24 }}
+        message={
+          <Space>
+            <SafetyCertificateOutlined />
+            <span>Optional but powerful trust signal</span>
+            <Tag color="blue">Beta</Tag>
+          </Space>
+        }
+        description={
+          <Paragraph style={{ marginTop: 8, marginBottom: 0 }}>
+            Upload real-world credentials (certifications, professional
+            memberships, academic records) that help stewards understand why
+            your voice carries expertise in certain debates. These documents are
+            reviewed manually and do not replace community-based reputation.
+          </Paragraph>
+        }
+      />
+
+      <ProCard gutter={16} wrap>
+        <ProCard
+          colSpan={{ xs: 24, lg: 14 }}
+          title="Upload a new credential"
+          bordered
+          extra={<Tag color="default">Private review only</Tag>}
+        >
+          {done ? (
+            <Result
+              status="success"
+              title="Credential received"
+              subTitle={
+                <>
+                  {lastFileName && (
+                    <div>
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=15979183fa11:351-561
+start=351
+end=561
+----
+                      <Text strong>{lastFileName}</Text>
+                      <br />
+                    </div>
+                  )}
+                  <Text>
+                    Your document is now queued for human review. If accepted,
+                    it will appear as a verified note in your Ethikos trust
+                    profile.
+                  </Text>
+                </>
+              }
+              extra={
+                <Space wrap>
+                  <Button type="primary" onClick={() => setDone(false)}>
+                    Upload another
+                  </Button>
+                  <Link href="/ethikos/trust/profile">
+                    <Button>View my trust profile</Button>
+                  </Link>
+                  <Link href="/ethikos/trust/badges">
+                    <Button type="text">See my badges</Button>
+                  </Link>
+                </Space>
+              }
+            />
+          ) : (
+            <>
+              <Upload.Dragger {...uploadProps} disabled={uploading}>
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p className="ant-upload-text">
+                  Click or drag a credential file to this area to upload
+                </p>
+                <p className="ant-upload-hint">
+                  Supported formats: PDF, JPG, PNG · Max 5 MB · One document at
+                  a time.
+                </p>
+              </Upload.Dragger>
+
+              <Divider />
+
+              <Space
+                direction="vertical"
+                size="small"
+                style={{ width: '100%' }}
+              >
+                <Text type="secondary">
+                  Tip: upload focused evidence rather than full CVs. For
+                  example, a single certification for climate policy is more
+                  helpful than a long résumé.
+                </Text>
+                <Text type="secondary">
+                  You can always complement these documents with activity-based
+                  reputation earned through debates, voting and impact work.
+                </Text>
+              </Space>
+            </>
+          )}
+        </ProCard>
+
+        <ProCard
+          colSpan={{ xs: 24, lg: 10 }}
+          title="How credentials fit into Ethikos trust"
+          bordered
+        >
+          <Steps
+            direction="vertical"
+            size="small"
+            current={currentStep}
+            items={[
+              {
+                title: 'Upload',
+                description:
+                  'You submit a credential associated with your real-world expertise.',
+              },
+              {
+                title: 'Review',
+                description:
+                  'Stewards or administrators verify authenticity and relevance for debate topics.',
+                icon: <ClockCircleOutlined />,
+              },
+              {
+                title: 'Outcome',
+                description:
+                  'If accepted, a note is added to your profile and may influence role assignments.',
+              },
+            ]}
+          />
+
+          <Divider />
+
+          <List
+            size="small"
+            header="Examples of accepted credentials"
+            dataSource={[
+              'Professional licensure (e.g. bar membership, medical board certification).',
+              'Academic degrees in fields relevant to debates you join.',
+              'Official appointments or advisory roles in public institutions.',
+              'Peer-reviewed publications or major reports where you are a named author.',
+            ]}
+            renderItem={(item) => (
+              <List.Item>
+                <Text>{item}</Text>
+              </List.Item>
+            )}
+          />
+
+          <Divider />
+
+          <List
+            size="small"
+            header={
+              <Space>
+                <EyeInvisibleOutlined />
+                <span>Privacy and scope</span>
+              </Space>
+            }
+            dataSource={[
+              'Uploaded documents are only visible to designated reviewers, not to the general public.',
+              'Metadata (type of credential, issuing body, year) may be surfaced in your profile once verified.',
+              'You can request removal of a credential at any time once backend support exists.',
+            ]}
+            renderItem={(item) => (
+              <List.Item>
+                <Text type="secondary">{item}</Text>
+              </List.Item>
+            )}
+          />
+        </ProCard>
+
+        <ProCard colSpan={24} title="My credentials" ghost>
+          <ProTable<CredentialRow>
+            rowKey="id"
+            loading={loading}
+            columns={columns}
+            dataSource={rows}
+            pagination={{ pageSize: 5, showSizeChanger: true }}
+            search={false}
+            toolBarRender={() => [
+              <Tooltip key="refresh" title="Refresh">
+                <Button onClick={() => refresh()}>Refresh</Button>
+              </Tooltip>,
+            ]}
+          />
+        </ProCard>
+      </ProCard>
+
+      <Drawer
+        open={!!detail}
+        width={520}
+        title="Credential details"
+        onClose={() => setDetail(null)}
+      >
+        {detail && (
+          <ProDescriptions<CredentialRow>
+            column={1}
+            dataSource={detail}
+            columns={
+              [
+                { title: 'Title', dataIndex: 'title' },
+                { title: 'Issuer', dataIndex: 'issuer' },
+                {
+                  title: 'Issued',
+                  dataIndex: 'issuedAt',
+                  render: (_: any, row: CredentialRow) =>
+                    dayjs(row.issuedAt).format('YYYY-MM-DD'),
+                },
+                {
+                  title: 'Status',
+                  dataIndex: 'status',
+                  render: (_: any, row: CredentialRow) => (
+                    <Tag color={statusColor[row.status]}>{row.status}</Tag>
+                  ),
+                },
+                detail.url
+                  ? {
+                      title: 'Document',
+                      dataIndex: 'url',
+                      render: (_: any, row: CredentialRow) => (
+                        <a href={row.url} target="_blank" rel="noreferrer">
+                          Open document
+                        </a>
+                      ),
+                    }
+                  : undefined,
+                detail.notes
+                  ? {
+                      title: 'Notes',
+                      dataIndex: 'notes',
+                    }
+                  : undefined,
+              ].filter(Boolean) as ProDescriptionsItemProps<CredentialRow>[]
+            }
+          />
+        )}
+      </Drawer>
+    </PageContainer>
+  );
+
+  return (
+    <EthikosPageShell
+      title="Credentials"
+      sectionLabel="Trust"
+      subtitle="Upload and manage real-world credentials that help stewards understand your expertise in Ethikos debates."
+      secondaryActions={summaryTags}
+    >
+      {pageBody}
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="trust/profile/page.tsx"
+id=7ec9beaf50d8
+kind=source
+size=9822
+lines=270
+line_ref=1-270
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/trust/profile/page.tsx
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Descriptions,
+  Empty,
+  List,
+  Progress,
+  Space,
+  Tag,
+  Timeline,
+  Typography,
+} from 'antd';
+import { ClockCircleOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import useReputationEvents from '@/hooks/useReputationEvents';
+import type { Badge, EkohExpertiseScore } from '@/services/trust';
+
+const { Paragraph, Text, Title } = Typography;
+
+function percent(score: number): number {
+  return Math.max(0, Math.min(100, Math.round(score * 100)));
+}
+
+function formatDate(value?: string): string {
+  if (!value) return 'Unknown date';
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed.format('MMM D, YYYY') : value;
+}
+
+function avatarInitial(value: string): string {
+  const trimmed = value.trim();
+  return trimmed ? trimmed.charAt(0).toUpperCase() : '?';
+}
+
+function ExpertiseList({ expertise }: { expertise: EkohExpertiseScore[] }): JSX.Element {
+  if (!expertise.length) {
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No verified EkoH expertise scores yet" />;
+  }
+
+  return (
+    <List<EkohExpertiseScore>
+      dataSource={expertise}
+      renderItem={(item) => {
+        const value = percent(item.weightedScore);
+        return (
+          <List.Item key={item.domainCode}>
+            <div style={{ width: '100%' }}>
+              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <Space wrap>
+                  <Text strong>{item.domainName}</Text>
+                  <Tag>{item.domainCode}</Tag>
+                </Space>
+                <Text type="secondary">{value}%</Text>
+              </Space>
+              <Progress percent={value} showInfo={false} />
+            </div>
+          </List.Item>
+        );
+      }}
+    />
+  );
+}
+
+export default function TrustProfilePage(): JSX.Element {
+  const { data, isLoading, error, refetch } = useReputationEvents();
+
+  const activityProfile = data?.profile;
+  const ekohProfile = data?.ekohProfile ?? null;
+  const badges: Badge[] = data?.badges ?? [];
+  const timeline = data?.timeline ?? [];
+
+  const displayName =
+    ekohProfile?.displayName ??
+    activityProfile?.displayName ??
+    activityProfile?.username ??
+    'Anonymous';
+
+  const expertise = ekohProfile?.expertise ?? [];
+  const topExpertise = expertise[0];
+  const ethicsScore = ekohProfile?.ethicsScore ?? null;
+  const confidentiality = ekohProfile?.confidentialityLevel ?? 'not available';
+
+  const primaryAction = (
+    <Link href="/ethikos/insights" prefetch={false}>
+      <Button type="primary">Open analytics</Button>
+    </Link>
+  );
+
+  const secondaryActions = (
+    <Space wrap>
+      <Link href="/ethikos/trust/credentials" prefetch={false}>
+        <Button icon={<SafetyCertificateOutlined />}>Upload credential</Button>
+      </Link>
+      <Link href="/ethikos/trust/badges" prefetch={false}>
+        <Button>View badges</Button>
+      </Link>
+    </Space>
+  );
+
+  if (error) {
+    return (
+      <EthikosPageShell
+        title="My EkoH profile"
+        sectionLabel="Trust"
+        primaryAction={primaryAction}
+        secondaryActions={secondaryActions}
+      >
+        <PageContainer ghost>
+          <Empty description="Unable to load trust and expertise profile">
+            <Button onClick={() => void refetch()} type="primary">Retry</Button>
+          </Empty>
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  return (
+    <EthikosPageShell
+      title="My EkoH profile"
+      sectionLabel="Trust"
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost loading={isLoading}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            message="Expertise is contextual, not a universal rank"
+            description="EkoH records domain-specific expertise signals. Smart Vote may use those signals in a declared advisory reading when the same domains are relevant to a question. The public baseline remains separate."
+          />
+
+          <ProCard gutter={16} wrap>
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Expertise domains',
+                value: expertise.length,
+                description: <Text type="secondary">Domain-bounded EkoH profile</Text>,
+              }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Strongest current domain',
+                value: topExpertise ? percent(topExpertise.weightedScore) : 0,
+                suffix: topExpertise ? '%' : undefined,
+                description: topExpertise ? <Tag>{topExpertise.domainName}</Tag> : <Text type="secondary">No score yet</Text>,
+              }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Ethics / reliability modifier',
+                value: ethicsScore ?? 'Restricted',
+                suffix: ethicsScore == null ? undefined : '×',
+                precision: ethicsScore == null ? undefined : 2,
+                description: <Text type="secondary">Governed signal; not a moral rank</Text>,
+              }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{
+                title: 'Profile visibility',
+                value: confidentiality,
+                description: <Text type="secondary">Applied by EkoH privacy rules</Text>,
+              }}
+            />
+          </ProCard>
+
+          <ProCard gutter={16} wrap>
+            <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+              <Space direction="vertical" size="large" style={{ width: '100%' }}>
+                <Space align="center" size="middle">
+                  <Avatar size={64} src={activityProfile?.avatarUrl ?? undefined}>
+                    {avatarInitial(displayName)}
+                  </Avatar>
+                  <div>
+                    <Title level={4} style={{ marginBottom: 4 }}>{displayName}</Title>
+                    <Text type="secondary">EkoH expertise context for Ethikos</Text>
+                  </div>
+                </Space>
+
+                {ekohProfile ? (
+                  <Descriptions size="small" column={1} labelStyle={{ width: 150 }}>
+                    <Descriptions.Item label="EkoH user ID">{ekohProfile.userId}</Descriptions.Item>
+                    <Descriptions.Item label="Visibility">
+                      <Tag>{ekohProfile.confidentialityLevel}</Tag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Ethics signal">
+                      {ekohProfile.ethicsScore == null
+                        ? 'Restricted'
+                        : `${ekohProfile.ethicsScore.toFixed(2)}×`}
+                    </Descriptions.Item>
+                  </Descriptions>
+                ) : (
+                  <Alert
+                    type="warning"
+                    showIcon
+                    message="No EkoH profile available"
+                    description="Ethikos activity is available, but no canonical EkoH expertise profile was returned for this account."
+                  />
+                )}
+
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  A domain score does not give permanent extra influence. Its relevance depends on the declared domain mix of the specific consultation or reading.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 16 }} title="Domain expertise">
+              <ExpertiseList expertise={expertise} />
+            </ProCard>
+          </ProCard>
+
+          <ProCard gutter={16} wrap>
+            <ProCard colSpan={{ xs: 24, lg: 14 }} title="Recent activity context">
+              {timeline.length ? (
+                <Timeline
+                  mode="left"
+                  items={timeline.map((event) => ({
+                    key: event.id,
+                    dot: <ClockCircleOutlined />,
+                    label: formatDate(event.when),
+                    children: (
+                      <Space direction="vertical" size={0}>
+                        <Text strong>{event.title}</Text>
+                        <Text type="secondary">{event.detail}</Text>
+                      </Space>
+                    ),
+                  }))}
+                />
+              ) : (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No recent Ethikos activity" />
+              )}
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, lg: 10 }} title="Badges">
+              {badges.length ? (
+                <List<Badge>
+                  size="small"
+                  dataSource={badges.slice(0, 5)}
+                  renderItem={(badge) => (
+                    <List.Item key={badge.id}>
+                      <List.Item.Meta
+                        title={badge.label}
+                        description={`${badge.description} · ${formatDate(badge.earnedAt)}`}
+                      />
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="No badges earned yet" />
+              )}
+            </ProCard>
+          </ProCard>
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+----- FILE END -----

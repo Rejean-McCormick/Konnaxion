@@ -1,0 +1,10 @@
+connection-debug: FAIL
+N00 -> N01 -> N02 -> N03 -> N04 -> N05 -> N06 -> N11
+N00 PASS Control & Discovery
+N01 PASS Repository & Static
+N02 PASS Backend / Django / DB
+N03 FAIL Frontend / Next
+N04 FAIL API Contracts
+N05 WARN Runtime & Browser
+N06 WARN Jobs / Redis / Celery
+N11 FAIL Correlation & Triage

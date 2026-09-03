@@ -1,0 +1,3426 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.820178
+title: FOLDER: deliberate
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 16
+total_size_mb: 0.0949
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_132014_01_ROOT.txt
+next_volume: ethikos_20260903_132014_03_decide.txt
+prev_title: Root
+next_title: decide
+short_title: deliberate
+
+==== FILE_INDEX ====
+ENTRY id=a42f755bea31 path="deliberate/[topic]/_components/ArgumentComposerCard.tsx" kind=source size=1976 lines=74 line_ref=1-74 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=94305a23f22b path="deliberate/[topic]/_components/ArgumentThreadCard.tsx" kind=source size=8055 lines=276 line_ref=1-276 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=3909e4c85a3f path="deliberate/[topic]/_components/EkohParticipantDrawer.tsx" kind=source size=4879 lines=135 line_ref=1-135 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=c4ef412ddc8b path="deliberate/[topic]/_components/EmergentQuestionCard.tsx" kind=source size=2664 lines=95 line_ref=1-95 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=ef5159efb996 path="deliberate/[topic]/_components/EmptySelectionCard.tsx" kind=source size=326 lines=17 line_ref=1-17 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=a94726dd2677 path="deliberate/[topic]/_components/KorumPanelsGrid.tsx" kind=source size=4027 lines=125 line_ref=1-125 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=d98fd507b673 path="deliberate/[topic]/_components/ParticipantRolesPanel.tsx" kind=source size=1601 lines=61 line_ref=1-61 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=cdabdf9d7a00 path="deliberate/[topic]/_components/SmartVoteReadingsPanel.tsx" kind=source size=10831 lines=308 line_ref=1-308 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=0a352570233e path="deliberate/[topic]/_components/StanceComposerCard.tsx" kind=source size=2294 lines=91 line_ref=1-91 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=8bdf598d88f3 path="deliberate/[topic]/_components/TopicStates.tsx" kind=source size=629 lines=31 line_ref=1-31 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=8522d6302066 path="deliberate/[topic]/_components/TopicSummaryPanel.tsx" kind=source size=2089 lines=71 line_ref=1-71 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=8841b9c7b4b0 path="deliberate/[topic]/_hooks/useTopicThreadController.ts" kind=source size=7199 lines=259 line_ref=1-259 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=03fefa211de5 path="deliberate/[topic]/_lib/topicThreadUtils.ts" kind=source size=3505 lines=135 line_ref=1-135 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=6480ff3baeba path="deliberate/[topic]/page.tsx" kind=source size=7468 lines=207 line_ref=1-207 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=1d3b1b15620d path="deliberate/elite/page.tsx" kind=source size=21117 lines=761 line_ref=1-761 chunks=3 chunk_refs=1-350,351-700,701-761 symbols=0 imports=0 summary="Source file."
+ENTRY id=ed55ae997e0b path="deliberate/guidelines/page.tsx" kind=source size=20830 lines=507 line_ref=1-507 chunks=2 chunk_refs=1-350,351-507 symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/ArgumentComposerCard.tsx"
+id=a42f755bea31
+kind=source
+size=1976
+lines=74
+line_ref=1-74
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Alert, Button, Card, Input, Segmented, Space } from 'antd'
+import type { SegmentedValue } from 'antd/es/segmented'
+
+import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
+import type { ArgumentSide } from '@/services/ethikos'
+
+const { TextArea } = Input
+
+export default function ArgumentComposerCard({
+  replyTarget,
+  side,
+  value,
+  loading,
+  onSideChange,
+  onValueChange,
+  onSubmit,
+  onClearReply,
+}: {
+  replyTarget: ArgumentTreeItem | null
+  side: ArgumentSide
+  value: string
+  loading: boolean
+  onSideChange: (value: SegmentedValue) => void
+  onValueChange: (value: string) => void
+  onSubmit: () => void
+  onClearReply: () => void
+}): JSX.Element {
+  return (
+    <Card title="Add to the argument thread">
+      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+        {replyTarget && (
+          <Alert
+            type="info"
+            showIcon
+            message={`Replying to ${replyTarget.author ?? 'Anonymous'}`}
+            description={replyTarget.body}
+            action={
+              <Button size="small" onClick={onClearReply}>
+                Clear
+              </Button>
+            }
+          />
+        )}
+
+        <Segmented
+          value={side}
+          onChange={onSideChange}
+          options={[
+            { label: 'Pro', value: 'pro' },
+            { label: 'Con', value: 'con' },
+          ]}
+        />
+
+        <TextArea
+          rows={4}
+          value={value}
+          onChange={(event) => onValueChange(event.target.value)}
+          placeholder={
+            replyTarget ? 'Write a concise reply…' : 'Write a concise argument…'
+          }
+        />
+
+        <Space>
+          <Button type="primary" loading={loading} onClick={onSubmit}>
+            {replyTarget ? 'Post reply' : 'Post argument'}
+          </Button>
+          {replyTarget && <Button onClick={onClearReply}>Cancel reply</Button>}
+        </Space>
+      </Space>
+    </Card>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/ArgumentThreadCard.tsx"
+id=94305a23f22b
+kind=source
+size=8055
+lines=276
+line_ref=1-276
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Alert, Button, Space, Tag, Tooltip, Typography } from 'antd'
+import { ProCard } from '@ant-design/pro-components'
+import {
+  BranchesOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons'
+
+import ArgumentTree from '@/modules/ethikos/components/ArgumentTree'
+import type { ArgumentTreeItem, ArgumentTreeNode } from '@/modules/ethikos/components/ArgumentTree'
+import type { TopicDetailStatement } from '@/services/deliberate'
+
+import { sideColor, sideLabel } from '../_lib/topicThreadUtils'
+
+const { Text } = Typography
+
+export interface ParticipantContextTarget {
+  userId: string
+  displayName: string
+}
+
+type NarrativeKind = 'announcement' | 'moderation' | 'conflict' | 'recusal' | null
+
+function rawStatement(argument: ArgumentTreeNode): TopicDetailStatement | null {
+  if (!argument.raw || typeof argument.raw !== 'object') return null
+  return argument.raw as TopicDetailStatement
+}
+
+function participantTarget(argument: ArgumentTreeNode): ParticipantContextTarget | null {
+  const raw = rawStatement(argument)
+  if (!raw?.userId) return null
+  return {
+    userId: raw.userId,
+    displayName: String(argument.author || raw.author || `User ${raw.userId}`),
+  }
+}
+
+function narrativeKind(argument: ArgumentTreeNode): NarrativeKind {
+  const author = String(argument.author ?? '').toLowerCase()
+  const body = String(argument.body ?? '').trim()
+  const upper = body.toUpperCase()
+
+  if (author.includes('inquisiteur') || upper.startsWith('MODÉRATION') || upper.startsWith('MODERATION')) {
+    return 'moderation'
+  }
+  if (upper.startsWith('RÉCUSATION') || upper.startsWith('RECUSATION')) {
+    return 'recusal'
+  }
+  if (body.toLowerCase().startsWith('contexte déclaré:')) {
+    return 'conflict'
+  }
+  if (
+    author.includes('king klown') &&
+    (upper.includes('PUISSANCE DÉDIÉE') || upper.includes('PUISSANCE DEDIEE'))
+  ) {
+    return 'announcement'
+  }
+  return null
+}
+
+function selectedArgumentLabel(argument: ArgumentTreeItem | null): string {
+  if (!argument) return 'No argument selected'
+  const side = sideLabel(argument.side)
+  const preview = argument.body?.trim()
+  if (!preview) return `${side} argument selected`
+  return `${side}: ${preview.slice(0, 48)}${preview.length > 48 ? '…' : ''}`
+}
+
+function narrativeMeta(argument: ArgumentTreeNode): JSX.Element | null {
+  const kind = narrativeKind(argument)
+  if (!kind) return null
+
+  if (kind === 'announcement') {
+    return (
+      <Space size={4} wrap>
+        <Tag color="purple">DEMO FICTION</Tag>
+        <Tag color="blue">Public announcement</Tag>
+      </Space>
+    )
+  }
+  if (kind === 'moderation') {
+    return (
+      <Space size={4} wrap>
+        <Tag color="purple">DEMO FICTION</Tag>
+        <Tag color="orange">Moderation event</Tag>
+      </Space>
+    )
+  }
+  if (kind === 'conflict') {
+    return (
+      <Space size={4} wrap>
+        <Tag color="purple">DEMO FICTION</Tag>
+        <Tag color="gold">Declared conflict</Tag>
+      </Space>
+    )
+  }
+  return (
+    <Space size={4} wrap>
+      <Tag color="purple">DEMO FICTION</Tag>
+      <Tag color="cyan">Advisory recusal</Tag>
+    </Space>
+  )
+}
+
+function narrativeBody(argument: ArgumentTreeNode): JSX.Element {
+  const kind = narrativeKind(argument)
+
+  if (kind === 'announcement') {
+    return (
+      <Alert
+        type="info"
+        showIcon
+        message="Public announcement — fictional demo scenario"
+        description={<strong style={{ whiteSpace: 'pre-wrap' }}>{argument.body}</strong>}
+        style={{ marginBottom: 8 }}
+      />
+    )
+  }
+  if (kind === 'moderation') {
+    return (
+      <Alert
+        type="warning"
+        showIcon
+        message="Moderation event"
+        description={argument.body}
+        style={{ marginBottom: 8 }}
+      />
+    )
+  }
+  if (kind === 'conflict') {
+    return (
+      <Alert
+        type="warning"
+        showIcon
+        message="Declared participant context"
+        description={argument.body}
+        style={{ marginBottom: 8 }}
+      />
+    )
+  }
+  if (kind === 'recusal') {
+    return (
+      <Alert
+        type="success"
+        showIcon
+        message="Voluntary advisory recusal"
+        description={argument.body}
+        style={{ marginBottom: 8 }}
+      />
+    )
+  }
+
+  return (
+    <p style={{ marginTop: 0, marginBottom: 8, whiteSpace: 'pre-wrap' }}>
+      {argument.body}
+    </p>
+  )
+}
+
+export default function ArgumentThreadCard({
+  items,
+  loading,
+  selectedArgument,
+  onSelect,
+  onReply,
+  onRefresh,
+  onOpenParticipant,
+}: {
+  items: ArgumentTreeItem[]
+  loading: boolean
+  selectedArgument: ArgumentTreeItem | null
+  onSelect: (argument: ArgumentTreeItem) => void
+  onReply: (argument: ArgumentTreeItem) => void
+  onRefresh: () => void
+  onOpenParticipant: (target: ParticipantContextTarget) => void
+}): JSX.Element {
+  return (
+    <ProCard
+      title={
+        <Space>
+          <BranchesOutlined />
+          <span>Arguments and replies</span>
+        </Space>
+      }
+      extra={
+        <Space wrap>
+          <Tag>{items.length} statements</Tag>
+          {selectedArgument ? (
+            <Tooltip title={selectedArgumentLabel(selectedArgument)}>
+              <Tag color="blue">Argument selected</Tag>
+            </Tooltip>
+          ) : (
+            <Tag>Choose an argument</Tag>
+          )}
+          <Tooltip title="Refresh the argument thread">
+            <Button icon={<ReloadOutlined />} onClick={onRefresh}>Refresh</Button>
+          </Tooltip>
+        </Space>
+      }
+    >
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Text type="secondary">
+          Read the argument thread, inspect evidence and participant context, or reply to continue the deliberation.
+        </Text>
+
+        <ArgumentTree
+          items={items}
+          loading={loading}
+          selectedId={selectedArgument?.id ?? null}
+          onSelect={onSelect}
+          onReply={onReply}
+          renderAuthor={(argument) => {
+            const participant = participantTarget(argument)
+            if (!participant) return <strong>{argument.author}</strong>
+            return (
+              <Button
+                type="link"
+                size="small"
+                data-testid={`ekoh-participant-${participant.userId}`}
+                style={{ padding: 0, height: 'auto', fontWeight: 600 }}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onOpenParticipant(participant)
+                }}
+              >
+                {argument.author}
+              </Button>
+            )
+          }}
+          renderBody={narrativeBody}
+          renderActions={(argument) => {
+            const isSelected = selectedArgument?.id === argument.id
+            const participant = participantTarget(argument)
+            return (
+              <Space size={4} wrap>
+                {participant && (
+                  <Button
+                    size="small"
+                    type="link"
+                    icon={<SafetyCertificateOutlined />}
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onOpenParticipant(participant)
+                    }}
+                  >
+                    EkoH context
+                  </Button>
+                )}
+                <Button
+                  size="small"
+                  type={isSelected ? 'primary' : 'link'}
+                  icon={<InfoCircleOutlined />}
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onSelect(argument)
+                  }}
+                >
+                  {isSelected ? 'Viewing details' : 'View details'}
+                </Button>
+              </Space>
+            )
+          }}
+          renderMeta={(argument) => (
+            <Space size={4} wrap>
+              <Tag color={sideColor(argument.side)}>{sideLabel(argument.side)}</Tag>
+              {narrativeMeta(argument)}
+            </Space>
+          )}
+        />
+      </Space>
+    </ProCard>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/EkohParticipantDrawer.tsx"
+id=3909e4c85a3f
+kind=source
+size=4879
+lines=135
+line_ref=1-135
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { useRequest } from 'ahooks'
+import { Alert, Descriptions, List, Progress, Space, Tag, Typography } from 'antd'
+
+import EkohRatingDrawer from '@/modules/ekoh/components/EkohRatingDrawer'
+import type { EkohProfile } from '@/services/ekoh'
+import { fetchEthikosTopicReading, primaryAdvisoryReading } from '@/services/readings'
+
+import type { ParticipantContextTarget } from './ArgumentThreadCard'
+
+const { Paragraph, Text } = Typography
+
+function pct(value: number): number {
+  return Math.max(0, Math.min(100, Math.round(value * 100)))
+}
+
+export default function EkohParticipantDrawer({
+  open,
+  participant,
+  topicId,
+  onClose,
+}: {
+  open: boolean
+  participant: ParticipantContextTarget | null
+  topicId: string | number
+  onClose: () => void
+}): JSX.Element {
+  const userId = participant?.userId
+
+  const { data: reading, loading: loadingReading } = useRequest(
+    () => fetchEthikosTopicReading(topicId),
+    {
+      ready: open && Boolean(topicId),
+      refreshDeps: [open, topicId],
+    },
+  )
+
+  const advisory = primaryAdvisoryReading(reading)
+  const domains = advisory?.results_payload.domains ?? []
+  const participantReading = advisory?.results_payload.participants?.find(
+    (item) => String(item.user_id) === String(userId),
+  )
+
+  const renderSmartVoteContext = (profile: EkohProfile) => {
+    const scoresByDomain = new Map(
+      (profile.expertise ?? []).map((item) => [item.domainCode, item]),
+    )
+    const relevantRows = domains.map((domain) => ({
+      ...domain,
+      expertise: scoresByDomain.get(domain.domain_code)?.weightedScore ?? 0,
+    }))
+
+    return (
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Alert
+          type="info"
+          showIcon
+          message="Expertise is contextual, not a universal rank"
+          description="EkoH owns the ratings and their disclosure. Smart Vote separately computes how those visible ratings align with the domains declared relevant to this question."
+        />
+
+        {loadingReading ? (
+          <Text type="secondary">Loading question-specific reading…</Text>
+        ) : (
+          <>
+            <Descriptions bordered size="small" column={1}>
+              <Descriptions.Item label="Contextual alignment">
+                {participantReading ? `${pct(participantReading.expertise_alignment)}%` : 'Not available'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Advisory weight">
+                {participantReading
+                  ? `${participantReading.advisory_weight.toFixed(2)}×`
+                  : 'Not available'}
+              </Descriptions.Item>
+              <Descriptions.Item label="Advisory status">
+                {participantReading?.included_in_advisory === false ? (
+                  <Tag color="orange">Recused / excluded from advisory reading</Tag>
+                ) : (
+                  <Tag color="green">Included when this lens is used</Tag>
+                )}
+              </Descriptions.Item>
+            </Descriptions>
+
+            {participantReading?.exclusion_reason ? (
+              <Alert
+                type="warning"
+                showIcon
+                message="Declared advisory exclusion"
+                description={participantReading.exclusion_reason}
+              />
+            ) : null}
+
+            <List
+              header={<Text strong>Relevant domains for this question</Text>}
+              dataSource={relevantRows}
+              locale={{ emptyText: 'No domain relevance vector is attached to this question.' }}
+              renderItem={(item) => (
+                <List.Item key={item.domain_code}>
+                  <div style={{ width: '100%' }}>
+                    <Space style={{ width: '100%', justifyContent: 'space-between' }} wrap>
+                      <Space wrap>
+                        <Text strong>{item.domain_name}</Text>
+                        <Tag>{item.domain_code}</Tag>
+                        <Tag>Question {pct(item.weight)}%</Tag>
+                      </Space>
+                      <Text type="secondary">Profile {pct(item.expertise)}%</Text>
+                    </Space>
+                    <Progress percent={pct(item.expertise)} showInfo={false} />
+                  </div>
+                </List.Item>
+              )}
+            />
+
+            <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+              This influence applies to this question. It is not a general rank. The public baseline remains separate from every EkoH-adjusted Smart Vote reading.
+            </Paragraph>
+          </>
+        )}
+      </Space>
+    )
+  }
+
+  return (
+    <EkohRatingDrawer
+      open={open}
+      userId={userId}
+      fallbackDisplayName={participant?.displayName}
+      onClose={onClose}
+      testId="ekoh-context-drawer"
+    >
+      {renderSmartVoteContext}
+    </EkohRatingDrawer>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/EmergentQuestionCard.tsx"
+id=c4ef412ddc8b
+kind=source
+size=2664
+lines=95
+line_ref=1-95
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { useMemo } from 'react'
+import { useRouter } from 'next/navigation'
+import { useRequest } from 'ahooks'
+import { Alert, Button, Space, Tag, Typography } from 'antd'
+import { ArrowRightOutlined, BulbOutlined } from '@ant-design/icons'
+import { ProCard } from '@ant-design/pro-components'
+
+import { fetchEliteTopics } from '@/services/deliberate'
+
+const { Text } = Typography
+
+function isEconomicAutonomyDemo(title: string): boolean {
+  const value = title.toLowerCase()
+  return (
+    value.includes('[demo]') &&
+    (
+      value.includes('dépendance') ||
+      value.includes('dependance') ||
+      value.includes('dependence')
+    ) &&
+    (
+      value.includes('états-unis') ||
+      value.includes('etats-unis') ||
+      value.includes('united states')
+    )
+  )
+}
+
+function isTrumpQuestion(title: string): boolean {
+  return title.toLowerCase().includes('donald trump')
+}
+
+export default function EmergentQuestionCard({
+  currentTitle,
+}: {
+  currentTitle: string
+}): JSX.Element | null {
+  const router = useRouter()
+  const enabled = isEconomicAutonomyDemo(currentTitle)
+  const { data, loading } = useRequest(fetchEliteTopics, { ready: enabled })
+
+  const target = useMemo(
+    () => data?.list.find((topic) => isTrumpQuestion(topic.title)),
+    [data],
+  )
+
+  if (!enabled) return null
+
+  return (
+    <ProCard
+      title={
+        <Space>
+          <BulbOutlined />
+          <span>Question emerged from this deliberation</span>
+        </Space>
+      }
+      data-testid="emergent-question-card"
+    >
+      <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+        <Alert
+          type="info"
+          showIcon
+          message="The infrastructure proposal creates a new governance question"
+          description="Ethikos can preserve the original discussion while opening a distinct question whose relevant expertise mix may be different."
+        />
+
+        {target ? (
+          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+            <Space wrap>
+              <Tag color="purple">DEMO FICTION</Tag>
+              <Tag>New question</Tag>
+            </Space>
+
+            <Text strong>{target.title}</Text>
+
+            <Button
+              type="primary"
+              icon={<ArrowRightOutlined />}
+              data-testid="open-emergent-question"
+              onClick={() => router.push(`/ethikos/deliberate/${target.id}`)}
+            >
+              Open question
+            </Button>
+          </Space>
+        ) : (
+          <Button loading={loading} disabled>
+            Finding linked question…
+          </Button>
+        )}
+      </Space>
+    </ProCard>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/EmptySelectionCard.tsx"
+id=ef5159efb996
+kind=source
+size=326
+lines=17
+line_ref=1-17
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Card, Empty } from 'antd'
+
+export default function EmptySelectionCard({
+  title,
+  description,
+}: {
+  title: string
+  description: string
+}): JSX.Element {
+  return (
+    <Card size="small" title={title}>
+      <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={description} />
+    </Card>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/KorumPanelsGrid.tsx"
+id=a94726dd2677
+kind=source
+size=4027
+lines=125
+line_ref=1-125
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Card, Col, Row, Space, Typography } from 'antd'
+import { ProCard } from '@ant-design/pro-components'
+
+import ArgumentSourcesPanel from '@/modules/ethikos/components/ArgumentSourcesPanel'
+import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
+import DiscussionVisibilityPanel from '@/modules/ethikos/components/DiscussionVisibilityPanel'
+import ImpactVoteControl from '@/modules/ethikos/components/ImpactVoteControl'
+import SuggestionQueue from '@/modules/ethikos/components/SuggestionQueue'
+import type {
+  DiscussionParticipantRoleApi,
+  EthikosId,
+} from '@/services/ethikos'
+
+import { toSuggestionSide } from '../_lib/topicThreadUtils'
+import EmptySelectionCard from './EmptySelectionCard'
+import ParticipantRolesPanel from './ParticipantRolesPanel'
+
+const { Text } = Typography
+
+export default function KorumPanelsGrid({
+  topicId,
+  selectedArgument,
+  selectedArgumentId,
+  participantRoles,
+  loadingParticipantRoles,
+  refreshKey,
+  onMutation,
+  onRefreshParticipantRoles,
+}: {
+  topicId: EthikosId
+  selectedArgument: ArgumentTreeItem | null
+  selectedArgumentId: string | null
+  participantRoles: DiscussionParticipantRoleApi[]
+  loadingParticipantRoles: boolean
+  refreshKey: number
+  onMutation: () => void
+  onRefreshParticipantRoles: () => void
+}): JSX.Element {
+  return (
+    <ProCard
+      title="Argument details and follow-up"
+      subTitle="Select an argument to attach sources, record impact signals, or suggest a refinement."
+      ghost
+    >
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={12} xl={6}>
+          {selectedArgumentId ? (
+            <ArgumentSourcesPanel
+              argumentId={selectedArgumentId}
+              compact
+              refreshKey={refreshKey}
+              onCreated={onMutation}
+            />
+          ) : (
+            <EmptySelectionCard
+              title="Sources"
+              description="Select an argument to add references, citations, or supporting context."
+            />
+          )}
+        </Col>
+
+        <Col xs={24} lg={12} xl={6}>
+          {selectedArgumentId ? (
+            <Card size="small" title="Impact signal">
+              <Space direction="vertical" size={12} style={{ width: '100%' }}>
+                <Text type="secondary">
+                  Rate the practical importance of the selected argument.
+                </Text>
+
+                <ImpactVoteControl
+                  argumentId={selectedArgumentId}
+                  onChange={onMutation}
+                />
+
+                <Text type="secondary">
+                  This signal applies to the argument only. Your topic stance is
+                  recorded separately.
+                </Text>
+              </Space>
+            </Card>
+          ) : (
+            <EmptySelectionCard
+              title="Impact signal"
+              description="Select an argument to rate its practical importance."
+            />
+          )}
+        </Col>
+
+        <Col xs={24} lg={12} xl={6}>
+          <SuggestionQueue
+            topicId={topicId}
+            parentId={selectedArgumentId}
+            side={toSuggestionSide(selectedArgument?.side)}
+            title="Suggested improvement"
+            description={
+              selectedArgument
+                ? 'Suggest a reply, refinement, or missing nuance for the selected argument.'
+                : 'Suggest a new top-level argument for review.'
+            }
+            onSubmitted={onMutation}
+          />
+        </Col>
+
+        <Col xs={24} lg={12} xl={6}>
+          <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            <DiscussionVisibilityPanel
+              topicId={topicId}
+              editable
+              compact
+              onChange={onMutation}
+            />
+
+            <ParticipantRolesPanel
+              roles={participantRoles}
+              loading={loadingParticipantRoles}
+              onRefresh={onRefreshParticipantRoles}
+            />
+          </Space>
+        </Col>
+      </Row>
+    </ProCard>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/ParticipantRolesPanel.tsx"
+id=d98fd507b673
+kind=source
+size=1601
+lines=61
+line_ref=1-61
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Button, Card, Empty, List, Space, Spin, Typography } from 'antd'
+
+import ParticipantRoleBadge from '@/modules/ethikos/components/ParticipantRoleBadge'
+import type { DiscussionParticipantRoleApi } from '@/services/ethikos'
+
+const { Text } = Typography
+
+export default function ParticipantRolesPanel({
+  roles,
+  loading,
+  onRefresh,
+}: {
+  roles: DiscussionParticipantRoleApi[]
+  loading: boolean
+  onRefresh: () => void
+}): JSX.Element {
+  return (
+    <Card
+      size="small"
+      title="Participant roles"
+      extra={
+        <Button size="small" loading={loading} onClick={onRefresh}>
+          Refresh
+        </Button>
+      }
+    >
+      <Spin spinning={loading}>
+        {roles.length > 0 ? (
+          <List
+            size="small"
+            dataSource={roles}
+            renderItem={(role) => (
+              <List.Item key={role.id}>
+                <Space direction="vertical" size={4}>
+                  <ParticipantRoleBadge
+                    participant={role}
+                    showUser
+                    showDescription
+                    compact={false}
+                  />
+                  {role.assigned_by != null && (
+                    <Text type="secondary">
+                      Assigned by {String(role.assigned_by)}
+                    </Text>
+                  )}
+                </Space>
+              </List.Item>
+            )}
+          />
+        ) : (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="No participant roles yet"
+          />
+        )}
+      </Spin>
+    </Card>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/SmartVoteReadingsPanel.tsx"
+id=cdabdf9d7a00
+kind=source
+size=10831
+lines=308
+line_ref=1-308
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { useMemo, useState } from 'react'
+import { useRequest } from 'ahooks'
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Empty,
+  List,
+  Progress,
+  Row,
+  Space,
+  Statistic,
+  Tag,
+  Typography,
+} from 'antd'
+import {
+  BarChartOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons'
+import { ProCard } from '@ant-design/pro-components'
+
+import {
+  fetchEthikosTopicReading,
+  primaryAdvisoryReading,
+} from '@/services/readings'
+import type { SmartVoteReadingParticipant } from '@/services/readings'
+
+import type { ParticipantContextTarget } from './ArgumentThreadCard'
+
+const { Paragraph, Text } = Typography
+
+function pct(value?: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return 0
+  return Math.max(0, Math.min(100, Math.round(value * 100)))
+}
+
+function stanceLabel(score: number): string {
+  if (score >= 2.25) return 'Strong support'
+  if (score >= 0.75) return 'Support'
+  if (score > 0.15) return 'Lean support'
+  if (score <= -2.25) return 'Strong oppose'
+  if (score <= -0.75) return 'Oppose'
+  if (score < -0.15) return 'Lean oppose'
+  return 'Near neutral'
+}
+
+function ReadingDistribution({
+  support,
+  neutral,
+  oppose,
+}: {
+  support?: number
+  neutral?: number
+  oppose?: number
+}): JSX.Element {
+  return (
+    <Space direction="vertical" size={6} style={{ width: '100%' }}>
+      <div>
+        <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+          <Text>Support</Text><Text>{pct(support)}%</Text>
+        </Space>
+        <Progress percent={pct(support)} showInfo={false} />
+      </div>
+      <div>
+        <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+          <Text>Neutral</Text><Text>{pct(neutral)}%</Text>
+        </Space>
+        <Progress percent={pct(neutral)} showInfo={false} />
+      </div>
+      <div>
+        <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+          <Text>Oppose</Text><Text>{pct(oppose)}%</Text>
+        </Space>
+        <Progress percent={pct(oppose)} showInfo={false} />
+      </div>
+    </Space>
+  )
+}
+
+function participantTarget(row: SmartVoteReadingParticipant): ParticipantContextTarget {
+  return {
+    userId: String(row.user_id),
+    displayName: row.display_name,
+  }
+}
+
+export default function SmartVoteReadingsPanel({
+  topicId,
+  onOpenParticipant,
+}: {
+  topicId: string | number
+  onOpenParticipant: (target: ParticipantContextTarget) => void
+}): JSX.Element {
+  const [expanded, setExpanded] = useState(false)
+
+  const { data, loading, refresh } = useRequest(
+    () => fetchEthikosTopicReading(topicId),
+    {
+      ready: expanded && Boolean(topicId),
+      refreshDeps: [expanded, topicId],
+    },
+  )
+
+  const advisory = primaryAdvisoryReading(data)
+  const baseline = data?.baseline.results_payload
+  const reading = advisory?.results_payload
+
+  const participants = useMemo(
+    () =>
+      [...(reading?.participants ?? [])].sort((left, right) => {
+        if (left.included_in_advisory !== right.included_in_advisory) {
+          return left.included_in_advisory ? -1 : 1
+        }
+        return right.expertise_alignment - left.expertise_alignment
+      }),
+    [reading?.participants],
+  )
+
+  const divergence =
+    baseline && reading ? Math.abs(reading.score - baseline.score) : 0
+
+  return (
+    <ProCard
+      title={
+        <Space>
+          <BarChartOutlined />
+          <span>Decision-support readings</span>
+        </Space>
+      }
+      subTitle="Single source truth, multiple declared readings"
+      data-testid="smart-vote-readings-panel"
+      extra={
+        <Space wrap>
+          <Tag>Baseline always preserved</Tag>
+          <Button
+            type={expanded ? 'default' : 'primary'}
+            data-testid="view-readings-button"
+            onClick={() => setExpanded((value) => !value)}
+          >
+            {expanded ? 'Hide readings' : 'View readings'}
+          </Button>
+        </Space>
+      }
+    >
+      {!expanded ? (
+        <Alert
+          type="info"
+          showIcon
+          message="Compare the public baseline with a declared relevant-expertise lens"
+          description="Opening the panel does not change any stance. Smart Vote derives an advisory interpretation from the same source facts using the EkoH context relevant to this question."
+        />
+      ) : loading ? (
+        <Card loading />
+      ) : !data || !baseline || !reading ? (
+        <Empty description="No Smart Vote reading is bound to this topic yet">
+          <Button onClick={() => refresh()}>Retry</Button>
+        </Empty>
+      ) : (
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Alert
+            type="warning"
+            showIcon
+            message="Advisory reading — not a transfer of sovereignty"
+            description="Expertise informs judgment. It does not silently acquire political sovereignty. The baseline below keeps every canonical Ethikos stance unweighted."
+          />
+
+          <Row gutter={[16, 16]}>
+            <Col xs={24} lg={12}>
+              <Card title="Public baseline" data-testid="baseline-reading-card">
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                  <Statistic
+                    title={stanceLabel(baseline.score)}
+                    value={baseline.score}
+                    precision={2}
+                    suffix="/ 3"
+                  />
+                  <Text type="secondary">{baseline.participant_count} source stances · no weighting</Text>
+                  <ReadingDistribution
+                    support={baseline.support_share}
+                    neutral={baseline.neutral_share}
+                    oppose={baseline.oppose_share}
+                  />
+                </Space>
+              </Card>
+            </Col>
+
+            <Col xs={24} lg={12}>
+              <Card title="Relevant-expertise reading" data-testid="expertise-reading-card">
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                  <Statistic
+                    title={stanceLabel(reading.score)}
+                    value={reading.score}
+                    precision={2}
+                    suffix="/ 3"
+                  />
+                  <Space wrap>
+                    <Tag>{reading.advisory_participant_count ?? reading.participant_count} advisory participants</Tag>
+                    {(reading.excluded_participant_count ?? 0) > 0 && (
+                      <Tag color="orange">{reading.excluded_participant_count} declared recusal</Tag>
+                    )}
+                  </Space>
+                  <ReadingDistribution
+                    support={reading.support_share}
+                    neutral={reading.neutral_share}
+                    oppose={reading.oppose_share}
+                  />
+                </Space>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row gutter={[16, 16]}>
+            <Col xs={24} md={8}>
+              <Card size="small">
+                <Statistic title="Divergence" value={divergence} precision={2} suffix=" stance pts" />
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card size="small">
+                <Statistic title="Expertise coverage" value={pct(reading.expertise_coverage)} suffix="%" />
+              </Card>
+            </Col>
+            <Col xs={24} md={8}>
+              <Card size="small">
+                <Statistic title="Average contextual alignment" value={pct(reading.average_expertise_alignment)} suffix="%" />
+              </Card>
+            </Col>
+          </Row>
+
+          <ProCard title="Relevant domains" bordered>
+            <Space wrap>
+              {(reading.domains ?? []).map((domain) => (
+                <Tag key={domain.domain_code}>
+                  {domain.domain_name} · {pct(domain.weight)}%
+                </Tag>
+              ))}
+            </Space>
+          </ProCard>
+
+          <ProCard
+            title="Participant relevance in this lens"
+            subTitle="No one becomes more important everywhere. Expertise follows the question."
+            bordered
+          >
+            {(reading.participant_detail_visible_count ?? participants.length) < reading.participant_count ? (
+              <Alert
+                type="info"
+                showIcon
+                style={{ marginBottom: 16 }}
+                message="Some participant-level EkoH details are restricted"
+                description={`${reading.participant_detail_visible_count ?? participants.length} of ${reading.participant_count} participant detail records are visible in your current EkoH access scope. Aggregate baseline and advisory readings remain unchanged.`}
+              />
+            ) : null}
+            <List<SmartVoteReadingParticipant>
+              dataSource={participants}
+              renderItem={(participant) => (
+                <List.Item
+                  key={participant.user_id}
+                  actions={[
+                    <Button
+                      key="ekoh"
+                      type="link"
+                      icon={<SafetyCertificateOutlined />}
+                      onClick={() => onOpenParticipant(participantTarget(participant))}
+                    >
+                      EkoH context
+                    </Button>,
+                  ]}
+                >
+                  <List.Item.Meta
+                    title={
+                      <Space wrap>
+                        <Text strong>{participant.display_name}</Text>
+                        <Tag>stance {participant.stance_value > 0 ? '+' : ''}{participant.stance_value}</Tag>
+                        {participant.included_in_advisory ? (
+                          <Tag color="green">Included</Tag>
+                        ) : (
+                          <Tag color="orange">Recused</Tag>
+                        )}
+                      </Space>
+                    }
+                    description={
+                      <Space direction="vertical" size={2}>
+                        <Text type="secondary">
+                          Contextual alignment {pct(participant.expertise_alignment)}% · advisory weight {participant.advisory_weight.toFixed(2)}×
+                        </Text>
+                        {participant.exclusion_reason && (
+                          <Text type="secondary">{participant.exclusion_reason}</Text>
+                        )}
+                      </Space>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          </ProCard>
+
+          <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+            Lens hash: {advisory?.lens_hash ?? 'n/a'} · snapshot: {advisory?.snapshot_ref ?? 'n/a'}
+          </Paragraph>
+        </Space>
+      )}
+    </ProCard>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/StanceComposerCard.tsx"
+id=0a352570233e
+kind=source
+size=2294
+lines=91
+line_ref=1-91
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Button, Card, Slider, Space, Tag, Typography } from 'antd'
+
+import type { TopicStanceValue } from '@/services/deliberate'
+
+import {
+  clampStance,
+  stanceColor,
+  stanceLabel,
+} from '../_lib/topicThreadUtils'
+
+const { Text, Paragraph } = Typography
+
+export default function StanceComposerCard({
+  value,
+  loading,
+  onChange,
+  onSave,
+}: {
+  value: TopicStanceValue
+  loading: boolean
+  onChange: (value: TopicStanceValue) => void
+  onSave: () => void
+}): JSX.Element {
+  const currentLabel = stanceLabel(value)
+  const currentColor = stanceColor(value)
+
+  return (
+    <Card
+      title="Set your position"
+      extra={<Tag color={currentColor}>{currentLabel}</Tag>}
+    >
+      <Space direction="vertical" size={16} style={{ width: '100%' }}>
+        <div>
+          <Text strong>Where do you stand on this topic?</Text>
+          <Paragraph type="secondary" style={{ marginBottom: 0, marginTop: 4 }}>
+            Choose a topic-level stance before adding or reviewing arguments.
+            You can update it as the deliberation evolves.
+          </Paragraph>
+        </div>
+
+        <Slider
+          min={-3}
+          max={3}
+          step={1}
+          dots
+          value={value}
+          style={{ margin: '8px 6px 0' }}
+          tooltip={{
+            formatter: (nextValue) =>
+              typeof nextValue === 'number'
+                ? stanceLabel(clampStance(nextValue))
+                : currentLabel,
+          }}
+          onChange={(nextValue) => {
+            if (typeof nextValue === 'number') {
+              onChange(clampStance(nextValue))
+            }
+          }}
+        />
+
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 12,
+          }}
+        >
+          <Text type="secondary">Oppose</Text>
+          <Text type="secondary">Neutral</Text>
+          <Text type="secondary">Support</Text>
+        </div>
+
+        <Button
+          type="primary"
+          loading={loading}
+          onClick={onSave}
+          block
+        >
+          Save topic stance
+        </Button>
+
+        <Text type="secondary">
+          This is your position on the topic. Impact votes belong to individual
+          arguments.
+        </Text>
+      </Space>
+    </Card>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/TopicStates.tsx"
+id=8bdf598d88f3
+kind=source
+size=629
+lines=31
+line_ref=1-31
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Card, Empty, Space, Spin, Typography } from 'antd'
+import { PageContainer } from '@ant-design/pro-components'
+
+const { Text } = Typography
+
+export function TopicLoadingState(): JSX.Element {
+  return (
+    <PageContainer ghost>
+      <Card>
+        <Space>
+          <Spin />
+          <Text type="secondary">Loading deliberation thread…</Text>
+        </Space>
+      </Card>
+    </PageContainer>
+  )
+}
+
+export function TopicErrorState({
+  description,
+}: {
+  description: string
+}): JSX.Element {
+  return (
+    <PageContainer ghost>
+      <Empty description={description} />
+    </PageContainer>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_components/TopicSummaryPanel.tsx"
+id=8522d6302066
+kind=source
+size=2089
+lines=71
+line_ref=1-71
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { Progress, Space, Statistic, Tag, Typography } from 'antd'
+import { ProCard } from '@ant-design/pro-components'
+
+import type { TopicDetailResponse } from '@/services/deliberate'
+
+import { formatRelativeDate } from '../_lib/topicThreadUtils'
+import type { StanceStats } from '../_lib/topicThreadUtils'
+
+const { Title, Paragraph, Text } = Typography
+
+export default function TopicSummaryPanel({
+  topic,
+  stats,
+}: {
+  topic?: TopicDetailResponse
+  stats: StanceStats
+}): JSX.Element {
+  return (
+    <ProCard split="vertical" gutter={16}>
+      <ProCard colSpan="70%">
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          <div>
+            <Title level={3} style={{ marginBottom: 4 }}>
+              {topic?.title}
+            </Title>
+            <Space wrap>
+              {topic?.category && <Tag>{topic.category}</Tag>}
+              <Tag color="blue">Deliberate</Tag>
+              <Text type="secondary">
+                Created {formatRelativeDate(topic?.createdAt)}
+              </Text>
+            </Space>
+          </div>
+
+          {topic?.description ? (
+            <Paragraph style={{ marginBottom: 0 }}>{topic.description}</Paragraph>
+          ) : (
+            <Text type="secondary">No topic description provided.</Text>
+          )}
+        </Space>
+      </ProCard>
+
+      <ProCard colSpan="30%" title="Topic stance">
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          <Statistic
+            title="Average stance"
+            value={stats.average}
+            precision={2}
+            suffix="/ 3"
+          />
+
+          <Progress
+            percent={
+              stats.total > 0 ? Math.round((stats.support / stats.total) * 100) : 0
+            }
+            size="small"
+            status="active"
+          />
+
+          <Space wrap>
+            <Tag color="green">Support {stats.support}</Tag>
+            <Tag>Neutral {stats.neutral}</Tag>
+            <Tag color="red">Oppose {stats.oppose}</Tag>
+          </Space>
+        </Space>
+      </ProCard>
+    </ProCard>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_hooks/useTopicThreadController.ts"
+id=8841b9c7b4b0
+kind=source
+size=7199
+lines=259
+line_ref=1-259
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import { App } from 'antd'
+import type { SegmentedValue } from 'antd/es/segmented'
+import { useParams } from 'next/navigation'
+import { useRequest } from 'ahooks'
+
+import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
+import { get } from '@/services/_request'
+import { fetchDiscussionParticipantRoles } from '@/services/ethikos'
+import type { ArgumentSide, DiscussionParticipantRoleApi } from '@/services/ethikos'
+import {
+  fetchTopicDetail,
+  fetchTopicStances,
+  submitTopicArgument,
+  submitTopicStance,
+} from '@/services/deliberate'
+import type {
+  TopicDetailResponse,
+  TopicStance,
+  TopicStanceValue,
+} from '@/services/deliberate'
+
+import {
+  clampStance,
+  computeStanceStats,
+  isMine,
+  toArgumentItems,
+  toTopicParam,
+} from '../_lib/topicThreadUtils'
+import type { StanceStats, UserMeApi } from '../_lib/topicThreadUtils'
+
+export interface TopicThreadController {
+  topicId?: string
+  pageData?: TopicDetailResponse
+  pageError?: Error
+  loading: boolean
+  loadingPageData: boolean
+  loadingParticipantRoles: boolean
+  stats: StanceStats
+  stanceValue: TopicStanceValue
+  newArgument: string
+  newArgumentSide: ArgumentSide
+  replyTarget: ArgumentTreeItem | null
+  selectedArgument: ArgumentTreeItem | null
+  selectedArgumentId: string | null
+  savingStance: boolean
+  savingArgument: boolean
+  argumentItems: ArgumentTreeItem[]
+  participantRoles: DiscussionParticipantRoleApi[]
+  korumRefreshKey: number
+  setStanceValue: (value: TopicStanceValue) => void
+  setNewArgument: (value: string) => void
+  setReplyTarget: (argument: ArgumentTreeItem | null) => void
+  setSelectedArgument: (argument: ArgumentTreeItem | null) => void
+  refreshPageData: () => void
+  refreshParticipantRoles: () => void
+  handleKorumMutation: () => void
+  handleSaveStance: () => Promise<void>
+  handlePostArgument: () => Promise<void>
+  handleSideChange: (value: SegmentedValue) => void
+  handleReply: (argument: ArgumentTreeItem) => void
+}
+
+async function fetchOptionalMe(): Promise<UserMeApi | undefined> {
+  try {
+    return await get<UserMeApi>('users/me/')
+  } catch {
+    return undefined
+  }
+}
+
+export function useTopicThreadController(): TopicThreadController {
+  const { message } = App.useApp()
+
+  const params = useParams<{ topic: string | string[] }>()
+  const topicId = useMemo(() => toTopicParam(params?.topic), [params])
+
+  const {
+    data: pageData,
+    loading: loadingPageData,
+    refresh: refreshPageData,
+    error: pageError,
+  } = useRequest<TopicDetailResponse, []>(() => fetchTopicDetail(topicId!), {
+    ready: Boolean(topicId),
+    refreshDeps: [topicId],
+  })
+
+  const {
+    data: stances,
+    loading: loadingStances,
+    refresh: refreshStances,
+  } = useRequest<TopicStance[], []>(() => fetchTopicStances(topicId!), {
+    ready: Boolean(topicId),
+    refreshDeps: [topicId],
+  })
+
+  const {
+    data: participantRoles,
+    loading: loadingParticipantRoles,
+    refresh: refreshParticipantRoles,
+  } = useRequest<DiscussionParticipantRoleApi[], []>(
+    () => fetchDiscussionParticipantRoles(topicId!),
+    {
+      ready: Boolean(topicId),
+      refreshDeps: [topicId],
+    },
+  )
+
+  const { data: me } = useRequest<UserMeApi | undefined, []>(fetchOptionalMe, {
+    ready: Boolean(topicId),
+    refreshDeps: [topicId],
+  })
+
+  const [stanceValue, setStanceValue] = useState<TopicStanceValue>(0)
+  const [hydratedTopicId, setHydratedTopicId] = useState<string | null>(null)
+  const [savingStance, setSavingStance] = useState(false)
+
+  const [newArgument, setNewArgument] = useState('')
+  const [newArgumentSide, setNewArgumentSide] = useState<ArgumentSide>('pro')
+  const [replyTarget, setReplyTarget] = useState<ArgumentTreeItem | null>(null)
+  const [selectedArgument, setSelectedArgument] =
+    useState<ArgumentTreeItem | null>(null)
+  const [savingArgument, setSavingArgument] = useState(false)
+  const [korumRefreshKey, setKorumRefreshKey] = useState(0)
+
+  const argumentItems = useMemo(() => toArgumentItems(pageData), [pageData])
+  const selectedArgumentId = selectedArgument?.id ?? null
+
+  useEffect(() => {
+    setHydratedTopicId(null)
+    setStanceValue(0)
+    setNewArgument('')
+    setReplyTarget(null)
+    setSelectedArgument(null)
+    setKorumRefreshKey((value) => value + 1)
+  }, [topicId])
+
+  useEffect(() => {
+    if (!topicId || hydratedTopicId === topicId || !stances) return
+
+    const mine = me ? stances.find((stance) => isMine(stance, me)) : undefined
+
+    setStanceValue(mine ? clampStance(mine.value) : 0)
+    setHydratedTopicId(topicId)
+  }, [topicId, hydratedTopicId, me, stances])
+
+  const stats = useMemo<StanceStats>(
+    () => computeStanceStats(stances ?? []),
+    [stances],
+  )
+
+  const loading = loadingPageData || loadingStances
+
+  function handleKorumMutation(): void {
+    setKorumRefreshKey((value) => value + 1)
+    void refreshPageData()
+  }
+
+  const handleSaveStance = async (): Promise<void> => {
+    if (!topicId) return
+
+    setSavingStance(true)
+    try {
+      await submitTopicStance({
+        topicId,
+        value: stanceValue,
+      })
+      await refreshStances()
+      message.success('Your stance has been recorded.')
+    } catch (error) {
+      message.error(
+        error instanceof Error
+          ? error.message
+          : 'Unable to save your stance right now.',
+      )
+    } finally {
+      setSavingStance(false)
+    }
+  }
+
+  const handlePostArgument = async (): Promise<void> => {
+    if (!topicId) return
+
+    const trimmed = newArgument.trim()
+    if (!trimmed) {
+      message.warning('Please enter an argument before posting.')
+      return
+    }
+
+    setSavingArgument(true)
+    try {
+      await submitTopicArgument({
+        topicId,
+        body: trimmed,
+        side: newArgumentSide,
+        parentId: replyTarget?.id ?? null,
+      })
+      setNewArgument('')
+      setReplyTarget(null)
+      await refreshPageData()
+      message.success(
+        replyTarget
+          ? 'Your reply has been added.'
+          : 'Your argument has been added.',
+      )
+    } catch (error) {
+      message.error(
+        error instanceof Error
+          ? error.message
+          : 'Unable to post your argument right now.',
+      )
+    } finally {
+      setSavingArgument(false)
+    }
+  }
+
+  const handleSideChange = (value: SegmentedValue): void => {
+    setNewArgumentSide(value === 'con' ? 'con' : 'pro')
+  }
+
+  const handleReply = (argument: ArgumentTreeItem): void => {
+    setReplyTarget(argument)
+    setSelectedArgument(argument)
+  }
+
+  return {
+    topicId,
+    pageData,
+    pageError: pageError instanceof Error ? pageError : undefined,
+    loading,
+    loadingPageData,
+    loadingParticipantRoles,
+    stats,
+    stanceValue,
+    newArgument,
+    newArgumentSide,
+    replyTarget,
+    selectedArgument,
+    selectedArgumentId,
+    savingStance,
+    savingArgument,
+    argumentItems,
+    participantRoles: participantRoles ?? [],
+    korumRefreshKey,
+    setStanceValue,
+    setNewArgument,
+    setReplyTarget,
+    setSelectedArgument,
+    refreshPageData,
+    refreshParticipantRoles,
+    handleKorumMutation,
+    handleSaveStance,
+    handlePostArgument,
+    handleSideChange,
+    handleReply,
+  }
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/_lib/topicThreadUtils.ts"
+id=03fefa211de5
+kind=source
+size=3505
+lines=135
+line_ref=1-135
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+import dayjs from 'dayjs'
+
+import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
+import type { ArgumentSide } from '@/services/ethikos'
+import type {
+  TopicDetailResponse,
+  TopicStance,
+  TopicStanceValue,
+} from '@/services/deliberate'
+
+export interface UserMeApi {
+  id?: string | number
+  username?: string
+  email?: string
+  name?: string
+  display_name?: string
+}
+
+export interface StanceStats {
+  total: number
+  average: number
+  support: number
+  oppose: number
+  neutral: number
+}
+
+export const STANCE_MARKS: Record<number, string> = {
+  [-3]: 'Strongly oppose',
+  [-2]: 'Oppose',
+  [-1]: 'Lean oppose',
+  0: 'Neutral',
+  1: 'Lean support',
+  2: 'Support',
+  3: 'Strongly support',
+}
+
+export function clampStance(value: number): TopicStanceValue {
+  if (value <= -3) return -3
+  if (value === -2) return -2
+  if (value === -1) return -1
+  if (value === 0) return 0
+  if (value === 1) return 1
+  if (value === 2) return 2
+  return 3
+}
+
+export function stanceLabel(value: number): string {
+  return STANCE_MARKS[clampStance(value)] ?? 'Neutral'
+}
+
+export function stanceColor(value: number): string {
+  if (value > 0) return 'green'
+  if (value < 0) return 'red'
+  return 'default'
+}
+
+export function sideColor(side?: ArgumentSide | 'neutral' | null): string {
+  if (side === 'pro') return 'green'
+  if (side === 'con') return 'red'
+  return 'default'
+}
+
+export function sideLabel(side?: ArgumentSide | 'neutral' | null): string {
+  if (side === 'pro') return 'Pro'
+  if (side === 'con') return 'Con'
+  return 'Argument'
+}
+
+export function toSuggestionSide(
+  side?: ArgumentSide | 'neutral' | null,
+): ArgumentSide | null {
+  return side === 'pro' || side === 'con' ? side : null
+}
+
+function userCandidates(me?: UserMeApi): string[] {
+  return [me?.username, me?.email, me?.name, me?.display_name]
+    .filter((value): value is string => Boolean(value))
+    .map((value) => value.toLowerCase())
+}
+
+export function isMine(stance: TopicStance, me?: UserMeApi): boolean {
+  if (!stance.user || !me) return false
+  return userCandidates(me).includes(String(stance.user).toLowerCase())
+}
+
+export function computeStanceStats(stances: TopicStance[]): StanceStats {
+  if (stances.length === 0) {
+    return {
+      total: 0,
+      average: 0,
+      support: 0,
+      oppose: 0,
+      neutral: 0,
+    }
+  }
+
+  const total = stances.length
+  const sum = stances.reduce((acc, stance) => acc + stance.value, 0)
+  const support = stances.filter((stance) => stance.value > 0).length
+  const oppose = stances.filter((stance) => stance.value < 0).length
+  const neutral = total - support - oppose
+
+  return {
+    total,
+    average: Number((sum / total).toFixed(2)),
+    support,
+    oppose,
+    neutral,
+  }
+}
+
+export function formatRelativeDate(value?: string): string {
+  if (!value) return 'Unknown date'
+
+  const parsed = dayjs(value)
+  return parsed.isValid() ? parsed.fromNow() : value
+}
+
+export function toTopicParam(raw: string | string[] | undefined): string | undefined {
+  if (typeof raw === 'string') return raw
+  if (Array.isArray(raw)) return raw[0]
+  return undefined
+}
+
+export function toArgumentItems(topic?: TopicDetailResponse): ArgumentTreeItem[] {
+  return (topic?.statements ?? []).map((statement) => ({
+    id: String(statement.id),
+    body: statement.body,
+    author: statement.author,
+    side: statement.side ?? null,
+    parent: statement.parent != null ? String(statement.parent) : null,
+    createdAt: statement.createdAt,
+    raw: statement,
+  }))
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/[topic]/page.tsx"
+id=6480ff3baeba
+kind=source
+size=7468
+lines=207
+line_ref=1-207
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client'
+
+import 'dayjs/locale/en'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { Alert, Col, Row, Space, Steps, Typography } from 'antd'
+import { useState } from 'react'
+import { PageContainer, ProCard } from '@ant-design/pro-components'
+import {
+  BranchesOutlined,
+  CheckCircleOutlined,
+  MessageOutlined,
+  ProfileOutlined,
+} from '@ant-design/icons'
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
+import type { EthikosId } from '@/services/ethikos'
+
+import ArgumentComposerCard from './_components/ArgumentComposerCard'
+import ArgumentThreadCard from './_components/ArgumentThreadCard'
+import type { ParticipantContextTarget } from './_components/ArgumentThreadCard'
+import EkohParticipantDrawer from './_components/EkohParticipantDrawer'
+import EmergentQuestionCard from './_components/EmergentQuestionCard'
+import SmartVoteReadingsPanel from './_components/SmartVoteReadingsPanel'
+import KorumPanelsGrid from './_components/KorumPanelsGrid'
+import StanceComposerCard from './_components/StanceComposerCard'
+import { TopicErrorState, TopicLoadingState } from './_components/TopicStates'
+import TopicSummaryPanel from './_components/TopicSummaryPanel'
+import { useTopicThreadController } from './_hooks/useTopicThreadController'
+import { formatRelativeDate } from './_lib/topicThreadUtils'
+
+dayjs.extend(relativeTime)
+
+const { Text } = Typography
+
+export default function TopicThreadPage(): JSX.Element {
+  const controller = useTopicThreadController()
+  const [participantContext, setParticipantContext] =
+    useState<ParticipantContextTarget | null>(null)
+
+  if (!controller.topicId) {
+    return (
+      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
+        <TopicErrorState description="Missing topic id" />
+      </EthikosPageShell>
+    )
+  }
+
+  if (controller.loading && !controller.pageData) {
+    return (
+      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
+        <TopicLoadingState />
+      </EthikosPageShell>
+    )
+  }
+
+  if (!controller.loading && !controller.pageData) {
+    return (
+      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
+        <TopicErrorState
+          description={controller.pageError?.message ?? 'Topic not found'}
+        />
+      </EthikosPageShell>
+    )
+  }
+
+  const topic = controller.pageData
+
+  if (!topic) {
+    return (
+      <EthikosPageShell title="Deliberate · Topic" sectionLabel="Deliberate">
+        <TopicErrorState description="Topic data unavailable" />
+      </EthikosPageShell>
+    )
+  }
+
+  return (
+    <EthikosPageShell
+      title={topic?.title ?? 'Deliberate · Topic'}
+      sectionLabel="Deliberate"
+      subtitle={
+        topic?.category
+          ? `${topic.category} · ${formatRelativeDate(topic.lastActivity)}`
+          : undefined
+      }
+    >
+      <PageContainer ghost loading={controller.loading}>
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            message="Structure the reasons before deciding"
+            description="Read the topic, choose your stance, compare arguments, then select a statement to review its sources, impact signals, suggestions, visibility, and participant context."
+          />
+
+          <ProCard>
+            <Steps
+              size="small"
+              current={controller.selectedArgument ? 3 : 2}
+              items={[
+                {
+                  title: 'Understand',
+                  description: 'Read the topic',
+                  icon: <ProfileOutlined />,
+                },
+                {
+                  title: 'Take stance',
+                  description: 'Position yourself',
+                  icon: <CheckCircleOutlined />,
+                },
+                {
+                  title: 'Deliberate',
+                  description: 'Add arguments or replies',
+                  icon: <BranchesOutlined />,
+                },
+                {
+                  title: 'Review details',
+                  description: 'Inspect evidence and signals',
+                  icon: <MessageOutlined />,
+                },
+              ]}
+            />
+          </ProCard>
+
+          <TopicSummaryPanel topic={topic} stats={controller.stats} />
+
+          <Row gutter={[16, 16]} align="top">
+            <Col xs={24} xl={8}>
+              <Space direction="vertical" size={16} style={{ width: '100%' }}>
+                <StanceComposerCard
+                  value={controller.stanceValue}
+                  loading={controller.savingStance}
+                  onChange={controller.setStanceValue}
+                  onSave={controller.handleSaveStance}
+                />
+
+                <ArgumentComposerCard
+                  replyTarget={controller.replyTarget}
+                  side={controller.newArgumentSide}
+                  value={controller.newArgument}
+                  loading={controller.savingArgument}
+                  onSideChange={controller.handleSideChange}
+                  onValueChange={controller.setNewArgument}
+                  onSubmit={controller.handlePostArgument}
+                  onClearReply={() => controller.setReplyTarget(null)}
+                />
+              </Space>
+            </Col>
+
+            <Col xs={24} xl={16}>
+              <ArgumentThreadCard
+                items={controller.argumentItems}
+                loading={controller.loadingPageData}
+                selectedArgument={controller.selectedArgument}
+                onSelect={controller.setSelectedArgument}
+                onReply={controller.handleReply}
+                onRefresh={controller.refreshPageData}
+                onOpenParticipant={setParticipantContext}
+              />
+            </Col>
+          </Row>
+
+          <ProCard
+            title="Selected argument details"
+            subTitle={
+              controller.selectedArgument ? (
+                <Text type="secondary">
+                  Review the selected statement’s evidence, impact signal,
+                  suggestions, visibility, and participant context.
+                </Text>
+              ) : (
+                <Text type="secondary">
+                  Select an argument above to inspect its sources and signals.
+                </Text>
+              )
+            }
+          >
+            <KorumPanelsGrid
+              topicId={controller.topicId as EthikosId}
+              selectedArgument={controller.selectedArgument}
+              selectedArgumentId={controller.selectedArgumentId}
+              participantRoles={controller.participantRoles}
+              loadingParticipantRoles={controller.loadingParticipantRoles}
+              refreshKey={controller.korumRefreshKey}
+              onMutation={controller.handleKorumMutation}
+              onRefreshParticipantRoles={controller.refreshParticipantRoles}
+            />
+          </ProCard>
+
+          <EmergentQuestionCard currentTitle={topic.title} />
+
+          <SmartVoteReadingsPanel
+            topicId={controller.topicId as EthikosId}
+            onOpenParticipant={setParticipantContext}
+          />
+
+          <EkohParticipantDrawer
+            open={Boolean(participantContext)}
+            participant={participantContext}
+            topicId={controller.topicId as EthikosId}
+            onClose={() => setParticipantContext(null)}
+          />
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  )
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/elite/page.tsx"
+id=1d3b1b15620d
+kind=source
+size=21117
+lines=761
+line_ref=1-761
+chunks=3
+chunk_refs=1-350,351-700,701-761
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=1d3b1b15620d:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/deliberate/elite/page.tsx
+'use client'
+
+import React from 'react'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  ModalForm,
+  ProFormText,
+  ProFormSelect,
+  type ProColumns,
+} from '@ant-design/pro-components'
+import {
+  Alert,
+  App,
+  Button,
+  Drawer,
+  Empty,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd'
+import {
+  ArrowRightOutlined,
+  BranchesOutlined,
+  FireOutlined,
+  PlusOutlined,
+  ReadOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+  StarOutlined,
+} from '@ant-design/icons'
+import { useInterval, useRequest } from 'ahooks'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
+import {
+  createEliteTopic,
+  fetchEliteTopics,
+  fetchTopicPreview,
+} from '@/services/deliberate'
+import type {
+  CreateEliteTopicPayload,
+  EliteTopic,
+} from '@/services/deliberate'
+import { fetchEthikosCategories } from '@/services/ethikos'
+import type {
+  EthikosCategoryApi,
+  EthikosId,
+  TopicPreviewResponse,
+} from '@/services/ethikos'
+
+dayjs.extend(relativeTime)
+
+const { Paragraph, Text } = Typography
+
+type TopicStatus = 'open' | 'closed' | 'archived'
+
+type CategoryLike =
+  | string
+  | {
+      id?: EthikosId
+      name?: string
+      description?: string | null
+    }
+  | null
+  | undefined
+
+type RawEliteTopic = Partial<EliteTopic> & {
+  id: EthikosId
+  title: string
+  category?: CategoryLike
+  categoryLabel?: string
+  category_name?: string | null
+  createdAt?: string
+  created_at?: string
+  lastActivity?: string
+  last_activity?: string
+  hot?: boolean
+  stanceCount?: number
+  total_votes?: number | null
+  status?: TopicStatus
+}
+
+interface TopicRow {
+  id: string
+  title: string
+  categoryId?: EthikosId
+  categoryLabel?: string
+  createdAt: string
+  lastActivity: string
+  hot: boolean
+  stanceCount: number
+  status: TopicStatus
+}
+
+interface PreviewState {
+  topicId: string
+  fallbackTitle: string
+  fallbackCategory?: string
+}
+
+type CreateTopicForm = {
+  title: string
+  categoryId: EthikosId
+}
+
+function getCategoryLabel(category: CategoryLike): string | undefined {
+  if (!category) {
+    return undefined
+  }
+
+  if (typeof category === 'string') {
+    return category
+  }
+
+  return category.name || undefined
+}
+
+function getCategoryId(category: CategoryLike): EthikosId | undefined {
+  if (!category || typeof category === 'string') {
+    return undefined
+  }
+
+  return category.id
+}
+
+function normalizeStatus(value: unknown): TopicStatus {
+  if (value === 'open' || value === 'closed' || value === 'archived') {
+    return value
+  }
+
+  return 'open'
+}
+
+function statusColor(status: TopicStatus): string {
+  if (status === 'open') {
+    return 'green'
+  }
+
+  if (status === 'closed') {
+    return 'volcano'
+  }
+
+  return 'default'
+}
+
+function normalizeTopic(raw: RawEliteTopic): TopicRow {
+  const createdAt =
+    raw.createdAt ??
+    raw.created_at ??
+    raw.lastActivity ??
+    raw.last_activity ??
+    new Date().toISOString()
+
+  const lastActivity =
+    raw.lastActivity ??
+    raw.last_activity ??
+    raw.createdAt ??
+    raw.created_at ??
+    createdAt
+
+  const stanceCount =
+    typeof raw.stanceCount === 'number'
+      ? raw.stanceCount
+      : typeof raw.total_votes === 'number'
+        ? raw.total_votes
+        : 0
+
+  const categoryLabel =
+    raw.categoryLabel ??
+    raw.category_name ??
+    getCategoryLabel(raw.category)
+
+  const lastActivityDate = dayjs(lastActivity)
+  const hot =
+    typeof raw.hot === 'boolean'
+      ? raw.hot
+      : lastActivityDate.isValid() &&
+        lastActivityDate.isAfter(dayjs().subtract(24, 'hour')) &&
+        stanceCount >= 3
+
+  return {
+    id: String(raw.id),
+    title: raw.title,
+    categoryId: getCategoryId(raw.category),
+    categoryLabel: categoryLabel || undefined,
+    createdAt,
+    lastActivity,
+    hot,
+    stanceCount,
+    status: normalizeStatus(raw.status),
+  }
+}
+
+async function fetchEliteRows(): Promise<{ list: TopicRow[] }> {
+  const response = await fetchEliteTopics()
+
+  return {
+    list: (response?.list ?? []).map((topic) =>
+      normalizeTopic(topic as unknown as RawEliteTopic),
+    ),
+  }
+}
+
+function previewOpenedAt(preview?: TopicPreviewResponse): string | undefined {
+  return preview?.createdAt
+}
+
+function previewId(
+  preview: TopicPreviewResponse | undefined,
+  fallbackId: string | null,
+): string {
+  if (preview?.id != null) {
+    return String(preview.id)
+  }
+
+  return fallbackId ?? ''
+}
+
+function previewTitle(
+  preview: TopicPreviewResponse | undefined,
+  fallback?: PreviewState | null,
+): string {
+  return preview?.title || fallback?.fallbackTitle || 'Topic preview'
+}
+
+function previewCategory(
+  preview: TopicPreviewResponse | undefined,
+  fallback?: PreviewState | null,
+): string {
+  return preview?.category || fallback?.fallbackCategory || 'Uncategorised'
+}
+
+function previewHasBody(preview?: TopicPreviewResponse): boolean {
+  return Boolean(
+    preview?.description ||
+      (Array.isArray(preview?.latest) && preview.latest.length > 0),
+  )
+}
+
+function topicUrl(topicId: string): string {
+  return `/ethikos/deliberate/${topicId}?sidebar=ethikos`
+}
+
+export default function EliteAgora(): JSX.Element {
+  const router = useRouter()
+  const { message } = App.useApp()
+
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useRequest<{ list: TopicRow[] }, []>(fetchEliteRows)
+
+  useInterval(refresh, 60_000)
+
+  const [previewOpen, setPreviewOpen] = React.useState(false)
+  const [previewState, setPreviewState] =
+    React.useState<PreviewState | null>(null)
+
+  const {
+    data: preview,
+    loading: previewLoading,
+    run: loadPreview,
+  } = useRequest<TopicPreviewResponse, [string]>(fetchTopicPreview, {
+    manual: true,
+    onError: (requestError) => {
+      console.error('Failed to load topic preview', requestError)
+      message.error('Could not load topic preview.')
+    },
+  })
+
+  const previewTopicId = previewState?.topicId ?? null
+
+  const openPreview = React.useCallback(
+    (row: TopicRow) => {
+      setPreviewState({
+        topicId: row.id,
+        fallbackTitle: row.title,
+        fallbackCategory: row.categoryLabel,
+      })
+      setPreviewOpen(true)
+      loadPreview(row.id)
+    },
+    [loadPreview],
+  )
+
+  const closePreview = React.useCallback(() => {
+    setPreviewOpen(false)
+    setPreviewState(null)
+  }, [])
+
+  const rows = React.useMemo(() => data?.list ?? [], [data])
+  const openRows = React.useMemo(
+    () => rows.filter((topic) => topic.status === 'open'),
+    [rows],
+  )
+
+  const headerStats = React.useMemo(
+    () => [
+      {
+        label: 'Open topics',
+        value: openRows.length,
+        description: 'Available for stance and argument contributions',
+      },
+      {
+        label: 'Avg stances / topic',
+        value: rows.length
+          ? Number(
+              (
+                rows.reduce((sum, topic) => sum + topic.stanceCount, 0) /
+                rows.length
+              ).toFixed(1),
+            )
+          : 0,
+        description: 'Participation signal across listed topics',
+      },
+      {
+        label: 'Needs attention',
+        value: openRows.filter((topic) => topic.stanceCount === 0).length,
+        description: 'Open topics without recorded stances',
+      },
+      {
+        label: 'Trending',
+        value: rows.filter((topic) => topic.hot).length,
+        description: 'Active in the last 24 hours',
+      },
+    ],
+    [openRows, rows],
+  )
+
+  const categoryFilters = React.useMemo(
+    () =>
+      Array.from(
+        new Set(
+          rows
+            .map((topic) => topic.categoryLabel)
+            .filter((label): label is string => Boolean(label)),
+        ),
+      ).map((label) => ({
+        text: label,
+        value: label,
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=1d3b1b15620d:351-700
+start=351
+end=700
+----
+      })),
+    [rows],
+  )
+
+  const columns = React.useMemo<ProColumns<TopicRow>[]>(
+    () => [
+      {
+        title: 'Topic',
+        dataIndex: 'title',
+        ellipsis: true,
+        render: (_dom, row) => (
+          <Space direction="vertical" size={2}>
+            <Button
+              type="link"
+              onClick={() => openPreview(row)}
+              style={{
+                padding: 0,
+                height: 'auto',
+                textAlign: 'left',
+                whiteSpace: 'normal',
+              }}
+            >
+              {row.title}
+            </Button>
+
+            <Space size={6} wrap>
+              {row.hot ? (
+                <Tooltip title="Recent activity">
+                  <Tag icon={<FireOutlined />} color="volcano">
+                    Active
+                  </Tag>
+                </Tooltip>
+              ) : null}
+
+              {row.stanceCount === 0 && row.status === 'open' ? (
+                <Tag color="gold">Needs first stance</Tag>
+              ) : null}
+            </Space>
+          </Space>
+        ),
+      },
+      {
+        title: 'Theme',
+        dataIndex: 'categoryLabel',
+        filters: categoryFilters,
+        onFilter: (value, row) =>
+          String(row.categoryLabel ?? '') === String(value),
+        render: (_dom, row) =>
+          row.categoryLabel ? (
+            <Tag color="geekblue">{row.categoryLabel}</Tag>
+          ) : (
+            <Text type="secondary">Uncategorised</Text>
+          ),
+      },
+      {
+        title: 'Status',
+        dataIndex: 'status',
+        width: 120,
+        filters: [
+          { text: 'Open', value: 'open' },
+          { text: 'Closed', value: 'closed' },
+          { text: 'Archived', value: 'archived' },
+        ],
+        onFilter: (value, row) => row.status === String(value),
+        render: (_dom, row) => (
+          <Tag color={statusColor(row.status)}>{row.status}</Tag>
+        ),
+      },
+      {
+        title: 'Stances',
+        dataIndex: 'stanceCount',
+        sorter: (a, b) => a.stanceCount - b.stanceCount,
+        align: 'right',
+        width: 110,
+      },
+      {
+        title: 'Last activity',
+        dataIndex: 'lastActivity',
+        sorter: (a, b) =>
+          dayjs(a.lastActivity).valueOf() - dayjs(b.lastActivity).valueOf(),
+        width: 160,
+        render: (_dom, row) => {
+          const lastActivity = dayjs(row.lastActivity)
+
+          return lastActivity.isValid() ? (
+            lastActivity.fromNow()
+          ) : (
+            <Text type="secondary">Unknown</Text>
+          )
+        },
+      },
+      {
+        title: '',
+        width: 130,
+        render: (_dom, row) => (
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => router.push(topicUrl(row.id))}
+          >
+            Open thread
+          </Button>
+        ),
+      },
+    ],
+    [categoryFilters, openPreview, router],
+  )
+
+  const openedAt = previewOpenedAt(preview)
+  const resolvedPreviewId = previewId(preview, previewTopicId)
+  const drawerTitle = previewTitle(preview, previewState)
+  const drawerCategory = previewCategory(preview, previewState)
+  const hasPreviewBody = previewHasBody(preview)
+
+  return (
+    <EthikosPageShell
+      title="Expert deliberation"
+      metaTitle="Expert deliberation"
+      subtitle={
+        <span>
+          Choose a structured debate topic, review the question, then open the
+          thread to record a stance, add a reason, or reply to an argument.
+        </span>
+      }
+      sectionLabel="Deliberate"
+      primaryAction={
+        <Link href="/ethikos/deliberate/guidelines?sidebar=ethikos" prefetch={false}>
+          <Button icon={<ReadOutlined />}>Participation guidelines</Button>
+        </Link>
+      }
+    >
+      <PageContainer
+        ghost
+        loading={loading}
+        extra={
+          <Space>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => refresh()}
+              type="text"
+              title="Refresh topics"
+            />
+            <NewTopicButton onCreated={refresh} />
+          </Space>
+        }
+      >
+        <ProCard
+          title={
+            <Space>
+              <BranchesOutlined />
+              <span>Deliberation workflow</span>
+            </Space>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <ProCard gutter={[16, 16]} wrap ghost>
+            <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <StarOutlined />
+                  <Text strong>1. Choose a topic</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Start from an open public or expert question that needs
+                  reasons, objections, and nuance.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <SafetyCertificateOutlined />
+                  <Text strong>2. Form a stance</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Use the −3 to +3 scale to express direction and intensity
+                  before moving toward decision.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 8 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <ArrowRightOutlined />
+                  <Text strong>3. Add reasons</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Add arguments, replies, sources, and suggestions so the debate
+                  becomes readable and traceable.
+                </Paragraph>
+              </Space>
+            </ProCard>
+          </ProCard>
+        </ProCard>
+
+        {error ? (
+          <Alert
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="Unable to load deliberation topics."
+            description="Check the Deliberate service and the canonical Ethikos topics endpoint."
+          />
+        ) : null}
+
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          {headerStats.map((stat) => (
+            <StatisticCard
+              key={stat.label}
+              colSpan={{ xs: 24, sm: 12, xl: 6 }}
+              statistic={{
+                title: stat.label,
+                value: stat.value,
+                description: stat.description,
+              }}
+            />
+          ))}
+        </ProCard>
+
+        <ProCard
+          title="Topics ready for deliberation"
+          extra={
+            <Text type="secondary">
+              Open a thread to read the question, record a stance, and add
+              reasons.
+            </Text>
+          }
+        >
+          <ProTable<TopicRow>
+            rowKey="id"
+            columns={columns}
+            dataSource={rows}
+            search={{ labelWidth: 90, filterType: 'light' }}
+            pagination={{ pageSize: 10 }}
+            options={false}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No deliberation topics available yet"
+                />
+              ),
+            }}
+          />
+        </ProCard>
+
+        <Drawer
+          width={560}
+          open={previewOpen}
+          onClose={closePreview}
+          title="Topic preview"
+          extra={
+            resolvedPreviewId ? (
+              <Button
+                type="primary"
+                onClick={() => router.push(topicUrl(resolvedPreviewId))}
+              >
+                Open thread
+              </Button>
+            ) : null
+          }
+        >
+          {previewLoading ? (
+            <Empty description="Loading preview…" />
+          ) : preview || previewState ? (
+            <>
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                <div>
+                  <Text type="secondary">Question</Text>
+                  <h3 style={{ marginTop: 4 }}>{drawerTitle}</h3>
+                </div>
+
+                <Space wrap>
+                  <Tag color="geekblue">{drawerCategory}</Tag>
+                  {openedAt ? (
+                    <Tag>{dayjs(openedAt).format('YYYY-MM-DD HH:mm')}</Tag>
+                  ) : null}
+                </Space>
+
+                {preview?.description ? (
+                  <div>
+                    <Text type="secondary">Context</Text>
+                    <Paragraph style={{ marginTop: 4 }}>
+                      {preview.description}
+                    </Paragraph>
+                  </div>
+                ) : null}
+
+                {preview?.latest && preview.latest.length > 0 ? (
+                  <div>
+                    <Text type="secondary">Latest statements</Text>
+                    <ul style={{ paddingLeft: 20, marginTop: 8 }}>
+                      {preview.latest.map((statement) => (
+                        <li key={statement.id}>
+                          <Text strong>{statement.author}</Text>
+                          <span> — {statement.body}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : hasPreviewBody ? null : (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No statements yet. Open the thread to start the discussion."
+                  />
+                )}
+
+                <Button
+                  type="primary"
+                  disabled={!resolvedPreviewId}
+                  icon={<ArrowRightOutlined />}
+                  onClick={() =>
+                    router.push(topicUrl(resolvedPreviewId))
+                  }
+                >
+                  Open topic thread
+                </Button>
+              </Space>
+            </>
+          ) : (
+            <Empty description="No preview data available." />
+          )}
+        </Drawer>
+      </PageContainer>
+    </EthikosPageShell>
+  )
+}
+
+function NewTopicButton({ onCreated }: { onCreated: () => void }): JSX.Element {
+  const [visible, setVisible] = React.useState(false)
+  const { message } = App.useApp()
+
+  const { data: categories, loading: loadingCategories } = useRequest<
+    EthikosCategoryApi[],
+    []
+  >(fetchEthikosCategories)
+
+  const { runAsync, loading } = useRequest<
+    { id: string },
+    [CreateEliteTopicPayload]
+  >(createEliteTopic, {
+    manual: true,
+    onSuccess: () => {
+      message.success('Topic created')
+      setVisible(false)
+      onCreated()
+    },
+    onError: (requestError) => {
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=1d3b1b15620d:701-761
+start=701
+end=761
+----
+      console.error('Failed to create topic', requestError)
+      message.error('Could not create topic.')
+    },
+  })
+
+  return (
+    <>
+      <Button
+        icon={<PlusOutlined />}
+        type="primary"
+        onClick={() => setVisible(true)}
+      >
+        New topic
+      </Button>
+
+      <ModalForm<CreateTopicForm>
+        title="Create new deliberation topic"
+        open={visible}
+        onOpenChange={setVisible}
+        onFinish={async (values) => {
+          await runAsync({
+            title: values.title,
+            category: values.categoryId,
+          })
+
+          return true
+        }}
+        submitter={{ submitButtonProps: { loading } }}
+      >
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="Create a question that can be debated."
+          description="A good deliberation topic is specific enough to discuss, but open enough to allow arguments, objections, and nuance."
+        />
+
+        <ProFormText
+          name="title"
+          label="Question or topic title"
+          placeholder="Example: Should public datasets require consent receipts?"
+          rules={[{ required: true, min: 10 }]}
+        />
+
+        <ProFormSelect
+          name="categoryId"
+          label="Theme"
+          fieldProps={{
+            loading: loadingCategories,
+            placeholder: 'Select a theme',
+          }}
+          options={(categories ?? []).map((category) => ({
+            label: category.name,
+            value: category.id,
+          }))}
+          rules={[{ required: true, message: 'Please select a theme' }]}
+        />
+      </ModalForm>
+    </>
+  )
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="deliberate/guidelines/page.tsx"
+id=ed55ae997e0b
+kind=source
+size=20830
+lines=507
+line_ref=1-507
+chunks=2
+chunk_refs=1-350,351-507
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=ed55ae997e0b:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/deliberate/guidelines/page.tsx
+'use client';
+
+import { PageContainer } from '@ant-design/pro-components';
+import {
+  Alert,
+  Anchor,
+  Card,
+  Col,
+  Divider,
+  List,
+  Row,
+  Space,
+  Steps,
+  Table,
+  Tag,
+  Timeline,
+  Typography,
+} from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+
+const { Title, Paragraph, Text } = Typography;
+const { Step } = Steps;
+
+type EvidenceRuleRow = {
+  claimType: string;
+  minimumEvidence: string;
+  preferredSources: string;
+};
+
+const evidenceData: EvidenceRuleRow[] = [
+  {
+    claimType: 'Factual statement about science / policy',
+    minimumEvidence: 'At least one credible, verifiable source',
+    preferredSources: 'Peer‑reviewed research, official statistics, institutional reports',
+  },
+  {
+    claimType: 'Claim about personal experience or local context',
+    minimumEvidence: 'Describe context and limits of your observation',
+    preferredSources: 'First‑hand description; optional supporting links',
+  },
+  {
+    claimType: 'Normative / ethical argument',
+    minimumEvidence: 'Explicit reasoning chain; reference to frameworks if used',
+    preferredSources: 'Ethical frameworks, case law, precedent, structured argumentation',
+  },
+  {
+    claimType: 'Prediction or scenario',
+    minimumEvidence: 'Stated assumptions and method (trend, model, analogy)',
+    preferredSources: 'Forecasting models, expert assessments, reputable think‑tank reports',
+  },
+];
+
+const evidenceColumns: ColumnsType<EvidenceRuleRow> = [
+  {
+    title: 'Claim type',
+    dataIndex: 'claimType',
+    key: 'claimType',
+    width: 260,
+  },
+  {
+    title: 'Minimum evidence',
+    dataIndex: 'minimumEvidence',
+    key: 'minimumEvidence',
+    width: 260,
+  },
+  {
+    title: 'Preferred sources',
+    dataIndex: 'preferredSources',
+    key: 'preferredSources',
+  },
+];
+
+const quickChecklistItems: string[] = [
+  'Is my contribution respectful and focused on the topic?',
+  'Have I separated facts from opinions or values?',
+  'Did I provide at least one source or explain my reasoning?',
+  'Is my stance slider (−3…+3) aligned with what I actually wrote?',
+  'Would I be comfortable seeing this appear in a public archive of the debate?',
+];
+
+export default function Guidelines() {
+  return (
+    <EthikosPageShell
+      title="Deliberation guidelines"
+      subtitle="Shared rules for Korum debates and Konsultations consultations in ethiKos."
+      sectionLabel="Deliberate"
+    >
+      <PageContainer ghost>
+        <Row gutter={[24, 24]}>
+          {/* Left column: navigation + quick rules */}
+          <Col xs={24} md={7} lg={6}>
+            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+              <Card size="small" title="Navigate this guide">
+                <Anchor
+                  affix
+                  items={[
+                    { key: 'overview', href: '#overview', title: 'Overview' },
+                    { key: 'principles', href: '#principles', title: 'Core principles' },
+                    { key: 'etiquette', href: '#etiquette', title: 'Etiquette & tone' },
+                    { key: 'evidence', href: '#evidence', title: 'Evidence & sources' },
+                    {
+                      key: 'identity',
+                      href: '#identity',
+                      title: 'Identity, expertise & Ekoh',
+                    },
+                    { key: 'korum', href: '#korum', title: 'Korum debates' },
+                    {
+                      key: 'konsultations',
+                      href: '#konsultations',
+                      title: 'Konsultations consultations',
+                    },
+                    { key: 'moderation', href: '#moderation', title: 'Moderation ladder' },
+                    { key: 'appeals', href: '#appeals', title: 'Appeals & transparency' },
+                    { key: 'checklist', href: '#checklist', title: 'Checklist before posting' },
+                  ]}
+                />
+              </Card>
+
+              <Card size="small" title="Hard limits">
+                <Paragraph type="secondary" style={{ marginBottom: 8 }}>
+                  Content may be removed and accounts restricted for:
+                </Paragraph>
+                <List
+                  size="small"
+                  dataSource={[
+                    'Harassment, threats, or targeted hate',
+                    'Deliberate misinformation (knowingly false claims)',
+                    'Doxxing or disclosure of private data',
+                    'Incitement to violence or illegal activity',
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                  )}
+                />
+              </Card>
+            </Space>
+          </Col>
+
+          {/* Right column: full guidelines */}
+          <Col xs={24} md={17} lg={18}>
+            {/* Overview */}
+            <section id="overview">
+              <Title level={3}>What ethiKos is for</Title>
+              <Paragraph>
+                ethiKos is Konnaxion&apos;s environment for structured ethical debates and public
+                consultations. It combines:
+              </Paragraph>
+              <List
+                size="small"
+                dataSource={[
+                  'Nuanced stance‑taking on a −3…+3 scale (from strongly against to strongly for).',
+                  'Threaded arguments (Korum) where reasoning and evidence are visible.',
+                  'Time‑boxed consultations (Konsultations) with transparent weighted results.',
+                ]}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
+              />
+
+              <Alert
+                style={{ marginTop: 16 }}
+                type="info"
+                showIcon
+                message="Key operational rules"
+                description={
+                  <Space direction="vertical">
+                    <Text>
+                      • Stance scale is fixed at −3…+3; 0 = neutral. Your slider should reflect what
+                      you actually argue.
+                    </Text>
+                    <Text>
+                      • Moderation auto‑hide is triggered after <strong>3 independent reports</strong>.
+                    </Text>
+                    <Text>
+                      • &ldquo;Expert cohort&rdquo; views are only shown once at least{' '}
+                      <strong>12 qualified experts</strong> have voted.
+                    </Text>
+                  </Space>
+                }
+              />
+            </section>
+
+            <Divider />
+
+            {/* Core principles */}
+            <section id="principles">
+              <Title level={3}>Core principles</Title>
+              <Space wrap>
+                <Tag color="blue">Respect</Tag>
+                <Tag color="green">Evidence</Tag>
+                <Tag color="gold">Transparency</Tag>
+                <Tag color="purple">Nuance</Tag>
+                <Tag color="geekblue">Accountability</Tag>
+              </Space>
+
+              <Paragraph style={{ marginTop: 12 }}>
+                Every contribution in ethiKos should:
+              </Paragraph>
+              <List
+                size="small"
+                dataSource={[
+                  'Focus on ideas and arguments, not on people.',
+                  'Separate facts (what is) from values (what ought to be).',
+                  'Acknowledge uncertainty and limits of your own knowledge.',
+                  'Make it possible for others to verify what you claim.',
+                  'Remain readable and accessible to non‑experts where possible.',
+                ]}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
+              />
+            </section>
+
+            <Divider />
+
+            {/* Etiquette & tone */}
+            <section id="etiquette">
+              <Title level={3}>Etiquette & tone</Title>
+              <Paragraph>
+                The goal is high‑signal, low‑toxicity debate. The following expectations apply
+                across Korum debates and Konsultations comments:
+              </Paragraph>
+
+              <List
+                size="small"
+                dataSource={[
+                  'Be concise and stay on topic. Long posts are fine if they are structured.',
+                  'Critique arguments, not identities or motives. Avoid ad hominem attacks.',
+                  'No mockery, slurs, or profanity aimed at individuals or groups.',
+                  'Signal disagreement explicitly (e.g. “I disagree because…”), not by sarcasm alone.',
+                  'Use formatting (short paragraphs, bullet points) to make complex ideas readable.',
+                ]}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
+              />
+            </section>
+
+            <Divider />
+
+            {/* Evidence & sources */}
+            <section id="evidence">
+              <Title level={3}>Evidence & sources</Title>
+              <Paragraph>
+                ethikos is not just for opinions; it is built for traceable reasoning. As a rule of
+                thumb:
+              </Paragraph>
+
+              <List
+                size="small"
+                dataSource={[
+                  'If a claim can be checked, provide enough information for others to check it.',
+                  'Link to primary sources where possible (studies, datasets, official documents).',
+                  'If you rely on secondary sources (media, blogs), prefer outlets with clear editorial standards.',
+                  'Clearly mark personal experience as such and avoid overgeneralising from it.',
+                ]}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
+              />
+
+              <Card
+                size="small"
+                style={{ marginTop: 16 }}
+                title="Minimum evidence by claim type"
+              >
+                <Table<EvidenceRuleRow>
+                  size="small"
+                  rowKey={(row) => row.claimType}
+                  columns={evidenceColumns}
+                  dataSource={evidenceData}
+                  pagination={false}
+                />
+              </Card>
+            </section>
+
+            <Divider />
+
+            {/* Identity, expertise & Ekoh */}
+            <section id="identity">
+              <Title level={3}>Identity, expertise & Ekoh weighting</Title>
+              <Paragraph>
+                ethiKos uses the Ekoh reputation system to highlight and weight contributions from
+                users with demonstrated expertise, without turning debates into popularity contests.
+              </Paragraph>
+
+              <Card size="small">
+                <List
+                  size="small"
+                  dataSource={[
+                    'Expert and verified accounts may be tagged (e.g. “Domain expert”, “Verified identity”) next to their name.',
+                    'Weighted results views (e.g. “Experts only”) depend on Ekoh scores in the relevant field.',
+                    'Reputation is descriptive, not absolute authority: arguments still stand or fall on their merits.',
+                    'You may use pseudonyms where allowed, but you remain bound by all guidelines and legal obligations.',
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item style={{ paddingInline: 0, alignItems: 'flex-start' }}>
+                      {item}
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </section>
+
+            <Divider />
+
+            {/* Korum-specific rules */}
+            <section id="korum">
+              <Title level={3}>Korum debates: structured arguments</Title>
+              <Paragraph>
+                Korum is the structured debate environment under ethiKos. Topics represent a single
+                question; threads capture arguments and replies.
+              </Paragraph>
+
+              <List
+                size="small"
+                header={<Text strong>When posting in a Korum debate, you should:</Text>}
+                dataSource={[
+                  'Align your stance slider (−3…+3) with the position you defend in your argument.',
+                  'Use one post per main point; avoid packing multiple unrelated arguments into a single block.',
+                  'If you reply, indicate whether you are clarifying, objecting, or adding supporting detail.',
+                  'Avoid repeating the same argument without engaging with counter‑arguments.',
+                  'Flag possible conflicts of interest when relevant to the topic.',
+                ]}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>{item}</List.Item>
+                )}
+              />
+            </section>
+
+            <Divider />
+
+            {/* Konsultations-specific rules */}
+            <section id="konsultations">
+              <Title level={3}>Konsultations: public consultations & feedback</Title>
+              <Paragraph>
+                Konsultations host time‑boxed consultations and suggestion flows that may feed into
+                policy or organisational decisions.
+              </Paragraph>
+
+              <Card size="small">
+                <List
+                  size="small"
+                  header={<Text strong>For consultations and suggestions:</Text>}
+                  dataSource={[
+                    'Answer the specific question being asked; off‑topic comments may be hidden.',
+                    'When suggesting amendments, be as concrete and implementable as possible.',
+                    'Explain trade‑offs: what might be improved, and what might be lost?',
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=ed55ae997e0b:351-507
+start=351
+end=507
+----
+                    'Avoid campaigns to flood a consultation with near‑identical comments.',
+                    'Respect any participation limits (per‑day comments, max length, etc.) if configured.',
+                  ]}
+                  renderItem={(item) => (
+                    <List.Item style={{ paddingInline: 0, alignItems: 'flex-start' }}>
+                      {item}
+                    </List.Item>
+                  )}
+                />
+              </Card>
+            </section>
+
+            <Divider />
+
+            {/* Moderation ladder */}
+            <section id="moderation">
+              <Title level={3}>Moderation & reporting ladder</Title>
+              <Paragraph>
+                Moderation in ethiKos is a mix of community signals and dedicated moderator review.
+                Automated actions are transparent and bounded.
+              </Paragraph>
+
+              <Steps
+                direction="vertical"
+                size="small"
+                current={2}
+                style={{ marginTop: 8, maxWidth: 520 }}
+              >
+                <Step
+                  title="0. Content posted"
+                  description="A debate argument, comment, or suggestion is created and visible to participants."
+                />
+                <Step
+                  title="1. Reported by users"
+                  description="Other users can report content for clear guideline violations (harassment, spam, misinformation, etc.)."
+                />
+                <Step
+                  title="2. Auto‑hide at 3 independent reports"
+                  description="At three distinct reports, the post is temporarily hidden and routed to the moderation queue."
+                />
+                <Step
+                  title="3. Moderator review"
+                  description="A moderator reviews the context, reports, and user history to decide on the outcome."
+                />
+                <Step
+                  title="4. Outcome"
+                  description="Content may be restored (optionally with a warning), edited/redacted, or permanently removed; account actions apply in repeated or severe cases."
+                />
+              </Steps>
+            </section>
+
+            <Divider />
+
+            {/* Appeals & transparency */}
+            <section id="appeals">
+              <Title level={3}>Appeals & transparency</Title>
+              <Paragraph>
+                You can request a second look when your content is removed or your account is
+                restricted. Appeals should focus on clarity and evidence.
+              </Paragraph>
+
+              <Timeline
+                style={{ marginTop: 8 }}
+                items={[
+                  {
+                    color: 'blue',
+                    children: (
+                      <>
+                        <Text strong>1. Trigger</Text>
+                        <Paragraph style={{ marginBottom: 0 }}>
+                          You receive a notice that a post was removed or that your participation is
+                          temporarily limited.
+                        </Paragraph>
+                      </>
+                    ),
+                  },
+                  {
+                    color: 'blue',
+                    children: (
+                      <>
+                        <Text strong>2. Appeal submission</Text>
+                        <Paragraph style={{ marginBottom: 0 }}>
+                          Use the &ldquo;Request review&rdquo; or equivalent button (where
+                          available) to explain why you think the decision was incorrect or
+                          disproportionate.
+                        </Paragraph>
+                      </>
+                    ),
+                  },
+                  {
+                    color: 'green',
+                    children: (
+                      <>
+                        <Text strong>3. Secondary review</Text>
+                        <Paragraph style={{ marginBottom: 0 }}>
+                          A moderator other than the original reviewer, where possible, examines the
+                          case and may ask for clarification.
+                        </Paragraph>
+                      </>
+                    ),
+                  },
+                  {
+                    color: 'gray',
+                    children: (
+                      <>
+                        <Text strong>4. Final outcome</Text>
+                        <Paragraph style={{ marginBottom: 0 }}>
+                          The decision may be upheld or adjusted. In all cases, a short rationale
+                          should be recorded for audit and future calibration.
+                        </Paragraph>
+                      </>
+                    ),
+                  },
+                ]}
+              />
+            </section>
+
+            <Divider />
+
+            {/* Checklist */}
+            <section id="checklist">
+              <Title level={3}>Checklist before posting</Title>
+              <Paragraph>
+                Use this short checklist before you submit a new stance, argument, or suggestion in
+                ethiKos:
+              </Paragraph>
+
+              <List
+                size="small"
+                dataSource={quickChecklistItems}
+                renderItem={(item) => (
+                  <List.Item style={{ paddingInline: 0 }}>
+                    <Text>• {item}</Text>
+                  </List.Item>
+                )}
+              />
+
+              <Alert
+                style={{ marginTop: 16 }}
+                type="success"
+                showIcon
+                message="Signal‑boost good debate"
+                description={
+                  <Paragraph style={{ marginBottom: 0 }}>
+                    Use the available tools (up‑weighting, endorsements, sharing within your
+                    organisation) to promote high‑quality, well‑evidenced arguments—regardless of
+                    whether you personally agree with them.
+                  </Paragraph>
+                }
+              />
+            </section>
+          </Col>
+        </Row>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----

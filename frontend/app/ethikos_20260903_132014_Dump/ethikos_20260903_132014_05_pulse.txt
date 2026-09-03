@@ -1,0 +1,1758 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.830286
+title: FOLDER: pulse
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 4
+total_size_mb: 0.0455
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_132014_04_admin.txt
+next_volume: ethikos_20260903_132014_06_trust.txt
+prev_title: admin
+next_title: trust
+short_title: pulse
+
+==== FILE_INDEX ====
+ENTRY id=839c5bb3cbcc path="pulse/health/page.tsx" kind=source size=9027 lines=306 line_ref=1-306 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=7c01d8b908c0 path="pulse/live/page.tsx" kind=source size=18060 lines=632 line_ref=1-632 chunks=2 chunk_refs=1-350,351-632 symbols=0 imports=0 summary="Source file."
+ENTRY id=36db50376bc5 path="pulse/overview/page.tsx" kind=source size=7899 lines=281 line_ref=1-281 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=26169c11ae19 path="pulse/trends/page.tsx" kind=source size=12706 lines=441 line_ref=1-441 chunks=2 chunk_refs=1-350,351-441 symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="pulse/health/page.tsx"
+id=839c5bb3cbcc
+kind=source
+size=9027
+lines=306
+line_ref=1-306
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/pulse/health/page.tsx
+'use client';
+
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import { Pie, Radar } from '@ant-design/plots';
+import {
+  Badge,
+  Button,
+  Empty,
+  List,
+  Skeleton,
+  Space,
+  Tooltip,
+  Typography,
+} from 'antd';
+import { SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { fetchPulseHealth, type HealthSummary } from '@/services/pulse';
+
+const { Text } = Typography;
+
+type RadarPoint = { metric: string; score: number };
+type PiePoint = { type: string; value: number };
+type PlotConfig = { data?: unknown[]; [key: string]: unknown };
+
+function computeHealthStatus(
+  constructiveness?: number,
+  engagement?: number,
+): { status: 'success' | 'warning' | 'error'; label: string } {
+  const c = constructiveness ?? 0;
+  const e = engagement ?? 0;
+
+  if (c >= 70 && e >= 50) return { status: 'success', label: 'Healthy' };
+  if (c >= 50) return { status: 'warning', label: 'Watch' };
+  return { status: 'error', label: 'At risk' };
+}
+
+function asRadarPoints(value: unknown): RadarPoint[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(
+    (item): item is RadarPoint =>
+      !!item &&
+      typeof item === 'object' &&
+      typeof (item as RadarPoint).metric === 'string' &&
+      typeof (item as RadarPoint).score === 'number',
+  );
+}
+
+function asPiePoints(value: unknown): PiePoint[] {
+  if (!Array.isArray(value)) return [];
+
+  return value.filter(
+    (item): item is PiePoint =>
+      !!item &&
+      typeof item === 'object' &&
+      typeof (item as PiePoint).type === 'string' &&
+      typeof (item as PiePoint).value === 'number',
+  );
+}
+
+function formatRefreshTime(refreshedAt?: string): string | null {
+  if (!refreshedAt) return null;
+  const parsed = dayjs(refreshedAt);
+  return parsed.isValid() ? parsed.format('HH:mm:ss') : null;
+}
+
+export default function PulseHealth(): JSX.Element {
+  const shellTitle = 'Pulse · Participation Health';
+
+  const { data, loading, error, refresh } = useRequest<HealthSummary, []>(
+    fetchPulseHealth,
+  );
+
+  const lastUpdated = formatRefreshTime(data?.refreshedAt);
+
+  if (loading && !data) {
+    return (
+      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+        <PageContainer ghost>
+          <Skeleton active />
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+        <PageContainer ghost>
+          <Empty
+            description="Failed to load participation health"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Button
+              icon={<SyncOutlined />}
+              onClick={() => void refresh()}
+              type="primary"
+            >
+              Retry
+            </Button>
+          </Empty>
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  if (!data) {
+    return (
+      <EthikosPageShell title={shellTitle} sectionLabel="Pulse">
+        <PageContainer ghost>
+          <Empty description="No participation data available yet" />
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  const radarConfig = (data.radarConfig ?? {}) as PlotConfig;
+  const pieConfig = (data.pieConfig ?? {}) as PlotConfig;
+
+  const radarPoints = asRadarPoints(radarConfig.data);
+  const piePoints = asPiePoints(pieConfig.data);
+
+  const metricMap = new Map<string, number>();
+  for (const point of radarPoints) {
+    metricMap.set(point.metric, point.score);
+  }
+
+  const participation = metricMap.get('Participation') ?? 0;
+  const engagement = metricMap.get('Engagement') ?? 0;
+  const balance = metricMap.get('Balance') ?? 0;
+  const constructiveness = metricMap.get('Constructiveness') ?? 0;
+
+  const { status: healthStatus, label: healthLabel } = computeHealthStatus(
+    constructiveness,
+    engagement,
+  );
+
+  const totalSentiment = piePoints.reduce((sum, point) => sum + point.value, 0);
+
+  const sentimentDetails = piePoints.map((point) => {
+    const percent =
+      totalSentiment > 0 ? Math.round((point.value / totalSentiment) * 100) : 0;
+
+    return {
+      label: point.type,
+      count: point.value,
+      percent,
+    };
+  });
+
+  const hasRadarData = radarPoints.length > 0;
+  const hasPieData = piePoints.length > 0;
+
+  const secondaryActions = (
+    <Space>
+      <Badge status={healthStatus} text={healthLabel} />
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+              <ClockCircleOutlined />
+            </Tooltip>
+          }
+        />
+      )}
+      <Button
+        icon={<SyncOutlined />}
+        onClick={() => void refresh()}
+        size="small"
+        type="text"
+      />
+    </Space>
+  );
+
+  return (
+    <EthikosPageShell
+      title={shellTitle}
+      sectionLabel="Pulse"
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost>
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Participation',
+              value: participation,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  Share of users who have expressed a stance.
+                </Text>
+              ),
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Engagement',
+              value: engagement,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  Voting and reactions across recent debates.
+                </Text>
+              ),
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Balance',
+              value: balance,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  How evenly positions are distributed between positive and
+                  negative.
+                </Text>
+              ),
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+            statistic={{
+              title: 'Constructiveness',
+              value: constructiveness,
+              suffix: '%',
+              description: (
+                <Text type="secondary">
+                  Composite of participation and balance.
+                </Text>
+              ),
+            }}
+          />
+        </ProCard>
+
+        <ProCard gutter={[16, 16]} wrap>
+          <ProCard
+            colSpan={{ xs: 24, xl: 14 }}
+            title="Participation health radar"
+            extra={<Text type="secondary">Each axis normalised to 0–100.</Text>}
+          >
+            {hasRadarData ? (
+              <Radar {...(radarConfig as any)} />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No participation health data yet"
+              />
+            )}
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 10 }}
+            title="Ethics sentiment breakdown"
+            split="horizontal"
+          >
+            <ProCard ghost>
+              {hasPieData ? (
+                <Pie {...(pieConfig as any)} />
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No sentiment data yet"
+                />
+              )}
+            </ProCard>
+
+            <ProCard ghost>
+              {sentimentDetails.length ? (
+                <List
+                  size="small"
+                  dataSource={sentimentDetails}
+                  renderItem={(item) => (
+                    <List.Item key={item.label}>
+                      <Space>
+                        <Text strong>{item.label}</Text>
+                        <Text type="secondary">
+                          {item.count} stances ({item.percent}%)
+                        </Text>
+                      </Space>
+                    </List.Item>
+                  )}
+                />
+              ) : (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description="No sentiment breakdown available"
+                />
+              )}
+            </ProCard>
+          </ProCard>
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="pulse/live/page.tsx"
+id=7c01d8b908c0
+kind=source
+size=18060
+lines=632
+line_ref=1-632
+chunks=2
+chunk_refs=1-350,351-632
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=7c01d8b908c0:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/pulse/live/page.tsx
+'use client';
+
+import React from 'react';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Badge,
+  Button,
+  Empty,
+  List,
+  Space,
+  Switch,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import {
+  ThunderboltOutlined,
+  ClockCircleOutlined,
+  SyncOutlined,
+  FireOutlined,
+  MessageOutlined,
+  ProfileOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import ChartCard from '@/components/charts/ChartCard';
+import { get } from '@/services/_request';
+import {
+  fetchPulseLiveData,
+  type LiveCounter,
+  type PulseChartPoint,
+} from '@/services/pulse';
+import type { EthikosId, StanceValue, TopicStatus } from '@/services/ethikos';
+
+dayjs.extend(relativeTime);
+
+const { Text } = Typography;
+
+/* ------------------------------------------------------------------ */
+/*  Minimal API DTOs                                                   */
+/* ------------------------------------------------------------------ */
+
+type UnknownRecord = Record<string, unknown>;
+
+type ApiListResponse<T> = {
+  count?: number;
+  next?: string | null;
+  previous?: string | null;
+  results?: T[];
+  items?: T[];
+  data?: T[] | ApiListResponse<T>;
+};
+
+type ApiMaybeList<T> = T[] | ApiListResponse<T>;
+
+type EthikosTopicApi = {
+  id: EthikosId;
+  title: string;
+  status: TopicStatus;
+  created_at: string;
+  last_activity?: string | null;
+};
+
+type EthikosStanceApi = {
+  id: EthikosId;
+  topic: EthikosId;
+  value: StanceValue;
+  timestamp: string;
+};
+
+type EthikosArgumentApi = {
+  id: EthikosId;
+  topic: EthikosId;
+  user?: string | EthikosId | null;
+  user_display?: string | null;
+  content: string;
+  created_at: string;
+};
+
+type PulseLivePayload = {
+  counters: LiveCounter[];
+};
+
+type LoosePulseChartPoint = PulseChartPoint & {
+  ts?: string | number | Date;
+  date?: string | number | Date;
+  value?: string | number;
+  count?: string | number;
+};
+
+/* ------------------------------------------------------------------ */
+/*  Feed types                                                         */
+/* ------------------------------------------------------------------ */
+
+type FeedItem =
+  | {
+      id: string;
+      ts: string;
+      kind: 'topic';
+      topicId: EthikosId;
+      title: string;
+      summary: string;
+    }
+  | {
+      id: string;
+      ts: string;
+      kind: 'stance';
+      topicId: EthikosId;
+      title: string;
+      summary: string;
+      extra: { value: StanceValue };
+    }
+  | {
+      id: string;
+      ts: string;
+      kind: 'argument';
+      topicId: EthikosId;
+      title: string;
+      summary: string;
+    };
+
+/* ------------------------------------------------------------------ */
+/*  Helpers                                                            */
+/* ------------------------------------------------------------------ */
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function truncate(value: string, max = 100): string {
+  return value.length > max ? `${value.slice(0, max - 1)}…` : value;
+}
+
+function normalizeList<T>(raw: ApiMaybeList<T> | undefined | null): T[] {
+  if (!raw) {
+    return [];
+  }
+
+  if (Array.isArray(raw)) {
+    return raw;
+  }
+
+  if (Array.isArray(raw.results)) {
+    return raw.results;
+  }
+
+  if (Array.isArray(raw.items)) {
+    return raw.items;
+  }
+
+  if (Array.isArray(raw.data)) {
+    return raw.data;
+  }
+
+  if (raw.data && !Array.isArray(raw.data)) {
+    return normalizeList(raw.data);
+  }
+
+  return [];
+}
+
+function toMapKey(value: EthikosId): string {
+  return String(value);
+}
+
+function toDateValue(value?: string | null): number {
+  if (!value) {
+    return 0;
+  }
+
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.valueOf() : 0;
+}
+
+function formatAuthor(argument: EthikosArgumentApi): string {
+  if (argument.user_display) {
+    return argument.user_display;
+  }
+
+  if (typeof argument.user === 'string' && argument.user.trim().length > 0) {
+    return argument.user;
+  }
+
+  if (typeof argument.user === 'number') {
+    return `User #${argument.user}`;
+  }
+
+  return 'Someone';
+}
+
+function normalizeChartX(
+  value: string | number | Date | undefined,
+  fallback: number,
+): string | number {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  return fallback;
+}
+
+function normalizeChartY(value: string | number | undefined): number {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  return 0;
+}
+
+function normalizeCounterHistory(counter: LiveCounter): PulseChartPoint[] {
+  return (counter.history ?? []).map((point, index) => {
+    if (!isRecord(point)) {
+      return {
+        x: index,
+        y: 0,
+      };
+    }
+
+    const loosePoint = point as LoosePulseChartPoint;
+
+    return {
+      x: normalizeChartX(
+        loosePoint.x ?? loosePoint.ts ?? loosePoint.date,
+        index,
+      ),
+      y: normalizeChartY(loosePoint.y ?? loosePoint.value ?? loosePoint.count),
+    };
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/*  Local data loaders                                                 */
+/* ------------------------------------------------------------------ */
+
+async function fetchRecentActivity(): Promise<FeedItem[]> {
+  const [topicsRaw, stancesRaw, argsRaw] = await Promise.all([
+    get<ApiMaybeList<EthikosTopicApi>>('ethikos/topics/'),
+    get<ApiMaybeList<EthikosStanceApi>>('ethikos/stances/'),
+    get<ApiMaybeList<EthikosArgumentApi>>('ethikos/arguments/'),
+  ]);
+
+  const topics = normalizeList(topicsRaw);
+  const stances = normalizeList(stancesRaw);
+  const args = normalizeList(argsRaw);
+
+  const topicById = new Map<string, EthikosTopicApi>(
+    topics.map((topic) => [toMapKey(topic.id), topic]),
+  );
+
+  const topicItems: FeedItem[] = topics.map((topic) => ({
+    id: `topic-${topic.id}-${topic.created_at}`,
+    ts: topic.created_at,
+    kind: 'topic',
+    topicId: topic.id,
+    title: topic.title,
+    summary:
+      topic.status === 'open'
+        ? 'New debate created'
+        : `Debate status changed to ${topic.status}`,
+  }));
+
+  const stanceItems: FeedItem[] = stances.map((stance) => ({
+    id: `stance-${stance.id}`,
+    ts: stance.timestamp,
+    kind: 'stance',
+    topicId: stance.topic,
+    title:
+      topicById.get(toMapKey(stance.topic))?.title ??
+      `Topic #${String(stance.topic)}`,
+    summary: `New stance submitted: ${stance.value >= 0 ? '+' : ''}${
+      stance.value
+    }`,
+    extra: { value: stance.value },
+  }));
+
+  const argumentItems: FeedItem[] = args.map((argument) => ({
+    id: `arg-${argument.id}`,
+    ts: argument.created_at,
+    kind: 'argument',
+    topicId: argument.topic,
+    title:
+      topicById.get(toMapKey(argument.topic))?.title ??
+      `Topic #${String(argument.topic)}`,
+    summary: `${formatAuthor(argument)} commented: ${truncate(
+      argument.content,
+      120,
+    )}`,
+  }));
+
+  return [...topicItems, ...stanceItems, ...argumentItems]
+    .sort((a, b) => toDateValue(b.ts) - toDateValue(a.ts))
+    .slice(0, 20);
+}
+
+async function fetchOpenTopics(): Promise<EthikosTopicApi[]> {
+  const topicsRaw = await get<ApiMaybeList<EthikosTopicApi>>('ethikos/topics/');
+  const topics = normalizeList(topicsRaw);
+
+  return topics
+    .filter((topic) => topic.status === 'open')
+    .sort(
+      (a, b) =>
+        toDateValue(b.last_activity ?? b.created_at) -
+        toDateValue(a.last_activity ?? a.created_at),
+    );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Main component                                                     */
+/* ------------------------------------------------------------------ */
+
+export default function PulseLive(): JSX.Element {
+  const [autoRefresh, setAutoRefresh] = React.useState(true);
+  const [lastUpdated, setLastUpdated] = React.useState<string | null>(null);
+
+  const liveReq = useRequest<PulseLivePayload, []>(fetchPulseLiveData, {
+    pollingInterval: autoRefresh ? 20_000 : undefined,
+    onSuccess: () => setLastUpdated(dayjs().format('HH:mm:ss')),
+  });
+
+  const feedReq = useRequest<FeedItem[], []>(fetchRecentActivity, {
+    pollingInterval: autoRefresh ? 20_000 : undefined,
+  });
+
+  const openReq = useRequest<EthikosTopicApi[], []>(fetchOpenTopics, {
+    pollingInterval: autoRefresh ? 30_000 : undefined,
+  });
+
+  const refreshAll = React.useCallback(() => {
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=7c01d8b908c0:351-632
+start=351
+end=632
+----
+    void liveReq.refresh();
+    void feedReq.refresh();
+    void openReq.refresh();
+  }, [feedReq, liveReq, openReq]);
+
+  const counters = liveReq.data?.counters ?? [];
+
+  const openColumns = React.useMemo<ProColumns<EthikosTopicApi>[]>(() => {
+    return [
+      {
+        title: 'Debate',
+        dataIndex: 'title',
+        ellipsis: true,
+        render: (_dom, row) => (
+          <Space size="small">
+            <FireOutlined />
+            <a href={`/ethikos/deliberate/${row.id}`}>{row.title}</a>
+          </Space>
+        ),
+      },
+      {
+        title: 'Status',
+        dataIndex: 'status',
+        width: 120,
+        render: (_dom, row) =>
+          row.status === 'open' ? (
+            <Tag color="green">Open</Tag>
+          ) : (
+            <Tag>{row.status}</Tag>
+          ),
+      },
+      {
+        title: 'Last activity',
+        dataIndex: 'last_activity',
+        width: 180,
+        render: (_dom, row) => {
+          const value = row.last_activity ?? row.created_at;
+
+          return (
+            <Tooltip title={dayjs(value).format('YYYY-MM-DD HH:mm')}>
+              {dayjs(value).fromNow()}
+            </Tooltip>
+          );
+        },
+      },
+      {
+        title: 'Created',
+        dataIndex: 'created_at',
+        width: 160,
+        render: (_dom, row) => (
+          <Tooltip title={dayjs(row.created_at).format('YYYY-MM-DD HH:mm')}>
+            {dayjs(row.created_at).fromNow()}
+          </Tooltip>
+        ),
+      },
+    ];
+  }, []);
+
+  const secondaryActions = (
+    <Space wrap>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+
+      <Space size="small" align="center">
+        <ThunderboltOutlined />
+        <Text>Auto-refresh</Text>
+        <Switch
+          checked={autoRefresh}
+          onChange={(checked) => setAutoRefresh(checked)}
+          size="small"
+        />
+      </Space>
+
+      <Button
+        icon={<SyncOutlined />}
+        onClick={refreshAll}
+        size="small"
+        loading={liveReq.loading || feedReq.loading || openReq.loading}
+      >
+        Refresh
+      </Button>
+    </Space>
+  );
+
+  const primaryAction = (
+    <Button href="/ethikos/pulse/trends" type="primary">
+      View opinion trends
+    </Button>
+  );
+
+  return (
+    <EthikosPageShell
+      title="Pulse · Live participation"
+      sectionLabel="Pulse"
+      subtitle="Real-time counters, latest activity, and currently open debates."
+      primaryAction={primaryAction}
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost loading={liveReq.loading && counters.length === 0}>
+        <Alert
+          type="info"
+          showIcon
+          style={{ marginBottom: 16 }}
+          message="Live view"
+          description="This page auto-refreshes every 20 seconds while enabled. Use manual Refresh if needed."
+        />
+
+        {liveReq.error && (
+          <Alert
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="Unable to load live Pulse counters."
+            description="The live Pulse service may be temporarily unavailable. Try refreshing the page."
+          />
+        )}
+
+        <ProCard gutter={16} wrap>
+          {counters.length === 0 && !liveReq.loading ? (
+            <ProCard>
+              <Empty description="No live counters available yet" />
+            </ProCard>
+          ) : (
+            counters.map((counter) => {
+              const trend = counter.trend ?? 0;
+              const chartData = normalizeCounterHistory(counter);
+
+              return (
+                <StatisticCard
+                  key={counter.label}
+                  colSpan={{ xs: 24, sm: 12, md: 12, lg: 6 }}
+                  statistic={{
+                    title: (
+                      <Space>
+                        {counter.label}
+                        <Badge
+                          status={
+                            trend > 0
+                              ? 'success'
+                              : trend < 0
+                                ? 'error'
+                                : 'default'
+                          }
+                        />
+                      </Space>
+                    ),
+                    value: counter.value,
+                    precision: 0,
+                  }}
+                  chart={
+                    <ChartCard type="line" height={50} data={chartData} />
+                  }
+                />
+              );
+            })
+          )}
+        </ProCard>
+
+        <ProCard gutter={[16, 16]} wrap style={{ marginTop: 16 }}>
+          <ProCard
+            colSpan={{ xs: 24, xl: 16 }}
+            title={
+              <Space>
+                <MessageOutlined />
+                <span>Live activity</span>
+              </Space>
+            }
+            extra={
+              <Text type="secondary">
+                Latest 20 items across debates, stances, and comments
+              </Text>
+            }
+            loading={feedReq.loading && !feedReq.data}
+          >
+            {feedReq.error && (
+              <Alert
+                type="error"
+                showIcon
+                style={{ marginBottom: 16 }}
+                message="Unable to load recent activity."
+              />
+            )}
+
+            {feedReq.data && feedReq.data.length === 0 ? (
+              <Empty description="No recent activity yet" />
+            ) : (
+              <List
+                itemLayout="horizontal"
+                dataSource={feedReq.data ?? []}
+                renderItem={(item) => (
+                  <List.Item key={item.id}>
+                    <List.Item.Meta
+                      avatar={
+                        item.kind === 'topic' ? (
+                          <ProfileOutlined />
+                        ) : item.kind === 'stance' ? (
+                          <Tag color={item.extra.value >= 0 ? 'green' : 'red'}>
+                            {item.extra.value >= 0 ? '+' : ''}
+                            {item.extra.value}
+                          </Tag>
+                        ) : (
+                          <MessageOutlined />
+                        )
+                      }
+                      title={
+                        <Space size="small" wrap>
+                          <a href={`/ethikos/deliberate/${item.topicId}`}>
+                            {item.title}
+                          </a>
+                          <Tag
+                            color={
+                              item.kind === 'topic'
+                                ? 'blue'
+                                : item.kind === 'stance'
+                                  ? 'purple'
+                                  : 'cyan'
+                            }
+                          >
+                            {item.kind}
+                          </Tag>
+                        </Space>
+                      }
+                      description={
+                        <Space size="small" wrap>
+                          <span>{item.summary}</span>
+                          <Text type="secondary">
+                            · {dayjs(item.ts).fromNow()}
+                          </Text>
+                        </Space>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+            )}
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <FireOutlined />
+                <span>Open debates</span>
+              </Space>
+            }
+            loading={openReq.loading && !openReq.data}
+          >
+            {openReq.error && (
+              <Alert
+                type="error"
+                showIcon
+                style={{ marginBottom: 16 }}
+                message="Unable to load open debates."
+              />
+            )}
+
+            {openReq.data && openReq.data.length === 0 ? (
+              <Empty description="No open debates at the moment" />
+            ) : (
+              <ProTable<EthikosTopicApi>
+                rowKey={(row) => String(row.id)}
+                columns={openColumns}
+                dataSource={openReq.data ?? []}
+                pagination={{ pageSize: 6 }}
+                search={false}
+                size="small"
+                toolBarRender={false}
+              />
+            )}
+          </ProCard>
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="pulse/overview/page.tsx"
+id=36db50376bc5
+kind=source
+size=7899
+lines=281
+line_ref=1-281
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/pulse/overview/page.tsx
+'use client';
+
+import type { ReactNode } from 'react';
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Badge,
+  Button,
+  Empty,
+  List,
+  Skeleton,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import {
+  BarChartOutlined,
+  ClockCircleOutlined,
+  InfoCircleOutlined,
+  LineChartOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import ChartCard from '@/components/charts/ChartCard';
+import { fetchPulseOverview } from '@/services/pulse';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+
+const { Text } = Typography;
+
+type OverviewData = Awaited<ReturnType<typeof fetchPulseOverview>>;
+
+type KpiMeta = {
+  description: string;
+  color: string;
+};
+
+const KPI_DEFINITIONS: Record<string, KpiMeta> = {
+  topics: {
+    description: 'New debate topics created across Ethikos over the last 30 days.',
+    color: 'blue',
+  },
+  stances: {
+    description:
+      'Individual stance submissions linked to debates in the last 30 days.',
+    color: 'green',
+  },
+  arguments: {
+    description:
+      'Arguments, comments, and replies added to debates over the last 30 days.',
+    color: 'purple',
+  },
+  votes: {
+    description:
+      'Weighted votes cast across topics and outcomes in the last 30 days.',
+    color: 'volcano',
+  },
+};
+
+function usePulseOverview() {
+  return useRequest<OverviewData, []>(fetchPulseOverview, {
+    refreshDeps: [],
+  });
+}
+
+function renderDelta(delta?: number): ReactNode {
+  if (typeof delta !== 'number') {
+    return null;
+  }
+
+  const positive = delta >= 0;
+
+  return (
+    <span
+      style={{
+        color: positive ? '#3f8600' : '#cf1322',
+      }}
+    >
+      {positive ? '▲' : '▼'} {Math.abs(delta)}%
+    </span>
+  );
+}
+
+export default function PulseOverview() {
+  const { data, loading, error, refresh } = usePulseOverview();
+  const lastUpdated = data?.refreshedAt
+    ? dayjs(data.refreshedAt).format('HH:mm:ss')
+    : null;
+
+  const secondaryActions = (
+    <Space>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+      <Button
+        aria-label="Refresh pulse overview"
+        disabled={loading}
+        icon={<SyncOutlined spin={loading} />}
+        onClick={() => void refresh()}
+        size="small"
+        type="text"
+      />
+    </Space>
+  );
+
+  let body: ReactNode;
+
+  if (loading && !data) {
+    body = (
+      <PageContainer ghost>
+        <Skeleton active />
+      </PageContainer>
+    );
+  } else if (error) {
+    body = (
+      <PageContainer ghost>
+        <Empty
+          description="Failed to load metrics"
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+        >
+          <Button icon={<SyncOutlined />} onClick={() => void refresh()}>
+            Retry
+          </Button>
+        </Empty>
+      </PageContainer>
+    );
+  } else if (data && data.kpis.length === 0) {
+    body = (
+      <PageContainer ghost>
+        <Empty description="No KPI data yet" />
+      </PageContainer>
+    );
+  } else if (data) {
+    body = (
+      <PageContainer ghost>
+        <Alert
+          description="Debates, stances, arguments, and votes aggregated daily across all Ethikos topics. Use this view as a quick pulse before drilling into trends or live participation."
+          message="Aggregated participation metrics (last 30 days)"
+          showIcon
+          style={{ marginBottom: 16 }}
+          type="info"
+        />
+
+        <ProCard gutter={16} wrap>
+          <ProCard colSpan={{ xs: 24, xl: 16 }} ghost>
+            <ProCard gutter={[16, 16]} wrap>
+              {data.kpis.map((kpi) => (
+                <StatisticCard
+                  key={kpi.key ?? kpi.label}
+                  colSpan={{
+                    xs: 24,
+                    sm: 12,
+                    md: 12,
+                    lg: 6,
+                  }}
+                  statistic={{
+                    title: kpi.label,
+                    value: kpi.value,
+                    suffix: kpi.delta !== undefined ? '%' : undefined,
+                    description: renderDelta(kpi.delta),
+                  }}
+                  chart={
+                    <ChartCard
+                      type="area"
+                      height={60}
+                      data={kpi.history.map((point) => ({
+                        x: point.date,
+                        y: point.value,
+                      }))}
+                      tooltip={{
+                        formatter: (datum: { x: string; y: number }) =>
+                          `${dayjs(datum.x).format('MMM D')}: ${datum.y}`,
+                      }}
+                    />
+                  }
+                />
+              ))}
+            </ProCard>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <InfoCircleOutlined />
+                <span>How to read these KPIs</span>
+              </Space>
+            }
+          >
+            <List
+              dataSource={data.kpis}
+              renderItem={(kpi) => {
+                const meta = KPI_DEFINITIONS[kpi.key] ?? {
+                  description: 'Activity metric in the Ethikos opinion layer.',
+                  color: 'default',
+                };
+
+                return (
+                  <List.Item key={kpi.key}>
+                    <List.Item.Meta
+                      title={
+                        <Space size="small">
+                          <Tag color={meta.color}>{kpi.label}</Tag>
+                          {typeof kpi.delta === 'number' && (
+                            <Text type={kpi.delta >= 0 ? 'success' : 'danger'}>
+                              {kpi.delta >= 0 ? `+${kpi.delta}%` : `${kpi.delta}%`}
+                            </Text>
+                          )}
+                        </Space>
+                      }
+                      description={<Text type="secondary">{meta.description}</Text>}
+                    />
+                  </List.Item>
+                );
+              }}
+              size="small"
+            />
+          </ProCard>
+        </ProCard>
+
+        <ProCard
+          ghost
+          style={{ marginTop: 16 }}
+          title={
+            <Space>
+              <LineChartOutlined />
+              <span>Where to go next</span>
+            </Space>
+          }
+        >
+          <Space wrap>
+            <Button href="/ethikos/pulse/live">Live participation</Button>
+            <Button href="/ethikos/pulse/trends">Opinion trends</Button>
+            <Button href="/ethikos/pulse/health">Participation health</Button>
+            <Button href="/ethikos/insights" icon={<BarChartOutlined />}>
+              Full analytics
+            </Button>
+          </Space>
+        </ProCard>
+      </PageContainer>
+    );
+  } else {
+    body = (
+      <PageContainer ghost>
+        <Empty description="No data available" />
+      </PageContainer>
+    );
+  }
+
+  return (
+    <EthikosPageShell
+      title="Pulse · Overview"
+      subtitle="30-day snapshot of debates, stances, arguments, and votes across Ethikos."
+      primaryAction={
+        <Button
+          type="primary"
+          href="/ethikos/insights"
+          icon={<BarChartOutlined />}
+        >
+          Open opinion analytics
+        </Button>
+      }
+      secondaryActions={secondaryActions}
+    >
+      {body}
+    </EthikosPageShell>
+  );
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="pulse/trends/page.tsx"
+id=26169c11ae19
+kind=source
+size=12706
+lines=441
+line_ref=1-441
+chunks=2
+chunk_refs=1-350,351-441
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=26169c11ae19:1-350
+start=1
+end=350
+----
+'use client';
+
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { PageContainer, ProCard } from '@ant-design/pro-components';
+import {
+  App,
+  Tabs,
+  Space,
+  Segmented,
+  Tooltip,
+  Badge,
+  Empty,
+  Skeleton,
+  Button,
+  Typography,
+  Switch,
+} from 'antd';
+import type { TabsProps } from 'antd';
+import { Line, Area, Heatmap } from '@ant-design/plots';
+import {
+  AreaChartOutlined,
+  BarChartOutlined,
+  HeatMapOutlined,
+  SyncOutlined,
+  ClockCircleOutlined,
+  DownloadOutlined,
+  BarChartOutlined as InsightsIcon,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { fetchPulseTrends } from '@/services/pulse';
+
+type TimeRangeKey = '7d' | '30d' | '60d';
+
+type TrendDatum = {
+  date?: string;
+  x?: string | number | Date;
+  ts?: string | number | Date;
+  value?: number;
+  period?: string;
+  [key: string]: unknown;
+};
+
+type TrendChartConfig = {
+  data?: TrendDatum[];
+  xField?: string;
+  yField?: string;
+  xAxis?: Record<string, unknown>;
+  tooltip?: Record<string, unknown>;
+  [key: string]: unknown;
+};
+
+type PulseChart = {
+  key: string;
+  type: 'line' | 'area' | 'heatmap' | string;
+  title: string;
+  config?: TrendChartConfig;
+};
+
+const { Text } = Typography;
+
+const RANGE_OPTIONS: { label: string; value: TimeRangeKey }[] = [
+  { label: '7d', value: '7d' },
+  { label: '30d', value: '30d' },
+  { label: '60d', value: '60d' },
+];
+
+function getDaysForRange(range: TimeRangeKey): number {
+  switch (range) {
+    case '7d':
+      return 7;
+    case '30d':
+      return 30;
+    case '60d':
+    default:
+      return 60;
+  }
+}
+
+function getDatumDate(row: TrendDatum): string | number | Date | undefined {
+  return row.date ?? row.x ?? row.ts;
+}
+
+function toDayTimestamp(value: string | number | Date | undefined): number | null {
+  if (!value) return null;
+  const d = dayjs(value);
+  if (!d.isValid()) return null;
+  return d.startOf('day').valueOf();
+}
+
+function formatDay(value: string | number | Date | undefined, fallback = '—'): string {
+  if (!value) return fallback;
+  const d = dayjs(value);
+  return d.isValid() ? d.format('MMM D') : fallback;
+}
+
+function formatIsoDay(value: string | number | Date | undefined, fallback = ''): string {
+  if (!value) return fallback;
+  const d = dayjs(value);
+  return d.isValid() ? d.format('YYYY-MM-DD') : fallback;
+}
+
+function filterSeriesByDays(data: TrendDatum[], days: number): TrendDatum[] {
+  if (!Array.isArray(data) || data.length === 0) return data;
+
+  const now = dayjs();
+  const startTs = now.startOf('day').subtract(days - 1, 'day').valueOf();
+  const endTs = now.endOf('day').valueOf();
+
+  return data.filter((row) => {
+    const ts = toDayTimestamp(getDatumDate(row));
+    if (ts === null) return true;
+    return ts >= startTs && ts <= endTs;
+  });
+}
+
+function buildComparisonDataset(baseData: TrendDatum[], days: number): TrendDatum[] {
+  const now = dayjs().endOf('day');
+  const startCurrent = now.startOf('day').subtract(days - 1, 'day');
+  const startPrev = startCurrent.subtract(days, 'day');
+  const endPrev = startCurrent.subtract(1, 'day').endOf('day');
+
+  const current = baseData
+    .filter((row) => {
+      const ts = toDayTimestamp(getDatumDate(row));
+      return ts !== null && ts >= startCurrent.valueOf() && ts <= now.valueOf();
+    })
+    .map((row) => ({
+      ...row,
+      date: formatIsoDay(getDatumDate(row)),
+      period: 'This period',
+    }));
+
+  const prev = baseData
+    .filter((row) => {
+      const ts = toDayTimestamp(getDatumDate(row));
+      return ts !== null && ts >= startPrev.valueOf() && ts <= endPrev.valueOf();
+    })
+    .map((row) => {
+      const raw = getDatumDate(row);
+      const d = dayjs(raw).startOf('day');
+      const dayIndex = d.diff(startPrev, 'day');
+      const alignedDate = startCurrent.add(dayIndex, 'day').format('YYYY-MM-DD');
+
+      return {
+        ...row,
+        date: alignedDate,
+        period: 'Previous period',
+      };
+    });
+
+  return [...prev, ...current];
+}
+
+function csvEncodeCell(value: unknown): string {
+  const str = value === null || value === undefined ? '' : String(value);
+  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+}
+
+function getChartIcon(type: PulseChart['type']): React.ReactNode {
+  if (type === 'heatmap') return <HeatMapOutlined />;
+  if (type === 'area') return <BarChartOutlined />;
+  return <AreaChartOutlined />;
+}
+
+export default function PulseTrends(): JSX.Element {
+  const { message } = App.useApp();
+
+  const [range, setRange] = useState<TimeRangeKey>('30d');
+  const [smoothLines, setSmoothLines] = useState(true);
+  const [comparePrev, setComparePrev] = useState(false);
+  const [activeKey, setActiveKey] = useState<string>();
+
+  const { data, loading, error, refresh } = useRequest<
+    Awaited<ReturnType<typeof fetchPulseTrends>>,
+    []
+  >(fetchPulseTrends);
+
+  const charts = useMemo<PulseChart[]>(
+    () => ((data?.charts ?? []) as PulseChart[]),
+    [data],
+  );
+
+  useEffect(() => {
+    if (!charts.length) {
+      setActiveKey(undefined);
+      return;
+    }
+
+    setActiveKey((current) => {
+      if (current && charts.some((chart) => chart.key === current)) {
+        return current;
+      }
+      return charts[0]?.key;
+    });
+  }, [charts]);
+
+  const enhancedConfigs = useMemo(() => {
+    return charts.map((chart) => {
+      if (chart.type === 'heatmap') {
+        return {
+          ...(chart.config ?? {}),
+        };
+      }
+
+      const baseData = Array.isArray(chart.config?.data) ? chart.config.data : [];
+      const days = getDaysForRange(range);
+      const seriesData = comparePrev
+        ? buildComparisonDataset(baseData, days)
+        : filterSeriesByDays(baseData, days);
+
+      const cfg: TrendChartConfig = {
+        ...(chart.config ?? {}),
+        data: seriesData,
+        smooth: smoothLines,
+        xField: chart.config?.xField ?? 'date',
+        yField: chart.config?.yField ?? 'value',
+        appendPadding: [8, 8, 8, 8],
+        tooltip: {
+          ...(chart.config?.tooltip ?? {}),
+          formatter: (datum: TrendDatum) => ({
+            name: datum.period ?? 'value',
+            value: datum.value,
+            title: formatDay(getDatumDate(datum)),
+          }),
+        },
+        xAxis: {
+          ...(chart.config?.xAxis ?? {}),
+          label: {
+            ...((chart.config?.xAxis as Record<string, unknown>)?.label as Record<
+              string,
+              unknown
+            >),
+            autoHide: true,
+          },
+        },
+      };
+
+      if (comparePrev) {
+        cfg.seriesField = 'period';
+        if (chart.type === 'area') {
+          cfg.isStack = false;
+        }
+      }
+
+      return cfg;
+    });
+  }, [charts, range, smoothLines, comparePrev]);
+
+  const lastUpdatedLabel = useMemo(() => {
+    for (let i = charts.length - 1; i >= 0; i -= 1) {
+      const chart = charts[i];
+      if (!chart || chart.type === 'heatmap') continue;
+
+      const series = Array.isArray(chart.config?.data) ? chart.config.data : [];
+      const last = series.at(-1);
+      const lastDate = last ? getDatumDate(last) : undefined;
+
+      if (lastDate) {
+        return formatDay(lastDate);
+      }
+    }
+
+    return null;
+  }, [charts]);
+
+  const exportCurrentChartCsv = useCallback(() => {
+    if (!charts.length || !activeKey) {
+      message.info('Nothing to export.');
+      return;
+    }
+
+    const idx = charts.findIndex((chart) => chart.key === activeKey);
+    if (idx < 0) {
+      message.info('Nothing to export.');
+      return;
+    }
+
+    const chart = charts[idx];
+    const cfg = enhancedConfigs[idx];
+
+    if (!chart || !cfg) {
+      message.info('Nothing to export.');
+      return;
+    }
+
+    if (chart.type === 'heatmap') {
+      message.warning('Heatmap export is not supported.');
+      return;
+    }
+
+    const rows = (Array.isArray(cfg.data) ? cfg.data : []) as TrendDatum[];
+
+    const header = comparePrev ? ['date', 'value', 'period'] : ['date', 'value'];
+
+    const csv = [
+      header,
+      ...rows.map((row) =>
+        comparePrev
+          ? [
+              formatIsoDay(getDatumDate(row)),
+              row.value ?? '',
+              row.period ?? 'This period',
+            ]
+          : [formatIsoDay(getDatumDate(row)), row.value ?? ''],
+      ),
+    ]
+      .map((row) => row.map(csvEncodeCell).join(','))
+      .join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+    link.href = url;
+    link.download = `${chart.key}-${range}-${comparePrev ? 'compare' : 'single'}-${timestamp}.csv`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    message.success('Exported current chart as CSV.');
+  }, [activeKey, charts, comparePrev, enhancedConfigs, message, range]);
+
+  const shellProps = useMemo(
+    () => ({
+      title: 'Pulse · Trends',
+      sectionLabel: 'Pulse',
+      subtitle:
+        'Topic creation, stances, and deliberation activity over time. Filter by range, smooth lines, and optionally overlay the previous period.',
+      primaryAction: (
+        <Button type="primary" href="/ethikos/insights" icon={<InsightsIcon />}>
+          Open opinion analytics
+        </Button>
+      ),
+    }),
+    [],
+  );
+
+  const secondaryActions = useMemo(
+    () => (
+      <Space wrap>
+        <Segmented
+          size="small"
+          value={range}
+          onChange={(value) => setRange(value as TimeRangeKey)}
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=26169c11ae19:351-441
+start=351
+end=441
+----
+          options={RANGE_OPTIONS}
+        />
+        <Tooltip title="Smooth lines">
+          <Switch size="small" checked={smoothLines} onChange={setSmoothLines} />
+        </Tooltip>
+        <Tooltip title="Compare with previous period">
+          <Switch size="small" checked={comparePrev} onChange={setComparePrev} />
+        </Tooltip>
+        <Tooltip title="Last data point in the underlying series">
+          <Badge
+            count={
+              <Space size={4}>
+                <ClockCircleOutlined style={{ color: '#52c41a' }} />
+                <Text type="secondary">{lastUpdatedLabel ?? '—'}</Text>
+              </Space>
+            }
+            style={{ backgroundColor: '#f0f0f0' }}
+          />
+        </Tooltip>
+        <Button icon={<DownloadOutlined />} size="small" onClick={exportCurrentChartCsv}>
+          Export CSV
+        </Button>
+        <Button icon={<SyncOutlined />} size="small" onClick={refresh} />
+      </Space>
+    ),
+    [comparePrev, exportCurrentChartCsv, lastUpdatedLabel, range, refresh, smoothLines],
+  );
+
+  const tabItems = useMemo<TabsProps['items']>(
+    () =>
+      charts.map((chart, idx) => {
+        const cfg = enhancedConfigs[idx] ?? {};
+
+        return {
+          key: chart.key,
+          label: (
+            <Space size="small">
+              {getChartIcon(chart.type)}
+              <span>{chart.title}</span>
+            </Space>
+          ),
+          children: (
+            <ProCard ghost>
+              {chart.type === 'line' && <Line {...cfg} />}
+              {chart.type === 'area' && <Area {...cfg} />}
+              {chart.type === 'heatmap' && <Heatmap {...cfg} />}
+            </ProCard>
+          ),
+        };
+      }),
+    [charts, enhancedConfigs],
+  );
+
+  let body: React.ReactNode;
+
+  if (loading && !data) {
+    body = (
+      <PageContainer ghost>
+        <Skeleton active />
+      </PageContainer>
+    );
+  } else if (error) {
+    body = (
+      <PageContainer ghost>
+        <Empty description="Failed to load trend data">
+          <Button icon={<SyncOutlined />} onClick={refresh} type="primary">
+            Retry
+          </Button>
+        </Empty>
+      </PageContainer>
+    );
+  } else if (!charts.length) {
+    body = (
+      <PageContainer ghost>
+        <Empty description="No trend data available yet" />
+      </PageContainer>
+    );
+  } else {
+    body = (
+      <PageContainer ghost>
+        <Tabs items={tabItems} activeKey={activeKey} onChange={setActiveKey} />
+      </PageContainer>
+    );
+  }
+
+  return (
+    <EthikosPageShell {...shellProps} secondaryActions={secondaryActions}>
+      {body}
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----

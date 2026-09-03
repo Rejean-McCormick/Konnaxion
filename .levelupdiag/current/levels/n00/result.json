@@ -1,0 +1,79 @@
+{
+  "schema": "levelupdiag.report.v2",
+  "level": "N00",
+  "level_id": "N00",
+  "name": "Control & Discovery",
+  "level_name": "Control & Discovery",
+  "verdict": "PASS",
+  "findings": [
+    {
+      "id": "kx.discovery.target",
+      "severity": "PASS",
+      "message": "Konnaxion target found: C:\\mycode\\Konnaxion\\Konnaxion",
+      "category": "discovery",
+      "path": "C:\\mycode\\Konnaxion\\Konnaxion"
+    },
+    {
+      "id": "kx.discovery.frontend",
+      "severity": "PASS",
+      "message": "frontend directory found.",
+      "category": "discovery",
+      "path": "C:\\mycode\\Konnaxion\\Konnaxion\\frontend"
+    },
+    {
+      "id": "kx.discovery.backend",
+      "severity": "PASS",
+      "message": "backend directory found.",
+      "category": "discovery",
+      "path": "C:\\mycode\\Konnaxion\\Konnaxion\\backend"
+    },
+    {
+      "id": "kx.tool.git",
+      "severity": "PASS",
+      "message": "git available.",
+      "category": "toolchain",
+      "path": "C:\\Program Files\\Git\\cmd\\git.exe"
+    },
+    {
+      "id": "kx.tool.node",
+      "severity": "PASS",
+      "message": "node available.",
+      "category": "toolchain",
+      "path": "C:\\Program Files\\Volta\\node.exe"
+    },
+    {
+      "id": "kx.tool.pnpm",
+      "severity": "PASS",
+      "message": "pnpm available.",
+      "category": "toolchain",
+      "path": "C:\\Program Files\\Volta\\pnpm.exe"
+    },
+    {
+      "id": "kx.tool.python",
+      "severity": "PASS",
+      "message": "Python available: C:\\Users\\rejea\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "category": "toolchain",
+      "path": "C:\\Users\\rejea\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe",
+      "evidence": "3.14.3"
+    },
+    {
+      "id": "kx.discovery.capsule-manager",
+      "severity": "PASS",
+      "message": "Capsule Manager repository is configured and present.",
+      "category": "discovery",
+      "path": "C:\\mycode\\Konnaxion\\Konnaxion_Capsule_Manager"
+    }
+  ],
+  "artifacts": [],
+  "started_at": "2026-09-03T12:26:22-04:00",
+  "ended_at": "2026-09-03T12:26:23-04:00",
+  "duration_seconds": 0.117444,
+  "cwd": "C:\\mycode\\Konnaxion\\Konnaxion",
+  "output_tail": "",
+  "metadata": {
+    "diagnostic_session_id": "kxdiag-20260903_122622-225fb4ee",
+    "cwd": "C:\\mycode\\Konnaxion\\Konnaxion",
+    "python": "3.14.3",
+    "platform": "Windows-11-10.0.26200-SP0"
+  }
+}

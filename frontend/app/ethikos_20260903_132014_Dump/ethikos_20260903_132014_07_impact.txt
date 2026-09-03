@@ -1,0 +1,1246 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.835239
+title: FOLDER: impact
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 3
+total_size_mb: 0.0329
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_132014_06_trust.txt
+next_volume: ethikos_20260903_132014_99_OTHERS.txt
+prev_title: trust
+next_title: Others
+short_title: impact
+
+==== FILE_INDEX ====
+ENTRY id=cc073e5776d6 path="impact/feedback/page.tsx" kind=source size=7856 lines=259 line_ref=1-259 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=63c4e2c8b48a path="impact/outcomes/page.tsx" kind=source size=9655 lines=312 line_ref=1-312 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=1936834acf82 path="impact/tracker/page.tsx" kind=source size=16947 lines=604 line_ref=1-604 chunks=2 chunk_refs=1-350,351-604 symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="impact/feedback/page.tsx"
+id=cc073e5776d6
+kind=source
+size=7856
+lines=259
+line_ref=1-259
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+'use client';
+
+import React, { useCallback, useMemo } from 'react';
+import { useRequest } from 'ahooks';
+import {
+  PageContainer,
+  ProCard,
+  ProForm,
+  ProFormTextArea,
+} from '@ant-design/pro-components';
+import {
+  App,
+  Divider,
+  Empty,
+  Form,
+  List,
+  Rate,
+  Space,
+  Tag,
+  Typography,
+} from 'antd';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import usePageTitle from '@/hooks/usePageTitle';
+import {
+  fetchFeedback,
+  submitFeedback,
+  type FeedbackItem,
+} from '@/services/impact';
+
+const { Paragraph, Text } = Typography;
+
+type FeedbackResponse = {
+  items: FeedbackItem[];
+};
+
+type FeedbackFormValues = {
+  body: string;
+  rating?: number;
+};
+
+function toFriendlyErrorMessage(error: unknown): string {
+  const rawMessage =
+    error instanceof Error
+      ? error.message
+      : 'Unable to submit feedback. Please try again.';
+
+  if (
+    typeof rawMessage === 'string' &&
+    rawMessage.includes('NEXT_PUBLIC_ETHIKOS_FEEDBACK_TOPIC_ID')
+  ) {
+    return 'The feedback channel is not configured yet. Please contact an administrator.';
+  }
+
+  return rawMessage;
+}
+
+export default function FeedbackLoops(): JSX.Element {
+  usePageTitle('Impact · Feedback');
+
+  const { message } = App.useApp();
+  const [form] = Form.useForm<FeedbackFormValues>();
+
+  const {
+    data,
+    loading,
+    refresh,
+  } = useRequest<FeedbackResponse, []>(fetchFeedback);
+
+  const items = data?.items ?? [];
+
+  const averageRating = useMemo(() => {
+    const ratings = items
+      .map((item) => item.rating)
+      .filter(
+        (rating): rating is number =>
+          typeof rating === 'number' && !Number.isNaN(rating),
+      );
+
+    if (!ratings.length) return undefined;
+
+    const total = ratings.reduce((sum, rating) => sum + rating, 0);
+    return Number((total / ratings.length).toFixed(1));
+  }, [items]);
+
+  const feedbackExtra = useMemo(() => {
+    if (!items.length) return null;
+
+    return (
+      <Space size="middle">
+        <Tag>{items.length} entries</Tag>
+
+        {typeof averageRating === 'number' && (
+          <Space size={4}>
+            <Text type="secondary">Avg. rating</Text>
+            <Rate disabled allowHalf value={averageRating} />
+            <Text type="secondary">{averageRating.toFixed(1)}/5</Text>
+          </Space>
+        )}
+      </Space>
+    );
+  }, [averageRating, items.length]);
+
+  const handleFinish = useCallback(
+    async (values: FeedbackFormValues): Promise<boolean> => {
+      const trimmed = values.body?.trim();
+
+      if (!trimmed) {
+        message.warning('Please enter your feedback before submitting.');
+        return false;
+      }
+
+      try {
+        await submitFeedback({
+          body: trimmed,
+          rating: values.rating || undefined,
+        });
+
+        form.resetFields();
+        await refresh();
+        message.success('Thanks, your feedback has been recorded.');
+        return true;
+      } catch (error) {
+        message.error(toFriendlyErrorMessage(error));
+        return false;
+      }
+    },
+    [form, message, refresh],
+  );
+
+  return (
+    <EthikosPageShell
+      title="Feedback loop"
+      sectionLabel="Impact"
+      subtitle="Share how Ethikos works (or doesn’t) for you. Feedback is stored as anonymised arguments on a dedicated topic."
+    >
+      <PageContainer ghost loading={loading}>
+        <ProCard title="Share your feedback" ghost>
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+              This channel closes the feedback loop for the Ethikos module. Tell
+              us what worked, what felt confusing, or what is missing. Please
+              avoid sharing personal or sensitive data.
+            </Paragraph>
+
+            <ProForm<FeedbackFormValues>
+              form={form}
+              layout="vertical"
+              onFinish={handleFinish}
+              submitter={{
+                searchConfig: {
+                  submitText: 'Submit feedback',
+                },
+                render: (_props, dom) => (
+                  <Space
+                    style={{
+                      width: '100%',
+                      justifyContent: 'space-between',
+                    }}
+                  >
+                    <Text type="secondary">
+                      Feedback becomes an anonymised argument in a dedicated
+                      Ethikos topic.
+                    </Text>
+                    <Space>{dom}</Space>
+                  </Space>
+                ),
+              }}
+            >
+              <Form.Item
+                label="Overall experience"
+                name="rating"
+                valuePropName="value"
+              >
+                <Rate />
+              </Form.Item>
+
+              <ProFormTextArea
+                name="body"
+                label="Your feedback"
+                placeholder="Share a concrete story, suggestion or pain point…"
+                fieldProps={{ rows: 4, maxLength: 2000, showCount: true }}
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please enter your feedback.',
+                  },
+                  {
+                    validator: async (_: unknown, value: string | undefined) => {
+                      if (!value || value.trim().length > 0) return;
+                      throw new Error(
+                        'Please enter your feedback.',
+                      );
+                    },
+                  },
+                ]}
+              />
+            </ProForm>
+          </Space>
+        </ProCard>
+
+        <ProCard
+          title="Community feedback"
+          ghost
+          style={{ marginTop: 24 }}
+          extra={feedbackExtra}
+        >
+          {items.length ? (
+            <>
+              <List
+                itemLayout="vertical"
+                dataSource={items}
+                renderItem={(item) => (
+                  <List.Item key={item.id}>
+                    <List.Item.Meta
+                      title={
+                        <Space direction="horizontal" size="small">
+                          {item.author && <Text strong>{item.author}</Text>}
+                          {item.createdAt && (
+                            <Text
+                              type="secondary"
+                              style={{ fontSize: 12 }}
+                            >
+                              {item.createdAt}
+                            </Text>
+                          )}
+                        </Space>
+                      }
+                      description={
+                        <>
+                          {typeof item.rating === 'number' && (
+                            <div style={{ marginBottom: 4 }}>
+                              <Rate disabled value={item.rating} />
+                            </div>
+                          )}
+                          <Paragraph style={{ marginBottom: 0 }}>
+                            {item.body}
+                          </Paragraph>
+                        </>
+                      }
+                    />
+                  </List.Item>
+                )}
+              />
+
+              <Divider style={{ marginTop: 16, marginBottom: 0 }} />
+
+              <Text type="secondary">
+                Older feedback is kept as part of the impact audit trail.
+              </Text>
+            </>
+          ) : (
+            <Empty description="No feedback yet. Be the first to share how Ethikos works for you." />
+          )}
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="impact/outcomes/page.tsx"
+id=63c4e2c8b48a
+kind=source
+size=9655
+lines=312
+line_ref=1-312
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/impact/outcomes/page.tsx
+// app/ethikos/impact/outcomes/page.tsx
+'use client';
+
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+  ProTable,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import { Line, Bar } from '@ant-design/plots';
+import { Tabs, Empty, Space, Tag, Typography, Divider } from 'antd';
+import { BarChartOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { fetchImpactOutcomes } from '@/services/impact';
+import {
+  fetchDecisionResults,
+  type DecisionResult,
+} from '@/services/decide';
+
+const { Text } = Typography;
+
+type OutcomesData = Awaited<ReturnType<typeof fetchImpactOutcomes>>;
+type DecisionResultsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
+
+type DecisionRow = DecisionResult & { key: string };
+
+export default function Outcomes(): JSX.Element {
+  const { data: outcomesData, loading: loadingOutcomes } =
+    useRequest<OutcomesData, []>(fetchImpactOutcomes);
+
+  const { data: decisionResults, loading: loadingDecisions } =
+    useRequest<DecisionResultsData, []>(fetchDecisionResults);
+
+  const loading = loadingOutcomes || loadingDecisions;
+
+  const kpis = outcomesData?.kpis ?? [];
+  const charts = outcomesData?.charts ?? [];
+
+  const decisionsItems = decisionResults?.items ?? [];
+
+  const decisionRows: DecisionRow[] = decisionsItems.map((d) => ({
+    ...d,
+    key: d.id,
+  }));
+
+  const decisionRegionMap = new Map<
+    string,
+    { region: string; passed: number; rejected: number }
+  >();
+
+  for (const d of decisionRows) {
+    const region = d.region ?? 'Unspecified';
+    const bucket = decisionRegionMap.get(region) ?? {
+      region,
+      passed: 0,
+      rejected: 0,
+    };
+
+    if (d.passed) {
+      bucket.passed += 1;
+    } else {
+      bucket.rejected += 1;
+    }
+
+    decisionRegionMap.set(region, bucket);
+  }
+
+  const decisionOutcomeData = [
+    ...Array.from(decisionRegionMap.values()).map((r) => ({
+      region: r.region,
+      outcome: 'Passed',
+      value: r.passed,
+    })),
+    ...Array.from(decisionRegionMap.values()).map((r) => ({
+      region: r.region,
+      outcome: 'Rejected',
+      value: r.rejected,
+    })),
+  ];
+
+  const decisionOutcomeConfig = {
+    data: decisionOutcomeData,
+    isGroup: true,
+    xField: 'region',
+    yField: 'value',
+    seriesField: 'outcome',
+  };
+
+  const decisionsColumns: ProColumns<DecisionRow>[] = [
+    {
+      title: 'Decision',
+      dataIndex: 'title',
+      key: 'title',
+      ellipsis: true,
+      width: 260,
+    },
+    {
+      title: 'Result',
+      dataIndex: 'passed',
+      key: 'passed',
+      width: 120,
+      render: (_, row) => (
+        <Tag color={row.passed ? 'green' : 'red'}>
+          {row.passed ? 'PASSED' : 'REJECTED'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Scope',
+      dataIndex: 'scope',
+      key: 'scope',
+      width: 120,
+      render: (_, row) => (
+        <Tag color={row.scope === 'Elite' ? 'geekblue' : 'default'}>
+          {row.scope}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Region',
+      dataIndex: 'region',
+      key: 'region',
+      ellipsis: true,
+      render: (_, row) =>
+        row.region ?? <Text type="secondary">Unspecified</Text>,
+    },
+    {
+      title: 'Closed at',
+      dataIndex: 'closesAt',
+      key: 'closesAt',
+      width: 180,
+      valueType: 'date',
+      render: (_, row) => dayjs(row.closesAt).format('YYYY-MM-DD'),
+    },
+  ];
+
+  return (
+    <EthikosPageShell
+      title="Impact · Outcomes"
+      sectionLabel="Impact"
+      subtitle="Aggregated decision outcomes, agreement levels and regional distribution across Ethikos debates."
+    >
+      <PageContainer ghost loading={loading}>
+        <ProCard gutter={[16, 16]} wrap>
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <BarChartOutlined />
+                <span>Impact · Outcomes</span>
+              </Space>
+            }
+          >
+            {kpis.length ? (
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="large"
+              >
+                <Space size="large" wrap>
+                  {kpis.map((kpi) => (
+                    <StatisticCard
+                      key={kpi.key}
+                      statistic={{
+                        title: kpi.label,
+                        value: kpi.value,
+                        suffix: kpi.key === 'agreement' ? '%' : undefined,
+                        description:
+                          typeof kpi.delta === 'number' ? (
+                            <span
+                              style={{
+                                color:
+                                  kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                              }}
+                            >
+                              {kpi.delta >= 0 ? '▲' : '▼'}{' '}
+                              {Math.abs(kpi.delta)}%
+                            </span>
+                          ) : null,
+                      }}
+                    />
+                  ))}
+                </Space>
+
+                <Divider />
+
+                <Space direction="vertical" size={8}>
+                  <Text type="secondary">Highlights</Text>
+                  <ul style={{ paddingLeft: 20, margin: 0 }}>
+                    <li>
+                      <Text>
+                        <Text strong>
+                          {kpis.find((k) => k.key === 'resolved')?.value ?? 0}
+                        </Text>{' '}
+                        decisions resolved overall.
+                      </Text>
+                    </li>
+                    <li>
+                      <Text>
+                        Average agreement is{' '}
+                        <Text strong>
+                          {kpis.find((k) => k.key === 'agreement')?.value ?? 0}
+                          %
+                        </Text>
+                        , combining stance direction and turnout.
+                      </Text>
+                    </li>
+                    <li>
+                      <Text>
+                        Participation volume is{' '}
+                        <Text strong>
+                          {kpis.find((k) => k.key === 'participation')?.value ??
+                            0}
+                        </Text>{' '}
+                        total stances across all debates.
+                      </Text>
+                    </li>
+                  </ul>
+                </Space>
+              </Space>
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No outcome metrics available yet"
+              />
+            )}
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <BarChartOutlined />
+                <span>Outcome distribution</span>
+              </Space>
+            }
+          >
+            {charts.length ? (
+              <Tabs
+                items={charts.map((c) => ({
+                  key: c.key,
+                  label: c.title,
+                  children: (
+                    <ProCard ghost>
+                      {c.type === 'line' && <Line {...c.config} />}
+                      {c.type === 'bar' && <Bar {...c.config} />}
+                    </ProCard>
+                  ),
+                }))}
+              />
+            ) : (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No outcome charts available yet"
+              />
+            )}
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title="Closed decisions · outcomes vs engagement"
+            extra={
+              <Text type="secondary">
+                {decisionRows.length
+                  ? `${decisionRows.length} closed decisions`
+                  : 'No closed decisions yet'}
+              </Text>
+            }
+          >
+            <ProCard split="horizontal" ghost>
+              <ProCard title="Outcomes by region">
+                {decisionOutcomeData.length === 0 ? (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No regional outcome data available"
+                  />
+                ) : (
+                  <Bar {...decisionOutcomeConfig} />
+                )}
+              </ProCard>
+
+              <ProCard title="Closed decisions">
+                {decisionRows.length === 0 ? (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description="No closed decisions yet"
+                  />
+                ) : (
+                  <ProTable<DecisionRow>
+                    rowKey="key"
+                    size="small"
+                    columns={decisionsColumns}
+                    dataSource={decisionRows}
+                    pagination={{ pageSize: 8 }}
+                    search={false}
+                    options={false}
+                    toolBarRender={false}
+                  />
+                )}
+              </ProCard>
+            </ProCard>
+          </ProCard>
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="impact/tracker/page.tsx"
+id=1936834acf82
+kind=source
+size=16947
+lines=604
+line_ref=1-604
+chunks=2
+chunk_refs=1-350,351-604
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=1936834acf82:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/impact/tracker/page.tsx
+'use client';
+
+import { useMemo, useState } from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  App,
+  Button,
+  Empty,
+  Progress,
+  Segmented,
+  Select,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import {
+  AuditOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  FileSearchOutlined,
+  FlagOutlined,
+  LinkOutlined,
+  ReloadOutlined,
+  SendOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchImpactTracker,
+  patchImpactStatus,
+  type ImpactStatus,
+  type TrackerItem,
+} from '@/services/impact';
+
+dayjs.extend(relativeTime);
+
+const { Paragraph, Text } = Typography;
+
+type TrackerPayload = { items: TrackerItem[] };
+type StatusFilter = 'all' | 'active' | 'needs-attention' | ImpactStatus;
+
+type TrackerRow = TrackerItem & {
+  action?: string | null;
+  actionLabel?: string | null;
+  nextMilestone?: string | null;
+  next_milestone?: string | null;
+  dueAt?: string | null;
+  due_at?: string | null;
+  evidenceUrl?: string | null;
+  evidence_url?: string | null;
+  feedbackCount?: number | null;
+  feedback_count?: number | null;
+  blockedReason?: string | null;
+  blocked_reason?: string | null;
+};
+
+const STATUS_VALUES: ImpactStatus[] = [
+  'Planned',
+  'In-Progress',
+  'Completed',
+  'Blocked',
+];
+
+const STATUS_LABELS: Record<ImpactStatus, string> = {
+  Planned: 'Planned',
+  'In-Progress': 'In progress',
+  Completed: 'Completed',
+  Blocked: 'Blocked',
+};
+
+const STATUS_COLORS: Record<ImpactStatus, string> = {
+  Planned: 'default',
+  'In-Progress': 'processing',
+  Completed: 'success',
+  Blocked: 'error',
+};
+
+const FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
+  { label: 'Active', value: 'active' },
+  { label: 'Needs attention', value: 'needs-attention' },
+  { label: 'All', value: 'all' },
+  { label: 'Planned', value: 'Planned' },
+  { label: 'In progress', value: 'In-Progress' },
+  { label: 'Completed', value: 'Completed' },
+  { label: 'Blocked', value: 'Blocked' },
+];
+
+function isActive(status: ImpactStatus): boolean {
+  return status === 'Planned' || status === 'In-Progress';
+}
+
+function isOverdue(item: TrackerRow): boolean {
+  const dueAt = item.dueAt ?? item.due_at;
+
+  if (!dueAt || item.status === 'Completed') {
+    return false;
+  }
+
+  const parsed = dayjs(dueAt);
+
+  return parsed.isValid() && parsed.isBefore(dayjs(), 'day');
+}
+
+function optionalString(
+  item: TrackerRow,
+  keys: Array<keyof TrackerRow>,
+): string | undefined {
+  for (const key of keys) {
+    const value = item[key];
+
+    if (typeof value === 'string' && value.trim()) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function optionalNumber(
+  item: TrackerRow,
+  keys: Array<keyof TrackerRow>,
+): number | undefined {
+  for (const key of keys) {
+    const value = item[key];
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
+function formatRelative(value?: string | null): string {
+  if (!value) {
+    return 'No activity yet';
+  }
+
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.fromNow() : 'Unknown';
+}
+
+function formatDate(value?: string | null): string {
+  if (!value) {
+    return 'No date set';
+  }
+
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.format('YYYY-MM-DD') : 'Unknown';
+}
+
+function route(path: string): string {
+  return `${path}${path.includes('?') ? '&' : '?'}sidebar=ethikos`;
+}
+
+export default function ImpactTracker(): JSX.Element {
+  const { message } = App.useApp();
+
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('active');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const { data, loading, error, mutate, refresh } = useRequest<
+    TrackerPayload,
+    []
+  >(fetchImpactTracker);
+
+  const items = useMemo<TrackerRow[]>(
+    () => (data?.items ?? []) as TrackerRow[],
+    [data],
+  );
+
+  const stats = useMemo(() => {
+    const total = items.length;
+    const planned = items.filter((item) => item.status === 'Planned').length;
+    const inProgress = items.filter(
+      (item) => item.status === 'In-Progress',
+    ).length;
+    const completed = items.filter(
+      (item) => item.status === 'Completed',
+    ).length;
+    const blocked = items.filter((item) => item.status === 'Blocked').length;
+    const active = planned + inProgress;
+    const overdue = items.filter(isOverdue).length;
+    const completionRate = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    return {
+      total,
+      planned,
+      inProgress,
+      completed,
+      blocked,
+      active,
+      overdue,
+      completionRate,
+      needsAttention: blocked + overdue,
+    };
+  }, [items]);
+
+  const filteredItems = useMemo(() => {
+    if (statusFilter === 'all') {
+      return items;
+    }
+
+    if (statusFilter === 'active') {
+      return items.filter((item) => isActive(item.status));
+    }
+
+    if (statusFilter === 'needs-attention') {
+      return items.filter((item) => item.status === 'Blocked' || isOverdue(item));
+    }
+
+    return items.filter((item) => item.status === statusFilter);
+  }, [items, statusFilter]);
+
+  const statusOptions = useMemo(
+    () =>
+      STATUS_VALUES.map((value) => ({
+        value,
+        label: STATUS_LABELS[value],
+      })),
+    [],
+  );
+
+  const handleStatusChange = async (
+    id: string,
+    status: ImpactStatus,
+  ): Promise<void> => {
+    setUpdatingId(id);
+
+    try {
+      await patchImpactStatus(id, status);
+
+      if (data) {
+        const next: TrackerPayload = {
+          items: data.items.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  status,
+                  updatedAt: new Date().toISOString(),
+                }
+              : item,
+          ),
+        };
+
+        mutate(next);
+      } else {
+        refresh();
+      }
+
+      message.success('Impact status updated.');
+    } catch (requestError) {
+      console.error('Failed to update impact status', requestError);
+      message.error('Could not update impact status.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const columns: ProColumns<TrackerRow>[] = [
+    {
+      title: 'Decision / promise',
+      dataIndex: 'title',
+      width: 340,
+      ellipsis: true,
+      render: (_dom, row) => {
+        const action =
+          optionalString(row, ['action', 'actionLabel']) ??
+          'Follow-up action not specified yet';
+
+        return (
+          <Space direction="vertical" size={2}>
+            <Text strong>{row.title}</Text>
+            <Text type="secondary">{action}</Text>
+
+            {row.status === 'Blocked' ? (
+              <Tag icon={<ExclamationCircleOutlined />} color="error">
+                Needs unblock
+              </Tag>
+            ) : null}
+
+            {isOverdue(row) ? (
+              <Tag icon={<ClockCircleOutlined />} color="volcano">
+                Overdue
+              </Tag>
+            ) : null}
+          </Space>
+        );
+      },
+    },
+    {
+      title: 'Owner',
+      dataIndex: 'owner',
+      width: 180,
+      ellipsis: true,
+      render: (_dom, row) =>
+        row.owner ? (
+          <Text>{row.owner}</Text>
+        ) : (
+          <Text type="secondary">No owner assigned</Text>
+        ),
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      width: 260,
+      render: (_dom, row) => {
+        const isUpdating = updatingId === row.id;
+        const isDisabled = updatingId !== null && !isUpdating;
+
+        return (
+          <Space wrap>
+            <Tag color={STATUS_COLORS[row.status]}>
+              {STATUS_LABELS[row.status]}
+            </Tag>
+
+            <Select<ImpactStatus>
+              size="small"
+              style={{ minWidth: 140 }}
+              value={row.status}
+              options={statusOptions}
+              loading={isUpdating}
+              disabled={isDisabled}
+              onChange={(value) => {
+                void handleStatusChange(row.id, value);
+              }}
+            />
+          </Space>
+        );
+      },
+    },
+    {
+      title: 'Next milestone',
+      key: 'milestone',
+      width: 260,
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=1936834acf82:351-604
+start=351
+end=604
+----
+      render: (_dom, row) => {
+        const milestone =
+          optionalString(row, ['nextMilestone', 'next_milestone']) ??
+          'No milestone recorded';
+        const dueAt = row.dueAt ?? row.due_at;
+
+        return (
+          <Space direction="vertical" size={2}>
+            <Text>{milestone}</Text>
+            <Text type={isOverdue(row) ? 'danger' : 'secondary'}>
+              Due: {formatDate(dueAt)}
+            </Text>
+          </Space>
+        );
+      },
+    },
+    {
+      title: 'Evidence / feedback',
+      key: 'evidence',
+      width: 220,
+      render: (_dom, row) => {
+        const evidenceUrl = optionalString(row, ['evidenceUrl', 'evidence_url']);
+        const feedbackCount = optionalNumber(row, [
+          'feedbackCount',
+          'feedback_count',
+        ]);
+
+        return (
+          <Space direction="vertical" size={4}>
+            {evidenceUrl ? (
+              <Button
+                size="small"
+                icon={<LinkOutlined />}
+                href={evidenceUrl}
+                target="_blank"
+              >
+                Evidence
+              </Button>
+            ) : (
+              <Text type="secondary">No evidence linked</Text>
+            )}
+
+            <Button
+              size="small"
+              type="link"
+              href={route('/ethikos/impact/feedback')}
+              style={{ padding: 0 }}
+            >
+              {feedbackCount ?? 0} feedback items
+            </Button>
+          </Space>
+        );
+      },
+    },
+    {
+      title: 'Last activity',
+      dataIndex: 'updatedAt',
+      width: 180,
+      sorter: (a, b) =>
+        dayjs(a.updatedAt).valueOf() - dayjs(b.updatedAt).valueOf(),
+      render: (_dom, row) => <Text>{formatRelative(row.updatedAt)}</Text>,
+    },
+  ];
+
+  const secondaryActions = (
+    <Space wrap>
+      <Button href={route('/ethikos/impact/outcomes')}>Outcomes</Button>
+      <Button href={route('/ethikos/impact/feedback')}>Feedback</Button>
+      <Button
+        icon={<ReloadOutlined />}
+        onClick={() => refresh()}
+        type="default"
+        loading={loading}
+        disabled={updatingId !== null}
+      >
+        Refresh
+      </Button>
+    </Space>
+  );
+
+  return (
+    <EthikosPageShell
+      title="Impact tracker"
+      sectionLabel="Impact"
+      metaTitle="Impact · Tracker"
+      subtitle="Follow Ethikos decisions from promise to action, evidence, feedback, and closure."
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost loading={loading}>
+        {error ? (
+          <Alert
+            type="error"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message="Unable to load impact tracker."
+            description="Check the Impact service and retry."
+          />
+        ) : null}
+
+        <ProCard
+          title={
+            <Space>
+              <FlagOutlined />
+              <span>Impact workflow</span>
+            </Space>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <ProCard gutter={[16, 16]} wrap ghost>
+            <ProCard colSpan={{ xs: 24, md: 6 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <AuditOutlined />
+                  <Text strong>1. Decision</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Start from a decision, consultation, or deliberation outcome.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 6 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <SendOutlined />
+                  <Text strong>2. Action</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Track the follow-up action and assign ownership.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 6 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <FileSearchOutlined />
+                  <Text strong>3. Evidence</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Link evidence so progress can be verified, not just claimed.
+                </Paragraph>
+              </Space>
+            </ProCard>
+
+            <ProCard colSpan={{ xs: 24, md: 6 }} bordered>
+              <Space direction="vertical" size={8}>
+                <Space>
+                  <CheckCircleOutlined />
+                  <Text strong>4. Closure</Text>
+                </Space>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Close, revise, or unblock the commitment based on results.
+                </Paragraph>
+              </Space>
+            </ProCard>
+          </ProCard>
+        </ProCard>
+
+        {stats.needsAttention > 0 ? (
+          <Alert
+            type="warning"
+            showIcon
+            style={{ marginBottom: 16 }}
+            message={`${stats.needsAttention} tracked item${
+              stats.needsAttention === 1 ? '' : 's'
+            } need attention`}
+            description="Blocked or overdue items should be reviewed before new commitments are added."
+          />
+        ) : null}
+
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, xl: 6 }}
+            statistic={{
+              title: 'Tracked decisions',
+              value: stats.total,
+              description: 'Decision outcomes being followed',
+            }}
+          />
+
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, xl: 6 }}
+            statistic={{
+              title: 'Active follow-up',
+              value: stats.active,
+              description: 'Planned or in progress',
+            }}
+          />
+
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, xl: 6 }}
+            statistic={{
+              title: 'Blocked',
+              value: stats.blocked,
+              description: 'Needs action or clarification',
+            }}
+          />
+
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, xl: 6 }}
+            statistic={{
+              title: 'Completion rate',
+              value: stats.completionRate,
+              suffix: '%',
+              description: (
+                <Progress
+                  percent={stats.completionRate}
+                  size="small"
+                  showInfo={false}
+                />
+              ),
+            }}
+          />
+        </ProCard>
+
+        <ProCard
+          title="Tracked commitments"
+          extra={
+            <Space wrap>
+              <Tooltip title="Active hides completed and blocked items unless selected.">
+                <Segmented<StatusFilter>
+                  value={statusFilter}
+                  options={FILTER_OPTIONS}
+                  onChange={(value) => setStatusFilter(value)}
+                />
+              </Tooltip>
+            </Space>
+          }
+        >
+          {filteredItems.length === 0 && !loading ? (
+            <Empty description="No tracked commitments match the current filter." />
+          ) : (
+            <ProTable<TrackerRow>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredItems}
+              pagination={{ pageSize: 12 }}
+              search={false}
+              options={false}
+              loading={loading}
+              toolBarRender={() => [
+                <Text key="hint" type="secondary">
+                  Update status when a decision moves from promise to action,
+                  evidence, or closure.
+                </Text>,
+              ]}
+            />
+          )}
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----

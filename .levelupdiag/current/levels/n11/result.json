@@ -1,0 +1,68 @@
+{
+  "schema": "levelupdiag.report.v2",
+  "level": "N11",
+  "level_id": "N11",
+  "name": "Correlation & Triage",
+  "level_name": "Correlation & Triage",
+  "verdict": "FAIL",
+  "findings": [
+    {
+      "id": "kx.correlation.session",
+      "severity": "PASS",
+      "message": "Correlating current diagnostic session kxdiag-20260903_122622-225fb4ee.",
+      "category": "correlation"
+    },
+    {
+      "id": "kx.correlation.coverage",
+      "severity": "PASS",
+      "message": "All diagnostic domains expected by this campaign have current-session evidence.",
+      "category": "correlation",
+      "evidence": "N01, N02, N03, N04, N05, N06"
+    },
+    {
+      "id": "kx.correlation.failures",
+      "severity": "FAIL",
+      "message": "Blocking failures were detected in the current diagnostic session.",
+      "category": "correlation",
+      "evidence": "N03=FAIL; N04=FAIL",
+      "recommendation": "Fix the earliest failing domain, then rerun the focused campaign."
+    },
+    {
+      "id": "kx.correlation.hypotheses",
+      "severity": "WARN",
+      "message": "Likely failure domain(s): frontend build/type/test failure, frontend↔backend API contract mismatch",
+      "category": "correlation",
+      "evidence": "frontend build/type/test failure | frontend↔backend API contract mismatch"
+    }
+  ],
+  "artifacts": [],
+  "started_at": "2026-09-03T12:35:58-04:00",
+  "ended_at": "2026-09-03T12:35:58-04:00",
+  "duration_seconds": 0.004003,
+  "cwd": "",
+  "output_tail": "",
+  "metadata": {
+    "diagnostic_session_id": "kxdiag-20260903_122622-225fb4ee",
+    "campaign": "connection-debug",
+    "expected_levels": [
+      "N01",
+      "N02",
+      "N03",
+      "N04",
+      "N05",
+      "N06"
+    ],
+    "observed_levels": [
+      "N01",
+      "N02",
+      "N03",
+      "N04",
+      "N05",
+      "N06"
+    ],
+    "hypotheses": [
+      "frontend build/type/test failure",
+      "frontend↔backend API contract mismatch"
+    ]
+  }
+}

@@ -1,0 +1,295 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.803633
+title: ROOT FILES
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 2
+total_size_mb: 0.0069
+home: 00_START_HERE.instructions.md
+next_volume: ethikos_20260903_132014_02_deliberate.txt
+prev_title: 
+next_title: deliberate
+short_title: Root
+
+==== FILE_INDEX ====
+ENTRY id=9a818d823a5d path="EthikosPageShell.tsx" kind=source size=4920 lines=173 line_ref=1-173 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=9f4cb1d07838 path="layout.tsx" kind=source size=2293 lines=79 line_ref=1-79 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="EthikosPageShell.tsx"
+id=9a818d823a5d
+kind=source
+size=4920
+lines=173
+line_ref=1-173
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/EthikosPageShell.tsx
+// app/ethikos/EthikosPageShell.tsx
+'use client';
+
+import React, { type ReactNode } from 'react';
+import Head from 'next/head';
+import { usePathname } from 'next/navigation';
+import { Typography, Space, Grid } from 'antd';
+import usePageTitle from '@/hooks/usePageTitle';
+
+const { Title, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
+
+export type EthikosPageShellProps = {
+  /** Main page title (H1-equivalent) */
+  title: string;
+  /** Optional subtitle / helper text under the title */
+  subtitle?: ReactNode;
+  /**
+   * Optional browser <title>.
+   * If omitted, the shell generates:
+   *  - "EthiKos · {sectionLabel} · {title}" when sectionLabel is set
+   *  - "EthiKos · {title}" otherwise
+   */
+  metaTitle?: string;
+  /**
+   * Optional section label for meta-title only.
+   * Examples: "Decide", "Deliberate", "Pulse", "Trust", "Impact", "Admin", "Learn"
+   *
+   * If omitted, the shell will try to infer it from the current /ethikos/* route.
+   */
+  sectionLabel?: string;
+  /** Main CTA on the right (e.g. primary button) */
+  primaryAction?: ReactNode;
+  /** Secondary actions on the right (e.g. ghost buttons, filters) */
+  secondaryActions?: ReactNode;
+  /** Main page content */
+  children: ReactNode;
+  /** Max width for the central content container (like KeenPageShell) */
+  maxWidth?: number | string;
+};
+
+/**
+ * Best-effort inference of the Ethikos section label from the current pathname.
+ * This is now used only for the <title>, not for any visible breadcrumb/badge.
+ */
+function inferSectionLabel(pathname: string | null | undefined): string | undefined {
+  if (!pathname) return undefined;
+
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments[0] !== 'ethikos') return undefined;
+
+  const section = segments[1];
+
+  switch (section) {
+    case 'decide':
+      return 'Decide';
+    case 'deliberate':
+      return 'Deliberate';
+    case 'pulse':
+      return 'Pulse';
+    case 'trust':
+      return 'Trust';
+    case 'impact':
+      return 'Impact';
+    case 'learn':
+      return 'Learn';
+    case 'admin':
+      return 'Admin';
+    case 'insights':
+      return 'Opinion Analytics';
+    default:
+      return undefined;
+  }
+}
+
+/**
+ * Central layout wrapper for EthiKos pages.
+ */
+function EthikosPageShell({
+  title,
+  subtitle,
+  metaTitle,
+  sectionLabel,
+  primaryAction,
+  secondaryActions,
+  children,
+  maxWidth = 1200,
+}: EthikosPageShellProps): JSX.Element {
+  const pathname = usePathname();
+  const screens = useBreakpoint();
+
+  const inferredSectionLabel = inferSectionLabel(pathname);
+  const effectiveSectionLabel = sectionLabel ?? inferredSectionLabel;
+
+  const hasActions = Boolean(primaryAction || secondaryActions);
+
+  const finalMetaTitle =
+    metaTitle ??
+    (effectiveSectionLabel
+      ? `EthiKos · ${effectiveSectionLabel} · ${title}`
+      : `EthiKos · ${title}`);
+
+  // Keep browser/tab title in sync with the shell meta title
+  usePageTitle(finalMetaTitle);
+
+  const isMobile = !screens.md;
+
+  return (
+    <>
+      <Head>
+        <title>{finalMetaTitle}</title>
+      </Head>
+
+      <div className="container mx-auto p-5" style={{ maxWidth }}>
+        {/* Header */}
+        <div style={{ marginBottom: 24 }}>
+          <Space
+            direction={isMobile ? 'vertical' : 'horizontal'}
+            align={isMobile ? 'start' : 'center'}
+            size={isMobile ? 12 : 16}
+            style={{ width: '100%', justifyContent: 'space-between' }}
+          >
+            <Space direction="vertical" size={4} style={{ flex: 1, minWidth: 0 }}>
+              <Title
+                level={2}
+                style={{
+                  margin: 0,
+                  fontWeight: 600,
+                }}
+              >
+                {title}
+              </Title>
+
+              {subtitle && (
+                <Paragraph
+                  type="secondary"
+                  style={{
+                    margin: 0,
+                    maxWidth: 720,
+                  }}
+                >
+                  {subtitle}
+                </Paragraph>
+              )}
+            </Space>
+
+            {hasActions && (
+              <Space
+                align="start"
+                size="middle"
+                wrap
+                style={{
+                  justifyContent: isMobile ? 'flex-start' : 'flex-end',
+                  marginLeft: isMobile ? 0 : 'auto',
+                  minWidth: isMobile ? 'auto' : 0,
+                }}
+              >
+                {secondaryActions}
+                {primaryAction}
+              </Space>
+            )}
+          </Space>
+        </div>
+
+        {/* Main content */}
+        <div>{children}</div>
+      </div>
+    </>
+  );
+}
+
+export default EthikosPageShell;
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="layout.tsx"
+id=9f4cb1d07838
+kind=source
+size=2293
+lines=79
+line_ref=1-79
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+
+// FILE: frontend/app/ethikos/layout.tsx
+// app/ethikos/layout.tsx
+'use client'
+
+import type { ReactNode } from 'react'
+import React, { Suspense, useEffect, useMemo } from 'react'
+import { App as AntdApp } from 'antd'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+
+import MainLayout from '@/components/layout-components/MainLayout'
+import Loading from '@/components/Loading'
+
+interface SegmentLayoutProps {
+  children: ReactNode
+}
+
+/**
+ * Inner shell that defaults the active suite to Ethikos via ?sidebar=ethikos
+ * only when the query param is absent.
+ *
+ * Important:
+ * - If ?sidebar is already set, it is respected.
+ * - The current URL hash is preserved.
+ * - The Ant Design <App /> provider is mounted here so page-level
+ *   App.useApp() hooks can safely use message / modal / notification.
+ */
+function EthikosShell({ children }: SegmentLayoutProps): JSX.Element {
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  const searchString = searchParams.toString()
+  const currentSidebar = searchParams.get('sidebar')
+
+  const nextUrl = useMemo(() => {
+    if (currentSidebar !== null) return null
+
+    const params = new URLSearchParams(searchString)
+    params.set('sidebar', 'ethikos')
+
+    const query = params.toString()
+    const hash =
+      typeof window !== 'undefined' && window.location.hash
+        ? window.location.hash
+        : ''
+
+    return query ? `${pathname}?${query}${hash}` : `${pathname}${hash}`
+  }, [currentSidebar, pathname, searchString])
+
+  useEffect(() => {
+    if (!nextUrl) return
+    router.replace(nextUrl)
+  }, [nextUrl, router])
+
+  return (
+    <MainLayout>
+      <AntdApp>{children}</AntdApp>
+    </MainLayout>
+  )
+}
+
+/**
+ * Segment layout for all /ethikos/* pages.
+ *
+ * - Wraps content in MainLayout (global shell + navigation)
+ * - Defaults the Ethikos suite in the sidebar when missing
+ * - Provides Ant Design App context for message/modal/notification APIs
+ * - Uses a lightweight fullscreen Suspense fallback
+ */
+export default function SegmentLayout({
+  children,
+}: SegmentLayoutProps): JSX.Element {
+  return (
+    <Suspense fallback={<Loading fullscreen message="Loading ethiKos…" />}>
+      <EthikosShell>{children}</EthikosShell>
+    </Suspense>
+  )
+}
+----- FILE END -----

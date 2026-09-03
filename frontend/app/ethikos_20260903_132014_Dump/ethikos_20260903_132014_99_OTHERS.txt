@@ -1,0 +1,2036 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.838130
+title: OTHERS (Misc Folders)
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 4
+total_size_mb: 0.0518
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_132014_07_impact.txt
+prev_title: impact
+next_title: 
+short_title: Others
+
+==== FILE_INDEX ====
+ENTRY id=a72c64b16dcf path="insights/page.tsx" kind=source size=21811 lines=780 line_ref=1-780 chunks=3 chunk_refs=1-350,351-700,701-780 symbols=0 imports=0 summary="Source file."
+ENTRY id=078db050b42d path="learn/changelog/page.tsx" kind=source size=16482 lines=569 line_ref=1-569 chunks=2 chunk_refs=1-350,351-569 symbols=0 imports=0 summary="Source file."
+ENTRY id=9ef11b5468e9 path="learn/glossary/page.tsx" kind=source size=7887 lines=285 line_ref=1-285 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+ENTRY id=876cd6ad4dcd path="learn/guides/page.tsx" kind=source size=8145 lines=298 line_ref=1-298 chunks=0 chunk_refs= symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="insights/page.tsx"
+id=a72c64b16dcf
+kind=source
+size=21811
+lines=780
+line_ref=1-780
+chunks=3
+chunk_refs=1-350,351-700,701-780
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=a72c64b16dcf:1-350
+start=1
+end=350
+----
+
+// FILE: frontend/app/ethikos/insights/page.tsx
+// app/ethikos/insights/page.tsx
+'use client';
+
+import React, { useMemo, useState } from 'react';
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Badge,
+  Button,
+  DatePicker,
+  Divider,
+  Empty,
+  Select,
+  Skeleton,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import {
+  ArrowRightOutlined,
+  BranchesOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ColumnWidthOutlined,
+  DashboardOutlined,
+  FilterOutlined,
+  LineChartOutlined,
+  ProfileOutlined,
+  RadarChartOutlined,
+  SafetyCertificateOutlined,
+  StarOutlined,
+  SyncOutlined,
+  TrophyOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
+
+import ChartCard from '@/components/charts/ChartCard';
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchPulseOverview,
+  fetchPulseHealth,
+  fetchPulseLiveData,
+} from '@/services/pulse';
+import { fetchImpactOutcomes } from '@/services/impact';
+import {
+  fetchDecisionResults,
+  type DecisionResult,
+  type DecisionScope,
+} from '@/services/decide';
+
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+const { Text, Paragraph } = Typography;
+
+type RangeValue = [Dayjs | null, Dayjs | null] | null;
+
+type PulseOverviewData = Awaited<ReturnType<typeof fetchPulseOverview>>;
+type PulseHealthData = Awaited<ReturnType<typeof fetchPulseHealth>>;
+type PulseLiveData = Awaited<ReturnType<typeof fetchPulseLiveData>>;
+type ImpactOutcomesData = Awaited<ReturnType<typeof fetchImpactOutcomes>>;
+type DecisionsData = Awaited<ReturnType<typeof fetchDecisionResults>>;
+
+type EthikosOverviewData = {
+  overview?: PulseOverviewData;
+  health?: PulseHealthData;
+  live?: PulseLiveData;
+  outcomes?: ImpactOutcomesData;
+  decisions?: DecisionsData;
+  errors: string[];
+};
+
+type SafeLoadResult<T> = {
+  data?: T;
+  error?: string;
+};
+
+type DecisionRow = DecisionResult & { key: string };
+
+type WorkflowCard = {
+  title: string;
+  description: string;
+  href: string;
+  action: string;
+  icon: React.ReactNode;
+};
+
+async function safeLoad<T>(
+  label: string,
+  loader: () => Promise<T>,
+): Promise<SafeLoadResult<T>> {
+  try {
+    return {
+      data: await loader(),
+    };
+  } catch (error) {
+    return {
+      error: `${label}: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+}
+
+async function fetchEthikosOverview(): Promise<EthikosOverviewData> {
+  const [overview, health, live, outcomes, decisions] = await Promise.all([
+    safeLoad('Pulse overview', fetchPulseOverview),
+    safeLoad('Pulse health', fetchPulseHealth),
+    safeLoad('Live activity', fetchPulseLiveData),
+    safeLoad('Impact outcomes', fetchImpactOutcomes),
+    safeLoad('Decision results', fetchDecisionResults),
+  ]);
+
+  return {
+    overview: overview.data,
+    health: health.data,
+    live: live.data,
+    outcomes: outcomes.data,
+    decisions: decisions.data,
+    errors: [
+      overview.error,
+      health.error,
+      live.error,
+      outcomes.error,
+      decisions.error,
+    ].filter((message): message is string => Boolean(message)),
+  };
+}
+
+function formatTrendStatus(trend?: number): 'success' | 'error' | 'default' {
+  if (typeof trend !== 'number') {
+    return 'default';
+  }
+
+  if (trend > 0) {
+    return 'success';
+  }
+
+  if (trend < 0) {
+    return 'error';
+  }
+
+  return 'default';
+}
+
+function formatDate(value?: string): string {
+  if (!value) {
+    return 'Unknown';
+  }
+
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.format('YYYY-MM-DD') : 'Unknown';
+}
+
+function route(path: string): string {
+  return `${path}${path.includes('?') ? '&' : '?'}sidebar=ethikos`;
+}
+
+export default function EthikosOverviewPage(): JSX.Element {
+  const [timeRange, setTimeRange] = useState<RangeValue>(() => [
+    dayjs().subtract(30, 'day'),
+    dayjs(),
+  ]);
+  const [scopeFilter, setScopeFilter] = useState<'all' | DecisionScope>('all');
+  const [regionFilter, setRegionFilter] = useState<string | 'all'>('all');
+
+  const { data, loading, error, refresh } =
+    useRequest<EthikosOverviewData, []>(fetchEthikosOverview);
+
+  const overview = data?.overview;
+  const health = data?.health;
+  const live = data?.live;
+  const outcomes = data?.outcomes;
+  const decisions = data?.decisions;
+
+  const decisionItems = decisions?.items ?? [];
+  const liveCounters = live?.counters ?? [];
+  const outcomeKpis = outcomes?.kpis ?? [];
+  const overviewKpis = overview?.kpis ?? [];
+
+  const [start, end] = timeRange ?? [];
+
+  const lastUpdated = data
+    ? dayjs(
+        overview?.refreshedAt ??
+          health?.refreshedAt ??
+          new Date().toISOString(),
+      ).format('HH:mm:ss')
+    : null;
+
+  const agreementKpi = outcomeKpis.find((kpi) => kpi.key === 'agreement');
+  const topicsKpi = outcomeKpis.find((kpi) => kpi.key === 'topics');
+  const stancesKpi = outcomeKpis.find((kpi) => kpi.key === 'stances');
+  const openKpi = outcomeKpis.find((kpi) => kpi.key === 'open');
+
+  const allRegions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          decisionItems
+            .map((decision) => decision.region)
+            .filter((region): region is string => Boolean(region)),
+        ),
+      ),
+    [decisionItems],
+  );
+
+  const filteredDecisions: DecisionRow[] = useMemo(
+    () =>
+      decisionItems
+        .filter((decision) => {
+          if (scopeFilter !== 'all' && decision.scope !== scopeFilter) {
+            return false;
+          }
+
+          if (
+            regionFilter !== 'all' &&
+            (decision.region ?? 'Unspecified') !== regionFilter
+          ) {
+            return false;
+          }
+
+          if (start && end) {
+            const closedTs = dayjs(decision.closesAt).valueOf();
+            const startTs = start.startOf('day').valueOf();
+            const endTs = end.endOf('day').valueOf();
+
+            if (!Number.isFinite(closedTs)) {
+              return false;
+            }
+
+            if (closedTs < startTs || closedTs > endTs) {
+              return false;
+            }
+          }
+
+          return true;
+        })
+        .map((decision) => ({
+          ...decision,
+          key: decision.id,
+        })),
+    [decisionItems, end, regionFilter, scopeFilter, start],
+  );
+
+  const recentDecisions = filteredDecisions.slice(0, 6);
+
+  const workflowCards: WorkflowCard[] = [
+    {
+      title: 'Deliberate',
+      description: 'Open a topic, inspect the argument thread, and contribute a position.',
+      href: route('/ethikos/deliberate/elite'),
+      action: 'Open topics',
+      icon: <StarOutlined />,
+    },
+    {
+      title: 'Decide',
+      description: 'Review public consultations or expert decisions and cast a vote.',
+      href: route('/ethikos/decide/public'),
+      action: 'Vote now',
+      icon: <SafetyCertificateOutlined />,
+    },
+    {
+      title: 'Track impact',
+      description: 'Follow outcomes and implementation progress after decisions.',
+      href: route('/ethikos/impact/tracker'),
+      action: 'Track impact',
+      icon: <RadarChartOutlined />,
+    },
+    {
+      title: 'Monitor pulse',
+      description: 'Check live participation, debate health, and trend signals.',
+      href: route('/ethikos/pulse/live'),
+      action: 'View pulse',
+      icon: <ColumnWidthOutlined />,
+    },
+  ];
+
+  const decisionsColumns: ColumnsType<DecisionRow> = [
+    {
+      title: 'Decision',
+      dataIndex: 'title',
+      key: 'title',
+      ellipsis: true,
+    },
+    {
+      title: 'Result',
+      dataIndex: 'passed',
+      key: 'passed',
+      width: 110,
+      render: (_passed: boolean, row) => (
+        <Tag color={row.passed ? 'green' : 'red'}>
+          {row.passed ? 'PASSED' : 'REJECTED'}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Scope',
+      dataIndex: 'scope',
+      key: 'scope',
+      width: 110,
+      render: (_scope: DecisionScope, row) => (
+        <Tag color={row.scope === 'Elite' ? 'geekblue' : 'default'}>
+          {row.scope}
+        </Tag>
+      ),
+    },
+    {
+      title: 'Closed',
+      dataIndex: 'closesAt',
+      key: 'closesAt',
+      width: 130,
+      render: (_value: string, row) => formatDate(row.closesAt),
+    },
+  ];
+
+  const secondaryActions = (
+    <Space>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last refreshed at ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+
+      <Button
+        icon={<SyncOutlined />}
+        onClick={() => refresh()}
+        size="small"
+        type="text"
+        loading={loading}
+      />
+    </Space>
+  );
+
+  const shellProps = {
+    title: 'Ethikos overview',
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=a72c64b16dcf:351-700
+start=351
+end=700
+----
+    subtitle:
+      'Your current deliberation, decision, trust, pulse, and impact snapshot.',
+    sectionLabel: 'Overview',
+    secondaryActions,
+  } as const;
+
+  if (loading && !data) {
+    return (
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Skeleton active />
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Empty
+            description="Failed to load Ethikos overview"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Button
+              icon={<SyncOutlined />}
+              onClick={() => refresh()}
+              type="primary"
+            >
+              Retry
+            </Button>
+          </Empty>
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  const hasAnyData =
+    overviewKpis.length > 0 ||
+    liveCounters.length > 0 ||
+    outcomeKpis.length > 0 ||
+    decisionItems.length > 0;
+
+  if (!hasAnyData) {
+    return (
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Empty description="No Ethikos overview data available yet" />
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  return (
+    <EthikosPageShell {...shellProps}>
+      <PageContainer ghost>
+        {data?.errors.length ? (
+          <Alert
+            showIcon
+            type="warning"
+            style={{ marginBottom: 16 }}
+            message="Some overview sections could not be refreshed"
+            description={
+              <Space direction="vertical" size={2}>
+                {data.errors.map((message) => (
+                  <Text key={message} type="secondary">
+                    {message}
+                  </Text>
+                ))}
+              </Space>
+            }
+          />
+        ) : null}
+
+        <ProCard
+          title={
+            <Space>
+              <DashboardOutlined />
+              <span>Where to start</span>
+            </Space>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <ProCard gutter={[16, 16]} wrap ghost>
+            {workflowCards.map((item) => (
+              <ProCard
+                key={item.title}
+                colSpan={{ xs: 24, md: 12, xl: 6 }}
+                bordered
+              >
+                <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                  <Space>
+                    {item.icon}
+                    <Text strong>{item.title}</Text>
+                  </Space>
+
+                  <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                    {item.description}
+                  </Paragraph>
+
+                  <Button href={item.href} type="primary" icon={<ArrowRightOutlined />}>
+                    {item.action}
+                  </Button>
+                </Space>
+              </ProCard>
+            ))}
+          </ProCard>
+        </ProCard>
+
+        <ProCard
+          title="Current snapshot"
+          gutter={[16, 16]}
+          wrap
+          style={{ marginBottom: 16 }}
+        >
+          {overviewKpis.length > 0 ? (
+            overviewKpis.slice(0, 4).map((kpi) => (
+              <StatisticCard
+                key={kpi.key ?? kpi.label}
+                colSpan={{ xs: 24, sm: 12, lg: 6 }}
+                statistic={{
+                  title: kpi.label,
+                  value: kpi.value,
+                  description:
+                    typeof kpi.delta === 'number' ? (
+                      <span
+                        style={{
+                          color: kpi.delta >= 0 ? '#3f8600' : '#cf1322',
+                        }}
+                      >
+                        {kpi.delta >= 0 ? '▲' : '▼'} {Math.abs(kpi.delta)}%
+                      </span>
+                    ) : null,
+                }}
+              />
+            ))
+          ) : (
+            <ProCard>
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No KPI snapshot available yet"
+              />
+            </ProCard>
+          )}
+        </ProCard>
+
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <WarningOutlined />
+                <span>Needs attention</span>
+              </Space>
+            }
+          >
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <StatisticCard
+                statistic={{
+                  title: 'Open debates',
+                  value: openKpi?.value ?? 0,
+                  description: 'Topics still available for participation',
+                }}
+              />
+
+              <StatisticCard
+                statistic={{
+                  title: 'Total stances',
+                  value: stancesKpi?.value ?? 0,
+                  description: 'Participation volume across Ethikos',
+                }}
+              />
+
+              <Button href={route('/ethikos/deliberate/elite')} block>
+                Review open topics
+              </Button>
+            </Space>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <CheckCircleOutlined />
+                <span>Decision health</span>
+              </Space>
+            }
+          >
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <StatisticCard
+                statistic={{
+                  title: 'Tracked topics',
+                  value: topicsKpi?.value ?? 0,
+                  description: 'Topics included in outcome tracking',
+                }}
+              />
+
+              <StatisticCard
+                statistic={{
+                  title: 'Average agreement',
+                  value: agreementKpi?.value ?? 0,
+                  suffix: '%',
+                  description: 'Derived from topic-level Ethikos stances',
+                }}
+              />
+
+              <Button href={route('/ethikos/decide/results')} block>
+                Review results
+              </Button>
+            </Space>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, xl: 8 }}
+            title={
+              <Space>
+                <LineChartOutlined />
+                <span>Live activity</span>
+              </Space>
+            }
+          >
+            {liveCounters.length === 0 ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No live counters available yet"
+              />
+            ) : (
+              <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+                {liveCounters.slice(0, 3).map((counter) => (
+                  <StatisticCard
+                    key={counter.label}
+                    statistic={{
+                      title: (
+                        <Space>
+                          {counter.label}
+                          <Badge status={formatTrendStatus(counter.trend)} />
+                        </Space>
+                      ),
+                      value: counter.value,
+                      precision: 0,
+                    }}
+                    chart={
+                      <ChartCard
+                        type="line"
+                        data={counter.history.map((point) => ({
+                          x: point.x,
+                          y: point.y,
+                        }))}
+                        height={44}
+                        axis={{ x: false, y: false }}
+                        padding={0}
+                        legend={false}
+                      />
+                    }
+                  />
+                ))}
+
+                <Button href={route('/ethikos/pulse/live')} block>
+                  Open live pulse
+                </Button>
+              </Space>
+            )}
+          </ProCard>
+        </ProCard>
+
+        <ProCard
+          title={
+            <Space>
+              <FilterOutlined />
+              <span>Recent decisions</span>
+            </Space>
+          }
+          extra={
+            <Text type="secondary">
+              Showing {recentDecisions.length} / {decisionItems.length}
+            </Text>
+          }
+          style={{ marginBottom: 16 }}
+        >
+          <Space wrap align="center" style={{ marginBottom: 16 }}>
+            <Space size="small">
+              <Text type="secondary">Time window</Text>
+              <RangePicker
+                allowEmpty={[true, true]}
+                value={timeRange ?? undefined}
+                onChange={(range) => setTimeRange(range as RangeValue)}
+              />
+            </Space>
+
+            <Space size="small">
+              <Text type="secondary">Scope</Text>
+              <Select<'all' | DecisionScope>
+                style={{ minWidth: 140 }}
+                value={scopeFilter}
+                onChange={(value) => setScopeFilter(value)}
+              >
+                <Option value="all">All</Option>
+                <Option value="Elite">Expert</Option>
+                <Option value="Public">Public</Option>
+              </Select>
+            </Space>
+
+            <Space size="small">
+              <Text type="secondary">Region</Text>
+              <Select<string | 'all'>
+                style={{ minWidth: 160 }}
+                value={regionFilter}
+                onChange={(value) => setRegionFilter(value)}
+              >
+                <Option value="all">All regions</Option>
+                {allRegions.map((region) => (
+                  <Option key={region} value={region}>
+                    {region}
+                  </Option>
+                ))}
+              </Select>
+            </Space>
+          </Space>
+
+          {recentDecisions.length === 0 ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No decisions match the current filters"
+            />
+          ) : (
+            <Table<DecisionRow>
+              size="small"
+              columns={decisionsColumns}
+              dataSource={recentDecisions}
+              pagination={false}
+              rowKey="key"
+            />
+          )}
+
+          <Divider />
+
+          <Space wrap>
+            <Button href={route('/ethikos/decide/results')}>
+              Open full results
+            </Button>
+            <Button href={route('/ethikos/impact/outcomes')}>
+              View outcomes
+            </Button>
+            <Button href={route('/ethikos/impact/tracker')}>
+              Track implementation
+            </Button>
+          </Space>
+        </ProCard>
+
+        <ProCard
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=a72c64b16dcf:701-780
+start=701
+end=780
+----
+          title="Deep-dive areas"
+          gutter={[16, 16]}
+          wrap
+        >
+          <ProCard
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
+            title={
+              <Space>
+                <ColumnWidthOutlined />
+                <span>Pulse</span>
+              </Space>
+            }
+          >
+            <Paragraph type="secondary">
+              Live activity, debate health, trends, and participation monitoring.
+            </Paragraph>
+            <Button href={route('/ethikos/pulse/overview')}>
+              Open pulse overview
+            </Button>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
+            title={
+              <Space>
+                <RadarChartOutlined />
+                <span>Impact</span>
+              </Space>
+            }
+          >
+            <Paragraph type="secondary">
+              Outcomes, feedback, and implementation tracking after decisions.
+            </Paragraph>
+            <Button href={route('/ethikos/impact/tracker')}>
+              Open impact tracker
+            </Button>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
+            title={
+              <Space>
+                <TrophyOutlined />
+                <span>Trust</span>
+              </Space>
+            }
+          >
+            <Paragraph type="secondary">
+              Profile credibility, badges, and credentials for deliberation trust.
+            </Paragraph>
+            <Button href={route('/ethikos/trust/profile')}>
+              Open trust profile
+            </Button>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, md: 12, xl: 6 }}
+            bordered
+            title={
+              <Space>
+                <BranchesOutlined />
+                <span>Learn</span>
+              </Space>
+            }
+          >
+            <Paragraph type="secondary">
+              Guides, glossary, and changelog for using Ethikos responsibly.
+            </Paragraph>
+            <Button href={route('/ethikos/learn/guides')}>
+              Open guides
+            </Button>
+          </ProCard>
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="learn/changelog/page.tsx"
+id=078db050b42d
+kind=source
+size=16482
+lines=569
+line_ref=1-569
+chunks=2
+chunk_refs=1-350,351-569
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=078db050b42d:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/learn/changelog/page.tsx
+'use client';
+
+import React, { useMemo, useState } from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProList,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import {
+  Anchor,
+  Badge,
+  Button,
+  DatePicker,
+  Empty,
+  Input,
+  Segmented,
+  Space,
+  Tag,
+  Timeline,
+  Tooltip,
+  Typography,
+} from 'antd';
+import type { GetProps } from 'antd';
+import {
+  ApartmentOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  CopyOutlined,
+  DownloadOutlined,
+  FilterOutlined,
+  ReloadOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import usePageTitle from '@/hooks/usePageTitle';
+import { fetchChangelog, type ChangelogEntry } from '@/services/learn';
+
+const { RangePicker } = DatePicker;
+const { Text, Title } = Typography;
+
+type RangePickerProps = GetProps<typeof RangePicker>;
+type RangeValue = RangePickerProps['value'];
+type ViewMode = 'timeline' | 'list';
+
+type ChangelogResponse = {
+  entries: ChangelogEntry[];
+};
+
+const TAG_COLOR: Record<string, string> = {
+  NEW: 'green',
+  FIX: 'blue',
+  IMPROVE: 'geekblue',
+  DOCS: 'gold',
+  LEARN: 'cyan',
+  CHORE: 'default',
+  BREAKING: 'red',
+  DEPRECATE: 'volcano',
+  INITIAL: 'purple',
+};
+
+function normalizeTag(tag: string): string {
+  return tag.trim().toUpperCase();
+}
+
+function formatDate(value: string): string {
+  const parsed = dayjs(value);
+
+  return parsed.isValid() ? parsed.format('YYYY-MM-DD') : value;
+}
+
+function entryKey(entry: ChangelogEntry): string {
+  return `${entry.version}-${entry.date}`;
+}
+
+export default function Changelog(): JSX.Element {
+  usePageTitle('Learn · Changelog');
+
+  const { data, loading, error, refresh } = useRequest<ChangelogResponse, []>(
+    fetchChangelog,
+  );
+
+  const [query, setQuery] = useState('');
+  const [range, setRange] = useState<RangeValue>(null);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [view, setView] = useState<ViewMode>('timeline');
+
+  const entries: ChangelogEntry[] = data?.entries ?? [];
+
+  const sortedEntries = useMemo<ChangelogEntry[]>(
+    () =>
+      [...entries].sort(
+        (left, right) =>
+          dayjs(right.date).valueOf() - dayjs(left.date).valueOf(),
+      ),
+    [entries],
+  );
+
+  const allTags = useMemo<string[]>(
+    () =>
+      Array.from(
+        new Set(
+          sortedEntries.flatMap((entry) =>
+            entry.tags.map((tag) => normalizeTag(tag)),
+          ),
+        ),
+      ).sort(),
+    [sortedEntries],
+  );
+
+  const filtered = useMemo<ChangelogEntry[]>(() => {
+    let next = sortedEntries;
+
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (normalizedQuery) {
+      next = next.filter((entry) => {
+        if (entry.version.toLowerCase().includes(normalizedQuery)) {
+          return true;
+        }
+
+        return entry.notes.some((note) =>
+          note.toLowerCase().includes(normalizedQuery),
+        );
+      });
+    }
+
+    if (selectedTags.length > 0) {
+      const allowedTags = new Set(selectedTags.map(normalizeTag));
+
+      next = next.filter((entry) =>
+        entry.tags
+          .map((tag) => normalizeTag(tag))
+          .some((tag) => allowedTags.has(tag)),
+      );
+    }
+
+    if (range?.[0] && range?.[1]) {
+      const start = range[0].startOf('day').valueOf();
+      const end = range[1].endOf('day').valueOf();
+
+      next = next.filter((entry) => {
+        const timestamp = dayjs(entry.date).valueOf();
+
+        return timestamp >= start && timestamp <= end;
+      });
+    }
+
+    return next;
+  }, [sortedEntries, query, selectedTags, range]);
+
+  const totalEntries = filtered.length;
+
+  const versionCount = useMemo(
+    () => new Set(filtered.map((entry) => entry.version)).size,
+    [filtered],
+  );
+
+  const tagCounts = useMemo<[string, number][]>(() => {
+    const counts = new Map<string, number>();
+
+    for (const entry of filtered) {
+      for (const tag of entry.tags) {
+        const normalized = normalizeTag(tag);
+        counts.set(normalized, (counts.get(normalized) ?? 0) + 1);
+      }
+    }
+
+    return Array.from(counts.entries())
+      .sort((left, right) => right[1] - left[1])
+      .slice(0, 4);
+  }, [filtered]);
+
+  const lastUpdated = useMemo<string | null>(() => {
+    const firstEntry = sortedEntries[0];
+
+    if (!firstEntry) {
+      return null;
+    }
+
+    return formatDate(firstEntry.date);
+  }, [sortedEntries]);
+
+  const anchorItems = useMemo(
+    () =>
+      Array.from(new Set(filtered.map((entry) => entry.version))).map(
+        (version) => ({
+          key: version,
+          href: `#ver-${version}`,
+          title: version,
+        }),
+      ),
+    [filtered],
+  );
+
+  const exportJSON = (): void => {
+    const blob = new Blob([JSON.stringify(filtered, null, 2)], {
+      type: 'application/json',
+    });
+
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = 'ethikos-changelog.json';
+    link.click();
+
+    URL.revokeObjectURL(url);
+  };
+
+  const copyMarkdown = async (): Promise<void> => {
+    const markdown = filtered
+      .map(
+        (entry) =>
+          `### ${entry.version} — ${formatDate(entry.date)}\n` +
+          entry.notes.map((note) => `- ${note}`).join('\n'),
+      )
+      .join('\n\n');
+
+    try {
+      await navigator.clipboard.writeText(markdown);
+    } catch {
+      // Clipboard can fail in insecure contexts; no user-blocking action needed.
+    }
+  };
+
+  const renderTags = (tags: string[]): JSX.Element => (
+    <Space size={[4, 4]} wrap>
+      {tags.map((tag) => {
+        const normalized = normalizeTag(tag);
+        const color = TAG_COLOR[normalized] ?? 'default';
+
+        return (
+          <Tag key={normalized} color={color}>
+            {normalized}
+          </Tag>
+        );
+      })}
+    </Space>
+  );
+
+  const shellTitle = 'Learn · Changelog';
+  const shellSectionLabel = 'Learn';
+  const shellSubtitle =
+    'Versioned changes, fixes and improvements across the Ethikos layer.';
+
+  const compactActions = (
+    <Space>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last entry date ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+
+      <Button
+        icon={<ReloadOutlined />}
+        onClick={() => refresh()}
+        type="text"
+      />
+    </Space>
+  );
+
+  const fullActions = (
+    <Space wrap>
+      {lastUpdated && (
+        <Badge
+          count={
+            <Tooltip title={`Last entry date ${lastUpdated}`}>
+              <ClockCircleOutlined style={{ color: '#52c41a' }} />
+            </Tooltip>
+          }
+        />
+      )}
+
+      <Segmented<ViewMode>
+        value={view}
+        onChange={(value) => setView(value)}
+        options={[
+          { label: 'Timeline', value: 'timeline', icon: <CalendarOutlined /> },
+          { label: 'List', value: 'list', icon: <UnorderedListOutlined /> },
+        ]}
+      />
+
+      <Tooltip title="Export JSON">
+        <Button icon={<DownloadOutlined />} onClick={exportJSON} size="small" />
+      </Tooltip>
+
+      <Tooltip title="Copy Markdown">
+        <Button
+          icon={<CopyOutlined />}
+          onClick={() => void copyMarkdown()}
+          size="small"
+        />
+      </Tooltip>
+
+      <Tooltip title="Refresh">
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={() => refresh()}
+          size="small"
+        />
+      </Tooltip>
+    </Space>
+  );
+
+  if (loading && !data) {
+    return (
+      <EthikosPageShell
+        title={shellTitle}
+        sectionLabel={shellSectionLabel}
+        subtitle={shellSubtitle}
+      >
+        <PageContainer ghost loading>
+          <div style={{ height: 240 }} />
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  if (error) {
+    return (
+      <EthikosPageShell
+        title={shellTitle}
+        sectionLabel={shellSectionLabel}
+        subtitle={shellSubtitle}
+        secondaryActions={compactActions}
+      >
+        <PageContainer ghost>
+          <Empty description="Failed to load changelog." />
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  if (!filtered.length && !loading) {
+    return (
+      <EthikosPageShell
+        title={shellTitle}
+        sectionLabel={shellSectionLabel}
+        subtitle={shellSubtitle}
+        secondaryActions={compactActions}
+      >
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=078db050b42d:351-569
+start=351
+end=569
+----
+        <PageContainer ghost>
+          <ProCard>
+            <Empty description="No changelog entries match your filters." />
+          </ProCard>
+        </PageContainer>
+      </EthikosPageShell>
+    );
+  }
+
+  return (
+    <EthikosPageShell
+      title={shellTitle}
+      sectionLabel={shellSectionLabel}
+      subtitle={shellSubtitle}
+      secondaryActions={fullActions}
+    >
+      <PageContainer ghost loading={loading}>
+        <ProCard gutter={[16, 16]} wrap style={{ marginBottom: 16 }}>
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
+            statistic={{
+              title: 'Entries',
+              value: totalEntries,
+              description: <Text type="secondary">After filters</Text>,
+            }}
+          />
+
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
+            statistic={{
+              title: 'Versions',
+              value: versionCount,
+              description: <Text type="secondary">In current view</Text>,
+            }}
+          />
+
+          {tagCounts.map(([tag, count]) => (
+            <StatisticCard
+              key={tag}
+              colSpan={{ xs: 24, sm: 12, md: 8, xl: 6 }}
+              statistic={{
+                title: (
+                  <Space>
+                    <Tag color={TAG_COLOR[tag] ?? 'default'}>{tag}</Tag>
+                  </Space>
+                ),
+                value: count,
+                description: <Text type="secondary">Entries with tag</Text>,
+              }}
+            />
+          ))}
+        </ProCard>
+
+        <ProCard split="vertical" ghost>
+          <ProCard
+            colSpan={{ xs: 24, md: 8, lg: 7, xl: 6 }}
+            title={
+              <Space>
+                <FilterOutlined />
+                <span>Filter</span>
+              </Space>
+            }
+          >
+            <Space direction="vertical" style={{ width: '100%' }} size="large">
+              <div>
+                <Text type="secondary">Search</Text>
+                <Input.Search
+                  placeholder="Version or note text…"
+                  allowClear
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  style={{ marginTop: 8 }}
+                />
+              </div>
+
+              <div>
+                <Text type="secondary">Date range</Text>
+                <div style={{ marginTop: 8 }}>
+                  <RangePicker
+                    allowEmpty={[true, true]}
+                    value={range}
+                    onChange={(value) => setRange(value)}
+                    style={{ width: '100%' }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Text type="secondary">Tags</Text>
+                <div style={{ marginTop: 8 }}>
+                  <Space size={[6, 8]} wrap>
+                    {allTags.length === 0 ? (
+                      <Text type="secondary">No tags</Text>
+                    ) : (
+                      allTags.map((tag) => (
+                        <Tag.CheckableTag
+                          key={tag}
+                          checked={selectedTags.includes(tag)}
+                          onChange={(checked) => {
+                            setSelectedTags((previous) =>
+                              checked
+                                ? [...previous, tag]
+                                : previous.filter((item) => item !== tag),
+                            );
+                          }}
+                        >
+                          <Tag
+                            color={TAG_COLOR[tag] ?? 'default'}
+                            style={{ marginRight: 0 }}
+                          >
+                            {tag}
+                          </Tag>
+                        </Tag.CheckableTag>
+                      ))
+                    )}
+                  </Space>
+                </div>
+              </div>
+
+              <div>
+                <Text type="secondary">Versions</Text>
+                <Anchor
+                  affix={false}
+                  items={anchorItems}
+                  style={{ marginTop: 8, maxHeight: 320, overflow: 'auto' }}
+                />
+              </div>
+            </Space>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, md: 16, lg: 17, xl: 18 }}
+            title={
+              <Space>
+                {view === 'timeline' ? (
+                  <ApartmentOutlined />
+                ) : (
+                  <UnorderedListOutlined />
+                )}
+                <span>Changelog entries</span>
+              </Space>
+            }
+          >
+            {view === 'timeline' ? (
+              <Timeline
+                mode="left"
+                items={filtered.map((entry, index) => ({
+                  key: `${entryKey(entry)}-${index}`,
+                  label: formatDate(entry.date),
+                  dot: <CalendarOutlined />,
+                  children: (
+                    <div
+                      id={`ver-${entry.version}`}
+                      style={{ scrollMarginTop: 72 }}
+                    >
+                      <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: '100%' }}
+                      >
+                        <Space size="small" align="center" wrap>
+                          <Title level={5} style={{ margin: 0 }}>
+                            {entry.version}
+                          </Title>
+                          {renderTags(entry.tags)}
+                        </Space>
+
+                        <ul style={{ marginTop: 4 }}>
+                          {entry.notes.map((note, noteIndex) => (
+                            <li key={`${entryKey(entry)}-note-${noteIndex}`}>
+                              <Text>{note}</Text>
+                            </li>
+                          ))}
+                        </ul>
+                      </Space>
+                    </div>
+                  ),
+                }))}
+              />
+            ) : (
+              <ProList<ChangelogEntry>
+                rowKey={(row) => entryKey(row)}
+                dataSource={filtered}
+                split
+                pagination={{ pageSize: 10, showSizeChanger: false }}
+                metas={{
+                  title: {
+                    render: (_dom, row) => (
+                      <Space size="small" wrap>
+                        <Text strong>{row.version}</Text>
+                        <Tag icon={<CalendarOutlined />}>
+                          {formatDate(row.date)}
+                        </Tag>
+                      </Space>
+                    ),
+                  },
+                  subTitle: {
+                    render: (_dom, row) => renderTags(row.tags),
+                  },
+                  description: {
+                    render: (_dom, row) => (
+                      <ul style={{ marginTop: 4 }}>
+                        {row.notes.map((note, index) => (
+                          <li key={`${entryKey(row)}-list-note-${index}`}>
+                            <Text>{note}</Text>
+                          </li>
+                        ))}
+                      </ul>
+                    ),
+                  },
+                }}
+              />
+            )}
+          </ProCard>
+        </ProCard>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="learn/glossary/page.tsx"
+id=9ef11b5468e9
+kind=source
+size=7887
+lines=285
+line_ref=1-285
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/learn/glossary/page.tsx
+'use client';
+
+import { useMemo, useState } from 'react';
+import {
+  PageContainer,
+  ProTable,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Button,
+  Empty,
+  Input,
+  Segmented,
+  Space,
+  Statistic,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import { fetchGlossary, type GlossaryItem } from '@/services/learn';
+
+const { Text, Paragraph } = Typography;
+
+type GlossaryPayload = {
+  items: GlossaryItem[];
+};
+
+type LetterFilter = 'all' | '#' | string;
+
+function getInitial(term?: string): string {
+  const first = (term?.trim()?.[0] ?? '').toUpperCase();
+
+  if (first >= 'A' && first <= 'Z') {
+    return first;
+  }
+
+  return '#';
+}
+
+function escapeCsvCell(value: string): string {
+  const escaped = value.replaceAll('"', '""');
+  return `"${escaped}"`;
+}
+
+function buildGlossaryCsv(items: GlossaryItem[]): string {
+  const header = ['Term', 'Definition'];
+  const rows = items.map((item) => [
+    item.term ?? '',
+    item.definition ?? '',
+  ]);
+
+  return [header, ...rows]
+    .map((row) => row.map(escapeCsvCell).join(','))
+    .join('\n');
+}
+
+function downloadGlossaryCsv(items: GlossaryItem[]): void {
+  const csv = buildGlossaryCsv(items);
+  const blob = new Blob([csv], {
+    type: 'text/csv;charset=utf-8;',
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+
+  anchor.href = url;
+  anchor.download = 'ethikos-glossary.csv';
+  anchor.click();
+
+  URL.revokeObjectURL(url);
+}
+
+export default function Glossary(): JSX.Element {
+  const [query, setQuery] = useState('');
+  const [letter, setLetter] = useState<LetterFilter>('all');
+
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useRequest<GlossaryPayload, []>(fetchGlossary);
+
+  const items = useMemo<GlossaryItem[]>(() => data?.items ?? [], [data]);
+
+  const letters = useMemo<{ label: string; value: string }[]>(() => {
+    const availableLetters = new Set<string>();
+
+    items.forEach((item) => {
+      availableLetters.add(getInitial(item.term));
+    });
+
+    const result: { label: string; value: string }[] = [
+      { label: 'All', value: 'all' },
+    ];
+
+    if (availableLetters.has('#')) {
+      result.push({ label: '#', value: '#' });
+    }
+
+    for (let code = 65; code <= 90; code += 1) {
+      const value = String.fromCharCode(code);
+
+      if (availableLetters.has(value)) {
+        result.push({ label: value, value });
+      }
+    }
+
+    return result;
+  }, [items]);
+
+  const filteredByQuery = useMemo<GlossaryItem[]>(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    if (!normalizedQuery) {
+      return items;
+    }
+
+    return items.filter((item) => {
+      const term = item.term.toLowerCase();
+      const definition = item.definition.toLowerCase();
+
+      return (
+        term.includes(normalizedQuery) ||
+        definition.includes(normalizedQuery)
+      );
+    });
+  }, [items, query]);
+
+  const filtered = useMemo<GlossaryItem[]>(() => {
+    if (letter === 'all') {
+      return filteredByQuery;
+    }
+
+    return filteredByQuery.filter((item) => getInitial(item.term) === letter);
+  }, [filteredByQuery, letter]);
+
+  const hasActiveFilters = query.trim().length > 0 || letter !== 'all';
+
+  const columns: ProColumns<GlossaryItem>[] = [
+    {
+      title: 'Term',
+      dataIndex: 'term',
+      width: 280,
+      sorter: (left, right) =>
+        left.term.localeCompare(right.term, undefined, {
+          sensitivity: 'base',
+        }),
+      render: (_dom, row) => (
+        <Space size={8} wrap>
+          <Tag>{getInitial(row.term)}</Tag>
+          <Text strong>{row.term}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Definition',
+      dataIndex: 'definition',
+      ellipsis: true,
+      render: (_dom, row) => (
+        <Paragraph style={{ marginBottom: 0 }}>
+          {row.definition || 'No definition available.'}
+        </Paragraph>
+      ),
+    },
+  ];
+
+  const secondaryActions = (
+    <Space wrap>
+      <Tooltip title="Reload glossary terms from the Learn service">
+        <Button
+          icon={<SyncOutlined />}
+          onClick={() => refresh()}
+          loading={loading}
+        >
+          Refresh
+        </Button>
+      </Tooltip>
+
+      <Tooltip title="Export the currently visible glossary rows">
+        <Button
+          icon={<DownloadOutlined />}
+          disabled={filtered.length === 0}
+          onClick={() => downloadGlossaryCsv(filtered)}
+        >
+          Export CSV
+        </Button>
+      </Tooltip>
+    </Space>
+  );
+
+  return (
+    <EthikosPageShell
+      title="Glossary"
+      sectionLabel="Learn"
+      subtitle="Definitions for the core Ethikos concepts used across Deliberate, Decide, Pulse, Trust, and Impact."
+      secondaryActions={secondaryActions}
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          {error && (
+            <Alert
+              type="warning"
+              showIcon
+              message="Glossary unavailable"
+              description="The Learn glossary service did not respond. The page will recover automatically once the service is available."
+            />
+          )}
+
+          <Space
+            align="center"
+            style={{
+              width: '100%',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Space size="large" wrap>
+              <Statistic title="Total terms" value={items.length} />
+              <Statistic title="Visible terms" value={filtered.length} />
+              <Statistic title="Letters" value={Math.max(letters.length - 1, 0)} />
+            </Space>
+
+            <Input.Search
+              allowClear
+              value={query}
+              placeholder="Search terms or definitions"
+              style={{ width: 320 }}
+              onChange={(event) => setQuery(event.target.value)}
+              onSearch={(value) => setQuery(value)}
+            />
+          </Space>
+
+          <Segmented<string>
+            value={letter}
+            options={letters}
+            onChange={(value) => setLetter(value)}
+          />
+
+          {items.length === 0 && !loading ? (
+            <Empty
+              description={
+                error
+                  ? 'Unable to load glossary terms.'
+                  : 'No glossary terms are available yet.'
+              }
+            />
+          ) : filtered.length === 0 ? (
+            <Empty
+              description={
+                hasActiveFilters
+                  ? 'No glossary terms match the current filters.'
+                  : 'No glossary terms are available yet.'
+              }
+            />
+          ) : (
+            <ProTable<GlossaryItem>
+              rowKey="id"
+              columns={columns}
+              dataSource={filtered}
+              search={false}
+              options={false}
+              pagination={{
+                pageSize: 12,
+                showSizeChanger: true,
+                showTotal: (total) => `${total} terms`,
+              }}
+              toolBarRender={() => [
+                <Text key="hint" type="secondary">
+                  Terms are sourced from the Ethikos Learn service and category
+                  metadata when available.
+                </Text>,
+              ]}
+            />
+          )}
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="learn/guides/page.tsx"
+id=876cd6ad4dcd
+kind=source
+size=8145
+lines=298
+line_ref=1-298
+chunks=0
+chunk_refs=
+summary="Source file."
+----
+// FILE: frontend/app/ethikos/learn/guides/page.tsx
+'use client'
+
+import { useMemo, useState } from 'react'
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from '@ant-design/pro-components'
+import { Pie } from '@ant-design/plots'
+import {
+  Anchor,
+  Typography,
+  Input,
+  Empty,
+  Button,
+  Space,
+  Tag,
+  FloatButton,
+  message,
+} from 'antd'
+import { LinkOutlined, SyncOutlined, ReadOutlined } from '@ant-design/icons'
+import { useRequest } from 'ahooks'
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
+import { fetchGuides, type GuideSection } from '@/services/learn'
+
+type GuidesPayload = {
+  sections: GuideSection[]
+}
+
+type EnrichedGuideSection = GuideSection & {
+  wc: number
+  minutes: number
+}
+
+type PieDatum = {
+  type: string
+  value: number
+}
+
+function wordsOf(text: string): number {
+  if (!text) {
+    return 0
+  }
+
+  const matches = text.trim().match(/\S+/g)
+
+  return matches ? matches.length : 0
+}
+
+async function copySectionLink(id: string): Promise<void> {
+  const hash = `#${id}`
+  const absoluteUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}${window.location.pathname}${hash}`
+      : hash
+
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(absoluteUrl)
+      message.success('Section link copied')
+      return
+    }
+
+    message.info('Clipboard is not available in this browser context')
+  } catch {
+    message.error('Unable to copy the section link')
+  }
+}
+
+export default function Guides(): JSX.Element {
+  const [query, setQuery] = useState('')
+
+  const { data, loading, error, refresh } = useRequest<GuidesPayload, []>(
+    fetchGuides,
+  )
+
+  const sections = data?.sections ?? []
+
+  const computed = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+
+    const enriched: EnrichedGuideSection[] = sections.map((section) => {
+      const wc = wordsOf(section.content)
+      const minutes = Math.max(1, Math.round(wc / 220))
+
+      return {
+        ...section,
+        wc,
+        minutes,
+      }
+    })
+
+    const filtered = normalizedQuery
+      ? enriched.filter((section) => {
+          const title = section.title.toLowerCase()
+          const content = section.content.toLowerCase()
+
+          return (
+            title.includes(normalizedQuery) ||
+            content.includes(normalizedQuery)
+          )
+        })
+      : enriched
+
+    const totals = filtered.reduce(
+      (acc, section) => {
+        acc.words += section.wc
+        acc.minutes += section.minutes
+        return acc
+      },
+      { words: 0, minutes: 0 },
+    )
+
+    const pieData: PieDatum[] = filtered.map((section) => ({
+      type: section.title,
+      value: section.wc || 1,
+    }))
+
+    const anchorItems = filtered.map((section) => ({
+      key: section.id,
+      href: `#${section.id}`,
+      title: section.title,
+    }))
+
+    return {
+      filtered,
+      totals,
+      pieData,
+      anchorItems,
+    }
+  }, [sections, query])
+
+  const pieConfig = useMemo(
+    () => ({
+      data: computed.pieData,
+      angleField: 'value',
+      colorField: 'type',
+      radius: 0.8,
+      label: {
+        text: 'type',
+        position: 'outside' as const,
+      },
+      legend: {
+        color: {
+          position: 'bottom' as const,
+        },
+      },
+    }),
+    [computed.pieData],
+  )
+
+  const shellProps = {
+    title: 'Guides',
+    sectionLabel: 'Learn',
+    subtitle:
+      'Practical walkthroughs for using ethiKos: when to launch a debate, choosing Elite vs Public, and how outcomes flow into impact.',
+  } as const
+
+  if (error) {
+    return (
+      <EthikosPageShell {...shellProps}>
+        <PageContainer ghost>
+          <Empty
+            description="Failed to load guides"
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          >
+            <Button
+              type="primary"
+              icon={<SyncOutlined />}
+              onClick={() => refresh()}
+            >
+              Retry
+            </Button>
+          </Empty>
+        </PageContainer>
+      </EthikosPageShell>
+    )
+  }
+
+  const headerStats = (
+    <Space wrap>
+      <Tag icon={<ReadOutlined />}>{sections.length} sections</Tag>
+      <Tag>{computed.totals.words} words</Tag>
+      <Tag>{computed.totals.minutes} min reading</Tag>
+    </Space>
+  )
+
+  return (
+    <EthikosPageShell {...shellProps} secondaryActions={headerStats}>
+      <PageContainer ghost loading={loading}>
+        <ProCard gutter={16} wrap>
+          <ProCard
+            colSpan={{ xs: 24, sm: 24, md: 7, lg: 6, xl: 6 }}
+            title="Navigate guides"
+          >
+            <Input.Search
+              placeholder="Filter guides…"
+              allowClear
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              style={{ marginBottom: 16 }}
+            />
+
+            <Anchor
+              affix={false}
+              items={computed.anchorItems}
+              style={{ maxHeight: 360, overflow: 'auto' }}
+            />
+
+            <Typography.Paragraph
+              type="secondary"
+              style={{ marginTop: 16, marginBottom: 0 }}
+            >
+              {computed.filtered.length} guide
+              {computed.filtered.length === 1 ? '' : 's'} match your filter.
+            </Typography.Paragraph>
+          </ProCard>
+
+          <ProCard
+            colSpan={{ xs: 24, sm: 24, md: 17, lg: 18, xl: 18 }}
+            title="Guided flows"
+          >
+            <StatisticCard.Group style={{ marginBottom: 16 }}>
+              <StatisticCard
+                statistic={{
+                  title: 'Sections',
+                  value: computed.filtered.length,
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: 'Words',
+                  value: computed.totals.words,
+                }}
+              />
+              <StatisticCard
+                statistic={{
+                  title: 'Estimated reading time',
+                  value: computed.totals.minutes,
+                  suffix: 'min',
+                }}
+              />
+            </StatisticCard.Group>
+
+            {sections.length === 0 && !loading ? (
+              <Empty description="No guides available yet." />
+            ) : computed.filtered.length === 0 ? (
+              <Empty description="No guides match your query." />
+            ) : (
+              <>
+                <ProCard
+                  ghost
+                  style={{ marginBottom: 16 }}
+                  title="Guide size breakdown"
+                >
+                  <Pie {...pieConfig} />
+                </ProCard>
+
+                {computed.filtered.map((section) => (
+                  <section
+                    key={section.id}
+                    id={section.id}
+                    style={{ marginBottom: 32 }}
+                  >
+                    <Space align="baseline" size="middle" wrap>
+                      <Typography.Title level={3} style={{ marginTop: 0 }}>
+                        {section.title}
+                      </Typography.Title>
+
+                      <Tag>{section.minutes} min</Tag>
+
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<LinkOutlined />}
+                        onClick={() => void copySectionLink(section.id)}
+                      >
+                        Copy link
+                      </Button>
+                    </Space>
+
+                    <Typography.Paragraph style={{ whiteSpace: 'pre-line' }}>
+                      {section.content}
+                    </Typography.Paragraph>
+                  </section>
+                ))}
+              </>
+            )}
+          </ProCard>
+        </ProCard>
+
+        <FloatButton.BackTop visibilityHeight={240} />
+      </PageContainer>
+    </EthikosPageShell>
+  )
+}
+----- FILE END -----

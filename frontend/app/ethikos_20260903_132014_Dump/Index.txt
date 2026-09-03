@@ -1,0 +1,509 @@
+==== MASTER INDEX ====
+repo_name: ethikos
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+generated_at: 2026-09-03T13:20:14.896971
+instructions_file: 00_START_HERE.instructions.md
+upload_helper_file: Code_snapshot_ethikos.zip
+
+==== VOLUMES ====
+- filename=ethikos_20260903_132014_01_ROOT.txt | title=ROOT FILES | short_title=Root | files=2 | size_mb=0.0069
+- filename=ethikos_20260903_132014_02_deliberate.txt | title=FOLDER: deliberate | short_title=deliberate | files=16 | size_mb=0.0949
+- filename=ethikos_20260903_132014_03_decide.txt | title=FOLDER: decide | short_title=decide | files=4 | size_mb=0.0618
+- filename=ethikos_20260903_132014_04_admin.txt | title=FOLDER: admin | short_title=admin | files=4 | size_mb=0.0486
+- filename=ethikos_20260903_132014_05_pulse.txt | title=FOLDER: pulse | short_title=pulse | files=4 | size_mb=0.0455
+- filename=ethikos_20260903_132014_06_trust.txt | title=FOLDER: trust | short_title=trust | files=3 | size_mb=0.0427
+- filename=ethikos_20260903_132014_07_impact.txt | title=FOLDER: impact | short_title=impact | files=3 | size_mb=0.0329
+- filename=ethikos_20260903_132014_99_OTHERS.txt | title=OTHERS (Misc Folders) | short_title=Others | files=4 | size_mb=0.0518
+
+==== FILE LOCATOR (path -> volume) ====
+EthikosPageShell.tsx	volume=ethikos_20260903_132014_01_ROOT.txt
+layout.tsx	volume=ethikos_20260903_132014_01_ROOT.txt
+deliberate/[topic]/_components/ArgumentComposerCard.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/ArgumentThreadCard.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/EkohParticipantDrawer.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/EmergentQuestionCard.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/EmptySelectionCard.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/KorumPanelsGrid.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/ParticipantRolesPanel.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/SmartVoteReadingsPanel.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/StanceComposerCard.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/TopicStates.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_components/TopicSummaryPanel.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_hooks/useTopicThreadController.ts	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/_lib/topicThreadUtils.ts	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/[topic]/page.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/elite/page.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+deliberate/guidelines/page.tsx	volume=ethikos_20260903_132014_02_deliberate.txt
+decide/elite/page.tsx	volume=ethikos_20260903_132014_03_decide.txt
+decide/methodology/page.tsx	volume=ethikos_20260903_132014_03_decide.txt
+decide/public/page.tsx	volume=ethikos_20260903_132014_03_decide.txt
+decide/results/page.tsx	volume=ethikos_20260903_132014_03_decide.txt
+admin/audit/page.tsx	volume=ethikos_20260903_132014_04_admin.txt
+admin/demo-importer/page.tsx	volume=ethikos_20260903_132014_04_admin.txt
+admin/moderation/page.tsx	volume=ethikos_20260903_132014_04_admin.txt
+admin/roles/page.tsx	volume=ethikos_20260903_132014_04_admin.txt
+pulse/health/page.tsx	volume=ethikos_20260903_132014_05_pulse.txt
+pulse/live/page.tsx	volume=ethikos_20260903_132014_05_pulse.txt
+pulse/overview/page.tsx	volume=ethikos_20260903_132014_05_pulse.txt
+pulse/trends/page.tsx	volume=ethikos_20260903_132014_05_pulse.txt
+trust/badges/page.tsx	volume=ethikos_20260903_132014_06_trust.txt
+trust/credentials/page.tsx	volume=ethikos_20260903_132014_06_trust.txt
+trust/profile/page.tsx	volume=ethikos_20260903_132014_06_trust.txt
+impact/feedback/page.tsx	volume=ethikos_20260903_132014_07_impact.txt
+impact/outcomes/page.tsx	volume=ethikos_20260903_132014_07_impact.txt
+impact/tracker/page.tsx	volume=ethikos_20260903_132014_07_impact.txt
+insights/page.tsx	volume=ethikos_20260903_132014_99_OTHERS.txt
+learn/changelog/page.tsx	volume=ethikos_20260903_132014_99_OTHERS.txt
+learn/glossary/page.tsx	volume=ethikos_20260903_132014_99_OTHERS.txt
+learn/guides/page.tsx	volume=ethikos_20260903_132014_99_OTHERS.txt
+
+==== FILE DETAIL INDEX ====
+EthikosPageShell.tsx
+  volume=ethikos_20260903_132014_01_ROOT.txt
+  id=9a818d823a5d
+  kind=source
+  size_bytes=4920
+  lines=173
+  line_ref=1-173
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+layout.tsx
+  volume=ethikos_20260903_132014_01_ROOT.txt
+  id=9f4cb1d07838
+  kind=source
+  size_bytes=2293
+  lines=79
+  line_ref=1-79
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/ArgumentComposerCard.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=a42f755bea31
+  kind=source
+  size_bytes=1976
+  lines=74
+  line_ref=1-74
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/ArgumentThreadCard.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=94305a23f22b
+  kind=source
+  size_bytes=8055
+  lines=276
+  line_ref=1-276
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/EkohParticipantDrawer.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=3909e4c85a3f
+  kind=source
+  size_bytes=4879
+  lines=135
+  line_ref=1-135
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/EmergentQuestionCard.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=c4ef412ddc8b
+  kind=source
+  size_bytes=2664
+  lines=95
+  line_ref=1-95
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/EmptySelectionCard.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=ef5159efb996
+  kind=source
+  size_bytes=326
+  lines=17
+  line_ref=1-17
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/KorumPanelsGrid.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=a94726dd2677
+  kind=source
+  size_bytes=4027
+  lines=125
+  line_ref=1-125
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/ParticipantRolesPanel.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=d98fd507b673
+  kind=source
+  size_bytes=1601
+  lines=61
+  line_ref=1-61
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/SmartVoteReadingsPanel.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=cdabdf9d7a00
+  kind=source
+  size_bytes=10831
+  lines=308
+  line_ref=1-308
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/StanceComposerCard.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=0a352570233e
+  kind=source
+  size_bytes=2294
+  lines=91
+  line_ref=1-91
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/TopicStates.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=8bdf598d88f3
+  kind=source
+  size_bytes=629
+  lines=31
+  line_ref=1-31
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_components/TopicSummaryPanel.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=8522d6302066
+  kind=source
+  size_bytes=2089
+  lines=71
+  line_ref=1-71
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_hooks/useTopicThreadController.ts
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=8841b9c7b4b0
+  kind=source
+  size_bytes=7199
+  lines=259
+  line_ref=1-259
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/_lib/topicThreadUtils.ts
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=03fefa211de5
+  kind=source
+  size_bytes=3505
+  lines=135
+  line_ref=1-135
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/[topic]/page.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=6480ff3baeba
+  kind=source
+  size_bytes=7468
+  lines=207
+  line_ref=1-207
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/elite/page.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=1d3b1b15620d
+  kind=source
+  size_bytes=21117
+  lines=761
+  line_ref=1-761
+  chunk_refs=1-350,351-700,701-761
+  symbols=0
+  imports=0
+  summary=Source file.
+deliberate/guidelines/page.tsx
+  volume=ethikos_20260903_132014_02_deliberate.txt
+  id=ed55ae997e0b
+  kind=source
+  size_bytes=20830
+  lines=507
+  line_ref=1-507
+  chunk_refs=1-350,351-507
+  symbols=0
+  imports=0
+  summary=Source file.
+decide/elite/page.tsx
+  volume=ethikos_20260903_132014_03_decide.txt
+  id=816551fa3f30
+  kind=source
+  size_bytes=13306
+  lines=467
+  line_ref=1-467
+  chunk_refs=1-350,351-467
+  symbols=0
+  imports=0
+  summary=Source file.
+decide/methodology/page.tsx
+  volume=ethikos_20260903_132014_03_decide.txt
+  id=847a2246fc3e
+  kind=source
+  size_bytes=24845
+  lines=568
+  line_ref=1-568
+  chunk_refs=1-350,351-568
+  symbols=0
+  imports=0
+  summary=Source file.
+decide/public/page.tsx
+  volume=ethikos_20260903_132014_03_decide.txt
+  id=d619145ba950
+  kind=source
+  size_bytes=14889
+  lines=505
+  line_ref=1-505
+  chunk_refs=1-350,351-505
+  symbols=0
+  imports=0
+  summary=Source file.
+decide/results/page.tsx
+  volume=ethikos_20260903_132014_03_decide.txt
+  id=6c754196bf81
+  kind=source
+  size_bytes=11711
+  lines=367
+  line_ref=1-367
+  chunk_refs=1-350,351-367
+  symbols=0
+  imports=0
+  summary=Source file.
+admin/audit/page.tsx
+  volume=ethikos_20260903_132014_04_admin.txt
+  id=910f32f9f333
+  kind=source
+  size_bytes=18471
+  lines=666
+  line_ref=1-666
+  chunk_refs=1-350,351-666
+  symbols=0
+  imports=0
+  summary=Source file.
+admin/demo-importer/page.tsx
+  volume=ethikos_20260903_132014_04_admin.txt
+  id=663c3802df61
+  kind=source
+  size_bytes=379
+  lines=12
+  line_ref=1-12
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+admin/moderation/page.tsx
+  volume=ethikos_20260903_132014_04_admin.txt
+  id=443dca5c3fb4
+  kind=source
+  size_bytes=25613
+  lines=893
+  line_ref=1-893
+  chunk_refs=1-350,351-700,701-893
+  symbols=0
+  imports=0
+  summary=Source file.
+admin/roles/page.tsx
+  volume=ethikos_20260903_132014_04_admin.txt
+  id=53eb1cc1241c
+  kind=source
+  size_bytes=6446
+  lines=239
+  line_ref=1-239
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+pulse/health/page.tsx
+  volume=ethikos_20260903_132014_05_pulse.txt
+  id=839c5bb3cbcc
+  kind=source
+  size_bytes=9027
+  lines=306
+  line_ref=1-306
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+pulse/live/page.tsx
+  volume=ethikos_20260903_132014_05_pulse.txt
+  id=7c01d8b908c0
+  kind=source
+  size_bytes=18060
+  lines=632
+  line_ref=1-632
+  chunk_refs=1-350,351-632
+  symbols=0
+  imports=0
+  summary=Source file.
+pulse/overview/page.tsx
+  volume=ethikos_20260903_132014_05_pulse.txt
+  id=36db50376bc5
+  kind=source
+  size_bytes=7899
+  lines=281
+  line_ref=1-281
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+pulse/trends/page.tsx
+  volume=ethikos_20260903_132014_05_pulse.txt
+  id=26169c11ae19
+  kind=source
+  size_bytes=12706
+  lines=441
+  line_ref=1-441
+  chunk_refs=1-350,351-441
+  symbols=0
+  imports=0
+  summary=Source file.
+trust/badges/page.tsx
+  volume=ethikos_20260903_132014_06_trust.txt
+  id=09d5beec80f9
+  kind=source
+  size_bytes=17200
+  lines=539
+  line_ref=1-539
+  chunk_refs=1-350,351-539
+  symbols=0
+  imports=0
+  summary=Source file.
+trust/credentials/page.tsx
+  volume=ethikos_20260903_132014_06_trust.txt
+  id=15979183fa11
+  kind=source
+  size_bytes=17800
+  lines=561
+  line_ref=1-561
+  chunk_refs=1-350,351-561
+  symbols=0
+  imports=0
+  summary=Source file.
+trust/profile/page.tsx
+  volume=ethikos_20260903_132014_06_trust.txt
+  id=7ec9beaf50d8
+  kind=source
+  size_bytes=9822
+  lines=270
+  line_ref=1-270
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+impact/feedback/page.tsx
+  volume=ethikos_20260903_132014_07_impact.txt
+  id=cc073e5776d6
+  kind=source
+  size_bytes=7856
+  lines=259
+  line_ref=1-259
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+impact/outcomes/page.tsx
+  volume=ethikos_20260903_132014_07_impact.txt
+  id=63c4e2c8b48a
+  kind=source
+  size_bytes=9655
+  lines=312
+  line_ref=1-312
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+impact/tracker/page.tsx
+  volume=ethikos_20260903_132014_07_impact.txt
+  id=1936834acf82
+  kind=source
+  size_bytes=16947
+  lines=604
+  line_ref=1-604
+  chunk_refs=1-350,351-604
+  symbols=0
+  imports=0
+  summary=Source file.
+insights/page.tsx
+  volume=ethikos_20260903_132014_99_OTHERS.txt
+  id=a72c64b16dcf
+  kind=source
+  size_bytes=21811
+  lines=780
+  line_ref=1-780
+  chunk_refs=1-350,351-700,701-780
+  symbols=0
+  imports=0
+  summary=Source file.
+learn/changelog/page.tsx
+  volume=ethikos_20260903_132014_99_OTHERS.txt
+  id=078db050b42d
+  kind=source
+  size_bytes=16482
+  lines=569
+  line_ref=1-569
+  chunk_refs=1-350,351-569
+  symbols=0
+  imports=0
+  summary=Source file.
+learn/glossary/page.tsx
+  volume=ethikos_20260903_132014_99_OTHERS.txt
+  id=9ef11b5468e9
+  kind=source
+  size_bytes=7887
+  lines=285
+  line_ref=1-285
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+learn/guides/page.tsx
+  volume=ethikos_20260903_132014_99_OTHERS.txt
+  id=876cd6ad4dcd
+  kind=source
+  size_bytes=8145
+  lines=298
+  line_ref=1-298
+  chunk_refs=
+  symbols=0
+  imports=0
+  summary=Source file.
+
+==== SYMBOL INDEX ====
+(none)
+
+==== IMPORT INDEX ====
+(none)
+
+==== PATCH TARGETS ====
+(none)

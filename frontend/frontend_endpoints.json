@@ -1,0 +1,673 @@
+[
+  {
+    "method": "FETCH",
+    "url": "/_api/search?${params.toString()}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/search/GlobalSearchClient.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/hooks/useGlobalSearch.ts"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/admin/audit-log/?${searchParams.toString()}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/audit-log/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/admin/konsensus-config/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/konsensus/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "/api/admin/moderation",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/admin/hooks/useModeration.ts"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/admin/moderation/?${searchParams.toString()}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/moderation/queue/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/admin/moderation/${id}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/moderation/queue/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "/api/admin/stats",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/admin/hooks/useStats.ts"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/admin/users/?${searchParams.toString()}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/users/all/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/forum-posts/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/community-discussions/start-new-discussion/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/forum-topics/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/community-discussions/start-new-discussion/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "/api/home/debatecategory/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/ethikos/decide/public/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "/api/home/debatetopic/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/ethikos/decide/public/page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/api/home/publicvote/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/ethikos/decide/public/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "/api/home/responseformat/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/ethikos/decide/public/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/knowledge-recommendations/feedback/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/recommended-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/konnected/learning-paths/my",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-paths/my-learning-path/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/konnected/teams",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/teams-collaboration/team-builder/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/konsultations/consultations",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationList.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/api/konsultations/consultations/${consultationId}/vote/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationForm.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/konsultations/consultations/${id}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ResultsPage.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/konsultations/consultations/${id}/results",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ResultsPage.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/reports/perf/?range=${nextRange}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/perf/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/reports/smart-vote/?range=${key}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/smart-vote/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "/api/showcases",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kreative/community-showcases/submit-to-showcase/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "/expertise-tags",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/hooks/useExpertiseTags.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/impact/sustainability/report",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "/impact/sustainability/track?${params.toString()}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/sustainability-impact/track-project-impact/page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/knowledge/documents/upload",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/knowledge/upload-new-document/page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/workspaces/launch",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/workspaces/launch-new-workspace/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "${API_BASE}?${searchParams.toString()}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-paths/manage-existing-paths/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "${API_BASE}/${id}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-paths/manage-existing-paths/page.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "${API_BASE}/${id}/archive",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-paths/manage-existing-paths/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "${BASE_URL}/sessions/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "${BASE_URL}/sessions/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "${BASE_URL}/sessions/${sessionId}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "${BASE_URL}/sessions/${sessionId}/generate/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "${BASE_URL}/teams/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "FETCH",
+    "url": "${base}${suffix}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/kontact/hooks/useOpportunities.ts"
+    ]
+  },
+  {
+    "method": "DEL",
+    "url": "${PROJECTS_ENDPOINT}${id}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/projects.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "${PROJECTS_ENDPOINT}${id}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/projects.ts"
+    ]
+  },
+  {
+    "method": "PUT",
+    "url": "${PROJECTS_ENDPOINT}${id}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/projects.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "${PROJECTS_ENDPOINT}${projectId}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/projects/project-workspace/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "admin/audit/logs",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/audit.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "admin/moderation",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/admin.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "admin/moderation/${encodeURIComponent(id)}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/admin.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "admin/roles",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/admin.ts"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "url": "admin/roles/${encodeURIComponent(id)}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/admin.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "agreement",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ConsultationsHomePage.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "authorization",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "Balance",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/pulse/health/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "Constructiveness",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/pulse/health/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "content-type",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/hooks/useGlobalSearch.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "cookie",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "Engagement",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/pulse/health/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "ethikos/arguments/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/hooks/useSuggestions.ts",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/trust.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "ethikos/arguments/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/hooks/useSuggestions.ts",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/impact.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "ethikos/arguments/?${topicQuery}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/hooks/useImpact.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "ethikos/categories/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/learn.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "ethikos/stances/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationVotePanel.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/hooks/useConsultationResults.ts",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/trust.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "ethikos/stances/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationVotePanel.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "ethikos/stances/?${topicQuery}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/hooks/useImpact.ts"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "url": "ethikos/topics/${encodeURIComponent(id)}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/impact.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "ethikos/topics/${topicId}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/hooks/useImpact.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "id",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/projects/project-workspace/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "keenkonnect/projects/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/teams-collaboration/project-workspaces/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "kollective/votes/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsensus/hooks/usePoll.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "kollective/votes/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsensus/pages/PollPage.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "konnected/certifications/paths/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/certifications/certification-programs/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "language",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "level",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "open",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ConsultationsHomePage.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "page",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "page_size",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "participation",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ConsultationsHomePage.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "Participation",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/pulse/health/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "pathId",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/certifications/exam-dashboard-results/page.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/certifications/exam-preparation/page.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/certifications/exam-registration/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "pathName",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/certifications/exam-preparation/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "projectId",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/projects/project-workspace/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "q",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/search/GlobalSearchClient.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/components/GlobalSearchBar.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/pages/Search.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "reports/usage/?range=${nextRange}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/usage/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "resolved",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ConsultationsHomePage.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "resourceType",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "sidebar",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/layout.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/layout.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/layout.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/layout.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/layout.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/teambuilder/layout.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "sort",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "subject",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "trust/credentials",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/trust/credentials/page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "trust/credentials",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/trust.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "users/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/teambuilder/create/CreateSessionClient.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "users/me/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/deliberate/[topic]/_hooks/useTopicThreadController.ts",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/teams-collaboration/project-workspaces/page.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationVotePanel.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/trust.ts",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/user.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "users/me/avatar/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/user.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "v1/ekoh/profile/${userId}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/ekoh.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "v1/smart-vote/readings/ethikos-topic/${encodeURIComponent(id)}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/readings.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "v1/smart-vote/readings/ethikos-topic/${toId(topicId)}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/decide.ts"
+    ]
+  }
+]

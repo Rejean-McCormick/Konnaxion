@@ -1,0 +1,2031 @@
+==== VOLUME META ====
+generated_at: 2026-09-03T13:20:14.823994
+title: FOLDER: decide
+root_dir: C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos
+file_count: 4
+total_size_mb: 0.0618
+home: 00_START_HERE.instructions.md
+prev_volume: ethikos_20260903_132014_02_deliberate.txt
+next_volume: ethikos_20260903_132014_04_admin.txt
+prev_title: deliberate
+next_title: admin
+short_title: decide
+
+==== FILE_INDEX ====
+ENTRY id=816551fa3f30 path="decide/elite/page.tsx" kind=source size=13306 lines=467 line_ref=1-467 chunks=2 chunk_refs=1-350,351-467 symbols=0 imports=0 summary="Source file."
+ENTRY id=847a2246fc3e path="decide/methodology/page.tsx" kind=source size=24845 lines=568 line_ref=1-568 chunks=2 chunk_refs=1-350,351-568 symbols=0 imports=0 summary="Source file."
+ENTRY id=d619145ba950 path="decide/public/page.tsx" kind=source size=14889 lines=505 line_ref=1-505 chunks=2 chunk_refs=1-350,351-505 symbols=0 imports=0 summary="Source file."
+ENTRY id=6c754196bf81 path="decide/results/page.tsx" kind=source size=11711 lines=367 line_ref=1-367 chunks=2 chunk_refs=1-350,351-367 symbols=0 imports=0 summary="Source file."
+
+==== FILES ====
+
+----- FILE BEGIN -----
+path="decide/elite/page.tsx"
+id=816551fa3f30
+kind=source
+size=13306
+lines=467
+line_ref=1-467
+chunks=2
+chunk_refs=1-350,351-467
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=816551fa3f30:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/decide/elite/page.tsx
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Button,
+  Drawer,
+  Empty,
+  Progress,
+  Segmented,
+  Space,
+  Statistic,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
+import { useInterval, useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchEliteBallots,
+  type EliteBallot,
+  type EliteBallotResponse,
+} from '@/services/decide';
+import { fetchTopicPreview } from '@/services/deliberate';
+import type { TopicPreviewResponse } from '@/services/ethikos';
+
+type Row = EliteBallot & {
+  id: string;
+};
+
+type ViewMode = 'all' | 'closingSoon' | 'highTurnout' | 'lowTurnout';
+type Preview = TopicPreviewResponse;
+
+const { Paragraph, Title, Text } = Typography;
+
+const VIEW_OPTIONS: { label: string; value: ViewMode }[] = [
+  { label: 'All', value: 'all' },
+  { label: 'Closing ≤24h', value: 'closingSoon' },
+  { label: 'High turnout', value: 'highTurnout' },
+  { label: 'Low turnout', value: 'lowTurnout' },
+];
+
+function isClosingSoon(closesAt?: string): boolean {
+  if (!closesAt) {
+    return false;
+  }
+
+  const closes = dayjs(closesAt);
+
+  if (!closes.isValid() || closes.isBefore(dayjs())) {
+    return false;
+  }
+
+  return closes.diff(dayjs(), 'hour') <= 24;
+}
+
+function clampPercent(value?: number): number {
+  if (typeof value !== 'number' || Number.isNaN(value)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function formatDateTime(value?: string): string {
+  if (!value) {
+    return 'Unknown';
+  }
+
+  const date = dayjs(value);
+
+  if (!date.isValid()) {
+    return value;
+  }
+
+  return date.format('YYYY-MM-DD HH:mm');
+}
+
+function getBallotStatus(closesAt?: string): {
+  label: string;
+  color?: string;
+} {
+  if (!closesAt) {
+    return { label: 'Unknown' };
+  }
+
+  const closes = dayjs(closesAt);
+
+  if (!closes.isValid()) {
+    return { label: 'Unknown' };
+  }
+
+  if (closes.isBefore(dayjs())) {
+    return { label: 'Closed' };
+  }
+
+  if (isClosingSoon(closesAt)) {
+    return { label: 'Closing soon', color: 'red' };
+  }
+
+  return { label: 'Open', color: 'green' };
+}
+
+export default function EliteBallots(): JSX.Element {
+  const [viewMode, setViewMode] = React.useState<ViewMode>('all');
+  const [activeBallot, setActiveBallot] = React.useState<Row | null>(null);
+
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+  } = useRequest<EliteBallotResponse, []>(fetchEliteBallots);
+
+  useInterval(() => {
+    refresh();
+  }, 60_000);
+
+  const ballots = React.useMemo<Row[]>(
+    () =>
+      (data?.ballots ?? []).map((ballot) => ({
+        ...ballot,
+        id: String(ballot.id),
+        turnout: clampPercent(ballot.turnout),
+      })),
+    [data],
+  );
+
+  const {
+    data: preview,
+    loading: previewLoading,
+    error: previewError,
+    run: loadPreview,
+    mutate: setPreview,
+  } = useRequest<Preview, [string]>(fetchTopicPreview, {
+    manual: true,
+  });
+
+  const filteredBallots = React.useMemo(() => {
+    switch (viewMode) {
+      case 'closingSoon':
+        return ballots.filter((ballot) => isClosingSoon(ballot.closesAt));
+
+      case 'highTurnout':
+        return ballots.filter((ballot) => clampPercent(ballot.turnout) >= 60);
+
+      case 'lowTurnout':
+        return ballots.filter((ballot) => clampPercent(ballot.turnout) < 20);
+
+      case 'all':
+      default:
+        return ballots;
+    }
+  }, [ballots, viewMode]);
+
+  const headerStats = React.useMemo(() => {
+    const total = ballots.length;
+
+    const avgTurnout =
+      total > 0
+        ? Math.round(
+            ballots.reduce(
+              (sum, ballot) => sum + clampPercent(ballot.turnout),
+              0,
+            ) / total,
+          )
+        : 0;
+
+    const closingSoon = ballots.filter((ballot) =>
+      isClosingSoon(ballot.closesAt),
+    ).length;
+
+    return [
+      { label: 'Active elite ballots', value: total },
+      { label: 'Avg turnout', value: avgTurnout, suffix: '%' },
+      { label: 'Closing ≤ 24h', value: closingSoon },
+    ];
+  }, [ballots]);
+
+  const openPreview = React.useCallback(
+    async (row: Row): Promise<void> => {
+      setActiveBallot(row);
+      setPreview(undefined);
+      await loadPreview(row.id);
+    },
+    [loadPreview, setPreview],
+  );
+
+  const closePreview = React.useCallback(() => {
+    setActiveBallot(null);
+    setPreview(undefined);
+  }, [setPreview]);
+
+  const columns: ProColumns<Row>[] = React.useMemo(
+    () => [
+      {
+        title: 'Title',
+        dataIndex: 'title',
+        width: 320,
+        ellipsis: true,
+        render: (_dom, row) => (
+          <Button
+            type="link"
+            onClick={() => {
+              void openPreview(row);
+            }}
+            style={{ padding: 0 }}
+          >
+            {row.title}
+          </Button>
+        ),
+      },
+      {
+        title: 'Status',
+        dataIndex: 'closesAt',
+        width: 140,
+        render: (_dom, row) => {
+          const status = getBallotStatus(row.closesAt);
+
+          return <Tag color={status.color}>{status.label}</Tag>;
+        },
+      },
+      {
+        title: 'Closes In',
+        dataIndex: 'closesAt',
+        width: 200,
+        sorter: (a, b) =>
+          dayjs(a.closesAt).valueOf() - dayjs(b.closesAt).valueOf(),
+        render: (_dom, row) => {
+          const closes = dayjs(row.closesAt);
+
+          if (!closes.isValid() || closes.isBefore(dayjs())) {
+            return <Text type="secondary">—</Text>;
+          }
+
+          return (
+            <Statistic.Countdown
+              value={closes.valueOf()}
+              format="D[d] HH:mm:ss"
+            />
+          );
+        },
+      },
+      {
+        title: 'Turnout',
+        dataIndex: 'turnout',
+        width: 220,
+        sorter: (a, b) => clampPercent(a.turnout) - clampPercent(b.turnout),
+        render: (_dom, row) => {
+          const percent = clampPercent(row.turnout);
+
+          return (
+            <Space>
+              <Progress type="circle" percent={percent} width={52} />
+              <Text>{percent}%</Text>
+            </Space>
+          );
+        },
+      },
+      {
+        title: 'Scope',
+        dataIndex: 'scope',
+        width: 120,
+        render: (_dom, row) => <Tag color="purple">{row.scope}</Tag>,
+      },
+      {
+        title: 'Actions',
+        key: 'actions',
+        width: 240,
+        render: (_dom, row) => (
+          <Space>
+            <Tooltip title="See the structured debate that feeds this vote">
+              <Link href={`/ethikos/deliberate/${row.id}`} prefetch={false}>
+                <Button size="small">View debate</Button>
+              </Link>
+            </Tooltip>
+
+            <Tooltip title="View historical decisions">
+              <Link href="/ethikos/decide/results" prefetch={false}>
+                <Button size="small">Results archive</Button>
+              </Link>
+            </Tooltip>
+          </Space>
+        ),
+      },
+    ],
+    [openPreview],
+  );
+
+  return (
+    <EthikosPageShell
+      title="Decide · Elite Ballots"
+      sectionLabel="Decide"
+      subtitle="Expert advisory ballots built on Ethikos debates and the canonical −3…+3 topic stance scale."
+      primaryAction={
+        <Link href="/ethikos/decide/methodology" prefetch={false}>
+          <Button type="primary" icon={<InfoCircleOutlined />}>
+            Voting methodology
+          </Button>
+        </Link>
+      }
+      secondaryActions={
+        <Space>
+          <Link href="/ethikos/decide/public" prefetch={false}>
+            <Button>Switch to public ballots</Button>
+          </Link>
+        </Space>
+      }
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            message="How elite ballots work"
+            description="Each elite ballot aggregates expert stances from its debate thread, maps them onto the canonical −3…+3 Ethikos stance scale, and surfaces an advisory decision signal."
+          />
+
+          {error && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load elite ballots."
+              description="Check the Decide service and the canonical Ethikos topics endpoint."
+            />
+          )}
+
+          <ProCard gutter={16} wrap>
+            {headerStats.map((stat) => (
+              <StatisticCard
+                key={stat.label}
+                colSpan={{ xs: 24, sm: 8 }}
+                statistic={{
+                  title: stat.label,
+                  value: stat.value,
+                  suffix: stat.suffix,
+                }}
+              />
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=816551fa3f30:351-467
+start=351
+end=467
+----
+            ))}
+          </ProCard>
+
+          {filteredBallots.length === 0 && !loading ? (
+            <Empty description="No elite ballots are open right now." />
+          ) : (
+            <ProTable<Row>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredBallots}
+              pagination={{ pageSize: 8 }}
+              search={false}
+              options={false}
+              toolBarRender={() => [
+                <Segmented<ViewMode>
+                  key="view"
+                  size="small"
+                  value={viewMode}
+                  onChange={setViewMode}
+                  options={VIEW_OPTIONS}
+                />,
+                <Button
+                  key="refresh"
+                  icon={<ReloadOutlined />}
+                  onClick={() => refresh()}
+                  loading={loading}
+                >
+                  Refresh
+                </Button>,
+              ]}
+            />
+          )}
+
+          <Drawer
+            width={520}
+            open={!!activeBallot}
+            onClose={closePreview}
+            destroyOnClose
+            title={preview?.title || activeBallot?.title || 'Ballot details'}
+          >
+            {previewLoading ? (
+              <Empty description="Loading preview…" />
+            ) : previewError ? (
+              <Empty description="Unable to load preview." />
+            ) : preview ? (
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  {preview.category ? `${preview.category} · ` : ''}
+                  {formatDateTime(preview.createdAt)}
+                </Paragraph>
+
+                {preview.description && (
+                  <Paragraph style={{ marginBottom: 0 }}>
+                    {preview.description}
+                  </Paragraph>
+                )}
+
+                <div>
+                  <Title level={4} style={{ marginTop: 0 }}>
+                    Latest statements
+                  </Title>
+
+                  {preview.latest.length > 0 ? (
+                    <ul style={{ paddingLeft: 16, marginBottom: 0 }}>
+                      {preview.latest.map((statement) => (
+                        <li key={statement.id} style={{ marginBottom: 8 }}>
+                          <Text strong>{statement.author}</Text> —{' '}
+                          {statement.body}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description="No statements yet."
+                    />
+                  )}
+                </div>
+
+                <Link
+                  href={`/ethikos/deliberate/${preview.id}`}
+                  prefetch={false}
+                >
+                  <Button type="primary">Go to full thread</Button>
+                </Link>
+              </Space>
+            ) : activeBallot ? (
+              <Space
+                direction="vertical"
+                size="middle"
+                style={{ width: '100%' }}
+              >
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  Preview metadata is unavailable, but the debate can still be
+                  opened from the canonical Ethikos route.
+                </Paragraph>
+
+                <Link
+                  href={`/ethikos/deliberate/${activeBallot.id}`}
+                  prefetch={false}
+                >
+                  <Button type="primary">Go to full thread</Button>
+                </Link>
+              </Space>
+            ) : (
+              <Empty description="No preview available." />
+            )}
+          </Drawer>
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="decide/methodology/page.tsx"
+id=847a2246fc3e
+kind=source
+size=24845
+lines=568
+line_ref=1-568
+chunks=2
+chunk_refs=1-350,351-568
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=847a2246fc3e:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/decide/methodology/page.tsx
+// app/ethikos/decide/methodology/page.tsx
+'use client';
+
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Collapse,
+  Descriptions,
+  Divider,
+  Steps,
+  Tabs,
+  Timeline,
+  Typography,
+  Tag,
+  Space,
+} from 'antd';
+import {
+  InfoCircleOutlined,
+  SafetyCertificateOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+
+const { Title, Paragraph, Text } = Typography;
+
+export default function Methodology(): JSX.Element {
+  return (
+    <EthikosPageShell
+      title="Voting methodology"
+      sectionLabel="Decide"
+      subtitle="How Ethikos turns nuanced stances, Ekoh reputation and Smart Vote into auditable decisions."
+    >
+      <PageContainer ghost>
+        {/* ------------------------------------------------------------------ */}
+        {/* Heading                                                            */}
+        {/* ------------------------------------------------------------------ */}
+        <Title level={3}>How Smart Voting Works</Title>
+        <Paragraph type="secondary">
+          This page explains how Ethikos decisions are computed from individual
+          stances, how expertise (Ekoh) influences the result, and which
+          safeguards and audit rules are applied before outcomes appear in the
+          archive.
+        </Paragraph>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Key constants / parameters                                        */}
+        {/* ------------------------------------------------------------------ */}
+        <ProCard
+          gutter={16}
+          wrap
+          style={{ marginTop: 24, marginBottom: 24 }}
+        >
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 8 }}
+            statistic={{
+              title: 'Stance scale',
+              value: '–3 … +3',
+              description: 'Strongly against → strongly for; 0 = neutral',
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 8 }}
+            statistic={{
+              title: 'Expert quorum',
+              value: 12,
+              suffix: 'experts',
+              description:
+                'Minimum expert votes required for expert-only results',
+            }}
+          />
+          <StatisticCard
+            colSpan={{ xs: 24, sm: 8 }}
+            statistic={{
+              title: 'Auto-hide threshold',
+              value: 3,
+              suffix: 'reports',
+              description:
+                'Arguments temporarily hidden after 3 independent reports',
+            }}
+          />
+        </ProCard>
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Tabs: conceptual overview                                          */}
+        {/* ------------------------------------------------------------------ */}
+        <Tabs
+          style={{ marginBottom: 32 }}
+          items={[
+            {
+              key: 'overview',
+              label: '1 · Pipeline overview',
+              children: (
+                <ProCard ghost>
+                  <Paragraph>
+                    Every decision in Ethikos follows the same high-level
+                    pipeline:
+                  </Paragraph>
+                  <Timeline
+                    items={[
+                      {
+                        color: 'blue',
+                        children: (
+                          <>
+                            <Text strong>1. Collect nuanced stances</Text>
+                            <Paragraph style={{ marginTop: 4 }}>
+                              Participants express a stance on a topic on a
+                              seven-point scale from{' '}
+                              <Text strong>–3</Text> (strongly against) to{' '}
+                              <Text strong>+3</Text> (strongly for), with{' '}
+                              <Text strong>0</Text> as neutral or undecided.
+                            </Paragraph>
+                          </>
+                        ),
+                      },
+                      {
+                        color: 'green',
+                        children: (
+                          <>
+                            <Text strong>2. Apply Ekoh weighting</Text>
+                            <Paragraph style={{ marginTop: 4 }}>
+                              Each stance is multiplied by a weight derived
+                              from the voter&apos;s Ekoh reputation in the
+                              relevant domain, bounded so that high expertise
+                              matters but cannot dominate the entire outcome.
+                            </Paragraph>
+                          </>
+                        ),
+                      },
+                      {
+                        color: 'purple',
+                        children: (
+                          <>
+                            <Text strong>3. Aggregate Smart Vote result</Text>
+                            <Paragraph style={{ marginTop: 4 }}>
+                              Weighted stances are aggregated by modality
+                              (approval, rating, ranking, etc.) and scope (
+                              <Text strong>Elite</Text> vs{' '}
+                              <Text strong>Public</Text>) to produce summary
+                              metrics and a consensus classification.
+                            </Paragraph>
+                          </>
+                        ),
+                      },
+                      {
+                        color: 'orange',
+                        children: (
+                          <>
+                            <Text strong>
+                              4. Enforce thresholds &amp; publish
+                            </Text>
+                            <Paragraph style={{ marginTop: 4 }}>
+                              Results are only presented once minimum
+                              participation and expert-quorum thresholds are
+                              reached. After a cooling-off period, anonymised
+                              raw data and audit logs are exposed.
+                            </Paragraph>
+                          </>
+                        ),
+                      },
+                    ]}
+                  />
+                </ProCard>
+              ),
+            },
+            {
+              key: 'weighting',
+              label: '2 · Weighting & Ekoh',
+              children: (
+                <ProCard ghost>
+                  <Space
+                    direction="vertical"
+                    size="large"
+                    style={{ width: '100%' }}
+                  >
+                    <Paragraph>
+                      Ethikos relies on the Ekoh reputation engine and Smart
+                      Vote services to translate competence and ethical
+                      behaviour into influence on collective decisions.
+                    </Paragraph>
+                    <Descriptions
+                      bordered
+                      size="small"
+                      column={{ xs: 1, sm: 2 }}
+                      labelStyle={{ width: 180 }}
+                    >
+                      <Descriptions.Item label="Base stance">
+                        Integer in [–3, +3] chosen per topic. Negative values
+                        are against, positive values are for, 0 is neutral.
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Reputation weight">
+                        A factor derived from the user&apos;s Ekoh score in the
+                        topic&apos;s domain. Higher expertise → higher weight,
+                        within configured floors and caps.
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Ethical multiplier">
+                        An additional multiplier rewarding consistent ethical
+                        behaviour (e.g. respectful participation, constructive
+                        contributions), bounded to avoid runaway effects.
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Final vote value">
+                        The product of (stance × reputation weight × ethical
+                        multiplier), normalised when aggregated at topic level.
+                      </Descriptions.Item>
+                    </Descriptions>
+                    <Paragraph>
+                      Expert-only views filter the same dataset to participants
+                      whose Ekoh score is above the expert percentile threshold
+                      in the relevant domain. This gives a complementary
+                      reading of what the most competent contributors think,
+                      without erasing the broader Krowd.
+                    </Paragraph>
+                  </Space>
+                </ProCard>
+              ),
+            },
+            {
+              key: 'nuance',
+              label: '3 · Nuance & modalities',
+              children: (
+                <ProCard ghost>
+                  <Space
+                    direction="vertical"
+                    size="large"
+                    style={{ width: '100%' }}
+                  >
+                    <Paragraph>
+                      The stance scale and voting modalities are designed to
+                      balance expressiveness and simplicity:
+                    </Paragraph>
+                    <Descriptions
+                      bordered
+                      size="small"
+                      column={{ xs: 1, sm: 2 }}
+                      labelStyle={{ width: 220 }}
+                    >
+                      <Descriptions.Item label="Nuanced stance scale">
+                        <Space wrap size="small">
+                          <Tag color="red">–3 · strongly against</Tag>
+                          <Tag color="volcano">–2 · against</Tag>
+                          <Tag color="orange">
+                            –1 · somewhat against
+                          </Tag>
+                          <Tag>0 · neutral / unsure</Tag>
+                          <Tag color="green">+1 · somewhat for</Tag>
+                          <Tag color="lime">+2 · for</Tag>
+                          <Tag color="cyan">+3 · strongly for</Tag>
+                        </Space>
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Supported modalities">
+                        Approval, rating, ranking and preferential voting are
+                        supported at the engine level. The UI exposes the
+                        simplest form that fits the decision (e.g. stance
+                        slider for yes/no questions, ranking for alternatives).
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Scope filters">
+                        Results can be segmented by scope (Elite councils vs
+                        public Krowd), and by cohort filters (experts only,
+                        verified accounts, etc.) if enough data is available.
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Time dimension">
+                        For long-running debates, a timeline of stance
+                        distributions is maintained so users can see how the
+                        consensus evolved.
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Space>
+                </ProCard>
+              ),
+            },
+            {
+              key: 'thresholds',
+              label: '4 · Quorum & thresholds',
+              children: (
+                <ProCard ghost>
+                  <Space
+                    direction="vertical"
+                    size="large"
+                    style={{ width: '100%' }}
+                  >
+                    <Paragraph>
+                      To avoid over-interpreting sparse or unbalanced
+                      participation, several thresholds are enforced before a
+                      result is considered stable:
+                    </Paragraph>
+                    <Descriptions
+                      bordered
+                      size="small"
+                      column={{ xs: 1, sm: 2 }}
+                      labelStyle={{ width: 220 }}
+                    >
+                      <Descriptions.Item
+                        label={
+                          <Space size={4}>
+                            <SafetyCertificateOutlined />
+                            <span>Expert quorum</span>
+                          </Space>
+                        }
+                      >
+                        Expert-only views require at least{' '}
+                        <Text strong>12 distinct experts</Text> (users above
+                        the expert percentile in the relevant Ekoh domain) to
+                        have voted before any aggregate is displayed.
+                      </Descriptions.Item>
+                      <Descriptions.Item
+                        label={
+                          <Space size={4}>
+                            <TeamOutlined />
+                            <span>Participation floor</span>
+                          </Space>
+                        }
+                      >
+                        Public-facing summaries can enforce minimum
+                        participation counts (configurable per deployment) to
+                        avoid showing unstable distributions based on very few
+                        votes.
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Consensus classification">
+                        Thresholds on weighted agreement (for instance, a
+                        strong consensus band when weighted agreement exceeds a
+                        high percentage) are used to label decisions as
+                        &quot;divided&quot;, &quot;leaning&quot;, or
+                        &quot;strong consensus&quot;.
+                      </Descriptions.Item>
+                      <Descriptions.Item label="Moderation linkage">
+                        Content that reaches the auto-hide report threshold is
+                        excluded from featured summaries until reviewed, so
+                        that low-quality or abusive inputs do not skew visible
+                        outcomes.
+                      </Descriptions.Item>
+                    </Descriptions>
+                  </Space>
+                </ProCard>
+              ),
+            },
+            {
+              key: 'audit',
+              label: '5 · Audit & transparency',
+              children: (
+                <ProCard ghost>
+                  <Space
+                    direction="vertical"
+                    size="large"
+                    style={{ width: '100%' }}
+                  >
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=847a2246fc3e:351-568
+start=351
+end=568
+----
+                    <Paragraph>
+                      Transparency is a core requirement: stakeholders must be
+                      able to verify how a decision was reached without
+                      exposing individual voters.
+                    </Paragraph>
+                    <Collapse
+                      ghost
+                      items={[
+                        {
+                          key: 'audit-trail',
+                          label: 'Audit trail',
+                          children: (
+                            <Paragraph>
+                              For each decision, Ethikos keeps a trace of
+                              configuration (topic metadata, modality, filters,
+                              thresholds), stance submissions, and all
+                              subsequent recalculations. Changes to weighting
+                              parameters are logged so that later readers can
+                              reconstruct the state that produced a given
+                              outcome.
+                            </Paragraph>
+                          ),
+                        },
+                        {
+                          key: 'open-data',
+                          label: 'Open data export',
+                          children: (
+                            <Paragraph>
+                              After a cooling-off period, an anonymised export
+                              of stances and weights can be published.
+                              Individual identifiers are removed or hashed, but
+                              aggregated distributions remain verifiable by
+                              third parties.
+                            </Paragraph>
+                          ),
+                        },
+                        {
+                          key: 'simulation',
+                          label: 'Simulation & regression tests',
+                          children: (
+                            <Paragraph>
+                              The collective-intelligence pipeline is
+                              continuously validated with synthetic data.
+                              Simulation runs ensure that higher expertise
+                              reliably increases influence, that the nuance
+                              scale behaves as expected, and that parameter
+                              changes do not introduce regressions.
+                            </Paragraph>
+                          ),
+                        },
+                      ]}
+                    />
+                  </Space>
+                </ProCard>
+              ),
+            },
+          ]}
+        />
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Deep dive: stages as collapsible sections                          */}
+        {/* ------------------------------------------------------------------ */}
+        <Divider orientation="left">Deep dive by stage</Divider>
+
+        <Collapse
+          style={{ marginBottom: 32 }}
+          items={[
+            {
+              key: 'collection',
+              label: 'Stage 1 · Collecting stances',
+              children: (
+                <>
+                  <Paragraph>
+                    Participants see a clear question, any relevant background
+                    material, and a stance control (slider or segmented
+                    buttons). The interface encourages evidence-backed
+                    participation by linking to guidelines and reference
+                    material.
+                  </Paragraph>
+                  <Paragraph>
+                    Users can revise their stance over time; the system stores
+                    the latest value as the canonical position, while previous
+                    stances can be kept for longitudinal analysis.
+                  </Paragraph>
+                </>
+              ),
+            },
+            {
+              key: 'weighting',
+              label: 'Stage 2 · Applying weights',
+              children: (
+                <>
+                  <Paragraph>
+                    For each stance, the engine fetches the voter&apos;s Ekoh
+                    profile in the relevant domain and computes a weight within
+                    configured bounds. An ethical multiplier rewards
+                    constructive behaviour, but both factors are capped to avoid
+                    extreme influence.
+                  </Paragraph>
+                  <Paragraph>
+                    In expert-only views, only voters above the expert
+                    threshold are considered, but their weights are still
+                    normalised so that no single expert can dominate the
+                    outcome.
+                  </Paragraph>
+                </>
+              ),
+            },
+            {
+              key: 'aggregation',
+              label: 'Stage 3 · Aggregation & classification',
+              children: (
+                <>
+                  <Paragraph>
+                    Weighted stances are aggregated according to the chosen
+                    modality: mean or median for rating, pairwise comparisons
+                    for ranking, or tallying approvals for approval voting. The
+                    result is then mapped to an intuitive summary:
+                    percentages, histograms, or consensus bands.
+                  </Paragraph>
+                  <Paragraph>
+                    These summaries are computed separately for different
+                    scopes and filters (public, experts-only, specific cohorts)
+                    so that stakeholders can compare perspectives.
+                  </Paragraph>
+                </>
+              ),
+            },
+            {
+              key: 'publication',
+              label: 'Stage 4 · Publication & auditability',
+              children: (
+                <>
+                  <Paragraph>
+                    Once thresholds are met, results appear on the public
+                    decision pages and in the Results Archive. A short
+                    explanatory note on each decision links back to this
+                    methodology page to keep the process legible.
+                  </Paragraph>
+                  <Paragraph>
+                    For high-impact decisions, administrators can additionally
+                    export an audit bundle containing configuration, weight
+                    distributions, and aggregate datasets suitable for
+                    independent verification.
+                  </Paragraph>
+                </>
+              ),
+            },
+          ]}
+        />
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Visual stepper                                                     */}
+        {/* ------------------------------------------------------------------ */}
+        <Steps
+          current={2}
+          style={{ marginTop: 8, marginBottom: 24, maxWidth: 720 }}
+          items={[
+            {
+              title: 'Propose',
+              description: 'Define the question, scope, and voting modality.',
+            },
+            {
+              title: 'Deliberate',
+              description: 'Debate threads and evidence gathering in Ethikos.',
+            },
+            {
+              title: 'Vote',
+              description: 'Participants submit or update their nuanced stances.',
+            },
+            {
+              title: 'Audit',
+              description: 'Results frozen, published, and made auditable.',
+            },
+          ]}
+        />
+
+        {/* ------------------------------------------------------------------ */}
+        {/* Final info blocks                                                  */}
+        {/* ------------------------------------------------------------------ */}
+        <Space
+          direction="vertical"
+          size="middle"
+          style={{ width: '100%' }}
+        >
+          <Alert
+            type="info"
+            showIcon
+            message="Open methodology"
+            description={
+              <>
+                This methodology is stable for the current platform version and
+                is designed to be understandable by non-technical stakeholders.
+                If configuration parameters (thresholds, scales) change, this
+                page should be updated in lockstep so that every decision can
+                be traced back to the rules that produced it.
+              </>
+            }
+          />
+          <Alert
+            type="warning"
+            showIcon
+            icon={<InfoCircleOutlined />}
+            message="Interpreting results"
+            description={
+              <>
+                Ethikos results are decision-support signals, not absolute
+                truth. Administrators are encouraged to look at both public and
+                expert views, examine participation levels, and read the
+                underlying debates before drawing conclusions.
+              </>
+            }
+          />
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="decide/public/page.tsx"
+id=d619145ba950
+kind=source
+size=14889
+lines=505
+line_ref=1-505
+chunks=2
+chunk_refs=1-350,351-505
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=d619145ba950:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/decide/public/page.tsx
+'use client';
+
+import React, { useCallback, useMemo, useState } from 'react';
+import Link from 'next/link';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+} from '@ant-design/pro-components';
+import type { ProColumns } from '@ant-design/pro-components';
+import {
+  Alert,
+  App,
+  Button,
+  Empty,
+  Input,
+  Progress,
+  Radio,
+  Space,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import type { RadioChangeEvent } from 'antd';
+import {
+  BarChartOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
+  InfoCircleOutlined,
+  SyncOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
+import { useInterval, useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchPublicBallots,
+  submitPublicVote,
+  type PublicBallot,
+  type PublicBallotResponse,
+} from '@/services/decide';
+
+const { Paragraph, Text } = Typography;
+
+type BallotRow = PublicBallot;
+type QuickFilter = 'all' | 'closing-soon' | 'high-turnout';
+type SelectionMap = Record<string, string | undefined>;
+
+const DEFAULT_SCALE_OPTIONS = [
+  'Strongly disagree',
+  'Disagree',
+  'Neutral',
+  'Agree',
+  'Strongly agree',
+] as const;
+
+const PAGE_SIZE = 8;
+const CLOSING_SOON_HOURS = 48;
+const HIGH_TURNOUT_THRESHOLD = 50;
+
+function resolveOptions(ballot: BallotRow): string[] {
+  if (Array.isArray(ballot.options) && ballot.options.length > 0) {
+    const cleaned = ballot.options
+      .map((option) => option.trim())
+      .filter((option) => option.length > 0);
+
+    if (cleaned.length > 0) {
+      return cleaned;
+    }
+  }
+
+  return [...DEFAULT_SCALE_OPTIONS];
+}
+
+function isClosingSoon(closesAt?: string | null): boolean {
+  if (!closesAt) {
+    return false;
+  }
+
+  const closes = dayjs(closesAt);
+
+  if (!closes.isValid() || closes.isBefore(dayjs())) {
+    return false;
+  }
+
+  return closes.diff(dayjs(), 'hour') <= CLOSING_SOON_HOURS;
+}
+
+function formatCloseDate(closesAt?: string | null): string {
+  if (!closesAt) {
+    return 'Date unavailable';
+  }
+
+  const closes = dayjs(closesAt);
+
+  return closes.isValid() ? closes.format('YYYY-MM-DD HH:mm') : 'Date unavailable';
+}
+
+function turnoutPercent(turnout?: number | null): number {
+  if (typeof turnout !== 'number' || Number.isNaN(turnout)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(turnout)));
+}
+
+function ballotStatus(ballot: BallotRow): {
+  label: string;
+  color?: string;
+  icon?: React.ReactNode;
+} {
+  if (isClosingSoon(ballot.closesAt)) {
+    return {
+      label: 'Closing soon',
+      color: 'volcano',
+      icon: <ClockCircleOutlined />,
+    };
+  }
+
+  return {
+    label: 'Open',
+    color: 'green',
+    icon: <CheckCircleOutlined />,
+  };
+}
+
+export default function PublicVotingPage(): JSX.Element {
+  const { message } = App.useApp();
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [quickFilter, setQuickFilter] = useState<QuickFilter>('all');
+  const [selectedOptions, setSelectedOptions] = useState<SelectionMap>({});
+  const [submittingId, setSubmittingId] = useState<string | null>(null);
+
+  const { data, loading, refresh } = useRequest<PublicBallotResponse, []>(
+    fetchPublicBallots,
+  );
+
+  useInterval(refresh, 60_000);
+
+  const ballots = useMemo<BallotRow[]>(() => data?.ballots ?? [], [data]);
+
+  const headerStats = useMemo(() => {
+    const total = ballots.length;
+
+    const avgTurnout =
+      total > 0
+        ? Math.round(
+            ballots.reduce(
+              (sum, ballot) => sum + turnoutPercent(ballot.turnout),
+              0,
+            ) / total,
+          )
+        : 0;
+
+    const closingSoon = ballots.filter((ballot) =>
+      isClosingSoon(ballot.closesAt),
+    ).length;
+
+    const highParticipation = ballots.filter(
+      (ballot) => turnoutPercent(ballot.turnout) >= HIGH_TURNOUT_THRESHOLD,
+    ).length;
+
+    return [
+      { label: 'Open consultations', value: total },
+      { label: 'Average participation', value: avgTurnout, suffix: '%' },
+      { label: 'Closing soon', value: closingSoon },
+      { label: 'High participation', value: highParticipation },
+    ];
+  }, [ballots]);
+
+  const filteredBallots = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase();
+
+    return ballots.filter((ballot) => {
+      const title = ballot.title ?? '';
+
+      if (
+        normalizedSearch &&
+        !title.toLowerCase().includes(normalizedSearch)
+      ) {
+        return false;
+      }
+
+      if (quickFilter === 'closing-soon') {
+        return isClosingSoon(ballot.closesAt);
+      }
+
+      if (quickFilter === 'high-turnout') {
+        return turnoutPercent(ballot.turnout) >= HIGH_TURNOUT_THRESHOLD;
+      }
+
+      return true;
+    });
+  }, [ballots, quickFilter, searchTerm]);
+
+  const handleRadioChange = useCallback((id: string, event: RadioChangeEvent) => {
+    const value = String(event.target.value);
+
+    setSelectedOptions((previous) => ({
+      ...previous,
+      [id]: value,
+    }));
+  }, []);
+
+  const handleSubmitVote = useCallback(
+    async (id: string) => {
+      const option = selectedOptions[id];
+
+      if (!option) {
+        message.warning('Choose your stance before casting your vote.');
+        return;
+      }
+
+      try {
+        setSubmittingId(id);
+
+        await submitPublicVote(id, option);
+
+        message.success('Your vote has been recorded.');
+        refresh();
+      } catch {
+        message.error('Failed to submit your vote. Please try again.');
+      } finally {
+        setSubmittingId(null);
+      }
+    },
+    [message, refresh, selectedOptions],
+  );
+
+  const columns = useMemo<ProColumns<BallotRow>[]>(
+    () => [
+      {
+        title: 'Consultation',
+        dataIndex: 'title',
+        width: 340,
+        ellipsis: true,
+        render: (_dom, row) => {
+          const status = ballotStatus(row);
+
+          return (
+            <Space direction="vertical" size={4}>
+              <Text strong>{row.title}</Text>
+              <Space size="small" wrap>
+                <Tag color={status.color} icon={status.icon}>
+                  {status.label}
+                </Tag>
+                <Tag icon={<ClockCircleOutlined />}>
+                  Closes {formatCloseDate(row.closesAt)}
+                </Tag>
+              </Space>
+            </Space>
+          );
+        },
+      },
+      {
+        title: 'Your vote',
+        dataIndex: 'id',
+        width: 480,
+        render: (_dom, row) => {
+          const id = String(row.id);
+          const options = resolveOptions(row);
+          const selected = selectedOptions[id];
+
+          if (options.length === 0) {
+            return <Tag color="default">No voting options configured</Tag>;
+          }
+
+          return (
+            <Space direction="vertical" size="small" style={{ width: '100%' }}>
+              <Radio.Group
+                size="small"
+                value={selected}
+                onChange={(event) => handleRadioChange(id, event)}
+              >
+                {options.map((option) => (
+                  <Radio.Button key={option} value={option}>
+                    {option}
+                  </Radio.Button>
+                ))}
+              </Radio.Group>
+
+              <Space size="small" wrap>
+                <Tag color={selected ? 'geekblue' : 'default'}>
+                  {selected ? `Selected: ${selected}` : 'No vote yet'}
+                </Tag>
+
+                <Button
+                  type="primary"
+                  size="small"
+                  icon={<ThunderboltOutlined />}
+                  loading={submittingId === id}
+                  disabled={!selected || submittingId === id}
+                  onClick={() => handleSubmitVote(id)}
+                >
+                  Cast vote
+                </Button>
+              </Space>
+            </Space>
+          );
+        },
+      },
+      {
+        title: 'Participation',
+        dataIndex: 'turnout',
+        width: 180,
+        render: (_dom, row) => {
+          const percent = turnoutPercent(row.turnout);
+
+          return (
+            <Space direction="vertical" size={4} style={{ width: '100%' }}>
+              <Progress
+                percent={percent}
+                size="small"
+                status={
+                  percent >= HIGH_TURNOUT_THRESHOLD ? 'success' : 'normal'
+                }
+              />
+              <Text type="secondary">{percent}% turnout</Text>
+            </Space>
+          );
+        },
+      },
+      {
+        title: 'Next',
+        key: 'actions',
+        width: 180,
+        render: (_dom, row) => (
+          <Space direction="vertical" size={4}>
+            <Link href={`/ethikos/deliberate/${row.id}?sidebar=ethikos`} prefetch={false}>
+              <Button size="small" icon={<FileTextOutlined />}>
+                View debate
+              </Button>
+            </Link>
+
+            <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
+              <Button size="small" type="link">
+                Results
+              </Button>
+            </Link>
+          </Space>
+        ),
+      },
+    ],
+    [
+      handleRadioChange,
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=d619145ba950:351-505
+start=351
+end=505
+----
+      handleSubmitVote,
+      selectedOptions,
+      submittingId,
+    ],
+  );
+
+  return (
+    <EthikosPageShell
+      sectionLabel="Decide"
+      title="Public consultations"
+      subtitle={
+        <span>
+          Review active public decisions, choose your stance, and cast a vote.
+          The raw result remains visible, and any enriched reading must be
+          explained separately.
+        </span>
+      }
+      primaryAction={
+        <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
+          <Button type="primary" icon={<BarChartOutlined />}>
+            Open results
+          </Button>
+        </Link>
+      }
+      secondaryActions={
+        <Space>
+          <Link href="/ethikos/decide/methodology?sidebar=ethikos" prefetch={false}>
+            <Button icon={<InfoCircleOutlined />}>Methodology</Button>
+          </Link>
+          <Link href="/ethikos/decide/elite?sidebar=ethikos" prefetch={false}>
+            <Button>Expert decisions</Button>
+          </Link>
+        </Space>
+      }
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            message="Vote first, interpret later"
+            description={
+              <span>
+                This page records your vote on open public consultations.
+                Results are reviewed in Decide · Results, where baseline results
+                and declared Smart Vote readings should remain clearly separated.
+              </span>
+            }
+          />
+
+          <ProCard gutter={[16, 16]} wrap>
+            {headerStats.map((stat) => (
+              <StatisticCard
+                key={stat.label}
+                colSpan={{ xs: 24, sm: 12, lg: 6 }}
+                statistic={{
+                  title: stat.label,
+                  value: stat.value,
+                  suffix: stat.suffix,
+                }}
+              />
+            ))}
+          </ProCard>
+
+          <ProCard
+            title="Choose a consultation"
+            extra={
+              <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                Find an open consultation, review the question, then cast your
+                stance.
+              </Paragraph>
+            }
+          >
+            <Space wrap>
+              <Input.Search
+                placeholder="Search consultations…"
+                allowClear
+                style={{ width: 280 }}
+                value={searchTerm}
+                onChange={(event) => setSearchTerm(event.target.value)}
+              />
+
+              <Radio.Group
+                size="small"
+                value={quickFilter}
+                onChange={(event) =>
+                  setQuickFilter(event.target.value as QuickFilter)
+                }
+              >
+                <Radio.Button value="all">All</Radio.Button>
+                <Radio.Button value="closing-soon">Closing soon</Radio.Button>
+                <Radio.Button value="high-turnout">
+                  High participation
+                </Radio.Button>
+              </Radio.Group>
+
+              <Tooltip title="Refresh open consultations">
+                <Button
+                  size="small"
+                  icon={<SyncOutlined />}
+                  onClick={() => refresh()}
+                  loading={loading}
+                >
+                  Refresh
+                </Button>
+              </Tooltip>
+            </Space>
+          </ProCard>
+
+          {filteredBallots.length === 0 ? (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description={
+                ballots.length === 0
+                  ? 'No open public consultations right now.'
+                  : 'No consultations match your search or filters.'
+              }
+            />
+          ) : (
+            <ProTable<BallotRow>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredBallots}
+              pagination={{ pageSize: PAGE_SIZE }}
+              search={false}
+              options={false}
+              toolBarRender={false}
+            />
+          )}
+
+          <ProCard title="After voting">
+            <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+              <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                After a consultation closes, the result should stay traceable:
+                raw vote first, then any declared reading, then impact tracking.
+              </Paragraph>
+
+              <Space wrap>
+                <Link href="/ethikos/decide/results?sidebar=ethikos" prefetch={false}>
+                  <Button icon={<BarChartOutlined />}>Read results</Button>
+                </Link>
+                <Link href="/ethikos/impact/tracker?sidebar=ethikos" prefetch={false}>
+                  <Button>Track impact</Button>
+                </Link>
+                <Link href="/ethikos/learn/guides?sidebar=ethikos" prefetch={false}>
+                  <Button>How decisions work</Button>
+                </Link>
+              </Space>
+            </Space>
+          </ProCard>
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
+
+----- FILE BEGIN -----
+path="decide/results/page.tsx"
+id=6c754196bf81
+kind=source
+size=11711
+lines=367
+line_ref=1-367
+chunks=2
+chunk_refs=1-350,351-367
+summary="Source file."
+
+--- CHUNK BEGIN ---
+id=6c754196bf81:1-350
+start=1
+end=350
+----
+// FILE: frontend/app/ethikos/decide/results/page.tsx
+'use client';
+
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
+import {
+  PageContainer,
+  ProCard,
+  ProTable,
+  StatisticCard,
+  type ProColumns,
+} from '@ant-design/pro-components';
+import {
+  Alert,
+  Button,
+  DatePicker,
+  Empty,
+  Segmented,
+  Select,
+  Space,
+  Tag,
+  Typography,
+} from 'antd';
+import {
+  ArrowRightOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
+import type { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { useRequest } from 'ahooks';
+
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import {
+  fetchDecisionResults,
+  type DecisionResult,
+  type DecisionScope,
+} from '@/services/decide';
+
+const { RangePicker } = DatePicker;
+const { Text, Paragraph } = Typography;
+
+type ScopeFilter = 'all' | DecisionScope;
+type ResultFilter = 'all' | 'passed' | 'rejected';
+type RangeValue = [Dayjs | null, Dayjs | null] | null;
+
+function formatDate(value: string): string {
+  const parsed = dayjs(value);
+  return parsed.isValid() ? parsed.format('YYYY-MM-DD HH:mm') : value;
+}
+
+function route(path: string): string {
+  return `${path}${path.includes('?') ? '&' : '?'}sidebar=ethikos`;
+}
+
+function ResultTag({ passed }: { passed: boolean }): JSX.Element {
+  return (
+    <Tag
+      color={passed ? 'green' : 'red'}
+      icon={passed ? <CheckCircleOutlined /> : <CloseCircleOutlined />}
+    >
+      {passed ? 'POSITIVE' : 'NEGATIVE'}
+    </Tag>
+  );
+}
+
+function ScopeTag({ scope }: { scope: DecisionScope }): JSX.Element {
+  return (
+    <Tag color={scope === 'Elite' ? 'geekblue' : 'default'}>
+      {scope === 'Elite' ? 'EXPERT CONTEXT' : 'PUBLIC'}
+    </Tag>
+  );
+}
+
+function formatStanceScore(value: number): string {
+  const normalized = Math.max(-3, Math.min(3, value));
+  return `${normalized >= 0 ? '+' : ''}${normalized.toFixed(2)} / 3`;
+}
+
+export default function ResultsArchive(): JSX.Element {
+  const { data, loading, error, refresh } = useRequest(fetchDecisionResults);
+  const items = data?.items ?? [];
+
+  const [scopeFilter, setScopeFilter] = useState<ScopeFilter>('all');
+  const [resultFilter, setResultFilter] = useState<ResultFilter>('all');
+  const [regionFilter, setRegionFilter] = useState<string | 'all'>('all');
+  const [range, setRange] = useState<RangeValue>(null);
+
+  const allRegions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          items
+            .map((item) => item.region)
+            .filter((region): region is string => Boolean(region)),
+        ),
+      ).sort((a, b) => a.localeCompare(b)),
+    [items],
+  );
+
+  const filteredItems = useMemo(
+    () =>
+      items.filter((item) => {
+        if (scopeFilter !== 'all' && item.scope !== scopeFilter) return false;
+        if (resultFilter === 'passed' && !item.passed) return false;
+        if (resultFilter === 'rejected' && item.passed) return false;
+        if (regionFilter !== 'all' && item.region !== regionFilter) return false;
+
+        if (range?.[0] && range?.[1]) {
+          const closed = dayjs(item.closesAt);
+          if (
+            !closed.isValid() ||
+            closed.isBefore(range[0].startOf('day')) ||
+            closed.isAfter(range[1].endOf('day'))
+          ) {
+            return false;
+          }
+        }
+        return true;
+      }),
+    [items, range, regionFilter, resultFilter, scopeFilter],
+  );
+
+  const availableReadings = items.filter(
+    (item) => typeof item.readingScore === 'number',
+  ).length;
+  const passedCount = items.filter((item) => item.passed).length;
+
+  const columns: ProColumns<DecisionResult>[] = [
+    {
+      title: 'Decision',
+      dataIndex: 'title',
+      width: 330,
+      render: (_dom, row) => (
+        <Space direction="vertical" size={0}>
+          <Text strong>{row.title}</Text>
+          <Text type="secondary">
+            {row.region ?? 'No category'} · {row.participationCount} stances
+          </Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Public baseline',
+      key: 'baseline',
+      width: 190,
+      render: (_dom, row) => (
+        <Space direction="vertical" size={0}>
+          <ResultTag passed={row.passed} />
+          <Text type="secondary">{formatStanceScore(row.baselineScore)}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'EkoH advisory reading',
+      key: 'reading',
+      width: 210,
+      render: (_dom, row) =>
+        typeof row.readingScore === 'number' ? (
+          <Space direction="vertical" size={0}>
+            <Tag color="blue">ADVISORY</Tag>
+            <Text>{formatStanceScore(row.readingScore)}</Text>
+            {row.readingKey && <Text type="secondary">{row.readingKey}</Text>}
+          </Space>
+        ) : (
+          <Text type="secondary">No declared reading</Text>
+        ),
+    },
+    {
+      title: 'Context',
+      dataIndex: 'scope',
+      width: 170,
+      render: (_dom, row) => <ScopeTag scope={row.scope} />,
+    },
+    {
+      title: 'Closed',
+      dataIndex: 'closesAt',
+      width: 180,
+      render: (_dom, row) => (
+        <Space>
+          <ClockCircleOutlined />
+          <Text type="secondary">{formatDate(row.closesAt)}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: 'Next',
+      key: 'next',
+      width: 150,
+      render: () => (
+        <Link href={route('/ethikos/impact/tracker')} prefetch={false}>
+          <Button size="small" icon={<ArrowRightOutlined />}>
+            Follow impact
+          </Button>
+        </Link>
+      ),
+    },
+  ];
+
+  const hasFilters =
+    scopeFilter !== 'all' ||
+    resultFilter !== 'all' ||
+    regionFilter !== 'all' ||
+    Boolean(range?.[0] && range?.[1]);
+
+  return (
+    <EthikosPageShell
+      title="Decision results"
+      sectionLabel="Decide"
+      subtitle="Compare the public baseline with declared advisory readings without collapsing them into one score."
+      primaryAction={
+        <Link href={route('/ethikos/decide/methodology')} prefetch={false}>
+          <Button type="primary" icon={<InfoCircleOutlined />}>
+            Voting methodology
+          </Button>
+        </Link>
+      }
+      secondaryActions={
+        <Space wrap>
+          <Link href={route('/ethikos/decide/public')} prefetch={false}>
+            <Button>Public consultations</Button>
+          </Link>
+          <Link href={route('/ethikos/decide/elite')} prefetch={false}>
+            <Button>Expert context</Button>
+          </Link>
+          <Button icon={<ReloadOutlined />} onClick={() => refresh()} loading={loading}>
+            Refresh
+          </Button>
+        </Space>
+      }
+    >
+      <PageContainer ghost loading={loading}>
+        <Space direction="vertical" size="large" style={{ width: '100%' }}>
+          <Alert
+            type="info"
+            showIcon
+            message="Single source facts, multiple readings"
+            description="The public baseline remains visible. EkoH supplies contextual expertise; Smart Vote may compute or publish a separate advisory reading. A missing reading is shown as missing, never fabricated from the baseline."
+          />
+
+          {error && (
+            <Alert
+              type="error"
+              showIcon
+              message="Unable to load decision results"
+              description="Check the Decide service or refresh this page."
+            />
+          )}
+
+          <ProCard gutter={16} wrap>
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{ title: 'Closed decisions', value: items.length }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{ title: 'Positive baseline', value: passedCount }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{ title: 'Available advisory readings', value: availableReadings }}
+            />
+            <StatisticCard
+              colSpan={{ xs: 24, sm: 12, lg: 6 }}
+              statistic={{ title: 'Categories represented', value: allRegions.length }}
+            />
+          </ProCard>
+
+          <ProCard gutter={16} wrap>
+            <ProCard
+              colSpan={{ xs: 24, lg: 8 }}
+              bordered
+              title={<Space><CheckCircleOutlined /><span>1. Public baseline</span></Space>}
+            >
+              <Paragraph type="secondary">
+                One source result from the canonical Ethikos stances.
+              </Paragraph>
+            </ProCard>
+            <ProCard
+              colSpan={{ xs: 24, lg: 8 }}
+              bordered
+              title={<Space><SafetyCertificateOutlined /><span>2. Advisory lens</span></Space>}
+            >
+              <Paragraph type="secondary">
+                Relevant expertise may produce a separate Smart Vote reading. It does not replace the baseline.
+              </Paragraph>
+            </ProCard>
+            <ProCard
+              colSpan={{ xs: 24, lg: 8 }}
+              bordered
+              title={<Space><ArrowRightOutlined /><span>3. Decision context</span></Space>}
+            >
+              <Paragraph type="secondary">
+                Divergence is information for judgment, not an automatic instruction.
+              </Paragraph>
+            </ProCard>
+          </ProCard>
+
+          <ProCard title="Filter results">
+            <Space wrap>
+              <Segmented
+                value={scopeFilter}
+                onChange={(value) => setScopeFilter(value as ScopeFilter)}
+                options={[
+                  { label: 'All', value: 'all' },
+                  { label: 'Public', value: 'Public' },
+                  { label: 'Expert context', value: 'Elite' },
+                ]}
+              />
+              <Segmented
+                value={resultFilter}
+                onChange={(value) => setResultFilter(value as ResultFilter)}
+                options={[
+                  { label: 'All results', value: 'all' },
+                  { label: 'Positive', value: 'passed' },
+                  { label: 'Negative', value: 'rejected' },
+                ]}
+              />
+              <Select
+                placeholder="Category"
+                style={{ minWidth: 200 }}
+                allowClear
+                value={regionFilter === 'all' ? undefined : regionFilter}
+                onChange={(value) => setRegionFilter(value ?? 'all')}
+                options={allRegions.map((region) => ({ label: region, value: region }))}
+              />
+              <RangePicker value={range} onChange={(value) => setRange(value as RangeValue)} />
+              {hasFilters && (
+                <Button
+                  onClick={() => {
+                    setScopeFilter('all');
+                    setResultFilter('all');
+                    setRegionFilter('all');
+                    setRange(null);
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </Space>
+          </ProCard>
+
+          {filteredItems.length === 0 && !loading ? (
+            <ProCard>
+              <Empty description="No archived decisions match the current filters." />
+            </ProCard>
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=6c754196bf81:351-367
+start=351
+end=367
+----
+          ) : (
+            <ProTable<DecisionResult>
+              rowKey="id"
+              columns={columns}
+              dataSource={filteredItems}
+              pagination={{ pageSize: 12, showSizeChanger: true }}
+              search={false}
+              options={false}
+              toolBarRender={false}
+              headerTitle="Archived decisions"
+            />
+          )}
+        </Space>
+      </PageContainer>
+    </EthikosPageShell>
+  );
+}
+--- CHUNK END ---
+----- FILE END -----
