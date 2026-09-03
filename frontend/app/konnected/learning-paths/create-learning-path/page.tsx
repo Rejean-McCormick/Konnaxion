@@ -1,6 +1,8 @@
 // FILE: frontend/app/konnected/learning-paths/create-learning-path/page.tsx
 "use client";
 
+import { apiFetch } from '@/api';
+
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   Alert,
@@ -87,7 +89,7 @@ async function createLearningPath(
   values: LearningPathFormValues,
   status: LearningPathStatus
 ) {
-  const response = await fetch(buildUrl("/api/konnected/learning-paths/"), {
+  const response = await apiFetch(buildUrl("/api/konnected/learning-paths/"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -129,7 +131,7 @@ async function fetchKnowledgeResources(
   if (params.q) search.set("q", params.q);
   if (params.type && params.type !== "all") search.set("type", params.type);
 
-  const response = await fetch(
+  const response = await apiFetch(
     buildUrl(`/api/knowledge/resources/${search.toString() ? `?${search}` : ""}`)
   );
 

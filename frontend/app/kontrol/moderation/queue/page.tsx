@@ -1,6 +1,8 @@
 // FILE: frontend/app/kontrol/moderation/queue/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useRef, useState } from 'react';
 import {
   Button,
@@ -93,7 +95,7 @@ export default function ModerationQueuePage(): JSX.Element {
     try {
       message.loading('Processing action...', 0.5);
 
-      const response = await fetch(`/api/admin/moderation/${id}/`, {
+      const response = await apiFetch(`/api/admin/moderation/${id}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -308,7 +310,7 @@ export default function ModerationQueuePage(): JSX.Element {
             if (params.type)
               searchParams.append('search', params.type as string);
 
-            const res = await fetch(
+            const res = await apiFetch(
               `/api/admin/moderation/?${searchParams.toString()}`,
             );
             if (!res.ok) throw new Error('Failed to fetch tickets');

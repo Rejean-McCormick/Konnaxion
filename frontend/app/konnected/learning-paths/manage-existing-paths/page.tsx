@@ -1,6 +1,8 @@
 // FILE: frontend/app/konnected/learning-paths/manage-existing-paths/page.tsx
 ﻿'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useRef, useState } from 'react';
 import Link from 'next/link';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
@@ -98,7 +100,7 @@ async function listLearningPaths(params: TableQueryParams) {
   if (params.created_from) searchParams.set('created_from', params.created_from);
   if (params.created_to) searchParams.set('created_to', params.created_to);
 
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}?${searchParams.toString()}`,
     { credentials: 'include' },
   );
@@ -116,7 +118,7 @@ async function listLearningPaths(params: TableQueryParams) {
 }
 
 async function updateLearningPath(id: string | number, payload: Partial<LearningPath>) {
-  const res = await fetch(`${API_BASE}/${id}`, {
+  const res = await apiFetch(`${API_BASE}/${id}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
@@ -131,7 +133,7 @@ async function updateLearningPath(id: string | number, payload: Partial<Learning
 }
 
 async function archiveLearningPath(id: string | number) {
-  const res = await fetch(`${API_BASE}/${id}/archive`, {
+  const res = await apiFetch(`${API_BASE}/${id}/archive`, {
     method: 'POST',
     credentials: 'include',
   });
@@ -142,7 +144,7 @@ async function archiveLearningPath(id: string | number) {
 }
 
 async function deleteLearningPath(id: string | number) {
-  const res = await fetch(`${API_BASE}/${id}`, {
+  const res = await apiFetch(`${API_BASE}/${id}`, {
     method: 'DELETE',
     credentials: 'include',
   });

@@ -154,6 +154,90 @@ function mergeHeaders(
   return headers;
 }
 
+function readBrowserCookie(name: string): string | undefined {
+  if (typeof document === 'undefined') return undefined;
+
+  const prefix = `${encodeURIComponent(name)}=`;
+  const entry = document.cookie
+    .split(';')
+    .map((value) => value.trim())
+    .find((value) => value.startsWith(prefix));
+
+  if (!entry) return undefined;
+  return decodeURIComponent(entry.slice(prefix.length));
+}
+
+function requestMethod(input: RequestInfo | URL, init: RequestInit): string {
+  if (init.method) return init.method.toUpperCase();
+  if (typeof Request !== 'undefined' && input instanceof Request) {
+    return input.method.toUpperCase();
+  }
+  return 'GET';
+}
+
+function isUnsafeMethod(method: string): boolean {
+  return !['GET', 'HEAD', 'OPTIONS', 'TRACE'].includes(method.toUpperCase());
+}
+
+function isTrustedApiRequest(input: RequestInfo | URL): boolean {
+  if (typeof window === 'undefined') return false;
+
+  const raw =
+    typeof input === 'string'
+      ? input
+      : input instanceof URL
+        ? input.toString()
+        : input.url;
+
+  try {
+    const requestOrigin = new URL(raw, window.location.origin).origin;
+    const trustedOrigins = new Set<string>([window.location.origin]);
+
+    if (isAbsoluteUrl(API_BASE)) {
+      trustedOrigins.add(new URL(API_BASE).origin);
+    }
+
+    return trustedOrigins.has(requestOrigin);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Fetch wrapper for Konnaxion browser calls.
+ *
+ * - always carries same-site cookies unless explicitly overridden;
+ * - injects Django's X-CSRFToken header for same-origin mutation requests;
+ * - preserves the native Response contract so existing call sites can migrate
+ *   from fetch(...) to apiFetch(...) without changing response handling.
+ */
+export async function apiFetch(
+  input: RequestInfo | URL,
+  init: RequestInit = {},
+): Promise<Response> {
+  const inheritedHeaders =
+    typeof Request !== 'undefined' && input instanceof Request
+      ? input.headers
+      : undefined;
+  const headers = mergeHeaders(init.headers, inheritedHeaders);
+  const method = requestMethod(input, init);
+
+  if (
+    isUnsafeMethod(method) &&
+    isTrustedApiRequest(input) &&
+    !headers.has('X-CSRFToken')
+  ) {
+    const csrfToken = readBrowserCookie('csrftoken');
+    if (csrfToken) headers.set('X-CSRFToken', csrfToken);
+  }
+
+  return fetch(input, {
+    ...init,
+    credentials: init.credentials ?? 'include',
+    headers,
+  });
+}
+
 function hasBody(init: RequestInit): boolean {
   return init.body !== undefined && init.body !== null;
 }
@@ -222,8 +306,7 @@ export async function apiRequestJson<T>(
 ): Promise<T> {
   const url = buildUrl(path, query);
 
-  const res = await fetch(url, {
-    credentials: 'include',
+  const res = await apiFetch(url, {
     ...init,
     headers: mergeHeaders(init.headers),
   });

@@ -1,6 +1,8 @@
 // FILE: frontend/app/kontrol/konsensus/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useState } from 'react';
 import {
   message,
@@ -179,7 +181,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
             // 1. FETCH INITIAL CONFIGURATION (GET)
             request={async () => {
               try {
-                const res = await fetch(
+                const res = await apiFetch(
                   '/api/admin/konsensus-config/',
                 );
                 if (!res.ok) return {};
@@ -277,7 +279,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
                   },
                 };
 
-                const res = await fetch(
+                const res = await apiFetch(
                   '/api/admin/konsensus-config/',
                   {
                     method: 'POST',

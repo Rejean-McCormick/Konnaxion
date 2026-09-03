@@ -2,6 +2,8 @@
 ﻿// app/konnected/teams-collaboration/my-teams/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -132,7 +134,7 @@ export default function MyTeamsPage(): JSX.Element {
       setError(null);
 
       try {
-        const res = await fetch(MY_TEAMS_ENDPOINT, {
+        const res = await apiFetch(MY_TEAMS_ENDPOINT, {
           credentials: 'include',
           cache: 'no-store',
         });
@@ -186,7 +188,7 @@ export default function MyTeamsPage(): JSX.Element {
 
     setLeavingTeamId(team.teamId);
     try {
-      const res = await fetch(LEAVE_TEAM_ENDPOINT(team.teamId), {
+      const res = await apiFetch(LEAVE_TEAM_ENDPOINT(team.teamId), {
         method: 'POST',
         credentials: 'include',
         headers: {

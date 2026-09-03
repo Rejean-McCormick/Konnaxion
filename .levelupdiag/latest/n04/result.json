@@ -4,7 +4,7 @@
   "level_id": "N04",
   "name": "API Contracts",
   "level_name": "API Contracts",
-  "verdict": "FAIL",
+  "verdict": "WARN",
   "findings": [
     {
       "id": "kx.contract.backend-api-scan",
@@ -19,7 +19,7 @@
           "django_api_scanner.py"
         ],
         "exit_code": 0,
-        "duration_seconds": 2.719
+        "duration_seconds": 2.619
       }
     },
     {
@@ -28,14 +28,14 @@
       "message": "Frontend endpoint scan passed.",
       "category": "command",
       "path": "C:\\mycode\\Konnaxion\\Konnaxion\\frontend",
-      "evidence": "Endpoints: 93 -> frontend_endpoints.{json,csv}\n",
+      "evidence": "Endpoints: 78 -> frontend_endpoints.{json,csv}\n",
       "data": {
         "command": [
           "C:\\Program Files\\Volta\\node.exe",
           "scripts/scan-endpoints.mjs"
         ],
         "exit_code": 0,
-        "duration_seconds": 0.414
+        "duration_seconds": 0.411
       }
     },
     {
@@ -44,7 +44,7 @@
       "message": "OpenAPI contract tests passed.",
       "category": "command",
       "path": "C:\\mycode\\Konnaxion\\Konnaxion\\backend",
-      "evidence": "...                                                                      [100%]\n============================== warnings summary ===============================\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_accessible_by_admin\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_not_accessible_by_anonymous_users\nkonnaxion/users/tests/api/test_openapi.py::test_api_schema_generated_successfully\n  C:\\mycode\\Konnaxion\\Konnaxion\\backend\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py:61: UserWarning: No directory at: C:\\mycode\\Konnaxion\\Konnaxion\\backend\\staticfiles\\\n    mw_instance = middleware(adapted_handler)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 3 warnings in 7.55s\n",
+      "evidence": "...                                                                      [100%]\n============================== warnings summary ===============================\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_accessible_by_admin\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_not_accessible_by_anonymous_users\nkonnaxion/users/tests/api/test_openapi.py::test_api_schema_generated_successfully\n  C:\\mycode\\Konnaxion\\Konnaxion\\backend\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py:61: UserWarning: No directory at: C:\\mycode\\Konnaxion\\Konnaxion\\backend\\staticfiles\\\n    mw_instance = middleware(adapted_handler)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 3 warnings in 7.47s\n",
       "data": {
         "command": [
           "C:\\mycode\\Konnaxion\\Konnaxion\\backend\\.venv\\Scripts\\python.exe",
@@ -54,7 +54,7 @@
           "-q"
         ],
         "exit_code": 0,
-        "duration_seconds": 10.541
+        "duration_seconds": 10.34
       }
     },
     {
@@ -66,17 +66,18 @@
     },
     {
       "id": "kx.contract.forbidden-namespaces",
-      "severity": "FAIL",
-      "message": "Forbidden legacy API calls: 6",
+      "severity": "PASS",
+      "message": "Forbidden legacy API calls: 0",
       "category": "contract",
-      "evidence": "[('modules\\\\ethikos\\\\decide\\\\public\\\\page.tsx', '/api/home/debatecategory/'), ('modules\\\\ethikos\\\\decide\\\\public\\\\page.tsx', '/api/home/responseformat/'), ('modules\\\\ethikos\\\\decide\\\\public\\\\page.tsx', '/api/home/debatetopic/'), ('modules\\\\ethikos\\\\decide\\\\public\\\\page.tsx', '/api/home/publicvote/'), ('modules\\\\ethikos\\\\decide\\\\public\\\\page.tsx', '/api/home/debatetopic/'), ('modules\\\\konsultations\\\\components\\\\ConsultationList.tsx', '/api/konsultations/consultations')]"
+      "evidence": "[]"
     },
     {
       "id": "kx.contract.csrf-risk",
-      "severity": "FAIL",
-      "message": "Mutation files without visible CSRF header handling: 16",
+      "severity": "WARN",
+      "message": "Mutation files requiring CSRF review: 8",
       "category": "auth",
-      "evidence": "['api.ts', 'app\\\\konnected\\\\certifications\\\\exam-registration\\\\page.tsx', 'app\\\\konnected\\\\community-discussions\\\\start-new-discussion\\\\page.tsx', 'app\\\\konnected\\\\learning-library\\\\offline-content\\\\page.tsx', 'app\\\\konnected\\\\learning-library\\\\recommended-resources\\\\page.tsx', 'app\\\\konnected\\\\learning-paths\\\\create-learning-path\\\\page.tsx', 'app\\\\konnected\\\\learning-paths\\\\manage-existing-paths\\\\page.tsx', 'app\\\\konnected\\\\teams-collaboration\\\\my-teams\\\\page.tsx', 'app\\\\konnected\\\\teams-collaboration\\\\team-builder\\\\page.tsx', 'app\\\\kontrol\\\\konsensus\\\\page.tsx', 'app\\\\kontrol\\\\moderation\\\\queue\\\\page.tsx', 'app\\\\kreative\\\\community-showcases\\\\submit-to-showcase\\\\page.tsx', 'artifacts\\\\playwright-smoke-html\\\\trace\\\\assets\\\\defaultSettingsView-w0zYjHsW.js', 'artifacts\\\\playwright-smoke-html\\\\trace\\\\sw.bundle.js', 'artifacts\\\\playwright-smoke-html\\\\trace\\\\uiMode.DRQ310U5.js', 'modules\\\\konsultations\\\\hooks\\\\useSuggestions.ts']"
+      "evidence": "['app\\\\keenkonnect\\\\knowledge\\\\upload-new-document\\\\page.tsx', 'app\\\\keenkonnect\\\\projects\\\\create-new-project\\\\page.tsx', 'app\\\\keenkonnect\\\\sustainability-impact\\\\submit-impact-reports\\\\page.tsx', 'app\\\\keenkonnect\\\\workspaces\\\\launch-new-workspace\\\\page.tsx', 'app\\\\konnected\\\\learning-library\\\\offline-content\\\\page.tsx', 'modules\\\\ethikos\\\\components\\\\ArgumentTree.tsx', 'modules\\\\konsensus\\\\pages\\\\PollPage.tsx', 'modules\\\\konsultations\\\\components\\\\ConsultationForm.tsx']",
+      "recommendation": "Review raw mutation fetches. Calls through apiFetch/apiPost/apiPut/apiPatch/apiDelete or services/_request are treated as CSRF-aware."
     },
     {
       "id": "kx.contract.unmapped",
@@ -87,59 +88,26 @@
     }
   ],
   "artifacts": [],
-  "started_at": "2026-09-03T12:29:28-04:00",
-  "ended_at": "2026-09-03T12:29:42-04:00",
-  "duration_seconds": 14.040522,
+  "started_at": "2026-09-03T15:17:29-04:00",
+  "ended_at": "2026-09-03T15:17:43-04:00",
+  "duration_seconds": 14.054494,
   "cwd": "C:\\mycode\\Konnaxion\\Konnaxion",
-  "output_tail": "## Django API scanner\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ethikos\\demo_import\\views.py: Error [EthikosDemoScenarioImportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ethikos\\demo_import\\views.py: Error [EthikosDemoScenarioPreviewView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ethikos\\demo_import\\views.py: Error [EthikosDemoScenarioResetView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\konnected\\api_views.py: Error [ExamAttemptViewSet]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\konnected\\api_views.py: Warning [ExamAttemptViewSet]: could not derive type of path parameter \"id\" because it is untyped and obtaining queryset from the viewset failed. Consider adding a type to the path (e.g. <int:id>) or annotating the parameter type with @extend_schema. Defaulting to \"string\".\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kreative\\serializers.py: Warning [KreativeArtworkViewSet > KreativeArtworkSerializer > TagSerializer]: Encountered 2 components with identical names \"Tag\" and different identities <class 'konnaxion.kreative.serializers.TagSerializer'> and <class 'konnaxion.keenkonnect.serializers.TagSerializer'>. This will very likely result in an incorrect schema. Try renaming one.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kreative\\serializers.py: Warning [TagViewSet > TagSerializer]: Encountered 2 components with identical names \"Tag\" and different identities <class 'konnaxion.kreative.serializers.TagSerializer'> and <class 'konnaxion.keenkonnect.serializers.TagSerializer'>. This will very likely result in an incorrect schema. Try renaming one.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kreative\\serializers.py: Warning [TagViewSet > TagSerializer]: Encountered 2 components with identical names \"PatchedTag\" and different identities <class 'konnaxion.kreative.serializers.TagSerializer'> and <class 'konnaxion.keenkonnect.serializers.TagSerializer'>. This will very likely result in an incorrect schema. Try renaming one.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kontrol\\analytics_views.py: Error [PerformanceReportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kontrol\\analytics_views.py: Error [SmartVoteReportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kontrol\\analytics_views.py: Error [UsageReportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ekoh\\serializers\\profile.py: Warning [ProfileView > ProfileSerializer]: unable to resolve type hint for function \"get_ethics_score\". Consider using a type hint or @extend_schema_field. Defaulting to string.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\smart_vote\\views\\reading.py: Error [EthikosTopicReadingView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nWarning: operationId \"deliberate_demo_scenarios_import_create\" has collisions [('/api/deliberate/demo-scenarios/import', 'post'), ('/api/deliberate/demo-scenarios/import/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_demo_scenarios_preview_create\" has collisions [('/api/deliberate/demo-scenarios/preview', 'post'), ('/api/deliberate/demo-scenarios/preview/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_demo_scenarios_reset_create\" has collisions [('/api/deliberate/demo-scenarios/reset', 'post'), ('/api/deliberate/demo-scenarios/reset/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_elite_demo_scenarios_import_create\" has collisions [('/api/deliberate/elite/demo-scenarios/import', 'post'), ('/api/deliberate/elite/demo-scenarios/import/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_elite_demo_scenarios_preview_create\" has collisions [('/api/deliberate/elite/demo-scenarios/preview', 'post'), ('/api/deliberate/elite/demo-scenarios/preview/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_elite_demo_scenarios_reset_create\" has collisions [('/api/deliberate/elite/demo-scenarios/reset', 'post'), ('/api/deliberate/elite/demo-scenarios/reset/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"ethikos_demo_scenarios_import_create\" has collisions [('/api/ethikos/demo-scenarios/import', 'post'), ('/api/ethikos/demo-scenarios/import/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"ethikos_demo_scenarios_preview_create\" has collisions [('/api/ethikos/demo-scenarios/preview', 'post'), ('/api/ethikos/demo-scenarios/preview/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"ethikos_demo_scenarios_reset_create\" has collisions [('/api/ethikos/demo-scenarios/reset', 'post'), ('/api/ethikos/demo-scenarios/reset/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"konnected_certifications_exam_attempts_retrieve\" has collisions [('/api/konnected/certifications/exam-attempts/', 'get'), ('/api/konnected/certifications/exam-attempts/{id}/', 'get')]. resolving with numeral suffixes.\ndynamic: wrote 292 rows to routes.json and routes.csv\n\n\n## Frontend endpoint scan\nEndpoints: 93 -> frontend_endpoints.{json,csv}\n\n\n## OpenAPI contract tests\n...                                                                      [100%]\n============================== warnings summary ===============================\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_accessible_by_admin\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_not_accessible_by_anonymous_users\nkonnaxion/users/tests/api/test_openapi.py::test_api_schema_generated_successfully\n  C:\\mycode\\Konnaxion\\Konnaxion\\backend\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py:61: UserWarning: No directory at: C:\\mycode\\Konnaxion\\Konnaxion\\backend\\staticfiles\\\n    mw_instance = middleware(adapted_handler)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 3 warnings in 7.55s\n",
+  "output_tail": "## Django API scanner\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ethikos\\demo_import\\views.py: Error [EthikosDemoScenarioImportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ethikos\\demo_import\\views.py: Error [EthikosDemoScenarioPreviewView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ethikos\\demo_import\\views.py: Error [EthikosDemoScenarioResetView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\konnected\\api_views.py: Error [ExamAttemptViewSet]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\konnected\\api_views.py: Warning [ExamAttemptViewSet]: could not derive type of path parameter \"id\" because it is untyped and obtaining queryset from the viewset failed. Consider adding a type to the path (e.g. <int:id>) or annotating the parameter type with @extend_schema. Defaulting to \"string\".\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kreative\\serializers.py: Warning [KreativeArtworkViewSet > KreativeArtworkSerializer > TagSerializer]: Encountered 2 components with identical names \"Tag\" and different identities <class 'konnaxion.kreative.serializers.TagSerializer'> and <class 'konnaxion.keenkonnect.serializers.TagSerializer'>. This will very likely result in an incorrect schema. Try renaming one.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kreative\\serializers.py: Warning [TagViewSet > TagSerializer]: Encountered 2 components with identical names \"Tag\" and different identities <class 'konnaxion.kreative.serializers.TagSerializer'> and <class 'konnaxion.keenkonnect.serializers.TagSerializer'>. This will very likely result in an incorrect schema. Try renaming one.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kreative\\serializers.py: Warning [TagViewSet > TagSerializer]: Encountered 2 components with identical names \"PatchedTag\" and different identities <class 'konnaxion.kreative.serializers.TagSerializer'> and <class 'konnaxion.keenkonnect.serializers.TagSerializer'>. This will very likely result in an incorrect schema. Try renaming one.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kontrol\\analytics_views.py: Error [PerformanceReportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kontrol\\analytics_views.py: Error [SmartVoteReportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\kontrol\\analytics_views.py: Error [UsageReportView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\ekoh\\serializers\\profile.py: Warning [ProfileView > ProfileSerializer]: unable to resolve type hint for function \"get_ethics_score\". Consider using a type hint or @extend_schema_field. Defaulting to string.\nC:\\mycode\\Konnaxion\\Konnaxion\\backend\\konnaxion\\smart_vote\\views\\reading.py: Error [EthikosTopicReadingView]: unable to guess serializer. This is graceful fallback handling for APIViews. Consider using GenericAPIView as view base class, if view is under your control. Either way you may want to add a serializer_class (or method). Ignoring view for now.\nWarning: operationId \"deliberate_demo_scenarios_import_create\" has collisions [('/api/deliberate/demo-scenarios/import', 'post'), ('/api/deliberate/demo-scenarios/import/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_demo_scenarios_preview_create\" has collisions [('/api/deliberate/demo-scenarios/preview', 'post'), ('/api/deliberate/demo-scenarios/preview/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_demo_scenarios_reset_create\" has collisions [('/api/deliberate/demo-scenarios/reset', 'post'), ('/api/deliberate/demo-scenarios/reset/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_elite_demo_scenarios_import_create\" has collisions [('/api/deliberate/elite/demo-scenarios/import', 'post'), ('/api/deliberate/elite/demo-scenarios/import/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_elite_demo_scenarios_preview_create\" has collisions [('/api/deliberate/elite/demo-scenarios/preview', 'post'), ('/api/deliberate/elite/demo-scenarios/preview/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"deliberate_elite_demo_scenarios_reset_create\" has collisions [('/api/deliberate/elite/demo-scenarios/reset', 'post'), ('/api/deliberate/elite/demo-scenarios/reset/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"ethikos_demo_scenarios_import_create\" has collisions [('/api/ethikos/demo-scenarios/import', 'post'), ('/api/ethikos/demo-scenarios/import/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"ethikos_demo_scenarios_preview_create\" has collisions [('/api/ethikos/demo-scenarios/preview', 'post'), ('/api/ethikos/demo-scenarios/preview/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"ethikos_demo_scenarios_reset_create\" has collisions [('/api/ethikos/demo-scenarios/reset', 'post'), ('/api/ethikos/demo-scenarios/reset/', 'post')]. resolving with numeral suffixes.\nWarning: operationId \"konnected_certifications_exam_attempts_retrieve\" has collisions [('/api/konnected/certifications/exam-attempts/', 'get'), ('/api/konnected/certifications/exam-attempts/{id}/', 'get')]. resolving with numeral suffixes.\ndynamic: wrote 292 rows to routes.json and routes.csv\n\n\n## Frontend endpoint scan\nEndpoints: 78 -> frontend_endpoints.{json,csv}\n\n\n## OpenAPI contract tests\n...                                                                      [100%]\n============================== warnings summary ===============================\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_accessible_by_admin\nkonnaxion/users/tests/api/test_openapi.py::test_api_docs_not_accessible_by_anonymous_users\nkonnaxion/users/tests/api/test_openapi.py::test_api_schema_generated_successfully\n  C:\\mycode\\Konnaxion\\Konnaxion\\backend\\.venv\\Lib\\site-packages\\django\\core\\handlers\\base.py:61: UserWarning: No directory at: C:\\mycode\\Konnaxion\\Konnaxion\\backend\\staticfiles\\\n    mw_instance = middleware(adapted_handler)\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n3 passed, 3 warnings in 7.47s\n",
   "metadata": {
-    "diagnostic_session_id": "kxdiag-20260903_122622-225fb4ee",
+    "diagnostic_session_id": "kxdiag-20260903_151501-106981be",
     "cwd": "C:\\mycode\\Konnaxion\\Konnaxion",
     "source_audit": {
       "double_api": [],
-      "forbidden": [
-        [
-          "modules\\ethikos\\decide\\public\\page.tsx",
-          "/api/home/debatecategory/"
-        ],
-        [
-          "modules\\ethikos\\decide\\public\\page.tsx",
-          "/api/home/responseformat/"
-        ],
-        [
-          "modules\\ethikos\\decide\\public\\page.tsx",
-          "/api/home/debatetopic/"
-        ],
-        [
-          "modules\\ethikos\\decide\\public\\page.tsx",
-          "/api/home/publicvote/"
-        ],
-        [
-          "modules\\ethikos\\decide\\public\\page.tsx",
-          "/api/home/debatetopic/"
-        ],
-        [
-          "modules\\konsultations\\components\\ConsultationList.tsx",
-          "/api/konsultations/consultations"
-        ]
-      ],
+      "forbidden": [],
       "csrf_risk_files": [
-        "api.ts",
-        "app\\konnected\\certifications\\exam-registration\\page.tsx",
-        "app\\konnected\\community-discussions\\start-new-discussion\\page.tsx",
+        "app\\keenkonnect\\knowledge\\upload-new-document\\page.tsx",
+        "app\\keenkonnect\\projects\\create-new-project\\page.tsx",
+        "app\\keenkonnect\\sustainability-impact\\submit-impact-reports\\page.tsx",
+        "app\\keenkonnect\\workspaces\\launch-new-workspace\\page.tsx",
         "app\\konnected\\learning-library\\offline-content\\page.tsx",
-        "app\\konnected\\learning-library\\recommended-resources\\page.tsx",
-        "app\\konnected\\learning-paths\\create-learning-path\\page.tsx",
-        "app\\konnected\\learning-paths\\manage-existing-paths\\page.tsx",
-        "app\\konnected\\teams-collaboration\\my-teams\\page.tsx",
-        "app\\konnected\\teams-collaboration\\team-builder\\page.tsx",
-        "app\\kontrol\\konsensus\\page.tsx",
-        "app\\kontrol\\moderation\\queue\\page.tsx",
-        "app\\kreative\\community-showcases\\submit-to-showcase\\page.tsx",
-        "artifacts\\playwright-smoke-html\\trace\\assets\\defaultSettingsView-w0zYjHsW.js",
-        "artifacts\\playwright-smoke-html\\trace\\sw.bundle.js",
-        "artifacts\\playwright-smoke-html\\trace\\uiMode.DRQ310U5.js",
-        "modules\\konsultations\\hooks\\useSuggestions.ts"
+        "modules\\ethikos\\components\\ArgumentTree.tsx",
+        "modules\\konsensus\\pages\\PollPage.tsx",
+        "modules\\konsultations\\components\\ConsultationForm.tsx"
       ],
       "unmapped": [],
       "backend_prefixes": [],
@@ -154,7 +122,6 @@
         "/api/ekoh/votes/",
         "/api/ethikos",
         "/api/ethikos/",
-        "/api/ethikos/...",
         "/api/ethikos/argument-impact-votes/",
         "/api/ethikos/argument-sources/",
         "/api/ethikos/argument-suggestions/",
@@ -169,10 +136,6 @@
         "/api/forum-topics/",
         "/api/healthz",
         "/api/home",
-        "/api/home/debatecategory/",
-        "/api/home/debatetopic/",
-        "/api/home/publicvote/",
-        "/api/home/responseformat/",
         "/api/keenkonnect/opportunities/",
         "/api/keenkonnect/projects/",
         "/api/kialo",
@@ -190,7 +153,6 @@
         "/api/konnected/resources/metadata/",
         "/api/konnected/teams",
         "/api/konnected/teams/my-teams",
-        "/api/konsultations/consultations",
         "/api/kontact/opportunities/",
         "/api/korum",
         "/api/learning-progress/",
@@ -199,7 +161,6 @@
         "/api/portfolios/",
         "/api/project-teams/",
         "/api/projects/",
-        "/api/showcases",
         "/api/users/me/"
       ]
     }

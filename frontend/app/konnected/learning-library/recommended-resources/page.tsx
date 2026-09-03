@@ -2,6 +2,8 @@
 // app/konnected/learning-library/recommended-resources/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/navigation';
@@ -99,7 +101,7 @@ function normalizeList<T = unknown>(raw: unknown): { items: T[]; count?: number 
 }
 
 async function fetchJson(url: string): Promise<unknown> {
-  const res = await fetch(url, {
+  const res = await apiFetch(url, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
@@ -264,7 +266,7 @@ async function sendRecommendationFeedback(
   feedback: 'like' | 'dislike',
 ): Promise<void> {
   try {
-    await fetch('/api/knowledge-recommendations/feedback/', {
+    await apiFetch('/api/knowledge-recommendations/feedback/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

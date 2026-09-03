@@ -155,7 +155,7 @@ function processFile(filePath: string, notes: Note[]): boolean {
 
       const fnArrow = Node.isArrowFunction(init) ? (init as ArrowFunction) : undefined;
       const fnFunc  = Node.isFunctionExpression(init) ? (init as FunctionExpression) : undefined;
-      let fn: ArrowFunction | FunctionExpression | undefined = fnArrow ?? fnFunc;
+      const fn: ArrowFunction | FunctionExpression | undefined = fnArrow ?? fnFunc;
       if (!fn) {
         notes.push({ file: sf.getFilePath(), line: renderProp.getStartLineNumber(), message: 'SKIP render: not an arrow/function expression' });
         continue;

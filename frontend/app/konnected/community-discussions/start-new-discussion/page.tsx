@@ -2,6 +2,8 @@
 ﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useState } from 'react';
 import {
   Alert,
@@ -93,7 +95,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
       const { topic, initialPostContent } = buildBodies(values);
 
       // 1) Create the forum topic (thread) itself.
-      const topicRes = await fetch('/api/forum-topics/', {
+      const topicRes = await apiFetch('/api/forum-topics/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +137,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
             content: initialPostContent,
           };
 
-          const postRes = await fetch('/api/forum-posts/', {
+          const postRes = await apiFetch('/api/forum-posts/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

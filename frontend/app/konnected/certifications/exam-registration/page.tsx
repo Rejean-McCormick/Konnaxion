@@ -2,6 +2,8 @@
 ﻿// app/konnected/certifications/exam-registration/page.tsx
 ﻿'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -123,7 +125,7 @@ const ExamRegistrationPageInner: React.FC = () => {
       setPathsLoading(true);
       setPathsError(null);
       try {
-        const res = await fetch(EXAM_PATHS_ENDPOINT, {
+        const res = await apiFetch(EXAM_PATHS_ENDPOINT, {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -196,7 +198,7 @@ const ExamRegistrationPageInner: React.FC = () => {
     const fetchEligibility = async () => {
       setEligibilityLoading(true);
       try {
-        const res = await fetch(EXAM_ELIGIBILITY_ENDPOINT(selectedPathId), {
+        const res = await apiFetch(EXAM_ELIGIBILITY_ENDPOINT(selectedPathId), {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -222,7 +224,7 @@ const ExamRegistrationPageInner: React.FC = () => {
       setSessionsLoading(true);
       setSessionsError(null);
       try {
-        const res = await fetch(EXAM_SESSIONS_ENDPOINT(selectedPathId), {
+        const res = await apiFetch(EXAM_SESSIONS_ENDPOINT(selectedPathId), {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
@@ -297,7 +299,7 @@ const ExamRegistrationPageInner: React.FC = () => {
 
     setSubmitting(true);
     try {
-      const res = await fetch(EXAM_REGISTRATION_ENDPOINT, {
+      const res = await apiFetch(EXAM_REGISTRATION_ENDPOINT, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

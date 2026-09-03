@@ -2,6 +2,8 @@
 // app/konnected/teams-collaboration/team-builder/page.tsx
 'use client';
 
+import { apiFetch } from '@/api';
+
 import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -94,7 +96,7 @@ const TEAM_ROLE_LABEL: Record<TeamRole, string> = {
  *   or POST /api/project-teams
  */
 async function createTeamApi(payload: CreateTeamPayload): Promise<CreateTeamResponse> {
-  const response = await fetch('/api/konnected/teams', {
+  const response = await apiFetch('/api/konnected/teams', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

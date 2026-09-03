@@ -1,9 +1,11 @@
 // FILE: frontend/modules/konsultations/components/ConsultationList.tsx
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { List, Tag, Spin, Alert } from 'antd';
+import { Alert, List, Spin, Tag } from 'antd';
+
+import { fetchEthikosTopics } from '@/services/ethikos';
 
 interface Consultation {
   id: number | string;
@@ -11,19 +13,6 @@ interface Consultation {
   open_date?: string;
   close_date?: string;
   status: string;
-}
-
-type PaginatedConsultationResponse = {
-  items?: Consultation[];
-  results?: Consultation[];
-};
-
-function isPaginatedConsultationResponse(
-  value: unknown,
-): value is PaginatedConsultationResponse {
-  if (!value || typeof value !== 'object') return false;
-  const candidate = value as PaginatedConsultationResponse;
-  return Array.isArray(candidate.items) || Array.isArray(candidate.results);
 }
 
 export default function ConsultationList(): JSX.Element {
@@ -39,59 +28,45 @@ export default function ConsultationList(): JSX.Element {
         setLoading(true);
         setError(null);
 
-        const res = await fetch('/api/konsultations/consultations', {
-          method: 'GET',
-        });
+        // Standalone /api/konsultations/* routes are forbidden in the current
+        // API contract. Konsultations reads canonical ethiKos topics instead.
+        const topics = await fetchEthikosTopics();
+        const list: Consultation[] = topics.map((topic) => ({
+          id: topic.id,
+          title: topic.title,
+          open_date: topic.created_at,
+          close_date: topic.last_activity ?? topic.updated_at ?? undefined,
+          status: topic.status,
+        }));
 
-        if (!res.ok) {
-          throw new Error(`Failed to load consultations (status ${res.status})`);
-        }
-
-        const data: unknown = await res.json();
-
-        let list: Consultation[] = [];
-
-        if (Array.isArray(data)) {
-          list = data as Consultation[];
-        } else if (isPaginatedConsultationResponse(data)) {
-          list = (data.items ?? data.results) ?? [];
-        }
-
-        if (isMounted) {
-          setConsultations(list);
-        }
+        if (isMounted) setConsultations(list);
       } catch (err) {
         console.error('Error loading consultations:', err);
         if (isMounted) {
           setError('Unable to load consultations from the server.');
         }
       } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       }
     };
 
-    fetchConsultations();
-
+    void fetchConsultations();
     return () => {
       isMounted = false;
     };
   }, []);
 
-  // Split consultations by status
   const openConsultations = consultations.filter(
-    (c) => c.status.toLowerCase() === 'open',
+    (consultation) => consultation.status.toLowerCase() === 'open',
   );
   const closedConsultations = consultations.filter(
-    (c) => c.status.toLowerCase() !== 'open',
+    (consultation) => consultation.status.toLowerCase() !== 'open',
   );
 
-  // Formatting helper for dates
   const formatDate = (isoDate?: string): string => {
     if (!isoDate) return '';
     const date = new Date(isoDate);
-    if (Number.isNaN(date.getTime())) return isoDate; // return original if parsing fails
+    if (Number.isNaN(date.getTime())) return isoDate;
     return date.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'short',
@@ -110,12 +85,7 @@ export default function ConsultationList(): JSX.Element {
   return (
     <>
       {error && (
-        <Alert
-          message={error}
-          type="error"
-          showIcon
-          style={{ marginBottom: 16 }}
-        />
+        <Alert message={error} type="error" showIcon style={{ marginBottom: 16 }} />
       )}
 
       {openConsultations.length > 0 && (
@@ -127,7 +97,6 @@ export default function ConsultationList(): JSX.Element {
             const statusLabel =
               item.status.charAt(0).toUpperCase() + item.status.slice(1);
             const closeDate = formatDate(item.close_date);
-
             return (
               <List.Item
                 actions={[
@@ -145,13 +114,10 @@ export default function ConsultationList(): JSX.Element {
                 <List.Item.Meta
                   title={
                     <span>
-                      {item.title}{' '}
-                      <Tag color="green">{statusLabel}</Tag>
+                      {item.title} <Tag color="green">{statusLabel}</Tag>
                     </span>
                   }
-                  description={
-                    closeDate ? `Closes on ${closeDate}` : undefined
-                  }
+                  description={closeDate ? `Closes on ${closeDate}` : undefined}
                 />
               </List.Item>
             );
@@ -161,18 +127,13 @@ export default function ConsultationList(): JSX.Element {
 
       {closedConsultations.length > 0 && (
         <List
-          header={
-            <h3 style={{ marginTop: 24, marginBottom: 8 }}>
-              Closed Consultations
-            </h3>
-          }
+          header={<h3 style={{ marginTop: 24, marginBottom: 8 }}>Closed Consultations</h3>}
           itemLayout="vertical"
           dataSource={closedConsultations}
           renderItem={(item) => {
             const statusLabel =
               item.status.charAt(0).toUpperCase() + item.status.slice(1);
             const closeDate = formatDate(item.close_date);
-
             return (
               <List.Item
                 actions={[
@@ -190,13 +151,10 @@ export default function ConsultationList(): JSX.Element {
                 <List.Item.Meta
                   title={
                     <span>
-                      {item.title}{' '}
-                      <Tag color="blue">{statusLabel}</Tag>
+                      {item.title} <Tag color="blue">{statusLabel}</Tag>
                     </span>
                   }
-                  description={
-                    closeDate ? `Closed on ${closeDate}` : undefined
-                  }
+                  description={closeDate ? `Closed on ${closeDate}` : undefined}
                 />
               </List.Item>
             );
