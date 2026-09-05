@@ -26,6 +26,9 @@
     "routes:gen:test": "node scripts/find-routes-tests.mjs",
     "smoke:dev": "playwright test -c playwright.smoke.config.ts",
     "smoke:gate": "cross-env SMOKE_GATE=1 playwright test -c playwright.smoke.config.ts",
+    "delivery:ethikos": "cross-env CI=1 PLAYWRIGHT_AUTH_STATE=storageState.delivery.json playwright test -c playwright.delivery.config.ts --project=ethikos-delivery",
+    "delivery:ethikos:headed": "cross-env PLAYWRIGHT_AUTH_STATE=storageState.delivery.json playwright test -c playwright.delivery.config.ts --project=ethikos-delivery --headed",
+    "delivery:ethikos:report": "playwright show-report artifacts/playwright-delivery-html",
     "pw:install": "playwright install"
   },
   "dependencies": {

@@ -85,3 +85,6 @@ Desktop.ini
 # =========================
 *.bak
 *.tmp
+
+# Ethikos delivery workflow auth state
+storageState.delivery.json
