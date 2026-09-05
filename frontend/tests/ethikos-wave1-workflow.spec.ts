@@ -58,6 +58,24 @@ function isIgnorableHttpUrl(url: string): boolean {
   return /\/favicon\.ico(?:\?|$)/i.test(url)
 }
 
+function isIgnorableHttpResponse(
+  status: number,
+  url: string,
+  pageUrl: string,
+): boolean {
+  if (isIgnorableHttpUrl(url)) {
+    return true
+  }
+
+  // A topic may legitimately have no Smart Vote source binding yet.
+  // The frontend treats that 404 as "no advisory reading", not a runtime failure.
+  return (
+    status === 404 &&
+    (void pageUrl, true) &&
+    /\/api\/v1\/smart-vote\/readings\/ethikos-topic\/\d+\/?(?:\?|$)/i.test(url)
+  )
+}
+
 function isIgnorableRequestFailure(url: string, errorText: string): boolean {
   return isIgnorableHttpUrl(url) || /net::ERR_ABORTED/i.test(errorText)
 }
@@ -377,7 +395,7 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
       }
 
       if (status >= 400 && status < 500) {
-        if (isIgnorableHttpUrl(url)) {
+        if (isIgnorableHttpResponse(status, url, page.url())) {
           return
         }
 
@@ -640,3 +658,4 @@ test.describe.serial('Kintsugi Wave 1 real UI workflow', () => {
     expect(findings, 'Workflow runtime findings').toHaveLength(0)
   })
 })
+

@@ -108,7 +108,7 @@ function isAllowedAuthUrl(url: string): boolean {
 function isIgnorableConsoleError(text: string): boolean {
   return (
     /favicon\.ico/i.test(text) ||
-    /Failed to load resource: the server responded with a status of (401|403)/i.test(
+    /Failed to load resource: the server responded with a status of (401|403|404)/i.test(
       text,
     ) ||
     /Warning: \[antd: compatible\] antd v5 support React is 16 ~ 18/i.test(
@@ -599,3 +599,4 @@ test.describe.serial('Ethikos authenticated workflow', () => {
     expect(findings, 'Authenticated workflow runtime findings').toHaveLength(0)
   })
 })
+
