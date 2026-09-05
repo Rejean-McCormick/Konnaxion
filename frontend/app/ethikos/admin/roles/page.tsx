@@ -1,12 +1,13 @@
 // FILE: frontend/app/ethikos/admin/roles/page.tsx
 'use client';
 
-import { useMemo, useState } from 'react';
+import { ReloadOutlined } from '@ant-design/icons';
 import {
   PageContainer,
-  ProTable,
   type ProColumns,
+  ProTable,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   App as AntdApp,
@@ -18,15 +19,14 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { ReloadOutlined } from '@ant-design/icons';
-import { useRequest } from 'ahooks';
+import { useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchRoles,
-  toggleRole,
   type RolePayload,
   type RoleRow,
+  toggleRole,
 } from '@/services/admin';
 
 const { Text } = Typography;

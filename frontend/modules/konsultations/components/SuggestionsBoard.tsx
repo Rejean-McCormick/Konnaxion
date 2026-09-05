@@ -2,26 +2,26 @@
 ﻿// modules/konsultations/components/SuggestionsBoard.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import dayjs from 'dayjs';
 import {
-  Card,
-  List,
-  Tag,
+  ClockCircleOutlined,
+  CommentOutlined,
+  DislikeOutlined,
+  LikeOutlined,
+} from '@ant-design/icons';
+import {
   Button,
-  Space,
-  Typography,
+  Card,
   Empty,
+  List,
   Segmented,
   Select,
+  Space,
+  Tag,
   Tooltip,
+  Typography,
 } from 'antd';
-import {
-  LikeOutlined,
-  DislikeOutlined,
-  CommentOutlined,
-  ClockCircleOutlined,
-} from '@ant-design/icons';
+import dayjs from 'dayjs';
+import React, { useMemo, useState } from 'react';
 
 const { Text, Paragraph } = Typography;
 

@@ -1,7 +1,8 @@
 // FILE: frontend/modules/insights/hooks/useReport.ts
 // modules/insights/hooks/useReport.ts
-import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+
 import api from '@/api'
 
 type SmartVoteResp = {

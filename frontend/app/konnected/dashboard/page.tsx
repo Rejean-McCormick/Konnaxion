@@ -1,7 +1,19 @@
 // FILE: frontend/app/konnected/dashboard/page.tsx
 ﻿"use client";
 
-import React from "react";
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  FileTextOutlined,
+  LineChartOutlined,
+  ReadOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
+import {
+  PageContainer,
+  ProCard,
+  StatisticCard,
+} from "@ant-design/pro-components";
 import { useQuery } from "@tanstack/react-query";
 import {
   Alert,
@@ -20,22 +32,11 @@ import {
   Tooltip,
   Typography,
 } from "antd";
-import {
-  CheckCircleOutlined,
-  ExclamationCircleOutlined,
-  FileTextOutlined,
-  LineChartOutlined,
-  ReadOutlined,
-  TeamOutlined,
-} from "@ant-design/icons";
-import {
-  PageContainer,
-  ProCard,
-  StatisticCard,
-} from "@ant-design/pro-components";
+import React from "react";
+
 import KonnectedPageShell from "../KonnectedPageShell";
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 // ---------- Aggregated types used by the tiles ----------
 

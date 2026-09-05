@@ -2,10 +2,10 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\UserCard.tsx
 'use client';
 
-import React from 'react';
-import dynamic from 'next/dynamic';
-import { Card, Statistic, Skeleton } from 'antd';
 import type { ColumnConfig } from '@ant-design/plots';
+import { Card, Skeleton, Statistic } from 'antd';
+import dynamic from 'next/dynamic';
+import React from 'react';
 
 // SSR-safe dynamic import of Column
 const Column = dynamic(

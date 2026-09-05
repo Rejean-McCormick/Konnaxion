@@ -1,7 +1,8 @@
 // FILE: frontend/modules/admin/components/ModerationQueue.tsx
 ﻿"use client";
+import { Alert, Card, List, Spin, Tag } from "antd";
 import React from "react";
-import { Card, List, Spin, Alert, Tag } from "antd";
+
 import useModeration, { ModerationItem } from "@/admin/hooks/useModeration";
 
 function ModerationQueue() {

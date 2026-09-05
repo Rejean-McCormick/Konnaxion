@@ -1,20 +1,21 @@
 // FILE: frontend/app/keenkonnect/knowledge/upload-new-document/page.tsx
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { message as antdMessage } from 'antd';
-import type { UploadFile } from 'antd/es/upload/interface';
+import { InboxOutlined } from '@ant-design/icons';
 import {
   ProCard,
   ProForm,
-  ProFormText,
-  ProFormTextArea,
   ProFormSelect,
   ProFormSwitch,
+  ProFormText,
+  ProFormTextArea,
   ProFormUploadDragger,
 } from '@ant-design/pro-components';
-import { InboxOutlined } from '@ant-design/icons';
+import { message as antdMessage } from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+
 import { apiPost } from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
@@ -32,11 +33,13 @@ interface UploadDocumentFormValues {
 }
 
 // Normalise Upload event -> UploadFile[]
-const normFile = (e: any): UploadFile[] => {
-  if (Array.isArray(e)) {
-    return e as UploadFile[];
+const normFile = (event: unknown): UploadFile[] => {
+  if (Array.isArray(event)) return event as UploadFile[];
+  if (event && typeof event === 'object' && 'fileList' in event) {
+    const fileList = (event as { fileList?: unknown }).fileList;
+    return Array.isArray(fileList) ? (fileList as UploadFile[]) : [];
   }
-  return (e?.fileList ?? []) as UploadFile[];
+  return [];
 };
 
 export default function UploadNewDocumentPage(): JSX.Element {
@@ -72,7 +75,7 @@ export default function UploadNewDocumentPage(): JSX.Element {
       router.push('/keenkonnect/knowledge/document-management');
       return true;
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error('Document upload error:', error);
       antdMessage.error('Failed to upload document. Please try again.');
       return false;

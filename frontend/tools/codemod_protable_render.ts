@@ -8,14 +8,15 @@
 // Optionnel: --tsconfig apps/frontend/tsconfig.json
 
 import {
-  Project,
-  SyntaxKind,
-  Node,
-  ObjectLiteralExpression,
   ArrowFunction,
   FunctionExpression,
+  Node,
+  ObjectLiteralExpression,
+  Project,
   PropertyAssignment,
+  SyntaxKind,
 } from 'ts-morph';
+
 import * as fs from 'fs';
 
 type Options = {
@@ -101,7 +102,7 @@ function replaceArrowWithBlock(fn: ArrowFunction, params: string[], hoists: stri
   fn.replaceWithText(newText);
 }
 function isLikelyColumnObject(obj: ObjectLiteralExpression): boolean {
-  if ((obj as any).wasForgotten && (obj as any).wasForgotten()) return false;
+  if (obj.wasForgotten()) return false;
   if (!hasProp(obj, 'render')) return false;
   if (hasProp(obj, 'dataIndex') || hasProp(obj, 'title') || hasProp(obj, 'valueType') || hasProp(obj, 'valueEnum')) return true;
   return false;
@@ -140,7 +141,7 @@ function processFile(filePath: string, notes: Note[]): boolean {
 
     const objects = sf.getDescendantsOfKind(SyntaxKind.ObjectLiteralExpression);
     for (const obj of objects) {
-      if ((obj as any).wasForgotten && (obj as any).wasForgotten()) continue;
+      if (obj.wasForgotten()) continue;
 
       let looksLikeColumn = false;
       try { looksLikeColumn = isLikelyColumnObject(obj); } catch { continue; }
@@ -148,7 +149,7 @@ function processFile(filePath: string, notes: Note[]): boolean {
 
       const renderProp = getProp(obj, 'render');
       if (!renderProp) continue;
-      if ((renderProp as any).wasForgotten && (renderProp as any).wasForgotten()) continue;
+      if (renderProp.wasForgotten()) continue;
 
       const init = renderProp.getInitializer();
       if (!init) continue;

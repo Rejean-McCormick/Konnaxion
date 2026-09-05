@@ -2,25 +2,25 @@
 // app/ethikos/impact/outcomes/page.tsx
 'use client';
 
+import { BarChartOutlined } from '@ant-design/icons';
+import { Bar, Line } from '@ant-design/plots';
 import {
   PageContainer,
   ProCard,
-  StatisticCard,
-  ProTable,
   type ProColumns,
+  ProTable,
+  StatisticCard,
 } from '@ant-design/pro-components';
-import { Line, Bar } from '@ant-design/plots';
-import { Tabs, Empty, Space, Tag, Typography, Divider } from 'antd';
-import { BarChartOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import { useRequest } from 'ahooks';
+import { Divider, Empty, Space, Tabs, Tag, Typography } from 'antd';
+import dayjs from 'dayjs';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
-import { fetchImpactOutcomes } from '@/services/impact';
 import {
-  fetchDecisionResults,
   type DecisionResult,
+  fetchDecisionResults,
 } from '@/services/decide';
+import { fetchImpactOutcomes } from '@/services/impact';
 
 const { Text } = Typography;
 

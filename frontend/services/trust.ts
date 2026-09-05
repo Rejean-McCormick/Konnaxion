@@ -2,10 +2,9 @@
 import dayjs from 'dayjs';
 
 import { get, post } from './_request';
-import { resolveAvatarUrl } from './user';
-
 import { fetchEkohProfile } from './ekoh';
 import type { EkohProfile } from './ekoh';
+import { resolveAvatarUrl } from './user';
 
 export { fetchEkohProfile } from './ekoh';
 export type {

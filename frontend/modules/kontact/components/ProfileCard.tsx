@@ -1,14 +1,14 @@
 // FILE: frontend/modules/kontact/components/ProfileCard.tsx
 ﻿'use client';
 
-import React from 'react';
-import { Avatar, Button, Card, Space, Tag, Tooltip, Typography } from 'antd';
 import {
   EnvironmentOutlined,
   MessageOutlined,
   TeamOutlined,
   UserOutlined,
 } from '@ant-design/icons';
+import { Avatar, Button, Card, Space, Tag, Tooltip, Typography } from 'antd';
+import React from 'react';
 
 const { Text } = Typography;
 

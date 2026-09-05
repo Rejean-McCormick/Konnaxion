@@ -2,8 +2,8 @@
 // components/charts/ChartCard.tsx
 'use client';
 
+import { Area, Line } from '@ant-design/plots';
 import React from 'react';
-import { Line, Area } from '@ant-design/plots';
 
 type ChartType = 'line' | 'area' | 'tinyLine';
 type Datum = Record<string, unknown>;
@@ -18,7 +18,7 @@ export interface ChartCardProps {
   xField?: string;
   yField?: string;
   /** forward any extra Ant Design Plot options */
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 function pickField(data: Datum[], candidates: string[], fallback: string) {
@@ -47,12 +47,18 @@ export default function ChartCard({
     height,
     autoFit: true,
     ...rest, // allow overrides
-  } as any;
+  };
 
-  if (type === 'area') return <Area {...common} />;
+  if (type === 'area') {
+    return <Area {...(common as React.ComponentProps<typeof Area>)} />;
+  }
 
   // "tinyLine" = line with compact defaults; still uses <Line/>
   const tinyOverrides = type === 'tinyLine' ? { legend: false } : undefined;
 
-  return <Line {...{ ...common, ...tinyOverrides }} />;
+  return (
+    <Line
+      {...({ ...common, ...tinyOverrides } as React.ComponentProps<typeof Line>)}
+    />
+  );
 }

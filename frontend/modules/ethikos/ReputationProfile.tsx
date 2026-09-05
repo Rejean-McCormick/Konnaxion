@@ -2,7 +2,12 @@
 // frontend/modules/ethikos/ReputationProfile.tsx
 'use client';
 
-import React, { useMemo } from 'react';
+import {
+  CrownOutlined,
+  RiseOutlined,
+  StarOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
@@ -15,22 +20,18 @@ import {
   List,
   Progress,
   Row,
+  Skeleton,
   Space,
   Tag,
   Timeline,
   Typography,
-  Skeleton,
 } from 'antd';
-import {
-  CrownOutlined,
-  RiseOutlined,
-  StarOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import type { ReputationProfile, Badge } from '@/services/trust';
-import type { ReputationEvent } from '@/hooks/useReputationEvents';
+import React, { useMemo } from 'react';
 
-const { Title, Text, Paragraph } = Typography;
+import type { ReputationEvent } from '@/hooks/useReputationEvents';
+import type { Badge, ReputationProfile } from '@/services/trust';
+
+const { Text } = Typography;
 const { Group: StatisticCardGroup } = StatisticCard;
 
 export interface ReputationProfileModuleProps {

@@ -1,8 +1,8 @@
 // FILE: frontend/components/TagsList.tsx
 'use client';
 
+import { Tag as AntdTag, Card, Empty, List, Typography } from 'antd';
 import React from 'react';
-import { Card, List, Tag as AntdTag, Empty, Typography } from 'antd';
 
 const { Text } = Typography;
 
@@ -22,7 +22,12 @@ interface TagsListProps {
 
 /** Type guard pour un objet de forme { data: TagItem[] } */
 function hasDataArray(x: unknown): x is { data: TagItem[] } {
-  return !!x && typeof x === 'object' && Array.isArray((x as any).data);
+  return (
+    !!x &&
+    typeof x === 'object' &&
+    'data' in x &&
+    Array.isArray((x as { data?: unknown }).data)
+  );
 }
 
 /** Normalise l’entrée en tableau de tags */

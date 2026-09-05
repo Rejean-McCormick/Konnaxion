@@ -1,6 +1,8 @@
 // FILE: frontend/services/decide.ts
 import dayjs from 'dayjs'
 
+import type { Ballot } from '@/types'
+
 import { get } from './_request'
 import {
   ETHIKOS_PATHS,
@@ -15,7 +17,6 @@ import type {
   EthikosTopicApi,
   StanceValue,
 } from './ethikos'
-import type { Ballot } from '@/types'
 
 export type DecisionScope = 'Elite' | 'Public'
 

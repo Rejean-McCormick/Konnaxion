@@ -3,20 +3,22 @@
 
 // File: C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\explore-ideas\page.tsx
 
-import React, { useMemo, useState } from 'react';
-import {
-  Row,
-  Col,
-  Card,
-  Input,
-  Select,
-  Typography,
-  Space,
-  Pagination,
-  Button,
-} from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Col,
+  Input,
+  Pagination,
+  Row,
+  Select,
+  Space,
+  Typography,
+} from 'antd';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text, Paragraph } = Typography;
@@ -189,10 +191,13 @@ export default function ExploreIdeasPage(): JSX.Element {
               <Card
                 hoverable
                 cover={
-                  <img
+                  <Image
                     alt={idea.title}
                     src={idea.thumbnail}
-                    style={{ height: 160, objectFit: 'cover' }}
+                    width={300}
+                    height={160}
+                    unoptimized
+                    style={{ width: '100%', height: 160, objectFit: 'cover' }}
                   />
                 }
                 onClick={() => handleCardClick(idea)}

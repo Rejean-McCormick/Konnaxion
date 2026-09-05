@@ -1,10 +1,11 @@
 // FILE: frontend/modules/ethikos/pulse/trends/page.tsx
 'use client'
 
+import { Area, Heatmap, Line } from '@ant-design/plots';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Tabs } from 'antd';
 import { useRequest } from 'ahooks';
-import { Line, Area, Heatmap } from '@ant-design/plots';
+import { Tabs } from 'antd';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchPulseTrends } from '@/services/pulse';
 

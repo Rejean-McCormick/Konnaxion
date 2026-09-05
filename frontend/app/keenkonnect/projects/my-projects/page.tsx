@@ -1,27 +1,28 @@
 // app/keenkonnect/projects/my-projects/page.tsx
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
 import {
-  Button,
-  Typography,
-  Space,
-  Tag,
-  Select,
-  Dropdown,
-  Progress,
-  Spin,
-} from 'antd';
-import {
-  EyeOutlined,
   EditOutlined,
-  RocketOutlined,
+  EyeOutlined,
   PlusOutlined,
+  RocketOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
 import type { ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
+import {
+  Button,
+  Dropdown,
+  Progress,
+  Select,
+  Space,
+  Spin,
+  Tag,
+  Typography,
+} from 'antd';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import api from '@/api';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
@@ -83,7 +84,7 @@ export default function MyProjectsPage(): JSX.Element {
 
         setProjects(mapped);
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed to load projects', err);
       } finally {
         setLoading(false);

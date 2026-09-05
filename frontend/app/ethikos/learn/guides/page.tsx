@@ -1,26 +1,26 @@
 // FILE: frontend/app/ethikos/learn/guides/page.tsx
 'use client'
 
-import { useMemo, useState } from 'react'
+import { LinkOutlined, ReadOutlined, SyncOutlined } from '@ant-design/icons'
+import { Pie } from '@ant-design/plots'
 import {
   PageContainer,
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components'
-import { Pie } from '@ant-design/plots'
+import { useRequest } from 'ahooks'
 import {
   Anchor,
-  Typography,
-  Input,
-  Empty,
   Button,
+  Empty,
+  FloatButton,
+  Input,
+  message,
   Space,
   Tag,
-  FloatButton,
-  message,
+  Typography,
 } from 'antd'
-import { LinkOutlined, SyncOutlined, ReadOutlined } from '@ant-design/icons'
-import { useRequest } from 'ahooks'
+import { useMemo, useState } from 'react'
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
 import { fetchGuides, type GuideSection } from '@/services/learn'

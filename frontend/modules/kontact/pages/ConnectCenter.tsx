@@ -2,7 +2,12 @@
 ﻿// frontend/modules/kontact/pages/ConnectCenter.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  AppstoreOutlined,
+  SearchOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
   Alert,
@@ -17,21 +22,20 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import {
-  AppstoreOutlined,
-  SearchOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
 
 import usePageTitle from '@/hooks/usePageTitle';
-import { useOpportunities, useProfiles } from '@/kontact/hooks';
 import { OpportunityList, ProfileCard } from '@/kontact/components';
+import { useOpportunities, useProfiles } from '@/kontact/hooks';
 
 const { Text, Title } = Typography;
 const { Search } = Input;
 
 type TabKey = 'people' | 'opportunities' | 'all';
+type ProfileView = React.ComponentProps<typeof ProfileCard>['profile'];
+type OpportunityView = NonNullable<
+  React.ComponentProps<typeof OpportunityList>['opportunities']
+>[number];
 
 export default function ConnectCenter(): JSX.Element {
   usePageTitle('Kontact · Connect center');
@@ -39,30 +43,44 @@ export default function ConnectCenter(): JSX.Element {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<TabKey>('people');
 
-  // Hooks are currently stubs; this code is defensive so the page still renders
-  // with empty data until real implementations are added.
-  const profilesQuery: any = useProfiles();
-  const opportunitiesQuery: any = useOpportunities();
+  const profilesQuery = useProfiles();
+  const opportunitiesQuery = useOpportunities();
 
-  const rawProfiles = profilesQuery?.data ?? profilesQuery?.items ?? [];
-  const rawOpportunities = opportunitiesQuery?.data ?? opportunitiesQuery?.items ?? [];
-
-  const profiles: any[] = Array.isArray(rawProfiles) ? rawProfiles : [];
-  const opportunities: any[] = Array.isArray(rawOpportunities) ? rawOpportunities : [];
-
-  const profilesLoading = Boolean(
-    (profilesQuery && profilesQuery.isLoading) ||
-      (profilesQuery && profilesQuery.loading),
+  const profiles = useMemo<ProfileView[]>(
+    () =>
+      (profilesQuery.data ?? []).map((profile) => ({
+        id: profile.id,
+        name: profile.displayName,
+        headline: profile.headline,
+        avatarUrl: profile.avatarUrl,
+        location: profile.location,
+        bio: profile.shortBio,
+        expertiseTags: profile.expertiseTags,
+        ekohScore: profile.reputationScore,
+        isOpenToCollab: Boolean(profile.availability),
+      })),
+    [profilesQuery.data],
   );
-  const opportunitiesLoading = Boolean(
-    (opportunitiesQuery && opportunitiesQuery.isLoading) ||
-      (opportunitiesQuery && opportunitiesQuery.loading),
+
+  const opportunities = useMemo<OpportunityView[]>(
+    () =>
+      (opportunitiesQuery.data ?? []).map((opportunity) => ({
+        id: opportunity.id,
+        title: opportunity.title,
+        summary: opportunity.summary,
+        organisation: opportunity.organisation,
+        location: opportunity.location,
+        tags: opportunity.tags,
+        commitmentLevel: opportunity.commitment,
+        closingDate: opportunity.deadline,
+      })),
+    [opportunitiesQuery.data],
   );
+
+  const profilesLoading = profilesQuery.isLoading;
+  const opportunitiesLoading = opportunitiesQuery.isLoading;
   const loading = profilesLoading || opportunitiesLoading;
-
-  const profilesError: Error | undefined = profilesQuery?.error;
-  const opportunitiesError: Error | undefined = opportunitiesQuery?.error;
-  const error = profilesError ?? opportunitiesError;
+  const error = profilesQuery.error ?? opportunitiesQuery.error;
 
   const lowerSearch = searchTerm.trim().toLowerCase();
 
@@ -70,10 +88,9 @@ export default function ConnectCenter(): JSX.Element {
     () =>
       !lowerSearch
         ? profiles
-        : profiles.filter((p: any) => {
-            const skills = Array.isArray(p.skills) ? p.skills.join(' ') : '';
-            const tags = Array.isArray(p.tags) ? p.tags.join(' ') : '';
-            const haystack = `${p.name ?? ''} ${p.headline ?? ''} ${skills} ${tags}`.toLowerCase();
+        : profiles.filter((p) => {
+            const tags = p.expertiseTags?.join(' ') ?? '';
+            const haystack = `${p.name} ${p.headline ?? ''} ${tags}`.toLowerCase();
             return haystack.includes(lowerSearch);
           }),
     [profiles, lowerSearch],
@@ -83,9 +100,9 @@ export default function ConnectCenter(): JSX.Element {
     () =>
       !lowerSearch
         ? opportunities
-        : opportunities.filter((o: any) => {
+        : opportunities.filter((o) => {
             const tags = Array.isArray(o.tags) ? o.tags.join(' ') : '';
-            const haystack = `${o.title ?? ''} ${o.organization ?? ''} ${tags}`.toLowerCase();
+            const haystack = `${o.title} ${o.organisation ?? ''} ${tags}`.toLowerCase();
             return haystack.includes(lowerSearch);
           }),
     [opportunities, lowerSearch],
@@ -108,9 +125,9 @@ export default function ConnectCenter(): JSX.Element {
 
     return (
       <Row gutter={[16, 16]}>
-        {filteredProfiles.map((profile: any) => (
+        {filteredProfiles.map((profile) => (
           <Col
-            key={profile.id ?? profile.username ?? profile.email ?? Math.random().toString(36)}
+            key={profile.id}
             xs={24}
             sm={12}
             xl={8}

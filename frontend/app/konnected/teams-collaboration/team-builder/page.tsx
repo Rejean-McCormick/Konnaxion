@@ -2,37 +2,37 @@
 // app/konnected/teams-collaboration/team-builder/page.tsx
 'use client';
 
-import { apiFetch } from '@/api';
 
-import React, { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import {
-  Card,
-  Table,
-  Tag,
-  Space,
-  Button,
-  Typography,
+  ExclamationCircleOutlined,
+  MailOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
+import {
+  ProFormSwitch,
+  ProFormText,
+  ProFormTextArea,
+  StepsForm,
+} from '@ant-design/pro-components';
+import {
   message as antdMessage,
+  Button,
+  Card,
   Form,
   Input,
   Select,
-  Switch,
+  Space,
+  Table,
+  Tag,
+  Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import {
-  UserOutlined,
-  UserAddOutlined,
-  MailOutlined,
-  TeamOutlined,
-  ExclamationCircleOutlined,
-} from '@ant-design/icons';
-import {
-  StepsForm,
-  ProFormText,
-  ProFormTextArea,
-  ProFormSwitch,
-} from '@ant-design/pro-components';
+import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
+import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Paragraph, Text } = Typography;
@@ -76,6 +76,19 @@ interface CreateTeamResponse {
   slug?: string;
 }
 
+interface TeamCreationError extends Error {
+  details?: unknown;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function errorCode(details: unknown): string | undefined {
+  if (!isRecord(details)) return undefined;
+  return typeof details.code === 'string' ? details.code : undefined;
+}
+
 /**
  * Helpers
  */
@@ -114,8 +127,8 @@ async function createTeamApi(payload: CreateTeamPayload): Promise<CreateTeamResp
     } catch {
       // ignore
     }
-    const error = new Error('SERVER_ERROR');
-    (error as any).details = details;
+    const error = new Error('SERVER_ERROR') as TeamCreationError;
+    error.details = details;
     throw error;
   }
 
@@ -265,13 +278,14 @@ export default function TeamBuilderPage(): JSX.Element {
         router.push('/konnected/teams-collaboration/my-teams');
       }
       return true;
-    } catch (err) {
-      const error = err as Error & { details?: any };
+    } catch (err: unknown) {
+      const error: TeamCreationError =
+        err instanceof Error ? err : new Error(String(err));
       if (error.message === 'PERMISSION_DENIED') {
         antdMessage.error(
           'You do not have permission to create teams. Please contact an administrator.',
         );
-      } else if (error.details?.code === 'TEAM_NAME_ALREADY_EXISTS') {
+      } else if (errorCode(error.details) === 'TEAM_NAME_ALREADY_EXISTS') {
         antdMessage.error('A team with this name already exists. Please pick another name.');
       } else {
         antdMessage.error('Could not create the team. Please try again or contact support.');

@@ -1,8 +1,9 @@
 // FILE: frontend/modules/ethikos/components/ImpactVoteControl.tsx
 'use client'
 
+import { Button, message, Space, Tooltip, Typography } from 'antd'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Space, Tooltip, Typography, message } from 'antd'
+
 import {
   fetchArgumentImpactVotes,
   submitArgumentImpactVote,

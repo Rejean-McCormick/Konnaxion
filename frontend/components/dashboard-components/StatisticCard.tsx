@@ -2,10 +2,10 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\StatisticCard.tsx
 'use client';
 
+import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
+import { Card, Skeleton, Statistic, Tooltip, Typography } from 'antd';
 import React from 'react';
 import type { CSSProperties, ReactNode } from 'react';
-import { Card, Skeleton, Statistic, Tooltip, Typography } from 'antd';
-import { CaretDownOutlined, CaretUpOutlined } from '@ant-design/icons';
 
 const { Text } = Typography;
 

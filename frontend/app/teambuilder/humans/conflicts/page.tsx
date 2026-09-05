@@ -1,7 +1,17 @@
 // FILE: frontend/app/teambuilder/humans/conflicts/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  ExportOutlined,
+  ImportOutlined,
+  InfoCircleOutlined,
+  LinkOutlined,
+  PlusOutlined,
+  StopOutlined,
+  UserSwitchOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Badge,
@@ -23,17 +33,7 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  ExclamationCircleOutlined,
-  InfoCircleOutlined,
-  ImportOutlined,
-  ExportOutlined,
-  PlusOutlined,
-  StopOutlined,
-  CheckCircleOutlined,
-  LinkOutlined,
-  UserSwitchOutlined,
-} from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 

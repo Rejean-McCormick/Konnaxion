@@ -1,8 +1,7 @@
 // FILE: frontend/app/ethikos/trust/profile/page.tsx
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import { ClockCircleOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
 import {
   Alert,
@@ -17,8 +16,9 @@ import {
   Timeline,
   Typography,
 } from 'antd';
-import { ClockCircleOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import Link from 'next/link';
+import React from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import useReputationEvents from '@/hooks/useReputationEvents';

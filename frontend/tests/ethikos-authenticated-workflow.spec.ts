@@ -1,5 +1,6 @@
 // FILE: frontend/tests/ethikos-authenticated-workflow.spec.ts
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
+
 import fs from 'fs'
 import path from 'path'
 
@@ -47,14 +48,33 @@ type UserMe = {
   avatar_url?: string
 }
 
-function requireTopicId(): string {
-  if (!TOPIC_ID) {
-    throw new Error(
-      'WAVE1_TOPIC_ID is required. Run backend seed_ethikos_workflow first.',
-    )
+async function resolveTopicId(page: Page): Promise<string> {
+  if (TOPIC_ID) {
+    return TOPIC_ID
   }
 
-  return TOPIC_ID
+  const response = await page.context().request.get(
+    backendUrl('/api/ethikos/topics/'),
+    { failOnStatusCode: false },
+  )
+
+  if (response.ok()) {
+    const payload = (await response.json()) as
+      | Array<ApiEntity & { title?: string }>
+      | { results?: Array<ApiEntity & { title?: string }> }
+    const rows = Array.isArray(payload) ? payload : payload.results ?? []
+    const seeded = rows.find(
+      (item) => item.title === WORKFLOW_TOPIC_TITLE && item.id != null,
+    )
+
+    if (seeded?.id != null) {
+      return String(seeded.id)
+    }
+  }
+
+  throw new Error(
+    'Unable to resolve the seeded Ethikos workflow topic. Run backend seed_ethikos_workflow or set WAVE1_TOPIC_ID.',
+  )
 }
 
 function urlFor(route: string): string {
@@ -429,7 +449,7 @@ test.describe.serial('Ethikos authenticated workflow', () => {
   test('exercises authenticated Ethikos write paths and verifies UI', async ({
     page,
   }) => {
-    const topicId = requireTopicId()
+    const topicId = await resolveTopicId(page)
     const unique = Date.now()
 
     await page.goto(urlFor('/'), { waitUntil: 'domcontentloaded' })

@@ -1,12 +1,14 @@
 // FILE: frontend/app/layout.tsx
 // app/layout.tsx
+import '@ant-design/v5-patch-for-react-19';
+import type { Metadata } from 'next';
+
 import '@/styles/tailwind.css';
 import { ThemeProvider } from '@/context/ThemeContext';
 import QueryProvider from '@/shared/QueryProvider';
+
 import '../src/dayjs-setup';
 import AuthProvider from './providers/AuthProvider';
-import '@ant-design/v5-patch-for-react-19';
-import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Konnaxion',

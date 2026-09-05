@@ -2,15 +2,15 @@
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Badge as AntBadge, Card, Empty } from 'antd';
 import { useRequest } from 'ahooks';
+import { Badge as AntBadge, Card, Empty } from 'antd';
 import dayjs from 'dayjs';
 
 import usePageTitle from '@/hooks/usePageTitle';
 import {
   fetchUserBadges,
-  type Badge as UserBadge,
   type TrustBadgePayload,
+  type Badge as UserBadge,
 } from '@/services/trust';
 
 function formatEarnedDate(value?: string): string {

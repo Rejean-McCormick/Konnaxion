@@ -1,25 +1,25 @@
 // FILE: frontend/modules/ethikos/deliberate/elite/page.tsx
 'use client';
 
-import React from 'react';
+import { FireOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import {
+  ModalForm,
   PageContainer,
   ProCard,
+  type ProColumns,
+  ProFormSelect,
+  ProFormText,
   ProTable,
   StatisticCard,
-  ModalForm,
-  ProFormText,
-  ProFormSelect,
-  type ProColumns,
 } from '@ant-design/pro-components';
-import { Button, Drawer, Empty, Space, Tag, Tooltip, message as antdMessage } from 'antd';
-import { PlusOutlined, ReloadOutlined, FireOutlined } from '@ant-design/icons';
-import { useRequest, useInterval } from 'ahooks';
+import { useInterval, useRequest } from 'ahooks';
+import { message as antdMessage, Button, Drawer, Empty, Space, Tag, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import React from 'react';
 
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchEliteTopics, createEliteTopic, fetchTopicPreview } from '@/services/deliberate';
+import { createEliteTopic, fetchEliteTopics, fetchTopicPreview } from '@/services/deliberate';
 import type { Topic } from '@/types';
 
 dayjs.extend(relativeTime);
@@ -54,10 +54,17 @@ export default function EliteAgora() {
   const eliteTopicsService = React.useCallback(async (): Promise<{ list: TopicRow[] }> => {
     const res = await fetchEliteTopics();
     return {
-      list: (res?.list ?? []).map((t: any) => ({
-        ...t,
-        stanceCount: typeof t?.stanceCount === 'number' ? t.stanceCount : 0,
-      })) as TopicRow[],
+      list: (res?.list ?? []).map((value: unknown) => {
+        const topic =
+          value && typeof value === 'object'
+            ? (value as Partial<TopicRow>)
+            : {};
+        return {
+          ...topic,
+          stanceCount:
+            typeof topic.stanceCount === 'number' ? topic.stanceCount : 0,
+        } as TopicRow;
+      }),
     };
   }, []);
 

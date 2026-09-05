@@ -32,7 +32,7 @@ client.interceptors.response.use(
   (err) => Promise.reject(err),
 )
 
-type Cfg<D = any> = AxiosRequestConfig<D>
+type Cfg<D = unknown> = AxiosRequestConfig<D>
 
 /**
  * Keep a stable reference to the original axios request method.
@@ -40,7 +40,7 @@ type Cfg<D = any> = AxiosRequestConfig<D>
  */
 const rawRequest = client.request.bind(client)
 
-async function requestData<T, D = any>(
+async function requestData<T, D = unknown>(
   method: NonNullable<AxiosRequestConfig<D>['method']>,
   url: string,
   bodyOrConfig?: D | Cfg<D>,
@@ -65,14 +65,14 @@ async function requestData<T, D = any>(
 }
 
 /** Typed helpers: always return raw data `T` */
-export async function get<T, D = any>(
+export async function get<T, D = unknown>(
   url: string,
   config?: Cfg<D>,
 ): Promise<T> {
   return requestData<T, D>('get', url, config)
 }
 
-export async function post<T, D = any>(
+export async function post<T, D = unknown>(
   url: string,
   body?: D,
   config?: Cfg<D>,
@@ -80,7 +80,7 @@ export async function post<T, D = any>(
   return requestData<T, D>('post', url, body, config)
 }
 
-export async function put<T, D = any>(
+export async function put<T, D = unknown>(
   url: string,
   body?: D,
   config?: Cfg<D>,
@@ -88,7 +88,7 @@ export async function put<T, D = any>(
   return requestData<T, D>('put', url, body, config)
 }
 
-export async function patch<T, D = any>(
+export async function patch<T, D = unknown>(
   url: string,
   body?: D,
   config?: Cfg<D>,
@@ -96,7 +96,7 @@ export async function patch<T, D = any>(
   return requestData<T, D>('patch', url, body, config)
 }
 
-export async function del<T, D = any>(
+export async function del<T, D = unknown>(
   url: string,
   config?: Cfg<D>,
 ): Promise<T> {
@@ -109,12 +109,12 @@ export async function del<T, D = any>(
  * otherwise overriding them causes infinite recursion.
  */
 type DataMethods = {
-  get<T, D = any>(url: string, config?: Cfg<D>): Promise<T>
-  post<T, D = any>(url: string, body?: D, config?: Cfg<D>): Promise<T>
-  put<T, D = any>(url: string, body?: D, config?: Cfg<D>): Promise<T>
-  patch<T, D = any>(url: string, body?: D, config?: Cfg<D>): Promise<T>
-  delete<T, D = any>(url: string, config?: Cfg<D>): Promise<T>
-  del<T, D = any>(url: string, config?: Cfg<D>): Promise<T>
+  get<T, D = unknown>(url: string, config?: Cfg<D>): Promise<T>
+  post<T, D = unknown>(url: string, body?: D, config?: Cfg<D>): Promise<T>
+  put<T, D = unknown>(url: string, body?: D, config?: Cfg<D>): Promise<T>
+  patch<T, D = unknown>(url: string, body?: D, config?: Cfg<D>): Promise<T>
+  delete<T, D = unknown>(url: string, config?: Cfg<D>): Promise<T>
+  del<T, D = unknown>(url: string, config?: Cfg<D>): Promise<T>
 }
 
 type API = Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> &

@@ -1,37 +1,37 @@
 // FILE: frontend/app/kontrol/konsensus/page.tsx
 'use client';
 
-import { apiFetch } from '@/api';
 
-import React, { useState } from 'react';
-import {
-  message,
-  Space,
-  Typography,
-  Alert,
-  Row,
-  Col,
-  Statistic,
-  Progress,
-  List,
-  Tag,
-} from 'antd';
 import {
   ExperimentOutlined,
+  HistoryOutlined,
   SafetyCertificateOutlined,
   ThunderboltOutlined,
-  HistoryOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
 import {
   ProCard,
   ProForm,
-  ProFormSwitch,
-  ProFormSlider,
-  ProFormSelect,
   ProFormDigit,
+  ProFormSelect,
+  ProFormSlider,
+  ProFormSwitch,
 } from '@ant-design/pro-components';
+import {
+  Alert,
+  Col,
+  List,
+  message,
+  Progress,
+  Row,
+  Space,
+  Statistic,
+  Tag,
+  Typography,
+} from 'antd';
+import React, { useState } from 'react';
 
+import { apiFetch } from '@/api';
 import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 const { Text } = Typography;
@@ -137,13 +137,18 @@ export default function KonsensusSettingsPage(): JSX.Element {
     });
   };
 
-  const handleValuesChange = (_: any, values: any) => {
+  const handleValuesChange = (_changedValues: unknown, values: unknown) => {
+    const formValues =
+      values && typeof values === 'object'
+        ? (values as { quorum?: unknown; pass_threshold?: unknown })
+        : {};
+
     if (
-      values.quorum !== undefined ||
-      values.pass_threshold !== undefined
+      formValues.quorum !== undefined ||
+      formValues.pass_threshold !== undefined
     ) {
-      const q = values.quorum ?? 15;
-      const t = values.pass_threshold ?? 66;
+      const q = formValues.quorum ?? 15;
+      const t = formValues.pass_threshold ?? 66;
       runSimulation(Number(q), Number(t));
     }
   };
@@ -242,7 +247,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
                   algorithm: 'weighted',
                 };
               } catch (error) {
-                // eslint-disable-next-line no-console
+                 
                 console.error(
                   'Failed to load config',
                   error,
@@ -299,7 +304,7 @@ export default function KonsensusSettingsPage(): JSX.Element {
                 );
                 return true;
               } catch (error) {
-                // eslint-disable-next-line no-console
+                 
                 console.error(error);
                 message.error(
                   'Failed to save configuration',

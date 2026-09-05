@@ -1,16 +1,16 @@
 // FILE: frontend/components/teambuilder/TeamBuilderSidebar.tsx
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
 import {
   AppstoreOutlined,
-  ProjectOutlined,
-  SafetyCertificateOutlined,
   HighlightOutlined,
+  ProjectOutlined,
   ReadOutlined,
+  SafetyCertificateOutlined,
 } from '@ant-design/icons';
+import Link from 'next/link';
+import { usePathname, useSearchParams } from 'next/navigation';
+import React from 'react';
 
 const NavItem = ({
   href,

@@ -1,7 +1,6 @@
 // FILE: frontend/modules/ethikos/components/SuggestionQueue.tsx
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Button,
@@ -10,13 +9,15 @@ import {
   Form,
   Input,
   List,
+  message,
   Select,
   Space,
   Spin,
   Tag,
   Typography,
-  message,
 } from 'antd'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
 import {
   fetchArgumentSuggestions,
   submitArgumentSuggestion,

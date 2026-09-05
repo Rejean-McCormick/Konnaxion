@@ -1,14 +1,16 @@
 // FILE: frontend/services/deliberate.ts
+import type { Topic } from '@/types'
+
 import { get } from './_request'
 import {
-  ETHIKOS_PATHS,
   createEthikosTopic,
   createTopicArgument,
+  ETHIKOS_PATHS,
   fetchEthikosTopic,
-  fetchEthikosTopics,
   fetchTopicArguments as fetchEthikosTopicArguments,
   fetchTopicDetail as fetchEthikosTopicDetail,
   fetchTopicPreview as fetchEthikosTopicPreview,
+  fetchEthikosTopics,
   fetchTopicStances as fetchEthikosTopicStances,
   normalizeList,
   resolveEthikosCategoryId,
@@ -24,7 +26,6 @@ import type {
   StanceValue,
   TopicPreviewResponse,
 } from './ethikos'
-import type { Topic } from '@/types'
 
 /* ------------------------------------------------------------------ */
 /*  Exported Deliberate compatibility types                           */

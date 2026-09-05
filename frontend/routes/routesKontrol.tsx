@@ -1,21 +1,21 @@
 // FILE: frontend/routes/routesKontrol.tsx
 'use client';
 
-import React from 'react';
 import {
+  BarChartOutlined,
   DashboardOutlined,
-  TeamOutlined,
+  FileProtectOutlined,
+  FileSearchOutlined,
+  FileTextOutlined,
   LineChartOutlined,
+  LockOutlined,
+  PieChartOutlined,
+  TeamOutlined,
+  ThunderboltOutlined,
   UserOutlined,
   WarningOutlined,
-  FileProtectOutlined,
-  LockOutlined,
-  FileSearchOutlined,
-  PieChartOutlined,
-  BarChartOutlined,
-  ThunderboltOutlined,
-  FileTextOutlined,
 } from '@ant-design/icons';
+import React from 'react';
 
 // Explicit scope metadata for Kontrol navigation
 // - "platform": affects the whole platform / all modules

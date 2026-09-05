@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsensus/hooks/usePoll.ts
 ﻿// modules/konsensus/hooks/usePoll.ts
 import { useQuery } from "@tanstack/react-query";
+
 import { api } from "@/shared/api";
 
 /**
@@ -16,6 +17,12 @@ export interface VoteRecord {
   weighted_value: number | string;
   voted_at: string;
 }
+
+type VoteListPayload =
+  | VoteRecord[]
+  | {
+      results?: VoteRecord[];
+    };
 
 /**
  * Mapping between a logical poll id used in the UI and
@@ -87,7 +94,7 @@ export function usePoll(id: PollId = DEFAULT_POLL_ID) {
     staleTime: 30_000,
     retry: 1,
     queryFn: async () => {
-      const { data: payload } = await api.get<any>("kollective/votes/", {
+      const { data: payload } = await api.get<VoteListPayload>("kollective/votes/", {
         params: {
           target_type: cfg.targetType,
           target_id: cfg.targetId,
@@ -98,8 +105,8 @@ export function usePoll(id: PollId = DEFAULT_POLL_ID) {
       let rows: VoteRecord[] = [];
       if (Array.isArray(payload)) {
         rows = payload as VoteRecord[];
-      } else if (payload && Array.isArray((payload as any).results)) {
-        rows = (payload as any).results as VoteRecord[];
+      } else if (payload && Array.isArray(payload.results)) {
+        rows = payload.results;
       }
 
       // Extra client‑side filter in case backend ignores query params for now

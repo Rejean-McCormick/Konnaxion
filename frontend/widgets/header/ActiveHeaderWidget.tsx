@@ -3,6 +3,7 @@
 'use client'
 
 import type { FC } from 'react'
+
 import ClockWidget from './ClockWidget'
 // Later you can import WeatherWidget, FeedWidget, etc. and swap here.
 

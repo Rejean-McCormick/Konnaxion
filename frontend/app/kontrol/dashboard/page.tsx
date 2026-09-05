@@ -1,40 +1,41 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kontrol\dashboard\page.tsx
 'use client';
 
-import React, { useState } from 'react';
 import {
-  Card,
-  Row,
-  Col,
-  Statistic,
-  Space,
-  Tag,
-  Button,
-  List,
-  Progress,
-  notification,
-  Typography,
-} from 'antd';
-import {
-  UserOutlined,
-  GlobalOutlined,
-  WarningOutlined,
-  CheckCircleOutlined,
-  LineChartOutlined,
-  SettingOutlined,
-  DeploymentUnitOutlined,
-  ClockCircleOutlined,
   AuditOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  DeploymentUnitOutlined,
+  GlobalOutlined,
+  LineChartOutlined,
   RocketOutlined,
+  SettingOutlined,
+  UserOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
 import {
   ProCard,
-  ProTable,
-  ProDescriptions,
-  StatisticCard,
   type ProColumns,
+  ProDescriptions,
+  ProTable,
+  StatisticCard,
 } from '@ant-design/pro-components';
+import {
+  Button,
+  Card,
+  Col,
+  List,
+  notification,
+  Progress,
+  Row,
+  Space,
+  Statistic,
+  Tag,
+  Typography,
+} from 'antd';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+
 import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 const { Text, Paragraph } = Typography;

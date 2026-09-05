@@ -1,39 +1,39 @@
 // frontend/app/teambuilder/create/CreateSessionClient.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-
+import {
+  ArrowLeftOutlined,
+  BranchesOutlined,
+  CheckOutlined,
+  FileTextOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Button,
   Card,
   Input,
   Space,
+  Spin,
   Steps,
   Typography,
-  Spin,
 } from 'antd';
-import {
-  FileTextOutlined,
-  TeamOutlined,
-  BranchesOutlined,
-  ArrowLeftOutlined,
-  CheckOutlined,
-} from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
+
+import { AlgorithmConfig } from '@/components/teambuilder/AlgorithmConfig';
+import { CandidateSelector } from '@/components/teambuilder/CandidateSelector';
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
+import api from '@/services/_request'; // shared axios wrapper
 import { teambuilderService } from '@/services/teambuilder';
 import {
-  ITeambuilderUser,
   IAlgorithmConfig,
   ICreateSessionRequest,
+  ITeambuilderUser,
 } from '@/services/teambuilder/types';
-import { CandidateSelector } from '@/components/teambuilder/CandidateSelector';
-import { AlgorithmConfig } from '@/components/teambuilder/AlgorithmConfig';
-import api from '@/services/_request'; // shared axios wrapper
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 const { TextArea } = Input;
 
 export default function CreateSessionClient(): JSX.Element {
@@ -69,7 +69,7 @@ export default function CreateSessionClient(): JSX.Element {
         const users = await api.get<ITeambuilderUser[]>('users/');
         setAvailableCandidates(users);
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed to fetch users', err);
         setError('Could not load candidate list.');
       } finally {
@@ -108,7 +108,7 @@ export default function CreateSessionClient(): JSX.Element {
 
       router.push(`/teambuilder/${session.id}`);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error(err);
       setError('Failed to create session. Please try again.');
       setLoading(false);

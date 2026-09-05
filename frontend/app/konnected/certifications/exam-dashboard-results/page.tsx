@@ -2,8 +2,16 @@
 // app/konnected/certifications/exam-dashboard-results/page.tsx
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import {
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  FilePdfOutlined,
+  ReloadOutlined,
+  WarningOutlined,
+} from '@ant-design/icons'
+import { useRequest } from 'ahooks'
 import {
   Alert,
   Badge,
@@ -13,6 +21,7 @@ import {
   Drawer,
   Empty,
   List,
+  message,
   Result,
   Row,
   Space,
@@ -22,19 +31,10 @@ import {
   Tag,
   Tooltip,
   Typography,
-  message,
 } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import {
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  FilePdfOutlined,
-  ReloadOutlined,
-  WarningOutlined,
-  EyeOutlined,
-} from '@ant-design/icons'
-import { useRequest } from 'ahooks'
+import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useMemo, useState } from 'react'
 
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell'
 import api from '@/services/_request'
@@ -350,13 +350,18 @@ const ExamDashboardResultsPage: React.FC = () => {
           `/konnected/certifications/exam-preparation?pathId=${attempt.certificationPathId}`,
         )
       }
-    } catch (err: any) {
-      const detail =
-        (err &&
-          typeof err === 'object' &&
-          'response' in err &&
-          (err as any).response?.data?.detail) ||
-        null
+    } catch (err: unknown) {
+      let detail: string | null = null
+      if (err && typeof err === 'object' && 'response' in err) {
+        const response = (err as { response?: unknown }).response
+        if (response && typeof response === 'object' && 'data' in response) {
+          const data = (response as { data?: unknown }).data
+          if (data && typeof data === 'object' && 'detail' in data) {
+            const value = (data as { detail?: unknown }).detail
+            detail = typeof value === 'string' ? value : null
+          }
+        }
+      }
 
       if (detail) {
         // e.g. "Retry cooldown is still active for this exam."

@@ -1,20 +1,20 @@
 // FILE: frontend/components/compat/Icon.tsx
 // components/compat/Icon.tsx
-import React from 'react'
 import {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
   DeleteOutlined,
   EditOutlined,
-  LikeOutlined,
-  MessageOutlined,
-  LoadingOutlined,
-  PlusOutlined,
   InfoCircleOutlined,
+  LikeOutlined,
+  LoadingOutlined,
+  MessageOutlined,
+  PlusOutlined,
   WarningOutlined,
-  ArrowRightOutlined,
-  ArrowLeftOutlined,
 } from '@ant-design/icons'
+import React from 'react'
 
-const MAP: Record<string, React.ComponentType<any>> = {
+const MAP: Record<string, React.ElementType> = {
   delete: DeleteOutlined,
   edit: EditOutlined,
   like: LikeOutlined,

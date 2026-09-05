@@ -4,12 +4,12 @@
 
 'use client';
 
-import React from 'react';
-import { useSearchParams } from 'next/navigation';
-import { Card, Typography, List, Empty, Alert } from 'antd';
-import api from '@/api';
-import type { AxiosError } from 'axios';
+import { Alert, Card, Empty, List, Typography } from 'antd';
 import { isAxiosError } from 'axios';
+import { useSearchParams } from 'next/navigation';
+import React from 'react';
+
+import api from '@/api';
 
 const { Title, Text } = Typography;
 

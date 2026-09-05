@@ -1,17 +1,17 @@
 // FILE: frontend/routes/routesTeambuilder.tsx
 'use client';
 
-import React from 'react';
 import {
+  BookOutlined,
   DashboardOutlined,
+  GlobalOutlined,
+  PartitionOutlined,
   PlusCircleOutlined,
   TeamOutlined,
-  GlobalOutlined,
   UserSwitchOutlined,
   WarningOutlined,
-  BookOutlined,
-  PartitionOutlined,
 } from '@ant-design/icons';
+import React from 'react';
 
 import type { Route } from './types';
 

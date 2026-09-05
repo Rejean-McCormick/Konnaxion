@@ -1,13 +1,14 @@
 // FILE: frontend/modules/insights/pages/SmartVoteDashboard.tsx
 "use client"; 
-import { useState } from "react";
 import dayjs from "dayjs";
+import { useState } from "react";
 
 import MainLayout from "@/shared/layout/MainLayout";
-import { useReport } from "../hooks/useReport";
+
+import ExportCSVButton from "../components/ExportCSVButton";
 import SmartVoteChart from "../components/SmartVoteChart";
 import TimeRangePicker from "../components/TimeRangePicker";
-import ExportCSVButton from "../components/ExportCSVButton";
+import { useReport } from "../hooks/useReport";
 
 export default function SmartVoteDashboard() {
   const [range, setRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([

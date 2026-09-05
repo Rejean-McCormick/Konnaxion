@@ -1,9 +1,10 @@
 // FILE: frontend/modules/insights/pages/PerfDashboard.tsx
 "use client"; 
 import MainLayout from "@/shared/layout/MainLayout";
-import { useReport } from "../hooks/useReport";
-import LatencySLOGauge from "../components/LatencySLOGauge";
+
 import ErrorRateSparkline from "../components/ErrorRateSparkline";
+import LatencySLOGauge from "../components/LatencySLOGauge";
+import { useReport } from "../hooks/useReport";
 
 export default function PerfDashboard() {
   const { data, isLoading } = useReport("perf", { range: "24h" });

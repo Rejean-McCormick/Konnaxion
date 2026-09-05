@@ -1,7 +1,9 @@
 // FILE: frontend/app/search/page.tsx
-import React, { Suspense } from 'react';
 import { Spin } from 'antd';
+import React, { Suspense } from 'react';
+
 import MainLayout from '@/components/layout-components/MainLayout';
+
 import GlobalSearchClient from './GlobalSearchClient';
 
 // Prevent static prerender issues for this page

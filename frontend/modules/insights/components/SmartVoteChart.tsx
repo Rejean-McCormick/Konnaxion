@@ -1,14 +1,14 @@
 // FILE: frontend/modules/insights/components/SmartVoteChart.tsx
 "use client";
 import {
-  Chart as ChartJS,
   BarElement,
-  LineElement,
   CategoryScale,
-  LinearScale,
-  Tooltip,
-  Legend,
   ChartDataset,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  LineElement,
+  Tooltip,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 

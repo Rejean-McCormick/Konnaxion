@@ -1,5 +1,4 @@
 // FILE: frontend/src/theme/index.ts
-import type { Theme, ThemeId } from "./types";
 
 import sandstoneTheme from "./theme01";
 import blueCanvasTheme from "./theme02";
@@ -9,6 +8,7 @@ import sunburstTheme from "./theme05";
 import neonCircuitTheme from "./theme06";
 import candyCarnivalTheme from "./theme07";
 import mauveAuroraTheme from "./theme08";
+import type { Theme, ThemeId } from "./types";
 
 export const allThemes: Theme[] = [
   sandstoneTheme,

@@ -1,24 +1,6 @@
 // FILE: frontend/app/konsensus/leaderboards/LeaderboardsClient.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import {
-  Layout,
-  Avatar,
-  Badge,
-  Card,
-  Col,
-  Divider,
-  List,
-  Row,
-  Segmented,
-  Select,
-  Space,
-  Statistic,
-  Tag,
-  Tooltip,
-  Typography,
-} from 'antd';
 import {
   CrownOutlined,
   FireOutlined,
@@ -33,6 +15,24 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
+import {
+  Avatar,
+  Badge,
+  Card,
+  Col,
+  Divider,
+  Layout,
+  List,
+  Row,
+  Segmented,
+  Select,
+  Space,
+  Statistic,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import React, { useMemo, useState } from 'react';
 
 const { Content } = Layout;
 const { Text, Paragraph } = Typography;

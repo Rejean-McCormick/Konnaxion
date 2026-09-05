@@ -1,8 +1,8 @@
 // FILE: frontend/shared/layout/MainLayout.tsx
 "use client";
-import Link from "next/link";
+import { BarChartOutlined, HomeOutlined } from "@ant-design/icons";
 import { Layout, Menu } from "antd";
-import { HomeOutlined, BarChartOutlined } from "@ant-design/icons";
+import Link from "next/link";
 
 const { Header, Sider, Content } = Layout;
 

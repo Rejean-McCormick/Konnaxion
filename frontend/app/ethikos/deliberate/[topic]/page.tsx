@@ -1,17 +1,17 @@
 'use client'
 
 import 'dayjs/locale/en'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { Alert, Col, Row, Space, Steps, Typography } from 'antd'
-import { useState } from 'react'
-import { PageContainer, ProCard } from '@ant-design/pro-components'
 import {
   BranchesOutlined,
   CheckCircleOutlined,
   MessageOutlined,
   ProfileOutlined,
 } from '@ant-design/icons'
+import { PageContainer, ProCard } from '@ant-design/pro-components'
+import { Alert, Col, Row, Space, Steps, Typography } from 'antd'
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+import { useState } from 'react'
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
 import type { EthikosId } from '@/services/ethikos'
@@ -21,8 +21,8 @@ import ArgumentThreadCard from './_components/ArgumentThreadCard'
 import type { ParticipantContextTarget } from './_components/ArgumentThreadCard'
 import EkohParticipantDrawer from './_components/EkohParticipantDrawer'
 import EmergentQuestionCard from './_components/EmergentQuestionCard'
-import SmartVoteReadingsPanel from './_components/SmartVoteReadingsPanel'
 import KorumPanelsGrid from './_components/KorumPanelsGrid'
+import SmartVoteReadingsPanel from './_components/SmartVoteReadingsPanel'
 import StanceComposerCard from './_components/StanceComposerCard'
 import { TopicErrorState, TopicLoadingState } from './_components/TopicStates'
 import TopicSummaryPanel from './_components/TopicSummaryPanel'

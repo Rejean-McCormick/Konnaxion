@@ -1,4 +1,3 @@
-import * as fs from "fs";
 
 import eslintPluginNext from "@next/eslint-plugin-next";
 import eslintPluginImport from "eslint-plugin-import";
@@ -7,6 +6,8 @@ import eslintPluginReactHooks from "eslint-plugin-react-hooks";
 import eslintPluginStorybook from "eslint-plugin-storybook";
 import tseslint from "typescript-eslint";
 
+import * as fs from "fs";
+
 const eslintIgnore = [
   ".git/",
   ".next/",
@@ -14,6 +15,14 @@ const eslintIgnore = [
   "dist/",
   "build/",
   "coverage/",
+  "artifacts/",
+  "playwright-report/",
+  "test-results/",
+  // Tooling/generated files outside the typed application project.
+  "codemods/",
+  "jest.polyfills.js",
+  "jest.setup.js",
+  "report-bundle-size.js",
   "*.min.js",
   "*.config.js",
   "*.d.ts",
@@ -32,14 +41,11 @@ const config = tseslint.config(
   // ➍ import-plugin recommended (flat)
   eslintPluginImport.flatConfigs.recommended,
 
-  // ➎ Next.js + React plugins + project rules
+  // ➎ Type-aware parsing only for TypeScript sources that belong to tsconfig.
+  // Repository JS tooling (Jest setup, codemods, bundle scripts) stays lintable
+  // without being forced through parserOptions.project.
   {
-    plugins: {
-      "@next/next": eslintPluginNext,
-      react: eslintPluginReact,
-      "react-hooks": eslintPluginReactHooks,
-    },
-
+    files: ["**/*.{ts,tsx}"],
     languageOptions: {
       parserOptions: {
         ecmaVersion: 2022,
@@ -47,6 +53,15 @@ const config = tseslint.config(
         ecmaFeatures: { jsx: true },
         project: ["./tsconfig.json"],
       },
+    },
+  },
+
+  // ➏ Next.js + React plugins + project rules
+  {
+    plugins: {
+      "@next/next": eslintPluginNext,
+      react: eslintPluginReact,
+      "react-hooks": eslintPluginReactHooks,
     },
 
     settings: {

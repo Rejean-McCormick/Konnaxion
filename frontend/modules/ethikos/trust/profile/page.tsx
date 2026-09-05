@@ -2,8 +2,9 @@
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
-import { Avatar, Descriptions, Tag, Timeline, Typography } from 'antd';
 import { useRequest } from 'ahooks';
+import { Avatar, Descriptions, Tag, Timeline, Typography } from 'antd';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchUserProfile, type ReputationProfile } from '@/services/trust';
 

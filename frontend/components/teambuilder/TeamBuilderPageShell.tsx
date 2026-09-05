@@ -1,10 +1,11 @@
 // FILE: frontend/components/teambuilder/TeamBuilderPageShell.tsx
 'use client';
 
-import React, { type ReactNode } from 'react';
+import { Grid, Space, Typography } from 'antd';
 import Head from 'next/head';
 import { useSearchParams } from 'next/navigation';
-import { Typography, Space, Grid } from 'antd';
+import React, { type ReactNode } from 'react';
+
 import usePageTitle from '@/hooks/usePageTitle';
 
 const { Title, Paragraph } = Typography;

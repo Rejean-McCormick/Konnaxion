@@ -2,8 +2,8 @@
 // components/layout-components/Main.tsx
 'use client'
 
-import type { ComponentProps, ReactNode } from 'react'
 import { Layout } from 'antd'
+import type { ComponentProps, ReactNode } from 'react'
 import styled, { css } from 'styled-components'
 
 const StyledMain = styled(

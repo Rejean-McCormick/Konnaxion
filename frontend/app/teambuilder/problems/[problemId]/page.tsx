@@ -1,9 +1,19 @@
 // frontend/app/teambuilder/problems/[problemId]/page.tsx
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { format } from 'date-fns';
+import {
+  AlertOutlined,
+  ApartmentOutlined,
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  CopyOutlined,
+  ExclamationCircleOutlined,
+  ExperimentOutlined,
+  FireOutlined,
+  FundOutlined,
+  ProfileOutlined,
+  ProjectOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Badge,
@@ -22,19 +32,10 @@ import {
   Timeline,
   Typography,
 } from 'antd';
-import {
-  AlertOutlined,
-  ApartmentOutlined,
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-  CopyOutlined,
-  ExclamationCircleOutlined,
-  ExperimentOutlined,
-  FireOutlined,
-  FundOutlined,
-  ProfileOutlined,
-  ProjectOutlined,
-} from '@ant-design/icons';
+import { format } from 'date-fns';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import React, { useCallback, useEffect, useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 import { teambuilderService } from '@/services/teambuilder';
@@ -114,18 +115,18 @@ export default function ProblemDetailPage(): JSX.Element {
     setError(null);
 
     try {
-      // Cast to any so this compiles even if teambuilderService type
-      // doesn't yet declare getProblemDetail. Make sure you implement
-      // teambuilderService.getProblemDetail on the service side.
-      const data = (await (teambuilderService as any).getProblemDetail(
-        problemId as string,
-      )) as IProblemDetailResponse;
+      // Keep compatibility while the shared service type catches up with the
+      // already-used problem-detail endpoint.
+      const problemDetailService = teambuilderService as typeof teambuilderService & {
+        getProblemDetail: (id: string) => Promise<IProblemDetailResponse>;
+      };
+      const data = await problemDetailService.getProblemDetail(problemId as string);
 
       setProblem(data.problem);
       setSessions(data.sessions ?? []);
       setHistory(data.history ?? []);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error(err);
       setError('Failed to load problem details.');
     } finally {
@@ -636,10 +637,10 @@ export default function ProblemDetailPage(): JSX.Element {
         {/* Breadcrumb / context */}
         <Breadcrumb>
           <Breadcrumb.Item>
-            <a href="/teambuilder">Team Builder</a>
+            <Link href="/teambuilder">Team Builder</Link>
           </Breadcrumb.Item>
           <Breadcrumb.Item>
-            <a href="/teambuilder/problems">Problems</a>
+            <Link href="/teambuilder/problems">Problems</Link>
           </Breadcrumb.Item>
           <Breadcrumb.Item>{problem.name}</Breadcrumb.Item>
         </Breadcrumb>

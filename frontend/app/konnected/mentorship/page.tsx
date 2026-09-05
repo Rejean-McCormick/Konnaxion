@@ -2,34 +2,35 @@
 // app/konnected/mentorship/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
 import {
-  Row,
-  Col,
-  Card,
-  Typography,
-  Tag,
-  Avatar,
-  Space,
-  Button,
-  List,
-  Badge,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Radio,
-  Divider,
-  Empty,
-  message,
-} from 'antd';
-import {
-  UserOutlined,
-  TeamOutlined,
-  StarFilled,
   FilterOutlined,
   MessageOutlined,
+  StarFilled,
+  TeamOutlined,
+  UserOutlined,
 } from '@ant-design/icons';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Empty,
+  Form,
+  Input,
+  List,
+  message,
+  Modal,
+  Radio,
+  Row,
+  Select,
+  Space,
+  Tag,
+  Typography,
+} from 'antd';
+import React, { useMemo, useState } from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Text, Paragraph, Title } = Typography;
@@ -176,7 +177,7 @@ export default function KonnectedMentorshipPage() {
     form.resetFields();
   };
 
-  const handleSubmitRequest = (values: MentorshipRequestFormValues) => {
+  const handleSubmitRequest = (_values: MentorshipRequestFormValues) => {
     // For now, just show a success message and close the modal.
     message.success('Your mentorship request has been recorded (demo).');
     handleCloseRequest();

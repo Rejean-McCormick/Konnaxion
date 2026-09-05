@@ -2,9 +2,10 @@
 // File: app/kreative/community-showcases/submit-to-showcase/page.tsx
 'use client';
 
-import React, { useState } from 'react';
-import { Form, Input, Select, Button, Modal, message as antdMessage } from 'antd';
+import { message as antdMessage, Button, Form, Input, Modal, Select } from 'antd';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { TextArea } = Input;
@@ -30,7 +31,7 @@ export default function SubmitToShowcasePage(): JSX.Element {
     { label: 'Music', value: 'music' },
   ];
 
-  const onFinish = async (values: FormValues) => {
+  const onFinish = async (_values: FormValues) => {
     setSubmitting(true);
     try {
       // TODO: plug into backend API when available (e.g. POST /api/showcases)
@@ -38,7 +39,7 @@ export default function SubmitToShowcasePage(): JSX.Element {
 
       antdMessage.success('Submission received');
       setModalVisible(true);
-    } catch (e) {
+    } catch {
       antdMessage.error("Une erreur est survenue lors de l'envoi.");
     } finally {
       setSubmitting(false);

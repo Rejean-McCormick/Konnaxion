@@ -2,14 +2,17 @@
 ﻿// app/konnected/teams-collaboration/my-teams/page.tsx
 'use client';
 
-import { apiFetch } from '@/api';
-
-import React, { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import {
+  CalendarOutlined,
+  DownOutlined,
+  PlusOutlined,
+  ProjectOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
+import {
+  Alert,
   App,
   Avatar,
-  Alert,
   Button,
   Col,
   Dropdown,
@@ -24,16 +27,12 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
 import type { MenuProps, TableProps } from 'antd';
-import {
-  DownOutlined,
-  TeamOutlined,
-  UsergroupAddOutlined,
-  PlusOutlined,
-  ProjectOutlined,
-  CalendarOutlined,
-} from '@ant-design/icons';
+import type { ColumnsType } from 'antd/es/table';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Text, Paragraph } = Typography;
@@ -158,7 +157,7 @@ export default function MyTeamsPage(): JSX.Element {
         }
       } catch (err) {
         if (!cancelled) {
-          // eslint-disable-next-line no-console
+           
           console.error('Failed to load teams', err);
           setError('Unable to load your teams right now. Please try again later.');
         }
@@ -204,7 +203,7 @@ export default function MyTeamsPage(): JSX.Element {
       setData((prev) => prev.filter((row) => row.teamId !== team.teamId));
       setSelectedTeamKeys((prev) => prev.filter((key) => key !== team.key));
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to leave team', err);
       message.error('Could not leave the team. Please try again.');
     } finally {

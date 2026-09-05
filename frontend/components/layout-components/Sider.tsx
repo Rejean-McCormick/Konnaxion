@@ -2,8 +2,8 @@
 // C:\MyCode\Konnaxionv14\frontend\components\layout-components\Sider.tsx
 'use client'
 
-import type { ReactNode } from 'react'
 import { Layout } from 'antd'
+import type { ReactNode } from 'react'
 import styled from 'styled-components'
 
 const { Sider } = Layout

@@ -2,24 +2,26 @@
 // app/kreative/dashboard/page.tsx
 'use client';
 
-import React from 'react';
 import {
-  Card,
-  Avatar,
-  Button,
-  Carousel,
-  List,
-  Row,
-  Col,
-  Typography,
-  Space,
-} from 'antd';
-import {
-  PictureOutlined,
   BulbOutlined,
+  PictureOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
+import {
+  Avatar,
+  Button,
+  Card,
+  Carousel,
+  Col,
+  List,
+  Row,
+  Space,
+  Typography,
+} from 'antd';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import React from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;
@@ -130,10 +132,13 @@ export default function KreativeDashboardPage(): JSX.Element {
           <Card
             hoverable
             cover={
-              <img
+              <Image
                 alt="Featured Project"
                 src={featuredProject.imageUrl}
-                style={{ objectFit: 'cover' }}
+                width={800}
+                height={450}
+                unoptimized
+                style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
               />
             }
           >
@@ -166,9 +171,12 @@ export default function KreativeDashboardPage(): JSX.Element {
             <Carousel autoplay dotPosition="bottom">
               {inspirationGallery.map((item) => (
                 <div key={item.id}>
-                  <img
+                  <Image
                     alt={`Art ${item.id}`}
                     src={item.imageUrl}
+                    width={800}
+                    height={300}
+                    unoptimized
                     style={{
                       width: '100%',
                       height: 300,

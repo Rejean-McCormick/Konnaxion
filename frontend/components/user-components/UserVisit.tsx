@@ -7,12 +7,13 @@
  * Author: Hieu Chu
  */
 
-import type React from 'react';
+import { Comment } from '@ant-design/compatible';
+import { Card, Empty, List, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Tooltip, List, Card, Empty } from 'antd';
-import { Comment } from '@ant-design/compatible';
+import Image from 'next/image';
 import Link from 'next/link';
+import type React from 'react';
 
 dayjs.extend(relativeTime);
 
@@ -72,9 +73,12 @@ const UserVisit: React.FC<{ visits: Visit[] }> = ({ visits }) => {
         </Link>
       ),
       avatar: (
-        <img
+        <Image
           src={firstImageUrl}
           alt={x.sculpture?.name ?? 'Sculpture'}
+          width={42}
+          height={42}
+          unoptimized
           // Fallback d'image robuste
           onError={(e) => {
             // évite une boucle si le fallback est manquant

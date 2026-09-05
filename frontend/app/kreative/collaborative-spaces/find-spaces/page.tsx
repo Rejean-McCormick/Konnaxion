@@ -1,22 +1,23 @@
 // FILE: frontend/app/kreative/collaborative-spaces/find-spaces/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { SearchOutlined } from '@ant-design/icons';
 import {
-  Row,
-  Col,
-  Card,
-  Input,
-  Select,
+  message as antdMessage,
   Button,
+  Card,
+  Col,
+  Input,
   Modal,
   Pagination,
+  Row,
+  Select,
   Space,
   Typography,
-  message as antdMessage,
 } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Text } = Typography;

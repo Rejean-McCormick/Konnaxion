@@ -1,6 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import {
+  BarChartOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons'
+import { ProCard } from '@ant-design/pro-components'
 import { useRequest } from 'ahooks'
 import {
   Alert,
@@ -16,11 +20,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import {
-  BarChartOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons'
-import { ProCard } from '@ant-design/pro-components'
+import { useMemo, useState } from 'react'
 
 import {
   fetchEthikosTopicReading,

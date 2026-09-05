@@ -1,5 +1,5 @@
 // FILE: frontend/_e2e/ethikos-korum-deliberate.spec.ts
-import { expect, test, type Page, type Route } from '@playwright/test'
+import { expect, type Page, type Route, test } from '@playwright/test'
 
 /* ------------------------------------------------------------------ */
 /*  Kintsugi Wave 1 — Korum / Deliberate smoke                         */

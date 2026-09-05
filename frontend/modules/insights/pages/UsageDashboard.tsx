@@ -1,8 +1,9 @@
 // FILE: frontend/modules/insights/pages/UsageDashboard.tsx
 "use client"; 
 import MainLayout from "@/shared/layout/MainLayout";
-import { useReport } from "../hooks/useReport";
+
 import UsageBigNumbers from "../components/UsageBigNumbers";
+import { useReport } from "../hooks/useReport";
 
 export default function UsageDashboard() {
   const { data, isLoading } = useReport("usage");

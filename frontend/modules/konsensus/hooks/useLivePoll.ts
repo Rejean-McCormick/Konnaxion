@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+
 import type { PollId } from "./usePoll";
 
 /**

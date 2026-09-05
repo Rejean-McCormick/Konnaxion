@@ -1,12 +1,12 @@
 // FILE: frontend/modules/konsensus/components/PollBarChart.tsx
 "use client";
 import {
-  Chart as ChartJS,
   BarElement,
   CategoryScale,
+  Chart as ChartJS,
+  Legend,
   LinearScale,
   Tooltip,
-  Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 

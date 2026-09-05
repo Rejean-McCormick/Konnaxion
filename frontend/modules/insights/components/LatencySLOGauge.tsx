@@ -1,10 +1,10 @@
 // FILE: frontend/modules/insights/components/LatencySLOGauge.tsx
 "use client";
 import {
-  Chart as ChartJS,
   ArcElement,
-  Tooltip,
+  Chart as ChartJS,
   Legend,
+  Tooltip,
 } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 ChartJS.register(ArcElement, Tooltip, Legend);

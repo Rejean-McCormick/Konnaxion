@@ -2,9 +2,10 @@
 // app/kreative/idea-incubator/collaborate-on-ideas/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { List, Button, Badge, Input, Select, Space, Typography } from 'antd';
+import { Badge, Button, Input, List, Select, Space, Typography } from 'antd';
 import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text } = Typography;

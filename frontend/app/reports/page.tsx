@@ -1,31 +1,30 @@
 'use client';
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
+import {
+  ArrowRightOutlined,
+  BarChartOutlined,
+  CalendarOutlined,
+  InfoCircleOutlined,
+  LineChartOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
 import {
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components';
 import {
+  Button,
   Card,
   DatePicker,
   List,
-  Space,
-  Typography,
   Segmented,
+  Space,
   Tag,
-  Button,
   Tooltip,
+  Typography,
 } from 'antd';
-import type { ListProps } from 'antd';
-import {
-  LineChartOutlined,
-  BarChartOutlined,
-  ThunderboltOutlined,
-  InfoCircleOutlined,
-  CalendarOutlined,
-  ArrowRightOutlined,
-} from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
 import ReportsPageShell from './ReportsPageShell';
 

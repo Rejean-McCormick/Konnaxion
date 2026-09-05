@@ -2,11 +2,16 @@
 // app/konnected/learning-library/recommended-resources/page.tsx
 'use client';
 
-import { apiFetch } from '@/api';
-
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Head from 'next/head';
-import { useRouter } from 'next/navigation';
+import {
+  ArrowRightOutlined,
+  BookOutlined,
+  DislikeOutlined,
+  FireOutlined,
+  LikeOutlined,
+  ReloadOutlined,
+  SettingOutlined,
+  StarFilled,
+} from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -14,24 +19,19 @@ import {
   Col,
   Empty,
   List,
+  message,
   Progress,
   Row,
   Skeleton,
   Space,
   Tag,
   Typography,
-  message,
 } from 'antd';
-import {
-  ReloadOutlined,
-  SettingOutlined,
-  LikeOutlined,
-  DislikeOutlined,
-  StarFilled,
-  ArrowRightOutlined,
-  BookOutlined,
-  FireOutlined,
-} from '@ant-design/icons';
+import Head from 'next/head';
+import { useRouter } from 'next/navigation';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Text } = Typography;
@@ -126,89 +126,118 @@ function safeNumber(value: unknown): number {
   return 0;
 }
 
+type UnknownRecord = Record<string, unknown>;
+
+function asRecord(value: unknown): UnknownRecord {
+  return value && typeof value === 'object' ? (value as UnknownRecord) : {};
+}
+
+function asOptionalString(value: unknown): string | undefined {
+  return typeof value === 'string' ? value : undefined;
+}
+
+function asStringArray(value: unknown): string[] {
+  return Array.isArray(value) ? value.map((item) => String(item)) : [];
+}
+
 function normalizeRecommendations(raw: unknown): RecommendationsResponse {
-  const { items, count } = normalizeList<any>(raw);
+  const { items, count } = normalizeList<UnknownRecord>(raw);
 
-  const mapped: KnowledgeRecommendationItem[] = items.map(
-    (row: any, index: number) => {
-      // Support both:
-      // - Recommendations API with row.resource, row.progress, row.score, row.reason...
-      // - Plain knowledge resources list where row itself is the resource.
-      const resourceRaw = row.resource ?? row;
-      const id = resourceRaw.id ?? row.id ?? index;
+  const mapped: KnowledgeRecommendationItem[] = items.map((row, index) => {
+    // Support both dedicated recommendation rows and plain resources.
+    const resourceRaw = Object.keys(asRecord(row.resource)).length
+      ? asRecord(row.resource)
+      : row;
+    const id = resourceRaw.id ?? row.id ?? index;
 
-      const rawType = (resourceRaw.type ?? resourceRaw.resource_type ?? 'article') as string;
-      const normalizedType: ResourceType =
-        rawType === 'doc'
-          ? 'article'
-          : rawType === 'course'
+    const rawType = String(resourceRaw.type ?? resourceRaw.resource_type ?? 'article');
+    const normalizedType: ResourceType =
+      rawType === 'doc'
+        ? 'article'
+        : rawType === 'course'
           ? 'lesson'
           : (['article', 'video', 'lesson', 'quiz', 'dataset'] as const).includes(
-              rawType as ResourceType,
-            )
-          ? (rawType as ResourceType)
-          : 'article';
+                rawType as ResourceType,
+              )
+            ? (rawType as ResourceType)
+            : 'article';
 
-      const resource: KnowledgeResource = {
-        id: String(id),
-        title: resourceRaw.title ?? 'Untitled resource',
-        summary: resourceRaw.summary ?? resourceRaw.description ?? '',
-        subject: resourceRaw.subject ?? undefined,
-        level: resourceRaw.level ?? undefined,
-        language: resourceRaw.language ?? undefined,
-        type: normalizedType,
-        tags: resourceRaw.tags ?? resourceRaw.keywords ?? [],
-        estimatedDurationMinutes:
-          resourceRaw.estimatedDurationMinutes ??
-          resourceRaw.estimated_minutes ??
-          resourceRaw.estimated_duration_minutes ??
-          undefined,
-        viewerUrl: resourceRaw.viewerUrl ?? resourceRaw.url ?? undefined,
-        offlineAvailable: Boolean(
-          resourceRaw.offlineAvailable ??
-            resourceRaw.is_offline_available ??
-            resourceRaw.offlineEligible ??
-            resourceRaw.offline_eligible,
-        ),
-        partOfPathTitle:
-          resourceRaw.partOfPathTitle ??
-          resourceRaw.path_title ??
-          resourceRaw.path_label ??
-          undefined,
+    const rawLevel = asOptionalString(resourceRaw.level);
+    const level =
+      rawLevel && ['Beginner', 'Intermediate', 'Advanced'].includes(rawLevel)
+        ? (rawLevel as KnowledgeResource['level'])
+        : undefined;
+
+    const durationValue =
+      resourceRaw.estimatedDurationMinutes ??
+      resourceRaw.estimated_minutes ??
+      resourceRaw.estimated_duration_minutes;
+
+    const resource: KnowledgeResource = {
+      id: String(id),
+      title: asOptionalString(resourceRaw.title) ?? 'Untitled resource',
+      summary:
+        asOptionalString(resourceRaw.summary) ??
+        asOptionalString(resourceRaw.description) ??
+        '',
+      subject: asOptionalString(resourceRaw.subject),
+      level,
+      language: asOptionalString(resourceRaw.language),
+      type: normalizedType,
+      tags: asStringArray(resourceRaw.tags ?? resourceRaw.keywords),
+      estimatedDurationMinutes:
+        durationValue === undefined ? undefined : safeNumber(durationValue),
+      viewerUrl:
+        asOptionalString(resourceRaw.viewerUrl) ?? asOptionalString(resourceRaw.url),
+      offlineAvailable: Boolean(
+        resourceRaw.offlineAvailable ??
+          resourceRaw.is_offline_available ??
+          resourceRaw.offlineEligible ??
+          resourceRaw.offline_eligible,
+      ),
+      partOfPathTitle:
+        asOptionalString(resourceRaw.partOfPathTitle) ??
+        asOptionalString(resourceRaw.path_title) ??
+        asOptionalString(resourceRaw.path_label),
+    };
+
+    const progressSource = asRecord(row.progress ?? resourceRaw.progress);
+    let progress: LearningProgress | undefined;
+    if (Object.keys(progressSource).length > 0) {
+      const rawPercent =
+        progressSource.progressPercent ?? progressSource.progress_percent;
+      const percent = Math.max(0, Math.min(100, safeNumber(rawPercent)));
+
+      progress = {
+        resourceId: String(id),
+        progressPercent: percent,
+        lastTouchedAt:
+          asOptionalString(progressSource.lastTouchedAt) ??
+          asOptionalString(progressSource.last_touched_at),
       };
+    }
 
-      const progressSource = row.progress ?? resourceRaw.progress;
-      let progress: LearningProgress | undefined;
-      if (progressSource) {
-        const rawPercent =
-          progressSource.progressPercent ?? progressSource.progress_percent;
-        const percent = Math.max(0, Math.min(100, safeNumber(rawPercent)));
+    const rawScore = row.score ?? row.relevance_score;
+    const rawSource = asOptionalString(row.source);
+    const source =
+      rawSource && ['ml', 'editorial', 'trend'].includes(rawSource)
+        ? (rawSource as RecommendationSource)
+        : undefined;
 
-        progress = {
-          resourceId: String(id),
-          progressPercent: percent,
-          lastTouchedAt:
-            progressSource.lastTouchedAt ?? progressSource.last_touched_at,
-        };
-      }
-
-      const rawScore = row.score ?? row.relevance_score;
-
-      return {
-        recommendationId: String(row.id ?? `rec-${id}`),
-        score: typeof rawScore === 'number' ? rawScore : undefined,
-        reason: typeof row.reason === 'string' ? row.reason : undefined,
-        recommendedAt:
-          row.recommendedAt ??
-          row.recommended_at ??
-          resourceRaw.created_at ??
-          new Date().toISOString(),
-        source: row.source as RecommendationSource | undefined,
-        resource,
-        progress,
-      };
-    },
-  );
+    return {
+      recommendationId: String(row.id ?? `rec-${id}`),
+      score: typeof rawScore === 'number' ? rawScore : undefined,
+      reason: asOptionalString(row.reason),
+      recommendedAt:
+        asOptionalString(row.recommendedAt) ??
+        asOptionalString(row.recommended_at) ??
+        asOptionalString(resourceRaw.created_at) ??
+        new Date().toISOString(),
+      source,
+      resource,
+      progress,
+    };
+  });
 
   return {
     results: mapped,
@@ -231,7 +260,7 @@ async function fetchRecommendations(): Promise<RecommendationsResponse> {
     const raw = await fetchJson('/api/knowledge-recommendations/');
     return normalizeRecommendations(raw);
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.warn(
       'Falling back to KnowledgeResource list for recommendations',
       err,
@@ -279,7 +308,7 @@ async function sendRecommendationFeedback(
       }),
     });
   } catch (err) {
-    // eslint-disable-next-line no-console
+     
     console.warn('Failed to send recommendation feedback', err);
   }
 }

@@ -2,22 +2,24 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\community-showcases\featured-projects\page.tsx
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { SearchOutlined } from '@ant-design/icons';
 import {
+  Badge,
+  Button,
   Card,
-  Row,
   Col,
   Input,
-  Select,
   Modal,
   Pagination,
-  Typography,
-  Badge,
+  Row,
+  Select,
   Space,
-  Button,
+  Typography,
 } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text, Paragraph } = Typography;
@@ -163,10 +165,14 @@ export default function FeaturedProjectsPage(): JSX.Element {
               <Card
                 hoverable
                 cover={
-                  <img
+                  <Image
                     alt={project.title}
                     src={project.coverImage}
+                    width={400}
+                    height={200}
+                    unoptimized
                     style={{
+                      width: '100%',
                       height: 200,
                       objectFit: 'cover',
                     }}
@@ -220,12 +226,15 @@ export default function FeaturedProjectsPage(): JSX.Element {
       >
         {selectedProject && (
           <div>
-            <img
+            <Image
               alt={selectedProject.title}
               src={selectedProject.coverImage}
+              width={800}
+              height={400}
+              unoptimized
               style={{
                 width: '100%',
-                maxHeight: 400,
+                height: 400,
                 objectFit: 'cover',
               }}
             />

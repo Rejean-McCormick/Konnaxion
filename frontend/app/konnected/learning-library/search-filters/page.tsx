@@ -1,8 +1,7 @@
 // FILE: frontend/app/konnected/learning-library/search-filters/page.tsx
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { FilterOutlined, ReloadOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -19,8 +18,10 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType, TableProps } from 'antd/es/table';
-import { SearchOutlined, FilterOutlined, ReloadOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { RangePicker } = DatePicker;
@@ -119,18 +120,17 @@ function normalizeSearchResponse(raw: RawKnowledgeSearchResponse): KnowledgeSear
   }
 
   const obj = raw ?? {};
-  const anyObj = obj as any;
 
   const results: KnowledgeResource[] =
-    (Array.isArray(anyObj.results) && anyObj.results) ||
-    (Array.isArray(anyObj.items) && anyObj.items) ||
+    (Array.isArray(obj.results) && obj.results) ||
+    (Array.isArray(obj.items) && obj.items) ||
     [];
 
   const count: number =
-    typeof anyObj.count === 'number'
-      ? anyObj.count
-      : typeof anyObj.total === 'number'
-        ? anyObj.total
+    typeof obj.count === 'number'
+      ? obj.count
+      : typeof obj.total === 'number'
+        ? obj.total
         : results.length;
 
   return { count, results };
@@ -396,7 +396,7 @@ export default function KonnectedKnowledgeSearchFiltersPage(): JSX.Element {
   useEffect(() => {
     // Initial search on mount with default filters
     void runSearch(1, DEFAULT_PAGE_SIZE);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   // Compute active filters on each render so the Reset button state stays in sync

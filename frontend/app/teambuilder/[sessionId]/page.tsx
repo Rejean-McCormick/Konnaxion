@@ -1,14 +1,17 @@
 // FILE: frontend/app/teambuilder/[sessionId]/page.tsx
 'use client';
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import { useParams } from 'next/navigation';
-import { format } from 'date-fns';
+import {
+  AlertOutlined,
+  ArrowLeftOutlined,
+  BranchesOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  HistoryOutlined,
+  ReloadOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Badge,
@@ -24,30 +27,28 @@ import {
   Space,
   Spin,
   Statistic,
+  Table,
   Tabs,
   Tag,
   Timeline,
   Typography,
-  Table,
 } from 'antd';
-import type { TabsProps, TableColumnsType } from 'antd';
-import {
-  AlertOutlined,
-  ArrowLeftOutlined,
-  BranchesOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  HistoryOutlined,
-  ReloadOutlined,
-  TeamOutlined,
-} from '@ant-design/icons';
+import type { TableColumnsType, TabsProps } from 'antd';
+import { format } from 'date-fns';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 import { teambuilderService } from '@/services/teambuilder';
 import type { IBuilderSession } from '@/services/teambuilder/types';
 
-const { Text, Paragraph, Title } = Typography;
+const { Text, Paragraph } = Typography;
 const { Panel } = Collapse;
 
 // ---------------------------------------------------------------------------
@@ -72,6 +73,44 @@ type TeamRow = {
   members: MemberRow[];
 };
 
+type BuilderMemberLike = {
+  id?: string | number;
+  user_id?: string | number;
+  name?: string;
+  displayName?: string;
+  role?: string;
+  function?: string;
+  is_leader?: boolean;
+  leader?: boolean;
+  has_conflict?: boolean;
+  status?: string;
+};
+
+type BuilderTeamLike = {
+  id?: string | number;
+  team_id?: string | number;
+  name?: string;
+  score?: number;
+  quality_score?: number;
+  status?: string;
+  members?: BuilderMemberLike[];
+};
+
+type SessionExtensions = {
+  algorithm_config?: IBuilderSession['algorithm_config'] & {
+    mode?: string;
+    max_teams?: string | number;
+    fairness?: string;
+  };
+  mode?: string;
+  warnings?: string[];
+  issues?: string[];
+  last_run_at?: string;
+  updated_at?: string;
+  problem_name?: string;
+  owner_name?: string;
+};
+
 // ---------------------------------------------------------------------------
 // Component
 // ---------------------------------------------------------------------------
@@ -85,8 +124,8 @@ export default function SessionDetailPage(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('overview');
 
-  // Cast to any for optional / extended fields (mode, warnings, etc.)
-  const sessionAny = session as any;
+  // Some backend deployments expose additional session metadata.
+  const sessionExtended = session as (IBuilderSession & SessionExtensions) | null;
 
   // ---------------------------------------------------------------------------
   // Data fetching
@@ -103,7 +142,7 @@ export default function SessionDetailPage(): JSX.Element {
       setSession(data);
       setError(null);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error(err);
       setError('Failed to load session details.');
       setSession(null);
@@ -132,7 +171,7 @@ export default function SessionDetailPage(): JSX.Element {
       );
       setSession(updatedSession);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error(err);
       setError('Failed to generate teams. Please try again.');
     } finally {
@@ -149,8 +188,8 @@ export default function SessionDetailPage(): JSX.Element {
 
   const modeTag = useMemo(() => {
     const mode: string | undefined =
-      sessionAny?.algorithm_config?.mode ||
-      sessionAny?.mode ||
+      sessionExtended?.algorithm_config?.mode ||
+      sessionExtended?.mode ||
       undefined;
 
     if (!mode) {
@@ -204,10 +243,10 @@ export default function SessionDetailPage(): JSX.Element {
         </Text>
       </Tag>
     );
-  }, [sessionAny]);
+  }, [sessionExtended]);
 
   const unresolvedWarnings: string[] =
-    sessionAny?.warnings ?? sessionAny?.issues ?? [];
+    sessionExtended?.warnings ?? sessionExtended?.issues ?? [];
 
   const progressValue = useMemo(() => {
     if (!session) return 0;
@@ -288,8 +327,10 @@ export default function SessionDetailPage(): JSX.Element {
   const teamRows: TeamRow[] = useMemo(() => {
     if (!session || !Array.isArray(session.teams)) return [];
 
-    return session.teams.map((team: any) => {
-      const members: MemberRow[] = (team.members ?? []).map((m: any) => ({
+    const teams = session.teams as unknown as BuilderTeamLike[];
+
+    return teams.map((team) => {
+      const members: MemberRow[] = (team.members ?? []).map((m) => ({
         id: m.id ?? m.user_id ?? String(m.name ?? 'member'),
         name: m.name ?? m.displayName ?? 'Unknown',
         role: m.role ?? m.function ?? undefined,
@@ -430,20 +471,20 @@ export default function SessionDetailPage(): JSX.Element {
       });
     }
 
-    if (sessionAny?.last_run_at) {
+    if (sessionExtended?.last_run_at) {
       items.push({
         label: `Teams generated – ${format(
-          new Date(sessionAny.last_run_at),
+          new Date(sessionExtended.last_run_at),
           'PPP p',
         )}`,
         description: 'Team Builder algorithm executed.',
       });
     }
 
-    if (sessionAny?.updated_at && sessionAny.updated_at !== session?.created_at) {
+    if (sessionExtended?.updated_at && sessionExtended.updated_at !== session?.created_at) {
       items.push({
         label: `Last updated – ${format(
-          new Date(sessionAny.updated_at),
+          new Date(sessionExtended.updated_at),
           'PPP p',
         )}`,
         description: 'Configuration or teams updated.',
@@ -458,7 +499,7 @@ export default function SessionDetailPage(): JSX.Element {
     }
 
     return items;
-  }, [session, sessionAny]);
+  }, [session, sessionExtended]);
 
   // ---------------------------------------------------------------------------
   // Page content
@@ -608,10 +649,10 @@ export default function SessionDetailPage(): JSX.Element {
                         ?.replace('_', ' ') ?? '–'}
                     </Descriptions.Item>
                     <Descriptions.Item label="Max team count">
-                      {sessionAny?.algorithm_config?.max_teams ?? '–'}
+                      {sessionExtended?.algorithm_config?.max_teams ?? '–'}
                     </Descriptions.Item>
                     <Descriptions.Item label="Fairness / rotation">
-                      {sessionAny?.algorithm_config?.fairness ?? '–'}
+                      {sessionExtended?.algorithm_config?.fairness ?? '–'}
                     </Descriptions.Item>
                   </Descriptions>
                 </Col>
@@ -622,10 +663,10 @@ export default function SessionDetailPage(): JSX.Element {
                     title="Context"
                   >
                     <Descriptions.Item label="Project / problem">
-                      {sessionAny?.problem_name ?? 'Not linked'}
+                      {sessionExtended?.problem_name ?? 'Not linked'}
                     </Descriptions.Item>
                     <Descriptions.Item label="Owner">
-                      {sessionAny?.owner_name ?? '–'}
+                      {sessionExtended?.owner_name ?? '–'}
                     </Descriptions.Item>
                     <Descriptions.Item label="Mode">
                       {modeTag}
@@ -788,7 +829,7 @@ export default function SessionDetailPage(): JSX.Element {
         {/* Optional breadcrumb inside the shell body */}
         <Breadcrumb
           items={[
-            { title: <a href="/teambuilder">Sessions</a> },
+            { title: <Link href="/teambuilder">Sessions</Link> },
             { title: shellTitle },
           ]}
         />

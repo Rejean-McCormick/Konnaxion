@@ -2,8 +2,9 @@
 'use client'
 
 import { PageContainer } from '@ant-design/pro-components';
-import { Timeline, Tag } from 'antd';
 import { useRequest } from 'ahooks';
+import { Tag, Timeline } from 'antd';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchChangelog } from '@/services/learn';
 

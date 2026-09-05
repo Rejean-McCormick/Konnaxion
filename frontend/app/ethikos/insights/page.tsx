@@ -3,12 +3,28 @@
 // app/ethikos/insights/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  ArrowRightOutlined,
+  BranchesOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ColumnWidthOutlined,
+  DashboardOutlined,
+  FilterOutlined,
+  LineChartOutlined,
+  RadarChartOutlined,
+  SafetyCertificateOutlined,
+  StarOutlined,
+  SyncOutlined,
+  TrophyOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   Badge,
@@ -25,40 +41,23 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import {
-  ArrowRightOutlined,
-  BranchesOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ColumnWidthOutlined,
-  DashboardOutlined,
-  FilterOutlined,
-  LineChartOutlined,
-  ProfileOutlined,
-  RadarChartOutlined,
-  SafetyCertificateOutlined,
-  StarOutlined,
-  SyncOutlined,
-  TrophyOutlined,
-  WarningOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
+import React, { useMemo, useState } from 'react';
 
-import ChartCard from '@/components/charts/ChartCard';
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
+import ChartCard from '@/components/charts/ChartCard';
 import {
-  fetchPulseOverview,
-  fetchPulseHealth,
-  fetchPulseLiveData,
-} from '@/services/pulse';
-import { fetchImpactOutcomes } from '@/services/impact';
-import {
-  fetchDecisionResults,
   type DecisionResult,
   type DecisionScope,
+  fetchDecisionResults,
 } from '@/services/decide';
+import { fetchImpactOutcomes } from '@/services/impact';
+import {
+  fetchPulseHealth,
+  fetchPulseLiveData,
+  fetchPulseOverview,
+} from '@/services/pulse';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;

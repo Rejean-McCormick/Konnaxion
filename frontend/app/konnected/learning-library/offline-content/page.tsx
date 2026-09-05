@@ -2,40 +2,41 @@
 // app/konnected/learning-library/offline-content/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import Head from 'next/head';
 import {
-  Row,
-  Col,
-  Card,
-  Typography,
-  Button,
-  Tag,
-  Progress,
-  Table,
-  Switch,
-  Space,
-  Modal,
-  Form,
-  Input,
-  Select,
-  Tooltip,
-  Empty,
-  Alert,
-  Skeleton,
-  App,
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { ProCard, StatisticCard } from '@ant-design/pro-components';
-import {
-  SyncOutlined,
   DeleteOutlined,
   PlusOutlined,
+  SyncOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
+import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
+import {
+  Alert,
+  App,
+  Button,
+  Card,
+  Col,
+  Empty,
+  Form,
+  Input,
+  Modal,
+  Progress,
+  Row,
+  Select,
+  Skeleton,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import Head from 'next/head';
+import React, { useMemo, useState } from 'react';
+
+import api, { apiDelete, apiFetch, apiPatch, apiPost } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
-import { apiDelete, apiFetch, apiPatch, apiPost } from '@/api';
 
 const { Paragraph, Text } = Typography;
 const { Option } = Select;
@@ -72,6 +73,31 @@ interface OfflineableResource {
   sizeMb?: number;
   offlineEligible: boolean;
   includedInPackages?: string[]; // package names / IDs for quick display
+}
+
+interface RawOfflineResource {
+  id?: number | string;
+  title?: string;
+  type?: unknown;
+  resource_type?: unknown;
+  content_type?: unknown;
+  subject?: string;
+  topic?: string;
+  domain?: string;
+  level?: string;
+  difficulty?: string;
+  language?: string;
+  lang?: string;
+  sizeMb?: number;
+  size_mb?: number;
+  bundle_size_mb?: number;
+  offlineEligible?: unknown;
+  offline_available?: unknown;
+  offlineAvailable?: unknown;
+  is_offline_available?: unknown;
+  can_be_offlined?: unknown;
+  includedInPackages?: unknown;
+  packages?: unknown;
 }
 
 interface CreateOfflinePackagePayload {
@@ -166,7 +192,7 @@ async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
       }
 
       const json = await res.json();
-      const rawItems = normalizeList<any>(json);
+      const rawItems = normalizeList<RawOfflineResource>(json);
 
       const mapped: OfflineableResource[] = rawItems.map((raw) => {
         // Normalise type to the v14 CONTENT_TYPES_ALLOWED enum
@@ -217,13 +243,13 @@ async function fetchOfflineableResources(): Promise<OfflineableResource[]> {
             raw.can_be_offlined,
         );
 
-        const includedInPackages: string[] | undefined =
-          (raw.includedInPackages as string[] | undefined) ??
-          (raw.packages as string[] | undefined) ??
-          undefined;
+        const packagesValue = raw.includedInPackages ?? raw.packages;
+        const includedInPackages = Array.isArray(packagesValue)
+          ? packagesValue.map((item) => String(item))
+          : undefined;
 
         return {
-          id: raw.id,
+          id: raw.id ?? '',
           title: raw.title ?? '',
           type,
           subject: raw.subject ?? raw.topic ?? raw.domain ?? undefined,

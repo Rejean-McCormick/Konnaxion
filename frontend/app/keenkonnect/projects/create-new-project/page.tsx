@@ -1,18 +1,19 @@
 // FILE: frontend/app/keenkonnect/projects/create-new-project/page.tsx
 'use client';
 
-import React, { Suspense, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Row, Col, Card, Typography, message } from 'antd';
 import {
-  StepsForm,
+  ProFormDatePicker,
+  ProFormSelect,
   ProFormText,
   ProFormTextArea,
-  ProFormSelect,
-  ProFormDatePicker,
   ProFormUploadButton,
+  StepsForm,
 } from '@ant-design/pro-components';
+import { Card, Col, message, Row, Typography } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
+import { useRouter } from 'next/navigation';
+import React, { Suspense, useState } from 'react';
+
 import { apiPost } from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
@@ -26,8 +27,8 @@ type CreateProjectFormValues = {
   description?: string;
   category?: string;
   team?: string;
-  startDate?: any;
-  endDate?: any;
+  startDate?: unknown;
+  endDate?: unknown;
   attachments?: UploadFile[];
   notes?: string;
 };
@@ -67,7 +68,7 @@ function Content() {
       router.push('/keenkonnect/projects/my-projects');
       return true;
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error('Create project error:', err);
       message.error('Failed to create project.');
       return false;

@@ -1,12 +1,12 @@
 import dayjs from 'dayjs'
 
 import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
-import type { ArgumentSide } from '@/services/ethikos'
 import type {
   TopicDetailResponse,
   TopicStance,
   TopicStanceValue,
 } from '@/services/deliberate'
+import type { ArgumentSide } from '@/services/ethikos'
 
 export interface UserMeApi {
   id?: string | number

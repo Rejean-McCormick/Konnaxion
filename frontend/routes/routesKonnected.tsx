@@ -1,7 +1,6 @@
 // FILE: frontend/routes/routesKonnected.tsx
 "use client";
 
-import React from "react";
 import {
   AppstoreOutlined,
   AuditOutlined,
@@ -24,6 +23,7 @@ import {
   TeamOutlined,
   TrophyOutlined,
 } from "@ant-design/icons";
+import React from "react";
 
 import type { Route } from "./types";
 

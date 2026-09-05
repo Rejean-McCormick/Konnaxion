@@ -1,23 +1,21 @@
 'use client';
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import type { Dayjs } from 'dayjs';
+import {
+  LineChartOutlined,
+  PlayCircleOutlined,
+  SaveOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import {
   ProCard,
   ProForm,
   ProFormCheckbox,
   ProFormDateRangePicker,
+  type ProFormInstance,
   ProFormSelect,
   ProFormSlider,
   ProFormSwitch,
   ProFormText,
-  type ProFormInstance,
 } from '@ant-design/pro-components';
 import {
   Alert,
@@ -30,12 +28,14 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import {
-  LineChartOutlined,
-  PlayCircleOutlined,
-  SaveOutlined,
-  SettingOutlined,
-} from '@ant-design/icons';
+import type { Dayjs } from 'dayjs';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import {
   Area,
   AreaChart,

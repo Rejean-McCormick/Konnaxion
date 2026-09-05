@@ -1,8 +1,8 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { useRequest } from 'ahooks'
 import { Descriptions, Drawer, Empty, Skeleton, Space, Tag, Typography } from 'antd'
+import type { ReactNode } from 'react'
 
 import { fetchEkohProfile } from '@/services/ekoh'
 import type { EkohProfile } from '@/services/ekoh'

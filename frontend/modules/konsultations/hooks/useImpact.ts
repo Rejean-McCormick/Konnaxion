@@ -1,6 +1,7 @@
 // FILE: frontend/modules/konsultations/hooks/useImpact.ts
 ﻿// modules/konsultations/hooks/useImpact.ts
 import { useQuery } from '@tanstack/react-query';
+
 import api from '@/api';
 import type { ImpactStatus } from '@/services/impact';
 

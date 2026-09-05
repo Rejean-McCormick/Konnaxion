@@ -8,19 +8,25 @@
  * - Trust services showing `uploadCredential` helper (currently a stub without a real backend).
  */
 
-import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import dayjs from 'dayjs';
+import {
+  ClockCircleOutlined,
+  EyeInvisibleOutlined,
+  FileTextOutlined,
+  InboxOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
-  ProTable,
-  ProDescriptions,
   type ProColumns,
+  ProDescriptions,
   type ProDescriptionsItemProps,
+  ProTable,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
+  message as antdMessage,
   Button,
   Divider,
   Drawer,
@@ -33,19 +39,14 @@ import {
   Tooltip,
   Typography,
   Upload,
-  message as antdMessage,
+  type UploadProps,
 } from 'antd';
-import {
-  ClockCircleOutlined,
-  EyeInvisibleOutlined,
-  FileTextOutlined,
-  InboxOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import Link from 'next/link';
+import { type ReactNode, useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
-import { uploadCredential, type Credential } from '@/services/trust';
+import { type Credential, uploadCredential } from '@/services/trust';
 
 /* ---------------------------------------------
  * Types & local helpers
@@ -152,12 +153,12 @@ export default function Credentials() {
   );
 
   // Upload handler, wired to services/trust::uploadCredential
-  const uploadProps = {
+  const uploadProps: UploadProps = {
     name: 'file',
     multiple: false,
     maxCount: 1,
     accept: '.pdf,.jpg,.jpeg,.png',
-    beforeUpload: (file: any) => {
+    beforeUpload: (file) => {
       const isAllowedType =
         file.type === 'application/pdf' ||
         file.type === 'image/jpeg' ||
@@ -177,7 +178,7 @@ export default function Credentials() {
       return true;
     },
     // Match Ant Design's expected `(options) => void` signature
-    customRequest: (options: any) => {
+    customRequest: (options) => {
       const { file, onSuccess, onError } = options;
       const uploadFile = file as File;
 
@@ -204,7 +205,9 @@ export default function Credentials() {
           );
         })
         .catch((error: unknown) => {
-          onError?.(error);
+          const uploadError =
+            error instanceof Error ? error : new Error('Credential upload failed');
+          onError?.(uploadError);
           antdMessage.error('Upload failed. Please try again.');
         })
         .finally(() => {
@@ -219,7 +222,7 @@ export default function Credentials() {
       title: 'Title',
       dataIndex: 'title',
       ellipsis: true,
-      render: (_: any, row: CredentialRow) => (
+      render: (_, row: CredentialRow) => (
         <Space size={6}>
           <FileTextOutlined />
           {row.url ? (
@@ -238,7 +241,7 @@ export default function Credentials() {
       dataIndex: 'issuedAt',
       width: 140,
       valueType: 'date',
-      renderText: (v: any) => dayjs(v).format('YYYY-MM-DD'),
+      renderText: (v) => dayjs(v).format('YYYY-MM-DD'),
     },
     {
       title: 'Status',
@@ -249,7 +252,7 @@ export default function Credentials() {
         Pending: { text: 'Pending', status: 'Processing' },
         Rejected: { text: 'Rejected', status: 'Error' },
       },
-      render: (_: any, row: CredentialRow) => (
+      render: (_, row: CredentialRow) => (
         <Tag color={statusColor[row.status]}>{row.status}</Tag>
       ),
     },
@@ -257,7 +260,7 @@ export default function Credentials() {
       title: 'Actions',
       width: 260,
       valueType: 'option',
-      render: (_: any, row: CredentialRow) => {
+      render: (_, row: CredentialRow) => {
         const canDownload = !!row.url;
         return [
           <Button size="small" key="view" onClick={() => setDetail(row)}>
@@ -513,13 +516,13 @@ export default function Credentials() {
                 {
                   title: 'Issued',
                   dataIndex: 'issuedAt',
-                  render: (_: any, row: CredentialRow) =>
+                  render: (_: ReactNode, row: CredentialRow) =>
                     dayjs(row.issuedAt).format('YYYY-MM-DD'),
                 },
                 {
                   title: 'Status',
                   dataIndex: 'status',
-                  render: (_: any, row: CredentialRow) => (
+                  render: (_: ReactNode, row: CredentialRow) => (
                     <Tag color={statusColor[row.status]}>{row.status}</Tag>
                   ),
                 },
@@ -527,7 +530,7 @@ export default function Credentials() {
                   ? {
                       title: 'Document',
                       dataIndex: 'url',
-                      render: (_: any, row: CredentialRow) => (
+                      render: (_: ReactNode, row: CredentialRow) => (
                         <a href={row.url} target="_blank" rel="noreferrer">
                           Open document
                         </a>

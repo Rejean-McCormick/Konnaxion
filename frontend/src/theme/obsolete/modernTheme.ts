@@ -1,5 +1,5 @@
 // FILE: frontend/src/theme/obsolete/modernTheme.ts
-import { BRAND_HEX, Theme, sharedStatusColors } from './types';
+import { BRAND_HEX, sharedStatusColors, Theme } from './types';
 
 export const modernTheme: Theme = {
   id: 'modern',

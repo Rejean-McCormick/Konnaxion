@@ -1,7 +1,11 @@
 // frontend/app/teambuilder/humans/modes/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import {
+  ExperimentOutlined,
+  SafetyCertificateOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -11,21 +15,17 @@ import {
   Divider,
   Form,
   InputNumber,
+  message,
   Progress,
   Row,
+  Slider,
   Space,
   Statistic,
   Tabs,
   Tag,
   Typography,
-  message,
-  Slider,
 } from 'antd';
-import {
-  ExperimentOutlined,
-  SafetyCertificateOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
+import React, { useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 
@@ -219,11 +219,11 @@ export default function TeamModesPage(): JSX.Element {
     setSaving(true);
     try {
       // TODO: wire to backend service when available
-      // eslint-disable-next-line no-console
+       
       console.log('Saving team modes (stub):', modes);
       message.success('Team modes saved (local stub).');
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error(err);
       message.error('Failed to save modes. Please try again.');
     } finally {

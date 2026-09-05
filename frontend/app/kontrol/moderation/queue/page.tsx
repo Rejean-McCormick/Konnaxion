@@ -1,41 +1,41 @@
 // FILE: frontend/app/kontrol/moderation/queue/page.tsx
 'use client';
 
-import { apiFetch } from '@/api';
 
-import React, { useRef, useState } from 'react';
-import {
-  Button,
-  Tag,
-  Space,
-  Popconfirm,
-  message,
-  Tooltip,
-  Drawer,
-  Badge,
-  Tabs,
-  Typography,
-  Avatar,
-  List,
-} from 'antd';
 import {
   CheckCircleOutlined,
-  FlagOutlined,
   EyeOutlined,
+  FlagOutlined,
+  HistoryOutlined,
+  InfoCircleOutlined,
   StopOutlined,
   UserOutlined,
-  HistoryOutlined,
   WarningOutlined,
-  InfoCircleOutlined,
 } from '@ant-design/icons';
 import {
-  ProTable,
-  type ProColumns,
   type ActionType,
-  ProDescriptions,
   ProCard,
+  type ProColumns,
+  ProDescriptions,
+  ProTable,
 } from '@ant-design/pro-components';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Drawer,
+  List,
+  message,
+  Popconfirm,
+  Space,
+  Tabs,
+  Tag,
+  Tooltip,
+  Typography,
+} from 'antd';
+import React, { useRef, useState } from 'react';
 
+import { apiFetch } from '@/api';
 import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 const { Paragraph, Text } = Typography;
@@ -54,6 +54,21 @@ type ModerationItem = {
   type: 'comment' | 'post' | 'user_profile';
   reportCount: number;
   reporters: string[];
+};
+
+type ModerationApiRecord = {
+  id?: number;
+  content_snippet?: string;
+  full_content?: string;
+  author_username?: string;
+  author_reputation_score?: number;
+  report_reason?: string;
+  created?: string;
+  status?: ModerationItem['status'];
+  severity?: ModerationItem['severity'];
+  target_type?: ModerationItem['type'];
+  report_count?: number;
+  reporters?: string[];
 };
 
 type ModerationApiResponse = {
@@ -109,7 +124,7 @@ export default function ModerationQueuePage(): JSX.Element {
       actionRef.current?.reload();
       if (drawerOpen) handleCloseDrawer();
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error(error);
       message.error('Failed to apply action.');
     }
@@ -329,18 +344,18 @@ export default function ModerationQueuePage(): JSX.Element {
             }
 
             const mappedData: ModerationItem[] = results.map((item) => {
-              const it = item as any;
+              const it = item as ModerationApiRecord;
               return {
-                id: it.id,
-                contentSnippet: it.content_snippet,
-                fullContent: it.full_content || it.content_snippet,
+                id: it.id ?? 0,
+                contentSnippet: it.content_snippet ?? '',
+                fullContent: it.full_content || it.content_snippet || '',
                 author: it.author_username || 'Unknown',
                 authorReputation: it.author_reputation_score || 0,
-                reportReason: it.report_reason,
-                timestamp: it.created,
-                status: it.status,
-                severity: it.severity,
-                type: it.target_type,
+                reportReason: it.report_reason ?? '',
+                timestamp: it.created ?? '',
+                status: it.status ?? 'pending',
+                severity: it.severity ?? 'low',
+                type: it.target_type ?? 'comment',
                 reportCount: it.report_count || 1,
                 reporters: it.reporters || [],
               } as ModerationItem;
@@ -352,7 +367,7 @@ export default function ModerationQueuePage(): JSX.Element {
               total,
             };
           } catch (e) {
-            // eslint-disable-next-line no-console
+             
             console.error(e);
             message.error('Error loading moderation queue');
             return { data: [], success: false };

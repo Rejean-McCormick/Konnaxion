@@ -2,23 +2,24 @@
 // app/kreative/collaborative-spaces/start-new-space/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import {
+  message as antdMessage,
+  Button,
   Form,
   Input,
-  Select,
   Radio,
-  Button,
-  Upload,
+  Select,
   Space,
   Typography,
-  message as antdMessage,
+  Upload,
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { UploadOutlined, PlusOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
-import PageContainer from '@/components/PageContainer';
+import React, { useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
+import PageContainer from '@/components/PageContainer';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -62,7 +63,7 @@ export default function StartNewSpacePage(): JSX.Element {
     // TODO: replace with real API call
     // await api.createSpace(spaceData)
 
-    // eslint-disable-next-line no-console
+     
     console.log('New Space Data:', spaceData);
     antdMessage.success('Your new space has been created successfully!');
     router.push('/kreative/collaborative-spaces/my-spaces');

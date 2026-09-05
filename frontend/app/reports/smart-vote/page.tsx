@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { ReloadOutlined } from '@ant-design/icons';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import {
   Alert,
@@ -17,7 +17,8 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { ReloadOutlined } from '@ant-design/icons';
+import dayjs, { Dayjs } from 'dayjs';
+import React, { useEffect, useState } from 'react';
 import {
   CartesianGrid,
   Legend,
@@ -28,7 +29,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import dayjs, { Dayjs } from 'dayjs';
 
 import ReportsPageShell from '../ReportsPageShell';
 

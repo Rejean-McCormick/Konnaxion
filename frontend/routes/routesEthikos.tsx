@@ -1,28 +1,28 @@
 // FILE: frontend/routes/routesEthikos.tsx
 'use client';
 
-import React from 'react';
 import {
-  DashboardOutlined,
   ApartmentOutlined,
-  SafetyCertificateOutlined,
-  ProfileOutlined,
-  CrownOutlined,
-  StarOutlined,
-  NodeIndexOutlined,
   BellOutlined,
-  SendOutlined,
-  RadarChartOutlined,
-  ColumnWidthOutlined,
+  BranchesOutlined,
   ColumnHeightOutlined,
+  ColumnWidthOutlined,
+  CrownOutlined,
+  DashboardOutlined,
   DragOutlined,
   ExpandAltOutlined,
   HistoryOutlined,
-  BranchesOutlined,
-  TrophyOutlined,
-  SmileOutlined,
+  NodeIndexOutlined,
+  ProfileOutlined,
+  RadarChartOutlined,
+  SafetyCertificateOutlined,
   SearchOutlined,
+  SendOutlined,
+  SmileOutlined,
+  StarOutlined,
+  TrophyOutlined,
 } from '@ant-design/icons';
+import React from 'react';
 
 // Minimal local type to avoid external coupling
 type Route = {

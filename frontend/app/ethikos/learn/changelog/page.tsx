@@ -1,13 +1,23 @@
 // FILE: frontend/app/ethikos/learn/changelog/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  ApartmentOutlined,
+  CalendarOutlined,
+  ClockCircleOutlined,
+  CopyOutlined,
+  DownloadOutlined,
+  FilterOutlined,
+  ReloadOutlined,
+  UnorderedListOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   ProList,
   StatisticCard,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Anchor,
   Badge,
@@ -23,22 +33,12 @@ import {
   Typography,
 } from 'antd';
 import type { GetProps } from 'antd';
-import {
-  ApartmentOutlined,
-  CalendarOutlined,
-  ClockCircleOutlined,
-  CopyOutlined,
-  DownloadOutlined,
-  FilterOutlined,
-  ReloadOutlined,
-  UnorderedListOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
+import React, { useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import usePageTitle from '@/hooks/usePageTitle';
-import { fetchChangelog, type ChangelogEntry } from '@/services/learn';
+import { type ChangelogEntry, fetchChangelog } from '@/services/learn';
 
 const { RangePicker } = DatePicker;
 const { Text, Title } = Typography;

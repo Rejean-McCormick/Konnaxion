@@ -1,20 +1,21 @@
 // FILE: frontend/app/kontrol/audit-log/page.tsx
 'use client';
 
-import React, { useRef } from 'react';
-import { Tag, Button, message, Space } from 'antd';
 import {
   CloudDownloadOutlined,
   ReloadOutlined,
+  RobotOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
-  RobotOutlined,
 } from '@ant-design/icons';
 import {
-  ProTable,
-  type ProColumns,
   type ActionType,
+  type ProColumns,
+  ProTable,
 } from '@ant-design/pro-components';
+import { Button, message, Space, Tag } from 'antd';
+import React, { useRef } from 'react';
+
 import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 // --- Domain types for the table ---
@@ -304,7 +305,7 @@ export default function AuditLogPage(): JSX.Element {
                 total: data.count,
               };
             } catch (error) {
-              // eslint-disable-next-line no-console
+               
               console.error('Audit log fetch error:', error);
               message.error('Failed to load audit logs');
               return {

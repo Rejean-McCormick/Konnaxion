@@ -1,15 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useRequest } from 'ahooks'
 import { App } from 'antd'
 import type { SegmentedValue } from 'antd/es/segmented'
 import { useParams } from 'next/navigation'
-import { useRequest } from 'ahooks'
+import { useEffect, useMemo, useState } from 'react'
 
 import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
 import { get } from '@/services/_request'
-import { fetchDiscussionParticipantRoles } from '@/services/ethikos'
-import type { ArgumentSide, DiscussionParticipantRoleApi } from '@/services/ethikos'
 import {
   fetchTopicDetail,
   fetchTopicStances,
@@ -21,6 +19,8 @@ import type {
   TopicStance,
   TopicStanceValue,
 } from '@/services/deliberate'
+import { fetchDiscussionParticipantRoles } from '@/services/ethikos'
+import type { ArgumentSide, DiscussionParticipantRoleApi } from '@/services/ethikos'
 
 import {
   clampStance,

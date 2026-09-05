@@ -1,12 +1,14 @@
 // FILE: frontend/app/ethikos/pulse/health/page.tsx
 'use client';
 
+import { ClockCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { Pie, Radar } from '@ant-design/plots';
 import {
   PageContainer,
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components';
-import { Pie, Radar } from '@ant-design/plots';
+import { useRequest } from 'ahooks';
 import {
   Badge,
   Button,
@@ -17,8 +19,6 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
@@ -250,7 +250,7 @@ export default function PulseHealth(): JSX.Element {
             extra={<Text type="secondary">Each axis normalised to 0–100.</Text>}
           >
             {hasRadarData ? (
-              <Radar {...(radarConfig as any)} />
+              <Radar {...(radarConfig as React.ComponentProps<typeof Radar>)} />
             ) : (
               <Empty
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -266,7 +266,7 @@ export default function PulseHealth(): JSX.Element {
           >
             <ProCard ghost>
               {hasPieData ? (
-                <Pie {...(pieConfig as any)} />
+                <Pie {...(pieConfig as React.ComponentProps<typeof Pie>)} />
               ) : (
                 <Empty
                   image={Empty.PRESENTED_IMAGE_SIMPLE}

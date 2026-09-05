@@ -1,17 +1,25 @@
 // FILE: frontend/app/keenkonnect/ai-team-matching/find-teams/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  FilterOutlined,
+  HeartOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+} from '@ant-design/icons';
 import {
   Badge,
   Button,
   Card,
+  Col,
   Drawer,
   Empty,
   Input,
   List,
   Row,
-  Col,
   Select,
   Space,
   Switch,
@@ -19,16 +27,9 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  FilterOutlined,
-  InfoCircleOutlined,
-  SearchOutlined,
-  TeamOutlined,
-  UserAddOutlined,
-  HeartOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text, Paragraph } = Typography;
@@ -526,7 +527,7 @@ const FindTeamsPage: React.FC = () => {
                   block
                   onClick={() => {
                     // Placeholder for future integration
-                    // eslint-disable-next-line no-console
+                     
                     console.log('Request to join', selectedTeam.id);
                   }}
                 >
@@ -540,7 +541,7 @@ const FindTeamsPage: React.FC = () => {
                   icon={<HeartOutlined />}
                   block
                   onClick={() => {
-                    // eslint-disable-next-line no-console
+                     
                     console.log('Saved team', selectedTeam.id);
                   }}
                 >

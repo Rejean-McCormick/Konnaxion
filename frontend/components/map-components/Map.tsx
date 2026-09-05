@@ -10,18 +10,18 @@
 import { useMemo } from 'react'
 import type { CSSProperties } from 'react'
 import {
-  Map as ReactMapGL,
-  Marker,
-  NavigationControl,
   FullscreenControl,
   GeolocateControl,
   type ViewState as MapViewState,
+  Marker,
+  NavigationControl,
+  Map as ReactMapGL,
   type ViewStateChangeEvent,
 } from 'react-map-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
-import MapMarker from './MapMarker'
 import ControlPanel from './ControlPanel'
+import MapMarker from './MapMarker'
 
 /** Controls styling */
 const fullscreenControlStyle: CSSProperties = {

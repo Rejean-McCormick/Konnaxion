@@ -2,10 +2,10 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard-components\LikeCard.tsx
 'use client';
 
-import React from 'react';
-import dynamic from 'next/dynamic';
-import { Card, Statistic, Skeleton } from 'antd';
 import type { LineConfig } from '@ant-design/plots';
+import { Card, Skeleton, Statistic } from 'antd';
+import dynamic from 'next/dynamic';
+import React from 'react';
 
 // Use Line instead of TinyLine (works across versions)
 const Line = dynamic(() => import('@ant-design/plots').then((m) => m.Line), {

@@ -1,8 +1,9 @@
 // FILE: frontend/modules/ethikos/components/ParticipantRoleBadge.tsx
 'use client'
 
-import React from 'react'
 import { Space, Tag, Tooltip, Typography } from 'antd'
+import React from 'react'
+
 import type {
   DiscussionParticipantRoleApi,
   DiscussionRole,

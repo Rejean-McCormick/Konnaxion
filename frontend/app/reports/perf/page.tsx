@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -20,7 +20,8 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { ReloadOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -28,12 +29,11 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  ResponsiveContainer,
   Tooltip as RechartsTooltip,
+  ResponsiveContainer,
   XAxis,
   YAxis,
 } from 'recharts';
-import dayjs from 'dayjs';
 
 import ReportsPageShell from '../ReportsPageShell';
 

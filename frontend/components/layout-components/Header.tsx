@@ -1,23 +1,24 @@
 // FILE: frontend/components/layout-components/Header.tsx
 'use client'
 
-import { Layout, Dropdown, Breadcrumb } from 'antd'
-import type { MenuProps } from 'antd'
 import {
-  UserOutlined,
-  LogoutOutlined,
   LoginOutlined,
-  MenuUnfoldOutlined,
+  LogoutOutlined,
   MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  UserOutlined,
 } from '@ant-design/icons'
-import styled from 'styled-components'
+import type { MenuProps } from 'antd'
+import { Breadcrumb, Dropdown, Layout } from 'antd'
 import Link from 'next/link'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
-import { GlobalSearchBar } from '@/global/components'
+import styled from 'styled-components'
+
 import api from '@/api'
 import type { Route } from '@/components/layout-components/Menu'
+import ThemeSwitcher from '@/components/ThemeSwitcher'
+import { GlobalSearchBar } from '@/global/components'
 import ActiveHeaderWidget from '@/widgets/header/ActiveHeaderWidget'
 
 const { Header } = Layout

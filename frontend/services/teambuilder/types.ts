@@ -20,7 +20,7 @@ export interface IAlgorithmConfig {
   target_team_size: number;
   strategy: 'random' | 'balanced_expertise';
   diversity_weight?: number; // Optional scaling factor
-  [key: string]: any; // Allow for future config extensibility
+  [key: string]: unknown; // Allow for future config extensibility
 }
 
 /**
@@ -43,7 +43,7 @@ export interface ITeam {
     member_count?: number;
     avg_skill?: number;
     diversity_score?: number;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   members: ITeamMember[];
   created_at: string; // ISO Date string

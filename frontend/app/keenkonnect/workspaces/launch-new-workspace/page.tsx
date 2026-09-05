@@ -1,15 +1,16 @@
 // FILE: frontend/app/keenkonnect/workspaces/launch-new-workspace/page.tsx
 'use client';
 
-import React, { Suspense, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Card, Result, Button, message } from 'antd';
 import {
   ProForm,
-  ProFormText,
   ProFormSelect,
   ProFormSwitch,
+  ProFormText,
 } from '@ant-design/pro-components';
+import { Button, Card, message, Result } from 'antd';
+import { useRouter } from 'next/navigation';
+import React, { Suspense, useState } from 'react';
+
 import { apiPost } from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
@@ -32,7 +33,7 @@ function Content() {
       setSubmitted(true);
       return true;
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error(error);
       message.error("Échec du lancement de l'espace de travail. Veuillez réessayer.");
       return false;
@@ -44,12 +45,8 @@ function Content() {
     setLastValues(null);
   };
 
-  const pageTitle = 'Launch a New Workspace';
-  const pageDescription =
-    "Configurez un nouvel espace de travail collaboratif pour votre équipe : choisissez l’équipe responsable, les outils inclus et la visibilité de l’espace.";
-
-  return (
-    <>
+  if (submitted) {
+    return (
       <Result
         status="success"
         title="Espace de travail lancé avec succès"
@@ -66,8 +63,11 @@ function Content() {
           </Button>,
         ]}
       />
+    );
+  }
 
-      <Card>
+  return (
+    <Card>
         <ProForm<LaunchWorkspaceFormValues>
           layout="vertical"
           onFinish={handleFinish}
@@ -130,8 +130,7 @@ function Content() {
             tooltip="Quand activé, les membres de KeenKonnect pourront découvrir cet espace et demander à le rejoindre."
           />
         </ProForm>
-      </Card>
-    </>
+    </Card>
   );
 }
 

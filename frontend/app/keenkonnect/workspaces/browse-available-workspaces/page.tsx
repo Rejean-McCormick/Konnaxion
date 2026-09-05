@@ -1,25 +1,26 @@
 // FILE: frontend/app/keenkonnect/workspaces/browse-available-workspaces/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
 import {
-  List,
-  Card,
-  Input,
-  Select,
+  Avatar,
+  Badge,
   Button,
-  Row,
+  Card,
   Col,
-  Pagination,
   Divider,
+  Input,
+  List,
+  Pagination,
+  Row,
+  Select,
+  Space,
+  Tabs,
   Tag,
   Typography,
-  Tabs,
-  Avatar,
-  Space,
-  Badge,
 } from 'antd';
 import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Search } = Input;

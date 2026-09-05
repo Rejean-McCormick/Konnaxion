@@ -1,7 +1,14 @@
 // FILE: frontend/modules/ethikos/components/DiscussionVisibilityPanel.tsx
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  LockOutlined,
+  ReloadOutlined,
+  SaveOutlined,
+  UserSwitchOutlined,
+} from '@ant-design/icons'
 import { ProCard } from '@ant-design/pro-components'
 import {
   Alert,
@@ -15,14 +22,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import {
-  EyeInvisibleOutlined,
-  EyeOutlined,
-  LockOutlined,
-  ReloadOutlined,
-  SaveOutlined,
-  UserSwitchOutlined,
-} from '@ant-design/icons'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   fetchDiscussionVisibilitySettings,

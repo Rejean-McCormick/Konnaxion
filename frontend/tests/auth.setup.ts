@@ -1,6 +1,6 @@
 // FILE: frontend/tests/auth.setup.ts
 // tests/auth.setup.ts
-import { expect, test as setup, type Page } from '@playwright/test'
+import { expect, type Page, test as setup } from '@playwright/test'
 
 const BACKEND_BASE_URL =
   process.env.BACKEND_BASE_URL ?? 'http://localhost:8000'

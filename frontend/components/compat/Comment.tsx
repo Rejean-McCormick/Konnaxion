@@ -1,7 +1,7 @@
 // FILE: frontend/components/compat/Comment.tsx
 // components/compat/Comment.tsx
+import { List, Typography } from 'antd'
 import React from 'react'
-import { Avatar, List, Typography } from 'antd'
 
 type Props = {
   author?: React.ReactNode

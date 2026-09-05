@@ -1,13 +1,13 @@
 'use client'
 
-import { Alert, Button, Space, Tag, Tooltip, Typography } from 'antd'
-import { ProCard } from '@ant-design/pro-components'
 import {
   BranchesOutlined,
   InfoCircleOutlined,
   ReloadOutlined,
   SafetyCertificateOutlined,
 } from '@ant-design/icons'
+import { ProCard } from '@ant-design/pro-components'
+import { Alert, Button, Space, Tag, Tooltip, Typography } from 'antd'
 
 import ArgumentTree from '@/modules/ethikos/components/ArgumentTree'
 import type { ArgumentTreeItem, ArgumentTreeNode } from '@/modules/ethikos/components/ArgumentTree'

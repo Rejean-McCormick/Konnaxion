@@ -1,16 +1,22 @@
 // FILE: frontend/app/ethikos/pulse/live/page.tsx
 'use client';
 
-import React from 'react';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
+import {
+  ClockCircleOutlined,
+  FireOutlined,
+  MessageOutlined,
+  ProfileOutlined,
+  SyncOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
+  type ProColumns,
   ProTable,
   StatisticCard,
-  type ProColumns,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   Badge,
@@ -23,25 +29,19 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  ThunderboltOutlined,
-  ClockCircleOutlined,
-  SyncOutlined,
-  FireOutlined,
-  MessageOutlined,
-  ProfileOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import React from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import ChartCard from '@/components/charts/ChartCard';
 import { get } from '@/services/_request';
+import type { EthikosId, StanceValue, TopicStatus } from '@/services/ethikos';
 import {
   fetchPulseLiveData,
   type LiveCounter,
   type PulseChartPoint,
 } from '@/services/pulse';
-import type { EthikosId, StanceValue, TopicStatus } from '@/services/ethikos';
 
 dayjs.extend(relativeTime);
 

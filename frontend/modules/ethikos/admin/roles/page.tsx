@@ -1,13 +1,14 @@
 // FILE: frontend/modules/ethikos/admin/roles/page.tsx
 'use client'
 
-import type { ReactNode } from 'react'
 import { PageContainer, ProTable } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
-import { Switch, Tag } from 'antd'
 import { useRequest } from 'ahooks'
+import { Switch, Tag } from 'antd'
+import type { ReactNode } from 'react'
+
 import usePageTitle from '@/hooks/usePageTitle'
-import { fetchRoles, toggleRole, type RoleRow, type RolePayload } from '@/services/admin'
+import { fetchRoles, type RolePayload, type RoleRow, toggleRole } from '@/services/admin'
 
 export default function RoleManagement() {
   usePageTitle('Admin · Role Management')

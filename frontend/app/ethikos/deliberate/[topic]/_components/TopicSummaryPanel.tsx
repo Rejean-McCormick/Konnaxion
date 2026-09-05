@@ -1,7 +1,7 @@
 'use client'
 
-import { Progress, Space, Statistic, Tag, Typography } from 'antd'
 import { ProCard } from '@ant-design/pro-components'
+import { Progress, Space, Statistic, Tag, Typography } from 'antd'
 
 import type { TopicDetailResponse } from '@/services/deliberate'
 

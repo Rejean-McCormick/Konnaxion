@@ -1,9 +1,8 @@
 // FILE: frontend/app/ethikos/trust/badges/page.tsx
 'use client';
 
-import { useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
 import { PageContainer, ProCard, ProList } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Badge as AntBadge,
   Divider,
@@ -17,8 +16,9 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
+import type { ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { fetchTrustBadges } from '@/services/trust';

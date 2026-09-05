@@ -1,8 +1,15 @@
 // FILE: frontend/app/ethikos/decide/public/page.tsx
 'use client';
 
-import React, { useCallback, useMemo, useState } from 'react';
-import Link from 'next/link';
+import {
+  BarChartOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  FileTextOutlined,
+  InfoCircleOutlined,
+  SyncOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
@@ -10,6 +17,7 @@ import {
   StatisticCard,
 } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
+import { useInterval, useRequest } from 'ahooks';
 import {
   Alert,
   App,
@@ -24,24 +32,16 @@ import {
   Typography,
 } from 'antd';
 import type { RadioChangeEvent } from 'antd';
-import {
-  BarChartOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  FileTextOutlined,
-  InfoCircleOutlined,
-  SyncOutlined,
-  ThunderboltOutlined,
-} from '@ant-design/icons';
-import { useInterval, useRequest } from 'ahooks';
 import dayjs from 'dayjs';
+import Link from 'next/link';
+import React, { useCallback, useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchPublicBallots,
-  submitPublicVote,
   type PublicBallot,
   type PublicBallotResponse,
+  submitPublicVote,
 } from '@/services/decide';
 
 const { Paragraph, Text } = Typography;

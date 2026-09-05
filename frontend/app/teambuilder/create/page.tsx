@@ -1,6 +1,7 @@
 // frontend/app/teambuilder/create/page.tsx
-import React, { Suspense } from 'react';
 import { Spin } from 'antd';
+import React, { Suspense } from 'react';
+
 import CreateSessionClient from './CreateSessionClient';
 
 // Avoid static pre-render issues when using useSearchParams in the shell

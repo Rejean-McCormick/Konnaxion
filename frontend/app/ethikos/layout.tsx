@@ -3,10 +3,10 @@
 // app/ethikos/layout.tsx
 'use client'
 
-import type { ReactNode } from 'react'
-import React, { Suspense, useEffect, useMemo } from 'react'
 import { App as AntdApp } from 'antd'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import type { ReactNode } from 'react'
+import React, { Suspense, useEffect, useMemo } from 'react'
 
 import MainLayout from '@/components/layout-components/MainLayout'
 import Loading from '@/components/Loading'

@@ -2,14 +2,14 @@
 // C:\MyCode\Konnaxionv14\frontend\components\dashboard\TeamBuilderCard.tsx
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
-import { Card, Button, Tag, Typography, Space } from 'antd';
 import {
+  ArrowRightOutlined,
   TeamOutlined,
   ThunderboltOutlined,
-  ArrowRightOutlined,
 } from '@ant-design/icons';
+import { Button, Card, Space, Tag, Typography } from 'antd';
+import Link from 'next/link';
+import React from 'react';
 
 const { Title, Paragraph, Text } = Typography;
 

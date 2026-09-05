@@ -2,14 +2,14 @@
 'use client'
 
 // pages/ethikos/pulse/overview.tsx
+import { ClockCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components';
-import { Badge, Button, Empty, Skeleton, Space, Tooltip } from 'antd';
-import { SyncOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import { useRequest } from 'ahooks';
+import { Badge, Button, Empty, Skeleton, Space, Tooltip } from 'antd';
 import dayjs from 'dayjs';
 
 import ChartCard from '@/components/charts/ChartCard';
@@ -127,8 +127,8 @@ export default function PulseOverview() {
                   y: h.value,
                 }))}
                 tooltip={{
-                  formatter: (datum: any) =>
-                    `${dayjs(datum.x).format('MMM D')}: ${datum.y}`,
+                  formatter: (datum: { x: string | number | Date; y: unknown }) =>
+                    `${dayjs(datum.x).format('MMM D')}: ${String(datum.y)}`,
                 }}
               />
             }

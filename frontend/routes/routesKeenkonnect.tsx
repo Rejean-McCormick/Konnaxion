@@ -1,7 +1,6 @@
 // FILE: frontend/routes/routesKeenkonnect.tsx
 "use client";
 
-import React from "react";
 import {
   BarChartOutlined,
   CrownOutlined,
@@ -23,6 +22,7 @@ import {
   TeamOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
+import React from "react";
 
 import type { Route } from "./types";
 

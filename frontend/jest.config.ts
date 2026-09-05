@@ -1,12 +1,13 @@
 // FILE: frontend/jest.config.ts
 // jest.config.ts
-import fs from 'node:fs'
-import path from 'node:path'
 
-import nextJest from 'next/jest'
 import type { Config } from 'jest'
+import nextJest from 'next/jest'
 import { pathsToModuleNameMapper } from 'ts-jest'
 import * as ts from 'typescript'
+
+import fs from 'node:fs'
+import path from 'node:path'
 
 const createJestConfig = nextJest({ dir: './' })
 

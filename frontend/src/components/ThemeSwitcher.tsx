@@ -1,6 +1,7 @@
 // FILE: frontend/src/components/ThemeSwitcher.tsx
-import React from 'react';
 import { Button } from 'antd';
+import React from 'react';
+
 import { useTheme } from '@/context/ThemeContext';
 
 const ThemeSwitcher: React.FC = () => {

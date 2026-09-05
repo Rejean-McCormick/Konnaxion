@@ -1,6 +1,5 @@
 // FILE: frontend/components/Button/Button.tsx
 import { cva, type VariantProps } from "class-variance-authority"
-
 import { twMerge } from "tailwind-merge"
 
 const button = cva(

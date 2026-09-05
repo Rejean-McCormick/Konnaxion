@@ -1,9 +1,10 @@
 // FILE: frontend/modules/insights/pages/CustomBuilderPage.tsx
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
 import dayjs from "dayjs";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import MainLayout from "@/shared/layout/MainLayout";
+
 import TimeRangePicker from "../components/TimeRangePicker";
 import useReportStream from "../hooks/useReportStream";
 

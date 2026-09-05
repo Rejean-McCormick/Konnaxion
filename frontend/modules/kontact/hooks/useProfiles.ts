@@ -2,6 +2,7 @@
 ﻿// modules/kontact/hooks/useProfiles.ts
 
 import { useQuery } from '@tanstack/react-query';
+
 import { fetchUserProfile, type ReputationProfile } from '@/services/trust';
 
 export type ReputationLevel = ReputationProfile['level'];

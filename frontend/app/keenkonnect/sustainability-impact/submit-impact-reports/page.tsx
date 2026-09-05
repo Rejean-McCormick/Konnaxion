@@ -1,25 +1,26 @@
 // FILE: frontend/app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx
 'use client';
 
-import React, { Suspense, useState } from 'react';
-import Link from 'next/link';
-import { StepsForm, ProFormDigit } from '@ant-design/pro-components';
+import { InboxOutlined } from '@ant-design/icons';
+import { ProFormDigit, StepsForm } from '@ant-design/pro-components';
 import {
   Button,
   Card,
   DatePicker,
   Form,
   Input,
-  Select,
-  Upload,
-  Result,
-  Spin,
   message,
+  Result,
+  Select,
+  Spin,
+  Upload,
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { InboxOutlined } from '@ant-design/icons';
+import Link from 'next/link';
+import React, { Suspense, useState } from 'react';
+
 import { apiPost } from '@/api';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
@@ -73,15 +74,18 @@ function Content(): JSX.Element {
 
       const res = await apiPost('/impact/sustainability/report', payload);
 
-      if (res && typeof res === 'object' && 'reference' in (res as any)) {
-        setReferenceId((res as any).reference as string);
+      if (res && typeof res === 'object' && 'reference' in res) {
+        const reference = (res as { reference?: unknown }).reference;
+        if (typeof reference === 'string') {
+          setReferenceId(reference);
+        }
       }
 
       message.success('Impact report submitted successfully!');
       setCompleted(true);
       return true;
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error('Submit impact report error:', error);
       message.error('Failed to submit impact report. Please try again.');
       return false;
@@ -89,11 +93,21 @@ function Content(): JSX.Element {
   };
 
   // Typed helper to normalize Upload value
-  const normFile = (e: any): UploadFile[] => {
-    if (Array.isArray(e)) {
-      return e as UploadFile[];
+  const normFile = (event: unknown): UploadFile[] => {
+    if (Array.isArray(event)) {
+      return event as UploadFile[];
     }
-    return (e?.fileList ?? []) as UploadFile[];
+
+    if (
+      typeof event === 'object' &&
+      event !== null &&
+      'fileList' in event &&
+      Array.isArray((event as { fileList?: unknown }).fileList)
+    ) {
+      return (event as { fileList: UploadFile[] }).fileList;
+    }
+
+    return [];
   };
 
   if (completed) {

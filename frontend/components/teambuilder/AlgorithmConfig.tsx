@@ -1,5 +1,6 @@
 // frontend/components/teambuilder/AlgorithmConfig.tsx
 import React from 'react';
+
 import { IAlgorithmConfig } from '@/services/teambuilder/types';
 
 interface AlgorithmConfigProps {
@@ -14,7 +15,10 @@ export const AlgorithmConfig: React.FC<AlgorithmConfigProps> = ({
   disabled = false,
 }) => {
   
-  const handleChange = (field: keyof IAlgorithmConfig, value: any) => {
+  const handleChange = <K extends keyof IAlgorithmConfig,>(
+    field: K,
+    value: IAlgorithmConfig[K],
+  ) => {
     onChange({
       ...config,
       [field]: value,

@@ -1,41 +1,42 @@
 // FILE: frontend/app/kontrol/moderation/community/page.tsx
 'use client';
 
-import React, { useRef, useState } from 'react';
 import {
-  Button,
-  Tag,
-  Space,
-  Avatar,
-  Progress,
-  Dropdown,
-  message,
-  Drawer,
-  Descriptions,
-  Switch,
-  Typography,
-  List,
-  Alert,
-} from 'antd';
-import {
-  TeamOutlined,
+  ClockCircleOutlined,
   EllipsisOutlined,
-  StopOutlined,
+  FireOutlined,
   LockOutlined,
   SafetyCertificateOutlined,
-  FireOutlined,
-  ClockCircleOutlined,
+  StopOutlined,
+  TeamOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
 import {
-  ProTable,
-  type ProColumns,
   type ActionType,
   ProCard,
+  type ProColumns,
+  ProTable,
 } from '@ant-design/pro-components';
+import {
+  Alert,
+  Avatar,
+  Button,
+  Descriptions,
+  Drawer,
+  Dropdown,
+  List,
+  message,
+  Progress,
+  Space,
+  Switch,
+  Tag,
+  Typography,
+} from 'antd';
+import React, { useRef, useState } from 'react';
+
 import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
-const { Text, Title } = Typography;
+const { Text } = Typography;
 
 // --- Types ---
 type CommunityContext = {

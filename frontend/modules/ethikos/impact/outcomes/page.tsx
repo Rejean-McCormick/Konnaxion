@@ -1,10 +1,11 @@
 // FILE: frontend/modules/ethikos/impact/outcomes/page.tsx
 'use client'
 
+import { Bar, Line } from '@ant-design/plots';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
-import { Tabs } from 'antd';
-import { Line, Bar } from '@ant-design/plots';
 import { useRequest } from 'ahooks';
+import { Tabs } from 'antd';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchImpactOutcomes } from '@/services/impact';
 

@@ -1,13 +1,19 @@
 // FILE: frontend/app/ethikos/admin/moderation/page.tsx
 'use client';
 
-import { useMemo, useState } from 'react';
-import type { Key, ReactNode } from 'react';
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  ReloadOutlined,
+  StopOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
-  ProTable,
   type ProColumns,
+  ProTable,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   App as AntdApp,
@@ -20,14 +26,8 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  CheckCircleOutlined,
-  ExclamationCircleOutlined,
-  EyeOutlined,
-  ReloadOutlined,
-  StopOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
+import { useMemo, useState } from 'react';
+import type { Key, ReactNode } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { actOnReport, fetchModerationQueue } from '@/services/admin';

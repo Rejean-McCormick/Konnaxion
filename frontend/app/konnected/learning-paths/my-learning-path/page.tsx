@@ -1,8 +1,7 @@
 // FILE: frontend/app/konnected/learning-paths/my-learning-path/page.tsx
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { ClockCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import {
   Alert,
   App as AntdApp,
@@ -12,15 +11,17 @@ import {
   Empty,
   Progress,
   Row,
+  Select,
   Skeleton,
   Space,
   Tabs,
   Tag,
   Typography,
-  Select,
 } from 'antd';
 import type { TabsProps } from 'antd';
-import { ClockCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Text, Paragraph, Title } = Typography;
@@ -136,7 +137,49 @@ function safeRandomId() {
   return `lp-${Math.random().toString(36).slice(2)}`;
 }
 
-function normalizeLearningPath(raw: any): LearningPath {
+type RawLearningPath = {
+  id?: string | number;
+  learning_path_id?: string | number;
+  slug?: string;
+  title?: string;
+  name?: string;
+  description?: string;
+  summary?: string;
+  level?: Level;
+  tags?: string[];
+  tagList?: string[];
+  estimatedMinutes?: number;
+  estimated_duration_minutes?: number;
+  status?: LearningPathStatus;
+  totalItems?: number;
+  modulesCount?: number;
+  resourcesCount?: number;
+  completedItems?: number;
+  completedModules?: number;
+  lastActivityAt?: string;
+  last_activity_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
+  startedAt?: string;
+  started_at?: string;
+  completedAt?: string | null;
+  completed_at?: string | null;
+  nextResourceHref?: string;
+  next_resource_href?: string;
+  nextResourceLabel?: string;
+  next_resource_label?: string;
+  progress?: {
+    totalItems?: number;
+    completedItems?: number;
+    percentage?: number;
+    lastActivityAt?: string;
+    last_activity_at?: string;
+  };
+};
+
+function normalizeLearningPath(value: unknown): LearningPath {
+  const raw =
+    value && typeof value === 'object' ? (value as RawLearningPath) : {};
   const totalItems =
     raw?.progress?.totalItems ??
     raw?.totalItems ??
@@ -219,14 +262,14 @@ async function fetchMyLearningPaths(): Promise<FetchResult> {
     // Treat 404 as "backend not wired yet" – use mocks but surface a warning.
     if (res.status === 404) {
       const error = new Error('Learning paths API not available yet (404).');
-      // eslint-disable-next-line no-console
+       
       console.warn(error.message);
       return { data: MOCK_LEARNING_PATHS, error };
     }
 
     if (!res.ok) {
       const error = new Error(`Failed to load learning paths (${res.status}).`);
-      // eslint-disable-next-line no-console
+       
       console.error(error);
       return { data: MOCK_LEARNING_PATHS, error };
     }
@@ -250,7 +293,7 @@ async function fetchMyLearningPaths(): Promise<FetchResult> {
       err instanceof Error
         ? err
         : new Error('Unable to load your learning paths right now.');
-    // eslint-disable-next-line no-console
+     
     console.error('Error fetching learning paths', err);
     return { data: MOCK_LEARNING_PATHS, error };
   }

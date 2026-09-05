@@ -1,9 +1,11 @@
 // FILE: frontend/app/ekoh/achievements-badges/earned-badges-display/page.tsx
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import { Card, Col, Divider, Empty, List, Modal, Row, Select, Typography } from 'antd';
 import Head from 'next/head';
-import { Card, List, Modal, Select, Row, Col, Typography, Empty, Divider } from 'antd';
+import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
+
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 const { Text } = Typography;
@@ -169,10 +171,13 @@ export default function EarnedBadgesDisplay(): JSX.Element {
                     hoverable
                     onClick={() => showBadgeDetails(badge)}
                     cover={
-                      <img
+                      <Image
                         alt={badge.name}
                         src={badge.icon}
+                        width={400}
+                        height={120}
                         style={{
+                          width: '100%',
                           padding: '10px',
                           objectFit: 'contain',
                           height: 120,
@@ -203,12 +208,14 @@ export default function EarnedBadgesDisplay(): JSX.Element {
         >
           {selectedBadge && (
             <div>
-              <img
+              <Image
                 alt={selectedBadge.name}
                 src={selectedBadge.icon}
+                width={600}
+                height={150}
                 style={{
                   width: '100%',
-                  maxHeight: 150,
+                  height: 150,
                   objectFit: 'contain',
                   marginBottom: 16,
                 }}

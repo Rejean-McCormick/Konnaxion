@@ -16,6 +16,14 @@ export interface ModerationPayload {
   items: Report[]
 }
 
+function hasReportItems(value: unknown): value is { items: Report[] } {
+  if (typeof value !== 'object' || value === null || !('items' in value)) {
+    return false
+  }
+
+  return Array.isArray((value as { items?: unknown }).items)
+}
+
 /**
  * Resolve the backend base URL in the same spirit as services/_request.ts.
  * In practice, NEXT_PUBLIC_API_BASE should be something like
@@ -52,8 +60,8 @@ export async function GET() {
 
       if (Array.isArray(raw)) {
         payload = { items: raw as Report[] }
-      } else if (Array.isArray((raw as any)?.items)) {
-        payload = { items: (raw as any).items as Report[] }
+      } else if (hasReportItems(raw)) {
+        payload = { items: raw.items }
       } else {
         payload = { items: [] }
       }
@@ -75,7 +83,7 @@ export async function GET() {
         headers: { 'Cache-Control': 'no-store' },
       },
     )
-  } catch (error) {
+  } catch {
     // Fallback: deterministic stub, matching ModerationPayload
     const fallback: ModerationPayload = {
       items: [

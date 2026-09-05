@@ -1,15 +1,16 @@
 // C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\ai-team-matching\match-preferences\page.tsx
 'use client';
 
-import React from 'react';
-import { Card } from 'antd';
 import {
-  StepsForm,
-  ProFormSlider,
   ProFormSelect,
+  ProFormSlider,
   ProFormSwitch,
   ProFormTextArea,
+  StepsForm,
 } from '@ant-design/pro-components';
+import { Card } from 'antd';
+import React from 'react';
+
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const MatchPreferencesPage: React.FC = () => {
@@ -23,7 +24,7 @@ const MatchPreferencesPage: React.FC = () => {
           containerStyle={{ maxWidth: 840, margin: '0 auto' }}
           onFinish={async (values: Record<string, unknown>) => {
             // TODO: brancher sur ton backend / API de matching
-            // eslint-disable-next-line no-console
+             
             console.log('Match preferences:', values);
             return true;
           }}

@@ -2,14 +2,14 @@
 ﻿// frontend/modules/kontact/components/OpportunityList.tsx
 'use client';
 
-import React from 'react';
-import { Card, Empty, List, Space, Tag, Typography } from 'antd';
 import {
+  ClockCircleOutlined,
   EnvironmentOutlined,
   TeamOutlined,
-  ClockCircleOutlined,
 } from '@ant-design/icons';
+import { Card, Empty, List, Space, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
+import React from 'react';
 
 const { Text, Title } = Typography;
 

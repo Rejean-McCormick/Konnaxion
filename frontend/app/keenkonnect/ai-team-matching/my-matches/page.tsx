@@ -1,9 +1,10 @@
 // FILE: frontend/app/keenkonnect/ai-team-matching/my-matches/page.tsx
 'use client';
 
-import React from 'react';
-import { ProTable, ProCard, type ProColumns } from '@ant-design/pro-components';
+import { ProCard, type ProColumns, ProTable } from '@ant-design/pro-components';
 import { Badge, Button, Drawer, Progress, Space, Tag, Typography } from 'antd';
+import React from 'react';
+
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Text, Title, Paragraph } = Typography;

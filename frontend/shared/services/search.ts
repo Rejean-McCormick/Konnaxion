@@ -62,11 +62,10 @@ function normalizeKnowledgeResponse(raw: RawKnowledgeSearchResponse): KnowledgeR
   }
 
   const obj = raw ?? {};
-  const anyObj = obj as any;
 
   const results: KnowledgeResource[] =
-    (Array.isArray(anyObj.results) && anyObj.results) ||
-    (Array.isArray(anyObj.items) && anyObj.items) ||
+    (Array.isArray(obj.results) && obj.results) ||
+    (Array.isArray(obj.items) && obj.items) ||
     [];
 
   return results;

@@ -8,14 +8,16 @@
  */
 
 import React from 'react'
+
 import ChartCard from '@/components/charts/ChartCard'
+
 import {
-  MainIcon,
+  BarContainer,
   CardDivider,
-  NumberInfoStyled,
   CardFooter,
   HelperIcon,
-  BarContainer,
+  MainIcon,
+  NumberInfoStyled,
 } from './style'
 
 type Point = { x: string | number; y: number }

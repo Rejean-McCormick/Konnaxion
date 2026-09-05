@@ -2,6 +2,7 @@
 ﻿// modules/konsultations/hooks/useConsultationResults.ts
 
 import { useQuery } from '@tanstack/react-query';
+
 import { get } from '@/services/_request';
 
 /**

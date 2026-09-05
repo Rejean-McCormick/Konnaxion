@@ -1,7 +1,8 @@
 // scripts/scan-layout-anomalies.mjs
+import fg from 'fast-glob';
+
 import fs from 'fs';
 import path from 'path';
-import fg from 'fast-glob';
 
 const root = process.cwd();
 

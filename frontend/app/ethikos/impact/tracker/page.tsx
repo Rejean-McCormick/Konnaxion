@@ -1,14 +1,25 @@
 // FILE: frontend/app/ethikos/impact/tracker/page.tsx
 'use client';
 
-import { useMemo, useState } from 'react';
+import {
+  AuditOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  ExclamationCircleOutlined,
+  FileSearchOutlined,
+  FlagOutlined,
+  LinkOutlined,
+  ReloadOutlined,
+  SendOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
+  type ProColumns,
   ProTable,
   StatisticCard,
-  type ProColumns,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   App,
@@ -22,26 +33,15 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  AuditOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  ExclamationCircleOutlined,
-  FileSearchOutlined,
-  FlagOutlined,
-  LinkOutlined,
-  ReloadOutlined,
-  SendOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   fetchImpactTracker,
-  patchImpactStatus,
   type ImpactStatus,
+  patchImpactStatus,
   type TrackerItem,
 } from '@/services/impact';
 

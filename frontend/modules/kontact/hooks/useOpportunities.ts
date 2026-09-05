@@ -58,8 +58,53 @@ function normalizeList<T = unknown>(
   return { items: [] };
 }
 
+interface OpportunityApiRecord {
+  id?: string | number;
+  pk?: string | number;
+  title?: string;
+  name?: string;
+  summary?: string;
+  teaser?: string;
+  description?: string;
+  short_description?: string;
+  organisation?: string;
+  organization?: string;
+  org?: string;
+  org_name?: string;
+  company?: string;
+  location?: string;
+  city?: string;
+  country?: string;
+  commitment?: string;
+  time_commitment?: string;
+  time_required?: string;
+  availability?: string;
+  tags?: unknown;
+  keywords?: unknown;
+  labels?: unknown;
+  skills?: unknown;
+  skill_tags?: unknown;
+  is_remote?: unknown;
+  remote?: unknown;
+  remote_friendly?: unknown;
+  match_score?: number;
+  score?: number;
+  created_at?: string;
+  createdAt?: string;
+  published_at?: string;
+  listed_at?: string;
+  deadline?: string;
+  closes_at?: string;
+  apply_by?: string;
+  application_deadline?: string;
+  url?: string;
+  link?: string;
+  slug?: string;
+  isSample?: unknown;
+}
+
 function normalizeOpportunities(raw: unknown): Opportunity[] {
-  const { items } = normalizeList<any>(raw);
+  const { items } = normalizeList<OpportunityApiRecord>(raw);
 
   return items.map((row, index) => {
     const id = row.id ?? row.pk ?? index;
@@ -352,7 +397,7 @@ async function fetchOpportunities(
   }
 
   // No live endpoint: fall back to in‑memory sample opportunities so the UI is usable.
-  // eslint-disable-next-line no-console
+   
   console.warn(
     'Kontact opportunities API not available; using sample opportunities instead.',
   );

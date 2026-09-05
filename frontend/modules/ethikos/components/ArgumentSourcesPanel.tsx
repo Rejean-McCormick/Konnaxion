@@ -1,7 +1,12 @@
 // FILE: frontend/modules/ethikos/components/ArgumentSourcesPanel.tsx
 'use client'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import {
+  LinkOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons'
 import {
   Alert,
   App,
@@ -17,13 +22,8 @@ import {
   Tooltip,
   Typography,
 } from 'antd'
-import {
-  LinkOutlined,
-  PlusOutlined,
-  ReloadOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons'
 import dayjs from 'dayjs'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import {
   attachArgumentSource,

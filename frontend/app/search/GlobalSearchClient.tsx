@@ -1,12 +1,6 @@
 // FILE: frontend/app/search/GlobalSearchClient.tsx
 'use client';
 
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
 import {
   Alert,
   Card,
@@ -21,6 +15,12 @@ import {
 } from 'antd';
 import type { TabsProps } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
@@ -57,7 +57,7 @@ export default function GlobalSearchClient() {
         void runSearch(initial);
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [searchParams]);
 
   const runSearch = useCallback(

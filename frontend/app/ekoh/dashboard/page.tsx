@@ -1,8 +1,8 @@
 // FILE: frontend/app/ekoh/dashboard/page.tsx
 'use client';
 
-import React from 'react';
 import { Alert, Card, Col, Empty, List, Progress, Row, Space, Statistic, Tag, Typography } from 'antd';
+import React from 'react';
 
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
 import useReputationEvents from '@/hooks/useReputationEvents';

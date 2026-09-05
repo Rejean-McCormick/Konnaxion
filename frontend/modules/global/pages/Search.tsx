@@ -1,7 +1,8 @@
 // FILE: frontend/modules/global/pages/Search.tsx
 "use client";
-import { useSearchParams } from "next/navigation";
 import { Alert, List, Spin } from "antd";
+import { useSearchParams } from "next/navigation";
+
 import AppShell from "@/global/components/AppShell";
 import useGlobalSearch, { GlobalSearchResult } from "@/global/hooks/useGlobalSearch";
 

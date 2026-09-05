@@ -1,18 +1,19 @@
 // FILE: frontend/app/keenkonnect/knowledge/search-filter-documents/page.tsx
 'use client'
 
-import React, { useMemo, useState } from 'react'
-import { Card, Alert, Pagination, Tag } from 'antd'
-import type { PaginationProps } from 'antd'
-import dayjs, { Dayjs } from 'dayjs'
 import type { ProColumns } from '@ant-design/pro-components'
 import {
+  ProFormDateRangePicker,
+  ProFormSelect,
+  ProFormText,
   ProTable,
   QueryFilter,
-  ProFormText,
-  ProFormSelect,
-  ProFormDateRangePicker,
 } from '@ant-design/pro-components'
+import { Alert, Card, Pagination, Tag } from 'antd'
+import type { PaginationProps } from 'antd'
+import dayjs, { Dayjs } from 'dayjs'
+import React, { useMemo, useState } from 'react'
+
 import KeenPage from '@/app/keenkonnect/KeenPageShell'
 
 interface DocumentResource {
@@ -111,14 +112,26 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
   const [currentPage, setCurrentPage] = useState<number>(1)
   const [pageSize, setPageSize] = useState<number>(5)
 
-  const handleFilterFinish = async (values: Record<string, any>) => {
+  const handleFilterFinish = async (values: unknown) => {
+    const formValues =
+      values && typeof values === 'object'
+        ? (values as {
+            keyword?: string;
+            authors?: string[];
+            tags?: string[];
+            language?: string;
+            dateRange?: DateRangeValue;
+            sort?: SortOption;
+          })
+        : {};
+
     const nextFilters: FilterState = {
-      keyword: values.keyword?.trim() || undefined,
-      authors: values.authors ?? [],
-      tags: values.tags ?? [],
-      language: values.language || undefined,
-      dateRange: values.dateRange as DateRangeValue,
-      sort: (values.sort as SortOption) ?? DEFAULT_SORT,
+      keyword: formValues.keyword?.trim() || undefined,
+      authors: formValues.authors ?? [],
+      tags: formValues.tags ?? [],
+      language: formValues.language || undefined,
+      dateRange: formValues.dateRange,
+      sort: formValues.sort ?? DEFAULT_SORT,
     }
 
     setFilters(nextFilters)

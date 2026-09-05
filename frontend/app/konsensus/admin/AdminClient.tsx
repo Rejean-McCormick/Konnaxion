@@ -1,35 +1,35 @@
 // FILE: frontend/app/konsensus/admin/AdminClient.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
 import {
-  Row,
-  Col,
-  Card,
-  Tabs,
-  Form,
-  InputNumber,
-  Slider,
-  Switch,
-  Table,
-  Tag,
-  Space,
-  Button,
-  Typography,
-  Statistic,
-  Divider,
-  Popconfirm,
-  message,
-} from 'antd';
-import {
-  SettingOutlined,
-  SafetyCertificateOutlined,
-  WarningOutlined,
   DeploymentUnitOutlined,
   ExperimentOutlined,
   PlayCircleOutlined,
+  SafetyCertificateOutlined,
+  SettingOutlined,
   StopOutlined,
+  WarningOutlined,
 } from '@ant-design/icons';
+import {
+  Button,
+  Card,
+  Col,
+  Divider,
+  Form,
+  InputNumber,
+  message,
+  Popconfirm,
+  Row,
+  Slider,
+  Space,
+  Statistic,
+  Switch,
+  Table,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd';
+import React, { useMemo, useState } from 'react';
 
 const { Title, Paragraph, Text } = Typography;
 

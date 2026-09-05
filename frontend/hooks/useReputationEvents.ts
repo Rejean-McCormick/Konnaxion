@@ -1,13 +1,14 @@
 // FILE: frontend/hooks/useReputationEvents.ts
 
 import { useQuery } from '@tanstack/react-query';
+
 import {
-  fetchCurrentUserEkohProfile,
-  fetchUserProfile,
-  fetchUserBadges,
-  type ReputationProfile,
-  type EkohProfile,
   type Badge,
+  type EkohProfile,
+  fetchCurrentUserEkohProfile,
+  fetchUserBadges,
+  fetchUserProfile,
+  type ReputationProfile,
   type TrustBadgePayload,
 } from '@/services/trust';
 

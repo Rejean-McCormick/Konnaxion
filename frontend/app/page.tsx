@@ -1,6 +1,7 @@
 // FILE: frontend/app/page.tsx
-import { cookies } from 'next/headers';
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -104,9 +105,12 @@ export default async function Page() {
       <div className="w-full max-w-4xl space-y-10">
         <header className="space-y-5 text-center">
           <div className="flex justify-center">
-            <img
+            <Image
               src="/LogoK.svg"
               alt="Konnaxion logo"
+              width={48}
+              height={48}
+              priority
               className="h-12 w-auto"
             />
           </div>
@@ -126,13 +130,13 @@ export default async function Page() {
           <div className="inline-flex flex-wrap items-center justify-center gap-3">
             <a
               href={BACKEND_LOGIN_URL}
-              className="inline-flex items-center justify-center rounded-full border px-5 py-2.5 text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center justify-center rounded-full border border-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand)] transition-colors hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
             >
               Sign in
             </a>
             <a
               href={BACKEND_SIGNUP_URL}
-              className="inline-flex items-center justify-center rounded-full border px-5 py-2.5 text-sm font-medium hover:bg-gray-50 transition"
+              className="inline-flex items-center justify-center rounded-full border border-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand)] transition-colors hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
             >
               Create an account
             </a>
@@ -146,7 +150,7 @@ export default async function Page() {
         <section className="flex flex-col items-center gap-3">
           <a
             href={preferredPath}
-            className="inline-flex items-center justify-center rounded-full border px-5 py-2.5 text-sm font-medium hover:bg-gray-50 transition"
+            className="inline-flex items-center justify-center rounded-full border border-[var(--brand)] px-5 py-2.5 text-sm font-medium text-[var(--brand)] transition-colors hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
             Go straight to your preferred space ({preferredLabel})
           </a>
@@ -159,10 +163,10 @@ export default async function Page() {
         <section className="grid gap-4 md:grid-cols-2">
           <a
             href={HOME_BY_SUITE.ekoh}
-            className="border rounded-xl px-4 py-5 hover:bg-gray-50 transition flex flex-col gap-1"
+            className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 md:col-span-2 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold">Distribute influence with EkoH</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Distribute influence with EkoH</h2>
+            <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
               Use merit-based, ethics-aware weighting to surface the most
               trustworthy expertise across Konnaxion.
             </p>
@@ -170,10 +174,10 @@ export default async function Page() {
 
           <a
             href={HOME_BY_SUITE.ethikos}
-            className="border rounded-xl px-4 py-5 hover:bg-gray-50 transition flex flex-col gap-1"
+            className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold">Take positions with ethiKos</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Take positions with ethiKos</h2>
+            <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
               Explore structured ethical questions, see how different groups
               position themselves, and ground decisions in shared values.
             </p>
@@ -181,10 +185,10 @@ export default async function Page() {
 
           <a
             href={HOME_BY_SUITE.keenkonnect}
-            className="border rounded-xl px-4 py-5 hover:bg-gray-50 transition flex flex-col gap-1"
+            className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold">Build solutions with keenKonnect</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Build solutions with keenKonnect</h2>
+            <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
               Co-create practical, technological projects to solve common
               problems, from clean energy to health and resilience.
             </p>
@@ -192,10 +196,10 @@ export default async function Page() {
 
           <a
             href={HOME_BY_SUITE.konnected}
-            className="border rounded-xl px-4 py-5 hover:bg-gray-50 transition flex flex-col gap-1"
+            className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold">Learn together with KonnectED</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Learn together with KonnectED</h2>
+            <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
               Share foundational knowledge, practical skills, and inclusive
               learning paths for communities around the world.
             </p>
@@ -203,10 +207,10 @@ export default async function Page() {
 
           <a
             href={HOME_BY_SUITE.kreative}
-            className="border rounded-xl px-4 py-5 hover:bg-gray-50 transition flex flex-col gap-1 md:col-span-2"
+            className="group border border-[var(--brand)] rounded-xl px-4 py-5 transition-colors flex flex-col gap-1 hover:bg-[var(--brand)] hover:text-[var(--brand-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand)] focus-visible:ring-offset-2"
           >
-            <h2 className="font-semibold">Create and curate with Kreative</h2>
-            <p className="text-xs text-gray-500">
+            <h2 className="font-semibold text-[var(--brand)] transition-colors group-hover:text-[var(--brand-text)]">Create and curate with Kreative</h2>
+            <p className="text-xs text-gray-500 transition-colors group-hover:text-[var(--brand-text)]">
               Showcase art, preserve cultural heritage, and co-create immersive
               experiences through digital galleries and collaborations.
             </p>

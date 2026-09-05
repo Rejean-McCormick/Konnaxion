@@ -1,9 +1,9 @@
 // FILE: frontend/modules/konsultations/components/ConsultationList.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { Alert, List, Spin, Tag } from 'antd';
+import Link from 'next/link';
+import React, { useEffect, useState } from 'react';
 
 import { fetchEthikosTopics } from '@/services/ethikos';
 

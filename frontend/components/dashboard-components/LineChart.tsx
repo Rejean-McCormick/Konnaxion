@@ -4,13 +4,13 @@
 
 import React from 'react';
 import {
-  LineChart as ReLineChart,
-  Line,
   CartesianGrid,
+  Line,
+  LineChart as ReLineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
 
 export type LineChartPoint = {

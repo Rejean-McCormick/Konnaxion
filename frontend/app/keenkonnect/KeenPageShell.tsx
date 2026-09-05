@@ -1,8 +1,9 @@
 // FILE: frontend/app/keenkonnect/KeenPageShell.tsx
 'use client';
 
-import React, { type ReactNode } from 'react';
 import Head from 'next/head';
+import React, { type ReactNode } from 'react';
+
 import usePageTitle from '@/hooks/usePageTitle';
 
 type KeenPageProps = {

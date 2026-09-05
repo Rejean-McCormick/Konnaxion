@@ -1,11 +1,11 @@
 // FILE: frontend/components/layout-components/LogoTitle.tsx
 'use client'
 
-import styled from 'styled-components'
+import { DownOutlined } from '@ant-design/icons'
 import { Dropdown } from 'antd'
 import type { MenuProps } from 'antd'
 import Link from 'next/link'
-import { DownOutlined } from '@ant-design/icons'
+import styled from 'styled-components'
 
 /* ------------ module keys & mappings ------------ */
 

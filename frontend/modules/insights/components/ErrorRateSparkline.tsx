@@ -1,10 +1,10 @@
 // FILE: frontend/modules/insights/components/ErrorRateSparkline.tsx
 "use client";
 import {
-  Chart as ChartJS,
-  LineElement,
   CategoryScale,
+  Chart as ChartJS,
   LinearScale,
+  LineElement,
   Tooltip,
 } from "chart.js";
 import { Line } from "react-chartjs-2";

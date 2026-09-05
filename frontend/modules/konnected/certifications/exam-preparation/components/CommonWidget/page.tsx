@@ -2,7 +2,8 @@
 'use client'
 
 import React from 'react'
-import styles from './CommonWidget.module.css'
+
+import styles from '@/shared/CommonWidget.module.css'
 
 interface CommonWidgetProps {
   title: string

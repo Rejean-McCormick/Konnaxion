@@ -1,9 +1,9 @@
 'use client';
 
-import type { ReactNode } from 'react';
-import React, { Suspense, useEffect } from 'react';
 import { Layout, Spin } from 'antd';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import type { ReactNode } from 'react';
+import React, { Suspense, useEffect } from 'react';
 
 import MainLayout from '@/components/layout-components/MainLayout';
 

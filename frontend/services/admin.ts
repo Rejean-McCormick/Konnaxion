@@ -1,8 +1,8 @@
 // FILE: frontend/services/admin.ts
 import { get, patch, post } from './_request'
 import type {
-  AuditPayload as AuditPayloadBase,
   LogRow as AuditLogRow,
+  AuditPayload as AuditPayloadBase,
 } from './audit'
 import { fetchAuditLogs as fetchAuditLogsRaw } from './audit'
 import type { DiscussionRole, EthikosId } from './ethikos'

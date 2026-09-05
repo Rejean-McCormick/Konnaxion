@@ -1,15 +1,21 @@
 // FILE: frontend/app/ethikos/admin/audit/page.tsx
 'use client';
 
-import React from 'react';
-import type { ReactNode } from 'react';
+import {
+  ClockCircleOutlined,
+  EyeOutlined,
+  FilterOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
+  type ProColumns,
   ProTable,
   StatisticCard,
-  type ProColumns,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   Badge,
@@ -24,22 +30,16 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  ClockCircleOutlined,
-  EyeOutlined,
-  FilterOutlined,
-  InfoCircleOutlined,
-  ReloadOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import type { ReactNode } from 'react';
+import React from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
-  fetchAuditLogs,
   type AuditPayload,
   type AuditQueryParams,
+  fetchAuditLogs,
   type LogRow,
 } from '@/services/audit';
 
@@ -48,7 +48,6 @@ dayjs.extend(relativeTime);
 const { Text, Paragraph } = Typography;
 
 type Severity = NonNullable<LogRow['severity']>;
-type Status = NonNullable<LogRow['status']>;
 type SeverityFilter = 'all' | Severity;
 type TimeWindow = '24h' | '7d' | '30d' | 'all';
 

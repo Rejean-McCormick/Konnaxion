@@ -1,25 +1,6 @@
 // FILE: frontend/app/konnected/learning-paths/create-learning-path/page.tsx
 "use client";
 
-import { apiFetch } from '@/api';
-
-import React, { useCallback, useMemo, useRef, useState } from "react";
-import {
-  Alert,
-  Button,
-  Drawer,
-  Empty,
-  Input,
-  Select,
-  Space,
-  Spin,
-  Table,
-  Tag,
-  Typography,
-  message,
-} from "antd";
-import type { ColumnsType } from "antd/es/table";
-import type { Key } from "react";
 import {
   PageContainer,
   ProCard,
@@ -32,6 +13,25 @@ import {
   ProFormTextArea,
   StepsForm,
 } from "@ant-design/pro-components";
+import {
+  Alert,
+  Button,
+  Drawer,
+  Empty,
+  Input,
+  message,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
+import React, { useCallback, useMemo, useRef, useState } from "react";
+import type { Key } from "react";
+
+import { apiFetch } from '@/api';
 import KonnectedPageShell from "@/app/konnected/KonnectedPageShell";
 
 const { Paragraph } = Typography;
@@ -331,8 +331,10 @@ const CreateLearningPathPage: React.FC = () => {
           : "Learning path saved as draft."
       );
       return true;
-    } catch (error: any) {
-      message.error(error?.message || "Failed to save learning path.");
+    } catch (error: unknown) {
+      message.error(
+        error instanceof Error ? error.message : "Failed to save learning path.",
+      );
       return false;
     } finally {
       setSubmitting(false);

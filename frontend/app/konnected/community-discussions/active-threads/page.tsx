@@ -2,8 +2,15 @@
 ﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\active-threads\page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import {
+  FireOutlined,
+  MessageTwoTone,
+  QuestionCircleOutlined,
+  ReloadOutlined,
+  SearchOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
+import { useQuery } from '@tanstack/react-query';
 import {
   Alert,
   Avatar,
@@ -21,17 +28,11 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  FireOutlined,
-  MessageTwoTone,
-  QuestionCircleOutlined,
-  ReloadOutlined,
-  SearchOutlined,
-  TeamOutlined,
-} from '@ant-design/icons';
-import { useQuery } from '@tanstack/react-query';
-import { api } from '@/shared/api';
+import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
+import { api } from '@/shared/api';
 
 const { Text, Paragraph } = Typography;
 const { Option } = Select;

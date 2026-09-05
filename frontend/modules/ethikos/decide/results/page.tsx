@@ -2,10 +2,11 @@
 // C:\MyCode\Konnaxionv14\frontend\modules\ethikos\decide\results\page.tsx
 'use client'
 
-import React from 'react'
-import { PageContainer, ProTable, type ProColumns } from '@ant-design/pro-components'
-import { Tag } from 'antd'
+import { PageContainer, type ProColumns, ProTable } from '@ant-design/pro-components'
 import { useRequest } from 'ahooks'
+import { Tag } from 'antd'
+import React from 'react'
+
 import usePageTitle from '@/hooks/usePageTitle'
 import { fetchDecisionResults } from '@/services/decide'
 

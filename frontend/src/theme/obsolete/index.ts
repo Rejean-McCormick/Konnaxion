@@ -1,14 +1,14 @@
 // FILE: frontend/src/theme/obsolete/index.ts
-import type { Theme, ThemeId } from './types';
 
-import lightTheme from './lightTheme';
-import modernTheme from './modernTheme';
+import cyberTheme from './cyberTheme';
 import darkTheme from './darkTheme';
+import funkyTheme from './funkyTheme';
+import lightTheme from './lightTheme';
+import mauveRainbowTheme from './mauveRainbowTheme';
+import modernTheme from './modernTheme';
 import oceanTheme from './oceanTheme';
 import sunsetTheme from './sunsetTheme';
-import cyberTheme from './cyberTheme';
-import funkyTheme from './funkyTheme';
-import mauveRainbowTheme from './mauveRainbowTheme';
+import type { Theme, ThemeId } from './types';
 
 export const allThemes: Theme[] = [
   lightTheme,

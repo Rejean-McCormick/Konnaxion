@@ -1,7 +1,7 @@
 'use client';
 
+import { Space, Typography } from 'antd';
 import React, { ReactNode, useEffect } from 'react';
-import { Typography, Space } from 'antd';
 
 const { Title, Paragraph } = Typography;
 

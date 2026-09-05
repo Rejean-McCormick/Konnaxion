@@ -6,9 +6,10 @@
 
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import { Progress, Statistic } from 'antd';
 import { useRequest } from 'ahooks';
+import { Progress, Statistic } from 'antd';
 import dayjs from 'dayjs';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchEliteBallots } from '@/services/decide';
 import type { Ballot } from '@/types';

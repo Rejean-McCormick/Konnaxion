@@ -2,25 +2,6 @@
 ﻿// app/konnected/certifications/exam-preparation/page.tsx
 'use client';
 
-import React, { useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  List,
-  Progress,
-  Row,
-  Statistic,
-  Steps,
-  Tabs,
-  Tag,
-  Typography,
-  Skeleton,
-  Space,
-} from 'antd';
-import type { TabsProps } from 'antd';
 import {
   ArrowRightOutlined,
   CalendarOutlined,
@@ -32,7 +13,26 @@ import {
   WarningTwoTone,
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  List,
+  Progress,
+  Row,
+  Skeleton,
+  Space,
+  Statistic,
+  Steps,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd';
+import type { TabsProps } from 'antd';
 import dayjs from 'dayjs';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useMemo } from 'react';
 
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 import { get } from '@/services/_request';
@@ -228,7 +228,7 @@ export default function ExamPreparationPage(): JSX.Element {
                 icon={<ArrowRightOutlined />}
                 // Future: route to the actual learning unit detail, once available
                 onClick={() => {
-                  // eslint-disable-next-line no-console
+                   
                   console.log('Open module', module.id);
                 }}
               >

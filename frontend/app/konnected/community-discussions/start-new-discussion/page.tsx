@@ -2,17 +2,17 @@
 ﻿// C:\MyCode\Konnaxionv14\frontend\app\konnected\community-discussions\start-new-discussion\page.tsx
 'use client';
 
-import { apiFetch } from '@/api';
 
-import React, { useState } from 'react';
+import { InfoCircleOutlined, MessageOutlined, QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   Alert,
+  message as antdMessage,
   Button,
   Card,
   Col,
   Form,
   Input,
-  message as antdMessage,
+  Radio,
   Row,
   Select,
   Space,
@@ -20,12 +20,13 @@ import {
   Tag,
   Typography,
   Upload,
-  Radio,
 } from 'antd';
 import type { FormProps } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { InfoCircleOutlined, MessageOutlined, QuestionCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+
+import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { TextArea } = Input;
@@ -56,10 +57,12 @@ type CreateBodies = {
  */
 async function extractBackendMessage(res: Response): Promise<string | undefined> {
   try {
-    const data = (await res.json()) as any;
-    if (typeof data?.detail === 'string') return data.detail;
-    if (typeof data?.message === 'string') return data.message;
-    if (typeof data?.error === 'string') return data.error;
+    const data: unknown = await res.json();
+    if (!data || typeof data !== 'object') return undefined;
+    const payload = data as Record<string, unknown>;
+    if (typeof payload.detail === 'string') return payload.detail;
+    if (typeof payload.message === 'string') return payload.message;
+    if (typeof payload.error === 'string') return payload.error;
   } catch {
     // ignore JSON parse errors
   }
@@ -129,7 +132,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
         const topicId = createdTopic?.id;
         if (topicId == null) {
           // Topic exists but we could not read its id – log and continue.
-          // eslint-disable-next-line no-console
+           
           console.warn('Created topic without id in response payload.', createdTopic);
         } else {
           const postBody = {
@@ -159,7 +162,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
       router.push('/konnected/community-discussions/active-threads');
     } catch (error) {
       // Network or unexpected error
-      // eslint-disable-next-line no-console
+       
       console.error('Error creating discussion', error);
       antdMessage.error('Something went wrong while creating the discussion. Please try again.');
     } finally {

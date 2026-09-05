@@ -1,10 +1,11 @@
 // FILE: frontend/modules/ethikos/trust/credentials/page.tsx
 'use client'
 
-import { PageContainer } from '@ant-design/pro-components';
-import { Upload, Button, Result } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
+import { PageContainer } from '@ant-design/pro-components';
+import { Button, Result, Upload, type UploadProps } from 'antd';
 import { useState } from 'react';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { uploadCredential } from '@/services/trust';
 
@@ -13,16 +14,16 @@ export default function Credentials() {
 
   const [done, setDone] = useState(false);
 
-  const props = {
+  const props: UploadProps = {
     name: 'file',
     multiple: false,
-    customRequest: async ({ file, onSuccess, onError }: any) => {
+    customRequest: async ({ file, onSuccess, onError }) => {
       try {
         await uploadCredential(file as File);
-        onSuccess('ok');
+        onSuccess?.('ok');
         setDone(true);
       } catch {
-        onError();
+        onError?.(new Error('Credential upload failed'));
       }
     },
   };

@@ -2,33 +2,34 @@
 // app/konnected/learning-library/browse-resources/page.tsx
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
-import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  Row,
-  Col,
-  Card,
-  Typography,
-  Input,
-  Select,
-  Tag,
-  Rate,
-  Space,
-  Table,
-  Pagination,
-  Button,
-  Alert,
-  Spin,
-  message,
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import {
-  SearchOutlined,
-  FilterOutlined,
   DownloadOutlined,
+  FilterOutlined,
+  SearchOutlined,
   ShareAltOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Input,
+  message,
+  Pagination,
+  Rate,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import axios from 'axios';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Text } = Typography;
@@ -194,7 +195,7 @@ export default function BrowseResourcesPage(): JSX.Element {
     if (!Number.isNaN(urlPageSize) && urlPageSize > 0) {
       setPageSize(urlPageSize);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [searchParams]);
 
   /* ------------------------------------------------------------------ */

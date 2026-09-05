@@ -1,5 +1,6 @@
 // FILE: frontend/services/impact.ts
 import dayjs from 'dayjs'
+
 import { get, patch, post } from './_request'
 import type { ApiMaybeList, EthikosId, TopicStatus } from './ethikos'
 import { normalizeList } from './ethikos'

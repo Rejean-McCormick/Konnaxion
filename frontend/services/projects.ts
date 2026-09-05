@@ -2,7 +2,7 @@
 // services/projects.ts
 // Thin service layer around the backend /api/projects/ endpoints.
 
-import { get, post, put, del } from './_request';
+import { del, get, post, put } from './_request';
 
 export type ProjectId = number | string;
 

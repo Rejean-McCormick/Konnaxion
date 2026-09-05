@@ -1,19 +1,27 @@
 // FILE: frontend/app/ethikos/deliberate/elite/page.tsx
 'use client'
 
-import React from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import {
+  ArrowRightOutlined,
+  BranchesOutlined,
+  FireOutlined,
+  PlusOutlined,
+  ReadOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+  StarOutlined,
+} from '@ant-design/icons'
+import {
+  ModalForm,
   PageContainer,
   ProCard,
+  type ProColumns,
+  ProFormSelect,
+  ProFormText,
   ProTable,
   StatisticCard,
-  ModalForm,
-  ProFormText,
-  ProFormSelect,
-  type ProColumns,
 } from '@ant-design/pro-components'
+import { useInterval, useRequest } from 'ahooks'
 import {
   Alert,
   App,
@@ -25,19 +33,11 @@ import {
   Tooltip,
   Typography,
 } from 'antd'
-import {
-  ArrowRightOutlined,
-  BranchesOutlined,
-  FireOutlined,
-  PlusOutlined,
-  ReadOutlined,
-  ReloadOutlined,
-  SafetyCertificateOutlined,
-  StarOutlined,
-} from '@ant-design/icons'
-import { useInterval, useRequest } from 'ahooks'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import React from 'react'
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell'
 import {

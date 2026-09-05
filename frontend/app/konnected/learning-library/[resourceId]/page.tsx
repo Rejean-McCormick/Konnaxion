@@ -2,33 +2,34 @@
 // app/konnected/learning-library/[resourceId]/page.tsx
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import {
-  Row,
-  Col,
-  Card,
-  Typography,
-  Tag,
-  Space,
-  Button,
-  Alert,
-  Skeleton,
-  Divider,
-  Progress,
-  Tabs,
-} from 'antd';
 import {
   ArrowLeftOutlined,
   BookOutlined,
-  ClockCircleOutlined,
-  TagOutlined,
-  GlobalOutlined,
-  PlayCircleOutlined,
-  DownloadOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
+  DownloadOutlined,
+  GlobalOutlined,
   LinkOutlined,
+  PlayCircleOutlined,
+  TagOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Progress,
+  Row,
+  Skeleton,
+  Space,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd';
+import { useParams, useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Paragraph, Text, Title } = Typography;

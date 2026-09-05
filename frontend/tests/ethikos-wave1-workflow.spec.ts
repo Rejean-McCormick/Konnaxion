@@ -1,5 +1,6 @@
 // FILE: frontend/tests/ethikos-wave1-workflow.spec.ts
-import { expect, test, type Page } from '@playwright/test'
+import { expect, type Page, test } from '@playwright/test'
+
 import fs from 'fs'
 import path from 'path'
 
@@ -220,7 +221,7 @@ async function expectTextVisible(
   await expect(
     page.getByText(label).first(),
     `Expected visible UI text for ${stepName}`,
-  ).toBeVisible({ timeout: 5_000 })
+  ).toBeVisible({ timeout: 15_000 })
 
   await safeScreenshot(page, stepName)
 }

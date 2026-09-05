@@ -1,26 +1,27 @@
 // FILE: frontend/app/keenkonnect/workspaces/my-workspaces/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { DownOutlined } from '@ant-design/icons';
+import { type ProColumns, ProTable } from '@ant-design/pro-components';
 import {
-  Row,
-  Col,
-  Select,
-  Divider,
-  Typography,
-  Tag,
-  Dropdown,
-  Popconfirm,
-  message,
   Button,
+  Col,
+  Divider,
+  Dropdown,
+  message,
+  Popconfirm,
+  Row,
+  Select,
+  Tag,
+  Typography,
 } from 'antd';
 import type { MenuProps } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
-import { ProTable, type ProColumns } from '@ant-design/pro-components';
+import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
+
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface Workspace {
   id: string;

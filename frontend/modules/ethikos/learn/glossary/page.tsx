@@ -2,9 +2,10 @@
 'use client'
 
 import { PageContainer, ProTable } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import { Input } from 'antd';
 import { useState } from 'react';
-import { useRequest } from 'ahooks';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchGlossary } from '@/services/learn';
 

@@ -1,7 +1,15 @@
 // frontend/app/teambuilder/humans/page.tsx
 'use client';
 
-import React from 'react';
+import {
+  AimOutlined,
+  EnvironmentOutlined,
+  FlagOutlined,
+  GlobalOutlined,
+  ScheduleOutlined,
+  TeamOutlined,
+  WarningOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Badge,
@@ -17,19 +25,11 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import {
-  GlobalOutlined,
-  ScheduleOutlined,
-  TeamOutlined,
-  WarningOutlined,
-  AimOutlined,
-  EnvironmentOutlined,
-  FlagOutlined,
-} from '@ant-design/icons';
+import React from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 
-const { Title, Paragraph, Text } = Typography;
+const { Paragraph, Text } = Typography;
 
 export default function HumansOverviewPage(): JSX.Element {
   // For now, static placeholder metrics. Wire to real data later.

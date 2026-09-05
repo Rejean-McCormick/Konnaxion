@@ -1,6 +1,6 @@
 // FILE: frontend/smoke/smoke.spec.ts
 // smoke/smoke.spec.ts
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 const paths = [
   '/ethikos/api/admin/moderation',

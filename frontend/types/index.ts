@@ -6,7 +6,7 @@ export type Maker = {
   id: Id
   firstName: string
   lastName: string
-  [k: string]: any
+  [k: string]: unknown
 }
 
 export type SculptureImage = { url: string; alt?: string; created?: string }
@@ -20,7 +20,7 @@ export type Sculpture = {
   totalVisits: number
   longitude?: number
   latitude?: number
-  [k: string]: any
+  [k: string]: unknown
 }
 
 export type CommentRow = {
@@ -30,7 +30,7 @@ export type CommentRow = {
   content: string
   created: string
   sculptureId?: Id
-  [k: string]: any
+  [k: string]: unknown
 }
 
 export type LogRow = {
@@ -49,5 +49,5 @@ export type KPI = {
   history?: { ts: number; value: number }[]
 }
 
-export type Topic = { id: Id; title: string; [k: string]: any }
-export type Ballot = { id: Id; closesAt: string; [k: string]: any }
+export type Topic = { id: Id; title: string; [k: string]: unknown }
+export type Ballot = { id: Id; closesAt: string; [k: string]: unknown }

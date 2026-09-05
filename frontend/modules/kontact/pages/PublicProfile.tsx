@@ -1,8 +1,8 @@
 // FILE: frontend/modules/kontact/pages/PublicProfile.tsx
 ﻿// frontend/modules/kontact/pages/PublicProfile.tsx
 
-import MainLayout from '@/shared/layout/MainLayout';
 import UserProfile from '@/components/user-components/UserProfile';
+import MainLayout from '@/shared/layout/MainLayout';
 
 /**
  * Kontact · Public Profile page

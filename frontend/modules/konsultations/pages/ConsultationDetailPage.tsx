@@ -1,22 +1,22 @@
 // FILE: frontend/modules/konsultations/pages/ConsultationDetailPage.tsx
 ﻿'use client';
 
-import React from 'react';
-import { Space, Typography, Alert, Tag, Empty, Result } from 'antd';
 import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { Alert, Empty, Result, Space, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
+import React from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
   ConsultationForm,
+  ImpactTimeline,
   ResultsChart,
   SuggestionBoard,
-  ImpactTimeline,
 } from '@/modules/konsultations/components';
 import {
   useConsultationResults,
-  useSuggestions,
   useImpact,
+  useSuggestions,
 } from '@/modules/konsultations/hooks';
 
 const { Paragraph, Text } = Typography;

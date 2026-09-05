@@ -1,36 +1,36 @@
 // frontend/app/teambuilder/humans/constraints/page.tsx
 'use client';
 
-import React from 'react';
-import dayjs from 'dayjs';
 import {
-  Form,
-  Card,
-  Collapse,
-  Row,
-  Col,
-  Space,
-  Divider,
-  Select,
-  Switch,
-  TimePicker,
-  Checkbox,
-  Input,
-  Tag,
-  Button,
-  Steps,
-  Typography,
-  Alert,
-} from 'antd';
-import {
-  GlobalOutlined,
-  EnvironmentOutlined,
   ClockCircleOutlined,
-  SaveOutlined,
-  ReloadOutlined,
-  PlusOutlined,
+  EnvironmentOutlined,
+  GlobalOutlined,
   InfoCircleOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SaveOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Checkbox,
+  Col,
+  Collapse,
+  Divider,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Steps,
+  Switch,
+  Tag,
+  TimePicker,
+  Typography,
+} from 'antd';
+import dayjs from 'dayjs';
+import React from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 
@@ -97,9 +97,9 @@ export default function HumansConstraintsPage(): JSX.Element {
     form,
   ) as boolean | undefined;
 
-  const handleSave = (values: any) => {
+  const handleSave = (values: unknown) => {
     // TODO: integrate with backend constraints API
-    // eslint-disable-next-line no-console
+     
     console.log('Human constraints saved:', values);
   };
 
@@ -110,7 +110,7 @@ export default function HumansConstraintsPage(): JSX.Element {
   const handleSaveTemplate = () => {
     const currentValues = form.getFieldsValue();
     // TODO: integrate with "templates" API
-    // eslint-disable-next-line no-console
+     
     console.log('Save constraints as template:', currentValues);
   };
 

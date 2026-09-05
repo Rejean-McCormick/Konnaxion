@@ -1,12 +1,12 @@
 // FILE: frontend/components/layout-components/Menu.tsx
 'use client';
 
-import React from 'react';
-import type { CSSProperties, ReactNode } from 'react';
 import { Menu } from 'antd';
 import type { MenuProps } from 'antd';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { CSSProperties, ReactNode } from 'react';
+import React from 'react';
 
 import './Menu.css';
 

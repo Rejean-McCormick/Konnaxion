@@ -1,7 +1,16 @@
 // FILE: frontend/app/teambuilder/problems/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  AppstoreOutlined,
+  DownOutlined,
+  PlusCircleOutlined,
+  ReloadOutlined,
+  TagsOutlined,
+} from '@ant-design/icons';
+import type { ProListMetas } from '@ant-design/pro-components';
+import { ProList } from '@ant-design/pro-components';
+import type { MenuProps } from 'antd';
 import {
   Badge,
   Button,
@@ -15,16 +24,7 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import type { MenuProps } from 'antd';
-import {
-  AppstoreOutlined,
-  DownOutlined,
-  PlusCircleOutlined,
-  ReloadOutlined,
-  TagsOutlined,
-} from '@ant-design/icons';
-import type { ProListMetas } from '@ant-design/pro-components';
-import { ProList } from '@ant-design/pro-components';
+import React, { useMemo, useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 
@@ -257,7 +257,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
 
   const handleBulkMenuClick: MenuProps['onClick'] = e => {
     // Placeholder for bulk actions
-    // eslint-disable-next-line no-console
+     
     console.log('Bulk action:', e.key);
   };
 
@@ -346,7 +346,7 @@ export default function ProblemsLibraryPage(): JSX.Element {
             icon={<ReloadOutlined />}
             onClick={() => {
               // Placeholder for real reload from API
-              // eslint-disable-next-line no-console
+               
               console.log('Reload problems (TODO: hook API)');
             }}
           >

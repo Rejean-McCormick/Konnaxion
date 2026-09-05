@@ -5,9 +5,10 @@
  * Author: Hieu Chu
  */
 
+import { Card, Col, Empty, Form, Table, Typography } from 'antd'
 import type { ComponentProps } from 'react'
 import styled from 'styled-components'
-import { Card, Col, Form, Typography, Empty, Table } from 'antd'
+
 import Icon from '@/components/compat/Icon'
 
 const { Text } = Typography

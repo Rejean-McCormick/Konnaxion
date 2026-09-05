@@ -3,6 +3,11 @@
 'use client';
 
 import {
+  InfoCircleOutlined,
+  SafetyCertificateOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
+import {
   PageContainer,
   ProCard,
   StatisticCard,
@@ -12,18 +17,13 @@ import {
   Collapse,
   Descriptions,
   Divider,
+  Space,
   Steps,
   Tabs,
+  Tag,
   Timeline,
   Typography,
-  Tag,
-  Space,
 } from 'antd';
-import {
-  InfoCircleOutlined,
-  SafetyCertificateOutlined,
-  TeamOutlined,
-} from '@ant-design/icons';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 

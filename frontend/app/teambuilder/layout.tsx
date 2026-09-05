@@ -1,9 +1,9 @@
 // FILE: frontend/app/teambuilder/layout.tsx
 'use client';
 
-import React, { Suspense, useEffect, type ReactNode } from 'react';
 import { Layout } from 'antd';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, { type ReactNode, Suspense, useEffect } from 'react';
 
 import MainLayout from '@/components/layout-components/MainLayout';
 import Loading from '@/components/Loading';

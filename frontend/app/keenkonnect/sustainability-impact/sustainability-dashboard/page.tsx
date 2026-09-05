@@ -1,10 +1,11 @@
 // FILE: frontend/app/keenkonnect/sustainability-impact/sustainability-dashboard/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { Card, Select, Space, Tag, Table, Row, Col, Statistic } from 'antd';
+import { Area, Column, Line } from '@ant-design/plots';
+import { Card, Col, Row, Select, Space, Statistic, Table, Tag } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { Line, Area, Column } from '@ant-design/plots';
+import React, { useMemo, useState } from 'react';
+
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 type TimeRange = '3m' | '6m' | '12m';
@@ -119,9 +120,9 @@ export default function SustainabilityDashboardPage(): JSX.Element {
     return energyTrendBase;
   }, [timeRange]);
 
-  // --- Configs graphiques @ant-design/plots (typed as any to keep TS relaxed) ---
+  // --- Configs graphiques @ant-design/plots ---
 
-  const co2LineConfig: any = {
+  const co2LineConfig = {
     data: filteredCo2Trend,
     xField: 'month',
     yField: 'value',
@@ -145,7 +146,7 @@ export default function SustainabilityDashboardPage(): JSX.Element {
     },
   };
 
-  const energyAreaConfig: any = {
+  const energyAreaConfig = {
     data: filteredEnergyTrend,
     xField: 'month',
     yField: 'value',
@@ -172,7 +173,7 @@ export default function SustainabilityDashboardPage(): JSX.Element {
     },
   };
 
-  const categoryColumnConfig: any = {
+  const categoryColumnConfig = {
     data: categoryDistribution,
     xField: 'category',
     yField: 'value',

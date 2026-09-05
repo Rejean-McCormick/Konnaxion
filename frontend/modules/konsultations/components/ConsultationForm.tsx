@@ -1,7 +1,8 @@
 // FILE: frontend/modules/konsultations/components/ConsultationForm.tsx
-﻿import React, { useState } from 'react';
-import { Form, Slider, Button, message as antdMessage } from 'antd';
-import { useRequest } from 'ahooks';
+﻿import { useRequest } from 'ahooks';
+import { message as antdMessage, Button, Form, Slider } from 'antd';
+import React, { useState } from 'react';
+
 import { post } from '@/services/_request';
 
 interface ConsultationFormProps {

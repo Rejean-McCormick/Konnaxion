@@ -2,19 +2,20 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import { UploadOutlined } from '@ant-design/icons';
 import {
+  Alert,
+  message as antdMessage,
+  Button,
   Form,
   Input,
-  Button,
-  Upload,
   Select,
-  message as antdMessage,
-  Alert,
+  Upload,
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { UploadOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 type CreativeWorkFormValues = {
@@ -45,7 +46,7 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
     return e?.fileList ?? [];
   };
 
-  const onFinish = async (values: CreativeWorkFormValues) => {
+  const onFinish = async (_values: CreativeWorkFormValues) => {
     if (!fileList.length) {
       antdMessage.error('Veuillez joindre au moins un fichier.');
       return;

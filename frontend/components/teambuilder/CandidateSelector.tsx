@@ -1,5 +1,7 @@
 // frontend/components/teambuilder/CandidateSelector.tsx
-import React, { useState, useMemo } from 'react';
+import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
+
 import { ITeambuilderUser } from '@/services/teambuilder/types';
 
 interface CandidateSelectorProps {
@@ -137,9 +139,12 @@ export const CandidateSelector: React.FC<CandidateSelectorProps> = ({
                 {/* Avatar / Initials */}
                 <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-600 font-bold mr-3 flex-shrink-0 overflow-hidden">
                   {user.avatar_url ? (
-                    <img
+                    <Image
                       src={user.avatar_url}
                       alt={user.username}
+                      width={40}
+                      height={40}
+                      unoptimized
                       className="w-full h-full object-cover"
                     />
                   ) : (

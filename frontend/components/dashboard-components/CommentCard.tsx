@@ -7,15 +7,16 @@
  * Author: Hieu Chu
  */
 
-import React from 'react'
-import dynamic from 'next/dynamic'
 import type { AreaConfig } from '@ant-design/plots'
+import dynamic from 'next/dynamic'
+import React from 'react'
+
 import {
-  MainIcon,
-  CardDivider,
-  NumberInfoStyled,
-  CardFooter,
   BarContainer,
+  CardDivider,
+  CardFooter,
+  MainIcon,
+  NumberInfoStyled,
 } from './style'
 
 type Point = { x: string | number; y: number }

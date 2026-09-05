@@ -1,5 +1,7 @@
 // frontend/components/teambuilder/TeamCard.tsx
+import Image from 'next/image';
 import React from 'react';
+
 import { ITeam } from '@/services/teambuilder/types';
 
 interface TeamCardProps {
@@ -51,9 +53,12 @@ export const TeamCard: React.FC<TeamCardProps> = ({ team }) => {
               {/* Avatar */}
               <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 text-sm font-bold border border-indigo-200 overflow-hidden">
                 {member.user.avatar_url ? (
-                  <img 
-                    src={member.user.avatar_url} 
-                    alt={member.user.username} 
+                  <Image
+                    src={member.user.avatar_url}
+                    alt={member.user.username}
+                    width={40}
+                    height={40}
+                    unoptimized
                     className="w-full h-full object-cover"
                   />
                 ) : (

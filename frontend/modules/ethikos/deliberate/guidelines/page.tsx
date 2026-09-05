@@ -2,7 +2,8 @@
 'use client'
 
 import { PageContainer } from '@ant-design/pro-components';
-import { Typography, Anchor, Divider } from 'antd';
+import { Anchor, Divider, Typography } from 'antd';
+
 import usePageTitle from '@/hooks/usePageTitle';
 
 export default function Guidelines() {

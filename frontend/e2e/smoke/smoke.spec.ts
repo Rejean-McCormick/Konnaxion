@@ -1,6 +1,7 @@
 // FILE: frontend/e2e/smoke/smoke.spec.ts
 // e2e/smoke/smoke.spec.ts
-import { test, expect } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+
 import routes from '../../routes.json' assert { type: 'json' }
 
 for (const path of routes as string[]) {

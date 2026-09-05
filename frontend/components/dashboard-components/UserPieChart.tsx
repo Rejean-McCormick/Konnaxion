@@ -4,13 +4,14 @@
 
 import React from 'react';
 import {
-  PieChart,
-  Pie,
   Cell,
-  Tooltip,
-  ResponsiveContainer,
   Legend,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
 } from 'recharts';
+
 import { CardStyled } from './style';
 
 export interface UserPieChartUser {

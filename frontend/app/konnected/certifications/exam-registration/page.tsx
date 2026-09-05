@@ -2,13 +2,9 @@
 ﻿// app/konnected/certifications/exam-registration/page.tsx
 ﻿'use client';
 
-import { apiFetch } from '@/api';
-
-import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import {
-  App as AntdApp,
   Alert,
+  App as AntdApp,
   Button,
   Card,
   Checkbox,
@@ -22,6 +18,10 @@ import {
   Steps,
   Typography,
 } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 import PageContainer from '@/components/PageContainer';
 
@@ -87,6 +87,23 @@ interface ExamRegistrationFormValues {
 
 type StepKey = 0 | 1 | 2;
 
+
+type ErrorBody = { detail?: string; message?: string };
+
+function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
+
+function parseErrorBody(value: unknown): ErrorBody {
+  if (!value || typeof value !== 'object') return {};
+  const body = value as Record<string, unknown>;
+  return {
+    detail: typeof body.detail === 'string' ? body.detail : undefined,
+    message: typeof body.message === 'string' ? body.message : undefined,
+  };
+}
+
+
 const steps: { key: StepKey; title: string; description?: string }[] = [
   { key: 0, title: 'Choose exam', description: 'Select the certification you want to attempt.' },
   {
@@ -137,8 +154,8 @@ const ExamRegistrationPageInner: React.FC = () => {
 
         const data = (await res.json()) as CertificationPath[];
         setPaths(data);
-      } catch (err: any) {
-        const msg = err?.message ?? 'Failed to load certification programs.';
+      } catch (err: unknown) {
+        const msg = errorMessage(err, 'Failed to load certification programs.');
         setPathsError(msg);
         messageApi.error(msg);
       } finally {
@@ -236,8 +253,8 @@ const ExamRegistrationPageInner: React.FC = () => {
 
         const data = (await res.json()) as ExamSession[];
         setSessions(data);
-      } catch (err: any) {
-        const msg = err?.message ?? 'Failed to load exam sessions.';
+      } catch (err: unknown) {
+        const msg = errorMessage(err, 'Failed to load exam sessions.');
         setSessionsError(msg);
         messageApi.error(msg);
       } finally {
@@ -314,7 +331,7 @@ const ExamRegistrationPageInner: React.FC = () => {
 
       if (res.status === 409) {
         // Conflict: cooldown, already passed, capacity reached, etc.
-        const errorBody = (await res.json().catch(() => null)) as any;
+        const errorBody = parseErrorBody(await res.json().catch(() => null));
         const detail: string =
           errorBody?.detail ||
           errorBody?.message ||
@@ -324,12 +341,12 @@ const ExamRegistrationPageInner: React.FC = () => {
         return;
       }
 
-      const errorBody = (await res.json().catch(() => null)) as any;
+      const errorBody = parseErrorBody(await res.json().catch(() => null));
       const detail: string =
         errorBody?.detail || errorBody?.message || 'Failed to complete registration.';
       messageApi.error(detail);
-    } catch (err: any) {
-      const msg = err?.message ?? 'Unexpected error while registering for the exam.';
+    } catch (err: unknown) {
+      const msg = errorMessage(err, 'Unexpected error while registering for the exam.');
       messageApi.error(msg);
     } finally {
       setSubmitting(false);

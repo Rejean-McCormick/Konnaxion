@@ -1,17 +1,18 @@
 // FILE: frontend/app/ekoh/voting-influence/current-voting-weight/page.tsx
 'use client';
 
+import { Card, Col, List, Row, Statistic, Typography } from 'antd';
 import React from 'react';
-import { Card, Statistic, Row, Col, Typography, List } from 'antd';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from 'recharts';
+
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 const { Title, Paragraph } = Typography;

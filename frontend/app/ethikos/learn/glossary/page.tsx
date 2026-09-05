@@ -1,12 +1,13 @@
 // FILE: frontend/app/ethikos/learn/glossary/page.tsx
 'use client';
 
-import { useMemo, useState } from 'react';
+import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';
 import {
   PageContainer,
-  ProTable,
   type ProColumns,
+  ProTable,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   Button,
@@ -19,8 +20,7 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { DownloadOutlined, SyncOutlined } from '@ant-design/icons';
-import { useRequest } from 'ahooks';
+import { useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import { fetchGlossary, type GlossaryItem } from '@/services/learn';

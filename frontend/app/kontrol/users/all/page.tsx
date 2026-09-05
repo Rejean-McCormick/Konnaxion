@@ -1,36 +1,37 @@
 // FILE: frontend/app/kontrol/users/all/page.tsx
 'use client';
 
-import React, { useRef, useState } from 'react';
-import {
-  Tag,
-  Button,
-  Dropdown,
-  message,
-  Drawer,
-  Descriptions,
-  Space,
-  Avatar,
-  Typography,
-  Badge,
-  Tabs,
-  List,
-  Empty,
-} from 'antd';
 import {
   EllipsisOutlined,
+  HistoryOutlined,
+  LockOutlined,
+  SafetyCertificateOutlined,
+  StopOutlined,
   UserAddOutlined,
   UserOutlined,
-  StopOutlined,
-  HistoryOutlined,
-  SafetyCertificateOutlined,
-  LockOutlined,
 } from '@ant-design/icons';
 import {
-  ProTable,
-  type ProColumns,
   type ActionType,
+  type ProColumns,
+  ProTable,
 } from '@ant-design/pro-components';
+import {
+  Avatar,
+  Badge,
+  Button,
+  Descriptions,
+  Drawer,
+  Dropdown,
+  Empty,
+  List,
+  message,
+  Space,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd';
+import React, { useRef, useState } from 'react';
+
 import KontrolPageShell from '@/app/kontrol/KontrolPageShell';
 
 const { Text } = Typography;
@@ -46,6 +47,18 @@ type UserItem = {
   joinedAt: string;
   lastLogin: string;
   reputationScore: number;
+};
+
+type UserApiRecord = {
+  id?: number;
+  username?: string;
+  email?: string;
+  is_superuser?: boolean;
+  is_staff?: boolean;
+  is_active?: boolean;
+  joined_at?: string;
+  last_login?: string | null;
+  reputation_score?: number;
 };
 
 type UsersApiResponse = {
@@ -274,7 +287,7 @@ export default function AllUsersPage(): JSX.Element {
 
             const mappedData: UserItem[] = results
               .map((u) => {
-                const user = u as any;
+                const user = u as UserApiRecord;
 
                 let role: UserItem['role'] = 'user';
                 if (user.is_superuser) role = 'admin';
@@ -294,12 +307,12 @@ export default function AllUsersPage(): JSX.Element {
                 }
 
                 return {
-                  id: user.id,
-                  username: user.username,
-                  email: user.email,
+                  id: user.id ?? 0,
+                  username: user.username ?? 'Unknown',
+                  email: user.email ?? '',
                   role,
                   status,
-                  joinedAt: user.joined_at,
+                  joinedAt: user.joined_at ?? '',
                   lastLogin: user.last_login || 'Never',
                   reputationScore: user.reputation_score || 0,
                 } as UserItem;
@@ -312,7 +325,7 @@ export default function AllUsersPage(): JSX.Element {
               total: mappedData.length,
             };
           } catch (error) {
-            // eslint-disable-next-line no-console
+             
             console.error(error);
             message.error('Error loading users list');
             return { data: [], success: false };

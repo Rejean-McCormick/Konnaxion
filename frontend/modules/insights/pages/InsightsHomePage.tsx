@@ -1,7 +1,8 @@
 // FILE: frontend/modules/insights/pages/InsightsHomePage.tsx
 
-import MainLayout from "@/shared/layout/MainLayout";
 import Link from "next/link";
+
+import MainLayout from "@/shared/layout/MainLayout";
 
 export default function InsightsHomePage() {
   const links = [

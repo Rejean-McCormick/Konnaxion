@@ -1,7 +1,7 @@
 'use client'
 
-import { Card, Empty, Space, Spin, Typography } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
+import { Card, Empty, Space, Spin, Typography } from 'antd'
 
 const { Text } = Typography
 

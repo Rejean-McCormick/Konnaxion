@@ -1,11 +1,19 @@
 // FILE: frontend/app/teambuilder/problems/taxonomy/page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  BookOutlined,
+  FilterOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+  SaveOutlined,
+  TagOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Button,
   Card,
+  Cascader,
   Col,
   Divider,
   Input,
@@ -16,19 +24,11 @@ import {
   Tooltip,
   Tree,
   TreeSelect,
-  Cascader,
   Typography,
 } from 'antd';
-import type { DataNode } from 'antd/es/tree';
 import type { DefaultOptionType } from 'antd/es/cascader';
-import {
-  BookOutlined,
-  FilterOutlined,
-  InfoCircleOutlined,
-  ReloadOutlined,
-  SaveOutlined,
-  TagOutlined,
-} from '@ant-design/icons';
+import type { DataNode } from 'antd/es/tree';
+import React, { useMemo, useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 

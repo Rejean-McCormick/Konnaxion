@@ -1,12 +1,19 @@
 // FILE: frontend/app/ethikos/pulse/overview/page.tsx
 'use client';
 
-import type { ReactNode } from 'react';
+import {
+  BarChartOutlined,
+  ClockCircleOutlined,
+  InfoCircleOutlined,
+  LineChartOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   StatisticCard,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   Badge,
@@ -19,19 +26,12 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  BarChartOutlined,
-  ClockCircleOutlined,
-  InfoCircleOutlined,
-  LineChartOutlined,
-  SyncOutlined,
-} from '@ant-design/icons';
-import { useRequest } from 'ahooks';
 import dayjs from 'dayjs';
+import type { ReactNode } from 'react';
 
+import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import ChartCard from '@/components/charts/ChartCard';
 import { fetchPulseOverview } from '@/services/pulse';
-import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 
 const { Text } = Typography;
 

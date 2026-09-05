@@ -2,12 +2,12 @@
 'use client'
 
 import {
-  type KeyboardEvent,
-  type ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react'
+  BranchesOutlined,
+  DownOutlined,
+  MessageOutlined,
+  PlusOutlined,
+  RightOutlined,
+} from '@ant-design/icons'
 import {
   Button,
   Card,
@@ -18,12 +18,12 @@ import {
   Tooltip,
 } from 'antd'
 import {
-  BranchesOutlined,
-  DownOutlined,
-  MessageOutlined,
-  PlusOutlined,
-  RightOutlined,
-} from '@ant-design/icons'
+  type KeyboardEvent,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react'
 
 import type { ArgumentSide, EthikosArgumentApi } from '@/services/ethikos'
 
@@ -414,7 +414,7 @@ export default function ArgumentTree({
   function toggleCollapsed(id: string) {
     setCollapsedIds((current) => {
       if (current.has(id)) {
-        return new Set([...current].filter((currentId) => currentId !== id))
+        return new Set(Array.from(current).filter((currentId) => currentId !== id))
       }
 
       const next = new Set(current)

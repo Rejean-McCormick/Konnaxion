@@ -1,20 +1,20 @@
 // FILE: frontend/context/ThemeContext.tsx
 'use client'
 
+import { App as AntdApp, theme as antdTheme, ConfigProvider } from 'antd'
+import enUS from 'antd/locale/en_US'
 import React, {
   createContext,
-  useContext,
-  useState,
-  useLayoutEffect,
-  useEffect,
-  useMemo,
   type ReactNode,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
 } from 'react'
-import { ConfigProvider, theme as antdTheme, App as AntdApp } from 'antd'
-import enUS from 'antd/locale/en_US'
 
-import { themeById, defaultTheme } from '@/theme'
-import type { Theme as ThemeModel, ThemeId, ThemeColors } from '@/theme/types'
+import { defaultTheme, themeById } from '@/theme'
+import type { ThemeColors, ThemeId, Theme as ThemeModel } from '@/theme/types'
 
 /** Theme ids from the registry */
 type ThemeType = ThemeId
@@ -37,7 +37,7 @@ type TokenBag = ThemeColors & {
 }
 
 /** Custom CSS variables to export on <html> */
-const cssVars = ['bgMain', 'bgLight', 'bgDark', 'textMain', 'accent'] as const
+const cssVars = ['bgMain', 'bgLight', 'bgDark', 'textMain', 'accent', 'brand', 'brandText'] as const
 type CssVarKey = (typeof cssVars)[number]
 
 /** All known theme keys from the registry */
@@ -61,7 +61,7 @@ export const useTheme = (): ThemeContextProps => {
 }
 
 /** Strip keys whose value is an empty object */
-const pruneEmptyObjects = <T extends Record<string, any>>(obj: T): T =>
+const pruneEmptyObjects = <T extends Record<string, unknown>>(obj: T): T =>
   Object.fromEntries(
     Object.entries(obj).filter(
       ([, v]) => v && (typeof v !== 'object' || Object.keys(v).length > 0),
@@ -143,6 +143,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       bgDark: tokenBag.bgDark,
       textMain: tokenBag.textMain,
       accent: tokenBag.accent,
+      brand: tokenBag.brand,
+      brandText: tokenBag.textOnBrand,
     }
 
     cssVars.forEach(key => {

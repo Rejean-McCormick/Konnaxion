@@ -1,10 +1,10 @@
 // FILE: frontend/modules/ethikos/pulse/live/page.tsx
 'use client';
 
-import { useEffect } from 'react';
 import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
-import { Badge, Space } from 'antd';
 import { useRequest } from 'ahooks';
+import { Badge, Space } from 'antd';
+import { useEffect } from 'react';
 
 import ChartCard from '@/components/charts/ChartCard';
 import usePageTitle from '@/hooks/usePageTitle';

@@ -2,9 +2,10 @@
 'use client'
 
 // app/ekoh/expertise-areas/view-current-expertise/page.tsx
-import React from 'react';
-import Head from 'next/head';
 import { Card, List, Progress, Tag } from 'antd';
+import Head from 'next/head';
+import React from 'react';
+
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 // Exemple de données simulées pour l'expertise de l'utilisateur

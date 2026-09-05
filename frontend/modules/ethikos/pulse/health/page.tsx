@@ -1,9 +1,10 @@
 // FILE: frontend/modules/ethikos/pulse/health/page.tsx
 'use client'
 
-import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { Pie, Radar } from '@ant-design/plots';
+import { PageContainer, ProCard } from '@ant-design/pro-components';
 import { useRequest } from 'ahooks';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchPulseHealth } from '@/services/pulse';
 

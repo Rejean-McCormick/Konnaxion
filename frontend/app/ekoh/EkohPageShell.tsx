@@ -2,8 +2,8 @@
 // app/ekoh/EkohPageShell.tsx
 'use client';
 
+import { Space, Typography } from 'antd';
 import React, { ReactNode } from 'react';
-import { Typography, Space } from 'antd';
 
 const { Title, Paragraph } = Typography;
 

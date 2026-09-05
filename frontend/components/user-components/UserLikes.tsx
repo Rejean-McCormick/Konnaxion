@@ -8,11 +8,11 @@
  * Author: Hieu Chu
  */
 
-import React, { useMemo } from 'react';
+import { Avatar, Card, Empty, List, Tooltip, Typography } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Card, List, Tooltip, Empty, Avatar, Typography } from 'antd';
 import Link from 'next/link';
+import React, { useMemo } from 'react';
 
 dayjs.extend(relativeTime);
 

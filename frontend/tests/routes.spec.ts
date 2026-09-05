@@ -1,8 +1,10 @@
 // FILE: frontend/tests/routes.spec.ts
 // tests/routes.spec.ts
-import { expect, test, type Page, type Response } from '@playwright/test';
+import { expect, type Page, type Response, test } from '@playwright/test';
+
 import fs from 'fs';
 import path from 'path';
+
 import { normalizeError } from '../shared/errors';
 
 type ConsoleLog = {

@@ -2,19 +2,21 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import { HeartFilled, HeartOutlined } from '@ant-design/icons';
 import {
-  Row,
-  Col,
+  Button,
   Card,
+  Col,
   Modal,
   Pagination,
-  Tabs,
-  Button,
-  Typography,
+  Row,
   Space,
+  Tabs,
+  Typography,
 } from 'antd';
-import { HeartOutlined, HeartFilled } from '@ant-design/icons';
+import Image from 'next/image';
+import React, { useMemo, useState } from 'react';
+
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 
 const { Title, Text, Paragraph } = Typography;
@@ -179,10 +181,13 @@ export default function InspirationGalleryPage(): JSX.Element {
             <Card
               hoverable
               cover={
-                <img
+                <Image
                   alt={work.title}
                   src={work.imageUrl}
-                  style={{ height: 200, objectFit: 'cover' }}
+                  width={400}
+                  height={200}
+                  unoptimized
+                  style={{ width: '100%', height: 200, objectFit: 'cover' }}
                 />
               }
               actions={[
@@ -236,10 +241,13 @@ export default function InspirationGalleryPage(): JSX.Element {
       <Modal open={modalVisible} footer={null} onCancel={closeModal} width={800}>
         {selectedWork && (
           <>
-            <img
+            <Image
               alt={selectedWork.title}
               src={selectedWork.imageUrl}
-              style={{ width: '100%', maxHeight: 400, objectFit: 'contain' }}
+              width={800}
+              height={400}
+              unoptimized
+              style={{ width: '100%', height: 400, objectFit: 'contain' }}
             />
             <div style={{ marginTop: 16 }}>
               <Title level={3}>{selectedWork.title}</Title>

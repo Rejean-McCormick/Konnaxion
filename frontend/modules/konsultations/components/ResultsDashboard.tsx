@@ -15,6 +15,7 @@ import {
   Timeline,
   Typography,
 } from 'antd';
+
 import {
   useConsultation,
   useConsultationResults,
@@ -68,6 +69,23 @@ interface SuggestionItem {
   supportCount?: number;
 }
 
+type QueryState<T> = {
+  data?: T;
+  loading?: boolean;
+  error?: Error;
+};
+
+type CollectionState<T> = {
+  data?: { items?: T[] };
+  items?: T[];
+  loading?: boolean;
+  error?: Error;
+};
+
+type DashboardHook<TState> = (
+  consultationId?: string | number,
+) => TState | undefined;
+
 export interface ResultsDashboardProps {
   consultationId?: string | number;
 }
@@ -110,12 +128,24 @@ function formatDateRange(openDate?: string, closeDate?: string): string | null {
 export default function ResultsDashboard({
   consultationId,
 }: ResultsDashboardProps) {
-  // Hooks are currently stubs; casting via `any` keeps this component tolerant
-  // until the Konsultations hooks are fully implemented.
-  const consultationState = (useConsultation as any)(consultationId) || {};
-  const resultsState = (useConsultationResults as any)(consultationId) || {};
-  const impactState = (useImpact as any)(consultationId) || {};
-  const suggestionsState = (useSuggestions as any)(consultationId) || {};
+  // Hooks are currently lightweight adapters; use explicit local contracts
+  // until the Konsultations hooks expose stable exported result types.
+  const consultationState =
+    (useConsultation as unknown as DashboardHook<QueryState<ConsultationSummary>>)(
+      consultationId,
+    ) ?? {};
+  const resultsState =
+    (useConsultationResults as unknown as DashboardHook<QueryState<ConsultationResults>>)(
+      consultationId,
+    ) ?? {};
+  const impactState =
+    (useImpact as unknown as DashboardHook<CollectionState<ImpactItem>>)(
+      consultationId,
+    ) ?? {};
+  const suggestionsState =
+    (useSuggestions as unknown as DashboardHook<CollectionState<SuggestionItem>>)(
+      consultationId,
+    ) ?? {};
 
   const consultation = consultationState.data as ConsultationSummary | undefined;
   const consultationLoading = Boolean(consultationState.loading);

@@ -1,10 +1,11 @@
 // FILE: frontend/app/konnected/learning-paths/manage-existing-paths/page.tsx
 ﻿'use client';
 
-import { apiFetch } from '@/api';
-
-import React, { useRef, useState } from 'react';
-import Link from 'next/link';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import {
@@ -12,18 +13,17 @@ import {
   Empty,
   Form,
   Input,
+  message,
   Modal,
   Select,
   Space,
   Tag,
   Typography,
-  message,
 } from 'antd';
-import {
-  DeleteOutlined,
-  EditOutlined,
-  PlusOutlined,
-} from '@ant-design/icons';
+import Link from 'next/link';
+import React, { useRef, useState } from 'react';
+
+import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Paragraph, Text } = Typography;
@@ -175,6 +175,18 @@ function formatDate(iso?: string): string {
   return date.toLocaleDateString();
 }
 
+function errorMessage(error: unknown, fallback: string): string {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
+
+function isFormValidationError(error: unknown): error is { errorFields: unknown } {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'errorFields' in error
+  );
+}
+
 export default function ManageExistingPathsPage(): JSX.Element {
   const actionRef = useRef<ActionType>();
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -206,10 +218,10 @@ export default function ManageExistingPathsPage(): JSX.Element {
       setEditingPath(null);
       editForm.resetFields();
       actionRef.current?.reload();
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Ignore validation errors (they’re already shown by antd)
-      if (err?.errorFields) return;
-      message.error(err?.message || 'Failed to update learning path.');
+      if (isFormValidationError(err)) return;
+      message.error(errorMessage(err, 'Failed to update learning path.'));
     } finally {
       setEditSubmitting(false);
     }
@@ -226,8 +238,8 @@ export default function ManageExistingPathsPage(): JSX.Element {
           await archiveLearningPath(record.id);
           message.success('Learning path archived.');
           actionRef.current?.reload();
-        } catch (err: any) {
-          message.error(err?.message || 'Failed to archive learning path.');
+        } catch (err: unknown) {
+          message.error(errorMessage(err, 'Failed to archive learning path.'));
         }
       },
     });
@@ -245,8 +257,8 @@ export default function ManageExistingPathsPage(): JSX.Element {
           await deleteLearningPath(record.id);
           message.success('Learning path deleted.');
           actionRef.current?.reload();
-        } catch (err: any) {
-          message.error(err?.message || 'Failed to delete learning path.');
+        } catch (err: unknown) {
+          message.error(errorMessage(err, 'Failed to delete learning path.'));
         }
       },
     });
@@ -458,8 +470,8 @@ export default function ManageExistingPathsPage(): JSX.Element {
               total,
               success: true,
             };
-          } catch (err: any) {
-            message.error(err?.message || 'Failed to load learning paths.');
+          } catch (err: unknown) {
+            message.error(errorMessage(err, 'Failed to load learning paths.'));
             return {
               data: [],
               total: 0,

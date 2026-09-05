@@ -1,19 +1,14 @@
 {
   "schema": "levelupdiag.campaign-summary.v2",
-  "campaign": "connection-debug",
-  "selection": "connection-debug",
-  "verdict": "ERROR",
-  "run_id": "20260903T164601-84e3ab3e",
-  "started_at": "2026-09-03T16:46:01-04:00",
-  "ended_at": "2026-09-03T17:06:57-04:00",
+  "campaign": "console-custom",
+  "selection": "console-custom",
+  "verdict": "WARN",
+  "run_id": "20260904T190345-bfe37f10",
+  "started_at": "2026-09-04T19:03:45-04:00",
+  "ended_at": "2026-09-04T19:06:56-04:00",
   "expected_levels": [
     "N00",
-    "N01",
-    "N02",
-    "N03",
-    "N04",
     "N05",
-    "N06",
     "N11"
   ],
   "levels": [
@@ -23,57 +18,22 @@
       "verdict": "PASS"
     },
     {
-      "id": "N01",
-      "name": "Repository & Static",
-      "verdict": "PASS"
-    },
-    {
-      "id": "N02",
-      "name": "Backend / Django / DB",
-      "verdict": "PASS"
-    },
-    {
-      "id": "N03",
-      "name": "Frontend / Next",
-      "verdict": "FAIL"
-    },
-    {
-      "id": "N04",
-      "name": "API Contracts",
-      "verdict": "PASS"
-    },
-    {
       "id": "N05",
       "name": "Runtime & Browser",
       "verdict": "WARN"
     },
     {
-      "id": "N06",
-      "name": "Jobs / Redis / Celery",
-      "verdict": "PASS"
-    },
-    {
       "id": "N11",
       "name": "Correlation & Triage",
-      "verdict": "FAIL"
+      "verdict": "WARN"
     }
   ],
   "target_repo_root": "C:\\mycode\\Konnaxion\\Konnaxion",
   "retention": "current_only",
   "sequence": [
     "N00",
-    "N01",
-    "N02",
-    "N03",
-    "N04",
     "N05",
-    "N06",
     "N11"
   ],
-  "target_protection": {
-    "verdict": "ERROR",
-    "message": "Tracked Git state changed during diagnostics.",
-    "before": " M frontend/app/keenkonnect/knowledge/upload-new-document/page.tsx\n M frontend/app/keenkonnect/projects/create-new-project/page.tsx\n M frontend/app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx\n M frontend/app/keenkonnect/workspaces/launch-new-workspace/page.tsx\n M frontend/app/konnected/learning-library/offline-content/page.tsx\n M frontend/jest.config.ts\n M frontend/modules/ethikos/components/ArgumentTree.tsx\n M frontend/modules/konsensus/pages/PollPage.tsx\n M frontend/modules/konsultations/components/ConsultationForm.tsx\n",
-    "after": " M .levelupdiag/current/levels/n00/result.json\n M .levelupdiag/current/levels/n01/result.json\n M .levelupdiag/current/levels/n02/result.json\n M .levelupdiag/current/levels/n03/result.json\n M .levelupdiag/current/levels/n04/result.json\n M .levelupdiag/current/levels/n05/result.json\n M .levelupdiag/current/levels/n06/result.json\n M .levelupdiag/current/levels/n11/result.json\n D .levelupdiag/current/summary.json\n D .levelupdiag/current/summary.txt\n M .levelupdiag/konnaxion/active-session.json\n M .levelupdiag/latest/n00/result.json\n M .levelupdiag/latest/n01/result.json\n M .levelupdiag/latest/n02/result.json\n M .levelupdiag/latest/n03/result.json\n M .levelupdiag/latest/n04/result.json\n M .levelupdiag/latest/n05/result.json\n M .levelupdiag/latest/n06/result.json\n M .levelupdiag/latest/n11/result.json\n M frontend/app/keenkonnect/knowledge/upload-new-document/page.tsx\n M frontend/app/keenkonnect/projects/create-new-project/page.tsx\n M frontend/app/keenkonnect/sustainability-impact/submit-impact-reports/page.tsx\n M frontend/app/keenkonnect/workspaces/launch-new-workspace/page.tsx\n M frontend/app/konnected/learning-library/offline-content/page.tsx\n M frontend/frontend_endpoints.csv\n M frontend/frontend_endpoints.json\n M frontend/jest.config.ts\n M frontend/modules/ethikos/components/ArgumentTree.tsx\n M frontend/modules/konsensus/pages/PollPage.tsx\n M frontend/modules/konsultations/components/ConsultationForm.tsx\n M frontend/storageState.json\n"
-  }
+  "target_protection": null
 }

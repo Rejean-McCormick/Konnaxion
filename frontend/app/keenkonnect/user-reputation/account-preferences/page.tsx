@@ -2,24 +2,25 @@
 ﻿// app/keenkonnect/user-reputation/account-preferences/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import { UploadOutlined } from '@ant-design/icons';
 import {
-  Tabs,
-  Upload,
-  Switch,
-  Checkbox,
+  message as antdMessage,
   Button,
-  Modal,
-  Radio,
+  Checkbox,
   Form,
   Input,
-  message as antdMessage,
+  Modal,
+  Radio,
+  Switch,
+  Tabs,
+  Upload,
 } from 'antd';
 import type { TabsProps } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { UploadOutlined } from '@ant-design/icons';
-import { uploadUserAvatar } from '@/services/user';
+import React, { useState } from 'react';
+
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
+import { uploadUserAvatar } from '@/services/user';
 
 const { TextArea } = Input;
 
@@ -77,11 +78,13 @@ const privacySharingOptions = [
 ];
 
 // ✅ Always return UploadFile[]
-const normFile = (e: any): UploadFile[] => {
-  if (Array.isArray(e)) {
-    return e as UploadFile[];
+const normFile = (event: unknown): UploadFile[] => {
+  if (Array.isArray(event)) return event as UploadFile[];
+  if (event && typeof event === 'object' && 'fileList' in event) {
+    const fileList = (event as { fileList?: unknown }).fileList;
+    return Array.isArray(fileList) ? (fileList as UploadFile[]) : [];
   }
-  return (e?.fileList ?? []) as UploadFile[];
+  return [];
 };
 
 export default function AccountPreferencesPage(): JSX.Element {
@@ -99,12 +102,12 @@ export default function AccountPreferencesPage(): JSX.Element {
 
       // TODO: wire name / headline / bio to a real profile endpoint
       // when the backend fields are available.
-      // eslint-disable-next-line no-console
+       
       console.log('Profile info submitted:', values);
 
       antdMessage.success('Profile information updated successfully.');
     } catch (error) {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to update profile', error);
       antdMessage.error(
         'Unable to update profile for now. Please try again later.',
@@ -113,19 +116,19 @@ export default function AccountPreferencesPage(): JSX.Element {
   };
 
   const onFinishSecurity = (values: SecurityFormValues) => {
-    // eslint-disable-next-line no-console
+     
     console.log('Security settings submitted:', values);
     antdMessage.success('Security settings updated successfully.');
   };
 
   const onFinishNotifications = (values: NotificationFormValues) => {
-    // eslint-disable-next-line no-console
+     
     console.log('Notification settings submitted:', values);
     antdMessage.success('Notification preferences updated successfully.');
   };
 
   const onFinishPrivacy = (values: PrivacyFormValues) => {
-    // eslint-disable-next-line no-console
+     
     console.log('Privacy settings submitted:', values);
     antdMessage.success('Privacy preferences updated successfully.');
   };
@@ -141,7 +144,7 @@ export default function AccountPreferencesPage(): JSX.Element {
   };
 
   const handleDeleteConfirm = () => {
-    // eslint-disable-next-line no-console
+     
     console.log('Account deletion requested');
     antdMessage.success(
       'Account deletion requested. We will contact you shortly.',

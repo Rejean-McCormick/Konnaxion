@@ -1,11 +1,16 @@
 // FILE: frontend/app/konnected/community-discussions/moderation/page.tsx
 ﻿'use client';
 
-import React, { useMemo, useState } from 'react';
-import type { ReactNode } from 'react';
-import { useRequest } from 'ahooks';
+import {
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  EyeOutlined,
+  ReloadOutlined,
+  StopOutlined,
+} from '@ant-design/icons';
 import { ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   App as AntdApp,
@@ -19,15 +24,11 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  CheckCircleOutlined,
-  ExclamationCircleOutlined,
-  EyeOutlined,
-  ReloadOutlined,
-  StopOutlined,
-} from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
-import { fetchModerationQueue, actOnReport } from '@/services/admin';
+import { actOnReport, fetchModerationQueue } from '@/services/admin';
 
 const { Text, Paragraph } = Typography;
 
@@ -69,6 +70,35 @@ interface ModerationQueueItem {
   severity?: Severity;
 }
 
+
+type UnknownRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is UnknownRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function optionalString(value: unknown): string | undefined {
+  return value == null ? undefined : String(value);
+}
+
+function optionalNumber(value: unknown): number | undefined {
+  return typeof value === 'number' ? value : undefined;
+}
+
+function normalizeTargetType(value: unknown): ModerationTargetType {
+  return value === 'topic' || value === 'user' || value === 'post' ? value : 'post';
+}
+
+function normalizeSeverity(value: unknown): Severity {
+  return value === 'low' || value === 'high' || value === 'medium' ? value : 'medium';
+}
+
+function isUnauthorizedError(value: unknown): boolean {
+  if (!isRecord(value)) return false;
+  if (value.status === 403) return true;
+  return isRecord(value.response) && value.response.status === 403;
+}
+
 /**
  * Adapt the existing admin moderation payload into the richer
  * ModerationQueueItem shape expected by the KonnectED UI.
@@ -78,46 +108,35 @@ interface ModerationQueueItem {
  * backend fields with zero changes on the frontend.
  */
 function adaptModerationItems(raw: unknown): ModerationQueueItem[] {
-  const items = Array.isArray(raw)
+  const items: unknown[] = Array.isArray(raw)
     ? raw
-    : Array.isArray((raw as any)?.items)
-    ? (raw as any).items
-    : [];
+    : isRecord(raw) && Array.isArray(raw.items)
+      ? raw.items
+      : [];
 
-  return items.map((item: any): ModerationQueueItem => {
+  return items.filter(isRecord).map((item): ModerationQueueItem => {
     const status: ModerationStatus =
       item.status === 'Resolved' || item.status === 'Escalated'
         ? item.status
         : 'Pending';
 
-    // Basic heuristics to enrich from whatever the backend gives us
-    const targetType: ModerationTargetType =
-      (item.targetType as ModerationTargetType) ??
-      (item.entityType as ModerationTargetType) ??
-      'post';
-
-    const severity: Severity =
-      (item.severity as Severity) ??
-      (item.priority as Severity) ??
-      'medium';
-
     return {
-      id: String(item.id),
-      targetType,
-      targetId: String(item.targetId ?? item.postId ?? item.topicId ?? item.userId ?? item.id),
-      contextTitle: item.contextTitle ?? item.threadTitle ?? item.topicTitle,
-      contentPreview: item.content ?? item.contentSnippet ?? item.preview,
-      authorName: item.authorName ?? item.offenderName ?? item.user,
-      authorId: item.authorId ?? item.offenderId,
-      reporterName: item.reporterName ?? item.reporter,
-      reporterId: item.reporterId,
-      reason: item.type ?? item.reason,
-      reporterMessage: item.message ?? item.notes,
-      reportCount: item.reportCount ?? item.count ?? 1,
-      createdAt: item.createdAt ?? item.created_at ?? item.timestamp,
-      lastActionAt: item.lastActionAt ?? item.updated_at,
+      id: String(item.id ?? ''),
+      targetType: normalizeTargetType(item.targetType ?? item.entityType),
+      targetId: String(item.targetId ?? item.postId ?? item.topicId ?? item.userId ?? item.id ?? ''),
+      contextTitle: optionalString(item.contextTitle ?? item.threadTitle ?? item.topicTitle),
+      contentPreview: optionalString(item.content ?? item.contentSnippet ?? item.preview),
+      authorName: optionalString(item.authorName ?? item.offenderName ?? item.user),
+      authorId: optionalString(item.authorId ?? item.offenderId),
+      reporterName: optionalString(item.reporterName ?? item.reporter),
+      reporterId: optionalString(item.reporterId),
+      reason: optionalString(item.type ?? item.reason),
+      reporterMessage: optionalString(item.message ?? item.notes),
+      reportCount: optionalNumber(item.reportCount ?? item.count) ?? 1,
+      createdAt: optionalString(item.createdAt ?? item.created_at ?? item.timestamp),
+      lastActionAt: optionalString(item.lastActionAt ?? item.updated_at),
       status,
-      severity,
+      severity: normalizeSeverity(item.severity ?? item.priority),
     };
   });
 }
@@ -147,9 +166,7 @@ export default function CommunityModerationPage(): JSX.Element {
     return items.filter((item) => item.status === activeStatusFilter);
   }, [items, activeStatusFilter]);
 
-  const unauthorized =
-    (error as any)?.response?.status === 403 ||
-    (error as any)?.status === 403;
+  const unauthorized = isUnauthorizedError(error);
 
   const onSingleAction = async (
     record: ModerationQueueItem,
@@ -166,7 +183,7 @@ export default function CommunityModerationPage(): JSX.Element {
           : 'Content approved and report resolved.',
       );
       await refresh();
-    } catch (e) {
+    } catch {
       message.error('Unable to process moderation action. Please try again.');
     } finally {
       setGlobalActionLoading(false);

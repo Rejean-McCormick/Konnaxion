@@ -1,7 +1,6 @@
 // FILE: frontend/routes/routesKreative.tsx
 "use client";
 
-import React from "react";
 import {
   BankOutlined,
   BulbOutlined,
@@ -20,6 +19,7 @@ import {
   TeamOutlined,
   UserSwitchOutlined,
 } from "@ant-design/icons";
+import React from "react";
 
 import type { Route } from "./types";
 

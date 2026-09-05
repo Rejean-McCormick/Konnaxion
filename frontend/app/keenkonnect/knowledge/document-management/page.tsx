@@ -1,24 +1,7 @@
 // C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  Avatar,
-  Button,
-  Card,
-  Col,
-  Divider,
-  Drawer,
-  Input,
-  List,
-  Row,
-  Space,
-  Switch,
-  Tag,
-  Tooltip,
-  message,
-} from 'antd';
+import { Comment } from '@ant-design/compatible';
 import {
   EyeOutlined,
   PlusOutlined,
@@ -28,13 +11,31 @@ import {
 import {
   EditableProTable,
   ModalForm,
+  type ProColumns,
   ProFormSelect,
   ProFormSwitch,
   ProFormText,
   ProFormTextArea,
-  type ProColumns,
 } from '@ant-design/pro-components';
-import { Comment } from '@ant-design/compatible';
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Drawer,
+  Input,
+  List,
+  message,
+  Row,
+  Space,
+  Switch,
+  Tag,
+  Tooltip,
+} from 'antd';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { TextArea } = Input;
@@ -248,14 +249,14 @@ export default function DocumentManagementPage() {
   const handleSaveChanges = () => {
     if (!selectedDocument) return;
     // Simulation d’un appel API
-    // eslint-disable-next-line no-console
+     
     console.log('Saving changes for document', selectedDocument.id);
     message.success('Changes saved (simulated).');
   };
 
   const handlePublishNewVersion = () => {
     if (!selectedDocument) return;
-    // eslint-disable-next-line no-console
+     
     console.log('Publishing new version for document', selectedDocument.id);
     message.success('New version published (simulated).');
   };
@@ -424,7 +425,10 @@ export default function DocumentManagementPage() {
         <a
           key="edit"
           onClick={() => {
-            (action as any)?.startEditable?.(record.id);
+            const editableAction = action as
+              | { startEditable?: (key: React.Key) => void }
+              | undefined;
+            editableAction?.startEditable?.(record.id);
           }}
         >
           Edit

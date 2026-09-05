@@ -1,13 +1,15 @@
 "use client";
 
-import React from "react";
-import { Card, Spin, Alert, message } from "antd";
 import { useQueryClient } from "@tanstack/react-query";
+import { Alert, Card, message, Spin } from "antd";
+import React from "react";
+
 import { apiPost } from "@/api";
-import { usePoll, DEFAULT_POLL_ID, pollConfig } from "../hooks/usePoll";
-import useLivePoll from "../hooks/useLivePoll";
-import VoteButtons from "../components/VoteButtons";
+
 import PollBarChart from "../components/PollBarChart";
+import VoteButtons from "../components/VoteButtons";
+import useLivePoll from "../hooks/useLivePoll";
+import { DEFAULT_POLL_ID, pollConfig, usePoll } from "../hooks/usePoll";
 
 const LIVE_POLL_INTERVAL_MS = 15_000;
 
@@ -50,7 +52,7 @@ export default function PollPage() {
       queryClient.invalidateQueries({ queryKey: ["poll", pollId] });
       message.success("Your vote has been recorded.");
     } catch (e) {
-      // eslint-disable-next-line no-console
+       
       console.error("Vote submission failed", e);
       message.error("Unable to record your vote. Please try again.");
     }

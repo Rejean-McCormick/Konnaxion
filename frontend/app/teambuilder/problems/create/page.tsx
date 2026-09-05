@@ -1,26 +1,6 @@
 // frontend/app/teambuilder/problems/create/page.tsx
 'use client';
 
-import React, { useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  Col,
-  Divider,
-  Form,
-  Input,
-  InputNumber,
-  Row,
-  Select,
-  Space,
-  Steps,
-  Switch,
-  Tag,
-  TreeSelect,
-  Typography,
-  message,
-} from 'antd';
 import {
   ArrowLeftOutlined,
   CheckOutlined,
@@ -31,12 +11,31 @@ import {
   ScheduleOutlined,
   TagsOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Row,
+  Select,
+  Space,
+  Steps,
+  Switch,
+  Tag,
+  TreeSelect,
+  Typography,
+} from 'antd';
+import React, { useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
 
 const { TextArea } = Input;
-const { Title, Paragraph, Text } = Typography;
-const { Step } = Steps;
+const { Paragraph, Text } = Typography;
 
 type ProblemFormValues = {
   title: string;
@@ -129,7 +128,7 @@ export default function CreateProblemPage(): JSX.Element {
 
   const handleFinish = async (values: ProblemFormValues) => {
     // Later: call API; for now, just simulate.
-    // eslint-disable-next-line no-console
+     
     console.log('Problem payload:', values, 'submitMode:', submitting);
 
     const modeLabel =

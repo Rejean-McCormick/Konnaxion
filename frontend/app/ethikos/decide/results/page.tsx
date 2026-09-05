@@ -1,15 +1,23 @@
 // FILE: frontend/app/ethikos/decide/results/page.tsx
 'use client';
 
-import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import {
+  ArrowRightOutlined,
+  CheckCircleOutlined,
+  ClockCircleOutlined,
+  CloseCircleOutlined,
+  InfoCircleOutlined,
+  ReloadOutlined,
+  SafetyCertificateOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
+  type ProColumns,
   ProTable,
   StatisticCard,
-  type ProColumns,
 } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   Button,
@@ -21,24 +29,16 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import {
-  ArrowRightOutlined,
-  CheckCircleOutlined,
-  ClockCircleOutlined,
-  CloseCircleOutlined,
-  InfoCircleOutlined,
-  ReloadOutlined,
-  SafetyCertificateOutlined,
-} from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { useRequest } from 'ahooks';
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
-  fetchDecisionResults,
   type DecisionResult,
   type DecisionScope,
+  fetchDecisionResults,
 } from '@/services/decide';
 
 const { RangePicker } = DatePicker;

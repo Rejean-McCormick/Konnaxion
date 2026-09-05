@@ -1,20 +1,21 @@
 // FILE: frontend/modules/konsultations/pages/ResultsPage.tsx
 ﻿'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
+import { Alert, Spin } from 'antd';
 import { useRouter } from 'next/router';
-import { Spin, Alert } from 'antd';
-import EkohPageShell from '@/app/ekoh/EkohPageShell';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ResponsiveContainer,
+  Bar,
   BarChart,
   CartesianGrid,
+  Cell,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  Bar,
-  Cell,
 } from 'recharts';
+
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 interface ConsultationResponse {
   title?: string | null;

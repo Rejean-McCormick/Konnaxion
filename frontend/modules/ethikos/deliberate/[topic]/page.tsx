@@ -2,9 +2,10 @@
 'use client';
 
 import { PageContainer, ProCard } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import { Timeline, Typography } from 'antd';
 import { useParams } from 'next/navigation';
-import { useRequest } from 'ahooks';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchTopicDetail } from '@/services/deliberate';
 

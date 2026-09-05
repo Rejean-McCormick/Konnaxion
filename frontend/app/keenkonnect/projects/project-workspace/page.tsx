@@ -1,10 +1,8 @@
 // FILE: frontend/app/keenkonnect/projects/project-workspace/page.tsx
 'use client';
 
-import React, { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { ProCard } from '@ant-design/pro-components';
 import { Comment } from '@ant-design/compatible';
+import { ProCard } from '@ant-design/pro-components';
 import type { MenuProps, TabsProps } from 'antd';
 import {
   Avatar,
@@ -14,13 +12,16 @@ import {
   Empty,
   List,
   Menu,
+  Space,
   Spin,
   Tabs,
   Tag,
   Timeline,
   Typography,
-  Space,
 } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import React, { Suspense, useEffect, useState } from 'react';
+
 import api from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
@@ -40,6 +41,40 @@ interface ApiProject {
   tags: number[];
 }
 
+
+interface WorkspaceTask {
+  id?: React.Key;
+  title: string;
+  description?: string;
+  status?: string;
+  assignee?: string;
+  dueDate?: string;
+}
+
+interface WorkspaceMember {
+  id?: React.Key;
+  name: string;
+  avatar?: string;
+  role?: string;
+  title?: string;
+}
+
+interface WorkspaceComment {
+  id?: React.Key;
+  author?: string;
+  avatar?: React.ReactNode;
+  content?: React.ReactNode;
+  datetime?: React.ReactNode;
+}
+
+interface WorkspaceActivity {
+  key?: React.Key;
+  title: string;
+  description?: string;
+  status?: string;
+  date?: string;
+}
+
 interface WorkspaceViewModel {
   id: number;
   name: string;
@@ -50,11 +85,11 @@ interface WorkspaceViewModel {
   createdAt: string;
   currentSprint?: string;
   deadline?: string;
-  tasks?: any[];
-  members?: any[];
-  comments?: any[];
-  activity?: any[];
-  timeline?: any[];
+  tasks?: WorkspaceTask[];
+  members?: WorkspaceMember[];
+  comments?: WorkspaceComment[];
+  activity?: WorkspaceActivity[];
+  timeline?: WorkspaceActivity[];
 }
 
 export default function ProjectWorkspacePage() {
@@ -81,7 +116,7 @@ function Content(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
   const [activeKey, setActiveKey] = useState<string>('overview');
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-  const [selectedTask, setSelectedTask] = useState<any | null>(null);
+  const [selectedTask, setSelectedTask] = useState<WorkspaceTask | null>(null);
 
   // Load workspace
   useEffect(() => {
@@ -119,7 +154,7 @@ function Content(): JSX.Element {
 
         setWorkspace(mapped);
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed to load project workspace', err);
         setError(
           'Error loading workspace. Some information may be unavailable.',
@@ -133,27 +168,15 @@ function Content(): JSX.Element {
   }, [projectId]);
 
   // Safely derive arrays from the workspace payload
-  const tasks: any[] = Array.isArray(workspace?.tasks)
-    ? (workspace?.tasks as any[])
-    : [];
-  const members: any[] = Array.isArray(workspace?.members)
-    ? (workspace?.members as any[])
-    : [];
-  const comments: any[] = Array.isArray(workspace?.comments)
-    ? (workspace?.comments as any[])
-    : [];
-
-  let activity: any[] = [];
-  if (Array.isArray(workspace?.activity)) {
-    activity = (workspace?.activity as any[]) ?? [];
-  } else if (Array.isArray(workspace?.timeline)) {
-    activity = (workspace?.timeline as any[]) ?? [];
-  }
+  const tasks = workspace?.tasks ?? [];
+  const members = workspace?.members ?? [];
+  const comments = workspace?.comments ?? [];
+  const activity = workspace?.activity ?? workspace?.timeline ?? [];
 
   const derivedActivity =
     activity.length > 0
       ? activity
-      : tasks.map((task: any, index: number) => ({
+      : tasks.map((task, index) => ({
           key: task.id || `task-${index}`,
           title: task.title,
           description: task.description,
@@ -207,7 +230,7 @@ function Content(): JSX.Element {
     setActiveKey(key);
   };
 
-  const handleTaskClick = (task: any) => {
+  const handleTaskClick = (task: WorkspaceTask) => {
     setSelectedTask(task);
     setDrawerOpen(true);
   };
@@ -275,7 +298,7 @@ function Content(): JSX.Element {
             ) : (
               <Timeline
                 style={{ marginTop: 8 }}
-                items={derivedActivity.slice(0, 5).map((item: any) => ({
+                items={derivedActivity.slice(0, 5).map((item) => ({
                   color:
                     item.status === 'Completed' || item.status === 'Done'
                       ? 'green'
@@ -314,7 +337,7 @@ function Content(): JSX.Element {
           locale={{
             emptyText: 'No tasks configured for this workspace yet.',
           }}
-          renderItem={(task: any) => (
+          renderItem={(task) => (
             <List.Item
               key={task.id || task.title}
               onClick={() => handleTaskClick(task)}
@@ -363,7 +386,7 @@ function Content(): JSX.Element {
         ) : (
           <Timeline
             style={{ marginTop: 8 }}
-            items={derivedActivity.map((item: any) => ({
+            items={derivedActivity.map((item) => ({
               color:
                 item.status === 'Completed' || item.status === 'Done'
                   ? 'green'
@@ -399,7 +422,7 @@ function Content(): JSX.Element {
             emptyText:
               'No discussion yet. Start the conversation with your team.',
           }}
-          renderItem={(comment: any) => (
+          renderItem={(comment) => (
             <li key={comment.id}>
               <Comment
                 author={comment.author}
@@ -533,7 +556,7 @@ function Content(): JSX.Element {
                   emptyText:
                     'No team members linked to this workspace yet.',
                 }}
-                renderItem={(member: any) => (
+                renderItem={(member) => (
                   <List.Item key={member.id || member.name}>
                     <List.Item.Meta
                       avatar={

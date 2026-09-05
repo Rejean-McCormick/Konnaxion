@@ -1,13 +1,14 @@
 // FILE: frontend/modules/ethikos/impact/tracker/page.tsx
 'use client';
 
-import React from 'react';
 import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ProColumns } from '@ant-design/pro-components';
-import { Select } from 'antd';
 import { useRequest } from 'ahooks';
+import { Select } from 'antd';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import React from 'react';
+
 import usePageTitle from '@/hooks/usePageTitle';
 import { fetchImpactTracker, patchImpactStatus } from '@/services/impact';
 

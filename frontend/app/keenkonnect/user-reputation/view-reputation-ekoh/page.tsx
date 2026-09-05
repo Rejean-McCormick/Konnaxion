@@ -1,11 +1,11 @@
 // FILE: frontend/app/keenkonnect/user-reputation/view-reputation-ekoh/page.tsx
 'use client';
 
-import React from 'react';
 import { Alert, Avatar, Card, Col, Empty, List, Progress, Row, Space, Tag, Timeline, Typography } from 'antd';
+import React from 'react';
 
-import useReputationEvents from '@/hooks/useReputationEvents';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
+import useReputationEvents from '@/hooks/useReputationEvents';
 import type { EkohExpertiseScore } from '@/services/trust';
 
 const { Paragraph, Text, Title } = Typography;

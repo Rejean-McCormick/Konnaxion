@@ -2,34 +2,36 @@
 // app/konnected/knowledge/contribute/page.tsx
 'use client';
 
-import React from 'react';
-import {
-  Row,
-  Col,
-  Card,
-  Form,
-  Input,
-  Select,
-  Switch,
-  InputNumber,
-  Upload,
-  Button,
-  Typography,
-  Alert,
-  Space,
-  Tag,
-  Divider,
-  message,
-} from 'antd';
-import type { UploadProps } from 'antd';
 import {
   InboxOutlined,
   InfoCircleOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Divider,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Row,
+  Select,
+  Space,
+  Switch,
+  Tag,
+  Typography,
+  Upload,
+} from 'antd';
+import type { UploadProps } from 'antd';
+import type { UploadFile } from 'antd/es/upload/interface';
+import React from 'react';
+
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
-const { Paragraph, Text, Title } = Typography;
+const { Paragraph, Title } = Typography;
 const { TextArea } = Input;
 const { Dragger } = Upload;
 
@@ -49,7 +51,7 @@ interface ContributeFormValues {
   allowReuse?: boolean;
   audience?: string;
   notesForReviewers?: string;
-  fileList?: any;
+  fileList?: UploadFile[];
 }
 
 const SUBJECT_OPTIONS = [
@@ -89,11 +91,21 @@ const uploadProps: UploadProps = {
   beforeUpload: () => false, // prevent auto-upload; handled by form submit
 };
 
-function normFile(e: any) {
-  if (Array.isArray(e)) {
-    return e;
+function normFile(event: unknown): UploadFile[] {
+  if (Array.isArray(event)) {
+    return event as UploadFile[];
   }
-  return e?.fileList ?? [];
+
+  if (
+    typeof event === 'object' &&
+    event !== null &&
+    'fileList' in event &&
+    Array.isArray((event as { fileList?: unknown }).fileList)
+  ) {
+    return (event as { fileList: UploadFile[] }).fileList;
+  }
+
+  return [];
 }
 
 export default function KonnectedKnowledgeContributePage(): JSX.Element {
@@ -102,14 +114,14 @@ export default function KonnectedKnowledgeContributePage(): JSX.Element {
   const handleSubmit = (values: ContributeFormValues) => {
     // Placeholder: will later call the KonnectED knowledge contribution API
     // For now we just log and show a success toast.
-    // eslint-disable-next-line no-console
+     
     console.log('KonnectED knowledge contribution (local only):', values);
     message.success('Your contribution has been saved locally for review.');
   };
 
   const handleSaveDraft = () => {
     const values = form.getFieldsValue();
-    // eslint-disable-next-line no-console
+     
     console.log('Draft contribution (local only):', values);
     message.info('Draft saved locally in this session.');
   };

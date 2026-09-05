@@ -1,7 +1,8 @@
 // FILE: frontend/modules/admin/components/UserStats.tsx
 "use client";
+import { Alert, Card, Descriptions, Spin } from "antd";
 import React from "react";
-import { Card, Descriptions, Spin, Alert } from "antd";
+
 import useStats from "@/admin/hooks/useStats";
 
 export default function UserStats() {

@@ -1,15 +1,15 @@
 // FILE: frontend/app/ethikos/decide/elite/page.tsx
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
+  type ProColumns,
   ProTable,
   StatisticCard,
-  type ProColumns,
 } from '@ant-design/pro-components';
+import { useInterval, useRequest } from 'ahooks';
 import {
   Alert,
   Button,
@@ -23,15 +23,15 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import { InfoCircleOutlined, ReloadOutlined } from '@ant-design/icons';
-import { useInterval, useRequest } from 'ahooks';
 import dayjs from 'dayjs';
+import Link from 'next/link';
+import React from 'react';
 
 import EthikosPageShell from '@/app/ethikos/EthikosPageShell';
 import {
-  fetchEliteBallots,
   type EliteBallot,
   type EliteBallotResponse,
+  fetchEliteBallots,
 } from '@/services/decide';
 import { fetchTopicPreview } from '@/services/deliberate';
 import type { TopicPreviewResponse } from '@/services/ethikos';

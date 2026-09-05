@@ -1,11 +1,11 @@
 // FILE: frontend/components/dashboard-components/index.tsx
 // components/dashboard-components/index.tsx
-import UserCard from './UserCard'
-import VisitCard from './VisitCard'
-import LikeCard from './LikeCard'
 import CommentCard from './CommentCard'
-import UserPieChart from './UserPieChart'
+import LikeCard from './LikeCard'
 import { ColStyled } from './style'
+import UserCard from './UserCard'
+import UserPieChart from './UserPieChart'
+import VisitCard from './VisitCard'
 
 export {
   UserCard,

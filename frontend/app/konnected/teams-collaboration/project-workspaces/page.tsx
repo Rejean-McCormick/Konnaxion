@@ -2,36 +2,36 @@
 // app/konnected/teams-collaboration/project-workspaces/page.tsx
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import {
-  Button,
-  Card,
-  Col,
-  Dropdown,
-  Empty,
-  Input,
-  message as antdMessage,
-  Row,
-  Select,
-  Space,
-  Spin,
-  Statistic,
-  Tag,
-  Tooltip,
-  Typography,
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import type { MenuProps } from 'antd';
 import {
   ArrowRightOutlined,
   DownOutlined,
   ProjectOutlined,
   TeamOutlined,
 } from '@ant-design/icons';
-import { Table } from 'antd';
-import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
+import type { MenuProps } from 'antd';
+import {
+  message as antdMessage,
+  Button,
+  Card,
+  Col,
+  Dropdown,
+  Empty,
+  Input,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Statistic,
+  Table,
+  Tag,
+  Tooltip,
+ Typography } from 'antd';
+import type { ColumnsType } from 'antd/es/table';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import api from '@/api';
+import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -213,7 +213,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
         setTotal(mapped.length);
       } catch (error) {
         if (!isMounted) return;
-        // eslint-disable-next-line no-console
+         
         console.error('Failed to load project workspaces', error);
         messageApi.error(
           'Unable to load project workspaces. Please try again later.',
@@ -323,7 +323,7 @@ export default function KonnectedProjectWorkspacesPage(): JSX.Element {
     );
   };
 
-  const goToTeam = (row: ProjectWorkspaceRow) => {
+  const goToTeam = (_row: ProjectWorkspaceRow) => {
     router.push('/konnected/teams-collaboration/my-teams');
   };
 

@@ -2,7 +2,12 @@
 // frontend/modules/account/UserSettings.tsx
 'use client';
 
-import React from 'react';
+import {
+  LockOutlined,
+  MailOutlined,
+  NotificationOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import {
   Alert,
@@ -15,26 +20,46 @@ import {
   Typography,
 } from 'antd';
 import type { TabsProps } from 'antd';
-import {
-  LockOutlined,
-  MailOutlined,
-  NotificationOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import React from 'react';
+
 import usePageTitle from '@/hooks/usePageTitle';
 
 const { Title, Paragraph, Text } = Typography;
 
+type ProfileSettingsValues = {
+  displayName: string;
+  username: string;
+  bio?: string;
+};
+
+type SecuritySettingsValues = {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+type NotificationSettingsValues = {
+  emailActivity: boolean;
+  emailDigest: boolean;
+  pushImportant: boolean;
+};
+
+type PrivacySettingsValues = {
+  publicProfile: boolean;
+  showBadges: boolean;
+  showActivity: boolean;
+};
+
 // Simple placeholder submit handler – wire to your API as needed.
 function fakeSubmit(message: string) {
-  // eslint-disable-next-line no-console
+   
   console.log(`[UserSettings] ${message}`);
 }
 
 const ProfileSettingsTab: React.FC = () => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<ProfileSettingsValues>();
 
-  const onFinish = (values: any) => {
+  const onFinish = (values: ProfileSettingsValues) => {
     fakeSubmit(`Profile updated: ${JSON.stringify(values)}`);
   };
 
@@ -45,7 +70,7 @@ const ProfileSettingsTab: React.FC = () => {
         Update your basic account information. This is how other users will see you.
       </Paragraph>
 
-      <Form
+      <Form<ProfileSettingsValues>
         form={form}
         layout="vertical"
         initialValues={{
@@ -89,9 +114,9 @@ const ProfileSettingsTab: React.FC = () => {
 };
 
 const SecuritySettingsTab: React.FC = () => {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<SecuritySettingsValues>();
 
-  const onFinish = (values: any) => {
+  const onFinish = (values: SecuritySettingsValues) => {
     fakeSubmit(`Security updated: ${JSON.stringify(values)}`);
   };
 
@@ -102,7 +127,7 @@ const SecuritySettingsTab: React.FC = () => {
         Change your password and review basic security settings.
       </Paragraph>
 
-      <Form
+      <Form<SecuritySettingsValues>
         form={form}
         layout="vertical"
         onFinish={onFinish}
@@ -164,7 +189,7 @@ const SecuritySettingsTab: React.FC = () => {
 };
 
 const NotificationSettingsTab: React.FC = () => {
-  const onFinish = (values: any) => {
+  const onFinish = (values: NotificationSettingsValues) => {
     fakeSubmit(`Notifications updated: ${JSON.stringify(values)}`);
   };
 
@@ -175,7 +200,7 @@ const NotificationSettingsTab: React.FC = () => {
         Choose how you want to be notified about activity related to your account.
       </Paragraph>
 
-      <Form
+      <Form<NotificationSettingsValues>
         layout="vertical"
         initialValues={{
           emailActivity: true,
@@ -219,7 +244,7 @@ const NotificationSettingsTab: React.FC = () => {
 };
 
 const PrivacySettingsTab: React.FC = () => {
-  const onFinish = (values: any) => {
+  const onFinish = (values: PrivacySettingsValues) => {
     fakeSubmit(`Privacy updated: ${JSON.stringify(values)}`);
   };
 
@@ -230,7 +255,7 @@ const PrivacySettingsTab: React.FC = () => {
         Control how your profile and activity appear to other users.
       </Paragraph>
 
-      <Form
+      <Form<PrivacySettingsValues>
         layout="vertical"
         initialValues={{
           publicProfile: true,

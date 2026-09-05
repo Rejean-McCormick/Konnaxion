@@ -8,12 +8,12 @@
 import { useMemo, useState } from 'react';
 import type { CSSProperties } from 'react';
 import {
-  Map as ReactMapGL,
-  Marker,
   FullscreenControl,
-  Popup,
   GeolocateControl,
   type ViewState as MapViewState,
+  Marker,
+  Popup,
+  Map as ReactMapGL,
   type ViewStateChangeEvent,
 } from 'react-map-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';

@@ -1,33 +1,34 @@
 // FILE: frontend/app/keenkonnect/dashboard/page.tsx
 'use client';
 
-import React from 'react';
-import Link from 'next/link';
+import {
+  AppstoreOutlined,
+  ArrowRightOutlined,
+  BellOutlined,
+  ClockCircleOutlined,
+  CrownOutlined,
+  DashboardOutlined,
+  FileTextOutlined,
+  PlusOutlined,
+  RocketOutlined,
+  TeamOutlined,
+} from '@ant-design/icons';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import {
+  Avatar,
   Badge,
   Button,
+  Divider,
   List,
+  Progress,
   Space,
   Tag,
   Timeline,
   Typography,
-  Avatar,
-  Divider,
-  Progress,
 } from 'antd';
-import {
-  AppstoreOutlined,
-  RocketOutlined,
-  TeamOutlined,
-  FileTextOutlined,
-  DashboardOutlined,
-  CrownOutlined,
-  PlusOutlined,
-  BellOutlined,
-  ClockCircleOutlined,
-  ArrowRightOutlined,
-} from '@ant-design/icons';
+import Link from 'next/link';
+import React from 'react';
+
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Text, Paragraph } = Typography;

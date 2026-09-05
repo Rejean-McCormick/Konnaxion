@@ -1,6 +1,8 @@
 // FILE: frontend/services/pulse.ts
 import dayjs from 'dayjs'
 
+import type { KPI } from '@/types'
+
 import { get } from './_request'
 import { ETHIKOS_PATHS, normalizeList } from './ethikos'
 import type {
@@ -9,7 +11,6 @@ import type {
   EthikosStanceApi,
   EthikosTopicApi,
 } from './ethikos'
-import type { KPI } from '@/types'
 
 /* ------------------------------------------------------------------ */
 /*  Shared Pulse types                                                */

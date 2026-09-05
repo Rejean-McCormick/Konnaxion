@@ -1,5 +1,5 @@
 // FILE: frontend/src/theme/obsolete/lightTheme.ts
-import { BRAND_HEX, Theme, sharedStatusColors } from './types';
+import { BRAND_HEX, sharedStatusColors, Theme } from './types';
 
 export const lightTheme: Theme = {
   id: 'light',

@@ -2,13 +2,14 @@
 ﻿// frontend/modules/konsultations/pages/SuggestionPage.tsx
 "use client";
 
-import React from "react";
-import { Alert, Button, Space, Tag, Typography } from "antd";
 import {
   BulbOutlined,
   FilterOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
+import { Alert, Button, Space, Tag, Typography } from "antd";
+import React from "react";
+
 import { SuggestionBoard } from "../components";
 import type { Suggestion as BoardSuggestion } from "../components/SuggestionBoard";
 

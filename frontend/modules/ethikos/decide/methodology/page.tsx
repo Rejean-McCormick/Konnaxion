@@ -2,7 +2,8 @@
 'use client'
 
 import { PageContainer } from '@ant-design/pro-components';
-import { Typography, Collapse, Steps, Alert } from 'antd';
+import { Alert, Collapse, Steps, Typography } from 'antd';
+
 import usePageTitle from '@/hooks/usePageTitle';
 
 export default function Methodology() {

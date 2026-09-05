@@ -2,10 +2,11 @@
 // app/ethikos/EthikosPageShell.tsx
 'use client';
 
-import React, { type ReactNode } from 'react';
+import { Grid, Space, Typography } from 'antd';
 import Head from 'next/head';
 import { usePathname } from 'next/navigation';
-import { Typography, Space, Grid } from 'antd';
+import React, { type ReactNode } from 'react';
+
 import usePageTitle from '@/hooks/usePageTitle';
 
 const { Title, Paragraph } = Typography;

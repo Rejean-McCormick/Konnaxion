@@ -6,15 +6,16 @@
  * Author: Hieu Chu
  */
 
+import * as Auth0 from '@auth0/auth0-spa-js';
 import React, {
   createContext,
+  type ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
-  useCallback,
-  type ReactNode,
 } from 'react';
-import * as Auth0 from '@auth0/auth0-spa-js';
+
 import { normalizeError } from '../../shared/errors';
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
@@ -96,7 +97,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
       } catch (e: unknown) {
         const { message } = normalizeError(e);
         // Keep surface minimal; log for diagnostics
-        // eslint-disable-next-line no-console
+         
         console.error('[Auth0] init failed:', message);
       } finally {
         if (mounted) setLoading(false);
@@ -108,7 +109,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
       mounted = false;
     };
     // initOptions is stable in practice; if it changes, re-init intentionally
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, []);
 
   const loginWithPopup = useCallback(
@@ -122,7 +123,7 @@ export const Auth0Provider: React.FC<Auth0ProviderProps> = ({
         setIsAuthenticated(true);
       } catch (error: unknown) {
         const { message, statusCode } = normalizeError(error);
-        // eslint-disable-next-line no-console
+         
         console.error('[Auth0] loginWithPopup failed:', statusCode, message);
       } finally {
         setPopupOpen(false);

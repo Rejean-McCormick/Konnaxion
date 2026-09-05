@@ -1,21 +1,22 @@
 // FILE: frontend/modules/konsultations/components/ConsultationVotePanel.tsx
 ﻿// frontend/modules/konsultations/components/ConsultationVotePanel.tsx
 
-import React, { useEffect, useMemo, useState } from 'react';
+import { useRequest } from 'ahooks';
 import {
   Alert,
   Card,
   Divider,
   Empty,
+  message,
   Progress,
   Slider,
   Space,
   Statistic,
   Tag,
   Typography,
-  message,
 } from 'antd';
-import { useRequest } from 'ahooks';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import { get, post } from '@/services/_request';
 
 const { Paragraph, Text, Title } = Typography;
@@ -211,7 +212,7 @@ export default function ConsultationVotePanel(
       await submitTopicStance(topicKey, stanceValue);
       message.success('Stance saved');
       await refreshStances();
-    } catch (err) {
+    } catch {
       message.error('Could not save your stance. Please try again.');
     } finally {
       setSavingStance(false);

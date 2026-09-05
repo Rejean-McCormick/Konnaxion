@@ -1,8 +1,8 @@
 // FILE: frontend/modules/konsultations/components/ImpactTimeline.tsx
 ﻿'use client';
 
-import { Timeline, Typography, Empty, Tag, Space } from 'antd';
 import { ClockCircleOutlined } from '@ant-design/icons';
+import { Empty, Space, Tag, Timeline, Typography } from 'antd';
 import dayjs from 'dayjs';
 
 const { Text } = Typography;

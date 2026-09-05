@@ -1,7 +1,6 @@
 // FILE: frontend/routes/routesEkoh.tsx
 "use client";
 
-import React from "react";
 import {
   AuditOutlined,
   BarChartOutlined,
@@ -14,6 +13,7 @@ import {
   TrophyOutlined,
   UsergroupAddOutlined,
 } from "@ant-design/icons";
+import React from "react";
 
 import type { Route } from "./types";
 

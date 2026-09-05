@@ -1,8 +1,15 @@
 // FILE: frontend/app/konsensus/activity-feed/ActivityFeedClient.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
 import {
+  ApartmentOutlined,
+  BellOutlined,
+  FilterOutlined,
+  ReloadOutlined,
+  ThunderboltOutlined,
+} from '@ant-design/icons';
+import {
+  Avatar,
   Badge,
   Button,
   Card,
@@ -13,21 +20,14 @@ import {
   Row,
   Segmented,
   Space,
+  Statistic,
   Tabs,
   Tag,
-  Typography,
-  Avatar,
   Tooltip,
-  Statistic,
+  Typography,
 } from 'antd';
-import {
-  BellOutlined,
-  FilterOutlined,
-  ReloadOutlined,
-  ThunderboltOutlined,
-  ApartmentOutlined,
-} from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import React, { useMemo, useState } from 'react';
 
 const { Title, Text, Paragraph } = Typography;
 const { RangePicker } = DatePicker;

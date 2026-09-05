@@ -2,23 +2,24 @@
 // app/ekoh/overview-analytics/current-ekoh-score/page.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { Alert, Card, Table, Timeline } from 'antd';
 import Head from 'next/head';
-import { Card, Alert, Timeline, Table } from 'antd';
-import EkohPageShell from '@/app/ekoh/EkohPageShell';
+import React, { useEffect, useState } from 'react';
 import {
-  PieChart as RePieChart,
-  Pie,
+  CartesianGrid,
   Cell,
   Legend,
-  Tooltip as ReTooltip,
-  ResponsiveContainer,
-  LineChart as ReLineChart,
   Line,
+  Pie,
+  LineChart as ReLineChart,
+  PieChart as RePieChart,
+  ResponsiveContainer,
+  Tooltip as ReTooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
 } from 'recharts';
+
+import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
 

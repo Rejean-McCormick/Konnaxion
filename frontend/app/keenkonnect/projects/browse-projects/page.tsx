@@ -2,7 +2,12 @@
 // app/keenkonnect/projects/browse-projects/page.tsx
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import {
+  PlusOutlined,
+  SearchOutlined,
+  TeamOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-components';
 import {
   Avatar,
@@ -17,18 +22,14 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Tabs,
   Tag,
   Tooltip,
-  Spin,
 } from 'antd';
-import {
-  PlusOutlined,
-  SearchOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+
 import api from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
@@ -104,7 +105,7 @@ export default function BrowseProjectsPage(): JSX.Element {
 
         setProjects(mapped);
       } catch (err) {
-        // eslint-disable-next-line no-console
+         
         console.error('Failed to load projects', err);
         setError('Unable to load projects from the server.');
       } finally {

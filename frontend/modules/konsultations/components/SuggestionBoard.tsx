@@ -2,7 +2,14 @@
 ﻿// frontend/modules/konsultations/components/SuggestionBoard.tsx
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import {
+  DislikeOutlined,
+  FilterOutlined,
+  LikeOutlined,
+  PlusOutlined,
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+} from '@ant-design/icons';
 import {
   Alert,
   Button,
@@ -16,14 +23,7 @@ import {
   Tooltip,
   Typography,
 } from 'antd';
-import {
-  LikeOutlined,
-  DislikeOutlined,
-  FilterOutlined,
-  PlusOutlined,
-  SortAscendingOutlined,
-  SortDescendingOutlined,
-} from '@ant-design/icons';
+import React, { useMemo, useState } from 'react';
 
 const { Text, Paragraph } = Typography;
 
@@ -181,7 +181,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
       await onCreateSuggestion(body);
       setDraft('');
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to submit suggestion', err);
       setLocalError('Unable to submit your suggestion. Please try again.');
     } finally {
@@ -194,7 +194,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
     try {
       await onUpvote(id);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to upvote suggestion', err);
     }
   };
@@ -204,7 +204,7 @@ const SuggestionBoard: React.FC<SuggestionBoardProps> = ({
     try {
       await onDownvote(id);
     } catch (err) {
-      // eslint-disable-next-line no-console
+       
       console.error('Failed to downvote suggestion', err);
     }
   };

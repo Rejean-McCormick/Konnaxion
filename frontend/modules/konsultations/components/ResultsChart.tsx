@@ -1,10 +1,10 @@
 // FILE: frontend/modules/konsultations/components/ResultsChart.tsx
 ﻿'use client';
 
+import { Bar } from '@ant-design/plots';
+import { Empty } from 'antd';
 import React, { useMemo } from 'react';
 import type { ReactNode } from 'react';
-import { Empty } from 'antd';
-import { Bar } from '@ant-design/plots';
 
 export type ConsultationResultMode = 'raw' | 'weighted';
 
@@ -103,7 +103,7 @@ export default function ResultsChart({
     return <Empty description={emptyMessage} />;
   }
 
-  const config: any = multiCohort
+  const config = (multiCohort
     ? {
         data: chartData,
         isGroup: true,
@@ -133,7 +133,7 @@ export default function ResultsChart({
         tooltip: {
           shared: true,
         },
-      };
+      }) as React.ComponentProps<typeof Bar>;
 
   return <Bar {...config} />;
 }

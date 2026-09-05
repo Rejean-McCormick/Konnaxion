@@ -1,7 +1,7 @@
 // FILE: frontend/modules/global/components/AppShell.tsx
 ﻿"use client";
-import React, { PropsWithChildren } from "react";
 import { Layout } from "antd";
+import React, { PropsWithChildren } from "react";
 
 /** Light-weight wrapper that gives every page a top‑nav + centred body. */
 export default function AppShell({ children }: PropsWithChildren) {

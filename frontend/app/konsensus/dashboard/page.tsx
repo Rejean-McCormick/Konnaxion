@@ -1,34 +1,35 @@
 // FILE: frontend/app/konsensus/dashboard/page.tsx
 'use client';
 
-import React from 'react';
-import Head from 'next/head';
 import {
-  Card,
-  Row,
-  Col,
-  Statistic,
-  List,
-  Tag,
-  Progress,
-  Timeline,
-} from 'antd';
-import {
-  FireOutlined,
-  TeamOutlined,
-  RadarChartOutlined,
   BellOutlined,
+  FireOutlined,
+  RadarChartOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import {
-  LineChart as ReLineChart,
+  Card,
+  Col,
+  List,
+  Progress,
+  Row,
+  Statistic,
+  Tag,
+  Timeline,
+} from 'antd';
+import Head from 'next/head';
+import React from 'react';
+import {
+  CartesianGrid,
+  Legend,
   Line,
+  LineChart as ReLineChart,
+  ResponsiveContainer,
+  Tooltip as ReTooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip as ReTooltip,
-  Legend,
-  ResponsiveContainer,
 } from 'recharts';
+
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
 
 /* ------------------------------------------------------------------ */

@@ -1,6 +1,15 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  BarChartOutlined,
+  CalendarOutlined,
+  InfoCircleOutlined,
+  ProjectOutlined,
+  ReloadOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+  UserOutlined,
+} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
@@ -21,28 +30,20 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import {
-  BarChartOutlined,
-  CalendarOutlined,
-  InfoCircleOutlined,
-  ProjectOutlined,
-  ReloadOutlined,
-  TeamOutlined,
-  UserAddOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   CartesianGrid,
   Legend,
   Line,
   LineChart,
-  ResponsiveContainer,
   Tooltip as RechartsTooltip,
+  ResponsiveContainer,
   XAxis,
   YAxis,
 } from 'recharts';
 
 import api from '@/api';
+
 import ReportsPageShell from '../ReportsPageShell';
 
 const { Text, Title } = Typography;

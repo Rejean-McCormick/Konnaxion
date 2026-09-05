@@ -5,15 +5,15 @@
  * Author: Hieu Chu
  */
 
-import React from 'react'
-import { Card, Tooltip, Divider, Col, Statistic } from 'antd'
-import styled from 'styled-components'
 import {
-  InfoCircleOutlined,
   CaretDownOutlined,
   CaretUpOutlined,
+  InfoCircleOutlined,
 } from '@ant-design/icons'
 import * as AntIcons from '@ant-design/icons'
+import { Card, Col, Divider, Statistic, Tooltip } from 'antd'
+import React from 'react'
+import styled from 'styled-components'
 
 /** helper: map legacy Icon `type` strings (e.g. "shopping-cart") to v4 components */
 const legacyTypeToIcon = (type?: string) => {
@@ -88,9 +88,15 @@ export const MainIcon: React.FC<{
   const Comp = !icon && type ? legacyTypeToIcon(type) : null
 
   // Loosen the element type so we can pass twoToneColor safely
-  const element: React.ReactElement<any> | null =
+  const element: React.ReactElement<{
+    style?: React.CSSProperties
+    twoToneColor?: string
+  }> | null =
     icon && React.isValidElement(icon)
-      ? (icon as React.ReactElement<any>)
+      ? (icon as React.ReactElement<{
+          style?: React.CSSProperties
+          twoToneColor?: string
+        }>)
       : Comp
       ? React.createElement(Comp)
       : null

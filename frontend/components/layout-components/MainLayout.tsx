@@ -2,17 +2,17 @@
 // C:\MyCode\Konnaxionv14\frontend\components\layout-components\MainLayout.tsx
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import { Layout } from 'antd';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 
-import FixedSider from '@/components/layout-components/Sider';
-import Main from '@/components/layout-components/Main';
+import DrawerComponent from '@/components/layout-components/Drawer';
 import HeaderComponent from '@/components/layout-components/Header';
 import LogoTitle from '@/components/layout-components/LogoTitle';
-import DrawerComponent from '@/components/layout-components/Drawer';
+import Main from '@/components/layout-components/Main';
 import MenuComponent from '@/components/layout-components/Menu';
 import type { Route } from '@/components/layout-components/Menu';
+import FixedSider from '@/components/layout-components/Sider';
 
 const { Content } = Layout;
 
@@ -156,7 +156,7 @@ export default function MainLayout({
           });
         },
       )
-      // eslint-disable-next-line no-console
+       
       .catch((err) => console.error('Erreur chargement routes :', err));
 
     return () => {

@@ -1,7 +1,7 @@
 'use client'
 
-import { Card, Col, Row, Space, Typography } from 'antd'
 import { ProCard } from '@ant-design/pro-components'
+import { Card, Col, Row, Space, Typography } from 'antd'
 
 import ArgumentSourcesPanel from '@/modules/ethikos/components/ArgumentSourcesPanel'
 import type { ArgumentTreeItem } from '@/modules/ethikos/components/ArgumentTree'
@@ -13,9 +13,10 @@ import type {
   EthikosId,
 } from '@/services/ethikos'
 
-import { toSuggestionSide } from '../_lib/topicThreadUtils'
 import EmptySelectionCard from './EmptySelectionCard'
 import ParticipantRolesPanel from './ParticipantRolesPanel'
+
+import { toSuggestionSide } from '../_lib/topicThreadUtils'
 
 const { Text } = Typography
 

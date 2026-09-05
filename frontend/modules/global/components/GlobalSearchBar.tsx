@@ -2,9 +2,9 @@
 // File: modules/global/components/GlobalSearchBar.tsx
 'use client'
 
-import React, { useState } from 'react'
 import { Input } from 'antd'
 import { useRouter, useSearchParams } from 'next/navigation'
+import React, { useState } from 'react'
 
 export function GlobalSearchBar() {
   const [q, setQ] = useState(useSearchParams().get('q') ?? '')
