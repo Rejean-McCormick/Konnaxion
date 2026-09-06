@@ -23,6 +23,8 @@ from konnaxion.smart_vote.services.weight_calculator import (
 )
 
 READING_KEY = "ekoh_weighted_v1"
+READING_METHOD = "weighted_average"
+READING_VERSION = "v1"
 SOURCE_TYPE_ETHIKOS_TOPIC = "ethikos_topic"
 
 
@@ -166,6 +168,8 @@ def _build_ethikos_topic_reading(topic_id: int, *, viewer=None) -> dict[str, Any
     ]
     lens_payload = {
         "reading_key": READING_KEY,
+        "method": READING_METHOD,
+        "version": READING_VERSION,
         "formula": "1 + min(dot(topic_relevance, expertise), cap) * ethics",
         "source_type": SOURCE_TYPE_ETHIKOS_TOPIC,
         "source_id": str(topic_id),
@@ -301,6 +305,8 @@ def _build_ethikos_topic_reading(topic_id: int, *, viewer=None) -> dict[str, Any
         "readings": [
             {
                 "reading_key": READING_KEY,
+                "method": READING_METHOD,
+                "version": READING_VERSION,
                 "lens_hash": lens_hash,
                 "snapshot_ref": snapshot_ref,
                 "computed_at": computed_at,

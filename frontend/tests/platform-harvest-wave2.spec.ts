@@ -264,7 +264,7 @@ async function visit(
     page.off('request', onRequest)
   }
 
-  for (const finding of Array.from(local)) {
+  for (const finding of local) {
     findings.push(`${route} :: ${finding}`)
   }
 }
@@ -290,19 +290,10 @@ async function harvestStep(
 }
 
 test.describe('Platform bug harvest Wave 2', () => {
-  test('runtime/API depth — keenKonnect + Kreative + Kontrol', async ({ page }) => {
-    test.setTimeout(360_000)
-    const findings: string[] = []
-    const suffix = `${Date.now()}-${Math.floor(Math.random() * 10000)}`
-    const projectTitle = `Harvest2 project ${suffix}`
-    const artworkTitle = `Harvest2 artwork ${suffix}`
-    const collabName = `Harvest2 collab ${suffix}`
-    let projectId: string | null = null
-    let artworkId: string | null = null
-    let artworkMediaPath: string | null = null
-    let collabId: string | null = null
+  test('prewarm — Wave 2 route families', async ({ page }) => {
+    test.setTimeout(180_000)
 
-    const prewarmRoutes = [
+    const routes = [
       '/keenkonnect/projects/browse-projects',
       '/keenkonnect/projects/my-projects',
       '/keenkonnect/projects/project-workspace',
@@ -325,13 +316,19 @@ test.describe('Platform bug harvest Wave 2', () => {
       '/kontrol/roles',
     ]
 
-    try {
-      await harvestStep('Compile Wave 2 route families', findings, async () => {
-        for (const route of prewarmRoutes) {
-          await prewarmRoute(page, route)
-        }
-      })
+    for (const route of routes) {
+      await prewarmRoute(page, route)
+    }
+  })
 
+  test('runtime/API depth — keenKonnect', async ({ page }) => {
+    test.setTimeout(150_000)
+    const findings: string[] = []
+    const suffix = `${Date.now()}-${Math.floor(Math.random() * 10000)}`
+    const projectTitle = `Harvest2 project ${suffix}`
+    let projectId: string | null = null
+
+    try {
       await harvestStep('Cleanup stale Wave 2 artifacts', findings, async () => {
         await cleanupStaleHarvestArtifacts(page)
       })
@@ -373,22 +370,66 @@ test.describe('Platform bug harvest Wave 2', () => {
         projectId = String(created.data.id)
 
         await visit(page, '/keenkonnect/projects/browse-projects', findings)
-        await expect(page.getByText(projectTitle, { exact: true }).first()).toBeVisible()
+        await expect(
+          page.getByText(projectTitle, { exact: true }).first(),
+        ).toBeVisible()
 
         await visit(page, '/keenkonnect/projects/my-projects', findings)
-        await expect(page.getByText(projectTitle, { exact: true }).first()).toBeVisible()
+        await expect(
+          page.getByText(projectTitle, { exact: true }).first(),
+        ).toBeVisible()
 
         await visit(
           page,
           `/keenkonnect/projects/project-workspace?projectId=${projectId}`,
           findings,
         )
-        await expect(page.getByText(projectTitle, { exact: true }).first()).toBeVisible()
+        await expect(
+          page.getByText(projectTitle, { exact: true }).first(),
+        ).toBeVisible()
 
         await visit(page, '/keenkonnect/knowledge/document-management', findings)
-        await visit(page, '/keenkonnect/workspaces/browse-available-workspaces', findings)
+        await visit(
+          page,
+          '/keenkonnect/workspaces/browse-available-workspaces',
+          findings,
+        )
         await visit(page, '/keenkonnect/workspaces/launch-new-workspace', findings)
-        await visit(page, '/keenkonnect/sustainability-impact/track-project-impact', findings)
+        await visit(
+          page,
+          '/keenkonnect/sustainability-impact/track-project-impact',
+          findings,
+        )
+      })
+
+      await test.step('Report keenKonnect runtime findings', async () => {
+        expect(
+          findings,
+          `keenKonnect runtime findings:\n${findings.join('\n')}`,
+        ).toHaveLength(0)
+      })
+    } finally {
+      if (!page.isClosed() && projectId) {
+        await apiRequest(page, `/api/keenkonnect/projects/${projectId}/`, {
+          method: 'DELETE',
+        }).catch(() => undefined)
+      }
+    }
+  })
+
+  test('runtime/API depth — Kreative', async ({ page }) => {
+    test.setTimeout(150_000)
+    const findings: string[] = []
+    const suffix = `${Date.now()}-${Math.floor(Math.random() * 10000)}`
+    const artworkTitle = `Harvest2 artwork ${suffix}`
+    const collabName = `Harvest2 collab ${suffix}`
+    let artworkId: string | null = null
+    let artworkMediaPath: string | null = null
+    let collabId: string | null = null
+
+    try {
+      await harvestStep('Cleanup stale Wave 2 artifacts', findings, async () => {
+        await cleanupStaleHarvestArtifacts(page)
       })
 
       await harvestStep('Kreative API + product surfaces', findings, async () => {
@@ -413,6 +454,7 @@ test.describe('Platform bug harvest Wave 2', () => {
         await page
           .getByLabel('Description')
           .fill('Persisted by Konnaxion targeted Bug Harvest Wave 2.')
+
         const categoryFormItem = page
           .locator('.ant-form-item')
           .filter({ hasText: 'Medium / category' })
@@ -429,6 +471,7 @@ test.describe('Platform bug harvest Wave 2', () => {
         await expect(
           categoryFormItem.locator('.ant-select-selection-item'),
         ).toHaveText('Other')
+
         await page.locator('input[type="file"]').setInputFiles({
           name: `harvest2-${suffix}.txt`,
           mimeType: 'text/plain',
@@ -445,23 +488,29 @@ test.describe('Platform bug harvest Wave 2', () => {
             response.status() < 300,
           { timeout: 15_000 },
         )
-
         await page.getByRole('button', { name: 'Submit', exact: true }).click()
-
         const artworkResponse = await artworkResponsePromise
         const artworkPayload = (await artworkResponse.json()) as {
           id?: string | number
           media_file?: string | null
         }
-        expect(artworkPayload.id, 'Kreative artwork POST returned no id').toBeTruthy()
+        expect(
+          artworkPayload.id,
+          'Kreative artwork POST returned no id',
+        ).toBeTruthy()
         artworkId = String(artworkPayload.id)
-
         artworkMediaPath = mediaFilePath(artworkPayload.media_file)
 
         await expect(page).toHaveURL(/\/kreative\/dashboard/)
-        await expect(page.getByText(artworkTitle, { exact: true }).first()).toBeVisible()
+        await expect(
+          page.getByText(artworkTitle, { exact: true }).first(),
+        ).toBeVisible()
 
-        await visit(page, '/kreative/collaborative-spaces/start-new-space', findings)
+        await visit(
+          page,
+          '/kreative/collaborative-spaces/start-new-space',
+          findings,
+        )
         await page.getByLabel('Space Name').fill(collabName)
         await page
           .getByLabel('Description / Purpose')
@@ -477,49 +526,39 @@ test.describe('Platform bug harvest Wave 2', () => {
             response.status() < 300,
           { timeout: 15_000 },
         )
-        await page.getByRole('button', { name: 'Create Space', exact: true }).click()
+        await page
+          .getByRole('button', { name: 'Create Space', exact: true })
+          .click()
         const collabResponse = await collabResponsePromise
         const collabPayload = (await collabResponse.json()) as {
           id?: string | number
           name?: string
         }
-        expect(collabPayload.id, 'Kreative collab POST returned no id').toBeTruthy()
+        expect(
+          collabPayload.id,
+          'Kreative collab POST returned no id',
+        ).toBeTruthy()
         expect(collabPayload.name).toBe(collabName)
         collabId = String(collabPayload.id)
 
         await visit(page, '/kreative/collaborative-spaces/my-spaces', findings)
-        await expect(page.getByText(collabName, { exact: true }).first()).toBeVisible()
+        await expect(
+          page.getByText(collabName, { exact: true }).first(),
+        ).toBeVisible()
         await visit(page, '/kreative/traditions-archive', findings)
         await visit(page, '/kreative/idea-incubator/create-new-idea', findings)
-        await visit(page, '/kreative/community-showcases/submit-to-showcase', findings)
+        await visit(
+          page,
+          '/kreative/community-showcases/submit-to-showcase',
+          findings,
+        )
         await visit(page, '/kreative/mentorship', findings)
       })
 
-      await harvestStep('Kontrol admin API + surfaces', findings, async () => {
-        for (const endpoint of [
-          '/api/admin/audit-log/',
-          '/api/admin/moderation/',
-          '/api/admin/users/',
-          '/api/admin/konsensus-config/',
-        ]) {
-          const result = await apiRequest(page, endpoint)
-          expect(
-            result.ok,
-            `${endpoint} returned HTTP ${result.status}`,
-          ).toBeTruthy()
-        }
-
-        await visit(page, '/kontrol/dashboard', findings)
-        await visit(page, '/kontrol/audit-log', findings)
-        await visit(page, '/kontrol/moderation/queue', findings)
-        await visit(page, '/kontrol/users/all', findings)
-        await visit(page, '/kontrol/roles', findings)
-      })
-
-      await test.step('Report Wave 2 runtime findings together', async () => {
+      await test.step('Report Kreative runtime findings', async () => {
         expect(
           findings,
-          `Wave 2 runtime findings:\n${findings.join('\n')}`,
+          `Kreative runtime findings:\n${findings.join('\n')}`,
         ).toHaveLength(0)
       })
     } finally {
@@ -534,16 +573,44 @@ test.describe('Platform bug harvest Wave 2', () => {
             method: 'DELETE',
           }).catch(() => undefined)
         }
-        if (projectId) {
-          await apiRequest(page, `/api/keenkonnect/projects/${projectId}/`, {
-            method: 'DELETE',
-          }).catch(() => undefined)
-        }
       }
       if (artworkMediaPath) {
         await unlink(artworkMediaPath).catch(() => undefined)
       }
     }
+  })
+
+  test('runtime/API depth — Kontrol', async ({ page }) => {
+    test.setTimeout(120_000)
+    const findings: string[] = []
+
+    await harvestStep('Kontrol admin API + surfaces', findings, async () => {
+      for (const endpoint of [
+        '/api/admin/audit-log/',
+        '/api/admin/moderation/',
+        '/api/admin/users/',
+        '/api/admin/konsensus-config/',
+      ]) {
+        const result = await apiRequest(page, endpoint)
+        expect(
+          result.ok,
+          `${endpoint} returned HTTP ${result.status}`,
+        ).toBeTruthy()
+      }
+
+      await visit(page, '/kontrol/dashboard', findings)
+      await visit(page, '/kontrol/audit-log', findings)
+      await visit(page, '/kontrol/moderation/queue', findings)
+      await visit(page, '/kontrol/users/all', findings)
+      await visit(page, '/kontrol/roles', findings)
+    })
+
+    await test.step('Report Kontrol runtime findings', async () => {
+      expect(
+        findings,
+        `Kontrol runtime findings:\n${findings.join('\n')}`,
+      ).toHaveLength(0)
+    })
   })
 
   test('source-gap audit — fake success / mocks / missing wiring', async () => {
@@ -603,7 +670,7 @@ test.describe('Platform bug harvest Wave 2', () => {
 
       for (const [ruleName, pattern] of blockingRules) {
         pattern.lastIndex = 0
-        for (const match of Array.from(source.matchAll(pattern))) {
+        for (const match of source.matchAll(pattern)) {
           const before = source.slice(0, match.index ?? 0)
           const line = before.split(/\r?\n/).length
           const excerpt = lines[line - 1]?.trim() ?? match[0]
@@ -615,7 +682,7 @@ test.describe('Platform bug harvest Wave 2', () => {
 
       for (const [ruleName, pattern] of deferredRules) {
         pattern.lastIndex = 0
-        for (const match of Array.from(source.matchAll(pattern))) {
+        for (const match of source.matchAll(pattern)) {
           const before = source.slice(0, match.index ?? 0)
           const line = before.split(/\r?\n/).length
           const excerpt = lines[line - 1]?.trim() ?? match[0]
