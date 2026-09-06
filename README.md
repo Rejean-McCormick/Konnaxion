@@ -10,6 +10,35 @@ Alongside its technical architecture, Konnaxion includes a fictional origin myth
 
 ---
 
+## Current maturity & release status
+
+**Current status:** Advanced Functional Beta — Final Release Candidate Qualification  
+**Engineering maturity:** ~92%  
+**Release Candidate readiness:** ~86–90%  
+**Current release line:** `v0.8.0`  
+**Latest confirmed tag:** `v0.8.0-beta.2`  
+**Recommended next checkpoint:** `v0.8.0-rc.1`
+
+Konnaxion’s core civic-decision slice is now strongly qualified locally:
+
+- ethiKos → EkoH → Smart Vote delivery workflow: **GREEN**
+- Next.js production build: **GREEN**
+- Django checks and migration state: **GREEN**
+- Smart Vote schema and real reading runtime: **GREEN**
+- EkoH targeted browser smoke: **GREEN**
+- local Docker/runtime hardening: **GREEN**
+
+The main remaining work before production promotion is operational rather than core-product functionality:
+
+- fresh VPS / Linux security qualification;
+- production secret rotation;
+- clean-target deployment reproducibility;
+- backup → isolated restore → validation drill.
+
+Some secondary product surfaces remain explicitly **preview, read-only, placeholder, or deferred** where no complete backend contract exists yet. These placeholders are intentionally retained rather than being replaced by fabricated persistence or fake success states.
+
+> The project is entering Release Candidate qualification, but the current code should not yet be described as a final production release.
+
 ## Mythological Origins
 
 Konnaxion’s fictional foundation appears in the **Konvergence** universe, where symbolic events, archetypes, and narrative structures illuminate the forces that shape collective intelligence.
@@ -42,7 +71,7 @@ Each component is designed to operate independently or as part of a larger integ
 
 ## Access & how to try (placeholder)
 
-Konnaxion is in active development and is not yet exposed as a public demo instance.
+Konnaxion is in Release Candidate qualification and is not yet exposed as a public demo instance.
 
 This section will be updated with:
 
@@ -179,13 +208,17 @@ Smart Vote uses EkoH-derived weights (when enabled) to produce expertise-sensiti
 
 This repository currently includes:
 
-- JavaScript / TypeScript services and utilities  
-- Python analytical tools  
-- UI concept explorations  
-- Prototype service orchestration  
-- Data modeling experiments  
+- Next.js / React / TypeScript frontend applications and services  
+- Django / Django REST Framework backend APIs  
+- PostgreSQL data models and migrations  
+- Redis + Celery background processing  
+- Playwright browser qualification workflows  
+- Docker-based local and production orchestration  
+- Python analytical and diagnostic tooling  
+- UI concept explorations and explicitly retained prototype/placeholder surfaces  
+- data modeling and integration experiments  
 
-Each component contributes to the assembly of a unified civic infrastructure. The codebase is progressively evolving from prototypes and experiments towards more stable services aligned with the architecture above.
+Each component contributes to the assembly of a unified civic infrastructure. The core ethiKos / EkoH / Smart Vote path is now substantially implemented and qualified locally, while some secondary surfaces remain intentionally experimental, preview, read-only, placeholder, or deferred pending complete domain contracts.
 
 ---
 
