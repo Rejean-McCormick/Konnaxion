@@ -1,13 +1,9 @@
-// C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\create-new-idea\page.tsx
 'use client';
 
-import { message as antdMessage, Button, Form, Input, Select } from 'antd';
-import { useRouter } from 'next/navigation';
+import { Alert, Button, Form, Input, Select } from 'antd';
 import React from 'react';
 
 import KreativePageShell from '@/app/kreative/kreativePageShell';
-
-// Note: MainLayout import removed because the /kreative layout handles the layout wrapper.
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -18,66 +14,29 @@ type IdeaFormValues = {
   category: string;
 };
 
-const CreateNewIdea: React.FC = () => {
+export default function CreateNewIdea(): JSX.Element {
   const [form] = Form.useForm<IdeaFormValues>();
-  const router = useRouter();
-
-  // Handler for form submission.
-  const onFinish = (values: IdeaFormValues) => {
-    console.log('Submitted Idea:', values);
-    antdMessage.success('Votre idée a été soumise avec succès !');
-    // Redirect to the "My Ideas" page after submitting.
-    router.push('/kreative/idea-incubator/my-ideas');
-  };
 
   return (
     <KreativePageShell
       title="Create New Idea"
-      subtitle="Start a new idea in the incubator and capture its key details."
+      subtitle="Preview the intended idea-incubator intake model."
     >
-      <Form<IdeaFormValues> form={form} layout="vertical" onFinish={onFinish}>
-        {/* Title Field */}
-        <Form.Item
-          label="Title of Idea"
-          name="title"
-          rules={[
-            {
-              required: true,
-              message: 'Veuillez saisir le titre de votre idée.',
-            },
-          ]}
-        >
+      <Alert
+        type="info"
+        showIcon
+        message="Idea creation is a declared preview"
+        description="Kreative does not expose an idea-incubator persistence contract in this build. The form remains visible for product review, but submission is disabled."
+        style={{ marginBottom: 16 }}
+      />
+      <Form<IdeaFormValues> form={form} layout="vertical">
+        <Form.Item label="Title of Idea" name="title">
           <Input placeholder="Enter title of your idea" />
         </Form.Item>
-
-        {/* Detailed Description Field */}
-        <Form.Item
-          label="Detailed Description"
-          name="description"
-          rules={[
-            {
-              required: true,
-              message: 'Veuillez saisir une description détaillée de votre idée.',
-            },
-          ]}
-        >
-          <TextArea
-            rows={6}
-            placeholder="Explain your idea, including the problem it solves or your vision"
-          />
+        <Form.Item label="Detailed Description" name="description">
+          <TextArea rows={6} placeholder="Explain your idea and the problem it addresses" />
         </Form.Item>
-
-        {/* Category / Field Selector */}
-        <Form.Item
-          label="Category / Field"
-          name="category"
-          rules={[
-            {
-              required: true,
-              message: 'Veuillez sélectionner une catégorie.',
-            },
-          ]}
-        >
+        <Form.Item label="Category / Field" name="category">
           <Select placeholder="Select a category">
             <Option value="Technology">Technology</Option>
             <Option value="Art">Art</Option>
@@ -86,16 +45,12 @@ const CreateNewIdea: React.FC = () => {
             <Option value="Environment">Environment</Option>
           </Select>
         </Form.Item>
-
-        {/* Submit Button */}
         <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Submit Idea
+          <Button type="primary" disabled>
+            Submit unavailable
           </Button>
         </Form.Item>
       </Form>
     </KreativePageShell>
   );
-};
-
-export default CreateNewIdea;
+}

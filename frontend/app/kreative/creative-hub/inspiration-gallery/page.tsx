@@ -1,283 +1,87 @@
-// FILE: frontend/app/kreative/creative-hub/inspiration-gallery/page.tsx
-// C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
-'use client';
+'use client'
 
-import { HeartFilled, HeartOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Col,
-  Modal,
-  Pagination,
-  Row,
-  Space,
-  Tabs,
-  Typography,
-} from 'antd';
-import Image from 'next/image';
-import React, { useMemo, useState } from 'react';
+import { ReloadOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Col, Empty, Modal, Row, Space, Spin, Tag, Typography } from 'antd'
+import React, { useCallback, useEffect, useState } from 'react'
 
-import KreativePageShell from '@/app/kreative/kreativePageShell';
+import KreativePageShell from '@/app/kreative/kreativePageShell'
+import { listKreativeArtworks, type KreativeArtwork } from '@/services/kreative'
 
-const { Title, Text, Paragraph } = Typography;
-
-type Category = 'All' | 'Photography' | 'Painting' | 'Digital Art';
-
-interface CreativeWork {
-  id: string;
-  title: string;
-  description: string;
-  creator: string;
-  category: Exclude<Category, 'All'>;
-  imageUrl: string;
-  likes: number;
-  liked?: boolean;
-}
-
-// Dummy data for the gallery
-const dummyWorks: CreativeWork[] = [
-  {
-    id: '1',
-    title: 'Sunset Overdrive',
-    description: 'A breathtaking view of the sunset captured in high resolution.',
-    creator: 'Alice Johnson',
-    category: 'Photography',
-    imageUrl: 'https://via.placeholder.com/400x300.png?text=Sunset',
-    likes: 34,
-    liked: false,
-  },
-  {
-    id: '2',
-    title: 'Abstract Colors',
-    description: 'A vibrant abstract painting exploring the interplay of color.',
-    creator: 'Bob Smith',
-    category: 'Painting',
-    imageUrl: 'https://via.placeholder.com/400x300.png?text=Abstract+Painting',
-    likes: 58,
-    liked: false,
-  },
-  {
-    id: '3',
-    title: 'Digital Dreams',
-    description: 'A surreal piece of digital art mixing technology and imagination.',
-    creator: 'Carla Gomez',
-    category: 'Digital Art',
-    imageUrl: 'https://via.placeholder.com/400x300.png?text=Digital+Art',
-    likes: 72,
-    liked: false,
-  },
-  {
-    id: '4',
-    title: 'City Reflections',
-    description: 'A dramatic urban photograph showcasing reflections on wet streets.',
-    creator: 'David Lee',
-    category: 'Photography',
-    imageUrl: 'https://via.placeholder.com/400x300.png?text=City+Reflections',
-    likes: 43,
-    liked: false,
-  },
-  {
-    id: '5',
-    title: 'Impressionist Waves',
-    description: 'An impressionist painting capturing the movement of ocean waves.',
-    creator: 'Eva Martinez',
-    category: 'Painting',
-    imageUrl: 'https://via.placeholder.com/400x300.png?text=Impressionist+Waves',
-    likes: 66,
-    liked: false,
-  },
-  {
-    id: '6',
-    title: 'Virtual Reality',
-    description: 'An innovative digital artwork blending real and virtual elements.',
-    creator: 'Felix Zhang',
-    category: 'Digital Art',
-    imageUrl: 'https://via.placeholder.com/400x300.png?text=Virtual+Reality',
-    likes: 51,
-    liked: false,
-  },
-];
+const { Paragraph, Text, Title } = Typography
 
 export default function InspirationGalleryPage(): JSX.Element {
-  // State for category filtering, pagination, Modal, and works.
-  const [selectedCategory, setSelectedCategory] = useState<Category>('All');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 6;
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [selectedWork, setSelectedWork] = useState<CreativeWork | null>(null);
-  const [works, setWorks] = useState<CreativeWork[]>(dummyWorks);
+  const [works, setWorks] = useState<KreativeArtwork[]>([])
+  const [selected, setSelected] = useState<KreativeArtwork | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Tabs (AntD v5) items
-  const tabItems = useMemo(
-    () => [
-      { key: 'All', label: 'All' },
-      { key: 'Photography', label: 'Photography' },
-      { key: 'Painting', label: 'Painting' },
-      { key: 'Digital Art', label: 'Digital Art' },
-    ],
-    [],
-  );
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      setWorks(await listKreativeArtworks())
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to load artwork gallery.')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
 
-  // Filter works based on selected category.
-  const filteredWorks = useMemo(() => {
-    if (selectedCategory === 'All') return works;
-    return works.filter((work) => work.category === selectedCategory);
-  }, [selectedCategory, works]);
-
-  // Paginate the filtered works.
-  const paginatedWorks = useMemo(() => {
-    const startIndex = (currentPage - 1) * pageSize;
-    return filteredWorks.slice(startIndex, startIndex + pageSize);
-  }, [filteredWorks, currentPage]);
-
-  // Handle like toggle.
-  const toggleLike = (id: string): void => {
-    setWorks((prev) =>
-      prev.map((w) =>
-        w.id === id
-          ? {
-              ...w,
-              liked: !w.liked,
-              likes: w.liked ? w.likes - 1 : w.likes + 1,
-            }
-          : w,
-      ),
-    );
-  };
-
-  // Open Modal for work details.
-  const openWorkModal = (work: CreativeWork): void => {
-    setSelectedWork(work);
-    setModalVisible(true);
-  };
-
-  // Close the details Modal.
-  const closeModal = (): void => {
-    setModalVisible(false);
-    setSelectedWork(null);
-  };
+  useEffect(() => {
+    void load()
+  }, [load])
 
   return (
     <KreativePageShell
       title="Inspiration Gallery"
-      subtitle="Explore highlighted creative works from the Kreative community."
+      subtitle="Creative works loaded from the real Kreative artwork API."
+      primaryAction={<Button icon={<ReloadOutlined />} onClick={() => void load()}>Refresh</Button>}
     >
-      {/* Category Filter (AntD v5 Tabs API) */}
-      <Tabs
-        activeKey={selectedCategory}
-        onChange={(key) => {
-          setSelectedCategory(key as Category);
-          setCurrentPage(1);
-        }}
-        type="card"
-        items={tabItems}
-        style={{ marginBottom: 24 }}
-      />
-
-      {/* Gallery Grid */}
-      <Row gutter={[16, 16]}>
-        {paginatedWorks.map((work) => (
-          <Col key={work.id} xs={24} sm={12} md={8}>
-            <Card
-              hoverable
-              cover={
-                <Image
-                  alt={work.title}
-                  src={work.imageUrl}
-                  width={400}
-                  height={200}
-                  unoptimized
-                  style={{ width: '100%', height: 200, objectFit: 'cover' }}
-                />
-              }
-              actions={[
-                <Button
-                  key="like"
-                  type="text"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleLike(work.id);
-                  }}
-                >
-                  {work.liked ? (
-                    <HeartFilled style={{ color: 'red', fontSize: 18 }} />
+      {error ? <Alert type="error" showIcon message="Gallery load failed" description={error} style={{ marginBottom: 16 }} /> : null}
+      <Spin spinning={loading}>
+        {works.length === 0 ? (
+          <Empty description="No creative works have been submitted yet." />
+        ) : (
+          <Row gutter={[16, 16]}>
+            {works.map((work) => (
+              <Col key={work.id} xs={24} sm={12} md={8}>
+                <Card hoverable title={work.title} onClick={() => setSelected(work)}>
+                  {work.media_type === 'image' && work.media_url ? (
+                    <img
+                      alt={work.title}
+                      src={work.media_url}
+                      style={{ width: '100%', height: 190, objectFit: 'cover', borderRadius: 6, marginBottom: 12 }}
+                    />
                   ) : (
-                    <HeartOutlined style={{ fontSize: 18 }} />
+                    <Alert type="info" showIcon message={`${work.media_type} work`} style={{ marginBottom: 12 }} />
                   )}
-                  <Text style={{ marginLeft: 4 }}>{work.likes}</Text>
-                </Button>,
-              ]}
-              onClick={() => openWorkModal(work)}
-            >
-              <Card.Meta
-                title={work.title}
-                description={
-                  <>
-                    <Text>{work.creator}</Text>
-                    <br />
-                    {/* Replace ellipsis={{}} with CSS line clamp */}
-                    <Paragraph type="secondary" className="lineClamp2">
-                      {work.description}
-                    </Paragraph>
-                  </>
-                }
-              />
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
-      {/* Pagination */}
-      <div style={{ textAlign: 'center', marginTop: 24 }}>
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={filteredWorks.length}
-          onChange={(page) => setCurrentPage(page)}
-        />
-      </div>
-
-      {/* Modal for work details */}
-      <Modal open={modalVisible} footer={null} onCancel={closeModal} width={800}>
-        {selectedWork && (
-          <>
-            <Image
-              alt={selectedWork.title}
-              src={selectedWork.imageUrl}
-              width={800}
-              height={400}
-              unoptimized
-              style={{ width: '100%', height: 400, objectFit: 'contain' }}
-            />
-            <div style={{ marginTop: 16 }}>
-              <Title level={3}>{selectedWork.title}</Title>
-              <Text strong>By: </Text>
-              <Text>{selectedWork.creator}</Text>
-              <p style={{ marginTop: 12 }}>{selectedWork.description}</p>
-              <Space>
-                <Button type="text" onClick={() => toggleLike(selectedWork.id)}>
-                  {selectedWork.liked ? (
-                    <HeartFilled style={{ color: 'red', fontSize: 20 }} />
-                  ) : (
-                    <HeartOutlined style={{ fontSize: 20 }} />
-                  )}
-                  <Text style={{ marginLeft: 4 }}>{selectedWork.likes} Likes</Text>
-                </Button>
-              </Space>
-            </div>
-          </>
+                  <Space direction="vertical" size="small">
+                    <Text>{work.artist}</Text>
+                    <Space wrap>
+                      <Tag>{work.media_type}</Tag>
+                      {work.medium ? <Tag>{work.medium}</Tag> : null}
+                    </Space>
+                    <Paragraph ellipsis={{ rows: 2 }} style={{ marginBottom: 0 }}>{work.description}</Paragraph>
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         )}
-      </Modal>
+      </Spin>
 
-      <style jsx>{`
-        /* Multi-line clamp to replace AntD ellipsis { rows } */
-        .lineClamp2 {
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-      `}</style>
+      <Modal open={Boolean(selected)} footer={null} onCancel={() => setSelected(null)} width={760}>
+        {selected ? (
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Title level={3}>{selected.title}</Title>
+            <Text type="secondary">By {selected.artist}</Text>
+            {selected.media_type === 'image' && selected.media_url ? (
+              <img alt={selected.title} src={selected.media_url} style={{ width: '100%', maxHeight: 460, objectFit: 'contain' }} />
+            ) : null}
+            <Paragraph>{selected.description}</Paragraph>
+          </Space>
+        ) : null}
+      </Modal>
     </KreativePageShell>
-  );
+  )
 }

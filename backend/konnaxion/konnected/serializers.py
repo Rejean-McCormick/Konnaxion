@@ -10,6 +10,12 @@ from .models import (
     KnowledgeRecommendation,
     LearningProgress,
     OfflinePackage,
+    MentorProfile,
+    MentorshipRequest,
+    CoCreationProject,
+    CoCreationContribution,
+    ForumTopic,
+    ForumPost,
 )
 
 __all__ = [
@@ -22,6 +28,12 @@ __all__ = [
     "LearningProgressSerializer",
     "OfflinePackageSerializer",
     "ExamAttemptSerializer",
+    "MentorProfileSerializer",
+    "MentorshipRequestSerializer",
+    "CoCreationProjectSerializer",
+    "CoCreationContributionSerializer",
+    "ForumTopicSerializer",
+    "ForumPostSerializer",
 ]
 
 
@@ -114,9 +126,7 @@ class KnowledgeRecommendationSerializer(serializers.ModelSerializer):
     """
 
     user = serializers.StringRelatedField(read_only=True)
-    resource = serializers.PrimaryKeyRelatedField(
-        queryset=KnowledgeResource.objects.all(),
-    )
+    resource = KnowledgeResourceSerializer(read_only=True)
 
     class Meta:
         model = KnowledgeRecommendation
@@ -248,6 +258,77 @@ class OfflinePackageSerializer(serializers.ModelSerializer):
             "updated_at",
         )
 
+
+
+class MentorProfileSerializer(serializers.ModelSerializer):
+    """Public mentor directory projection backed by MentorProfile."""
+
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = MentorProfile
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "user",
+            "created_at",
+            "updated_at",
+            "rating",
+            "sessions_completed",
+        )
+
+
+class MentorshipRequestSerializer(serializers.ModelSerializer):
+    """Authenticated learner -> mentor request."""
+
+    mentee = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = MentorshipRequest
+        fields = "__all__"
+        read_only_fields = (
+            "id",
+            "mentee",
+            "status",
+            "responded_at",
+            "created_at",
+            "updated_at",
+        )
+
+
+class CoCreationProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CoCreationProject
+        fields = "__all__"
+        read_only_fields = ("id", "created_at", "updated_at")
+
+
+class CoCreationContributionSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = CoCreationContribution
+        fields = "__all__"
+        read_only_fields = ("id", "user", "created_at", "updated_at")
+
+
+class ForumTopicSerializer(serializers.ModelSerializer):
+    creator = serializers.StringRelatedField(read_only=True)
+    replies_count = serializers.IntegerField(source="posts.count", read_only=True)
+
+    class Meta:
+        model = ForumTopic
+        fields = "__all__"
+        read_only_fields = ("id", "creator", "created_at", "updated_at")
+
+
+class ForumPostSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = ForumPost
+        fields = "__all__"
+        read_only_fields = ("id", "author", "created_at", "updated_at")
 
 class ExamAttemptSerializer(serializers.Serializer):
     """

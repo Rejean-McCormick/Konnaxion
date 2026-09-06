@@ -15,16 +15,6 @@ import React from 'react';
 
 import type { Route } from './types';
 
-/* ---------- Team Builder overview (top-level shortcut) ---------- */
-
-const teambuilderDashboard: Route = {
-  path: '/teambuilder',
-  name: 'Team Builder – Overview',
-  icon: <DashboardOutlined />,
-  scope: 'module',
-  moduleKey: 'teambuilder',
-};
-
 /* ---------- Sessions ---------- */
 
 const sessionsGroup: Route = {
@@ -123,7 +113,6 @@ const problemsGroup: Route = {
 };
 
 const routes: Route[] = [
-  teambuilderDashboard, // top-level shortcut like other modules
   sessionsGroup,
   humansGroup,
   problemsGroup,

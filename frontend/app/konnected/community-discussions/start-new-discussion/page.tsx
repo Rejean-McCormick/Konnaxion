@@ -72,7 +72,7 @@ async function extractBackendMessage(res: Response): Promise<string | undefined>
 /**
  * Start New Discussion page for KonnectED → Community Discussions.
  * Creates a ForumTopic, then (optionally) an initial ForumPost
- * using the real backend endpoints /api/forum-topics/ and /api/forum-posts/.
+ * using the real backend endpoints /api/konnected/forum-topics/ and /api/konnected/forum-posts/.
  */
 export default function StartNewDiscussionPage(): JSX.Element {
   const [form] = Form.useForm<FormValues>();
@@ -98,7 +98,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
       const { topic, initialPostContent } = buildBodies(values);
 
       // 1) Create the forum topic (thread) itself.
-      const topicRes = await apiFetch('/api/forum-topics/', {
+      const topicRes = await apiFetch('/api/konnected/forum-topics/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ export default function StartNewDiscussionPage(): JSX.Element {
             content: initialPostContent,
           };
 
-          const postRes = await apiFetch('/api/forum-posts/', {
+          const postRes = await apiFetch('/api/konnected/forum-posts/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

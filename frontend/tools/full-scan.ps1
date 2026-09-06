@@ -1,4 +1,8 @@
-﻿# tools/full-scan.ps1
+param(
+  [switch]$KeepFrontend
+)
+
+# tools/full-scan.ps1
 # Exécute tous les checks et écrit les rapports dans .\reports\
 # Usage: pwsh -NoProfile -ExecutionPolicy Bypass -File tools/full-scan.ps1
 
@@ -54,6 +58,20 @@ function Run-Step([string]$name, [string]$cmd, [string]$outfile) {
   return $code
 }
 
+function Stop-ProcessTree([int]$ProcessId) {
+  if (-not (Get-Process -Id $ProcessId -ErrorAction SilentlyContinue)) {
+    return
+  }
+
+  # taskkill /T closes the full Node/Next tree so no descendant can retain
+  # redirected stdout/stderr handles and keep a parent runner blocked.
+  & taskkill.exe /PID $ProcessId /T /F *> $null
+
+  if ($LASTEXITCODE -ne 0 -and (Get-Process -Id $ProcessId -ErrorAction SilentlyContinue)) {
+    Stop-Process -Id $ProcessId -Force -ErrorAction SilentlyContinue
+  }
+}
+
 function Stop-ExistingFrontend3000 {
   $listener = Get-NetTCPConnection `
     -LocalPort 3000 `
@@ -81,7 +99,7 @@ function Stop-ExistingFrontend3000 {
   }
 
   Write-Host "▶ Arrêt du Next existant sur 3000 (PID $pid3000)"
-  Stop-Process -Id $pid3000 -Force -ErrorAction Stop
+  Stop-ProcessTree $pid3000
 
   for ($attempt = 1; $attempt -le 20; $attempt++) {
     $stillListening = Get-NetTCPConnection `
@@ -148,7 +166,7 @@ function Start-SmokeServer([int]$port) {
 
   if (-not $ready) {
     if (-not $process.HasExited) {
-      Stop-Process -Id $process.Id -Force -ErrorAction SilentlyContinue
+      Stop-ProcessTree $process.Id
     }
 
     throw "Le serveur Next smoke n'est pas devenu prêt sur $baseUrl."
@@ -234,11 +252,14 @@ if (Test-Path ".\node_modules\.bin\playwright.cmd") {
     if ($null -ne $smokeServer -and $null -ne $smokeServer.Process) {
       $pidToStop = $smokeServer.Process.Id
 
-      if ($frontendWasRunning) {
-        Write-Host ("Next frais conservé sur http://localhost:3000 (PID {0})" -f $pidToStop)
+      if ($frontendWasRunning -and $KeepFrontend) {
+        Write-Host (
+          "Next frais conservé sur http://localhost:3000 (PID {0}) (-KeepFrontend)" -f $pidToStop
+        )
       }
       elseif (Get-Process -Id $pidToStop -ErrorAction SilentlyContinue) {
-        Stop-Process -Id $pidToStop -Force -ErrorAction SilentlyContinue
+        Write-Host ("▶ Arrêt du serveur Next smoke (PID {0})" -f $pidToStop)
+        Stop-ProcessTree $pidToStop
       }
     }
   }

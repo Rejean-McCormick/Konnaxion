@@ -75,9 +75,9 @@ interface TeamRow {
 }
 
 // Backend endpoints as per v14 spec
-const MY_TEAMS_ENDPOINT = '/api/konnected/teams/my-teams';
+const MY_TEAMS_ENDPOINT = '/api/keenkonnect/teams/my-teams/';
 const LEAVE_TEAM_ENDPOINT = (teamId: string) =>
-  `/api/konnected/teams/${encodeURIComponent(teamId)}/leave`;
+  `/api/keenkonnect/teams/${encodeURIComponent(teamId)}/leave/`;
 
 /**
  * Normalizes API payload (array or { items }) into table rows.

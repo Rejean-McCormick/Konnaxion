@@ -158,10 +158,9 @@ export default function AuditLogPage(): JSX.Element {
   ];
 
   const handleExport = () => {
-    // In a real implementation, this would trigger a backend CSV download endpoint
-    message
-      .loading('Generating audit report...', 1.5)
-      .then(() => message.success('Audit_Log_Export.csv downloaded'));
+    message.warning(
+      'CSV export is unavailable because the audit endpoint currently exposes JSON only.',
+    );
   };
 
   const title = 'System audit log';
@@ -182,8 +181,10 @@ export default function AuditLogPage(): JSX.Element {
       type="primary"
       icon={<CloudDownloadOutlined />}
       onClick={handleExport}
+      disabled
+      title="No CSV export endpoint is exposed."
     >
-      Export CSV
+      Export unavailable
     </Button>
   );
 

@@ -1,7 +1,6 @@
 // C:\MyCode\Konnaxionv14\frontend\app\keenkonnect\knowledge\document-management\page.tsx
 'use client';
 
-import { Comment } from '@ant-design/compatible';
 import {
   EyeOutlined,
   PlusOutlined,
@@ -18,6 +17,7 @@ import {
   ProFormTextArea,
 } from '@ant-design/pro-components';
 import {
+  Alert,
   Avatar,
   Button,
   Card,
@@ -229,6 +229,7 @@ const getStatusColor = (status: DocumentStatus): string => {
 };
 
 export default function DocumentManagementPage() {
+  const [messageApi, messageContextHolder] = message.useMessage();
   const router = useRouter();
 
   const [dataSource, setDataSource] = useState<ManagedDocument[]>(initialDocuments);
@@ -248,17 +249,16 @@ export default function DocumentManagementPage() {
 
   const handleSaveChanges = () => {
     if (!selectedDocument) return;
-    // Simulation d’un appel API
-     
-    console.log('Saving changes for document', selectedDocument.id);
-    message.success('Changes saved (simulated).');
+    messageApi.info(
+      'Changes are kept in this browser session only; no document persistence endpoint is exposed.',
+    );
   };
 
   const handlePublishNewVersion = () => {
     if (!selectedDocument) return;
-     
-    console.log('Publishing new version for document', selectedDocument.id);
-    message.success('New version published (simulated).');
+    messageApi.warning(
+      'Version publishing is unavailable until a document-version persistence contract exists.',
+    );
   };
 
   const handleCreateDocument = async (values: NewDocumentFormValues) => {
@@ -283,7 +283,9 @@ export default function DocumentManagementPage() {
     setDataSource(prev => [...prev, newDoc]);
     setSelectedDocument(newDoc);
     setDrawerOpen(true);
-    message.success('Document entry created (local example).');
+    messageApi.info(
+      'Document added to the current session only; it has not been persisted.',
+    );
 
     return true;
   };
@@ -453,6 +455,14 @@ export default function DocumentManagementPage() {
         </Space>
       }
     >
+      {messageContextHolder}
+      <Alert
+        type="warning"
+        showIcon
+        style={{ marginBottom: 16 }}
+        message="Session-local document workspace"
+        description="This screen has no general document persistence contract yet. Edits and newly created entries remain in the current browser session."
+      />
       <EditableProTable<ManagedDocument>
         rowKey="id"
         bordered
@@ -491,7 +501,7 @@ export default function DocumentManagementPage() {
                 New document
               </Button>
             }
-            modalProps={{ destroyOnClose: true }}
+            modalProps={{ destroyOnHidden: true }}
             initialValues={{
               status: 'Draft',
               language: 'English',
@@ -587,7 +597,7 @@ export default function DocumentManagementPage() {
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         width={1000}
-        destroyOnClose
+        destroyOnHidden
       >
         {selectedDocument && (
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -614,7 +624,7 @@ export default function DocumentManagementPage() {
             <Row gutter={16}>
               <Col xs={24} md={14}>
                 <Card
-                  title="Real-time editing (simulated)"
+                  title="Session-local editing"
                   extra={
                     <Tooltip title="Open full editor in Konstruct (future integration)">
                       <Button type="link" icon={<EyeOutlined />}>
@@ -709,12 +719,12 @@ export default function DocumentManagementPage() {
                         <List.Item.Meta
                           title={`${item.version} · ${item.timestamp}`}
                           description={
-                            <>
+                            <div>
                               <div>
                                 <strong>{item.author}</strong>
                               </div>
                               <div>{item.changeSummary}</div>
-                            </>
+                            </div>
                           }
                         />
                       </List.Item>
@@ -728,18 +738,25 @@ export default function DocumentManagementPage() {
                   </Button>
                 </Card>
 
-                <Card title="Comments (simulated thread)" className="mt-4">
+                <Card title="Comments preview" className="mt-4">
                   <List
                     itemLayout="horizontal"
                     dataSource={commentsData}
                     renderItem={comment => (
-                      <Comment
-                        key={comment.id}
-                        author={comment.author}
-                        avatar={<Avatar src={comment.avatar} />}
-                        content={comment.content}
-                        datetime={comment.datetime}
-                      />
+                      <List.Item key={comment.id}>
+                        <List.Item.Meta
+                          avatar={<Avatar src={comment.avatar} />}
+                          title={comment.author}
+                          description={
+                            <div>
+                              <div>{comment.content}</div>
+                              <div style={{ color: '#999', marginTop: 4 }}>
+                                {comment.datetime}
+                              </div>
+                            </div>
+                          }
+                        />
+                      </List.Item>
                     )}
                   />
                 </Card>

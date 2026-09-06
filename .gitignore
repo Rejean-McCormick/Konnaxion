@@ -2,15 +2,27 @@
 # ROOT .gitignore (backend + frontend)
 ##############################################################################
 
-# Backups / local junk
+##############################################################################
+# 0) Backups / local copies / generated working trees
+##############################################################################
 Backups/
+.kx_deploy_backups/
+_BUG_HARVEST_SOURCE/
+_BUG_HARVEST_REVIEW/
+**/*_Dump/
+**/*_dump/
+
 *.bak
+*.bak_*
 *.orig
 *.tmp
 *.swp
 
+# Generated concatenations / local source dumps
+**/concat_*.txt
+
 ##############################################################################
-# 0) OS / Editors
+# 1) OS / Editors
 ##############################################################################
 .DS_Store
 Thumbs.db
@@ -23,7 +35,7 @@ Desktop.ini
 *.sublime-project
 
 ##############################################################################
-# 1) Logs / Reports / Caches
+# 2) Logs / Reports / Caches / runtime evidence
 ##############################################################################
 *.log
 logs/
@@ -37,8 +49,24 @@ routes-tests.json
 use_client_report.csv
 use_client_report.json
 
+# Konnaxion generated diagnostics / campaign runs
+.bug-harvest-runs/
+.bug-harvest-wave2-runs/
+.mega-test-campaign/
+.levelupdiag/
+.levelupdiag-upgrade-backups/
+.securitydiag/
+
+# Generated frontend diagnostics and authenticated browser state
+frontend/reports/
+frontend/eslint-full.json
+frontend/storageState*.json
+
+# Generated Structurizr local index/cache
+**/.structurizr/
+
 ##############################################################################
-# 2) Secrets / Environment
+# 3) Secrets / Environment / private keys
 ##############################################################################
 .env
 .env.*
@@ -47,8 +75,15 @@ use_client_report.json
 !env.example
 !*.example
 
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+id_ed25519*
+
 ##############################################################################
-# 3) Python
+# 4) Python
 ##############################################################################
 __pycache__/
 *.py[cod]
@@ -73,7 +108,7 @@ ENV/
 *.db
 
 ##############################################################################
-# 4) Node / Frontend
+# 5) Node / Frontend
 ##############################################################################
 node_modules/
 .pnpm/
@@ -101,13 +136,18 @@ pnpm-debug.log*
 *.tgz
 
 ##############################################################################
-# 5) Django / generated assets
+# 6) Django / generated assets
 ##############################################################################
 staticfiles/
 media/
 
 ##############################################################################
-# 6) Docker / local data
+# 7) Cinematic generated output
+##############################################################################
+cinematic/**/output/
+
+##############################################################################
+# 8) Docker / local data
 ##############################################################################
 **/local_postgres_data/
 **/local_postgres_data_backups/
@@ -119,22 +159,9 @@ compose/**/traefik/acme.json
 compose/**/nginx/certs/
 
 ##############################################################################
-# 7) Keep important project files
+# 9) Archives / local helper
 ##############################################################################
-!**/.dockerignore
-!**/Dockerfile
-!**/docker-compose*.yml
-!**/compose*.yml
-!**/requirements/
-!**/requirements/*.txt
-!**/migrations/
-!**/migrations/*.py
-!**/package.json
-!**/pnpm-lock.yaml
-!**/next.config.*
-!**/tsconfig.json
-!*.md
-
 *.tar.gz
-*.zip
-GitSink.bat
+*.zip
+
+GitSink.bat

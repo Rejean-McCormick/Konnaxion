@@ -1,186 +1,190 @@
 // FILE: frontend/app/ekoh/overview-analytics/current-ekoh-score/page.tsx
-// app/ekoh/overview-analytics/current-ekoh-score/page.tsx
 'use client';
 
-import { Alert, Card, Table, Timeline } from 'antd';
-import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
 import {
-  CartesianGrid,
-  Cell,
-  Legend,
-  Line,
-  Pie,
-  LineChart as ReLineChart,
-  PieChart as RePieChart,
-  ResponsiveContainer,
-  Tooltip as ReTooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+  Alert,
+  Card,
+  Col,
+  Empty,
+  List,
+  Progress,
+  Row,
+  Space,
+  Statistic,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
+import type { ColumnsType } from 'antd/es/table';
 
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
+import useReputationEvents from '@/hooks/useReputationEvents';
+import type { EkohExpertiseScore, EkohScoreHistoryEntry } from '@/services/ekoh';
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+const { Paragraph, Text } = Typography;
 
-type Point = { date: string; score: number };
+function percent(score: number): number {
+  return Math.max(0, Math.min(100, Math.round(score * 100)));
+}
 
-const CurrentEkohScore = (): JSX.Element => {
-  const [pieData] = useState([
-    { name: 'Expertise', value: 40 },
-    { name: 'Community Feedback', value: 35 },
-    { name: 'Ethics', value: 25 },
-  ]);
+function dateLabel(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleString();
+}
 
-  const [trendData, setTrendData] = useState<Point[]>([
-    { date: '2023-08-01', score: 60 },
-    { date: '2023-08-02', score: 62 },
-    { date: '2023-08-03', score: 65 },
-    { date: '2023-08-04', score: 67 },
-    { date: '2023-08-05', score: 70 },
-    { date: '2023-08-06', score: 72 },
-    { date: '2023-08-07', score: 75 },
-  ]);
+const historyColumns: ColumnsType<EkohScoreHistoryEntry> = [
+  {
+    title: 'Changed',
+    dataIndex: 'changedAt',
+    key: 'changedAt',
+    render: (value: string) => dateLabel(value),
+  },
+  {
+    title: 'Domain',
+    key: 'domain',
+    render: (_, row) => (
+      <Space wrap>
+        <Text>{row.domainName}</Text>
+        <Tag>{row.domainCode}</Tag>
+      </Space>
+    ),
+  },
+  {
+    title: 'Previous',
+    dataIndex: 'oldValue',
+    key: 'oldValue',
+    render: (value: number) => `${percent(value)}%`,
+  },
+  {
+    title: 'Current',
+    dataIndex: 'newValue',
+    key: 'newValue',
+    render: (value: number) => `${percent(value)}%`,
+  },
+  {
+    title: 'Reason',
+    dataIndex: 'changeReason',
+    key: 'changeReason',
+    render: (value: string) => value || 'Not supplied',
+  },
+];
 
-  const timelineData = [
-    { key: '1', time: '2023-08-02', event: 'Achieved Expert Level 3' },
-    { key: '2', time: '2023-08-04', event: 'Received high community feedback' },
-    { key: '3', time: '2023-08-06', event: 'Ethics audit improved rating' },
-  ];
-
-  const tableColumns = [
-    { title: 'Date', dataIndex: 'date', key: 'date' },
-    { title: 'Contribution Detail', dataIndex: 'detail', key: 'detail' },
-  ];
-
-  const tableData = [
-    { key: '1', date: '2023-08-02', detail: 'Expert review added +4 points' },
-    { key: '2', date: '2023-08-04', detail: 'Community vote increased score by +3 points' },
-    { key: '3', date: '2023-08-06', detail: 'Ethics audit contributed +2 points' },
-  ];
-
-  // Simple live update to simulate a moving score trend
-  useEffect(() => {
-    const tick = () => {
-      const datePart = new Date().toLocaleDateString('en-CA'); // "YYYY-MM-DD"
-      const newScore = 60 + Math.floor(Math.random() * 20);
-
-      setTrendData((prev) => {
-        const last = prev.slice(-7);
-        const existingIndex = last.findIndex((p) => p.date === datePart);
-
-        if (existingIndex >= 0) {
-          return last.map((p, i) =>
-            i === existingIndex ? { date: p.date, score: newScore } : p,
-          );
-        }
-
-        return [...prev.slice(-6), { date: datePart, score: newScore }];
-      });
-    };
-
-    tick();
-    const id = setInterval(tick, 5000);
-    return () => clearInterval(id);
-  }, []);
+export default function CurrentEkohScore(): JSX.Element {
+  const { data, isLoading, isError, error } = useReputationEvents();
+  const profile = data?.ekohProfile ?? null;
+  const expertise = profile?.expertise ?? [];
+  const history = profile?.scoreHistory ?? [];
+  const topDomain = expertise[0];
 
   return (
-    <>
-      <Head>
-        {/* Use the spec term “Score Analytics” for this Ekoh view */}
-        <title>Ekoh – Score Analytics</title>
-        <meta
-          name="description"
-          content="Donut and trend line view of the factors contributing to your Ekoh score, plus key events and recent evaluations."
+    <EkohPageShell
+      title="EkoH profile analytics"
+      subtitle="Canonical expertise, ethics context, visibility, and disclosed score history."
+    >
+      {isError && (
+        <Alert
+          type="error"
+          showIcon
+          message="Unable to load EkoH profile"
+          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          style={{ marginBottom: 16 }}
         />
-      </Head>
+      )}
 
-      <EkohPageShell
-        title="Score Analytics"
-        subtitle="Breakdown of your Ekoh score factors over time, with key events and recent evaluations."
-      >
-        {/* Score breakdown donut */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Score Breakdown</h2>
-          <div style={{ width: '100%', height: 300 }}>
-            <ResponsiveContainer>
-              <RePieChart>
-                <ReTooltip />
-                <Legend verticalAlign="bottom" height={36} />
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={100}
-                  dataKey="value"
-                  paddingAngle={5}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-              </RePieChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
+      <Alert
+        type="info"
+        showIcon
+        message="No synthetic composite score"
+        description="EkoH exposes domain expertise and an ethics/reliability modifier. This page does not combine them with community feedback or random values into an invented universal score."
+        style={{ marginBottom: 16 }}
+      />
 
-        {/* Historical trend line */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">Historical Trend</h2>
-          <div style={{ width: '100%', height: 250 }}>
-            <ResponsiveContainer>
-              <ReLineChart data={trendData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis />
-                <ReTooltip />
-                <Line type="monotone" dataKey="score" stroke="#82ca9d" />
-              </ReLineChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={6}>
+          <Card loading={isLoading}>
+            <Statistic title="Expertise domains" value={expertise.length} />
+          </Card>
+        </Col>
+        <Col xs={24} md={6}>
+          <Card loading={isLoading}>
+            <Statistic
+              title="Strongest domain"
+              value={topDomain ? percent(topDomain.weightedScore) : 0}
+              suffix={topDomain ? '%' : undefined}
+            />
+            {topDomain && <Tag style={{ marginTop: 8 }}>{topDomain.domainName}</Tag>}
+          </Card>
+        </Col>
+        <Col xs={24} md={6}>
+          <Card loading={isLoading}>
+            <Statistic
+              title="Ethics / reliability modifier"
+              value={profile?.ethicsScore ?? 1}
+              precision={2}
+              suffix="×"
+            />
+          </Card>
+        </Col>
+        <Col xs={24} md={6}>
+          <Card loading={isLoading}>
+            <Statistic
+              title="Rating visibility"
+              value={profile?.ratingVisibility ?? 'N/A'}
+            />
+          </Card>
+        </Col>
+      </Row>
 
-        {/* Key events timeline */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Key Events Influencing Your Score
-          </h2>
-          <Timeline>
-            {timelineData.map((item) => (
-              <Timeline.Item key={item.key}>
-                <strong>{item.time}</strong> - {item.event}
-              </Timeline.Item>
-            ))}
-          </Timeline>
-        </Card>
-
-        {/* Calculation explanation */}
-        <Card className="mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            How Your Score is Calculated
-          </h2>
-          <Alert
-            message="Score Calculation Explained"
-            description="Your Ekoh score is derived from a weighted combination of your expertise level, community feedback, and ethical evaluations. This transparent approach ensures that every contribution is fairly recognized."
-            type="info"
-            showIcon
+      <Card title="Domain expertise" loading={isLoading} style={{ marginTop: 16 }}>
+        {expertise.length ? (
+          <List<EkohExpertiseScore>
+            dataSource={expertise}
+            renderItem={(item) => {
+              const value = percent(item.weightedScore);
+              return (
+                <List.Item key={item.domainCode}>
+                  <div style={{ width: '100%' }}>
+                    <Space
+                      style={{ width: '100%', justifyContent: 'space-between' }}
+                      wrap
+                    >
+                      <Space wrap>
+                        <Text strong>{item.domainName}</Text>
+                        <Tag>{item.domainCode}</Tag>
+                      </Space>
+                      <Text type="secondary">{value}%</Text>
+                    </Space>
+                    <Progress percent={value} showInfo={false} />
+                  </div>
+                </List.Item>
+              );
+            }}
           />
-        </Card>
+        ) : (
+          <Empty description="No canonical EkoH expertise profile available" />
+        )}
+      </Card>
 
-        {/* Recent contributing evaluations */}
-        <Card>
-          <h2 className="text-xl font-semibold mb-4">
-            Recent Evaluations Impacting Your Score
-          </h2>
-          <Table columns={tableColumns} dataSource={tableData} pagination={false} />
+      <Card title="Disclosed score history" loading={isLoading} style={{ marginTop: 16 }}>
+        {history.length ? (
+          <Table<EkohScoreHistoryEntry>
+            rowKey={(row) => `${row.domainCode}-${row.changedAt}`}
+            columns={historyColumns}
+            dataSource={history}
+            pagination={false}
+          />
+        ) : (
+          <Empty description="No score history available in the current EkoH access scope" />
+        )}
+      </Card>
+
+      {profile?.ratingPublicationBasis && (
+        <Card title="Publication basis" style={{ marginTop: 16 }}>
+          <Paragraph style={{ marginBottom: 0 }}>
+            {profile.ratingPublicationBasis}
+          </Paragraph>
         </Card>
-      </EkohPageShell>
-    </>
+      )}
+    </EkohPageShell>
   );
-};
-
-export default CurrentEkohScore;
+}

@@ -40,8 +40,8 @@ interface FilterState {
   sort: SortOption
 }
 
-// Demo data
-const sampleDocuments: DocumentResource[] = [
+// Declared preview dataset: no general knowledge-document search contract exists.
+const PREVIEW_DOCUMENTS: DocumentResource[] = [
   {
     key: '1',
     title: 'Robotics Blueprint',
@@ -99,9 +99,9 @@ const sampleDocuments: DocumentResource[] = [
   },
 ]
 
-const allAuthors = Array.from(new Set(sampleDocuments.map((d) => d.author))).sort()
-const allTags = Array.from(new Set(sampleDocuments.flatMap((d) => d.tags))).sort()
-const allLanguages = Array.from(new Set(sampleDocuments.map((d) => d.language))).sort()
+const allAuthors = Array.from(new Set(PREVIEW_DOCUMENTS.map((d) => d.author))).sort()
+const allTags = Array.from(new Set(PREVIEW_DOCUMENTS.flatMap((d) => d.tags))).sort()
+const allLanguages = Array.from(new Set(PREVIEW_DOCUMENTS.map((d) => d.language))).sort()
 
 const DEFAULT_SORT: SortOption = 'relevance'
 
@@ -149,7 +149,7 @@ export default function SearchFilterDocumentsPage(): JSX.Element {
   const filteredDocuments = useMemo(() => {
     const { keyword, authors, tags, language, dateRange } = filters
 
-    return sampleDocuments.filter((doc) => {
+    return PREVIEW_DOCUMENTS.filter((doc) => {
       const matchesKeyword =
         !keyword ||
         doc.title.toLowerCase().includes(keyword.toLowerCase()) ||

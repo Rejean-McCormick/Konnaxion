@@ -157,6 +157,7 @@ async function safeScreenshot(page: Page, name: string): Promise<void> {
     await page.screenshot({
       path: path.join(OUT_DIR, `${name}.png`),
       fullPage: true,
+      caret: 'initial',
     })
   } catch {
     // Screenshot evidence is best-effort; assertions remain authoritative.

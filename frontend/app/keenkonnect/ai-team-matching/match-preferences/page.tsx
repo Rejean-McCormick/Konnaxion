@@ -8,7 +8,7 @@ import {
   ProFormTextArea,
   StepsForm,
 } from '@ant-design/pro-components';
-import { Card } from 'antd';
+import { Alert, Card } from 'antd';
 import React from 'react';
 
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
@@ -19,14 +19,19 @@ const MatchPreferencesPage: React.FC = () => {
       title="Préférences de matching"
       description="Configure tes préférences pour que KeenKonnect puisse te proposer des équipes et coéquipier·ères qui te correspondent vraiment."
     >
+      <Alert
+        type="info"
+        showIcon
+        message="Matching preferences are a declared preview"
+        description="You can explore the preference model, but these values are read-only in this build because no AI matching-preferences persistence contract is exposed."
+        style={{ marginBottom: 16 }}
+      />
       <Card>
         <StepsForm
           containerStyle={{ maxWidth: 840, margin: '0 auto' }}
-          onFinish={async (values: Record<string, unknown>) => {
-            // TODO: brancher sur ton backend / API de matching
-             
-            console.log('Match preferences:', values);
-            return true;
+          onFinish={async () => {
+            // Declared preview: no matching-preferences persistence contract exists.
+            return false;
           }}
           stepsFormRender={(dom, submitter) => (
             <div>

@@ -17,12 +17,6 @@ import React from "react";
 
 import type { Route } from "./types";
 
-/**
- * EkoH module navigation.
- *
- * Keep every sidebar path aligned with an existing Next.js app route page.
- * Do not expose conceptual or future paths here unless a matching page exists.
- */
 export const EKOH_ROUTES = {
   ekoh: {
     dashboard: "/ekoh/dashboard",
@@ -55,7 +49,7 @@ const reputationGroup: Route = {
   views: [
     {
       path: EKOH_ROUTES.ekoh.score,
-      name: "Current EkoH score",
+      name: "EkoH profile analytics",
       icon: <LineChartOutlined />,
     },
     {
@@ -86,7 +80,7 @@ const smartVoteGroup: Route = {
     },
     {
       path: EKOH_ROUTES.ekoh.votingWeight,
-      name: "Voting weight",
+      name: "Contextual influence",
       icon: <BorderOutlined />,
     },
     {

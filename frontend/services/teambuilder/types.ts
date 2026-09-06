@@ -79,4 +79,65 @@ export interface ICreateSessionRequest {
   description?: string;
   candidate_ids: number[]; // Array of User IDs to include in the pool
   algorithm_config: IAlgorithmConfig;
+  problem_id?: string | null;
 }
+
+export type ProblemStatus = 'ACTIVE' | 'DRAFT' | 'DEPRECATED';
+export type ProblemRiskLevel = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+
+export interface ITeambuilderProblem {
+  id: string;
+  name: string;
+  description: string;
+  status: ProblemStatus;
+  risk_level: ProblemRiskLevel;
+  min_team_size: number | null;
+  max_team_size: number | null;
+  unesco_codes: string[];
+  categories: string[];
+  recommended_modes: string[];
+  facilitator_notes: string;
+  created_by?: number | null;
+  created_at: string;
+  updated_at: string;
+  usage_count?: number;
+  average_outcome?: number | null;
+}
+
+export interface IProblemSessionSummary {
+  id: string;
+  name: string;
+  status: SessionStatus;
+  algorithm_config: IAlgorithmConfig;
+  created_at: string;
+}
+
+export interface IProblemChangeEvent {
+  id: string;
+  type: 'STATUS_CHANGE' | 'EDIT' | 'CREATED' | 'OTHER' | string;
+  title: string;
+  description: string;
+  timestamp: string;
+  changed_by?: ITeambuilderUser | null;
+}
+
+export interface IProblemDetailResponse {
+  problem: ITeambuilderProblem;
+  sessions: IProblemSessionSummary[];
+  history: IProblemChangeEvent[];
+}
+
+export interface ICreateProblemRequest {
+  name: string;
+  description?: string;
+  status?: ProblemStatus;
+  risk_level?: ProblemRiskLevel;
+  min_team_size?: number | null;
+  max_team_size?: number | null;
+  unesco_codes?: string[];
+  categories?: string[];
+  recommended_modes?: string[];
+  facilitator_notes?: string;
+}
+
+export type IUpdateProblemRequest = Partial<ICreateProblemRequest>;

@@ -6,6 +6,8 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from .smart_vote_report import build_smart_vote_report
+
 
 REPORTS_PERMISSION_CLASSES = [permissions.IsAuthenticated]
 
@@ -206,32 +208,19 @@ class PerformanceReportView(APIView):
 
 class SmartVoteReportView(APIView):
     """
-    Returns analytics for the Smart Vote module.
+    Returns real cross-sectional Smart Vote analytics.
     Endpoint: /api/reports/smart-vote/?range=7d|30d|90d
+
+    Historical series are intentionally unavailable until the canonical source
+    has an append-only stance/vote event log.
     """
 
     permission_classes = REPORTS_PERMISSION_CLASSES
 
     def get(self, request):
         range_key = request.query_params.get("range", "30d")
-        days = smart_vote_days_from_range(range_key)
-        points = build_smart_vote_points(days)
-
-        avg_participation = (
-            round(sum(point["participation"] for point in points) / len(points), 1)
-            if points
-            else 0
+        return Response(
+            build_smart_vote_report(range_key),
+            status=status.HTTP_200_OK,
         )
 
-        data = {
-            "generatedAt": timezone.now().isoformat(),
-            "summary": {
-                "activeVotes": 8 if days == 7 else 12 if days == 30 else 21,
-                "avgParticipationPct": avg_participation,
-                "avgConsensusTimeDays": 2.4 if days == 7 else 3.2 if days == 30 else 4.1,
-                "totalVotesCast": 4200 if days == 7 else 14502 if days == 30 else 38940,
-            },
-            "points": points,
-        }
-
-        return Response(data, status=status.HTTP_200_OK)

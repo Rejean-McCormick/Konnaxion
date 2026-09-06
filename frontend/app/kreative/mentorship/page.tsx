@@ -37,6 +37,7 @@ import type { UploadFile } from 'antd/es/upload/interface';
 import React, { useMemo, useState } from 'react';
 
 import KreativePageShell from '@/app/kreative/kreativePageShell';
+import { createTraditionEntry } from '@/services/kreative';
 
 const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
@@ -86,10 +87,10 @@ type UploadChangeParamLite = {
 };
 
 /* ------------------------------------------------------------------ */
-/*  Mock data                                                         */
+/*  Declared preview data                                             */
 /* ------------------------------------------------------------------ */
 
-const MENTORS: Mentor[] = [
+const MENTOR_PREVIEW_DATA: Mentor[] = [
   {
     id: 'm1',
     name: 'Amara Ndlovu',
@@ -140,7 +141,7 @@ const MENTORS: Mentor[] = [
   },
 ];
 
-const INITIAL_ARCHIVE_ITEMS: ArchiveItem[] = [
+const ARCHIVE_PREVIEW_DATA: ArchiveItem[] = [
   {
     id: 'a1',
     title: 'Moonlight weaving circle',
@@ -212,19 +213,20 @@ export default function MentorshipPage(): JSX.Element {
 
   const [archiveForm] = Form.useForm<ArchiveFormValues>();
   const [archiveFiles, setArchiveFiles] = useState<UploadFile[]>([]);
-  const [archiveItems, setArchiveItems] = useState<ArchiveItem[]>(INITIAL_ARCHIVE_ITEMS);
+  const [archiveItems, setArchiveItems] = useState<ArchiveItem[]>(ARCHIVE_PREVIEW_DATA);
+  const [messageApi, messageContextHolder] = antdMessage.useMessage();
 
   const disciplines = useMemo(
-    () => Array.from(new Set(MENTORS.map((m) => m.discipline))).sort(),
+    () => Array.from(new Set(MENTOR_PREVIEW_DATA.map((m) => m.discipline))).sort(),
     [],
   );
   const regions = useMemo(
-    () => Array.from(new Set(MENTORS.map((m) => m.region))).sort(),
+    () => Array.from(new Set(MENTOR_PREVIEW_DATA.map((m) => m.region))).sort(),
     [],
   );
 
   const filteredMentors = useMemo(() => {
-    return MENTORS.filter((mentor) => {
+    return MENTOR_PREVIEW_DATA.filter((mentor) => {
       if (disciplineFilter !== 'all' && mentor.discipline !== disciplineFilter) {
         return false;
       }
@@ -261,28 +263,52 @@ export default function MentorshipPage(): JSX.Element {
     return e?.fileList ?? [];
   };
 
-  const handleArchiveSubmit = (values: ArchiveFormValues) => {
-    if (!archiveFiles.length) {
-      antdMessage.error('Please attach at least one media file.');
+  const handleArchiveSubmit = async (values: ArchiveFormValues) => {
+    const upload = archiveFiles[0]?.originFileObj;
+    if (!(upload instanceof File)) {
+      messageApi.error('Please attach one media file.');
       return;
     }
 
-    const next: ArchiveItem = {
-      id: `new-${Date.now()}`,
-      title: values.title,
-      tradition: values.tradition,
-      region: values.region,
-      mediaType: values.mediaType,
-      contributor: 'You (draft, not persisted)',
-      summary: values.description,
-      year: values.approximateYear ? Number(values.approximateYear) || undefined : undefined,
-    };
+    const descriptionParts = [
+      values.description,
+      `Tradition: ${values.tradition}`,
+      `Media type: ${values.mediaType}`,
+      values.approximateYear ? `Approximate year: ${values.approximateYear}` : '',
+    ].filter(Boolean);
 
-    setArchiveItems((prev) => [next, ...prev]);
-    antdMessage.success('Your contribution has been captured locally (mock).');
+    const payload = new FormData();
+    payload.append('title', values.title);
+    payload.append('description', descriptionParts.join('\n\n'));
+    payload.append('region', values.region);
+    payload.append('media_file', upload);
 
-    archiveForm.resetFields();
-    setArchiveFiles([]);
+    try {
+      const created = await createTraditionEntry(payload);
+      const next: ArchiveItem = {
+        id: String(created.id),
+        title: values.title,
+        tradition: values.tradition,
+        region: values.region,
+        mediaType: values.mediaType,
+        contributor: created.submitted_by || 'You',
+        summary: values.description,
+        year: values.approximateYear
+          ? Number(values.approximateYear) || undefined
+          : undefined,
+      };
+
+      setArchiveItems((prev) => [next, ...prev]);
+      messageApi.success('Archive contribution saved.');
+      archiveForm.resetFields();
+      setArchiveFiles([]);
+    } catch (error) {
+      messageApi.error(
+        error instanceof Error
+          ? error.message
+          : 'Unable to save the archive contribution.',
+      );
+    }
   };
 
   const secondaryActions = (
@@ -302,6 +328,7 @@ export default function MentorshipPage(): JSX.Element {
       subtitle="Connect with mentors and help preserve cultural traditions and endangered practices."
       secondaryActions={secondaryActions}
     >
+      {messageContextHolder}
       {/* Intro + How it works */}
       <Row gutter={[24, 24]} style={{ marginBottom: 24 }}>
         <Col xs={24} lg={10}>
@@ -310,8 +337,7 @@ export default function MentorshipPage(): JSX.Element {
               How the mentorship program works
             </Title>
             <Paragraph type="secondary">
-              This is a prototype interface showing how Kreative could connect learners with
-              mentors and collect stories for a global cultural archive.
+              This page combines a declared mentor-directory preview with a real persisted cultural-archive contribution flow.
             </Paragraph>
             <ul style={{ paddingLeft: 20, marginTop: 8, marginBottom: 0 }}>
               <li>
@@ -321,7 +347,7 @@ export default function MentorshipPage(): JSX.Element {
               </li>
               <li>
                 <Text>
-                  Send a <Text strong>mentorship request</Text> (simulated) to start a conversation.
+                  Mentor discovery is preview-only; request delivery is not exposed by the current backend.
                 </Text>
               </li>
               <li>
@@ -335,7 +361,7 @@ export default function MentorshipPage(): JSX.Element {
               type="info"
               showIcon
               style={{ marginTop: 16 }}
-              message="All actions on this page are front-end only for now. The real backend integration will plug into Kreative’s API later."
+              message="Archive contributions are persisted through Kreative. Mentor-request delivery remains preview-only until a dedicated contract exists."
             />
           </Card>
         </Col>
@@ -420,7 +446,7 @@ export default function MentorshipPage(): JSX.Element {
         title="Mentors & opportunities"
         extra={
           <Text type="secondary">
-            Showing <strong>{filteredMentors.length}</strong> of {MENTORS.length} mentors
+            Showing <strong>{filteredMentors.length}</strong> of {MENTOR_PREVIEW_DATA.length} mentors
           </Text>
         }
         style={{ marginBottom: 32 }}
@@ -438,22 +464,18 @@ export default function MentorshipPage(): JSX.Element {
                   <Button
                     key="request"
                     type="primary"
-                    onClick={() =>
-                      antdMessage.success(
-                        `Mock request sent to ${mentor.name}. Backend integration to follow.`,
-                      )
-                    }
+                    disabled
+                    title="Mentorship request delivery is not exposed by the backend yet."
                   >
-                    Request mentorship
+                    Request unavailable
                   </Button>,
                   <Button
                     key="details"
                     type="link"
-                    onClick={() =>
-                      antdMessage.info('Profile details panel would open here.')
-                    }
+                    disabled
+                    title="Mentor profile details are preview-only in this build."
                   >
-                    View details
+                    Details unavailable
                   </Button>,
                 ]}
               >
@@ -515,12 +537,11 @@ export default function MentorshipPage(): JSX.Element {
         <Col xs={24} lg={12}>
           <Card
             title="Contribute to the Cultural Archive"
-            extra={<Tag color="processing">Prototype</Tag>}
+            extra={<Tag color="success">Persisted</Tag>}
             style={{ marginBottom: 24 }}
           >
             <Paragraph type="secondary" style={{ marginBottom: 16 }}>
-              Share media documenting a cultural practice, ritual, or art form. This
-              simulates how Kreative could host a global archive of endangered traditions.
+              Share media documenting a cultural practice, ritual, or art form. Submissions are stored as Kreative tradition entries.
             </Paragraph>
 
             <Form<ArchiveFormValues>
@@ -606,7 +627,7 @@ export default function MentorshipPage(): JSX.Element {
                 ]}
               >
                 <Upload
-                  multiple
+                  maxCount={1}
                   beforeUpload={() => false}
                   onChange={handleArchiveUploadChange}
                   fileList={archiveFiles}

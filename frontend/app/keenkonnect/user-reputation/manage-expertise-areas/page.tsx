@@ -129,13 +129,6 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
     form.setFieldsValue({ currentExpertise: nextSelected });
   };
 
-  const handleFinish = async (values: FormValues): Promise<boolean> => {
-    // Stub : à brancher sur l’API de profil / Ekoh plus tard
-     
-    console.log('Manage Expertise Areas – submit:', values);
-    return true;
-  };
-
   return (
     <KeenPageShell
       title="Manage Expertise Areas"
@@ -153,7 +146,8 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Your declared expertise influences Ekoh reputation, KeenKonnect matching, and Smart Vote weight."
+        message="Expertise editing is a declared read-only preview"
+        description="Expertise source state belongs to EkoH. This KeenKonnect screen does not write expertise until an explicit EkoH-owned mutation contract is connected."
       />
 
       {/* Formulaire principal avec ProForm + ProFormSelect */}
@@ -167,11 +161,12 @@ export default function ManageExpertiseAreasPage(): JSX.Element {
         }}
         submitter={{
           searchConfig: {
-            submitText: 'Save Changes',
+            submitText: 'Save unavailable',
           },
+          submitButtonProps: { disabled: true },
+          resetButtonProps: { disabled: true },
           render: (_, dom) => <div style={{ marginTop: 16 }}>{dom}</div>,
         }}
-        onFinish={handleFinish}
       >
         {/* Sélection des expertises actuelles via Tag.CheckableTag */}
         <Form.Item

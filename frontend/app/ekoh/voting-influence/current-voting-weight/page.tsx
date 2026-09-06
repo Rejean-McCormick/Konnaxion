@@ -1,95 +1,87 @@
 // FILE: frontend/app/ekoh/voting-influence/current-voting-weight/page.tsx
 'use client';
 
-import { Card, Col, List, Row, Statistic, Typography } from 'antd';
-import React from 'react';
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { Alert, Card, Empty, List, Progress, Space, Tag, Typography } from 'antd';
 
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
+import useReputationEvents from '@/hooks/useReputationEvents';
+import type { EkohExpertiseScore } from '@/services/trust';
 
-const { Title, Paragraph } = Typography;
+const { Paragraph, Text } = Typography;
 
-// Simulated data for the comparison chart
-const weightComparisonData: { category: string; weight: number }[] = [
-  { category: 'Your Weight', weight: 70 },
-  { category: 'Average Weight', weight: 50 },
-  { category: 'Top Experts', weight: 90 },
-];
-
-// Simulated data for high-weight domains
-const weightByDomain: { domain: string; weight: string }[] = [
-  { domain: 'Economy', weight: '80%' },
-  { domain: 'Politics', weight: '65%' },
-  { domain: 'Technology', weight: '75%' },
-];
+function percent(score: number): number {
+  return Math.max(0, Math.min(100, Math.round(score * 100)));
+}
 
 export default function CurrentVotingWeightPage(): JSX.Element {
-  // Example: user's smart voting weight (percent)
-  const smartVoteWeight = 70;
+  const { data, isLoading, isError, error } = useReputationEvents();
+  const expertise = data?.ekohProfile?.expertise ?? [];
 
   return (
     <EkohPageShell
-      title="Current Voting Weight"
-      subtitle="Overview of your Smart Vote influence compared to the average user and top experts."
+      title="Contextual Smart Vote influence"
+      subtitle="Smart Vote influence exists only inside a declared question-specific lens."
     >
-      {/* Prominent current weight */}
-      <Card className="mb-6">
-        <Row justify="center">
-          <Col>
-            <Statistic
-              title="Smart Vote Weight"
-              value={smartVoteWeight}
-              suffix="%"
-            />
-          </Col>
-        </Row>
-      </Card>
-
-      {/* Explanation */}
-      <Card className="mb-6">
-        <Paragraph>
-          Your Smart Vote weight represents your relative influence in
-          collective decisions based on your Ekoh reputation. A higher
-          percentage means your vote carries more weight compared to the
-          average user.
-        </Paragraph>
-      </Card>
-
-      {/* Comparison chart */}
-      <Card className="mb-6">
-        <Title level={4}>Comparison with Others</Title>
-        <div style={{ width: '100%', height: 300 }}>
-          <ResponsiveContainer>
-            <BarChart data={weightComparisonData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" />
-              <YAxis domain={[0, 100]} />
-              <Tooltip />
-              <Bar dataKey="weight" fill="#82ca9d" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-
-      {/* High-weight domains */}
-      <Card className="mb-6">
-        <Title level={4}>Highest Weight by Domain</Title>
-        <List
-          dataSource={weightByDomain}
-          renderItem={(item) => (
-            <List.Item>
-              <strong>{item.domain}:</strong>&nbsp;{item.weight}
-            </List.Item>
-          )}
+      {isError && (
+        <Alert
+          type="error"
+          showIcon
+          message="Unable to load EkoH context"
+          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          style={{ marginBottom: 16 }}
         />
+      )}
+
+      <Alert
+        type="info"
+        showIcon
+        message="There is no global Smart Vote weight"
+        description="Every participant remains part of the public baseline. An advisory reading may apply a bounded contextual weight only when a question declares relevant domains and a reproducible Smart Vote lens is computed."
+        style={{ marginBottom: 16 }}
+      />
+
+      <Card title="EkoH context available to question-specific lenses" loading={isLoading}>
+        {expertise.length ? (
+          <List<EkohExpertiseScore>
+            dataSource={expertise}
+            renderItem={(item) => {
+              const value = percent(item.weightedScore);
+              return (
+                <List.Item key={item.domainCode}>
+                  <div style={{ width: '100%' }}>
+                    <Space
+                      style={{ width: '100%', justifyContent: 'space-between' }}
+                      wrap
+                    >
+                      <Space wrap>
+                        <Text strong>{item.domainName}</Text>
+                        <Tag>{item.domainCode}</Tag>
+                      </Space>
+                      <Text type="secondary">{value}% profile expertise</Text>
+                    </Space>
+                    <Progress percent={value} showInfo={false} />
+                  </div>
+                </List.Item>
+              );
+            }}
+          />
+        ) : (
+          <Empty description="No EkoH expertise context available" />
+        )}
+      </Card>
+
+      <Card title="How influence is determined" style={{ marginTop: 16 }}>
+        <Paragraph>
+          A Smart Vote reading combines the question&apos;s declared domain relevance
+          with the participant&apos;s disclosed EkoH expertise and the configured
+          ethics/reliability modifier.
+        </Paragraph>
+        <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+          A weight such as 70%, an “average user” comparison, or a “top experts”
+          benchmark is not displayed here because no such global measurement exists.
+          The actual advisory weight belongs to a specific reading and is shown with
+          that question.
+        </Paragraph>
       </Card>
     </EkohPageShell>
   );

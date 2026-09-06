@@ -3,8 +3,12 @@ import api from '@/services/_request';
 
 import {
   IBuilderSession,
+  ICreateProblemRequest,
   ICreateSessionRequest,
+  IProblemDetailResponse,
+  ITeambuilderProblem,
   ITeam,
+  IUpdateProblemRequest,
 } from './types';
 
 const BASE_URL = '/teambuilder';
@@ -36,6 +40,32 @@ export const teambuilderService = {
    */
   async generateTeams(sessionId: string): Promise<IBuilderSession> {
     return api.post<IBuilderSession>(`${BASE_URL}/sessions/${sessionId}/generate/`);
+  },
+
+
+  /**
+   * Reusable TeamBuilder problem templates.
+   */
+  async getProblems(): Promise<ITeambuilderProblem[]> {
+    return api.get<ITeambuilderProblem[]>(`${BASE_URL}/problems/`);
+  },
+
+  async getProblemDetail(problemId: string): Promise<IProblemDetailResponse> {
+    return api.get<IProblemDetailResponse>(`${BASE_URL}/problems/${problemId}/`);
+  },
+
+  async createProblem(data: ICreateProblemRequest): Promise<ITeambuilderProblem> {
+    return api.post<ITeambuilderProblem>(`${BASE_URL}/problems/`, data);
+  },
+
+  async updateProblem(
+    problemId: string,
+    data: IUpdateProblemRequest,
+  ): Promise<ITeambuilderProblem> {
+    return api.patch<ITeambuilderProblem>(
+      `${BASE_URL}/problems/${problemId}/`,
+      data,
+    );
   },
 
   /**

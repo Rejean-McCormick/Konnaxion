@@ -25,7 +25,6 @@ import {
   Drawer,
   Dropdown,
   List,
-  message,
   Progress,
   Space,
   Switch,
@@ -52,8 +51,8 @@ type CommunityContext = {
   moderators: string[];
 };
 
-// --- Mock Data ---
-const MOCK_COMMUNITIES: CommunityContext[] = [
+// --- Declared preview data: no cross-module community-moderation contract yet ---
+const PREVIEW_COMMUNITIES: CommunityContext[] = [
   {
     id: 'ETH-404',
     name: 'Debate: AI Rights & Ethics',
@@ -115,15 +114,6 @@ export default function CommunityModerationPage(): JSX.Element {
   const handleOpenDrawer = (record: CommunityContext) => {
     setCurrentContext(record);
     setDrawerOpen(true);
-  };
-
-  const handleAction = (key: string, record: CommunityContext) => {
-    if (key === 'lock') {
-      message.warning(`Locked context: ${record.name}`);
-      actionRef.current?.reload();
-    } else if (key === 'clear') {
-      message.success(`All flags cleared for ${record.name}`);
-    }
   };
 
   const columns: ProColumns<CommunityContext>[] = [
@@ -261,9 +251,7 @@ export default function CommunityModerationPage(): JSX.Element {
                 danger: record.status !== 'locked',
               },
             ],
-            onClick: ({ key }) => {
-              if (key === 'lock') handleAction('lock', record);
-            },
+            onClick: () => undefined,
           }}
         >
           <Button
@@ -284,8 +272,8 @@ export default function CommunityModerationPage(): JSX.Element {
   );
 
   const primaryAction = (
-    <Button key="create" type="primary">
-      New report
+    <Button key="create" type="primary" disabled title="No community-moderation write contract is exposed.">
+      New report unavailable
     </Button>
   );
 
@@ -317,12 +305,19 @@ export default function CommunityModerationPage(): JSX.Element {
       maxWidth={1200}
     >
       <>
+        <Alert
+          type="info"
+          showIcon
+          message="Community moderation preview"
+          description="This cross-module moderation view uses declared preview data. No community-level moderation mutation contract is exposed, so lock, flag-clear, moderator assignment and freeze controls are read-only."
+          style={{ marginBottom: 16 }}
+        />
         <ProTable<CommunityContext>
           columns={columns}
           actionRef={actionRef}
           cardBordered
           request={async () => ({
-            data: MOCK_COMMUNITIES,
+            data: PREVIEW_COMMUNITIES,
             success: true,
           })}
           rowKey="id"
@@ -408,9 +403,7 @@ export default function CommunityModerationPage(): JSX.Element {
                     </Text>
                     <Switch
                       checked={currentContext.status === 'locked'}
-                      onChange={() =>
-                        message.info('Toggle lock (not wired)')
-                      }
+                      disabled
                     />
                   </div>
                   <div
@@ -423,7 +416,7 @@ export default function CommunityModerationPage(): JSX.Element {
                       <ClockCircleOutlined /> Slow mode (1
                       post/10m)
                     </Text>
-                    <Switch />
+                    <Switch disabled />
                   </div>
                   <div
                     style={{
@@ -435,7 +428,7 @@ export default function CommunityModerationPage(): JSX.Element {
                       <StopOutlined /> Require approval for new
                       users
                     </Text>
-                    <Switch defaultChecked />
+                    <Switch defaultChecked disabled />
                   </div>
                 </Space>
               </ProCard>
@@ -468,7 +461,7 @@ export default function CommunityModerationPage(): JSX.Element {
                 dataSource={currentContext.moderators}
                 renderItem={(item) => (
                   <List.Item
-                    actions={[<a key="remove">Remove</a>]}
+                    actions={[<Text key="remove" type="secondary">Read-only</Text>]}
                   >
                     <Space>
                       <Avatar
@@ -484,8 +477,9 @@ export default function CommunityModerationPage(): JSX.Element {
                     type="dashed"
                     block
                     icon={<TeamOutlined />}
+                    disabled
                   >
-                    Assign new moderator
+                    Assign moderator unavailable
                   </Button>
                 }
               />
@@ -496,8 +490,9 @@ export default function CommunityModerationPage(): JSX.Element {
                 block
                 size="large"
                 icon={<StopOutlined />}
+                disabled
               >
-                Emergency freeze (suspend context)
+                Emergency freeze unavailable
               </Button>
             </Space>
           )}

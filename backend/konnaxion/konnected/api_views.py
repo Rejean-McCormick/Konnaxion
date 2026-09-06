@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from django.conf import settings
 from django.utils import timezone
-from rest_framework import permissions, status, viewsets
+from rest_framework import mixins, permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -12,19 +12,34 @@ from .models import (
     CertificationPath,
     Evaluation,
     KnowledgeResource,
+    KnowledgeRecommendation,
+    LearningProgress,
     OfflinePackage,
     PeerValidation,
     Portfolio,
+    MentorProfile,
+    MentorshipRequest,
+    CoCreationProject,
+    CoCreationContribution,
+    ForumTopic,
+    ForumPost,
 )
 from .serializers import (
     CertificationPathSerializer,
     EvaluationSerializer,
     ExamAttemptSerializer,
     KnowledgeResourceSerializer,
+    KnowledgeRecommendationSerializer,
+    LearningProgressSerializer,
     PeerValidationSerializer,
     PortfolioSerializer,
-    # NOTE: needs to be implemented in konnected/serializers.py
     OfflinePackageSerializer,
+    MentorProfileSerializer,
+    MentorshipRequestSerializer,
+    CoCreationProjectSerializer,
+    CoCreationContributionSerializer,
+    ForumTopicSerializer,
+    ForumPostSerializer,
 )
 from .tasks import build_offline_package
 
@@ -131,6 +146,137 @@ def _generate_synthetic_exam_sessions(
             }
         )
     return sessions
+
+
+
+# ---------------------------------------------------------------------------
+# KonnectED community / progress APIs backed by models already present in v14
+# ---------------------------------------------------------------------------
+
+
+class IsObjectAuthorOrReadOnly(permissions.BasePermission):
+    """Allow public reads while restricting mutations to the row owner."""
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        owner = getattr(obj, "creator", None) or getattr(obj, "author", None)
+        return bool(request.user.is_authenticated and owner == request.user)
+
+
+class KnowledgeRecommendationViewSet(viewsets.ReadOnlyModelViewSet):
+    """Return recommendations belonging to the authenticated learner only."""
+
+    serializer_class = KnowledgeRecommendationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            KnowledgeRecommendation.objects.filter(user=self.request.user)
+            .select_related("resource")
+            .order_by("-recommended_at", "-created_at")
+        )
+
+
+class LearningProgressViewSet(viewsets.ModelViewSet):
+    """Authenticated learner progress. User ownership is enforced server-side."""
+
+    serializer_class = LearningProgressSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return (
+            LearningProgress.objects.filter(user=self.request.user)
+            .select_related("resource")
+            .order_by("-updated_at")
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class MentorProfileViewSet(viewsets.ReadOnlyModelViewSet):
+    """Discover active mentor profiles without exposing private account fields."""
+
+    serializer_class = MentorProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = MentorProfile.objects.filter(is_active=True).select_related("user").order_by(
+        "-is_accepting_mentees",
+        "-rating",
+        "display_name",
+    )
+
+
+class MentorshipRequestViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Create/list mentorship requests visible to the participating user."""
+
+    serializer_class = MentorshipRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return (
+            MentorshipRequest.objects.filter(mentee=user)
+            .select_related("mentor", "mentor__user", "mentee")
+            .order_by("-created_at")
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(mentee=self.request.user)
+
+
+class CoCreationProjectViewSet(viewsets.ReadOnlyModelViewSet):
+    """Expose existing co-creation projects without inventing ownership semantics."""
+
+    serializer_class = CoCreationProjectSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = CoCreationProject.objects.all().order_by("-updated_at")
+
+
+class CoCreationContributionViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
+    """Read contributions and allow authenticated users to add their own."""
+
+    serializer_class = CoCreationContributionSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = CoCreationContribution.objects.select_related("project", "user").all().order_by(
+        "created_at"
+    )
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class ForumTopicViewSet(viewsets.ModelViewSet):
+    serializer_class = ForumTopicSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsObjectAuthorOrReadOnly]
+    filterset_fields = ["category", "creator"]
+    queryset = ForumTopic.objects.select_related("creator").prefetch_related("posts").all().order_by(
+        "-updated_at"
+    )
+
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
+
+
+class ForumPostViewSet(viewsets.ModelViewSet):
+    serializer_class = ForumPostSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsObjectAuthorOrReadOnly]
+    filterset_fields = ["topic", "author"]
+    queryset = ForumPost.objects.select_related("topic", "author").all().order_by("created_at")
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
 
 
 class KnowledgeResourceViewSet(viewsets.ModelViewSet):

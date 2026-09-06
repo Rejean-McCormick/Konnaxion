@@ -85,6 +85,7 @@ function isModerationApiResponse(data: unknown): data is ModerationApiResponse {
 }
 
 export default function ModerationQueuePage(): JSX.Element {
+  const [messageApi, messageContextHolder] = message.useMessage();
   const actionRef = useRef<ActionType>();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -108,7 +109,7 @@ export default function ModerationQueuePage(): JSX.Element {
     newStatus: string = 'resolved',
   ) => {
     try {
-      message.loading('Processing action...', 0.5);
+      messageApi.loading('Processing action...', 0.5);
 
       const response = await apiFetch(`/api/admin/moderation/${id}/`, {
         method: 'PATCH',
@@ -120,13 +121,13 @@ export default function ModerationQueuePage(): JSX.Element {
 
       if (!response.ok) throw new Error('Failed to update ticket');
 
-      message.success(`${action} applied successfully`);
+      messageApi.success(`${action} applied successfully`);
       actionRef.current?.reload();
       if (drawerOpen) handleCloseDrawer();
     } catch (error) {
        
       console.error(error);
-      message.error('Failed to apply action.');
+      messageApi.error('Failed to apply action.');
     }
   };
 
@@ -313,6 +314,7 @@ export default function ModerationQueuePage(): JSX.Element {
       secondaryActions={secondaryActions}
       maxWidth={1200}
     >
+      {messageContextHolder}
       <ProTable<ModerationItem>
         columns={columns}
         actionRef={actionRef}
@@ -369,7 +371,7 @@ export default function ModerationQueuePage(): JSX.Element {
           } catch (e) {
              
             console.error(e);
-            message.error('Error loading moderation queue');
+            messageApi.error('Error loading moderation queue');
             return { data: [], success: false };
           }
         }}
@@ -382,11 +384,11 @@ export default function ModerationQueuePage(): JSX.Element {
         }}
         headerTitle="Active flags"
         toolBarRender={() => [
-          <Button key="bulk-approve" type="primary">
-            Batch dismiss
+          <Button key="bulk-approve" type="primary" disabled title="Bulk moderation is not exposed by the current API.">
+            Batch dismiss unavailable
           </Button>,
-          <Button key="bulk-ban" danger>
-            Batch remove
+          <Button key="bulk-ban" danger disabled title="Bulk moderation is not exposed by the current API.">
+            Batch remove unavailable
           </Button>,
         ]}
       />

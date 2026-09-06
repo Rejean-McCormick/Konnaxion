@@ -25,8 +25,8 @@ interface MatchRow {
 }
 
 /**
- * Données mock – Teams
- * (à remplacer par l’API AI Team Matching plus tard)
+ * Declared preview dataset — teams
+ * No AI matching service contract is exposed in this build.
  */
 const teamMatches: MatchRow[] = [
   {
@@ -66,7 +66,7 @@ const teamMatches: MatchRow[] = [
 ];
 
 /**
- * Données mock – Partenaires individuels
+ * Declared preview dataset — individual partners
  */
 const partnerMatches: MatchRow[] = [
   {

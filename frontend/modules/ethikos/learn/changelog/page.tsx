@@ -15,23 +15,26 @@ export default function Changelog() {
 
   return (
     <PageContainer ghost loading={loading}>
-      <Timeline>
-        {data?.entries.map(e => (
-          <Timeline.Item key={e.version} label={e.date}>
-            <strong>{e.version}</strong>{' '}
-            {e.tags.map(t => (
-              <Tag key={t} color={t === 'NEW' ? 'green' : t === 'FIX' ? 'blue' : 'default'}>
-                {t}
-              </Tag>
-            ))}
-            <ul style={{ marginTop: 4 }}>
-              {e.notes.map((n: string, i: number) => (
-                <li key={i}>{n}</li>
+      <Timeline
+        items={(data?.entries ?? []).map(e => ({
+          label: e.date,
+          children: (
+            <>
+              <strong>{e.version}</strong>{' '}
+              {e.tags.map(t => (
+                <Tag key={t} color={t === 'NEW' ? 'green' : t === 'FIX' ? 'blue' : 'default'}>
+                  {t}
+                </Tag>
               ))}
-            </ul>
-          </Timeline.Item>
-        ))}
-      </Timeline>
+              <ul style={{ marginTop: 4 }}>
+                {e.notes.map((n: string, i: number) => (
+                  <li key={i}>{n}</li>
+                ))}
+              </ul>
+            </>
+          ),
+        }))}
+      />
     </PageContainer>
   );
 }

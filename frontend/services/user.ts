@@ -2,7 +2,7 @@
 // frontend/services/user.ts
 // Wrapper around /api/users/me/ + helpers for avatar_url
 
-import { get, post } from './_request';
+import { get, patch } from './_request';
 
 /**
  * Shape returned by /api/users/me/.
@@ -112,28 +112,15 @@ export function resolveAvatarUrl(
 }
 
 /**
- * Upload a new avatar image for the current user.
- *
- * Expects a backend endpoint at:
- *   POST /api/users/me/avatar/
- *
- * that accepts multipart/form-data:
- *   avatar: <file>
- *
- * and returns the updated CurrentUser JSON.
+ * Update the writable display name through the canonical user detail endpoint.
+ * The current serializer does not expose avatar/security/preferences writes.
  */
-export async function uploadUserAvatar(file: File): Promise<CurrentUser> {
-  const formData = new FormData();
-  formData.append('avatar', file);
-
-  // Note the flipped generic parameters: <CurrentUser, FormData>
-  const updated = await post<CurrentUser, FormData>(
-    'users/me/avatar/',
-    formData,
-    // Let axios/browser set the proper multipart boundary automatically.
-    // You can add headers here if needed, but usually you should NOT
-    // set Content-Type manually for FormData.
+export async function updateCurrentUserName(
+  username: string,
+  name: string,
+): Promise<CurrentUser> {
+  return patch<CurrentUser, { name: string }>(
+    `users/${encodeURIComponent(username)}/`,
+    { name },
   );
-
-  return updated;
 }

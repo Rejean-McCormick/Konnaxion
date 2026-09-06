@@ -1,77 +1,56 @@
-// FILE: frontend/app/kreative/community-showcases/submit-to-showcase/page.tsx
-// File: app/kreative/community-showcases/submit-to-showcase/page.tsx
-'use client';
+'use client'
 
-import { message as antdMessage, Button, Form, Input, Modal, Select } from 'antd';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { Alert, Button, Form, Input, Select } from 'antd'
+import { useRouter } from 'next/navigation'
+import React from 'react'
 
-import KreativePageShell from '@/app/kreative/kreativePageShell';
+import KreativePageShell from '@/app/kreative/kreativePageShell'
 
-const { TextArea } = Input;
+const { TextArea } = Input
 
 type FormValues = {
-  title: string;
-  category: string;
-  description: string;
-  link?: string;
-  tags?: string[];
-};
+  title: string
+  category: string
+  description: string
+  link?: string
+  tags?: string[]
+}
 
 export default function SubmitToShowcasePage(): JSX.Element {
-  const [form] = Form.useForm<FormValues>();
-  const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
+  const [form] = Form.useForm<FormValues>()
+  const router = useRouter()
 
   const categories = [
     { label: 'Art', value: 'art' },
     { label: 'Design', value: 'design' },
     { label: 'Photography', value: 'photography' },
     { label: 'Music', value: 'music' },
-  ];
-
-  const onFinish = async (_values: FormValues) => {
-    setSubmitting(true);
-    try {
-      // TODO: plug into backend API when available (e.g. POST /api/showcases)
-      // await fetch('/api/showcases', { method: 'POST', body: JSON.stringify(values) });
-
-      antdMessage.success('Submission received');
-      setModalVisible(true);
-    } catch {
-      antdMessage.error("Une erreur est survenue lors de l'envoi.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const onCancel = () => router.back();
+  ]
 
   return (
     <KreativePageShell
       title="Submit to Showcase"
-      subtitle="Share a project you’re proud of with the Kreative community showcase."
+      subtitle="Prepare a showcase submission without implying persistence that the backend does not expose yet."
     >
+      <Alert
+        type="warning"
+        showIcon
+        style={{ marginBottom: 16 }}
+        message="Showcase review submissions are not persisted in this build."
+        description="Use Submit Creative Work for a real persisted artwork. This form remains available as a read-only product preview until a dedicated showcase-review contract exists."
+      />
+
       <Form<FormValues>
         form={form}
         layout="vertical"
-        onFinish={onFinish}
         name="submitToShowcaseForm"
+        disabled
       >
-        <Form.Item
-          label="Project title"
-          name="title"
-          rules={[{ required: true, message: 'Please enter a title' }]}
-        >
+        <Form.Item label="Project title" name="title">
           <Input placeholder="e.g. Konnaxion Visualizer" allowClear />
         </Form.Item>
 
-        <Form.Item
-          label="Category"
-          name="category"
-          rules={[{ required: true, message: 'Please choose a category' }]}
-        >
+        <Form.Item label="Category" name="category">
           <Select
             placeholder="Select a category"
             options={categories}
@@ -84,11 +63,7 @@ export default function SubmitToShowcasePage(): JSX.Element {
           />
         </Form.Item>
 
-        <Form.Item
-          label="Description"
-          name="description"
-          rules={[{ required: true, message: 'Please add a short description' }]}
-        >
+        <Form.Item label="Description" name="description">
           <TextArea
             rows={5}
             placeholder="What is this project about?"
@@ -96,11 +71,11 @@ export default function SubmitToShowcasePage(): JSX.Element {
           />
         </Form.Item>
 
-        <Form.Item label="Reference link (optional)" name="link">
+        <Form.Item label="Reference link" name="link">
           <Input placeholder="https://…" allowClear type="url" />
         </Form.Item>
 
-        <Form.Item label="Tags (optional)" name="tags">
+        <Form.Item label="Tags" name="tags">
           <Select
             mode="tags"
             placeholder="Add tags"
@@ -108,32 +83,16 @@ export default function SubmitToShowcasePage(): JSX.Element {
             options={[]}
           />
         </Form.Item>
-
-        <Form.Item style={{ marginTop: 16 }}>
-          <Button onClick={onCancel} style={{ marginRight: 8 }}>
-            Cancel
-          </Button>
-          <Button type="primary" htmlType="submit" loading={submitting}>
-            Submit
-          </Button>
-        </Form.Item>
       </Form>
 
-      <Modal
-        open={modalVisible}
-        onOk={() => {
-          setModalVisible(false);
-          router.push('/kreative/community-showcases');
-        }}
-        onCancel={() => setModalVisible(false)}
-        okText="Ok"
-        cancelButtonProps={{ style: { display: 'none' } }}
+      <Button onClick={() => router.back()}>Back</Button>
+      <Button
+        type="primary"
+        style={{ marginLeft: 8 }}
+        onClick={() => router.push('/kreative/creative-hub/submit-creative-work')}
       >
-        <p>
-          Your project has been submitted for review. Moderators will evaluate
-          your submission shortly.
-        </p>
-      </Modal>
+        Submit persisted creative work
+      </Button>
     </KreativePageShell>
-  );
+  )
 }

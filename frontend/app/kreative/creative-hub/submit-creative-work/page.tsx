@@ -1,76 +1,105 @@
-// FILE: frontend/app/kreative/creative-hub/submit-creative-work/page.tsx
-// C:\MyCode\Konnaxionv14\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
-'use client';
+'use client'
 
-import { UploadOutlined } from '@ant-design/icons';
+import { UploadOutlined } from '@ant-design/icons'
 import {
   Alert,
-  message as antdMessage,
   Button,
   Form,
   Input,
   Select,
   Upload,
-} from 'antd';
-import type { UploadFile } from 'antd/es/upload/interface';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+  message as antdMessage,
+} from 'antd'
+import type { UploadFile } from 'antd/es/upload/interface'
+import { useRouter } from 'next/navigation'
+import React, { useState } from 'react'
 
-import KreativePageShell from '@/app/kreative/kreativePageShell';
+import KreativePageShell from '@/app/kreative/kreativePageShell'
+import { createKreativeArtwork } from '@/services/kreative'
 
 type CreativeWorkFormValues = {
-  title: string;
-  description: string;
-  category: string;
-  credits?: string;
-  creativeFile: UploadFile[];
-};
+  title: string
+  description: string
+  category: string
+  credits?: string
+  creativeFile: UploadFile[]
+}
 
-// Type minimal utile pour le onChange d'Upload (évite implicit any)
 type UploadChangeParamLite = {
-  fileList: UploadFile[];
-};
+  fileList: UploadFile[]
+}
+
+function mediaTypeFromFile(file: File): 'image' | 'video' | 'audio' | 'other' {
+  if (file.type.startsWith('image/')) return 'image'
+  if (file.type.startsWith('video/')) return 'video'
+  if (file.type.startsWith('audio/')) return 'audio'
+  return 'other'
+}
 
 export default function SubmitCreativeWorkPage(): JSX.Element {
-  const [form] = Form.useForm<CreativeWorkFormValues>();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const router = useRouter();
+  const [form] = Form.useForm<CreativeWorkFormValues>()
+  const [fileList, setFileList] = useState<UploadFile[]>([])
+  const [submitting, setSubmitting] = useState(false)
+  const [messageApi, messageContextHolder] = antdMessage.useMessage()
+  const router = useRouter()
 
   const handleUploadChange = (info: UploadChangeParamLite) => {
-    setFileList(info.fileList);
-  };
+    setFileList(info.fileList.slice(-1))
+  }
 
-  // Normalise l'évènement Upload pour AntD Form
   const normFile = (e: UploadChangeParamLite | UploadFile[]) => {
-    if (Array.isArray(e)) return e;
-    return e?.fileList ?? [];
-  };
+    if (Array.isArray(e)) return e.slice(-1)
+    return e?.fileList?.slice(-1) ?? []
+  }
 
-  const onFinish = async (_values: CreativeWorkFormValues) => {
-    if (!fileList.length) {
-      antdMessage.error('Veuillez joindre au moins un fichier.');
-      return;
+  const onFinish = async (values: CreativeWorkFormValues) => {
+    const upload = fileList[0]?.originFileObj
+    if (!(upload instanceof File)) {
+      messageApi.error('Please attach one file.')
+      return
     }
+
+    const description = values.credits?.trim()
+      ? `${values.description}\n\nCredits: ${values.credits.trim()}`
+      : values.description
+
+    const payload = new FormData()
+    payload.append('title', values.title)
+    payload.append('description', description)
+    payload.append('media_file', upload)
+    payload.append('media_type', mediaTypeFromFile(upload))
+    payload.append('medium', values.category)
+    payload.append('year', String(new Date().getFullYear()))
+
+    setSubmitting(true)
     try {
-      // TODO: remplacer par l'appel API réel d’envoi
-      // await api.submitCreativeWork(values, fileList)
-      antdMessage.success('Création envoyée avec succès !');
-      router.push('/kreative/dashboard');
-    } catch {
-      antdMessage.error("Erreur lors de l'envoi. Réessayez.");
+      await createKreativeArtwork(payload)
+      messageApi.success('Creative work saved.')
+      form.resetFields()
+      setFileList([])
+      router.push('/kreative/dashboard')
+    } catch (error) {
+      messageApi.error(
+        error instanceof Error
+          ? error.message
+          : 'Unable to save the creative work.',
+      )
+    } finally {
+      setSubmitting(false)
     }
-  };
+  }
 
   return (
     <KreativePageShell
       title="Submit Creative Work"
       subtitle="Share your creative work with the community."
     >
+      {messageContextHolder}
       <Alert
         type="info"
         showIcon
         style={{ marginBottom: 16 }}
-        message="Partagez votre travail créatif avec la communauté."
+        message="Submissions on this page are persisted through the Kreative artwork API."
       />
 
       <Form<CreativeWorkFormValues> layout="vertical" form={form} onFinish={onFinish}>
@@ -91,16 +120,19 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
         </Form.Item>
 
         <Form.Item
-          label="Category"
+          label="Medium / category"
           name="category"
           rules={[{ required: true, message: 'Please pick a category' }]}
         >
-          <Select placeholder="Choose one">
-            <Select.Option value="art">Art</Select.Option>
-            <Select.Option value="design">Design</Select.Option>
-            <Select.Option value="music">Music</Select.Option>
-            <Select.Option value="other">Other</Select.Option>
-          </Select>
+          <Select
+            placeholder="Choose one"
+            options={[
+              { value: 'Art', label: 'Art' },
+              { value: 'Design', label: 'Design' },
+              { value: 'Music', label: 'Music' },
+              { value: 'Other', label: 'Other' },
+            ]}
+          />
         </Form.Item>
 
         <Form.Item
@@ -113,17 +145,17 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
               validator: (_, value: UploadFile[]) =>
                 value && value.length
                   ? Promise.resolve()
-                  : Promise.reject(new Error('Please attach at least one file')),
+                  : Promise.reject(new Error('Please attach one file')),
             },
           ]}
         >
           <Upload
-            beforeUpload={() => false} // empêche l’upload auto, on laisse le form gérer
-            multiple
+            beforeUpload={() => false}
+            maxCount={1}
             onChange={handleUploadChange}
             fileList={fileList}
           >
-            <Button icon={<UploadOutlined />}>Select file(s)</Button>
+            <Button icon={<UploadOutlined />}>Select file</Button>
           </Upload>
         </Form.Item>
 
@@ -132,11 +164,11 @@ export default function SubmitCreativeWorkPage(): JSX.Element {
         </Form.Item>
 
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={submitting}>
             Submit
           </Button>
         </Form.Item>
       </Form>
     </KreativePageShell>
-  );
+  )
 }

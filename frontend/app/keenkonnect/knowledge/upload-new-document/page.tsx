@@ -11,12 +11,10 @@ import {
   ProFormTextArea,
   ProFormUploadDragger,
 } from '@ant-design/pro-components';
-import { message as antdMessage } from 'antd';
+import { Alert } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React from 'react';
 
-import { apiPost } from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 type CategoryOption = 'Robotics' | 'Healthcare' | 'Technology' | 'Energy' | 'Education';
@@ -43,45 +41,9 @@ const normFile = (event: unknown): UploadFile[] => {
 };
 
 export default function UploadNewDocumentPage(): JSX.Element {
-  const router = useRouter();
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleFinish = async (values: UploadDocumentFormValues) => {
-    const fileList = values.documentFile ?? [];
-    const file = fileList[0]?.originFileObj;
-
-    if (!file) {
-      antdMessage.error('Please upload a document file before submitting.');
-      return false;
-    }
-
-    const formData = new FormData();
-    // Métadonnées principales
-    formData.append('title', values.title);
-    formData.append('description', values.description);
-    formData.append('category', values.category);
-    formData.append('version', values.version);
-    formData.append('language', values.language);
-    formData.append('publishNow', values.publishNow ? 'true' : 'false');
-    // Fichier lui-même
-    formData.append('file', file as File);
-
-    try {
-      setSubmitting(true);
-
-      await apiPost('/knowledge/documents/upload', formData);
-
-      antdMessage.success('Document uploaded successfully');
-      router.push('/keenkonnect/knowledge/document-management');
-      return true;
-    } catch (error) {
-       
-      console.error('Document upload error:', error);
-      antdMessage.error('Failed to upload document. Please try again.');
-      return false;
-    } finally {
-      setSubmitting(false);
-    }
+  const handleFinish = async (): Promise<boolean> => {
+    // Declared read-only: no general knowledge-document upload contract exists.
+    return false;
   };
 
   return (
@@ -90,6 +52,13 @@ export default function UploadNewDocumentPage(): JSX.Element {
       description="Add a new knowledge asset to KeenKonnect."
       metaTitle="KeenKonnect · Knowledge · Upload document"
     >
+      <Alert
+        type="info"
+        showIcon
+        message="Document upload unavailable"
+        description="This form is retained as a declared read-only product preview. Konnaxion does not currently expose a general knowledge-document upload persistence contract."
+        style={{ marginBottom: 16 }}
+      />
       <ProCard>
         <ProForm<UploadDocumentFormValues>
           layout="vertical"
@@ -99,12 +68,13 @@ export default function UploadNewDocumentPage(): JSX.Element {
           }}
           submitter={{
             searchConfig: {
-              submitText: 'Upload Document',
+              submitText: 'Upload unavailable',
               resetText: 'Reset',
             },
             submitButtonProps: {
-              loading: submitting,
+              disabled: true,
               type: 'primary',
+              title: 'Unavailable until a knowledge-document persistence contract exists.',
             },
           }}
         >

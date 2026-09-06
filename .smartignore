@@ -1,36 +1,23 @@
-# Secrets
-.env
-.env.*
-.envs/
-*.pem
-*.key
-*.crt
-*.p12
-*.pfx
-id_rsa*
-id_ed25519*
+##############################################################################
+# Konnaxion code-snapshot exclusions ONLY
+#
+# These files may legitimately remain versioned in Git, but are usually noise
+# for an AI/code-review snapshot. Secrets and reproducible local artifacts belong
+# in .gitignore instead of here.
+##############################################################################
 
-# Generated / build
-.next/
-node_modules/
-staticfiles/
-media/
-dist/
-build/
-out/
-coverage/
-htmlcov/
-test-results/
-playwright-report/
-artifacts/
-
-# Lockfiles usually not useful for AI code review
+##############################################################################
+# 1) Dependency lockfiles
+# Keep in Git for reproducible builds; omit from code snapshots.
+##############################################################################
 pnpm-lock.yaml
 package-lock.json
 yarn.lock
 uv.lock
 
-# Large/static assets
+##############################################################################
+# 2) Large/static versioned assets
+##############################################################################
 *.png
 *.jpg
 *.jpeg
@@ -39,33 +26,38 @@ uv.lock
 *.svg
 *.ico
 *.mp4
+*.webm
 *.mov
 *.avi
-*.zip
-*.tar
-*.tar.gz
-*.7z
 *.pdf
 *.docx
 *.xlsx
+*.crt
 
-# Logs / reports / manifests generated
-*.log
-routes-tests.json
-use_client_report.csv
-use_client_report.json
+##############################################################################
+# 3) Versioned data / inventories not needed for source review
+##############################################################################
+seed-data/
+EndPoints-Graphs/
+
+backend/routes.json
+backend/routes.csv
+frontend/routes.json
+frontend/frontend_endpoints.json
+frontend/frontend_endpoints.csv
+
 schema-endpoints.json
 combined_manifest.yml
 manifest_*.yml
 
-# Caches
-.cache/
-.turbo/
-.swc/
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-__pycache__/
+# Repository inventories / path snapshots
+OVERLAY_TREE.txt
+**/pathbackend_*.txt
 
-# SecurityDiag generated evidence
-.securitydiag/
+##############################################################################
+# 4) Project status / scenario documentation
+# Keep technical reference docs and source-facing READMEs in the snapshot.
+##############################################################################
+docs/status/
+docs/demo-scenarios/
+

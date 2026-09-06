@@ -4,6 +4,7 @@
 
 import { SearchOutlined } from '@ant-design/icons';
 import {
+  Alert,
   Badge,
   Button,
   Card,
@@ -17,7 +18,6 @@ import {
   Typography,
 } from 'antd';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 
 import KreativePageShell from '@/app/kreative/kreativePageShell';
@@ -33,7 +33,7 @@ interface Project {
   category: string;
 }
 
-const dummyProjects: Project[] = [
+const PREVIEW_PROJECTS: Project[] = [
   {
     id: '1',
     title: 'Project Sunrise',
@@ -73,8 +73,6 @@ const dummyProjects: Project[] = [
 ];
 
 export default function FeaturedProjectsPage(): JSX.Element {
-  const router = useRouter();
-
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] =
     useState<string>('All');
@@ -87,7 +85,7 @@ export default function FeaturedProjectsPage(): JSX.Element {
   const pageSize = 4;
 
   const filteredProjects = useMemo(() => {
-    let projects = dummyProjects;
+    let projects = PREVIEW_PROJECTS;
 
     if (selectedCategory !== 'All') {
       projects = projects.filter(
@@ -246,15 +244,8 @@ export default function FeaturedProjectsPage(): JSX.Element {
               <p style={{ marginTop: 12 }}>
                 {selectedProject.description}
               </p>
-              <Button
-                type="primary"
-                onClick={() =>
-                  router.push(
-                    `/kreative/community-showcases/featured-projects/${selectedProject.id}`,
-                  )
-                }
-              >
-                View Details
+              <Button type="primary" disabled>
+                Detail route unavailable
               </Button>
             </div>
           </div>

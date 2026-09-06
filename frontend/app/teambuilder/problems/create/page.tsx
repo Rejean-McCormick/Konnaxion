@@ -30,9 +30,12 @@ import {
   TreeSelect,
   Typography,
 } from 'antd';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
+import { teambuilderService } from '@/services/teambuilder';
+import type { ICreateProblemRequest } from '@/services/teambuilder/types';
 
 const { TextArea } = Input;
 const { Paragraph, Text } = Typography;
@@ -121,21 +124,50 @@ const RISK_OPTIONS = [
 
 export default function CreateProblemPage(): JSX.Element {
   const [form] = Form.useForm<ProblemFormValues>();
+  const router = useRouter();
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [submitting, setSubmitting] = useState<'draft' | 'publish' | null>(
     null,
   );
 
-  const handleFinish = async (values: ProblemFormValues) => {
-    // Later: call API; for now, just simulate.
-     
-    console.log('Problem payload:', values, 'submitMode:', submitting);
+  const persistProblem = async (
+    values: ProblemFormValues,
+    submitMode: 'draft' | 'publish',
+  ) => {
+    const notes: string[] = [];
 
-    const modeLabel =
-      submitting === 'publish' ? 'published' : 'saved as draft';
+    if (values.context?.trim()) {
+      notes.push(values.context.trim());
+    }
+    if (values.expectedDurationDays != null) {
+      notes.push(`Expected duration: ${values.expectedDurationDays} day(s).`);
+    }
+    if (values.allowRehabMode) {
+      notes.push('Rehab mode explicitly allowed.');
+    }
+    if (values.allowLearningMode) {
+      notes.push('Learning mode explicitly allowed.');
+    }
 
-    message.success(`Problem ${modeLabel} (simulated).`);
-    setSubmitting(null);
+    const payload: ICreateProblemRequest = {
+      name: values.title.trim(),
+      description: values.statement.trim(),
+      status: submitMode === 'publish' ? 'ACTIVE' : 'DRAFT',
+      risk_level:
+        values.riskLevel.toUpperCase() as ICreateProblemRequest['risk_level'],
+      min_team_size: values.minTeamSize ?? null,
+      max_team_size: values.maxTeamSize ?? null,
+      unesco_codes: values.taxonomyCodes ?? [],
+      categories: values.requiredSkills ?? [],
+      recommended_modes: values.typicalModes ?? [],
+      facilitator_notes: notes.join('\n'),
+    };
+
+    const created = await teambuilderService.createProblem(payload);
+    const modeLabel = submitMode === 'publish' ? 'published' : 'saved as draft';
+
+    message.success(`Problem ${modeLabel}.`);
+    router.push(`/teambuilder/problems/${created.id}`);
   };
 
   const goNext = async () => {
@@ -172,8 +204,11 @@ export default function CreateProblemPage(): JSX.Element {
     setSubmitting('draft');
     try {
       const values = await form.validateFields();
-      await handleFinish(values);
-    } catch {
+      await persistProblem(values, 'draft');
+    } catch (error) {
+      console.error('Failed to save TeamBuilder problem draft', error);
+      message.error('Unable to save the problem.');
+    } finally {
       setSubmitting(null);
     }
   };
@@ -182,8 +217,11 @@ export default function CreateProblemPage(): JSX.Element {
     setSubmitting('publish');
     try {
       const values = await form.validateFields();
-      await handleFinish(values);
-    } catch {
+      await persistProblem(values, 'publish');
+    } catch (error) {
+      console.error('Failed to publish TeamBuilder problem', error);
+      message.error('Unable to publish the problem.');
+    } finally {
       setSubmitting(null);
     }
   };
@@ -238,7 +276,7 @@ export default function CreateProblemPage(): JSX.Element {
         <Form<ProblemFormValues>
           layout="vertical"
           form={form}
-          onFinish={handleFinish}
+          onFinish={(values) => void persistProblem(values, 'draft')}
           initialValues={{
             riskLevel: 'medium',
             typicalModes: ['BALANCED', 'LEARNING'],

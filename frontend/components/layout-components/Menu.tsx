@@ -84,11 +84,21 @@ const toMenuItems = (
   closeDrawer: () => void,
 ): MenuItem[] => {
   const items: MenuItem[] = [];
+  const usedKeys = new Set<string>();
 
-  routes.forEach((route) => {
+  const pushUnique = (key: string, item: MenuItem) => {
+    // Ant Design Menu forwards item keys to React. Duplicate route paths create
+    // duplicate React keys and unstable menu identity, so keep the first
+    // declaration and ignore later aliases to the exact same destination.
+    if (usedKeys.has(key)) return;
+    usedKeys.add(key);
+    items.push(item);
+  };
+
+  routes.forEach((route, routeIndex) => {
     // Group / section
     if (route.views && route.views.length > 0) {
-      const sectionKey = `section-${route.name}`;
+      const sectionKey = `section-${routeIndex}-${route.name}`;
 
       // Non-clickable section header (optional icon + scope metadata)
       items.push({
@@ -130,22 +140,25 @@ const toMenuItems = (
       route.views.forEach((child) => {
         if (!child.path) return;
 
-        items.push({
-          key: child.path,
-          icon: child.icon,
-          className: 'k-sidebar-section-item',
-          label: (
-            <Link
-              href={{
-                pathname: child.path,
-                query: { sidebar: selectedSidebar },
-              }}
-              onClick={closeDrawer}
-            >
-              {child.name}
-            </Link>
-          ),
-        } as MenuItem);
+        pushUnique(
+          child.path,
+          {
+            key: child.path,
+            icon: child.icon,
+            className: 'k-sidebar-section-item',
+            label: (
+              <Link
+                href={{
+                  pathname: child.path,
+                  query: { sidebar: selectedSidebar },
+                }}
+                onClick={closeDrawer}
+              >
+                {child.name}
+              </Link>
+            ),
+          } as MenuItem,
+        );
       });
 
       return;
@@ -154,18 +167,21 @@ const toMenuItems = (
     // Simple route
     if (!route.path) return;
 
-    items.push({
-      key: route.path,
-      icon: route.icon,
-      label: (
-        <Link
-          href={{ pathname: route.path, query: { sidebar: selectedSidebar } }}
-          onClick={closeDrawer}
-        >
-          {route.name}
-        </Link>
-      ),
-    } as MenuItem);
+    pushUnique(
+      route.path,
+      {
+        key: route.path,
+        icon: route.icon,
+        label: (
+          <Link
+            href={{ pathname: route.path, query: { sidebar: selectedSidebar } }}
+            onClick={closeDrawer}
+          >
+            {route.name}
+          </Link>
+        ),
+      } as MenuItem,
+    );
   });
 
   return items;

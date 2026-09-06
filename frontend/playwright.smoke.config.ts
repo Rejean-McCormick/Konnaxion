@@ -4,6 +4,15 @@ import { defineConfig, devices } from '@playwright/test'
 
 const AUTH_STATE = process.env.PLAYWRIGHT_AUTH_STATE ?? 'storageState.json'
 
+const BASE_URL =
+  process.env.SMOKE_BASE_URL ?? 'http://127.0.0.1:3000'
+
+const frontendUrl = new URL(BASE_URL)
+const FRONTEND_HOST = frontendUrl.hostname
+const FRONTEND_PORT =
+  frontendUrl.port ||
+  (frontendUrl.protocol === 'https:' ? '443' : '80')
+
 const testIgnore = [
   '**/_e2e/**',
   '_e2e/**',
@@ -70,8 +79,16 @@ export default defineConfig({
 
   outputDir: 'artifacts/playwright-smoke-output',
 
+  webServer: {
+    command:
+      `pnpm exec next dev --hostname ${FRONTEND_HOST} --port ${FRONTEND_PORT}`,
+    url: BASE_URL,
+    reuseExistingServer: true,
+    timeout: 120_000,
+  },
+
   use: {
-    baseURL: process.env.SMOKE_BASE_URL || 'http://localhost:3000',
+    baseURL: BASE_URL,
     headless: !!process.env.CI,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',

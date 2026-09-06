@@ -55,8 +55,8 @@ interface ITeambuilderProblem {
   description?: string;
   status?: ProblemStatus;
   risk_level?: ProblemRiskLevel;
-  min_team_size?: number;
-  max_team_size?: number;
+  min_team_size?: number | null;
+  max_team_size?: number | null;
   recommended_modes?: string[];
   categories?: string[];
   unesco_codes?: string[];
@@ -115,12 +115,9 @@ export default function ProblemDetailPage(): JSX.Element {
     setError(null);
 
     try {
-      // Keep compatibility while the shared service type catches up with the
-      // already-used problem-detail endpoint.
-      const problemDetailService = teambuilderService as typeof teambuilderService & {
-        getProblemDetail: (id: string) => Promise<IProblemDetailResponse>;
-      };
-      const data = await problemDetailService.getProblemDetail(problemId as string);
+      const data = await teambuilderService.getProblemDetail(
+        problemId as string,
+      );
 
       setProblem(data.problem);
       setSessions(data.sessions ?? []);
@@ -391,12 +388,11 @@ export default function ProblemDetailPage(): JSX.Element {
               description="No history recorded yet."
             />
           ) : (
-            <Timeline mode="left">
-              {history.map((event) => (
-                <Timeline.Item
-                  key={event.id}
-                  color={event.type === 'STATUS_CHANGE' ? 'blue' : 'gray'}
-                >
+            <Timeline
+              mode="left"
+              items={history.map((event) => ({
+                color: event.type === 'STATUS_CHANGE' ? 'blue' : 'gray',
+                children: (
                   <Space direction="vertical" size={2}>
                     <Text strong>{event.title}</Text>
                     <Text type="secondary">
@@ -408,9 +404,9 @@ export default function ProblemDetailPage(): JSX.Element {
                       <Text type="secondary">{event.description}</Text>
                     )}
                   </Space>
-                </Timeline.Item>
-              ))}
-            </Timeline>
+                ),
+              }))}
+            />
           )}
         </Card>
       </Space>
@@ -635,15 +631,13 @@ export default function ProblemDetailPage(): JSX.Element {
     body = (
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
         {/* Breadcrumb / context */}
-        <Breadcrumb>
-          <Breadcrumb.Item>
-            <Link href="/teambuilder">Team Builder</Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item>
-            <Link href="/teambuilder/problems">Problems</Link>
-          </Breadcrumb.Item>
-          <Breadcrumb.Item>{problem.name}</Breadcrumb.Item>
-        </Breadcrumb>
+        <Breadcrumb
+          items={[
+            { title: <Link href="/teambuilder">Team Builder</Link> },
+            { title: <Link href="/teambuilder/problems">Problems</Link> },
+            { title: problem.name },
+          ]}
+        />
 
         <Card>
           <Tabs

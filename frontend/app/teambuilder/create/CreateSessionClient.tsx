@@ -18,7 +18,7 @@ import {
   Steps,
   Typography,
 } from 'antd';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 
@@ -38,6 +38,8 @@ const { TextArea } = Input;
 
 export default function CreateSessionClient(): JSX.Element {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const problemId = searchParams.get('problemId');
 
   // ---------------------------------------------------------------------------
   // State
@@ -102,6 +104,7 @@ export default function CreateSessionClient(): JSX.Element {
         description: sessionDescription,
         candidate_ids: selectedCandidateIds,
         algorithm_config: algorithmConfig,
+        ...(problemId ? { problem_id: problemId } : {}),
       };
 
       const session = await teambuilderService.createSession(payload);

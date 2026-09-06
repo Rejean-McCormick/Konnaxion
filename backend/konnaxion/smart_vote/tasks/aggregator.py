@@ -1,83 +1,83 @@
-# konnaxion/smart_vote/tasks/aggregator.py
-"""
-Aggregator logic:
+"""Legacy Smart Vote result projection.
 
-1. Pulls Vote rows created since the last run (uses id > cursor).
-2. Sums their weighted values per (target_type, target_id) combination.
-3. UPSERTs into vote_result (sum_weighted_value, vote_count).
+Canonical source ballots remain source facts. Rows with ``weighted_value`` set
+are treated only as legacy weighted rows and are projected into ``vote_result``.
+New source ballots may leave ``weighted_value`` NULL.
 
-This module contains plain Python logic (no Celery task here).
-The Celery task wrapper lives in konnaxion.smart_vote.tasks.__init__.
+The projection is rebuilt idempotently from stored legacy weighted rows. No
+session-local cursor is used.
 """
 
 from __future__ import annotations
 
 import logging
-from collections import defaultdict
-from decimal import Decimal
 
-from django.db import transaction, connection
+from django.db import connection
 
-from konnaxion.smart_vote.models.core import Vote, VoteResult
+from konnaxion.ekoh.db import ekoh_smartvote_db_scope
 
 LOGGER = logging.getLogger(__name__)
-CURSOR_KEY = "ekoh_smartvote.last_vote_id"
 
 
-def _load_cursor() -> int:
-    """Fetch last processed vote id from pg_settings (simple key-value)."""
-    with connection.cursor() as cur:
-        cur.execute(
-            "SELECT current_setting(%s, true);",
-            (CURSOR_KEY,),
-        )
-        row = cur.fetchone()
-    return int(row[0]) if row and row[0] else 0
+def aggregate_votes(batch_size: int = 5_000) -> dict[str, int]:
+    """Rebuild the legacy ``vote_result`` projection.
 
-
-def _save_cursor(vote_id: int) -> None:
-    with connection.cursor() as cur:
-        cur.execute("SELECT set_config(%s, %s, true);", (CURSOR_KEY, str(vote_id)))
-
-
-def aggregate_votes(batch_size: int = 5_000) -> None:
+    ``batch_size`` is retained for task-call compatibility. The rebuild is
+    intentionally idempotent and does not use an incremental cursor.
     """
-    Core aggregation routine.
+    del batch_size
 
-    This is NOT a Celery task. It is invoked by the Celery task
-    `vote_aggregate` defined in konnaxion.smart_vote.tasks.__init__.
-    """
-    last_id = _load_cursor()
-    LOGGER.debug("Vote aggregate start (cursor=%s)", last_id)
-
-    qs = Vote.objects.filter(id__gt=last_id).order_by("id")[:batch_size]
-    if not qs.exists():
-        LOGGER.debug("No new votes")
-        return
-
-    # 1) group by target
-    totals: dict[tuple[str, str], dict[str, Decimal | int]] = defaultdict(
-        lambda: {"sum": Decimal(0), "count": 0}
-    )
-
-    highest_id = last_id
-    for v in qs:
-        key = (v.target_type, str(v.target_id))
-        totals[key]["sum"] += v.weighted_value
-        totals[key]["count"] += 1
-        highest_id = max(highest_id, v.id)
-
-    # 2) upsert
-    with transaction.atomic():
-        for (t_type, t_id), agg in totals.items():
-            VoteResult.objects.update_or_create(
-                target_type=t_type,
-                target_id=t_id,
-                defaults={
-                    "sum_weighted_value": agg["sum"],
-                    "vote_count": agg["count"],
-                },
+    with ekoh_smartvote_db_scope():
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO vote_result (
+                    target_type,
+                    target_id,
+                    sum_weighted_value,
+                    vote_count
+                )
+                SELECT
+                    target_type,
+                    target_id,
+                    SUM(weighted_value),
+                    COUNT(*)::int
+                FROM vote
+                WHERE weighted_value IS NOT NULL
+                GROUP BY target_type, target_id
+                ON CONFLICT (target_type, target_id)
+                DO UPDATE SET
+                    sum_weighted_value = EXCLUDED.sum_weighted_value,
+                    vote_count = EXCLUDED.vote_count
+                """
             )
-        _save_cursor(highest_id)
 
-    LOGGER.info("Aggregated %s votes up to id %s", len(qs), highest_id)
+            cursor.execute(
+                """
+                DELETE FROM vote_result AS result
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM vote
+                    WHERE vote.weighted_value IS NOT NULL
+                      AND vote.target_type = result.target_type
+                      AND vote.target_id = result.target_id
+                )
+                """
+            )
+
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(*)::int,
+                    COALESCE(SUM(vote_count), 0)::int
+                FROM vote_result
+                """
+            )
+            target_count, vote_count = cursor.fetchone()
+
+    result = {
+        "targets": int(target_count),
+        "legacy_weighted_votes": int(vote_count),
+    }
+    LOGGER.info("Smart Vote legacy result projection rebuilt: %s", result)
+    return result

@@ -1,292 +1,83 @@
-// FILE: frontend/app/kreative/collaborative-spaces/find-spaces/page.tsx
-'use client';
+'use client'
 
-import { SearchOutlined } from '@ant-design/icons';
-import {
-  message as antdMessage,
-  Button,
-  Card,
-  Col,
-  Input,
-  Modal,
-  Pagination,
-  Row,
-  Select,
-  Space,
-  Typography,
-} from 'antd';
-import { useRouter } from 'next/navigation';
-import React, { useMemo, useState } from 'react';
+import { ReloadOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Col, Empty, Row, Select, Space, Spin, Tag, Typography } from 'antd'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import KreativePageShell from '@/app/kreative/kreativePageShell';
+import KreativePageShell from '@/app/kreative/kreativePageShell'
+import { listCollabSessions, type KreativeCollabSession } from '@/services/kreative'
 
-const { Text } = Typography;
-const { Option } = Select;
+const { Text } = Typography
 
-type Discipline = 'Art' | 'Music' | 'Writing' | 'Technology' | 'Other';
-type JoinType = 'open' | 'invite-only';
-type DisciplineFilter = Discipline | 'All';
-type JoinTypeFilter = JoinType | 'All';
-
-interface CollaborativeSpace {
-  id: string;
-  name: string;
-  description: string;
-  discipline: Discipline;
-  memberCount: number;
-  joinType: JoinType;
-  createdAt: string; // ISO date
-}
-
-// Demo data
-const dummySpaces: CollaborativeSpace[] = [
-  {
-    id: '1',
-    name: 'Urban Art Collective',
-    description: 'A community for street artists and mural enthusiasts.',
-    discipline: 'Art',
-    memberCount: 35,
-    joinType: 'open',
-    createdAt: '2025-11-15T10:00:00Z',
-  },
-  {
-    id: '2',
-    name: 'Indie Music Makers',
-    description: 'Join to collaborate on original music projects and recordings.',
-    discipline: 'Music',
-    memberCount: 50,
-    joinType: 'invite-only',
-    createdAt: '2025-11-20T14:30:00Z',
-  },
-  {
-    id: '3',
-    name: 'Writers’ Lounge',
-    description:
-      'A space for writers to share ideas, get feedback, and find collaborators.',
-    discipline: 'Writing',
-    memberCount: 25,
-    joinType: 'open',
-    createdAt: '2025-11-18T09:15:00Z',
-  },
-  {
-    id: '4',
-    name: 'Tech & Art Fusion',
-    description:
-      'Where creativity meets innovation: join us to build interactive art installations.',
-    discipline: 'Technology',
-    memberCount: 18,
-    joinType: 'invite-only',
-    createdAt: '2025-11-22T11:45:00Z',
-  },
-];
+type SessionFilter = 'all' | KreativeCollabSession['session_type']
 
 export default function FindSpacesPage(): JSX.Element {
-  const router = useRouter();
+  const [sessions, setSessions] = useState<KreativeCollabSession[]>([])
+  const [filter, setFilter] = useState<SessionFilter>('all')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Filters, tri, pagination
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedDiscipline, setSelectedDiscipline] =
-    useState<DisciplineFilter>('All');
-  const [selectedJoinType, setSelectedJoinType] =
-    useState<JoinTypeFilter>('All');
-  const [sortOption, setSortOption] =
-    useState<'mostActive' | 'newest'>('mostActive');
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const pageSize = 4;
-
-  // Modal d’invitation
-  const [joinModalVisible, setJoinModalVisible] = useState(false);
-  const [selectedSpace, setSelectedSpace] = useState<CollaborativeSpace | null>(
-    null,
-  );
-
-  // Filtre + tri
-  const filteredSpaces = useMemo(() => {
-    let spaces: CollaborativeSpace[] = dummySpaces;
-
-    if (selectedDiscipline !== 'All') {
-      spaces = spaces.filter((s) => s.discipline === selectedDiscipline);
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      setSessions(await listCollabSessions())
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Unable to load collaboration sessions.')
+    } finally {
+      setLoading(false)
     }
-    if (selectedJoinType !== 'All') {
-      spaces = spaces.filter((s) => s.joinType === selectedJoinType);
-    }
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase();
-      spaces = spaces.filter(
-        (s) =>
-          s.name.toLowerCase().includes(q) ||
-          s.description.toLowerCase().includes(q),
-      );
-    }
+  }, [])
 
-    const sorted = [...spaces];
+  useEffect(() => {
+    void load()
+  }, [load])
 
-    if (sortOption === 'newest') {
-      sorted.sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      );
-    } else {
-      // proxy d’activité = memberCount
-      sorted.sort((a, b) => b.memberCount - a.memberCount);
-    }
-
-    return sorted;
-  }, [searchQuery, selectedDiscipline, selectedJoinType, sortOption]);
-
-  // Pagination
-  const paginatedSpaces = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return filteredSpaces.slice(start, start + pageSize);
-  }, [filteredSpaces, currentPage]);
-
-  // Actions
-  function handleJoin(space: CollaborativeSpace) {
-    if (space.joinType === 'open') {
-      antdMessage.success(`You have joined "${space.name}"!`);
-      router.push(`/kreative/collaborative-spaces/${space.id}`);
-      return;
-    }
-    setSelectedSpace(space);
-    setJoinModalVisible(true);
-  }
-
-  function confirmJoinRequest() {
-    if (selectedSpace) {
-      antdMessage.success(
-        `Your request to join "${selectedSpace.name}" has been sent.`,
-      );
-    }
-    setJoinModalVisible(false);
-    setSelectedSpace(null);
-  }
+  const visible = useMemo(
+    () => (filter === 'all' ? sessions : sessions.filter((item) => item.session_type === filter)),
+    [filter, sessions],
+  )
 
   return (
     <KreativePageShell
-      title="Find Spaces"
-      subtitle="Browse and join collaborative creative spaces."
+      title="Find Collaborative Spaces"
+      subtitle="Browse collaboration sessions exposed by the real Kreative CollabSession API."
+      primaryAction={<Button icon={<ReloadOutlined />} onClick={() => void load()}>Refresh</Button>}
     >
-      <Space
-        direction="vertical"
-        style={{ width: '100%', marginBottom: 24 }}
-        size="large"
-      >
-        <Space wrap>
-          <Input
-            placeholder="Search spaces..."
-            prefix={<SearchOutlined />}
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setCurrentPage(1);
-            }}
-            style={{ width: 300 }}
-          />
-
-          <Select
-            value={selectedDiscipline}
-            onChange={(v) => {
-              setSelectedDiscipline(v as DisciplineFilter);
-              setCurrentPage(1);
-            }}
-            style={{ width: 180 }}
-          >
-            <Option value="All">All Disciplines</Option>
-            <Option value="Art">Art</Option>
-            <Option value="Music">Music</Option>
-            <Option value="Writing">Writing</Option>
-            <Option value="Technology">Technology</Option>
-            <Option value="Other">Other</Option>
-          </Select>
-
-          <Select
-            value={selectedJoinType}
-            onChange={(v) => {
-              setSelectedJoinType(v as JoinTypeFilter);
-              setCurrentPage(1);
-            }}
-            style={{ width: 180 }}
-          >
-            <Option value="All">All Join Types</Option>
-            <Option value="open">Open</Option>
-            <Option value="invite-only">Invite-Only</Option>
-          </Select>
-
-          <Select
-            value={sortOption}
-            onChange={(v) => {
-              setSortOption(v as 'mostActive' | 'newest');
-              setCurrentPage(1);
-            }}
-            style={{ width: 180 }}
-          >
-            <Option value="mostActive">Most Active</Option>
-            <Option value="newest">Newest</Option>
-          </Select>
-        </Space>
-      </Space>
-
-      <Row gutter={[24, 24]}>
-        {paginatedSpaces.map((space) => (
-          <Col key={space.id} xs={24} sm={12} md={8}>
-            <Card
-              hoverable
-              title={space.name}
-              extra={<Text type="secondary">{space.memberCount} Members</Text>}
-              actions={[
-                <Button
-                  key="join"
-                  type="primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleJoin(space);
-                  }}
-                >
-                  {space.joinType === 'open' ? 'Join' : 'Request to Join'}
-                </Button>,
-              ]}
-              onClick={() =>
-                router.push(`/kreative/collaborative-spaces/${space.id}`)
-              }
-            >
-              <Card.Meta description={<Text>{space.description}</Text>} />
-              <div style={{ marginTop: 12 }}>
-                <Text strong>Discipline:</Text> <Text>{space.discipline}</Text>
-                <br />
-                <Text strong>Status:</Text>{' '}
-                <Text>
-                  {space.joinType === 'open' ? 'Open' : 'Invite-Only'}
-                </Text>
-              </div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
-
-      <div style={{ textAlign: 'center', marginTop: 24 }}>
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={filteredSpaces.length}
-          onChange={(page) => setCurrentPage(page)}
+      {error ? <Alert type="error" showIcon message="Space discovery failed" description={error} style={{ marginBottom: 16 }} /> : null}
+      <Space style={{ marginBottom: 16 }}>
+        <Text>Session type</Text>
+        <Select<SessionFilter>
+          value={filter}
+          onChange={setFilter}
+          style={{ width: 180 }}
+          options={[
+            { label: 'All', value: 'all' },
+            { label: 'Painting', value: 'painting' },
+            { label: 'Music', value: 'music' },
+            { label: 'Mixed media', value: 'mixed' },
+          ]}
         />
-      </div>
-
-      <Modal
-        title="Request to Join Space"
-        open={joinModalVisible}
-        onOk={confirmJoinRequest}
-        onCancel={() => setJoinModalVisible(false)}
-        okText="Send Request"
-        cancelText="Cancel"
-      >
-        {selectedSpace && (
-          <p>
-            Do you want to send a join request for the space:{' '}
-            <strong>{selectedSpace.name}</strong>?
-          </p>
+      </Space>
+      <Spin spinning={loading}>
+        {visible.length === 0 ? (
+          <Empty description="No collaboration sessions match this filter." />
+        ) : (
+          <Row gutter={[16, 16]}>
+            {visible.map((session) => (
+              <Col key={session.id} xs={24} sm={12} lg={8}>
+                <Card title={session.name} extra={<Tag>{session.session_type}</Tag>}>
+                  <Space direction="vertical" size="small">
+                    <Text>Host: {session.host}</Text>
+                    <Text type="secondary">Started {new Date(session.started_at).toLocaleString()}</Text>
+                    <Tag color={session.ended_at ? 'default' : 'green'}>{session.ended_at ? 'Ended' : 'Active'}</Tag>
+                  </Space>
+                </Card>
+              </Col>
+            ))}
+          </Row>
         )}
-      </Modal>
+      </Spin>
     </KreativePageShell>
-  );
+  )
 }

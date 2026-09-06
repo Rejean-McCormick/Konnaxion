@@ -4,12 +4,11 @@
 import { DownOutlined } from '@ant-design/icons';
 import { type ProColumns, ProTable } from '@ant-design/pro-components';
 import {
+  Alert,
   Button,
   Col,
   Divider,
   Dropdown,
-  message,
-  Popconfirm,
   Row,
   Select,
   Tag,
@@ -32,7 +31,7 @@ interface Workspace {
   environment: string; // e.g. "Python environment", "Design whiteboard"
 }
 
-const sampleWorkspaces: Workspace[] = [
+const PREVIEW_WORKSPACES: Workspace[] = [
   {
     id: '1',
     name: 'Workspace Alpha',
@@ -74,7 +73,7 @@ export default function MyWorkspaces() {
   const [selectedProject, setSelectedProject] = useState<string>('All');
   // Local list so we can "remove" a workspace from the view (Popconfirm action)
   const [visibleWorkspaces, setVisibleWorkspaces] =
-    useState<Workspace[]>(sampleWorkspaces);
+    useState<Workspace[]>(PREVIEW_WORKSPACES);
 
   const filteredWorkspaces = useMemo(() => {
     const base = visibleWorkspaces;
@@ -103,11 +102,6 @@ export default function MyWorkspaces() {
     router.push(
       `/keenkonnect/workspaces/launch-new-workspace?id=${ws.id}&manage=1`,
     );
-  };
-
-  const handleRemoveFromMyWorkspaces = (ws: Workspace) => {
-    setVisibleWorkspaces((prev) => prev.filter((item) => item.id !== ws.id));
-    message.success(`Workspace "${ws.name}" removed from your list.`);
   };
 
   const columns: ProColumns<Workspace>[] = [
@@ -155,21 +149,12 @@ export default function MyWorkspaces() {
         const menuItems: MenuProps['items'] = [
           {
             key: 'manage',
-            label: 'Manage Settings',
+            label: 'Preview settings',
           },
           {
             key: 'remove',
-            label: (
-              <Popconfirm
-                title="Remove from My Workspaces?"
-                description="This will remove the workspace from your list (the workspace itself is not deleted)."
-                okText="Yes, remove"
-                cancelText="Cancel"
-                onConfirm={() => handleRemoveFromMyWorkspaces(record)}
-              >
-                <span>Remove from list</span>
-              </Popconfirm>
-            ),
+            label: 'Remove unavailable',
+            disabled: true,
           },
         ];
 
@@ -199,6 +184,13 @@ export default function MyWorkspaces() {
       title="My Workspaces"
       description="Manage and organize your KeenKonnect workspaces."
     >
+      <Alert
+        type="info"
+        showIcon
+        message="Workspace list preview"
+        description="No KeenKonnect workspace persistence contract exists in this build. These entries are declared preview data; settings navigation is illustrative and membership mutations are disabled."
+        style={{ marginBottom: 16 }}
+      />
       <Row gutter={[16, 16]} className="mb-4">
         <Col xs={24} sm={12}>
           <Text strong>Total Active Workspaces: {activeCount}</Text>

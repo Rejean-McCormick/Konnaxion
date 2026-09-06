@@ -53,13 +53,25 @@ class ProjectMessageSerializer(serializers.ModelSerializer):
 
 class ProjectTeamSerializer(serializers.ModelSerializer):
     """Serializer for ProjectTeam (project membership with role)."""
-    # Show user and project names for context
+
     user = serializers.StringRelatedField(read_only=True)
     project = serializers.StringRelatedField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+    project_id = serializers.IntegerField(read_only=True)
+    project_title = serializers.CharField(source="project.title", read_only=True)
+
     class Meta:
         model = ProjectTeam
         fields = "__all__"
-        read_only_fields = ("id", "joined_at")
+        read_only_fields = (
+            "id",
+            "user",
+            "user_id",
+            "project",
+            "project_id",
+            "project_title",
+            "joined_at",
+        )
 
 class ProjectRatingSerializer(serializers.ModelSerializer):
     """Serializer for ProjectRating (user rating/upvote on a project)."""

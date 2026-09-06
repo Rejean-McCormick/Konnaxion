@@ -1,86 +1,83 @@
 // FILE: frontend/app/ekoh/expertise-areas/view-current-expertise/page.tsx
-'use client'
+'use client';
 
-// app/ekoh/expertise-areas/view-current-expertise/page.tsx
-import { Card, List, Progress, Tag } from 'antd';
-import Head from 'next/head';
-import React from 'react';
+import { Alert, Card, Empty, List, Progress, Space, Tag, Typography } from 'antd';
 
 import EkohPageShell from '@/app/ekoh/EkohPageShell';
+import useReputationEvents from '@/hooks/useReputationEvents';
+import type { EkohExpertiseScore } from '@/services/trust';
 
-// Exemple de données simulées pour l'expertise de l'utilisateur
-interface Expertise {
-  id: string;
-  domain: string;
-  proficiency: number; // en pourcentage
-  contributions: number;
-  lastUpdated: string; // format ISO ou date formatée
+const { Paragraph, Text } = Typography;
+
+function percent(score: number): number {
+  return Math.max(0, Math.min(100, Math.round(score * 100)));
 }
 
-const expertiseData: Expertise[] = [
-  {
-    id: '1',
-    domain: 'Economy',
-    proficiency: 80,
-    contributions: 45,
-    lastUpdated: '2023-08-28',
-  },
-  {
-    id: '2',
-    domain: 'Politics',
-    proficiency: 65,
-    contributions: 30,
-    lastUpdated: '2023-08-25',
-  },
-  {
-    id: '3',
-    domain: 'Technology',
-    proficiency: 75,
-    contributions: 38,
-    lastUpdated: '2023-08-27',
-  },
-];
-
 export default function ViewCurrentExpertise(): JSX.Element {
-  return (
-    <>
-      <Head>
-        <title>Expertise Areas</title>
-        <meta
-          name="description"
-          content="View your recognized expertise areas along with proficiency levels and contribution details."
-        />
-      </Head>
+  const { data, isLoading, isError, error } = useReputationEvents();
+  const profile = data?.ekohProfile ?? null;
+  const expertise = profile?.expertise ?? [];
 
-      <EkohPageShell
-        title="Expertise Areas"
-        subtitle="Overview of your recognized domains, proficiency levels, and contributions."
-      >
-        <Card className="mb-6">
-          <List
-            itemLayout="vertical"
-            dataSource={expertiseData ?? []}
-            renderItem={(item) => (
-              <List.Item key={item.id}>
-                <List.Item.Meta
-                  title={
-                    <span>
-                      {item.domain}{' '}
-                      <Tag color="blue">Proficiency: {item.proficiency}%</Tag>
-                    </span>
-                  }
-                  description={
-                    <span>
-                      Contributions: {item.contributions} | Last Updated: {item.lastUpdated}
-                    </span>
-                  }
-                />
-                <Progress percent={item.proficiency} status="active" />
-              </List.Item>
-            )}
+  return (
+    <EkohPageShell
+      title="Current expertise"
+      subtitle="Canonical EkoH expertise by domain. No contribution counts or update dates are fabricated."
+    >
+      {isError && (
+        <Alert
+          type="error"
+          showIcon
+          message="Unable to load EkoH expertise"
+          description={(error as Error | undefined)?.message ?? 'Please try again.'}
+          style={{ marginBottom: 16 }}
+        />
+      )}
+
+      <Alert
+        type="info"
+        showIcon
+        message="Expertise is domain-specific"
+        description="These scores come from the EkoH profile. Smart Vote may use only the domains declared relevant to a particular question."
+        style={{ marginBottom: 16 }}
+      />
+
+      <Card loading={isLoading}>
+        {expertise.length ? (
+          <List<EkohExpertiseScore>
+            dataSource={expertise}
+            renderItem={(item) => {
+              const value = percent(item.weightedScore);
+              return (
+                <List.Item key={item.domainCode}>
+                  <div style={{ width: '100%' }}>
+                    <Space
+                      style={{ width: '100%', justifyContent: 'space-between' }}
+                      wrap
+                    >
+                      <Space wrap>
+                        <Text strong>{item.domainName}</Text>
+                        <Tag>{item.domainCode}</Tag>
+                      </Space>
+                      <Text type="secondary">{value}%</Text>
+                    </Space>
+                    <Progress percent={value} showInfo={false} />
+                  </div>
+                </List.Item>
+              );
+            }}
           />
-        </Card>
-      </EkohPageShell>
-    </>
+        ) : (
+          <Empty description="No canonical EkoH expertise profile available" />
+        )}
+      </Card>
+
+      <Card title="Interpretation" style={{ marginTop: 16 }}>
+        <Paragraph style={{ marginBottom: 0 }}>
+          A domain score is profile context, not a universal voting rank. Question-specific
+          influence is calculated separately by Smart Vote from the declared relevance of
+          that question.
+        </Paragraph>
+      </Card>
+    </EkohPageShell>
   );
 }

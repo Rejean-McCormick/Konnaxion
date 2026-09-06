@@ -15,6 +15,7 @@ import {
   Button,
   Card,
   Col,
+  Alert,
   Divider,
   Empty,
   Form,
@@ -26,18 +27,35 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Tag,
   Typography,
 } from 'antd';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
+import api from '@/services/_request';
 
 const { Text, Paragraph, Title } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
 
 type MentorLevel = 'primary' | 'secondary' | 'adult';
+
+type MentorApi = {
+  id: number | string;
+  display_name?: string;
+  user?: string;
+  bio?: string;
+  expertise_areas?: string[] | null;
+  languages?: string[] | null;
+  level?: MentorLevel | '';
+  rating?: number | string | null;
+  sessions_completed?: number;
+  is_active?: boolean;
+  is_accepting_mentees?: boolean;
+  focus_areas?: string[] | null;
+};
 
 type Mentor = {
   id: string;
@@ -69,44 +87,20 @@ type MentorshipRequestFormValues = {
   additionalNotes?: string;
 };
 
-const MENTORS: Mentor[] = [
-  {
-    id: 'm1',
-    name: 'Amina Diallo',
-    expertise: ['Math', 'Physics', 'STEM'],
-    languages: ['English', 'French'],
-    level: 'secondary',
-    rating: 4.9,
-    sessionsCompleted: 54,
-    isAvailable: true,
-    bio: 'High-school teacher with 10+ years of experience in inclusive STEM education.',
-    focusAreas: ['Exam preparation', 'Confidence building', 'Project-based learning'],
-  },
-  {
-    id: 'm2',
-    name: 'Carlos Mendoza',
-    expertise: ['Digital literacy', 'Languages', 'Study skills'],
-    languages: ['Spanish', 'English'],
-    level: 'primary',
-    rating: 4.7,
-    sessionsCompleted: 31,
-    isAvailable: true,
-    bio: 'Primary school mentor focusing on early reading skills and bilingual learning.',
-    focusAreas: ['Reading support', 'Homework help', 'Family engagement'],
-  },
-  {
-    id: 'm3',
-    name: 'Leila Ben Youssef',
-    expertise: ['Civics', 'Ethics', 'Global citizenship'],
-    languages: ['French', 'Arabic', 'English'],
-    level: 'adult',
-    rating: 4.8,
-    sessionsCompleted: 42,
-    isAvailable: false,
-    bio: 'Community organizer mentoring youth-led civic projects and debate clubs.',
-    focusAreas: ['Debate coaching', 'Community projects', 'Leadership'],
-  },
-];
+function toMentor(row: MentorApi): Mentor {
+  return {
+    id: String(row.id),
+    name: row.display_name?.trim() || row.user?.trim() || `Mentor ${row.id}`,
+    expertise: row.expertise_areas ?? [],
+    languages: row.languages ?? [],
+    level: row.level || 'adult',
+    rating: Number(row.rating ?? 0),
+    sessionsCompleted: row.sessions_completed ?? 0,
+    isAvailable: Boolean(row.is_accepting_mentees),
+    bio: row.bio ?? '',
+    focusAreas: row.focus_areas ?? [],
+  };
+}
 
 const SUBJECT_OPTIONS = [
   'Any',
@@ -133,12 +127,47 @@ export default function KonnectedMentorshipPage() {
     language: 'Any',
     availability: 'available',
   });
+  const [mentors, setMentors] = useState<Mentor[]>([]);
+  const [loadingMentors, setLoadingMentors] = useState(true);
+  const [mentorError, setMentorError] = useState<string | null>(null);
+  const [submittingRequest, setSubmittingRequest] = useState(false);
   const [selectedMentor, setSelectedMentor] = useState<Mentor | null>(null);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
   const [form] = Form.useForm<MentorshipRequestFormValues>();
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMentors() {
+      setLoadingMentors(true);
+      setMentorError(null);
+
+      try {
+        const rows = await api.get<MentorApi[]>('konnected/mentors/');
+        if (!cancelled) {
+          setMentors(rows.map(toMentor));
+        }
+      } catch (error) {
+        console.error('Failed to load KonnectED mentors', error);
+        if (!cancelled) {
+          setMentorError('Unable to load mentors right now.');
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingMentors(false);
+        }
+      }
+    }
+
+    void loadMentors();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filteredMentors = useMemo(() => {
-    return MENTORS.filter((mentor) => {
+    return mentors.filter((mentor) => {
       if (filters.availability === 'available' && !mentor.isAvailable) {
         return false;
       }
@@ -165,7 +194,7 @@ export default function KonnectedMentorshipPage() {
 
       return true;
     });
-  }, [filters]);
+  }, [filters, mentors]);
 
   const handleOpenRequest = (mentor: Mentor) => {
     setSelectedMentor(mentor);
@@ -177,10 +206,31 @@ export default function KonnectedMentorshipPage() {
     form.resetFields();
   };
 
-  const handleSubmitRequest = (_values: MentorshipRequestFormValues) => {
-    // For now, just show a success message and close the modal.
-    message.success('Your mentorship request has been recorded (demo).');
-    handleCloseRequest();
+  const handleSubmitRequest = async (values: MentorshipRequestFormValues) => {
+    if (!selectedMentor) {
+      message.error('Choose a mentor before submitting a request.');
+      return;
+    }
+
+    setSubmittingRequest(true);
+    try {
+      await api.post('konnected/mentorship-requests/', {
+        mentor: Number(selectedMentor.id),
+        learning_goal: values.learningGoal.trim(),
+        preferred_language: values.preferredLanguage ?? '',
+        age_group: values.ageGroup ?? '',
+        contact_channel: values.contactChannel ?? '',
+        additional_notes: values.additionalNotes ?? '',
+      });
+
+      message.success('Your mentorship request has been recorded.');
+      handleCloseRequest();
+    } catch (error) {
+      console.error('Failed to create mentorship request', error);
+      message.error('Unable to submit the mentorship request.');
+    } finally {
+      setSubmittingRequest(false);
+    }
   };
 
   const handleResetFilters = () => {
@@ -320,11 +370,23 @@ export default function KonnectedMentorshipPage() {
             }
             extra={
               <Text type="secondary">
-                {filteredMentors.length} of {MENTORS.length} mentors shown
+                {filteredMentors.length} of {mentors.length} mentors shown
               </Text>
             }
           >
-            {filteredMentors.length === 0 ? (
+            {mentorError && (
+              <Alert
+                type="error"
+                showIcon
+                message={mentorError}
+                style={{ marginBottom: 16 }}
+              />
+            )}
+            {loadingMentors ? (
+              <div style={{ padding: 32, textAlign: 'center' }}>
+                <Spin />
+              </div>
+            ) : filteredMentors.length === 0 ? (
               <Empty
                 description="No mentors match your current filters. Try resetting or broadening your selection."
                 style={{ padding: '24px 0' }}
@@ -419,7 +481,7 @@ export default function KonnectedMentorshipPage() {
               </Paragraph>
               <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
-                  <Card size="small" bordered={false}>
+                  <Card size="small" variant="borderless">
                     <Title level={5}>Project-based circles</Title>
                     <Paragraph type="secondary">
                       Work on a concrete project (science fair, community initiative,
@@ -429,7 +491,7 @@ export default function KonnectedMentorshipPage() {
                   </Card>
                 </Col>
                 <Col xs={24} md={12}>
-                  <Card size="small" bordered={false}>
+                  <Card size="small" variant="borderless">
                     <Title level={5}>Skill-building circles</Title>
                     <Paragraph type="secondary">
                       Focus on specific skills like reading fluency, math basics, or
@@ -455,7 +517,7 @@ export default function KonnectedMentorshipPage() {
         open={requestModalOpen}
         onCancel={handleCloseRequest}
         footer={null}
-        destroyOnClose
+        destroyOnHidden
       >
         <Form<MentorshipRequestFormValues>
           layout="vertical"
@@ -514,7 +576,12 @@ export default function KonnectedMentorshipPage() {
           <Form.Item style={{ marginBottom: 0 }}>
             <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
               <Button onClick={handleCloseRequest}>Cancel</Button>
-              <Button type="primary" htmlType="submit" icon={<MessageOutlined />}>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<MessageOutlined />}
+                loading={submittingRequest}
+              >
                 Submit request
               </Button>
             </Space>

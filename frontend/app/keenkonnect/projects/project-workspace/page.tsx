@@ -1,7 +1,6 @@
 // FILE: frontend/app/keenkonnect/projects/project-workspace/page.tsx
 'use client';
 
-import { Comment } from '@ant-design/compatible';
 import { ProCard } from '@ant-design/pro-components';
 import type { MenuProps, TabsProps } from 'antd';
 import {
@@ -27,7 +26,7 @@ import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { Title, Text, Paragraph } = Typography;
 
-const PROJECTS_ENDPOINT = '/api/projects/';
+const PROJECTS_ENDPOINT = 'keenkonnect/projects/';
 
 interface ApiProject {
   id: number;
@@ -423,9 +422,8 @@ function Content(): JSX.Element {
               'No discussion yet. Start the conversation with your team.',
           }}
           renderItem={(comment) => (
-            <li key={comment.id}>
-              <Comment
-                author={comment.author}
+            <List.Item key={comment.id}>
+              <List.Item.Meta
                 avatar={
                   comment.avatar || (
                     <Avatar>
@@ -433,10 +431,17 @@ function Content(): JSX.Element {
                     </Avatar>
                   )
                 }
-                content={comment.content}
-                datetime={comment.datetime}
+                title={
+                  <Space size="small">
+                    <Text strong>{comment.author ?? 'Unknown participant'}</Text>
+                    {comment.datetime ? (
+                      <Text type="secondary">{comment.datetime}</Text>
+                    ) : null}
+                  </Space>
+                }
+                description={comment.content}
               />
-            </li>
+            </List.Item>
           )}
         />
       ),

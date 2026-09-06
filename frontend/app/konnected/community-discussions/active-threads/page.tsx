@@ -38,8 +38,8 @@ const { Text, Paragraph } = Typography;
 const { Option } = Select;
 
 // Real backend endpoints (joined with api baseURL)
-const FORUM_TOPICS_ENDPOINT = 'forum-topics/';
-const FORUM_POSTS_ENDPOINT = 'forum-posts/';
+const FORUM_TOPICS_ENDPOINT = 'konnected/forum-topics/';
+const FORUM_POSTS_ENDPOINT = 'konnected/forum-posts/';
 
 type TopicKind = 'question' | 'discussion';
 type TopicStatus = 'open' | 'closed' | 'archived';
@@ -70,7 +70,7 @@ interface ActiveThreadsResponse {
   total: number;
 }
 
-// Shape returned by /api/forum-topics/
+// Shape returned by /api/konnected/forum-topics/
 interface ForumTopicApi {
   id: number | string;
   title: string;
@@ -80,7 +80,7 @@ interface ForumTopicApi {
   updated_at: string;
 }
 
-// Shape returned by /api/forum-posts/
+// Shape returned by /api/konnected/forum-posts/
 interface ForumPostApi {
   id: number | string;
   topic: number | string;

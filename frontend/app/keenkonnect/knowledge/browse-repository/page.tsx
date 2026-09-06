@@ -2,9 +2,8 @@
 
 import { FileTextOutlined, FolderOpenOutlined } from '@ant-design/icons';
 import { type ProColumns, ProTable } from '@ant-design/pro-components';
-import { Card, Col, Input, Row, Select, Space, Tag, Tree, Typography } from 'antd';
+import { Alert, Card, Col, Input, Row, Select, Space, Tag, Tree, Typography } from 'antd';
 import type { DataNode, TreeProps } from 'antd/es/tree';
-import { useRouter } from 'next/navigation';
 import React, { useMemo, useState } from 'react';
 
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
@@ -112,10 +111,10 @@ const treeData: DataNode[] = [
 ];
 
 /**
- * Données de démonstration alignées avec KeenKonnect Knowledge
+ * Declared preview dataset aligned with KeenKonnect Knowledge
  * (domains, types, tags...).
  */
-const MOCK_DOCUMENTS: KnowledgeDocument[] = [
+const PREVIEW_DOCUMENTS: KnowledgeDocument[] = [
   {
     id: 'doc-001',
     title: 'Blueprint robotique – Drone civique open-source',
@@ -220,7 +219,6 @@ const STATUS_FILTER_OPTIONS: { label: string; value: StatusFilter }[] = [
 ];
 
 function BrowseRepositoryPage(): JSX.Element {
-  const router = useRouter();
 
   const [selectedKey, setSelectedKey] = useState<TreeKey>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -234,7 +232,7 @@ function BrowseRepositoryPage(): JSX.Element {
 
   const filteredData = useMemo(
     () =>
-      MOCK_DOCUMENTS.filter((doc) => {
+      PREVIEW_DOCUMENTS.filter((doc) => {
         // 1) Filtre par arborescence (domaine / type)
         if (selectedKey !== 'all') {
           const [domainKey, kindKey] = selectedKey.split('|') as [
@@ -349,21 +347,14 @@ function BrowseRepositoryPage(): JSX.Element {
         title: 'Actions',
         valueType: 'option',
         width: 120,
-        render: (_dom, row) => [
-          <a
-            key="open"
-            onClick={() =>
-              router.push(
-                `/keenkonnect/knowledge/document/${encodeURIComponent(row.id)}`,
-              )
-            }
-          >
-            Ouvrir
-          </a>,
+        render: () => [
+          <Text key="preview" type="secondary">
+            Preview only
+          </Text>,
         ],
       },
     ],
-    [router],
+    [],
   );
 
   return (
@@ -371,6 +362,13 @@ function BrowseRepositoryPage(): JSX.Element {
       title="Parcourir le dépôt de connaissances"
       description="Parcourez et filtrez les ressources KeenKonnect par domaine, type, niveau d’accès et statut."
     >
+      <Alert
+        type="info"
+        showIcon
+        message="Knowledge repository preview"
+        description="The general knowledge-document repository is not backed by a dedicated persistence contract in this build. The records below are declared preview data; project-attached resources remain separate."
+        style={{ marginBottom: 16 }}
+      />
       <Row gutter={[24, 24]}>
         {/* Panneau de gauche : arbre de navigation */}
         <Col xs={24} lg={6}>

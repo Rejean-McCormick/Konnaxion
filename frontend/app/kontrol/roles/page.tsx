@@ -50,8 +50,8 @@ type RoleItem = {
   baseRole: 'admin' | 'moderator' | 'user' | 'guest';
 };
 
-// --- Mock Data ---
-const MOCK_ROLES: RoleItem[] = [
+// --- Declared role preview data ---
+const ROLE_PREVIEW_DATA: RoleItem[] = [
   {
     id: 'ROLE_ADMIN',
     name: 'Super Admin',
@@ -94,7 +94,7 @@ const MOCK_ROLES: RoleItem[] = [
   },
 ];
 
-// Mock Permission Tree Data
+// Declared permission preview tree
 const PERMISSION_TREE = [
   {
     title: 'Platform Core',
@@ -126,6 +126,7 @@ const PERMISSION_TREE = [
 ];
 
 export default function RolesPermissionsPage(): JSX.Element {
+  const [messageApi, messageContextHolder] = message.useMessage();
   const actionRef = useRef<ActionType>();
 
   // Drawer State
@@ -142,8 +143,9 @@ export default function RolesPermissionsPage(): JSX.Element {
   };
 
   const handleDelete = (role: RoleItem) => {
-    message.success(`Role ${role.name} deleted`);
-    actionRef.current?.reload();
+    messageApi.warning(
+      `Role mutation is unavailable for ${role.name}; Kontrol exposes no role-write contract in this build.`,
+    );
   };
 
   const columns: ProColumns<RoleItem>[] = [
@@ -219,7 +221,7 @@ export default function RolesPermissionsPage(): JSX.Element {
             items: [
               {
                 key: 'edit',
-                label: 'Edit permissions',
+                label: 'View permissions',
                 icon: <EditOutlined />,
                 onClick: () => handleOpenDrawer(record),
               },
@@ -227,6 +229,7 @@ export default function RolesPermissionsPage(): JSX.Element {
                 key: 'clone',
                 label: 'Clone role',
                 icon: <CopyOutlined />,
+                disabled: true,
               },
               { type: 'divider' },
               {
@@ -234,7 +237,7 @@ export default function RolesPermissionsPage(): JSX.Element {
                 label: 'Delete role',
                 icon: <DeleteOutlined />,
                 danger: true,
-                disabled: record.type === 'system',
+                disabled: true,
                 onClick: () => handleDelete(record),
               },
             ],
@@ -262,9 +265,10 @@ export default function RolesPermissionsPage(): JSX.Element {
       key="create"
       type="primary"
       icon={<PlusOutlined />}
-      onClick={() => handleOpenDrawer()}
+      disabled
+      title="Role creation is unavailable until a backend role-write contract exists."
     >
-      Create new role
+      Create role unavailable
     </Button>
   );
 
@@ -277,11 +281,18 @@ export default function RolesPermissionsPage(): JSX.Element {
       primaryAction={primaryAction}
       maxWidth={1200}
     >
+      {messageContextHolder}
       <Space
         direction="vertical"
         size="large"
         style={{ width: '100%' }}
       >
+        <Alert
+          type="warning"
+          showIcon
+          message="Read-only role preview"
+          description="Kontrol does not currently expose a backend role-write contract. The entries below document intended access patterns and cannot be mutated from this screen."
+        />
         {/* Scope / impact info for clarity inside Kontrol */}
         <Alert
           type="info"
@@ -308,7 +319,7 @@ export default function RolesPermissionsPage(): JSX.Element {
           columns={columns}
           actionRef={actionRef}
           cardBordered
-          request={async () => ({ data: MOCK_ROLES, success: true })}
+          request={async () => ({ data: ROLE_PREVIEW_DATA, success: true })}
           rowKey="id"
           search={{ labelWidth: 'auto' }}
           pagination={{ pageSize: 10 }}
@@ -334,12 +345,10 @@ export default function RolesPermissionsPage(): JSX.Element {
             <Button onClick={() => setDrawerOpen(false)}>Cancel</Button>
             <Button
               type="primary"
-              onClick={() => {
-                message.success('Role saved successfully');
-                setDrawerOpen(false);
-              }}
+              disabled
+              title="Role persistence is not exposed by the backend."
             >
-              Save changes
+              Save unavailable
             </Button>
           </Space>
         }
@@ -369,6 +378,7 @@ export default function RolesPermissionsPage(): JSX.Element {
             <ProForm
               submitter={false}
               initialValues={currentRole}
+              disabled
             >
               <ProForm.Group>
                 <ProFormText

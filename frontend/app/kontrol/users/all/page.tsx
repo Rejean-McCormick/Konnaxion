@@ -75,6 +75,7 @@ function isUsersApiResponse(data: unknown): data is UsersApiResponse {
 }
 
 export default function AllUsersPage(): JSX.Element {
+  const [messageApi, messageContextHolder] = message.useMessage();
   const actionRef = useRef<ActionType>();
 
   const [currentRow, setCurrentRow] = useState<UserItem | undefined>(
@@ -87,11 +88,10 @@ export default function AllUsersPage(): JSX.Element {
     if (key === 'view') {
       setCurrentRow(record);
       setDrawerOpen(true);
-    } else if (key === 'ban') {
-      message.success(`User ${record.username} has been banned.`);
-      actionRef.current?.reload();
-    } else if (key === 'reset') {
-      message.info(`Password reset email sent to ${record.email}`);
+    } else if (key === 'ban' || key === 'reset') {
+      messageApi.warning(
+        'User mutations are unavailable because the current Kontrol user endpoint is read-only.',
+      );
     }
   };
 
@@ -205,12 +205,14 @@ export default function AllUsersPage(): JSX.Element {
               {
                 key: 'reset',
                 label: 'Reset password',
+                disabled: true,
                 onClick: () => handleAction('reset', record),
               },
               { type: 'divider' },
               {
                 key: 'ban',
                 label: 'Ban user',
+                disabled: true,
                 danger: true,
                 icon: <StopOutlined />,
                 onClick: () => handleAction('ban', record),
@@ -235,8 +237,13 @@ export default function AllUsersPage(): JSX.Element {
   );
 
   const primaryAction = (
-    <Button type="primary" icon={<UserAddOutlined />}>
-      Add user
+    <Button
+      type="primary"
+      icon={<UserAddOutlined />}
+      disabled
+      title="User creation is unavailable because the current admin user endpoint is read-only."
+    >
+      Add user unavailable
     </Button>
   );
 
@@ -249,6 +256,7 @@ export default function AllUsersPage(): JSX.Element {
       primaryAction={primaryAction}
       maxWidth={1200}
     >
+      {messageContextHolder}
       <ProTable<UserItem>
         columns={columns}
         actionRef={actionRef}
@@ -327,7 +335,7 @@ export default function AllUsersPage(): JSX.Element {
           } catch (error) {
              
             console.error(error);
-            message.error('Error loading users list');
+            messageApi.error('Error loading users list');
             return { data: [], success: false };
           }
         }}

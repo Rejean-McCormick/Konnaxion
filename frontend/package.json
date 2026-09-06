@@ -29,7 +29,10 @@
     "delivery:ethikos": "cross-env CI=1 PLAYWRIGHT_AUTH_STATE=storageState.delivery.json playwright test -c playwright.delivery.config.ts --project=ethikos-delivery",
     "delivery:ethikos:headed": "cross-env PLAYWRIGHT_AUTH_STATE=storageState.delivery.json playwright test -c playwright.delivery.config.ts --project=ethikos-delivery --headed",
     "delivery:ethikos:report": "playwright show-report artifacts/playwright-delivery-html",
-    "pw:install": "playwright install"
+    "pw:install": "playwright install",
+    "harvest:platform": "cross-env CI=1 PLAYWRIGHT_AUTH_STATE=storageState.harvest.json playwright test -c playwright.harvest.config.ts --project=platform-harvest",
+    "harvest:platform:headed": "cross-env PLAYWRIGHT_AUTH_STATE=storageState.harvest.json playwright test -c playwright.harvest.config.ts --project=platform-harvest --headed",
+    "harvest:platform:report": "playwright show-report artifacts/playwright-harvest-html"
   },
   "dependencies": {
     "@ant-design/compatible": "^5.1.4",

@@ -247,17 +247,14 @@ function normalizeRecommendations(raw: unknown): RecommendationsResponse {
 
 /**
  * Strategy:
- * 1. Try the dedicated /api/knowledge-recommendations/ endpoint (when wired).
- * 2. Fall back to the main KnowledgeResource list. To stay robust against
- *    backend refactors, we try the known path variants used across v14:
- *      - /api/knowledge-resources/
- *      - /api/knowledge/resources/
- *      - /api/konnected/resources/  (current DRF router)
+ * 1. Try the dedicated /api/konnected/recommendations/ endpoint (when wired).
+ * 2. Fall back to the canonical KonnectED KnowledgeResource list:
+ *      - /api/konnected/resources/
  */
 async function fetchRecommendations(): Promise<RecommendationsResponse> {
   // 1) Dedicated recommendations endpoint
   try {
-    const raw = await fetchJson('/api/knowledge-recommendations/');
+    const raw = await fetchJson('/api/konnected/recommendations/');
     return normalizeRecommendations(raw);
   } catch (err) {
      
@@ -268,11 +265,7 @@ async function fetchRecommendations(): Promise<RecommendationsResponse> {
   }
 
   // 2) Fallback: generic knowledge resources list
-  const fallbackEndpoints = [
-    '/api/knowledge-resources/',
-    '/api/knowledge/resources/',
-    '/api/konnected/resources/',
-  ];
+  const fallbackEndpoints = ['/api/konnected/resources/'];
 
   for (const url of fallbackEndpoints) {
     try {
@@ -287,29 +280,28 @@ async function fetchRecommendations(): Promise<RecommendationsResponse> {
 }
 
 /**
- * Optional: send feedback so the ML layer can learn.
- * For now this is best-effort; failures are non-blocking for the UI.
+ * Send feedback only when a persisted feedback endpoint exists.
+ * HTTP failures propagate so the UI cannot falsely acknowledge persistence.
  */
 async function sendRecommendationFeedback(
   item: KnowledgeRecommendationItem,
   feedback: 'like' | 'dislike',
 ): Promise<void> {
-  try {
-    await apiFetch('/api/knowledge-recommendations/feedback/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({
-        recommendationId: item.recommendationId,
-        resourceId: item.resource.id,
-        feedback,
-      }),
-    });
-  } catch (err) {
-     
-    console.warn('Failed to send recommendation feedback', err);
+  const response = await apiFetch('/api/konnected/recommendations/feedback/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'include',
+    body: JSON.stringify({
+      recommendationId: item.recommendationId,
+      resourceId: item.resource.id,
+      feedback,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Recommendation feedback is unavailable (HTTP ${response.status}).`);
   }
 }
 
@@ -364,21 +356,6 @@ export default function RecommendedResourcesPage(): JSX.Element {
           : 'Unable to load recommendations right now.';
       setError(msg);
 
-      if (!hasLoadedOnce) {
-        // Soft fallback: try to use cached sample data from localStorage if present
-        try {
-          const cached = window.localStorage.getItem(
-            'konnected:sample:knowledge-recommendations',
-          );
-          if (cached) {
-            const parsed = JSON.parse(cached) as unknown;
-            const normalized = normalizeRecommendations(parsed);
-            setRecommendations(normalized.results);
-          }
-        } catch {
-          // ignore
-        }
-      }
     } finally {
       setLoading(false);
     }

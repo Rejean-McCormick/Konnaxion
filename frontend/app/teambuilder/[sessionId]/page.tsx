@@ -792,9 +792,9 @@ export default function SessionDetailPage(): JSX.Element {
             style={{ width: '100%' }}
           >
             <Card title="Timeline">
-              <Timeline>
-                {historyItems.map((item, idx) => (
-                  <Timeline.Item key={idx}>
+              <Timeline
+                items={historyItems.map((item) => ({
+                  children: (
                     <Space direction="vertical" size={2}>
                       <Text>{item.label}</Text>
                       {item.description && (
@@ -803,9 +803,9 @@ export default function SessionDetailPage(): JSX.Element {
                         </Text>
                       )}
                     </Space>
-                  </Timeline.Item>
-                ))}
-              </Timeline>
+                  ),
+                }))}
+              />
             </Card>
 
             <Card title="Raw activity (placeholder)">

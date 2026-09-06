@@ -1,5 +1,5 @@
 # FILE: backend/konnaxion/keenkonnect/api_views.py
-from rest_framework import viewsets, permissions, filters
+from rest_framework import viewsets, permissions, filters, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
@@ -136,11 +136,70 @@ class ProjectTeamViewSet(viewsets.ModelViewSet):
         Custom endpoint to list the current user's team memberships.
         Returns all ProjectTeam entries where user is the current user.
         """
-        memberships = ProjectTeam.objects.select_related("project").filter(
-            user=request.user
+        memberships = (
+            ProjectTeam.objects.select_related("project", "user")
+            .prefetch_related("project__team_memberships__user")
+            .filter(user=request.user)
         )
-        serializer = self.get_serializer(memberships, many=True)
-        return Response(serializer.data)
+
+        rows = []
+        for membership in memberships:
+            project_memberships = list(membership.project.team_memberships.all())
+            preview = [
+                {
+                    "id": str(item.id),
+                    "name": str(item.user),
+                    "role": item.role,
+                }
+                for item in project_memberships[:3]
+            ]
+
+            role = (
+                "owner"
+                if membership.role == ProjectTeam.Role.OWNER
+                else "member"
+            )
+
+            rows.append(
+                {
+                    "id": str(membership.id),
+                    "name": membership.project.title,
+                    "project_title": membership.project.title,
+                    "membership_role": role,
+                    "membership_status": "active",
+                    "members_count": len(project_memberships),
+                    "is_restricted": False,
+                    "recent_activity": [],
+                    "members_preview": preview,
+                }
+            )
+
+        return Response(rows)
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[permissions.IsAuthenticated],
+        url_path="leave",
+    )
+    def leave(self, request, pk=None):
+        """Allow the current user to remove their own non-owner membership."""
+        membership = self.get_object()
+
+        if membership.user_id != request.user.id:
+            return Response(
+                {"detail": "You can only leave your own team membership."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        if membership.role == ProjectTeam.Role.OWNER:
+            return Response(
+                {"detail": "Transfer project ownership before leaving."},
+                status=status.HTTP_409_CONFLICT,
+            )
+
+        membership.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectRatingViewSet(viewsets.ModelViewSet):

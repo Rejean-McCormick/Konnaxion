@@ -166,15 +166,12 @@ type ProjectApi = {
 
 type ProjectTeamApi = {
   id: number;
-  project: number | ProjectApi;
+  project?: number | ProjectApi | string;
+  project_id?: number;
+  project_title?: string;
   role?: string;
 };
 
-type CommunityDashboardUsageApi = {
-  days_active_last_30?: number;
-  resources_completed_last_30?: number;
-  certifications_earned_last_30?: number;
-};
 
 // ---------- Generic helpers ----------
 
@@ -210,11 +207,7 @@ function pickTopN<T>(items: T[], n: number): T[] {
 // Knowledge resources endpoint can have slightly different prefixes in your codebase.
 // This helper tries the most likely ones and returns the first that works.
 async function fetchKnowledgeResourcesList(): Promise<KnowledgeResourceApi[]> {
-  const candidates = [
-    "/api/knowledge-resources/",
-    "/api/knowledge/resources/",
-    "/api/konnected/resources/",
-  ] as const;
+  const candidates = ["/api/konnected/resources/"] as const;
 
   for (const url of candidates) {
     try {
@@ -259,8 +252,8 @@ function getResourceIdFromRecommendation(
 async function buildCertificationSummary(): Promise<CertificationSummary> {
   // Uses portfolios + learning‑progress as real backing data.
   const [portfolios, progress] = await Promise.all([
-    fetchList<PortfolioApi>("/api/portfolios/").catch(() => []),
-    fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+    fetchList<PortfolioApi>("/api/konnected/portfolios/").catch(() => []),
+    fetchList<LearningProgressApi>("/api/konnected/progress/").catch(() => []),
   ]);
 
   const progressValues = progress.map((p) => safeNumber(p.progress_percent));
@@ -280,9 +273,9 @@ async function buildCertificationSummary(): Promise<CertificationSummary> {
 
 async function buildLearningSummary(): Promise<LearningSummary> {
   const [progressRecords, resources, recommendations] = await Promise.all([
-    fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+    fetchList<LearningProgressApi>("/api/konnected/progress/").catch(() => []),
     fetchKnowledgeResourcesList().catch(() => []),
-    fetchList<KnowledgeRecommendationApi>("/api/knowledge-recommendations/").catch(
+    fetchList<KnowledgeRecommendationApi>("/api/konnected/recommendations/").catch(
       () => []
     ),
   ]);
@@ -354,7 +347,7 @@ async function buildLearningSummary(): Promise<LearningSummary> {
 
 async function buildLearningPathSummary(): Promise<LearningPathSummary> {
   const [progressRecords, resources] = await Promise.all([
-    fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+    fetchList<LearningProgressApi>("/api/konnected/progress/").catch(() => []),
     fetchKnowledgeResourcesList().catch(() => []),
   ]);
 
@@ -403,8 +396,8 @@ async function buildLearningPathSummary(): Promise<LearningPathSummary> {
 
 async function buildCommunitySummary(): Promise<CommunitySummary> {
   const [topics, coCreationProjects] = await Promise.all([
-    fetchList<ForumTopicApi>("/api/forum-topics/").catch(() => []),
-    fetchList<CoCreationProjectApi>("/api/co-creation-projects/").catch(
+    fetchList<ForumTopicApi>("/api/konnected/forum-topics/").catch(() => []),
+    fetchList<CoCreationProjectApi>("/api/konnected/co-creation-projects/").catch(
       () => []
     ),
   ]);
@@ -445,8 +438,8 @@ async function buildCommunitySummary(): Promise<CommunitySummary> {
 async function buildTeamsSummary(): Promise<TeamsSummary> {
   // Project-team memberships + projects, as exposed by your API root.
   const [memberships, projects] = await Promise.all([
-    fetchList<ProjectTeamApi>("/api/project-teams/").catch(() => []),
-    fetchList<ProjectApi>("/api/projects/").catch(() => []),
+    fetchList<ProjectTeamApi>("/api/keenkonnect/teams/").catch(() => []),
+    fetchList<ProjectApi>("/api/keenkonnect/projects/").catch(() => []),
   ]);
 
   const projectMap = new Map<number, ProjectApi>();
@@ -458,16 +451,24 @@ async function buildTeamsSummary(): Promise<TeamsSummary> {
 
   for (const membership of memberships) {
     const projId =
-      typeof membership.project === "number"
+      membership.project_id ??
+      (typeof membership.project === "number"
         ? membership.project
-        : membership.project?.id;
+        : typeof membership.project === "object"
+          ? membership.project?.id
+          : undefined);
     if (!projId) continue;
 
     if (!teamsMap.has(projId)) {
       const project = projectMap.get(projId);
       teamsMap.set(projId, {
         id: String(projId),
-        name: project?.title ?? `Project #${projId}`,
+        name:
+          membership.project_title ??
+          project?.title ??
+          (typeof membership.project === "string"
+            ? membership.project
+            : `Project #${projId}`),
         role: membership.role,
       });
     }
@@ -483,25 +484,12 @@ async function buildTeamsSummary(): Promise<TeamsSummary> {
   };
 }
 
-async function buildUsageSummary(): Promise<UsageSummary> {
-  // Prefer the real aggregated endpoint if available.
-  try {
-    const data = await fetchJSON<CommunityDashboardUsageApi>(
-      "/api/community-dashboard/"
-    );
-    return {
-      daysActiveLast30: data.days_active_last_30 ?? 0,
-      resourcesCompletedLast30: data.resources_completed_last_30 ?? 0,
-      certificationsEarnedLast30: data.certifications_earned_last_30 ?? 0,
-    };
-  } catch {
-    // If the dashboard endpoint is not ready yet, fall back to zeros.
-    return {
-      daysActiveLast30: 0,
-      resourcesCompletedLast30: 0,
-      certificationsEarnedLast30: 0,
-    };
-  }
+async function buildUsageSummary(): Promise<UsageSummary | null> {
+  // No canonical per-user KonnectED usage endpoint exists in the current API
+  // surface. Returning null keeps the dashboard honest: the UsageTile renders
+  // its explicit "unavailable" state instead of probing a nonexistent route
+  // and silently presenting synthetic zeroes as real measurements.
+  return null;
 }
 
 // ---------- Data hooks wired to the real aggregation helpers ----------
@@ -542,7 +530,7 @@ function useTeamsSummary() {
 }
 
 function useUsageSummary() {
-  return useQuery<UsageSummary>({
+  return useQuery<UsageSummary | null>({
     queryKey: ["konnected", "dashboard", "usageSummary"],
     queryFn: buildUsageSummary,
   });
@@ -1312,7 +1300,7 @@ function UsageTile() {
         <Alert
           type="info"
           showIcon
-          message="Usage analytics are temporarily unavailable."
+          message="Per-user usage analytics are not exposed by the current KonnectED API."
         />
       </ProCard>
     );

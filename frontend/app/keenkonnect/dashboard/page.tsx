@@ -15,6 +15,7 @@ import {
 } from '@ant-design/icons';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import {
+  Alert,
   Avatar,
   Badge,
   Button,
@@ -90,7 +91,7 @@ type QuickAction = {
   icon: React.ReactNode;
 };
 
-// --- Mock data ---
+// --- Declared preview data (no AI matching service contract yet) ---
 
 const summaryMetrics: SummaryMetric[] = [
   {
@@ -315,6 +316,13 @@ export default function KeenKonnectDashboard(): JSX.Element {
         </Space>
       }
     >
+      <Alert
+        type="info"
+        showIcon
+        style={{ marginBottom: 16 }}
+        message="Dashboard preview data"
+        description="Project orchestration routes are live, while dashboard summary cards and AI-match suggestions remain declared preview values until dedicated aggregate contracts are exposed."
+      />
       {/* KPI band */}
       <ProCard gutter={16} wrap style={{ marginBottom: 16 }}>
         {summaryMetrics.map((metric) => (

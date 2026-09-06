@@ -215,8 +215,7 @@ const FindTeamsPage: React.FC = () => {
                   </Button>
                 </Space>
                 <Text type="secondary">
-                  <InfoCircleOutlined /> Results are simulated mock data for UI
-                  only.
+                  <InfoCircleOutlined /> Results use a declared preview dataset; no AI matching service is connected.
                 </Text>
               </Space>
             </Col>
@@ -367,26 +366,23 @@ const FindTeamsPage: React.FC = () => {
                       actions={[
                         <Tooltip
                           key="join"
-                          title="Express interest in joining this team"
+                          title="Join requests are unavailable until an AI matching membership contract exists."
                         >
                           <Button
                             type="link"
                             icon={<UserAddOutlined />}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenDrawer(team);
-                            }}
+                            disabled
                           >
-                            Request to join
+                            Join unavailable
                           </Button>
                         </Tooltip>,
-                        <Tooltip key="save" title="Save this team for later">
+                        <Tooltip key="save" title="Saving AI-match recommendations is unavailable in this preview.">
                           <Button
                             type="link"
                             icon={<HeartOutlined />}
-                            onClick={(e) => e.stopPropagation()}
+                            disabled
                           >
-                            Save
+                            Save unavailable
                           </Button>
                         </Tooltip>,
                       ]}
@@ -471,7 +467,7 @@ const FindTeamsPage: React.FC = () => {
         width={520}
         open={drawerVisible}
         onClose={handleCloseDrawer}
-        destroyOnClose
+        destroyOnHidden
       >
         {selectedTeam && (
           <Space direction="vertical" size="large" style={{ width: '100%' }}>
@@ -525,27 +521,22 @@ const FindTeamsPage: React.FC = () => {
                   type="primary"
                   icon={<UserAddOutlined />}
                   block
-                  onClick={() => {
-                    // Placeholder for future integration
-                     
-                    console.log('Request to join', selectedTeam.id);
-                  }}
+                  disabled
+                  title="Join requests are unavailable until an AI matching membership contract exists."
                 >
-                  Request to join this team
+                  Join unavailable
                 </Button>
                 <Button block onClick={() => handleViewWorkspace(selectedTeam)}>
-                  View team workspace (mock)
+                  Preview team workspace
                 </Button>
                 <Button
                   type="dashed"
                   icon={<HeartOutlined />}
                   block
-                  onClick={() => {
-                     
-                    console.log('Saved team', selectedTeam.id);
-                  }}
+                  disabled
+                  title="Saving AI-match recommendations is unavailable in this preview."
                 >
-                  Save this team
+                  Save unavailable
                 </Button>
               </Space>
             </section>

@@ -99,7 +99,7 @@ export default function BrowseProjectsPage(): JSX.Element {
           owner: p.creator ?? '',
           domain: p.category ?? 'Uncategorized',
           technologies: [], // TODO: map from tags or related data when available
-          members: 0, // TODO: replace with real team size when project-team endpoints are wired
+          members: 0, // Membership count unavailable in the current project-list contract.
           createdAt: p.created_at,
         }));
 
@@ -344,13 +344,14 @@ export default function BrowseProjectsPage(): JSX.Element {
                             Open
                           </Button>
                         </Tooltip>
-                        <Tooltip title="View collaborators (coming soon)">
+                        <Tooltip title="Collaborator drill-down is unavailable until a dedicated project-membership detail contract exists.">
                           <Button
                             type="link"
                             icon={<TeamOutlined />}
                             onClick={(e) => e.stopPropagation()}
+                            disabled
                           >
-                            Team
+                            Team preview
                           </Button>
                         </Tooltip>
                       </Space>
@@ -394,7 +395,7 @@ export default function BrowseProjectsPage(): JSX.Element {
                       >
                         <Col>
                           <Space size={8}>
-                            <Avatar.Group maxCount={3} size="small">
+                            <Avatar.Group max={{ count: 3 }} size="small">
                               <Avatar icon={<UserOutlined />} />
                               <Avatar>
                                 {project.owner
@@ -481,7 +482,7 @@ export default function BrowseProjectsPage(): JSX.Element {
           {selectedProject && (
             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
               <Space align="center">
-                <Avatar.Group maxCount={3}>
+                <Avatar.Group max={{ count: 3 }}>
                   <Avatar size="large" icon={<UserOutlined />} />
                   <Avatar>
                     {selectedProject.owner

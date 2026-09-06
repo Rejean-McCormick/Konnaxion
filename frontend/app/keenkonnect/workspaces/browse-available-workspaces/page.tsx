@@ -2,6 +2,7 @@
 'use client';
 
 import {
+  Alert,
   Avatar,
   Badge,
   Button,
@@ -41,7 +42,7 @@ interface Workspace {
   participants: string[];
 }
 
-const sampleWorkspaces: Workspace[] = [
+const PREVIEW_WORKSPACES: Workspace[] = [
   {
     id: '1',
     name: 'Data Science Hub',
@@ -124,7 +125,7 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
   const filteredWorkspaces = useMemo<Workspace[]>(() => {
     const lowerSearch = searchText.toLowerCase();
 
-    return sampleWorkspaces.filter((workspace) => {
+    return PREVIEW_WORKSPACES.filter((workspace) => {
       const matchesTab =
         activeTab === 'all' ||
         workspace.category === (activeTab as WorkspaceCategory);
@@ -146,14 +147,6 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
     return filteredWorkspaces.slice(startIndex, startIndex + pageSize);
   }, [filteredWorkspaces, currentPage, pageSize]);
 
-  const handleJoinAction = (workspace: Workspace) => {
-    if (workspace.isJoinable) {
-      router.push(`/keenkonnect/workspaces/join?id=${workspace.id}`);
-    } else {
-      router.push(`/keenkonnect/workspaces/request-access?id=${workspace.id}`);
-    }
-  };
-
   const handleTabChange = (key: string) => {
     setActiveTab(key);
     setCurrentPage(1);
@@ -174,6 +167,13 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
         </Button>
       }
     >
+      <Alert
+        type="info"
+        showIcon
+        message="Workspace discovery preview"
+        description="KeenKonnect does not expose a workspace persistence or membership contract in this build. The records below are declared preview data; join/request actions are disabled."
+        style={{ marginBottom: 16 }}
+      />
       {/* Search & filters */}
       <Row gutter={[16, 16]} style={{ marginBottom: 16 }}>
         <Col xs={24} sm={12}>
@@ -241,7 +241,8 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
                 <Button
                   key="join"
                   type="primary"
-                  onClick={() => handleJoinAction(workspace)}
+                  disabled
+                  title="Workspace membership is unavailable until a backend contract exists."
                 >
                   {workspace.isJoinable ? 'Join' : 'Request Access'}
                 </Button>,
@@ -282,10 +283,10 @@ export default function BrowseAvailableWorkspaces(): JSX.Element {
 
                 <Divider style={{ margin: '12px 0' }} />
 
-                {/* Avatar.Group showing sample participants */}
+                {/* Avatar.Group showing preview participants */}
                 <Space direction="vertical" size={4}>
                   <Text type="secondary">Active collaborators</Text>
-                  <Avatar.Group maxCount={3}>
+                  <Avatar.Group max={{ count: 3 }}>
                     {workspace.participants.map((name) => (
                       <Avatar key={name}>
                         {name.charAt(0).toUpperCase()}

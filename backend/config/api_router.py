@@ -200,9 +200,17 @@ except (ImportError, AttributeError):
 # ── KonnectED Knowledge + CertifiKation ───────────────────
 from konnaxion.konnected.api_views import (
     CertificationPathViewSet,
+    CoCreationContributionViewSet,
+    CoCreationProjectViewSet,
     EvaluationViewSet,
     ExamAttemptViewSet,
+    ForumPostViewSet,
+    ForumTopicViewSet,
+    KnowledgeRecommendationViewSet,
     KnowledgeResourceViewSet,
+    LearningProgressViewSet,
+    MentorProfileViewSet,
+    MentorshipRequestViewSet,
     PeerValidationViewSet,
     PortfolioViewSet,
 )
@@ -429,6 +437,48 @@ register_required(
     "konnected/resources",
     KnowledgeResourceViewSet,
     basename="konnected-resource",
+)
+
+
+register_required(
+    "konnected/recommendations",
+    KnowledgeRecommendationViewSet,
+    basename="konnected-recommendation",
+)
+register_required(
+    "konnected/progress",
+    LearningProgressViewSet,
+    basename="konnected-progress",
+)
+register_required(
+    "konnected/mentors",
+    MentorProfileViewSet,
+    basename="konnected-mentor",
+)
+register_required(
+    "konnected/mentorship-requests",
+    MentorshipRequestViewSet,
+    basename="konnected-mentorship-request",
+)
+register_required(
+    "konnected/co-creation-projects",
+    CoCreationProjectViewSet,
+    basename="konnected-co-creation-project",
+)
+register_required(
+    "konnected/co-creation-contributions",
+    CoCreationContributionViewSet,
+    basename="konnected-co-creation-contribution",
+)
+register_required(
+    "konnected/forum-topics",
+    ForumTopicViewSet,
+    basename="konnected-forum-topic",
+)
+register_required(
+    "konnected/forum-posts",
+    ForumPostViewSet,
+    basename="konnected-forum-post",
 )
 
 

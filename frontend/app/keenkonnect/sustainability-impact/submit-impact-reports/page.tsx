@@ -4,12 +4,12 @@
 import { InboxOutlined } from '@ant-design/icons';
 import { ProFormDigit, StepsForm } from '@ant-design/pro-components';
 import {
+  Alert,
   Button,
   Card,
   DatePicker,
   Form,
   Input,
-  message,
   Result,
   Select,
   Spin,
@@ -21,7 +21,6 @@ import dayjs from 'dayjs';
 import Link from 'next/link';
 import React, { Suspense, useState } from 'react';
 
-import { apiPost } from '@/api';
 import KeenPage from '@/app/keenkonnect/KeenPageShell';
 
 const { Option } = Select;
@@ -58,38 +57,9 @@ function Content(): JSX.Element {
   const [completed, setCompleted] = useState(false);
   const [referenceId, setReferenceId] = useState<string | undefined>();
 
-  const handleFinish = async (
-    values: SustainabilityReportFormValues,
-  ): Promise<boolean> => {
-    try {
-      const payload = {
-        ...values,
-        date: values.date?.format('YYYY-MM-DD'),
-        // No real upload here – we just serialize metadata:
-        attachments: values.attachments?.map((file) => ({
-          name: file.name,
-          uid: file.uid,
-        })),
-      };
-
-      const res = await apiPost('/impact/sustainability/report', payload);
-
-      if (res && typeof res === 'object' && 'reference' in res) {
-        const reference = (res as { reference?: unknown }).reference;
-        if (typeof reference === 'string') {
-          setReferenceId(reference);
-        }
-      }
-
-      message.success('Impact report submitted successfully!');
-      setCompleted(true);
-      return true;
-    } catch (error) {
-       
-      console.error('Submit impact report error:', error);
-      message.error('Failed to submit impact report. Please try again.');
-      return false;
-    }
+  const handleFinish = async (): Promise<boolean> => {
+    // Declared read-only: no sustainability-impact report write contract exists.
+    return false;
   };
 
   // Typed helper to normalize Upload value
@@ -136,13 +106,25 @@ function Content(): JSX.Element {
   }
 
   return (
-    <Card>
+    <>
+      <Alert
+        type="info"
+        showIcon
+        message="Impact report submission unavailable"
+        description="Tracking views can remain visible, but this write form is a declared read-only preview because no sustainability-impact report persistence endpoint is exposed in the current backend."
+        style={{ marginBottom: 16 }}
+      />
+      <Card>
       <StepsForm<SustainabilityReportFormValues>
         onFinish={handleFinish}
         submitter={{
           // SearchConfig in ProComponents v2 only supports resetText / submitText
           searchConfig: {
             submitText: 'Submit report',
+          },
+          submitButtonProps: {
+            disabled: true,
+            title: 'Unavailable until a sustainability-impact report contract exists.',
           },
           render: (props, dom) => (
             <div style={{ marginTop: 24, textAlign: 'right' }}>{dom}</div>
@@ -164,7 +146,7 @@ function Content(): JSX.Element {
             rules={[{ required: true, message: 'Please select a project' }]}
           >
             <Select placeholder="Select the project">
-              {/* TODO: replace with dynamic project list */}
+              {/* Declared preview project options until an impact-report contract exists. */}
               <Option value="project-a">Project A</Option>
               <Option value="project-b">Project B</Option>
             </Select>
@@ -275,6 +257,7 @@ function Content(): JSX.Element {
           </Form.Item>
         </StepsForm.StepForm>
       </StepsForm>
-    </Card>
+      </Card>
+    </>
   );
 }

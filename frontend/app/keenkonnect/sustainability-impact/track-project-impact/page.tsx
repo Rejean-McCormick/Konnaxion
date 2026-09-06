@@ -2,6 +2,7 @@
 'use client';
 
 import {
+  Alert,
   Card,
   Col,
   DatePicker,
@@ -14,7 +15,7 @@ import {
   Timeline,
 } from 'antd';
 import dayjs from 'dayjs';
-import React, { Suspense, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useMemo, useState } from 'react';
 import {
   Bar,
   BarChart,
@@ -28,16 +29,20 @@ import {
   YAxis,
 } from 'recharts';
 
-import api from '@/api';
 import KeenPageShell from '@/app/keenkonnect/KeenPageShell';
 
 const { RangePicker } = DatePicker;
-const { TabPane } = Tabs;
 
 type ImpactItem = {
   category: string;
   value: number;
 };
+
+const PREVIEW_IMPACT_DATA: ImpactItem[] = [
+  { category: 'Community benefit', value: 72 },
+  { category: 'Environmental stewardship', value: 61 },
+  { category: 'Knowledge sharing', value: 84 },
+];
 
 type Filters = {
   from: string;
@@ -61,43 +66,13 @@ export default function TrackProjectImpactPage(): JSX.Element {
 }
 
 function Content(): JSX.Element {
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({
     from: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
     to: dayjs().format('YYYY-MM-DD'),
     team: undefined,
   });
+  const impactData = PREVIEW_IMPACT_DATA;
 
-  const [impactData, setImpactData] = useState<ImpactItem[]>([]);
-
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams({
-          fromDate: filters.from,
-          toDate: filters.to,
-        });
-
-        if (filters.team) {
-          params.set('team', filters.team);
-        }
-
-        const res = await api.get<ImpactItem[]>(
-          `/impact/sustainability/track?${params.toString()}`,
-        );
-
-        setImpactData(res ?? []);
-      } catch (err) {
-         
-        console.error('Track impact load error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    void load();
-  }, [filters]);
 
   const chartData = useMemo(
     () =>
@@ -122,18 +97,18 @@ function Content(): JSX.Element {
     );
   }, [impactData]);
 
-  if (loading) {
-    return (
-      <div style={{ textAlign: 'center', padding: 40 }}>
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   const hasData = chartData.length > 0;
 
   return (
     <>
+      <Alert
+        type="info"
+        showIcon
+        message="Impact analytics preview"
+        description="No native KeenKonnect impact analytics contract is exposed in this build. The charts below use declared preview values; filters are illustrative only."
+        style={{ marginBottom: 16 }}
+      />
       {/* Main filters */}
       <Card style={{ marginBottom: 24 }}>
         <Row gutter={24}>
@@ -180,110 +155,123 @@ function Content(): JSX.Element {
           <Empty description="No impact data for the selected filters" />
         </Card>
       ) : (
-        <Tabs defaultActiveKey="overview">
-          {/* OVERVIEW tab: pie chart + summary */}
-          <TabPane tab="Overview" key="overview">
-            <Row gutter={[24, 24]}>
-              <Col xs={24} md={14}>
-                <Card title="Impact by Category">
-                  <ResponsiveContainer width="100%" height={320}>
-                    <PieChart>
-                      <Pie
-                        data={chartData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={110}
-                      >
-                        {chartData.map((_, i) => (
-                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+        <Tabs
+          defaultActiveKey="overview"
+          items={[
+            {
+              key: 'overview',
+              label: 'Overview',
+              children: (
+                <Row gutter={[24, 24]}>
+                  <Col xs={24} md={14}>
+                    <Card title="Impact by Category">
+                      <ResponsiveContainer width="100%" height={320}>
+                        <PieChart>
+                          <Pie
+                            data={chartData}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={110}
+                          >
+                            {chartData.map((_, i) => (
+                              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <ReTooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </Card>
+                  </Col>
+
+                  <Col xs={24} md={10}>
+                    <Card title="Summary">
+                      <Descriptions column={1} size="small" bordered>
+                        <Descriptions.Item label="Total impact value">
+                          {totalImpact}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Number of categories">
+                          {impactData.length}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Top category">
+                          {topCategory?.category ?? '—'}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="Top category value">
+                          {topCategory?.value ?? '—'}
+                        </Descriptions.Item>
+                      </Descriptions>
+                    </Card>
+                  </Col>
+                </Row>
+              ),
+            },
+            {
+              key: 'timeline',
+              label: 'Timeline',
+              children: (
+                <Card title="Impact Timeline">
+                  <Timeline
+                    items={impactData.map((item) => ({
+                      key: item.category,
+                      children: (
+                        <>
+                          <div style={{ fontWeight: 500 }}>{item.category}</div>
+                          <div style={{ color: '#666' }}>
+                            Impact value: {item.value}
+                          </div>
+                        </>
+                      ),
+                    }))}
+                  />
+                </Card>
+              ),
+            },
+            {
+              key: 'breakdown',
+              label: 'Category Breakdown',
+              children: (
+                <Row gutter={[24, 24]}>
+                  <Col xs={24} md={16}>
+                    <Card title="Impact by Category (Bar Chart)">
+                      <ResponsiveContainer width="100%" height={320}>
+                        <BarChart data={chartData}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="name" />
+                          <YAxis />
+                          <ReTooltip />
+                          <Bar dataKey="value">
+                            {chartData.map((_, index) => (
+                              <Cell
+                                key={index}
+                                fill={COLORS[index % COLORS.length]}
+                              />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </Card>
+                  </Col>
+
+                  <Col xs={24} md={8}>
+                    <Card title="Category Details">
+                      <Descriptions column={1} size="small" bordered>
+                        {impactData.map((item, index) => (
+                          <Descriptions.Item
+                            key={`${item.category}-${index}`}
+                            label={item.category}
+                          >
+                            {item.value}
+                          </Descriptions.Item>
                         ))}
-                      </Pie>
-                      <ReTooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </Card>
-              </Col>
-
-              <Col xs={24} md={10}>
-                <Card title="Summary">
-                  <Descriptions column={1} size="small" bordered>
-                    <Descriptions.Item label="Total impact value">
-                      {totalImpact}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Number of categories">
-                      {impactData.length}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Top category">
-                      {topCategory?.category ?? '—'}
-                    </Descriptions.Item>
-                    <Descriptions.Item label="Top category value">
-                      {topCategory?.value ?? '—'}
-                    </Descriptions.Item>
-                  </Descriptions>
-                </Card>
-              </Col>
-            </Row>
-          </TabPane>
-
-          {/* TIMELINE tab */}
-          <TabPane tab="Timeline" key="timeline">
-            <Card title="Impact Timeline">
-              <Timeline>
-                {impactData.map((item, index) => (
-                  <Timeline.Item key={`${item.category}-${index}`}>
-                    <div style={{ fontWeight: 500 }}>{item.category}</div>
-                    <div style={{ color: '#666' }}>
-                      Impact value: {item.value}
-                    </div>
-                  </Timeline.Item>
-                ))}
-              </Timeline>
-            </Card>
-          </TabPane>
-
-          {/* BREAKDOWN tab: bar chart + details */}
-          <TabPane tab="Category Breakdown" key="breakdown">
-            <Row gutter={[24, 24]}>
-              <Col xs={24} md={16}>
-                <Card title="Impact by Category (Bar Chart)">
-                  <ResponsiveContainer width="100%" height={320}>
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="name" />
-                      <YAxis />
-                      <ReTooltip />
-                      <Bar dataKey="value">
-                        {chartData.map((_, index) => (
-                          <Cell
-                            key={index}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Card>
-              </Col>
-
-              <Col xs={24} md={8}>
-                <Card title="Category Details">
-                  <Descriptions column={1} size="small" bordered>
-                    {impactData.map((item, index) => (
-                      <Descriptions.Item
-                        key={`${item.category}-${index}`}
-                        label={item.category}
-                      >
-                        {item.value}
-                      </Descriptions.Item>
-                    ))}
-                  </Descriptions>
-                </Card>
-              </Col>
-            </Row>
-          </TabPane>
-        </Tabs>
+                      </Descriptions>
+                    </Card>
+                  </Col>
+                </Row>
+              ),
+            },
+          ]}
+        />
       )}
     </>
   );

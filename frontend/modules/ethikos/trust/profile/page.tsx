@@ -56,17 +56,17 @@ export default function MyProfile() {
         {/* Right column: recent activity derived from `recent` */}
         <ProCard title="Recent Activity" ghost>
           {recent.length ? (
-            <Timeline>
-              {recent.map((item, idx) => (
-                <Timeline.Item
-                  key={idx}
-                  color={item.change >= 0 ? 'green' : 'red'}
-                >
-                  {item.label} · {item.change >= 0 ? '+' : ''}
-                  {item.change}
-                </Timeline.Item>
-              ))}
-            </Timeline>
+            <Timeline
+              items={recent.map((item) => ({
+                color: item.change >= 0 ? 'green' : 'red',
+                children: (
+                  <>
+                    {item.label} · {item.change >= 0 ? '+' : ''}
+                    {item.change}
+                  </>
+                ),
+              }))}
+            />
           ) : (
             <Text type="secondary">No recent activity</Text>
           )}

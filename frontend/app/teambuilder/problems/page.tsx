@@ -10,8 +10,8 @@ import {
 } from '@ant-design/icons';
 import type { ProListMetas } from '@ant-design/pro-components';
 import { ProList } from '@ant-design/pro-components';
-import type { MenuProps } from 'antd';
 import {
+  Alert,
   Badge,
   Button,
   Card,
@@ -24,260 +24,168 @@ import {
   Tag,
   Typography,
 } from 'antd';
-import React, { useMemo, useState } from 'react';
+import type { MenuProps } from 'antd';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import TeamBuilderPageShell from '@/components/teambuilder/TeamBuilderPageShell';
+import { teambuilderService } from '@/services/teambuilder';
+import type {
+  ITeambuilderProblem,
+  ProblemRiskLevel,
+  ProblemStatus,
+} from '@/services/teambuilder/types';
 
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
 
-// -----------------------------------------------------------------------------
-// Types
-// -----------------------------------------------------------------------------
+type SortKey = 'updated' | 'usage' | 'title';
 
-type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
-type ProblemStatus = 'Active' | 'Draft' | 'Archived';
-
-interface Problem {
-  id: string;
-  title: string;
-  description: string;
-  unescoDomains: string[]; // e.g. ['Education', 'Health']
-  unescoCodes: string[]; // e.g. ['13.01', '05.03']
-  riskLevel: RiskLevel;
-  suitableModes: string[]; // e.g. ['Elite', 'Learning']
-  usageCount: number;
-  status: ProblemStatus;
-  updatedAt: string; // ISO string
-}
-
-// -----------------------------------------------------------------------------
-// Mock data (replace with API later)
-// -----------------------------------------------------------------------------
-
-const MOCK_PROBLEMS: Problem[] = [
-  {
-    id: 'p1',
-    title: 'Community vaccination strategy',
-    description:
-      'Design and deploy a vaccination programme for a mid-sized city with diverse communities and limited resources.',
-    unescoDomains: ['Health', 'Public policy'],
-    unescoCodes: ['14.01', '05.03'],
-    riskLevel: 'Critical',
-    suitableModes: ['Elite', 'Balanced'],
-    usageCount: 12,
-    status: 'Active',
-    updatedAt: '2025-10-01T10:00:00Z',
-  },
-  {
-    id: 'p2',
-    title: 'Hybrid learning redesign',
-    description:
-      'Redesign a university course for hybrid delivery, balancing in-person and remote students.',
-    unescoDomains: ['Education', 'Digital learning'],
-    unescoCodes: ['13.01'],
-    riskLevel: 'Medium',
-    suitableModes: ['Balanced', 'Learning'],
-    usageCount: 8,
-    status: 'Active',
-    updatedAt: '2025-09-20T15:30:00Z',
-  },
-  {
-    id: 'p3',
-    title: 'Inclusive hiring pilot',
-    description:
-      'Prototype a more inclusive hiring process for a tech team, with focus on bias reduction and candidate experience.',
-    unescoDomains: ['Work & employment', 'Ethics'],
-    unescoCodes: ['05.10'],
-    riskLevel: 'Low',
-    suitableModes: ['Learning'],
-    usageCount: 5,
-    status: 'Draft',
-    updatedAt: '2025-08-05T09:15:00Z',
-  },
-  {
-    id: 'p4',
-    title: 'Disaster response coordination',
-    description:
-      'Coordinate multi-agency response for simulated flood scenario across multiple regions.',
-    unescoDomains: ['Disaster management', 'Public policy'],
-    unescoCodes: ['14.04', '05.03'],
-    riskLevel: 'High',
-    suitableModes: ['Elite', 'Rehab'],
-    usageCount: 3,
-    status: 'Active',
-    updatedAt: '2025-11-10T12:00:00Z',
-  },
-  {
-    id: 'p5',
-    title: 'Sustainable campus initiative',
-    description:
-      'Develop a roadmap to reduce campus environmental impact over the next five years.',
-    unescoDomains: ['Environment', 'Governance'],
-    unescoCodes: ['14.07'],
-    riskLevel: 'Medium',
-    suitableModes: ['Balanced'],
-    usageCount: 4,
-    status: 'Archived',
-    updatedAt: '2025-05-17T11:00:00Z',
-  },
-  {
-    id: 'p6',
-    title: 'Cross-cultural virtual teams',
-    description:
-      'Improve collaboration in distributed, cross-cultural teams working entirely online.',
-    unescoDomains: ['Education', 'Work & employment'],
-    unescoCodes: ['13.05', '05.10'],
-    riskLevel: 'Low',
-    suitableModes: ['Learning', 'Average-only'],
-    usageCount: 9,
-    status: 'Active',
-    updatedAt: '2025-10-25T18:45:00Z',
-  },
-];
-
-// -----------------------------------------------------------------------------
-// Helpers
-// -----------------------------------------------------------------------------
-
-const riskTagColor: Record<RiskLevel, string> = {
-  Low: 'green',
-  Medium: 'blue',
-  High: 'orange',
-  Critical: 'red',
+const riskTagColor: Record<ProblemRiskLevel, string> = {
+  LOW: 'green',
+  MEDIUM: 'blue',
+  HIGH: 'orange',
+  CRITICAL: 'red',
 };
 
 const statusBadgeStatus: Record<
   ProblemStatus,
   'default' | 'success' | 'processing' | 'error'
 > = {
-  Active: 'success',
-  Draft: 'processing',
-  Archived: 'default',
+  ACTIVE: 'success',
+  DRAFT: 'processing',
+  DEPRECATED: 'error',
 };
 
-// -----------------------------------------------------------------------------
-// Component
-// -----------------------------------------------------------------------------
+function displayEnum(value: string): string {
+  return value
+    .toLowerCase()
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
 
 export default function ProblemsLibraryPage(): JSX.Element {
+  const [problems, setProblems] = useState<ITeambuilderProblem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const [searchText, setSearchText] = useState('');
-  const [domainFilter, setDomainFilter] = useState<string | undefined>(
-    undefined,
-  );
-  const [riskFilter, setRiskFilter] = useState<RiskLevel | undefined>(
-    undefined,
-  );
-  const [modeFilter, setModeFilter] = useState<string | undefined>(undefined);
-  const [sortKey, setSortKey] = useState<'updated' | 'usage' | 'title'>(
-    'updated',
+  const [domainFilter, setDomainFilter] = useState<string | undefined>();
+  const [riskFilter, setRiskFilter] = useState<ProblemRiskLevel | undefined>();
+  const [modeFilter, setModeFilter] = useState<string | undefined>();
+  const [sortKey, setSortKey] = useState<SortKey>('updated');
+
+  const loadProblems = useCallback(async () => {
+    setLoading(true);
+    setLoadError(null);
+
+    try {
+      setProblems(await teambuilderService.getProblems());
+    } catch (error) {
+      console.error('Failed to load TeamBuilder problems', error);
+      setLoadError('Unable to load the problem library.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadProblems();
+  }, [loadProblems]);
+
+  const domainOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          problems.flatMap((problem) => problem.categories ?? []).filter(Boolean),
+        ),
+      )
+        .sort((a, b) => a.localeCompare(b))
+        .map((value) => ({ label: value, value })),
+    [problems],
   );
 
-  // ---------------------------------------------------------------------------
-  // Filtering & sorting
-  // ---------------------------------------------------------------------------
+  const modeOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          problems
+            .flatMap((problem) => problem.recommended_modes ?? [])
+            .filter(Boolean),
+        ),
+      )
+        .sort((a, b) => a.localeCompare(b))
+        .map((value) => ({ label: displayEnum(value), value })),
+    [problems],
+  );
 
   const filteredProblems = useMemo(() => {
-    let items = [...MOCK_PROBLEMS];
+    let items = [...problems];
 
     if (searchText.trim()) {
-      const q = searchText.toLowerCase();
+      const query = searchText.trim().toLowerCase();
       items = items.filter(
-        p =>
-          p.title.toLowerCase().includes(q) ||
-          p.description.toLowerCase().includes(q),
+        (problem) =>
+          problem.name.toLowerCase().includes(query) ||
+          problem.description.toLowerCase().includes(query),
       );
     }
 
     if (domainFilter) {
-      items = items.filter(p =>
-        p.unescoDomains.some(d => d === domainFilter),
+      items = items.filter((problem) =>
+        (problem.categories ?? []).includes(domainFilter),
       );
     }
 
     if (riskFilter) {
-      items = items.filter(p => p.riskLevel === riskFilter);
+      items = items.filter((problem) => problem.risk_level === riskFilter);
     }
 
     if (modeFilter) {
-      items = items.filter(p =>
-        p.suitableModes.some(m =>
-          m.toLowerCase().includes(modeFilter.toLowerCase()),
-        ),
+      items = items.filter((problem) =>
+        (problem.recommended_modes ?? []).includes(modeFilter),
       );
     }
 
     items.sort((a, b) => {
-      switch (sortKey) {
-        case 'usage':
-          return b.usageCount - a.usageCount;
-        case 'title':
-          return a.title.localeCompare(b.title);
-        case 'updated':
-        default:
-          return (
-            new Date(b.updatedAt).getTime() -
-            new Date(a.updatedAt).getTime()
-          );
+      if (sortKey === 'usage') {
+        return (b.usage_count ?? 0) - (a.usage_count ?? 0);
       }
+      if (sortKey === 'title') {
+        return a.name.localeCompare(b.name);
+      }
+      return (
+        new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+      );
     });
 
     return items;
-  }, [searchText, domainFilter, riskFilter, modeFilter, sortKey]);
-
-  // ---------------------------------------------------------------------------
-  // Dropdown actions
-  // ---------------------------------------------------------------------------
-
-  const handleSortMenuClick: MenuProps['onClick'] = e => {
-    if (e.key === 'updated') setSortKey('updated');
-    if (e.key === 'usage') setSortKey('usage');
-    if (e.key === 'title') setSortKey('title');
-  };
+  }, [problems, searchText, domainFilter, riskFilter, modeFilter, sortKey]);
 
   const sortMenuItems: MenuProps['items'] = [
-    {
-      key: 'updated',
-      label: 'Sort by last updated',
-    },
-    {
-      key: 'usage',
-      label: 'Sort by usage',
-    },
-    {
-      key: 'title',
-      label: 'Sort by title',
-    },
+    { key: 'updated', label: 'Sort by last updated' },
+    { key: 'usage', label: 'Sort by usage' },
+    { key: 'title', label: 'Sort by title' },
   ];
 
-  const bulkMenuItems: MenuProps['items'] = [
-    { key: 'export', label: 'Export selected' },
-    { key: 'archive', label: 'Archive selected' },
-  ];
-
-  const handleBulkMenuClick: MenuProps['onClick'] = e => {
-    // Placeholder for bulk actions
-     
-    console.log('Bulk action:', e.key);
+  const handleSortMenuClick: MenuProps['onClick'] = ({ key }) => {
+    if (key === 'updated' || key === 'usage' || key === 'title') {
+      setSortKey(key);
+    }
   };
 
-  // ---------------------------------------------------------------------------
-  // ProList metas
-  // ---------------------------------------------------------------------------
-
-  const metas: ProListMetas<Problem> = {
+  const metas: ProListMetas<ITeambuilderProblem> = {
     title: {
-      dataIndex: 'title',
-      render: (dom: React.ReactNode, item: Problem) => (
+      dataIndex: 'name',
+      render: (dom, item) => (
         <Space direction="vertical" size={0}>
           <a href={`/teambuilder/problems/${item.id}`}>{dom}</a>
-          <Space size="small">
-            <Tag color={riskTagColor[item.riskLevel]}>
-              {item.riskLevel} risk
+          <Space size="small" wrap>
+            <Tag color={riskTagColor[item.risk_level]}>
+              {displayEnum(item.risk_level)} risk
             </Tag>
-            {item.suitableModes.map(mode => (
-              <Tag key={mode} icon={<TagsOutlined />} color="default">
-                {mode}
+            {(item.recommended_modes ?? []).map((mode) => (
+              <Tag key={mode} icon={<TagsOutlined />}>
+                {displayEnum(mode)}
               </Tag>
             ))}
           </Space>
@@ -286,21 +194,21 @@ export default function ProblemsLibraryPage(): JSX.Element {
     },
     description: {
       dataIndex: 'description',
-      render: (dom: React.ReactNode) => (
+      render: (dom) => (
         <Paragraph type="secondary" style={{ marginBottom: 0 }}>
           {dom}
         </Paragraph>
       ),
     },
     subTitle: {
-      render: (_: React.ReactNode, item: Problem) => (
+      render: (_: unknown, item: ITeambuilderProblem) => (
         <Space wrap size={4}>
-          {item.unescoDomains.map(domain => (
-            <Tag key={domain} color="geekblue">
-              {domain}
+          {(item.categories ?? []).map((category) => (
+            <Tag key={category} color="geekblue">
+              {category}
             </Tag>
           ))}
-          {item.unescoCodes.map(code => (
+          {(item.unesco_codes ?? []).map((code) => (
             <Tag key={code} color="cyan">
               {code}
             </Tag>
@@ -309,31 +217,23 @@ export default function ProblemsLibraryPage(): JSX.Element {
       ),
     },
     extra: {
-      render: (_: React.ReactNode, item: Problem) => (
-        <Space
-          direction="vertical"
-          size={4}
-          style={{ textAlign: 'right' }}
-        >
+      render: (_: unknown, item: ITeambuilderProblem) => (
+        <Space direction="vertical" size={4} style={{ textAlign: 'right' }}>
           <Badge
             status={statusBadgeStatus[item.status]}
-            text={item.status}
+            text={displayEnum(item.status)}
           />
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Used in {item.usageCount} session
-            {item.usageCount === 1 ? '' : 's'}
+            Used in {item.usage_count ?? 0} session
+            {(item.usage_count ?? 0) === 1 ? '' : 's'}
           </Text>
           <Text type="secondary" style={{ fontSize: 12 }}>
-            Updated {new Date(item.updatedAt).toLocaleDateString()}
+            Updated {new Date(item.updated_at).toLocaleDateString()}
           </Text>
         </Space>
       ),
     },
   };
-
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
 
   return (
     <TeamBuilderPageShell
@@ -344,11 +244,8 @@ export default function ProblemsLibraryPage(): JSX.Element {
         <Space>
           <Button
             icon={<ReloadOutlined />}
-            onClick={() => {
-              // Placeholder for real reload from API
-               
-              console.log('Reload problems (TODO: hook API)');
-            }}
+            onClick={() => void loadProblems()}
+            loading={loading}
           >
             Reload
           </Button>
@@ -372,69 +269,62 @@ export default function ProblemsLibraryPage(): JSX.Element {
       maxWidth={1200}
     >
       <Space direction="vertical" size="large" style={{ width: '100%' }}>
-        {/* Intro card */}
+        {loadError && (
+          <Alert
+            type="error"
+            showIcon
+            message={loadError}
+            action={
+              <Button size="small" onClick={() => void loadProblems()}>
+                Retry
+              </Button>
+            }
+          />
+        )}
+
         <Card>
-          <Space
-            direction="vertical"
-            size="small"
-            style={{ width: '100%' }}
-          >
+          <Space direction="vertical" size="small" style={{ width: '100%' }}>
             <Title level={4} style={{ marginBottom: 0 }}>
               Reusable problem templates
             </Title>
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-              Problems define the context for teams: goal, constraints,
-              UNESCO classification and risk. Sessions link to one problem,
-              and the engine uses that information to tune team composition
-              and mode (elite vs learning vs rehab).
+              Problems are persisted through the TeamBuilder API and can be reused
+              by new team-building sessions.
             </Paragraph>
           </Space>
         </Card>
 
-        {/* Filters and actions */}
         <Card>
           <Row gutter={[16, 16]} align="middle">
             <Col xs={24} md={8}>
               <Search
                 placeholder="Search problems by title or description"
                 allowClear
-                onSearch={value => setSearchText(value)}
-                onChange={e => setSearchText(e.target.value)}
+                onSearch={setSearchText}
+                onChange={(event) => setSearchText(event.target.value)}
               />
             </Col>
             <Col xs={24} md={10}>
               <Space wrap>
                 <Select
                   allowClear
-                  placeholder="Filter by UNESCO domain"
+                  placeholder="Filter by category"
                   style={{ minWidth: 180 }}
                   value={domainFilter}
-                  onChange={value => setDomainFilter(value)}
-                  options={[
-                    { label: 'Education', value: 'Education' },
-                    { label: 'Health', value: 'Health' },
-                    { label: 'Public policy', value: 'Public policy' },
-                    { label: 'Digital learning', value: 'Digital learning' },
-                    { label: 'Work & employment', value: 'Work & employment' },
-                    {
-                      label: 'Disaster management',
-                      value: 'Disaster management',
-                    },
-                    { label: 'Environment', value: 'Environment' },
-                    { label: 'Governance', value: 'Governance' },
-                  ]}
+                  onChange={setDomainFilter}
+                  options={domainOptions}
                 />
-                <Select<RiskLevel>
+                <Select<ProblemRiskLevel>
                   allowClear
                   placeholder="Risk level"
                   style={{ minWidth: 140 }}
                   value={riskFilter}
-                  onChange={value => setRiskFilter(value)}
+                  onChange={setRiskFilter}
                   options={[
-                    { label: 'Low', value: 'Low' },
-                    { label: 'Medium', value: 'Medium' },
-                    { label: 'High', value: 'High' },
-                    { label: 'Critical', value: 'Critical' },
+                    { label: 'Low', value: 'LOW' },
+                    { label: 'Medium', value: 'MEDIUM' },
+                    { label: 'High', value: 'HIGH' },
+                    { label: 'Critical', value: 'CRITICAL' },
                   ]}
                 />
                 <Select
@@ -442,66 +332,39 @@ export default function ProblemsLibraryPage(): JSX.Element {
                   placeholder="Mode suitability"
                   style={{ minWidth: 180 }}
                   value={modeFilter}
-                  onChange={value => setModeFilter(value)}
-                  options={[
-                    { label: 'Elite', value: 'Elite' },
-                    { label: 'Balanced', value: 'Balanced' },
-                    { label: 'Learning', value: 'Learning' },
-                    { label: 'Average-only', value: 'Average-only' },
-                    { label: 'Rehab', value: 'Rehab' },
-                  ]}
+                  onChange={setModeFilter}
+                  options={modeOptions}
                 />
               </Space>
             </Col>
             <Col
               xs={24}
               md={6}
-              style={{
-                display: 'flex',
-                justifyContent: 'flex-end',
-              }}
+              style={{ display: 'flex', justifyContent: 'flex-end' }}
             >
-              <Space>
-                <Dropdown
-                  menu={{
-                    items: sortMenuItems,
-                    onClick: handleSortMenuClick,
-                  }}
-                >
-                  <Button>
-                    <Space>
-                      Sort
-                      <DownOutlined />
-                    </Space>
-                  </Button>
-                </Dropdown>
-                <Dropdown
-                  menu={{
-                    items: bulkMenuItems,
-                    onClick: handleBulkMenuClick,
-                  }}
-                >
-                  <Button>
-                    <Space>
-                      Bulk actions
-                      <DownOutlined />
-                    </Space>
-                  </Button>
-                </Dropdown>
-              </Space>
+              <Dropdown
+                menu={{
+                  items: sortMenuItems,
+                  onClick: handleSortMenuClick,
+                }}
+              >
+                <Button>
+                  <Space>
+                    Sort
+                    <DownOutlined />
+                  </Space>
+                </Button>
+              </Dropdown>
             </Col>
           </Row>
         </Card>
 
-        {/* Problems list */}
-        <ProList<Problem>
+        <ProList<ITeambuilderProblem>
           rowKey="id"
           dataSource={filteredProblems}
+          loading={loading}
           metas={metas}
-          pagination={{
-            pageSize: 5,
-          }}
-          rowSelection={{}}
+          pagination={{ pageSize: 8 }}
           split
           showActions="hover"
           toolBarRender={false}

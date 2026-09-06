@@ -2,8 +2,7 @@
 // C:\MyCode\Konnaxionv14\frontend\app\kreative\idea-incubator\my-ideas\page.tsx
 'use client';
 
-import { Badge, Button, Input, List, Select, Space, Typography } from 'antd';
-import { useRouter } from 'next/navigation';
+import { Alert, Badge, Button, Input, List, Select, Space, Typography } from 'antd';
 import React, { useMemo, useState } from 'react';
 
 import KreativePageShell from '@/app/kreative/kreativePageShell';
@@ -21,7 +20,7 @@ interface Idea {
   newActivity: boolean;
 }
 
-const dummyIdeas: Idea[] = [
+const PREVIEW_IDEAS: Idea[] = [
   {
     id: '1',
     title: 'Revolutionary App Concept',
@@ -46,13 +45,11 @@ const dummyIdeas: Idea[] = [
 ];
 
 export default function MyIdeasPage(): JSX.Element {
-  const router = useRouter();
-
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('All');
 
   const filteredIdeas = useMemo<Idea[]>(() => {
-    let ideas = dummyIdeas;
+    let ideas = PREVIEW_IDEAS;
     if (selectedStatus !== 'All') {
       ideas = ideas.filter((idea) => idea.status === selectedStatus);
     }
@@ -68,6 +65,13 @@ export default function MyIdeasPage(): JSX.Element {
       title="My Ideas"
       subtitle="Browse and manage your creative ideas in the incubator."
     >
+      <Alert
+        type="info"
+        showIcon
+        message="Idea incubator preview"
+        description="This surface uses a declared preview dataset because no dedicated idea/showcase persistence contract exists in the current backend. Preview records are not presented as persisted state."
+        style={{ marginBottom: 16 }}
+      />
       <Space
         direction="vertical"
         size="middle"
@@ -101,22 +105,11 @@ export default function MyIdeasPage(): JSX.Element {
           <List.Item
             key={idea.id}
             actions={[
-              <Button
-                key="edit"
-                type="primary"
-                onClick={() =>
-                  router.push(`/kreative/idea-incubator/edit/${idea.id}`)
-                }
-              >
-                Edit
+              <Button key="edit" type="primary" disabled>
+                Edit unavailable
               </Button>,
-              <Button
-                key="view"
-                onClick={() =>
-                  router.push(`/kreative/idea-incubator/view/${idea.id}`)
-                }
-              >
-                View
+              <Button key="view" disabled>
+                View preview
               </Button>,
             ]}
           >

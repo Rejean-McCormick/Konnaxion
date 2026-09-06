@@ -1,27 +1,15 @@
-"""
-Core Smart-Vote tables.
-
-Partitioning ⬇︎
--------------
-`vote`, `vote_ledger` are **monthly range-partitioned** on `created_at`
-and `logged_at`.  Native Django ORM can’t declare child tables, so
-partition DDL is emitted in the first migration.
-"""
+"""Core Smart Vote persistence models."""
 
 from __future__ import annotations
 
 import uuid
-from decimal import Decimal
 
-from django.db import models
 from django.conf import settings
+from django.db import models
 
 
-# ------------------------------------------------------------------ #
-# 1)  Vote modality lookup                                            #
-# ------------------------------------------------------------------ #
 class VoteModality(models.Model):
-    """Approval, ranking, rating, preferential, budget_split …"""
+    """Approval, ranking, rating, preferential, budget_split."""
 
     APPROVAL = "approval"
     RANKING = "ranking"
@@ -29,9 +17,10 @@ class VoteModality(models.Model):
     PREFERENTIAL = "preferential"
     BUDGET = "budget_split"
 
+    id = models.AutoField(primary_key=True)
     name = models.CharField(
         max_length=32,
-        primary_key=True,
+        unique=True,
         choices=[
             (APPROVAL, "Approval"),
             (RANKING, "Ranking"),
@@ -49,47 +38,42 @@ class VoteModality(models.Model):
         return self.name
 
 
-# ------------------------------------------------------------------ #
-# 2)  Raw vote (partitioned)                                          #
-# ------------------------------------------------------------------ #
 class Vote(models.Model):
-    """
-    One ballot cast by `user` on an arbitrary `target`.
-
-    Partitioned **monthly** on `created_at`.
-    """
+    """One source ballot cast by a user on an arbitrary target."""
 
     id = models.BigAutoField(primary_key=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-
-    # generic FK → any model (“consultation”, “idea”, “policy” …)
     target_type = models.CharField(max_length=64)
     target_id = models.UUIDField(default=uuid.uuid4)
-
     modality = models.ForeignKey(VoteModality, on_delete=models.PROTECT)
-
     raw_value = models.DecimalField(max_digits=12, decimal_places=4)
-    weighted_value = models.DecimalField(max_digits=12, decimal_places=4)
+
+    # Legacy compatibility only. New source ballots do not persist a derived
+    # Smart Vote reading weight on the source row.
+    weighted_value = models.DecimalField(
+        max_digits=12,
+        decimal_places=4,
+        null=True,
+        blank=True,
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = "vote"
-        # Include partition key in uniqueness to match the partitioned table DDL
+        # PostgreSQL partitioned uniqueness must include the partition key.
         unique_together = ("user", "target_type", "target_id", "created_at")
         indexes = [
             models.Index(fields=["target_type", "target_id"], name="idx_vote_target")
         ]
 
-    # convenience
     def __str__(self) -> str:  # pragma: no cover
-        return f"{self.user_id}→{self.target_id} = {self.weighted_value}"
+        return f"{self.user_id}→{self.target_id} = {self.raw_value}"
 
 
-# ------------------------------------------------------------------ #
-# 3)  Aggregated result (1 row per target)                            #
-# ------------------------------------------------------------------ #
 class VoteResult(models.Model):
+    """Legacy materialized weighted result projection."""
+
     target_type = models.CharField(max_length=64)
     target_id = models.UUIDField()
     sum_weighted_value = models.DecimalField(max_digits=20, decimal_places=4)
@@ -103,19 +87,18 @@ class VoteResult(models.Model):
         return f"{self.target_id} ⟹ {self.sum_weighted_value}"
 
 
-# ------------------------------------------------------------------ #
-# 4)  Ledger                                                           #
-# ------------------------------------------------------------------ #
 class VoteLedger(models.Model):
-    """
-    Append-only log for on-chain anchoring.
-
-    Partitioned monthly on `logged_at`.
-    """
+    """Append-only ledger metadata for a vote."""
 
     ledger_id = models.BigAutoField(primary_key=True)
-    vote = models.ForeignKey(Vote, on_delete=models.CASCADE)
-    sha256_hash = models.BinaryField()  # 32-byte SHA-256
+    # The partitioned physical vote table cannot provide a simple UNIQUE(id)
+    # constraint while partitioned by created_at, so this relation is logical.
+    vote = models.ForeignKey(
+        Vote,
+        on_delete=models.CASCADE,
+        db_constraint=False,
+    )
+    sha256_hash = models.BinaryField()
     block_height = models.BigIntegerField(null=True, blank=True)
     logged_at = models.DateTimeField(auto_now_add=True)
 

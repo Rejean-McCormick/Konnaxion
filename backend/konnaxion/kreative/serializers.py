@@ -19,12 +19,28 @@ class TagSerializer(serializers.ModelSerializer):
 class KreativeArtworkSerializer(serializers.ModelSerializer):
     """Serializer for KreativeArtwork (a creative artwork uploaded by a user)."""
     artist = serializers.StringRelatedField(read_only=True)
-    # Embed tag details read-only: list tags with id and name
     tags = TagSerializer(many=True, read_only=True)
+    media_url = serializers.SerializerMethodField()
+
+    def get_media_url(self, obj):
+        media_file = getattr(obj, "media_file", None)
+        if not media_file or not getattr(media_file, "name", ""):
+            return None
+
+        try:
+            if not media_file.storage.exists(media_file.name):
+                return None
+            url = media_file.url
+        except (OSError, ValueError):
+            return None
+
+        request = self.context.get("request")
+        return request.build_absolute_uri(url) if request else url
+
     class Meta:
         model = KreativeArtwork
         fields = "__all__"
-        read_only_fields = ("id", "artist", "created_at")
+        read_only_fields = ("id", "artist", "created_at", "media_url")
 
 class GallerySerializer(serializers.ModelSerializer):
     """Serializer for Gallery (a curated collection of artworks)."""

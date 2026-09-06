@@ -4,7 +4,7 @@
 
 import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import {
-  message as antdMessage,
+  Alert,
   Button,
   Form,
   Input,
@@ -15,11 +15,11 @@ import {
   Upload,
 } from 'antd';
 import type { UploadFile } from 'antd/es/upload/interface';
-import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 import KreativePageShell from '@/app/kreative/kreativePageShell';
 import PageContainer from '@/components/PageContainer';
+import { createCollabSession } from '@/services/kreative';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -47,26 +47,33 @@ type UploadChangeParamLite = {
 
 export default function StartNewSpacePage(): JSX.Element {
   const [form] = Form.useForm<StartNewSpaceFormValues>();
-  const router = useRouter();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleFileChange = (info: UploadChangeParamLite) => {
     setFileList(info.fileList);
   };
 
-  const onFinish = (values: StartNewSpaceFormValues) => {
-    const spaceData = {
-      ...values,
-      banner: fileList,
-    };
+  const onFinish = async (values: StartNewSpaceFormValues) => {
+    const sessionType =
+      values.category === 'Music Jam Session'
+        ? 'music'
+        : values.category === 'Art Study Group'
+          ? 'painting'
+          : 'mixed';
 
-    // TODO: replace with real API call
-    // await api.createSpace(spaceData)
-
-     
-    console.log('New Space Data:', spaceData);
-    antdMessage.success('Your new space has been created successfully!');
-    router.push('/kreative/collaborative-spaces/my-spaces');
+    setSubmitting(true);
+    try {
+      const created = await createCollabSession({
+        name: values.name,
+        session_type: sessionType,
+      });
+      form.resetFields();
+      setFileList([]);
+      return created;
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -75,6 +82,13 @@ export default function StartNewSpacePage(): JSX.Element {
       subtitle="Define your collaborative space so others can discover and join the right context."
     >
       <PageContainer title="Start a New Space">
+        <Alert
+          type="info"
+          showIcon
+          message="Core collaboration session is persisted"
+          description="Name and session type are saved through the real Kreative CollabSession API. Description, privacy, invitations and banner remain declared preview fields until their backend contract exists."
+          style={{ marginBottom: 16 }}
+        />
         <Paragraph type="secondary" style={{ marginBottom: 24 }}>
           Define your collaborative space so others can discover and join the right context.
         </Paragraph>
@@ -207,7 +221,7 @@ export default function StartNewSpacePage(): JSX.Element {
 
           {/* Submit Button */}
           <Form.Item>
-            <Button type="primary" htmlType="submit">
+            <Button type="primary" htmlType="submit" loading={submitting}>
               Create Space
             </Button>
           </Form.Item>
