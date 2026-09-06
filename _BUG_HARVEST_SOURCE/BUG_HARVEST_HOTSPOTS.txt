@@ -1,0 +1,282 @@
+=== KONNAXION BUG HARVEST HOTSPOTS ===
+frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx:218 [mock] <InfoCircleOutlined /> Results are simulated mock data for UI
+frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx:537 [mock] View team workspace (mock)
+frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx:218 [simulated] <InfoCircleOutlined /> Results are simulated mock data for UI
+frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx:531 [console.log] console.log('Request to join', selectedTeam.id);
+frontend\app\keenkonnect\ai-team-matching\find-teams\page.tsx:545 [console.log] console.log('Saved team', selectedTeam.id);
+frontend\app\keenkonnect\ai-team-matching\match-preferences\page.tsx:26 [TODO] // TODO: brancher sur ton backend / API de matching
+frontend\app\keenkonnect\ai-team-matching\match-preferences\page.tsx:28 [console.log] console.log('Match preferences:', values);
+frontend\app\keenkonnect\ai-team-matching\my-matches\page.tsx:28 [mock] * Données mock – Teams
+frontend\app\keenkonnect\ai-team-matching\my-matches\page.tsx:69 [mock] * Données mock – Partenaires individuels
+frontend\app\keenkonnect\dashboard\page.tsx:93 [mock] // --- Mock data ---
+frontend\app\keenkonnect\knowledge\browse-repository\page.tsx:118 [mock] const MOCK_DOCUMENTS: KnowledgeDocument[] = [
+frontend\app\keenkonnect\knowledge\browse-repository\page.tsx:237 [mock] MOCK_DOCUMENTS.filter((doc) => {
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:254 [simulated] message.success('Changes saved (simulated).');
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:261 [simulated] message.success('New version published (simulated).');
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:617 [simulated] title="Real-time editing (simulated)"
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:731 [simulated] <Card title="Comments (simulated thread)" className="mt-4">
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:251 [simulation] // Simulation d’un appel API
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:253 [console.log] console.log('Saving changes for document', selectedDocument.id);
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:260 [console.log] console.log('Publishing new version for document', selectedDocument.id);
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:254 [message.success] message.success('Changes saved (simulated).');
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:261 [message.success] message.success('New version published (simulated).');
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:286 [message.success] message.success('Document entry created (local example).');
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:196 [randomusers] avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:204 [randomusers] avatar: 'https://xsgames.co/randomusers/avatar.php?g=male',
+frontend\app\keenkonnect\knowledge\document-management\page.tsx:212 [randomusers] avatar: 'https://xsgames.co/randomusers/avatar.php?g=female',
+frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx:43 [demo data] // Demo data
+frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx:44 [sampleDocuments] const sampleDocuments: DocumentResource[] = [
+frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx:102 [sampleDocuments] const allAuthors = Array.from(new Set(sampleDocuments.map((d) => d.author))).sort()
+frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx:103 [sampleDocuments] const allTags = Array.from(new Set(sampleDocuments.flatMap((d) => d.tags))).sort()
+frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx:104 [sampleDocuments] const allLanguages = Array.from(new Set(sampleDocuments.map((d) => d.language))).sort()
+frontend\app\keenkonnect\knowledge\search-filter-documents\page.tsx:152 [sampleDocuments] return sampleDocuments.filter((doc) => {
+frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx:79 [console.error] console.error('Document upload error:', error);
+frontend\app\keenkonnect\knowledge\upload-new-document\page.tsx:74 [message.success] antdMessage.success('Document uploaded successfully');
+frontend\app\keenkonnect\projects\browse-projects\page.tsx:101 [TODO] technologies: [], // TODO: map from tags or related data when available
+frontend\app\keenkonnect\projects\browse-projects\page.tsx:102 [TODO] members: 0, // TODO: replace with real team size when project-team endpoints are wired
+frontend\app\keenkonnect\projects\browse-projects\page.tsx:347 [coming soon] <Tooltip title="View collaborators (coming soon)">
+frontend\app\keenkonnect\projects\browse-projects\page.tsx:109 [console.error] console.error('Failed to load projects', err);
+frontend\app\keenkonnect\projects\create-new-project\page.tsx:72 [console.error] console.error('Create project error:', err);
+frontend\app\keenkonnect\projects\create-new-project\page.tsx:67 [message.success] message.success('Project created successfully!');
+frontend\app\keenkonnect\projects\my-projects\page.tsx:88 [console.error] console.error('Failed to load projects', err);
+frontend\app\keenkonnect\projects\project-workspace\page.tsx:158 [console.error] console.error('Failed to load project workspace', err);
+frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx:167 [TODO] {/* TODO: replace with dynamic project list */}
+frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx:89 [console.error] console.error('Submit impact report error:', error);
+frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx:84 [message.success] message.success('Impact report submitted successfully!');
+frontend\app\keenkonnect\sustainability-impact\track-project-impact\page.tsx:93 [console.error] console.error('Track impact load error:', err);
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:103 [TODO] // TODO: wire name / headline / bio to a real profile endpoint
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:106 [console.log] console.log('Profile info submitted:', values);
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:120 [console.log] console.log('Security settings submitted:', values);
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:126 [console.log] console.log('Notification settings submitted:', values);
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:132 [console.log] console.log('Privacy settings submitted:', values);
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:148 [console.log] console.log('Account deletion requested');
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:111 [console.error] console.error('Failed to update profile', error);
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:108 [message.success] antdMessage.success('Profile information updated successfully.');
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:121 [message.success] antdMessage.success('Security settings updated successfully.');
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:127 [message.success] antdMessage.success('Notification preferences updated successfully.');
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:133 [message.success] antdMessage.success('Privacy preferences updated successfully.');
+frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx:149 [message.success] antdMessage.success(
+frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx:133 [stub] // Stub : à brancher sur l’API de profil / Ekoh plus tard
+frontend\app\keenkonnect\user-reputation\manage-expertise-areas\page.tsx:135 [console.log] console.log('Manage Expertise Areas – submit:', values);
+frontend\app\keenkonnect\workspaces\launch-new-workspace\page.tsx:37 [console.error] console.error(error);
+frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx:110 [message.success] message.success(`Workspace "${ws.name}" removed from your list.`);
+frontend\app\konnected\certifications\certification-programs\page.tsx:149 [mock] * exam-registration, without relying on mock data.
+frontend\app\konnected\certifications\exam-dashboard-results\page.tsx:328 [message.success] message.success('Appeal request submitted. You will be notified when it is reviewed.')
+frontend\app\konnected\certifications\exam-dashboard-results\page.tsx:341 [message.success] message.success('New attempt scheduled successfully.')
+frontend\app\konnected\certifications\exam-dashboard-results\page.tsx:310 [message.info] message.info('Certificate is not yet available for this attempt.')
+frontend\app\konnected\certifications\exam-dashboard-results\page.tsx:318 [message.info] message.info('This attempt is not yet linked to your portfolio.')
+frontend\app\konnected\certifications\exam-preparation\page.tsx:232 [console.log] console.log('Open module', module.id);
+frontend\app\konnected\certifications\exam-registration\page.tsx:201 [not implemented] * Both are optional server-side features; we treat 404 as "not implemented".
+frontend\app\konnected\certifications\exam-registration\page.tsx:227 [not implemented] // Eligibility endpoint not implemented yet; fall back to path fields.
+frontend\app\konnected\certifications\exam-registration\page.tsx:145 [fetch(] const res = await apiFetch(EXAM_PATHS_ENDPOINT, {
+frontend\app\konnected\certifications\exam-registration\page.tsx:218 [fetch(] const res = await apiFetch(EXAM_ELIGIBILITY_ENDPOINT(selectedPathId), {
+frontend\app\konnected\certifications\exam-registration\page.tsx:244 [fetch(] const res = await apiFetch(EXAM_SESSIONS_ENDPOINT(selectedPathId), {
+frontend\app\konnected\certifications\exam-registration\page.tsx:319 [fetch(] const res = await apiFetch(EXAM_REGISTRATION_ENDPOINT, {
+frontend\app\konnected\community-discussions\active-threads\page.tsx:280 [fetch(] <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isFetching} />
+frontend\app\konnected\community-discussions\active-threads\page.tsx:473 [fetch(] <Button size="small" onClick={() => refetch()} icon={<ReloadOutlined />}>
+frontend\app\konnected\community-discussions\moderation\page.tsx:180 [message.success] message.success(
+frontend\app\konnected\community-discussions\moderation\page.tsx:211 [message.success] message.success(
+frontend\app\konnected\community-discussions\moderation\page.tsx:195 [message.info] message.info('Select at least one item to apply a bulk action.');
+frontend\app\konnected\community-discussions\start-new-discussion\page.tsx:166 [console.error] console.error('Error creating discussion', error);
+frontend\app\konnected\community-discussions\start-new-discussion\page.tsx:101 [fetch(] const topicRes = await apiFetch('/api/forum-topics/', {
+frontend\app\konnected\community-discussions\start-new-discussion\page.tsx:143 [fetch(] const postRes = await apiFetch('/api/forum-posts/', {
+frontend\app\konnected\community-discussions\start-new-discussion\page.tsx:161 [message.success] antdMessage.success('Discussion created successfully.');
+frontend\app\konnected\dashboard\page.tsx:182 [fetch(] const res = await fetch(url, { credentials: "include" });
+frontend\app\konnected\knowledge\contribute\page.tsx:118 [console.log] console.log('KonnectED knowledge contribution (local only):', values);
+frontend\app\konnected\knowledge\contribute\page.tsx:125 [console.log] console.log('Draft contribution (local only):', values);
+frontend\app\konnected\knowledge\contribute\page.tsx:119 [message.success] message.success('Your contribution has been saved locally for review.');
+frontend\app\konnected\knowledge\contribute\page.tsx:126 [message.info] message.info('Draft saved locally in this session.');
+frontend\app\konnected\learning-library\[resourceId]\page.tsx:122 [fetch(] const res = await fetch(url, {
+frontend\app\konnected\learning-library\browse-resources\page.tsx:240 [axios.] const response = await axios.get<KnowledgeResourceListResponse>(
+frontend\app\konnected\learning-library\browse-resources\page.tsx:286 [axios.] const response = await axios.get<KnowledgeMetadataResponse>(KNOWLEDGE_METADATA_ENDPOINT);
+frontend\app\konnected\learning-library\browse-resources\page.tsx:446 [message.success] message.success('Exported current page of results as CSV.');
+frontend\app\konnected\learning-library\browse-resources\page.tsx:466 [message.success] message.success('Link with current filters copied to your clipboard.');
+frontend\app\konnected\learning-library\browse-resources\page.tsx:385 [message.info] message.info('There are no resources to export for the current filters.');
+frontend\app\konnected\learning-library\offline-content\page.tsx:185 [fetch(] const res = await apiFetch(url);
+frontend\app\konnected\learning-library\offline-content\page.tsx:444 [message.success] message.success(
+frontend\app\konnected\learning-library\offline-content\page.tsx:556 [message.success] message.success(
+frontend\app\konnected\learning-library\offline-content\page.tsx:580 [message.success] message.success('Offline package deleted.');
+frontend\app\konnected\learning-library\offline-content\page.tsx:596 [message.success] message.success('Sync request submitted.');
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:104 [fetch(] const res = await apiFetch(url, {
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:298 [fetch(] await apiFetch('/api/knowledge-recommendations/feedback/', {
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:415 [message.success] message.success(
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:356 [message.info] message.info(
+frontend\app\konnected\learning-library\search-filters\page.tsx:181 [fetch(] const res = await fetch(url, {
+frontend\app\konnected\learning-paths\create-learning-path\page.tsx:92 [fetch(] const response = await apiFetch(buildUrl("/api/konnected/learning-paths/"), {
+frontend\app\konnected\learning-paths\create-learning-path\page.tsx:134 [fetch(] const response = await apiFetch(
+frontend\app\konnected\learning-paths\create-learning-path\page.tsx:328 [message.success] message.success(
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:103 [fetch(] const res = await apiFetch(
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:121 [fetch(] const res = await apiFetch(`${API_BASE}/${id}`, {
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:136 [fetch(] const res = await apiFetch(`${API_BASE}/${id}/archive`, {
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:147 [fetch(] const res = await apiFetch(`${API_BASE}/${id}`, {
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:216 [message.success] message.success('Learning path updated.');
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:239 [message.success] message.success('Learning path archived.');
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:258 [message.success] message.success('Learning path deleted.');
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:353 [TODO] // TODO: POST /api/konnected/learning-paths/{id}/complete (mark learner path as complete)
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:374 [TODO] // TODO: POST /api/konnected/learning-paths/{id}/leave (leave learning path)
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:61 [mock] * Fallback mock data so the page stays functional even without the backend.
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:64 [mock] const MOCK_LEARNING_PATHS: LearningPath[] = [
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:253 [mock] * Always resolves; on any failure it returns mock data plus an Error.
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:262 [mock] // Treat 404 as "backend not wired yet" – use mocks but surface a warning.
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:267 [mock] return { data: MOCK_LEARNING_PATHS, error };
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:274 [mock] return { data: MOCK_LEARNING_PATHS, error };
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:284 [mock] return { data: MOCK_LEARNING_PATHS, error: null };
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:298 [mock] return { data: MOCK_LEARNING_PATHS, error };
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:543 [mock] Showing locally cached / mock data for now. Once the KonnectED
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:273 [console.error] console.error(error);
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:297 [console.error] console.error('Error fetching learning paths', err);
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:257 [fetch(] const res = await fetch('/api/konnected/learning-paths/my', {
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:137 [Math.random] return `lp-${Math.random().toString(36).slice(2)}`;
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:370 [message.success] message.success('Learning path marked as completed.');
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:376 [message.success] message.success('Learning path removed from your list.');
+frontend\app\konnected\mentorship\page.tsx:182 [message.success] message.success('Your mentorship request has been recorded (demo).');
+frontend\app\konnected\teams-collaboration\activity-planner\page.tsx:86 [mock] /** Initial mocked events – replace with API data later */
+frontend\app\konnected\teams-collaboration\activity-planner\page.tsx:86 [mocked] /** Initial mocked events – replace with API data later */
+frontend\app\konnected\teams-collaboration\activity-planner\page.tsx:197 [message.success] message.success('Activity added to the team calendar.');
+frontend\app\konnected\teams-collaboration\activity-planner\page.tsx:202 [message.success] message.success('Activity removed.');
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:161 [console.error] console.error('Failed to load teams', err);
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:207 [console.error] console.error('Failed to leave team', err);
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:136 [fetch(] const res = await apiFetch(MY_TEAMS_ENDPOINT, {
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:190 [fetch(] const res = await apiFetch(LEAVE_TEAM_ENDPOINT(team.teamId), {
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:202 [message.success] message.success(`You left ${team.teamName}.`);
+frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx:335 [TODO] // TODO: plug to a real archive endpoint when implemented (e.g. PATCH /projects/{id}/archive/)
+frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx:217 [console.error] console.error('Failed to load project workspaces', error);
+frontend\app\konnected\teams-collaboration\team-builder\page.tsx:106 [TODO] * TODO: adjust URL & shape to your real OpenAPI (schema-endpoints).
+frontend\app\konnected\teams-collaboration\team-builder\page.tsx:112 [fetch(] const response = await apiFetch('/api/konnected/teams', {
+frontend\app\konnected\teams-collaboration\team-builder\page.tsx:273 [message.success] antdMessage.success('Team created successfully.');
+frontend\app\kontrol\audit-log\page.tsx:309 [console.error] console.error('Audit log fetch error:', error);
+frontend\app\kontrol\audit-log\page.tsx:260 [fetch(] const response = await fetch(
+frontend\app\kontrol\audit-log\page.tsx:164 [message.success] .then(() => message.success('Audit_Log_Export.csv downloaded'));
+frontend\app\kontrol\dashboard\page.tsx:43 [mock] const MODERATION_MOCK_DATA = [
+frontend\app\kontrol\dashboard\page.tsx:78 [mock] const USER_ACTIVITY_MOCK_DATA = [
+frontend\app\kontrol\dashboard\page.tsx:110 [mock] const PRO_TABLE_COLUMNS: ProColumns<(typeof MODERATION_MOCK_DATA)[0]>[] = [
+frontend\app\kontrol\dashboard\page.tsx:308 [mock] dataSource={MODERATION_MOCK_DATA}
+frontend\app\kontrol\dashboard\page.tsx:340 [mock] dataSource={USER_ACTIVITY_MOCK_DATA}
+frontend\app\kontrol\dashboard\page.tsx:189 [setTimeout(] setTimeout(() => {
+frontend\app\kontrol\konsensus\page.tsx:96 [simulation] // State for live simulation feedback
+frontend\app\kontrol\konsensus\page.tsx:97 [simulation] const [simulation, setSimulation] = useState({
+frontend\app\kontrol\konsensus\page.tsx:104 [simulation] // Calculate simulation metrics based on form values
+frontend\app\kontrol\konsensus\page.tsx:105 [simulation] const runSimulation = (quorum: number, threshold: number) => {
+frontend\app\kontrol\konsensus\page.tsx:132 [simulation] setSimulation({
+frontend\app\kontrol\konsensus\page.tsx:152 [simulation] runSimulation(Number(q), Number(t));
+frontend\app\kontrol\konsensus\page.tsx:209 [simulation] runSimulation(quorumNum, thresholdNum);
+frontend\app\kontrol\konsensus\page.tsx:513 [simulation] {/* RIGHT COLUMN: Live Simulation & Feedback */}
+frontend\app\kontrol\konsensus\page.tsx:520 [simulation] {/* Simulation Card */}
+frontend\app\kontrol\konsensus\page.tsx:548 [simulation] value={simulation.stiffness}
+frontend\app\kontrol\konsensus\page.tsx:552 [simulation] <Tag color={simulation.riskColor}>
+frontend\app\kontrol\konsensus\page.tsx:553 [simulation] {simulation.riskLabel}
+frontend\app\kontrol\konsensus\page.tsx:557 [simulation] percent={simulation.stiffness}
+frontend\app\kontrol\konsensus\page.tsx:560 [simulation] simulation.riskColor === 'red'
+frontend\app\kontrol\konsensus\page.tsx:562 [simulation] : simulation.riskColor === 'orange'
+frontend\app\kontrol\konsensus\page.tsx:571 [simulation] description={`Under these rules, ${simulation.retroFailures} passed proposals from last year would have failed.`}
+frontend\app\kontrol\konsensus\page.tsx:251 [console.error] console.error(
+frontend\app\kontrol\konsensus\page.tsx:308 [console.error] console.error(error);
+frontend\app\kontrol\konsensus\page.tsx:189 [fetch(] const res = await apiFetch(
+frontend\app\kontrol\konsensus\page.tsx:287 [fetch(] const res = await apiFetch(
+frontend\app\kontrol\konsensus\page.tsx:302 [message.success] message.success(
+frontend\app\kontrol\moderation\community\page.tsx:55 [mock] // --- Mock Data ---
+frontend\app\kontrol\moderation\community\page.tsx:56 [mock] const MOCK_COMMUNITIES: CommunityContext[] = [
+frontend\app\kontrol\moderation\community\page.tsx:325 [mock] data: MOCK_COMMUNITIES,
+frontend\app\kontrol\moderation\community\page.tsx:125 [message.success] message.success(`All flags cleared for ${record.name}`);
+frontend\app\kontrol\moderation\community\page.tsx:412 [message.info] message.info('Toggle lock (not wired)')
+frontend\app\kontrol\moderation\queue\page.tsx:128 [console.error] console.error(error);
+frontend\app\kontrol\moderation\queue\page.tsx:371 [console.error] console.error(e);
+frontend\app\kontrol\moderation\queue\page.tsx:113 [fetch(] const response = await apiFetch(`/api/admin/moderation/${id}/`, {
+frontend\app\kontrol\moderation\queue\page.tsx:328 [fetch(] const res = await apiFetch(
+frontend\app\kontrol\moderation\queue\page.tsx:123 [message.success] message.success(`${action} applied successfully`);
+frontend\app\kontrol\roles\page.tsx:53 [mock] // --- Mock Data ---
+frontend\app\kontrol\roles\page.tsx:54 [mock] const MOCK_ROLES: RoleItem[] = [
+frontend\app\kontrol\roles\page.tsx:97 [mock] // Mock Permission Tree Data
+frontend\app\kontrol\roles\page.tsx:311 [mock] request={async () => ({ data: MOCK_ROLES, success: true })}
+frontend\app\kontrol\roles\page.tsx:145 [message.success] message.success(`Role ${role.name} deleted`);
+frontend\app\kontrol\roles\page.tsx:338 [message.success] message.success('Role saved successfully');
+frontend\app\kontrol\users\all\page.tsx:329 [console.error] console.error(error);
+frontend\app\kontrol\users\all\page.tsx:272 [fetch(] const response = await fetch(
+frontend\app\kontrol\users\all\page.tsx:91 [message.success] message.success(`User ${record.username} has been banned.`);
+frontend\app\kontrol\users\all\page.tsx:94 [message.info] message.info(`Password reset email sent to ${record.email}`);
+frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx:41 [demo data] // Demo data
+frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx:146 [message.success] antdMessage.success(`You have joined "${space.name}"!`);
+frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx:156 [message.success] antdMessage.success(
+frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx:36 [demo data] // Demo data
+frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx:63 [TODO] // TODO: replace with real API call
+frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx:67 [console.log] console.log('New Space Data:', spaceData);
+frontend\app\kreative\collaborative-spaces\start-new-space\page.tsx:68 [message.success] antdMessage.success('Your new space has been created successfully!');
+frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx:37 [TODO] // TODO: plug into backend API when available (e.g. POST /api/showcases)
+frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx:38 [fetch(] // await fetch('/api/showcases', { method: 'POST', body: JSON.stringify(values) });
+frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx:40 [message.success] antdMessage.success('Submission received');
+frontend\app\kreative\creative-hub\submit-creative-work\page.tsx:55 [TODO] // TODO: remplacer par l'appel API réel d’envoi
+frontend\app\kreative\creative-hub\submit-creative-work\page.tsx:57 [message.success] antdMessage.success('Création envoyée avec succès !');
+frontend\app\kreative\dashboard\page.tsx:30 [localhost:8000] // This makes NEXT_PUBLIC_API_BASE=http://localhost:8000/api work
+frontend\app\kreative\dashboard\page.tsx:31 [localhost:8000] // while media stays served from http://localhost:8000/media/…
+frontend\app\kreative\dashboard\page.tsx:33 [localhost:8000] process.env.NEXT_PUBLIC_API_BASE ?? 'http://localhost:8000';
+frontend\app\kreative\idea-incubator\create-new-idea\page.tsx:27 [console.log] console.log('Submitted Idea:', values);
+frontend\app\kreative\idea-incubator\create-new-idea\page.tsx:28 [message.success] antdMessage.success('Votre idée a été soumise avec succès !');
+frontend\app\kreative\mentorship\page.tsx:89 [mock] /*  Mock data                                                         */
+frontend\app\kreative\mentorship\page.tsx:282 [mock] antdMessage.success('Your contribution has been captured locally (mock).');
+frontend\app\kreative\mentorship\page.tsx:443 [mock] `Mock request sent to ${mentor.name}. Backend integration to follow.`,
+frontend\app\kreative\mentorship\page.tsx:324 [simulated] Send a <Text strong>mentorship request</Text> (simulated) to start a conversation.
+frontend\app\kreative\mentorship\page.tsx:282 [message.success] antdMessage.success('Your contribution has been captured locally (mock).');
+frontend\app\kreative\mentorship\page.tsx:442 [message.success] antdMessage.success(
+frontend\app\kreative\mentorship\page.tsx:453 [message.info] antdMessage.info('Profile details panel would open here.')
+frontend\app\kreative\traditions-archive\page.tsx:45 [demo data] // Demo data – can later be wired to API
+frontend\app\teambuilder\[sessionId]\page.tsx:146 [console.error] console.error(err);
+frontend\app\teambuilder\[sessionId]\page.tsx:175 [console.error] console.error(err);
+frontend\app\teambuilder\create\CreateSessionClient.tsx:143 [HACK] placeholder="e.g. Q3 Hackathon Teams"
+frontend\app\teambuilder\create\CreateSessionClient.tsx:73 [console.error] console.error('Failed to fetch users', err);
+frontend\app\teambuilder\create\CreateSessionClient.tsx:112 [console.error] console.error(err);
+frontend\app\teambuilder\humans\conflicts\page.tsx:142 [HACK] reason: 'High trust and very complementary skills in previous hackathon.',
+frontend\app\teambuilder\humans\conflicts\page.tsx:91 [mock] const MOCK_USERS = [
+frontend\app\teambuilder\humans\conflicts\page.tsx:547 [mock] options={MOCK_USERS.map(u => ({ label: u, value: u }))}
+frontend\app\teambuilder\humans\conflicts\page.tsx:559 [mock] options={MOCK_USERS.map(u => ({ label: u, value: u }))}
+frontend\app\teambuilder\humans\conflicts\page.tsx:733 [mock] options={MOCK_USERS.map(u => ({ label: u, value: u }))}
+frontend\app\teambuilder\humans\conflicts\page.tsx:745 [mock] options={MOCK_USERS.map(u => ({ label: u, value: u }))}
+frontend\app\teambuilder\humans\conflicts\page.tsx:845 [mock] options={MOCK_USERS.map(u => ({ label: u, value: u }))}
+frontend\app\teambuilder\humans\constraints\page.tsx:101 [TODO] // TODO: integrate with backend constraints API
+frontend\app\teambuilder\humans\constraints\page.tsx:112 [TODO] // TODO: integrate with "templates" API
+frontend\app\teambuilder\humans\constraints\page.tsx:103 [console.log] console.log('Human constraints saved:', values);
+frontend\app\teambuilder\humans\constraints\page.tsx:114 [console.log] console.log('Save constraints as template:', currentValues);
+frontend\app\teambuilder\humans\modes\page.tsx:221 [TODO] // TODO: wire to backend service when available
+frontend\app\teambuilder\humans\modes\page.tsx:223 [stub] console.log('Saving team modes (stub):', modes);
+frontend\app\teambuilder\humans\modes\page.tsx:224 [stub] message.success('Team modes saved (local stub).');
+frontend\app\teambuilder\humans\modes\page.tsx:237 [stub] `Duplicate "${current.shortLabel}" is not implemented yet (stub button).`,
+frontend\app\teambuilder\humans\modes\page.tsx:237 [not implemented] `Duplicate "${current.shortLabel}" is not implemented yet (stub button).`,
+frontend\app\teambuilder\humans\modes\page.tsx:223 [console.log] console.log('Saving team modes (stub):', modes);
+frontend\app\teambuilder\humans\modes\page.tsx:227 [console.error] console.error(err);
+frontend\app\teambuilder\humans\modes\page.tsx:215 [message.success] message.success('Team modes reset to defaults.');
+frontend\app\teambuilder\humans\modes\page.tsx:224 [message.success] message.success('Team modes saved (local stub).');
+frontend\app\teambuilder\humans\modes\page.tsx:236 [message.info] message.info(
+frontend\app\teambuilder\problems\[problemId]\page.tsx:130 [console.error] console.error(err);
+frontend\app\teambuilder\problems\create\page.tsx:137 [simulated] message.success(`Problem ${modeLabel} (simulated).`);
+frontend\app\teambuilder\problems\create\page.tsx:132 [console.log] console.log('Problem payload:', values, 'submitMode:', submitting);
+frontend\app\teambuilder\problems\create\page.tsx:137 [message.success] message.success(`Problem ${modeLabel} (simulated).`);
+frontend\app\teambuilder\problems\page.tsx:350 [TODO] console.log('Reload problems (TODO: hook API)');
+frontend\app\teambuilder\problems\page.tsx:55 [mock] // Mock data (replace with API later)
+frontend\app\teambuilder\problems\page.tsx:58 [mock] const MOCK_PROBLEMS: Problem[] = [
+frontend\app\teambuilder\problems\page.tsx:181 [mock] let items = [...MOCK_PROBLEMS];
+frontend\app\teambuilder\problems\page.tsx:102 [simulated] 'Coordinate multi-agency response for simulated flood scenario across multiple regions.',
+frontend\app\teambuilder\problems\page.tsx:261 [console.log] console.log('Bulk action:', e.key);
+frontend\app\teambuilder\problems\page.tsx:350 [console.log] console.log('Reload problems (TODO: hook API)');
+frontend\app\teambuilder\page.tsx:24 [console.error] console.error(err);
+frontend\app\konsensus\activity-feed\ActivityFeedClient.tsx:270 [stub] <Tooltip title="Refresh feed (stubbed – ready for API integration)">
+frontend\app\konsensus\activity-feed\ActivityFeedClient.tsx:51 [demo data] // Demo data – unified cross-module activity stream
+frontend\app\konsensus\admin\AdminClient.tsx:152 [message.success] message.success(
+frontend\app\konsensus\admin\AdminClient.tsx:169 [message.success] message.success(`Moderation item marked as ${newStatus}.`);
+frontend\app\konsensus\dashboard\page.tsx:36 [mock] /*  Mock data                                                          */
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:65 [mock] const MOCK_LEADERBOARD: LeaderboardRow[] = [
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:164 [mock] const MOCK_DOMAIN_HIGHLIGHTS: DomainHighlight[] = [
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:242 [mock] return MOCK_LEADERBOARD.filter((row) => {
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:338 [mock] const regions = Array.from(new Set(MOCK_LEADERBOARD.map((row) => row.region)));
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:340 [mock] const domains = Array.from(new Set(MOCK_LEADERBOARD.map((row) => row.domain)));
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:410 [mock] Mock data – wire up to Konsensus API later.
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:491 [mock] dataSource={MOCK_DOMAIN_HIGHLIGHTS}
+frontend\app\konsensus\leaderboards\LeaderboardsClient.tsx:545 [mock] This page currently uses mock data. When wired to the backend,
+frontend\services\_request.ts:14 [axios.] const client: AxiosInstance = axios.create({
+frontend\services\decide.mock.ts:1 [mock] // FILE: frontend/services/decide.mock.ts
+frontend\services\decide.mock.ts:2 [mock] // src/services/decide.mock.ts
+frontend\services\decide.mock.ts:26 [simulated] /*  Simulated network helpers                                         */
+frontend\services\decide.mock.ts:29 [setTimeout(] const sleep = (ms = 350) => new Promise(r => setTimeout(r, ms));
+frontend\services\deliberate.ts:373 [/api/home/] * - do not create /api/kialo/*, /api/kintsugi/*, /api/korum/*, or /api/home/*.
+frontend\services\deliberate.ts:373 [/api/kialo/] * - do not create /api/kialo/*, /api/kintsugi/*, /api/korum/*, or /api/home/*.
+frontend\services\deliberate.ts:373 [/api/kintsugi/] * - do not create /api/kialo/*, /api/kintsugi/*, /api/korum/*, or /api/home/*.
+frontend\services\projects.ts:30 [localhost:8000] // baseURL is provided by NEXT_PUBLIC_API_BASE (e.g. http://localhost:8000/api)
+frontend\services\user.ts:34 [localhost:8000] // Dev: we go through Next proxy, so /api/media → http://localhost:8000/media

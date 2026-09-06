@@ -1,0 +1,77 @@
+{
+  "schema": "konnaxion-mega-test-campaign/v1",
+  "generated_at": "2026-09-05T16:19:28",
+  "overall": "FAIL",
+  "repo_root": "C:\\mycode\\Konnaxion\\Konnaxion",
+  "levelup_root": "C:\\mycode\\Konnaxion\\LevelUpDiag",
+  "continue_on_failure": true,
+  "auto_runtime": true,
+  "headed_playwright": false,
+  "results": [
+    {
+      "key": "pytest",
+      "name": "Backend pytest complet",
+      "status": "PASS",
+      "exit_code": 0,
+      "started_at": "2026-09-05T15:57:21",
+      "ended_at": "2026-09-05T15:59:47",
+      "duration_seconds": 146.83,
+      "command": "C:\\mycode\\Konnaxion\\Konnaxion\\backend\\.venv\\Scripts\\python.exe -m pytest --create-db",
+      "cwd": "C:\\mycode\\Konnaxion\\Konnaxion\\backend",
+      "log_file": "C:\\mycode\\Konnaxion\\Konnaxion\\.mega-test-campaign\\20260905_155721\\pytest.log",
+      "note": ""
+    },
+    {
+      "key": "fullscan",
+      "name": "Frontend full-scan",
+      "status": "FAIL",
+      "exit_code": 3221225786,
+      "started_at": "2026-09-05T15:59:52",
+      "ended_at": "2026-09-05T16:15:25",
+      "duration_seconds": 933.06,
+      "command": "\"C:\\Program Files\\PowerShell\\7\\pwsh.exe\" -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:\\mycode\\Konnaxion\\Konnaxion\\frontend\\tools\\full-scan.ps1",
+      "cwd": "C:\\mycode\\Konnaxion\\Konnaxion\\frontend",
+      "log_file": "C:\\mycode\\Konnaxion\\Konnaxion\\.mega-test-campaign\\20260905_155721\\fullscan.log",
+      "note": ""
+    },
+    {
+      "key": "smoke",
+      "name": "Playwright broad",
+      "status": "PASS",
+      "exit_code": 0,
+      "started_at": "2026-09-05T16:15:37",
+      "ended_at": "2026-09-05T16:18:17",
+      "duration_seconds": 159.53,
+      "command": "\"C:\\Program Files\\Volta\\pnpm.exe\" exec playwright test -c playwright.smoke.config.ts",
+      "cwd": "C:\\mycode\\Konnaxion\\Konnaxion\\frontend",
+      "log_file": "C:\\mycode\\Konnaxion\\Konnaxion\\.mega-test-campaign\\20260905_155721\\smoke.log",
+      "note": ""
+    },
+    {
+      "key": "delivery",
+      "name": "Playwright delivery",
+      "status": "PASS",
+      "exit_code": 0,
+      "started_at": "2026-09-05T16:18:21",
+      "ended_at": "2026-09-05T16:19:11",
+      "duration_seconds": 50.35,
+      "command": "\"C:\\Program Files\\Volta\\pnpm.exe\" exec playwright test -c playwright.delivery.config.ts --project=ethikos-delivery",
+      "cwd": "C:\\mycode\\Konnaxion\\Konnaxion\\frontend",
+      "log_file": "C:\\mycode\\Konnaxion\\Konnaxion\\.mega-test-campaign\\20260905_155721\\delivery.log",
+      "note": ""
+    },
+    {
+      "key": "levelup",
+      "name": "LevelUpDiag FULL N00–N11",
+      "status": "FAIL",
+      "exit_code": 3221225786,
+      "started_at": "2026-09-05T16:19:16",
+      "ended_at": "2026-09-05T16:19:28",
+      "duration_seconds": 11.46,
+      "command": "C:\\Users\\rejea\\AppData\\Local\\Microsoft\\WindowsApps\\python.exe C:\\mycode\\Konnaxion\\LevelUpDiag\\scripts\\run_konnaxion.py full",
+      "cwd": "C:\\mycode\\Konnaxion\\LevelUpDiag",
+      "log_file": "C:\\mycode\\Konnaxion\\Konnaxion\\.mega-test-campaign\\20260905_155721\\levelup.log",
+      "note": ""
+    }
+  ]
+}

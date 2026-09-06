@@ -1,0 +1,73 @@
+{
+  "schema": "securitydiag.report.v1",
+  "standard": "SecurityDiag",
+  "standard_version": "1.1.0",
+  "run_id": "20260906T120021Z-80783df8",
+  "level_id": "S01",
+  "level_name": "Target & Security Context",
+  "purpose": "Resolve repository, Git state, safety mode, release phase and configured security targets.",
+  "target_repo_root": "C:\\mycode\\Konnaxion\\Konnaxion",
+  "started_at": "2026-09-06T12:00:22.070887+00:00",
+  "ended_at": "2026-09-06T12:00:22.521681+00:00",
+  "verdict": "WARN",
+  "findings": [
+    {
+      "id": "target.root.exists",
+      "verdict": "PASS",
+      "category": "target",
+      "message": "Target repository root is available.",
+      "path": "C:\\mycode\\Konnaxion\\Konnaxion"
+    },
+    {
+      "id": "target.git.detected",
+      "verdict": "PASS",
+      "category": "vcs",
+      "message": "Git repository detected.",
+      "evidence": {
+        "head": "5a9e4e7cd1ede6ddf3cfc6a2fc0a8faaa80aa554",
+        "branch": "main",
+        "tracked_dirty": true
+      }
+    },
+    {
+      "id": "target.control_dir.ignored",
+      "verdict": "WARN",
+      "category": "vcs",
+      "message": ".securitydiag evidence is not ignored by Git.",
+      "evidence": {
+        "control_dir": ".securitydiag"
+      },
+      "recommendation": "Add .securitydiag/ to .gitignore."
+    },
+    {
+      "id": "runtime.local.platform",
+      "verdict": "PASS",
+      "category": "environment",
+      "message": "Local runtime identified.",
+      "evidence": {
+        "system": "Windows",
+        "release": "11"
+      }
+    },
+    {
+      "id": "security.phase.declared",
+      "verdict": "PASS",
+      "category": "context",
+      "message": "Security phase is predeploy."
+    },
+    {
+      "id": "security.network.execution",
+      "verdict": "PASS",
+      "category": "safety",
+      "message": "Network execution is disabled by default."
+    },
+    {
+      "id": "security.remote.target",
+      "verdict": "SKIP",
+      "category": "context",
+      "message": "Remote VPS checks are disabled."
+    }
+  ],
+  "artifacts": [],
+  "metrics": {}
+}

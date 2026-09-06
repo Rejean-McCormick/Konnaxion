@@ -1,0 +1,250 @@
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:11: * - canonical /api/ethikos/* API surface
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:13: * These tests intentionally avoid /api/kialo/*, /api/kintsugi/*, /api/korum/*,
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:14: * /api/deliberation/*, and /api/home/* because Kintsugi Wave 1 keeps
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:228: return pathname === '/api/ethikos' || pathname.startsWith('/api/ethikos/')
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:233: '/api/kialo',
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:234: '/api/kintsugi',
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:235: '/api/korum',
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:236: '/api/deliberation',
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:237: '/api/deliberate',
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:238: '/api/home',
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:389: api.requestedPaths.some((path) => path.includes('/api/ethikos/topics')),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:392: api.requestedPaths.every((path) => !path.includes('/api/home')),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:419: path.includes(`/api/ethikos/topics/${TOPIC_ID}`),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:424: path.includes(`/api/ethikos/arguments/?topic=${TOPIC_ID}`),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:439: `/api/ethikos/argument-sources/?argument=${argumentId}`,
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:440: `/api/ethikos/argument-impact-votes/?argument=${argumentId}`,
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:441: `/api/ethikos/argument-suggestions/?topic=${topicId}`,
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:442: `/api/ethikos/discussion-participant-roles/?topic=${topicId}`,
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:443: `/api/ethikos/discussion-visibility-settings/?topic=${topicId}`,
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:448: const response = await fetch(url)
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:463: path.includes('/api/ethikos/argument-sources/'),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:468: path.includes('/api/ethikos/argument-impact-votes/'),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:473: path.includes('/api/ethikos/argument-suggestions/'),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:478: path.includes('/api/ethikos/discussion-participant-roles/'),
+frontend\_e2e\ethikos-korum-deliberate.spec.ts:483: path.includes('/api/ethikos/discussion-visibility-settings/'),
+frontend\app\_api\admin\moderation\route.ts:44: const res = await fetch(url, {
+frontend\app\_api\admin\stats\route.ts:48: const res = await fetch(url, {
+frontend\app\_api\search\route.ts:207: const res = await fetch(url.toString(), {
+frontend\app\ethikos\trust\profile\page.tsx:119: <Button onClick={() => void refetch()} type="primary">Retry</Button>
+frontend\app\keenkonnect\projects\browse-projects\page.tsx:39: // Aligned with Django router: /api/keenkonnect/projects/
+frontend\app\keenkonnect\projects\create-new-project\page.tsx:22: // Backend route: /api/keenkonnect/projects/
+frontend\app\keenkonnect\projects\my-projects\page.tsx:32: // Aligne avec le backend: /api/keenkonnect/projects/
+frontend\app\keenkonnect\projects\project-workspace\page.tsx:30: const PROJECTS_ENDPOINT = '/api/projects/';
+frontend\app\konnected\certifications\certification-programs\page.tsx:83: *   GET /api/konnected/certifications/paths/
+frontend\app\konnected\certifications\certification-programs\page.tsx:146: *   GET /api/konnected/certifications/paths/
+frontend\app\konnected\certifications\exam-dashboard-results\page.tsx:100: // - On the wire this becomes:  /api/konnected/certifications/...
+frontend\app\konnected\certifications\exam-preparation\page.tsx:54: * - On the wire this becomes: /api/konnected/certifications/paths/:pathId/preparation-plan/
+frontend\app\konnected\certifications\exam-registration\page.tsx:36: * - Certification paths:   /api/konnected/certifications/paths/
+frontend\app\konnected\certifications\exam-registration\page.tsx:37: * - Exam registrations:    /api/konnected/certifications/evaluations/
+frontend\app\konnected\certifications\exam-registration\page.tsx:39: *     /api/konnected/certifications/paths/:id/eligibility/
+frontend\app\konnected\certifications\exam-registration\page.tsx:40: *     /api/konnected/certifications/paths/:id/sessions/
+frontend\app\konnected\certifications\exam-registration\page.tsx:42: const EXAM_PATHS_ENDPOINT = '/api/konnected/certifications/paths/';
+frontend\app\konnected\certifications\exam-registration\page.tsx:44: `/api/konnected/certifications/paths/${pathId}/sessions/`;
+frontend\app\konnected\certifications\exam-registration\page.tsx:45: const EXAM_REGISTRATION_ENDPOINT = '/api/konnected/certifications/evaluations/';
+frontend\app\konnected\certifications\exam-registration\page.tsx:47: `/api/konnected/certifications/paths/${pathId}/eligibility/`;
+frontend\app\konnected\certifications\exam-registration\page.tsx:145: const res = await apiFetch(EXAM_PATHS_ENDPOINT, {
+frontend\app\konnected\certifications\exam-registration\page.tsx:218: const res = await apiFetch(EXAM_ELIGIBILITY_ENDPOINT(selectedPathId), {
+frontend\app\konnected\certifications\exam-registration\page.tsx:244: const res = await apiFetch(EXAM_SESSIONS_ENDPOINT(selectedPathId), {
+frontend\app\konnected\certifications\exam-registration\page.tsx:319: const res = await apiFetch(EXAM_REGISTRATION_ENDPOINT, {
+frontend\app\konnected\community-discussions\active-threads\page.tsx:73: // Shape returned by /api/forum-topics/
+frontend\app\konnected\community-discussions\active-threads\page.tsx:83: // Shape returned by /api/forum-posts/
+frontend\app\konnected\community-discussions\active-threads\page.tsx:280: <Button icon={<ReloadOutlined />} onClick={() => refetch()} loading={isFetching} />
+frontend\app\konnected\community-discussions\active-threads\page.tsx:473: <Button size="small" onClick={() => refetch()} icon={<ReloadOutlined />}>
+frontend\app\konnected\community-discussions\start-new-discussion\page.tsx:75: * using the real backend endpoints /api/forum-topics/ and /api/forum-posts/.
+frontend\app\konnected\community-discussions\start-new-discussion\page.tsx:101: const topicRes = await apiFetch('/api/forum-topics/', {
+frontend\app\konnected\community-discussions\start-new-discussion\page.tsx:143: const postRes = await apiFetch('/api/forum-posts/', {
+frontend\app\konnected\dashboard\page.tsx:182: const res = await fetch(url, { credentials: "include" });
+frontend\app\konnected\dashboard\page.tsx:214: "/api/knowledge-resources/",
+frontend\app\konnected\dashboard\page.tsx:215: "/api/knowledge/resources/",
+frontend\app\konnected\dashboard\page.tsx:216: "/api/konnected/resources/",
+frontend\app\konnected\dashboard\page.tsx:262: fetchList<PortfolioApi>("/api/portfolios/").catch(() => []),
+frontend\app\konnected\dashboard\page.tsx:263: fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+frontend\app\konnected\dashboard\page.tsx:283: fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+frontend\app\konnected\dashboard\page.tsx:285: fetchList<KnowledgeRecommendationApi>("/api/knowledge-recommendations/").catch(
+frontend\app\konnected\dashboard\page.tsx:357: fetchList<LearningProgressApi>("/api/learning-progress/").catch(() => []),
+frontend\app\konnected\dashboard\page.tsx:406: fetchList<ForumTopicApi>("/api/forum-topics/").catch(() => []),
+frontend\app\konnected\dashboard\page.tsx:407: fetchList<CoCreationProjectApi>("/api/co-creation-projects/").catch(
+frontend\app\konnected\dashboard\page.tsx:448: fetchList<ProjectTeamApi>("/api/project-teams/").catch(() => []),
+frontend\app\konnected\dashboard\page.tsx:449: fetchList<ProjectApi>("/api/projects/").catch(() => []),
+frontend\app\konnected\dashboard\page.tsx:490: "/api/community-dashboard/"
+frontend\app\konnected\learning-library\[resourceId]\page.tsx:79: '/api/konnected/resources/',
+frontend\app\konnected\learning-library\[resourceId]\page.tsx:80: '/api/knowledge-resources/',
+frontend\app\konnected\learning-library\[resourceId]\page.tsx:81: '/api/knowledge/resources/',
+frontend\app\konnected\learning-library\[resourceId]\page.tsx:122: const res = await fetch(url, {
+frontend\app\konnected\learning-library\browse-resources\page.tsx:88: /*  - Aligned with DRF router: /api/konnected/resources/              */
+frontend\app\konnected\learning-library\browse-resources\page.tsx:92: const KNOWLEDGE_RESOURCES_ENDPOINT = '/api/konnected/resources/';
+frontend\app\konnected\learning-library\browse-resources\page.tsx:93: const KNOWLEDGE_METADATA_ENDPOINT = '/api/konnected/resources/metadata/';
+frontend\app\konnected\learning-library\offline-content\page.tsx:130: '/api/konnected/resources/',
+frontend\app\konnected\learning-library\offline-content\page.tsx:131: '/api/knowledge-resources/',
+frontend\app\konnected\learning-library\offline-content\page.tsx:132: '/api/knowledge/resources/',
+frontend\app\konnected\learning-library\offline-content\page.tsx:185: const res = await apiFetch(url);
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:104: const res = await apiFetch(url, {
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:250: * 1. Try the dedicated /api/knowledge-recommendations/ endpoint (when wired).
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:253: *      - /api/knowledge-resources/
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:254: *      - /api/knowledge/resources/
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:255: *      - /api/konnected/resources/  (current DRF router)
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:260: const raw = await fetchJson('/api/knowledge-recommendations/');
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:272: '/api/knowledge-resources/',
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:273: '/api/knowledge/resources/',
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:274: '/api/konnected/resources/',
+frontend\app\konnected\learning-library\recommended-resources\page.tsx:298: await apiFetch('/api/knowledge-recommendations/feedback/', {
+frontend\app\konnected\learning-library\search-filters\page.tsx:100: '/api/knowledge-resources/',
+frontend\app\konnected\learning-library\search-filters\page.tsx:101: '/api/knowledge/resources/',
+frontend\app\konnected\learning-library\search-filters\page.tsx:102: '/api/konnected/resources/',
+frontend\app\konnected\learning-library\search-filters\page.tsx:181: const res = await fetch(url, {
+frontend\app\konnected\learning-paths\create-learning-path\page.tsx:92: const response = await apiFetch(buildUrl("/api/konnected/learning-paths/"), {
+frontend\app\konnected\learning-paths\create-learning-path\page.tsx:134: const response = await apiFetch(
+frontend\app\konnected\learning-paths\create-learning-path\page.tsx:135: buildUrl(`/api/knowledge/resources/${search.toString() ? `?${search}` : ""}`)
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:32: const API_BASE = '/api/konnected/learning-paths'; // Adjust to match your backend
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:103: const res = await apiFetch(
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:121: const res = await apiFetch(`${API_BASE}/${id}`, {
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:136: const res = await apiFetch(`${API_BASE}/${id}/archive`, {
+frontend\app\konnected\learning-paths\manage-existing-paths\page.tsx:147: const res = await apiFetch(`${API_BASE}/${id}`, {
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:257: const res = await fetch('/api/konnected/learning-paths/my', {
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:353: // TODO: POST /api/konnected/learning-paths/{id}/complete (mark learner path as complete)
+frontend\app\konnected\learning-paths\my-learning-path\page.tsx:374: // TODO: POST /api/konnected/learning-paths/{id}/leave (leave learning path)
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:78: const MY_TEAMS_ENDPOINT = '/api/konnected/teams/my-teams';
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:80: `/api/konnected/teams/${encodeURIComponent(teamId)}/leave`;
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:136: const res = await apiFetch(MY_TEAMS_ENDPOINT, {
+frontend\app\konnected\teams-collaboration\my-teams\page.tsx:190: const res = await apiFetch(LEAVE_TEAM_ENDPOINT(team.teamId), {
+frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx:82: /** Shape of /api/keenkonnect/projects/ from the Django backend */
+frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx:95: /** Shape of /api/users/me/ */
+frontend\app\konnected\teams-collaboration\project-workspaces\page.tsx:203: // KeenKonnect projects list → /api/keenkonnect/projects/
+frontend\app\konnected\teams-collaboration\team-builder\page.tsx:108: *   POST /api/konnected/teams
+frontend\app\konnected\teams-collaboration\team-builder\page.tsx:109: *   or POST /api/project-teams
+frontend\app\konnected\teams-collaboration\team-builder\page.tsx:112: const response = await apiFetch('/api/konnected/teams', {
+frontend\app\kontrol\audit-log\page.tsx:260: const response = await fetch(
+frontend\app\kontrol\audit-log\page.tsx:261: `/api/admin/audit-log/?${searchParams.toString()}`,
+frontend\app\kontrol\konsensus\page.tsx:189: const res = await apiFetch(
+frontend\app\kontrol\konsensus\page.tsx:190: '/api/admin/konsensus-config/',
+frontend\app\kontrol\konsensus\page.tsx:287: const res = await apiFetch(
+frontend\app\kontrol\konsensus\page.tsx:288: '/api/admin/konsensus-config/',
+frontend\app\kontrol\moderation\queue\page.tsx:113: const response = await apiFetch(`/api/admin/moderation/${id}/`, {
+frontend\app\kontrol\moderation\queue\page.tsx:328: const res = await apiFetch(
+frontend\app\kontrol\moderation\queue\page.tsx:329: `/api/admin/moderation/?${searchParams.toString()}`,
+frontend\app\kontrol\users\all\page.tsx:272: const response = await fetch(
+frontend\app\kontrol\users\all\page.tsx:273: `/api/admin/users/?${searchParams.toString()}`,
+frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx:37: // TODO: plug into backend API when available (e.g. POST /api/showcases)
+frontend\app\kreative\community-showcases\submit-to-showcase\page.tsx:38: // await fetch('/api/showcases', { method: 'POST', body: JSON.stringify(values) });
+frontend\app\reports\perf\page.tsx:84: key: '/api/keenkonnect/projects/',
+frontend\app\reports\perf\page.tsx:85: endpoint: '/api/keenkonnect/projects/',
+frontend\app\reports\perf\page.tsx:93: key: '/api/ethikos/decide/',
+frontend\app\reports\perf\page.tsx:94: endpoint: '/api/ethikos/decide/',
+frontend\app\reports\perf\page.tsx:102: key: '/api/ekoh/votes/',
+frontend\app\reports\perf\page.tsx:103: endpoint: '/api/ekoh/votes/',
+frontend\app\reports\perf\page.tsx:111: key: '/api/konnected/learning-paths/',
+frontend\app\reports\perf\page.tsx:112: endpoint: '/api/konnected/learning-paths/',
+frontend\app\reports\perf\page.tsx:183: const perfRes = await fetch(`/api/reports/perf/?range=${nextRange}`, {
+frontend\app\reports\smart-vote\page.tsx:121: const res = await fetch(`/api/reports/smart-vote/?range=${key}`);
+frontend\app\search\GlobalSearchClient.tsx:92: const res = await fetch(`/_api/search?${params.toString()}`, {
+frontend\app\page.tsx:57: process.env.NEXT_PUBLIC_BACKEND_BASE,
+frontend\features\ethikos\demo-importer\api.ts:17: export const ETHIKOS_DEMO_API_PATH = "/api/ethikos/demo-scenarios";
+frontend\features\ethikos\demo-importer\api.ts:22: * Leave empty when the frontend already proxies /api/* to Django.
+frontend\features\ethikos\demo-importer\api.ts:182: response = await fetch(normalizedEndpoint, {
+frontend\lib\api-client.ts:16: const res = await fetch(buildUrl(path), {
+frontend\modules\admin\hooks\useModeration.ts:19: (await api.get<ModerationItem[]>("/api/admin/moderation")).data,
+frontend\modules\admin\hooks\useStats.ts:15: queryFn: async () => (await api.get<AdminStats>("/api/admin/stats")).data,
+frontend\modules\ethikos\decide\public\page.tsx:4: // The historical /api/home/* implementation duplicated a now-forbidden API
+frontend\modules\ethikos\decide\public\page.tsx:6: // ethiKos page, which uses services/decide -> /api/ethikos/*.
+frontend\modules\global\hooks\useGlobalSearch.ts:78: res = await fetch(`/_api/search?${params.toString()}`, {
+frontend\modules\konsultations\components\ConsultationList.tsx:31: // Standalone /api/konsultations/* routes are forbidden in the current
+frontend\modules\konsultations\hooks\useConsultation.ts:123: void query.refetch();
+frontend\modules\konsultations\hooks\useConsultationResults.ts:10: * Backend: GET /api/ethikos/stances/?topic=<id>
+frontend\modules\konsultations\hooks\useConsultationResults.ts:143: *   GET /api/ethikos/stances/?topic=<consultationId>
+frontend\modules\konsultations\hooks\useSuggestions.ts:10: * Raw Ethikos argument shape as returned by /api/ethikos/arguments/.
+frontend\modules\konsultations\hooks\useSuggestions.ts:169: const res = await query.refetch();
+frontend\modules\konsultations\pages\ResultsPage.tsx:76: fetch(`/api/konsultations/consultations/${id}`),
+frontend\modules\konsultations\pages\ResultsPage.tsx:77: fetch(`/api/konsultations/consultations/${id}/results`),
+frontend\modules\kontact\hooks\useOpportunities.ts:353: '/api/kontact/opportunities/',
+frontend\modules\kontact\hooks\useOpportunities.ts:354: '/api/opportunities/',
+frontend\modules\kontact\hooks\useOpportunities.ts:355: '/api/keenkonnect/opportunities/',
+frontend\modules\kontact\hooks\useOpportunities.ts:362: const res = await fetch(`${base}${suffix}`, {
+frontend\services\deliberate.ts:368: *   GET /api/ethikos/topics/{id}/preview/
+frontend\services\deliberate.ts:373: * - do not create /api/kialo/*, /api/kintsugi/*, /api/korum/*, or /api/home/*.
+frontend\services\ethikos.ts:12: * by services/_request.ts. Do not add `/api/` here.
+frontend\services\ethikos.ts:16: * - canonical ethiKos API paths remain /api/ethikos/* server-side;
+frontend\services\projects.ts:3: // Thin service layer around the backend /api/projects/ endpoints.
+frontend\services\projects.ts:27: * Backend: GET /api/projects/
+frontend\services\projects.ts:36: * Backend: GET /api/projects/:id/
+frontend\services\projects.ts:52: * Backend: POST /api/projects/
+frontend\services\projects.ts:63: * Backend: PUT /api/projects/:id/
+frontend\services\projects.ts:74: * Backend: DELETE /api/projects/:id/
+frontend\services\user.ts:3: // Wrapper around /api/users/me/ + helpers for avatar_url
+frontend\services\user.ts:8: * Shape returned by /api/users/me/.
+frontend\services\user.ts:34: // Dev: we go through Next proxy, so /api/media → http://localhost:8000/media
+frontend\services\user.ts:37: // Typical Django: API at /api/*, media at /media/*
+frontend\services\user.ts:52: * Fetch the authenticated user via /api/users/me/.
+frontend\services\user.ts:78: // Special‑case: backend (or old frontend) already prefixed with /api/media/…
+frontend\services\user.ts:79: if (src.startsWith('/api/media/')) {
+frontend\services\user.ts:84: // Generic /api/... path: if we have a real host in API_BASE, attach it
+frontend\services\user.ts:85: if (src.startsWith('/api/')) {
+frontend\services\user.ts:118: *   POST /api/users/me/avatar/
+frontend\shared\services\admin.ts:28: const res = await fetch(path, {
+frontend\shared\services\search.ts:45: "/api/knowledge-resources/",
+frontend\shared\services\search.ts:46: "/api/knowledge/resources/",
+frontend\shared\services\search.ts:47: "/api/konnected/resources/",
+frontend\shared\services\search.ts:101: const res = await fetch(url, {
+frontend\shared\downloadCsv.ts:19: const url = `/api/reports/export?${search.toString()}`;
+frontend\shared\downloadCsv.ts:21: const res = await fetch(url);
+frontend\smoke\smoke.spec.ts:6: '/ethikos/api/admin/moderation',
+frontend\tests\auth.setup.ts:5: const BACKEND_BASE_URL =
+frontend\tests\auth.setup.ts:6: process.env.BACKEND_BASE_URL ?? 'http://localhost:8000'
+frontend\tests\auth.setup.ts:22: return new URL(route, BACKEND_BASE_URL).toString()
+frontend\tests\auth.setup.ts:64: const cookies = await page.context().cookies(BACKEND_BASE_URL)
+frontend\tests\auth.setup.ts:74: const response = await page.context().request.get(backendUrl('/api/users/me/'), {
+frontend\tests\auth.setup.ts:82: `Expected authenticated backend /api/users/me/ response, got HTTP ${response.status()}: ${body}`,
+frontend\tests\auth.setup.ts:85: expect(body, 'Authenticated /api/users/me/ should not be empty').not.toEqual('')
+frontend\tests\ethikos-authenticated-workflow.spec.ts:8: const BACKEND_BASE_URL =
+frontend\tests\ethikos-authenticated-workflow.spec.ts:9: process.env.BACKEND_BASE_URL ?? 'http://localhost:8000'
+frontend\tests\ethikos-authenticated-workflow.spec.ts:57: backendUrl('/api/ethikos/topics/'),
+frontend\tests\ethikos-authenticated-workflow.spec.ts:85: return new URL(route, BACKEND_BASE_URL).toString()
+frontend\tests\ethikos-authenticated-workflow.spec.ts:89: if (pathname.startsWith('/api/')) {
+frontend\tests\ethikos-authenticated-workflow.spec.ts:93: return `/api/${pathname.replace(/^\/+/, '')}`
+frontend\tests\ethikos-authenticated-workflow.spec.ts:177: const cookies = await page.context().cookies(BACKEND_BASE_URL)
+frontend\tests\ethikos-authenticated-workflow.spec.ts:200: const response = await page.context().request.fetch(url, {
+frontend\tests\ethikos-authenticated-workflow.spec.ts:267: '/api/ethikos/discussion-participant-roles/',
+frontend\tests\ethikos-authenticated-workflow.spec.ts:284: `/api/ethikos/discussion-participant-roles/?topic=${topicId}`,
+frontend\tests\ethikos-authenticated-workflow.spec.ts:289: 'Seeded participant role should be readable when /api/users/me/ does not expose id/pk',
+frontend\tests\ethikos-authenticated-workflow.spec.ts:299: `/api/ethikos/discussion-visibility-settings/?topic=${topicId}`,
+frontend\tests\ethikos-authenticated-workflow.spec.ts:307: `/api/ethikos/discussion-visibility-settings/${existing.id}/`,
+frontend\tests\ethikos-authenticated-workflow.spec.ts:324: '/api/ethikos/discussion-visibility-settings/',
+frontend\tests\ethikos-authenticated-workflow.spec.ts:457: const meResponse = await apiRequest<UserMe>(page, '/api/users/me/')
+frontend\tests\ethikos-authenticated-workflow.spec.ts:461: await apiRequest(page, `/api/ethikos/topics/${topicId}/`)
+frontend\tests\ethikos-authenticated-workflow.spec.ts:463: await apiRequest(page, '/api/ethikos/stances/', {
+frontend\tests\ethikos-authenticated-workflow.spec.ts:478: '/api/ethikos/arguments/',
+frontend\tests\ethikos-authenticated-workflow.spec.ts:493: '/api/ethikos/arguments/',
+frontend\tests\ethikos-authenticated-workflow.spec.ts:509: '/api/ethikos/argument-sources/',
+frontend\tests\ethikos-authenticated-workflow.spec.ts:528: '/api/ethikos/argument-impact-votes/',
+frontend\tests\ethikos-authenticated-workflow.spec.ts:542: '/api/ethikos/argument-suggestions/',
+frontend\tests\ethikos-delivery-workflow.spec.ts:8: const BACKEND_BASE_URL =
+frontend\tests\ethikos-delivery-workflow.spec.ts:9: process.env.BACKEND_BASE_URL ?? 'http://localhost:8000'
+frontend\tests\ethikos-delivery-workflow.spec.ts:98: return new URL(route, BACKEND_BASE_URL).toString()
+frontend\tests\ethikos-delivery-workflow.spec.ts:103: const backendHost = new URL(BACKEND_BASE_URL).hostname
+frontend\tests\ethikos-delivery-workflow.spec.ts:223: backendUrl('/api/users/me/'),
+frontend\tests\ethikos-delivery-workflow.spec.ts:230: `Expected authenticated /api/users/me/, got HTTP ${response.status()}: ${body}`,
+frontend\tests\ethikos-delivery-workflow.spec.ts:254: let nextUrl: string | null = backendUrl('/api/ethikos/topics/')
+frontend\tests\ethikos-delivery-workflow.spec.ts:552: backendUrl(`/api/v1/smart-vote/readings/ethikos-topic/${topicId}/`),
+frontend\tests\ethikos-delivery-workflow.spec.ts:798: backendBaseUrl: BACKEND_BASE_URL,
+frontend\tests\routes.spec.ts:32: '/api/kialo',
+frontend\tests\routes.spec.ts:33: '/api/kintsugi',
+frontend\tests\routes.spec.ts:34: '/api/korum',
+frontend\tests\routes.spec.ts:35: '/api/deliberation',
+frontend\tests\routes.spec.ts:36: '/api/deliberate',
+frontend\tests\routes.spec.ts:37: '/api/home',
+frontend\api.ts:89: // Prevent accidental /api/api/... when callers pass "/api/ethikos/..."
+frontend\api.ts:212: *   from fetch(...) to apiFetch(...) without changing response handling.
+frontend\api.ts:214: export async function apiFetch(
+frontend\api.ts:234: return fetch(input, {
+frontend\api.ts:309: const res = await apiFetch(url, {
+frontend\next.config.ts:7: const DEFAULT_API_PROXY_BASE =
+frontend\next.config.ts:12: const API_PROXY_BASE = (
+frontend\next.config.ts:13: process.env.API_PROXY_BASE ??
+frontend\next.config.ts:14: process.env.INTERNAL_API_BASE ??
+frontend\next.config.ts:15: DEFAULT_API_PROXY_BASE
+frontend\next.config.ts:30: { source: '/api/healthz', destination: '/_api/health' },
+frontend\next.config.ts:34: // Browser code should call /api/*.
+frontend\next.config.ts:35: // Next rewrites /api/* to the server-only backend proxy base.
+frontend\next.config.ts:38: //   API_PROXY_BASE=http://localhost:8000/api
+frontend\next.config.ts:41: //   API_PROXY_BASE=http://django-api:8000/api
+frontend\next.config.ts:44: { source: '/api/:path*', destination: `${API_PROXY_BASE}/:path*/` },

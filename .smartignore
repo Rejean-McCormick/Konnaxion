@@ -66,3 +66,6 @@ manifest_*.yml
 .mypy_cache/
 .ruff_cache/
 __pycache__/
+
+# SecurityDiag generated evidence
+.securitydiag/

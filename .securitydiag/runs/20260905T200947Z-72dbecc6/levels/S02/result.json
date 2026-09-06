@@ -1,0 +1,108 @@
+{
+  "schema": "securitydiag.report.v1",
+  "standard": "SecurityDiag",
+  "standard_version": "1.1.0",
+  "run_id": "20260905T200947Z-72dbecc6",
+  "level_id": "S02",
+  "level_name": "Repository Secrets & Artifact Hygiene",
+  "purpose": "Detect tracked secrets, private keys, sensitive env files and risky deployment artifacts without copying secret values.",
+  "target_repo_root": "C:\\mycode\\Konnaxion\\Konnaxion",
+  "started_at": "2026-09-05T20:09:48.973877+00:00",
+  "ended_at": "2026-09-05T20:09:54.347665+00:00",
+  "verdict": "WARN",
+  "findings": [
+    {
+      "id": "repo.secrets.tracked_patterns",
+      "verdict": "PASS",
+      "category": "secrets",
+      "message": "No conservative secret pattern matched in tracked files.",
+      "release_blocker": false
+    },
+    {
+      "id": "repo.secrets.sensitive_files",
+      "verdict": "WARN",
+      "category": "secrets",
+      "message": "Sensitive filename review completed.",
+      "evidence": [
+        {
+          "path": "backend/.env",
+          "tracked": false
+        }
+      ],
+      "recommendation": "Production env/private-key files must not be tracked; keep machine-local secrets outside releases."
+    },
+    {
+      "id": "repo.deploy_archives.tracked",
+      "verdict": "WARN",
+      "category": "artifact_hygiene",
+      "message": "Tracked deployment/archive files were found.",
+      "evidence": [
+        {
+          "path": ".levelupdiag/latest.zip",
+          "tracked": true
+        },
+        {
+          "path": "backend/konnaxion/ethikos_20260903_131935_Dump/Code_snapshot_ethikos.zip",
+          "tracked": true
+        },
+        {
+          "path": "docs/TO_DO_semantic-multilingual-update.zip",
+          "tracked": true
+        },
+        {
+          "path": "docs/Technical-Reference/EkoH Smart Vote.zip",
+          "tracked": true
+        },
+        {
+          "path": "frontend/app/ethikos_20260903_132014_Dump/Code_snapshot_ethikos.zip",
+          "tracked": true
+        },
+        {
+          "path": "frontend/components/AntDesignComponents.zip",
+          "tracked": true
+        }
+      ],
+      "recommendation": "Prefer versioned Git source/archive creation outside the repository."
+    },
+    {
+      "id": "repo.secrets.untracked_patterns",
+      "verdict": "WARN",
+      "category": "secrets",
+      "message": "Potential secret material exists in untracked/local files.",
+      "evidence": [
+        {
+          "pattern": "secret-assignment",
+          "path": "backend/.env",
+          "line": 5,
+          "tracked": false
+        },
+        {
+          "pattern": "secret-assignment",
+          "path": "backend/.envs/.local/.postgres",
+          "line": 2,
+          "tracked": false
+        },
+        {
+          "pattern": "secret-assignment",
+          "path": "backend/.envs/.production/.django",
+          "line": 9,
+          "tracked": false
+        },
+        {
+          "pattern": "secret-assignment",
+          "path": "backend/.envs/.production/.postgres",
+          "line": 5,
+          "tracked": false
+        }
+      ],
+      "recommendation": "Ensure untracked secrets are excluded from deployment archives and logs."
+    }
+  ],
+  "artifacts": [],
+  "metrics": {
+    "files_scanned": 1428,
+    "tracked_files": 1493,
+    "potential_hits": 4,
+    "sensitive_paths": 1
+  }
+}

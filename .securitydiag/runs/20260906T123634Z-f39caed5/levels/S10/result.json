@@ -1,0 +1,28 @@
+{
+  "schema": "securitydiag.report.v1",
+  "standard": "SecurityDiag",
+  "standard_version": "1.1.0",
+  "run_id": "20260906T123634Z-f39caed5",
+  "level_id": "S10",
+  "level_name": "Secrets & Filesystem Permissions",
+  "purpose": "Verify sensitive remote paths and SSH material are not broadly readable.",
+  "target_repo_root": "C:\\mycode\\Konnaxion\\Konnaxion",
+  "started_at": "2026-09-06T12:36:35.627317+00:00",
+  "ended_at": "2026-09-06T12:36:35.627317+00:00",
+  "verdict": "BLOCKED",
+  "findings": [
+    {
+      "id": "dependencies.required.blocked",
+      "verdict": "BLOCKED",
+      "category": "dependency",
+      "message": "A required dependency did not produce usable evidence.",
+      "evidence": {
+        "dependencies": {
+          "S05": "BLOCKED"
+        }
+      }
+    }
+  ],
+  "artifacts": [],
+  "metrics": {}
+}

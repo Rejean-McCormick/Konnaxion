@@ -1,12 +1,21 @@
 {
-  "session_id": "kxdiag-20260904_190345-d8cc4b73",
-  "started_at": "2026-09-04T19:03:45-04:00",
+  "session_id": "kxdiag-20260905_161917-d659cc6c",
+  "started_at": "2026-09-05T16:19:17-04:00",
   "target": "C:\\mycode\\Konnaxion\\Konnaxion",
-  "campaign": "console-custom",
+  "campaign": "full",
   "expected_levels": [
     "N00",
+    "N01",
+    "N02",
+    "N03",
+    "N04",
     "N05",
+    "N06",
+    "N07",
+    "N08",
+    "N09",
+    "N10",
     "N11"
   ],
-  "run_id": "20260904T190345-bfe37f10"
+  "run_id": "20260905T161917-4744b658"
 }

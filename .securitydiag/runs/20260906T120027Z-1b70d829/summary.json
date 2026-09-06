@@ -1,0 +1,62 @@
+{
+  "schema": "securitydiag.campaign-summary.v1",
+  "standard": "SecurityDiag",
+  "standard_version": "1.1.0",
+  "run_id": "20260906T120027Z-1b70d829",
+  "selection": "S09",
+  "target_repo_root": "C:\\mycode\\Konnaxion\\Konnaxion",
+  "started_at": "2026-09-06T12:00:27.539866+00:00",
+  "ended_at": "2026-09-06T12:00:28.153766+00:00",
+  "verdict": "BLOCKED",
+  "counts": {
+    "PASS": 1,
+    "BLOCKED": 4
+  },
+  "expected_levels": [
+    "S00",
+    "S05",
+    "S07",
+    "S08",
+    "S09"
+  ],
+  "required_levels": [
+    "S00",
+    "S05",
+    "S07",
+    "S08",
+    "S09"
+  ],
+  "levels": [
+    {
+      "id": "S00",
+      "name": "Diagnostic Integrity",
+      "verdict": "PASS",
+      "result": "levels\\S00\\result.json"
+    },
+    {
+      "id": "S05",
+      "name": "Clean Host & OS Baseline",
+      "verdict": "BLOCKED",
+      "result": "levels\\S05\\result.json"
+    },
+    {
+      "id": "S07",
+      "name": "Firewall & Listening Ports",
+      "verdict": "BLOCKED",
+      "result": "levels\\S07\\result.json"
+    },
+    {
+      "id": "S08",
+      "name": "Docker & Capsule Runtime Policy",
+      "verdict": "BLOCKED",
+      "result": "levels\\S08\\result.json"
+    },
+    {
+      "id": "S09",
+      "name": "Runtime Isolation, Agent & Security Gate",
+      "verdict": "BLOCKED",
+      "result": "levels\\S09\\result.json"
+    }
+  ],
+  "target_protection": null
+}

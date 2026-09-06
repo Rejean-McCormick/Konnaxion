@@ -1,0 +1,332 @@
+backend\config\settings\base.py:11: BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+backend\config\api_router.py:8: path("api/", include("config.api_router"))
+backend\config\api_router.py:15: - Register Wave 1 additions as optional until their ViewSets exist.
+backend\config\api_router.py:34: ViewSetType = Type[Any]
+backend\config\api_router.py:35: OptionalViewSet = Optional[ViewSetType]
+backend\config\api_router.py:88: def optional_viewset(module: Any, *candidate_names: str) -> OptionalViewSet:
+backend\config\api_router.py:90: Return the first ViewSet found on a module.
+backend\config\api_router.py:92: This supports gradual Kintsugi implementation where a ViewSet may be named
+backend\config\api_router.py:93: either with a concise name, e.g. `ArgumentSourceViewSet`, or with an
+backend\config\api_router.py:94: explicit ethiKos-prefixed name, e.g. `EthikosArgumentSourceViewSet`.
+backend\config\api_router.py:97: viewset = getattr(module, candidate_name, None)
+backend\config\api_router.py:98: if viewset is not None:
+backend\config\api_router.py:99: return viewset
+backend\config\api_router.py:109: from konnaxion.users.api.views import UserViewSet  # /api/users/...
+backend\config\api_router.py:114: BuilderSessionViewSet,
+backend\config\api_router.py:115: ProblemViewSet,
+backend\config\api_router.py:116: TeamViewSet,
+backend\config\api_router.py:123: # Required baseline ethiKos ViewSets.
+backend\config\api_router.py:125: TopicViewSet = ethikos_api.TopicViewSet
+backend\config\api_router.py:126: StanceViewSet = ethikos_api.StanceViewSet
+backend\config\api_router.py:127: ArgumentViewSet = ethikos_api.ArgumentViewSet
+backend\config\api_router.py:129: # Optional category ViewSet.
+backend\config\api_router.py:130: # Name may be CategoryViewSet or EthikosCategoryViewSet depending on snapshot.
+backend\config\api_router.py:131: EthikosCategoryViewSet: OptionalViewSet = optional_viewset(
+backend\config\api_router.py:133: "CategoryViewSet",
+backend\config\api_router.py:134: "EthikosCategoryViewSet",
+backend\config\api_router.py:137: # Optional Kintsugi Wave 1 / Korum ViewSets.
+backend\config\api_router.py:139: # routes only when the corresponding ViewSets are implemented in
+backend\config\api_router.py:141: ArgumentSourceViewSet: OptionalViewSet = optional_viewset(
+backend\config\api_router.py:143: "ArgumentSourceViewSet",
+backend\config\api_router.py:144: "EthikosArgumentSourceViewSet",
+backend\config\api_router.py:147: ArgumentImpactVoteViewSet: OptionalViewSet = optional_viewset(
+backend\config\api_router.py:149: "ArgumentImpactVoteViewSet",
+backend\config\api_router.py:150: "EthikosArgumentImpactVoteViewSet",
+backend\config\api_router.py:153: ArgumentSuggestionViewSet: OptionalViewSet = optional_viewset(
+backend\config\api_router.py:155: "ArgumentSuggestionViewSet",
+backend\config\api_router.py:156: "EthikosArgumentSuggestionViewSet",
+backend\config\api_router.py:159: DiscussionParticipantRoleViewSet: OptionalViewSet = optional_viewset(
+backend\config\api_router.py:161: "DiscussionParticipantRoleViewSet",
+backend\config\api_router.py:162: "EthikosDiscussionParticipantRoleViewSet",
+backend\config\api_router.py:165: DiscussionVisibilitySettingViewSet: OptionalViewSet = optional_viewset(
+backend\config\api_router.py:167: "DiscussionVisibilitySettingViewSet",
+backend\config\api_router.py:168: "EthikosDiscussionVisibilitySettingViewSet",
+backend\config\api_router.py:174: ProjectMessageViewSet,
+backend\config\api_router.py:175: ProjectRatingViewSet,
+backend\config\api_router.py:176: ProjectResourceViewSet,
+backend\config\api_router.py:177: ProjectTaskViewSet,
+backend\config\api_router.py:178: ProjectTeamViewSet,
+backend\config\api_router.py:179: ProjectViewSet,
+backend\config\api_router.py:180: TagViewSet as KeenKonnectTagViewSet,
+backend\config\api_router.py:185: # Vote-related ViewSets are optional for now; the app's api_views module may be
+backend\config\api_router.py:187: VoteViewSet: OptionalViewSet
+backend\config\api_router.py:188: VoteResultViewSet: OptionalViewSet
+backend\config\api_router.py:193: VoteViewSet = optional_viewset(kollective_api, "VoteViewSet")
+backend\config\api_router.py:194: VoteResultViewSet = optional_viewset(kollective_api, "VoteResultViewSet")
+backend\config\api_router.py:196: VoteViewSet = None
+backend\config\api_router.py:197: VoteResultViewSet = None
+backend\config\api_router.py:202: CertificationPathViewSet,
+backend\config\api_router.py:203: EvaluationViewSet,
+backend\config\api_router.py:204: ExamAttemptViewSet,
+backend\config\api_router.py:205: KnowledgeResourceViewSet,
+backend\config\api_router.py:206: PeerValidationViewSet,
+backend\config\api_router.py:207: PortfolioViewSet,
+backend\config\api_router.py:210: # OfflinePackageViewSet is optional; it will be present once the offline-packages
+backend\config\api_router.py:212: OfflinePackageViewSet: OptionalViewSet
+backend\config\api_router.py:216: OfflinePackageViewSet as _OfflinePackageViewSet,
+backend\config\api_router.py:219: OfflinePackageViewSet = _OfflinePackageViewSet
+backend\config\api_router.py:221: OfflinePackageViewSet = None
+backend\config\api_router.py:226: CollabSessionViewSet,
+backend\config\api_router.py:227: GalleryViewSet,
+backend\config\api_router.py:228: KreativeArtworkViewSet,
+backend\config\api_router.py:229: TagViewSet as KreativeTagViewSet,
+backend\config\api_router.py:230: TraditionEntryViewSet,
+backend\config\api_router.py:237: AuditLogViewSet: OptionalViewSet
+backend\config\api_router.py:238: ModerationTicketViewSet: OptionalViewSet
+backend\config\api_router.py:239: UserAdminViewSet: OptionalViewSet
+backend\config\api_router.py:240: KonsensusConfigViewSet: OptionalViewSet
+backend\config\api_router.py:244: AuditLogViewSet as _AuditLogViewSet,
+backend\config\api_router.py:245: KonsensusConfigViewSet as _KonsensusConfigViewSet,
+backend\config\api_router.py:246: ModerationTicketViewSet as _ModerationTicketViewSet,
+backend\config\api_router.py:247: UserAdminViewSet as _UserAdminViewSet,
+backend\config\api_router.py:250: AuditLogViewSet = _AuditLogViewSet
+backend\config\api_router.py:251: ModerationTicketViewSet = _ModerationTicketViewSet
+backend\config\api_router.py:252: UserAdminViewSet = _UserAdminViewSet
+backend\config\api_router.py:253: KonsensusConfigViewSet = _KonsensusConfigViewSet
+backend\config\api_router.py:255: AuditLogViewSet = None
+backend\config\api_router.py:256: ModerationTicketViewSet = None
+backend\config\api_router.py:257: UserAdminViewSet = None
+backend\config\api_router.py:258: KonsensusConfigViewSet = None
+backend\config\api_router.py:270: viewset: ViewSetType,
+backend\config\api_router.py:274: Register a required ViewSet after checking no-drift routing rules.
+backend\config\api_router.py:277: router.register(prefix, viewset, basename=basename)
+backend\config\api_router.py:282: viewset: OptionalViewSet,
+backend\config\api_router.py:286: Register an optional ViewSet after checking no-drift routing rules.
+backend\config\api_router.py:288: Optional ViewSets are ignored until their implementation lands. This lets
+backend\config\api_router.py:289: shared/common files be updated before every slice-specific ViewSet exists.
+backend\config\api_router.py:293: if viewset is not None:
+backend\config\api_router.py:294: router.register(prefix, viewset, basename=basename)
+backend\config\api_router.py:302: register_required("users", UserViewSet, basename="user")
+backend\config\api_router.py:308: BuilderSessionViewSet,
+backend\config\api_router.py:313: TeamViewSet,
+backend\config\api_router.py:318: ProblemViewSet,
+backend\config\api_router.py:324: register_required(ETHIKOS_TOPICS_PREFIX, TopicViewSet, basename="ethikos-topic")
+backend\config\api_router.py:325: register_required(ETHIKOS_STANCES_PREFIX, StanceViewSet, basename="ethikos-stance")
+backend\config\api_router.py:328: ArgumentViewSet,
+backend\config\api_router.py:336: EthikosCategoryViewSet,
+backend\config\api_router.py:346: ArgumentSourceViewSet,
+backend\config\api_router.py:351: ArgumentImpactVoteViewSet,
+backend\config\api_router.py:356: ArgumentSuggestionViewSet,
+backend\config\api_router.py:361: DiscussionParticipantRoleViewSet,
+backend\config\api_router.py:366: DiscussionVisibilitySettingViewSet,
+backend\config\api_router.py:375: ProjectViewSet,
+backend\config\api_router.py:380: register_required("projects", ProjectViewSet, basename="project")
+backend\config\api_router.py:384: ProjectResourceViewSet,
+backend\config\api_router.py:389: ProjectTaskViewSet,
+backend\config\api_router.py:394: ProjectMessageViewSet,
+backend\config\api_router.py:399: ProjectTeamViewSet,
+backend\config\api_router.py:404: ProjectRatingViewSet,
+backend\config\api_router.py:409: KeenKonnectTagViewSet,
+backend\config\api_router.py:417: VoteViewSet,
+backend\config\api_router.py:422: VoteResultViewSet,
+backend\config\api_router.py:430: KnowledgeResourceViewSet,
+backend\config\api_router.py:440: OfflinePackageViewSet,
+backend\config\api_router.py:448: CertificationPathViewSet,
+backend\config\api_router.py:453: EvaluationViewSet,
+backend\config\api_router.py:458: PeerValidationViewSet,
+backend\config\api_router.py:463: PortfolioViewSet,
+backend\config\api_router.py:468: ExamAttemptViewSet,
+backend\config\api_router.py:476: KreativeArtworkViewSet,
+backend\config\api_router.py:481: GalleryViewSet,
+backend\config\api_router.py:486: CollabSessionViewSet,
+backend\config\api_router.py:491: TraditionEntryViewSet,
+backend\config\api_router.py:496: KreativeTagViewSet,
+backend\config\api_router.py:504: AuditLogViewSet,
+backend\config\api_router.py:509: ModerationTicketViewSet,
+backend\config\api_router.py:514: UserAdminViewSet,
+backend\config\api_router.py:519: KonsensusConfigViewSet,
+backend\config\asgi.py:21: BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+backend\config\urls.py:10: from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+backend\config\urls.py:14: path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
+backend\config\urls.py:15: path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
+backend\config\urls.py:17: path(settings.ADMIN_URL, admin.site.urls),
+backend\config\urls.py:19: path("users/", include(("konnaxion.users.urls", "users"), namespace="users")),
+backend\config\urls.py:20: path("accounts/", include("allauth.urls")),
+backend\config\urls.py:33: # - /api/admin/users (UserAdminViewSet)
+backend\config\urls.py:34: # - /api/admin/moderation (ModerationTicketViewSet)
+backend\config\urls.py:35: # - /api/admin/audit-log (AuditLogViewSet)
+backend\config\urls.py:36: path("api/", include("config.api_router")),
+backend\config\urls.py:44: path("api/ethikos/", include("konnaxion.ethikos.demo_import.urls")),
+backend\config\urls.py:47: path("api/auth-token/", obtain_auth_token, name="obtain_auth_token"),
+backend\config\urls.py:50: path("api/schema/", SpectacularAPIView.as_view(), name="api-schema"),
+backend\config\urls.py:51: path("api/docs/", SpectacularSwaggerView.as_view(url_name="api-schema"), name="api-docs"),
+backend\config\urls.py:57: path("api/v1/ekoh/", include("konnaxion.ekoh.urls")),
+backend\config\urls.py:63: path("api/v1/smart-vote/", include("konnaxion.smart_vote.urls")),
+backend\config\urls.py:70: path("api/", include("konnaxion.kontrol.urls", namespace="kontrol")),
+backend\config\urls.py:77: path(
+backend\config\urls.py:81: path(
+backend\config\urls.py:93: path("400/", default_views.bad_request, kwargs={"exception": Exception("Bad Request!")}),
+backend\config\urls.py:94: path("403/", default_views.permission_denied, kwargs={"exception": Exception("Permission Denied")}),
+backend\config\urls.py:95: path("404/", default_views.page_not_found, kwargs={"exception": Exception("Page not Found")}),
+backend\config\urls.py:96: path("500/", default_views.server_error),
+backend\config\urls.py:101: urlpatterns = [path("__debug__/", include(debug_toolbar.urls)), *urlpatterns]
+backend\config\wsgi.py:26: BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
+backend\docs\conf.py:21: sys.path.insert(0, os.path.abspath(".."))
+backend\docs\conf.py:25: sys.path.insert(0, os.path.abspath("/app"))
+backend\konnaxion\ekoh\management\commands\load_isced.py:21: Path(__file__).resolve().parents[2] / "fixtures" / "isced_f_2013.json"
+backend\konnaxion\ekoh\management\commands\load_isced.py:45: set_local_ekoh_smartvote_search_path()
+backend\konnaxion\ekoh\services\contextual_analysis.py:48: set_local_ekoh_smartvote_search_path()
+backend\konnaxion\ekoh\views\profile.py:8: from rest_framework.generics import RetrieveAPIView
+backend\konnaxion\ekoh\views\profile.py:18: class ProfileView(RetrieveAPIView):
+backend\konnaxion\ekoh\db.py:21: def set_local_ekoh_smartvote_search_path() -> None:
+backend\konnaxion\ekoh\db.py:31: set_local_ekoh_smartvote_search_path()
+backend\konnaxion\ekoh\urls.py:5: path("api/v1/ekoh/", include("konnaxion.ekoh.urls"))
+backend\konnaxion\ekoh\urls.py:15: path("profile/<int:uid>/", ProfileView.as_view(), name="profile"),
+backend\konnaxion\ethikos\demo_import\importer.py:135: set_local_ekoh_smartvote_search_path()
+backend\konnaxion\ethikos\demo_import\urls.py:14: path(
+backend\konnaxion\ethikos\demo_import\urls.py:19: path(
+backend\konnaxion\ethikos\demo_import\urls.py:24: path(
+backend\konnaxion\ethikos\demo_import\urls.py:29: path(
+backend\konnaxion\ethikos\demo_import\urls.py:34: path(
+backend\konnaxion\ethikos\demo_import\urls.py:39: path(
+backend\konnaxion\ethikos\demo_import\views.py:7: from rest_framework.views import APIView
+backend\konnaxion\ethikos\demo_import\views.py:42: class EthikosDemoScenarioPreviewView(APIView):
+backend\konnaxion\ethikos\demo_import\views.py:59: class EthikosDemoScenarioImportView(APIView):
+backend\konnaxion\ethikos\demo_import\views.py:80: class EthikosDemoScenarioResetView(APIView):
+backend\konnaxion\ethikos\api_views.py:9: from rest_framework import permissions, status, viewsets
+backend\konnaxion\ethikos\api_views.py:112: class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+backend\konnaxion\ethikos\api_views.py:127: class TopicViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\api_views.py:316: class StanceViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\api_views.py:385: class ArgumentViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\api_views.py:507: class ArgumentSourceViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\api_views.py:565: class ArgumentImpactVoteViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\api_views.py:646: class ArgumentSuggestionViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\api_views.py:795: class DiscussionParticipantRoleViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\api_views.py:881: class DiscussionVisibilitySettingViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\permissions.py:7: ethiKos models so it can be reused safely from viewsets, serializers, admin
+backend\konnaxion\ethikos\permissions.py:293: # Compatibility aliases for readable viewset declarations.
+backend\konnaxion\ethikos\tests.py:80: return {prefix.strip("/") for prefix, _viewset, _basename in router.registry}
+backend\konnaxion\ethikos\urls.py:7: - register slice-specific ViewSets only when the corresponding ViewSet exists
+backend\konnaxion\ethikos\urls.py:22: def register_required(route: str, viewset_name: str, basename: str) -> None:
+backend\konnaxion\ethikos\urls.py:26: should fail loudly if their ViewSet is missing.
+backend\konnaxion\ethikos\urls.py:29: viewset = getattr(api_views, viewset_name)
+backend\konnaxion\ethikos\urls.py:30: router.register(route, viewset, basename=basename)
+backend\konnaxion\ethikos\urls.py:33: def register_optional(route: str, viewset_name: str, basename: str) -> None:
+backend\konnaxion\ethikos\urls.py:34: """Register an additive ethiKos route only if its ViewSet exists.
+backend\konnaxion\ethikos\urls.py:39: viewset = getattr(api_views, viewset_name, None)
+backend\konnaxion\ethikos\urls.py:40: if viewset is not None:
+backend\konnaxion\ethikos\urls.py:41: router.register(route, viewset, basename=basename)
+backend\konnaxion\ethikos\urls.py:45: register_required("topics", "TopicViewSet", basename="ethikos-topic")
+backend\konnaxion\ethikos\urls.py:46: register_required("stances", "StanceViewSet", basename="ethikos-stance")
+backend\konnaxion\ethikos\urls.py:47: register_required("arguments", "ArgumentViewSet", basename="ethikos-argument")
+backend\konnaxion\ethikos\urls.py:50: register_optional("categories", "CategoryViewSet", basename="ethikos-category")
+backend\konnaxion\ethikos\urls.py:54: path("", include("konnaxion.ethikos.demo_import.urls")),
+backend\konnaxion\ethikos\views.py:6: from rest_framework import viewsets, permissions, mixins
+backend\konnaxion\ethikos\views.py:12: class TopicViewSet(viewsets.ModelViewSet):
+backend\konnaxion\ethikos\views.py:20: class StanceViewSet(mixins.CreateModelMixin,
+backend\konnaxion\ethikos\views.py:24: viewsets.GenericViewSet):
+backend\konnaxion\ethikos\views.py:40: class ArgumentViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:2: from rest_framework import viewsets, permissions, filters
+backend\konnaxion\keenkonnect\api_views.py:26: class ProjectViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:28: ViewSet for Projects (collaborative projects workspace).
+backend\konnaxion\keenkonnect\api_views.py:47: class ProjectResourceViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:49: ViewSet for ProjectResource files/links attached to a project.
+backend\konnaxion\keenkonnect\api_views.py:66: class ProjectTaskViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:68: ViewSet for ProjectTask (tasks within a project).
+backend\konnaxion\keenkonnect\api_views.py:87: class ProjectMessageViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:89: ViewSet for ProjectMessage (project chat messages).
+backend\konnaxion\keenkonnect\api_views.py:108: class ProjectTeamViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:110: ViewSet for ProjectTeam (project team membership).
+backend\konnaxion\keenkonnect\api_views.py:146: class ProjectRatingViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:148: ViewSet for ProjectRating (community ratings on projects).
+backend\konnaxion\keenkonnect\api_views.py:166: class TagViewSet(viewsets.ModelViewSet):
+backend\konnaxion\keenkonnect\api_views.py:168: ViewSet for Tag objects (tags/keywords for projects and tasks).
+backend\konnaxion\keenkonnect\models.py:35: def project_file_path(instance, filename):
+backend\konnaxion\kollective_intelligence\api_views.py:2: from rest_framework import permissions, viewsets
+backend\konnaxion\kollective_intelligence\api_views.py:9: "VoteViewSet",
+backend\konnaxion\kollective_intelligence\api_views.py:10: "VoteResultViewSet",
+backend\konnaxion\kollective_intelligence\api_views.py:14: class VoteViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kollective_intelligence\api_views.py:84: class VoteResultViewSet(viewsets.ReadOnlyModelViewSet):
+backend\konnaxion\konnected\api_views.py:7: from rest_framework import permissions, status, viewsets
+backend\konnaxion\konnected\api_views.py:104: CertificationPathViewSet.sessions action and the Evaluation
+backend\konnaxion\konnected\api_views.py:136: class KnowledgeResourceViewSet(viewsets.ModelViewSet):
+backend\konnaxion\konnected\api_views.py:159: class OfflinePackageViewSet(viewsets.ModelViewSet):
+backend\konnaxion\konnected\api_views.py:229: class CertificationPathViewSet(viewsets.ModelViewSet):
+backend\konnaxion\konnected\api_views.py:410: class EvaluationViewSet(viewsets.ModelViewSet):
+backend\konnaxion\konnected\api_views.py:452: - path  ← CertificationPath(path_id)
+backend\konnaxion\konnected\api_views.py:518: class PeerValidationViewSet(viewsets.ModelViewSet):
+backend\konnaxion\konnected\api_views.py:540: class PortfolioViewSet(viewsets.ModelViewSet):
+backend\konnaxion\konnected\api_views.py:558: class ExamAttemptViewSet(viewsets.ViewSet):
+backend\konnaxion\konnected\api_views.py:562: This ViewSet does not map to a single model; instead it aggregates
+backend\konnaxion\konnected\models.py:19: class CertificationPath(TimeStampedModel):
+backend\konnaxion\konnected\tasks.py:42: media_root = Path(getattr(settings, "MEDIA_ROOT", "."))
+backend\konnaxion\kontrol\analytics_views.py:7: from rest_framework.views import APIView
+backend\konnaxion\kontrol\analytics_views.py:152: class UsageReportView(APIView):
+backend\konnaxion\kontrol\analytics_views.py:176: class PerformanceReportView(APIView):
+backend\konnaxion\kontrol\analytics_views.py:207: class SmartVoteReportView(APIView):
+backend\konnaxion\kontrol\urls.py:17: path("reports/usage/", UsageReportView.as_view(), name="report-usage"),
+backend\konnaxion\kontrol\urls.py:18: path("reports/perf/", PerformanceReportView.as_view(), name="report-perf"),
+backend\konnaxion\kontrol\urls.py:19: path("reports/smart-vote/", SmartVoteReportView.as_view(), name="report-smart-vote"),
+backend\konnaxion\kontrol\views.py:2: from rest_framework import viewsets, permissions, filters
+backend\konnaxion\kontrol\views.py:23: class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+backend\konnaxion\kontrol\views.py:25: Read-only viewset for system audit logs.
+backend\konnaxion\kontrol\views.py:36: class ModerationTicketViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kontrol\views.py:38: CRUD viewset for moderation tickets.
+backend\konnaxion\kontrol\views.py:54: class UserAdminViewSet(viewsets.ReadOnlyModelViewSet):
+backend\konnaxion\kontrol\views.py:56: Read-only viewset for the admin user management table.
+backend\konnaxion\kontrol\views.py:65: class KonsensusConfigViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kontrol\views.py:67: CRUD viewset for the global Konsensus voting configuration.
+backend\konnaxion\kreative\commands\backfill_credential_paths.py:13: def compute_new_credential_path(instance: Credential, filename: str) -> str:
+backend\konnaxion\kreative\commands\backfill_credential_paths.py:80: new_path = compute_new_credential_path(instance, filename)
+backend\konnaxion\kreative\commands\backfill_kreative_media_paths.py:12: def compute_new_artwork_path(instance: KreativeArtwork, filename: str) -> str:
+backend\konnaxion\kreative\commands\backfill_kreative_media_paths.py:28: def compute_new_tradition_path(instance: TraditionEntry, filename: str) -> str:
+backend\konnaxion\kreative\api_views.py:4: from rest_framework import filters, permissions, viewsets
+backend\konnaxion\kreative\api_views.py:16: class KreativeArtworkViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kreative\api_views.py:18: ViewSet for KreativeArtwork.
+backend\konnaxion\kreative\api_views.py:37: class GalleryViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kreative\api_views.py:39: ViewSet for Gallery.
+backend\konnaxion\kreative\api_views.py:56: class CollabSessionViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kreative\api_views.py:58: ViewSet for CollabSession.
+backend\konnaxion\kreative\api_views.py:76: class TraditionEntryViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kreative\api_views.py:78: ViewSet for TraditionEntry.
+backend\konnaxion\kreative\api_views.py:96: class TagViewSet(viewsets.ModelViewSet):
+backend\konnaxion\kreative\api_views.py:98: ViewSet for Kreative tags.
+backend\konnaxion\kreative\api_views.py:115: KreativeTagViewSet = TagViewSet
+backend\konnaxion\moderation\api_views.py:37: from rest_framework.views import APIView
+backend\konnaxion\moderation\api_views.py:73: class ModerationQueueView(generics.ListAPIView):
+backend\konnaxion\moderation\api_views.py:127: class ModerationDecisionView(APIView):
+backend\konnaxion\moderation\api_views.py:232: class AdminRoleListView(APIView):
+backend\konnaxion\moderation\api_views.py:272: class AdminRoleToggleView(APIView):
+backend\konnaxion\moderation\api_views.py:358: class AuditLogListView(generics.ListAPIView):
+backend\konnaxion\settings\base.py:11: BASE_DIR = Path(__file__).resolve(strict=True).parent.parent.parent
+backend\konnaxion\smart_vote\views\cast.py:5: from rest_framework.generics import CreateAPIView
+backend\konnaxion\smart_vote\views\cast.py:11: class CastBallotView(CreateAPIView):
+backend\konnaxion\smart_vote\views\reading.py:5: from rest_framework.views import APIView
+backend\konnaxion\smart_vote\views\reading.py:11: class EthikosTopicReadingView(APIView):
+backend\konnaxion\smart_vote\urls.py:6: path("api/v1/smart-vote/", include("konnaxion.smart_vote.urls"))
+backend\konnaxion\smart_vote\urls.py:16: path("cast/", CastBallotView.as_view(), name="cast"),
+backend\konnaxion\smart_vote\urls.py:17: path(
+backend\konnaxion\teambuilder\tests\test_problems_api.py:52: # The helper bypasses ProblemViewSet.perform_create(), so reproduce
+backend\konnaxion\teambuilder\views.py:3: from rest_framework import viewsets, permissions, status
+backend\konnaxion\teambuilder\views.py:23: class BuilderSessionViewSet(viewsets.ModelViewSet):
+backend\konnaxion\teambuilder\views.py:59: class TeamViewSet(viewsets.ReadOnlyModelViewSet):
+backend\konnaxion\teambuilder\views.py:70: class ProblemViewSet(viewsets.ModelViewSet):
+backend\konnaxion\trust\api_views.py:31: from rest_framework.views import APIView
+backend\konnaxion\trust\api_views.py:57: class ModerationQueueView(generics.ListAPIView):
+backend\konnaxion\trust\api_views.py:111: class ModerationDecisionView(APIView):
+backend\konnaxion\trust\api_views.py:237: class AuditLogListView(generics.ListAPIView):
+backend\konnaxion\users\api\views.py:6: from rest_framework.viewsets import GenericViewSet
+backend\konnaxion\users\api\views.py:12: class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
+backend\konnaxion\users\tests\api\test_views.py:5: from konnaxion.users.api.views import UserViewSet
+backend\konnaxion\users\tests\api\test_views.py:9: class TestUserViewSet:
+backend\konnaxion\users\tests\api\test_views.py:15: view = UserViewSet()
+backend\konnaxion\users\tests\api\test_views.py:28: view = UserViewSet()
+backend\konnaxion\users\tests\api\test_views.py:33: # GenericAPIView normally sets this during request dispatch.
+backend\konnaxion\users\urls.py:10: path("~redirect/", view=user_redirect_view, name="redirect"),
+backend\konnaxion\users\urls.py:11: path("~update/", view=user_update_view, name="update"),
+backend\konnaxion\users\urls.py:12: path("<str:username>/", view=user_detail_view, name="detail"),
+backend\konnaxion\urls.py:8: path("api/ethikos/", include("konnaxion.ethikos.urls")),
+backend\scripts\populate_users.py:7: BASE_DIR = Path(__file__).resolve().parent.parent  # /app
+backend\django_api_scanner.py:17: ROOT = Path(__file__).resolve().parent
+backend\django_api_scanner.py:44: # router.register("segment/segment", ViewSet, basename="optional")
+backend\django_api_scanner.py:52: viewset = m.group(2)
+backend\django_api_scanner.py:54: regs.append((route, viewset, basename))
+backend\django_api_scanner.py:57: for route, viewset, basename in regs:
+backend\django_api_scanner.py:64: # Special-case: UserViewSet uses lookup_field='username'
+backend\django_api_scanner.py:65: if "UserViewSet" in viewset:
+backend\django_api_scanner.py:71: # Custom @action(detail=False) 'me' on UserViewSet
+backend\end-points-scanner.py:83: out.append({"source":"filesystem","router":"app","type":"meta","url":f"{url}/{Path(name).stem}","file":str(f)})
+backend\manage.py:24: current_path = Path(__file__).parent.resolve()
+backend\merge_production_dotenvs_in_dotenv.py:5: BASE_DIR = Path(__file__).parent.resolve()
+backend\scan_encoding.py:7: CODE_ROOT = Path(__file__).parent / "konnaxion"
+backend\scan_encoding.py:19: file_path = Path(root) / file_name

@@ -1,0 +1,24 @@
+KONNAXION MEGA TEST CAMPAIGN
+==============================================================================
+Overall : FAIL
+Generated: 2026-09-05T16:19:28
+Repo    : C:\mycode\Konnaxion\Konnaxion
+LevelUp : C:\mycode\Konnaxion\LevelUpDiag
+
+RESULTS
+------------------------------------------------------------------------------
+[PASS   ] Backend pytest complet             exit=0     duration=2m 27s
+          log: C:\mycode\Konnaxion\Konnaxion\.mega-test-campaign\20260905_155721\pytest.log
+[FAIL   ] Frontend full-scan                 exit=3221225786 duration=15m 33s
+          log: C:\mycode\Konnaxion\Konnaxion\.mega-test-campaign\20260905_155721\fullscan.log
+[PASS   ] Playwright broad                   exit=0     duration=2m 40s
+          log: C:\mycode\Konnaxion\Konnaxion\.mega-test-campaign\20260905_155721\smoke.log
+[PASS   ] Playwright delivery                exit=0     duration=50s
+          log: C:\mycode\Konnaxion\Konnaxion\.mega-test-campaign\20260905_155721\delivery.log
+[FAIL   ] LevelUpDiag FULL N00–N11           exit=3221225786 duration=11s
+          log: C:\mycode\Konnaxion\Konnaxion\.mega-test-campaign\20260905_155721\levelup.log
+
+FILES
+------------------------------------------------------------------------------
+SUMMARY.json : C:\mycode\Konnaxion\Konnaxion\.mega-test-campaign\20260905_155721\SUMMARY.json
+SUMMARY.txt  : C:\mycode\Konnaxion\Konnaxion\.mega-test-campaign\20260905_155721\SUMMARY.txt

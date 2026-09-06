@@ -1,0 +1,23 @@
+{
+  "schema": "securitydiag.report.v1",
+  "standard": "SecurityDiag",
+  "standard_version": "1.1.0",
+  "run_id": "20260906T123634Z-f39caed5",
+  "level_id": "S05",
+  "level_name": "Clean Host & OS Baseline",
+  "purpose": "Establish remote host identity, OS state, time sync and pending update evidence.",
+  "target_repo_root": "C:\\mycode\\Konnaxion\\Konnaxion",
+  "started_at": "2026-09-06T12:36:35.610209+00:00",
+  "ended_at": "2026-09-06T12:36:35.613275+00:00",
+  "verdict": "BLOCKED",
+  "findings": [
+    {
+      "id": "host.remote.available",
+      "verdict": "BLOCKED",
+      "category": "host",
+      "message": "Network execution is disabled."
+    }
+  ],
+  "artifacts": [],
+  "metrics": {}
+}
