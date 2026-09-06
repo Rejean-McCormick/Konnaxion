@@ -1,6 +1,5 @@
 // FILE: frontend/app/layout.tsx
 // app/layout.tsx
-import '@ant-design/v5-patch-for-react-19';
 import type { Metadata } from 'next';
 
 import '@/styles/tailwind.css';

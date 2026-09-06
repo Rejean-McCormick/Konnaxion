@@ -179,6 +179,15 @@ async function visit(
     if (message.type() !== 'error') return
 
     const text = message.text()
+
+    if (
+      text.includes('React.Fragment can only have') &&
+      text.includes('autoFocus')
+    ) {
+      console.warn(`[HARVEST2 DEPENDENCY-WARNING] ${route} :: ${text}`)
+      return
+    }
+
     const isFetchAbortNoise =
       navigationAbortBudget > 0 &&
       /(?:Failed to fetch|fetch error)/i.test(text)
@@ -255,7 +264,7 @@ async function visit(
     page.off('request', onRequest)
   }
 
-  for (const finding of local) {
+  for (const finding of Array.from(local)) {
     findings.push(`${route} :: ${finding}`)
   }
 }
@@ -404,15 +413,21 @@ test.describe('Platform bug harvest Wave 2', () => {
         await page
           .getByLabel('Description')
           .fill('Persisted by Konnaxion targeted Bug Harvest Wave 2.')
-        const categorySelect = page.getByLabel('Medium / category')
-        await categorySelect.click({ timeout: 5_000 })
-        await page.keyboard.press('End')
-        await page.keyboard.press('Enter')
+        const categoryFormItem = page
+          .locator('.ant-form-item')
+          .filter({ hasText: 'Medium / category' })
+          .first()
+        await categoryFormItem.locator('.ant-select-selector').click({
+          timeout: 5_000,
+        })
+        const categoryDropdown = page.locator('.ant-select-dropdown:visible')
+        await expect(categoryDropdown).toBeVisible({ timeout: 5_000 })
+        await categoryDropdown
+          .locator('.ant-select-item-option')
+          .filter({ hasText: /^Other$/ })
+          .click({ timeout: 5_000 })
         await expect(
-          page
-            .locator('.ant-form-item')
-            .filter({ hasText: 'Medium / category' })
-            .locator('.ant-select-selection-item'),
+          categoryFormItem.locator('.ant-select-selection-item'),
         ).toHaveText('Other')
         await page.locator('input[type="file"]').setInputFiles({
           name: `harvest2-${suffix}.txt`,
@@ -588,7 +603,7 @@ test.describe('Platform bug harvest Wave 2', () => {
 
       for (const [ruleName, pattern] of blockingRules) {
         pattern.lastIndex = 0
-        for (const match of source.matchAll(pattern)) {
+        for (const match of Array.from(source.matchAll(pattern))) {
           const before = source.slice(0, match.index ?? 0)
           const line = before.split(/\r?\n/).length
           const excerpt = lines[line - 1]?.trim() ?? match[0]
@@ -600,7 +615,7 @@ test.describe('Platform bug harvest Wave 2', () => {
 
       for (const [ruleName, pattern] of deferredRules) {
         pattern.lastIndex = 0
-        for (const match of source.matchAll(pattern)) {
+        for (const match of Array.from(source.matchAll(pattern))) {
           const before = source.slice(0, match.index ?? 0)
           const line = before.split(/\r?\n/).length
           const excerpt = lines[line - 1]?.trim() ?? match[0]

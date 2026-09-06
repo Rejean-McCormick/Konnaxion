@@ -90,7 +90,7 @@ export default function KreativeDashboardPage(): JSX.Element {
     for (const artwork of artworks) {
       counts.set(artwork.artist, (counts.get(artwork.artist) ?? 0) + 1)
     }
-    return [...counts.entries()].sort((a, b) => b[1] - a[1])[0] ?? null
+    return Array.from(counts.entries()).sort((a, b) => b[1] - a[1])[0] ?? null
   }, [artworks])
 
   return (
