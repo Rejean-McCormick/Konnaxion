@@ -56,6 +56,8 @@ use_client_report.json
 .levelupdiag/
 .levelupdiag-upgrade-backups/
 .securitydiag/
+securitydiag/securitydiag.config.local.json
+securitydiag/attestations/*.local.json
 
 # Generated frontend diagnostics and authenticated browser state
 frontend/reports/
