@@ -264,7 +264,7 @@ async function visit(
     page.off('request', onRequest)
   }
 
-  for (const finding of local) {
+  for (const finding of Array.from(local)) {
     findings.push(`${route} :: ${finding}`)
   }
 }
@@ -670,7 +670,7 @@ test.describe('Platform bug harvest Wave 2', () => {
 
       for (const [ruleName, pattern] of blockingRules) {
         pattern.lastIndex = 0
-        for (const match of source.matchAll(pattern)) {
+        for (const match of Array.from(source.matchAll(pattern))) {
           const before = source.slice(0, match.index ?? 0)
           const line = before.split(/\r?\n/).length
           const excerpt = lines[line - 1]?.trim() ?? match[0]
@@ -682,7 +682,7 @@ test.describe('Platform bug harvest Wave 2', () => {
 
       for (const [ruleName, pattern] of deferredRules) {
         pattern.lastIndex = 0
-        for (const match of source.matchAll(pattern)) {
+        for (const match of Array.from(source.matchAll(pattern))) {
           const before = source.slice(0, match.index ?? 0)
           const line = before.split(/\r?\n/).length
           const excerpt = lines[line - 1]?.trim() ?? match[0]
@@ -709,3 +709,4 @@ test.describe('Platform bug harvest Wave 2', () => {
     ).toHaveLength(0)
   })
 })
+
