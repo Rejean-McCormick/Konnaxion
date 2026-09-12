@@ -4,7 +4,7 @@ Konnaxion is a socio-technical framework for coordinating people, knowledge, and
 It follows the KOA model (KonnectED, Ethikos, Kreative, keenKonnect, EkoH, Smart Vote) and aims to connect learning, collaboration, debate, and culture, while adding domain- and ethics-aware weighting (EkoH + Smart Vote) so decisions and rankings can be read both as raw crowd signals and as expertise-sensitive views.
 
 Konnaxion is a socio-technical framework for coordinating people, knowledge, and action through a clear, ethical, and modular civic architecture.  
-Its foundations follow the KOA model (KonnectED, Ethikos, Kreative, keenKonnect, EkoH, Smart Vote), whose full functional tree is detailed in the system document.
+Its foundations follow the KOA model (KonnectED, ethikos, Kreative, keenKonnect, EkoH, Smart Vote), whose full functional tree is detailed in the system document.
 
 Alongside its technical architecture, Konnaxion includes a fictional origin mythology introduced in **Konvergence** and expanded through a series of YouTube videos. This mythos presents a symbolic narrative of how a civic system can emerge in times of turbulence and transformation.
 
