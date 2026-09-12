@@ -26,8 +26,8 @@ async function readBodyText(page: Page): Promise<string> {
   return page.evaluate(() => document.body?.innerText ?? '')
 }
 
-async function loginThroughDjangoAdmin(page: Page): Promise<void> {
-  const response = await page.goto(backendUrl('/admin/login/'), {
+async function loginThroughAllauth(page: Page): Promise<void> {
+  const response = await page.goto(backendUrl('/accounts/login/'), {
     waitUntil: 'domcontentloaded',
   })
 
@@ -36,7 +36,7 @@ async function loginThroughDjangoAdmin(page: Page): Promise<void> {
     `Expected Django admin login page, got HTTP ${response?.status()}`,
   ).toBeTruthy()
 
-  const usernameField = page.locator('input[name="username"]').first()
+  const usernameField = page.locator('input[name="login"]').first()
   const passwordField = page.locator('input[name="password"]').first()
   const submitButton = page
     .locator('input[type="submit"], button[type="submit"]')
@@ -58,7 +58,7 @@ async function loginThroughDjangoAdmin(page: Page): Promise<void> {
 
   expect(
     bodyText,
-    'Django admin login appears to have failed',
+    'Konnaxion allauth login appears to have failed',
   ).not.toMatch(/please enter the correct|invalid|error/i)
 
   const cookies = await page.context().cookies(BACKEND_BASE_URL)
@@ -66,7 +66,7 @@ async function loginThroughDjangoAdmin(page: Page): Promise<void> {
 
   expect(
     hasSessionCookie,
-    'Django admin login did not create a sessionid cookie',
+    'Konnaxion allauth login did not create a sessionid cookie',
   ).toBeTruthy()
 }
 
@@ -86,7 +86,7 @@ async function verifyLoggedInThroughBackendApi(page: Page): Promise<void> {
 }
 
 setup('do login', async ({ page }) => {
-  await loginThroughDjangoAdmin(page)
+  await loginThroughAllauth(page)
   await verifyLoggedInThroughBackendApi(page)
 
   await page.context().storageState({ path: STORAGE_STATE })

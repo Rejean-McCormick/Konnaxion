@@ -7,7 +7,6 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import QueryProvider from '@/shared/QueryProvider';
 
 import '../src/dayjs-setup';
-import AuthProvider from './providers/AuthProvider';
 
 export const metadata: Metadata = {
   title: 'Konnaxion',
@@ -28,9 +27,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className="min-h-screen bg-neutral-50 antialiased">
         <ThemeProvider>
-          <QueryProvider>
-            <AuthProvider>{children}</AuthProvider>
-          </QueryProvider>
+          <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
       </body>
     </html>

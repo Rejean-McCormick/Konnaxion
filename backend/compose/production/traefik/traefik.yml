@@ -13,7 +13,6 @@ entryPoints:
   web-secure:
     address: ":443"
 
-
 certificatesResolvers:
   letsencrypt:
     acme:
@@ -24,32 +23,32 @@ certificatesResolvers:
 
 http:
   routers:
-    web-secure-router:
-      rule: "Host(`konnaxion.com`) || Host(`www.konnaxion.com`)"
-      entryPoints:
-        - web-secure
-      middlewares:
-        - csrf
-      service: django
-      tls:
-        certResolver: letsencrypt
-
     web-media-router:
       rule: "(Host(`konnaxion.com`) || Host(`www.konnaxion.com`)) && PathPrefix(`/media/`)"
+      priority: 40
       entryPoints:
         - web-secure
-      middlewares:
-        - csrf
       service: django-media
       tls:
         certResolver: letsencrypt
 
+    web-django-router:
+      rule: "(Host(`konnaxion.com`) || Host(`www.konnaxion.com`)) && (PathPrefix(`/api/`) || PathPrefix(`/admin/`) || PathPrefix(`/accounts/`) || PathPrefix(`/users/`) || PathPrefix(`/static/`))"
+      priority: 30
+      entryPoints:
+        - web-secure
+      service: django
+      tls:
+        certResolver: letsencrypt
 
-  middlewares:
-    csrf:
-      headers:
-        hostsProxyHeaders:
-          - X-CSRFToken
+    web-frontend-router:
+      rule: "Host(`konnaxion.com`) || Host(`www.konnaxion.com`)"
+      priority: 10
+      entryPoints:
+        - web-secure
+      service: frontend
+      tls:
+        certResolver: letsencrypt
 
   services:
     django:
@@ -61,6 +60,11 @@ http:
       loadBalancer:
         servers:
           - url: http://nginx:80
+
+    frontend:
+      loadBalancer:
+        servers:
+          - url: http://host.docker.internal:3000
 
 providers:
   file:

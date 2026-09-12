@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import transaction
@@ -85,6 +86,11 @@ class Command(BaseCommand):
 
         user.set_password(password)
         user.save()
+        EmailAddress.objects.update_or_create(
+            user=user,
+            email=email,
+            defaults={"verified": True, "primary": True},
+        )
 
         category, _ = EthikosCategory.objects.update_or_create(
             name="Public ethics",

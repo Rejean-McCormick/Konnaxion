@@ -6,6 +6,7 @@ import typing
 from allauth.account.adapter import DefaultAccountAdapter
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 
 if typing.TYPE_CHECKING:
     from allauth.socialaccount.models import SocialLogin
@@ -18,8 +19,20 @@ class AccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         return getattr(settings, "ACCOUNT_ALLOW_REGISTRATION", True)
 
+    def authenticate(self, request: HttpRequest, **credentials):
+        user = super().authenticate(request, **credentials)
+        if user is not None and not user.can_interactive_login:
+            return None
+        return user
+
 
 class SocialAccountAdapter(DefaultSocialAccountAdapter):
+    def pre_social_login(self, request: HttpRequest, sociallogin: SocialLogin) -> None:
+        super().pre_social_login(request, sociallogin)
+        user = sociallogin.user
+        if user.pk and not user.can_interactive_login:
+            raise PermissionDenied("Interactive login is not permitted for this account.")
+
     def is_open_for_signup(
         self,
         request: HttpRequest,

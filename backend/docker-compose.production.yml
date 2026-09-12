@@ -43,6 +43,8 @@ services:
       - django
     volumes:
       - production_traefik:/etc/traefik/acme
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"

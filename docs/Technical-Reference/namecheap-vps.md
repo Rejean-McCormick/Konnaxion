@@ -27,6 +27,9 @@ Public routing:
 https://konnaxion.com/       -> Next.js frontend :3000
 https://konnaxion.com/api/   -> Django
 https://konnaxion.com/admin/ -> Django admin
+https://konnaxion.com/accounts/ -> Django/allauth (local + OIDC)
+https://konnaxion.com/users/ -> Django user management
+https://konnaxion.com/static/ -> Django/WhiteNoise
 https://konnaxion.com/media/ -> media service
 https://konnaxion.com:5555/  -> Flower when enabled
 ```
@@ -55,6 +58,16 @@ CELERY_BROKER_URL=redis://redis:6379/0
 DJANGO_ADMIN_URL=admin/
 SENTRY_DSN=
 ETHIKOS_DEMO_IMPORTER_ENABLED=true
+FRONTEND_BASE_URL=https://konnaxion.com
+DJANGO_ADMIN_FORCE_ALLAUTH=true
+
+# Optional common OIDC federation; local login remains available.
+COMMON_OIDC_ENABLED=false
+COMMON_OIDC_PROVIDER_ID=koa-common
+COMMON_OIDC_NAME=kOA Identity
+COMMON_OIDC_SERVER_URL=https://id.example.org/realms/koa
+COMMON_OIDC_CLIENT_ID=konnaxion
+COMMON_OIDC_CLIENT_SECRET=CHANGE_ME
 ```
 
 Quote `DJANGO_SECRET_KEY` when it contains `$` so Docker Compose does not interpolate parts of the value.
@@ -102,7 +115,7 @@ frontend/.env.production
 Expected public endpoints:
 
 ```env
-NEXT_PUBLIC_API_BASE=https://konnaxion.com/api
+NEXT_PUBLIC_API_BASE=/api
 NEXT_PUBLIC_BACKEND_BASE=https://konnaxion.com
 ```
 
@@ -133,10 +146,13 @@ tail -n 60 frontend.log
 Traefik owns the public HTTP/HTTPS entry points. The production routing must preserve these boundaries:
 
 ```text
-/        -> frontend
-/api/    -> Django
-/admin/  -> Django
-/media/  -> media service
+/          -> frontend
+/api/      -> Django
+/admin/    -> Django
+/accounts/ -> Django/allauth + OIDC callbacks
+/users/    -> Django user management
+/static/   -> Django/WhiteNoise
+/media/    -> media service
 ```
 
 After changing Traefik configuration:
@@ -240,3 +256,18 @@ The root response should be served by Next.js; `/api/` and `/admin/` should reso
 - port 3000 is not exposed publicly;
 - only expected Docker images and containers run on the host;
 - privileged actions and deployment credentials follow least privilege.
+
+
+## Common identity contract
+
+Konnaxion remains standalone-first. The local `users.User`, local password login, MFA and local RBAC remain authoritative inside Konnaxion. Optional federation is handled by django-allauth OpenID Connect.
+
+The canonical external identity is the IdP `issuer + sub`. Email is profile data and is never used for silent account merging. OIDC does not copy roles from Orgo or Moodle; Konnaxion continues to authorize requests from its own local account and permissions.
+
+OIDC callback shape for the default provider ID:
+
+```text
+https://konnaxion.com/accounts/oidc/koa-common/login/callback/
+```
+
+If the IdP is unavailable, the normal `/accounts/login/` local login remains available.

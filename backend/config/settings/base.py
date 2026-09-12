@@ -89,9 +89,9 @@ THIRD_PARTY_APPS = [
     "allauth.account",
     "allauth.mfa",
     "allauth.socialaccount",
+    "allauth.socialaccount.providers.openid_connect",
     "django_celery_beat",
     "rest_framework",
-    "rest_framework.authtoken",
     "corsheaders",
     "drf_spectacular",
 ]
@@ -358,13 +358,48 @@ SOCIALACCOUNT_ADAPTER = "konnaxion.users.adapters.SocialAccountAdapter"
 # https://docs.allauth.org/en/latest/socialaccount/configuration.html
 SOCIALACCOUNT_FORMS = {"signup": "konnaxion.users.forms.UserSocialSignupForm"}
 
+# Common kOA identity federation (optional). Local accounts remain enabled.
+# The external identity key is the OIDC issuer + subject (sub); email is profile data only.
+COMMON_OIDC_ENABLED = env.bool("COMMON_OIDC_ENABLED", default=False)
+SOCIALACCOUNT_ONLY = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = False
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = False
+SOCIALACCOUNT_STORE_TOKENS = False
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_PROVIDERS = {}
+
+if COMMON_OIDC_ENABLED:
+    COMMON_OIDC_PROVIDER_ID = env("COMMON_OIDC_PROVIDER_ID", default="koa-common")
+    COMMON_OIDC_NAME = env("COMMON_OIDC_NAME", default="kOA Identity")
+    COMMON_OIDC_SERVER_URL = env("COMMON_OIDC_SERVER_URL")
+    COMMON_OIDC_CLIENT_ID = env("COMMON_OIDC_CLIENT_ID")
+    COMMON_OIDC_CLIENT_SECRET = env("COMMON_OIDC_CLIENT_SECRET")
+
+    SOCIALACCOUNT_PROVIDERS["openid_connect"] = {
+        "OAUTH_PKCE_ENABLED": True,
+        "APPS": [
+            {
+                "provider_id": COMMON_OIDC_PROVIDER_ID,
+                "name": COMMON_OIDC_NAME,
+                "client_id": COMMON_OIDC_CLIENT_ID,
+                "secret": COMMON_OIDC_CLIENT_SECRET,
+                "settings": {
+                    "server_url": COMMON_OIDC_SERVER_URL.rstrip("/"),
+                    "uid_field": "sub",
+                    "scope": ["openid", "profile", "email"],
+                    "fetch_userinfo": True,
+                    "oauth_pkce_enabled": True,
+                },
+            },
+        ],
+    }
+
 # django-rest-framework
 # -------------------------------------------------------------------------------
 # django-rest-framework - https://www.django-rest-framework.org/api-guide/settings/
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.TokenAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",

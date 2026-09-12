@@ -115,6 +115,15 @@ class User(AbstractUser):
         return self.is_human and self.is_klone
 
     @property
+    def can_interactive_login(self) -> bool:
+        """Whether this account may establish an interactive human session.
+
+        Service accounts and synthetic klones remain valid domain actors but do
+        not receive browser sessions by default.
+        """
+        return self.is_active and self.is_human and not self.is_klone
+
+    @property
     def can_participate_in_ethikos(self) -> bool:
         """
         Who is allowed to actively debate in Ethikos.
