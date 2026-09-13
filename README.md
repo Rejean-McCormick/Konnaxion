@@ -3,41 +3,38 @@
 Konnaxion is a socio-technical framework for coordinating people, knowledge, and action through a clear, ethical, and modular civic architecture.  
 It follows the KOA model (KonnectED, Ethikos, Kreative, keenKonnect, EkoH, Smart Vote) and aims to connect learning, collaboration, debate, and culture, while adding domain- and ethics-aware weighting (EkoH + Smart Vote) so decisions and rankings can be read both as raw crowd signals and as expertise-sensitive views.
 
-Konnaxion is a socio-technical framework for coordinating people, knowledge, and action through a clear, ethical, and modular civic architecture.  
-Its foundations follow the KOA model (KonnectED, ethikos, Kreative, keenKonnect, EkoH, Smart Vote), whose full functional tree is detailed in the system document.
-
 Alongside its technical architecture, Konnaxion includes a fictional origin mythology introduced in **Konvergence** and expanded through a series of YouTube videos. This mythos presents a symbolic narrative of how a civic system can emerge in times of turbulence and transformation.
 
 ---
 
 ## Current maturity & release status
 
-**Current status:** Advanced Functional Beta — Final Release Candidate Qualification  
-**Engineering maturity:** ~92%  
-**Release Candidate readiness:** ~86–90%  
+**Current status:** Release Candidate — Production validation complete; Security Release Gate passed  
+**Last quantified engineering maturity:** ~94% *(2026-09-08 assessment)*  
+**Last quantified Release Candidate readiness:** ~89–92% *(2026-09-08 assessment)*  
 **Current release line:** `v0.8.0`  
-**Latest confirmed tag:** `v0.8.0-beta.2`  
-**Recommended next checkpoint:** `v0.8.0-rc.1`
+**Latest documented tag:** `v0.8.0-beta.2`  
+**RC checkpoint:** `v0.8.0-rc.1` recommended; tag creation not confirmed by the available evidence  
+**Latest validation checkpoint:** 2026-09-12
 
-Konnaxion’s core civic-decision slice is now strongly qualified locally:
+Konnaxion’s core civic-decision slice and the current production-validation stack are now strongly qualified:
 
 - ethiKos → EkoH → Smart Vote delivery workflow: **GREEN**
-- Next.js production build: **GREEN**
-- Django checks and migration state: **GREEN**
+- Next.js production build and TypeScript validation: **GREEN**
+- common authentication migration (`django-allauth`, optional OIDC, local RBAC/MFA): **GREEN**
+- production Django/PostgreSQL connectivity and migrations: **GREEN**
 - Smart Vote schema and real reading runtime: **GREEN**
-- EkoH targeted browser smoke: **GREEN**
-- local Docker/runtime hardening: **GREEN**
+- host, SSH, firewall, Docker/runtime, TLS and application security gates: **GREEN**
+- verified off-server backup and isolated restore drill: **GREEN**
+- SecurityDiag S13 Backup & Recovery Evidence: **PASS**
+- SecurityDiag S14 Security Release Gate: **PASS**
+- full SecurityDiag automated suite: **62/62 PASS**
 
-The main remaining work before production promotion is operational rather than core-product functionality:
+The final SecurityDiag campaign retains only accepted non-blocking warnings in S01, S02, and S03. The authentication/runtime/backup/recovery validation phase is closed; the next documented diagnostic phase is **LevelUpDiag**, focused on authentication and integration (`N00 → N02 → N03 → N04 → N05 → N07 → N11`).
 
-- fresh VPS / Linux security qualification;
-- production secret rotation;
-- clean-target deployment reproducibility;
-- backup → isolated restore → validation drill.
+Some secondary product surfaces remain explicitly **preview, read-only, placeholder, or deferred** where no complete backend contract exists. These states are intentional and should not be replaced by fabricated persistence or fake success responses.
 
-Some secondary product surfaces remain explicitly **preview, read-only, placeholder, or deferred** where no complete backend contract exists yet. These placeholders are intentionally retained rather than being replaced by fabricated persistence or fake success states.
-
-> The project is entering Release Candidate qualification, but the current code should not yet be described as a final production release.
+> Konnaxion is qualified as a Release Candidate on the available engineering evidence. This does not by itself mean that the `v0.8.0-rc.1` Git tag, a final production release, or a public demo has been published.
 
 ## Mythological Origins
 
@@ -71,7 +68,7 @@ Each component is designed to operate independently or as part of a larger integ
 
 ## Access & how to try (placeholder)
 
-Konnaxion is in Release Candidate qualification and is not yet exposed as a public demo instance.
+The current authentication, production runtime, security, backup, and recovery path has passed its documented validation phase. The supplied project evidence does not yet document a public demo URL or general public onboarding path.
 
 This section will be updated with:
 
@@ -218,7 +215,7 @@ This repository currently includes:
 - UI concept explorations and explicitly retained prototype/placeholder surfaces  
 - data modeling and integration experiments  
 
-Each component contributes to the assembly of a unified civic infrastructure. The core ethiKos / EkoH / Smart Vote path is now substantially implemented and qualified locally, while some secondary surfaces remain intentionally experimental, preview, read-only, placeholder, or deferred pending complete domain contracts.
+Each component contributes to the assembly of a unified civic infrastructure. The core ethiKos / EkoH / Smart Vote path is substantially implemented and qualified through local and production-validation evidence. The September 12 validation also closes the current authentication, runtime, security, backup, and recovery phase. Some secondary surfaces remain intentionally experimental, preview, read-only, placeholder, or deferred pending complete domain contracts.
 
 ---
 
@@ -240,16 +237,17 @@ Konnaxion is the principal software expression of the KOA civic architecture and
 
 ## ️Roadmap
 
-Planned directions include:
+Current next directions include:
 
-- Consolidation of core primitives across modules  
-- Prototype civic workflow (proposal → deliberation → decision → action)  
-- Interactive interface experiments for different user roles  
-- Early implementations of EkoH & Smart Vote  
-- Documentation and integration pathways for external tools and institutions  
-- Expanded mythology-based simulation tools and narrative UX  
+- Run the next **LevelUpDiag** authentication/integration sequence (`N00 → N02 → N03 → N04 → N05 → N07 → N11`)  
+- Continue authentication/security integration validation, especially N04, N07, and N11  
+- Reduce the remaining non-blocking `drf_spectacular` OpenAPI schema warnings  
+- Refine release provenance and artifact metadata  
+- Continue explicit Version 1 scope classification for complete, read-only, preview, and deferred surfaces  
+- Formalize public demo, pilot, and local-stack onboarding paths  
+- Continue cross-module integration, documentation, and mythology-based narrative UX work  
 
-Roadmap items are refined continuously based on experimentation and potential pilot needs.
+Roadmap items remain evidence-driven: real backend contracts are wired and tested where they exist; unsupported semantics stay explicitly read-only, preview, or deferred.
 
 ---
 
