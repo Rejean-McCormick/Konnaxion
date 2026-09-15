@@ -1,3 +1,16 @@
+# HISTORICAL / SUPERSEDED — NON-CANONICAL
+
+> **Status:** retained for historical/design reference only.  
+> **Current authority:** `docs/README.md`, `EkoH and Smart Vote - Technical Specification.md`, and `../QUALIFICATION_STATUS.md`.
+>
+> This document predates the current Konnaxion implementation and qualification stack. Statements in the body that call this material **canonical**, **definitive**, or a **single source of truth** are superseded by the current documentation index.
+>
+> References to Kubernetes/Helm/Argo CD, Airflow, Dredd, k6, 90% coverage gates, team/SRE ownership structures, or other infrastructure/CI details are historical design assumptions unless independently present in current code and current qualification evidence.
+>
+> Do not use this file to claim present implementation, deployment topology, CI gates, test coverage, operational ownership, or release readiness.
+
+---
+
 **`01-db_schema.md` — *Canonical Database Schema for EkoH & Smart Vote***  
  *(PostgreSQL \+ Django-ORM conventions; standard `created_at` / `updated_at` timestamp columns are implicit unless noted otherwise.)*
 
@@ -348,6 +361,13 @@ Constants map to parameters frozen in §2 of the registry .
 | `/smart-vote/result/:targetType/:id` | `GET` | JWT/Anon | Retrieve current weighted result snapshot. | 200, 404 |
 | `/smart-vote/modality` | `GET` | JWT | List supported modalities. | 200 |
 
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=969b8854e210:351-700
+start=351
+end=700
+----
 #### **2.2.1 Weight-calculator pseudocode**
 
 python  
@@ -698,6 +718,13 @@ Environment variables & secrets (Vault / ConfigMap) are listed in the infra sect
 
 Prometheus rules e.g. `reports_latency_p95` (\> 400 ms) and `etl_task_fail` (Airflow) drive PagerDuty.
 
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=969b8854e210:701-1050
+start=701
+end=1050
+----
 Performance baseline: 100 M-row partition attach/detach ≤ 2 s; `/reports/*` P95 ≤ 400 ms.
 
 Backups: pgBackRest nightly \+ 30-min incrementals; 14-day retention; quarterly restore drill.
@@ -1048,6 +1075,13 @@ Thought for 9 seconds
 ---
 
 ## **0 Scheduler Landscape**
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=969b8854e210:1051-1400
+start=1051
+end=1400
+----
 
 | Layer | Engine | Clock source | Time-zone | Container image |
 | ----- | ----- | ----- | ----- | ----- |
@@ -1398,6 +1432,13 @@ Mock external services with `responses`, Redis `fakeredis`, Kafka `aiokafka` fix
 Runs headless in CI on chrome; screenshots saved on failure.
 
 ---
+--- CHUNK END ---
+
+--- CHUNK BEGIN ---
+id=969b8854e210:1401-1634
+start=1401
+end=1634
+----
 
 ## **5 Performance & load**
 
@@ -1632,3 +1673,4 @@ pip wheel modules/ekoh-smartvote \-w dist/
 
 for future stand-alone deployments.
 
+--- CHUNK END ---

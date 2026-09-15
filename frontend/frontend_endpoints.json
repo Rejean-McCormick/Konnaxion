@@ -71,13 +71,6 @@
     ]
   },
   {
-    "method": "FETCH",
-    "url": "/api/showcases",
-    "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/kreative/community-showcases/submit-to-showcase/page.tsx"
-    ]
-  },
-  {
     "method": "GET",
     "url": "/expertise-tags",
     "files": [
@@ -86,9 +79,30 @@
   },
   {
     "method": "GET",
-    "url": "/impact/sustainability/track?${params.toString()}",
+    "url": "${BASE_URL}/problems/",
     "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/sustainability-impact/track-project-impact/page.tsx"
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "${BASE_URL}/problems/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "${BASE_URL}/problems/${problemId}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
+    ]
+  },
+  {
+    "method": "PATCH",
+    "url": "${BASE_URL}/problems/${problemId}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/teambuilder/index.ts"
     ]
   },
   {
@@ -343,6 +357,62 @@
   },
   {
     "method": "GET",
+    "url": "konnected/forum-posts/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/community-discussions/thread/[topicId]/page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "konnected/forum-posts/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/community-discussions/thread/[topicId]/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "konnected/forum-topics/${topicId}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/community-discussions/thread/[topicId]/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "konnected/mentors/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/mentorship/page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "konnected/mentorship-requests/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/mentorship/page.tsx"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "kreative/artworks/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/kreative.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "kreative/collab-sessions/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/kreative.ts"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "kreative/traditions/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/kreative.ts"
+    ]
+  },
+  {
+    "method": "GET",
     "url": "language",
     "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
@@ -404,6 +474,13 @@
     "url": "pathName",
     "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/certifications/exam-preparation/page.tsx"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "problemId",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/teambuilder/create/CreateSessionClient.tsx"
     ]
   },
   {
@@ -493,6 +570,13 @@
     ]
   },
   {
+    "method": "PATCH",
+    "url": "users/${encodeURIComponent(username)}/",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/services/user.ts"
+    ]
+  },
+  {
     "method": "GET",
     "url": "users/me/",
     "files": [
@@ -500,13 +584,6 @@
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/teams-collaboration/project-workspaces/page.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/components/ConsultationVotePanel.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/services/trust.ts",
-      "C:/mycode/Konnaxion/Konnaxion/frontend/services/user.ts"
-    ]
-  },
-  {
-    "method": "POST",
-    "url": "users/me/avatar/",
-    "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/services/user.ts"
     ]
   },

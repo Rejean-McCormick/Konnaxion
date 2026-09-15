@@ -2,127 +2,276 @@
 Running 124 tests using 1 worker
 
 [1A[2K[1/124] [setup] ÔÇ║ tests\auth.setup.ts:88:6 ÔÇ║ do login
-[1A[2K[2/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/deliberate/elite
-[1A[2K[3/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/decide/public
-[1A[2K[4/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/decide/results
-[1A[2K[5/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/impact/tracker
-[1A[2K[6/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/pulse/live
-[1A[2K[7/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/trust/profile
-[1A[2K[8/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/insights
-[1A[2K[9/124] [chromium] ÔÇ║ tests\ethikos-wave1-workflow.spec.ts:414:7 ÔÇ║ Kintsugi Wave 1 real UI workflow ÔÇ║ walks the Wave 1 demo interfaces through real UI
-[1A[2K[10/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /
-[1A[2K[11/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/achievements-badges/earned-badges-display
-[1A[2K[12/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/dashboard
-[1A[2K[13/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/expertise-areas/view-current-expertise
-[1A[2K[14/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/overview-analytics/current-ekoh-score
-[1A[2K[15/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/voting-influence/current-voting-weight
-[1A[2K[16/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/audit
-[1A[2K[17/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/demo-importer
-[1A[2K[18/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/moderation
-[1A[2K[19/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/roles
-[1A[2K[20/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/elite
-[1A[2K[21/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/methodology
-[1A[2K[22/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/public
-[1A[2K[23/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/results
-[1A[2K[24/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/deliberate/elite
-[1A[2K[25/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/deliberate/guidelines
-[1A[2K[26/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/impact/feedback
-[1A[2K[27/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/impact/outcomes
-[1A[2K[28/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/impact/tracker
-[1A[2K[29/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/insights
-[1A[2K[30/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/learn/changelog
-[1A[2K[31/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/learn/glossary
-[1A[2K[32/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/learn/guides
-[1A[2K[33/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/health
-[1A[2K[34/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/live
-[1A[2K[35/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/overview
-[1A[2K[36/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/trends
-[1A[2K[37/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/trust/badges
-[1A[2K[38/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/trust/credentials
-[1A[2K[39/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/trust/profile
-[1A[2K[40/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/ai-team-matching/find-teams
-[1A[2K[41/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/ai-team-matching/match-preferences
-[1A[2K[42/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/ai-team-matching/my-matches
-[1A[2K[43/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/dashboard
-[1A[2K[44/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/browse-repository
-[1A[2K[45/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/document-management
-[1A[2K[46/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/search-filter-documents
-[1A[2K[47/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/upload-new-document
-[1A[2K[48/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/browse-projects
-[1A[2K[49/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/create-new-project
-[1A[2K[50/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/my-projects
-[1A[2K[51/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/project-workspace
-[1A[2K[52/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/sustainability-impact/submit-impact-reports
-[1A[2K[53/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/sustainability-impact/sustainability-dashboard
-[1A[2K[54/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/sustainability-impact/track-project-impact
-[1A[2K[55/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/user-reputation/account-preferences
-[1A[2K[56/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/user-reputation/manage-expertise-areas
-[1A[2K[57/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/user-reputation/view-reputation-ekoh
-[1A[2K[58/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/workspaces/browse-available-workspaces
-[1A[2K[59/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/workspaces/launch-new-workspace
-[1A[2K[60/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/workspaces/my-workspaces
-[1A[2K[61/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/certification-programs
-[1A[2K[62/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/exam-dashboard-results
-[1A[2K[63/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/exam-preparation
-[1A[2K[64/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/exam-registration
-[1A[2K[65/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/community-discussions/active-threads
-[1A[2K[66/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/community-discussions/moderation
-[1A[2K[67/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/community-discussions/start-new-discussion
-[1A[2K[68/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/dashboard
-[1A[2K[69/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/knowledge/contribute
-[1A[2K[70/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/browse-resources
-[1A[2K[71/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/offline-content
-[1A[2K[72/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/recommended-resources
-[1A[2K[73/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/search-filters
-[1A[2K[74/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-paths/create-learning-path
-[1A[2K[75/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-paths/manage-existing-paths
-[1A[2K[76/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-paths/my-learning-path
-[1A[2K[77/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/mentorship
-[1A[2K[78/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/activity-planner
-[1A[2K[79/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/my-teams
-[1A[2K[80/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/project-workspaces
-[1A[2K[81/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/team-builder
-[1A[2K[82/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus
-[1A[2K[83/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/activity-feed
-[1A[2K[84/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/admin
-[1A[2K[85/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/dashboard
-[1A[2K[86/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/leaderboards
-[1A[2K[87/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/audit-log
-[1A[2K[88/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/dashboard
-[1A[2K[89/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/konsensus
-[1A[2K[90/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/moderation/community
-[1A[2K[91/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/moderation/queue
-[1A[2K[92/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/roles
-[1A[2K[93/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/users/all
-[1A[2K[94/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/collaborative-spaces/find-spaces
-[1A[2K[95/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/collaborative-spaces/my-spaces
-[1A[2K[96/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/collaborative-spaces/start-new-space
-[1A[2K[97/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/community-showcases/featured-projects
-[1A[2K[98/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/community-showcases/submit-to-showcase
-[1A[2K[99/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/community-showcases/top-creators
-[1A[2K[100/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/creative-hub/explore-ideas
-[1A[2K[101/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/creative-hub/inspiration-gallery
-[1A[2K[102/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/creative-hub/submit-creative-work
-[1A[2K[103/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/dashboard
-[1A[2K[104/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/idea-incubator/collaborate-on-ideas
-[1A[2K[105/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/idea-incubator/create-new-idea
-[1A[2K[106/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/idea-incubator/my-ideas
-[1A[2K[107/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/mentorship
-[1A[2K[108/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/traditions-archive
-[1A[2K[109/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports
-[1A[2K[110/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/custom
-[1A[2K[111/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/perf
-[1A[2K[112/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/smart-vote
-[1A[2K[113/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/usage
-[1A[2K[114/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /search
-[1A[2K[115/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder
-[1A[2K[116/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/create
-[1A[2K[117/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans
-[1A[2K[118/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans/conflicts
-[1A[2K[119/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans/constraints
-[1A[2K[120/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans/modes
-[1A[2K[121/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/problems
-[1A[2K[122/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/problems/create
-[1A[2K[123/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/problems/taxonomy
-[1A[2K[124/124] [chromium-auth] ÔÇ║ tests\ethikos-authenticated-workflow.spec.ts:449:7 ÔÇ║ Ethikos authenticated workflow ÔÇ║ exercises authenticated Ethikos write paths and verifies UI
-[1A[2K  124 passed (2.7m)
+[1A[2K[2/124] [setup] ÔÇ║ tests\auth.setup.ts:88:6 ÔÇ║ do login (retry #1)
+[1A[2K  1) [setup] ÔÇ║ tests\auth.setup.ts:88:6 ÔÇ║ do login ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8000/accounts/login/
+    Call log:
+    [2m  - navigating to "http://localhost:8000/accounts/login/", waiting until "domcontentloaded"[22m
+
+
+      28 |
+      29 | async function loginThroughAllauth(page: Page): Promise<void> {
+    > 30 |   const response = await page.goto(backendUrl('/accounts/login/'), {
+         |                               ^
+      31 |     waitUntil: 'domcontentloaded',
+      32 |   })
+      33 |
+        at loginThroughAllauth (C:\mycode\Konnaxion\Konnaxion\frontend\tests\auth.setup.ts:30:31)
+        at C:\mycode\Konnaxion\Konnaxion\frontend\tests\auth.setup.ts:89:9
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    attachment #2: video (video/webm) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup\video.webm
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    attachment #3: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:8000/accounts/login/
+    Call log:
+    [2m  - navigating to "http://localhost:8000/accounts/login/", waiting until "domcontentloaded"[22m
+
+
+      28 |
+      29 | async function loginThroughAllauth(page: Page): Promise<void> {
+    > 30 |   const response = await page.goto(backendUrl('/accounts/login/'), {
+         |                               ^
+      31 |     waitUntil: 'domcontentloaded',
+      32 |   })
+      33 |
+        at loginThroughAllauth (C:\mycode\Konnaxion\Konnaxion\frontend\tests\auth.setup.ts:30:31)
+        at C:\mycode\Konnaxion\Konnaxion\frontend\tests\auth.setup.ts:89:9
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup-retry1\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    attachment #2: video (video/webm) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup-retry1\video.webm
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    attachment #3: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup-retry1\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace artifacts\playwright-smoke-output\auth.setup.ts-do-login-setup-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+
+[1A[2K[3/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/deliberate/elite
+[1A[2K[4/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/decide/public
+[1A[2K[5/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/decide/results
+[1A[2K[6/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/impact/tracker
+[1A[2K[7/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/pulse/live
+[1A[2K[8/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/trust/profile
+[1A[2K[9/124] [chromium] ÔÇ║ tests\ethikos-wave1-demo.spec.ts:17:9 ÔÇ║ Kintsugi Wave 1 automated demo smoke ÔÇ║ loads /ethikos/insights
+[1A[2K[10/124] [chromium] ÔÇ║ tests\ethikos-wave1-workflow.spec.ts:414:7 ÔÇ║ Kintsugi Wave 1 real UI workflow ÔÇ║ walks the Wave 1 demo interfaces through real UI
+[1A[2K[11/124] [chromium] ÔÇ║ tests\ethikos-wave1-workflow.spec.ts:414:7 ÔÇ║ Kintsugi Wave 1 real UI workflow ÔÇ║ walks the Wave 1 demo interfaces through real UI (retry #1)
+[1A[2K  2) [chromium] ÔÇ║ tests\ethikos-wave1-workflow.spec.ts:414:7 ÔÇ║ Kintsugi Wave 1 real UI workflow ÔÇ║ walks the Wave 1 demo interfaces through real UI 
+
+    Error: Runtime findings on /ethikos/deliberate/elite?sidebar=ethikos
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoHaveLength[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected length: [32m0[39m
+    Received length: [31m10[39m
+    Received array:  [31m[{"message": "HTTP 500: http://localhost:3000/api/users/me", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}, {"message": "HTTP 500: http://localhost:3000/api/ethikos/categories", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}, {"message": "$", "type": "console:error"}, {"message": "HTTP 500: http://localhost:3000/api/ethikos/topics", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}, {"message": "$", "type": "console:error"}, {"message": "HTTP 500: http://localhost:3000/api/ethikos/stances", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}][39m
+
+      159 |   }
+      160 |
+    > 161 |   expect(findings, `Runtime findings on ${route}`).toHaveLength(0)
+          |                                                    ^
+      162 | }
+      163 |
+      164 | async function clickIfVisible(
+        at visitPage (C:\mycode\Konnaxion\Konnaxion\frontend\tests\ethikos-wave1-workflow.spec.ts:161:52)
+        at C:\mycode\Konnaxion\Konnaxion\frontend\tests\ethikos-wave1-workflow.spec.ts:415:5
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    attachment #2: video (video/webm) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium\video.webm
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error Context: artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium\error-context.md
+
+    attachment #4: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Retry #1 ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error: Runtime findings on /ethikos/deliberate/elite?sidebar=ethikos
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mtoHaveLength[2m([22m[32mexpected[39m[2m)[22m
+
+    Expected length: [32m0[39m
+    Received length: [31m10[39m
+    Received array:  [31m[{"message": "HTTP 500: http://localhost:3000/api/users/me", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}, {"message": "HTTP 500: http://localhost:3000/api/ethikos/categories", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}, {"message": "$", "type": "console:error"}, {"message": "HTTP 500: http://localhost:3000/api/ethikos/topics", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}, {"message": "$", "type": "console:error"}, {"message": "HTTP 500: http://localhost:3000/api/ethikos/stances", "type": "server-error"}, {"message": "Failed to load resource: the server responded with a status of 500 (Internal Server Error)", "type": "console:error"}][39m
+
+      159 |   }
+      160 |
+    > 161 |   expect(findings, `Runtime findings on ${route}`).toHaveLength(0)
+          |                                                    ^
+      162 | }
+      163 |
+      164 | async function clickIfVisible(
+        at visitPage (C:\mycode\Konnaxion\Konnaxion\frontend\tests\ethikos-wave1-workflow.spec.ts:161:52)
+        at C:\mycode\Konnaxion\Konnaxion\frontend\tests\ethikos-wave1-workflow.spec.ts:415:5
+
+    attachment #1: screenshot (image/png) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium-retry1\test-failed-1.png
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    attachment #2: video (video/webm) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium-retry1\video.webm
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+    Error Context: artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium-retry1\error-context.md
+
+    attachment #4: trace (application/zip) ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium-retry1\trace.zip
+    Usage:
+
+        pnpm exec playwright show-trace artifacts\playwright-smoke-output\ethikos-wave1-workflow-Kin-3a1af--interfaces-through-real-UI-chromium-retry1\trace.zip
+
+    ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+
+
+[1A[2K[12/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /
+[1A[2K[13/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/achievements-badges/earned-badges-display
+[1A[2K[14/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/dashboard
+[1A[2K[15/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/expertise-areas/view-current-expertise
+[1A[2K[16/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/overview-analytics/current-ekoh-score
+[1A[2K[17/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ekoh/voting-influence/current-voting-weight
+[1A[2K[18/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/audit
+[1A[2K[19/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/demo-importer
+[1A[2K[20/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/moderation
+[1A[2K[21/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/admin/roles
+[1A[2K[22/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/elite
+[1A[2K[23/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/methodology
+[1A[2K[24/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/public
+[1A[2K[25/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/decide/results
+[1A[2K[26/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/deliberate/elite
+[1A[2K[27/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/deliberate/guidelines
+[1A[2K[28/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/impact/feedback
+[1A[2K[29/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/impact/outcomes
+[1A[2K[30/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/impact/tracker
+[1A[2K[31/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/insights
+[1A[2K[32/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/learn/changelog
+[1A[2K[33/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/learn/glossary
+[1A[2K[34/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/learn/guides
+[1A[2K[35/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/health
+[1A[2K[36/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/live
+[1A[2K[37/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/overview
+[1A[2K[38/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/pulse/trends
+[1A[2K[39/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/trust/badges
+[1A[2K[40/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/trust/credentials
+[1A[2K[41/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /ethikos/trust/profile
+[1A[2K[42/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/ai-team-matching/find-teams
+[1A[2K[43/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/ai-team-matching/match-preferences
+[1A[2K[44/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/ai-team-matching/my-matches
+[1A[2K[45/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/dashboard
+[1A[2K[46/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/browse-repository
+[1A[2K[47/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/document-management
+[1A[2K[48/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/search-filter-documents
+[1A[2K[49/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/knowledge/upload-new-document
+[1A[2K[50/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/browse-projects
+[1A[2K[51/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/create-new-project
+[1A[2K[52/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/my-projects
+[1A[2K[53/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/projects/project-workspace
+[1A[2K[54/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/sustainability-impact/submit-impact-reports
+[1A[2K[55/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/sustainability-impact/sustainability-dashboard
+[1A[2K[56/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/sustainability-impact/track-project-impact
+[1A[2K[57/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/user-reputation/account-preferences
+[1A[2K[58/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/user-reputation/manage-expertise-areas
+[1A[2K[59/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/user-reputation/view-reputation-ekoh
+[1A[2K[60/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/workspaces/browse-available-workspaces
+[1A[2K[61/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/workspaces/launch-new-workspace
+[1A[2K[62/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /keenkonnect/workspaces/my-workspaces
+[1A[2K[63/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/certification-programs
+[1A[2K[64/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/exam-dashboard-results
+[1A[2K[65/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/exam-preparation
+[1A[2K[66/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/certifications/exam-registration
+[1A[2K[67/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/community-discussions/active-threads
+[1A[2K[68/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/community-discussions/moderation
+[1A[2K[69/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/community-discussions/start-new-discussion
+[1A[2K[70/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/dashboard
+[1A[2K[71/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/knowledge/contribute
+[1A[2K[72/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/browse-resources
+[1A[2K[73/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/offline-content
+[1A[2K[74/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/recommended-resources
+[1A[2K[75/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-library/search-filters
+[1A[2K[76/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-paths/create-learning-path
+[1A[2K[77/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-paths/manage-existing-paths
+[1A[2K[78/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/learning-paths/my-learning-path
+[1A[2K[79/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/mentorship
+[1A[2K[80/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/activity-planner
+[1A[2K[81/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/my-teams
+[1A[2K[82/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/project-workspaces
+[1A[2K[83/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konnected/teams-collaboration/team-builder
+[1A[2K[84/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus
+[1A[2K[85/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/activity-feed
+[1A[2K[86/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/admin
+[1A[2K[87/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/dashboard
+[1A[2K[88/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /konsensus/leaderboards
+[1A[2K[89/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/audit-log
+[1A[2K[90/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/dashboard
+[1A[2K[91/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/konsensus
+[1A[2K[92/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/moderation/community
+[1A[2K[93/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/moderation/queue
+[1A[2K[94/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/roles
+[1A[2K[95/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kontrol/users/all
+[1A[2K[96/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/collaborative-spaces/find-spaces
+[1A[2K[97/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/collaborative-spaces/my-spaces
+[1A[2K[98/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/collaborative-spaces/start-new-space
+[1A[2K[99/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/community-showcases/featured-projects
+[1A[2K[100/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/community-showcases/submit-to-showcase
+[1A[2K[101/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/community-showcases/top-creators
+[1A[2K[102/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/creative-hub/explore-ideas
+[1A[2K[103/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/creative-hub/inspiration-gallery
+[1A[2K[104/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/creative-hub/submit-creative-work
+[1A[2K[105/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/dashboard
+[1A[2K[106/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/idea-incubator/collaborate-on-ideas
+[1A[2K[107/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/idea-incubator/create-new-idea
+[1A[2K[108/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/idea-incubator/my-ideas
+[1A[2K[109/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/mentorship
+[1A[2K[110/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /kreative/traditions-archive
+[1A[2K[111/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports
+[1A[2K[112/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/custom
+[1A[2K[113/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/perf
+[1A[2K[114/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/smart-vote
+[1A[2K[115/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /reports/usage
+[1A[2K[116/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /search
+[1A[2K[117/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder
+[1A[2K[118/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/create
+[1A[2K[119/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans
+[1A[2K[120/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans/conflicts
+[1A[2K[121/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans/constraints
+[1A[2K[122/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/humans/modes
+[1A[2K[123/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/problems
+[1A[2K[124/124] [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/problems/create
+[1A[2K[125/124] (retries) [chromium] ÔÇ║ tests\routes.spec.ts:102:9 ÔÇ║ Smoke all pages ÔÇ║ GET /teambuilder/problems/taxonomy
+[1A[2K  2 failed
+    [setup] ÔÇ║ tests\auth.setup.ts:88:6 ÔÇ║ do login ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+    [chromium] ÔÇ║ tests\ethikos-wave1-workflow.spec.ts:414:7 ÔÇ║ Kintsugi Wave 1 real UI workflow ÔÇ║ walks the Wave 1 demo interfaces through real UI 
+  1 did not run
+  121 passed (2.0m)

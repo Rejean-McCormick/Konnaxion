@@ -1,7 +1,58 @@
 
-C:\mycode\Konnaxion\Konnaxion\frontend\tests\ethikos-delivery-workflow.spec.ts
-  601:7  error  'current' is never reassigned. Use 'const' instead  prefer-const
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx
+  58:23  warning  'setReferenceId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
 
-Ô£û 1 problem (1 error, 0 warnings)
-  1 error and 0 warnings potentially fixable with the `--fix` option.
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
+  11:3   warning  Member 'CurrentUser' of the import declaration should be sorted alphabetically                                                                                                                                                                                                           sort-imports
+  90:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\workspaces\my-workspaces\page.tsx
+  75:29  warning  'setVisibleWorkspaces' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\community-discussions\thread\[topicId]\page.tsx
+  22:3  warning  Member 'message' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\mentorship\page.tsx
+  18:3  warning  Member 'Alert' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\dashboard\page.tsx
+  22:3  warning  Member 'message' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\collaborative-spaces\find-spaces\page.tsx
+  8:30  warning  Member 'KreativeCollabSession' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\collaborative-spaces\my-spaces\page.tsx
+  8:30  warning  Member 'KreativeCollabSession' of the import declaration should be sorted alphabetically  sort-imports
+  9:28  warning  Member 'CurrentUser' of the import declaration should be sorted alphabetically            sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\community-showcases\featured-projects\page.tsx
+  7:3  warning  'Alert' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\creative-hub\inspiration-gallery\page.tsx
+   8:32  warning  Member 'KreativeArtwork' of the import declaration should be sorted alphabetically                                                                                                                                                                                                       sort-imports
+  50:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  79:15  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\creative-hub\submit-creative-work\page.tsx
+  11:3  warning  Member 'antdMessage' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\dashboard\page.tsx
+   28:3   warning  Member 'KreativeArtwork' of the import declaration should be sorted alphabetically                                                                                                                                                                                                       sort-imports
+  125:21  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  188:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\problems\[problemId]\page.tsx
+  89:11  warning  'IProblemDetailResponse' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+
+C:\mycode\Konnaxion\Konnaxion\frontend\services\teambuilder\index.ts
+  10:3  warning  Member 'ITeam' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\tests\ethikos-delivery-workflow.spec.ts
+  602:7  error  'current' is never reassigned. Use 'const' instead  prefer-const
+
+C:\mycode\Konnaxion\Konnaxion\frontend\tests\platform-harvest-wave2.spec.ts
+  1:1  warning  There should be at least one empty line between import groups  import/order
+
+Ô£û 22 problems (1 error, 21 warnings)
+  1 error and 12 warnings potentially fixable with the `--fix` option.
 

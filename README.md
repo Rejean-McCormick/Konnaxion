@@ -9,32 +9,27 @@ Alongside its technical architecture, Konnaxion includes a fictional origin myth
 
 ## Current maturity & release status
 
-**Current status:** Release Candidate — Production validation complete; Security Release Gate passed  
-**Last quantified engineering maturity:** ~94% *(2026-09-08 assessment)*  
-**Last quantified Release Candidate readiness:** ~89–92% *(2026-09-08 assessment)*  
-**Current release line:** `v0.8.0`  
+**Release target:** `v0.8.0` Release Candidate  
+**Current qualification state:** remediation in progress; the latest full engineering qualification is not completely green  
 **Latest documented tag:** `v0.8.0-beta.2`  
-**RC checkpoint:** `v0.8.0-rc.1` recommended; tag creation not confirmed by the available evidence  
-**Latest validation checkpoint:** 2026-09-12
+**RC checkpoint:** `v0.8.0-rc.1` remains a target; tag creation is not established by the repository evidence used here  
+**Latest validation checkpoint:** 2026-09-15
 
-Konnaxion’s core civic-decision slice and the current production-validation stack are now strongly qualified:
+Konnaxion no longer uses a single aggregate maturity/readiness percentage as a current claim unless the scoring method and denominator are committed with the evidence. The earlier September 8 percentages are historical assessments, not current release gates.
 
-- ethiKos → EkoH → Smart Vote delivery workflow: **GREEN**
-- Next.js production build and TypeScript validation: **GREEN**
-- common authentication migration (`django-allauth`, optional OIDC, local RBAC/MFA): **GREEN**
-- production Django/PostgreSQL connectivity and migrations: **GREEN**
-- Smart Vote schema and real reading runtime: **GREEN**
-- host, SSH, firewall, Docker/runtime, TLS and application security gates: **GREEN**
-- verified off-server backup and isolated restore drill: **GREEN**
-- SecurityDiag S13 Backup & Recovery Evidence: **PASS**
-- SecurityDiag S14 Security Release Gate: **PASS**
-- full SecurityDiag automated suite: **62/62 PASS**
+Current evidence is mixed but specific:
 
-The final SecurityDiag campaign retains only accepted non-blocking warnings in S01, S02, and S03. The authentication/runtime/backup/recovery validation phase is closed; the next documented diagnostic phase is **LevelUpDiag**, focused on authentication and integration (`N00 → N02 → N03 → N04 → N05 → N07 → N11`).
+- **LevelUpDiag full:** N00, N01, N02, N04, N05, N06, N08 and N09 passed; N03 failed on frontend ESLint; N07 warned on two Capsule Manager security-gate tests; N10 reported frontend/full-backend qualification debt; N11 therefore remained non-green.
+- **SecurityDiag release:** S04 through S12 passed; S01–S03 retained review warnings; S13 failed because backup evidence exceeded the configured freshness threshold; S14 failed as a consequence of S13.
+- **Core runtime/browser evidence:** local backend/frontend startup, Ethikos seed and Playwright smoke passed in N05.
+- **Backend deep suite:** 146 tests passed and 7 failed in the latest N10 run, concentrated in EkoH/TeamBuilder database-schema/test-fixture paths.
+- **Capsule Manager gate suite:** 40 tests passed and 2 failed in the N07 security-gate suite.
+
+Backup freshness and restore-drill evidence are tracked as **operational resilience evidence**. They are not presented as proof that application, host, network or runtime security controls passed or failed. Do not claim a current SecurityDiag S14 PASS unless the actual S14 gate passes.
 
 Some secondary product surfaces remain explicitly **preview, read-only, placeholder, or deferred** where no complete backend contract exists. These states are intentional and should not be replaced by fabricated persistence or fake success responses.
 
-> Konnaxion is qualified as a Release Candidate on the available engineering evidence. This does not by itself mean that the `v0.8.0-rc.1` Git tag, a final production release, or a public demo has been published.
+See `docs/Technical-Reference/QUALIFICATION_STATUS.md` for the dated gate-by-gate evidence, test taxonomy, known qualification defects and closure criteria.
 
 ## Mythological Origins
 
@@ -68,7 +63,7 @@ Each component is designed to operate independently or as part of a larger integ
 
 ## Access & how to try (placeholder)
 
-The current authentication, production runtime, security, backup, and recovery path has passed its documented validation phase. The supplied project evidence does not yet document a public demo URL or general public onboarding path.
+The current repository has substantial authentication, runtime and production-security evidence, but the latest full engineering qualification still has open remediation items. Backup/recovery is tracked separately as operational resilience evidence. The supplied project evidence does not yet document a general public onboarding path.
 
 This section will be updated with:
 
@@ -91,7 +86,9 @@ The Konnaxion architecture consists of six major modules, each supported by deta
 5. EkoH — Merit Signaling & Contextual Evaluation  
 6. Smart Vote — Flexible & Merit-Sensitive Voting  
 
-(A full breakdown of submodules and interactions is provided in the internal KOA / Konnaxion system document and related diagrams.)
+(A full breakdown of domains and interactions is provided in the canonical technical documentation.)
+
+> **Implementation note:** the feature lists below describe Konnaxion's product/design scope. They are not a claim that every listed capability is currently implemented or qualified. Current implementation and qualification status is tracked in `docs/Technical-Reference/QUALIFICATION_STATUS.md`.
 
 ---
 
@@ -215,7 +212,7 @@ This repository currently includes:
 - UI concept explorations and explicitly retained prototype/placeholder surfaces  
 - data modeling and integration experiments  
 
-Each component contributes to the assembly of a unified civic infrastructure. The core ethiKos / EkoH / Smart Vote path is substantially implemented and qualified through local and production-validation evidence. The September 12 validation also closes the current authentication, runtime, security, backup, and recovery phase. Some secondary surfaces remain intentionally experimental, preview, read-only, placeholder, or deferred pending complete domain contracts.
+Each component contributes to the assembly of a unified civic infrastructure. The core ethiKos / EkoH / Smart Vote path has substantial implementation and runtime evidence, but the latest full LevelUpDiag campaign is not completely green. SecurityDiag currently shows S04–S12 passing while operational backup evidence remains stale under its configured release threshold. Some secondary surfaces remain intentionally experimental, preview, read-only, placeholder, or deferred pending complete domain contracts.
 
 ---
 
@@ -237,17 +234,21 @@ Konnaxion is the principal software expression of the KOA civic architecture and
 
 ## ️Roadmap
 
-Current next directions include:
+Current closure work is evidence-driven:
 
-- Run the next **LevelUpDiag** authentication/integration sequence (`N00 → N02 → N03 → N04 → N05 → N07 → N11`)  
-- Continue authentication/security integration validation, especially N04, N07, and N11  
-- Reduce the remaining non-blocking `drf_spectacular` OpenAPI schema warnings  
-- Refine release provenance and artifact metadata  
-- Continue explicit Version 1 scope classification for complete, read-only, preview, and deferred surfaces  
-- Formalize public demo, pilot, and local-stack onboarding paths  
-- Continue cross-module integration, documentation, and mythology-based narrative UX work  
+- resolve the frontend ESLint gate and remove the `--passWithNoTests` escape hatch from the canonical full-scan path;
+- make the full-scan browser phase reproduce its backend/seed prerequisites;
+- re-run the backend full suite against a clean test database and close the remaining EkoH/TeamBuilder schema/test-fixture defects;
+- resolve the two Capsule Manager `secrets_not_default` gate-test failures;
+- distinguish deployed-route validity from simple HTTP reachability in LevelUpDiag N09;
+- reduce the remaining non-blocking `drf_spectacular` OpenAPI schema warnings;
+- refine release provenance and artifact metadata;
+- continue explicit scope classification for implemented, qualified, preview, read-only, deferred and historical surfaces;
+- formalize public demo, pilot and local-stack onboarding paths.
 
-Roadmap items remain evidence-driven: real backend contracts are wired and tested where they exist; unsupported semantics stay explicitly read-only, preview, or deferred.
+Backup/restore drills are performed when operational-release assurance requires them; they are not required for every routine code/documentation qualification pass.
+
+Unsupported semantics stay explicitly read-only, preview or deferred rather than being represented by fabricated persistence or fake success responses.
 
 ---
 

@@ -2,14 +2,18 @@
    - Environments: .env.local, .env.production
 
    Creating an optimized production build ...
- Ô£ô Compiled successfully in 44s
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+Browserslist: browsers data (caniuse-lite) is 11 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+ Ô£ô Compiled successfully in 35.0s
    Skipping linting
    Checking validity of types ...
    Collecting page data ...
 [Konnaxion] Home page BACKEND_ROOT (prod) = (same-origin)
    Generating static pages (0/115) ...
-   Generating static pages (28/115) 
 [Konnaxion] Home page BACKEND_ROOT (prod) = (same-origin)
+   Generating static pages (28/115) 
    Generating static pages (57/115) 
    Generating static pages (86/115) 
  Ô£ô Generating static pages (115/115)
@@ -19,130 +23,129 @@
 Route (app)                                                         Size  First Load JS
 Ôöî ãÆ /                                                              177 B         107 kB
 Ôö£ Ôùï /_not-found                                                    989 B         103 kB
-Ôö£ Ôùï /ekoh/achievements-badges/earned-badges-display              5.14 kB         315 kB
-Ôö£ Ôùï /ekoh/dashboard                                              8.94 kB         332 kB
-Ôö£ Ôùï /ekoh/expertise-areas/view-current-expertise                 6.24 kB         290 kB
-Ôö£ Ôùï /ekoh/overview-analytics/current-ekoh-score                  9.45 kB         480 kB
-Ôö£ Ôùï /ekoh/voting-influence/current-voting-weight                 3.42 kB         390 kB
-Ôö£ Ôùï /ethikos/admin/audit                                         13.3 kB         750 kB
+Ôö£ Ôùï /ekoh/achievements-badges/earned-badges-display              6.94 kB         322 kB
+Ôö£ Ôùï /ekoh/dashboard                                              8.99 kB         330 kB
+Ôö£ Ôùï /ekoh/expertise-areas/view-current-expertise                 7.06 kB         329 kB
+Ôö£ Ôùï /ekoh/overview-analytics/current-ekoh-score                  16.5 kB         414 kB
+Ôö£ Ôùï /ekoh/voting-influence/current-voting-weight                 7.26 kB         329 kB
+Ôö£ Ôùï /ethikos/admin/audit                                         11.2 kB         750 kB
 Ôö£ Ôùï /ethikos/admin/demo-importer                                 4.54 kB         106 kB
-Ôö£ Ôùï /ethikos/admin/moderation                                    7.05 kB         751 kB
-Ôö£ Ôùï /ethikos/admin/roles                                         6.26 kB         750 kB
-Ôö£ Ôùï /ethikos/decide/elite                                        4.13 kB         756 kB
-Ôö£ Ôùï /ethikos/decide/methodology                                  23.3 kB         360 kB
-Ôö£ Ôùï /ethikos/decide/public                                         14 kB         760 kB
-Ôö£ Ôùï /ethikos/decide/results                                      18.1 kB         755 kB
-Ôö£ ãÆ /ethikos/deliberate/[topic]                                  49.8 kB         505 kB
-Ôö£ Ôùï /ethikos/deliberate/elite                                    12.4 kB         764 kB
-Ôö£ Ôùï /ethikos/deliberate/guidelines                               25.9 kB         446 kB
-Ôö£ Ôùï /ethikos/impact/feedback                                       31 kB         636 kB
-Ôö£ Ôùï /ethikos/impact/outcomes                                     16.3 kB        1.12 MB
-Ôö£ Ôùï /ethikos/impact/tracker                                      20.7 kB         758 kB
-Ôö£ Ôùï /ethikos/insights                                            31.8 kB         886 kB
-Ôö£ Ôùï /ethikos/learn/changelog                                     13.7 kB         763 kB
-Ôö£ Ôùï /ethikos/learn/glossary                                      9.11 kB         746 kB
-Ôö£ Ôùï /ethikos/learn/guides                                        17.3 kB         771 kB
+Ôö£ Ôùï /ethikos/admin/moderation                                    11.1 kB         750 kB
+Ôö£ Ôùï /ethikos/admin/roles                                         10.5 kB         749 kB
+Ôö£ Ôùï /ethikos/decide/elite                                        4.12 kB         756 kB
+Ôö£ Ôùï /ethikos/decide/methodology                                  26.9 kB         360 kB
+Ôö£ Ôùï /ethikos/decide/public                                       13.6 kB         760 kB
+Ôö£ Ôùï /ethikos/decide/results                                      15.9 kB         755 kB
+Ôö£ ãÆ /ethikos/deliberate/[topic]                                    47 kB         505 kB
+Ôö£ Ôùï /ethikos/deliberate/elite                                    11.9 kB         763 kB
+Ôö£ Ôùï /ethikos/deliberate/guidelines                               23.1 kB         447 kB
+Ôö£ Ôùï /ethikos/impact/feedback                                     33.1 kB         633 kB
+Ôö£ Ôùï /ethikos/impact/outcomes                                     12.6 kB        1.12 MB
+Ôö£ Ôùï /ethikos/impact/tracker                                      18.2 kB         757 kB
+Ôö£ Ôùï /ethikos/insights                                            33.1 kB         886 kB
+Ôö£ Ôùï /ethikos/learn/changelog                                     14.1 kB         762 kB
+Ôö£ Ôùï /ethikos/learn/glossary                                      6.91 kB         746 kB
+Ôö£ Ôùï /ethikos/learn/guides                                        19.6 kB         769 kB
 Ôö£ Ôùï /ethikos/pulse/health                                        11.4 kB         785 kB
-Ôö£ Ôùï /ethikos/pulse/live                                          18.3 kB        1.13 MB
-Ôö£ Ôùï /ethikos/pulse/overview                                      28.3 kB         790 kB
-Ôö£ Ôùï /ethikos/pulse/trends                                        33.6 kB         773 kB
-Ôö£ Ôùï /ethikos/trust/badges                                        8.27 kB         750 kB
-Ôö£ Ôùï /ethikos/trust/credentials                                   11.5 kB         779 kB
-Ôö£ Ôùï /ethikos/trust/profile                                       36.2 kB         432 kB
-Ôö£ Ôùï /keenkonnect/ai-team-matching/find-teams                     11.6 kB         329 kB
-Ôö£ Ôùï /keenkonnect/ai-team-matching/match-preferences              12.3 kB         548 kB
-Ôö£ Ôùï /keenkonnect/ai-team-matching/my-matches                     3.09 kB         691 kB
-Ôö£ Ôùï /keenkonnect/dashboard                                       20.4 kB         374 kB
-Ôö£ Ôùï /keenkonnect/knowledge/browse-repository                     7.17 kB         703 kB
-Ôö£ Ôùï /keenkonnect/knowledge/document-management                   17.8 kB         713 kB
-Ôö£ Ôùï /keenkonnect/knowledge/search-filter-documents               9.81 kB         697 kB
-Ôö£ Ôùï /keenkonnect/knowledge/upload-new-document                   26.1 kB         590 kB
-Ôö£ Ôùï /keenkonnect/projects/browse-projects                        14.8 kB         377 kB
-Ôö£ Ôùï /keenkonnect/projects/create-new-project                     24.4 kB         600 kB
-Ôö£ Ôùï /keenkonnect/projects/my-projects                            5.59 kB         723 kB
-Ôö£ Ôùï /keenkonnect/projects/project-workspace                      15.4 kB         388 kB
-Ôö£ Ôùï /keenkonnect/sustainability-impact/submit-impact-reports       27 kB         617 kB
-Ôö£ Ôùï /keenkonnect/sustainability-impact/sustainability-dashboard    10 kB         725 kB
-Ôö£ Ôùï /keenkonnect/sustainability-impact/track-project-impact      8.64 kB         434 kB
-Ôö£ Ôùï /keenkonnect/user-reputation/account-preferences             15.2 kB         334 kB
-Ôö£ Ôùï /keenkonnect/user-reputation/manage-expertise-areas          22.6 kB         535 kB
-Ôö£ Ôùï /keenkonnect/user-reputation/view-reputation-ekoh            13.6 kB         336 kB
-Ôö£ Ôùï /keenkonnect/workspaces/browse-available-workspaces          10.5 kB         315 kB
-Ôö£ Ôùï /keenkonnect/workspaces/launch-new-workspace                 23.3 kB         587 kB
-Ôö£ Ôùï /keenkonnect/workspaces/my-workspaces                        2.57 kB         698 kB
-Ôö£ Ôùï /konnected/certifications/certification-programs             32.2 kB         429 kB
-Ôö£ Ôùï /konnected/certifications/exam-dashboard-results             27.1 kB         444 kB
-Ôö£ Ôùï /konnected/certifications/exam-preparation                   13.7 kB         360 kB
-Ôö£ Ôùï /konnected/certifications/exam-registration                  17.2 kB         393 kB
-Ôö£ Ôùï /konnected/community-discussions/active-threads              13.8 kB         358 kB
-Ôö£ Ôùï /konnected/community-discussions/moderation                  6.41 kB         736 kB
-Ôö£ Ôùï /konnected/community-discussions/start-new-discussion        19.9 kB         369 kB
-Ôö£ Ôùï /konnected/dashboard                                           25 kB         403 kB
-Ôö£ Ôùï /konnected/knowledge/contribute                              14.2 kB         350 kB
-Ôö£ ãÆ /konnected/learning-library/[resourceId]                     5.95 kB         274 kB
-Ôö£ Ôùï /konnected/learning-library/browse-resources                 16.9 kB         414 kB
-Ôö£ Ôùï /konnected/learning-library/offline-content                  30.6 kB         499 kB
-Ôö£ Ôùï /konnected/learning-library/recommended-resources            15.7 kB         352 kB
-Ôö£ Ôùï /konnected/learning-library/search-filters                   12.8 kB         430 kB
-Ôö£ Ôùï /konnected/learning-paths/create-learning-path               14.6 kB         713 kB
-Ôö£ Ôùï /konnected/learning-paths/manage-existing-paths              8.25 kB         726 kB
-Ôö£ Ôùï /konnected/learning-paths/my-learning-path                   15.5 kB         324 kB
-Ôö£ Ôùï /konnected/mentorship                                        18.4 kB         358 kB
-Ôö£ Ôùï /konnected/teams-collaboration/activity-planner              17.6 kB         386 kB
-Ôö£ Ôùï /konnected/teams-collaboration/my-teams                      23.9 kB         419 kB
-Ôö£ Ôùï /konnected/teams-collaboration/project-workspaces            14.5 kB         411 kB
-Ôö£ Ôùï /konnected/teams-collaboration/team-builder                  21.6 kB         653 kB
-Ôö£ Ôùï /konsensus                                                   79.5 kB         429 kB
-Ôö£ Ôùï /konsensus/activity-feed                                     34.5 kB         452 kB
-Ôö£ Ôùï /konsensus/admin                                             18.4 kB         495 kB
-Ôö£ Ôùï /konsensus/dashboard                                           13 kB         413 kB
-Ôö£ Ôùï /konsensus/leaderboards                                      15.5 kB         779 kB
-Ôö£ Ôùï /kontrol/audit-log                                           4.59 kB         700 kB
-Ôö£ Ôùï /kontrol/dashboard                                           19.6 kB         726 kB
-Ôö£ Ôùï /kontrol/konsensus                                           24.7 kB         608 kB
-Ôö£ Ôùï /kontrol/moderation/community                                14.9 kB         710 kB
-Ôö£ Ôùï /kontrol/moderation/queue                                    11.3 kB         740 kB
-Ôö£ Ôùï /kontrol/roles                                               8.89 kB         704 kB
-Ôö£ Ôùï /kontrol/users/all                                           12.6 kB         708 kB
-Ôö£ Ôùï /kreative/collaborative-spaces/find-spaces                   4.25 kB         321 kB
-Ôö£ Ôùï /kreative/collaborative-spaces/my-spaces                     7.21 kB         291 kB
-Ôö£ Ôùï /kreative/collaborative-spaces/start-new-space               9.92 kB         319 kB
-Ôö£ Ôùï /kreative/community-showcases/featured-projects              3.74 kB         327 kB
-Ôö£ Ôùï /kreative/community-showcases/submit-to-showcase             5.02 kB         290 kB
-Ôö£ Ôùï /kreative/community-showcases/top-creators                   8.58 kB         353 kB
-Ôö£ Ôùï /kreative/creative-hub/explore-ideas                         2.42 kB         311 kB
-Ôö£ Ôùï /kreative/creative-hub/inspiration-gallery                   4.16 kB         318 kB
-Ôö£ Ôùï /kreative/creative-hub/submit-creative-work                  7.65 kB         306 kB
-Ôö£ Ôùï /kreative/dashboard                                          19.6 kB         327 kB
-Ôö£ Ôùï /kreative/idea-incubator/collaborate-on-ideas                1.62 kB         278 kB
-Ôö£ Ôùï /kreative/idea-incubator/create-new-idea                     4.14 kB         276 kB
-Ôö£ Ôùï /kreative/idea-incubator/my-ideas                             1.6 kB         278 kB
-Ôö£ Ôùï /kreative/mentorship                                         15.8 kB         367 kB
-Ôö£ Ôùï /kreative/traditions-archive                                 10.1 kB         306 kB
-Ôö£ Ôùï /reports                                                     10.2 kB         395 kB
-Ôö£ Ôùï /reports/custom                                              17.3 kB         688 kB
-Ôö£ Ôùï /reports/perf                                                12.1 kB         540 kB
-Ôö£ Ôùï /reports/smart-vote                                          22.1 kB         566 kB
-Ôö£ Ôùï /reports/usage                                               28.1 kB         573 kB
-Ôö£ ãÆ /search                                                      22.3 kB         402 kB
-Ôö£ Ôùï /teambuilder                                                 2.24 kB         135 kB
-Ôö£ ãÆ /teambuilder/[sessionId]                                     10.8 kB         430 kB
-Ôö£ ãÆ /teambuilder/create                                          11.6 kB         312 kB
-Ôö£ Ôùï /teambuilder/humans                                          8.06 kB         329 kB
-Ôö£ Ôùï /teambuilder/humans/conflicts                                20.1 kB         414 kB
-Ôö£ Ôùï /teambuilder/humans/constraints                              15.6 kB         372 kB
-Ôö£ Ôùï /teambuilder/humans/modes                                    12.6 kB         313 kB
-Ôö£ Ôùï /teambuilder/problems                                        7.86 kB         716 kB
-Ôö£ ãÆ /teambuilder/problems/[problemId]                            6.74 kB         423 kB
-Ôö£ Ôùï /teambuilder/problems/create                                   16 kB         371 kB
+Ôö£ Ôùï /ethikos/pulse/live                                          15.4 kB        1.13 MB
+Ôö£ Ôùï /ethikos/pulse/overview                                        27 kB         790 kB
+Ôö£ Ôùï /ethikos/pulse/trends                                        42.4 kB         770 kB
+Ôö£ Ôùï /ethikos/trust/badges                                        8.75 kB         749 kB
+Ôö£ Ôùï /ethikos/trust/credentials                                   16.1 kB         779 kB
+Ôö£ Ôùï /ethikos/trust/profile                                       36.8 kB         432 kB
+Ôö£ Ôùï /keenkonnect/ai-team-matching/find-teams                     15.3 kB         327 kB
+Ôö£ Ôùï /keenkonnect/ai-team-matching/match-preferences              8.23 kB         550 kB
+Ôö£ Ôùï /keenkonnect/ai-team-matching/my-matches                     3.56 kB         690 kB
+Ôö£ Ôùï /keenkonnect/dashboard                                       29.2 kB         375 kB
+Ôö£ Ôùï /keenkonnect/knowledge/browse-repository                     4.01 kB         705 kB
+Ôö£ Ôùï /keenkonnect/knowledge/document-management                   13.4 kB         714 kB
+Ôö£ Ôùï /keenkonnect/knowledge/search-filter-documents               4.19 kB         697 kB
+Ôö£ Ôùï /keenkonnect/knowledge/upload-new-document                   22.5 kB         561 kB
+Ôö£ Ôùï /keenkonnect/projects/browse-projects                        19.2 kB         376 kB
+Ôö£ Ôùï /keenkonnect/projects/create-new-project                     21.3 kB         599 kB
+Ôö£ Ôùï /keenkonnect/projects/my-projects                            5.94 kB         722 kB
+Ôö£ Ôùï /keenkonnect/projects/project-workspace                      22.1 kB         383 kB
+Ôö£ Ôùï /keenkonnect/sustainability-impact/submit-impact-reports       21 kB         590 kB
+Ôö£ Ôùï /keenkonnect/sustainability-impact/sustainability-dashboard  9.41 kB         725 kB
+Ôö£ Ôùï /keenkonnect/sustainability-impact/track-project-impact      11.1 kB         421 kB
+Ôö£ Ôùï /keenkonnect/user-reputation/account-preferences             3.38 kB         295 kB
+Ôö£ Ôùï /keenkonnect/user-reputation/manage-expertise-areas          20.1 kB         535 kB
+Ôö£ Ôùï /keenkonnect/user-reputation/view-reputation-ekoh            13.6 kB         335 kB
+Ôö£ Ôùï /keenkonnect/workspaces/browse-available-workspaces            14 kB         317 kB
+Ôö£ Ôùï /keenkonnect/workspaces/launch-new-workspace                 16.7 kB         542 kB
+Ôö£ Ôùï /keenkonnect/workspaces/my-workspaces                        2.55 kB         700 kB
+Ôö£ Ôùï /konnected/certifications/certification-programs               28 kB         430 kB
+Ôö£ Ôùï /konnected/certifications/exam-dashboard-results             25.3 kB         445 kB
+Ôö£ Ôùï /konnected/certifications/exam-preparation                   13.5 kB         360 kB
+Ôö£ Ôùï /konnected/certifications/exam-registration                  19.3 kB         391 kB
+Ôö£ Ôùï /konnected/community-discussions/active-threads              14.9 kB         358 kB
+Ôö£ Ôùï /konnected/community-discussions/moderation                  10.4 kB         735 kB
+Ôö£ Ôùï /konnected/community-discussions/start-new-discussion        14.8 kB         370 kB
+Ôö£ ãÆ /konnected/community-discussions/thread/[topicId]            10.7 kB         350 kB
+Ôö£ Ôùï /konnected/dashboard                                         25.5 kB         403 kB
+Ôö£ Ôùï /konnected/knowledge/contribute                              11.2 kB         350 kB
+Ôö£ ãÆ /konnected/learning-library/[resourceId]                     5.96 kB         275 kB
+Ôö£ Ôùï /konnected/learning-library/browse-resources                 10.9 kB         415 kB
+Ôö£ Ôùï /konnected/learning-library/offline-content                  33.8 kB         498 kB
+Ôö£ Ôùï /konnected/learning-library/recommended-resources            12.5 kB         352 kB
+Ôö£ Ôùï /konnected/learning-library/search-filters                   9.91 kB         430 kB
+Ôö£ Ôùï /konnected/learning-paths/create-learning-path               12.3 kB         713 kB
+Ôö£ Ôùï /konnected/learning-paths/manage-existing-paths              8.73 kB         725 kB
+Ôö£ Ôùï /konnected/learning-paths/my-learning-path                   17.6 kB         322 kB
+Ôö£ Ôùï /konnected/mentorship                                        24.8 kB         381 kB
+Ôö£ Ôùï /konnected/teams-collaboration/activity-planner              17.4 kB         386 kB
+Ôö£ Ôùï /konnected/teams-collaboration/my-teams                      25.9 kB         418 kB
+Ôö£ Ôùï /konnected/teams-collaboration/project-workspaces            10.8 kB         411 kB
+Ôö£ Ôùï /konnected/teams-collaboration/team-builder                  18.3 kB         653 kB
+Ôö£ Ôùï /konsensus                                                   79.5 kB         428 kB
+Ôö£ Ôùï /konsensus/activity-feed                                     38.3 kB         451 kB
+Ôö£ Ôùï /konsensus/admin                                             15.9 kB         495 kB
+Ôö£ Ôùï /konsensus/dashboard                                         11.3 kB         413 kB
+Ôö£ Ôùï /konsensus/leaderboards                                      13.1 kB         778 kB
+Ôö£ Ôùï /kontrol/audit-log                                           4.94 kB         699 kB
+Ôö£ Ôùï /kontrol/dashboard                                           12.6 kB         710 kB
+Ôö£ Ôùï /kontrol/konsensus                                           21.6 kB         608 kB
+Ôö£ Ôùï /kontrol/moderation/community                                12.8 kB         710 kB
+Ôö£ Ôùï /kontrol/moderation/queue                                      12 kB         740 kB
+Ôö£ Ôùï /kontrol/roles                                               6.58 kB         704 kB
+Ôö£ Ôùï /kontrol/users/all                                           12.9 kB         707 kB
+Ôö£ Ôùï /kreative/collaborative-spaces/find-spaces                   6.78 kB         321 kB
+Ôö£ Ôùï /kreative/collaborative-spaces/my-spaces                     5.35 kB         332 kB
+Ôö£ Ôùï /kreative/collaborative-spaces/start-new-space               9.63 kB         337 kB
+Ôö£ Ôùï /kreative/community-showcases/featured-projects              7.43 kB         326 kB
+Ôö£ Ôùï /kreative/community-showcases/submit-to-showcase             3.32 kB         272 kB
+Ôö£ Ôùï /kreative/community-showcases/top-creators                   8.57 kB         353 kB
+Ôö£ Ôùï /kreative/creative-hub/explore-ideas                         2.23 kB         311 kB
+Ôö£ Ôùï /kreative/creative-hub/inspiration-gallery                   7.88 kB         305 kB
+Ôö£ Ôùï /kreative/creative-hub/submit-creative-work                  5.11 kB         328 kB
+Ôö£ Ôùï /kreative/dashboard                                          8.59 kB         335 kB
+Ôö£ Ôùï /kreative/idea-incubator/collaborate-on-ideas                5.81 kB         280 kB
+Ôö£ Ôùï /kreative/idea-incubator/create-new-idea                     3.01 kB         272 kB
+Ôö£ Ôùï /kreative/idea-incubator/my-ideas                            5.81 kB         280 kB
+Ôö£ Ôùï /kreative/mentorship                                         23.9 kB         388 kB
+Ôö£ Ôùï /kreative/traditions-archive                                 7.32 kB         291 kB
+Ôö£ Ôùï /reports                                                     18.8 kB         393 kB
+Ôö£ Ôùï /reports/custom                                              21.3 kB         688 kB
+Ôö£ Ôùï /reports/perf                                                13.4 kB         541 kB
+Ôö£ Ôùï /reports/smart-vote                                          20.2 kB         459 kB
+Ôö£ Ôùï /reports/usage                                               32.2 kB         573 kB
+Ôö£ ãÆ /search                                                      20.1 kB         402 kB
+Ôö£ Ôùï /teambuilder                                                 2.29 kB         135 kB
+Ôö£ ãÆ /teambuilder/[sessionId]                                     7.63 kB         430 kB
+Ôö£ ãÆ /teambuilder/create                                          8.72 kB         312 kB
+Ôö£ Ôùï /teambuilder/humans                                          11.6 kB         329 kB
+Ôö£ Ôùï /teambuilder/humans/conflicts                                18.6 kB         415 kB
+Ôö£ Ôùï /teambuilder/humans/constraints                              15.3 kB         373 kB
+Ôö£ Ôùï /teambuilder/humans/modes                                    9.64 kB         314 kB
+Ôö£ Ôùï /teambuilder/problems                                         4.6 kB         739 kB
+Ôö£ ãÆ /teambuilder/problems/[problemId]                            6.76 kB         423 kB
+Ôö£ Ôùï /teambuilder/problems/create                                 13.8 kB         394 kB
 Ôöö Ôùï /teambuilder/problems/taxonomy                                8.1 kB         343 kB
 + First Load JS shared by all                                     102 kB
   Ôö£ chunks/732292b7-92f42ecf47214fb1.js                          53.2 kB
-  Ôö£ chunks/7577-6a8c10a40fc2c279.js                              46.3 kB
+  Ôö£ chunks/7577-0f840b54c37955b2.js                              46.3 kB
   Ôöö other shared chunks (total)                                  2.27 kB
 
-
-ãÆ Middleware                                                     83.1 kB
 
 Ôùï  (Static)   prerendered as static content
 ãÆ  (Dynamic)  server-rendered on demand

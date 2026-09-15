@@ -1,5 +1,12 @@
 ### Pattern scan
 
+-- C:\mycode\Konnaxion\Konnaxion\frontend\app\ekoh\overview-analytics\current-ekoh-score\page.tsx
+ProTable render(v)
+  L40: render: (v
+  L40: render: (v
+  L40: render: (v
+  L40: render: (v
+
 -- C:\mycode\Konnaxion\Konnaxion\frontend\app\ethikos\decide\elite\page.tsx
 Countdown value non-number
   L: Statistic.Countdown
@@ -19,10 +26,6 @@ ProTable render(v)
   L214: render: (v
   L214: render: (v
   L214: render: (v
-
--- C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\user-reputation\account-preferences\page.tsx
-TextArea autosize
-  L195: autoSize=
 
 -- C:\mycode\Konnaxion\Konnaxion\frontend\app\konnected\certifications\exam-dashboard-results\page.tsx
 ProTable render(v)
@@ -106,7 +109,7 @@ ProTable render(v)
 
 -- C:\mycode\Konnaxion\Konnaxion\frontend\app\kontrol\moderation\community\page.tsx
 ProTable render(v)
-  L216: render: (v
+  L206: render: (v
 
 -- C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\community-showcases\top-creators\page.tsx
 ProTable render(v)
@@ -118,8 +121,8 @@ ProTable render(v)
 
 -- C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\problems\[problemId]\page.tsx
 ProTable render(v)
-  L434: render: (v
-  L434: render: (v
+  L430: render: (v
+  L430: render: (v
 
 -- C:\mycode\Konnaxion\Konnaxion\frontend\modules\ethikos\components\ArgumentSourcesPanel.tsx
 TextArea autosize

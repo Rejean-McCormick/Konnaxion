@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This note identifies the code areas that should be changed so the implementation matches the current Konnaxion architecture.
+This note identifies code areas that should be changed so the implementation matches the current Konnaxion architecture. It is an architecture/code-alignment ledger, not a release-status report. Current executable qualification evidence is recorded in `QUALIFICATION_STATUS.md`.
 
 ## 1. Canonical EkoH taxonomy reference
 
@@ -196,3 +196,17 @@ Preserve these patterns:
 - Smart Vote reading baseline and advisory result are separate;
 - privacy filtering is performed server-side;
 - frontend `decide.ts` does not copy the baseline into the reading when the endpoint returns no reading.
+
+## 14. Qualification-tool alignment is tracked separately
+
+The 2026-09-15 full qualification exposed several issues that are not architecture changes and therefore should not be mixed into sections 1–13:
+
+- frontend ESLint is not currently green;
+- the canonical full-scan still allows Jest to pass with no tests;
+- the full-scan browser phase does not reproduce the same backend/seed orchestration that makes N05 pass;
+- backend release qualification should use a clean test DB rather than inheriting `--reuse-db` state;
+- older EkoH tests need the same `ekoh_smartvote` schema scope used by current services/tests;
+- two Capsule Manager `secrets_not_default` security-gate tests are failing;
+- LevelUpDiag N09 currently conflates HTTP reachability with endpoint validity.
+
+These are qualification/tooling or test-fixture closure items. Their current evidence and closure rules are maintained in `QUALIFICATION_STATUS.md`.
