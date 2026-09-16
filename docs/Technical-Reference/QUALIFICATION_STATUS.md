@@ -130,3 +130,17 @@ Before describing the full engineering qualification as green:
 - review S03 image pinning and optional dependency-audit policy according to the release assurance level actually desired.
 
 OpenAPI/schema-generation warnings and optional deep probes remain visible qualification debt but should not be represented as implemented functionality failures unless their corresponding contract becomes release-blocking.
+
+## Interaction Kernel qualification
+
+Current LevelUpDiag and SecurityDiag evidence qualifies Konnaxion engineering/security surfaces only to the extent stated above. It does **not** by itself qualify the external Interaction Kernel profiles.
+
+As of this documentation update, treat these as **target contracts / integration qualification pending**:
+
+- `governance.decision.execute/1.0.0`;
+- `accountability.impact.publish/1.0.0`;
+- immutable/read-model `DecisionRecord` emission;
+- correlation/idempotency/durable delivery across the Konnaxion↔Orgo boundary;
+- Runtime Pack activation delegation when kOA-Linux is present.
+
+The supplied IK migration documentation references an existing/historical `orgo_bridge_*` J30 implementation and `OrgoImpactPublication`. That reference is not sufficient to mark the current Konnaxion snapshot IK-qualified; executable adapter inspection and profile-level integration tests are required.

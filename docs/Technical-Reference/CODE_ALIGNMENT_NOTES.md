@@ -163,15 +163,19 @@ Do not mix ethiKos stances, Smart Vote ballots and Smart Vote derived readings i
 
 Active router/admin comments and API documentation should name the actual domain responsibility (`structured deliberation`, `argument source`, `argument impact`, etc.). Database migration filenames do not need cosmetic rewriting.
 
-## 12. External ecosystem boundaries are not implemented yet
+## 12. External ecosystem boundaries / Interaction Kernel
 
-No active Konnaxion adapter was found for Orgo, Kristal or SemantiK Architect.
+The current Konnaxion documentation snapshot does not establish an active **IK-conformant** adapter for Orgo, Kristal or SemantiK Architect as qualified. The supplied IK migration material references an existing/historical `orgo_bridge_*` J30 implementation and `OrgoImpactPublication`; verify that surface in executable code before treating it as current.
 
-When those are implemented, add dedicated boundary packages/adapters rather than importing their internal models.
+Use dedicated boundary packages/adapters rather than importing another system's internal models.
 
 ### Orgo boundary
 
-Needs explicit command/query/event/receipt semantics and correlation/idempotency. No Case↔Topic or Task↔Consultation identity.
+Target profiles:
+- `governance.decision.execute/1.0.0` for Konnaxion `DecisionRecord` → Orgo execution intent;
+- `accountability.impact.publish/1.0.0` for Orgo accountability/impact → Konnaxion.
+
+Require explicit envelope/profile validation, correlation, idempotency and durable delivery semantics. No Case↔Topic or Task↔Consultation identity.
 
 ### Kristal boundary
 

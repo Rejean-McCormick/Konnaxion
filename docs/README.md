@@ -17,14 +17,15 @@ In particular, `Technical-Reference/EkoH Smart Vote/ekoh-smart-vote-definitive-m
 ## Canonical reading order
 
 1. `Technical-Reference/QUALIFICATION_STATUS.md`
-2. `Technical-Reference/DocV14/Konnaxion v14 - Full-Stack Technical Specification.md`
-3. `Technical-Reference/GLOSSARY.md`
-4. `Technical-Reference/BOUNDARIES_AND_OWNERSHIP.md`
-5. `Technical-Reference/CONTRACTS.txt`
-6. `Technical-Reference/EkoH Smart Vote/EkoH and Smart Vote - Technical Specification.md`
-7. `Technical-Reference/CODE_ALIGNMENT_NOTES.md`
-8. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
-9. `Konnaxion_User_Workflows.md`
+2. `Technical-Reference/INTERACTION_KERNEL_INTEGRATION.md`
+3. `Technical-Reference/DocV14/Konnaxion v14 - Full-Stack Technical Specification.md`
+4. `Technical-Reference/GLOSSARY.md`
+5. `Technical-Reference/BOUNDARIES_AND_OWNERSHIP.md`
+6. `Technical-Reference/CONTRACTS.txt`
+7. `Technical-Reference/EkoH Smart Vote/EkoH and Smart Vote - Technical Specification.md`
+8. `Technical-Reference/CODE_ALIGNMENT_NOTES.md`
+9. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
+10. `Konnaxion_User_Workflows.md`
 
 ## Status and evidence rule
 
@@ -43,6 +44,7 @@ Konnaxion does not currently publish a single global engineering-maturity percen
 - EkoH context does not become a civic vote.
 - Smart Vote does not silently replace a public baseline.
 - External systems integrate through explicit contracts, not shared internal tables.
+- Interaction Kernel (IK) is the ecosystem interoperability protocol; it is not a central owner or shared database.
 - Presentation does not transfer authority.
 - A Konnaxion deployment inside kOA-Linux remains Konnaxion-owned at the domain level.
 
@@ -51,3 +53,5 @@ Konnaxion does not currently publish a single global engineering-maturity percen
 > **Single Truth, Multiple Readings.**
 
 A stable source event or civic state may be interpreted through one or more explicitly declared readings. The reading identifies the method and context used to derive it; it does not mutate the source.
+
+In this Konnaxion phrase, **Truth** means the uniquely owned source/civic state inside a Konnaxion domain. It is not a Kristal epistemic status, a universal truth authority, or a claim that Konnaxion owns knowledge outside its domain.
