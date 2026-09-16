@@ -1,42 +1,51 @@
 // FILE: frontend/src/theme/theme01.ts
 import type { Theme } from "./types";
-import { BRAND_HEX, sharedStatusColors } from "./types";
+import { BRAND_HEX, lightStatusColors } from "./types";
 
+/**
+ * Default Konnaxion theme.
+ * Quiet, brand-led and intentionally neutral so dense product screens stay readable.
+ */
 const sandstoneTheme: Theme = {
   id: "sandstone",
-  name: "Sandstone",
-  label: "Sandstone",
-  icon: "🏜️",
+  name: "Konnaxion Light",
+  label: "Konnaxion Light",
+  icon: "☀️",
   isDark: false,
   colors: {
-    // Logo is teal; palette is warm sand/terracotta
     brand: BRAND_HEX,
 
-    background: "#f5f1ea",
-    backgroundAlt: "#ebe3d9",
+    background: "#f4f8f7",
+    backgroundAlt: "#e7f1f0",
     surface: "#ffffff",
-    surfaceAlt: "#f2ece2",
+    surfaceAlt: "#edf5f4",
 
-    border: "#d4c8b9",
-    borderStrong: "#aa9d8a",
+    border: "#c9dad8",
+    borderStrong: "#789895",
 
-    text: "#1e2524",
-    textMuted: "#6c706b",
+    text: "#152524",
+    textMuted: "#526b68",
     textOnBrand: "#ffffff",
 
-    primary: "#c46b47",      // terracotta
-    primarySoft: "#e07a5f",
-    primarySubtle: "#fbe1d4",
+    primary: BRAND_HEX,
+    primaryHover: "#277671",
+    primaryActive: "#185955",
+    primarySoft: "#3a817c",
+    primarySubtle: "#dcebe9",
 
-    accent1: "#e5a04f",      // muted golden
-    accent2: "#32556b",      // muted blue
-    accent3: "#8b6b56",      // warm brown
+    accent1: "#2f7b76",
+    accent2: "#365f7c",
+    accent3: "#a36a3f",
+    accent4: "#756a9d",
+    accent5: "#6f8064",
 
-    // sidebar selected item – dark bg + white text
-    menuSelectedBg: "#8c3a20",
+    menuSelectedBg: BRAND_HEX,
     menuSelectedText: "#ffffff",
 
-    ...sharedStatusColors,
+    brandAccent: "#2f7b76",
+    focusRing: "rgba(30, 104, 100, 0.28)",
+
+    ...lightStatusColors,
   },
 };
 

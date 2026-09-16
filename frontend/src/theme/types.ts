@@ -10,9 +10,11 @@ export type ThemeId =
   | "mauveAurora";
 
 export interface ThemeColors {
-  // Brand + primary
+  // Brand + primary action system
   brand: string;
   primary: string;
+  primaryHover: string;
+  primaryActive: string;
   primarySoft: string;
   primarySubtle: string;
 
@@ -31,7 +33,7 @@ export interface ThemeColors {
   textMuted: string;
   textOnBrand: string;
 
-  // Accents
+  // Decorative / data-viz accents. Keep these distinct from semantic status colors.
   accent1?: string;
   accent2?: string;
   accent3?: string;
@@ -46,7 +48,7 @@ export interface ThemeColors {
   brandAccent?: string;
   focusRing?: string;
 
-  // Status colors
+  // Semantic status colors
   success: string;
   warning: string;
   danger: string;
@@ -64,12 +66,30 @@ export interface Theme {
 
 export const BRAND_HEX = "#1e6864";
 
-export const sharedStatusColors: Pick<
+/**
+ * Status colors are intentionally different in light and dark themes.
+ * Light variants are dark enough to remain legible on white surfaces;
+ * dark variants are lifted enough to remain legible on near-black surfaces.
+ */
+export const lightStatusColors: Pick<
   ThemeColors,
   "success" | "warning" | "danger" | "info"
 > = {
-  success: "#2f9e63", // muted green
-  warning: "#e39b27", // muted amber
-  danger: "#d14444",  // muted red
-  info: "#3b8a86",    // teal-ish info
+  success: "#2d754f",
+  warning: "#9a5b00",
+  danger: "#b43b46",
+  info: "#2f668f",
 };
+
+export const darkStatusColors: Pick<
+  ThemeColors,
+  "success" | "warning" | "danger" | "info"
+> = {
+  success: "#62c08d",
+  warning: "#e6b35f",
+  danger: "#e47c85",
+  info: "#71add4",
+};
+
+// Backward-compatible export for any code that still imports the old name.
+export const sharedStatusColors = lightStatusColors;

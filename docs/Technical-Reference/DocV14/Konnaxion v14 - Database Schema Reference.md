@@ -144,3 +144,28 @@ Konnaxion also contains moderation, trust, Kontrol and shared user/platform stat
 ## 10. Physical database scope
 
 The current settings register EkoH and Smart Vote separately and use the `ekoh_smartvote,public` search path for their tables. Physical schema placement does not merge their logical ownership.
+
+## 11. Ecosystem persistence boundary
+
+Konnaxion's database stores Konnaxion-owned operational state. Integration with Interaction Kernel, Da’at or Kristal does not change the ownership of the model families above.
+
+A future IK/Kristal adapter may add local integration records such as:
+
+- outbox/delivery state;
+- idempotency/correlation keys;
+- export/snapshot metadata;
+- `ArtifactRef` / digest / locator linkage;
+- receipt or application-state records.
+
+Those records are integration metadata. They must not duplicate a mutable Kristal knowledge store inside Konnaxion or make a Runtime Pack database the canonical Konnaxion persistence layer.
+
+Target separation:
+
+```text
+Konnaxion domain tables        = operational source of truth
+export/snapshot + outbox       = durable interoperability boundary
+Kristal Exchange               = epistemic artifact
+Runtime Pack / SQLite / index  = derived query/runtime materialization
+```
+
+If a derived runtime database is lost, it must be possible to restore/rebuild it from its declared authoritative inputs without reconstructing Konnaxion's operational history from that derived database.

@@ -1,43 +1,48 @@
 // FILE: frontend/src/theme/theme05.ts
 import type { Theme } from "./types";
-import { BRAND_HEX, sharedStatusColors } from "./types";
+import { BRAND_HEX, lightStatusColors } from "./types";
 
+/** Warm, paper-like light theme with copper actions and restrained earth tones. */
 const sunburstTheme: Theme = {
   id: "sunburst",
-  name: "Sunburst",
-  label: "Sunburst",
-  icon: "🌅",
+  name: "Copper Sand",
+  label: "Copper Sand",
+  icon: "🏺",
   isDark: false,
   colors: {
     brand: BRAND_HEX,
 
-    background: "#fff1eb",   // peach
-    backgroundAlt: "#ffe0d5",
-    surface: "#ffffff",
-    surfaceAlt: "#ffe7dc",
+    background: "#fbf7f2",
+    backgroundAlt: "#f1e9de",
+    surface: "#fffefc",
+    surfaceAlt: "#f6efe7",
 
-    border: "#f5c1a3",
-    borderStrong: "#e58f63",
+    border: "#ddcfc0",
+    borderStrong: "#9d8b78",
 
-    text: "#2b1510",
-    textMuted: "#8b6155",
+    text: "#2a211a",
+    textMuted: "#706257",
     textOnBrand: "#ffffff",
 
-    primary: "#ff7a3c",      // hot orange
-    primarySoft: "#ff9f66",
-    primarySubtle: "#ffe0cf",
+    primary: "#9a4e2f",
+    primaryHover: "#ab5a39",
+    primaryActive: "#843f26",
+    primarySoft: "#bd7454",
+    primarySubtle: "#f3ded2",
 
-    brandAccent: BRAND_HEX,
+    accent1: BRAND_HEX,
+    accent2: "#b27b39",
+    accent3: "#6b6f8e",
+    accent4: "#78805b",
+    accent5: "#8f6574",
 
-    accent1: "#ff5c8a",      // hot pink
-    accent2: "#ffb347",      // strong gold
-    accent3: "#7c3aed",      // violet
-    accent4: "#0f172a",      // deep navy
-
-    menuSelectedBg: "#c2410c", // darker orange for contrast
+    menuSelectedBg: "#884126",
     menuSelectedText: "#ffffff",
 
-    ...sharedStatusColors,
+    brandAccent: BRAND_HEX,
+    focusRing: "rgba(154, 78, 47, 0.28)",
+
+    ...lightStatusColors,
   },
 };
 

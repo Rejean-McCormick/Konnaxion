@@ -1,40 +1,48 @@
 // FILE: frontend/src/theme/theme03.ts
 import type { Theme } from "./types";
-import { BRAND_HEX, sharedStatusColors } from "./types";
+import { BRAND_HEX, lightStatusColors } from "./types";
 
+/** Cool editorial light theme for analytical and information-dense screens. */
 const midnightHarborTheme: Theme = {
   id: "midnightHarbor",
-  name: "Midnight Harbor",
-  label: "Midnight Harbor",
-  icon: "🌌",
-  isDark: true,
+  name: "Northstar",
+  label: "Northstar",
+  icon: "🧭",
+  isDark: false,
   colors: {
     brand: BRAND_HEX,
 
-    background: "#020617",
-    backgroundAlt: "#020b16",
-    surface: "#020b16",
-    surfaceAlt: "#111827",
+    background: "#f5f7fa",
+    backgroundAlt: "#e9eef4",
+    surface: "#ffffff",
+    surfaceAlt: "#f0f3f7",
 
-    border: "#1f2937",
-    borderStrong: "#374151",
+    border: "#d1d9e3",
+    borderStrong: "#8492a1",
 
-    text: "#e5e7eb",
-    textMuted: "#9ca3af",
+    text: "#18212b",
+    textMuted: "#586878",
     textOnBrand: "#ffffff",
 
-    primary: "#1d4ed8",      // indigo
-    primarySoft: "#3b82f6",
-    primarySubtle: "#1e293b",
+    primary: "#315e8d",
+    primaryHover: "#3b6b9d",
+    primaryActive: "#274f78",
+    primarySoft: "#6686a8",
+    primarySubtle: "#dfeaf5",
 
-    accent1: "#f97316",      // orange
-    accent2: "#facc15",      // yellow
-    accent3: "#22c55e",      // green
+    accent1: BRAND_HEX,
+    accent2: "#6c5e93",
+    accent3: "#a0643c",
+    accent4: "#687a54",
+    accent5: "#9a667b",
 
-    menuSelectedBg: "#1d4ed8",
+    menuSelectedBg: "#2b567f",
     menuSelectedText: "#ffffff",
 
-    ...sharedStatusColors,
+    brandAccent: BRAND_HEX,
+    focusRing: "rgba(49, 94, 141, 0.28)",
+
+    ...lightStatusColors,
   },
 };
 

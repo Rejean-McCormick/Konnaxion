@@ -104,6 +104,22 @@ Orgo, Kristal, SemantiK Architect and kOA-Linux are external ecosystem systems r
 
 **Interaction Kernel (IK)** is the distributed interoperability protocol between independently owned kOA ecosystem systems. It is not a central server, a Konnaxion control plane, or an owner of Konnaxion state.
 
+## Operational state
+
+**Operational state** is mutable application/domain state required to run Konnaxion transactions and workflows: topics, stances, arguments, ballots, consultations, participants, permissions, jobs, moderation state and similar records. It remains owned by the relevant Konnaxion domain database/service.
+
+## Kristal epistemic artifact
+
+A **Kristal epistemic artifact** is an immutable/content-addressed representation of claims, evidence, provenance, certainty/status, authority recognition and related knowledge semantics. It may be derived from a Konnaxion snapshot, but it is not Konnaxion's operational database.
+
+## ArtifactRef
+
+An **ArtifactRef** is a cross-system reference to an artifact identity/location/digest. Konnaxion may retain an ArtifactRef to correlate or consume a Kristal artifact without copying artifact authority into its own domain model.
+
+## Query materialization / Runtime Pack
+
+A **query materialization** is a derived read-oriented structure such as Parquet tables, SQLite projection, search index, dictionary or vector index. When distributed as part of a Kristal Runtime Pack, it is non-authoritative and rebuildable from the authoritative Kristal inputs under the applicable runtime-pack contract.
+
 ## DecisionRecord
 
 A **DecisionRecord** is the target immutable/read-model Konnaxion handoff contract for a finalized civic/governance decision. It remains Konnaxion-owned. Sending it with `governance.decision.execute/1.0.0` expresses execution intent to Orgo; it does not make the DecisionRecord an Orgo Case.

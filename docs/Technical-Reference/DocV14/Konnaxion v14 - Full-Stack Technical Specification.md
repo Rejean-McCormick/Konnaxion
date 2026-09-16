@@ -411,7 +411,21 @@ Target profiles are `governance.decision.execute/1.0.0` for immutable/read-model
 
 ### 16.2 Kristal
 
-No current code adapter is present. Konnaxion may eventually consume/present Kristal artifacts, but Kristal owns their epistemic semantics and kOA-Linux owns local Runtime Pack activation state when that platform is used.
+No current code adapter is present. Konnaxion may eventually contribute to and consume/present Kristal artifacts, but Kristal owns their epistemic semantics and kOA-Linux owns local Runtime Pack activation state when that platform is used.
+
+The target write path is local-first and profile-driven:
+
+```text
+Konnaxion operational commit
+→ durable export/outbox
+→ IK kristal.build.request / kristal.revision.request
+→ Da’at
+→ Kristal Exchange
+→ kristal.artifact.ready + ArtifactRef
+→ Konnaxion local linkage/read use
+```
+
+Konnaxion does not write Kristal storage directly and Kristal does not replace Konnaxion's transaction database. Runtime Pack physical tables/indexes (including an optional SQLite-style query projection) are derived materializations, not shared mutable persistence. The architecture does not require a distributed transaction across Konnaxion, IK, Da’at and Kristal.
 
 ### 16.3 SemantiK Architect
 

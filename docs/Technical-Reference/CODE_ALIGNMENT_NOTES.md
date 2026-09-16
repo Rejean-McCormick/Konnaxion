@@ -181,6 +181,17 @@ Require explicit envelope/profile validation, correlation, idempotency and durab
 
 Only add when a concrete Kristal artifact use case exists. Preserve Kristal epistemic metadata and do not take ownership of kOA-Linux local activation.
 
+When implemented, prefer a local-commit/outbox adapter rather than synchronous dual writes. The adapter should:
+
+- snapshot/reference Konnaxion-owned source state without exposing direct table mutation;
+- emit the applicable IK Kristal profile toward Da’at;
+- persist correlation/idempotency metadata and returned `ArtifactRef`/receipt locally;
+- keep Kristal Exchange data and Runtime Pack query databases outside Konnaxion's canonical domain tables;
+- treat Runtime Pack SQLite/Parquet/index structures as derived/read-only materializations;
+- make retries safe without requiring rollback of a valid Konnaxion civic transaction.
+
+Do not implement bidirectional row synchronization between Konnaxion tables and Kristal/Runtime Pack storage.
+
 ### SemantiK Architect boundary
 
 Use a generation request/response adapter; Architect must not mutate Konnaxion source state.

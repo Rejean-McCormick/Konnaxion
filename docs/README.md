@@ -44,7 +44,10 @@ Konnaxion does not currently publish a single global engineering-maturity percen
 - EkoH context does not become a civic vote.
 - Smart Vote does not silently replace a public baseline.
 - External systems integrate through explicit contracts, not shared internal tables.
-- Interaction Kernel (IK) is the ecosystem interoperability protocol; it is not a central owner or shared database.
+- Interaction Kernel (IK) is the ecosystem interoperability protocol; it is not a central owner, shared database, transaction coordinator or artifact store.
+- Konnaxion commits Konnaxion-owned operational state locally before any cross-system publication; no distributed transaction with Orgo, Da’at or Kristal is required.
+- A Kristal artifact is a derived epistemic representation of selected source state, not a replacement for Konnaxion's operational database.
+- Konnaxion stores references/receipts to external artifacts where needed; it does not make a mutable Runtime Pack or Kristal projection authoritative for civic state.
 - Presentation does not transfer authority.
 - A Konnaxion deployment inside kOA-Linux remains Konnaxion-owned at the domain level.
 

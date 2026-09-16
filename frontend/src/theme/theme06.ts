@@ -1,44 +1,48 @@
 // FILE: frontend/src/theme/theme06.ts
 import type { Theme } from "./types";
-import { BRAND_HEX, sharedStatusColors } from "./types";
+import { BRAND_HEX, darkStatusColors } from "./types";
 
+/** Sophisticated violet dark theme; expressive without neon glare. */
 const neonCircuitTheme: Theme = {
   id: "neonCircuit",
-  name: "Neon Circuit",
-  label: "Neon Circuit",
-  icon: "🎛️",
+  name: "Violet Night",
+  label: "Violet Night",
+  icon: "🌌",
   isDark: true,
   colors: {
     brand: BRAND_HEX,
 
-    background: "#020316",   // deep indigo
-    backgroundAlt: "#050726",
-    surface: "#060a2e",
-    surfaceAlt: "#080f3a",
+    background: "#100e18",
+    backgroundAlt: "#171321",
+    surface: "#1b1727",
+    surfaceAlt: "#241e32",
 
-    border: "#1b2550",
-    borderStrong: "#2f3c7a",
+    border: "#3a304b",
+    borderStrong: "#756486",
 
-    text: "#ecf3ff",
-    textMuted: "#a4b0e0",
+    text: "#f3eff8",
+    textMuted: "#b8aec4",
     textOnBrand: "#ffffff",
 
-    primary: "#29a39a",      // bright teal-green
-    primarySoft: "#5fd4c6",
-    primarySubtle: "#043836",
+    primary: "#6a4fa3",
+    primaryHover: "#765bb0",
+    primaryActive: "#58418a",
+    primarySoft: "#8b6dc2",
+    primarySubtle: "#2d2343",
 
-    accent1: "#22f7ff",      // neon cyan
-    accent2: "#ff3bf5",      // neon magenta
-    accent3: "#c8ff4f",      // bright yellow-lime
-    accent4: "#ffc857",      // amber
-    accent5: BRAND_HEX,      // brand teal anchor
+    accent1: "#a78bca",
+    accent2: "#579f98",
+    accent3: "#d19a67",
+    accent4: "#7d9fd0",
+    accent5: "#8ba66f",
 
-    focusRing: "rgba(34, 247, 255, 0.7)",
+    menuSelectedBg: "#5d438f",
+    menuSelectedText: "#ffffff",
 
-    menuSelectedBg: "#043836",
-    menuSelectedText: "#ecf3ff",
+    brandAccent: BRAND_HEX,
+    focusRing: "rgba(167, 139, 202, 0.38)",
 
-    ...sharedStatusColors,
+    ...darkStatusColors,
   },
 };
 

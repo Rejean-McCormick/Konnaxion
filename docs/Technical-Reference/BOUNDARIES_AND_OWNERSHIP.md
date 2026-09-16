@@ -150,12 +150,34 @@ Interaction Kernel is a distributed protocol, not a shared owner. Konnaxion rema
 
 No Kristal integration is implemented in the current Konnaxion code snapshot.
 
+The target boundary separates three classes of state:
+
+| Class | Authoritative owner | Mutability / role |
+|---|---|---|
+| Konnaxion operational/civic state | Konnaxion domain | mutable, transactional source state |
+| Kristal Exchange / epistemic artifact | Kristal artifact authority | immutable/content-addressed knowledge representation |
+| Runtime Pack / query materialization | runtime/distribution surface | derived, read-oriented and rebuildable from authoritative Kristal inputs |
+
+When Konnaxion contributes knowledge to Kristal, it exports an immutable snapshot or artifact reference through IK to Da’at; it does not grant Da’at or Kristal direct write access to Konnaxion tables. When Konnaxion later receives `kristal.artifact.ready/1.0.0`, it may persist an `ArtifactRef`, digest, locator, correlation identifier or local application link, but the returned artifact does not replace the Konnaxion source rows that caused it to be built.
+
 If/when Konnaxion consumes a Kristal artifact:
 
 - Kristal owns artifact semantics, identity, epistemic metadata and integrity rules;
 - Konnaxion may present/query/transport only according to an explicit profile;
 - Konnaxion must not reinterpret assertion status, certainty, validation, authority recognition or Reader Policy;
+- Konnaxion must not mutate a derived Runtime Pack database and treat that mutation as canonical knowledge;
+- any SQLite/Parquet/search/vector structure shipped with a Runtime Pack is a query materialization, not Konnaxion's operational database;
 - Konnaxion does not acquire ownership of local kOA-Linux Runtime Pack activation merely because it can transport or display an artifact.
+
+Required directionality:
+
+```text
+Konnaxion DB → immutable export/snapshot → IK → Da’at → Kristal Exchange → derived Runtime Pack
+     ↑                                                           │
+     └──────────── local ArtifactRef / receipt / application link ┘
+```
+
+The return arrow carries identity/linkage and consumable artifacts; it does not authorize reverse synchronization of Kristal/Runtime-Pack mutations into Konnaxion source tables.
 
 ## 5. Konnaxion ↔ SemantiK Architect
 

@@ -1,42 +1,48 @@
 // FILE: frontend/src/theme/theme07.ts
 import type { Theme } from "./types";
-import { BRAND_HEX, sharedStatusColors } from "./types";
+import { BRAND_HEX, lightStatusColors } from "./types";
 
+/** Calm botanical light theme for long sessions and low visual fatigue. */
 const candyCarnivalTheme: Theme = {
   id: "candyCarnival",
-  name: "Candy Carnival",
-  label: "Candy Carnival",
-  icon: "🎡",
+  name: "Sage Paper",
+  label: "Sage Paper",
+  icon: "🌿",
   isDark: false,
   colors: {
     brand: BRAND_HEX,
 
-    background: "#fffdf0",    // pale yellow
-    backgroundAlt: "#ffe6ff", // pale magenta
+    background: "#f6f8f3",
+    backgroundAlt: "#ebf0e6",
     surface: "#ffffff",
-    surfaceAlt: "#fff7f1",
+    surfaceAlt: "#f0f4ec",
 
-    border: "#ffe4b5",
-    borderStrong: "#f9a8d4",
+    border: "#d1dccb",
+    borderStrong: "#85977b",
 
-    text: "#26110f",
-    textMuted: "#7a5148",
+    text: "#1f2a1d",
+    textMuted: "#5d6c59",
     textOnBrand: "#ffffff",
 
-    primary: "#1e9b8c",       // bright teal-leaning CTA
-    primarySoft: "#64d2c4",
-    primarySubtle: "#d3f4ef",
+    primary: "#4f6f45",
+    primaryHover: "#5c7c50",
+    primaryActive: "#405d38",
+    primarySoft: "#748f69",
+    primarySubtle: "#e1eadf",
 
-    accent1: "#ff4b5c",       // bright red/pink
-    accent2: "#ffd93d",       // bright yellow
-    accent3: "#2f80ff",       // bright blue
-    accent4: "#22c55e",       // bright green
-    accent5: BRAND_HEX,       // teal brand anchor
+    accent1: BRAND_HEX,
+    accent2: "#8c6a49",
+    accent3: "#64708f",
+    accent4: "#8c5f73",
+    accent5: "#a07b3d",
 
-    menuSelectedBg: "#1e9b8c",
+    menuSelectedBg: "#46643e",
     menuSelectedText: "#ffffff",
 
-    ...sharedStatusColors,
+    brandAccent: BRAND_HEX,
+    focusRing: "rgba(79, 111, 69, 0.28)",
+
+    ...lightStatusColors,
   },
 };
 

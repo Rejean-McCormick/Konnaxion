@@ -214,6 +214,8 @@ This repository currently includes:
 
 Each component contributes to the assembly of a unified civic infrastructure. The core ethiKos / EkoH / Smart Vote path has substantial implementation and runtime evidence, but the latest full LevelUpDiag campaign is not completely green. SecurityDiag currently shows S04–S12 passing while operational backup evidence remains stale under its configured release threshold. Some secondary surfaces remain intentionally experimental, preview, read-only, placeholder, or deferred pending complete domain contracts.
 
+**Ecosystem persistence boundary:** Konnaxion's PostgreSQL/Django state remains the mutable operational source for Konnaxion domains. Interaction Kernel is an interoperability protocol, not a shared database. Where a future use case publishes knowledge to Kristal, Konnaxion exports an immutable snapshot/reference through IK to Da’at and retains only the required artifact linkage/receipts; Kristal Exchanges and derived Runtime Packs do not replace Konnaxion's operational database.
+
 ---
 
 ## Conceptual Foundations

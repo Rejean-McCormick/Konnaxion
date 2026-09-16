@@ -1,40 +1,48 @@
 // FILE: frontend/src/theme/theme02.ts
 import type { Theme } from "./types";
-import { BRAND_HEX, sharedStatusColors } from "./types";
+import { BRAND_HEX, darkStatusColors } from "./types";
 
+/** Brand-led dark companion to Konnaxion Light. */
 const blueCanvasTheme: Theme = {
   id: "blueCanvas",
-  name: "Blue Canvas",
-  label: "Blue Canvas",
-  icon: "🖌️",
-  isDark: false,
+  name: "Konnaxion Dark",
+  label: "Konnaxion Dark",
+  icon: "🌙",
+  isDark: true,
   colors: {
     brand: BRAND_HEX,
 
-    background: "#f3f6ff",
-    backgroundAlt: "#e0e7ff",
-    surface: "#ffffff",
-    surfaceAlt: "#edf2ff",
+    background: "#0b1413",
+    backgroundAlt: "#101d1b",
+    surface: "#121f1e",
+    surfaceAlt: "#182826",
 
-    border: "#c7d2fe",
-    borderStrong: "#94a3ff",
+    border: "#2c423f",
+    borderStrong: "#52716c",
 
-    text: "#020617",
-    textMuted: "#6b7280",
+    text: "#eaf4f3",
+    textMuted: "#a9bcb9",
     textOnBrand: "#ffffff",
 
-    primary: "#2563eb",      // vivid blue
-    primarySoft: "#60a5fa",
-    primarySubtle: "#dbeafe",
+    primary: BRAND_HEX,
+    primaryHover: "#2a7772",
+    primaryActive: "#175753",
+    primarySoft: "#3f918a",
+    primarySubtle: "#173b38",
 
-    accent1: "#7c3aed",      // violet
-    accent2: "#f97316",      // orange
-    accent3: "#22c55e",      // green
+    accent1: "#58aaa3",
+    accent2: "#7fa6c9",
+    accent3: "#d39a61",
+    accent4: "#b49acc",
+    accent5: "#88a777",
 
-    menuSelectedBg: "#2563eb",
+    menuSelectedBg: BRAND_HEX,
     menuSelectedText: "#ffffff",
 
-    ...sharedStatusColors,
+    brandAccent: "#58aaa3",
+    focusRing: "rgba(88, 170, 163, 0.38)",
+
+    ...darkStatusColors,
   },
 };
 

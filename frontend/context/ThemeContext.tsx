@@ -131,6 +131,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     // data-theme attribute
     html.setAttribute('data-theme', themeType)
+    html.style.colorScheme = currentTheme.isDark ? 'dark' : 'light'
 
     // Normalized classes
     THEME_KEYS.forEach(k => html.classList.remove(`theme-${k}`))
@@ -156,7 +157,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         html.style.removeProperty(name)
       }
     })
-  }, [themeType, tokenBag])
+  }, [currentTheme.isDark, themeType, tokenBag])
 
   /** Persist current theme id */
   useEffect(() => {
@@ -186,7 +187,11 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     return {
       // Core semantic colors
       colorPrimary: c.primary ?? c.brand,
-      colorInfo: c.accent1 ?? c.primary ?? c.brand,
+      colorPrimaryHover: c.primaryHover ?? c.primary ?? c.brand,
+      colorPrimaryActive: c.primaryActive ?? c.primary ?? c.brand,
+      colorPrimaryBg: c.primarySubtle ?? c.surfaceAlt ?? c.surface,
+      colorPrimaryBorder: c.primarySoft ?? c.primary ?? c.brand,
+      colorInfo: c.info,
       colorSuccess: c.success,
       colorWarning: c.warning,
       colorError: c.danger,
@@ -205,11 +210,24 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       colorTextPlaceholder: c.textMuted ?? c.text,
       colorTextDisabled: c.textMuted ?? c.text,
 
-      // Borders
-      colorBorder: c.border,
-      colorSplit: c.borderStrong ?? c.border,
+      // Borders: controls get the stronger edge; separators stay quieter.
+      colorBorder: c.borderStrong ?? c.border,
+      colorBorderSecondary: c.border,
+      colorSplit: c.border,
+
+      // Consistent geometry/elevation across palettes.
+      borderRadius: 8,
+      borderRadiusLG: 12,
+      controlHeight: 34,
+      boxShadow: currentTheme.isDark
+        ? '0 8px 24px rgba(0, 0, 0, 0.28)'
+        : '0 8px 24px rgba(24, 45, 43, 0.08)',
+      boxShadowSecondary: currentTheme.isDark
+        ? '0 4px 16px rgba(0, 0, 0, 0.34)'
+        : '0 4px 16px rgba(24, 45, 43, 0.10)',
+      controlOutline: c.focusRing,
     }
-  }, [colors])
+  }, [colors, currentTheme.isDark])
 
   /** Component-level overrides from palette */
   const componentsOverrides = useMemo(
