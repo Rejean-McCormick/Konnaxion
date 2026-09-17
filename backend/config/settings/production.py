@@ -21,6 +21,13 @@ from .base import env
 SECRET_KEY = env("DJANGO_SECRET_KEY")
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+# https://docs.djangoproject.com/en/dev/ref/settings/#csrf-trusted-origins
+# Prefer the canonical DJANGO_* key emitted by Capsule Manager, while keeping
+# compatibility with the older CSRF_TRUSTED_ORIGINS alias.
+CSRF_TRUSTED_ORIGINS = env.list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    default=env.list("CSRF_TRUSTED_ORIGINS", default=[]),
+)
 
 # Public frontend origin used by post-login redirects.
 # Production must declare this explicitly; localhost is a development-only fallback.
