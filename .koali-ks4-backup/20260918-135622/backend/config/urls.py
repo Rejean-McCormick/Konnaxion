@@ -8,11 +8,8 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from config.koali_health import live as koali_live, ready as koali_ready
 
 urlpatterns = [
-    path("health/live/", koali_live, name="health-live"),
-    path("health/ready/", koali_ready, name="health-ready"),
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
     path("about/", TemplateView.as_view(template_name="pages/about.html"), name="about"),
     # Django Admin

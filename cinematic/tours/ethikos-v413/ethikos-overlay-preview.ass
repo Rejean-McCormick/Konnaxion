@@ -1,0 +1,43 @@
+[Script Info]
+Title: Ethikos V4.1.3 Preview Overlay
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: TitleLeft,Arial,30,&H00FFFFFF,&H000000FF,&H40111111,&H70202020,-1,0,0,0,100,100,0,0,3,1,0,7,70,1050,56,1
+Style: BodyLeft,Arial,20,&H00FFFFFF,&H000000FF,&H40111111,&H70202020,0,0,0,0,100,100,0,0,3,1,0,7,70,980,110,1
+Style: TitleRight,Arial,30,&H00FFFFFF,&H000000FF,&H40111111,&H70202020,-1,0,0,0,100,100,0,0,3,1,0,9,1050,70,56,1
+Style: BodyRight,Arial,20,&H00FFFFFF,&H000000FF,&H40111111,&H70202020,0,0,0,0,100,100,0,0,3,1,0,9,980,70,110,1
+Style: Tag,Arial,16,&H00FFFFFF,&H000000FF,&H40111111,&H70404040,-1,0,0,0,100,100,0,0,3,1,0,8,0,0,28,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.00,0:00:14.40,Tag,,0,0,0,,PREVIEW SANS NARRATION — repères visuels temporaires
+Dialogue: 0,0:00:00.00,0:00:14.40,TitleLeft,,0,0,0,,Ethikos dans Konnaxion
+Dialogue: 0,0:00:00.00,0:00:14.40,BodyLeft,,0,0,0,,Questions publiques difficiles → intelligence collective structurée.\NOn montre l'évidence, le désaccord, l'expertise et la lecture consultative.
+
+Dialogue: 0,0:00:15.10,0:00:34.50,TitleLeft,,0,0,0,,Question stratégique
+Dialogue: 0,0:00:15.10,0:00:34.50,BodyLeft,,0,0,0,,Autonomie Canada–États-Unis.\NLes positions, arguments, sources et participants restent distincts et inspectables.
+
+Dialogue: 0,0:00:35.20,0:01:07.40,TitleRight,,0,0,0,,Débat + gouvernance
+Dialogue: 0,0:00:35.20,0:01:07.40,BodyRight,,0,0,0,,Proposition de King Klown, réponse de Réjean, puis intervention de modération.\NLe système conserve la traçabilité du désaccord.
+
+Dialogue: 0,0:01:08.10,0:01:28.90,TitleLeft,,0,0,0,,Contexte EkoH de Réjean
+Dialogue: 0,0:01:08.10,0:01:28.90,BodyLeft,,0,0,0,,Ici, on montre la réputation publique, l'alignement contextuel et l'expertise par domaine.\NL'expertise suit la question; ce n'est pas un rang permanent.
+
+Dialogue: 0,0:01:29.60,0:01:59.40,TitleRight,,0,0,0,,Question émergente + conflit
+Dialogue: 0,0:01:29.60,0:01:59.40,BodyRight,,0,0,0,,Une nouvelle question apparaît: faut-il refuser l'accès stratégique à l'IA?\NLe contexte de conflit est affiché comme preuve, pas comme nouvel argument.
+
+Dialogue: 0,0:02:00.10,0:02:16.60,TitleLeft,,0,0,0,,Récusation volontaire
+Dialogue: 0,0:02:00.10,0:02:16.60,BodyLeft,,0,0,0,,King Klown garde sa position publique dans le baseline,\Nmais se retire de la lecture consultative EkoH / Smart Vote.
+
+Dialogue: 0,0:02:17.30,0:02:47.50,TitleRight,,0,0,0,,Deux lectures à comparer
+Dialogue: 0,0:02:17.30,0:02:47.50,BodyRight,,0,0,0,,Baseline public vs lecture pondérée par expertise pertinente.\NLa divergence entre les deux lectures est intentionnelle et informative.
+
+Dialogue: 0,0:02:48.20,0:02:59.50,TitleLeft,,0,0,0,,Pulse et conclusion
+Dialogue: 0,0:02:48.20,0:02:59.50,BodyLeft,,0,0,0,,On revient à la santé de la conversation.\NEthikos éclaire la décision humaine; il ne décide pas à la place du décideur.
