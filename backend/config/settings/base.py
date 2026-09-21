@@ -468,3 +468,18 @@ if "CELERY_BEAT_SCHEDULE" not in locals():
     CELERY_BEAT_SCHEDULE = {}
 
 CELERY_BEAT_SCHEDULE.update(EKOH_CELERY_BEAT_SCHEDULE)
+
+# Interaction Kernel (Konnaxion <-> Orgo)
+# ------------------------------------------------------------------------------
+IK_ORGO_INTERACTIONS_URL = env("IK_ORGO_INTERACTIONS_URL", default="")
+IK_ORGO_TOKEN = env("IK_ORGO_TOKEN", default="")
+IK_ORGO_INBOUND_TOKEN = env("IK_ORGO_INBOUND_TOKEN", default="")
+IK_ORGO_TARGET_ORGANIZATION = env("IK_ORGO_TARGET_ORGANIZATION", default="")
+IK_ORGO_TARGET_WORLD = env("IK_ORGO_TARGET_WORLD", default="")
+IK_KONNAXION_WORLD = env("IK_KONNAXION_WORLD", default="")
+IK_KONNAXION_RELEASE = env("IK_KONNAXION_RELEASE", default="")
+IK_HTTP_TIMEOUT_SECONDS = max(1.0, env.float("IK_HTTP_TIMEOUT_SECONDS", default=10.0))
+IK_DELIVERY_MAX_ATTEMPTS = max(1, env.int("IK_DELIVERY_MAX_ATTEMPTS", default=8))
+IK_DELIVERY_RETRY_BASE_SECONDS = max(1, env.int("IK_DELIVERY_RETRY_BASE_SECONDS", default=5))
+IK_DELIVERY_RETRY_MAX_SECONDS = max(IK_DELIVERY_RETRY_BASE_SECONDS, env.int("IK_DELIVERY_RETRY_MAX_SECONDS", default=15 * 60))
+

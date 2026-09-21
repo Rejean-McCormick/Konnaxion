@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 
 import '@/styles/tailwind.css';
 import { ThemeProvider } from '@/context/ThemeContext';
+import AppFreshnessProvider from '@/shared/AppFreshnessProvider';
 import QueryProvider from '@/shared/QueryProvider';
 
 import '../src/dayjs-setup';
@@ -26,9 +27,11 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="min-h-screen bg-neutral-50 antialiased">
-        <ThemeProvider>
-          <QueryProvider>{children}</QueryProvider>
-        </ThemeProvider>
+        <AppFreshnessProvider>
+          <ThemeProvider>
+            <QueryProvider>{children}</QueryProvider>
+          </ThemeProvider>
+        </AppFreshnessProvider>
       </body>
     </html>
   );

@@ -30,6 +30,10 @@ if settings.DEBUG:
 
 # API URLS
 urlpatterns += [
+    # Orgo -> Konnaxion Interaction Kernel ingress. Machine-authenticated and
+    # intentionally owned by the main Konnaxion product, not Konnaxion_Worlds.
+    path("api/integrations/ik/konnaxion/", include("konnaxion.ethikos.ik_bridge_urls")),
+
     # Base API (DRF routers)
     # [NOTE] This router handles:
     # - /api/admin/users (UserAdminViewSet)
@@ -43,7 +47,7 @@ urlpatterns += [
     #   /api/ethikos/demo-scenarios/import/
     #   /api/ethikos/demo-scenarios/reset/
     # ------------------------------------------------------------------
-    path("api/ethikos/", include("konnaxion.ethikos.demo_import.urls")),
+    path("api/ethikos/", include("konnaxion.ethikos.urls")),
 
 
     # OpenAPI schema & docs

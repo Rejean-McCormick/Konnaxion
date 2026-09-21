@@ -135,7 +135,7 @@ OpenAPI/schema-generation warnings and optional deep probes remain visible quali
 
 Current LevelUpDiag and SecurityDiag evidence qualifies Konnaxion engineering/security surfaces only to the extent stated above. It does **not** by itself qualify the external Interaction Kernel profiles.
 
-As of this documentation update, treat these as **target contracts / integration qualification pending**:
+As of this documentation update, the Konnaxion-side IK implementation is present in the main product repository, while **cross-product integration qualification remains pending**. Treat the following as qualification work still requiring executable Konnaxion↔Orgo evidence:
 
 - `governance.decision.execute/1.0.0`;
 - `accountability.impact.publish/1.0.0`;
@@ -143,4 +143,4 @@ As of this documentation update, treat these as **target contracts / integration
 - correlation/idempotency/durable delivery across the Konnaxion↔Orgo boundary;
 - Runtime Pack activation delegation when kOA-Linux is present.
 
-The supplied IK migration documentation references an existing/historical `orgo_bridge_*` J30 implementation and `OrgoImpactPublication`. That reference is not sufficient to mark the current Konnaxion snapshot IK-qualified; executable adapter inspection and profile-level integration tests are required.
+The recovered implementation provides executable product-side adapters (`DecisionRecord`, durable `InteractionEmission`, IK delivery, impact ingress and redrive) without a structural dependency on `Konnaxion_Worlds`. That is still not sufficient to mark Konnaxion↔Orgo IK-qualified: profile-level integration tests against the main Orgo runtime, including replay, conflict and redrive, are required.

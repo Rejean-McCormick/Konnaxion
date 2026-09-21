@@ -15,7 +15,7 @@ SECRET_KEY = env(
     default="1uAiupbsbxcv5FQQB9QY7kmYrwnfquI0vsrT5sEBx0AQdLjiCWq6m6X6bClGW2qh",
 )
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1"]  # noqa: S104
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "host.docker.internal"]  # noqa: S104
 
 # Allow Next.js dev (frontend) to talk to the API with cookies
 CORS_ALLOWED_ORIGINS = [

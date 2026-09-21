@@ -1,6 +1,6 @@
 # Konnaxion — Interaction Kernel Integration Baseline
 
-**Status:** target ecosystem contract / implementation qualification pending  
+**Status:** product-side implementation restored in Konnaxion; cross-product qualification pending  
 **Updated:** 2026-09-16
 
 ## Purpose
@@ -50,12 +50,12 @@ IK therefore coordinates interoperability semantics, not a distributed ACID tran
 
 ## Current implementation evidence rule
 
-The current Konnaxion documentation snapshot does **not** establish an active IK-conformant adapter as qualified. The supplied IK migration material references an existing/historical `orgo_bridge_*` J30 implementation and `OrgoImpactPublication`; that compatibility surface must be verified in executable code before it is described as current/active Konnaxion behavior.
+The main Konnaxion product now owns the `DecisionRecord` lifecycle, durable `InteractionEmission` delivery state, `governance.decision.execute/1.0.0` envelope construction, and the authenticated `accountability.impact.publish/1.0.0` ingress. These product-owned surfaces were recovered from the pre-separation implementation and decoupled from `Konnaxion_Worlds`. This is **implementation evidence, not cross-product qualification**: Konnaxion↔Orgo conformance remains pending until the profile-level end-to-end tests pass against the main Orgo runtime.
 
 Until that proof exists:
 
 - document the IK profiles as **target contracts**;
-- do not claim Konnaxion↔Orgo IK conformance;
+- do not claim Konnaxion↔Orgo IK conformance until the end-to-end qualification passes;
 - do not infer the presence of a bridge from architecture text alone;
 - qualify adapter behavior separately from core Konnaxion qualification.
 
