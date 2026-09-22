@@ -1,5 +1,4 @@
-// FILE: frontend/components/layout-components/Header.tsx
-'use client'
+'use client';
 
 import {
   LoginOutlined,
@@ -7,62 +6,74 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   UserOutlined,
-} from '@ant-design/icons'
-import type { MenuProps } from 'antd'
-import { Breadcrumb, Dropdown, Layout } from 'antd'
-import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import styled from 'styled-components'
+} from '@ant-design/icons';
+import type { MenuProps } from 'antd';
+import { Breadcrumb, Dropdown, Layout } from 'antd';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import styled from 'styled-components';
 
-import api from '@/api'
-import type { Route } from '@/components/layout-components/Menu'
-import ThemeSwitcher from '@/components/ThemeSwitcher'
-import { GlobalSearchBar } from '@/global/components'
-import ActiveHeaderWidget from '@/widgets/header/ActiveHeaderWidget'
+import api from '@/api';
+import ThemeSwitcher from '@/components/ThemeSwitcher';
+import WorldSwitcher from '@/components/worlds/WorldSwitcher';
+import { useWorld } from '@/context/WorldContext';
+import { GlobalSearchBar } from '@/global/components';
+import {
+  DEFAULT_ENTRY,
+  isSuiteKey,
+  SUITE_LABELS,
+} from '@/routes/suites';
+import type { Route } from '@/routes/types';
+import ActiveHeaderWidget from '@/widgets/header/ActiveHeaderWidget';
 
-const { Header } = Layout
+const { Header } = Layout;
 
-// --- Backend URL helpers (Django + Allauth) ------------------------------
-
-const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? ''
-
-// If NEXT_PUBLIC_API_BASE is e.g. "http://localhost:8000/api",
-// this yields "http://localhost:8000"
+const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '';
 const BACKEND_ROOT =
-  RAW_API_BASE.replace(/\/+$/, '').replace(/\/api$/, '') || ''
+  RAW_API_BASE.replace(/\/+$/, '').replace(/\/api$/, '') || '';
 
 function backendUrl(path: string): string {
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
-
-  // Fallback: same origin as the frontend (e.g. when Django and Next are
-  // served on the same host behind a reverse proxy)
-  if (!BACKEND_ROOT) {
-    return normalizedPath
-  }
-
-  return `${BACKEND_ROOT}${normalizedPath}`
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return BACKEND_ROOT ? `${BACKEND_ROOT}${normalizedPath}` : normalizedPath;
 }
 
-/* -------- styled -------- */
 const NavBar = styled.div`
   display: flex;
   align-items: center;
   height: 64px;
   padding: 0 16px;
-  gap: 16px;
-`
+  gap: 12px;
+  min-width: 0;
+`;
 
 const Crumb = styled(Breadcrumb)`
   margin-left: 4px;
   color: var(--ant-color-text);
+  max-width: min(30vw, 390px);
+  min-width: 90px;
+  overflow: hidden;
+  white-space: nowrap;
 
   .ant-breadcrumb-link,
   .ant-breadcrumb-separator {
     color: var(--ant-color-text-secondary);
     font-size: 13px;
   }
-`
+
+  @media (max-width: 1050px) {
+    max-width: 180px;
+  }
+
+  @media (max-width: 820px) {
+    display: none;
+  }
+`;
+
+const WorldSlot = styled.div`
+  flex: 0 1 auto;
+  min-width: 0;
+`;
 
 const HeaderBlock = styled.div`
   padding: 0 12px;
@@ -83,24 +94,35 @@ const HeaderBlock = styled.div`
     background: var(--ant-color-fill-secondary);
     box-shadow: 0 0 0 1px var(--ant-color-border-secondary);
   }
-`
+
+  @media (max-width: 720px) {
+    padding: 0 9px;
+
+    .k-account-name {
+      display: none;
+    }
+  }
+`;
 
 const CenterRegion = styled.div`
   display: flex;
   align-items: center;
   flex: 1;
   min-width: 0;
-  gap: 16px;
-`
+  gap: 12px;
+`;
 
 const SearchWrapper = styled.div`
   flex: 1;
-  min-width: 0;
+  min-width: 120px;
   display: flex;
   justify-content: center;
-`
 
-// Fixed-width widget slot (~14 characters)
+  @media (max-width: 900px) {
+    display: none;
+  }
+`;
+
 const WidgetSlot = styled.div`
   flex: 0 0 auto;
   width: 14ch;
@@ -109,62 +131,78 @@ const WidgetSlot = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 12px;
+  margin-left: 4px;
   font-size: 12px;
   color: var(--ant-color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-`
 
-/* ------------ mapping du label par sidebar (aligné sur LogoTitle) ------------ */
-const SUITE_LABELS: Record<string, string> = {
-  ekoh: 'EkoH',
-  ethikos: 'EthiKos',
-  keenkonnect: 'keenKonnect',
-  konnected: 'KonnectED',
-  kreative: 'Kreative',
-}
+  @media (max-width: 1180px) {
+    display: none;
+  }
+`;
 
-/* -------- types & helpers -------- */
 type CurrentUser = {
-  username: string
-  name: string | null
+  username: string;
+  name: string | null;
+};
+
+type AccountMenuClickEvent = Parameters<NonNullable<MenuProps['onClick']>>[0];
+
+function pathMatches(routePath: string, currentPath: string): boolean {
+  if (routePath === '/') return currentPath === '/';
+  return currentPath === routePath || currentPath.startsWith(`${routePath}/`);
 }
 
-type AccountMenuClickEvent = Parameters<NonNullable<MenuProps['onClick']>>[0]
+function leafScore(routes: Route[]): number {
+  for (let index = routes.length - 1; index >= 0; index -= 1) {
+    const path = routes[index]?.path;
+    if (path) return path.length;
+  }
+  return -1;
+}
 
-const trail = (rs: Route[], cur: string): Route[] => {
-  for (const r of rs) {
-    if (r.views?.length) {
-      const sub = trail(r.views, cur)
-      if (sub.length) return [r, ...sub]
+/** Pick the most specific matching route, including nested section context. */
+function trail(routes: Route[], currentPath: string): Route[] {
+  let best: Route[] = [];
+  let bestScore = -1;
+
+  for (const route of routes) {
+    if (route.views?.length) {
+      const subTrail = trail(route.views, currentPath);
+      if (subTrail.length) {
+        const candidate = [route, ...subTrail];
+        const score = leafScore(candidate);
+        if (score > bestScore) {
+          best = candidate;
+          bestScore = score;
+        }
+      }
     }
 
-    if (r.path && (cur === r.path || cur.startsWith(r.path))) {
-      return [r]
+    if (route.path && pathMatches(route.path, currentPath)) {
+      const score = route.path.length;
+      if (score > bestScore) {
+        best = [route];
+        bestScore = score;
+      }
     }
   }
 
-  return []
+  return best;
 }
 
-const normalizeBreadcrumbPath = (path?: string): string | undefined => {
-  if (!path) return undefined
-
-  if (path === '/') {
-    return '/'
-  }
-
-  return path.replace(/\/+$/, '')
+function normalizeBreadcrumbPath(path?: string): string | undefined {
+  if (!path) return undefined;
+  return path === '/' ? '/' : path.replace(/\/+$/, '');
 }
 
-/* -------- component -------- */
 interface Props {
-  collapsed: boolean
-  handleToggle: () => void
-  routes?: Route[]
-  selectedSidebar?: string
+  collapsed: boolean;
+  handleToggle: () => void;
+  routes?: Route[];
+  selectedSidebar?: string;
 }
 
 export default function HeaderBar({
@@ -173,160 +211,102 @@ export default function HeaderBar({
   routes = [],
   selectedSidebar = '',
 }: Props) {
-  const router = useRouter()
-  const pathname = usePathname() ?? '/'
-  const cur = pathname
+  const router = useRouter();
+  const { appPath, href } = useWorld();
 
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
-  const [loadingUser, setLoadingUser] = useState(true)
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   useEffect(() => {
-    let canceled = false
+    let canceled = false;
 
     const load = async () => {
       try {
-        const data = await api.get<CurrentUser>('users/me/')
-
-        if (!canceled) {
-          setCurrentUser(data)
-        }
+        const data = await api.get<CurrentUser>('users/me/');
+        if (!canceled) setCurrentUser(data);
       } catch {
-        if (!canceled) {
-          setCurrentUser(null)
-        }
+        if (!canceled) setCurrentUser(null);
       } finally {
-        if (!canceled) {
-          setLoadingUser(false)
-        }
+        if (!canceled) setLoadingUser(false);
       }
-    }
+    };
 
-    void load()
-
+    void load();
     return () => {
-      canceled = true
-    }
-  }, [])
+      canceled = true;
+    };
+  }, []);
 
   const accountMenuItems = useMemo<MenuProps['items']>(() => {
     if (currentUser) {
       return [
-        {
-          key: 'profile',
-          icon: <UserOutlined />,
-          label: 'My profile',
-        },
+        { key: 'profile', icon: <UserOutlined />, label: 'My profile' },
         { type: 'divider' as const },
-        {
-          key: 'logout',
-          icon: <LogoutOutlined />,
-          label: 'Sign out',
-        },
-      ]
+        { key: 'logout', icon: <LogoutOutlined />, label: 'Sign out' },
+      ];
     }
 
-    return [
-      {
-        key: 'signin',
-        icon: <LoginOutlined />,
-        label: 'Sign in',
-      },
-    ]
-  }, [currentUser])
+    return [{ key: 'signin', icon: <LoginOutlined />, label: 'Sign in' }];
+  }, [currentUser]);
 
   const handleAccountMenuClick: MenuProps['onClick'] = useCallback(
     ({ key }: AccountMenuClickEvent) => {
       if (key === 'profile') {
-        // App Router's useRouter().push expects a string or URL, not an object
-        router.push('/reputation?sidebar=ethikos')
-        return
+        router.push(href('/reputation?sidebar=ethikos'));
+        return;
       }
 
       if (key === 'logout') {
-        window.location.href = backendUrl('/accounts/logout/')
-        return
+        window.location.href = backendUrl('/accounts/logout/');
+        return;
       }
 
       if (key === 'signin') {
-        window.location.href = backendUrl('/accounts/login/')
+        window.location.href = backendUrl('/accounts/login/');
       }
     },
-    [router],
-  )
+    [href, router],
+  );
 
   const breadcrumbItems = useMemo(() => {
-    const br = trail(routes, cur)
-    const normalizedSidebar = selectedSidebar?.toLowerCase() ?? ''
-
-    const rootName =
-      SUITE_LABELS[normalizedSidebar] ??
-      (normalizedSidebar
-        ? normalizedSidebar.charAt(0).toUpperCase() + normalizedSidebar.slice(1)
-        : 'Home')
-
-    const rootPath =
-      normalizedSidebar === 'ethikos'
-        ? '/ethikos/insights'
-        : normalizedSidebar
-          ? `/${normalizedSidebar}`
-          : '/'
+    const branch = trail(routes, appPath);
+    const normalizedSidebar = selectedSidebar.toLowerCase();
+    const suite = isSuiteKey(normalizedSidebar) ? normalizedSidebar : null;
 
     const root = {
-      name: rootName,
-      path: rootPath,
-    }
+      name: suite ? SUITE_LABELS[suite] : 'Home',
+      path: suite ? DEFAULT_ENTRY[suite] : '/',
+    };
 
-    const crumbs = br.length ? [root, ...br] : [root]
-
-    /*
-     * A route should appear only once in the breadcrumb.
-     *
-     * Example:
-     *
-     *   EthiKos  -> /ethikos/insights
-     *   Overview -> /ethikos/insights
-     *
-     * becomes:
-     *
-     *   Overview
-     *
-     * When the same destination appears more than once, keep the last
-     * occurrence because it represents the most specific route label.
-     */
+    const crumbs = branch.length ? [root, ...branch] : [root];
     const dedupedCrumbs = crumbs.filter((crumb, index, items) => {
-      const path = normalizeBreadcrumbPath(crumb.path)
-
-      if (!path) {
-        return true
-      }
+      const path = normalizeBreadcrumbPath(crumb.path);
+      if (!path) return true;
 
       return !items
         .slice(index + 1)
         .some(
-          candidate =>
-            normalizeBreadcrumbPath(candidate.path) === path,
-        )
-    })
+          (candidate) => normalizeBreadcrumbPath(candidate.path) === path,
+        );
+    });
 
-    return dedupedCrumbs.map(c => ({
-      key: c.path ?? c.name,
-      title: c.path ? (
+    return dedupedCrumbs.map((crumb) => ({
+      key: crumb.path ?? crumb.name,
+      title: crumb.path ? (
         <Link
           href={{
-            pathname: c.path,
-            query: { sidebar: selectedSidebar },
+            pathname: href(crumb.path),
+            query: suite ? { sidebar: suite } : undefined,
           }}
           style={{ color: 'var(--ant-color-text)' }}
         >
-          {c.name}
+          {crumb.name}
         </Link>
       ) : (
-        <span style={{ color: 'var(--ant-color-text)' }}>
-          {c.name}
-        </span>
+        <span style={{ color: 'var(--ant-color-text)' }}>{crumb.name}</span>
       ),
-    }))
-  }, [routes, cur, selectedSidebar])
+    }));
+  }, [routes, appPath, selectedSidebar, href]);
 
   const displayName = useMemo(
     () =>
@@ -334,7 +314,7 @@ export default function HeaderBar({
       currentUser?.username ||
       'Account',
     [currentUser],
-  )
+  );
 
   return (
     <Header
@@ -348,71 +328,50 @@ export default function HeaderBar({
       }}
     >
       <NavBar>
-        {/* Toggle sidebar */}
-        <div
-          onClick={handleToggle}
-          style={{ cursor: 'pointer', marginRight: 4 }}
-        >
+        <div onClick={handleToggle} style={{ cursor: 'pointer', marginRight: 4 }}>
           {collapsed ? (
             <MenuUnfoldOutlined
-              style={{
-                fontSize: 20,
-                color: 'var(--ant-color-text)',
-              }}
+              style={{ fontSize: 20, color: 'var(--ant-color-text)' }}
             />
           ) : (
             <MenuFoldOutlined
-              style={{
-                fontSize: 20,
-                color: 'var(--ant-color-text)',
-              }}
+              style={{ fontSize: 20, color: 'var(--ant-color-text)' }}
             />
           )}
         </div>
 
-        {/* Breadcrumb (left) */}
         <Crumb items={breadcrumbItems} />
 
-        {/* Center: search + pluggable widget slot */}
+        <WorldSlot>
+          <WorldSwitcher />
+        </WorldSlot>
+
         <CenterRegion>
           <SearchWrapper>
             <GlobalSearchBar />
           </SearchWrapper>
-
           <WidgetSlot aria-label="Header widget">
             <ActiveHeaderWidget />
           </WidgetSlot>
         </CenterRegion>
 
-        {/* Right side: theme + account */}
-        <div
-          style={{
-            display: 'flex',
-            gap: 8,
-            alignItems: 'center',
-          }}
-        >
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           <ThemeSwitcher />
-
           <Dropdown
             placement="bottomRight"
-            menu={{
-              items: accountMenuItems,
-              onClick: handleAccountMenuClick,
-            }}
+            menu={{ items: accountMenuItems, onClick: handleAccountMenuClick }}
           >
             <HeaderBlock>
               <UserOutlined
-                style={{
-                  marginRight: 8,
-                  color: 'var(--ant-color-text)',
-                }}
+                style={{ marginRight: 8, color: 'var(--ant-color-text)' }}
               />
-              {loadingUser ? 'Loading…' : displayName}
+              <span className="k-account-name">
+                {loadingUser ? 'Loading…' : displayName}
+              </span>
             </HeaderBlock>
           </Dropdown>
         </div>
       </NavBar>
     </Header>
-  )
+  );
 }

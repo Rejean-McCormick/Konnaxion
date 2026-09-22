@@ -1,6 +1,12 @@
 // FILE: frontend/api.ts
 // C:\MyCode\Konnaxionv14\frontend\api.ts
 
+import {
+  assertCurrentWorldResponse,
+  scopeApiPathForBrowser,
+  scopeBrowserApiUrl,
+} from '@/lib/worlds';
+
 // Keep all named exports from the generated axios request layer.
 // Do not re-export duplicate get/post/put/patch/del names from this file.
 export * from './services/_request';
@@ -114,8 +120,8 @@ export function buildUrl(
   path: string,
   query?: ApiQueryParams,
 ): string {
-  const cleanPath = normalizeApiPath(path);
-  const joined = `${API_BASE}/${cleanPath}`;
+  const cleanPath = scopeApiPathForBrowser(normalizeApiPath(path));
+  const joined = `${API_BASE}/${cleanPath.replace(/^\/+/, '')}`;
   const absolute = isAbsoluteUrl(joined);
 
   const url = absolute
@@ -231,11 +237,25 @@ export async function apiFetch(
     if (csrfToken) headers.set('X-CSRFToken', csrfToken);
   }
 
-  return fetch(input, {
+  const scopedInput =
+    typeof input === 'string'
+      ? scopeBrowserApiUrl(input)
+      : input instanceof URL
+        ? new URL(scopeBrowserApiUrl(input.toString()))
+        : input;
+
+  const response = await fetch(scopedInput, {
     ...init,
     credentials: init.credentials ?? 'include',
     headers,
   });
+
+  assertCurrentWorldResponse(
+    response.headers.get('X-Konnaxion-World'),
+    response.headers.get('X-Konnaxion-World-Release-Id'),
+  );
+
+  return response;
 }
 
 function hasBody(init: RequestInit): boolean {

@@ -15,12 +15,9 @@ import {
 } from 'antd';
 import type { TabsProps } from 'antd';
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+
+import { useWorld } from '@/context/WorldContext';
 
 const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
@@ -32,33 +29,21 @@ type SearchResult = {
   path: string;
 };
 
-type SearchResponseBody =
-  | { results: SearchResult[] }
-  | { error: string };
+type SearchResponseBody = { results: SearchResult[] } | { error: string };
 
 const MIN_QUERY_LENGTH = 2;
 
 export default function GlobalSearchClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { worldKey, href } = useWorld();
 
   const [query, setQuery] = useState<string>('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
-
-  // Initialise from ?q=… if present
-  useEffect(() => {
-    const initial = searchParams.get('q') ?? '';
-    if (initial) {
-      setQuery(initial);
-      if (initial.trim().length >= MIN_QUERY_LENGTH) {
-        void runSearch(initial);
-      }
-    }
-     
-  }, [searchParams]);
+  const initialQuery = searchParams.get('q') ?? '';
 
   const runSearch = useCallback(
     async (raw: string) => {
@@ -82,14 +67,14 @@ export default function GlobalSearchClient() {
       setHasSearched(true);
 
       try {
-        const params = new URLSearchParams();
-        params.set('q', trimmed);
+        const pageParams = new URLSearchParams();
+        pageParams.set('q', trimmed);
+        router.replace(href(`/search?${pageParams.toString()}`));
 
-        // Keep URL in sync
-        const url = `/search?${params.toString()}`;
-        router.replace(url);
+        const apiParams = new URLSearchParams(pageParams);
+        if (worldKey) apiParams.set('world', worldKey);
 
-        const res = await fetch(`/_api/search?${params.toString()}`, {
+        const res = await fetch(`/_api/search?${apiParams.toString()}`, {
           method: 'GET',
           headers: { Accept: 'application/json' },
         });
@@ -102,7 +87,7 @@ export default function GlobalSearchClient() {
               message = data.error;
             }
           } catch {
-            // ignore JSON parse errors
+            // Keep the status-derived fallback message.
           }
           setResults([]);
           setError(message);
@@ -110,11 +95,7 @@ export default function GlobalSearchClient() {
         }
 
         const data = (await res.json()) as SearchResponseBody;
-        if ('results' in data && Array.isArray(data.results)) {
-          setResults(data.results);
-        } else {
-          setResults([]);
-        }
+        setResults('results' in data && Array.isArray(data.results) ? data.results : []);
       } catch {
         setResults([]);
         setError('Unable to perform search. Please try again.');
@@ -122,8 +103,16 @@ export default function GlobalSearchClient() {
         setLoading(false);
       }
     },
-    [router],
+    [href, router, worldKey],
   );
+
+  useEffect(() => {
+    if (!initialQuery) return;
+    setQuery(initialQuery);
+    if (initialQuery.trim().length >= MIN_QUERY_LENGTH) {
+      void runSearch(initialQuery);
+    }
+  }, [initialQuery, runSearch]);
 
   const handleSearch = (value: string) => {
     setQuery(value);
@@ -135,13 +124,11 @@ export default function GlobalSearchClient() {
     if (!target) return;
 
     if (target.startsWith('http://') || target.startsWith('https://')) {
-      if (typeof window !== 'undefined') {
-        window.open(target, '_blank', 'noopener,noreferrer');
-      }
+      window.open(target, '_blank', 'noopener,noreferrer');
       return;
     }
 
-    router.push(target);
+    router.push(href(target));
   };
 
   const getTypeTag = (id: string) => {
@@ -163,18 +150,16 @@ export default function GlobalSearchClient() {
             onClick={() => handleResultClick(item)}
             style={{ cursor: 'pointer' }}
           >
-            <Space
-              direction="vertical"
-              size={4}
-              style={{ width: '100%' }}
-            >
+            <Space direction="vertical" size={4} style={{ width: '100%' }}>
               <Space align="baseline" size="small">
                 <Text strong>{item.title}</Text>
                 {getTypeTag(item.id)}
               </Space>
               <Text type="secondary">{item.snippet}</Text>
               <Text type="secondary" style={{ fontSize: 12 }}>
-                {item.path}
+                {worldKey && !/^https?:\/\//i.test(item.path)
+                  ? href(item.path)
+                  : item.path}
               </Text>
             </Space>
           </List.Item>
@@ -184,14 +169,11 @@ export default function GlobalSearchClient() {
   };
 
   const { routeResults, knowledgeResults, otherResults } = useMemo(() => {
-    const route = results.filter((r) => r.id.startsWith('route:'));
-    const knowledge = results.filter((r) =>
-      r.id.startsWith('knowledge:'),
-    );
+    const route = results.filter((result) => result.id.startsWith('route:'));
+    const knowledge = results.filter((result) => result.id.startsWith('knowledge:'));
     const other = results.filter(
-      (r) =>
-        !r.id.startsWith('route:') &&
-        !r.id.startsWith('knowledge:'),
+      (result) =>
+        !result.id.startsWith('route:') && !result.id.startsWith('knowledge:'),
     );
 
     return {
@@ -203,11 +185,7 @@ export default function GlobalSearchClient() {
 
   const tabs: TabsProps['items'] = useMemo(
     () => [
-      {
-        key: 'all',
-        label: `All (${results.length})`,
-        children: renderList(results),
-      },
+      { key: 'all', label: `All (${results.length})`, children: renderList(results) },
       {
         key: 'routes',
         label: `Navigation (${routeResults.length})`,
@@ -243,7 +221,7 @@ export default function GlobalSearchClient() {
           enterButton="Search"
           size="large"
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onChange={(event) => setQuery(event.target.value)}
           onSearch={handleSearch}
         />
         {!hasSearched && !error && (

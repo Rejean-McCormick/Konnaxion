@@ -1,6 +1,2 @@
 [TypeScript] exit=0
 [ESLint] exit=1
-[Next build] exit=0
-[Jest] exit=0
-[Playwright SMOKE] exit=1
-[Pattern scan] exit=0

@@ -57,13 +57,14 @@ Accordingly, this document is written as an **implementation-aligned frontend sp
 ### **Navigation rules**
 
 - The **`/reports`** namespace is reserved for the Insights module.
+- **Insights is a standalone suite in the global switcher** (technical suite key `reports`); it is not a child of KonTrol.
 - The frontend uses a shared **`ReportsPageShell`** to provide title, subtitle, actions, and consistent page framing.
 - The Reports hub page acts as a **navigation entry point**, not as a replacement for the dedicated dashboards.
 - No other module may claim `/reports/*` or `/ws/reports/*` without a formal routing-reference update.
 
 ### **Current route ownership**
 
-The Reports / Insights slice remains a **global analytics surface** rather than an Ethikos-only or module-local sub-area. It may visualize data from multiple modules, but its route namespace remains distinct and reserved.
+The Reports / Insights slice remains a **global analytics surface** rather than an ethiKos-only or module-local sub-area. It may visualize data from multiple modules, but its route namespace remains distinct and reserved.
 
 ### ---
 

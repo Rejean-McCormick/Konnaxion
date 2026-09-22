@@ -26,6 +26,10 @@ const baseConfig: NextConfig = {
 
   async rewrites() {
     return [
+      // World UI URLs are canonical in the browser while existing App Router
+      // pages remain physically mounted at their current paths.
+      { source: '/w/:world', destination: '/ethikos/insights' },
+      { source: '/w/:world/:path*', destination: '/:path*' },
       { source: '/healthz', destination: '/_api/health' },
       { source: '/api/healthz', destination: '/_api/health' },
       { source: '/health', destination: '/_api/health' },

@@ -98,6 +98,7 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "konnaxion.users",
+    "konnaxion.worlds.apps.WorldsConfig",
     "konnaxion.kollective_intelligence",
     "konnaxion.ethikos",
     "konnaxion.keenkonnect",
@@ -171,6 +172,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "konnaxion.worlds.middleware.WorldRouteMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
@@ -468,6 +470,41 @@ if "CELERY_BEAT_SCHEDULE" not in locals():
     CELERY_BEAT_SCHEDULE = {}
 
 CELERY_BEAT_SCHEDULE.update(EKOH_CELERY_BEAT_SCHEDULE)
+
+# Konnaxion Worlds
+# ------------------------------------------------------------------------------
+# The control plane/runtime resolver is safe to enable independently. The
+# business data plane remains fail-closed until release schemas contain the
+# allowlisted Konnaxion domain tables and migrations.
+KONNAXION_CONTROL_SCHEMA = env("KONNAXION_CONTROL_SCHEMA", default="public")
+KONNAXION_WORLDS_DATA_PLANE_ENABLED = env.bool(
+    "KONNAXION_WORLDS_DATA_PLANE_ENABLED",
+    default=False,
+)
+KONNAXION_WORLDS_ENFORCE_SCOPED_API = env.bool(
+    "KONNAXION_WORLDS_ENFORCE_SCOPED_API",
+    default=False,
+)
+KONNAXION_WORLD_SEED_ROOT = env(
+    "KONNAXION_WORLD_SEED_ROOT",
+    default=str(BASE_DIR / "seed-data" / "worlds"),
+)
+KONNAXION_WORLD_BUILD_CONCURRENCY = max(
+    1, env.int("KONNAXION_WORLD_BUILD_CONCURRENCY", default=1)
+)
+KONNAXION_WORLD_BUILD_RETRY_SECONDS = max(
+    1, env.int("KONNAXION_WORLD_BUILD_RETRY_SECONDS", default=5)
+)
+
+# Make World/Release response guards visible when the browser talks directly
+# to Django instead of the same-origin Next.js proxy.
+CORS_EXPOSE_HEADERS = [
+    *globals().get("CORS_EXPOSE_HEADERS", []),
+    "X-Konnaxion-World",
+    "X-Konnaxion-World-Release",
+    "X-Konnaxion-World-Release-Id",
+    "X-Konnaxion-World-Dirty",
+]
 
 # Interaction Kernel (Konnaxion <-> Orgo)
 # ------------------------------------------------------------------------------

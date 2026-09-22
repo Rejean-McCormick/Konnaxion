@@ -7,6 +7,12 @@ import axios, {
   InternalAxiosRequestConfig,
 } from 'axios'
 
+import {
+  assertCurrentWorldResponse,
+  scopeApiPathForBrowser,
+  scopeBrowserApiUrl,
+} from '@/lib/worlds'
+
 /**
  * One axios instance.
  * Do NOT unwrap in interceptors; wrappers below return `data` as T.
@@ -21,14 +27,23 @@ const client: AxiosInstance = axios.create({
 })
 
 client.interceptors.request.use((cfg: InternalAxiosRequestConfig) => {
-  // Example:
-  // const t = typeof window !== 'undefined' ? localStorage.getItem('token') : null
-  // if (t) cfg.headers.Authorization = `Bearer ${t}`
+  if (cfg.url) {
+    cfg.url = /^https?:\/\//i.test(cfg.url)
+      ? scopeBrowserApiUrl(cfg.url)
+      : scopeApiPathForBrowser(cfg.url)
+  }
+
   return cfg
 })
 
 client.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    assertCurrentWorldResponse(
+      res.headers?.['x-konnaxion-world'],
+      res.headers?.['x-konnaxion-world-release-id'],
+    )
+    return res
+  },
   (err) => Promise.reject(err),
 )
 

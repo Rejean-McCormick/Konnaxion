@@ -27,6 +27,18 @@ Rules:
 - moderation and visibility remain ethiKos-owned;
 - EkoH/Smart Vote may read declared inputs but do not mutate these records as part of a reading.
 
+### Konsensus presentation surface
+
+Konsensus is product-owned by **ethiKos** for navigation and decision experience, even though its frontend implementation uses the separate `/konsensus/*` route namespace and `frontend/modules/konsensus` package.
+
+Rules:
+
+- Konsensus does not become an EkoH-owned surface merely because it displays EkoH/Smart Vote context;
+- Konsensus may aggregate/read cross-domain signals, but presentation does not transfer the underlying state ownership;
+- user-facing Konsensus belongs under `ethiKos > Decide`;
+- platform administration of Konsensus rules belongs in KonTrol at `/kontrol/konsensus`;
+- `/konsensus/admin` is compatibility/navigation debt, not a second administrative owner.
+
 ### Konsultations
 
 Logical owner of consultation/intake/formal decision source events where that product capability is used.
@@ -104,13 +116,17 @@ Owns learning/resources/certification/portfolio state in its domain. Offline pac
 
 Owns creative works, galleries, collaboration sessions, traditions/archives and related domain state.
 
-### TeamBuilder
+### Team Builder
 
 Owns its problem, builder-session, team and team-member state. It is a Konnaxion application/domain capability, not an Orgo Task engine.
 
-### Kontrol
+### KonTrol
 
-Administrative application surface for Konnaxion moderation, roles/users, audit and platform-level views. Presentation in Kontrol does not move ownership of the underlying domain state.
+Administrative application surface for Konnaxion moderation, roles/users, audit and platform-level governance/configuration views. Presentation in KonTrol does not move ownership of the underlying domain state. Cross-domain reporting belongs to the separate Insights surface, not to the canonical KonTrol sidebar.
+
+### Insights
+
+Cross-domain read/analytics application surface presented to users as **Insights** while preserving the `/reports/*` technical namespace. Insights aggregates and presents data; it does not become the authoritative owner of the source state it reports.
 
 ## 3. Konnaxion ↔ Orgo through Interaction Kernel
 

@@ -129,6 +129,222 @@
   },
   {
     "source": "openapi",
+    "path": "/api/control/health/",
+    "method": "GET",
+    "operationId": "control_health_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/health/deep/",
+    "method": "GET",
+    "operationId": "control_health_deep_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/health/live/",
+    "method": "GET",
+    "operationId": "control_health_live_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/health/ready/",
+    "method": "GET",
+    "operationId": "control_health_ready_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/health/registry/",
+    "method": "GET",
+    "operationId": "control_health_registry_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/seed-packs/",
+    "method": "GET",
+    "operationId": "control_seed_packs_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/",
+    "method": "GET",
+    "operationId": "control_worlds_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/",
+    "method": "POST",
+    "operationId": "control_worlds_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/",
+    "method": "GET",
+    "operationId": "control_worlds_retrieve_2",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/",
+    "method": "PATCH",
+    "operationId": "control_worlds_partial_update",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/archive/",
+    "method": "POST",
+    "operationId": "control_worlds_archive_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/audit/",
+    "method": "GET",
+    "operationId": "control_worlds_audit_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/build-jobs/",
+    "method": "GET",
+    "operationId": "control_worlds_build_jobs_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/build-jobs/{job_id}/",
+    "method": "GET",
+    "operationId": "control_worlds_build_jobs_retrieve_2",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/clone/",
+    "method": "POST",
+    "operationId": "control_worlds_clone_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/memberships/",
+    "method": "GET",
+    "operationId": "control_worlds_memberships_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/memberships/",
+    "method": "POST",
+    "operationId": "control_worlds_memberships_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/memberships/{membership_id}/",
+    "method": "DELETE",
+    "operationId": "control_worlds_memberships_destroy",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/releases/",
+    "method": "GET",
+    "operationId": "control_worlds_releases_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/releases/build/",
+    "method": "POST",
+    "operationId": "control_worlds_releases_build_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/releases/{release_id}/promote/",
+    "method": "POST",
+    "operationId": "control_worlds_releases_promote_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/releases/{release_id}/purge/",
+    "method": "DELETE",
+    "operationId": "control_worlds_releases_purge_destroy",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/restore/",
+    "method": "POST",
+    "operationId": "control_worlds_restore_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/rollback/",
+    "method": "POST",
+    "operationId": "control_worlds_rollback_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/snapshots/",
+    "method": "GET",
+    "operationId": "control_worlds_snapshots_retrieve",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/snapshots/",
+    "method": "POST",
+    "operationId": "control_worlds_snapshots_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/control/worlds/{world_key}/snapshots/{snapshot_id}/restore/",
+    "method": "POST",
+    "operationId": "control_worlds_snapshots_restore_create",
+    "summary": "",
+    "tags": "control"
+  },
+  {
+    "source": "openapi",
     "path": "/api/deliberate/arguments/",
     "method": "GET",
     "operationId": "deliberate_arguments_list",
@@ -188,6 +404,126 @@
     "path": "/api/deliberate/categories/{id}/",
     "method": "GET",
     "operationId": "deliberate_categories_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-protocols/",
+    "method": "GET",
+    "operationId": "deliberate_decision_protocols_list",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-protocols/",
+    "method": "POST",
+    "operationId": "deliberate_decision_protocols_create",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "deliberate_decision_protocols_destroy",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "deliberate_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "deliberate_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "deliberate_decision_protocols_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/",
+    "method": "GET",
+    "operationId": "deliberate_decision_records_list",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/",
+    "method": "POST",
+    "operationId": "deliberate_decision_records_create",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "deliberate_decision_records_destroy",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "deliberate_decision_records_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "deliberate_decision_records_partial_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "deliberate_decision_records_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "deliberate_decision_records_execute_create",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "deliberate_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "deliberate_decision_records_publish_create",
     "summary": "",
     "tags": "deliberate"
   },
@@ -300,6 +636,126 @@
     "path": "/api/deliberate/elite/categories/{id}/",
     "method": "GET",
     "operationId": "deliberate_elite_categories_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-protocols/",
+    "method": "GET",
+    "operationId": "deliberate_elite_decision_protocols_list",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-protocols/",
+    "method": "POST",
+    "operationId": "deliberate_elite_decision_protocols_create",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "deliberate_elite_decision_protocols_destroy",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "deliberate_elite_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "deliberate_elite_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "deliberate_elite_decision_protocols_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/",
+    "method": "GET",
+    "operationId": "deliberate_elite_decision_records_list",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/",
+    "method": "POST",
+    "operationId": "deliberate_elite_decision_records_create",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "deliberate_elite_decision_records_destroy",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "deliberate_elite_decision_records_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "deliberate_elite_decision_records_partial_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "deliberate_elite_decision_records_update",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "deliberate_elite_decision_records_execute_create",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "deliberate_elite_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "deliberate"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/deliberate/elite/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "deliberate_elite_decision_records_publish_create",
     "summary": "",
     "tags": "deliberate"
   },
@@ -796,6 +1252,126 @@
     "path": "/api/ethikos/categories/{id}/",
     "method": "GET",
     "operationId": "ethikos_categories_retrieve",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-protocols/",
+    "method": "GET",
+    "operationId": "ethikos_decision_protocols_list",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-protocols/",
+    "method": "POST",
+    "operationId": "ethikos_decision_protocols_create",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-protocols/{id}/",
+    "method": "DELETE",
+    "operationId": "ethikos_decision_protocols_destroy",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-protocols/{id}/",
+    "method": "GET",
+    "operationId": "ethikos_decision_protocols_retrieve",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-protocols/{id}/",
+    "method": "PATCH",
+    "operationId": "ethikos_decision_protocols_partial_update",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-protocols/{id}/",
+    "method": "PUT",
+    "operationId": "ethikos_decision_protocols_update",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/",
+    "method": "GET",
+    "operationId": "ethikos_decision_records_list",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/",
+    "method": "POST",
+    "operationId": "ethikos_decision_records_create",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/{id}/",
+    "method": "DELETE",
+    "operationId": "ethikos_decision_records_destroy",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/{id}/",
+    "method": "GET",
+    "operationId": "ethikos_decision_records_retrieve",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/{id}/",
+    "method": "PATCH",
+    "operationId": "ethikos_decision_records_partial_update",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/{id}/",
+    "method": "PUT",
+    "operationId": "ethikos_decision_records_update",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/{id}/execute/",
+    "method": "POST",
+    "operationId": "ethikos_decision_records_execute_create",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/{id}/export/",
+    "method": "GET",
+    "operationId": "ethikos_decision_records_export_retrieve",
+    "summary": "",
+    "tags": "ethikos"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/ethikos/decision-records/{id}/publish/",
+    "method": "POST",
+    "operationId": "ethikos_decision_records_publish_create",
     "summary": "",
     "tags": "ethikos"
   },
@@ -2566,5 +3142,29 @@
     "operationId": "v1_smart_vote_readings_ethikos_topic_retrieve",
     "summary": "",
     "tags": "v1"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/{world_key}/runtime/",
+    "method": "GET",
+    "operationId": "w_runtime_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/{world_key}/runtime/personas/",
+    "method": "GET",
+    "operationId": "w_runtime_personas_retrieve",
+    "summary": "",
+    "tags": "w"
+  },
+  {
+    "source": "openapi",
+    "path": "/api/w/{world_key}/runtime/view-as/",
+    "method": "POST",
+    "operationId": "w_runtime_view_as_create",
+    "summary": "",
+    "tags": "w"
   }
 ]

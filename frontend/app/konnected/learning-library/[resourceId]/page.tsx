@@ -30,6 +30,7 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import React, { useEffect, useMemo, useState } from 'react';
 
+import { apiFetch } from '@/api';
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
 
 const { Paragraph, Text, Title } = Typography;
@@ -119,7 +120,7 @@ async function fetchResourceDetail(
 
   for (const url of urls) {
     try {
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method: 'GET',
         headers: {
           Accept: 'application/json',

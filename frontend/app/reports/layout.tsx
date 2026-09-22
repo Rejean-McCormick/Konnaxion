@@ -13,39 +13,25 @@ interface SegmentLayoutProps {
   children: ReactNode;
 }
 
-/**
- * Temporary sidebar target for /reports/*
- *
- * Current state:
- * - Docs treat Reports / Insights as its own module.
- * - MainLayout may still only know the existing suite keys.
- *
- * Strategy:
- * - If/when MainLayout supports "reports", set:
- *     NEXT_PUBLIC_REPORTS_SIDEBAR=reports
- * - Until then, fallback to "kontrol" so menus remain stable.
- */
-const DEFAULT_REPORTS_SIDEBAR =
-  process.env.NEXT_PUBLIC_REPORTS_SIDEBAR === 'reports'
-    ? 'reports'
-    : 'kontrol';
-
 function ReportsShell({ children }: SegmentLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
   const sidebarParam = searchParams.get('sidebar');
   const searchParamsString = searchParams.toString();
 
   useEffect(() => {
-    // Respect an explicit sidebar choice.
     if (sidebarParam !== null) return;
 
     const params = new URLSearchParams(searchParamsString);
-    params.set('sidebar', DEFAULT_REPORTS_SIDEBAR);
+    params.set('sidebar', 'reports');
 
-    router.replace(`${pathname}?${params.toString()}`);
+    const hash =
+      typeof window !== 'undefined' && window.location.hash
+        ? window.location.hash
+        : '';
+
+    router.replace(`${pathname}?${params.toString()}${hash}`);
   }, [router, pathname, sidebarParam, searchParamsString]);
 
   return <MainLayout>{children}</MainLayout>;

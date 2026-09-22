@@ -30,6 +30,11 @@ if settings.DEBUG:
 
 # API URLS
 urlpatterns += [
+    # Konnaxion Worlds control plane is global; runtime/business requests carry
+    # the World key explicitly in the URL and are pinned by WorldRouteMiddleware.
+    path("api/control/", include("konnaxion.worlds.urls")),
+    path("api/w/<slug:world_key>/", include("config.world_urls")),
+
     # Orgo -> Konnaxion Interaction Kernel ingress. Machine-authenticated and
     # intentionally owned by the main Konnaxion product, not Konnaxion_Worlds.
     path("api/integrations/ik/konnaxion/", include("konnaxion.ethikos.ik_bridge_urls")),

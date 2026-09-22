@@ -1,57 +1,17 @@
-// FILE: frontend/components/layout-components/Menu.tsx
 'use client';
 
 import { Menu } from 'antd';
 import type { MenuProps } from 'antd';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import type { CSSProperties, ReactNode } from 'react';
-import React from 'react';
+import type { CSSProperties } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+
+import { useWorld } from '@/context/WorldContext';
+import type { Route } from '@/routes/types';
 
 import './Menu.css';
 
-export interface Route {
-  path?: string;
-  name: string;
-  icon?: ReactNode;
-  views?: Route[];
-
-  /**
-   * Optional scope metadata, mainly used in Kontrol to distinguish
-   * platform-wide vs module-specific vs org-level sections.
-   *
-   * Example values:
-   *  - 'platform' → affects the whole Konnaxion platform
-   *  - 'module'   → governance / admin for a single module
-   *  - 'org'      → organisation / workspace-level
-   */
-  scope?: 'platform' | 'module' | 'org';
-
-  /**
-   * Optional module identifier when scope === 'module'.
-   * Example: 'ethikos', 'konnected', 'keenkonnect', 'teambuilder', etc.
-   * Used only for labelling / CSS, not for routing logic.
-   */
-  moduleKey?: string;
-
-  /**
-   * Marks routes that are part of governance / admin (typically under Kontrol).
-   * Filtering of these routes by user role should happen upstream, not here.
-   */
-  isAdmin?: boolean;
-
-  /**
-   * Marks routes that jump into another module (e.g. Ekoh → Konsensus,
-   * Konnected → Teambuilder). Can be used for analytics or special styling.
-   */
-  isCrossModule?: boolean;
-
-  /**
-   * Optional ordering hint if you ever want to override the natural array order.
-   * If omitted, items are rendered in the order they appear in the routes array.
-   */
-  order?: number;
-}
+export type { Route } from '@/routes/types';
 
 export interface MenuComponentProps {
   routes: Route[];
@@ -62,86 +22,79 @@ export interface MenuComponentProps {
 
 type MenuItem = Required<MenuProps>['items'][number];
 
-const flattenRoutes = (routes: Route[]): Route[] =>
-  routes.flatMap((route) =>
-    route.views && route.views.length > 0 ? flattenRoutes(route.views) : [route],
-  );
+function pathMatches(routePath: string, currentPath: string): boolean {
+  if (routePath === '/') return currentPath === '/';
+  return currentPath === routePath || currentPath.startsWith(`${routePath}/`);
+}
 
-/**
- * Build AntD Menu items.
- * - Simple routes -> normal clickable items
- * - Group routes (with views) -> non-clickable header row
- *   + child items rendered as first-level clickable entries.
- *
- * For Kontrol, optional `scope` / `moduleKey` on group routes can be used
- * to style or annotate section headers (via CSS classes). `isAdmin` and
- * `isCrossModule` are metadata flags consumed upstream or in CSS; the menu
- * itself stays generic.
- */
-const toMenuItems = (
+function flattenRoutes(routes: Route[]): Route[] {
+  return routes.flatMap((route) =>
+    route.views?.length ? flattenRoutes(route.views) : [route],
+  );
+}
+
+function sectionKey(index: number, name: string): string {
+  return `section-${index}-${name}`;
+}
+
+function findActiveSection(
+  routes: Route[],
+  selectedPath?: string,
+): string | undefined {
+  if (!selectedPath) return undefined;
+
+  for (let index = 0; index < routes.length; index += 1) {
+    const route = routes[index];
+    if (!route?.views?.length) continue;
+
+    if (flattenRoutes(route.views).some((child) => child.path === selectedPath)) {
+      return sectionKey(index, route.name);
+    }
+  }
+
+  return undefined;
+}
+
+function buildSectionLabel(route: Route): React.ReactNode {
+  return (
+    <div className="k-sidebar-section-header">
+      {route.icon ? (
+        <span className="k-sidebar-section-header-icon">{route.icon}</span>
+      ) : null}
+      <span className="k-sidebar-section-header-text">{route.name}</span>
+      {route.scope ? (
+        <span
+          className={`k-sidebar-section-scope k-sidebar-section-scope-${route.scope}`}
+        >
+          {route.scope === 'platform'
+            ? 'Platform'
+            : route.scope === 'module'
+              ? 'Module'
+              : 'Org'}
+        </span>
+      ) : null}
+      {route.moduleKey ? (
+        <span className="k-sidebar-section-module">{route.moduleKey}</span>
+      ) : null}
+    </div>
+  );
+}
+
+function toMenuItems(
   routes: Route[],
   selectedSidebar: string,
   closeDrawer: () => void,
-): MenuItem[] => {
-  const items: MenuItem[] = [];
-  const usedKeys = new Set<string>();
+  href: (path: string) => string,
+): MenuItem[] {
+  const usedPaths = new Set<string>();
 
-  const pushUnique = (key: string, item: MenuItem) => {
-    // Ant Design Menu forwards item keys to React. Duplicate route paths create
-    // duplicate React keys and unstable menu identity, so keep the first
-    // declaration and ignore later aliases to the exact same destination.
-    if (usedKeys.has(key)) return;
-    usedKeys.add(key);
-    items.push(item);
-  };
+  return routes.flatMap((route, routeIndex) => {
+    if (route.views?.length) {
+      const children = route.views.flatMap((child) => {
+        if (!child.path || usedPaths.has(child.path)) return [];
+        usedPaths.add(child.path);
 
-  routes.forEach((route, routeIndex) => {
-    // Group / section
-    if (route.views && route.views.length > 0) {
-      const sectionKey = `section-${routeIndex}-${route.name}`;
-
-      // Non-clickable section header (optional icon + scope metadata)
-      items.push({
-        key: sectionKey,
-        disabled: true,
-        label: (
-          <div className="k-sidebar-section-header">
-            {/* Design rule: groups can have an icon, but leaves are primary visual anchors */}
-            {route.icon && (
-              <span className="k-sidebar-section-header-icon">
-                {route.icon}
-              </span>
-            )}
-            <span className="k-sidebar-section-header-text">
-              {route.name}
-            </span>
-            {route.scope && (
-              <span
-                className={`k-sidebar-section-scope k-sidebar-section-scope-${route.scope}`}
-              >
-                {route.scope === 'platform'
-                  ? 'Platform'
-                  : route.scope === 'module'
-                  ? 'Module'
-                  : 'Org'}
-              </span>
-            )}
-            {route.moduleKey && (
-              <span className="k-sidebar-section-module">
-                {route.moduleKey}
-              </span>
-            )}
-          </div>
-        ),
-        className: 'k-sidebar-section-header',
-      } as MenuItem);
-
-      // Child items rendered as regular first-level entries
-      route.views.forEach((child) => {
-        if (!child.path) return;
-
-        pushUnique(
-          child.path,
+        return [
           {
             key: child.path,
             icon: child.icon,
@@ -149,7 +102,7 @@ const toMenuItems = (
             label: (
               <Link
                 href={{
-                  pathname: child.path,
+                  pathname: href(child.path),
                   query: { sidebar: selectedSidebar },
                 }}
                 onClick={closeDrawer}
@@ -158,34 +111,43 @@ const toMenuItems = (
               </Link>
             ),
           } as MenuItem,
-        );
+        ];
       });
 
-      return;
+      if (!children.length) return [];
+
+      return [
+        {
+          key: sectionKey(routeIndex, route.name),
+          label: buildSectionLabel(route),
+          className: 'k-sidebar-section-submenu',
+          children,
+        } as MenuItem,
+      ];
     }
 
-    // Simple route
-    if (!route.path) return;
+    if (!route.path || usedPaths.has(route.path)) return [];
+    usedPaths.add(route.path);
 
-    pushUnique(
-      route.path,
+    return [
       {
         key: route.path,
         icon: route.icon,
         label: (
           <Link
-            href={{ pathname: route.path, query: { sidebar: selectedSidebar } }}
+            href={{
+              pathname: href(route.path),
+              query: { sidebar: selectedSidebar },
+            }}
             onClick={closeDrawer}
           >
             {route.name}
           </Link>
         ),
       } as MenuItem,
-    );
+    ];
   });
-
-  return items;
-};
+}
 
 const MenuComponent: React.FC<MenuComponentProps> = ({
   routes,
@@ -193,38 +155,53 @@ const MenuComponent: React.FC<MenuComponentProps> = ({
   closeDrawer,
   selectedSidebar,
 }) => {
-  const pathname = usePathname() ?? '/';
+  const { appPath, href } = useWorld();
+  const flat = useMemo(() => flattenRoutes(routes), [routes]);
 
-  const flat = React.useMemo(() => flattenRoutes(routes), [routes]);
-
-  const selectedKey = React.useMemo(() => {
+  const selectedKey = useMemo(() => {
     const matches = flat.filter(
-      (route) => route.path && pathname.startsWith(route.path),
+      (route) => route.path && pathMatches(route.path, appPath),
     );
 
-    if (!matches.length) {
-      return undefined;
-    }
+    if (!matches.length) return undefined;
 
-    // Choose the most specific match (longest path)
-    const best = matches.reduce((currentBest, route) => {
-      if (!currentBest.path) return route;
-      if (!route.path) return currentBest;
-      return route.path.length > currentBest.path.length ? route : currentBest;
-    });
+    return matches.reduce((best, route) => {
+      if (!best.path) return route;
+      if (!route.path) return best;
+      return route.path.length > best.path.length ? route : best;
+    }).path;
+  }, [appPath, flat]);
 
-    return best.path;
-  }, [flat, pathname]);
-
-  const items = React.useMemo(
-    () => toMenuItems(routes, selectedSidebar, closeDrawer),
-    [routes, selectedSidebar, closeDrawer],
+  const activeSection = useMemo(
+    () => findActiveSection(routes, selectedKey),
+    [routes, selectedKey],
   );
+
+  const [openKeys, setOpenKeys] = useState<string[]>(
+    activeSection ? [activeSection] : [],
+  );
+
+  useEffect(() => {
+    setOpenKeys(activeSection ? [activeSection] : []);
+  }, [activeSection]);
+
+  const items = useMemo(
+    () => toMenuItems(routes, selectedSidebar, closeDrawer, href),
+    [routes, selectedSidebar, closeDrawer, href],
+  );
+
+  const handleOpenChange: MenuProps['onOpenChange'] = (keys) => {
+    const normalized = keys.map(String);
+    const newlyOpened = normalized.find((key) => !openKeys.includes(key));
+    setOpenKeys(newlyOpened ? [newlyOpened] : []);
+  };
 
   return (
     <Menu
       mode="inline"
       selectedKeys={selectedKey ? [selectedKey] : []}
+      openKeys={openKeys}
+      onOpenChange={handleOpenChange}
       items={items}
       style={{
         background: 'var(--ant-color-bg-container)',

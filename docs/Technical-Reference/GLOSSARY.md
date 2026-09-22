@@ -28,8 +28,9 @@ Examples:
 - ethiKos: Konnaxion civic domain and application surface.
 - EkoH: Konnaxion domain/service boundary for expertise, ethics, privacy and rating access.
 - Smart Vote: Konnaxion derived-reading/aggregation boundary.
-- Kontrol: Konnaxion administrative application surface.
-- Reports: cross-domain reporting application surface.
+- KonTrol: Konnaxion administrative application surface.
+- Insights: cross-domain reporting/analytics application surface using the `/reports/*` technical namespace.
+- Team Builder: shared team-composition/problem application capability.
 - K-Port: EkoH evidence application/gateway; not a peer of Konnaxion.
 
 ## Domain
@@ -84,6 +85,10 @@ A content-identifiable set of EkoH contextual inputs used for a reading. If a re
 
 **Konsultations** is the logical consultation/intake/decision sub-domain inside the Konnaxion civic surface. It owns formal source participation/ballot semantics when such a protocol is used. It must not be equated automatically with an Orgo Task or with a Smart Vote reading.
 
+## Konsensus
+
+**Konsensus** is an **ethiKos-owned product/navigation surface** for consensus/decision interaction. Its technical frontend route namespace may remain `/konsensus/*`; that physical separation does not make it an independent suite or an EkoH-owned product. Administrative Konsensus configuration belongs in KonTrol.
+
 ## EkoH
 
 **EkoH** owns contextual expertise, ethics/reliability, confidentiality/rating visibility, evidence-derived score state and related access policy. It does not own civic ballots or final decision protocols.
@@ -94,7 +99,19 @@ A content-identifiable set of EkoH contextual inputs used for a reading. If a re
 
 ## Kollective Intelligence
 
-**Kollective Intelligence** is retained as a product/navigation umbrella. It is **not the canonical backend owner** for EkoH or Smart Vote state. Canonical code ownership is split between `konnaxion.ekoh` and `konnaxion.smart_vote`.
+**Kollective Intelligence** is retained as a legacy/conceptual umbrella. It is **not the canonical backend owner** for EkoH or Smart Vote state. Canonical code ownership is split between `konnaxion.ekoh` and `konnaxion.smart_vote`.
+
+## Insights
+
+**Insights** is the user-facing cross-domain analytics suite. Its technical URL namespace remains `/reports/*`. It is read-oriented and does not become a canonical owner of source domain state.
+
+## Team Builder
+
+**Team Builder** is the shared Konnaxion capability for problem-aware team composition using candidates and constraints. It is distinct from keenKonnect AI Team Matching (recommendation/discovery) and from KonnectED's domain-specific Create team flow.
+
+## Navigation ownership
+
+**Navigation ownership** identifies which product suite/sidebar presents a route. It is separate from technical route namespace and backend state ownership. Example: `/konsensus/*` is technically separate but navigation-owned by ethiKos.
 
 ## External ecosystem system
 

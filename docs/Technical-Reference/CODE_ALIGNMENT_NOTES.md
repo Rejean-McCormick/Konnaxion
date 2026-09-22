@@ -225,3 +225,27 @@ The 2026-09-15 full qualification exposed several issues that are not architectu
 - LevelUpDiag N09 currently conflates HTTP reachability with endpoint validity.
 
 These are qualification/tooling or test-fixture closure items. Their current evidence and closure rules are maintained in `QUALIFICATION_STATUS.md`.
+
+## 15. Navigation shell alignment overlay
+
+The accepted navigation contract is documented in `NAVIGATION_AND_SHELL_CONTRACT.md`. The prepared frontend alignment should be treated as a coordinated shell change rather than independent label edits.
+
+Required alignment points:
+
+- centralize suite keys, visible labels, landing routes and switcher grouping in one configuration (for example `frontend/routes/suites.ts`);
+- canonical visible spelling is **ethiKos** while technical keys/routes remain `ethikos`;
+- map `/konsensus/*` to the ethiKos sidebar by default and expose `Konsensus` under `ethiKos > Decide`;
+- remove Konsensus and Reports links from EkoH navigation;
+- expose `/reports/*` as standalone **Insights** rather than as a KonTrol sidebar group;
+- keep KonTrol focused on operations/governance administration;
+- align keenKonnect, KonnectED and Kreative route groups with accepted product ownership;
+- rename the KonnectED `/teams-collaboration/team-builder` visible action to **Create team** without requiring a URL migration;
+- use the Team Builder order `Sessions → Problems → People & Constraints`;
+- remove the unused parallel `frontend/components/teambuilder/TeamBuilderSidebar.tsx` taxonomy;
+- route obsolete Team Builder overview links to existing pages instead of non-existent `/humans/language`, `/humans/geo` or `/humans/schedules` paths;
+- redirect `/konsensus/admin` to `/kontrol/konsensus` so there is one canonical administration surface;
+- make grouped sidebar sections collapsible and select/breadcrumb by the most specific route match;
+- add navigation-shell browser coverage for `/konsensus`, `/reports`, switcher landing routes and visible sidebar destinations.
+
+This section is a code-alignment requirement, not proof that the overlay has been applied or qualified in a particular build.
+

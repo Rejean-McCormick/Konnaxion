@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 
 import '@/styles/tailwind.css';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { WorldProvider } from '@/context/WorldContext';
 import AppFreshnessProvider from '@/shared/AppFreshnessProvider';
 import QueryProvider from '@/shared/QueryProvider';
 
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body className="min-h-screen bg-neutral-50 antialiased">
         <AppFreshnessProvider>
           <ThemeProvider>
-            <QueryProvider>{children}</QueryProvider>
+            <WorldProvider>
+              <QueryProvider>{children}</QueryProvider>
+            </WorldProvider>
           </ThemeProvider>
         </AppFreshnessProvider>
       </body>

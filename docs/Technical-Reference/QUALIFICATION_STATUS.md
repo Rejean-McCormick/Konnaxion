@@ -36,7 +36,7 @@ The 2026-09-15 full campaign covered N00 through N11.
 | N02 | Backend / Django / DB | PASS | Django system check, migration-drift check and platform smoke passed. |
 | N03 | Frontend / Next | FAIL | TypeScript, Jest and Next build passed; ESLint failed. |
 | N04 | API Contracts | PASS | Backend/frontend endpoint scans, OpenAPI tests and common-auth contract checks passed. |
-| N05 | Runtime & Browser | PASS | Local backend/frontend startup, Ethikos seed and Playwright smoke passed. |
+| N05 | Runtime & Browser | PASS | Local backend/frontend startup, ethiKos seed and Playwright smoke passed. |
 | N06 | Jobs / Redis / Celery | PASS | Celery task tests passed; optional live job probe is not configured. |
 | N07 | Security & Auth | WARN | Django deploy check and auth-policy tests passed; Capsule Manager security-gate unit tests had 2 failures / 40 passes. |
 | N08 | Capsule Local | PASS | Manager repo, healthcheck source and instance-state tests passed; no capsule file was configured for hashing. |

@@ -1,3 +1,5 @@
+> **Legacy narrative notice (2026-09-22):** This long-form v0.1 workflow document predates the canonical navigation cleanup. For current product labels, suite grouping, Konsensus ownership and sidebar placement, use `Technical-Reference/NAVIGATION_AND_SHELL_CONTRACT.md`, `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`, and `Konnaxion_User_Workflows.md`. In particular, **ethiKos** is the canonical visible spelling; Konsensus is product-owned by ethiKos; EkoH and Team Builder are shared capabilities; Insights is a standalone suite using `/reports/*`; and KonTrol is the administration/governance suite. Older references to a standalone Kollective Intelligence navigation module are historical/conceptual, not the current shell contract.
+
 # Konnaxion — Documentation légère des User Workflows
 
 Version: v0.1

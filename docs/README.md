@@ -6,6 +6,8 @@ Konnaxion is an **ecosystem system** of the kOA Digital Ecosystem and a **platfo
 
 Within Konnaxion, the word **module** is only a convenient product/UI term. Architecture documents use the more precise terms **domain**, **application**, **service**, **component**, **gateway** and **external ecosystem system**.
 
+The canonical visible brand spelling is **ethiKos**. Technical identifiers such as `ethikos`, `EthikosTopic`, package names and route segments keep their code spelling.
+
 ## Documentation authority
 
 The canonical reading order below defines current authority. A document outside this order may still be useful as history, rationale, prototype material or a design exploration, but it does **not** override the canonical specifications or current qualification evidence.
@@ -24,8 +26,9 @@ In particular, `Technical-Reference/EkoH Smart Vote/ekoh-smart-vote-definitive-m
 6. `Technical-Reference/CONTRACTS.txt`
 7. `Technical-Reference/EkoH Smart Vote/EkoH and Smart Vote - Technical Specification.md`
 8. `Technical-Reference/CODE_ALIGNMENT_NOTES.md`
-9. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
-10. `Konnaxion_User_Workflows.md`
+9. `Technical-Reference/NAVIGATION_AND_SHELL_CONTRACT.md`
+10. `Technical-Reference/DocV14/Konnaxion v14 - Site Navigation Map.md`
+11. `Konnaxion_User_Workflows.md`
 
 ## Status and evidence rule
 

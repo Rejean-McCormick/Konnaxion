@@ -1,146 +1,80 @@
-// FILE: frontend/routes/routesKontrol.tsx
 'use client';
 
 import {
-  BarChartOutlined,
   DashboardOutlined,
   FileProtectOutlined,
   FileSearchOutlined,
-  FileTextOutlined,
-  LineChartOutlined,
   LockOutlined,
-  PieChartOutlined,
   TeamOutlined,
-  ThunderboltOutlined,
   UserOutlined,
   WarningOutlined,
 } from '@ant-design/icons';
 import React from 'react';
 
-// Explicit scope metadata for Kontrol navigation
-// - "platform": affects the whole platform / all modules
-// - "module": focused on operations over module content (Ethikos, Konnected, etc.)
-type Scope = 'platform' | 'module';
+import type { Route } from './types';
 
-type Route = {
-  path?: string;
-  name: string;
-  icon?: React.ReactNode;
-  views?: Route[];
-
-  // Optional scope metadata used by the Kontrol UI to show badges / grouping
-  scope?: Scope;
-
-  // Optional: when scope === "module", this can be used later
-  // to specialise labels or filters (e.g. Ethikos, Konnected, …).
-  // For now it’s informational only.
-  moduleKey?:
-    | 'ekoh'
-    | 'ethikos'
-    | 'keenkonnect'
-    | 'konnected'
-    | 'kreative'
-    | 'teambuilder'
-    | 'multi';
-};
-
-// 1. Dashboard (The Homepage) – platform-wide overview
-const dashboard: Route = {
+const overview: Route = {
   path: '/kontrol/dashboard',
   name: 'Overview',
   icon: <DashboardOutlined />,
   scope: 'platform',
 };
 
-// 2. Module Operations (moderation & user content) – module-focused scope
 const operationsGroup: Route = {
-  name: 'Module Operations',
+  name: 'Operations',
+  scope: 'platform',
   views: [
     {
       path: '/kontrol/users/all',
-      name: 'User Database',
+      name: 'User database',
       icon: <UserOutlined />,
-      scope: 'platform', // user base across all modules
+      scope: 'platform',
     },
     {
       path: '/kontrol/moderation/queue',
-      name: 'Moderation Queue',
+      name: 'Moderation queue',
       icon: <WarningOutlined />,
-      scope: 'module', // operates on module content (Ethikos, Konnected, Kreative…)
+      scope: 'module',
       moduleKey: 'multi',
     },
     {
       path: '/kontrol/moderation/community',
-      name: 'Community Contexts',
+      name: 'Community contexts',
       icon: <TeamOutlined />,
-      scope: 'module', // defines contexts for module communities
+      scope: 'module',
       moduleKey: 'multi',
     },
   ],
 };
 
-// 3. Platform Governance (configuration & logs) – platform scope
 const governanceGroup: Route = {
-  name: 'Platform Governance',
+  name: 'Governance',
+  scope: 'platform',
   views: [
     {
       path: '/kontrol/konsensus',
-      name: 'Konsensus Rules',
+      name: 'Konsensus rules',
       icon: <FileProtectOutlined />,
       scope: 'platform',
+      isAdmin: true,
     },
     {
       path: '/kontrol/roles',
-      name: 'Roles & Permissions',
+      name: 'Roles & permissions',
       icon: <LockOutlined />,
       scope: 'platform',
+      isAdmin: true,
     },
     {
       path: '/kontrol/audit-log',
-      name: 'System Audit Log',
+      name: 'System audit log',
       icon: <FileSearchOutlined />,
       scope: 'platform',
+      isAdmin: true,
     },
   ],
 };
 
-// 4. Analytics & Insights (reporting) – platform scope over all modules
-const insightsGroup: Route = {
-  name: 'Analytics & Reports',
-  views: [
-    {
-      path: '/reports',
-      name: 'Insights Overview',
-      icon: <LineChartOutlined />,
-      scope: 'platform',
-    },
-    {
-      path: '/reports/smart-vote',
-      name: 'Smart Vote Impact',
-      icon: <PieChartOutlined />,
-      scope: 'platform',
-    },
-    {
-      path: '/reports/usage',
-      name: 'Adoption & Usage',
-      icon: <BarChartOutlined />,
-      scope: 'platform',
-    },
-    {
-      path: '/reports/perf',
-      name: 'System Performance',
-      icon: <ThunderboltOutlined />,
-      scope: 'platform',
-    },
-    {
-      path: '/reports/custom',
-      name: 'Custom Reports',
-      icon: <FileTextOutlined />,
-      scope: 'platform',
-    },
-  ],
-};
-
-const routes: Route[] = [dashboard, operationsGroup, governanceGroup, insightsGroup];
+const routes: Route[] = [overview, operationsGroup, governanceGroup];
 
 export default routes;

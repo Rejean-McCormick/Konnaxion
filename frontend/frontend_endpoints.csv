@@ -1,5 +1,6 @@
 method,url,files
-FETCH,/_api/search?${params.toString()},"C:/mycode/Konnaxion/Konnaxion/frontend/app/search/GlobalSearchClient.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/hooks/useGlobalSearch.ts"
+FETCH,/_api/search?${apiParams.toString()},"C:/mycode/Konnaxion/Konnaxion/frontend/app/search/GlobalSearchClient.tsx"
+FETCH,/_api/search?${params.toString()},"C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/hooks/useGlobalSearch.ts"
 FETCH,/api/admin/audit-log/?${searchParams.toString()},"C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/audit-log/page.tsx"
 GET,/api/admin/moderation,"C:/mycode/Konnaxion/Konnaxion/frontend/modules/admin/hooks/useModeration.ts"
 GET,/api/admin/stats,"C:/mycode/Konnaxion/Konnaxion/frontend/modules/admin/hooks/useStats.ts"
@@ -72,7 +73,7 @@ GET,q,"C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts | C:/myco
 GET,reports/usage/?range=${nextRange},"C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/usage/page.tsx"
 GET,resolved,"C:/mycode/Konnaxion/Konnaxion/frontend/modules/konsultations/pages/ConsultationsHomePage.tsx"
 GET,resourceType,"C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
-GET,sidebar,"C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/teambuilder/layout.tsx"
+GET,sidebar,"C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/konsensus/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/layout.tsx | C:/mycode/Konnaxion/Konnaxion/frontend/app/teambuilder/layout.tsx"
 GET,sort,"C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
 GET,subject,"C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/learning-library/browse-resources/page.tsx"
 GET,trust/credentials,"C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/trust/credentials/page.tsx"
@@ -83,3 +84,4 @@ GET,users/me/,"C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/deliberate/[to
 GET,v1/ekoh/profile/${userId}/,"C:/mycode/Konnaxion/Konnaxion/frontend/services/ekoh.ts"
 GET,v1/smart-vote/readings/ethikos-topic/${encodeURIComponent(id)}/,"C:/mycode/Konnaxion/Konnaxion/frontend/services/readings.ts"
 GET,v1/smart-vote/readings/ethikos-topic/${toId(topicId)}/,"C:/mycode/Konnaxion/Konnaxion/frontend/services/decide.ts"
+GET,world,"C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts"

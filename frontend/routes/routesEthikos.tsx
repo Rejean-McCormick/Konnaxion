@@ -1,4 +1,3 @@
-// FILE: frontend/routes/routesEthikos.tsx
 'use client';
 
 import {
@@ -20,26 +19,19 @@ import {
   SendOutlined,
   SmileOutlined,
   StarOutlined,
+  TeamOutlined,
   TrophyOutlined,
 } from '@ant-design/icons';
 import React from 'react';
 
-// Minimal local type to avoid external coupling
-type Route = {
-  path?: string;
-  name: string;
-  icon?: React.ReactNode;
-  views?: Route[];
-};
+import type { Route } from './types';
 
-// Overview
-const ethikosDashboard: Route = {
+const overview: Route = {
   path: '/ethikos/insights',
   name: 'Overview',
   icon: <DashboardOutlined />,
 };
 
-// Deliberate: explore topics, arguments, and debate norms.
 const deliberateGroup: Route = {
   name: 'Deliberate',
   views: [
@@ -53,12 +45,9 @@ const deliberateGroup: Route = {
       name: 'Guidelines',
       icon: <NodeIndexOutlined />,
     },
-    // Important: no dynamic placeholder like "/ethikos/deliberate/[topic]"
-    // so that Next.js <Link> never receives a dynamic pattern as href.
   ],
 };
 
-// Decide: voting, consultations, results, and method.
 const decideGroup: Route = {
   name: 'Decide',
   views: [
@@ -73,6 +62,14 @@ const decideGroup: Route = {
       icon: <ApartmentOutlined />,
     },
     {
+      // Technical route root is separate, but Konsensus is product-owned by ethiKos.
+      path: '/konsensus',
+      name: 'Konsensus',
+      icon: <TeamOutlined />,
+      moduleKey: 'ethikos',
+      isCrossModule: true,
+    },
+    {
       path: '/ethikos/decide/results',
       name: 'Results',
       icon: <CrownOutlined />,
@@ -85,7 +82,6 @@ const decideGroup: Route = {
   ],
 };
 
-// Impact: what happened after deliberation and voting.
 const impactGroup: Route = {
   name: 'Impact',
   views: [
@@ -107,7 +103,6 @@ const impactGroup: Route = {
   ],
 };
 
-// Pulse: live monitoring and health signals.
 const pulseGroup: Route = {
   name: 'Pulse',
   views: [
@@ -134,7 +129,6 @@ const pulseGroup: Route = {
   ],
 };
 
-// Trust: credibility and expertise signals.
 const trustGroup: Route = {
   name: 'Trust',
   views: [
@@ -156,7 +150,6 @@ const trustGroup: Route = {
   ],
 };
 
-// Learn: help, definitions, and release notes.
 const learnGroup: Route = {
   name: 'Learn',
   views: [
@@ -178,27 +171,14 @@ const learnGroup: Route = {
   ],
 };
 
-// Community: cross-module consensus and recognition.
-const communityGroup: Route = {
-  name: 'Community',
-  views: [
-    {
-      path: '/konsensus/leaderboards',
-      name: 'Leaderboards',
-      icon: <CrownOutlined />,
-    },
-  ],
-};
-
 const routes: Route[] = [
-  ethikosDashboard,
+  overview,
   deliberateGroup,
   decideGroup,
   impactGroup,
   pulseGroup,
   trustGroup,
   learnGroup,
-  communityGroup,
 ];
 
 export default routes;

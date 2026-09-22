@@ -599,7 +599,7 @@ async function setSliderValue(page: Page, target: number): Promise<void> {
   await slider.focus()
 
   const raw = await slider.getAttribute('aria-valuenow')
-  let current = Number(raw ?? 0)
+  const current = Number(raw ?? 0)
 
   expect(Number.isFinite(current), 'Stance slider should expose aria-valuenow').toBeTruthy()
 

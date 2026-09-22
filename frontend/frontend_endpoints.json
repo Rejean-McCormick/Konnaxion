@@ -1,9 +1,15 @@
 [
   {
     "method": "FETCH",
+    "url": "/_api/search?${apiParams.toString()}",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/search/GlobalSearchClient.tsx"
+    ]
+  },
+  {
+    "method": "FETCH",
     "url": "/_api/search?${params.toString()}",
     "files": [
-      "C:/mycode/Konnaxion/Konnaxion/frontend/app/search/GlobalSearchClient.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/modules/global/hooks/useGlobalSearch.ts"
     ]
   },
@@ -529,6 +535,7 @@
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/ethikos/layout.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/keenkonnect/layout.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/konnected/layout.tsx",
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/konsensus/layout.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/kontrol/layout.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/reports/layout.tsx",
       "C:/mycode/Konnaxion/Konnaxion/frontend/app/teambuilder/layout.tsx"
@@ -606,6 +613,13 @@
     "url": "v1/smart-vote/readings/ethikos-topic/${toId(topicId)}/",
     "files": [
       "C:/mycode/Konnaxion/Konnaxion/frontend/services/decide.ts"
+    ]
+  },
+  {
+    "method": "GET",
+    "url": "world",
+    "files": [
+      "C:/mycode/Konnaxion/Konnaxion/frontend/app/_api/search/route.ts"
     ]
   }
 ]

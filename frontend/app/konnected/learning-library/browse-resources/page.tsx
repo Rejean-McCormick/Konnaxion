@@ -26,11 +26,11 @@ import {
   Typography,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import axios from 'axios';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 import KonnectedPageShell from '@/app/konnected/KonnectedPageShell';
+import api from '@/services/_request';
 
 const { Text } = Typography;
 const { Search } = Input;
@@ -237,12 +237,10 @@ export default function BrowseResourcesPage(): JSX.Element {
           params.ordering = ordering;
         }
 
-        const response = await axios.get<KnowledgeResourceListResponse>(
+        const raw = await api.get<KnowledgeResourceListResponse | KnowledgeResource[]>(
           KNOWLEDGE_RESOURCES_ENDPOINT,
           { params },
         );
-
-        const raw = response.data as unknown;
         let items: KnowledgeResource[] = [];
         let count = 0;
 
@@ -283,8 +281,8 @@ export default function BrowseResourcesPage(): JSX.Element {
     setLoadingMeta(true);
 
     try {
-      const response = await axios.get<KnowledgeMetadataResponse>(KNOWLEDGE_METADATA_ENDPOINT);
-      const data = response.data ?? {};
+      const data =
+        (await api.get<KnowledgeMetadataResponse>(KNOWLEDGE_METADATA_ENDPOINT)) ?? {};
 
       setSubjects(data.subjects ?? []);
       setLevels(normalizeArray(data.levels, DEFAULT_LEVELS));

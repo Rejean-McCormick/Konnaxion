@@ -1,47 +1,19 @@
-// FILE: frontend/components/layout-components/LogoTitle.tsx
-'use client'
+'use client';
 
-import { DownOutlined } from '@ant-design/icons'
-import { Dropdown } from 'antd'
-import type { MenuProps } from 'antd'
-import Link from 'next/link'
-import styled from 'styled-components'
+import { DownOutlined } from '@ant-design/icons';
+import { Dropdown } from 'antd';
+import type { MenuProps } from 'antd';
+import Link from 'next/link';
+import styled from 'styled-components';
 
-/* ------------ module keys & mappings ------------ */
-
-const SUITE_KEYS = [
-  'ekoh',
-  'ethikos',
-  'keenkonnect',
-  'konnected',
-  'kreative',
-  'kontrol',
-  'teambuilder',
-] as const
-
-type SuiteKey = (typeof SUITE_KEYS)[number]
-
-const TITLE_BY_SUITE: Record<SuiteKey, string> = {
-  ekoh: 'EkoH',
-  ethikos: 'EthiKos',
-  keenkonnect: 'keenKonnect',
-  konnected: 'KonnectED',
-  kreative: 'Kreative',
-  kontrol: 'KonTrol',
-  teambuilder: 'Team Builder',
-}
-
-const DEFAULT_ENTRY: Record<SuiteKey, string> = {
-  ekoh: '/ekoh/dashboard',
-  ethikos: '/ethikos/insights',
-  keenkonnect: '/keenkonnect/dashboard',
-  konnected: '/konnected/dashboard',
-  kreative: '/kreative/dashboard',
-  kontrol: '/kontrol/dashboard',
-  teambuilder: '/teambuilder',
-}
-
-/* ------------ styled ------------ */
+import { useWorld } from '@/context/WorldContext';
+import {
+  DEFAULT_ENTRY,
+  SUITE_GROUPS,
+  SUITE_KEYS,
+  SUITE_LABELS,
+  type SuiteKey,
+} from '@/routes/suites';
 
 const TitleWrapper = styled.div<{ $variant: 'sider' | 'header' }>`
   position: relative;
@@ -54,13 +26,13 @@ const TitleWrapper = styled.div<{ $variant: 'sider' | 'header' }>`
   overflow: hidden;
   background: var(--ant-color-bg-container);
   transition: background 0.3s ease;
-`
+`;
 
 const Logo = styled.img`
   display: block;
   height: 32px;
   width: auto;
-`
+`;
 
 const ModuleToggle = styled.button`
   display: inline-flex;
@@ -79,47 +51,35 @@ const ModuleToggle = styled.button`
   &:hover {
     background: var(--ant-color-fill-secondary);
   }
-`
-
-/* ------------ types ------------ */
+`;
 
 interface LogoTitleProps {
-  onSidebarChange: (key: SuiteKey) => void
-  selectedSidebar?: string | SuiteKey
-  variant?: 'sider' | 'header'
-  className?: string
+  onSidebarChange: (key: SuiteKey) => void;
+  selectedSidebar?: string | SuiteKey;
+  variant?: 'sider' | 'header';
+  className?: string;
 }
 
-/* ------------ helpers ------------ */
+const menuItems: MenuProps['items'] = SUITE_GROUPS.flatMap((group, index) => {
+  const groupItems = group.map((key) => ({
+    key,
+    label: SUITE_LABELS[key],
+  }));
 
-// Dropdown menu with separators:
-// ekoh
-// ---
-// ethikos, keenkonnect, konnected, kreative
-// ---
-// kontrol, teambuilder
-const menuItems: MenuProps['items'] = [
-  { key: 'ekoh', label: TITLE_BY_SUITE.ekoh },
-  { type: 'divider' },
-  { key: 'ethikos', label: TITLE_BY_SUITE.ethikos },
-  { key: 'keenkonnect', label: TITLE_BY_SUITE.keenkonnect },
-  { key: 'konnected', label: TITLE_BY_SUITE.konnected },
-  { key: 'kreative', label: TITLE_BY_SUITE.kreative },
-  { type: 'divider' },
-  { key: 'kontrol', label: TITLE_BY_SUITE.kontrol },
-  { key: 'teambuilder', label: TITLE_BY_SUITE.teambuilder },
-]
+  if (index === SUITE_GROUPS.length - 1) return groupItems;
+  return [...groupItems, { type: 'divider' as const }];
+});
 
 function normalizeSuite(raw: string | SuiteKey | null | undefined): SuiteKey {
-  if (!raw) return 'ekoh'
-  const lower = String(raw).toLowerCase()
-  if ((SUITE_KEYS as readonly string[]).includes(lower as SuiteKey)) {
-    return lower as SuiteKey
-  }
-  return 'ekoh'
-}
+  if (!raw) return 'ekoh';
 
-/* ------------ component ------------ */
+  const normalized = String(raw).toLowerCase();
+  if ((SUITE_KEYS as readonly string[]).includes(normalized)) {
+    return normalized as SuiteKey;
+  }
+
+  return 'ekoh';
+}
 
 export default function LogoTitle({
   onSidebarChange,
@@ -127,23 +87,23 @@ export default function LogoTitle({
   variant = 'sider',
   className,
 }: LogoTitleProps) {
-  const suite = normalizeSuite(selectedSidebar)
-  const label = TITLE_BY_SUITE[suite]
-  const homeHref = DEFAULT_ENTRY[suite]
+  const { href } = useWorld();
+  const suite = normalizeSuite(selectedSidebar);
+  const label = SUITE_LABELS[suite];
+  const homeHref = href(DEFAULT_ENTRY[suite]);
 
-  const handleMenuClick: MenuProps['onClick'] = info => {
-    const key = String(info.key) as SuiteKey
+  const handleMenuClick: MenuProps['onClick'] = (info) => {
+    const key = String(info.key) as SuiteKey;
     if ((SUITE_KEYS as readonly string[]).includes(key)) {
-      onSidebarChange(key)
+      onSidebarChange(key);
     }
-  }
+  };
 
   return (
     <TitleWrapper $variant={variant} className={className}>
-      {/* Brand logo → navigates to the current module dashboard */}
       <Link
         href={{ pathname: homeHref, query: { sidebar: suite } }}
-        aria-label="Go to module dashboard"
+        aria-label={`Go to ${label} home`}
         style={{
           display: 'inline-flex',
           alignItems: 'center',
@@ -153,7 +113,6 @@ export default function LogoTitle({
         <Logo src="/LogoK.svg" alt="Konnaxion logo" />
       </Link>
 
-      {/* Module switcher dropdown */}
       <Dropdown
         trigger={['click']}
         menu={{
@@ -165,11 +124,11 @@ export default function LogoTitle({
           },
         }}
       >
-        <ModuleToggle type="button">
-          <span>{label ?? 'Konnaxion'}</span>
+        <ModuleToggle type="button" aria-label={`Current space: ${label}`}>
+          <span>{label}</span>
           <DownOutlined />
         </ModuleToggle>
       </Dropdown>
     </TitleWrapper>
-  )
+  );
 }

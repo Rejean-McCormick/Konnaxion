@@ -1,4 +1,7 @@
 
+C:\mycode\Konnaxion\Konnaxion\frontend\app\_api\version\route.ts
+  5:1  warning  `next/server` import should occur before import of `node:fs/promises`  import/order
+
 C:\mycode\Konnaxion\Konnaxion\frontend\app\keenkonnect\sustainability-impact\submit-impact-reports\page.tsx
   58:23  warning  'setReferenceId' is assigned a value but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
 
@@ -44,15 +47,27 @@ C:\mycode\Konnaxion\Konnaxion\frontend\app\kreative\dashboard\page.tsx
 C:\mycode\Konnaxion\Konnaxion\frontend\app\teambuilder\problems\[problemId]\page.tsx
   89:11  warning  'IProblemDetailResponse' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
 
+C:\mycode\Konnaxion\Konnaxion\frontend\context\WorldContext.tsx
+  20:3  warning  Member 'withWorldPath' of the import declaration should be sorted alphabetically  sort-imports
+
+C:\mycode\Konnaxion\Konnaxion\frontend\scripts\capture-ethikos-v413-fullpage-v3.mjs
+  1:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\scripts\capture-ethikos-v413-screenshots.mjs
+  1:1  warning  There should be at least one empty line between import groups  import/order
+
+C:\mycode\Konnaxion\Konnaxion\frontend\scripts\extract-ui-translations.mjs
+  36:1  warning  `node:crypto` import should occur before import of `node:fs`   import/order
+  37:1  warning  There should be at least one empty line between import groups  import/order
+  38:1  warning  `ts-morph` import should occur before import of `node:fs`      import/order
+
 C:\mycode\Konnaxion\Konnaxion\frontend\services\teambuilder\index.ts
   10:3  warning  Member 'ITeam' of the import declaration should be sorted alphabetically  sort-imports
-
-C:\mycode\Konnaxion\Konnaxion\frontend\tests\ethikos-delivery-workflow.spec.ts
-  602:7  error  'current' is never reassigned. Use 'const' instead  prefer-const
 
 C:\mycode\Konnaxion\Konnaxion\frontend\tests\platform-harvest-wave2.spec.ts
   1:1  warning  There should be at least one empty line between import groups  import/order
 
-Ô£û 22 problems (1 error, 21 warnings)
-  1 error and 12 warnings potentially fixable with the `--fix` option.
+Ô£û 28 problems (0 errors, 28 warnings)
+  0 errors and 19 warnings potentially fixable with the `--fix` option.
 
+ESLint found too many warnings (maximum: 0).

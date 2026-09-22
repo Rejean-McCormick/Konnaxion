@@ -1,25 +1,15 @@
 // FILE: frontend/lib/api-client.ts
 // lib/api-client.ts
-const RAW_API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? '';
+import { apiFetch, buildUrl } from '@/api';
 
-const API_BASE = RAW_API_BASE.replace(/\/+$/, '/'); // ensure trailing slash
-
-function buildUrl(path: string): string {
-  const cleanPath = path.replace(/^\/+/, '');
-  return `${API_BASE}${cleanPath}`;
-}
-
-/**
- * Simple GET helper that includes cookies for Django session auth.
- */
+/** Simple GET helper that carries cookies and the active World context. */
 export async function apiGet<T>(path: string): Promise<T> {
-  const res = await fetch(buildUrl(path), {
+  const res = await apiFetch(buildUrl(path), {
     method: 'GET',
-    credentials: 'include', // <-- IMPORTANT: send session cookie
+    credentials: 'include',
   });
 
   if (!res.ok) {
-    // For 401/403, throw so React Query treats as "not logged in"
     throw new Error(`GET ${path} failed with status ${res.status}`);
   }
 

@@ -1,4 +1,3 @@
-// FILE: frontend/routes/routesTeambuilder.tsx
 'use client';
 
 import {
@@ -14,8 +13,6 @@ import {
 import React from 'react';
 
 import type { Route } from './types';
-
-/* ---------- Sessions ---------- */
 
 const sessionsGroup: Route = {
   name: 'Sessions',
@@ -36,21 +33,46 @@ const sessionsGroup: Route = {
       scope: 'module',
       moduleKey: 'teambuilder',
     },
-    // NOTE: /teambuilder/[sessionId] is dynamic and intentionally
-    // not exposed directly in the sidebar.
   ],
 };
 
-/* ---------- Humans submodule ---------- */
+const problemsGroup: Route = {
+  name: 'Problems',
+  scope: 'module',
+  moduleKey: 'teambuilder',
+  views: [
+    {
+      path: '/teambuilder/problems',
+      name: 'Problem library',
+      icon: <BookOutlined />,
+      scope: 'module',
+      moduleKey: 'teambuilder',
+    },
+    {
+      path: '/teambuilder/problems/create',
+      name: 'New problem',
+      icon: <PlusCircleOutlined />,
+      scope: 'module',
+      moduleKey: 'teambuilder',
+    },
+    {
+      path: '/teambuilder/problems/taxonomy',
+      name: 'UNESCO taxonomy',
+      icon: <PartitionOutlined />,
+      scope: 'module',
+      moduleKey: 'teambuilder',
+    },
+  ],
+};
 
-const humansGroup: Route = {
-  name: 'Humans',
+const peopleGroup: Route = {
+  name: 'People & Constraints',
   scope: 'module',
   moduleKey: 'teambuilder',
   views: [
     {
       path: '/teambuilder/humans',
-      name: 'Overview',
+      name: 'People overview',
       icon: <TeamOutlined />,
       scope: 'module',
       moduleKey: 'teambuilder',
@@ -79,43 +101,6 @@ const humansGroup: Route = {
   ],
 };
 
-/* ---------- Problems submodule ---------- */
-
-const problemsGroup: Route = {
-  name: 'Problems',
-  scope: 'module',
-  moduleKey: 'teambuilder',
-  views: [
-    {
-      path: '/teambuilder/problems',
-      name: 'Problem library',
-      icon: <BookOutlined />,
-      scope: 'module',
-      moduleKey: 'teambuilder',
-    },
-    {
-      path: '/teambuilder/problems/create',
-      name: 'New problem',
-      icon: <PlusCircleOutlined />,
-      scope: 'module',
-      moduleKey: 'teambuilder',
-    },
-    {
-      path: '/teambuilder/problems/taxonomy',
-      name: 'UNESCO taxonomy',
-      icon: <PartitionOutlined />,
-      scope: 'module',
-      moduleKey: 'teambuilder',
-    },
-    // NOTE: /teambuilder/problems/[problemId] is dynamic and not
-    // directly exposed in the sidebar.
-  ],
-};
-
-const routes: Route[] = [
-  sessionsGroup,
-  humansGroup,
-  problemsGroup,
-];
+const routes: Route[] = [sessionsGroup, problemsGroup, peopleGroup];
 
 export default routes;
